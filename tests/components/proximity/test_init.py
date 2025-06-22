@@ -2,27 +2,27 @@
 
 import pytest
 
-from homeassistant.components.proximity.const import (
+from smarthub.components.proximity.const import (
     CONF_IGNORED_ZONES,
     CONF_TOLERANCE,
     CONF_TRACKED_ENTITIES,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     CONF_ZONE,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
-from homeassistant.util import slugify
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
+from smarthub.util import slugify
 
 from tests.common import MockConfigEntry
 
 
 async def async_setup_single_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zone: str,
     tracked_entites: list[str],
     ignored_zones: list[str],
@@ -62,7 +62,7 @@ async def async_setup_single_entry(
         },
     ],
 )
-async def test_proximities(hass: HomeAssistant, config: dict) -> None:
+async def test_proximities(hass: SmartHub, config: dict) -> None:
     """Test a list of proximities."""
     title = hass.states.get(config[CONF_ZONE]).name
     mock_config = MockConfigEntry(
@@ -88,7 +88,7 @@ async def test_proximities(hass: HomeAssistant, config: dict) -> None:
         assert state.state == STATE_UNAVAILABLE
 
 
-async def test_device_tracker_test1_in_zone(hass: HomeAssistant) -> None:
+async def test_device_tracker_test1_in_zone(hass: SmartHub) -> None:
     """Test for tracker in zone."""
     await async_setup_single_entry(hass, "zone.home", ["device_tracker.test1"], [], 1)
 
@@ -110,7 +110,7 @@ async def test_device_tracker_test1_in_zone(hass: HomeAssistant) -> None:
     assert state.state == "arrived"
 
 
-async def test_device_tracker_test1_away(hass: HomeAssistant) -> None:
+async def test_device_tracker_test1_away(hass: SmartHub) -> None:
     """Test for tracker state away."""
     await async_setup_single_entry(hass, "zone.home", ["device_tracker.test1"], [], 1)
 
@@ -134,7 +134,7 @@ async def test_device_tracker_test1_away(hass: HomeAssistant) -> None:
 
 
 async def test_device_tracker_test1_awayfurther(
-    hass: HomeAssistant, config_zones
+    hass: SmartHub, config_zones
 ) -> None:
     """Test for tracker state away further."""
     await async_setup_single_entry(hass, "zone.home", ["device_tracker.test1"], [], 1)
@@ -175,7 +175,7 @@ async def test_device_tracker_test1_awayfurther(
 
 
 async def test_device_tracker_test1_awaycloser(
-    hass: HomeAssistant, config_zones
+    hass: SmartHub, config_zones
 ) -> None:
     """Test for tracker state away closer."""
     await async_setup_single_entry(hass, "zone.home", ["device_tracker.test1"], [], 1)
@@ -215,7 +215,7 @@ async def test_device_tracker_test1_awaycloser(
     assert state.state == "towards"
 
 
-async def test_all_device_trackers_in_ignored_zone(hass: HomeAssistant) -> None:
+async def test_all_device_trackers_in_ignored_zone(hass: SmartHub) -> None:
     """Test for tracker in ignored zone."""
     await async_setup_single_entry(hass, "zone.home", ["device_tracker.test1"], [], 1)
 
@@ -233,7 +233,7 @@ async def test_all_device_trackers_in_ignored_zone(hass: HomeAssistant) -> None:
     assert state.state == STATE_UNKNOWN
 
 
-async def test_device_tracker_test1_no_coordinates(hass: HomeAssistant) -> None:
+async def test_device_tracker_test1_no_coordinates(hass: SmartHub) -> None:
     """Test for tracker with no coordinates."""
     await async_setup_single_entry(hass, "zone.home", ["device_tracker.test1"], [], 1)
 
@@ -253,7 +253,7 @@ async def test_device_tracker_test1_no_coordinates(hass: HomeAssistant) -> None:
     assert state.state == STATE_UNKNOWN
 
 
-async def test_device_tracker_test1_awayfurther_a_bit(hass: HomeAssistant) -> None:
+async def test_device_tracker_test1_awayfurther_a_bit(hass: SmartHub) -> None:
     """Test for tracker states."""
     await async_setup_single_entry(
         hass, "zone.home", ["device_tracker.test1"], ["zone.work"], 1000
@@ -294,7 +294,7 @@ async def test_device_tracker_test1_awayfurther_a_bit(hass: HomeAssistant) -> No
     assert state.state == "stationary"
 
 
-async def test_device_trackers_in_zone(hass: HomeAssistant) -> None:
+async def test_device_trackers_in_zone(hass: SmartHub) -> None:
     """Test for trackers in zone."""
     await async_setup_single_entry(
         hass,
@@ -330,7 +330,7 @@ async def test_device_trackers_in_zone(hass: HomeAssistant) -> None:
 
 
 async def test_device_tracker_test1_awayfurther_than_test2_first_test1(
-    hass: HomeAssistant, config_zones
+    hass: SmartHub, config_zones
 ) -> None:
     """Test for tracker ordering."""
     hass.states.async_set(
@@ -395,7 +395,7 @@ async def test_device_tracker_test1_awayfurther_than_test2_first_test1(
 
 
 async def test_device_tracker_test1_awayfurther_than_test2_first_test2(
-    hass: HomeAssistant, config_zones
+    hass: SmartHub, config_zones
 ) -> None:
     """Test for tracker ordering."""
     hass.states.async_set(
@@ -461,7 +461,7 @@ async def test_device_tracker_test1_awayfurther_than_test2_first_test2(
 
 
 async def test_device_tracker_test1_awayfurther_test2_in_ignored_zone(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test for tracker states."""
     hass.states.async_set(
@@ -501,7 +501,7 @@ async def test_device_tracker_test1_awayfurther_test2_in_ignored_zone(
 
 
 async def test_device_tracker_test1_awayfurther_test2_first(
-    hass: HomeAssistant, config_zones
+    hass: SmartHub, config_zones
 ) -> None:
     """Test for tracker state."""
     hass.states.async_set(
@@ -568,7 +568,7 @@ async def test_device_tracker_test1_awayfurther_test2_first(
 
 
 async def test_device_tracker_test1_nearest_after_test2_in_ignored_zone(
-    hass: HomeAssistant, config_zones
+    hass: SmartHub, config_zones
 ) -> None:
     """Test for tracker states."""
     await hass.async_block_till_done()
@@ -659,7 +659,7 @@ async def test_device_tracker_test1_nearest_after_test2_in_ignored_zone(
     assert state.state == "away_from"
 
 
-async def test_nearest_sensors(hass: HomeAssistant, config_zones) -> None:
+async def test_nearest_sensors(hass: SmartHub, config_zones) -> None:
     """Test for nearest sensors."""
     await async_setup_single_entry(
         hass, "zone.home", ["device_tracker.test1", "device_tracker.test2"], [], 1
@@ -774,7 +774,7 @@ async def test_nearest_sensors(hass: HomeAssistant, config_zones) -> None:
 
 
 async def test_create_removed_tracked_entity_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -816,7 +816,7 @@ async def test_create_removed_tracked_entity_issue(
 
 
 async def test_track_renamed_tracked_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test that when tracked entity is renamed."""
@@ -851,7 +851,7 @@ async def test_track_renamed_tracked_entity(
 
 
 async def test_sensor_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test that when tracked entity is renamed."""
@@ -880,7 +880,7 @@ async def test_sensor_unique_ids(
     )
 
 
-async def test_tracked_zone_is_removed(hass: HomeAssistant) -> None:
+async def test_tracked_zone_is_removed(hass: SmartHub) -> None:
     """Test that tracked zone is removed."""
     await async_setup_single_entry(hass, "zone.home", ["device_tracker.test1"], [], 1)
 
@@ -921,7 +921,7 @@ async def test_tracked_zone_is_removed(hass: HomeAssistant) -> None:
     assert state.state == STATE_UNAVAILABLE
 
 
-async def test_tracked_zone_radius_is_changed(hass: HomeAssistant) -> None:
+async def test_tracked_zone_radius_is_changed(hass: SmartHub) -> None:
     """Test that radius of the tracked zone is changed."""
     entry = await async_setup_single_entry(
         hass, "zone.home", ["device_tracker.test1"], [], 1
@@ -966,7 +966,7 @@ async def test_tracked_zone_radius_is_changed(hass: HomeAssistant) -> None:
     assert state.state == STATE_UNKNOWN
 
 
-async def test_tracked_zone_location_is_changed(hass: HomeAssistant) -> None:
+async def test_tracked_zone_location_is_changed(hass: SmartHub) -> None:
     """Test that gps location of the tracked zone is changed."""
     entry = await async_setup_single_entry(
         hass, "zone.home", ["device_tracker.test1"], [], 1

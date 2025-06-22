@@ -4,15 +4,15 @@ import logging
 
 import pytest
 
-from homeassistant.components import automation, zone
-from homeassistant.const import (
+from smarthub.components import automation, zone
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ENTITY_MATCH_ALL,
     SERVICE_TURN_OFF,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import Context, HomeAssistant, ServiceCall
-from homeassistant.setup import async_setup_component
+from smarthub.core import Context, SmartHub, ServiceCall
+from smarthub.setup import async_setup_component
 
 from tests.common import async_mock_service, mock_component
 
@@ -23,13 +23,13 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 @pytest.fixture
-def calls(hass: HomeAssistant) -> list[ServiceCall]:
+def calls(hass: SmartHub) -> list[ServiceCall]:
     """Track calls to a mock service."""
     return async_mock_service(hass, "test", "automation")
 
 
 @pytest.fixture(autouse=True)
-async def setup_comp(hass: HomeAssistant) -> None:
+async def setup_comp(hass: SmartHub) -> None:
     """Initialize components."""
     mock_component(hass, "group")
     await async_setup_component(
@@ -47,7 +47,7 @@ async def setup_comp(hass: HomeAssistant) -> None:
 
 
 async def test_if_fires_on_zone_enter(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test for firing on zone enter."""
     context = Context()
@@ -129,7 +129,7 @@ async def test_if_fires_on_zone_enter(
 
 
 async def test_if_not_fires_for_enter_on_zone_leave(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test for not firing on zone leave."""
     hass.states.async_set(
@@ -166,7 +166,7 @@ async def test_if_not_fires_for_enter_on_zone_leave(
 
 
 async def test_if_fires_on_zone_leave(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test for firing on zone leave."""
     hass.states.async_set(
@@ -203,7 +203,7 @@ async def test_if_fires_on_zone_leave(
 
 
 async def test_if_fires_on_zone_leave_2(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test for firing on zone leave for unavailable entity."""
     hass.states.async_set(
@@ -240,7 +240,7 @@ async def test_if_fires_on_zone_leave_2(
 
 
 async def test_if_not_fires_for_leave_on_zone_enter(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test for not firing on zone enter."""
     hass.states.async_set(
@@ -277,7 +277,7 @@ async def test_if_not_fires_for_leave_on_zone_enter(
 
 
 async def test_if_fires_on_zone_appear(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test for firing if entity appears in zone."""
     assert await async_setup_component(
@@ -326,7 +326,7 @@ async def test_if_fires_on_zone_appear(
 
 
 async def test_if_fires_on_zone_appear_2(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test for firing if entity appears in zone."""
     assert await async_setup_component(
@@ -383,7 +383,7 @@ async def test_if_fires_on_zone_appear_2(
 
 
 async def test_if_fires_on_zone_disappear(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test for firing if entity disappears from zone."""
     hass.states.async_set(
@@ -432,7 +432,7 @@ async def test_if_fires_on_zone_disappear(
 
 
 async def test_zone_undefined(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     caplog: pytest.LogCaptureFixture,
 ) -> None:

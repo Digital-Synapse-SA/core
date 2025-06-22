@@ -14,11 +14,11 @@ from pynordpool import (
 )
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.nordpool.const import CONF_AREAS, DOMAIN
-from homeassistant.const import CONF_CURRENCY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.nordpool.const import CONF_AREAS, DOMAIN
+from smarthub.const import CONF_CURRENCY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import ENTRY_CONFIG
 
@@ -27,7 +27,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.mark.freeze_time("2024-11-05T18:00:00+00:00")
-async def test_form(hass: HomeAssistant, get_client: NordPoolClient) -> None:
+async def test_form(hass: SmartHub, get_client: NordPoolClient) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -50,7 +50,7 @@ async def test_form(hass: HomeAssistant, get_client: NordPoolClient) -> None:
 
 @pytest.mark.freeze_time("2024-11-05T18:00:00+00:00")
 async def test_single_config_entry(
-    hass: HomeAssistant, load_int: None, get_client: NordPoolClient
+    hass: SmartHub, load_int: None, get_client: NordPoolClient
 ) -> None:
     """Test abort for single config entry."""
 
@@ -72,7 +72,7 @@ async def test_single_config_entry(
     ],
 )
 async def test_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_client: NordPoolClient,
     error_message: Exception,
     p_error: str,
@@ -87,7 +87,7 @@ async def test_cannot_connect(
     assert result["step_id"] == config_entries.SOURCE_USER
 
     with patch(
-        "homeassistant.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
+        "smarthub.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
         side_effect=error_message,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -109,7 +109,7 @@ async def test_cannot_connect(
 
 @pytest.mark.freeze_time("2024-11-05T18:00:00+00:00")
 async def test_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: MockConfigEntry,
 ) -> None:
     """Test reconfiguration."""
@@ -145,7 +145,7 @@ async def test_reconfigure(
     ],
 )
 async def test_reconfigure_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
     load_json: list[dict[str, Any]],
@@ -157,7 +157,7 @@ async def test_reconfigure_cannot_connect(
     result = await load_int.start_reconfigure_flow(hass)
 
     with patch(
-        "homeassistant.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
+        "smarthub.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
         side_effect=error_message,
     ):
         result = await hass.config_entries.flow.async_configure(

@@ -1,0 +1,8 @@
+{
+  "domain": "input_select",
+  "name": "Input Select",
+  "codeowners": ["@smart-hub/core"],
+  "documentation": "https://www.smart-hub.io/integrations/input_select",
+  "integration_type": "helper",
+  "quality_scale": "internal"
+}

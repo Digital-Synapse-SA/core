@@ -2,8 +2,8 @@
 
 from unittest.mock import AsyncMock, Mock, patch
 
-from homeassistant.components.nam.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.nam.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_json_object_fixture
 
@@ -14,9 +14,9 @@ INCOMPLETE_NAM_DATA = {
 
 
 async def init_integration(
-    hass: HomeAssistant, co2_sensor: bool = True
+    hass: SmartHub, co2_sensor: bool = True
 ) -> MockConfigEntry:
-    """Set up the Nettigo Air Monitor integration in Home Assistant."""
+    """Set up the Nettigo Air Monitor integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="10.10.2.3",
@@ -33,9 +33,9 @@ async def init_integration(
     update_response = Mock(json=AsyncMock(return_value=nam_data))
 
     with (
-        patch("homeassistant.components.nam.NettigoAirMonitor.initialize"),
+        patch("smarthub.components.nam.NettigoAirMonitor.initialize"),
         patch(
-            "homeassistant.components.nam.NettigoAirMonitor._async_http_request",
+            "smarthub.components.nam.NettigoAirMonitor._async_http_request",
             return_value=update_response,
         ),
     ):

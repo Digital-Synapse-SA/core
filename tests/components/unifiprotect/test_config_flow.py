@@ -10,20 +10,20 @@ import pytest
 from uiprotect import NotAuthorized, NvrError, ProtectApiClient
 from uiprotect.data import NVR, Bootstrap, CloudAccount
 
-from homeassistant import config_entries
-from homeassistant.components.unifiprotect.const import (
+from smarthub import config_entries
+from smarthub.components.unifiprotect.const import (
     CONF_ALL_UPDATES,
     CONF_DISABLE_RTSP,
     CONF_OVERRIDE_CHOST,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.ssdp import SsdpServiceInfo
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.ssdp import SsdpServiceInfo
 
 from . import (
     DEVICE_HOSTNAME,
@@ -60,7 +60,7 @@ UNIFI_DISCOVERY_DICT = asdict(UNIFI_DISCOVERY)
 UNIFI_DISCOVERY_DICT_PARTIAL = asdict(UNIFI_DISCOVERY_PARTIAL)
 
 
-async def test_form(hass: HomeAssistant, bootstrap: Bootstrap, nvr: NVR) -> None:
+async def test_form(hass: SmartHub, bootstrap: Bootstrap, nvr: NVR) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -71,15 +71,15 @@ async def test_form(hass: HomeAssistant, bootstrap: Bootstrap, nvr: NVR) -> None
     bootstrap.nvr = nvr
     with (
         patch(
-            "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+            "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
             return_value=bootstrap,
         ),
         patch(
-            "homeassistant.components.unifiprotect.async_setup_entry",
+            "smarthub.components.unifiprotect.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.unifiprotect.async_setup",
+            "smarthub.components.unifiprotect.async_setup",
             return_value=True,
         ) as mock_setup,
     ):
@@ -108,7 +108,7 @@ async def test_form(hass: HomeAssistant, bootstrap: Bootstrap, nvr: NVR) -> None
 
 
 async def test_form_version_too_old(
-    hass: HomeAssistant, bootstrap: Bootstrap, old_nvr: NVR
+    hass: SmartHub, bootstrap: Bootstrap, old_nvr: NVR
 ) -> None:
     """Test we handle the version being too old."""
     result = await hass.config_entries.flow.async_init(
@@ -117,7 +117,7 @@ async def test_form_version_too_old(
 
     bootstrap.nvr = old_nvr
     with patch(
-        "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+        "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
         return_value=bootstrap,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -133,14 +133,14 @@ async def test_form_version_too_old(
     assert result2["errors"] == {"base": "protect_version"}
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+        "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
         side_effect=NotAuthorized,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -157,7 +157,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
 
 
 async def test_form_cloud_user(
-    hass: HomeAssistant, bootstrap: Bootstrap, cloud_account: CloudAccount
+    hass: SmartHub, bootstrap: Bootstrap, cloud_account: CloudAccount
 ) -> None:
     """Test we handle cloud users."""
     result = await hass.config_entries.flow.async_init(
@@ -168,7 +168,7 @@ async def test_form_cloud_user(
     user.cloud_account = cloud_account
     bootstrap.users[bootstrap.auth_user_id] = user
     with patch(
-        "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+        "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
         return_value=bootstrap,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -184,14 +184,14 @@ async def test_form_cloud_user(
     assert result2["errors"] == {"base": "cloud_user"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+        "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
         side_effect=NvrError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -208,7 +208,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
 
 
 async def test_form_reauth_auth(
-    hass: HomeAssistant, bootstrap: Bootstrap, nvr: NVR
+    hass: SmartHub, bootstrap: Bootstrap, nvr: NVR
 ) -> None:
     """Test we handle reauth auth."""
     mock_config = MockConfigEntry(
@@ -235,7 +235,7 @@ async def test_form_reauth_auth(
     }
 
     with patch(
-        "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+        "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
         side_effect=NotAuthorized,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -253,11 +253,11 @@ async def test_form_reauth_auth(
     bootstrap.nvr = nvr
     with (
         patch(
-            "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+            "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
             return_value=bootstrap,
         ),
         patch(
-            "homeassistant.components.unifiprotect.async_setup",
+            "smarthub.components.unifiprotect.async_setup",
             return_value=True,
         ) as mock_setup,
     ):
@@ -275,7 +275,7 @@ async def test_form_reauth_auth(
     assert len(mock_setup.mock_calls) == 1
 
 
-async def test_form_options(hass: HomeAssistant, ufp_client: ProtectApiClient) -> None:
+async def test_form_options(hass: SmartHub, ufp_client: ProtectApiClient) -> None:
     """Test we handle options flows."""
     mock_config = MockConfigEntry(
         domain=DOMAIN,
@@ -296,7 +296,7 @@ async def test_form_options(hass: HomeAssistant, ufp_client: ProtectApiClient) -
     with (
         _patch_discovery(),
         patch(
-            "homeassistant.components.unifiprotect.utils.ProtectApiClient"
+            "smarthub.components.unifiprotect.utils.ProtectApiClient"
         ) as mock_api,
     ):
         mock_api.return_value = ufp_client
@@ -339,7 +339,7 @@ async def test_form_options(hass: HomeAssistant, ufp_client: ProtectApiClient) -
     ],
 )
 async def test_discovered_by_ssdp_or_dhcp(
-    hass: HomeAssistant, source: str, data: DhcpServiceInfo | SsdpServiceInfo
+    hass: SmartHub, source: str, data: DhcpServiceInfo | SsdpServiceInfo
 ) -> None:
     """Test we handoff to unifi-discovery when discovered via ssdp or dhcp."""
 
@@ -356,7 +356,7 @@ async def test_discovered_by_ssdp_or_dhcp(
 
 
 async def test_discovered_by_unifi_discovery_direct_connect(
-    hass: HomeAssistant, bootstrap: Bootstrap, nvr: NVR
+    hass: SmartHub, bootstrap: Bootstrap, nvr: NVR
 ) -> None:
     """Test a discovery from unifi-discovery."""
 
@@ -381,15 +381,15 @@ async def test_discovered_by_unifi_discovery_direct_connect(
     bootstrap.nvr = nvr
     with (
         patch(
-            "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+            "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
             return_value=bootstrap,
         ),
         patch(
-            "homeassistant.components.unifiprotect.async_setup_entry",
+            "smarthub.components.unifiprotect.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.unifiprotect.async_setup",
+            "smarthub.components.unifiprotect.async_setup",
             return_value=True,
         ) as mock_setup,
     ):
@@ -417,7 +417,7 @@ async def test_discovered_by_unifi_discovery_direct_connect(
 
 
 async def test_discovered_by_unifi_discovery_direct_connect_updated(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a discovery from unifi-discovery updates the direct connect host."""
     mock_config = MockConfigEntry(
@@ -449,7 +449,7 @@ async def test_discovered_by_unifi_discovery_direct_connect_updated(
 
 
 async def test_discovered_by_unifi_discovery_direct_connect_updated_but_not_using_direct_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a discovery from unifi-discovery updates the host but not direct connect if its not in use."""
     mock_config = MockConfigEntry(
@@ -470,7 +470,7 @@ async def test_discovered_by_unifi_discovery_direct_connect_updated_but_not_usin
     with (
         _patch_discovery(),
         patch(
-            "homeassistant.components.unifiprotect.config_flow.async_console_is_alive",
+            "smarthub.components.unifiprotect.config_flow.async_console_is_alive",
             return_value=False,
         ),
     ):
@@ -487,7 +487,7 @@ async def test_discovered_by_unifi_discovery_direct_connect_updated_but_not_usin
 
 
 async def test_discovered_by_unifi_discovery_does_not_update_ip_when_console_is_still_online(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a discovery from unifi-discovery does not update the ip unless the console at the old ip is offline."""
     mock_config = MockConfigEntry(
@@ -508,7 +508,7 @@ async def test_discovered_by_unifi_discovery_does_not_update_ip_when_console_is_
     with (
         _patch_discovery(),
         patch(
-            "homeassistant.components.unifiprotect.config_flow.async_console_is_alive",
+            "smarthub.components.unifiprotect.config_flow.async_console_is_alive",
             return_value=True,
         ),
     ):
@@ -525,7 +525,7 @@ async def test_discovered_by_unifi_discovery_does_not_update_ip_when_console_is_
 
 
 async def test_discovered_host_not_updated_if_existing_is_a_hostname(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we only update the host if its an ip address from discovery."""
     mock_config = MockConfigEntry(
@@ -556,7 +556,7 @@ async def test_discovered_host_not_updated_if_existing_is_a_hostname(
 
 
 async def test_discovered_by_unifi_discovery(
-    hass: HomeAssistant, bootstrap: Bootstrap, nvr: NVR
+    hass: SmartHub, bootstrap: Bootstrap, nvr: NVR
 ) -> None:
     """Test a discovery from unifi-discovery."""
 
@@ -581,15 +581,15 @@ async def test_discovered_by_unifi_discovery(
     bootstrap.nvr = nvr
     with (
         patch(
-            "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+            "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
             side_effect=[NotAuthorized, bootstrap],
         ),
         patch(
-            "homeassistant.components.unifiprotect.async_setup_entry",
+            "smarthub.components.unifiprotect.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.unifiprotect.async_setup",
+            "smarthub.components.unifiprotect.async_setup",
             return_value=True,
         ) as mock_setup,
     ):
@@ -617,7 +617,7 @@ async def test_discovered_by_unifi_discovery(
 
 
 async def test_discovered_by_unifi_discovery_partial(
-    hass: HomeAssistant, bootstrap: Bootstrap, nvr: NVR
+    hass: SmartHub, bootstrap: Bootstrap, nvr: NVR
 ) -> None:
     """Test a discovery from unifi-discovery partial."""
 
@@ -642,15 +642,15 @@ async def test_discovered_by_unifi_discovery_partial(
     bootstrap.nvr = nvr
     with (
         patch(
-            "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+            "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
             return_value=bootstrap,
         ),
         patch(
-            "homeassistant.components.unifiprotect.async_setup_entry",
+            "smarthub.components.unifiprotect.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.unifiprotect.async_setup",
+            "smarthub.components.unifiprotect.async_setup",
             return_value=True,
         ) as mock_setup,
     ):
@@ -678,7 +678,7 @@ async def test_discovered_by_unifi_discovery_partial(
 
 
 async def test_discovered_by_unifi_discovery_direct_connect_on_different_interface(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a discovery from unifi-discovery from an alternate interface."""
     mock_config = MockConfigEntry(
@@ -708,7 +708,7 @@ async def test_discovered_by_unifi_discovery_direct_connect_on_different_interfa
 
 
 async def test_discovered_by_unifi_discovery_direct_connect_on_different_interface_ip_matches(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a discovery from unifi-discovery from an alternate interface when the ip matches."""
     mock_config = MockConfigEntry(
@@ -738,7 +738,7 @@ async def test_discovered_by_unifi_discovery_direct_connect_on_different_interfa
 
 
 async def test_discovered_by_unifi_discovery_direct_connect_on_different_interface_resolver(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a discovery from unifi-discovery from an alternate interface when direct connect domain resolves to host ip."""
     mock_config = MockConfigEntry(
@@ -779,7 +779,7 @@ async def test_discovered_by_unifi_discovery_direct_connect_on_different_interfa
 
 
 async def test_discovered_by_unifi_discovery_direct_connect_on_different_interface_resolver_fails(
-    hass: HomeAssistant, bootstrap: Bootstrap, nvr: NVR
+    hass: SmartHub, bootstrap: Bootstrap, nvr: NVR
 ) -> None:
     """Test we can still configure if the resolver fails."""
     mock_config = MockConfigEntry(
@@ -824,15 +824,15 @@ async def test_discovered_by_unifi_discovery_direct_connect_on_different_interfa
     bootstrap.nvr = nvr
     with (
         patch(
-            "homeassistant.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
+            "smarthub.components.unifiprotect.config_flow.ProtectApiClient.get_bootstrap",
             return_value=bootstrap,
         ),
         patch(
-            "homeassistant.components.unifiprotect.async_setup_entry",
+            "smarthub.components.unifiprotect.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.unifiprotect.async_setup",
+            "smarthub.components.unifiprotect.async_setup",
             return_value=True,
         ) as mock_setup,
     ):
@@ -860,7 +860,7 @@ async def test_discovered_by_unifi_discovery_direct_connect_on_different_interfa
 
 
 async def test_discovered_by_unifi_discovery_direct_connect_on_different_interface_resolver_no_result(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a discovery from unifi-discovery from an alternate interface when direct connect domain resolve has no result."""
     mock_config = MockConfigEntry(
@@ -893,7 +893,7 @@ async def test_discovered_by_unifi_discovery_direct_connect_on_different_interfa
     assert result["reason"] == "already_configured"
 
 
-async def test_discovery_can_be_ignored(hass: HomeAssistant) -> None:
+async def test_discovery_can_be_ignored(hass: SmartHub) -> None:
     """Test a discovery can be ignored."""
     mock_config = MockConfigEntry(
         domain=DOMAIN,

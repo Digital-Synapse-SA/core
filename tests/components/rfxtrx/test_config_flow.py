@@ -6,12 +6,12 @@ from unittest.mock import MagicMock, patch, sentinel
 from RFXtrx import RFXtrxTransportError
 import serial.tools.list_ports
 
-from homeassistant import config_entries
-from homeassistant.components.rfxtrx import DOMAIN, config_flow
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub import config_entries
+from smarthub.components.rfxtrx import DOMAIN, config_flow
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -30,7 +30,7 @@ def com_port():
 
 
 async def start_options_flow(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> config_entries.ConfigFlowResult:
     """Start the options flow with the entry under test."""
     entry.add_to_hass(hass)
@@ -41,7 +41,7 @@ async def start_options_flow(
     return await hass.config_entries.options.async_init(entry.entry_id)
 
 
-async def test_setup_network(transport_mock, hass: HomeAssistant) -> None:
+async def test_setup_network(transport_mock, hass: SmartHub) -> None:
     """Test we can setup network."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -60,7 +60,7 @@ async def test_setup_network(transport_mock, hass: HomeAssistant) -> None:
     assert result["step_id"] == "setup_network"
     assert result["errors"] == {}
 
-    with patch("homeassistant.components.rfxtrx.async_setup_entry", return_value=True):
+    with patch("smarthub.components.rfxtrx.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {"host": "10.10.0.1", "port": 1234}
         )
@@ -77,7 +77,7 @@ async def test_setup_network(transport_mock, hass: HomeAssistant) -> None:
 
 
 @patch("serial.tools.list_ports.comports", return_value=[com_port()])
-async def test_setup_serial(com_mock, transport_mock, hass: HomeAssistant) -> None:
+async def test_setup_serial(com_mock, transport_mock, hass: SmartHub) -> None:
     """Test we can setup serial."""
     port = com_port()
 
@@ -98,7 +98,7 @@ async def test_setup_serial(com_mock, transport_mock, hass: HomeAssistant) -> No
     assert result["step_id"] == "setup_serial"
     assert result["errors"] == {}
 
-    with patch("homeassistant.components.rfxtrx.async_setup_entry", return_value=True):
+    with patch("smarthub.components.rfxtrx.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {"device": port.device}
         )
@@ -116,7 +116,7 @@ async def test_setup_serial(com_mock, transport_mock, hass: HomeAssistant) -> No
 
 @patch("serial.tools.list_ports.comports", return_value=[com_port()])
 async def test_setup_serial_manual(
-    com_mock, transport_mock, hass: HomeAssistant
+    com_mock, transport_mock, hass: SmartHub
 ) -> None:
     """Test we can setup serial with manual entry."""
     result = await hass.config_entries.flow.async_init(
@@ -144,7 +144,7 @@ async def test_setup_serial_manual(
     assert result["step_id"] == "setup_serial_manual_path"
     assert result["errors"] == {}
 
-    with patch("homeassistant.components.rfxtrx.async_setup_entry", return_value=True):
+    with patch("smarthub.components.rfxtrx.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {"device": "/dev/ttyUSB0"}
         )
@@ -160,7 +160,7 @@ async def test_setup_serial_manual(
     }
 
 
-async def test_setup_network_fail(transport_mock, hass: HomeAssistant) -> None:
+async def test_setup_network_fail(transport_mock, hass: SmartHub) -> None:
     """Test we can setup network."""
     transport_mock.return_value.connect.side_effect = RFXtrxTransportError
     result = await hass.config_entries.flow.async_init(
@@ -190,7 +190,7 @@ async def test_setup_network_fail(transport_mock, hass: HomeAssistant) -> None:
 
 
 @patch("serial.tools.list_ports.comports", return_value=[com_port()])
-async def test_setup_serial_fail(com_mock, transport_mock, hass: HomeAssistant) -> None:
+async def test_setup_serial_fail(com_mock, transport_mock, hass: SmartHub) -> None:
     """Test setup serial failed connection."""
     transport_mock.return_value.connect.side_effect = RFXtrxTransportError
     port = com_port()
@@ -223,7 +223,7 @@ async def test_setup_serial_fail(com_mock, transport_mock, hass: HomeAssistant) 
 
 @patch("serial.tools.list_ports.comports", return_value=[com_port()])
 async def test_setup_serial_manual_fail(
-    com_mock, transport_mock, hass: HomeAssistant
+    com_mock, transport_mock, hass: SmartHub
 ) -> None:
     """Test setup serial failed connection."""
     transport_mock.return_value.connect.side_effect = RFXtrxTransportError
@@ -261,7 +261,7 @@ async def test_setup_serial_manual_fail(
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_options_global(hass: HomeAssistant) -> None:
+async def test_options_global(hass: SmartHub) -> None:
     """Test if we can set global options."""
 
     entry = MockConfigEntry(
@@ -276,7 +276,7 @@ async def test_options_global(hass: HomeAssistant) -> None:
         },
         unique_id=DOMAIN,
     )
-    with patch("homeassistant.components.rfxtrx.async_setup_entry", return_value=True):
+    with patch("smarthub.components.rfxtrx.async_setup_entry", return_value=True):
         result = await start_options_flow(hass, entry)
 
     assert result["type"] is FlowResultType.FORM
@@ -296,7 +296,7 @@ async def test_options_global(hass: HomeAssistant) -> None:
     assert not set(entry.data["protocols"]) ^ set(SOME_PROTOCOLS)
 
 
-async def test_no_protocols(hass: HomeAssistant) -> None:
+async def test_no_protocols(hass: SmartHub) -> None:
     """Test we set protocols to None if none are selected."""
 
     entry = MockConfigEntry(
@@ -311,7 +311,7 @@ async def test_no_protocols(hass: HomeAssistant) -> None:
         },
         unique_id=DOMAIN,
     )
-    with patch("homeassistant.components.rfxtrx.async_setup_entry", return_value=True):
+    with patch("smarthub.components.rfxtrx.async_setup_entry", return_value=True):
         result = await start_options_flow(hass, entry)
 
     assert result["type"] is FlowResultType.FORM
@@ -331,7 +331,7 @@ async def test_no_protocols(hass: HomeAssistant) -> None:
     assert entry.data["protocols"] is None
 
 
-async def test_options_add_device(hass: HomeAssistant) -> None:
+async def test_options_add_device(hass: SmartHub) -> None:
     """Test we can add a device."""
 
     entry = MockConfigEntry(
@@ -392,7 +392,7 @@ async def test_options_add_device(hass: HomeAssistant) -> None:
     assert state.attributes.get("friendly_name") == "AC 213c7f2:48"
 
 
-async def test_options_add_duplicate_device(hass: HomeAssistant) -> None:
+async def test_options_add_duplicate_device(hass: SmartHub) -> None:
     """Test we can add a device."""
 
     entry = MockConfigEntry(
@@ -429,7 +429,7 @@ async def test_options_add_duplicate_device(hass: HomeAssistant) -> None:
 
 
 async def test_options_replace_sensor_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -587,7 +587,7 @@ async def test_options_replace_sensor_device(
 
 
 async def test_options_replace_control_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -691,7 +691,7 @@ async def test_options_replace_control_device(
 
 
 async def test_options_add_and_configure_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test we can add a device."""
 
@@ -799,7 +799,7 @@ async def test_options_add_and_configure_device(
 
 
 async def test_options_configure_rfy_cover_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test we can configure the venetion blind mode of an Rfy cover."""
 

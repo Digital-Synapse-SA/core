@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.v2c.sensor import _METER_ERROR_OPTIONS
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.v2c.sensor import _METER_ERROR_OPTIONS
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -17,14 +17,14 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_v2c_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test states of the sensor."""
-    with patch("homeassistant.components.v2c.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.v2c.PLATFORMS", [Platform.SENSOR]):
         await init_integration(hass, mock_config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 

@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 
 async def test_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster button."""

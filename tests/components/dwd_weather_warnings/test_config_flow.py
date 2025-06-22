@@ -5,16 +5,16 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.dwd_weather_warnings.const import (
+from smarthub.components.dwd_weather_warnings.const import (
     CONF_REGION_DEVICE_TRACKER,
     CONF_REGION_IDENTIFIER,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE, STATE_HOME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import ATTR_LATITUDE, ATTR_LONGITUDE, STATE_HOME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -30,7 +30,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_create_entry_region(
-    hass: HomeAssistant, mock_dwdwfsapi: MagicMock
+    hass: SmartHub, mock_dwdwfsapi: MagicMock
 ) -> None:
     """Test that the full config flow works for a region identifier."""
     result = await hass.config_entries.flow.async_init(
@@ -64,7 +64,7 @@ async def test_create_entry_region(
 
 
 async def test_create_entry_gps(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_dwdwfsapi: MagicMock
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_dwdwfsapi: MagicMock
 ) -> None:
     """Test that the full config flow works for a device tracker."""
     result = await hass.config_entries.flow.async_init(
@@ -141,7 +141,7 @@ async def test_create_entry_gps(
 
 
 async def test_config_flow_already_configured(
-    hass: HomeAssistant, mock_dwdwfsapi: MagicMock
+    hass: SmartHub, mock_dwdwfsapi: MagicMock
 ) -> None:
     """Test aborting, if the warncell ID / name is already configured during the config."""
     entry = MockConfigEntry(
@@ -168,7 +168,7 @@ async def test_config_flow_already_configured(
     assert result["reason"] == "already_configured"
 
 
-async def test_config_flow_with_errors(hass: HomeAssistant) -> None:
+async def test_config_flow_with_errors(hass: SmartHub) -> None:
     """Test error scenarios during the configuration."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}

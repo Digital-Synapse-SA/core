@@ -6,19 +6,19 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from python_opensky import StatesResponse
 
-from homeassistant.components.opensky.const import (
+from smarthub.components.opensky.const import (
     CONF_ALTITUDE,
     CONF_CONTRIBUTING_USER,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_PASSWORD,
     CONF_RADIUS,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_json_object_fixture
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry, async_load_json_object_fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.opensky.async_setup_entry",
+        "smarthub.components.opensky.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -35,7 +35,7 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 
 @pytest.fixture(name="config_entry")
 def mock_config_entry() -> MockConfigEntry:
-    """Create OpenSky entry in Home Assistant."""
+    """Create OpenSky entry in SmartHub."""
     return MockConfigEntry(
         domain=DOMAIN,
         title="OpenSky",
@@ -52,7 +52,7 @@ def mock_config_entry() -> MockConfigEntry:
 
 @pytest.fixture(name="config_entry_altitude")
 def mock_config_entry_altitude() -> MockConfigEntry:
-    """Create Opensky entry with altitude in Home Assistant."""
+    """Create Opensky entry with altitude in SmartHub."""
     return MockConfigEntry(
         domain=DOMAIN,
         title="OpenSky",
@@ -69,7 +69,7 @@ def mock_config_entry_altitude() -> MockConfigEntry:
 
 @pytest.fixture(name="config_entry_authenticated")
 def mock_config_entry_authenticated() -> MockConfigEntry:
-    """Create authenticated Opensky entry in Home Assistant."""
+    """Create authenticated Opensky entry in SmartHub."""
     return MockConfigEntry(
         domain=DOMAIN,
         title="OpenSky",
@@ -88,15 +88,15 @@ def mock_config_entry_authenticated() -> MockConfigEntry:
 
 
 @pytest.fixture
-async def opensky_client(hass: HomeAssistant) -> AsyncGenerator[AsyncMock]:
+async def opensky_client(hass: SmartHub) -> AsyncGenerator[AsyncMock]:
     """Mock the OpenSky client."""
     with (
         patch(
-            "homeassistant.components.opensky.OpenSky",
+            "smarthub.components.opensky.OpenSky",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.opensky.config_flow.OpenSky",
+            "smarthub.components.opensky.config_flow.OpenSky",
             new=mock_client,
         ),
     ):

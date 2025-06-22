@@ -7,10 +7,10 @@ from pypck.lcn_addr import LcnAddr
 from pypck.lcn_defs import LedStatus, LogicOpStatus, Var, VarValue
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.lcn.helpers import get_device_connection
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.lcn.helpers import get_device_connection
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MockConfigEntry, init_integration
 
@@ -23,20 +23,20 @@ SENSOR_LOGICOP1 = "sensor.testmodule_sensor_logicop1"
 
 
 async def test_setup_lcn_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the setup of sensor."""
-    with patch("homeassistant.components.lcn.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.lcn.PLATFORMS", [Platform.SENSOR]):
         await init_integration(hass, entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
 async def test_pushed_variable_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the variable sensor changes its state on status received."""
     await init_integration(hass, entry)
@@ -64,7 +64,7 @@ async def test_pushed_variable_status_change(
 
 
 async def test_pushed_ledlogicop_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the led and logicop sensor changes its state on status received."""
     await init_integration(hass, entry)
@@ -92,7 +92,7 @@ async def test_pushed_ledlogicop_status_change(
     assert state.state == "all"
 
 
-async def test_unload_config_entry(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_unload_config_entry(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the sensor is removed when the config entry is unloaded."""
     await init_integration(hass, entry)
 

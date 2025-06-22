@@ -2,10 +2,10 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.dlink.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.dlink.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import CONF_DATA, ComponentSetup, patch_setup
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_setup_config_and_unload(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test setup and unload."""
     await setup_integration()
@@ -31,7 +31,7 @@ async def test_setup_config_and_unload(
 
 
 async def test_legacy_setup_config_and_unload(
-    hass: HomeAssistant, setup_integration_legacy: ComponentSetup
+    hass: SmartHub, setup_integration_legacy: ComponentSetup
 ) -> None:
     """Test legacy setup and unload."""
     await setup_integration_legacy()
@@ -49,7 +49,7 @@ async def test_legacy_setup_config_and_unload(
 
 
 async def test_async_setup_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_with_uid: MockConfigEntry,
     mocked_plug_legacy_no_auth: MagicMock,
 ) -> None:
@@ -60,7 +60,7 @@ async def test_async_setup_entry_not_ready(
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     setup_integration: ComponentSetup,
 ) -> None:

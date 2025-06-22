@@ -12,7 +12,7 @@ from eheimdigital.types import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
     DOMAIN as CLIMATE_DOMAIN,
@@ -23,14 +23,14 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.eheimdigital.const import (
+from smarthub.components.eheimdigital.const import (
     HEATER_BIO_MODE,
     HEATER_SMART_MODE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .conftest import init_integration
 
@@ -39,7 +39,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 @pytest.mark.usefixtures("heater_mock")
 async def test_setup_heater(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -49,9 +49,9 @@ async def test_setup_heater(
     mock_config_entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.eheimdigital.PLATFORMS", [Platform.CLIMATE]),
+        patch("smarthub.components.eheimdigital.PLATFORMS", [Platform.CLIMATE]),
         patch(
-            "homeassistant.components.eheimdigital.coordinator.asyncio.Event",
+            "smarthub.components.eheimdigital.coordinator.asyncio.Event",
             new=AsyncMock,
         ),
     ):
@@ -66,7 +66,7 @@ async def test_setup_heater(
 
 
 async def test_dynamic_new_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     heater_mock: EheimDigitalHeater,
     entity_registry: er.EntityRegistry,
@@ -79,9 +79,9 @@ async def test_dynamic_new_devices(
     eheimdigital_hub_mock.return_value.devices = {}
 
     with (
-        patch("homeassistant.components.eheimdigital.PLATFORMS", [Platform.CLIMATE]),
+        patch("smarthub.components.eheimdigital.PLATFORMS", [Platform.CLIMATE]),
         patch(
-            "homeassistant.components.eheimdigital.coordinator.asyncio.Event",
+            "smarthub.components.eheimdigital.coordinator.asyncio.Event",
             new=AsyncMock,
         ),
     ):
@@ -115,7 +115,7 @@ async def test_dynamic_new_devices(
     ],
 )
 async def test_set_preset_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     heater_mock: EheimDigitalHeater,
     mock_config_entry: MockConfigEntry,
@@ -132,7 +132,7 @@ async def test_set_preset_mode(
 
     heater_mock.hub.send_packet.side_effect = EheimDigitalClientError
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -154,7 +154,7 @@ async def test_set_preset_mode(
 
 
 async def test_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     heater_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -169,7 +169,7 @@ async def test_set_temperature(
 
     heater_mock.hub.send_packet.side_effect = EheimDigitalClientError
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,
@@ -194,7 +194,7 @@ async def test_set_temperature(
     ("hvac_mode", "active"), [(HVACMode.AUTO, True), (HVACMode.OFF, False)]
 )
 async def test_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     heater_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -211,7 +211,7 @@ async def test_set_hvac_mode(
 
     heater_mock.hub.send_packet.side_effect = EheimDigitalClientError
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_HVAC_MODE,
@@ -233,7 +233,7 @@ async def test_set_hvac_mode(
 
 
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     heater_mock: EheimDigitalHeater,

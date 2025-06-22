@@ -1,0 +1,9 @@
+{
+  "domain": "flexit",
+  "name": "Flexit",
+  "codeowners": [],
+  "dependencies": ["modbus"],
+  "documentation": "https://www.smart-hub.io/integrations/flexit",
+  "iot_class": "local_polling",
+  "quality_scale": "legacy"
+}

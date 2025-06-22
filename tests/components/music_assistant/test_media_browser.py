@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     BrowseError,
     BrowseMedia,
     MediaClass,
@@ -13,8 +13,8 @@ from homeassistant.components.media_player import (
     SearchMedia,
     SearchMediaQuery,
 )
-from homeassistant.components.music_assistant.const import DOMAIN
-from homeassistant.components.music_assistant.media_browser import (
+from smarthub.components.music_assistant.const import DOMAIN
+from smarthub.components.music_assistant.media_browser import (
     LIBRARY_ALBUMS,
     LIBRARY_ARTISTS,
     LIBRARY_AUDIOBOOKS,
@@ -27,7 +27,7 @@ from homeassistant.components.music_assistant.media_browser import (
     async_browse_media,
     async_search_media,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import setup_integration_from_fixtures
 
@@ -49,7 +49,7 @@ from .common import setup_integration_from_fixtures
     ],
 )
 async def test_browse_media_root(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
     media_content_id: str,
     media_content_type: str,
@@ -67,7 +67,7 @@ async def test_browse_media_root(
 
 
 async def test_browse_media_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test the async_browse_media method when media is not found."""
@@ -146,7 +146,7 @@ class MockSearchResults:
     ],
 )
 async def test_search_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
     search_query: str,
     media_content_type: str,
@@ -226,7 +226,7 @@ async def test_search_media(
     ],
 )
 async def test_search_media_with_filter_classes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
     search_query: str,
     media_filter_classes: set[MediaClass],
@@ -258,7 +258,7 @@ async def test_search_media_with_filter_classes(
 
 
 async def test_search_media_within_album(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test searching within an album context."""
@@ -306,7 +306,7 @@ async def test_search_media_within_album(
 
 
 async def test_search_media_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test that search errors are properly handled."""

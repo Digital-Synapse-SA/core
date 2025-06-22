@@ -1,4 +1,4 @@
-"""Test the Home Assistant hardware firmware config flow."""
+"""Test the SmartHub hardware firmware config flow."""
 
 import asyncio
 from collections.abc import Awaitable, Callable, Generator, Iterator
@@ -8,23 +8,23 @@ from unittest.mock import AsyncMock, Mock, call, patch
 
 import pytest
 
-from homeassistant.components.hassio import AddonInfo, AddonState
-from homeassistant.components.homeassistant_hardware.firmware_config_flow import (
+from smarthub.components.hassio import AddonInfo, AddonState
+from smarthub.components.smarthub_hardware.firmware_config_flow import (
     STEP_PICK_FIRMWARE_THREAD,
     STEP_PICK_FIRMWARE_ZIGBEE,
     BaseFirmwareConfigFlow,
     BaseFirmwareOptionsFlow,
 )
-from homeassistant.components.homeassistant_hardware.util import (
+from smarthub.components.smarthub_hardware.util import (
     ApplicationType,
     FirmwareInfo,
     get_otbr_addon_manager,
     get_zigbee_flasher_addon_manager,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigFlowResult, OptionsFlow
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntry, ConfigFlowResult, OptionsFlow
+from smarthub.core import SmartHub, callback
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -117,7 +117,7 @@ class FakeFirmwareOptionsFlowHandler(BaseFirmwareOptionsFlow):
 
 @pytest.fixture(autouse=True)
 async def mock_test_firmware_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> Generator[None]:
     """Fixture for a test config flow."""
     mock_module = MockModule(
@@ -126,7 +126,7 @@ async def mock_test_firmware_platform(
     mock_integration(hass, mock_module)
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
-    await async_setup_component(hass, "homeassistant_hardware", {})
+    await async_setup_component(hass, "smarthub_hardware", {})
 
     with mock_config_flow(TEST_DOMAIN, FakeFirmwareConfigFlow):
         yield
@@ -148,7 +148,7 @@ def delayed_side_effect() -> Callable[..., Awaitable[None]]:
 
 @contextlib.contextmanager
 def mock_addon_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     *,
     is_hassio: bool = True,
     app_type: ApplicationType | None = ApplicationType.EZSP,
@@ -209,34 +209,34 @@ def mock_addon_info(
 
     with (
         patch(
-            "homeassistant.components.homeassistant_hardware.firmware_config_flow.get_otbr_addon_manager",
+            "smarthub.components.smarthub_hardware.firmware_config_flow.get_otbr_addon_manager",
             return_value=mock_otbr_manager,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.util.get_otbr_addon_manager",
+            "smarthub.components.smarthub_hardware.util.get_otbr_addon_manager",
             return_value=mock_otbr_manager,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.firmware_config_flow.get_zigbee_flasher_addon_manager",
+            "smarthub.components.smarthub_hardware.firmware_config_flow.get_zigbee_flasher_addon_manager",
             return_value=mock_flasher_manager,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.firmware_config_flow.is_hassio",
+            "smarthub.components.smarthub_hardware.firmware_config_flow.is_hassio",
             return_value=is_hassio,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.util.is_hassio",
+            "smarthub.components.smarthub_hardware.util.is_hassio",
             return_value=is_hassio,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.firmware_config_flow.probe_silabs_firmware_info",
+            "smarthub.components.smarthub_hardware.firmware_config_flow.probe_silabs_firmware_info",
             return_value=firmware_info_result,
         ),
     ):
         yield mock_otbr_manager, mock_flasher_manager
 
 
-async def test_config_flow_zigbee(hass: HomeAssistant) -> None:
+async def test_config_flow_zigbee(hass: SmartHub) -> None:
     """Test the config flow."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -319,7 +319,7 @@ async def test_config_flow_zigbee(hass: HomeAssistant) -> None:
     assert zha_flow["step_id"] == "confirm"
 
 
-async def test_config_flow_zigbee_skip_step_if_installed(hass: HomeAssistant) -> None:
+async def test_config_flow_zigbee_skip_step_if_installed(hass: SmartHub) -> None:
     """Test the config flow, skip installing the addon if necessary."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -381,10 +381,10 @@ async def test_config_flow_zigbee_skip_step_if_installed(hass: HomeAssistant) ->
         assert result["step_id"] == "confirm_zigbee"
 
 
-async def test_config_flow_auto_confirm_if_running(hass: HomeAssistant) -> None:
+async def test_config_flow_auto_confirm_if_running(hass: SmartHub) -> None:
     """Test the config flow skips the confirmation step the hardware is already used."""
     with patch(
-        "homeassistant.components.homeassistant_hardware.firmware_config_flow.guess_firmware_info",
+        "smarthub.components.smarthub_hardware.firmware_config_flow.guess_firmware_info",
         return_value=FirmwareInfo(
             device=TEST_DEVICE,
             firmware_type=ApplicationType.EZSP,
@@ -407,7 +407,7 @@ async def test_config_flow_auto_confirm_if_running(hass: HomeAssistant) -> None:
     }
 
 
-async def test_config_flow_thread(hass: HomeAssistant) -> None:
+async def test_config_flow_thread(hass: SmartHub) -> None:
     """Test the config flow."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -490,7 +490,7 @@ async def test_config_flow_thread(hass: HomeAssistant) -> None:
         }
 
 
-async def test_config_flow_thread_addon_already_installed(hass: HomeAssistant) -> None:
+async def test_config_flow_thread_addon_already_installed(hass: SmartHub) -> None:
     """Test the Thread config flow, addon is already installed."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -545,7 +545,7 @@ async def test_config_flow_thread_addon_already_installed(hass: HomeAssistant) -
         assert result["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_config_flow_zigbee_not_hassio(hass: HomeAssistant) -> None:
+async def test_config_flow_zigbee_not_hassio(hass: SmartHub) -> None:
     """Test when the stick is used with a non-hassio setup."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -585,7 +585,7 @@ async def test_config_flow_zigbee_not_hassio(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("addon_store_info")
-async def test_options_flow_zigbee_to_thread(hass: HomeAssistant) -> None:
+async def test_options_flow_zigbee_to_thread(hass: SmartHub) -> None:
     """Test the options flow, migrating Zigbee to Thread."""
     config_entry = MockConfigEntry(
         domain=TEST_DOMAIN,
@@ -677,7 +677,7 @@ async def test_options_flow_zigbee_to_thread(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("addon_store_info")
-async def test_options_flow_thread_to_zigbee(hass: HomeAssistant) -> None:
+async def test_options_flow_thread_to_zigbee(hass: SmartHub) -> None:
     """Test the options flow, migrating Thread to Zigbee."""
     config_entry = MockConfigEntry(
         domain=TEST_DOMAIN,

@@ -7,10 +7,10 @@ from aiocomelit.const import AlarmAreaState, AlarmZoneState
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.comelit.const import SCAN_INTERVAL
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.comelit.const import SCAN_INTERVAL
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -20,14 +20,14 @@ ENTITY_ID = "sensor.zone0"
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_vedo: AsyncMock,
     mock_vedo_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.comelit.VEDO_PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.comelit.VEDO_PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_vedo_config_entry)
 
     await snapshot_platform(
@@ -39,7 +39,7 @@ async def test_all_entities(
 
 
 async def test_sensor_state_unknown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_vedo: AsyncMock,
     mock_vedo_config_entry: MockConfigEntry,

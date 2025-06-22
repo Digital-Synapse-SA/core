@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 import pyvera as pv
 
-from homeassistant.components.lock import LockState
-from homeassistant.core import HomeAssistant
+from smarthub.components.lock import LockState
+from smarthub.core import SmartHub
 
 from .common import ComponentFactory, new_simple_controller_config
 
 
 async def test_lock(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
     vera_device: pv.VeraLock = MagicMock(spec=pv.VeraLock)

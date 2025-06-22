@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import DOMAIN as COVER_DOMAIN
-from homeassistant.const import (
+from smarthub.components.cover import DOMAIN as COVER_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
@@ -15,8 +15,8 @@ from homeassistant.const import (
     STATE_OPEN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import find_update_callback, setup_integration
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_niko_home_control_connection: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -32,7 +32,7 @@ async def test_cover(
 ) -> None:
     """Test all entities."""
     with patch(
-        "homeassistant.components.niko_home_control.PLATFORMS", [Platform.COVER]
+        "smarthub.components.niko_home_control.PLATFORMS", [Platform.COVER]
     ):
         await setup_integration(hass, mock_config_entry)
 
@@ -46,7 +46,7 @@ async def test_cover(
     ],
 )
 async def test_open_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_niko_home_control_connection: AsyncMock,
     mock_config_entry: MockConfigEntry,
     cover_id: int,
@@ -71,7 +71,7 @@ async def test_open_cover(
     ],
 )
 async def test_close_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_niko_home_control_connection: AsyncMock,
     mock_config_entry: MockConfigEntry,
     cover_id: int,
@@ -96,7 +96,7 @@ async def test_close_cover(
     ],
 )
 async def test_stop_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_niko_home_control_connection: AsyncMock,
     mock_config_entry: MockConfigEntry,
     cover_id: int,
@@ -115,7 +115,7 @@ async def test_stop_cover(
 
 
 async def test_updating(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_niko_home_control_connection: AsyncMock,
     mock_config_entry: MockConfigEntry,
     cover: AsyncMock,

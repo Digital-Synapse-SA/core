@@ -13,7 +13,7 @@ from pytradfri.const import (
 )
 from pytradfri.device import Device
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     ATTR_PERCENTAGE_STEP,
     ATTR_PRESET_MODE,
@@ -24,20 +24,20 @@ from homeassistant.components.fan import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_SUPPORTED_FEATURES,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import CommandStore, setup_integration
 
 
 @pytest.mark.parametrize("device", ["air_purifier"], indirect=True)
 async def test_fan_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
 ) -> None:
@@ -151,7 +151,7 @@ async def test_fan_available(
     ],
 )
 async def test_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
     service: str,

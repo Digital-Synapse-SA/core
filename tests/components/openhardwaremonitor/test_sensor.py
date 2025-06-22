@@ -2,13 +2,13 @@
 
 import requests_mock
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_load_fixture
 
 
-async def test_setup(hass: HomeAssistant, requests_mock: requests_mock.Mocker) -> None:
+async def test_setup(hass: SmartHub, requests_mock: requests_mock.Mocker) -> None:
     """Test for successfully setting up the platform."""
     config = {
         "sensor": {

@@ -5,10 +5,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components.min_max.const import DOMAIN
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
-from homeassistant.const import (
+from smarthub import config as hass_config
+from smarthub.components.min_max.const import DOMAIN
+from smarthub.components.sensor import ATTR_STATE_CLASS, SensorStateClass
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
     SERVICE_RELOAD,
@@ -16,9 +16,9 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import get_fixture_path
 
@@ -36,7 +36,7 @@ RANGE_4_DIGITS = round(max(VALUES) - min(VALUES), 4)
 SUM_VALUE = sum(VALUES)
 
 
-async def test_default_name_sensor(hass: HomeAssistant) -> None:
+async def test_default_name_sensor(hass: SmartHub) -> None:
     """Test the min sensor with a default name."""
     config = {
         "sensor": {
@@ -62,7 +62,7 @@ async def test_default_name_sensor(hass: HomeAssistant) -> None:
 
 
 async def test_min_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the min sensor."""
     config = {
@@ -94,7 +94,7 @@ async def test_min_sensor(
     assert entity.unique_id == "very_unique_id"
 
 
-async def test_max_sensor(hass: HomeAssistant) -> None:
+async def test_max_sensor(hass: SmartHub) -> None:
     """Test the max sensor."""
     config = {
         "sensor": {
@@ -121,7 +121,7 @@ async def test_max_sensor(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
 
-async def test_mean_sensor(hass: HomeAssistant) -> None:
+async def test_mean_sensor(hass: SmartHub) -> None:
     """Test the mean sensor."""
     config = {
         "sensor": {
@@ -147,7 +147,7 @@ async def test_mean_sensor(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
 
-async def test_mean_1_digit_sensor(hass: HomeAssistant) -> None:
+async def test_mean_1_digit_sensor(hass: SmartHub) -> None:
     """Test the mean with 1-digit precision sensor."""
     config = {
         "sensor": {
@@ -173,7 +173,7 @@ async def test_mean_1_digit_sensor(hass: HomeAssistant) -> None:
     assert str(float(MEAN_1_DIGIT)) == state.state
 
 
-async def test_mean_4_digit_sensor(hass: HomeAssistant) -> None:
+async def test_mean_4_digit_sensor(hass: SmartHub) -> None:
     """Test the mean with 4-digit precision sensor."""
     config = {
         "sensor": {
@@ -199,7 +199,7 @@ async def test_mean_4_digit_sensor(hass: HomeAssistant) -> None:
     assert str(float(MEAN_4_DIGITS)) == state.state
 
 
-async def test_median_sensor(hass: HomeAssistant) -> None:
+async def test_median_sensor(hass: SmartHub) -> None:
     """Test the median sensor."""
     config = {
         "sensor": {
@@ -225,7 +225,7 @@ async def test_median_sensor(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
 
-async def test_range_4_digit_sensor(hass: HomeAssistant) -> None:
+async def test_range_4_digit_sensor(hass: SmartHub) -> None:
     """Test the range with 4-digit precision sensor."""
     config = {
         "sensor": {
@@ -251,7 +251,7 @@ async def test_range_4_digit_sensor(hass: HomeAssistant) -> None:
     assert str(float(RANGE_4_DIGITS)) == state.state
 
 
-async def test_range_1_digit_sensor(hass: HomeAssistant) -> None:
+async def test_range_1_digit_sensor(hass: SmartHub) -> None:
     """Test the range with 1-digit precision sensor."""
     config = {
         "sensor": {
@@ -277,7 +277,7 @@ async def test_range_1_digit_sensor(hass: HomeAssistant) -> None:
     assert str(float(RANGE_1_DIGIT)) == state.state
 
 
-async def test_not_enough_sensor_value(hass: HomeAssistant) -> None:
+async def test_not_enough_sensor_value(hass: SmartHub) -> None:
     """Test that there is nothing done if not enough values available."""
     config = {
         "sensor": {
@@ -329,7 +329,7 @@ async def test_not_enough_sensor_value(hass: HomeAssistant) -> None:
     assert state.attributes.get("max_value") is None
 
 
-async def test_different_unit_of_measurement(hass: HomeAssistant) -> None:
+async def test_different_unit_of_measurement(hass: SmartHub) -> None:
     """Test for different unit of measurement."""
     config = {
         "sensor": {
@@ -378,7 +378,7 @@ async def test_different_unit_of_measurement(hass: HomeAssistant) -> None:
     assert state.attributes.get("unit_of_measurement") == "ERR"
 
 
-async def test_last_sensor(hass: HomeAssistant) -> None:
+async def test_last_sensor(hass: SmartHub) -> None:
     """Test the last sensor."""
     config = {
         "sensor": {
@@ -403,7 +403,7 @@ async def test_last_sensor(hass: HomeAssistant) -> None:
         assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
 
-async def test_reload(hass: HomeAssistant) -> None:
+async def test_reload(hass: SmartHub) -> None:
     """Verify we can reload filter sensors."""
     hass.states.async_set("sensor.test_1", 12345)
     hass.states.async_set("sensor.test_2", 45678)
@@ -444,7 +444,7 @@ async def test_reload(hass: HomeAssistant) -> None:
 
 
 async def test_sensor_incorrect_state(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the min sensor."""
     config = {
@@ -473,7 +473,7 @@ async def test_sensor_incorrect_state(
 
 
 async def test_sum_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the sum sensor."""
     config = {
@@ -504,7 +504,7 @@ async def test_sum_sensor(
     assert entity.unique_id == "very_unique_id_sum_sensor"
 
 
-async def test_sum_sensor_no_state(hass: HomeAssistant) -> None:
+async def test_sum_sensor_no_state(hass: SmartHub) -> None:
     """Test the sum sensor with no state ."""
     config = {
         "sensor": {

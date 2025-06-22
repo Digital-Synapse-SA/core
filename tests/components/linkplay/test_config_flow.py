@@ -6,12 +6,12 @@ from unittest.mock import AsyncMock
 from linkplay.exceptions import LinkPlayRequestException
 import pytest
 
-from homeassistant.components.linkplay.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.linkplay.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .conftest import HOST, HOST_REENTRY, NAME, UUID
 
@@ -52,7 +52,7 @@ ZEROCONF_DISCOVERY_RE_ENTRY = ZeroconfServiceInfo(
 
 @pytest.mark.usefixtures("mock_linkplay_factory_bridge", "mock_setup_entry")
 async def test_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test user setup config flow."""
     result = await hass.config_entries.flow.async_init(
@@ -78,7 +78,7 @@ async def test_user_flow(
 
 @pytest.mark.usefixtures("mock_linkplay_factory_bridge")
 async def test_user_flow_re_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test user setup config flow when an entry with the same unique id already exists."""
 
@@ -108,7 +108,7 @@ async def test_user_flow_re_entry(
 
 @pytest.mark.usefixtures("mock_linkplay_factory_bridge", "mock_setup_entry")
 async def test_zeroconf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test Zeroconf flow."""
     result = await hass.config_entries.flow.async_init(
@@ -135,7 +135,7 @@ async def test_zeroconf_flow(
 
 @pytest.mark.usefixtures("mock_linkplay_factory_bridge")
 async def test_zeroconf_flow_re_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test Zeroconf flow when an entry with the same unique id already exists."""
 
@@ -161,7 +161,7 @@ async def test_zeroconf_flow_re_entry(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_zeroconf_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_linkplay_factory_bridge: AsyncMock,
 ) -> None:
     """Test flow when the device discovered through Zeroconf cannot be reached."""
@@ -181,7 +181,7 @@ async def test_zeroconf_flow_errors(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_user_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_linkplay_factory_bridge: AsyncMock,
 ) -> None:
     """Test flow when the device cannot be reached."""
@@ -224,7 +224,7 @@ async def test_user_flow_errors(
 
 @pytest.mark.usefixtures("mock_linkplay_factory_bridge")
 async def test_zeroconf_no_probe_existing_device(
-    hass: HomeAssistant, mock_linkplay_factory_bridge: AsyncMock
+    hass: SmartHub, mock_linkplay_factory_bridge: AsyncMock
 ) -> None:
     """Test we do not probe the device is the host is already configured."""
     entry = MockConfigEntry(

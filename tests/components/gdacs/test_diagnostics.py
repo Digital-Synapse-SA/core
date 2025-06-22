@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -16,7 +16,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.freeze_time("2024-09-05 15:00:00")
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
     config_entry: MockConfigEntry,

@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, patch
 import pytest
 import python_otbr_api
 
-from homeassistant.components import otbr, thread
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import otbr, thread
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import (
     BASE_URL,
@@ -23,7 +23,7 @@ from tests.typing import MockHAClientWebSocket, WebSocketGenerator
 
 @pytest.fixture
 async def websocket_client(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> MockHAClientWebSocket:
     """Create a websocket client."""
     return await hass_ws_client(hass)
@@ -35,7 +35,7 @@ def mock_supervisor_client(supervisor_client: AsyncMock) -> None:
 
 
 async def test_get_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -80,7 +80,7 @@ async def test_get_info(
 
 
 async def test_get_info_no_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -95,7 +95,7 @@ async def test_get_info_no_entry(
 
 
 async def test_get_info_fetch_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -119,7 +119,7 @@ async def test_get_info_fetch_fails(
 
 
 async def test_create_network(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -138,10 +138,10 @@ async def test_create_network(
             return_value=TEST_BORDER_AGENT_EXTENDED_ADDRESS,
         ),
         patch(
-            "homeassistant.components.thread.dataset_store.DatasetStore.async_add"
+            "smarthub.components.thread.dataset_store.DatasetStore.async_add"
         ) as mock_add,
         patch(
-            "homeassistant.components.otbr.util.random.randint",
+            "smarthub.components.otbr.util.random.randint",
             return_value=0x1234,
         ),
     ):
@@ -170,7 +170,7 @@ async def test_create_network(
 
 
 async def test_create_network_no_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -187,7 +187,7 @@ async def test_create_network_no_entry(
 
 
 async def test_create_network_fails_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -216,7 +216,7 @@ async def test_create_network_fails_1(
 
 
 async def test_create_network_fails_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -249,7 +249,7 @@ async def test_create_network_fails_2(
 
 
 async def test_create_network_fails_3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -284,7 +284,7 @@ async def test_create_network_fails_3(
 
 
 async def test_create_network_fails_4(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -318,7 +318,7 @@ async def test_create_network_fails_4(
 
 
 async def test_create_network_fails_5(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -347,7 +347,7 @@ async def test_create_network_fails_5(
 
 
 async def test_create_network_fails_6(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -379,7 +379,7 @@ async def test_create_network_fails_6(
 
 
 async def test_create_network_fails_7(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -402,7 +402,7 @@ async def test_create_network_fails_7(
 
 
 async def test_create_network_fails_8(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -425,7 +425,7 @@ async def test_create_network_fails_8(
 
 
 async def test_set_network(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -465,7 +465,7 @@ async def test_set_network(
 
 
 async def test_set_network_no_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -486,7 +486,7 @@ async def test_set_network_no_entry(
 
 
 async def test_set_network_channel_conflict(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     multiprotocol_addon_manager_mock,
     otbr_config_entry_multipan,
@@ -518,7 +518,7 @@ async def test_set_network_channel_conflict(
 
 
 async def test_set_network_unknown_dataset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -544,7 +544,7 @@ async def test_set_network_unknown_dataset(
 
 
 async def test_set_network_fails_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -578,7 +578,7 @@ async def test_set_network_fails_1(
 
 
 async def test_set_network_fails_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -615,7 +615,7 @@ async def test_set_network_fails_2(
 
 
 async def test_set_network_fails_3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -652,7 +652,7 @@ async def test_set_network_fails_3(
 
 
 async def test_set_network_fails_4(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -676,7 +676,7 @@ async def test_set_network_fails_4(
 
 
 async def test_set_network_fails_5(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -700,7 +700,7 @@ async def test_set_network_fails_5(
 
 
 async def test_set_channel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_thread,
     websocket_client,
@@ -728,7 +728,7 @@ async def test_set_channel(
 
 
 async def test_set_channel_multiprotocol(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -756,7 +756,7 @@ async def test_set_channel_multiprotocol(
 
 
 async def test_set_channel_no_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -777,7 +777,7 @@ async def test_set_channel_no_entry(
 
 
 async def test_set_channel_fails_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_thread,
     websocket_client,
@@ -807,7 +807,7 @@ async def test_set_channel_fails_1(
 
 
 async def test_set_channel_fails_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,
@@ -831,7 +831,7 @@ async def test_set_channel_fails_2(
 
 
 async def test_set_channel_fails_3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     otbr_config_entry_multipan,
     websocket_client,

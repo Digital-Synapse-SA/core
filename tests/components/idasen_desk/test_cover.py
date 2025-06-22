@@ -6,27 +6,27 @@ from unittest.mock import AsyncMock, MagicMock
 from bleak.exc import BleakError
 import pytest
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
     DOMAIN as COVER_DOMAIN,
     CoverState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
     SERVICE_SET_COVER_POSITION,
     SERVICE_STOP_COVER,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import init_integration
 
 
 async def test_cover_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_desk_api: MagicMock,
 ) -> None:
     """Test cover available property."""
@@ -58,7 +58,7 @@ async def test_cover_available(
     ],
 )
 async def test_cover_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_desk_api: MagicMock,
     service: str,
     service_data: dict[str, Any],
@@ -95,7 +95,7 @@ async def test_cover_services(
     ],
 )
 async def test_cover_services_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_desk_api: MagicMock,
     service: str,
     service_data: dict[str, Any],
@@ -106,7 +106,7 @@ async def test_cover_services_exception(
     await init_integration(hass)
     fail_call = getattr(mock_desk_api, mock_method_name)
     fail_call.side_effect = BleakError()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             COVER_DOMAIN,
             service,

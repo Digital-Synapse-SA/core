@@ -2,9 +2,9 @@
 
 from http import HTTPStatus
 
-from homeassistant.components import google_assistant as ga
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import google_assistant as ga
+from smarthub.core import Context, SmartHub
+from smarthub.setup import async_setup_component
 
 from .test_http import DUMMY_CONFIG
 
@@ -12,7 +12,7 @@ from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
-async def test_import(hass: HomeAssistant) -> None:
+async def test_import(hass: SmartHub) -> None:
     """Test import."""
 
     await async_setup_component(
@@ -26,7 +26,7 @@ async def test_import(hass: HomeAssistant) -> None:
     assert entries[0].data[ga.const.CONF_PROJECT_ID] == "1234"
 
 
-async def test_import_changed(hass: HomeAssistant) -> None:
+async def test_import_changed(hass: SmartHub) -> None:
     """Test import with changed project id."""
 
     old_entry = MockConfigEntry(
@@ -47,7 +47,7 @@ async def test_import_changed(hass: HomeAssistant) -> None:
 
 
 async def test_request_sync_service(
-    aioclient_mock: AiohttpClientMocker, hass: HomeAssistant
+    aioclient_mock: AiohttpClientMocker, hass: SmartHub
 ) -> None:
     """Test that it posts to the request_sync url."""
     aioclient_mock.post(

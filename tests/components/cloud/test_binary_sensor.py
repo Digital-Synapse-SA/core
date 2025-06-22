@@ -6,20 +6,20 @@ from unittest.mock import MagicMock, patch
 from hass_nabucasa.const import DISPATCH_REMOTE_CONNECT, DISPATCH_REMOTE_DISCONNECT
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(autouse=True)
 def mock_wait_until() -> Generator[None]:
     """Mock WAIT_UNTIL_CHANGE to execute callback immediately."""
-    with patch("homeassistant.components.cloud.binary_sensor.WAIT_UNTIL_CHANGE", 0):
+    with patch("smarthub.components.cloud.binary_sensor.WAIT_UNTIL_CHANGE", 0):
         yield
 
 
 async def test_remote_connection_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     entity_registry: EntityRegistry,
 ) -> None:

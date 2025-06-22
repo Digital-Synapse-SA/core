@@ -6,11 +6,11 @@ from collections import OrderedDict
 from typing import Final
 from unittest.mock import patch
 
-from homeassistant.components.apcupsd.const import DOMAIN
-from homeassistant.components.apcupsd.coordinator import APCUPSdData
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.apcupsd.const import DOMAIN
+from smarthub.components.apcupsd.coordinator import APCUPSdData
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -82,13 +82,13 @@ MOCK_MINIMAL_STATUS: Final = OrderedDict(
 
 
 async def async_init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     *,
     host: str = "test",
     status: dict[str, str] | None = None,
     entry_id: str = "mocked-config-entry-id",
 ) -> MockConfigEntry:
-    """Set up the APC UPS Daemon integration in HomeAssistant."""
+    """Set up the APC UPS Daemon integration in SmartHub."""
     if status is None:
         status = MOCK_STATUS
 

@@ -2,19 +2,19 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant import config_entries
-from homeassistant.components.speedtestdotnet.const import (
+from smarthub import config_entries
+from smarthub.components.speedtestdotnet.const import (
     CONF_SERVER_ID,
     CONF_SERVER_NAME,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_flow_works(hass: HomeAssistant) -> None:
+async def test_flow_works(hass: SmartHub) -> None:
     """Test user config."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -28,7 +28,7 @@ async def test_flow_works(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_options(hass: HomeAssistant, mock_api: MagicMock) -> None:
+async def test_options(hass: SmartHub, mock_api: MagicMock) -> None:
     """Test updating options."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -76,7 +76,7 @@ async def test_options(hass: HomeAssistant, mock_api: MagicMock) -> None:
     }
 
 
-async def test_integration_already_configured(hass: HomeAssistant) -> None:
+async def test_integration_already_configured(hass: SmartHub) -> None:
     """Test integration is already configured."""
     entry = MockConfigEntry(
         domain=DOMAIN,

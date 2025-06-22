@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pyprosegur.installation import Camera
 import pytest
 
-from homeassistant.components.prosegur import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.prosegur import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -57,7 +57,7 @@ def mock_install() -> AsyncMock:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_install: AsyncMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_install: AsyncMock
 ) -> MockConfigEntry:
     """Set up the Prosegur integration for testing."""
     mock_config_entry.add_to_hass(hass)

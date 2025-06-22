@@ -8,8 +8,8 @@ from aioazuredevops.models.core import Project
 from aioazuredevops.models.work_item import WorkItem, WorkItemFields
 from aioazuredevops.models.work_item_type import Category, Icon, State, WorkItemType
 
-from homeassistant.components.azure_devops.const import CONF_ORG, CONF_PAT, CONF_PROJECT
-from homeassistant.core import HomeAssistant
+from smarthub.components.azure_devops.const import CONF_ORG, CONF_PAT, CONF_PROJECT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -131,7 +131,7 @@ DEVOPS_WORK_ITEMS = [
 
 
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> bool:
     """Fixture for setting up the component."""

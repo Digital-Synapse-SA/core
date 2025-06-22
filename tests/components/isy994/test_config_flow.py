@@ -6,19 +6,19 @@ from unittest.mock import patch
 from pyisy import ISYConnectionError, ISYInvalidAuthError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.isy994.const import (
+from smarthub import config_entries
+from smarthub.components.isy994.const import (
     CONF_TLS_VER,
     DOMAIN,
     ISY_URL_POSTFIX,
     UDN_UUID_PREFIX,
 )
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_IGNORE, SOURCE_SSDP
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_IGNORE, SOURCE_SSDP
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_UDN,
     SsdpServiceInfo,
@@ -35,7 +35,7 @@ MOCK_TLS_VERSION = 1.2
 MOCK_IGNORE_STRING = "{IGNOREME}"
 MOCK_RESTORE_LIGHT_STATE = True
 MOCK_SENSOR_STRING = "IMASENSOR"
-MOCK_VARIABLE_SENSOR_STRING = "HomeAssistant."
+MOCK_VARIABLE_SENSOR_STRING = "SmartHub."
 
 MOCK_USER_INPUT = {
     CONF_HOST: f"http://{MOCK_HOSTNAME}",
@@ -74,7 +74,7 @@ MOCK_CONFIG_RESPONSE = """<?xml version="1.0" encoding="UTF-8"?>
 </configuration>
 """
 
-INTEGRATION = "homeassistant.components.isy994"
+INTEGRATION = "smarthub.components.isy994"
 PATCH_CONNECTION = f"{INTEGRATION}.config_flow.Connection.test_connection"
 PATCH_ASYNC_SETUP = f"{INTEGRATION}.async_setup"
 PATCH_ASYNC_SETUP_ENTRY = f"{INTEGRATION}.async_setup_entry"
@@ -88,7 +88,7 @@ def _get_schema_default(schema, key_name):
     raise KeyError(f"{key_name} not found in schema")
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -116,7 +116,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_host(hass: HomeAssistant) -> None:
+async def test_form_invalid_host(hass: SmartHub) -> None:
     """Test we handle invalid host."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -136,7 +136,7 @@ async def test_form_invalid_host(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_host"}
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -154,7 +154,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {CONF_PASSWORD: "invalid_auth"}
 
 
-async def test_form_unknown_exeption(hass: HomeAssistant) -> None:
+async def test_form_unknown_exeption(hass: SmartHub) -> None:
     """Test we handle generic exceptions."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -172,7 +172,7 @@ async def test_form_unknown_exeption(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_isy_connection_error(hass: HomeAssistant) -> None:
+async def test_form_isy_connection_error(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -191,7 +191,7 @@ async def test_form_isy_connection_error(hass: HomeAssistant) -> None:
 
 
 async def test_form_isy_parse_response_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle poorly formatted XML response from ISY."""
     result = await hass.config_entries.flow.async_init(
@@ -210,7 +210,7 @@ async def test_form_isy_parse_response_error(
     assert "ISY Could not parse response, poorly formatted XML." in caplog.text
 
 
-async def test_form_no_name_in_response(hass: HomeAssistant) -> None:
+async def test_form_no_name_in_response(hass: SmartHub) -> None:
     """Test we handle invalid response from ISY with name not set."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -230,7 +230,7 @@ async def test_form_no_name_in_response(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_existing_config_entry(hass: HomeAssistant) -> None:
+async def test_form_existing_config_entry(hass: SmartHub) -> None:
     """Test if config entry already exists."""
     MockConfigEntry(domain=DOMAIN, unique_id=MOCK_UUID).add_to_hass(hass)
 
@@ -248,7 +248,7 @@ async def test_form_existing_config_entry(hass: HomeAssistant) -> None:
     assert result2["type"] is FlowResultType.ABORT
 
 
-async def test_form_ssdp_already_configured(hass: HomeAssistant) -> None:
+async def test_form_ssdp_already_configured(hass: SmartHub) -> None:
     """Test ssdp abort when the serial number is already configured."""
 
     MockConfigEntry(
@@ -273,7 +273,7 @@ async def test_form_ssdp_already_configured(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.ABORT
 
 
-async def test_form_ssdp(hass: HomeAssistant) -> None:
+async def test_form_ssdp(hass: SmartHub) -> None:
     """Test we can setup from ssdp."""
 
     result = await hass.config_entries.flow.async_init(
@@ -313,7 +313,7 @@ async def test_form_ssdp(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_ssdp_existing_entry(hass: HomeAssistant) -> None:
+async def test_form_ssdp_existing_entry(hass: SmartHub) -> None:
     """Test we update the ip of an existing entry from ssdp."""
 
     entry = MockConfigEntry(
@@ -344,7 +344,7 @@ async def test_form_ssdp_existing_entry(hass: HomeAssistant) -> None:
     assert entry.data[CONF_HOST] == f"http://3.3.3.3:80{ISY_URL_POSTFIX}"
 
 
-async def test_form_ssdp_existing_entry_with_no_port(hass: HomeAssistant) -> None:
+async def test_form_ssdp_existing_entry_with_no_port(hass: SmartHub) -> None:
     """Test we update the ip of an existing entry from ssdp with no port."""
 
     entry = MockConfigEntry(
@@ -376,7 +376,7 @@ async def test_form_ssdp_existing_entry_with_no_port(hass: HomeAssistant) -> Non
 
 
 async def test_form_ssdp_existing_entry_with_alternate_port(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we update the ip of an existing entry from ssdp with an alternate port."""
 
@@ -408,7 +408,7 @@ async def test_form_ssdp_existing_entry_with_alternate_port(
     assert entry.data[CONF_HOST] == f"http://3.3.3.3:1443/{ISY_URL_POSTFIX}"
 
 
-async def test_form_ssdp_existing_entry_no_port_https(hass: HomeAssistant) -> None:
+async def test_form_ssdp_existing_entry_no_port_https(hass: SmartHub) -> None:
     """Test we update the ip of an existing entry from ssdp with no port and https."""
 
     entry = MockConfigEntry(
@@ -439,7 +439,7 @@ async def test_form_ssdp_existing_entry_no_port_https(hass: HomeAssistant) -> No
     assert entry.data[CONF_HOST] == f"https://3.3.3.3:443/{ISY_URL_POSTFIX}"
 
 
-async def test_form_dhcp(hass: HomeAssistant) -> None:
+async def test_form_dhcp(hass: SmartHub) -> None:
     """Test we can setup from dhcp."""
 
     result = await hass.config_entries.flow.async_init(
@@ -475,7 +475,7 @@ async def test_form_dhcp(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_dhcp_with_polisy(hass: HomeAssistant) -> None:
+async def test_form_dhcp_with_polisy(hass: SmartHub) -> None:
     """Test we can setup from dhcp with polisy."""
 
     result = await hass.config_entries.flow.async_init(
@@ -515,7 +515,7 @@ async def test_form_dhcp_with_polisy(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_dhcp_with_eisy(hass: HomeAssistant) -> None:
+async def test_form_dhcp_with_eisy(hass: SmartHub) -> None:
     """Test we can setup from dhcp with eisy."""
 
     result = await hass.config_entries.flow.async_init(
@@ -555,7 +555,7 @@ async def test_form_dhcp_with_eisy(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_dhcp_existing_entry(hass: HomeAssistant) -> None:
+async def test_form_dhcp_existing_entry(hass: SmartHub) -> None:
     """Test we update the ip of an existing entry from dhcp."""
 
     entry = MockConfigEntry(
@@ -582,7 +582,7 @@ async def test_form_dhcp_existing_entry(hass: HomeAssistant) -> None:
     assert entry.data[CONF_HOST] == f"http://1.2.3.4{ISY_URL_POSTFIX}"
 
 
-async def test_form_dhcp_existing_entry_preserves_port(hass: HomeAssistant) -> None:
+async def test_form_dhcp_existing_entry_preserves_port(hass: SmartHub) -> None:
     """Test we update the ip of an existing entry from dhcp preserves port."""
 
     entry = MockConfigEntry(
@@ -613,7 +613,7 @@ async def test_form_dhcp_existing_entry_preserves_port(hass: HomeAssistant) -> N
     assert entry.data[CONF_USERNAME] == "bob"
 
 
-async def test_form_dhcp_existing_ignored_entry(hass: HomeAssistant) -> None:
+async def test_form_dhcp_existing_ignored_entry(hass: SmartHub) -> None:
     """Test we handled an ignored entry from dhcp."""
 
     entry = MockConfigEntry(
@@ -637,7 +637,7 @@ async def test_form_dhcp_existing_ignored_entry(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_reauth(hass: HomeAssistant) -> None:
+async def test_reauth(hass: SmartHub) -> None:
     """Test we can reauth."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -687,7 +687,7 @@ async def test_reauth(hass: HomeAssistant) -> None:
     with (
         patch(PATCH_CONNECTION, return_value=MOCK_CONFIG_RESPONSE),
         patch(
-            "homeassistant.components.isy994.async_setup_entry",
+            "smarthub.components.isy994.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -705,7 +705,7 @@ async def test_reauth(hass: HomeAssistant) -> None:
     assert result4["reason"] == "reauth_successful"
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test option flow."""
     entry = MockConfigEntry(domain=DOMAIN)
     entry.add_to_hass(hass)

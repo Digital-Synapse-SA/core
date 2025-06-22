@@ -6,10 +6,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components import imap
-from homeassistant.components.sensor import SensorStateClass
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components import imap
+from smarthub.components.sensor import SensorStateClass
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .const import TEST_FETCH_RESPONSE_TEXT_PLAIN, TEST_SEARCH_RESPONSE
 from .test_config_flow import MOCK_CONFIG
@@ -23,7 +23,7 @@ from tests.typing import ClientSessionGenerator
 @pytest.mark.parametrize("imap_fetch", [TEST_FETCH_RESPONSE_TEXT_PLAIN])
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imap_protocol: MagicMock,
     hass_client: ClientSessionGenerator,
 ) -> None:

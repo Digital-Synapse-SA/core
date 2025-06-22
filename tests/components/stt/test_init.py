@@ -8,17 +8,17 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.stt import (
+from smarthub.components.stt import (
     DOMAIN,
     async_default_engine,
     async_get_provider,
     async_get_speech_to_text_engine,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState, ConfigFlow
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntry, ConfigEntryState, ConfigFlow
+from smarthub.const import Platform
+from smarthub.core import SmartHub, State
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.setup import async_setup_component
 
 from .common import (
     TEST_DOMAIN,
@@ -63,7 +63,7 @@ def config_flow_test_domain_fixture() -> Iterable[str]:
 
 @pytest.fixture(autouse=True)
 def config_flow_fixture(
-    hass: HomeAssistant, config_flow_test_domains: Iterable[str]
+    hass: SmartHub, config_flow_test_domains: Iterable[str]
 ) -> Generator[None]:
     """Mock config flow."""
     for domain in config_flow_test_domains:
@@ -77,7 +77,7 @@ def config_flow_fixture(
 
 @pytest.fixture(name="setup")
 async def setup_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     request: pytest.FixtureRequest,
 ) -> MockSTTProvider | MockSTTProviderEntity:
@@ -96,7 +96,7 @@ async def setup_fixture(
 
 
 async def mock_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     mock_provider: MockSTTProvider,
 ) -> None:
@@ -112,7 +112,7 @@ async def mock_setup(
 
 
 async def mock_config_entry_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     mock_provider_entity: MockSTTProviderEntity,
     test_domain: str = TEST_DOMAIN,
@@ -120,7 +120,7 @@ async def mock_config_entry_setup(
     """Set up a test provider via config entry."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -129,7 +129,7 @@ async def mock_config_entry_setup(
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Unload up test config entry."""
         await hass.config_entries.async_forward_entry_unload(config_entry, Platform.STT)
@@ -145,7 +145,7 @@ async def mock_config_entry_setup(
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -166,7 +166,7 @@ async def mock_config_entry_setup(
     "setup", ["mock_setup", "mock_config_entry_setup"], indirect=True
 )
 async def test_get_provider_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup: MockSTTProvider | MockSTTProviderEntity,
 ) -> None:
@@ -188,7 +188,7 @@ async def test_get_provider_info(
     "setup", ["mock_setup", "mock_config_entry_setup"], indirect=True
 )
 async def test_non_existing_provider(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup: MockSTTProvider | MockSTTProviderEntity,
 ) -> None:
@@ -214,7 +214,7 @@ async def test_non_existing_provider(
     "setup", ["mock_setup", "mock_config_entry_setup"], indirect=True
 )
 async def test_stream_audio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup: MockSTTProvider | MockSTTProviderEntity,
 ) -> None:
@@ -272,7 +272,7 @@ async def test_stream_audio(
     ],
 )
 async def test_metadata_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     header: str | None,
     status: int,
@@ -291,7 +291,7 @@ async def test_metadata_errors(
 
 
 async def test_get_provider(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     mock_provider: MockSTTProvider,
 ) -> None:
@@ -304,7 +304,7 @@ async def test_get_provider(
 
 
 async def test_config_entry_unload(
-    hass: HomeAssistant, tmp_path: Path, mock_provider_entity: MockSTTProviderEntity
+    hass: SmartHub, tmp_path: Path, mock_provider_entity: MockSTTProviderEntity
 ) -> None:
     """Test we can unload config entry."""
     config_entry = await mock_config_entry_setup(hass, tmp_path, mock_provider_entity)
@@ -314,7 +314,7 @@ async def test_config_entry_unload(
 
 
 async def test_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     mock_provider_entity: MockSTTProviderEntity,
 ) -> None:
@@ -341,7 +341,7 @@ async def test_restore_state(
     indirect=["setup"],
 )
 async def test_ws_list_engines(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup: MockSTTProvider | MockSTTProviderEntity,
     engine_id: str,
@@ -414,7 +414,7 @@ async def test_ws_list_engines(
     }
 
 
-async def test_default_engine_none(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_default_engine_none(hass: SmartHub, tmp_path: Path) -> None:
     """Test async_default_engine."""
     assert await async_setup_component(hass, "stt", {"stt": {}})
     await hass.async_block_till_done()
@@ -423,7 +423,7 @@ async def test_default_engine_none(hass: HomeAssistant, tmp_path: Path) -> None:
 
 
 async def test_default_engine(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     mock_provider: MockSTTProvider,
 ) -> None:
@@ -441,7 +441,7 @@ async def test_default_engine(
 
 
 async def test_default_engine_entity(
-    hass: HomeAssistant, tmp_path: Path, mock_provider_entity: MockSTTProviderEntity
+    hass: SmartHub, tmp_path: Path, mock_provider_entity: MockSTTProviderEntity
 ) -> None:
     """Test async_default_engine."""
     await mock_config_entry_setup(hass, tmp_path, mock_provider_entity)
@@ -451,7 +451,7 @@ async def test_default_engine_entity(
 
 @pytest.mark.parametrize("config_flow_test_domains", [("new_test",)])
 async def test_default_engine_prefer_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     mock_provider_entity: MockSTTProviderEntity,
     mock_provider: MockSTTProvider,
@@ -490,7 +490,7 @@ async def test_default_engine_prefer_entity(
     ],
 )
 async def test_default_engine_prefer_cloud_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     mock_provider: MockSTTProvider,
     config_flow_test_domains: str,
@@ -523,7 +523,7 @@ async def test_default_engine_prefer_cloud_entity(
 
 
 async def test_get_engine_legacy(
-    hass: HomeAssistant, tmp_path: Path, mock_provider: MockSTTProvider
+    hass: SmartHub, tmp_path: Path, mock_provider: MockSTTProvider
 ) -> None:
     """Test async_get_speech_to_text_engine."""
     mock_stt_platform(
@@ -548,7 +548,7 @@ async def test_get_engine_legacy(
 
 
 async def test_get_engine_entity(
-    hass: HomeAssistant, tmp_path: Path, mock_provider_entity: MockSTTProviderEntity
+    hass: SmartHub, tmp_path: Path, mock_provider_entity: MockSTTProviderEntity
 ) -> None:
     """Test async_get_speech_to_text_engine."""
     await mock_config_entry_setup(hass, tmp_path, mock_provider_entity)

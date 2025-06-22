@@ -2,12 +2,12 @@
 
 import pytest
 
-from homeassistant.components.switchbot.const import (
+from smarthub.components.switchbot.const import (
     CONF_ENCRYPTION_KEY,
     CONF_KEY_ID,
     DOMAIN,
 )
-from homeassistant.const import CONF_ADDRESS, CONF_NAME, CONF_SENSOR_TYPE
+from smarthub.const import CONF_ADDRESS, CONF_NAME, CONF_SENSOR_TYPE
 
 from tests.common import MockConfigEntry
 

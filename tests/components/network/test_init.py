@@ -9,8 +9,8 @@ from unittest.mock import MagicMock, Mock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import network
-from homeassistant.components.network.const import (
+from smarthub.components import network
+from smarthub.components.network.const import (
     ATTR_ADAPTERS,
     ATTR_CONFIGURED_ADAPTERS,
     DOMAIN,
@@ -18,10 +18,10 @@ from homeassistant.components.network.const import (
     STORAGE_KEY,
     STORAGE_VERSION,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from . import LOOPBACK_IPADDR, NO_LOOPBACK_IPADDR
 
@@ -52,7 +52,7 @@ def _mock_socket_exception(exc):
 
 @pytest.mark.usefixtures("mock_socket_no_loopback")
 async def test_async_detect_interfaces_setting_non_loopback_route(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test without default interface config and the route returns a non-loopback address."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -110,7 +110,7 @@ async def test_async_detect_interfaces_setting_non_loopback_route(
 
 @pytest.mark.usefixtures("mock_socket_loopback")
 async def test_async_detect_interfaces_setting_loopback_route(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test without default interface config and the route returns a loopback address."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -168,7 +168,7 @@ async def test_async_detect_interfaces_setting_loopback_route(
 @pytest.mark.parametrize("mock_socket", [[]], indirect=True)
 @pytest.mark.usefixtures("mock_socket")
 async def test_async_detect_interfaces_setting_empty_route(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test without default interface config and the route returns nothing."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -224,11 +224,11 @@ async def test_async_detect_interfaces_setting_empty_route(
 
 
 async def test_async_detect_interfaces_setting_exception(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test without default interface config and the route throws an exception."""
     with patch(
-        "homeassistant.components.network.util.socket.socket",
+        "smarthub.components.network.util.socket.socket",
         return_value=_mock_socket_exception(AttributeError),
     ):
         assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -285,7 +285,7 @@ async def test_async_detect_interfaces_setting_exception(
 
 @pytest.mark.usefixtures("mock_socket_no_loopback")
 async def test_interfaces_configured_from_storage(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test settings from storage are preferred over auto configure."""
     hass_storage[STORAGE_KEY] = {
@@ -348,7 +348,7 @@ async def test_interfaces_configured_from_storage(
 
 
 async def test_interfaces_configured_from_storage_websocket_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -359,7 +359,7 @@ async def test_interfaces_configured_from_storage_websocket_update(
         "data": {ATTR_CONFIGURED_ADAPTERS: ["eth0", "eth1", "vtun0"]},
     }
     with patch(
-        "homeassistant.components.network.util.socket.socket",
+        "smarthub.components.network.util.socket.socket",
         return_value=MagicMock(getsockname=Mock(return_value=[NO_LOOPBACK_IPADDR])),
     ):
         assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -478,7 +478,7 @@ async def test_interfaces_configured_from_storage_websocket_update(
 
 @pytest.mark.usefixtures("mock_socket_no_loopback")
 async def test_async_get_source_ip_matching_interface(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test getting the source ip address with interface matching."""
     hass_storage[STORAGE_KEY] = {
@@ -495,7 +495,7 @@ async def test_async_get_source_ip_matching_interface(
 
 @pytest.mark.usefixtures("mock_socket_no_loopback")
 async def test_async_get_source_ip_interface_not_match(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test getting the source ip address with interface does not match."""
     hass_storage[STORAGE_KEY] = {
@@ -513,7 +513,7 @@ async def test_async_get_source_ip_interface_not_match(
 @pytest.mark.parametrize("mock_socket", [[None]], indirect=True)
 @pytest.mark.usefixtures("mock_socket")
 async def test_async_get_source_ip_cannot_determine_target(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test getting the source ip address when getsockname fails."""
     hass_storage[STORAGE_KEY] = {
@@ -530,7 +530,7 @@ async def test_async_get_source_ip_cannot_determine_target(
 
 @pytest.mark.usefixtures("mock_socket_no_loopback")
 async def test_async_get_ipv4_broadcast_addresses_default(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test getting ipv4 broadcast addresses when only the default address is enabled."""
     hass_storage[STORAGE_KEY] = {
@@ -549,7 +549,7 @@ async def test_async_get_ipv4_broadcast_addresses_default(
 
 @pytest.mark.usefixtures("mock_socket_loopback")
 async def test_async_get_ipv4_broadcast_addresses_multiple(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test getting ipv4 broadcast addresses when multiple adapters are enabled."""
     hass_storage[STORAGE_KEY] = {
@@ -570,7 +570,7 @@ async def test_async_get_ipv4_broadcast_addresses_multiple(
 
 @pytest.mark.usefixtures("mock_socket_no_loopback")
 async def test_async_get_source_ip_no_enabled_addresses(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test getting the source ip address when all adapters are disabled."""
     hass_storage[STORAGE_KEY] = {
@@ -580,7 +580,7 @@ async def test_async_get_source_ip_no_enabled_addresses(
     }
 
     with patch(
-        "homeassistant.components.network.util.ifaddr.get_adapters",
+        "smarthub.components.network.util.ifaddr.get_adapters",
         return_value=[],
     ):
         assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -597,7 +597,7 @@ async def test_async_get_source_ip_no_enabled_addresses(
 @pytest.mark.parametrize("mock_socket", [[None]], indirect=True)
 @pytest.mark.usefixtures("mock_socket")
 async def test_async_get_source_ip_cannot_be_determined_and_no_enabled_addresses(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test getting the source ip address when all adapters are disabled and getting it fails."""
     hass_storage[STORAGE_KEY] = {
@@ -607,17 +607,17 @@ async def test_async_get_source_ip_cannot_be_determined_and_no_enabled_addresses
     }
 
     with patch(
-        "homeassistant.components.network.util.ifaddr.get_adapters",
+        "smarthub.components.network.util.ifaddr.get_adapters",
         return_value=[],
     ):
         assert not await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
         await hass.async_block_till_done()
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await network.async_get_source_ip(hass, MDNS_TARGET_IP)
 
 
 async def test_async_get_source_ip_no_ip_loopback(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test getting the source ip address when all adapters are disabled no target is specified."""
     hass_storage[STORAGE_KEY] = {
@@ -628,11 +628,11 @@ async def test_async_get_source_ip_no_ip_loopback(
 
     with (
         patch(
-            "homeassistant.components.network.util.ifaddr.get_adapters",
+            "smarthub.components.network.util.ifaddr.get_adapters",
             return_value=[],
         ),
         patch(
-            "homeassistant.components.network.util.socket.socket",
+            "smarthub.components.network.util.socket.socket",
             return_value=_mock_cond_socket(LOOPBACK_IPADDR),
         ),
     ):
@@ -702,16 +702,16 @@ _ADAPTERS_WITH_MANUAL_CONFIG = [
 ]
 
 
-async def test_async_get_announce_addresses(hass: HomeAssistant) -> None:
+async def test_async_get_announce_addresses(hass: SmartHub) -> None:
     """Test addresses for mDNS/etc announcement."""
     first_ip = "172.16.1.5"
     with (
         patch(
-            "homeassistant.components.network.async_get_source_ip",
+            "smarthub.components.network.async_get_source_ip",
             return_value=first_ip,
         ),
         patch(
-            "homeassistant.components.network.async_get_adapters",
+            "smarthub.components.network.async_get_adapters",
             return_value=_ADAPTERS_WITH_MANUAL_CONFIG,
         ),
     ):
@@ -727,11 +727,11 @@ async def test_async_get_announce_addresses(hass: HomeAssistant) -> None:
     first_ip = "192.168.1.5"
     with (
         patch(
-            "homeassistant.components.network.async_get_source_ip",
+            "smarthub.components.network.async_get_source_ip",
             return_value=first_ip,
         ),
         patch(
-            "homeassistant.components.network.async_get_adapters",
+            "smarthub.components.network.async_get_adapters",
             return_value=_ADAPTERS_WITH_MANUAL_CONFIG,
         ),
     ):
@@ -746,15 +746,15 @@ async def test_async_get_announce_addresses(hass: HomeAssistant) -> None:
     ]
 
 
-async def test_async_get_announce_addresses_no_source_ip(hass: HomeAssistant) -> None:
+async def test_async_get_announce_addresses_no_source_ip(hass: SmartHub) -> None:
     """Test addresses for mDNS/etc announcement without source ip."""
     with (
         patch(
-            "homeassistant.components.network.async_get_source_ip",
+            "smarthub.components.network.async_get_source_ip",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.network.async_get_adapters",
+            "smarthub.components.network.async_get_adapters",
             return_value=_ADAPTERS_WITH_MANUAL_CONFIG,
         ),
     ):
@@ -769,7 +769,7 @@ async def test_async_get_announce_addresses_no_source_ip(hass: HomeAssistant) ->
 
 
 async def test_websocket_network_url(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the network/url websocket command."""
     assert await async_setup_component(hass, "network", {})
@@ -778,9 +778,9 @@ async def test_websocket_network_url(
 
     with (
         patch(
-            "homeassistant.helpers.network._get_internal_url", return_value="internal"
+            "smarthub.helpers.network._get_internal_url", return_value="internal"
         ),
-        patch("homeassistant.helpers.network._get_cloud_url", return_value="cloud"),
+        patch("smarthub.helpers.network._get_cloud_url", return_value="cloud"),
     ):
         await client.send_json({"id": 1, "type": "network/url"})
         msg = await client.receive_json()
@@ -794,7 +794,7 @@ async def test_websocket_network_url(
     # Test with no cloud URL
     with (
         patch(
-            "homeassistant.helpers.network._get_internal_url", return_value="internal"
+            "smarthub.helpers.network._get_internal_url", return_value="internal"
         ),
     ):
         await client.send_json({"id": 2, "type": "network/url"})
@@ -810,10 +810,10 @@ async def test_websocket_network_url(
 @pytest.mark.parametrize("mock_socket", [[]], indirect=True)
 @pytest.mark.usefixtures("mock_socket")
 async def test_repair_docker_host_network_not_docker(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test repair is not created when not in Docker."""
-    with patch("homeassistant.util.package.is_docker_env", return_value=False):
+    with patch("smarthub.util.package.is_docker_env", return_value=False):
         assert await async_setup_component(hass, "network", {})
 
     assert not issue_registry.async_get_issue(DOMAIN, "docker_host_network")
@@ -822,12 +822,12 @@ async def test_repair_docker_host_network_not_docker(
 @pytest.mark.parametrize("mock_socket", [[]], indirect=True)
 @pytest.mark.usefixtures("mock_socket")
 async def test_repair_docker_host_network_with_host_networking(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test repair is not created when in Docker with host networking."""
     with (
-        patch("homeassistant.util.package.is_docker_env", return_value=True),
-        patch("homeassistant.components.network.Path.exists", return_value=True),
+        patch("smarthub.util.package.is_docker_env", return_value=True),
+        patch("smarthub.components.network.Path.exists", return_value=True),
     ):
         assert await async_setup_component(hass, "network", {})
 
@@ -837,14 +837,14 @@ async def test_repair_docker_host_network_with_host_networking(
 @pytest.mark.parametrize("mock_socket", [[]], indirect=True)
 @pytest.mark.usefixtures("mock_socket")
 async def test_repair_docker_host_network_without_host_networking(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test repair is created when in Docker without host networking."""
     with (
-        patch("homeassistant.util.package.is_docker_env", return_value=True),
-        patch("homeassistant.components.network.Path.exists", return_value=False),
+        patch("smarthub.util.package.is_docker_env", return_value=True),
+        patch("smarthub.components.network.Path.exists", return_value=False),
     ):
         assert await async_setup_component(hass, "network", {})
 

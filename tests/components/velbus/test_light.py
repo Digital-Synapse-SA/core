@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_FLASH,
     ATTR_TRANSITION,
@@ -13,14 +13,14 @@ from homeassistant.components.light import (
     FLASH_LONG,
     FLASH_SHORT,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -29,20 +29,20 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.velbus.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.velbus.PLATFORMS", [Platform.LIGHT]):
         await init_integration(hass, config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
 
 async def test_dimmer_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dimmer: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -90,7 +90,7 @@ async def test_dimmer_actions(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_led_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_button: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:

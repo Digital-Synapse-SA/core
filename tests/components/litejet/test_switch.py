@@ -1,7 +1,7 @@
 """The tests for the litejet component."""
 
-from homeassistant.components import switch
-from homeassistant.const import (
+from smarthub.components import switch
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -9,7 +9,7 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import async_init_integration
 
@@ -19,7 +19,7 @@ ENTITY_OTHER_SWITCH = "switch.mock_switch_2"
 ENTITY_OTHER_SWITCH_NUMBER = 2
 
 
-async def test_on_off(hass: HomeAssistant, mock_litejet) -> None:
+async def test_on_off(hass: SmartHub, mock_litejet) -> None:
     """Test turning the switch on and off."""
 
     await async_init_integration(hass, use_switch=True)
@@ -40,7 +40,7 @@ async def test_on_off(hass: HomeAssistant, mock_litejet) -> None:
     mock_litejet.release_switch.assert_called_with(ENTITY_SWITCH_NUMBER)
 
 
-async def test_pressed_event(hass: HomeAssistant, mock_litejet) -> None:
+async def test_pressed_event(hass: SmartHub, mock_litejet) -> None:
     """Test handling an event from LiteJet."""
 
     await async_init_integration(hass, use_switch=True)
@@ -64,7 +64,7 @@ async def test_pressed_event(hass: HomeAssistant, mock_litejet) -> None:
     assert hass.states.get(ENTITY_OTHER_SWITCH).state == STATE_ON
 
 
-async def test_released_event(hass: HomeAssistant, mock_litejet) -> None:
+async def test_released_event(hass: SmartHub, mock_litejet) -> None:
     """Test handling an event from LiteJet."""
 
     await async_init_integration(hass, use_switch=True)
@@ -85,7 +85,7 @@ async def test_released_event(hass: HomeAssistant, mock_litejet) -> None:
     assert hass.states.get(ENTITY_OTHER_SWITCH).state == STATE_OFF
 
 
-async def test_connected_event(hass: HomeAssistant, mock_litejet) -> None:
+async def test_connected_event(hass: SmartHub, mock_litejet) -> None:
     """Test handling an event from LiteJet."""
 
     await async_init_integration(hass, use_switch=True)

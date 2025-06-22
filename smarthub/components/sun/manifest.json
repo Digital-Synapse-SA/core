@@ -1,0 +1,10 @@
+{
+  "domain": "sun",
+  "name": "Sun",
+  "codeowners": ["@smart-hub/core"],
+  "config_flow": true,
+  "documentation": "https://www.smart-hub.io/integrations/sun",
+  "iot_class": "calculated",
+  "quality_scale": "internal",
+  "single_config_entry": true
+}

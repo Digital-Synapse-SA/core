@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from p1monitor import P1MonitorConnectionError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.p1_monitor.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components.p1_monitor.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_p1monitor: AsyncMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_p1monitor: AsyncMock
 ) -> None:
     """Test the P1 Monitor configuration entry loading/unloading."""
     mock_config_entry.add_to_hass(hass)
@@ -30,12 +30,12 @@ async def test_load_unload_config_entry(
 
 
 @patch(
-    "homeassistant.components.p1_monitor.coordinator.P1Monitor._request",
+    "smarthub.components.p1_monitor.coordinator.P1Monitor._request",
     side_effect=P1MonitorConnectionError,
 )
 async def test_config_entry_not_ready(
     mock_request: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the P1 Monitor configuration entry not ready."""
@@ -47,7 +47,7 @@ async def test_config_entry_not_ready(
     assert mock_config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_migration(hass: HomeAssistant, snapshot: SnapshotAssertion) -> None:
+async def test_migration(hass: SmartHub, snapshot: SnapshotAssertion) -> None:
     """Test config entry version 1 -> 2 migration."""
     mock_config_entry = MockConfigEntry(
         unique_id="unique_thingy",
@@ -63,7 +63,7 @@ async def test_migration(hass: HomeAssistant, snapshot: SnapshotAssertion) -> No
     assert hass.config_entries.async_get_entry(mock_config_entry.entry_id) == snapshot
 
 
-async def test_port_migration(hass: HomeAssistant, snapshot: SnapshotAssertion) -> None:
+async def test_port_migration(hass: SmartHub, snapshot: SnapshotAssertion) -> None:
     """Test migration of host:port to separate host and port."""
     mock_config_entry = MockConfigEntry(
         unique_id="unique_thingy",

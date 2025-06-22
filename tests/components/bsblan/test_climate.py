@@ -8,7 +8,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
     DOMAIN as CLIMATE_DOMAIN,
@@ -19,10 +19,10 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_with_selected_platforms
 
@@ -32,7 +32,7 @@ ENTITY_ID = "climate.bsb_lan"
 
 
 async def test_celsius_fahrenheit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -45,7 +45,7 @@ async def test_celsius_fahrenheit(
 
 
 async def test_climate_entity_properties(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -96,7 +96,7 @@ async def test_climate_entity_properties(
     [HVACMode.HEAT, HVACMode.AUTO, HVACMode.OFF],
 )
 async def test_async_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mode: HVACMode,
@@ -125,7 +125,7 @@ async def test_async_set_hvac_mode(
     ],
 )
 async def test_async_set_preset_mode_succes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hvac_mode: HVACMode,
@@ -159,7 +159,7 @@ async def test_async_set_preset_mode_succes(
     ],
 )
 async def test_async_set_preset_mode_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hvac_mode: HVACMode,
@@ -175,7 +175,7 @@ async def test_async_set_preset_mode_error(
 
     # Attempt to set the preset mode
     error_message = "Preset mode can only be set when HVAC mode is set to 'auto'"
-    with pytest.raises(HomeAssistantError, match=error_message):
+    with pytest.raises(SmartHubError, match=error_message):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -193,7 +193,7 @@ async def test_async_set_preset_mode_error(
     ],
 )
 async def test_async_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
     target_temp: float,
@@ -212,7 +212,7 @@ async def test_async_set_temperature(
 
 
 async def test_async_set_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -267,7 +267,7 @@ async def test_async_set_data(
     # Test error handling
     mock_bsblan.thermostat.side_effect = BSBLANError("Test error")
     error_message = "An error occurred while updating the BSBLAN device"
-    with pytest.raises(HomeAssistantError, match=error_message):
+    with pytest.raises(SmartHubError, match=error_message):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,

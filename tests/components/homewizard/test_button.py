@@ -6,11 +6,11 @@ from homewizard_energy.errors import DisabledError, RequestError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import button
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components import button
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = [
     pytest.mark.usefixtures("init_integration"),
@@ -20,14 +20,14 @@ pytestmark = [
 
 @pytest.mark.parametrize("device_fixture", ["SDM230", "SDM630", "HWE-KWH1", "HWE-KWH3"])
 async def test_identify_button_entity_not_loaded_when_not_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Does not load button when device has no support for it."""
     assert not hass.states.get("button.device_identify")
 
 
 async def test_identify_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_homewizardenergy: MagicMock,
@@ -60,7 +60,7 @@ async def test_identify_button(
     mock_homewizardenergy.identify.side_effect = RequestError()
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"^An error occurred while communicating with your HomeWizard Energy device$",
     ):
         await hass.services.async_call(
@@ -78,7 +78,7 @@ async def test_identify_button(
     mock_homewizardenergy.identify.side_effect = DisabledError()
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"^The local API is disabled$",
     ):
         await hass.services.async_call(

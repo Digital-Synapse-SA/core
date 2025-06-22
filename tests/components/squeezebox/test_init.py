@@ -3,14 +3,14 @@
 from http import HTTPStatus
 from unittest.mock import patch
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_init_api_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test init fail due to API fail."""
@@ -18,7 +18,7 @@ async def test_init_api_fail(
     # Setup component to fail...
     with (
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=False,
         ),
     ):
@@ -26,7 +26,7 @@ async def test_init_api_fail(
 
 
 async def test_init_timeout_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test init fail due to TimeoutError."""
@@ -34,7 +34,7 @@ async def test_init_timeout_error(
     # Setup component to raise TimeoutError
     with (
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             side_effect=TimeoutError,
         ),
     ):
@@ -43,7 +43,7 @@ async def test_init_timeout_error(
 
 
 async def test_init_unauthorized(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test init fail due to unauthorized error."""
@@ -51,11 +51,11 @@ async def test_init_unauthorized(
     # Setup component to simulate unauthorized response
     with (
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=False,  # async_query returns False on auth failure
         ),
         patch(
-            "homeassistant.components.squeezebox.Server",  # Patch the Server class itself
+            "smarthub.components.squeezebox.Server",  # Patch the Server class itself
             autospec=True,
         ) as mock_server_instance,
     ):
@@ -65,7 +65,7 @@ async def test_init_unauthorized(
 
 
 async def test_init_missing_uuid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test init fail due to missing UUID in server status."""
@@ -73,7 +73,7 @@ async def test_init_missing_uuid(
     mock_status_without_uuid = {"name": "Test Server"}
 
     with patch(
-        "homeassistant.components.squeezebox.Server.async_query",
+        "smarthub.components.squeezebox.Server.async_query",
         return_value=mock_status_without_uuid,
     ) as mock_async_query:
         # ConfigEntryError is raised, caught by setup, and returns False

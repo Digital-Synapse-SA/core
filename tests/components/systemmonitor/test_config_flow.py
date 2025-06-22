@@ -4,16 +4,16 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock
 
-from homeassistant import config_entries
-from homeassistant.components.systemmonitor.const import CONF_PROCESS, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub import config_entries
+from smarthub.components.systemmonitor.const import CONF_PROCESS, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -35,7 +35,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
 
 
 async def test_form_already_configured(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test abort when already configured."""
     config_entry = MockConfigEntry(
@@ -54,7 +54,7 @@ async def test_form_already_configured(
 
 
 async def test_add_and_remove_processes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

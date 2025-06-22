@@ -5,8 +5,8 @@ from unittest.mock import patch
 import pypck
 import pytest
 
-from homeassistant.components.lcn import DOMAIN
-from homeassistant.components.lcn.const import (
+from smarthub.components.lcn import DOMAIN
+from smarthub.components.lcn.const import (
     CONF_KEYS,
     CONF_LED,
     CONF_OUTPUT,
@@ -22,15 +22,15 @@ from homeassistant.components.lcn.const import (
     CONF_VALUE,
     CONF_VARIABLE,
 )
-from homeassistant.components.lcn.services import LcnService
-from homeassistant.const import (
+from smarthub.components.lcn.services import LcnService
+from smarthub.const import (
     CONF_BRIGHTNESS,
     CONF_DEVICE_ID,
     CONF_STATE,
     CONF_UNIT_OF_MEASUREMENT,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .conftest import (
     MockConfigEntry,
@@ -41,7 +41,7 @@ from .conftest import (
 
 
 async def test_service_output_abs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test output_abs service."""
@@ -65,7 +65,7 @@ async def test_service_output_abs(
 
 
 async def test_service_output_rel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test output_rel service."""
@@ -88,7 +88,7 @@ async def test_service_output_rel(
 
 
 async def test_service_output_toggle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test output_toggle service."""
@@ -111,7 +111,7 @@ async def test_service_output_toggle(
 
 
 async def test_service_relays(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test relays service."""
@@ -136,7 +136,7 @@ async def test_service_relays(
 
 
 async def test_service_led(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test led service."""
@@ -162,7 +162,7 @@ async def test_service_led(
 
 
 async def test_service_var_abs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test var_abs service."""
@@ -188,7 +188,7 @@ async def test_service_var_abs(
 
 
 async def test_service_var_rel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test var_rel service."""
@@ -218,7 +218,7 @@ async def test_service_var_rel(
 
 
 async def test_service_var_reset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test var_reset service."""
@@ -240,7 +240,7 @@ async def test_service_var_reset(
 
 
 async def test_service_lock_regulator(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test lock_regulator service."""
@@ -263,7 +263,7 @@ async def test_service_lock_regulator(
 
 
 async def test_service_send_keys(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test send_keys service."""
@@ -291,7 +291,7 @@ async def test_service_send_keys(
 
 
 async def test_service_send_keys_hit_deferred(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test send_keys (hit_deferred) service."""
@@ -345,7 +345,7 @@ async def test_service_send_keys_hit_deferred(
 
 
 async def test_service_lock_keys(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test lock_keys service."""
@@ -371,7 +371,7 @@ async def test_service_lock_keys(
 
 
 async def test_service_lock_keys_tab_a_temporary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test lock_keys (tab_a_temporary) service."""
@@ -423,7 +423,7 @@ async def test_service_lock_keys_tab_a_temporary(
 
 
 async def test_service_dyn_text(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test dyn_text service."""
@@ -446,7 +446,7 @@ async def test_service_dyn_text(
 
 
 async def test_service_pck(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test pck service."""

@@ -10,21 +10,21 @@ import ring_doorbell
 from ring_doorbell.webrtcstream import RingWebRtcMessage
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.camera import (
+from smarthub.components.camera import (
     CameraEntityFeature,
     StreamType,
     async_get_image,
     async_get_mjpeg_stream,
     get_camera_from_entity_id,
 )
-from homeassistant.components.ring.camera import FORCE_REFRESH_INTERVAL
-from homeassistant.components.ring.const import SCAN_INTERVAL
-from homeassistant.config_entries import SOURCE_REAUTH
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.aiohttp import MockStreamReader
+from smarthub.components.ring.camera import FORCE_REFRESH_INTERVAL
+from smarthub.components.ring.const import SCAN_INTERVAL
+from smarthub.config_entries import SOURCE_REAUTH
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.util.aiohttp import MockStreamReader
 
 from .common import MockConfigEntry, setup_platform
 from .device_mocks import FRONT_DEVICE_ID
@@ -42,7 +42,7 @@ SMALLEST_VALID_JPEG_BYTES = bytes.fromhex(SMALLEST_VALID_JPEG)
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -66,7 +66,7 @@ async def test_states(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_camera_motion_detection_state_reports_correctly(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     entity_name,
     expected_state,
@@ -82,7 +82,7 @@ async def test_camera_motion_detection_state_reports_correctly(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_camera_motion_detection_can_be_turned_on_and_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
 ) -> None:
     """Tests the siren turns on correctly."""
@@ -118,7 +118,7 @@ async def test_camera_motion_detection_can_be_turned_on_and_off(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_camera_motion_detection_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     mock_ring_devices,
     caplog: pytest.LogCaptureFixture,
@@ -166,7 +166,7 @@ async def test_camera_motion_detection_not_supported(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_motion_detection_errors_when_turned_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     mock_ring_devices,
     exception_type,
@@ -181,7 +181,7 @@ async def test_motion_detection_errors_when_turned_on(
     front_camera_mock = mock_ring_devices.get_device(765432)
     front_camera_mock.async_set_motion_detection.side_effect = exception_type
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "camera",
             "enable_motion_detection",
@@ -202,7 +202,7 @@ async def test_motion_detection_errors_when_turned_on(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_camera_handle_mjpeg_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     mock_ring_devices,
     freezer: FrozenDateTimeFactory,
@@ -271,7 +271,7 @@ async def test_camera_handle_mjpeg_stream(
 
     # Now the stream should be returned
     stream_reader = MockStreamReader(SMALLEST_VALID_JPEG_BYTES)
-    with patch("homeassistant.components.ring.camera.CameraMjpeg") as mock_camera:
+    with patch("smarthub.components.ring.camera.CameraMjpeg") as mock_camera:
         mock_camera.return_value.get_reader = AsyncMock(return_value=stream_reader)
         mock_camera.return_value.open_camera = AsyncMock()
         mock_camera.return_value.close = AsyncMock()
@@ -285,7 +285,7 @@ async def test_camera_handle_mjpeg_stream(
 
 
 async def test_camera_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     mock_ring_devices,
     freezer: FrozenDateTimeFactory,
@@ -303,10 +303,10 @@ async def test_camera_image(
     front_camera_mock.async_recording_url.assert_not_called()
     with (
         patch(
-            "homeassistant.components.ring.camera.ffmpeg.async_get_image",
+            "smarthub.components.ring.camera.ffmpeg.async_get_image",
             return_value=SMALLEST_VALID_JPEG_BYTES,
         ),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         image = await async_get_image(hass, "camera.front_live_view")
 
@@ -318,7 +318,7 @@ async def test_camera_image(
     front_camera_mock.async_recording_url.assert_called_once()
 
     with patch(
-        "homeassistant.components.ring.camera.ffmpeg.async_get_image",
+        "smarthub.components.ring.camera.ffmpeg.async_get_image",
         return_value=SMALLEST_VALID_JPEG_BYTES,
     ):
         image = await async_get_image(hass, "camera.front_live_view")
@@ -327,7 +327,7 @@ async def test_camera_image(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_camera_stream_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -352,7 +352,7 @@ async def test_camera_stream_attributes(
 
 
 async def test_camera_webrtc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,

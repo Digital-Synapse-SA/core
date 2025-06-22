@@ -2,16 +2,16 @@
 
 import pytest
 
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.state import async_reproduce_state
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, State
+from smarthub.helpers.state import async_reproduce_state
+from smarthub.setup import async_setup_component
 
 VALID_NUMBER1 = "19.0"
 VALID_NUMBER2 = "99.9"
 
 
 async def test_reproducing_states(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reproducing Input number states."""
 

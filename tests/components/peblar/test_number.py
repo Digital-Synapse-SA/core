@@ -6,17 +6,17 @@ from peblar import PeblarAuthenticationError, PeblarConnectionError, PeblarError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.components.peblar.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.peblar.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import (
     MockConfigEntry,
@@ -28,7 +28,7 @@ from tests.common import (
 @pytest.mark.parametrize("init_integration", [Platform.NUMBER], indirect=True)
 @pytest.mark.usefixtures("init_integration")
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -52,7 +52,7 @@ async def test_entities(
 @pytest.mark.parametrize("init_integration", [Platform.NUMBER], indirect=True)
 @pytest.mark.usefixtures("init_integration", "entity_registry_enabled_by_default")
 async def test_number_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
 ) -> None:
     """Test the Peblar EV charger numbers."""
@@ -76,7 +76,7 @@ async def test_number_set_value(
 
 
 async def test_number_set_value_when_charging_is_suspended(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -138,7 +138,7 @@ async def test_number_set_value_when_charging_is_suspended(
 @pytest.mark.parametrize("init_integration", [Platform.NUMBER], indirect=True)
 @pytest.mark.usefixtures("init_integration", "entity_registry_enabled_by_default")
 async def test_number_set_value_communication_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     error: Exception,
     error_match: str,
@@ -150,7 +150,7 @@ async def test_number_set_value_communication_error(
     mock_peblar.rest_api.return_value.ev_interface.side_effect = error
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=error_match,
     ) as excinfo:
         await hass.services.async_call(
@@ -171,7 +171,7 @@ async def test_number_set_value_communication_error(
 @pytest.mark.parametrize("init_integration", [Platform.NUMBER], indirect=True)
 @pytest.mark.usefixtures("init_integration")
 async def test_number_set_value_authentication_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -182,7 +182,7 @@ async def test_number_set_value_authentication_error(
     )
     mock_peblar.login.side_effect = PeblarAuthenticationError("Authentication error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=(
             r"An authentication failure occurred while communicating "
             r"with the Peblar EV charger"
@@ -229,7 +229,7 @@ async def test_number_set_value_authentication_error(
     ],
 )
 async def test_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     mock_config_entry: MockConfigEntry,
     restore_state: str,

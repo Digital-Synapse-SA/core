@@ -9,23 +9,23 @@ from freezegun.api import FrozenDateTimeFactory
 from pydrawise.schema import Controller
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.hydrawise.const import MAIN_SCAN_INTERVAL
-from homeassistant.const import STATE_OFF, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.hydrawise.const import MAIN_SCAN_INTERVAL
+from smarthub.const import STATE_OFF, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
 
 async def test_all_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_add_config_entry: Callable[[], Awaitable[MockConfigEntry]],
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that all binary sensors are working."""
     with patch(
-        "homeassistant.components.hydrawise.PLATFORMS",
+        "smarthub.components.hydrawise.PLATFORMS",
         [Platform.BINARY_SENSOR],
     ):
         config_entry = await mock_add_config_entry()
@@ -33,7 +33,7 @@ async def test_all_binary_sensors(
 
 
 async def test_update_data_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_pydrawise: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -53,7 +53,7 @@ async def test_update_data_fails(
 
 
 async def test_controller_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_pydrawise: AsyncMock,
     freezer: FrozenDateTimeFactory,

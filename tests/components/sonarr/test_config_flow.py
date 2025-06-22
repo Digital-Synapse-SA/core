@@ -4,24 +4,24 @@ from unittest.mock import MagicMock, patch
 
 from aiopyarr import ArrAuthenticationException, ArrException
 
-from homeassistant.components.sonarr.const import (
+from smarthub.components.sonarr.const import (
     CONF_UPCOMING_DAYS,
     CONF_WANTED_MAX_ITEMS,
     DEFAULT_UPCOMING_DAYS,
     DEFAULT_WANTED_MAX_ITEMS,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_SOURCE, CONF_URL, CONF_VERIFY_SSL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_SOURCE, CONF_URL, CONF_VERIFY_SSL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import MOCK_REAUTH_INPUT, MOCK_USER_INPUT
 
 from tests.common import MockConfigEntry
 
 
-async def test_show_user_form(hass: HomeAssistant) -> None:
+async def test_show_user_form(hass: SmartHub) -> None:
     """Test that the user set up form is served."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -33,7 +33,7 @@ async def test_show_user_form(hass: HomeAssistant) -> None:
 
 
 async def test_cannot_connect(
-    hass: HomeAssistant, mock_sonarr_config_flow: MagicMock
+    hass: SmartHub, mock_sonarr_config_flow: MagicMock
 ) -> None:
     """Test we show user form on connection error."""
     mock_sonarr_config_flow.async_get_system_status.side_effect = ArrException
@@ -51,7 +51,7 @@ async def test_cannot_connect(
 
 
 async def test_url_rewrite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_sonarr_config_flow: MagicMock,
     mock_setup_entry: None,
 ) -> None:
@@ -79,7 +79,7 @@ async def test_url_rewrite(
 
 
 async def test_invalid_auth(
-    hass: HomeAssistant, mock_sonarr_config_flow: MagicMock
+    hass: SmartHub, mock_sonarr_config_flow: MagicMock
 ) -> None:
     """Test we show user form on invalid auth."""
     mock_sonarr_config_flow.async_get_system_status.side_effect = (
@@ -99,7 +99,7 @@ async def test_invalid_auth(
 
 
 async def test_unknown_error(
-    hass: HomeAssistant, mock_sonarr_config_flow: MagicMock
+    hass: SmartHub, mock_sonarr_config_flow: MagicMock
 ) -> None:
     """Test we show user form on unknown error."""
     mock_sonarr_config_flow.async_get_system_status.side_effect = Exception
@@ -116,7 +116,7 @@ async def test_unknown_error(
 
 
 async def test_full_reauth_flow_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_sonarr_config_flow: MagicMock,
     mock_setup_entry: None,
     init_integration: MockConfigEntry,
@@ -149,7 +149,7 @@ async def test_full_reauth_flow_implementation(
 
 
 async def test_full_user_flow_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_sonarr_config_flow: MagicMock,
     mock_setup_entry: None,
 ) -> None:
@@ -177,7 +177,7 @@ async def test_full_user_flow_implementation(
 
 
 async def test_full_user_flow_advanced_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_sonarr_config_flow: MagicMock,
     mock_setup_entry: None,
 ) -> None:
@@ -207,9 +207,9 @@ async def test_full_user_flow_advanced_options(
     assert result["data"][CONF_VERIFY_SSL]
 
 
-@patch("homeassistant.components.sonarr.PLATFORMS", [])
+@patch("smarthub.components.sonarr.PLATFORMS", [])
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: None,
     init_integration: MockConfigEntry,
 ) -> None:

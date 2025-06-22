@@ -3,20 +3,20 @@
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.camera import (
+from smarthub.components.camera import (
     CameraState,
     async_get_image,
     async_get_stream_source,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import mock_not_found_exception
 from .conftest import DoorbirdMockerType
 
 
 async def test_doorbird_cameras(
-    hass: HomeAssistant,
+    hass: SmartHub,
     doorbird_mocker: DoorbirdMockerType,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -31,10 +31,10 @@ async def test_doorbird_cameras(
     assert await async_get_stream_source(hass, live_camera_entity_id) is not None
     api = doorbird_entry.api
     api.get_image.side_effect = mock_not_found_exception()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await async_get_image(hass, live_camera_entity_id)
     api.get_image.side_effect = TimeoutError()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await async_get_image(hass, live_camera_entity_id)
     api.get_image.side_effect = None
     assert (await async_get_image(hass, live_camera_entity_id)).content == b"image"

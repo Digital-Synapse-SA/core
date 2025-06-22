@@ -4,8 +4,8 @@ from datetime import timedelta
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -14,7 +14,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_calendar(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
 ) -> None:

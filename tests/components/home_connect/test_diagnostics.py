@@ -5,20 +5,20 @@ from unittest.mock import MagicMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.home_connect.const import DOMAIN
-from homeassistant.components.home_connect.diagnostics import (
+from smarthub.components.home_connect.const import DOMAIN
+from smarthub.components.home_connect.diagnostics import (
     async_get_config_entry_diagnostics,
     async_get_device_diagnostics,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 
 
 async def test_async_get_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -32,7 +32,7 @@ async def test_async_get_config_entry_diagnostics(
 
 
 async def test_async_get_device_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
     config_entry: MockConfigEntry,

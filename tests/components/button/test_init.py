@@ -7,25 +7,25 @@ from unittest.mock import MagicMock
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.button import (
+from smarthub.components.button import (
     DOMAIN,
     SERVICE_PRESS,
     ButtonDeviceClass,
     ButtonEntity,
     ButtonEntityDescription,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_PLATFORM,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub, State
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .const import TEST_DOMAIN
 
@@ -40,7 +40,7 @@ from tests.common import (
 )
 
 
-async def test_button(hass: HomeAssistant) -> None:
+async def test_button(hass: SmartHub) -> None:
     """Test getting data from the mocked button entity."""
     button = ButtonEntity()
     assert button.state is None
@@ -58,7 +58,7 @@ async def test_button(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("enable_custom_integrations", "setup_platform")
 async def test_custom_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -96,7 +96,7 @@ async def test_custom_integration(
 
 
 @pytest.mark.usefixtures("enable_custom_integrations", "setup_platform")
-async def test_restore_state(hass: HomeAssistant) -> None:
+async def test_restore_state(hass: SmartHub) -> None:
     """Test we restore state integration."""
     mock_restore_cache(hass, (State("button.button_1", "2021-01-01T23:59:59+00:00"),))
 
@@ -107,7 +107,7 @@ async def test_restore_state(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_custom_integrations", "setup_platform")
-async def test_restore_state_does_not_restore_unavailable(hass: HomeAssistant) -> None:
+async def test_restore_state_does_not_restore_unavailable(hass: SmartHub) -> None:
     """Test we restore state integration except for unavailable."""
     mock_restore_cache(hass, (State("button.button_1", STATE_UNAVAILABLE),))
 
@@ -122,7 +122,7 @@ class MockFlow(ConfigFlow):
 
 
 @pytest.fixture(autouse=True)
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -130,11 +130,11 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
         yield
 
 
-async def test_name(hass: HomeAssistant) -> None:
+async def test_name(hass: SmartHub) -> None:
     """Test button name."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -176,7 +176,7 @@ async def test_name(hass: HomeAssistant) -> None:
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:

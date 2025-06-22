@@ -9,12 +9,12 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -22,8 +22,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .common import DEVICE_ID, CreateDevice, PlatformSetup, create_nest_event
 
@@ -41,7 +41,7 @@ def device_traits() -> dict[str, Any]:
 
 
 async def test_thermostat_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     create_device: CreateDevice,
@@ -96,7 +96,7 @@ async def test_thermostat_device(
 
 
 async def test_thermostat_device_available(
-    hass: HomeAssistant, create_device: CreateDevice, setup_platform: PlatformSetup
+    hass: SmartHub, create_device: CreateDevice, setup_platform: PlatformSetup
 ) -> None:
     """Test a thermostat with temperature and humidity sensors that is Online."""
     create_device.create(
@@ -122,7 +122,7 @@ async def test_thermostat_device_available(
 
 
 async def test_thermostat_device_unavailable(
-    hass: HomeAssistant, create_device: CreateDevice, setup_platform: PlatformSetup
+    hass: SmartHub, create_device: CreateDevice, setup_platform: PlatformSetup
 ) -> None:
     """Test a thermostat with temperature and humidity sensors that is Offline."""
     create_device.create(
@@ -147,7 +147,7 @@ async def test_thermostat_device_unavailable(
     assert humidity.state == STATE_UNAVAILABLE
 
 
-async def test_no_devices(hass: HomeAssistant, setup_platform: PlatformSetup) -> None:
+async def test_no_devices(hass: SmartHub, setup_platform: PlatformSetup) -> None:
     """Test no devices returned by the api."""
     await setup_platform()
 
@@ -159,7 +159,7 @@ async def test_no_devices(hass: HomeAssistant, setup_platform: PlatformSetup) ->
 
 
 async def test_device_no_sensor_traits(
-    hass: HomeAssistant, create_device: CreateDevice, setup_platform: PlatformSetup
+    hass: SmartHub, create_device: CreateDevice, setup_platform: PlatformSetup
 ) -> None:
     """Test a device with applicable sensor traits."""
     create_device.create({})
@@ -174,7 +174,7 @@ async def test_device_no_sensor_traits(
 
 @pytest.mark.parametrize("device_traits", [{}])  # Disable default name
 async def test_device_name_from_structure(
-    hass: HomeAssistant, create_device: CreateDevice, setup_platform: PlatformSetup
+    hass: SmartHub, create_device: CreateDevice, setup_platform: PlatformSetup
 ) -> None:
     """Test a device without a custom name, inferring name from structure."""
     create_device.create(
@@ -197,7 +197,7 @@ async def test_device_name_from_structure(
 
 
 async def test_event_updates_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     subscriber: AsyncMock,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -241,7 +241,7 @@ async def test_event_updates_sensor(
 
 @pytest.mark.parametrize("device_type", ["some-unknown-type"])
 async def test_device_with_unknown_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     create_device: CreateDevice,
@@ -273,7 +273,7 @@ async def test_device_with_unknown_type(
 
 
 async def test_temperature_rounding(
-    hass: HomeAssistant, create_device: CreateDevice, setup_platform: PlatformSetup
+    hass: SmartHub, create_device: CreateDevice, setup_platform: PlatformSetup
 ) -> None:
     """Test the rounding of overly precise temperatures."""
     create_device.create(

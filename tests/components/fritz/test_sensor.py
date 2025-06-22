@@ -9,12 +9,12 @@ from fritzconnection.core.exceptions import FritzConnectionException
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fritz.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.fritz.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .const import MOCK_USER_DATA
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 @pytest.mark.freeze_time(datetime(2024, 9, 1, 20, tzinfo=UTC))
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     fc_class_mock,
     fh_class_mock,
@@ -35,7 +35,7 @@ async def test_sensor_setup(
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
     entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.fritz.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.fritz.PLATFORMS", [Platform.SENSOR]):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
@@ -43,7 +43,7 @@ async def test_sensor_setup(
 
 
 async def test_sensor_update_fail(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, fc_class_mock, fh_class_mock
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, fc_class_mock, fh_class_mock
 ) -> None:
     """Test failed update of Fritz!Tools sensors."""
 

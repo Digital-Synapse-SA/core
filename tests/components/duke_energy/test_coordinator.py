@@ -5,15 +5,15 @@ from unittest.mock import Mock, patch
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder import Recorder
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_api_with_meters: Mock,
     freezer: FrozenDateTimeFactory,
@@ -28,7 +28,7 @@ async def test_update(
     assert mock_api_with_meters.get_energy_usage.call_count == 37
 
     with patch(
-        "homeassistant.components.duke_energy.coordinator.get_last_statistics",
+        "smarthub.components.duke_energy.coordinator.get_last_statistics",
         return_value={
             "duke_energy:electric_123_energy_consumption": [
                 {"start": dt_util.now().timestamp()}

@@ -13,21 +13,21 @@ from wled import (
     WLEDError,
 )
 
-from homeassistant.components.wled.const import SCAN_INTERVAL
-from homeassistant.const import (
+from smarthub.components.wled.const import SCAN_INTERVAL
+from smarthub.const import (
     EVENT_HOMEASSISTANT_STOP,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_not_supporting_websocket(
-    hass: HomeAssistant, init_integration: MockConfigEntry, mock_wled: MagicMock
+    hass: SmartHub, init_integration: MockConfigEntry, mock_wled: MagicMock
 ) -> None:
     """Ensure no WebSocket attempt is made if non-WebSocket device."""
     assert mock_wled.connect.call_count == 0
@@ -35,7 +35,7 @@ async def test_not_supporting_websocket(
 
 @pytest.mark.parametrize("device_fixture", ["rgb_websocket"])
 async def test_websocket_already_connected(
-    hass: HomeAssistant, init_integration: MockConfigEntry, mock_wled: MagicMock
+    hass: SmartHub, init_integration: MockConfigEntry, mock_wled: MagicMock
 ) -> None:
     """Ensure no a second WebSocket connection is made, if already connected."""
     assert mock_wled.connect.call_count == 1
@@ -49,7 +49,7 @@ async def test_websocket_already_connected(
 
 @pytest.mark.parametrize("device_fixture", ["rgb_websocket"])
 async def test_websocket_connect_error_no_listen(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_wled: MagicMock,
 ) -> None:
@@ -67,7 +67,7 @@ async def test_websocket_connect_error_no_listen(
 
 @pytest.mark.parametrize("device_fixture", ["rgb_websocket"])
 async def test_websocket(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_wled: MagicMock,
 ) -> None:
@@ -100,7 +100,7 @@ async def test_websocket(
     callback = await connection_connected
 
     # Connected to WebSocket, disconnect not called
-    # listening for Home Assistant to stop
+    # listening for SmartHub to stop
     assert mock_wled.connect.call_count == 2
     assert mock_wled.listen.call_count == 2
     assert mock_wled.disconnect.call_count == 1
@@ -128,7 +128,7 @@ async def test_websocket(
     connection_finished.set_exception(WLEDConnectionClosedError)
     await hass.async_block_till_done()
 
-    # Disconnect called, unsubbed Home Assistant stop listener
+    # Disconnect called, unsubbed SmartHub stop listener
     assert mock_wled.disconnect.call_count == 2
     assert mock_bus.async_listen_once.return_value.call_count == 1
 
@@ -140,7 +140,7 @@ async def test_websocket(
 
 @pytest.mark.parametrize("device_fixture", ["rgb_websocket"])
 async def test_websocket_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_wled: MagicMock,
 ) -> None:
@@ -172,11 +172,11 @@ async def test_websocket_error(
 
 @pytest.mark.parametrize("device_fixture", ["rgb_websocket"])
 async def test_websocket_disconnect_on_home_assistant_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_wled: MagicMock,
 ) -> None:
-    """Ensure WebSocket is disconnected when Home Assistant stops."""
+    """Ensure WebSocket is disconnected when SmartHub stops."""
     assert mock_wled.disconnect.call_count == 1
     connection_connected = asyncio.Future()
     connection_finished = asyncio.Future()

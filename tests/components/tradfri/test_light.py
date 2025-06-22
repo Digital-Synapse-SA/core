@@ -6,7 +6,7 @@ import pytest
 from pytradfri.const import ATTR_DEVICE_STATE, ATTR_LIGHT_CONTROL, ATTR_REACHABLE_STATE
 from pytradfri.device import Device
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
@@ -17,15 +17,15 @@ from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     ColorMode,
 )
-from homeassistant.components.tradfri.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.tradfri.const import DOMAIN
+from smarthub.const import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import CommandStore, setup_integration
 
@@ -88,7 +88,7 @@ def bulb_cws() -> str:
     indirect=["device"],
 )
 async def test_light_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: Device,
     entity_id: str,
     state_attributes: dict[str, Any],
@@ -105,7 +105,7 @@ async def test_light_state(
 
 @pytest.mark.parametrize("device", ["bulb_w"], indirect=True)
 async def test_light_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
 ) -> None:
@@ -236,7 +236,7 @@ async def test_light_available(
     ],
 )
 async def test_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
     entity_id: str,
@@ -284,7 +284,7 @@ async def test_turn_on(
     indirect=["device"],
 )
 async def test_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
     entity_id: str,

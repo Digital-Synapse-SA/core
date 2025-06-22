@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 import voluptuous as vol
 
-from homeassistant import config_entries
-from homeassistant.components.mopeka.const import CONF_MEDIUM_TYPE, DOMAIN, MediumType
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.mopeka.const import CONF_MEDIUM_TYPE, DOMAIN, MediumType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import NOT_MOPEKA_SERVICE_INFO, PRO_SERVICE_INFO
 
 from tests.common import MockConfigEntry
 
 
-async def test_async_step_bluetooth_valid_device(hass: HomeAssistant) -> None:
+async def test_async_step_bluetooth_valid_device(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -24,7 +24,7 @@ async def test_async_step_bluetooth_valid_device(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "bluetooth_confirm"
 
-    with patch("homeassistant.components.mopeka.async_setup_entry", return_value=True):
+    with patch("smarthub.components.mopeka.async_setup_entry", return_value=True):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"], user_input={CONF_MEDIUM_TYPE: MediumType.PROPANE.value}
         )
@@ -34,7 +34,7 @@ async def test_async_step_bluetooth_valid_device(hass: HomeAssistant) -> None:
     assert result2["result"].unique_id == "aa:bb:cc:dd:ee:ff"
 
 
-async def test_async_step_bluetooth_not_mopeka(hass: HomeAssistant) -> None:
+async def test_async_step_bluetooth_not_mopeka(hass: SmartHub) -> None:
     """Test discovery via bluetooth not mopeka."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -45,7 +45,7 @@ async def test_async_step_bluetooth_not_mopeka(hass: HomeAssistant) -> None:
     assert result["reason"] == "not_supported"
 
 
-async def test_async_step_user_no_devices_found(hass: HomeAssistant) -> None:
+async def test_async_step_user_no_devices_found(hass: SmartHub) -> None:
     """Test setup from service info cache with no devices found."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -55,10 +55,10 @@ async def test_async_step_user_no_devices_found(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_async_step_user_with_found_devices(hass: HomeAssistant) -> None:
+async def test_async_step_user_with_found_devices(hass: SmartHub) -> None:
     """Test setup from service info cache with devices found."""
     with patch(
-        "homeassistant.components.mopeka.config_flow.async_discovered_service_info",
+        "smarthub.components.mopeka.config_flow.async_discovered_service_info",
         return_value=[PRO_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -67,7 +67,7 @@ async def test_async_step_user_with_found_devices(hass: HomeAssistant) -> None:
         )
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "user"
-    with patch("homeassistant.components.mopeka.async_setup_entry", return_value=True):
+    with patch("smarthub.components.mopeka.async_setup_entry", return_value=True):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input={"address": "aa:bb:cc:dd:ee:ff"},
@@ -81,7 +81,7 @@ async def test_async_step_user_with_found_devices(hass: HomeAssistant) -> None:
     assert result2["result"].unique_id == "aa:bb:cc:dd:ee:ff"
 
 
-async def test_async_step_user_replace_ignored(hass: HomeAssistant) -> None:
+async def test_async_step_user_replace_ignored(hass: SmartHub) -> None:
     """Test setup from service info can replace an ignored entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -91,7 +91,7 @@ async def test_async_step_user_replace_ignored(hass: HomeAssistant) -> None:
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.mopeka.config_flow.async_discovered_service_info",
+        "smarthub.components.mopeka.config_flow.async_discovered_service_info",
         return_value=[PRO_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -100,7 +100,7 @@ async def test_async_step_user_replace_ignored(hass: HomeAssistant) -> None:
         )
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "user"
-    with patch("homeassistant.components.mopeka.async_setup_entry", return_value=True):
+    with patch("smarthub.components.mopeka.async_setup_entry", return_value=True):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input={"address": "aa:bb:cc:dd:ee:ff"},
@@ -114,10 +114,10 @@ async def test_async_step_user_replace_ignored(hass: HomeAssistant) -> None:
     assert result2["result"].unique_id == "aa:bb:cc:dd:ee:ff"
 
 
-async def test_async_step_user_device_added_between_steps(hass: HomeAssistant) -> None:
+async def test_async_step_user_device_added_between_steps(hass: SmartHub) -> None:
     """Test the device gets added via another flow between steps."""
     with patch(
-        "homeassistant.components.mopeka.config_flow.async_discovered_service_info",
+        "smarthub.components.mopeka.config_flow.async_discovered_service_info",
         return_value=[PRO_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -133,7 +133,7 @@ async def test_async_step_user_device_added_between_steps(hass: HomeAssistant) -
     )
     entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.mopeka.async_setup_entry", return_value=True):
+    with patch("smarthub.components.mopeka.async_setup_entry", return_value=True):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input={"address": "aa:bb:cc:dd:ee:ff"},
@@ -143,7 +143,7 @@ async def test_async_step_user_device_added_between_steps(hass: HomeAssistant) -
 
 
 async def test_async_step_user_with_found_devices_already_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test setup from service info cache with devices found."""
     entry = MockConfigEntry(
@@ -153,7 +153,7 @@ async def test_async_step_user_with_found_devices_already_setup(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.mopeka.config_flow.async_discovered_service_info",
+        "smarthub.components.mopeka.config_flow.async_discovered_service_info",
         return_value=[PRO_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -164,7 +164,7 @@ async def test_async_step_user_with_found_devices_already_setup(
     assert result["reason"] == "no_devices_found"
 
 
-async def test_async_step_bluetooth_devices_already_setup(hass: HomeAssistant) -> None:
+async def test_async_step_bluetooth_devices_already_setup(hass: SmartHub) -> None:
     """Test we can't start a flow if there is already a config entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -181,7 +181,7 @@ async def test_async_step_bluetooth_devices_already_setup(hass: HomeAssistant) -
     assert result["reason"] == "already_configured"
 
 
-async def test_async_step_bluetooth_already_in_progress(hass: HomeAssistant) -> None:
+async def test_async_step_bluetooth_already_in_progress(hass: SmartHub) -> None:
     """Test we can't start a flow for the same device twice."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -201,7 +201,7 @@ async def test_async_step_bluetooth_already_in_progress(hass: HomeAssistant) -> 
 
 
 async def test_async_step_user_takes_precedence_over_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test manual setup takes precedence over discovery."""
     result = await hass.config_entries.flow.async_init(
@@ -213,7 +213,7 @@ async def test_async_step_user_takes_precedence_over_discovery(
     assert result["step_id"] == "bluetooth_confirm"
 
     with patch(
-        "homeassistant.components.mopeka.config_flow.async_discovered_service_info",
+        "smarthub.components.mopeka.config_flow.async_discovered_service_info",
         return_value=[PRO_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -222,7 +222,7 @@ async def test_async_step_user_takes_precedence_over_discovery(
         )
         assert result["type"] is FlowResultType.FORM
 
-    with patch("homeassistant.components.mopeka.async_setup_entry", return_value=True):
+    with patch("smarthub.components.mopeka.async_setup_entry", return_value=True):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input={"address": "aa:bb:cc:dd:ee:ff"},
@@ -239,7 +239,7 @@ async def test_async_step_user_takes_precedence_over_discovery(
     assert not hass.config_entries.flow.async_progress(DOMAIN)
 
 
-async def test_async_step_reconfigure_options(hass: HomeAssistant) -> None:
+async def test_async_step_reconfigure_options(hass: SmartHub) -> None:
     """Test reconfig options: change MediumType from air to fresh water."""
     entry = MockConfigEntry(
         domain=DOMAIN,

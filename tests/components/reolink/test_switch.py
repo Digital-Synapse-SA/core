@@ -7,11 +7,11 @@ import pytest
 from reolink_aio.api import Chime
 from reolink_aio.exceptions import ReolinkError
 
-from homeassistant.components.reolink import DEVICE_UPDATE_INTERVAL
-from homeassistant.components.reolink.const import DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.reolink import DEVICE_UPDATE_INTERVAL
+from smarthub.components.reolink.const import DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -20,9 +20,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er, issue_registry as ir
 
 from .conftest import TEST_CAM_NAME, TEST_NVR_NAME, TEST_UID
 
@@ -30,7 +30,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
     reolink_connect: MagicMock,
@@ -39,7 +39,7 @@ async def test_switch(
     reolink_connect.camera_name.return_value = TEST_CAM_NAME
     reolink_connect.audio_record.return_value = True
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -64,7 +64,7 @@ async def test_switch(
     reolink_connect.set_audio.assert_called_with(0, True)
 
     reolink_connect.set_audio.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -83,7 +83,7 @@ async def test_switch(
     reolink_connect.set_audio.assert_called_with(0, False)
 
     reolink_connect.set_audio.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
@@ -104,7 +104,7 @@ async def test_switch(
 
 
 async def test_host_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
     reolink_connect: MagicMock,
@@ -115,7 +115,7 @@ async def test_host_switch(
     reolink_connect.is_hub = False
     reolink_connect.supported.return_value = True
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -140,7 +140,7 @@ async def test_host_switch(
     reolink_connect.set_email.assert_called_with(None, True)
 
     reolink_connect.set_email.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -159,7 +159,7 @@ async def test_host_switch(
     reolink_connect.set_email.assert_called_with(None, False)
 
     reolink_connect.set_email.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
@@ -171,14 +171,14 @@ async def test_host_switch(
 
 
 async def test_chime_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
     reolink_connect: MagicMock,
     test_chime: Chime,
 ) -> None:
     """Test host switch entity."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -204,7 +204,7 @@ async def test_chime_switch(
     test_chime.set_option.assert_called_with(led=True)
 
     test_chime.set_option.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -223,7 +223,7 @@ async def test_chime_switch(
     test_chime.set_option.assert_called_with(led=False)
 
     test_chime.set_option.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
@@ -263,7 +263,7 @@ async def test_chime_switch(
     ],
 )
 async def test_cleanup_hub_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -295,7 +295,7 @@ async def test_cleanup_hub_switches(
     assert entity_registry.async_get_entity_id(domain, DOMAIN, original_id)
 
     # setup CH 0 and host entities/device
-    with patch("homeassistant.components.reolink.PLATFORMS", [domain]):
+    with patch("smarthub.components.reolink.PLATFORMS", [domain]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -334,7 +334,7 @@ async def test_cleanup_hub_switches(
     ],
 )
 async def test_hub_switches_repair_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -367,7 +367,7 @@ async def test_hub_switches_repair_issue(
     assert entity_registry.async_get_entity_id(domain, DOMAIN, original_id)
 
     # setup CH 0 and host entities/device
-    with patch("homeassistant.components.reolink.PLATFORMS", [domain]):
+    with patch("smarthub.components.reolink.PLATFORMS", [domain]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 

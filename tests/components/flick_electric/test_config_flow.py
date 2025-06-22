@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock, patch
 from pyflick.authentication import AuthException
 from pyflick.types import APIException
 
-from homeassistant import config_entries
-from homeassistant.components.flick_electric.const import (
+from smarthub import config_entries
+from smarthub.components.flick_electric.const import (
     CONF_ACCOUNT_ID,
     CONF_SUPPLY_NODE_REF,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import ConfigFlowResult
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import CONF, setup_integration
 
@@ -27,7 +27,7 @@ ACCOUNT_ID_2 = "123456"
 SUPPLY_NODE_REF_2 = "/network/nz/supply_nodes/ed7617df-4b10-4c8a-a05d-deadbeef1234"
 
 
-async def _flow_submit(hass: HomeAssistant) -> ConfigFlowResult:
+async def _flow_submit(hass: SmartHub) -> ConfigFlowResult:
     return await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_USER},
@@ -38,7 +38,7 @@ async def _flow_submit(hass: HomeAssistant) -> ConfigFlowResult:
     )
 
 
-async def test_form(hass: HomeAssistant, mock_flick_client: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_flick_client: AsyncMock) -> None:
     """Test we get the form with only one, with no account picker."""
 
     result = await hass.config_entries.flow.async_init(
@@ -63,7 +63,7 @@ async def test_form(hass: HomeAssistant, mock_flick_client: AsyncMock) -> None:
 
 
 async def test_form_multi_account(
-    hass: HomeAssistant, mock_flick_client_multiple: AsyncMock
+    hass: SmartHub, mock_flick_client_multiple: AsyncMock
 ) -> None:
     """Test the form when multiple accounts are available."""
 
@@ -103,7 +103,7 @@ async def test_form_multi_account(
 
 
 async def test_reauth_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_flick_client: AsyncMock,
 ) -> None:
@@ -111,7 +111,7 @@ async def test_reauth_token(
     await setup_integration(hass, mock_config_entry)
 
     with patch(
-        "homeassistant.components.flick_electric.config_flow.SimpleFlickAuth.async_get_access_token",
+        "smarthub.components.flick_electric.config_flow.SimpleFlickAuth.async_get_access_token",
         side_effect=AuthException,
     ):
         result = await mock_config_entry.start_reauth_flow(hass)
@@ -130,7 +130,7 @@ async def test_reauth_token(
 
 
 async def test_form_reauth_migrate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_old_config_entry: MockConfigEntry,
     mock_flick_client: AsyncMock,
 ) -> None:
@@ -146,7 +146,7 @@ async def test_form_reauth_migrate(
 
 
 async def test_form_reauth_migrate_multi_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_old_config_entry: MockConfigEntry,
     mock_flick_client_multiple: AsyncMock,
 ) -> None:
@@ -173,7 +173,7 @@ async def test_form_reauth_migrate_multi_account(
 
 
 async def test_form_duplicate_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_flick_client: AsyncMock,
 ) -> None:
@@ -186,10 +186,10 @@ async def test_form_duplicate_account(
     assert result["reason"] == "already_configured"
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     with patch(
-        "homeassistant.components.flick_electric.config_flow.SimpleFlickAuth.async_get_access_token",
+        "smarthub.components.flick_electric.config_flow.SimpleFlickAuth.async_get_access_token",
         side_effect=AuthException,
     ):
         result = await _flow_submit(hass)
@@ -198,10 +198,10 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     with patch(
-        "homeassistant.components.flick_electric.config_flow.SimpleFlickAuth.async_get_access_token",
+        "smarthub.components.flick_electric.config_flow.SimpleFlickAuth.async_get_access_token",
         side_effect=TimeoutError,
     ):
         result = await _flow_submit(hass)
@@ -210,10 +210,10 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_generic_exception(hass: HomeAssistant) -> None:
+async def test_form_generic_exception(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     with patch(
-        "homeassistant.components.flick_electric.config_flow.SimpleFlickAuth.async_get_access_token",
+        "smarthub.components.flick_electric.config_flow.SimpleFlickAuth.async_get_access_token",
         side_effect=Exception,
     ):
         result = await _flow_submit(hass)
@@ -223,7 +223,7 @@ async def test_form_generic_exception(hass: HomeAssistant) -> None:
 
 
 async def test_form_select_account_cannot_connect(
-    hass: HomeAssistant, mock_flick_client_multiple: AsyncMock
+    hass: SmartHub, mock_flick_client_multiple: AsyncMock
 ) -> None:
     """Test we handle connection errors for select account."""
     result = await hass.config_entries.flow.async_init(
@@ -260,7 +260,7 @@ async def test_form_select_account_cannot_connect(
 
 
 async def test_form_select_account_invalid_auth(
-    hass: HomeAssistant, mock_flick_client_multiple: AsyncMock
+    hass: SmartHub, mock_flick_client_multiple: AsyncMock
 ) -> None:
     """Test we handle auth errors for select account."""
     result = await hass.config_entries.flow.async_init(
@@ -283,7 +283,7 @@ async def test_form_select_account_invalid_auth(
 
     with (
         patch(
-            "homeassistant.components.flick_electric.config_flow.SimpleFlickAuth.async_get_access_token",
+            "smarthub.components.flick_electric.config_flow.SimpleFlickAuth.async_get_access_token",
             side_effect=AuthException,
         ),
         patch.object(
@@ -302,7 +302,7 @@ async def test_form_select_account_invalid_auth(
 
 
 async def test_form_select_account_failed_to_connect(
-    hass: HomeAssistant, mock_flick_client_multiple: AsyncMock
+    hass: SmartHub, mock_flick_client_multiple: AsyncMock
 ) -> None:
     """Test we handle connection errors for select account."""
     result = await hass.config_entries.flow.async_init(
@@ -359,7 +359,7 @@ async def test_form_select_account_failed_to_connect(
 
 
 async def test_form_select_account_no_accounts(
-    hass: HomeAssistant, mock_flick_client: AsyncMock
+    hass: SmartHub, mock_flick_client: AsyncMock
 ) -> None:
     """Test we handle connection errors for select account."""
     result = await hass.config_entries.flow.async_init(

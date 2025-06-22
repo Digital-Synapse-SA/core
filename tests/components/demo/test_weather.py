@@ -7,9 +7,9 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components import weather
-from homeassistant.components.demo.weather import WEATHER_UPDATE_INTERVAL
-from homeassistant.components.weather import (
+from smarthub.components import weather
+from smarthub.components.demo.weather import WEATHER_UPDATE_INTERVAL
+from smarthub.components.weather import (
     ATTR_WEATHER_HUMIDITY,
     ATTR_WEATHER_OZONE,
     ATTR_WEATHER_PRESSURE,
@@ -17,10 +17,10 @@ from homeassistant.components.weather import (
     ATTR_WEATHER_WIND_BEARING,
     ATTR_WEATHER_WIND_SPEED,
 )
-from homeassistant.const import ATTR_ATTRIBUTION, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.unit_system import METRIC_SYSTEM
+from smarthub.const import ATTR_ATTRIBUTION, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.unit_system import METRIC_SYSTEM
 
 from tests.typing import WebSocketGenerator
 
@@ -29,13 +29,13 @@ from tests.typing import WebSocketGenerator
 async def weather_only() -> None:
     """Enable only the datetime platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.WEATHER],
     ):
         yield
 
 
-async def test_attributes(hass: HomeAssistant, weather_only) -> None:
+async def test_attributes(hass: SmartHub, weather_only) -> None:
     """Test weather attributes."""
     assert await async_setup_component(
         hass, weather.DOMAIN, {"weather": {"platform": "demo"}}
@@ -55,7 +55,7 @@ async def test_attributes(hass: HomeAssistant, weather_only) -> None:
     assert data.get(ATTR_WEATHER_WIND_SPEED) == 1.8  # 0.5 m/s -> km/h
     assert data.get(ATTR_WEATHER_WIND_BEARING) is None
     assert data.get(ATTR_WEATHER_OZONE) is None
-    assert data.get(ATTR_ATTRIBUTION) == "Powered by Home Assistant"
+    assert data.get(ATTR_ATTRIBUTION) == "Powered by SmartHub"
 
 
 TEST_TIME_ADVANCE_INTERVAL = datetime.timedelta(seconds=5 + 1)
@@ -124,7 +124,7 @@ TEST_TIME_ADVANCE_INTERVAL = datetime.timedelta(seconds=5 + 1)
     ],
 )
 async def test_forecast(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     weather_only: None,

@@ -11,8 +11,8 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from todoist_api_python.models import Due
 
-from homeassistant import setup
-from homeassistant.components.todoist.const import (
+from smarthub import setup
+from smarthub.components.todoist.const import (
     ASSIGNEE,
     CONTENT,
     DOMAIN,
@@ -21,12 +21,12 @@ from homeassistant.components.todoist.const import (
     SECTION_NAME,
     SERVICE_NEW_TASK,
 )
-from homeassistant.const import CONF_TOKEN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.util import dt as dt_util
+from smarthub.const import CONF_TOKEN, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.util import dt as dt_util
 
 from .conftest import PROJECT_ID, SECTION_ID, SUMMARY
 
@@ -45,7 +45,7 @@ def platforms() -> list[Platform]:
 
 
 @pytest.fixture(autouse=True)
-async def set_time_zone(hass: HomeAssistant):
+async def set_time_zone(hass: SmartHub):
     """Set the time zone for the tests."""
     await hass.config.async_set_time_zone(TZ_NAME)
 
@@ -77,13 +77,13 @@ def mock_todoist_config() -> dict[str, Any]:
 
 @pytest.fixture(name="setup_platform", autouse=True)
 async def mock_setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     api: AsyncMock,
     todoist_config: dict[str, Any],
 ) -> None:
     """Mock setup of the todoist integration."""
     with patch(
-        "homeassistant.components.todoist.calendar.TodoistAPIAsync"
+        "smarthub.components.todoist.calendar.TodoistAPIAsync"
     ) as todoist_api:
         todoist_api.return_value = api
         assert await setup.async_setup_component(
@@ -103,7 +103,7 @@ async def mock_setup_platform(
 
 
 async def test_calendar_entity_unique_id(
-    hass: HomeAssistant, api: AsyncMock, entity_registry: er.EntityRegistry
+    hass: SmartHub, api: AsyncMock, entity_registry: er.EntityRegistry
 ) -> None:
     """Test unique id is set to project id."""
     entity = entity_registry.async_get("calendar.name")
@@ -115,7 +115,7 @@ async def test_calendar_entity_unique_id(
     [{"custom_projects": [{"name": "All projects", "labels": ["Label1"]}]}],
 )
 async def test_update_entity_for_custom_project_with_labels_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     api: AsyncMock,
 ) -> None:
     """Test that the calendar's state is on for a custom project using labels."""
@@ -127,7 +127,7 @@ async def test_update_entity_for_custom_project_with_labels_on(
 
 @pytest.mark.parametrize("due", [None])
 async def test_update_entity_for_custom_project_no_due_date_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     api: AsyncMock,
 ) -> None:
     """Test that a task without an explicit due date is considered to be in an on state."""
@@ -148,7 +148,7 @@ async def test_update_entity_for_custom_project_no_due_date_on(
     ],
 )
 async def test_update_entity_for_calendar_with_due_date_in_the_future(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     api: AsyncMock,
 ) -> None:
@@ -165,7 +165,7 @@ async def test_update_entity_for_calendar_with_due_date_in_the_future(
 
 
 @pytest.mark.parametrize("setup_platform", [None])
-async def test_failed_coordinator_update(hass: HomeAssistant, api: AsyncMock) -> None:
+async def test_failed_coordinator_update(hass: SmartHub, api: AsyncMock) -> None:
     """Test a failed data coordinator update is handled correctly."""
     api.get_tasks.side_effect = Exception("API error")
 
@@ -192,7 +192,7 @@ async def test_failed_coordinator_update(hass: HomeAssistant, api: AsyncMock) ->
     [{"custom_projects": [{"name": "All projects"}]}],
 )
 async def test_calendar_custom_project_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test unique id is None for any custom projects."""
     entity = entity_registry.async_get("calendar.all_projects")
@@ -242,7 +242,7 @@ async def test_calendar_custom_project_unique_id(
     ids=("included", "exact", "overlap_start", "overlap_end", "after", "before"),
 )
 async def test_all_day_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     start: str,
     end: str,
@@ -257,7 +257,7 @@ async def test_all_day_event(
     assert await response.json() == expected_response
 
 
-async def test_create_task_service_call(hass: HomeAssistant, api: AsyncMock) -> None:
+async def test_create_task_service_call(hass: SmartHub, api: AsyncMock) -> None:
     """Test api is called correctly after a new task service call."""
     await hass.services.async_call(
         DOMAIN,
@@ -272,7 +272,7 @@ async def test_create_task_service_call(hass: HomeAssistant, api: AsyncMock) -> 
 
 
 async def test_create_task_service_call_raises(
-    hass: HomeAssistant, api: AsyncMock
+    hass: SmartHub, api: AsyncMock
 ) -> None:
     """Test adding an item to an invalid project raises an error."""
 
@@ -291,7 +291,7 @@ async def test_create_task_service_call_raises(
 
 
 async def test_create_task_service_call_with_section(
-    hass: HomeAssistant, api: AsyncMock
+    hass: SmartHub, api: AsyncMock
 ) -> None:
     """Test api is called correctly when section is included."""
     await hass.services.async_call(
@@ -345,7 +345,7 @@ async def test_create_task_service_call_with_section(
     ids=("in_local_timezone", "in_other_timezone", "floating"),
 )
 async def test_task_due_datetime(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test for task due at a specific time, using different time formats."""
@@ -465,7 +465,7 @@ async def test_task_due_datetime(
     ],
 )
 async def test_events_filtered_for_custom_projects(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     start: str,
     end: str,
@@ -496,7 +496,7 @@ async def test_events_filtered_for_custom_projects(
     ],
 )
 async def test_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_client: ClientSessionGenerator,
 ) -> None:

@@ -1,0 +1,10 @@
+{
+  "domain": "apprise",
+  "name": "Apprise",
+  "codeowners": ["@caronc"],
+  "documentation": "https://www.smart-hub.io/integrations/apprise",
+  "iot_class": "cloud_push",
+  "loggers": ["apprise"],
+  "quality_scale": "legacy",
+  "requirements": ["apprise==1.9.1"]
+}

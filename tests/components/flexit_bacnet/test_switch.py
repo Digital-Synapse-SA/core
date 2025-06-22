@@ -6,15 +6,15 @@ from flexit_bacnet import DecodingError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_with_selected_platforms
 
@@ -24,7 +24,7 @@ ENTITY_ID = "switch.device_name_electric_heater"
 
 
 async def test_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_flexit_bacnet: AsyncMock,
@@ -38,7 +38,7 @@ async def test_switches(
 
 
 async def test_switches_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_flexit_bacnet: AsyncMock,
@@ -80,7 +80,7 @@ async def test_switches_implementation(
     # Error recovery, when turning off
     mock_flexit_bacnet.disable_electric_heater.side_effect = DecodingError
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
@@ -106,7 +106,7 @@ async def test_switches_implementation(
     # Error recovery, when turning on
     mock_flexit_bacnet.enable_electric_heater.side_effect = DecodingError
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,

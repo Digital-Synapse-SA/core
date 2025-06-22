@@ -4,17 +4,17 @@ import asyncio
 
 from aiohttp import ClientError
 
-from homeassistant.components.gios.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.loader import async_get_integration
-from homeassistant.setup import async_setup_component
+from smarthub.components.gios.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.loader import async_get_integration
+from smarthub.setup import async_setup_component
 
 from tests.common import get_system_health_info
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_gios_system_health(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test GIOS system health."""
     aioclient_mock.get("http://api.gios.gov.pl/", text="")
@@ -34,7 +34,7 @@ async def test_gios_system_health(
 
 
 async def test_gios_system_health_fail(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test GIOS system health."""
     aioclient_mock.get("http://api.gios.gov.pl/", exc=ClientError)

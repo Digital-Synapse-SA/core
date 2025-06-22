@@ -6,18 +6,18 @@ from collections.abc import Callable
 
 from mysensors.sensor import Sensor
 
-from homeassistant.components.device_tracker import ATTR_SOURCE_TYPE, SourceType
-from homeassistant.const import (
+from smarthub.components.device_tracker import ATTR_SOURCE_TYPE, SourceType
+from smarthub.const import (
     ATTR_BATTERY_LEVEL,
     ATTR_LATITUDE,
     ATTR_LONGITUDE,
     STATE_NOT_HOME,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 async def test_gps_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gps_sensor: Sensor,
     receive_message: Callable[[str], None],
 ) -> None:

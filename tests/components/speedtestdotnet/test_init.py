@@ -5,23 +5,23 @@ from unittest.mock import MagicMock
 
 import speedtest
 
-from homeassistant.components.speedtestdotnet.const import (
+from smarthub.components.speedtestdotnet.const import (
     CONF_SERVER_ID,
     CONF_SERVER_NAME,
     DOMAIN,
 )
-from homeassistant.components.speedtestdotnet.coordinator import (
+from smarthub.components.speedtestdotnet.coordinator import (
     SpeedTestDataCoordinator,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_setup_failed(hass: HomeAssistant, mock_api: MagicMock) -> None:
+async def test_setup_failed(hass: SmartHub, mock_api: MagicMock) -> None:
     """Test SpeedTestDotNet failed due to an error."""
 
     entry = MockConfigEntry(
@@ -34,7 +34,7 @@ async def test_setup_failed(hass: HomeAssistant, mock_api: MagicMock) -> None:
     assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_entry_lifecycle(hass: HomeAssistant, mock_api: MagicMock) -> None:
+async def test_entry_lifecycle(hass: SmartHub, mock_api: MagicMock) -> None:
     """Test the SpeedTestDotNet entry lifecycle."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -58,7 +58,7 @@ async def test_entry_lifecycle(hass: HomeAssistant, mock_api: MagicMock) -> None
     assert entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_server_not_found(hass: HomeAssistant, mock_api: MagicMock) -> None:
+async def test_server_not_found(hass: SmartHub, mock_api: MagicMock) -> None:
     """Test configured server id is not found."""
 
     entry = MockConfigEntry(
@@ -84,7 +84,7 @@ async def test_server_not_found(hass: HomeAssistant, mock_api: MagicMock) -> Non
     assert state.state == STATE_UNAVAILABLE
 
 
-async def test_get_best_server_error(hass: HomeAssistant, mock_api: MagicMock) -> None:
+async def test_get_best_server_error(hass: SmartHub, mock_api: MagicMock) -> None:
     """Test configured server id is not found."""
 
     entry = MockConfigEntry(

@@ -140,7 +140,7 @@ jobs:
               '',
               `This issue appears to be written in **${languageResult.detected_language}** rather than English.`,
               '',
-              'The Home Assistant project uses English as the primary language for issues to ensure that everyone in our international community can participate and help resolve issues. This allows any of our thousands of contributors to jump in and provide assistance.',
+              'The SmartHub project uses English as the primary language for issues to ensure that everyone in our international community can participate and help resolve issues. This allows any of our thousands of contributors to jump in and provide assistance.',
               '',
               '**What to do:**',
               '1. Re-create the issue using the English language',

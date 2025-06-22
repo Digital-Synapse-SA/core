@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock, MagicMock
 from pylitterbot import LitterRobot3, LitterRobot4
 import pytest
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     ATTR_OPTIONS,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from .conftest import setup_integration
 
@@ -23,7 +23,7 @@ PANEL_BRIGHTNESS_ENTITY_ID = "select.test_panel_brightness"
 
 
 async def test_wait_time_select(
-    hass: HomeAssistant, mock_account, entity_registry: er.EntityRegistry
+    hass: SmartHub, mock_account, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests the wait time select entity."""
     await setup_integration(hass, mock_account, SELECT_DOMAIN)
@@ -50,7 +50,7 @@ async def test_wait_time_select(
         assert mock_account.robots[0].set_wait_time.call_count == count + 1
 
 
-async def test_invalid_wait_time_select(hass: HomeAssistant, mock_account) -> None:
+async def test_invalid_wait_time_select(hass: SmartHub, mock_account) -> None:
     """Tests the wait time select entity with invalid value."""
     await setup_integration(hass, mock_account, SELECT_DOMAIN)
 
@@ -70,7 +70,7 @@ async def test_invalid_wait_time_select(hass: HomeAssistant, mock_account) -> No
 
 
 async def test_panel_brightness_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_account_with_litterrobot_4: MagicMock,
     entity_registry: er.EntityRegistry,
 ) -> None:

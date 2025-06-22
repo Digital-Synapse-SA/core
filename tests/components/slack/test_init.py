@@ -1,15 +1,15 @@
 """Test Slack integration."""
 
-from homeassistant.components.slack.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.slack.const import DOMAIN
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import CONF_DATA, async_init_integration
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
-async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_setup(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Test Slack setup."""
     entry: ConfigEntry = await async_init_integration(hass, aioclient_mock)
     await hass.async_block_till_done()
@@ -19,7 +19,7 @@ async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -
 
 
 async def test_async_setup_entry_not_ready(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     entry: ConfigEntry = await async_init_integration(
@@ -30,7 +30,7 @@ async def test_async_setup_entry_not_ready(
 
 
 async def test_async_setup_entry_invalid_auth(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test invalid auth during setup."""
     entry: ConfigEntry = await async_init_integration(

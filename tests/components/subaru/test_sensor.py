@@ -5,15 +5,15 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.subaru.sensor import (
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.subaru.sensor import (
     API_GEN_2_SENSORS,
     DOMAIN,
     EV_SENSORS,
     SAFETY_SENSORS,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .api_responses import (
     EXPECTED_STATE_EV_METRIC,
@@ -30,12 +30,12 @@ from .conftest import (
 from tests.common import get_sensor_display_state
 
 
-async def test_sensors_ev_metric(hass: HomeAssistant, ev_entry) -> None:
+async def test_sensors_ev_metric(hass: SmartHub, ev_entry) -> None:
     """Test sensors supporting metric units."""
     _assert_data(hass, EXPECTED_STATE_EV_METRIC)
 
 
-async def test_sensors_missing_vin_data(hass: HomeAssistant, ev_entry) -> None:
+async def test_sensors_missing_vin_data(hass: SmartHub, ev_entry) -> None:
     """Test for missing VIN dataset."""
     with patch(MOCK_API_FETCH), patch(MOCK_API_GET_DATA, return_value=None):
         advance_time_to_next_fetch(hass)
@@ -59,7 +59,7 @@ async def test_sensors_missing_vin_data(hass: HomeAssistant, ev_entry) -> None:
     ],
 )
 async def test_sensor_migrate_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entitydata,
     old_unique_id,
@@ -95,7 +95,7 @@ async def test_sensor_migrate_unique_ids(
     ],
 )
 async def test_sensor_migrate_unique_ids_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entitydata,
     old_unique_id,
@@ -130,7 +130,7 @@ async def test_sensor_migrate_unique_ids_duplicate(
     assert entity_migrated != entity_not_changed
 
 
-def _assert_data(hass: HomeAssistant, expected_state: dict[str, Any]) -> None:
+def _assert_data(hass: SmartHub, expected_state: dict[str, Any]) -> None:
     sensor_list = EV_SENSORS
     sensor_list.extend(API_GEN_2_SENSORS)
     sensor_list.extend(SAFETY_SENSORS)

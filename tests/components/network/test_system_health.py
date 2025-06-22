@@ -4,15 +4,15 @@ import asyncio
 
 import pytest
 
-from homeassistant.components.network.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.network.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import get_system_health_info
 
 
 @pytest.mark.usefixtures("mock_socket_no_loopback")
-async def test_network_system_health(hass: HomeAssistant) -> None:
+async def test_network_system_health(hass: SmartHub) -> None:
     """Test network system health."""
 
     assert await async_setup_component(hass, "system_health", {})

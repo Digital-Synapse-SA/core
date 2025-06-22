@@ -6,11 +6,11 @@ from aiohttp import ClientError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.climate import DOMAIN as CLIMATE_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -31,7 +31,7 @@ SERVICE_SET_TEMPERATURE = "set_temperature"
 
 
 async def test_climate_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -44,7 +44,7 @@ async def test_climate_states(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate_states_api_push(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -57,7 +57,7 @@ async def test_climate_states_api_push(
 
 
 async def test_set_target(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: MockConfigEntry,
 ) -> None:
@@ -75,7 +75,7 @@ async def test_set_target(
 
 
 async def test_api_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: MockConfigEntry,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_api_failure(
     mock_miele_client.set_target_temperature.side_effect = ClientError
 
     with pytest.raises(
-        HomeAssistantError, match=f"Failed to set state for {ENTITY_ID}"
+        SmartHubError, match=f"Failed to set state for {ENTITY_ID}"
     ):
         await hass.services.async_call(
             TEST_PLATFORM,

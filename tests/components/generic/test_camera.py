@@ -12,12 +12,12 @@ import httpx
 import pytest
 import respx
 
-from homeassistant.components.camera import (
+from smarthub.components.camera import (
     DEFAULT_CONTENT_TYPE,
     async_get_mjpeg_stream,
     async_get_stream_source,
 )
-from homeassistant.components.generic.const import (
+from smarthub.components.generic.const import (
     CONF_CONTENT_TYPE,
     CONF_FRAMERATE,
     CONF_LIMIT_REFETCH_TO_URL_CHANGE,
@@ -25,24 +25,24 @@ from homeassistant.components.generic.const import (
     CONF_STREAM_SOURCE,
     DOMAIN,
 )
-from homeassistant.components.stream import CONF_RTSP_TRANSPORT
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.const import (
+from smarthub.components.stream import CONF_RTSP_TRANSPORT
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.const import (
     CONF_AUTHENTICATION,
     CONF_NAME,
     CONF_PASSWORD,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import Mock, MockConfigEntry
 from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 async def help_setup_mock_config_entry(
-    hass: HomeAssistant, options: dict[str, Any], unique_id: Any | None = None
+    hass: SmartHub, options: dict[str, Any], unique_id: Any | None = None
 ) -> MockConfigEntry:
     """Help setting up a generic camera config entry."""
     entry_options = {
@@ -71,7 +71,7 @@ async def help_setup_mock_config_entry(
 
 @respx.mock
 async def test_fetching_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     fakeimgbytes_png: bytes,
     caplog: pytest.LogCaptureFixture,
@@ -129,7 +129,7 @@ async def test_fetching_url(
 
 @respx.mock
 async def test_image_caching(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     freezer: FrozenDateTimeFactory,
     fakeimgbytes_png: bytes,
@@ -197,7 +197,7 @@ async def test_image_caching(
 
 @respx.mock
 async def test_fetching_without_verify_ssl(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, fakeimgbytes_png: bytes
+    hass: SmartHub, hass_client: ClientSessionGenerator, fakeimgbytes_png: bytes
 ) -> None:
     """Test that it fetches the given url when ssl verify is off."""
     respx.get("https://example.com").respond(stream=fakeimgbytes_png)
@@ -221,7 +221,7 @@ async def test_fetching_without_verify_ssl(
 
 @respx.mock
 async def test_fetching_url_with_verify_ssl(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, fakeimgbytes_png: bytes
+    hass: SmartHub, hass_client: ClientSessionGenerator, fakeimgbytes_png: bytes
 ) -> None:
     """Test that it fetches the given url when ssl verify is explicitly on."""
     respx.get("https://example.com").respond(stream=fakeimgbytes_png)
@@ -245,7 +245,7 @@ async def test_fetching_url_with_verify_ssl(
 
 @respx.mock
 async def test_limit_refetch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     fakeimgbytes_png: bytes,
     fakeimgbytes_jpg: bytes,
@@ -318,7 +318,7 @@ async def test_limit_refetch(
 
 @respx.mock
 async def test_stream_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     fakeimgbytes_png: bytes,
@@ -354,7 +354,7 @@ async def test_stream_source(
     assert stream_source == "http://barney:betty@example.com/5a"
 
     with patch(
-        "homeassistant.components.camera.Stream.endpoint_url",
+        "smarthub.components.camera.Stream.endpoint_url",
         return_value="http://home.assistant/playlist.m3u8",
     ) as mock_stream_url:
         # Request playlist through WebSocket
@@ -375,7 +375,7 @@ async def test_stream_source(
 
 @respx.mock
 async def test_stream_source_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     fakeimgbytes_png: bytes,
@@ -396,7 +396,7 @@ async def test_stream_source_error(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.camera.Stream.endpoint_url",
+        "smarthub.components.camera.Stream.endpoint_url",
         return_value="http://home.assistant/playlist.m3u8",
     ) as mock_stream_url:
         # Request playlist through WebSocket
@@ -420,7 +420,7 @@ async def test_stream_source_error(
 
 @respx.mock
 async def test_setup_alternative_options(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, fakeimgbytes_png: bytes
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, fakeimgbytes_png: bytes
 ) -> None:
     """Test that the stream source is setup with different config options."""
     respx.get("https://example.com").respond(stream=fakeimgbytes_png)
@@ -441,7 +441,7 @@ async def test_setup_alternative_options(
 
 @respx.mock
 async def test_no_stream_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     fakeimgbytes_png: bytes,
@@ -458,7 +458,7 @@ async def test_no_stream_source(
     await help_setup_mock_config_entry(hass, options)
 
     with patch(
-        "homeassistant.components.camera.Stream.endpoint_url",
+        "smarthub.components.camera.Stream.endpoint_url",
         return_value="http://home.assistant/playlist.m3u8",
     ) as mock_request_stream:
         # Request playlist through WebSocket
@@ -482,7 +482,7 @@ async def test_no_stream_source(
 
 @respx.mock
 async def test_camera_content_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     fakeimgbytes_svg: bytes,
     fakeimgbytes_jpg: bytes,
@@ -532,7 +532,7 @@ async def test_camera_content_type(
 
 @respx.mock
 async def test_timeout_cancelled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     fakeimgbytes_png: bytes,
     fakeimgbytes_jpg: bytes,
@@ -562,7 +562,7 @@ async def test_timeout_cancelled(
     respx.get("http://example.com").respond(stream=fakeimgbytes_jpg)
 
     with patch(
-        "homeassistant.components.generic.camera.GenericCamera.async_camera_image",
+        "smarthub.components.generic.camera.GenericCamera.async_camera_image",
         side_effect=asyncio.CancelledError(),
     ):
         resp = await client.get("/api/camera_proxy/camera.config_test")
@@ -583,7 +583,7 @@ async def test_timeout_cancelled(
         assert await resp.read() == fakeimgbytes_png
 
 
-async def test_frame_interval_property(hass: HomeAssistant) -> None:
+async def test_frame_interval_property(hass: SmartHub) -> None:
     """Test that the frame interval is calculated and returned correctly."""
 
     options = {
@@ -596,7 +596,7 @@ async def test_frame_interval_property(hass: HomeAssistant) -> None:
 
     request = Mock()
     with patch(
-        "homeassistant.components.camera.async_get_still_stream"
+        "smarthub.components.camera.async_get_still_stream"
     ) as mock_get_stream:
         await async_get_mjpeg_stream(hass, request, "camera.config_test")
 

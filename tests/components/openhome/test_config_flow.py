@@ -1,11 +1,11 @@
 """Tests for the Openhome config flow module."""
 
-from homeassistant.components.openhome.const import DOMAIN
-from homeassistant.config_entries import SOURCE_SSDP
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.components.openhome.const import DOMAIN
+from smarthub.config_entries import SOURCE_SSDP
+from smarthub.const import CONF_HOST, CONF_NAME, CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_UDN,
     SsdpServiceInfo,
@@ -25,7 +25,7 @@ MOCK_DISCOVER = SsdpServiceInfo(
 )
 
 
-async def test_ssdp(hass: HomeAssistant) -> None:
+async def test_ssdp(hass: SmartHub) -> None:
     """Test a ssdp import flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -42,7 +42,7 @@ async def test_ssdp(hass: HomeAssistant) -> None:
     assert result2["data"] == {CONF_HOST: MOCK_SSDP_LOCATION}
 
 
-async def test_device_exists(hass: HomeAssistant) -> None:
+async def test_device_exists(hass: SmartHub) -> None:
     """Test a ssdp import where device already exists."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -61,7 +61,7 @@ async def test_device_exists(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_missing_udn(hass: HomeAssistant) -> None:
+async def test_missing_udn(hass: SmartHub) -> None:
     """Test a ssdp import where discovery is missing udn."""
     broken_discovery = SsdpServiceInfo(
         ssdp_usn="usn",
@@ -80,7 +80,7 @@ async def test_missing_udn(hass: HomeAssistant) -> None:
     assert result["reason"] == "incomplete_discovery"
 
 
-async def test_missing_ssdp_location(hass: HomeAssistant) -> None:
+async def test_missing_ssdp_location(hass: SmartHub) -> None:
     """Test a ssdp import where discovery is missing udn."""
     broken_discovery = SsdpServiceInfo(
         ssdp_usn="usn",
@@ -97,7 +97,7 @@ async def test_missing_ssdp_location(hass: HomeAssistant) -> None:
     assert result["reason"] == "incomplete_discovery"
 
 
-async def test_host_updated(hass: HomeAssistant) -> None:
+async def test_host_updated(hass: SmartHub) -> None:
     """Test a ssdp import flow where host changes."""
     entry = MockConfigEntry(
         domain=DOMAIN,

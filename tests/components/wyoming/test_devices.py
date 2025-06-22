@@ -2,17 +2,17 @@
 
 from __future__ import annotations
 
-from homeassistant.components.assist_pipeline.select import OPTION_PREFERRED
-from homeassistant.components.wyoming import DOMAIN
-from homeassistant.components.wyoming.devices import SatelliteDevice
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_OFF
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.assist_pipeline.select import OPTION_PREFERRED
+from smarthub.components.wyoming import DOMAIN
+from smarthub.components.wyoming.devices import SatelliteDevice
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_OFF
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 
 async def test_device_registry_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     satellite_device: SatelliteDevice,
     satellite_config_entry: ConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -49,7 +49,7 @@ async def test_device_registry_info(
 
 
 async def test_remove_device_registry_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     satellite_device: SatelliteDevice,
     device_registry: dr.DeviceRegistry,
 ) -> None:

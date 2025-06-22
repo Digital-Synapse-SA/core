@@ -2,12 +2,12 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.lg_thinq.const import CONF_CONNECT_CLIENT_ID, DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_COUNTRY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.lg_thinq.const import CONF_CONNECT_CLIENT_ID, DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_COUNTRY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .const import MOCK_CONNECT_CLIENT_ID, MOCK_COUNTRY, MOCK_PAT
 
@@ -21,7 +21,7 @@ DHCP_DISCOVERY = DhcpServiceInfo(
 
 
 async def test_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_thinq_api: AsyncMock,
     mock_uuid: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -48,7 +48,7 @@ async def test_config_flow(
 
 
 async def test_config_flow_invalid_pat(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_invalid_thinq_api: AsyncMock,
 ) -> None:
     """Test that an thinq flow should be aborted with an invalid PAT."""
@@ -63,7 +63,7 @@ async def test_config_flow_invalid_pat(
 
 
 async def test_config_flow_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_config_thinq_api: AsyncMock,
 ) -> None:
@@ -80,7 +80,7 @@ async def test_config_flow_already_configured(
 
 
 async def test_dhcp_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_thinq_api: AsyncMock,
     mock_uuid: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -107,7 +107,7 @@ async def test_dhcp_config_flow(
 
 
 async def test_dhcp_config_flow_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_config_thinq_api: AsyncMock,
 ) -> None:

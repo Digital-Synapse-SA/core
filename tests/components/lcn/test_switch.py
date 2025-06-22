@@ -12,9 +12,9 @@ from pypck.lcn_addr import LcnAddr
 from pypck.lcn_defs import KeyLockStateModifier, RelayStateModifier, Var, VarValue
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.lcn.helpers import get_device_connection
-from homeassistant.components.switch import DOMAIN as DOMAIN_SWITCH
-from homeassistant.const import (
+from smarthub.components.lcn.helpers import get_device_connection
+from smarthub.components.switch import DOMAIN as DOMAIN_SWITCH
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -23,8 +23,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MockConfigEntry, MockModuleConnection, init_integration
 
@@ -39,19 +39,19 @@ SWITCH_KEYLOCKK1 = "switch.testmodule_switch_keylock1"
 
 
 async def test_setup_lcn_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the setup of switch."""
-    with patch("homeassistant.components.lcn.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.lcn.PLATFORMS", [Platform.SWITCH]):
         await init_integration(hass, entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_output_turn_on(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_output_turn_on(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the output switch turns on."""
     await init_integration(hass, entry)
 
@@ -88,7 +88,7 @@ async def test_output_turn_on(hass: HomeAssistant, entry: MockConfigEntry) -> No
         assert state.state == STATE_ON
 
 
-async def test_output_turn_off(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_output_turn_off(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the output switch turns off."""
     await init_integration(hass, entry)
 
@@ -128,7 +128,7 @@ async def test_output_turn_off(hass: HomeAssistant, entry: MockConfigEntry) -> N
         assert state.state == STATE_OFF
 
 
-async def test_relay_turn_on(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_relay_turn_on(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the relay switch turns on."""
     await init_integration(hass, entry)
 
@@ -168,7 +168,7 @@ async def test_relay_turn_on(hass: HomeAssistant, entry: MockConfigEntry) -> Non
         assert state.state == STATE_ON
 
 
-async def test_relay_turn_off(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_relay_turn_off(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the relay switch turns off."""
     await init_integration(hass, entry)
 
@@ -212,7 +212,7 @@ async def test_relay_turn_off(hass: HomeAssistant, entry: MockConfigEntry) -> No
 
 
 async def test_regulatorlock_turn_on(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the regulator lock switch turns on."""
     await init_integration(hass, entry)
@@ -251,7 +251,7 @@ async def test_regulatorlock_turn_on(
 
 
 async def test_regulatorlock_turn_off(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the regulator lock switch turns off."""
     await init_integration(hass, entry)
@@ -292,7 +292,7 @@ async def test_regulatorlock_turn_off(
         assert state.state == STATE_OFF
 
 
-async def test_keylock_turn_on(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_keylock_turn_on(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the keylock switch turns on."""
     await init_integration(hass, entry)
 
@@ -332,7 +332,7 @@ async def test_keylock_turn_on(hass: HomeAssistant, entry: MockConfigEntry) -> N
         assert state.state == STATE_ON
 
 
-async def test_keylock_turn_off(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_keylock_turn_off(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the keylock switch turns off."""
     await init_integration(hass, entry)
 
@@ -376,7 +376,7 @@ async def test_keylock_turn_off(hass: HomeAssistant, entry: MockConfigEntry) -> 
 
 
 async def test_pushed_output_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the output switch changes its state on status received."""
     await init_integration(hass, entry)
@@ -402,7 +402,7 @@ async def test_pushed_output_status_change(
 
 
 async def test_pushed_relay_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the relay switch changes its state on status received."""
     await init_integration(hass, entry)
@@ -431,7 +431,7 @@ async def test_pushed_relay_status_change(
 
 
 async def test_pushed_regulatorlock_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the regulator lock switch changes its state on status received."""
     await init_integration(hass, entry)
@@ -460,7 +460,7 @@ async def test_pushed_regulatorlock_status_change(
 
 
 async def test_pushed_keylock_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the keylock switch changes its state on status received."""
     await init_integration(hass, entry)
@@ -488,7 +488,7 @@ async def test_pushed_keylock_status_change(
     assert state.state == STATE_OFF
 
 
-async def test_unload_config_entry(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_unload_config_entry(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the switch is removed when the config entry is unloaded."""
     await init_integration(hass, entry)
 

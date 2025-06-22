@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from homeassistant.components.text import RestoreText, TextEntity
+from smarthub.components.text import RestoreText, TextEntity
 
 
 class MockTextEntity(TextEntity):

@@ -5,12 +5,12 @@ from datetime import datetime
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.const import SUN_EVENT_SUNRISE, SUN_EVENT_SUNSET
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import trace
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import automation
+from smarthub.const import SUN_EVENT_SUNRISE, SUN_EVENT_SUNSET
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import trace
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.typing import WebSocketGenerator
 
@@ -68,7 +68,7 @@ async def assert_automation_condition_trace(hass_ws_client, automation_id, expec
 
 
 async def test_if_action_before_sunrise_no_offset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -141,7 +141,7 @@ async def test_if_action_before_sunrise_no_offset(
 
 
 async def test_if_action_after_sunrise_no_offset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -214,7 +214,7 @@ async def test_if_action_after_sunrise_no_offset(
 
 
 async def test_if_action_before_sunrise_with_offset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -339,7 +339,7 @@ async def test_if_action_before_sunrise_with_offset(
 
 
 async def test_if_action_before_sunset_with_offset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -464,7 +464,7 @@ async def test_if_action_before_sunset_with_offset(
 
 
 async def test_if_action_after_sunrise_with_offset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -613,7 +613,7 @@ async def test_if_action_after_sunrise_with_offset(
 
 
 async def test_if_action_after_sunset_with_offset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -690,7 +690,7 @@ async def test_if_action_after_sunset_with_offset(
 
 
 async def test_if_action_after_and_before_during(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -795,7 +795,7 @@ async def test_if_action_after_and_before_during(
 
 
 async def test_if_action_before_or_after_during(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -920,7 +920,7 @@ async def test_if_action_before_or_after_during(
 
 
 async def test_if_action_before_sunrise_no_offset_kotzebue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -999,7 +999,7 @@ async def test_if_action_before_sunrise_no_offset_kotzebue(
 
 
 async def test_if_action_after_sunrise_no_offset_kotzebue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -1078,7 +1078,7 @@ async def test_if_action_after_sunrise_no_offset_kotzebue(
 
 
 async def test_if_action_before_sunset_no_offset_kotzebue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -1157,7 +1157,7 @@ async def test_if_action_before_sunset_no_offset_kotzebue(
 
 
 async def test_if_action_after_sunset_no_offset_kotzebue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     service_calls: list[ServiceCall],
 ) -> None:

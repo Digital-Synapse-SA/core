@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.backup.const import DOMAIN
-from homeassistant.components.backup.event import ATTR_BACKUP_STAGE, ATTR_FAILED_REASON
-from homeassistant.components.event import ATTR_EVENT_TYPE
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.backup.const import DOMAIN
+from smarthub.components.backup.event import ATTR_BACKUP_STAGE, ATTR_FAILED_REASON
+from smarthub.components.event import ATTR_EVENT_TYPE
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_backup_integration
 
@@ -20,13 +20,13 @@ from tests.typing import WebSocketGenerator
 
 @pytest.mark.usefixtures("mock_backup_generation")
 async def test_event_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test automatic backup event entity."""
-    with patch("homeassistant.components.backup.PLATFORMS", [Platform.EVENT]):
+    with patch("smarthub.components.backup.PLATFORMS", [Platform.EVENT]):
         await setup_backup_integration(hass, with_hassio=False)
         await hass.async_block_till_done(wait_background_tasks=True)
 
@@ -36,11 +36,11 @@ async def test_event_entity(
 
 @pytest.mark.usefixtures("mock_backup_generation")
 async def test_event_entity_backup_completed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test completed automatic backup event."""
-    with patch("homeassistant.components.backup.PLATFORMS", [Platform.EVENT]):
+    with patch("smarthub.components.backup.PLATFORMS", [Platform.EVENT]):
         await setup_backup_integration(hass, with_hassio=False)
         await hass.async_block_till_done(wait_background_tasks=True)
 
@@ -68,12 +68,12 @@ async def test_event_entity_backup_completed(
 
 @pytest.mark.usefixtures("mock_backup_generation")
 async def test_event_entity_backup_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     create_backup: AsyncMock,
 ) -> None:
     """Test failed automatic backup event."""
-    with patch("homeassistant.components.backup.PLATFORMS", [Platform.EVENT]):
+    with patch("smarthub.components.backup.PLATFORMS", [Platform.EVENT]):
         await setup_backup_integration(hass, with_hassio=False)
         await hass.async_block_till_done(wait_background_tasks=True)
 

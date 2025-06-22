@@ -8,15 +8,15 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components import template
-from homeassistant.components.blueprint import (
+from smarthub.components import template
+from smarthub.components.blueprint import (
     BLUEPRINT_SCHEMA,
     Blueprint,
     BlueprintInUse,
     DomainBlueprints,
 )
-from homeassistant.components.template import DOMAIN, SERVICE_RELOAD
-from homeassistant.components.template.config import (
+from smarthub.components.template import DOMAIN, SERVICE_RELOAD
+from smarthub.components.template.config import (
     DOMAIN_ALARM_CONTROL_PANEL,
     DOMAIN_BINARY_SENSOR,
     DOMAIN_COVER,
@@ -31,11 +31,11 @@ from homeassistant.components.template.config import (
     DOMAIN_VACUUM,
     DOMAIN_WEATHER,
 )
-from homeassistant.const import STATE_ON
-from homeassistant.core import Context, HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util, yaml as yaml_util
+from smarthub.const import STATE_ON
+from smarthub.core import Context, SmartHub, callback
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util, yaml as yaml_util
 
 from tests.common import async_mock_service
 
@@ -63,7 +63,7 @@ def patch_blueprint(
         )
 
     with patch(
-        "homeassistant.components.blueprint.models.DomainBlueprints._load_blueprint",
+        "smarthub.components.blueprint.models.DomainBlueprints._load_blueprint",
         mock_load_blueprint,
     ):
         yield
@@ -90,14 +90,14 @@ def patch_invalid_blueprint() -> Iterator[None]:
         )
 
     with patch(
-        "homeassistant.components.blueprint.models.DomainBlueprints._load_blueprint",
+        "smarthub.components.blueprint.models.DomainBlueprints._load_blueprint",
         mock_load_blueprint,
     ):
         yield
 
 
 async def test_inverted_binary_sensor(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test inverted binary sensor blueprint."""
     hass.states.async_set("binary_sensor.foo", "on", {"friendly_name": "Foo"})
@@ -165,7 +165,7 @@ async def test_inverted_binary_sensor(
         )
 
 
-async def test_reload_template_when_blueprint_changes(hass: HomeAssistant) -> None:
+async def test_reload_template_when_blueprint_changes(hass: SmartHub) -> None:
     """Test a template is updated at reload if the blueprint has changed."""
     hass.states.async_set("binary_sensor.foo", "on", {"friendly_name": "Foo"})
     config = {
@@ -201,12 +201,12 @@ async def test_reload_template_when_blueprint_changes(hass: HomeAssistant) -> No
     blueprint_config["binary_sensor"]["state"] = "{{ states(reference_entity) }}"
     with (
         patch(
-            "homeassistant.config.load_yaml_config_file",
+            "smarthub.config.load_yaml_config_file",
             autospec=True,
             return_value=config,
         ),
         patch(
-            "homeassistant.components.blueprint.models.yaml_util.load_yaml_dict",
+            "smarthub.components.blueprint.models.yaml_util.load_yaml_dict",
             autospec=True,
             return_value=blueprint_config,
         ),
@@ -233,7 +233,7 @@ async def test_reload_template_when_blueprint_changes(hass: HomeAssistant) -> No
     ["test_event_sensor.yaml", "test_event_sensor_legacy_schema.yaml"],
 )
 async def test_trigger_event_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     blueprint: str,
 ) -> None:
@@ -259,7 +259,7 @@ async def test_trigger_event_sensor(
 
     context = Context()
     now = dt_util.utcnow()
-    with patch("homeassistant.util.dt.now", return_value=now):
+    with patch("smarthub.util.dt.now", return_value=now):
         hass.bus.async_fire(
             "my_custom_event", {"foo": "bar", "beer": 2}, context=context
         )
@@ -314,7 +314,7 @@ async def test_trigger_event_sensor(
     ],
 )
 async def test_blueprint_template_override(
-    hass: HomeAssistant, blueprint: str, override: dict
+    hass: SmartHub, blueprint: str, override: dict
 ) -> None:
     """Test blueprint template where the template config overrides the blueprint."""
     assert await async_setup_component(
@@ -344,7 +344,7 @@ async def test_blueprint_template_override(
 
     context = Context()
     now = dt_util.utcnow()
-    with patch("homeassistant.util.dt.now", return_value=now):
+    with patch("smarthub.util.dt.now", return_value=now):
         hass.bus.async_fire(
             "my_custom_event", {"foo": "bar", "beer": 2}, context=context
         )
@@ -356,7 +356,7 @@ async def test_blueprint_template_override(
 
     context = Context()
     now = dt_util.utcnow()
-    with patch("homeassistant.util.dt.now", return_value=now):
+    with patch("smarthub.util.dt.now", return_value=now):
         hass.bus.async_fire("override", {"foo": "bar", "beer": 2}, context=context)
         await hass.async_block_till_done()
 
@@ -383,14 +383,14 @@ async def test_blueprint_template_override(
         await template.async_get_blueprints(hass).async_remove_blueprint(blueprint)
 
 
-async def test_domain_blueprint(hass: HomeAssistant) -> None:
+async def test_domain_blueprint(hass: SmartHub) -> None:
     """Test DomainBlueprint services."""
     reload_handler_calls = async_mock_service(hass, DOMAIN, SERVICE_RELOAD)
     mock_create_file = MagicMock()
     mock_create_file.return_value = True
 
     with patch(
-        "homeassistant.components.blueprint.models.DomainBlueprints._create_file",
+        "smarthub.components.blueprint.models.DomainBlueprints._create_file",
         mock_create_file,
     ):
         await template.async_get_blueprints(hass).async_add_blueprint(
@@ -412,7 +412,7 @@ async def test_domain_blueprint(hass: HomeAssistant) -> None:
 
 
 async def test_invalid_blueprint(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test an invalid blueprint definition."""
 
@@ -437,7 +437,7 @@ async def test_invalid_blueprint(
     assert "invalid.yaml" not in blueprints
 
 
-async def test_no_blueprint(hass: HomeAssistant) -> None:
+async def test_no_blueprint(hass: SmartHub) -> None:
     """Test templates without blueprints."""
     with patch_blueprint(
         "inverted_binary_sensor.yaml",
@@ -497,7 +497,7 @@ async def test_no_blueprint(hass: HomeAssistant) -> None:
 )
 @pytest.mark.freeze_time("2025-06-13 00:00:00+00:00")
 async def test_variables_for_entity(
-    hass: HomeAssistant, domain: str, set_state: str, expected: str
+    hass: SmartHub, domain: str, set_state: str, expected: str
 ) -> None:
     """Test regular template entities via blueprint with variables defined."""
     hass.states.async_set("sensor.test_state", set_state)

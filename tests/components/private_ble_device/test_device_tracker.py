@@ -6,10 +6,10 @@ import time
 from habluetooth.advertisement_tracker import ADVERTISING_TIMES_NEEDED
 import pytest
 
-from homeassistant.components.bluetooth.api import (
+from smarthub.components.bluetooth.api import (
     async_get_fallback_availability_interval,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import (
     MAC_RPA_VALID_1,
@@ -24,7 +24,7 @@ from tests.components.bluetooth.test_advertisement_tracker import ONE_HOUR_SECON
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_tracker_created(hass: HomeAssistant) -> None:
+async def test_tracker_created(hass: SmartHub) -> None:
     """Test creating a tracker entity when no devices have been seen."""
     await async_mock_config_entry(hass)
 
@@ -34,7 +34,7 @@ async def test_tracker_created(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_tracker_ignore_other_rpa(hass: HomeAssistant) -> None:
+async def test_tracker_ignore_other_rpa(hass: SmartHub) -> None:
     """Test that tracker ignores RPA's that don't match us."""
     await async_mock_config_entry(hass)
     await async_inject_broadcast(hass, MAC_STATIC)
@@ -45,7 +45,7 @@ async def test_tracker_ignore_other_rpa(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_tracker_already_home(hass: HomeAssistant) -> None:
+async def test_tracker_already_home(hass: SmartHub) -> None:
     """Test creating a tracker and the device was already discovered by HA."""
     await async_inject_broadcast(hass, MAC_RPA_VALID_1)
     await async_mock_config_entry(hass)
@@ -56,7 +56,7 @@ async def test_tracker_already_home(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_tracker_arrive_home(hass: HomeAssistant) -> None:
+async def test_tracker_arrive_home(hass: SmartHub) -> None:
     """Test transition from not_home to home."""
     await async_mock_config_entry(hass)
     await async_inject_broadcast(hass, MAC_RPA_VALID_1, b"1")
@@ -87,7 +87,7 @@ async def test_tracker_arrive_home(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_tracker_isolation(hass: HomeAssistant) -> None:
+async def test_tracker_isolation(hass: SmartHub) -> None:
     """Test creating 2 tracker entities doesn't confuse anything."""
     await async_mock_config_entry(hass)
     await async_mock_config_entry(hass, irk="1" * 32)
@@ -105,7 +105,7 @@ async def test_tracker_isolation(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_tracker_mac_rotate(hass: HomeAssistant) -> None:
+async def test_tracker_mac_rotate(hass: SmartHub) -> None:
     """Test MAC address rotation."""
     await async_inject_broadcast(hass, MAC_RPA_VALID_1)
     await async_mock_config_entry(hass)
@@ -123,7 +123,7 @@ async def test_tracker_mac_rotate(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_tracker_start_stale(hass: HomeAssistant) -> None:
+async def test_tracker_start_stale(hass: SmartHub) -> None:
     """Test edge case where we find an existing stale record, and it expires before we see any more."""
     time.monotonic()
 
@@ -143,7 +143,7 @@ async def test_tracker_start_stale(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_tracker_leave_home(hass: HomeAssistant) -> None:
+async def test_tracker_leave_home(hass: SmartHub) -> None:
     """Test tracker notices we have left."""
     time.monotonic()
 
@@ -163,7 +163,7 @@ async def test_tracker_leave_home(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_old_tracker_leave_home(hass: HomeAssistant) -> None:
+async def test_old_tracker_leave_home(hass: SmartHub) -> None:
     """Test tracker ignores an old stale mac address timing out."""
     start_time = time.monotonic()
 
@@ -190,7 +190,7 @@ async def test_old_tracker_leave_home(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth", "entity_registry_enabled_by_default")
-async def test_mac_rotation(hass: HomeAssistant) -> None:
+async def test_mac_rotation(hass: SmartHub) -> None:
     """Test sensors get value when we receive a broadcast."""
     await async_mock_config_entry(hass)
 

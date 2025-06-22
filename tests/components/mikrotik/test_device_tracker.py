@@ -8,11 +8,11 @@ from typing import Any
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components import device_tracker, mikrotik
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components import device_tracker, mikrotik
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import (
     DEVICE_2_WIRELESS,
@@ -32,7 +32,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, patch
 
 @pytest.fixture
 def mock_device_registry_devices(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Create device registry devices so the device tracker entities are enabled."""
     config_entry = MockConfigEntry(domain="something_else")
@@ -67,7 +67,7 @@ def mock_command(
 
 
 async def test_device_trackers(
-    hass: HomeAssistant, mock_device_registry_devices
+    hass: SmartHub, mock_device_registry_devices
 ) -> None:
     """Test device_trackers created by mikrotik."""
 
@@ -117,7 +117,7 @@ async def test_device_trackers(
         assert device_2.state == "not_home"
 
 
-async def test_force_dhcp(hass: HomeAssistant, mock_device_registry_devices) -> None:
+async def test_force_dhcp(hass: SmartHub, mock_device_registry_devices) -> None:
     """Test updating hub that supports wireless with forced dhcp method."""
 
     # hub supports wireless by default, force_dhcp is enabled to override
@@ -132,7 +132,7 @@ async def test_force_dhcp(hass: HomeAssistant, mock_device_registry_devices) -> 
 
 
 async def test_hub_not_support_wireless(
-    hass: HomeAssistant, mock_device_registry_devices
+    hass: SmartHub, mock_device_registry_devices
 ) -> None:
     """Test device_trackers created when hub doesn't support wireless."""
 
@@ -147,7 +147,7 @@ async def test_hub_not_support_wireless(
 
 
 async def test_arp_ping_success(
-    hass: HomeAssistant, mock_device_registry_devices
+    hass: SmartHub, mock_device_registry_devices
 ) -> None:
     """Test arp ping devices to confirm they are connected."""
 
@@ -163,7 +163,7 @@ async def test_arp_ping_success(
 
 
 async def test_arp_ping_timeout(
-    hass: HomeAssistant, mock_device_registry_devices
+    hass: SmartHub, mock_device_registry_devices
 ) -> None:
     """Test arp ping timeout so devices are shown away."""
     with patch.object(
@@ -178,7 +178,7 @@ async def test_arp_ping_timeout(
 
 
 async def test_device_trackers_numerical_name(
-    hass: HomeAssistant, mock_device_registry_devices
+    hass: SmartHub, mock_device_registry_devices
 ) -> None:
     """Test device_trackers created by mikrotik with numerical device name."""
 
@@ -195,7 +195,7 @@ async def test_device_trackers_numerical_name(
     assert device_3.attributes["host_name"] == "123"
 
 
-async def test_hub_wifiwave2(hass: HomeAssistant, mock_device_registry_devices) -> None:
+async def test_hub_wifiwave2(hass: SmartHub, mock_device_registry_devices) -> None:
     """Test device_trackers created when hub supports wifiwave2."""
 
     await setup_mikrotik_entry(
@@ -216,7 +216,7 @@ async def test_hub_wifiwave2(hass: HomeAssistant, mock_device_registry_devices) 
 
 
 async def test_restoring_devices(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test restoring existing device_tracker entities if not detected on startup."""
     config_entry = MockConfigEntry(
@@ -261,7 +261,7 @@ async def test_restoring_devices(
     assert device_3 is None
 
 
-async def test_update_failed(hass: HomeAssistant, mock_device_registry_devices) -> None:
+async def test_update_failed(hass: SmartHub, mock_device_registry_devices) -> None:
     """Test failing to connect during update."""
 
     await setup_mikrotik_entry(hass)

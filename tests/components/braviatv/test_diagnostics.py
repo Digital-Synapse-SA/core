@@ -5,10 +5,10 @@ from unittest.mock import patch
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.braviatv.const import CONF_USE_PSK, DOMAIN
-from homeassistant.const import CONF_HOST, CONF_MAC, CONF_PIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.braviatv.const import CONF_USE_PSK, DOMAIN
+from smarthub.const import CONF_HOST, CONF_MAC, CONF_PIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -38,7 +38,7 @@ INPUTS = [
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:

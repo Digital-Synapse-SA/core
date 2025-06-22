@@ -4,18 +4,18 @@ import pytest
 from pytest_unordered import unordered
 import voluptuous_serialize
 
-from homeassistant.components import automation, zone
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.device_tracker import DOMAIN, device_trigger
-from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import (
+from smarthub.components import automation, zone
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.device_tracker import DOMAIN, device_trigger
+from smarthub.const import EntityCategory
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import (
     config_validation as cv,
     device_registry as dr,
     entity_registry as er,
 )
-from homeassistant.helpers.entity_registry import RegistryEntryHider
-from homeassistant.setup import async_setup_component
+from smarthub.helpers.entity_registry import RegistryEntryHider
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_get_device_automations
 
@@ -33,7 +33,7 @@ HOME_LONGITUDE = -117.237561
 
 
 @pytest.fixture(autouse=True)
-async def setup_zone(hass: HomeAssistant) -> None:
+async def setup_zone(hass: SmartHub) -> None:
     """Create test zone."""
     await async_setup_component(
         hass,
@@ -50,7 +50,7 @@ async def setup_zone(hass: HomeAssistant) -> None:
 
 
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -91,7 +91,7 @@ async def test_get_triggers(
     ],
 )
 async def test_get_triggers_hidden_auxiliary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hidden_by,
@@ -130,7 +130,7 @@ async def test_get_triggers_hidden_auxiliary(
 
 
 async def test_if_fires_on_zone_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -237,7 +237,7 @@ async def test_if_fires_on_zone_change(
 
 
 async def test_if_fires_on_zone_change_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -307,7 +307,7 @@ async def test_if_fires_on_zone_change_legacy(
 
 
 async def test_get_trigger_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -346,7 +346,7 @@ async def test_get_trigger_capabilities(
 
 
 async def test_get_trigger_capabilities_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

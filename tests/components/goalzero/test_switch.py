@@ -1,15 +1,15 @@
 """Switch tests for the Goalzero integration."""
 
-from homeassistant.components.goalzero.const import DEFAULT_NAME, DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.goalzero.const import DEFAULT_NAME, DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import async_init_integration
 
@@ -18,7 +18,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_switches_states(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we get sensor data."""
     await async_init_integration(hass, aioclient_mock)

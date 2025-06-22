@@ -1,9 +1,9 @@
-"""Test the Home Assistant SkyConnect hardware platform."""
+"""Test the SmartHub SkyConnect hardware platform."""
 
-from homeassistant.components.homeassistant_sky_connect.const import DOMAIN
-from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.smarthub_sky_connect.const import DOMAIN
+from smarthub.const import EVENT_HOMEASSISTANT_STARTED
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
@@ -24,7 +24,7 @@ CONFIG_ENTRY_DATA_2 = {
     "pid": "EA60",
     "serial_number": "9e2adbd75b8beb119fe564a0f320645d",
     "manufacturer": "Nabu Casa",
-    "product": "Home Assistant Connect ZBT-1",
+    "product": "SmartHub Connect ZBT-1",
     "firmware": "ezsp",
 }
 
@@ -34,7 +34,7 @@ CONFIG_ENTRY_DATA_BAD = {
 
 
 async def test_hardware_info(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, addon_store_info
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, addon_store_info
 ) -> None:
     """Test we can get the board info."""
     assert await async_setup_component(hass, "usb", {})
@@ -45,7 +45,7 @@ async def test_hardware_info(
         data=CONFIG_ENTRY_DATA,
         domain=DOMAIN,
         options={},
-        title="Home Assistant SkyConnect",
+        title="SmartHub SkyConnect",
         unique_id="unique_1",
         version=1,
         minor_version=2,
@@ -57,7 +57,7 @@ async def test_hardware_info(
         data=CONFIG_ENTRY_DATA_2,
         domain=DOMAIN,
         options={},
-        title="Home Assistant Connect ZBT-1",
+        title="SmartHub Connect ZBT-1",
         unique_id="unique_2",
         version=1,
         minor_version=2,
@@ -69,7 +69,7 @@ async def test_hardware_info(
         data=CONFIG_ENTRY_DATA_BAD,
         domain=DOMAIN,
         options={},
-        title="Home Assistant Connect ZBT-1",
+        title="SmartHub Connect ZBT-1",
         unique_id="unique_3",
         version=1,
         minor_version=2,
@@ -96,7 +96,7 @@ async def test_hardware_info(
                     "manufacturer": "Nabu Casa",
                     "description": "SkyConnect v1.0",
                 },
-                "name": "Home Assistant SkyConnect",
+                "name": "SmartHub SkyConnect",
                 "url": "https://support.nabucasa.com/hc/en-us/categories/24734620813469-Home-Assistant-Connect-ZBT-1",
             },
             {
@@ -107,9 +107,9 @@ async def test_hardware_info(
                     "pid": "EA60",
                     "serial_number": "9e2adbd75b8beb119fe564a0f320645d",
                     "manufacturer": "Nabu Casa",
-                    "description": "Home Assistant Connect ZBT-1",
+                    "description": "SmartHub Connect ZBT-1",
                 },
-                "name": "Home Assistant Connect ZBT-1",
+                "name": "SmartHub Connect ZBT-1",
                 "url": "https://support.nabucasa.com/hc/en-us/categories/24734620813469-Home-Assistant-Connect-ZBT-1",
             },
             # Bad entry is skipped

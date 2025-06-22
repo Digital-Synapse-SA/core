@@ -1,0 +1,10 @@
+{
+  "domain": "recovery_mode",
+  "name": "Recovery Mode",
+  "codeowners": ["@smart-hub/core"],
+  "config_flow": false,
+  "dependencies": ["frontend", "persistent_notification", "cloud"],
+  "documentation": "https://www.smart-hub.io/integrations/recovery_mode",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

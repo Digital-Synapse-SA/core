@@ -1,14 +1,14 @@
 """Test the number websocket API."""
 
-from homeassistant.components.number.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.number.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import WebSocketGenerator
 
 
 async def test_device_class_units(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can get supported units."""
     assert await async_setup_component(hass, DOMAIN, {})

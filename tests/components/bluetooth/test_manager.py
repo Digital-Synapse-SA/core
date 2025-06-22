@@ -13,9 +13,9 @@ from freezegun import freeze_time
 from habluetooth.advertisement_tracker import TRACKER_BUFFERING_WOBBLE_SECONDS
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import bluetooth
-from homeassistant.components.bluetooth import (
+from smarthub import config_entries
+from smarthub.components import bluetooth
+from smarthub.components.bluetooth import (
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
     MONOTONIC_TIME,
     BaseHaRemoteScanner,
@@ -32,17 +32,17 @@ from homeassistant.components.bluetooth import (
     async_track_unavailable,
     storage,
 )
-from homeassistant.components.bluetooth.const import (
+from smarthub.components.bluetooth.const import (
     SOURCE_LOCAL,
     UNAVAILABLE_TRACK_SECONDS,
 )
-from homeassistant.components.bluetooth.manager import HomeAssistantBluetoothManager
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.discovery_flow import DiscoveryKey
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.dt import utcnow
-from homeassistant.util.json import json_loads
+from smarthub.components.bluetooth.manager import SmartHubBluetoothManager
+from smarthub.core import SmartHub, callback
+from smarthub.helpers.discovery_flow import DiscoveryKey
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.dt import utcnow
+from smarthub.util.json import json_loads
 
 from . import (
     HCI0_SOURCE_ADDRESS,
@@ -70,7 +70,7 @@ from tests.common import (
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_advertisements_do_not_switch_adapters_for_no_reason(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
 ) -> None:
@@ -127,7 +127,7 @@ async def test_advertisements_do_not_switch_adapters_for_no_reason(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_switching_adapters_based_on_rssi(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
 ) -> None:
@@ -200,7 +200,7 @@ async def test_switching_adapters_based_on_rssi(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_switching_adapters_based_on_zero_rssi(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
 ) -> None:
@@ -267,7 +267,7 @@ async def test_switching_adapters_based_on_zero_rssi(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_switching_adapters_based_on_stale(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
 ) -> None:
@@ -334,7 +334,7 @@ async def test_switching_adapters_based_on_stale(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_switching_adapters_based_on_stale_with_discovered_interval(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
 ) -> None:
@@ -417,7 +417,7 @@ async def test_switching_adapters_based_on_stale_with_discovered_interval(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_restore_history_from_dbus(
-    hass: HomeAssistant, disable_new_discovery_flows
+    hass: SmartHub, disable_new_discovery_flows
 ) -> None:
     """Test we can restore history from dbus."""
     address = "AA:BB:CC:CC:CC:FF"
@@ -445,7 +445,7 @@ async def test_restore_history_from_dbus(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_restore_history_from_dbus_and_remote_adapters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     disable_new_discovery_flows,
 ) -> None:
@@ -487,7 +487,7 @@ async def test_restore_history_from_dbus_and_remote_adapters(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_restore_history_from_dbus_and_corrupted_remote_adapters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     disable_new_discovery_flows,
 ) -> None:
@@ -529,7 +529,7 @@ async def test_restore_history_from_dbus_and_corrupted_remote_adapters(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_switching_adapters_based_on_rssi_connectable_to_non_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
 ) -> None:
@@ -622,7 +622,7 @@ async def test_switching_adapters_based_on_rssi_connectable_to_non_connectable(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_connectable_advertisement_can_be_retrieved_with_best_path_is_non_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
 ) -> None:
@@ -678,7 +678,7 @@ async def test_connectable_advertisement_can_be_retrieved_with_best_path_is_non_
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_switching_adapters_when_one_goes_away(
-    hass: HomeAssistant, register_hci0_scanner: None
+    hass: SmartHub, register_hci0_scanner: None
 ) -> None:
     """Test switching adapters when one goes away."""
     cancel_hci2 = bluetooth.async_register_scanner(hass, FakeScanner("hci2", "hci2"))
@@ -734,7 +734,7 @@ async def test_switching_adapters_when_one_goes_away(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_switching_adapters_when_one_stop_scanning(
-    hass: HomeAssistant, register_hci0_scanner: None
+    hass: SmartHub, register_hci0_scanner: None
 ) -> None:
     """Test switching adapters when stops scanning."""
     hci2_scanner = FakeScanner("hci2", "hci2")
@@ -793,7 +793,7 @@ async def test_switching_adapters_when_one_stop_scanning(
 
 @pytest.mark.usefixtures("mock_bluetooth_adapters")
 async def test_goes_unavailable_connectable_only_and_recovers(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test all connectable scanners go unavailable, and than recover when there is a non-connectable scanner."""
     assert await async_setup_component(hass, bluetooth.DOMAIN, {})
@@ -957,7 +957,7 @@ async def test_goes_unavailable_connectable_only_and_recovers(
 
 @pytest.mark.usefixtures("mock_bluetooth_adapters")
 async def test_goes_unavailable_dismisses_discovery_and_makes_discoverable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that unavailable will dismiss any active discoveries and make device discoverable again."""
     mock_bt = [
@@ -968,7 +968,7 @@ async def test_goes_unavailable_dismisses_discovery_and_makes_discoverable(
         },
     ]
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         assert await async_setup_component(hass, bluetooth.DOMAIN, {})
         await hass.async_block_till_done()
@@ -1140,7 +1140,7 @@ async def test_goes_unavailable_dismisses_discovery_and_makes_discoverable(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_debug_logging(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
     caplog: pytest.LogCaptureFixture,
@@ -1148,7 +1148,7 @@ async def test_debug_logging(
     """Test debug logging."""
     assert await async_setup_component(hass, "logger", {"logger": {}})
     async with async_call_logger_set_level(
-        "homeassistant.components.bluetooth", "DEBUG", hass=hass, caplog=caplog
+        "smarthub.components.bluetooth", "DEBUG", hass=hass, caplog=caplog
     ):
         address = "44:44:33:11:23:41"
         start_time_monotonic = 50.0
@@ -1170,7 +1170,7 @@ async def test_debug_logging(
         caplog.clear()
 
     async with async_call_logger_set_level(
-        "homeassistant.components.bluetooth", "WARNING", hass=hass, caplog=caplog
+        "smarthub.components.bluetooth", "WARNING", hass=hass, caplog=caplog
     ):
         switchbot_device_good_signal_hci0 = generate_ble_device(
             address, "wohand_good_signal_hci0"
@@ -1189,7 +1189,7 @@ async def test_debug_logging(
 
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
-async def test_set_fallback_interval_small(hass: HomeAssistant) -> None:
+async def test_set_fallback_interval_small(hass: SmartHub) -> None:
     """Test we can set the fallback advertisement interval."""
     assert async_get_fallback_availability_interval(hass, "44:44:33:11:23:12") is None
 
@@ -1243,7 +1243,7 @@ async def test_set_fallback_interval_small(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
-async def test_set_fallback_interval_big(hass: HomeAssistant) -> None:
+async def test_set_fallback_interval_big(hass: SmartHub) -> None:
     """Test we can set the fallback advertisement interval."""
     assert async_get_fallback_availability_interval(hass, "44:44:33:11:23:12") is None
 
@@ -1370,7 +1370,7 @@ async def test_set_fallback_interval_big(hass: HomeAssistant) -> None:
     ],
 )
 async def test_bluetooth_rediscover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_domain: str,
     entry_discovery_keys: dict[str, tuple[DiscoveryKey, ...]],
     entry_source: str,
@@ -1384,7 +1384,7 @@ async def test_bluetooth_rediscover(
         },
     ]
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         assert await async_setup_component(hass, bluetooth.DOMAIN, {})
         await hass.async_block_till_done()
@@ -1546,7 +1546,7 @@ async def test_bluetooth_rediscover(
     ],
 )
 async def test_bluetooth_rediscover_no_match(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_domain: str,
     entry_discovery_keys: dict[str, tuple[DiscoveryKey, ...]],
     entry_source: str,
@@ -1561,7 +1561,7 @@ async def test_bluetooth_rediscover_no_match(
         },
     ]
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         assert await async_setup_component(hass, bluetooth.DOMAIN, {})
         await hass.async_block_till_done()
@@ -1686,7 +1686,7 @@ async def test_bluetooth_rediscover_no_match(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_async_register_disappeared_callback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
 ) -> None:
@@ -1716,7 +1716,7 @@ async def test_async_register_disappeared_callback(
         """Ok callback."""
         ok_disappeared.append(_address)
 
-    manager: HomeAssistantBluetoothManager = _get_manager()
+    manager: SmartHubBluetoothManager = _get_manager()
     cancel1 = manager.async_register_disappeared_callback(_failing_callback)
     # Make sure the second callback still works if the first one fails and
     # raises an exception

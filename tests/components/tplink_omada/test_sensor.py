@@ -10,10 +10,10 @@ from syrupy.assertion import SnapshotAssertion
 from tplink_omada_client.definitions import DeviceStatus, DeviceStatusCategory
 from tplink_omada_client.devices import OmadaGatewayPortStatus, OmadaListDevice
 
-from homeassistant.components.tplink_omada.const import DOMAIN
-from homeassistant.components.tplink_omada.coordinator import POLL_DEVICES
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.tplink_omada.const import DOMAIN
+from smarthub.components.tplink_omada.coordinator import POLL_DEVICES
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import (
     MockConfigEntry,
@@ -27,14 +27,14 @@ POLL_INTERVAL = timedelta(seconds=POLL_DEVICES)
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_omada_client: MagicMock,
 ) -> MockConfigEntry:
     """Set up the TP-Link Omada integration for testing."""
     mock_config_entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.tplink_omada.PLATFORMS", ["sensor"]):
+    with patch("smarthub.components.tplink_omada.PLATFORMS", ["sensor"]):
         assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
 
@@ -42,7 +42,7 @@ async def init_integration(
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -52,7 +52,7 @@ async def test_entities(
 
 
 async def test_device_specific_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_omada_site_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -78,7 +78,7 @@ async def test_device_specific_status(
 
 
 async def test_device_category_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_omada_site_client: MagicMock,
     freezer: FrozenDateTimeFactory,

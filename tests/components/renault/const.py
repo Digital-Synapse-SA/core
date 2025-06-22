@@ -1,7 +1,7 @@
 """Constants for the Renault integration tests."""
 
-from homeassistant.components.renault.const import CONF_KAMEREON_ACCOUNT_ID, CONF_LOCALE
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.components.renault.const import CONF_KAMEREON_ACCOUNT_ID, CONF_LOCALE
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
 
 MOCK_ACCOUNT_ID = "account_id_1"
 

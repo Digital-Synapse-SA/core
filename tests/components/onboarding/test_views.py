@@ -9,11 +9,11 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components import onboarding
-from homeassistant.components.onboarding import const, views
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import area_registry as ar
-from homeassistant.setup import async_set_domains_to_be_loaded, async_setup_component
+from smarthub.components import onboarding
+from smarthub.components.onboarding import const, views
+from smarthub.core import SmartHub
+from smarthub.helpers import area_registry as ar
+from smarthub.setup import async_set_domains_to_be_loaded, async_setup_component
 
 from . import mock_storage
 
@@ -31,14 +31,14 @@ from tests.typing import ClientSessionGenerator
 
 
 @pytest.fixture(autouse=True)
-async def auth_active(hass: HomeAssistant) -> None:
+async def auth_active(hass: SmartHub) -> None:
     """Ensure auth is always active."""
-    await register_auth_provider(hass, {"type": "homeassistant"})
+    await register_auth_provider(hass, {"type": "smarthub"})
 
 
 @pytest.fixture(name="rpi")
 async def rpi_fixture(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, mock_supervisor
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, mock_supervisor
 ) -> None:
     """Mock core info with rpi."""
     aioclient_mock.get(
@@ -54,7 +54,7 @@ async def rpi_fixture(
 
 @pytest.fixture(name="no_rpi")
 async def no_rpi_fixture(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, mock_supervisor
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, mock_supervisor
 ) -> None:
     """Mock core info with rpi."""
     aioclient_mock.get(
@@ -76,7 +76,7 @@ async def mock_supervisor_fixture(
     resolution_info: AsyncMock,
 ) -> AsyncGenerator[None]:
     """Mock supervisor."""
-    aioclient_mock.post("http://127.0.0.1/homeassistant/options", json={"result": "ok"})
+    aioclient_mock.post("http://127.0.0.1/smarthub/options", json={"result": "ok"})
     aioclient_mock.post("http://127.0.0.1/supervisor/options", json={"result": "ok"})
     aioclient_mock.get(
         "http://127.0.0.1/network/info",
@@ -91,23 +91,23 @@ async def mock_supervisor_fixture(
     with (
         patch.dict(os.environ, {"SUPERVISOR": "127.0.0.1"}),
         patch(
-            "homeassistant.components.hassio.HassIO.get_info",
+            "smarthub.components.hassio.HassIO.get_info",
             return_value={},
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_host_info",
+            "smarthub.components.hassio.HassIO.get_host_info",
             return_value={},
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_supervisor_info",
+            "smarthub.components.hassio.HassIO.get_supervisor_info",
             return_value={"diagnostics": True},
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_os_info",
+            "smarthub.components.hassio.HassIO.get_os_info",
             return_value={},
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_ingress_panels",
+            "smarthub.components.hassio.HassIO.get_ingress_panels",
             return_value={"panels": {}},
         ),
         patch.dict(
@@ -122,15 +122,15 @@ async def mock_supervisor_fixture(
 def mock_default_integrations():
     """Mock the default integrations set up during onboarding."""
     with (
-        patch("homeassistant.components.rpi_power.config_flow.new_under_voltage"),
-        patch("homeassistant.components.rpi_power.binary_sensor.new_under_voltage"),
-        patch("homeassistant.components.met.async_setup_entry", return_value=True),
+        patch("smarthub.components.rpi_power.config_flow.new_under_voltage"),
+        patch("smarthub.components.rpi_power.binary_sensor.new_under_voltage"),
+        patch("smarthub.components.met.async_setup_entry", return_value=True),
         patch(
-            "homeassistant.components.radio_browser.async_setup_entry",
+            "smarthub.components.radio_browser.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.shopping_list.async_setup_entry",
+            "smarthub.components.shopping_list.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -138,7 +138,7 @@ def mock_default_integrations():
 
 
 async def test_onboarding_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client_no_auth: ClientSessionGenerator,
 ) -> None:
@@ -161,7 +161,7 @@ async def test_onboarding_progress(
 
 
 async def test_onboarding_user_already_done(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client_no_auth: ClientSessionGenerator,
 ) -> None:
@@ -189,7 +189,7 @@ async def test_onboarding_user_already_done(
 
 
 async def test_onboarding_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client_no_auth: ClientSessionGenerator,
     area_registry: ar.AreaRegistry,
@@ -256,7 +256,7 @@ async def test_onboarding_user(
 
 
 async def test_onboarding_user_invalid_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client_no_auth: ClientSessionGenerator,
 ) -> None:
@@ -282,7 +282,7 @@ async def test_onboarding_user_invalid_name(
 
 
 async def test_onboarding_user_race(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client_no_auth: ClientSessionGenerator,
 ) -> None:
@@ -321,7 +321,7 @@ async def test_onboarding_user_race(
 
 
 async def test_onboarding_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     hass_admin_user: MockUser,
@@ -365,7 +365,7 @@ async def test_onboarding_integration(
 
 
 async def test_onboarding_integration_missing_credential(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     hass_access_token: str,
@@ -390,7 +390,7 @@ async def test_onboarding_integration_missing_credential(
 
 
 async def test_onboarding_integration_invalid_redirect_uri(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -403,7 +403,7 @@ async def test_onboarding_integration_invalid_redirect_uri(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.auth.indieauth.fetch_redirect_uris", return_value=[]
+        "smarthub.components.auth.indieauth.fetch_redirect_uris", return_value=[]
     ):
         resp = await client.post(
             "/api/onboarding/integration",
@@ -424,7 +424,7 @@ async def test_onboarding_integration_invalid_redirect_uri(
 
 
 async def test_onboarding_integration_requires_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client_no_auth: ClientSessionGenerator,
 ) -> None:
@@ -444,7 +444,7 @@ async def test_onboarding_integration_requires_auth(
 
 
 async def test_onboarding_core_sets_up_met(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     mock_default_integrations,
@@ -465,7 +465,7 @@ async def test_onboarding_core_sets_up_met(
 
 
 async def test_onboarding_core_sets_up_shopping_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     mock_default_integrations,
@@ -486,7 +486,7 @@ async def test_onboarding_core_sets_up_shopping_list(
 
 
 async def test_onboarding_core_sets_up_google_translate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     mock_default_integrations,
@@ -507,7 +507,7 @@ async def test_onboarding_core_sets_up_google_translate(
 
 
 async def test_onboarding_core_sets_up_radio_browser(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     mock_default_integrations,
@@ -528,7 +528,7 @@ async def test_onboarding_core_sets_up_radio_browser(
 
 
 async def test_onboarding_core_no_rpi_power(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
@@ -554,7 +554,7 @@ async def test_onboarding_core_no_rpi_power(
 
 
 async def test_onboarding_core_ensures_analytics_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     mock_default_integrations,
@@ -576,7 +576,7 @@ async def test_onboarding_core_ensures_analytics_loaded(
 
 
 async def test_onboarding_analytics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     hass_admin_user: MockUser,
@@ -600,7 +600,7 @@ async def test_onboarding_analytics(
 
 
 async def test_onboarding_installation_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -613,15 +613,15 @@ async def test_onboarding_installation_type(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.onboarding.views.async_get_system_info",
-        return_value={"installation_type": "Home Assistant Core"},
+        "smarthub.components.onboarding.views.async_get_system_info",
+        return_value={"installation_type": "SmartHub Core"},
     ):
         resp = await client.get("/api/onboarding/installation_type")
 
         assert resp.status == 200
 
         resp_content = await resp.json()
-        assert resp_content["installation_type"] == "Home Assistant Core"
+        assert resp_content["installation_type"] == "SmartHub Core"
 
 
 @pytest.mark.parametrize(
@@ -631,7 +631,7 @@ async def test_onboarding_installation_type(
     ],
 )
 async def test_onboarding_view_after_done(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     method: str,
@@ -652,7 +652,7 @@ async def test_onboarding_view_after_done(
 
 
 async def test_complete_onboarding(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test completing onboarding calls listeners."""
     listener_1 = Mock()
@@ -720,7 +720,7 @@ async def test_complete_onboarding(
     ],
 )
 async def test_wait_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     domain: str,
@@ -741,7 +741,7 @@ async def test_wait_integration(
 
 
 async def test_wait_integration_startup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -755,7 +755,7 @@ async def test_wait_integration_startup(
     setup_stall = asyncio.Event()
     setup_started = asyncio.Event()
 
-    async def mock_setup(hass: HomeAssistant, _) -> bool:
+    async def mock_setup(hass: SmartHub, _) -> bool:
         setup_started.set()
         await setup_stall.wait()
         return True
@@ -792,7 +792,7 @@ async def test_wait_integration_startup(
 
 
 async def test_not_setup_platform_if_onboarded(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test if onboarding is done, we don't setup platforms."""
     mock_storage(hass_storage, {"done": onboarding.STEPS})
@@ -809,7 +809,7 @@ async def test_not_setup_platform_if_onboarded(
 
 
 async def test_setup_platform_if_not_onboarded(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test if onboarding is not done, we setup platforms."""
     platform_mock = Mock(async_setup_views=AsyncMock(), spec=["async_setup_views"])
@@ -831,7 +831,7 @@ async def test_setup_platform_if_not_onboarded(
     ],
 )
 async def test_bad_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     platform_mock: Mock,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

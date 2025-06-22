@@ -6,16 +6,16 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from switchbot.devices.device import SwitchbotOperationError
 
-from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN
-from homeassistant.const import (
+from smarthub.components.bluetooth import BluetoothServiceInfoBleak
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_LOCK,
     SERVICE_OPEN,
     SERVICE_UNLOCK,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import (
     LOCK_LITE_SERVICE_INFO,
@@ -42,7 +42,7 @@ from tests.components.bluetooth import inject_bluetooth_service_info
     [(SERVICE_UNLOCK, "unlock"), (SERVICE_LOCK, "lock")],
 )
 async def test_lock_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_encrypted_factory: Callable[[str], MockConfigEntry],
     sensor_type: str,
     service: str,
@@ -57,7 +57,7 @@ async def test_lock_services(
     mocked_instance = AsyncMock(return_value=True)
 
     with patch.multiple(
-        "homeassistant.components.switchbot.lock.switchbot.SwitchbotLock",
+        "smarthub.components.switchbot.lock.switchbot.SwitchbotLock",
         update=AsyncMock(return_value=None),
         **{mock_method: mocked_instance},
     ):
@@ -90,7 +90,7 @@ async def test_lock_services(
     [(SERVICE_UNLOCK, "unlock_without_unlatch"), (SERVICE_OPEN, "unlock")],
 )
 async def test_lock_services_with_night_latch_enabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_encrypted_factory: Callable[[str], MockConfigEntry],
     sensor_type: str,
     service: str,
@@ -105,7 +105,7 @@ async def test_lock_services_with_night_latch_enabled(
     mocked_instance = AsyncMock(return_value=True)
 
     with patch.multiple(
-        "homeassistant.components.switchbot.lock.switchbot.SwitchbotLock",
+        "smarthub.components.switchbot.lock.switchbot.SwitchbotLock",
         is_night_latch_enabled=MagicMock(return_value=True),
         update=AsyncMock(return_value=None),
         **{mock_method: mocked_instance},
@@ -143,7 +143,7 @@ async def test_lock_services_with_night_latch_enabled(
     ],
 )
 async def test_exception_handling_lock_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_encrypted_factory: Callable[[str], MockConfigEntry],
     service: str,
     mock_method: str,
@@ -158,7 +158,7 @@ async def test_exception_handling_lock_service(
     entity_id = "lock.test_name"
 
     with patch.multiple(
-        "homeassistant.components.switchbot.lock.switchbot.SwitchbotLock",
+        "smarthub.components.switchbot.lock.switchbot.SwitchbotLock",
         is_night_latch_enabled=MagicMock(return_value=True),
         update=AsyncMock(return_value=None),
         **{mock_method: AsyncMock(side_effect=exception)},
@@ -166,7 +166,7 @@ async def test_exception_handling_lock_service(
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
-        with pytest.raises(HomeAssistantError, match=error_message):
+        with pytest.raises(SmartHubError, match=error_message):
             await hass.services.async_call(
                 LOCK_DOMAIN,
                 service,

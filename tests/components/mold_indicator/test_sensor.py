@@ -2,25 +2,25 @@
 
 import pytest
 
-from homeassistant.components import sensor
-from homeassistant.components.mold_indicator.sensor import (
+from smarthub.components import sensor
+from smarthub.components.mold_indicator.sensor import (
     ATTR_CRITICAL_TEMP,
     ATTR_DEWPOINT,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
     STATE_UNKNOWN,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture(autouse=True)
-def init_sensors_fixture(hass: HomeAssistant) -> None:
+def init_sensors_fixture(hass: SmartHub) -> None:
     """Set up things to be run when tests are started."""
     hass.states.async_set(
         "test.indoortemp", "20", {ATTR_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS}
@@ -33,7 +33,7 @@ def init_sensors_fixture(hass: HomeAssistant) -> None:
     )
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test the mold indicator sensor setup."""
     assert await async_setup_component(
         hass,
@@ -55,7 +55,7 @@ async def test_setup(hass: HomeAssistant) -> None:
 
 
 async def test_setup_from_config_entry(
-    hass: HomeAssistant, loaded_entry: MockConfigEntry
+    hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test the mold indicator sensor setup from a config entry."""
 
@@ -64,7 +64,7 @@ async def test_setup_from_config_entry(
     assert moldind.attributes.get("unit_of_measurement") == PERCENTAGE
 
 
-async def test_invalidcalib(hass: HomeAssistant) -> None:
+async def test_invalidcalib(hass: SmartHub) -> None:
     """Test invalid sensor values."""
     hass.states.async_set(
         "test.indoortemp", "10", {ATTR_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS}
@@ -99,7 +99,7 @@ async def test_invalidcalib(hass: HomeAssistant) -> None:
     assert moldind.attributes.get(ATTR_CRITICAL_TEMP) is None
 
 
-async def test_invalidhum(hass: HomeAssistant) -> None:
+async def test_invalidhum(hass: SmartHub) -> None:
     """Test invalid sensor values."""
     hass.states.async_set(
         "test.indoortemp", "10", {ATTR_UNIT_OF_MEASUREMENT: UnitOfTemperature.CELSIUS}
@@ -157,7 +157,7 @@ async def test_invalidhum(hass: HomeAssistant) -> None:
     assert moldind.attributes.get(ATTR_CRITICAL_TEMP) is None
 
 
-async def test_calculation(hass: HomeAssistant) -> None:
+async def test_calculation(hass: SmartHub) -> None:
     """Test the mold indicator internal calculations."""
     assert await async_setup_component(
         hass,
@@ -196,7 +196,7 @@ async def test_calculation(hass: HomeAssistant) -> None:
     assert state == "68"
 
 
-async def test_unknown_sensor(hass: HomeAssistant) -> None:
+async def test_unknown_sensor(hass: SmartHub) -> None:
     """Test the sensor_changed function."""
     assert await async_setup_component(
         hass,
@@ -274,7 +274,7 @@ async def test_unknown_sensor(hass: HomeAssistant) -> None:
     assert esttemp == 27.5
 
 
-async def test_sensor_changed(hass: HomeAssistant) -> None:
+async def test_sensor_changed(hass: SmartHub) -> None:
     """Test the sensor_changed function."""
     assert await async_setup_component(
         hass,

@@ -6,15 +6,15 @@ from unittest.mock import MagicMock, patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import light, switch
-from homeassistant.components.homeassistant.exposed_entities import async_expose_entity
-from homeassistant.const import (
+from smarthub.components import light, switch
+from smarthub.components.smarthub.exposed_entities import async_expose_entity
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_SUPPORTED_FEATURES,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import (
+from smarthub.core import SmartHub, State
+from smarthub.helpers import (
     area_registry as ar,
     config_validation as cv,
     device_registry as dr,
@@ -22,7 +22,7 @@ from homeassistant.helpers import (
     floor_registry as fr,
     intent,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_mock_service
 
@@ -41,7 +41,7 @@ class MockIntentHandler(intent.IntentHandler):
 
 
 async def test_async_match_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
     floor_registry: fr.FloorRegistry,
@@ -172,7 +172,7 @@ async def test_async_match_states(
 
 
 async def test_async_match_targets(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
     floor_registry: fr.FloorRegistry,
@@ -180,7 +180,7 @@ async def test_async_match_targets(
 ) -> None:
     """Tests for async_match_targets function."""
     # Needed for exposure
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     # House layout
     # Floor 1 (ground):
@@ -543,7 +543,7 @@ async def test_async_match_targets(
 
 
 async def test_match_device_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -615,7 +615,7 @@ def test_async_validate_slots_no_schema() -> None:
     }
 
 
-def test_async_register(hass: HomeAssistant) -> None:
+def test_async_register(hass: SmartHub) -> None:
     """Test registering an intent and verifying it is stored correctly."""
     handler = MagicMock()
     handler.intent_type = "test_intent"
@@ -625,7 +625,7 @@ def test_async_register(hass: HomeAssistant) -> None:
     assert list(intent.async_get(hass)) == [handler]
 
 
-def test_async_register_overwrite(hass: HomeAssistant) -> None:
+def test_async_register_overwrite(hass: SmartHub) -> None:
     """Test registering multiple intents with the same type, ensuring the last one overwrites the previous one and a warning is emitted."""
     handler1 = MagicMock()
     handler1.intent_type = "test_intent"
@@ -644,8 +644,8 @@ def test_async_register_overwrite(hass: HomeAssistant) -> None:
     assert list(intent.async_get(hass)) == [handler2]
 
 
-def test_async_remove(hass: HomeAssistant) -> None:
-    """Test removing an intent and verifying it is no longer present in the Home Assistant data."""
+def test_async_remove(hass: SmartHub) -> None:
+    """Test removing an intent and verifying it is no longer present in the SmartHub data."""
     handler = MagicMock()
     handler.intent_type = "test_intent"
 
@@ -655,8 +655,8 @@ def test_async_remove(hass: HomeAssistant) -> None:
     assert not list(intent.async_get(hass))
 
 
-def test_async_remove_no_existing_entry(hass: HomeAssistant) -> None:
-    """Test the removal of a non-existing intent from Home Assistant's data."""
+def test_async_remove_no_existing_entry(hass: SmartHub) -> None:
+    """Test the removal of a non-existing intent from SmartHub's data."""
     handler = MagicMock()
     handler.intent_type = "test_intent"
     intent.async_register(hass, handler)
@@ -666,7 +666,7 @@ def test_async_remove_no_existing_entry(hass: HomeAssistant) -> None:
     assert list(intent.async_get(hass)) == [handler]
 
 
-def test_async_remove_no_existing(hass: HomeAssistant) -> None:
+def test_async_remove_no_existing(hass: SmartHub) -> None:
     """Test the removal of an intent where no config exists."""
 
     intent.async_remove(hass, "test_intent2")
@@ -675,7 +675,7 @@ def test_async_remove_no_existing(hass: HomeAssistant) -> None:
     assert intent.DATA_KEY not in hass.data
 
 
-async def test_validate_then_run_in_background(hass: HomeAssistant) -> None:
+async def test_validate_then_run_in_background(hass: SmartHub) -> None:
     """Test we don't execute a service in foreground forever."""
     hass.states.async_set("light.kitchen", "off")
     call_done = asyncio.Event()
@@ -713,7 +713,7 @@ async def test_validate_then_run_in_background(hass: HomeAssistant) -> None:
     assert calls[0].data == {"entity_id": "light.kitchen"}
 
 
-async def test_invalid_area_floor_names(hass: HomeAssistant) -> None:
+async def test_invalid_area_floor_names(hass: SmartHub) -> None:
     """Test that we throw an appropriate errors with invalid area/floor names."""
     handler = intent.ServiceIntentHandler(
         "TestType", "light", "turn_on", "Turned {} on"
@@ -742,15 +742,15 @@ async def test_invalid_area_floor_names(hass: HomeAssistant) -> None:
     assert err.value.result.no_match_reason == intent.MatchFailedReason.INVALID_FLOOR
 
 
-async def test_service_intent_handler_required_domains(hass: HomeAssistant) -> None:
+async def test_service_intent_handler_required_domains(hass: SmartHub) -> None:
     """Test that required_domains restricts the domain of a ServiceIntentHandler."""
     hass.states.async_set("light.kitchen", "off")
     hass.states.async_set("switch.bedroom", "off")
 
-    calls = async_mock_service(hass, "homeassistant", "turn_on")
+    calls = async_mock_service(hass, "smarthub", "turn_on")
     handler = intent.ServiceIntentHandler(
         "TestType",
-        "homeassistant",
+        "smarthub",
         "turn_on",
         "Turned {} on",
         required_domains={"light"},
@@ -786,7 +786,7 @@ async def test_service_intent_handler_required_domains(hass: HomeAssistant) -> N
         )
 
 
-async def test_service_handler_empty_strings(hass: HomeAssistant) -> None:
+async def test_service_handler_empty_strings(hass: SmartHub) -> None:
     """Test that passing empty strings for filters fails in ServiceIntentHandler."""
     handler = intent.ServiceIntentHandler(
         "TestType",
@@ -816,7 +816,7 @@ async def test_service_handler_empty_strings(hass: HomeAssistant) -> None:
             )
 
 
-async def test_service_handler_no_filter(hass: HomeAssistant) -> None:
+async def test_service_handler_no_filter(hass: SmartHub) -> None:
     """Test that targeting all devices in the house fails."""
     handler = intent.ServiceIntentHandler(
         "TestType", "light", "turn_on", "Turned {} on"
@@ -832,7 +832,7 @@ async def test_service_handler_no_filter(hass: HomeAssistant) -> None:
 
 
 async def test_service_handler_device_classes(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that passing empty strings for filters fails in ServiceIntentHandler."""
 

@@ -4,23 +4,23 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.met_eireann.const import DOMAIN, HOME_LOCATION_NAME
-from homeassistant.const import CONF_ELEVATION, CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.met_eireann.const import DOMAIN, HOME_LOCATION_NAME
+from smarthub.const import CONF_ELEVATION, CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 @pytest.fixture(name="met_eireann_setup", autouse=True)
 def met_setup_fixture():
     """Patch Met Éireann setup entry."""
     with patch(
-        "homeassistant.components.met_eireann.async_setup_entry", return_value=True
+        "smarthub.components.met_eireann.async_setup_entry", return_value=True
     ):
         yield
 
 
-async def test_show_config_form(hass: HomeAssistant) -> None:
+async def test_show_config_form(hass: SmartHub) -> None:
     """Test show configuration form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -30,7 +30,7 @@ async def test_show_config_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == config_entries.SOURCE_USER
 
 
-async def test_flow_with_home_location(hass: HomeAssistant) -> None:
+async def test_flow_with_home_location(hass: SmartHub) -> None:
     """Test config flow.
 
     Test the flow when a default location is configured.
@@ -54,7 +54,7 @@ async def test_flow_with_home_location(hass: HomeAssistant) -> None:
     assert default_data["elevation"] == 3
 
 
-async def test_create_entry(hass: HomeAssistant) -> None:
+async def test_create_entry(hass: SmartHub) -> None:
     """Test create entry from user input."""
     test_data = {
         "name": "test",
@@ -72,7 +72,7 @@ async def test_create_entry(hass: HomeAssistant) -> None:
     assert result["data"] == test_data
 
 
-async def test_flow_entry_already_exists(hass: HomeAssistant) -> None:
+async def test_flow_entry_already_exists(hass: SmartHub) -> None:
     """Test user input for config_entry that already exists.
 
     Test to ensure the config form does not allow duplicate entries.

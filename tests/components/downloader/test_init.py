@@ -2,18 +2,18 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.downloader.const import (
+from smarthub.components.downloader.const import (
     CONF_DOWNLOAD_DIR,
     DOMAIN,
     SERVICE_DOWNLOAD_FILE,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_initialization(hass: HomeAssistant) -> None:
+async def test_initialization(hass: SmartHub) -> None:
     """Test the initialization of the downloader component."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

@@ -6,8 +6,8 @@ from unittest.mock import patch
 import pytest
 from requests_mock import Mocker
 
-from homeassistant.components import vultr
-from homeassistant.core import HomeAssistant
+from smarthub.components import vultr
+from smarthub.core import SmartHub
 
 from .const import VALID_CONFIG
 
@@ -15,7 +15,7 @@ from tests.common import load_fixture
 
 
 @pytest.fixture(name="valid_config")
-def valid_config(hass: HomeAssistant, requests_mock: Mocker) -> None:
+def valid_config(hass: SmartHub, requests_mock: Mocker) -> None:
     """Load a valid config."""
     requests_mock.get(
         "https://api.vultr.com/v1/account/info?api_key=ABCDEFG1234567",

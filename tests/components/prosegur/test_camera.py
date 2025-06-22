@@ -6,15 +6,15 @@ from unittest.mock import AsyncMock
 from pyprosegur.exceptions import ProsegurException
 import pytest
 
-from homeassistant.components import camera
-from homeassistant.components.camera import Image
-from homeassistant.components.prosegur.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components import camera
+from smarthub.components.camera import Image
+from smarthub.components.prosegur.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 
-async def test_camera(hass: HomeAssistant, init_integration) -> None:
+async def test_camera(hass: SmartHub, init_integration) -> None:
     """Test prosegur get_image."""
 
     image = await camera.async_get_image(hass, "camera.contract_1234abcd_test_cam")
@@ -23,7 +23,7 @@ async def test_camera(hass: HomeAssistant, init_integration) -> None:
 
 
 async def test_camera_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration,
     mock_install,
     caplog: pytest.LogCaptureFixture,
@@ -35,8 +35,8 @@ async def test_camera_fail(
     )
 
     with (
-        caplog.at_level(logging.ERROR, logger="homeassistant.components.prosegur"),
-        pytest.raises(HomeAssistantError) as exc,
+        caplog.at_level(logging.ERROR, logger="smarthub.components.prosegur"),
+        pytest.raises(SmartHubError) as exc,
     ):
         await camera.async_get_image(hass, "camera.contract_1234abcd_test_cam")
 
@@ -46,7 +46,7 @@ async def test_camera_fail(
 
 
 async def test_request_image(
-    hass: HomeAssistant, init_integration, mock_install
+    hass: SmartHub, init_integration, mock_install
 ) -> None:
     """Test the camera request image service."""
 
@@ -61,7 +61,7 @@ async def test_request_image(
 
 
 async def test_request_image_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration,
     mock_install,
     caplog: pytest.LogCaptureFixture,
@@ -70,7 +70,7 @@ async def test_request_image_fail(
 
     mock_install.request_image = AsyncMock(side_effect=ProsegurException())
 
-    with caplog.at_level(logging.ERROR, logger="homeassistant.components.prosegur"):
+    with caplog.at_level(logging.ERROR, logger="smarthub.components.prosegur"):
         await hass.services.async_call(
             DOMAIN,
             "request_image",

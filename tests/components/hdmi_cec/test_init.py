@@ -8,7 +8,7 @@ from unittest.mock import ANY, MagicMock, PropertyMock, call, patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.hdmi_cec import (
+from smarthub.components.hdmi_cec import (
     DOMAIN,
     EVENT_HDMI_CEC_UNAVAILABLE,
     SERVICE_POWER_ON,
@@ -24,10 +24,10 @@ from homeassistant.components.hdmi_cec import (
     PhysicalAddress,
     parse_mapping,
 )
-from homeassistant.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from . import assert_key_press_release
 from .conftest import HDMINetworkCreator
@@ -44,7 +44,7 @@ from tests.common import (
 def mock_tcp_adapter_fixture() -> Generator[MagicMock]:
     """Mock TcpAdapter."""
     with patch(
-        "homeassistant.components.hdmi_cec.TcpAdapter", autospec=True
+        "smarthub.components.hdmi_cec.TcpAdapter", autospec=True
     ) as mock_tcp_adapter:
         yield mock_tcp_adapter
 
@@ -106,7 +106,7 @@ def test_parse_mapping_physical_address(
 
 
 async def test_setup_cec_adapter(
-    hass: HomeAssistant, mock_cec_adapter: MagicMock, mock_hdmi_network: MagicMock
+    hass: SmartHub, mock_cec_adapter: MagicMock, mock_hdmi_network: MagicMock
 ) -> None:
     """Test the general setup of this component."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -130,7 +130,7 @@ async def test_setup_cec_adapter(
 
 @pytest.mark.parametrize("osd_name", ["test", "test_a_long_name"])
 async def test_setup_set_osd_name(
-    hass: HomeAssistant, osd_name: str, mock_cec_adapter: MagicMock
+    hass: SmartHub, osd_name: str, mock_cec_adapter: MagicMock
 ) -> None:
     """Test the setup of this component with the `osd_name` config setting."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {"osd_name": osd_name}})
@@ -139,7 +139,7 @@ async def test_setup_set_osd_name(
 
 
 async def test_setup_tcp_adapter(
-    hass: HomeAssistant, mock_tcp_adapter: MagicMock, mock_hdmi_network: MagicMock
+    hass: SmartHub, mock_tcp_adapter: MagicMock, mock_hdmi_network: MagicMock
 ) -> None:
     """Test the setup of this component with the TcpAdapter (`host` config setting)."""
     host = "0.0.0.0"
@@ -167,7 +167,7 @@ async def test_setup_tcp_adapter(
 
 
 async def test_service_power_on(
-    hass: HomeAssistant, create_hdmi_network: HDMINetworkCreator
+    hass: SmartHub, create_hdmi_network: HDMINetworkCreator
 ) -> None:
     """Test the power on service call."""
     mock_hdmi_network_instance = await create_hdmi_network()
@@ -183,7 +183,7 @@ async def test_service_power_on(
 
 
 async def test_service_standby(
-    hass: HomeAssistant, create_hdmi_network: HDMINetworkCreator
+    hass: SmartHub, create_hdmi_network: HDMINetworkCreator
 ) -> None:
     """Test the standby service call."""
     mock_hdmi_network_instance = await create_hdmi_network()
@@ -199,7 +199,7 @@ async def test_service_standby(
 
 
 async def test_service_select_device_alias(
-    hass: HomeAssistant, create_hdmi_network: HDMINetworkCreator
+    hass: SmartHub, create_hdmi_network: HDMINetworkCreator
 ) -> None:
     """Test the select device service call with a known alias."""
     mock_hdmi_network_instance = await create_hdmi_network(
@@ -229,7 +229,7 @@ class MockCecEntity(MockEntity):
 
 
 async def test_service_select_device_entity(
-    hass: HomeAssistant, create_hdmi_network: HDMINetworkCreator
+    hass: SmartHub, create_hdmi_network: HDMINetworkCreator
 ) -> None:
     """Test the select device service call with an existing entity."""
     platform = MockEntityPlatform(hass)
@@ -253,7 +253,7 @@ async def test_service_select_device_entity(
 
 
 async def test_service_select_device_physical_address(
-    hass: HomeAssistant, create_hdmi_network: HDMINetworkCreator
+    hass: SmartHub, create_hdmi_network: HDMINetworkCreator
 ) -> None:
     """Test the select device service call with a raw physical address."""
     mock_hdmi_network_instance = await create_hdmi_network()
@@ -272,7 +272,7 @@ async def test_service_select_device_physical_address(
 
 
 async def test_service_update_devices(
-    hass: HomeAssistant, create_hdmi_network: HDMINetworkCreator
+    hass: SmartHub, create_hdmi_network: HDMINetworkCreator
 ) -> None:
     """Test the update devices service call."""
     mock_hdmi_network_instance = await create_hdmi_network()
@@ -305,7 +305,7 @@ async def test_service_update_devices(
 )
 @pytest.mark.parametrize(("direction", "key"), [("up", 65), ("down", 66)])
 async def test_service_volume_x_times(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     count: int,
     call_count: int,
@@ -331,7 +331,7 @@ async def test_service_volume_x_times(
 
 @pytest.mark.parametrize(("direction", "key"), [("up", 65), ("down", 66)])
 async def test_service_volume_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     direction: str,
     key: int,
@@ -355,7 +355,7 @@ async def test_service_volume_press(
 
 @pytest.mark.parametrize(("direction", "key"), [("up", 65), ("down", 66)])
 async def test_service_volume_release(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     direction: str,
     key: int,
@@ -393,7 +393,7 @@ async def test_service_volume_release(
     ],
 )
 async def test_service_volume_mute(
-    hass: HomeAssistant, create_hdmi_network: HDMINetworkCreator, attr: str, key: int
+    hass: SmartHub, create_hdmi_network: HDMINetworkCreator, attr: str, key: int
 ) -> None:
     """Test the volume service call with mute."""
     mock_hdmi_network_instance = await create_hdmi_network()
@@ -464,7 +464,7 @@ async def test_service_volume_mute(
     ],
 )
 async def test_service_send_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     data: dict[str, Any],
     expected: str,
@@ -489,7 +489,7 @@ async def test_service_send_command(
     ("adapter_initialized_value", "watchdog_actions"), [(False, 1), (True, 0)]
 )
 async def test_watchdog(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     mock_cec_adapter: MagicMock,
     adapter_initialized_value: bool,

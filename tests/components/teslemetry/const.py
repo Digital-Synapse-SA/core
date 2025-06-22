@@ -1,7 +1,7 @@
 """Constants for the teslemetry tests."""
 
-from homeassistant.components.teslemetry.const import DOMAIN, TeslemetryState
-from homeassistant.const import CONF_ACCESS_TOKEN
+from smarthub.components.teslemetry.const import DOMAIN, TeslemetryState
+from smarthub.const import CONF_ACCESS_TOKEN
 
 from tests.common import load_json_object_fixture
 

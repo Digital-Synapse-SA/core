@@ -6,15 +6,15 @@ from flexit_bacnet import DecodingError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_with_selected_platforms
 
@@ -24,7 +24,7 @@ ENTITY_ID = "number.device_name_fireplace_supply_fan_setpoint"
 
 
 async def test_numbers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_flexit_bacnet: AsyncMock,
@@ -38,7 +38,7 @@ async def test_numbers(
 
 
 async def test_numbers_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_flexit_bacnet: AsyncMock,
@@ -83,7 +83,7 @@ async def test_numbers_implementation(
     # Error recovery, when setting the value
     mock_flexit_bacnet.set_fan_setpoint_supply_air_fire.side_effect = DecodingError
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,

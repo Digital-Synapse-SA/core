@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.ibeacon.const import CONF_ALLOW_NAMELESS_UUIDS, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.ibeacon.const import CONF_ALLOW_NAMELESS_UUIDS, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_bluetooth_adapters")
-async def test_setup_user_no_bluetooth(hass: HomeAssistant) -> None:
+async def test_setup_user_no_bluetooth(hass: SmartHub) -> None:
     """Test setting up via user interaction when bluetooth is not enabled."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -24,7 +24,7 @@ async def test_setup_user_no_bluetooth(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_setup_user(hass: HomeAssistant) -> None:
+async def test_setup_user(hass: SmartHub) -> None:
     """Test setting up via user interaction with bluetooth enabled."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -32,7 +32,7 @@ async def test_setup_user(hass: HomeAssistant) -> None:
     )
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "user"
-    with patch("homeassistant.components.ibeacon.async_setup_entry", return_value=True):
+    with patch("smarthub.components.ibeacon.async_setup_entry", return_value=True):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"], user_input={}
         )
@@ -42,7 +42,7 @@ async def test_setup_user(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_setup_user_already_setup(hass: HomeAssistant) -> None:
+async def test_setup_user_already_setup(hass: SmartHub) -> None:
     """Test setting up via user when already setup ."""
     MockConfigEntry(domain=DOMAIN).add_to_hass(hass)
     result = await hass.config_entries.flow.async_init(
@@ -54,7 +54,7 @@ async def test_setup_user_already_setup(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test config flow options."""
     config_entry = MockConfigEntry(domain=DOMAIN)
     config_entry.add_to_hass(hass)

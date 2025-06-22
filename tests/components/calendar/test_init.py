@@ -13,11 +13,11 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 import voluptuous as vol
 
-from homeassistant.components.calendar import DOMAIN, SERVICE_GET_EVENTS
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceNotSupported
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.calendar import DOMAIN, SERVICE_GET_EVENTS
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceNotSupported
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .conftest import MockCalendarEntity, MockConfigEntry
 
@@ -45,7 +45,7 @@ def mock_set_frozen_time(frozen_time: str | None) -> Generator[None]:
 
 @pytest.fixture(name="setup_platform", autouse=True)
 async def mock_setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     set_time_zone: None,
     frozen_time: str | None,
     mock_setup_integration: None,
@@ -57,7 +57,7 @@ async def mock_setup_platform(
 
 
 async def test_events_http_api(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the calendar demo view."""
     client = await hass_client()
@@ -72,7 +72,7 @@ async def test_events_http_api(
 
 
 async def test_events_http_api_missing_fields(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the calendar demo view."""
     client = await hass_client()
@@ -81,7 +81,7 @@ async def test_events_http_api_missing_fields(
 
 
 async def test_events_http_api_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     test_entities: list[MockCalendarEntity],
 ) -> None:
@@ -90,7 +90,7 @@ async def test_events_http_api_error(
     start = dt_util.now()
     end = start + timedelta(days=1)
 
-    test_entities[0].async_get_events.side_effect = HomeAssistantError("Failure")
+    test_entities[0].async_get_events.side_effect = SmartHubError("Failure")
 
     response = await client.get(
         f"/api/calendars/calendar.calendar_1?start={start.isoformat()}&end={end.isoformat()}"
@@ -100,7 +100,7 @@ async def test_events_http_api_error(
 
 
 async def test_events_http_api_dates_wrong_order(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the calendar demo view."""
     client = await hass_client()
@@ -113,7 +113,7 @@ async def test_events_http_api_dates_wrong_order(
 
 
 async def test_calendars_http_api(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the calendar demo view."""
     client = await hass_client()
@@ -198,7 +198,7 @@ async def test_calendars_http_api(
     ],
 )
 async def test_unsupported_websocket(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, payload, code
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, payload, code
 ) -> None:
     """Test unsupported websocket command."""
     client = await hass_ws_client(hass)
@@ -214,9 +214,9 @@ async def test_unsupported_websocket(
     assert resp["error"].get("code") == code
 
 
-async def test_unsupported_create_event_service(hass: HomeAssistant) -> None:
+async def test_unsupported_create_event_service(hass: SmartHub) -> None:
     """Test unsupported service call."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     with pytest.raises(
         ServiceNotSupported,
         match="Entity calendar.calendar_1 does not "
@@ -390,7 +390,7 @@ async def test_unsupported_create_event_service(hass: HomeAssistant) -> None:
     ],
 )
 async def test_create_event_service_invalid_params(
-    hass: HomeAssistant,
+    hass: SmartHub,
     date_fields: dict[str, Any],
     expected_error: type[Exception],
     error_match: str | None,
@@ -443,7 +443,7 @@ async def test_create_event_service_invalid_params(
     ],
 )
 async def test_list_events_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     start_time: str,
     end_time: str,
     service: str,
@@ -489,7 +489,7 @@ async def test_list_events_service(
 )
 @pytest.mark.parametrize("frozen_time", ["2023-10-19 13:50:05"], ids=["frozen_time"])
 async def test_list_events_service_duration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity: str,
     duration: str,
     service: str,
@@ -509,7 +509,7 @@ async def test_list_events_service_duration(
     assert response == snapshot
 
 
-async def test_list_events_positive_duration(hass: HomeAssistant) -> None:
+async def test_list_events_positive_duration(hass: SmartHub) -> None:
     """Test listing events requires a positive duration."""
     with pytest.raises(vol.Invalid, match="should be positive"):
         await hass.services.async_call(
@@ -524,7 +524,7 @@ async def test_list_events_positive_duration(hass: HomeAssistant) -> None:
         )
 
 
-async def test_list_events_exclusive_fields(hass: HomeAssistant) -> None:
+async def test_list_events_exclusive_fields(hass: SmartHub) -> None:
     """Test listing events specifying fields that are exclusive."""
     end = dt_util.now() + timedelta(days=1)
 
@@ -542,7 +542,7 @@ async def test_list_events_exclusive_fields(hass: HomeAssistant) -> None:
         )
 
 
-async def test_list_events_missing_fields(hass: HomeAssistant) -> None:
+async def test_list_events_missing_fields(hass: SmartHub) -> None:
     """Test listing events missing some required fields."""
     with pytest.raises(vol.Invalid, match="at least one of"):
         await hass.services.async_call(
@@ -587,7 +587,7 @@ async def test_list_events_missing_fields(hass: HomeAssistant) -> None:
     ],
 )
 async def test_list_events_service_same_dates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_data: dict[str, str],
     error_msg: str,
 ) -> None:

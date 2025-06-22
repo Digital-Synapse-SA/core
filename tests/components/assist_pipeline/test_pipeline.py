@@ -9,15 +9,15 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 import voluptuous as vol
 
-from homeassistant.components import (
+from smarthub.components import (
     assist_pipeline,
     conversation,
     media_source,
     stt,
     tts,
 )
-from homeassistant.components.assist_pipeline.const import DOMAIN
-from homeassistant.components.assist_pipeline.pipeline import (
+from smarthub.components.assist_pipeline.const import DOMAIN
+from smarthub.components.assist_pipeline.pipeline import (
     STORAGE_KEY,
     STORAGE_VERSION,
     STORAGE_VERSION_MINOR,
@@ -32,10 +32,10 @@ from homeassistant.components.assist_pipeline.pipeline import (
     async_migrate_engine,
     async_update_pipeline,
 )
-from homeassistant.const import MATCH_ALL
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.helpers import chat_session, intent, llm
-from homeassistant.setup import async_setup_component
+from smarthub.const import MATCH_ALL
+from smarthub.core import Context, SmartHub
+from smarthub.helpers import chat_session, intent, llm
+from smarthub.setup import async_setup_component
 
 from . import MANY_LANGUAGES, process_events
 from .conftest import (
@@ -53,15 +53,15 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 @pytest.fixture(autouse=True)
 async def delay_save_fixture() -> AsyncGenerator[None]:
-    """Load the homeassistant integration."""
-    with patch("homeassistant.helpers.collection.SAVE_DELAY", new=0):
+    """Load the smarthub integration."""
+    with patch("smarthub.helpers.collection.SAVE_DELAY", new=0):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def load_homeassistant(hass: HomeAssistant) -> None:
-    """Load the homeassistant integration."""
-    assert await async_setup_component(hass, "homeassistant", {})
+async def load_smarthub(hass: SmartHub) -> None:
+    """Load the smarthub integration."""
+    assert await async_setup_component(hass, "smarthub", {})
 
 
 @pytest.fixture
@@ -71,7 +71,7 @@ async def disable_tts_entity(mock_tts_entity: tts.TextToSpeechEntity) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_load_pipelines(hass: HomeAssistant) -> None:
+async def test_load_pipelines(hass: SmartHub) -> None:
     """Make sure that we can load/save data correctly."""
 
     pipelines = [
@@ -146,7 +146,7 @@ async def test_load_pipelines(hass: HomeAssistant) -> None:
 def mock_chat_session_id() -> Generator[Mock]:
     """Mock the conversation ID of chat sessions."""
     with patch(
-        "homeassistant.helpers.chat_session.ulid_now", return_value="mock-ulid"
+        "smarthub.helpers.chat_session.ulid_now", return_value="mock-ulid"
     ) as mock_ulid_now:
         yield mock_ulid_now
 
@@ -159,7 +159,7 @@ def mock_tts_token() -> Generator[None]:
 
 
 async def test_loading_pipelines_from_storage(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test loading stored pipelines on start."""
     async_migrate_engine(
@@ -232,7 +232,7 @@ async def test_loading_pipelines_from_storage(
 
 
 async def test_migrate_pipeline_store(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test loading stored pipelines from an older version."""
     hass_storage[STORAGE_KEY] = {
@@ -292,7 +292,7 @@ async def test_migrate_pipeline_store(
 
 @pytest.mark.usefixtures("init_supporting_components")
 @pytest.mark.usefixtures("disable_tts_entity")
-async def test_create_default_pipeline(hass: HomeAssistant) -> None:
+async def test_create_default_pipeline(hass: SmartHub) -> None:
     """Test async_create_default_pipeline."""
     assert await async_setup_component(hass, "assist_pipeline", {})
 
@@ -330,7 +330,7 @@ async def test_create_default_pipeline(hass: HomeAssistant) -> None:
     )
 
 
-async def test_get_pipeline(hass: HomeAssistant) -> None:
+async def test_get_pipeline(hass: SmartHub) -> None:
     """Test async_get_pipeline."""
     assert await async_setup_component(hass, "assist_pipeline", {})
 
@@ -346,7 +346,7 @@ async def test_get_pipeline(hass: HomeAssistant) -> None:
     assert pipeline is async_get_pipeline(hass, pipeline.id)
 
 
-async def test_get_pipelines(hass: HomeAssistant) -> None:
+async def test_get_pipelines(hass: SmartHub) -> None:
     """Test async_get_pipelines."""
     assert await async_setup_component(hass, "assist_pipeline", {})
 
@@ -361,7 +361,7 @@ async def test_get_pipelines(hass: HomeAssistant) -> None:
             conversation_language="en",
             id=ANY,
             language="en",
-            name="Home Assistant",
+            name="SmartHub",
             stt_engine=None,
             stt_language=None,
             tts_engine=None,
@@ -386,7 +386,7 @@ async def test_get_pipelines(hass: HomeAssistant) -> None:
     ],
 )
 async def test_default_pipeline_no_stt_tts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ha_language: str,
     ha_country: str | None,
     conv_language: str,
@@ -408,7 +408,7 @@ async def test_default_pipeline_no_stt_tts(
         conversation_language=conv_language,
         id=pipeline.id,
         language=pipeline_language,
-        name="Home Assistant",
+        name="SmartHub",
         stt_engine=None,
         stt_language=None,
         tts_engine=None,
@@ -441,7 +441,7 @@ async def test_default_pipeline_no_stt_tts(
 @pytest.mark.usefixtures("init_supporting_components")
 @pytest.mark.usefixtures("disable_tts_entity")
 async def test_default_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stt_provider_entity: MockSTTProviderEntity,
     mock_tts_provider: MockTTSProvider,
     ha_language: str,
@@ -472,7 +472,7 @@ async def test_default_pipeline(
         conversation_language=conv_language,
         id=pipeline.id,
         language=pipeline_language,
-        name="Home Assistant",
+        name="SmartHub",
         stt_engine="stt.mock_stt",
         stt_language=stt_language,
         tts_engine="test",
@@ -486,7 +486,7 @@ async def test_default_pipeline(
 @pytest.mark.usefixtures("init_supporting_components")
 @pytest.mark.usefixtures("disable_tts_entity")
 async def test_default_pipeline_unsupported_stt_language(
-    hass: HomeAssistant, mock_stt_provider_entity: MockSTTProviderEntity
+    hass: SmartHub, mock_stt_provider_entity: MockSTTProviderEntity
 ) -> None:
     """Test async_get_pipeline."""
     with patch.object(mock_stt_provider_entity, "_supported_languages", ["smurfish"]):
@@ -503,7 +503,7 @@ async def test_default_pipeline_unsupported_stt_language(
         conversation_language="en",
         id=pipeline.id,
         language="en",
-        name="Home Assistant",
+        name="SmartHub",
         stt_engine=None,
         stt_language=None,
         tts_engine="test",
@@ -517,7 +517,7 @@ async def test_default_pipeline_unsupported_stt_language(
 @pytest.mark.usefixtures("init_supporting_components")
 @pytest.mark.usefixtures("disable_tts_entity")
 async def test_default_pipeline_unsupported_tts_language(
-    hass: HomeAssistant, mock_tts_provider: MockTTSProvider
+    hass: SmartHub, mock_tts_provider: MockTTSProvider
 ) -> None:
     """Test async_get_pipeline."""
     with patch.object(mock_tts_provider, "_supported_languages", ["smurfish"]):
@@ -534,7 +534,7 @@ async def test_default_pipeline_unsupported_tts_language(
         conversation_language="en",
         id=pipeline.id,
         language="en",
-        name="Home Assistant",
+        name="SmartHub",
         stt_engine="stt.mock_stt",
         stt_language="en-US",
         tts_engine=None,
@@ -546,7 +546,7 @@ async def test_default_pipeline_unsupported_tts_language(
 
 
 async def test_update_pipeline(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test async_update_pipeline."""
     assert await async_setup_component(hass, "assist_pipeline", {})
@@ -559,7 +559,7 @@ async def test_update_pipeline(
             conversation_language="en",
             id=ANY,
             language="en",
-            name="Home Assistant",
+            name="SmartHub",
             stt_engine=None,
             stt_language=None,
             tts_engine=None,
@@ -574,10 +574,10 @@ async def test_update_pipeline(
     await async_update_pipeline(
         hass,
         pipeline,
-        conversation_engine="homeassistant_1",
+        conversation_engine="smarthub_1",
         conversation_language="de",
         language="de",
-        name="Home Assistant 1",
+        name="SmartHub 1",
         stt_engine="stt.test_1",
         stt_language="de",
         tts_engine="test_1",
@@ -592,11 +592,11 @@ async def test_update_pipeline(
     pipeline = pipelines[0]
     assert pipelines == [
         Pipeline(
-            conversation_engine="homeassistant_1",
+            conversation_engine="smarthub_1",
             conversation_language="de",
             id=pipeline.id,
             language="de",
-            name="Home Assistant 1",
+            name="SmartHub 1",
             stt_engine="stt.test_1",
             stt_language="de",
             tts_engine="test_1",
@@ -608,11 +608,11 @@ async def test_update_pipeline(
     ]
     assert len(hass_storage[STORAGE_KEY]["data"]["items"]) == 1
     assert hass_storage[STORAGE_KEY]["data"]["items"][0] == {
-        "conversation_engine": "homeassistant_1",
+        "conversation_engine": "smarthub_1",
         "conversation_language": "de",
         "id": pipeline.id,
         "language": "de",
-        "name": "Home Assistant 1",
+        "name": "SmartHub 1",
         "stt_engine": "stt.test_1",
         "stt_language": "de",
         "tts_engine": "test_1",
@@ -636,11 +636,11 @@ async def test_update_pipeline(
     pipelines = list(pipelines)
     assert pipelines == [
         Pipeline(
-            conversation_engine="homeassistant_1",
+            conversation_engine="smarthub_1",
             conversation_language="de",
             id=pipeline.id,
             language="de",
-            name="Home Assistant 1",
+            name="SmartHub 1",
             stt_engine="stt.test_2",
             stt_language="en",
             tts_engine="test_2",
@@ -652,11 +652,11 @@ async def test_update_pipeline(
     ]
     assert len(hass_storage[STORAGE_KEY]["data"]["items"]) == 1
     assert hass_storage[STORAGE_KEY]["data"]["items"][0] == {
-        "conversation_engine": "homeassistant_1",
+        "conversation_engine": "smarthub_1",
         "conversation_language": "de",
         "id": pipeline.id,
         "language": "de",
-        "name": "Home Assistant 1",
+        "name": "SmartHub 1",
         "stt_engine": "stt.test_2",
         "stt_language": "en",
         "tts_engine": "test_2",
@@ -669,7 +669,7 @@ async def test_update_pipeline(
 
 
 @pytest.mark.usefixtures("init_supporting_components")
-async def test_migrate_after_load(hass: HomeAssistant) -> None:
+async def test_migrate_after_load(hass: SmartHub) -> None:
     """Test migrating an engine after done loading."""
     assert await async_setup_component(hass, "assist_pipeline", {})
 
@@ -743,7 +743,7 @@ def test_fallback_intent_filter() -> None:
 
 
 async def test_wake_word_detection_aborted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stt_provider: MockSTTProvider,
     mock_wake_word_provider_entity: MockWakeWordEntity,
     init_components,
@@ -805,7 +805,7 @@ async def test_wake_word_detection_aborted(
     assert process_events(events) == snapshot
 
 
-def test_pipeline_run_equality(hass: HomeAssistant, init_components) -> None:
+def test_pipeline_run_equality(hass: SmartHub, init_components) -> None:
     """Test that pipeline run equality uses unique id."""
 
     def event_callback(event):
@@ -835,7 +835,7 @@ def test_pipeline_run_equality(hass: HomeAssistant, init_components) -> None:
 
 
 async def test_tts_audio_output(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts_entity: MockTTSProvider,
     init_components,
@@ -898,7 +898,7 @@ async def test_tts_audio_output(
 
 
 async def test_tts_wav_preferred_format(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts_entity: MockTTSEntity,
     init_components,
@@ -965,7 +965,7 @@ async def test_tts_wav_preferred_format(
 
 
 async def test_tts_dict_preferred_format(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts_entity: MockTTSEntity,
     init_components,
@@ -1037,7 +1037,7 @@ async def test_tts_dict_preferred_format(
 
 
 async def test_sentence_trigger_overrides_conversation_agent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     mock_chat_session: chat_session.ChatSession,
     pipeline_data: assist_pipeline.pipeline.PipelineData,
@@ -1083,7 +1083,7 @@ async def test_sentence_trigger_overrides_conversation_agent(
 
     # Ensure prepare succeeds
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_get_agent_info",
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_get_agent_info",
         return_value=conversation.AgentInfo(
             id="test-agent",
             name="Test Agent",
@@ -1093,7 +1093,7 @@ async def test_sentence_trigger_overrides_conversation_agent(
         await pipeline_input.validate()
 
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_converse"
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_converse"
     ) as mock_async_converse:
         await pipeline_input.execute()
 
@@ -1119,7 +1119,7 @@ async def test_sentence_trigger_overrides_conversation_agent(
 
 
 async def test_prefer_local_intents(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     mock_chat_session: chat_session.ChatSession,
     pipeline_data: assist_pipeline.pipeline.PipelineData,
@@ -1165,7 +1165,7 @@ async def test_prefer_local_intents(
 
     # Ensure prepare succeeds
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_get_agent_info",
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_get_agent_info",
         return_value=conversation.AgentInfo(
             id="test-agent",
             name="Test Agent",
@@ -1175,7 +1175,7 @@ async def test_prefer_local_intents(
         await pipeline_input.validate()
 
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_converse"
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_converse"
     ) as mock_async_converse:
         await pipeline_input.execute()
 
@@ -1201,7 +1201,7 @@ async def test_prefer_local_intents(
 
 
 async def test_intent_continue_conversation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     mock_chat_session: chat_session.ChatSession,
     pipeline_data: assist_pipeline.pipeline.PipelineData,
@@ -1233,7 +1233,7 @@ async def test_intent_continue_conversation(
 
     # Ensure prepare succeeds
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_get_agent_info",
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_get_agent_info",
         return_value=conversation.AgentInfo(
             id="test-agent",
             name="Test Agent",
@@ -1246,7 +1246,7 @@ async def test_intent_continue_conversation(
     response.async_set_speech("For how long?")
 
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_converse",
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_converse",
         return_value=conversation.ConversationResult(
             response=response,
             conversation_id=mock_chat_session.conversation_id,
@@ -1307,7 +1307,7 @@ async def test_intent_continue_conversation(
 
     # Ensure prepare succeeds
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_get_agent_info",
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_get_agent_info",
         return_value=conversation.AgentInfo(
             id="test-agent",
             name="Test Agent",
@@ -1323,7 +1323,7 @@ async def test_intent_continue_conversation(
     response.async_set_speech("Timer set for 20 minutes")
 
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_converse",
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_converse",
         return_value=conversation.ConversationResult(
             response=response,
             conversation_id=mock_chat_session.conversation_id,
@@ -1348,7 +1348,7 @@ async def test_intent_continue_conversation(
 
 
 async def test_stt_language_used_instead_of_conversation_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     mock_chat_session: chat_session.ChatSession,
@@ -1362,7 +1362,7 @@ async def test_stt_language_used_instead_of_conversation_language(
     await client.send_json_auto_id(
         {
             "type": "assist_pipeline/pipeline/create",
-            "conversation_engine": "homeassistant",
+            "conversation_engine": "smarthub",
             "conversation_language": MATCH_ALL,
             "language": "en",
             "name": "test_name",
@@ -1395,7 +1395,7 @@ async def test_stt_language_used_instead_of_conversation_language(
     await pipeline_input.validate()
 
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_converse",
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_converse",
         return_value=conversation.ConversationResult(
             intent.IntentResponse(pipeline.language)
         ),
@@ -1424,7 +1424,7 @@ async def test_stt_language_used_instead_of_conversation_language(
 
 
 async def test_tts_language_used_instead_of_conversation_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     mock_chat_session: chat_session.ChatSession,
@@ -1438,7 +1438,7 @@ async def test_tts_language_used_instead_of_conversation_language(
     await client.send_json_auto_id(
         {
             "type": "assist_pipeline/pipeline/create",
-            "conversation_engine": "homeassistant",
+            "conversation_engine": "smarthub",
             "conversation_language": MATCH_ALL,
             "language": "en",
             "name": "test_name",
@@ -1471,7 +1471,7 @@ async def test_tts_language_used_instead_of_conversation_language(
     await pipeline_input.validate()
 
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_converse",
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_converse",
         return_value=conversation.ConversationResult(
             intent.IntentResponse(pipeline.language)
         ),
@@ -1500,7 +1500,7 @@ async def test_tts_language_used_instead_of_conversation_language(
 
 
 async def test_pipeline_language_used_instead_of_conversation_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     mock_chat_session: chat_session.ChatSession,
@@ -1514,7 +1514,7 @@ async def test_pipeline_language_used_instead_of_conversation_language(
     await client.send_json_auto_id(
         {
             "type": "assist_pipeline/pipeline/create",
-            "conversation_engine": "homeassistant",
+            "conversation_engine": "smarthub",
             "conversation_language": MATCH_ALL,
             "language": "en",
             "name": "test_name",
@@ -1547,7 +1547,7 @@ async def test_pipeline_language_used_instead_of_conversation_language(
     await pipeline_input.validate()
 
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_converse",
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_converse",
         return_value=conversation.ConversationResult(
             intent.IntentResponse(pipeline.language)
         ),
@@ -1660,7 +1660,7 @@ async def test_pipeline_language_used_instead_of_conversation_language(
     ],
 )
 async def test_chat_log_tts_streaming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     mock_chat_session: chat_session.ChatSession,
@@ -1732,7 +1732,7 @@ async def test_chat_log_tts_streaming(
     mock_tts_entity.async_supports_streaming_input = Mock(return_value=True)
 
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.conversation.async_get_agent_info",
+        "smarthub.components.assist_pipeline.pipeline.conversation.async_get_agent_info",
         return_value=conversation.AgentInfo(
             id="test-agent",
             name="Test Agent",
@@ -1742,7 +1742,7 @@ async def test_chat_log_tts_streaming(
         await pipeline_input.validate()
 
     async def mock_converse(
-        hass: HomeAssistant,
+        hass: SmartHub,
         text: str,
         conversation_id: str | None,
         context: Context,
@@ -1805,11 +1805,11 @@ async def test_chat_log_tts_streaming(
 
     with (
         patch(
-            "homeassistant.helpers.llm.AssistAPI._async_get_tools",
+            "smarthub.helpers.llm.AssistAPI._async_get_tools",
             return_value=[mock_tool],
         ),
         patch(
-            "homeassistant.components.assist_pipeline.pipeline.conversation.async_converse",
+            "smarthub.components.assist_pipeline.pipeline.conversation.async_converse",
             mock_converse,
         ),
     ):

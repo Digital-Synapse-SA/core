@@ -7,8 +7,8 @@ from aiohomekit.model.characteristics import CharacteristicsTypes
 from aiohomekit.model.characteristics.const import TemperatureDisplayUnits
 from aiohomekit.model.services import ServicesTypes
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import Helper, setup_test_component
 
@@ -37,7 +37,7 @@ def create_service_with_temperature_units(accessory: Accessory):
 
 
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:
@@ -59,7 +59,7 @@ async def test_migrate_unique_id(
 
 
 async def test_read_current_mode(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that Ecobee mode can be correctly read and show as human readable text."""
     helper = await setup_test_component(
@@ -101,7 +101,7 @@ async def test_read_current_mode(
 
 
 async def test_write_current_mode(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test can set a specific mode."""
     helper = await setup_test_component(
@@ -153,7 +153,7 @@ async def test_write_current_mode(
 
 
 async def test_read_select(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test the generic select can read the current value."""
     helper = await setup_test_component(
@@ -187,7 +187,7 @@ async def test_read_select(
 
 
 async def test_write_select(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test can set a value."""
     helper = await setup_test_component(

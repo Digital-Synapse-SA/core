@@ -8,11 +8,11 @@ from pyloadapi.exceptions import CannotConnect, InvalidAuth, ParserError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.pyload.coordinator import SCAN_INTERVAL
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.pyload.coordinator import SCAN_INTERVAL
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
@@ -21,14 +21,14 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 def sensor_only() -> Generator[None]:
     """Enable only the sensor platform."""
     with patch(
-        "homeassistant.components.pyload.PLATFORMS",
+        "smarthub.components.pyload.PLATFORMS",
         [Platform.SENSOR],
     ):
         yield
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -49,7 +49,7 @@ async def test_setup(
     [CannotConnect, InvalidAuth, ParserError],
 )
 async def test_sensor_update_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
     exception: Exception,
@@ -72,7 +72,7 @@ async def test_sensor_update_exceptions(
 
 
 async def test_sensor_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
     caplog: pytest.LogCaptureFixture,
@@ -98,7 +98,7 @@ async def test_sensor_invalid_auth(
 
 
 async def test_pyload_pre_0_5_0(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
 ) -> None:

@@ -7,13 +7,13 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.conversation import default_agent
-from homeassistant.components.conversation.const import DATA_DEFAULT_ENTITY
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import ATTR_FRIENDLY_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import area_registry as ar, entity_registry as er, intent
-from homeassistant.setup import async_setup_component
+from smarthub.components.conversation import default_agent
+from smarthub.components.conversation.const import DATA_DEFAULT_ENTITY
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.const import ATTR_FRIENDLY_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers import area_registry as ar, entity_registry as er, intent
+from smarthub.setup import async_setup_component
 
 from . import MockAgent
 
@@ -23,7 +23,7 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 AGENT_ID_OPTIONS = [
     None,
     # Old value of conversation.HOME_ASSISTANT_AGENT,
-    "homeassistant",
+    "smarthub",
     # Current value of conversation.HOME_ASSISTANT_AGENT,
     "conversation.home_assistant",
 ]
@@ -44,7 +44,7 @@ class OrderBeerIntentHandler(intent.IntentHandler):
 
 @pytest.mark.parametrize("agent_id", AGENT_ID_OPTIONS)
 async def test_http_processing_intent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_client: ClientSessionGenerator,
     agent_id,
@@ -74,7 +74,7 @@ async def test_http_processing_intent(
 
 
 async def test_http_api_no_match(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
@@ -94,7 +94,7 @@ async def test_http_api_no_match(
 
 
 async def test_http_api_handle_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
@@ -108,7 +108,7 @@ async def test_http_api_handle_failure(
     def async_handle_error(*args, **kwargs):
         raise intent.IntentHandleError
 
-    with patch("homeassistant.helpers.intent.async_handle", new=async_handle_error):
+    with patch("smarthub.helpers.intent.async_handle", new=async_handle_error):
         resp = await client.post(
             "/api/conversation/process", json={"text": "turn on the kitchen"}
         )
@@ -122,7 +122,7 @@ async def test_http_api_handle_failure(
 
 
 async def test_http_api_unexpected_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
@@ -136,7 +136,7 @@ async def test_http_api_unexpected_failure(
     def async_handle_error(*args, **kwargs):
         raise intent.IntentUnexpectedError
 
-    with patch("homeassistant.helpers.intent.async_handle", new=async_handle_error):
+    with patch("smarthub.helpers.intent.async_handle", new=async_handle_error):
         resp = await client.post(
             "/api/conversation/process", json={"text": "turn on the kitchen"}
         )
@@ -150,7 +150,7 @@ async def test_http_api_unexpected_failure(
 
 
 async def test_http_api_wrong_data(
-    hass: HomeAssistant, init_components, hass_client: ClientSessionGenerator
+    hass: SmartHub, init_components, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the HTTP conversation API."""
     client = await hass_client()
@@ -187,12 +187,12 @@ async def test_http_api_wrong_data(
         },
         {
             "text": "Test Text",
-            "agent_id": "homeassistant",
+            "agent_id": "smarthub",
         },
     ],
 )
 async def test_ws_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_ws_client: WebSocketGenerator,
     payload,
@@ -212,7 +212,7 @@ async def test_ws_api(
 
 @pytest.mark.parametrize("agent_id", AGENT_ID_OPTIONS)
 async def test_ws_prepare(
-    hass: HomeAssistant, init_components, hass_ws_client: WebSocketGenerator, agent_id
+    hass: SmartHub, init_components, hass_ws_client: WebSocketGenerator, agent_id
 ) -> None:
     """Test the Websocket prepare conversation API."""
     agent = hass.data[DATA_DEFAULT_ENTITY]
@@ -237,7 +237,7 @@ async def test_ws_prepare(
 
 
 async def test_get_agent_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     mock_conversation_agent: MockAgent,
     mock_agent_support_all: MockAgent,
@@ -295,14 +295,14 @@ async def test_get_agent_list(
 
 
 async def test_ws_hass_agent_debug(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_ws_client: WebSocketGenerator,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
-    """Test homeassistant agent debug websocket command."""
+    """Test smarthub agent debug websocket command."""
     client = await hass_ws_client(hass)
 
     kitchen_area = area_registry.async_create("kitchen")
@@ -322,7 +322,7 @@ async def test_ws_hass_agent_debug(
 
     await client.send_json_auto_id(
         {
-            "type": "conversation/agent/homeassistant/debug",
+            "type": "conversation/agent/smarthub/debug",
             "sentences": [
                 "turn on my cool light",
                 "turn my cool light off",
@@ -347,12 +347,12 @@ async def test_ws_hass_agent_debug(
 
 
 async def test_ws_hass_agent_debug_null_result(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
-    """Test homeassistant agent debug websocket command with a null result."""
+    """Test smarthub agent debug websocket command with a null result."""
     client = await hass_ws_client(hass)
 
     async def async_recognize_intent(self, user_input, *args, **kwargs):
@@ -362,12 +362,12 @@ async def test_ws_hass_agent_debug_null_result(
         return await self.async_recognize(user_input, *args, **kwargs)
 
     with patch(
-        "homeassistant.components.conversation.default_agent.DefaultAgent.async_recognize_intent",
+        "smarthub.components.conversation.default_agent.DefaultAgent.async_recognize_intent",
         async_recognize_intent,
     ):
         await client.send_json_auto_id(
             {
-                "type": "conversation/agent/homeassistant/debug",
+                "type": "conversation/agent/smarthub/debug",
                 "sentences": [
                     "bad sentence",
                 ],
@@ -382,13 +382,13 @@ async def test_ws_hass_agent_debug_null_result(
 
 
 async def test_ws_hass_agent_debug_out_of_range(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
-    """Test homeassistant agent debug websocket command with an out of range entity."""
+    """Test smarthub agent debug websocket command with an out of range entity."""
     test_light = entity_registry.async_get_or_create("light", "demo", "1234")
     hass.states.async_set(
         test_light.entity_id, "off", attributes={ATTR_FRIENDLY_NAME: "test light"}
@@ -399,7 +399,7 @@ async def test_ws_hass_agent_debug_out_of_range(
     # Brightness is in range (0-100)
     await client.send_json_auto_id(
         {
-            "type": "conversation/agent/homeassistant/debug",
+            "type": "conversation/agent/smarthub/debug",
             "sentences": [
                 "set test light brightness to 100%",
             ],
@@ -418,7 +418,7 @@ async def test_ws_hass_agent_debug_out_of_range(
     # Brightness is out of range
     await client.send_json_auto_id(
         {
-            "type": "conversation/agent/homeassistant/debug",
+            "type": "conversation/agent/smarthub/debug",
             "sentences": [
                 "set test light brightness to 1001%",
             ],
@@ -440,13 +440,13 @@ async def test_ws_hass_agent_debug_out_of_range(
 
 
 async def test_ws_hass_agent_debug_custom_sentence(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
-    """Test homeassistant agent debug websocket command with a custom sentence."""
+    """Test smarthub agent debug websocket command with a custom sentence."""
     # Expecting testing_config/custom_sentences/en/beer.yaml
     intent.async_register(hass, OrderBeerIntentHandler())
 
@@ -455,7 +455,7 @@ async def test_ws_hass_agent_debug_custom_sentence(
     # Brightness is in range (0-100)
     await client.send_json_auto_id(
         {
-            "type": "conversation/agent/homeassistant/debug",
+            "type": "conversation/agent/smarthub/debug",
             "sentences": [
                 "I'd like to order a lager, please.",
             ],
@@ -475,12 +475,12 @@ async def test_ws_hass_agent_debug_custom_sentence(
 
 
 async def test_ws_hass_agent_debug_sentence_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
-    """Test homeassistant agent debug websocket command with a sentence trigger."""
+    """Test smarthub agent debug websocket command with a sentence trigger."""
     calls = async_mock_service(hass, "test", "automation")
     assert await async_setup_component(
         hass,
@@ -517,7 +517,7 @@ async def test_ws_hass_agent_debug_sentence_trigger(
     # Use trigger sentence
     await client.send_json_auto_id(
         {
-            "type": "conversation/agent/homeassistant/debug",
+            "type": "conversation/agent/smarthub/debug",
             "sentences": ["hello world"],
         }
     )
@@ -539,13 +539,13 @@ async def test_ws_hass_agent_debug_sentence_trigger(
 
 
 async def test_ws_hass_language_scores(
-    hass: HomeAssistant, init_components, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, init_components, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test getting language support scores."""
     client = await hass_ws_client(hass)
 
     await client.send_json_auto_id(
-        {"type": "conversation/agent/homeassistant/language_scores"}
+        {"type": "conversation/agent/smarthub/language_scores"}
     )
 
     msg = await client.receive_json()
@@ -561,14 +561,14 @@ async def test_ws_hass_language_scores(
 
 
 async def test_ws_hass_language_scores_with_filter(
-    hass: HomeAssistant, init_components, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, init_components, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test getting language support scores with language/country filter."""
     client = await hass_ws_client(hass)
 
     # Language filter
     await client.send_json_auto_id(
-        {"type": "conversation/agent/homeassistant/language_scores", "language": "de"}
+        {"type": "conversation/agent/smarthub/language_scores", "language": "de"}
     )
 
     msg = await client.receive_json()
@@ -581,7 +581,7 @@ async def test_ws_hass_language_scores_with_filter(
     # Language/country filter
     await client.send_json_auto_id(
         {
-            "type": "conversation/agent/homeassistant/language_scores",
+            "type": "conversation/agent/smarthub/language_scores",
             "language": "en",
             "country": "GB",
         }

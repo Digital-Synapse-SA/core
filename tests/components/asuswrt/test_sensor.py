@@ -6,8 +6,8 @@ from freezegun.api import FrozenDateTimeFactory
 from pyasuswrt.exceptions import AsusWrtError, AsusWrtNotAvailableInfoError
 import pytest
 
-from homeassistant.components import device_tracker, sensor
-from homeassistant.components.asuswrt.const import (
+from smarthub.components import device_tracker, sensor
+from smarthub.components.asuswrt.const import (
     CONF_INTERFACE,
     DOMAIN,
     SENSORS_BYTES,
@@ -19,17 +19,17 @@ from homeassistant.components.asuswrt.const import (
     SENSORS_TEMPERATURES_LEGACY,
     SENSORS_UPTIME,
 )
-from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.device_tracker import CONF_CONSIDER_HOME
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_PROTOCOL,
     STATE_HOME,
     STATE_NOT_HOME,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import slugify
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import slugify
 
 from .common import (
     CONFIG_DATA_HTTP,
@@ -57,7 +57,7 @@ SENSORS_ALL_HTTP = [
 
 @pytest.fixture(name="create_device_registry_devices")
 def create_device_registry_devices_fixture(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ):
     """Create device registry devices so the device tracker entities are enabled when added."""
     config_entry = MockConfigEntry(domain="something_else")
@@ -71,7 +71,7 @@ def create_device_registry_devices_fixture(
         )
 
 
-def _setup_entry(hass: HomeAssistant, config, sensors, unique_id=None):
+def _setup_entry(hass: SmartHub, config, sensors, unique_id=None):
     """Create mock config entry with enabled sensors."""
     entity_reg = er.async_get(hass)
 
@@ -105,7 +105,7 @@ def _setup_entry(hass: HomeAssistant, config, sensors, unique_id=None):
 
 
 async def _test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_devices,
     config,
@@ -188,7 +188,7 @@ async def _test_sensors(
     [None, ROUTER_MAC_ADDR],
 )
 async def test_sensors_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_devices_legacy,
     entry_unique_id,
@@ -206,7 +206,7 @@ async def test_sensors_legacy(
     [None, ROUTER_MAC_ADDR],
 )
 async def test_sensors_http(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_devices_http,
     entry_unique_id,
@@ -220,7 +220,7 @@ async def test_sensors_http(
 
 
 async def _test_loadavg_sensors(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, config
+    hass: SmartHub, freezer: FrozenDateTimeFactory, config
 ) -> None:
     """Test creating an AsusWRT load average sensors."""
     config_entry, sensor_prefix = _setup_entry(hass, config, SENSORS_LOAD_AVG)
@@ -240,21 +240,21 @@ async def _test_loadavg_sensors(
 
 
 async def test_loadavg_sensors_legacy(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, connect_legacy
+    hass: SmartHub, freezer: FrozenDateTimeFactory, connect_legacy
 ) -> None:
     """Test creating an AsusWRT load average sensors."""
     await _test_loadavg_sensors(hass, freezer, CONFIG_DATA_TELNET)
 
 
 async def test_loadavg_sensors_http(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, connect_http
+    hass: SmartHub, freezer: FrozenDateTimeFactory, connect_http
 ) -> None:
     """Test creating an AsusWRT load average sensors."""
     await _test_loadavg_sensors(hass, freezer, CONFIG_DATA_HTTP)
 
 
 async def test_loadavg_sensors_unaivalable_http(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, connect_http
+    hass: SmartHub, freezer: FrozenDateTimeFactory, connect_http
 ) -> None:
     """Test load average sensors no available using http."""
     config_entry, sensor_prefix = _setup_entry(hass, CONFIG_DATA_HTTP, SENSORS_LOAD_AVG)
@@ -278,7 +278,7 @@ async def test_loadavg_sensors_unaivalable_http(
 
 
 async def test_temperature_sensors_http_fail(
-    hass: HomeAssistant, connect_http_sens_fail
+    hass: SmartHub, connect_http_sens_fail
 ) -> None:
     """Test fail creating AsusWRT temperature sensors."""
     config_entry, sensor_prefix = _setup_entry(
@@ -299,7 +299,7 @@ async def test_temperature_sensors_http_fail(
 
 
 async def _test_temperature_sensors(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, config, sensors
+    hass: SmartHub, freezer: FrozenDateTimeFactory, config, sensors
 ) -> str:
     """Test creating a AsusWRT temperature sensors."""
     config_entry, sensor_prefix = _setup_entry(hass, config, sensors)
@@ -316,7 +316,7 @@ async def _test_temperature_sensors(
 
 
 async def test_temperature_sensors_legacy(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, connect_legacy
+    hass: SmartHub, freezer: FrozenDateTimeFactory, connect_legacy
 ) -> None:
     """Test creating a AsusWRT temperature sensors."""
     sensor_prefix = await _test_temperature_sensors(
@@ -329,7 +329,7 @@ async def test_temperature_sensors_legacy(
 
 
 async def test_temperature_sensors_http(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, connect_http
+    hass: SmartHub, freezer: FrozenDateTimeFactory, connect_http
 ) -> None:
     """Test creating a AsusWRT temperature sensors."""
     sensor_prefix = await _test_temperature_sensors(
@@ -344,7 +344,7 @@ async def test_temperature_sensors_http(
 
 
 async def test_cpu_sensors_http_fail(
-    hass: HomeAssistant, connect_http_sens_fail
+    hass: SmartHub, connect_http_sens_fail
 ) -> None:
     """Test fail creating AsusWRT cpu sensors."""
     config_entry, sensor_prefix = _setup_entry(hass, CONFIG_DATA_HTTP, SENSORS_CPU)
@@ -367,7 +367,7 @@ async def test_cpu_sensors_http_fail(
 
 
 async def test_cpu_sensors_http(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, connect_http
+    hass: SmartHub, freezer: FrozenDateTimeFactory, connect_http
 ) -> None:
     """Test creating AsusWRT cpu sensors."""
     config_entry, sensor_prefix = _setup_entry(hass, CONFIG_DATA_HTTP, SENSORS_CPU)
@@ -393,7 +393,7 @@ async def test_cpu_sensors_http(
 
 
 async def test_memory_sensors_http(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, connect_http
+    hass: SmartHub, freezer: FrozenDateTimeFactory, connect_http
 ) -> None:
     """Test creating AsusWRT memory sensors."""
     config_entry, sensor_prefix = _setup_entry(hass, CONFIG_DATA_HTTP, SENSORS_MEMORY)
@@ -413,7 +413,7 @@ async def test_memory_sensors_http(
 
 
 async def test_uptime_sensors_http(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, connect_http
+    hass: SmartHub, freezer: FrozenDateTimeFactory, connect_http
 ) -> None:
     """Test creating AsusWRT uptime sensors."""
     config_entry, sensor_prefix = _setup_entry(hass, CONFIG_DATA_HTTP, SENSORS_UPTIME)
@@ -439,7 +439,7 @@ async def test_uptime_sensors_http(
     [OSError, None],
 )
 async def test_connect_fail_legacy(
-    hass: HomeAssistant, connect_legacy, side_effect
+    hass: SmartHub, connect_legacy, side_effect
 ) -> None:
     """Test AsusWRT connect fail."""
 
@@ -464,7 +464,7 @@ async def test_connect_fail_legacy(
     [AsusWrtError, None],
 )
 async def test_connect_fail_http(
-    hass: HomeAssistant, connect_http, side_effect
+    hass: SmartHub, connect_http, side_effect
 ) -> None:
     """Test AsusWRT connect fail."""
 
@@ -485,7 +485,7 @@ async def test_connect_fail_http(
 
 
 async def _test_sensors_polling_fails(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, config, sensors
+    hass: SmartHub, freezer: FrozenDateTimeFactory, config, sensors
 ) -> None:
     """Test AsusWRT sensors are unavailable when polling fails."""
     config_entry, sensor_prefix = _setup_entry(hass, config, sensors)
@@ -507,7 +507,7 @@ async def _test_sensors_polling_fails(
 
 
 async def test_sensors_polling_fails_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     connect_legacy_sens_fail,
 ) -> None:
@@ -518,7 +518,7 @@ async def test_sensors_polling_fails_legacy(
 
 
 async def test_sensors_polling_fails_http(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     connect_http_sens_fail,
     connect_http_sens_detect,
@@ -528,7 +528,7 @@ async def test_sensors_polling_fails_http(
 
 
 async def test_options_reload(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, connect_legacy
+    hass: SmartHub, freezer: FrozenDateTimeFactory, connect_legacy
 ) -> None:
     """Test AsusWRT integration is reload changing an options that require this."""
     config_entry = MockConfigEntry(
@@ -557,7 +557,7 @@ async def test_options_reload(
 
 
 async def test_unique_id_migration(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, connect_legacy
+    hass: SmartHub, entity_registry: er.EntityRegistry, connect_legacy
 ) -> None:
     """Test AsusWRT entities unique id format migration."""
     config_entry = MockConfigEntry(
@@ -586,7 +586,7 @@ async def test_unique_id_migration(
 
 
 async def test_decorator_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     connect_legacy,
     mock_available_temps,

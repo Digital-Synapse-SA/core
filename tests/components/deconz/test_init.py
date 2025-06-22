@@ -6,10 +6,10 @@ from unittest.mock import patch
 import pydeconz
 import pytest
 
-from homeassistant.components.deconz.const import CONF_MASTER_GATEWAY, DOMAIN
-from homeassistant.components.deconz.errors import AuthenticationRequired
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.deconz.const import CONF_MASTER_GATEWAY, DOMAIN
+from smarthub.components.deconz.errors import AuthenticationRequired
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .conftest import ConfigEntryFactoryType
 
@@ -34,7 +34,7 @@ async def test_setup_entry(config_entry_setup: MockConfigEntry) -> None:
     ],
 )
 async def test_get_deconz_api_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     side_effect: Exception,
     state: ConfigEntryState,
@@ -42,7 +42,7 @@ async def test_get_deconz_api_fails(
     """Failed setup."""
     config_entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.deconz.hub.api.DeconzSession.refresh_state",
+        "smarthub.components.deconz.hub.api.DeconzSession.refresh_state",
         side_effect=side_effect,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -51,12 +51,12 @@ async def test_get_deconz_api_fails(
 
 
 async def test_setup_entry_fails_trigger_reauth_flow(
-    hass: HomeAssistant, config_entry_factory: ConfigEntryFactoryType
+    hass: SmartHub, config_entry_factory: ConfigEntryFactoryType
 ) -> None:
     """Failed authentication trigger a reauthentication flow."""
     with (
         patch(
-            "homeassistant.components.deconz.get_deconz_api",
+            "smarthub.components.deconz.get_deconz_api",
             side_effect=AuthenticationRequired,
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_flow_init,
@@ -67,7 +67,7 @@ async def test_setup_entry_fails_trigger_reauth_flow(
 
 
 async def test_setup_entry_multiple_gateways(
-    hass: HomeAssistant, config_entry_factory: ConfigEntryFactoryType
+    hass: SmartHub, config_entry_factory: ConfigEntryFactoryType
 ) -> None:
     """Test setup entry is successful with multiple gateways."""
     config_entry = await config_entry_factory()
@@ -87,7 +87,7 @@ async def test_setup_entry_multiple_gateways(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, config_entry_setup: MockConfigEntry
+    hass: SmartHub, config_entry_setup: MockConfigEntry
 ) -> None:
     """Test being able to unload an entry."""
     assert config_entry_setup.state is ConfigEntryState.LOADED
@@ -96,7 +96,7 @@ async def test_unload_entry(
 
 
 async def test_unload_entry_multiple_gateways(
-    hass: HomeAssistant, config_entry_factory: ConfigEntryFactoryType
+    hass: SmartHub, config_entry_factory: ConfigEntryFactoryType
 ) -> None:
     """Test being able to unload an entry and master gateway gets moved."""
     config_entry = await config_entry_factory()
@@ -118,7 +118,7 @@ async def test_unload_entry_multiple_gateways(
 
 
 async def test_unload_entry_multiple_gateways_parallel(
-    hass: HomeAssistant, config_entry_factory: ConfigEntryFactoryType
+    hass: SmartHub, config_entry_factory: ConfigEntryFactoryType
 ) -> None:
     """Test race condition when unloading multiple config entries in parallel."""
     config_entry = await config_entry_factory()

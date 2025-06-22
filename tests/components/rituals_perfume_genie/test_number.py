@@ -4,19 +4,19 @@ from __future__ import annotations
 
 import pytest
 
-from homeassistant.components.homeassistant import SERVICE_UPDATE_ENTITY
-from homeassistant.components.number import (
+from smarthub.components.smarthub import SERVICE_UPDATE_ENTITY
+from smarthub.components.number import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import (
     init_integration,
@@ -27,7 +27,7 @@ from .common import (
 
 
 async def test_number_entity(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the creation and values of the diffuser number entity."""
     config_entry = mock_config_entry(unique_id="number_test")
@@ -45,12 +45,12 @@ async def test_number_entity(
     assert entry.unique_id == f"{diffuser.hublot}-perfume_amount"
 
 
-async def test_set_number_value(hass: HomeAssistant) -> None:
+async def test_set_number_value(hass: SmartHub) -> None:
     """Test setting the diffuser number entity value."""
     config_entry = mock_config_entry(unique_id="number_set_value_test")
     diffuser = mock_diffuser_v1_battery_cartridge()
     await init_integration(hass, config_entry, [diffuser])
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     diffuser.perfume_amount = 1
 
     state = hass.states.get("number.genie_perfume_amount")
@@ -64,7 +64,7 @@ async def test_set_number_value(hass: HomeAssistant) -> None:
         blocking=True,
     )
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         SERVICE_UPDATE_ENTITY,
         {ATTR_ENTITY_ID: ["number.genie_perfume_amount"]},
         blocking=True,
@@ -76,12 +76,12 @@ async def test_set_number_value(hass: HomeAssistant) -> None:
     assert state.state == "1"
 
 
-async def test_set_number_value_out_of_range(hass: HomeAssistant) -> None:
+async def test_set_number_value_out_of_range(hass: SmartHub) -> None:
     """Test setting the diffuser number entity value out of range."""
     config_entry = mock_config_entry(unique_id="number_set_value_out_of_range_test")
     diffuser = mock_diffuser(hublot="lot123", perfume_amount=2)
     await init_integration(hass, config_entry, [diffuser])
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     state = hass.states.get("number.genie_perfume_amount")
     assert state
@@ -95,7 +95,7 @@ async def test_set_number_value_out_of_range(hass: HomeAssistant) -> None:
             blocking=True,
         )
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         SERVICE_UPDATE_ENTITY,
         {ATTR_ENTITY_ID: ["number.genie_perfume_amount"]},
         blocking=True,
@@ -114,7 +114,7 @@ async def test_set_number_value_out_of_range(hass: HomeAssistant) -> None:
             blocking=True,
         )
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         SERVICE_UPDATE_ENTITY,
         {ATTR_ENTITY_ID: ["number.genie_perfume_amount"]},
         blocking=True,
@@ -126,12 +126,12 @@ async def test_set_number_value_out_of_range(hass: HomeAssistant) -> None:
     assert state.state == "2"
 
 
-async def test_set_number_value_to_float(hass: HomeAssistant) -> None:
+async def test_set_number_value_to_float(hass: SmartHub) -> None:
     """Test setting the diffuser number entity value to a float."""
     config_entry = mock_config_entry(unique_id="number_set_value_to_float_test")
     diffuser = mock_diffuser(hublot="lot123", perfume_amount=3)
     await init_integration(hass, config_entry, [diffuser])
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     state = hass.states.get("number.genie_perfume_amount")
     assert state
@@ -145,7 +145,7 @@ async def test_set_number_value_to_float(hass: HomeAssistant) -> None:
             blocking=True,
         )
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         SERVICE_UPDATE_ENTITY,
         {ATTR_ENTITY_ID: ["number.genie_perfume_amount"]},
         blocking=True,

@@ -6,13 +6,13 @@ from aiohttp import ClientConnectionError, ClientResponseError
 from bond_async import DeviceType
 import pytest
 
-from homeassistant.components.bond import DOMAIN, BondData
-from homeassistant.components.fan import DOMAIN as FAN_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ASSUMED_STATE, CONF_ACCESS_TOKEN, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.bond import DOMAIN, BondData
+from smarthub.components.fan import DOMAIN as FAN_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ASSUMED_STATE, CONF_ACCESS_TOKEN, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import (
     ceiling_fan,
@@ -32,7 +32,7 @@ from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
-async def test_async_setup_no_domain_config(hass: HomeAssistant) -> None:
+async def test_async_setup_no_domain_config(hass: SmartHub) -> None:
     """Test setup without configuration is noop."""
     result = await async_setup_component(hass, DOMAIN, {})
 
@@ -49,7 +49,7 @@ async def test_async_setup_no_domain_config(hass: HomeAssistant) -> None:
     ],
 )
 async def test_async_setup_raises_entry_not_ready(
-    hass: HomeAssistant, exc: Exception
+    hass: SmartHub, exc: Exception
 ) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     config_entry = MockConfigEntry(
@@ -63,7 +63,7 @@ async def test_async_setup_raises_entry_not_ready(
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_async_setup_raises_fails_if_auth_fails(hass: HomeAssistant) -> None:
+async def test_async_setup_raises_fails_if_auth_fails(hass: SmartHub) -> None:
     """Test that setup fails if auth fails during setup."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -79,7 +79,7 @@ async def test_async_setup_raises_fails_if_auth_fails(hass: HomeAssistant) -> No
 
 
 async def test_async_setup_entry_sets_up_hub_and_supported_domains(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test that configuring entry sets up cover domain."""
@@ -127,7 +127,7 @@ async def test_async_setup_entry_sets_up_hub_and_supported_domains(
     assert len(mock_switch_async_setup_entry.mock_calls) == 1
 
 
-async def test_unload_config_entry(hass: HomeAssistant) -> None:
+async def test_unload_config_entry(hass: SmartHub) -> None:
     """Test that configuration entry supports unloading."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -152,7 +152,7 @@ async def test_unload_config_entry(hass: HomeAssistant) -> None:
 
 
 async def test_old_identifiers_are_removed(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test we remove the old non-unique identifiers."""
     config_entry = MockConfigEntry(
@@ -202,7 +202,7 @@ async def test_old_identifiers_are_removed(
 
 
 async def test_smart_by_bond_device_suggested_area(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test we can setup a smart by bond device and get the suggested area."""
     config_entry = MockConfigEntry(
@@ -245,7 +245,7 @@ async def test_smart_by_bond_device_suggested_area(
 
 
 async def test_bridge_device_suggested_area(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test we can setup a bridge bond device and get the suggested area."""
     config_entry = MockConfigEntry(
@@ -293,7 +293,7 @@ async def test_bridge_device_suggested_area(
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -339,7 +339,7 @@ async def test_device_remove_devices(
     assert not response["success"]
 
 
-async def test_smart_by_bond_v3_firmware(hass: HomeAssistant) -> None:
+async def test_smart_by_bond_v3_firmware(hass: SmartHub) -> None:
     """Test we can detect smart by bond with the v3 firmware."""
     await setup_platform(
         hass,

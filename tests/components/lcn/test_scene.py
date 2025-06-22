@@ -5,15 +5,15 @@ from unittest.mock import patch
 from pypck.lcn_defs import OutputPort, RelayPort
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.scene import DOMAIN as DOMAIN_SCENE
-from homeassistant.const import (
+from smarthub.components.scene import DOMAIN as DOMAIN_SCENE
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_ON,
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MockConfigEntry, MockModuleConnection, init_integration
 
@@ -21,20 +21,20 @@ from tests.common import snapshot_platform
 
 
 async def test_setup_lcn_scene(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the setup of switch."""
-    with patch("homeassistant.components.lcn.PLATFORMS", [Platform.SCENE]):
+    with patch("smarthub.components.lcn.PLATFORMS", [Platform.SCENE]):
         await init_integration(hass, entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
 async def test_scene_activate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test the scene is activated."""
@@ -55,7 +55,7 @@ async def test_scene_activate(
     )
 
 
-async def test_unload_config_entry(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_unload_config_entry(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the scene is removed when the config entry is unloaded."""
     await init_integration(hass, entry)
 

@@ -11,27 +11,27 @@ from tibber import (
     RetryableHttpExceptionError,
 )
 
-from homeassistant import config_entries
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.tibber.config_flow import (
+from smarthub import config_entries
+from smarthub.components.recorder import Recorder
+from smarthub.components.tibber.config_flow import (
     ERR_CLIENT,
     ERR_TIMEOUT,
     ERR_TOKEN,
 )
-from homeassistant.components.tibber.const import DOMAIN
-from homeassistant.const import CONF_ACCESS_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.tibber.const import DOMAIN
+from smarthub.const import CONF_ACCESS_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 @pytest.fixture(name="tibber_setup", autouse=True)
 def tibber_setup_fixture():
     """Patch tibber setup entry."""
-    with patch("homeassistant.components.tibber.async_setup_entry", return_value=True):
+    with patch("smarthub.components.tibber.async_setup_entry", return_value=True):
         yield
 
 
-async def test_show_config_form(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_show_config_form(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test show configuration form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -41,7 +41,7 @@ async def test_show_config_form(recorder_mock: Recorder, hass: HomeAssistant) ->
     assert result["step_id"] == "user"
 
 
-async def test_create_entry(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_create_entry(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test create entry from user input."""
     test_data = {
         CONF_ACCESS_TOKEN: "valid",
@@ -76,7 +76,7 @@ async def test_create_entry(recorder_mock: Recorder, hass: HomeAssistant) -> Non
     ],
 )
 async def test_create_entry_exceptions(
-    recorder_mock: Recorder, hass: HomeAssistant, exception, expected_error
+    recorder_mock: Recorder, hass: SmartHub, exception, expected_error
 ) -> None:
     """Test create entry from user input."""
     test_data = {
@@ -101,7 +101,7 @@ async def test_create_entry_exceptions(
 
 
 async def test_flow_entry_already_exists(
-    recorder_mock: Recorder, hass: HomeAssistant, config_entry
+    recorder_mock: Recorder, hass: SmartHub, config_entry
 ) -> None:
     """Test user input for config_entry that already exists."""
     test_data = {

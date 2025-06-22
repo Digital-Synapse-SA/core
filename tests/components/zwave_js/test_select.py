@@ -6,11 +6,11 @@ from zwave_js_server.const import CURRENT_VALUE_PROPERTY, CommandClass
 from zwave_js_server.event import Event
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.zwave_js.helpers import ZwaveValueMatcher
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNKNOWN, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.zwave_js.helpers import ZwaveValueMatcher
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_UNKNOWN, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import replace_value_of_zwave_value
 
@@ -20,7 +20,7 @@ MULTILEVEL_SWITCH_SELECT_ENTITY = "select.front_door_siren"
 
 
 async def test_default_tone_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
     aeotec_zw164_siren: Node,
@@ -117,7 +117,7 @@ async def test_default_tone_select(
 
 
 async def test_protection_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
     inovelli_lzw36: Node,
@@ -212,7 +212,7 @@ async def test_protection_select(
 
 
 async def test_multilevel_switch_select(
-    hass: HomeAssistant, client, fortrezz_ssa1_siren, integration
+    hass: SmartHub, client, fortrezz_ssa1_siren, integration
 ) -> None:
     """Test Multilevel Switch CC based select entity."""
     node = fortrezz_ssa1_siren
@@ -274,7 +274,7 @@ async def test_multilevel_switch_select(
 
 
 async def test_multilevel_switch_select_no_value(
-    hass: HomeAssistant, client, fortrezz_ssa1_siren_state, integration
+    hass: SmartHub, client, fortrezz_ssa1_siren_state, integration
 ) -> None:
     """Test Multilevel Switch CC based select entity with primary value is None."""
     node_state = replace_value_of_zwave_value(
@@ -298,7 +298,7 @@ async def test_multilevel_switch_select_no_value(
 
 
 async def test_config_parameter_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     climate_adc_t3000,
     integration,
@@ -326,7 +326,7 @@ async def test_config_parameter_select(
 
 
 async def test_lock_popp_electric_strike_lock_control_select(
-    hass: HomeAssistant, client, lock_popp_electric_strike_lock_control, integration
+    hass: SmartHub, client, lock_popp_electric_strike_lock_control, integration
 ) -> None:
     """Test that the Popp Electric Strike Lock Control select entity."""
     LOCK_SELECT_ENTITY = "select.node_62_current_lock_mode"

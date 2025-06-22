@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 from aioqsw.exceptions import APIError
 
-from homeassistant.components.qnap_qsw.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.qnap_qsw.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .util import CONFIG
 
 from tests.common import MockConfigEntry
 
 
-async def test_firmware_check_error(hass: HomeAssistant) -> None:
+async def test_firmware_check_error(hass: SmartHub) -> None:
     """Test firmware update check error."""
 
     config_entry = MockConfigEntry(
@@ -23,15 +23,15 @@ async def test_firmware_check_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.qnap_qsw.QnapQswApi.check_firmware",
+            "smarthub.components.qnap_qsw.QnapQswApi.check_firmware",
             side_effect=APIError,
         ),
         patch(
-            "homeassistant.components.qnap_qsw.QnapQswApi.validate",
+            "smarthub.components.qnap_qsw.QnapQswApi.validate",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.qnap_qsw.QnapQswApi.update",
+            "smarthub.components.qnap_qsw.QnapQswApi.update",
             return_value=None,
         ),
     ):
@@ -40,7 +40,7 @@ async def test_firmware_check_error(hass: HomeAssistant) -> None:
         assert config_entry.state is ConfigEntryState.LOADED
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test unload."""
 
     config_entry = MockConfigEntry(
@@ -50,15 +50,15 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.qnap_qsw.QnapQswApi.check_firmware",
+            "smarthub.components.qnap_qsw.QnapQswApi.check_firmware",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.qnap_qsw.QnapQswApi.validate",
+            "smarthub.components.qnap_qsw.QnapQswApi.validate",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.qnap_qsw.QnapQswApi.update",
+            "smarthub.components.qnap_qsw.QnapQswApi.update",
             return_value=None,
         ),
     ):

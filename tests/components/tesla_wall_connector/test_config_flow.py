@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 from tesla_wall_connector.exceptions import WallConnectorConnectionError
 
-from homeassistant import config_entries
-from homeassistant.components.tesla_wall_connector.const import DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.tesla_wall_connector.const import DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(mock_wall_connector_version, hass: HomeAssistant) -> None:
+async def test_form(mock_wall_connector_version, hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -23,7 +23,7 @@ async def test_form(mock_wall_connector_version, hass: HomeAssistant) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.tesla_wall_connector.async_setup_entry",
+        "smarthub.components.tesla_wall_connector.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -38,7 +38,7 @@ async def test_form(mock_wall_connector_version, hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -58,7 +58,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
 
 
 async def test_form_other_error(
-    mock_wall_connector_version, hass: HomeAssistant
+    mock_wall_connector_version, hass: SmartHub
 ) -> None:
     """Test we handle any other error."""
     result = await hass.config_entries.flow.async_init(
@@ -79,7 +79,7 @@ async def test_form_other_error(
 
 
 async def test_form_already_configured(
-    mock_wall_connector_setup, mock_wall_connector_version, hass: HomeAssistant
+    mock_wall_connector_setup, mock_wall_connector_version, hass: SmartHub
 ) -> None:
     """Test we get already configured."""
 
@@ -106,7 +106,7 @@ async def test_form_already_configured(
 
 
 async def test_dhcp_can_finish(
-    mock_wall_connector_setup, mock_wall_connector_version, hass: HomeAssistant
+    mock_wall_connector_setup, mock_wall_connector_version, hass: SmartHub
 ) -> None:
     """Test DHCP discovery flow can finish right away."""
 
@@ -134,7 +134,7 @@ async def test_dhcp_can_finish(
 
 
 async def test_dhcp_already_exists(
-    mock_wall_connector_version, hass: HomeAssistant
+    mock_wall_connector_version, hass: SmartHub
 ) -> None:
     """Test DHCP discovery flow when device already exists."""
 
@@ -159,7 +159,7 @@ async def test_dhcp_already_exists(
 
 
 async def test_dhcp_error_from_wall_connector(
-    mock_wall_connector_version, hass: HomeAssistant
+    mock_wall_connector_version, hass: SmartHub
 ) -> None:
     """Test DHCP discovery flow when we cannot communicate with the device."""
 

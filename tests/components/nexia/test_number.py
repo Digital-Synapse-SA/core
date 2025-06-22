@@ -1,16 +1,16 @@
 """The number entity tests for the nexia platform."""
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 
-async def test_create_fan_speed_number_entities(hass: HomeAssistant) -> None:
+async def test_create_fan_speed_number_entities(hass: SmartHub) -> None:
     """Test creation of fan speed number entities."""
 
     await async_init_integration(hass)
@@ -44,7 +44,7 @@ async def test_create_fan_speed_number_entities(hass: HomeAssistant) -> None:
     )
 
 
-async def test_set_fan_speed(hass: HomeAssistant) -> None:
+async def test_set_fan_speed(hass: SmartHub) -> None:
     """Test setting fan speed."""
 
     await async_init_integration(hass)

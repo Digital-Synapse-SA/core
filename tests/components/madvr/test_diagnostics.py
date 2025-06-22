@@ -6,8 +6,8 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .conftest import get_update_callback
@@ -24,7 +24,7 @@ from tests.typing import ClientSessionGenerator
     ],
 )
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_config_entry: MockConfigEntry,
     mock_madvr_client: AsyncMock,
@@ -32,7 +32,7 @@ async def test_entry_diagnostics(
     positive_payload: dict,
 ) -> None:
     """Test config entry diagnostics."""
-    with patch("homeassistant.components.madvr.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.madvr.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_config_entry)
 
     update_callback = get_update_callback(mock_madvr_client)

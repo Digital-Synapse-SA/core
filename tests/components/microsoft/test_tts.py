@@ -7,13 +7,13 @@ from unittest.mock import patch
 from pycsspeechtts import pycsspeechtts
 import pytest
 
-from homeassistant.components import tts
-from homeassistant.components.media_player import ATTR_MEDIA_CONTENT_ID
-from homeassistant.components.microsoft.tts import SUPPORTED_LANGUAGES
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.exceptions import ServiceNotFound
-from homeassistant.setup import async_setup_component
+from smarthub.components import tts
+from smarthub.components.media_player import ATTR_MEDIA_CONTENT_ID
+from smarthub.components.microsoft.tts import SUPPORTED_LANGUAGES
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.exceptions import ServiceNotFound
+from smarthub.setup import async_setup_component
 
 from tests.components.tts.common import retrieve_media
 from tests.typing import ClientSessionGenerator
@@ -25,7 +25,7 @@ def mock_tts_cache_dir_autouse(mock_tts_cache_dir: Path) -> None:
 
 
 @pytest.fixture(autouse=True)
-async def setup_internal_url(hass: HomeAssistant):
+async def setup_internal_url(hass: SmartHub):
     """Set up internal url."""
     await async_process_ha_core_config(
         hass, {"internal_url": "http://example.local:8123"}
@@ -36,14 +36,14 @@ async def setup_internal_url(hass: HomeAssistant):
 def mock_tts():
     """Mock tts."""
     with patch(
-        "homeassistant.components.microsoft.tts.pycsspeechtts.TTSTranslator"
+        "smarthub.components.microsoft.tts.pycsspeechtts.TTSTranslator"
     ) as mock_tts:
         mock_tts.return_value.speak.return_value = b""
         yield mock_tts
 
 
 async def test_service_say(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts,
     service_calls: list[ServiceCall],
@@ -89,7 +89,7 @@ async def test_service_say(
 
 
 async def test_service_say_en_gb_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts,
     service_calls: list[ServiceCall],
@@ -143,7 +143,7 @@ async def test_service_say_en_gb_config(
 
 
 async def test_service_say_en_gb_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts,
     service_calls: list[ServiceCall],
@@ -192,7 +192,7 @@ async def test_service_say_en_gb_service(
 
 
 async def test_service_say_fa_ir_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts,
     service_calls: list[ServiceCall],
@@ -246,7 +246,7 @@ async def test_service_say_fa_ir_config(
 
 
 async def test_service_say_fa_ir_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts,
     service_calls: list[ServiceCall],
@@ -315,7 +315,7 @@ def test_supported_languages() -> None:
     assert len(SUPPORTED_LANGUAGES) > 100
 
 
-async def test_invalid_language(hass: HomeAssistant, mock_tts) -> None:
+async def test_invalid_language(hass: SmartHub, mock_tts) -> None:
     """Test setup component with invalid language."""
     await async_setup_component(
         hass,
@@ -339,7 +339,7 @@ async def test_invalid_language(hass: HomeAssistant, mock_tts) -> None:
 
 
 async def test_service_say_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts,
     service_calls: list[ServiceCall],

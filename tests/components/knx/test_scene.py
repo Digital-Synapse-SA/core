@@ -1,16 +1,16 @@
 """Test KNX scene."""
 
-from homeassistant.components.knx.const import KNX_ADDRESS
-from homeassistant.components.knx.schema import SceneSchema
-from homeassistant.const import CONF_ENTITY_CATEGORY, CONF_NAME, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.knx.const import KNX_ADDRESS
+from smarthub.components.knx.schema import SceneSchema
+from smarthub.const import CONF_ENTITY_CATEGORY, CONF_NAME, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import KNXTestKit
 
 
 async def test_activate_knx_scene(
-    hass: HomeAssistant, knx: KNXTestKit, entity_registry: er.EntityRegistry
+    hass: SmartHub, knx: KNXTestKit, entity_registry: er.EntityRegistry
 ) -> None:
     """Test KNX scene."""
     await knx.setup_integration(

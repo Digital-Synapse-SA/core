@@ -15,10 +15,10 @@ from py_aosmith.models import (
 )
 import pytest
 
-from homeassistant.components.aosmith.const import DOMAIN
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.components.aosmith.const import DOMAIN
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from tests.common import MockConfigEntry, async_load_json_object_fixture
 
@@ -130,7 +130,7 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.aosmith.async_setup_entry", return_value=True
+        "smarthub.components.aosmith.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -161,7 +161,7 @@ def get_devices_fixture_has_vacation_mode() -> bool:
 
 @pytest.fixture
 async def mock_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_devices_fixture_heat_pump: bool,
     get_devices_fixture_mode_pending: bool,
     get_devices_fixture_setpoint_pending: bool,
@@ -192,7 +192,7 @@ async def mock_client(
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
 ) -> MockConfigEntry:
@@ -200,7 +200,7 @@ async def init_integration(
     hass.config.units = US_CUSTOMARY_SYSTEM
 
     with patch(
-        "homeassistant.components.aosmith.AOSmithAPIClient", return_value=mock_client
+        "smarthub.components.aosmith.AOSmithAPIClient", return_value=mock_client
     ):
         mock_config_entry.add_to_hass(hass)
 

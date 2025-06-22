@@ -7,11 +7,11 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.backup import store
-from homeassistant.components.backup.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.backup import store
+from smarthub.components.backup.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_backup_integration
 
@@ -21,13 +21,13 @@ from tests.typing import WebSocketGenerator
 
 @pytest.mark.usefixtures("mock_backup_generation")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test setup of backup sensors."""
-    with patch("homeassistant.components.backup.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.backup.PLATFORMS", [Platform.SENSOR]):
         await setup_backup_integration(hass, with_hassio=False)
         await hass.async_block_till_done(wait_background_tasks=True)
 
@@ -51,7 +51,7 @@ async def test_sensors(
 
 
 async def test_sensor_updates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     hass_storage: dict[str, Any],
@@ -98,7 +98,7 @@ async def test_sensor_updates(
         "minor_version": store.STORAGE_VERSION_MINOR,
     }
 
-    with patch("homeassistant.components.backup.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.backup.PLATFORMS", [Platform.SENSOR]):
         await setup_backup_integration(
             hass, with_hassio=False, remote_agents=["test.remote"]
         )

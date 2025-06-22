@@ -13,17 +13,17 @@ from pytrafikverket import (
     UnknownError,
 )
 
-from homeassistant import config_entries
-from homeassistant.components.trafikverket_train.const import (
+from smarthub import config_entries
+from smarthub.components.trafikverket_train.const import (
     CONF_FILTER_PRODUCT,
     CONF_FROM,
     CONF_TIME,
     CONF_TO,
     DOMAIN,
 )
-from homeassistant.const import CONF_API_KEY, CONF_NAME, CONF_WEEKDAY, WEEKDAYS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_API_KEY, CONF_NAME, CONF_WEEKDAY, WEEKDAYS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import ENTRY_CONFIG, OPTIONS_CONFIG
 
@@ -31,7 +31,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_form(
-    hass: HomeAssistant, get_train_stations: list[StationInfoModel]
+    hass: SmartHub, get_train_stations: list[StationInfoModel]
 ) -> None:
     """Test we get the form."""
 
@@ -44,11 +44,11 @@ async def test_form(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -79,7 +79,7 @@ async def test_form(
 
 
 async def test_form_multiple_stations(
-    hass: HomeAssistant, get_multiple_train_stations: list[StationInfoModel]
+    hass: SmartHub, get_multiple_train_stations: list[StationInfoModel]
 ) -> None:
     """Test we get the form."""
 
@@ -91,7 +91,7 @@ async def test_form_multiple_stations(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_multiple_train_stations,
         ),
     ):
@@ -109,11 +109,11 @@ async def test_form_multiple_stations(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_multiple_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -140,7 +140,7 @@ async def test_form_multiple_stations(
 
 
 async def test_form_entry_already_exist(
-    hass: HomeAssistant, get_train_stations: list[StationInfoModel]
+    hass: SmartHub, get_train_stations: list[StationInfoModel]
 ) -> None:
     """Test flow aborts when entry already exist."""
 
@@ -168,14 +168,14 @@ async def test_form_entry_already_exist(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_get_train_stop",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_get_train_stop",
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -213,7 +213,7 @@ async def test_form_entry_already_exist(
     ],
 )
 async def test_flow_fails(
-    hass: HomeAssistant, side_effect: Exception, p_error: dict[str, str]
+    hass: SmartHub, side_effect: Exception, p_error: dict[str, str]
 ) -> None:
     """Test config flow errors."""
     result = await hass.config_entries.flow.async_init(
@@ -225,7 +225,7 @@ async def test_flow_fails(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
             side_effect=side_effect(),
         ),
     ):
@@ -255,7 +255,7 @@ async def test_flow_fails(
     ],
 )
 async def test_flow_fails_departures(
-    hass: HomeAssistant, side_effect: Exception, p_error: dict[str, str]
+    hass: SmartHub, side_effect: Exception, p_error: dict[str, str]
 ) -> None:
     """Test config flow errors."""
     result = await hass.config_entries.flow.async_init(
@@ -267,7 +267,7 @@ async def test_flow_fails_departures(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
             side_effect=side_effect(),
         ),
     ):
@@ -284,7 +284,7 @@ async def test_flow_fails_departures(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant, get_train_stations: list[StationInfoModel]
+    hass: SmartHub, get_train_stations: list[StationInfoModel]
 ) -> None:
     """Test a reauthentication flow."""
     entry = MockConfigEntry(
@@ -309,11 +309,11 @@ async def test_reauth_flow(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -357,7 +357,7 @@ async def test_reauth_flow(
     ],
 )
 async def test_reauth_flow_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: Exception,
     p_error: dict[str, str],
     get_train_stations: list[StationInfoModel],
@@ -382,7 +382,7 @@ async def test_reauth_flow_error(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
             side_effect=side_effect(),
         ),
     ):
@@ -398,11 +398,11 @@ async def test_reauth_flow_error(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -438,7 +438,7 @@ async def test_reauth_flow_error(
     ],
 )
 async def test_reauth_flow_error_departures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: Exception,
     p_error: dict[str, str],
     get_train_stations: list[StationInfoModel],
@@ -463,7 +463,7 @@ async def test_reauth_flow_error_departures(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
             side_effect=side_effect(),
         ),
     ):
@@ -479,14 +479,14 @@ async def test_reauth_flow_error_departures(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_get_train_stop",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_get_train_stop",
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -509,7 +509,7 @@ async def test_reauth_flow_error_departures(
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_trains: list[TrainStopModel],
     get_train_stop: TrainStopModel,
     get_train_stations: list[StationInfoModel],
@@ -532,18 +532,18 @@ async def test_options_flow(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
             return_value=get_trains,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_stop",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_stop",
             return_value=get_train_stop,
         ),
     ):
@@ -580,7 +580,7 @@ async def test_options_flow(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant, get_train_stations: list[StationInfoModel]
+    hass: SmartHub, get_train_stations: list[StationInfoModel]
 ) -> None:
     """Test reconfigure flow."""
 
@@ -601,11 +601,11 @@ async def test_reconfigure_flow(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -626,7 +626,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_multiple_stations(
-    hass: HomeAssistant, get_multiple_train_stations: list[StationInfoModel]
+    hass: SmartHub, get_multiple_train_stations: list[StationInfoModel]
 ) -> None:
     """Test we can reconfigure with multiple stations."""
 
@@ -647,7 +647,7 @@ async def test_reconfigure_multiple_stations(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_multiple_train_stations,
         ),
     ):
@@ -665,11 +665,11 @@ async def test_reconfigure_multiple_stations(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_multiple_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -687,7 +687,7 @@ async def test_reconfigure_multiple_stations(
 
 
 async def test_reconfigure_entry_already_exist(
-    hass: HomeAssistant, get_train_stations: list[StationInfoModel]
+    hass: SmartHub, get_train_stations: list[StationInfoModel]
 ) -> None:
     """Test flow aborts when entry already exist in a reconfigure flow."""
 
@@ -723,14 +723,14 @@ async def test_reconfigure_entry_already_exist(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_get_train_stop",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_get_train_stop",
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -768,7 +768,7 @@ async def test_reconfigure_entry_already_exist(
     ],
 )
 async def test_reconfigure_flow_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: Exception,
     p_error: dict[str, str],
     get_train_stations: list[StationInfoModel],
@@ -790,7 +790,7 @@ async def test_reconfigure_flow_fails(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
             side_effect=side_effect(),
         ),
     ):
@@ -807,11 +807,11 @@ async def test_reconfigure_flow_fails(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -843,7 +843,7 @@ async def test_reconfigure_flow_fails(
     ],
 )
 async def test_reconfigure_flow_fails_departures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: Exception,
     p_error: dict[str, str],
     get_train_stations: list[StationInfoModel],
@@ -865,7 +865,7 @@ async def test_reconfigure_flow_fails_departures(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
             side_effect=side_effect(),
         ),
     ):
@@ -882,11 +882,11 @@ async def test_reconfigure_flow_fails_departures(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.async_setup_entry",
+            "smarthub.components.trafikverket_train.async_setup_entry",
             return_value=True,
         ),
     ):

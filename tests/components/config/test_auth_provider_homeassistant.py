@@ -4,9 +4,9 @@ from typing import Any
 
 import pytest
 
-from homeassistant.auth.providers import homeassistant as prov_ha
-from homeassistant.components.config import auth_provider_homeassistant as auth_ha
-from homeassistant.core import HomeAssistant
+from smarthub.auth.providers import smarthub as prov_ha
+from smarthub.components.config import auth_provider_smarthub as auth_ha
+from smarthub.core import SmartHub
 
 from tests.common import CLIENT_ID, MockUser
 from tests.typing import WebSocketGenerator
@@ -14,7 +14,7 @@ from tests.typing import WebSocketGenerator
 
 @pytest.fixture(autouse=True)
 async def setup_config(
-    hass: HomeAssistant, local_auth: prov_ha.HassAuthProvider
+    hass: SmartHub, local_auth: prov_ha.HassAuthProvider
 ) -> None:
     """Fixture that sets up the auth provider ."""
     auth_ha.async_setup(hass)
@@ -29,7 +29,7 @@ async def auth_provider(
 
 
 @pytest.fixture
-async def owner_access_token(hass: HomeAssistant, hass_owner_user: MockUser) -> str:
+async def owner_access_token(hass: SmartHub, hass_owner_user: MockUser) -> str:
     """Access token for owner user."""
     refresh_token = await hass.auth.async_create_refresh_token(
         hass_owner_user, CLIENT_ID
@@ -39,7 +39,7 @@ async def owner_access_token(hass: HomeAssistant, hass_owner_user: MockUser) -> 
 
 @pytest.fixture
 async def hass_admin_credential(
-    hass: HomeAssistant, auth_provider: prov_ha.HassAuthProvider
+    hass: SmartHub, auth_provider: prov_ha.HassAuthProvider
 ):
     """Overload credentials to admin user."""
     await hass.async_add_executor_job(
@@ -52,7 +52,7 @@ async def hass_admin_credential(
 
 
 async def test_create_auth_system_generated_user(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can't add auth to system generated users."""
     system_user = MockUser(system_generated=True).add_to_hass(hass)
@@ -61,7 +61,7 @@ async def test_create_auth_system_generated_user(
     await client.send_json(
         {
             "id": 5,
-            "type": "config/auth_provider/homeassistant/create",
+            "type": "config/auth_provider/smarthub/create",
             "user_id": system_user.id,
             "username": "test-user",
             "password": "test-pass",
@@ -80,7 +80,7 @@ async def test_create_auth_user_already_credentials() -> None:
 
 
 async def test_create_auth_unknown_user(
-    hass_ws_client: WebSocketGenerator, hass: HomeAssistant
+    hass_ws_client: WebSocketGenerator, hass: SmartHub
 ) -> None:
     """Test create pointing at unknown user."""
     client = await hass_ws_client(hass)
@@ -88,7 +88,7 @@ async def test_create_auth_unknown_user(
     await client.send_json(
         {
             "id": 5,
-            "type": "config/auth_provider/homeassistant/create",
+            "type": "config/auth_provider/smarthub/create",
             "user_id": "test-id",
             "username": "test-user",
             "password": "test-pass",
@@ -102,7 +102,7 @@ async def test_create_auth_unknown_user(
 
 
 async def test_create_auth_requires_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_read_only_access_token: str,
 ) -> None:
@@ -112,7 +112,7 @@ async def test_create_auth_requires_admin(
     await client.send_json(
         {
             "id": 5,
-            "type": "config/auth_provider/homeassistant/create",
+            "type": "config/auth_provider/smarthub/create",
             "user_id": "test-id",
             "username": "test-user",
             "password": "test-pass",
@@ -125,7 +125,7 @@ async def test_create_auth_requires_admin(
 
 
 async def test_create_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -138,7 +138,7 @@ async def test_create_auth(
     await client.send_json(
         {
             "id": 5,
-            "type": "config/auth_provider/homeassistant/create",
+            "type": "config/auth_provider/smarthub/create",
             "user_id": user.id,
             "username": "test-user2",
             "password": "test-pass",
@@ -149,7 +149,7 @@ async def test_create_auth(
     assert result["success"], result
     assert len(user.credentials) == 1
     creds = user.credentials[0]
-    assert creds.auth_provider_type == "homeassistant"
+    assert creds.auth_provider_type == "smarthub"
     assert creds.auth_provider_id is None
     assert creds.data == {"username": "test-user2"}
     assert prov_ha.STORAGE_KEY in hass_storage
@@ -158,7 +158,7 @@ async def test_create_auth(
 
 
 async def test_create_auth_duplicate_username(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -174,7 +174,7 @@ async def test_create_auth_duplicate_username(
     await client.send_json(
         {
             "id": 5,
-            "type": "config/auth_provider/homeassistant/create",
+            "type": "config/auth_provider/smarthub/create",
             "user_id": user.id,
             "username": "test-user",
             "password": "test-pass",
@@ -194,7 +194,7 @@ async def test_create_auth_duplicate_username(
 
 async def test_delete_removes_just_auth(
     hass_ws_client: WebSocketGenerator,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ) -> None:
     """Test deleting an auth without being connected to a user."""
@@ -208,7 +208,7 @@ async def test_delete_removes_just_auth(
     await client.send_json(
         {
             "id": 5,
-            "type": "config/auth_provider/homeassistant/delete",
+            "type": "config/auth_provider/smarthub/delete",
             "username": "test-user",
         }
     )
@@ -219,7 +219,7 @@ async def test_delete_removes_just_auth(
 
 
 async def test_delete_removes_credential(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -241,7 +241,7 @@ async def test_delete_removes_credential(
     await client.send_json(
         {
             "id": 5,
-            "type": "config/auth_provider/homeassistant/delete",
+            "type": "config/auth_provider/smarthub/delete",
             "username": "test-user",
         }
     )
@@ -252,7 +252,7 @@ async def test_delete_removes_credential(
 
 
 async def test_delete_requires_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_read_only_access_token: str,
 ) -> None:
@@ -262,7 +262,7 @@ async def test_delete_requires_admin(
     await client.send_json(
         {
             "id": 5,
-            "type": "config/auth_provider/homeassistant/delete",
+            "type": "config/auth_provider/smarthub/delete",
             "username": "test-user",
         }
     )
@@ -273,7 +273,7 @@ async def test_delete_requires_admin(
 
 
 async def test_delete_unknown_auth(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test trying to delete an unknown auth username."""
     client = await hass_ws_client(hass)
@@ -281,7 +281,7 @@ async def test_delete_unknown_auth(
     await client.send_json(
         {
             "id": 5,
-            "type": "config/auth_provider/homeassistant/delete",
+            "type": "config/auth_provider/smarthub/delete",
             "username": "test-user2",
         }
     )
@@ -298,7 +298,7 @@ async def test_delete_unknown_auth(
 
 
 async def test_change_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     auth_provider: prov_ha.HassAuthProvider,
 ) -> None:
@@ -307,7 +307,7 @@ async def test_change_password(
     await client.send_json(
         {
             "id": 6,
-            "type": "config/auth_provider/homeassistant/change_password",
+            "type": "config/auth_provider/smarthub/change_password",
             "current_password": "test-pass",
             "new_password": "new-pass",
         }
@@ -319,7 +319,7 @@ async def test_change_password(
 
 
 async def test_change_password_wrong_pw(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_admin_user: MockUser,
     auth_provider: prov_ha.HassAuthProvider,
@@ -330,7 +330,7 @@ async def test_change_password_wrong_pw(
     await client.send_json(
         {
             "id": 6,
-            "type": "config/auth_provider/homeassistant/change_password",
+            "type": "config/auth_provider/smarthub/change_password",
             "current_password": "wrong-pass",
             "new_password": "new-pass",
         }
@@ -344,7 +344,7 @@ async def test_change_password_wrong_pw(
 
 
 async def test_change_password_no_creds(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, hass_admin_user: MockUser
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, hass_admin_user: MockUser
 ) -> None:
     """Test that change password fails with no credentials."""
     hass_admin_user.credentials.clear()
@@ -353,7 +353,7 @@ async def test_change_password_no_creds(
     await client.send_json(
         {
             "id": 6,
-            "type": "config/auth_provider/homeassistant/change_password",
+            "type": "config/auth_provider/smarthub/change_password",
             "current_password": "test-pass",
             "new_password": "new-pass",
         }
@@ -365,7 +365,7 @@ async def test_change_password_no_creds(
 
 
 async def test_admin_change_password_not_owner(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     auth_provider: prov_ha.HassAuthProvider,
 ) -> None:
@@ -375,7 +375,7 @@ async def test_admin_change_password_not_owner(
     await client.send_json(
         {
             "id": 6,
-            "type": "config/auth_provider/homeassistant/admin_change_password",
+            "type": "config/auth_provider/smarthub/admin_change_password",
             "user_id": "test-user",
             "password": "new-pass",
         }
@@ -390,7 +390,7 @@ async def test_admin_change_password_not_owner(
 
 
 async def test_admin_change_password_no_user(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, owner_access_token: str
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, owner_access_token: str
 ) -> None:
     """Test that change password fails with unknown user."""
     client = await hass_ws_client(hass, owner_access_token)
@@ -398,7 +398,7 @@ async def test_admin_change_password_no_user(
     await client.send_json(
         {
             "id": 6,
-            "type": "config/auth_provider/homeassistant/admin_change_password",
+            "type": "config/auth_provider/smarthub/admin_change_password",
             "user_id": "non-existing",
             "password": "new-pass",
         }
@@ -410,7 +410,7 @@ async def test_admin_change_password_no_user(
 
 
 async def test_admin_change_password_no_cred(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     owner_access_token: str,
     hass_admin_user: MockUser,
@@ -423,7 +423,7 @@ async def test_admin_change_password_no_cred(
     await client.send_json(
         {
             "id": 6,
-            "type": "config/auth_provider/homeassistant/admin_change_password",
+            "type": "config/auth_provider/smarthub/admin_change_password",
             "user_id": hass_admin_user.id,
             "password": "new-pass",
         }
@@ -435,7 +435,7 @@ async def test_admin_change_password_no_cred(
 
 
 async def test_admin_change_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     owner_access_token: str,
     auth_provider: prov_ha.HassAuthProvider,
@@ -447,7 +447,7 @@ async def test_admin_change_password(
     await client.send_json(
         {
             "id": 6,
-            "type": "config/auth_provider/homeassistant/admin_change_password",
+            "type": "config/auth_provider/smarthub/admin_change_password",
             "user_id": hass_admin_user.id,
             "password": "new-pass",
         }
@@ -473,7 +473,7 @@ def _assert_username(
 
 
 async def _test_admin_change_username(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     local_auth: prov_ha.HassAuthProvider,
     hass_admin_user: MockUser,
@@ -487,7 +487,7 @@ async def _test_admin_change_username(
 
     await client.send_json_auto_id(
         {
-            "type": "config/auth_provider/homeassistant/admin_change_username",
+            "type": "config/auth_provider/smarthub/admin_change_username",
             "user_id": hass_admin_user.id,
             "username": new_username,
         }
@@ -496,7 +496,7 @@ async def _test_admin_change_username(
 
 
 async def test_admin_change_username_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     local_auth: prov_ha.HassAuthProvider,
     hass_admin_user: MockUser,
@@ -528,7 +528,7 @@ async def test_admin_change_username_success(
 
 @pytest.mark.parametrize("new_username", [" bla", "bla ", "BlA"])
 async def test_admin_change_username_error_not_normalized(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     local_auth: prov_ha.HassAuthProvider,
     hass_admin_user: MockUser,
@@ -562,14 +562,14 @@ async def test_admin_change_username_error_not_normalized(
 
 
 async def test_admin_change_username_not_owner(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, auth_provider
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, auth_provider
 ) -> None:
     """Test that change username fails when not owner."""
     client = await hass_ws_client(hass)
 
     await client.send_json_auto_id(
         {
-            "type": "config/auth_provider/homeassistant/admin_change_username",
+            "type": "config/auth_provider/smarthub/admin_change_username",
             "user_id": "test-user",
             "username": "new-user",
         }
@@ -584,14 +584,14 @@ async def test_admin_change_username_not_owner(
 
 
 async def test_admin_change_username_no_user(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, owner_access_token
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, owner_access_token
 ) -> None:
     """Test that change username fails with unknown user."""
     client = await hass_ws_client(hass, owner_access_token)
 
     await client.send_json_auto_id(
         {
-            "type": "config/auth_provider/homeassistant/admin_change_username",
+            "type": "config/auth_provider/smarthub/admin_change_username",
             "user_id": "non-existing",
             "username": "new-username",
         }
@@ -603,7 +603,7 @@ async def test_admin_change_username_no_user(
 
 
 async def test_admin_change_username_no_cred(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     owner_access_token,
     hass_admin_user: MockUser,
@@ -615,7 +615,7 @@ async def test_admin_change_username_no_cred(
 
     await client.send_json_auto_id(
         {
-            "type": "config/auth_provider/homeassistant/admin_change_username",
+            "type": "config/auth_provider/smarthub/admin_change_username",
             "user_id": hass_admin_user.id,
             "username": "new-username",
         }

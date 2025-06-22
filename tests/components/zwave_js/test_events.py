@@ -6,8 +6,8 @@ import pytest
 from zwave_js_server.const import CommandClass
 from zwave_js_server.event import Event
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from tests.common import async_capture_events
 
@@ -19,7 +19,7 @@ def platforms() -> list[str]:
 
 
 async def test_scenes(
-    hass: HomeAssistant, hank_binary_switch, integration, client
+    hass: SmartHub, hank_binary_switch, integration, client
 ) -> None:
     """Test scene events."""
     # just pick a random node to fake the value notification events
@@ -150,7 +150,7 @@ async def test_scenes(
 
 
 async def test_notifications(
-    hass: HomeAssistant, hank_binary_switch, integration, client
+    hass: SmartHub, hank_binary_switch, integration, client
 ) -> None:
     """Test notification events."""
     # just pick a random node to fake the value notification events
@@ -253,7 +253,7 @@ async def test_notifications(
 
 @pytest.mark.parametrize("platforms", [[Platform.SWITCH]])
 async def test_value_updated(
-    hass: HomeAssistant, vision_security_zl7432, integration, client
+    hass: SmartHub, vision_security_zl7432, integration, client
 ) -> None:
     """Test value updated events."""
     node = vision_security_zl7432
@@ -322,7 +322,7 @@ async def test_value_updated(
 
 
 async def test_power_level_notification(
-    hass: HomeAssistant, hank_binary_switch, integration, client
+    hass: SmartHub, hank_binary_switch, integration, client
 ) -> None:
     """Test power level notification events."""
     # just pick a random node to fake the notification event
@@ -357,7 +357,7 @@ async def test_power_level_notification(
 
 
 async def test_unknown_notification(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     hank_binary_switch,
     integration,

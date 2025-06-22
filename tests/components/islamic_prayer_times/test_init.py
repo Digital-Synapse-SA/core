@@ -6,13 +6,13 @@ from unittest.mock import patch
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components.islamic_prayer_times.const import CONF_CALC_METHOD, DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.islamic_prayer_times.const import CONF_CALC_METHOD, DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import NOW, PRAYER_TIMES
 
@@ -20,12 +20,12 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 @pytest.fixture(autouse=True)
-async def set_utc(hass: HomeAssistant) -> None:
+async def set_utc(hass: SmartHub) -> None:
     """Set timezone to UTC."""
     await hass.config.async_set_time_zone("UTC")
 
 
-async def test_successful_config_entry(hass: HomeAssistant) -> None:
+async def test_successful_config_entry(hass: SmartHub) -> None:
     """Test that Islamic Prayer Times is configured successfully."""
 
     entry = MockConfigEntry(
@@ -44,7 +44,7 @@ async def test_successful_config_entry(hass: HomeAssistant) -> None:
         assert entry.state is ConfigEntryState.LOADED
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test removing Islamic Prayer Times."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -63,7 +63,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
         assert entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_options_listener(hass: HomeAssistant) -> None:
+async def test_options_listener(hass: SmartHub) -> None:
     """Ensure updating options triggers a coordinator refresh."""
     entry = MockConfigEntry(domain=DOMAIN, data={})
     entry.add_to_hass(hass)
@@ -103,7 +103,7 @@ async def test_options_listener(hass: HomeAssistant) -> None:
     ],
 )
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     object_id: str,
     old_unique_id: str,
@@ -136,7 +136,7 @@ async def test_migrate_unique_id(
     assert entity_migrated.unique_id == f"{entry.entry_id}-{old_unique_id}"
 
 
-async def test_migration_from_1_1_to_1_2(hass: HomeAssistant) -> None:
+async def test_migration_from_1_1_to_1_2(hass: SmartHub) -> None:
     """Test migrating from version 1.1 to 1.2."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -161,7 +161,7 @@ async def test_migration_from_1_1_to_1_2(hass: HomeAssistant) -> None:
     assert entry.minor_version == 2
 
 
-async def test_update_scheduling(hass: HomeAssistant) -> None:
+async def test_update_scheduling(hass: SmartHub) -> None:
     """Test that integration schedules update immediately after Islamic midnight."""
     entry = MockConfigEntry(domain=DOMAIN, data={})
     entry.add_to_hass(hass)

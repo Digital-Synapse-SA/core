@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock
 
 from aiohttp import ClientError
 
-from homeassistant.components.accuweather.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.accuweather.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import init_integration
 
@@ -16,7 +16,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_accuweather_system_health(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     mock_accuweather_client: AsyncMock,
 ) -> None:
@@ -40,7 +40,7 @@ async def test_accuweather_system_health(
 
 
 async def test_accuweather_system_health_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     mock_accuweather_client: AsyncMock,
 ) -> None:

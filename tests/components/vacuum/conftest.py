@@ -5,12 +5,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.vacuum import DOMAIN, VacuumEntityFeature
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, frame
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.components.vacuum import DOMAIN, VacuumEntityFeature
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, frame
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from . import MockVacuum
 
@@ -31,7 +31,7 @@ class MockFlow(ConfigFlow):
 
 
 @pytest.fixture
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -57,7 +57,7 @@ async def vacuum_supported_features() -> VacuumEntityFeature:
 
 @pytest.fixture(name="mock_vacuum_entity")
 async def setup_vacuum_platform_test_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     entity_registry: er.EntityRegistry,
     supported_features: VacuumEntityFeature,
@@ -65,7 +65,7 @@ async def setup_vacuum_platform_test_entity(
     """Set up vacuum entity using an entity platform."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -86,7 +86,7 @@ async def setup_vacuum_platform_test_entity(
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -111,10 +111,10 @@ async def setup_vacuum_platform_test_entity(
 
 
 @pytest.fixture(name="mock_as_custom_component")
-async def mock_frame(hass: HomeAssistant) -> AsyncGenerator[None]:
+async def mock_frame(hass: SmartHub) -> AsyncGenerator[None]:
     """Mock frame."""
     with patch(
-        "homeassistant.helpers.frame.get_integration_frame",
+        "smarthub.helpers.frame.get_integration_frame",
         return_value=frame.IntegrationFrame(
             custom_integration=True,
             integration="alarm_control_panel",

@@ -5,11 +5,11 @@ from unittest.mock import patch
 from pushbullet import InvalidKeyError, PushbulletError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.pushbullet.const import DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.pushbullet.const import DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import MOCK_CONFIG
 
@@ -20,12 +20,12 @@ from tests.common import MockConfigEntry
 def pushbullet_setup_fixture():
     """Patch pushbullet setup entry."""
     with patch(
-        "homeassistant.components.pushbullet.async_setup_entry", return_value=True
+        "smarthub.components.pushbullet.async_setup_entry", return_value=True
     ):
         yield
 
 
-async def test_flow_user(hass: HomeAssistant, requests_mock_fixture) -> None:
+async def test_flow_user(hass: SmartHub, requests_mock_fixture) -> None:
     """Test user initialized flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -41,7 +41,7 @@ async def test_flow_user(hass: HomeAssistant, requests_mock_fixture) -> None:
 
 
 async def test_flow_user_already_configured(
-    hass: HomeAssistant, requests_mock_fixture
+    hass: SmartHub, requests_mock_fixture
 ) -> None:
     """Test user initialized flow with duplicate server."""
     entry = MockConfigEntry(
@@ -64,7 +64,7 @@ async def test_flow_user_already_configured(
     assert result["reason"] == "already_configured"
 
 
-async def test_flow_name_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_name_already_configured(hass: SmartHub) -> None:
     """Test user initialized flow with duplicate server."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -89,11 +89,11 @@ async def test_flow_name_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_flow_invalid_key(hass: HomeAssistant) -> None:
+async def test_flow_invalid_key(hass: SmartHub) -> None:
     """Test user initialized flow with invalid api key."""
 
     with patch(
-        "homeassistant.components.pushbullet.config_flow.PushBullet",
+        "smarthub.components.pushbullet.config_flow.PushBullet",
         side_effect=InvalidKeyError,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -106,11 +106,11 @@ async def test_flow_invalid_key(hass: HomeAssistant) -> None:
     assert result["errors"] == {CONF_API_KEY: "invalid_api_key"}
 
 
-async def test_flow_conn_error(hass: HomeAssistant) -> None:
+async def test_flow_conn_error(hass: SmartHub) -> None:
     """Test user initialized flow with conn error."""
 
     with patch(
-        "homeassistant.components.pushbullet.config_flow.PushBullet",
+        "smarthub.components.pushbullet.config_flow.PushBullet",
         side_effect=PushbulletError,
     ):
         result = await hass.config_entries.flow.async_init(

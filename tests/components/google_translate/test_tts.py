@@ -11,13 +11,13 @@ from unittest.mock import MagicMock, patch
 from gtts import gTTSError
 import pytest
 
-from homeassistant.components import tts
-from homeassistant.components.google_translate.const import CONF_TLD, DOMAIN
-from homeassistant.components.media_player import ATTR_MEDIA_CONTENT_ID
-from homeassistant.const import ATTR_ENTITY_ID, CONF_PLATFORM
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.setup import async_setup_component
+from smarthub.components import tts
+from smarthub.components.google_translate.const import CONF_TLD, DOMAIN
+from smarthub.components.media_player import ATTR_MEDIA_CONTENT_ID
+from smarthub.const import ATTR_ENTITY_ID, CONF_PLATFORM
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.components.tts.common import retrieve_media
@@ -35,7 +35,7 @@ def mock_tts_cache_dir_autouse(mock_tts_cache_dir: Path) -> None:
 
 
 @pytest.fixture(autouse=True)
-async def setup_internal_url(hass: HomeAssistant) -> None:
+async def setup_internal_url(hass: SmartHub) -> None:
     """Set up internal url."""
     await async_process_ha_core_config(
         hass, {"internal_url": "http://example.local:8123"}
@@ -45,13 +45,13 @@ async def setup_internal_url(hass: HomeAssistant) -> None:
 @pytest.fixture
 def mock_gtts() -> Generator[MagicMock]:
     """Mock gtts."""
-    with patch("homeassistant.components.google_translate.tts.gTTS") as mock_gtts:
+    with patch("smarthub.components.google_translate.tts.gTTS") as mock_gtts:
         yield mock_gtts
 
 
 @pytest.fixture(name="setup")
 async def setup_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     request: pytest.FixtureRequest,
 ) -> None:
@@ -72,14 +72,14 @@ def config_fixture() -> dict[str, Any]:
     return {}
 
 
-async def mock_setup(hass: HomeAssistant, config: dict[str, Any]) -> None:
+async def mock_setup(hass: SmartHub, config: dict[str, Any]) -> None:
     """Mock setup."""
     assert await async_setup_component(
         hass, tts.DOMAIN, {tts.DOMAIN: {CONF_PLATFORM: DOMAIN} | config}
     )
 
 
-async def mock_config_entry_setup(hass: HomeAssistant, config: dict[str, Any]) -> None:
+async def mock_config_entry_setup(hass: SmartHub, config: dict[str, Any]) -> None:
     """Mock config entry setup."""
     default_config = {tts.CONF_LANG: "en", CONF_TLD: "com"}
     config_entry = MockConfigEntry(domain=DOMAIN, data=default_config | config)
@@ -112,7 +112,7 @@ async def mock_config_entry_setup(hass: HomeAssistant, config: dict[str, Any]) -
     indirect=["setup"],
 )
 async def test_tts_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_gtts: MagicMock,
     hass_client: ClientSessionGenerator,
     service_calls: list[ServiceCall],
@@ -169,7 +169,7 @@ async def test_tts_service(
     indirect=["setup"],
 )
 async def test_service_say_german_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_gtts: MagicMock,
     hass_client: ClientSessionGenerator,
     service_calls: list[ServiceCall],
@@ -226,7 +226,7 @@ async def test_service_say_german_config(
     indirect=["setup"],
 )
 async def test_service_say_german_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_gtts: MagicMock,
     hass_client: ClientSessionGenerator,
     service_calls: list[ServiceCall],
@@ -282,7 +282,7 @@ async def test_service_say_german_service(
     indirect=["setup"],
 )
 async def test_service_say_en_uk_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_gtts: MagicMock,
     hass_client: ClientSessionGenerator,
     service_calls: list[ServiceCall],
@@ -339,7 +339,7 @@ async def test_service_say_en_uk_config(
     indirect=["setup"],
 )
 async def test_service_say_en_uk_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_gtts: MagicMock,
     hass_client: ClientSessionGenerator,
     service_calls: list[ServiceCall],
@@ -396,7 +396,7 @@ async def test_service_say_en_uk_service(
     indirect=["setup"],
 )
 async def test_service_say_en_couk(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_gtts: MagicMock,
     hass_client: ClientSessionGenerator,
     service_calls: list[ServiceCall],
@@ -452,7 +452,7 @@ async def test_service_say_en_couk(
     indirect=["setup"],
 )
 async def test_service_say_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_gtts: MagicMock,
     hass_client: ClientSessionGenerator,
     service_calls: list[ServiceCall],

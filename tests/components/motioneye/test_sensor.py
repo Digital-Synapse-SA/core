@@ -7,15 +7,15 @@ from unittest.mock import AsyncMock, patch
 from freezegun.api import FrozenDateTimeFactory
 from motioneye_client.const import KEY_ACTIONS
 
-from homeassistant.components.motioneye import get_motioneye_device_identifier
-from homeassistant.components.motioneye.const import (
+from smarthub.components.motioneye import get_motioneye_device_identifier
+from smarthub.components.motioneye.const import (
     DEFAULT_SCAN_INTERVAL,
     TYPE_MOTIONEYE_ACTION_SENSOR,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import (
     TEST_CAMERA,
@@ -30,7 +30,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_sensor_actions(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test the actions sensor."""
     register_test_entity(
@@ -75,7 +75,7 @@ async def test_sensor_actions(
 
 
 async def test_sensor_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -107,7 +107,7 @@ async def test_sensor_device_info(
 
 
 async def test_sensor_actions_can_be_enabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -123,7 +123,7 @@ async def test_sensor_actions_can_be_enabled(
     assert not entity_state
 
     with patch(
-        "homeassistant.components.motioneye.MotionEyeClient",
+        "smarthub.components.motioneye.MotionEyeClient",
         return_value=client,
     ):
         updated_entry = entity_registry.async_update_entity(

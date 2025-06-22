@@ -7,17 +7,17 @@ from unittest.mock import Mock
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.systemmonitor.const import CONF_PROCESS, DOMAIN
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.systemmonitor.const import CONF_PROCESS, DOMAIN
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant, mock_added_config_entry: ConfigEntry
+    hass: SmartHub, mock_added_config_entry: ConfigEntry
 ) -> None:
     """Test load and unload an entry."""
 
@@ -28,7 +28,7 @@ async def test_load_unload_entry(
 
 
 async def test_adding_processor_to_options(
-    hass: HomeAssistant, mock_added_config_entry: ConfigEntry
+    hass: SmartHub, mock_added_config_entry: ConfigEntry
 ) -> None:
     """Test options listener."""
     process_sensor = hass.states.get("binary_sensor.system_monitor_process_systemd")
@@ -69,7 +69,7 @@ async def test_adding_processor_to_options(
 
 
 async def test_migrate_process_sensor_to_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     freezer: FrozenDateTimeFactory,
@@ -113,7 +113,7 @@ async def test_migrate_process_sensor_to_binary_sensors(
 
 
 async def test_migration_from_future_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     freezer: FrozenDateTimeFactory,

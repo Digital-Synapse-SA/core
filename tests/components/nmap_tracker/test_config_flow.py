@@ -4,20 +4,20 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.device_tracker import (
+from smarthub import config_entries
+from smarthub.components.device_tracker import (
     CONF_CONSIDER_HOME,
     CONF_SCAN_INTERVAL,
 )
-from homeassistant.components.nmap_tracker.const import (
+from smarthub.components.nmap_tracker.const import (
     CONF_HOME_INTERVAL,
     CONF_OPTIONS,
     DEFAULT_OPTIONS,
     DOMAIN,
 )
-from homeassistant.const import CONF_EXCLUDE, CONF_HOSTS
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_EXCLUDE, CONF_HOSTS
+from smarthub.core import CoreState, SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 @pytest.mark.parametrize(
     "hosts", ["1.1.1.1", "192.168.1.0/24", "192.168.1.0/24,192.168.2.0/24"]
 )
-async def test_form(hass: HomeAssistant, hosts: str) -> None:
+async def test_form(hass: SmartHub, hosts: str) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -38,7 +38,7 @@ async def test_form(hass: HomeAssistant, hosts: str) -> None:
     assert CONF_SCAN_INTERVAL not in schema_defaults
 
     with patch(
-        "homeassistant.components.nmap_tracker.async_setup_entry",
+        "smarthub.components.nmap_tracker.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -64,7 +64,7 @@ async def test_form(hass: HomeAssistant, hosts: str) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_range(hass: HomeAssistant) -> None:
+async def test_form_range(hass: SmartHub) -> None:
     """Test we get the form and can take an ip range."""
 
     result = await hass.config_entries.flow.async_init(
@@ -74,7 +74,7 @@ async def test_form_range(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.nmap_tracker.async_setup_entry",
+        "smarthub.components.nmap_tracker.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -100,7 +100,7 @@ async def test_form_range(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_hosts(hass: HomeAssistant) -> None:
+async def test_form_invalid_hosts(hass: SmartHub) -> None:
     """Test invalid hosts passed in."""
 
     result = await hass.config_entries.flow.async_init(
@@ -124,7 +124,7 @@ async def test_form_invalid_hosts(hass: HomeAssistant) -> None:
     assert result2["errors"] == {CONF_HOSTS: "invalid_hosts"}
 
 
-async def test_form_already_configured(hass: HomeAssistant) -> None:
+async def test_form_already_configured(hass: SmartHub) -> None:
     """Test duplicate host list."""
 
     config_entry = MockConfigEntry(
@@ -159,7 +159,7 @@ async def test_form_already_configured(hass: HomeAssistant) -> None:
     assert result2["reason"] == "already_configured"
 
 
-async def test_form_invalid_excludes(hass: HomeAssistant) -> None:
+async def test_form_invalid_excludes(hass: SmartHub) -> None:
     """Test invalid excludes passed in."""
 
     result = await hass.config_entries.flow.async_init(
@@ -183,7 +183,7 @@ async def test_form_invalid_excludes(hass: HomeAssistant) -> None:
     assert result2["errors"] == {CONF_EXCLUDE: "invalid_hosts"}
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test we can edit options."""
 
     config_entry = MockConfigEntry(
@@ -217,7 +217,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     }
 
     with patch(
-        "homeassistant.components.nmap_tracker.async_setup_entry",
+        "smarthub.components.nmap_tracker.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.options.async_configure(

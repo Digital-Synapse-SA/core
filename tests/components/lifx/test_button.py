@@ -4,13 +4,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import lifx
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN
-from homeassistant.components.lifx.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import lifx
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN
+from smarthub.components.lifx.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -28,12 +28,12 @@ from tests.common import MockConfigEntry
 @pytest.fixture(autouse=True)
 def mock_lifx_coordinator_sleep():
     """Mock out lifx coordinator sleeps."""
-    with patch("homeassistant.components.lifx.coordinator.LIFX_IDENTIFY_DELAY", 0):
+    with patch("smarthub.components.lifx.coordinator.LIFX_IDENTIFY_DELAY", 0):
         yield
 
 
 async def test_button_restart(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that a bulb can be restarted."""
     config_entry = MockConfigEntry(
@@ -68,7 +68,7 @@ async def test_button_restart(
 
 
 async def test_button_identify(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that a bulb can be identified."""
     config_entry = MockConfigEntry(

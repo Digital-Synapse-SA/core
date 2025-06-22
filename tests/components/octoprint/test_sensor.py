@@ -4,14 +4,14 @@ from datetime import UTC, datetime
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
 
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -82,7 +82,7 @@ async def test_sensors(
 
 
 async def test_sensors_no_target_temp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -113,7 +113,7 @@ async def test_sensors_no_target_temp(
 
 
 async def test_sensors_paused(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -149,7 +149,7 @@ async def test_sensors_paused(
 
 
 async def test_sensors_printer_disconnected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     entity_registry: er.EntityRegistry,
 ) -> None:

@@ -14,11 +14,11 @@ from pyuptimerobot import (
     UptimeRobotMonitor,
 )
 
-from homeassistant import config_entries
-from homeassistant.components.uptimerobot.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub import config_entries
+from smarthub.components.uptimerobot.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -103,7 +103,7 @@ def mock_uptimerobot_api_response(
     )
 
 
-async def setup_uptimerobot_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def setup_uptimerobot_integration(hass: SmartHub) -> MockConfigEntry:
     """Set up the UptimeRobot integration."""
     mock_entry = MockConfigEntry(**MOCK_UPTIMEROBOT_CONFIG_ENTRY_DATA)
     mock_entry.add_to_hass(hass)

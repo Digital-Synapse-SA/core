@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock
 
 from flipr_api.exceptions import FliprError
 
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
-from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, PERCENTAGE, UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.sensor import ATTR_STATE_CLASS, SensorStateClass
+from smarthub.const import ATTR_UNIT_OF_MEASUREMENT, PERCENTAGE, UnitOfTemperature
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     mock_flipr_client: AsyncMock,
@@ -66,7 +66,7 @@ async def test_sensors(
 
 
 async def test_error_flipr_api_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     mock_flipr_client: AsyncMock,

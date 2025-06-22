@@ -16,9 +16,9 @@ from aiohasupervisor.models import (
 )
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from .test_init import MOCK_ENVIRON
 from .test_issues import mock_resolution_info
@@ -35,7 +35,7 @@ def fixture_supervisor_environ() -> Generator[None]:
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issue_repair_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
@@ -114,7 +114,7 @@ async def test_supervisor_issue_repair_flow(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issue_repair_flow_with_multiple_suggestions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
@@ -209,7 +209,7 @@ async def test_supervisor_issue_repair_flow_with_multiple_suggestions(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issue_repair_flow_with_multiple_suggestions_and_confirmation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
@@ -323,7 +323,7 @@ async def test_supervisor_issue_repair_flow_with_multiple_suggestions_and_confir
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issue_repair_flow_skip_confirmation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
@@ -402,7 +402,7 @@ async def test_supervisor_issue_repair_flow_skip_confirmation(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_mount_failed_repair_flow_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
@@ -480,7 +480,7 @@ async def test_mount_failed_repair_flow_error(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_mount_failed_repair_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
@@ -582,7 +582,7 @@ async def test_mount_failed_repair_flow(
 )
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issue_docker_config_repair_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
@@ -666,7 +666,7 @@ async def test_supervisor_issue_docker_config_repair_flow(
         "step_id": "system_execute_rebuild",
         "data_schema": [],
         "errors": None,
-        "description_placeholders": {"components": "Home Assistant\n- test"},
+        "description_placeholders": {"components": "SmartHub\n- test"},
         "last_step": True,
         "preview": None,
     }
@@ -691,7 +691,7 @@ async def test_supervisor_issue_docker_config_repair_flow(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issue_repair_flow_multiple_data_disks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
@@ -808,7 +808,7 @@ async def test_supervisor_issue_repair_flow_multiple_data_disks(
 )
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issue_detached_addon_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
@@ -865,8 +865,8 @@ async def test_supervisor_issue_detached_addon_removed(
         "description_placeholders": {
             "reference": "test",
             "addon": "test",
-            "help_url": "https://www.home-assistant.io/help/",
-            "community_url": "https://community.home-assistant.io/",
+            "help_url": "https://www.smart-hub.io/help/",
+            "community_url": "https://community.smart-hub.io/",
         },
         "last_step": True,
         "preview": None,
@@ -895,7 +895,7 @@ async def test_supervisor_issue_detached_addon_removed(
 )
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issue_addon_boot_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,

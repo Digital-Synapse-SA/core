@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 from zeversolar import StatusEnum, ZeverSolarData
 
-from homeassistant.components.zeversolar.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.zeversolar.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -15,7 +15,7 @@ MOCK_PORT_ZEVERSOLAR = 10200
 MOCK_SERIAL_NUMBER = "123456778"
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
     """Mock integration setup."""
 
     zeverData = ZeverSolarData(

@@ -6,9 +6,9 @@ from unittest.mock import patch
 from aiohttp import ClientConnectionError
 from py_nightscout.models import SGV, ServerStatus
 
-from homeassistant.components.nightscout.const import DOMAIN
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
+from smarthub.components.nightscout.const import DOMAIN
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -31,19 +31,19 @@ SERVER_STATUS_STATUS_ONLY = ServerStatus.new_from_json_dict(
 )
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the Nightscout integration in Home Assistant."""
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
+    """Set up the Nightscout integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={CONF_URL: "https://some.url:1234"},
     )
     with (
         patch(
-            "homeassistant.components.nightscout.NightscoutAPI.get_sgvs",
+            "smarthub.components.nightscout.NightscoutAPI.get_sgvs",
             return_value=GLUCOSE_READINGS,
         ),
         patch(
-            "homeassistant.components.nightscout.NightscoutAPI.get_server_status",
+            "smarthub.components.nightscout.NightscoutAPI.get_server_status",
             return_value=SERVER_STATUS,
         ),
     ):
@@ -54,19 +54,19 @@ async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
     return entry
 
 
-async def init_integration_unavailable(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the Nightscout integration in Home Assistant."""
+async def init_integration_unavailable(hass: SmartHub) -> MockConfigEntry:
+    """Set up the Nightscout integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={CONF_URL: "https://some.url:1234"},
     )
     with (
         patch(
-            "homeassistant.components.nightscout.NightscoutAPI.get_sgvs",
+            "smarthub.components.nightscout.NightscoutAPI.get_sgvs",
             side_effect=ClientConnectionError(),
         ),
         patch(
-            "homeassistant.components.nightscout.NightscoutAPI.get_server_status",
+            "smarthub.components.nightscout.NightscoutAPI.get_server_status",
             return_value=SERVER_STATUS,
         ),
     ):
@@ -77,19 +77,19 @@ async def init_integration_unavailable(hass: HomeAssistant) -> MockConfigEntry:
     return entry
 
 
-async def init_integration_empty_response(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the Nightscout integration in Home Assistant."""
+async def init_integration_empty_response(hass: SmartHub) -> MockConfigEntry:
+    """Set up the Nightscout integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={CONF_URL: "https://some.url:1234"},
     )
     with (
         patch(
-            "homeassistant.components.nightscout.NightscoutAPI.get_sgvs",
+            "smarthub.components.nightscout.NightscoutAPI.get_sgvs",
             return_value=[],
         ),
         patch(
-            "homeassistant.components.nightscout.NightscoutAPI.get_server_status",
+            "smarthub.components.nightscout.NightscoutAPI.get_server_status",
             return_value=SERVER_STATUS,
         ),
     ):

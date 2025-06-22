@@ -4,9 +4,9 @@ from unittest.mock import MagicMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_with_selected_platforms
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_rova: MagicMock,
     mock_config_entry: MockConfigEntry,

@@ -7,13 +7,13 @@ from typing import Any
 from google.oauth2.credentials import Credentials
 import pytest
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.google_assistant_sdk.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.google_assistant_sdk.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -25,7 +25,7 @@ ACCESS_TOKEN = "mock-access-token"
 
 
 @pytest.fixture
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -66,7 +66,7 @@ def mock_config_entry(expires_at: int, scopes: list[str]) -> MockConfigEntry:
 
 @pytest.fixture(name="setup_integration")
 async def mock_setup_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> Callable[[], Coroutine[Any, Any, None]]:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)

@@ -6,11 +6,11 @@ from freezegun.api import FrozenDateTimeFactory
 from xknx.core import XknxConnectionState, XknxConnectionType
 from xknx.telegram import IndividualAddress
 
-from homeassistant.components.knx.sensor import SCAN_INTERVAL
-from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.knx.sensor import SCAN_INTERVAL
+from smarthub.const import EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import KNXTestKit
 
@@ -19,7 +19,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_diagnostic_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -97,7 +97,7 @@ async def test_diagnostic_entities(
 
 
 async def test_removed_entity(
-    hass: HomeAssistant, knx: KNXTestKit, entity_registry: er.EntityRegistry
+    hass: SmartHub, knx: KNXTestKit, entity_registry: er.EntityRegistry
 ) -> None:
     """Test unregister callback when entity is removed."""
     with patch(
@@ -113,7 +113,7 @@ async def test_removed_entity(
 
 
 async def test_remove_interface_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     device_registry: dr.DeviceRegistry,
     hass_ws_client: WebSocketGenerator,

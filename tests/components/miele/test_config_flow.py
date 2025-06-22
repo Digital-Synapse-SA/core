@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock
 from pymiele import OAUTH2_AUTHORIZE, OAUTH2_TOKEN
 import pytest
 
-from homeassistant.components.miele.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.components.miele.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .const import CLIENT_ID
 
@@ -25,7 +25,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: Generator[AsyncMock],
@@ -73,7 +73,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_flow_reauth_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_config_entry: MockConfigEntry,
@@ -147,7 +147,7 @@ async def test_flow_reauth_abort(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_flow_reconfigure_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_config_entry: MockConfigEntry,
@@ -216,7 +216,7 @@ async def test_flow_reconfigure_abort(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_zeroconf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: Generator[AsyncMock],

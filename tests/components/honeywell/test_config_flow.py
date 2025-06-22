@@ -5,15 +5,15 @@ from unittest.mock import MagicMock, patch
 import aiosomecomfort
 import pytest
 
-from homeassistant.components.honeywell.const import (
+from smarthub.components.honeywell.const import (
     CONF_COOL_AWAY_TEMPERATURE,
     CONF_HEAT_AWAY_TEMPERATURE,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -25,7 +25,7 @@ FAKE_CONFIG = {
 }
 
 
-async def test_show_authenticate_form(hass: HomeAssistant) -> None:
+async def test_show_authenticate_form(hass: SmartHub) -> None:
     """Test that the config form is shown."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -36,7 +36,7 @@ async def test_show_authenticate_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_connection_error(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_connection_error(hass: SmartHub, client: MagicMock) -> None:
     """Test that an error message is shown on connection fail."""
     client.login.side_effect = aiosomecomfort.device.ConnectionError
     result = await hass.config_entries.flow.async_init(
@@ -45,7 +45,7 @@ async def test_connection_error(hass: HomeAssistant, client: MagicMock) -> None:
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_auth_error(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_auth_error(hass: SmartHub, client: MagicMock) -> None:
     """Test that an error message is shown on login fail."""
     client.login.side_effect = aiosomecomfort.device.AuthError
 
@@ -55,10 +55,10 @@ async def test_auth_error(hass: HomeAssistant, client: MagicMock) -> None:
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_create_entry(hass: HomeAssistant) -> None:
+async def test_create_entry(hass: SmartHub) -> None:
     """Test that the config entry is created."""
     with patch(
-        "homeassistant.components.honeywell.async_setup_entry",
+        "smarthub.components.honeywell.async_setup_entry",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -71,7 +71,7 @@ async def test_create_entry(hass: HomeAssistant) -> None:
 
 
 async def test_show_option_form(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test that the option form is shown."""
     config_entry.add_to_hass(hass)
@@ -81,7 +81,7 @@ async def test_show_option_form(
     assert config_entry.state is ConfigEntryState.LOADED
 
     with patch(
-        "homeassistant.components.honeywell.async_setup_entry",
+        "smarthub.components.honeywell.async_setup_entry",
         return_value=True,
     ):
         result = await hass.config_entries.options.async_init(config_entry.entry_id)
@@ -91,7 +91,7 @@ async def test_show_option_form(
 
 
 async def test_create_option_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test that the config entry is created."""
     config_entry.add_to_hass(hass)
@@ -101,7 +101,7 @@ async def test_create_option_entry(
     assert config_entry.state is ConfigEntryState.LOADED
 
     with patch(
-        "homeassistant.components.honeywell.async_setup_entry",
+        "smarthub.components.honeywell.async_setup_entry",
         return_value=True,
     ):
         options_form = await hass.config_entries.options.async_init(
@@ -120,7 +120,7 @@ async def test_create_option_entry(
     }
 
 
-async def test_reauth_flow(hass: HomeAssistant) -> None:
+async def test_reauth_flow(hass: SmartHub) -> None:
     """Test a successful reauth flow."""
 
     mock_entry = MockConfigEntry(
@@ -136,7 +136,7 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.honeywell.async_setup_entry",
+        "smarthub.components.honeywell.async_setup_entry",
         return_value=True,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -153,7 +153,7 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_reauth_flow_auth_error(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_reauth_flow_auth_error(hass: SmartHub, client: MagicMock) -> None:
     """Test an authorization error reauth flow."""
 
     mock_entry = MockConfigEntry(
@@ -171,7 +171,7 @@ async def test_reauth_flow_auth_error(hass: HomeAssistant, client: MagicMock) ->
 
     client.login.side_effect = aiosomecomfort.device.AuthError
     with patch(
-        "homeassistant.components.honeywell.async_setup_entry",
+        "smarthub.components.honeywell.async_setup_entry",
         return_value=True,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -193,7 +193,7 @@ async def test_reauth_flow_auth_error(hass: HomeAssistant, client: MagicMock) ->
     ],
 )
 async def test_reauth_flow_connnection_error(
-    hass: HomeAssistant, client: MagicMock, error
+    hass: SmartHub, client: MagicMock, error
 ) -> None:
     """Test a connection error reauth flow."""
 

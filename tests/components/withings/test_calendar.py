@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import load_workout_fixture, setup_integration
 
@@ -16,7 +16,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_api_calendar(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
@@ -33,7 +33,7 @@ async def test_api_calendar(
 
 
 async def test_api_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
@@ -57,7 +57,7 @@ async def test_api_events(
 
 
 async def test_calendar_created_when_workouts_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,

@@ -102,7 +102,7 @@ def _populate_brand_integrations(
             "integration_type": integration.integration_type,
         }
         # Always set the config_flow key to avoid breaking the frontend
-        # https://github.com/home-assistant/frontend/issues/14376
+        # https://github.com/smart-hub/frontend/issues/14376
         metadata["config_flow"] = bool(integration.config_flow)
         if integration.iot_class:
             metadata["iot_class"] = integration.iot_class
@@ -207,14 +207,14 @@ def _generate_integrations(
 
 def validate(integrations: dict[str, Integration], config: Config) -> None:
     """Validate config flow file."""
-    config_flow_path = config.root / "homeassistant/generated/config_flows.py"
-    integrations_path = config.root / "homeassistant/generated/integrations.json"
+    config_flow_path = config.root / "smarthub/generated/config_flows.py"
+    integrations_path = config.root / "smarthub/generated/integrations.json"
     config.cache["config_flow"] = content = _generate_and_validate(integrations, config)
 
     if config.specific_integrations:
         return
 
-    brands = Brand.load_dir(config.root / "homeassistant/brands", config)
+    brands = Brand.load_dir(config.root / "smarthub/brands", config)
     validate_brands(brands, integrations, config)
 
     if config_flow_path.read_text() != content:
@@ -237,7 +237,7 @@ def validate(integrations: dict[str, Integration], config: Config) -> None:
 
 def generate(integrations: dict[str, Integration], config: Config) -> None:
     """Generate config flow file."""
-    config_flow_path = config.root / "homeassistant/generated/config_flows.py"
-    integrations_path = config.root / "homeassistant/generated/integrations.json"
+    config_flow_path = config.root / "smarthub/generated/config_flows.py"
+    integrations_path = config.root / "smarthub/generated/integrations.json"
     config_flow_path.write_text(f"{config.cache['config_flow']}")
     integrations_path.write_text(f"{config.cache['integrations']}\n")

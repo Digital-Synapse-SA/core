@@ -14,9 +14,9 @@ from unittest.mock import AsyncMock
 import aiohttp
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util.dt import utcnow
 
 from .common import (
     DEVICE_ID,
@@ -162,7 +162,7 @@ def create_events(events, device_id=DEVICE_ID, timestamp=None):
     ],
 )
 async def test_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     auth,
@@ -213,7 +213,7 @@ async def test_event(
     ],
 )
 async def test_camera_multiple_event(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, subscriber, setup_platform
+    hass: SmartHub, entity_registry: er.EntityRegistry, subscriber, setup_platform
 ) -> None:
     """Test a pubsub message for a camera person event."""
     events = async_capture_events(hass, NEST_EVENT)
@@ -255,7 +255,7 @@ async def test_camera_multiple_event(
     [(["sdm.devices.traits.CameraMotion"])],
 )
 async def test_media_not_supported(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, subscriber, setup_platform
+    hass: SmartHub, entity_registry: er.EntityRegistry, subscriber, setup_platform
 ) -> None:
     """Test a pubsub message for a camera person event."""
     events = async_capture_events(hass, NEST_EVENT)
@@ -285,7 +285,7 @@ async def test_media_not_supported(
     assert "attachment" not in events[0].data
 
 
-async def test_unknown_event(hass: HomeAssistant, subscriber, setup_platform) -> None:
+async def test_unknown_event(hass: SmartHub, subscriber, setup_platform) -> None:
     """Test a pubsub message for an unknown event type."""
     events = async_capture_events(hass, NEST_EVENT)
     await setup_platform()
@@ -296,7 +296,7 @@ async def test_unknown_event(hass: HomeAssistant, subscriber, setup_platform) ->
 
 
 async def test_unknown_device_id(
-    hass: HomeAssistant, subscriber, setup_platform
+    hass: SmartHub, subscriber, setup_platform
 ) -> None:
     """Test a pubsub message for an unknown event type."""
     events = async_capture_events(hass, NEST_EVENT)
@@ -310,7 +310,7 @@ async def test_unknown_device_id(
 
 
 async def test_event_message_without_device_event(
-    hass: HomeAssistant, subscriber, setup_platform
+    hass: SmartHub, subscriber, setup_platform
 ) -> None:
     """Test a pubsub message for an unknown event type."""
     events = async_capture_events(hass, NEST_EVENT)
@@ -335,7 +335,7 @@ async def test_event_message_without_device_event(
     ],
 )
 async def test_doorbell_event_thread(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, subscriber, setup_platform
+    hass: SmartHub, entity_registry: er.EntityRegistry, subscriber, setup_platform
 ) -> None:
     """Test a series of pubsub messages in the same thread."""
     events = async_capture_events(hass, NEST_EVENT)
@@ -407,7 +407,7 @@ async def test_doorbell_event_thread(
     ],
 )
 async def test_doorbell_event_session_update(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, subscriber, setup_platform
+    hass: SmartHub, entity_registry: er.EntityRegistry, subscriber, setup_platform
 ) -> None:
     """Test a pubsub message with updates to an existing session."""
     events = async_capture_events(hass, NEST_EVENT)
@@ -470,7 +470,7 @@ async def test_doorbell_event_session_update(
 
 
 async def test_structure_update_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     subscriber: AsyncMock,
     setup_platform: PlatformSetup,
@@ -530,7 +530,7 @@ async def test_structure_update_event(
     ],
 )
 async def test_event_zones(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, subscriber, setup_platform
+    hass: SmartHub, entity_registry: er.EntityRegistry, subscriber, setup_platform
 ) -> None:
     """Test events published with zone information."""
     events = async_capture_events(hass, NEST_EVENT)

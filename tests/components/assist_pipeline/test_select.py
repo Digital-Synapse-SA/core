@@ -4,23 +4,23 @@ from __future__ import annotations
 
 import pytest
 
-from homeassistant.components.assist_pipeline import Pipeline
-from homeassistant.components.assist_pipeline.pipeline import (
+from smarthub.components.assist_pipeline import Pipeline
+from smarthub.components.assist_pipeline.pipeline import (
     AssistDevice,
     PipelineData,
     PipelineStorageCollection,
 )
-from homeassistant.components.assist_pipeline.select import (
+from smarthub.components.assist_pipeline.select import (
     AssistPipelineSelect,
     VadSensitivitySelect,
 )
-from homeassistant.components.assist_pipeline.vad import VadSensitivity
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.components.assist_pipeline.vad import VadSensitivity
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.device_registry import DeviceInfo
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from tests.common import MockConfigEntry, MockPlatform, mock_platform
 
@@ -30,7 +30,7 @@ class SelectPlatform(MockPlatform):
 
     async def async_setup_entry(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -47,7 +47,7 @@ class SelectPlatform(MockPlatform):
 
 
 @pytest.fixture
-async def init_select(hass: HomeAssistant, init_components) -> ConfigEntry:
+async def init_select(hass: SmartHub, init_components) -> ConfigEntry:
     """Initialize select entity."""
     mock_platform(hass, "assist_pipeline.select", SelectPlatform())
     config_entry = MockConfigEntry(
@@ -62,7 +62,7 @@ async def init_select(hass: HomeAssistant, init_components) -> ConfigEntry:
 
 @pytest.fixture
 async def pipeline_1(
-    hass: HomeAssistant, init_select, pipeline_storage: PipelineStorageCollection
+    hass: SmartHub, init_select, pipeline_storage: PipelineStorageCollection
 ) -> Pipeline:
     """Create a pipeline."""
     return await pipeline_storage.async_create_item(
@@ -84,7 +84,7 @@ async def pipeline_1(
 
 @pytest.fixture
 async def pipeline_2(
-    hass: HomeAssistant, init_select, pipeline_storage: PipelineStorageCollection
+    hass: SmartHub, init_select, pipeline_storage: PipelineStorageCollection
 ) -> Pipeline:
     """Create a pipeline."""
     return await pipeline_storage.async_create_item(
@@ -105,7 +105,7 @@ async def pipeline_2(
 
 
 async def test_select_entity_registering_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_select: ConfigEntry,
     pipeline_data: PipelineData,
     device_registry: dr.DeviceRegistry,
@@ -127,7 +127,7 @@ async def test_select_entity_registering_device(
 
 
 async def test_select_entity_changing_pipelines(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_select: MockConfigEntry,
     pipeline_1: Pipeline,
     pipeline_2: Pipeline,
@@ -142,7 +142,7 @@ async def test_select_entity_changing_pipelines(
     assert state.state == "preferred"
     assert state.attributes["options"] == [
         "preferred",
-        "Home Assistant",
+        "SmartHub",
         pipeline_1.name,
         pipeline_2.name,
     ]
@@ -182,13 +182,13 @@ async def test_select_entity_changing_pipelines(
     assert state.state == "preferred"
     assert state.attributes["options"] == [
         "preferred",
-        "Home Assistant",
+        "SmartHub",
         pipeline_1.name,
     ]
 
 
 async def test_select_entity_changing_vad_sensitivity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_select: MockConfigEntry,
 ) -> None:
     """Test entity tracking vad sensitivity changes."""

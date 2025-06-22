@@ -1,11 +1,11 @@
 """The test for the Coolmaster integration."""
 
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.core import SmartHub
 
 
 async def test_load_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test Coolmaster initial load."""
@@ -15,7 +15,7 @@ async def test_load_entry(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test Coolmaster unloading an entry."""

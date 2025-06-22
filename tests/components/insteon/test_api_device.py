@@ -8,24 +8,24 @@ from pyinsteon.topics import DEVICE_LIST_CHANGED
 from pyinsteon.utils import publish_topic
 import pytest
 
-from homeassistant.components import insteon
-from homeassistant.components.insteon.api import async_load_api
-from homeassistant.components.insteon.api.device import (
+from smarthub.components import insteon
+from smarthub.components.insteon.api import async_load_api
+from smarthub.components.insteon.api.device import (
     DEVICE_ID,
     HA_DEVICE_NOT_FOUND,
     ID,
     INSTEON_DEVICE_NOT_FOUND,
     TYPE,
 )
-from homeassistant.components.insteon.const import (
+from smarthub.components.insteon.const import (
     CONF_OVERRIDE,
     CONF_X10,
     DOMAIN,
     MULTIPLE,
 )
-from homeassistant.components.insteon.utils import async_device_name
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.insteon.utils import async_device_name
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .const import MOCK_USER_INPUT_PLM
 from .mock_devices import MockDevices
@@ -36,7 +36,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_get_config(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test getting an Insteon device."""
 
@@ -53,7 +53,7 @@ async def test_get_config(
 
 
 async def test_no_ha_device(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test response when no HA device exists."""
 
@@ -69,7 +69,7 @@ async def test_no_ha_device(
 
 
 async def test_no_insteon_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -118,7 +118,7 @@ async def test_no_insteon_device(
 
 
 async def test_get_ha_device_name(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test getting the HA device name from an Insteon address."""
 
@@ -137,7 +137,7 @@ async def test_get_ha_device_name(
 # This tests needs to be adjusted to remove lingering tasks
 @pytest.mark.parametrize("expected_lingering_tasks", [True])
 async def test_add_device_api(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test adding an Insteon device."""
 
@@ -167,7 +167,7 @@ async def test_add_device_api(
 
 
 async def test_cancel_add_device(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test cancelling adding of a new device."""
 
@@ -185,7 +185,7 @@ async def test_cancel_add_device(
 
 
 async def test_add_x10_device(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test adding an X10 device."""
 
@@ -205,7 +205,7 @@ async def test_add_x10_device(
 
 
 async def test_add_x10_device_duplicate(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test adding a duplicate X10 device."""
 
@@ -223,7 +223,7 @@ async def test_add_x10_device_duplicate(
 
 
 async def test_remove_device(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test removing an Insteon device."""
     ws_client, _, _, _ = await async_mock_setup(hass, hass_ws_client)
@@ -240,7 +240,7 @@ async def test_remove_device(
 
 
 async def test_remove_x10_device(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test removing an X10 device."""
     ws_client, _, _, _ = await async_mock_setup(hass, hass_ws_client)
@@ -257,7 +257,7 @@ async def test_remove_x10_device(
 
 
 async def test_remove_one_x10_device(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test one X10 device without removing others."""
     x10_device = {"housecode": "a", "unitcode": 1, "platform": "light", "dim_steps": 22}
@@ -285,7 +285,7 @@ async def test_remove_one_x10_device(
 
 
 async def test_remove_device_with_overload(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test removing an Insteon device that has a device overload."""
     overload = {"address": "99.99.99", "cat": 1, "subcat": 3}

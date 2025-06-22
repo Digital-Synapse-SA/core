@@ -2,10 +2,10 @@
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.slack.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.slack.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import CONF_DATA, CONF_INPUT, TEAM_NAME, create_entry, mock_connection
 
@@ -13,7 +13,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_flow_user(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test user initialized flow."""
     mock_connection(aioclient_mock)
@@ -31,7 +31,7 @@ async def test_flow_user(
 
 
 async def test_flow_user_already_configured(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test user initialized flow with duplicate server."""
     create_entry(hass)
@@ -49,7 +49,7 @@ async def test_flow_user_already_configured(
 
 
 async def test_flow_user_invalid_auth(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test user initialized flow with invalid token."""
     mock_connection(aioclient_mock, "invalid_auth")
@@ -64,7 +64,7 @@ async def test_flow_user_invalid_auth(
 
 
 async def test_flow_user_cannot_connect(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test user initialized flow with unreachable server."""
     mock_connection(aioclient_mock, "cannot_connect")
@@ -78,10 +78,10 @@ async def test_flow_user_cannot_connect(
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_flow_user_unknown_error(hass: HomeAssistant) -> None:
+async def test_flow_user_unknown_error(hass: SmartHub) -> None:
     """Test user initialized flow with unreachable server."""
     with patch(
-        "homeassistant.components.slack.config_flow.AsyncWebClient.auth_test"
+        "smarthub.components.slack.config_flow.AsyncWebClient.auth_test"
     ) as mock:
         mock.side_effect = Exception
         result = await hass.config_entries.flow.async_init(

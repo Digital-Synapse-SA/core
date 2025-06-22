@@ -1,0 +1,8 @@
+{
+  "domain": "blueprint",
+  "name": "Blueprint",
+  "codeowners": ["@smart-hub/core"],
+  "documentation": "https://www.smart-hub.io/integrations/blueprint",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

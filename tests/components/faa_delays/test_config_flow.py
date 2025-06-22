@@ -5,12 +5,12 @@ from unittest.mock import patch
 from aiohttp import ClientConnectionError
 import faadelays
 
-from homeassistant import config_entries
-from homeassistant.components.faa_delays.const import DOMAIN
-from homeassistant.const import CONF_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.exceptions import HomeAssistantError
+from smarthub import config_entries
+from smarthub.components.faa_delays.const import DOMAIN
+from smarthub.const import CONF_ID
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry
 
@@ -20,7 +20,7 @@ async def mock_valid_airport(self, *args, **kwargs):
     self.code = "test"
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -32,7 +32,7 @@ async def test_form(hass: HomeAssistant) -> None:
     with (
         patch.object(faadelays.Airport, "update", new=mock_valid_airport),
         patch(
-            "homeassistant.components.faa_delays.async_setup_entry",
+            "smarthub.components.faa_delays.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -52,7 +52,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_duplicate_error(hass: HomeAssistant) -> None:
+async def test_duplicate_error(hass: SmartHub) -> None:
     """Test that we handle a duplicate configuration."""
     conf = {CONF_ID: "test"}
 
@@ -66,7 +66,7 @@ async def test_duplicate_error(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle a connection error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -84,13 +84,13 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_unexpected_exception(hass: HomeAssistant) -> None:
+async def test_form_unexpected_exception(hass: SmartHub) -> None:
     """Test we handle an unexpected exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
-    with patch("faadelays.Airport.update", side_effect=HomeAssistantError):
+    with patch("faadelays.Airport.update", side_effect=SmartHubError):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {

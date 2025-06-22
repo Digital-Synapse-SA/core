@@ -7,7 +7,7 @@ from freezegun.api import FrozenDateTimeFactory
 from plugwise.exceptions import PlugwiseError
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_HVAC_ACTION,
     ATTR_HVAC_MODE,
@@ -28,23 +28,23 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     ATTR_TEMPERATURE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 HA_PLUGWISE_SMILE_ASYNC_UPDATE = (
-    "homeassistant.components.plugwise.coordinator.Smile.async_update"
+    "smarthub.components.plugwise.coordinator.Smile.async_update"
 )
 
 
 async def test_adam_climate_entity_attributes(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test creation of adam climate device environment."""
     state = hass.states.get("climate.woonkamer")
@@ -82,7 +82,7 @@ async def test_adam_climate_entity_attributes(
 @pytest.mark.parametrize("chosen_env", ["m_adam_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [False], indirect=True)
 async def test_adam_2_climate_entity_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_adam_heat_cool: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -111,7 +111,7 @@ async def test_adam_2_climate_entity_attributes(
 @pytest.mark.parametrize("chosen_env", ["m_adam_cooling"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_adam_3_climate_entity_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_adam_heat_cool: MagicMock,
     init_integration: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -168,12 +168,12 @@ async def test_adam_3_climate_entity_attributes(
 
 
 async def test_adam_climate_adjust_negative_testing(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test PlugwiseError exception."""
     mock_smile_adam.set_temperature.side_effect = PlugwiseError
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,
@@ -183,7 +183,7 @@ async def test_adam_climate_adjust_negative_testing(
 
 
 async def test_adam_climate_entity_climate_changes(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test handling of user requests in adam climate device environment."""
     await hass.services.async_call(
@@ -258,7 +258,7 @@ async def test_adam_climate_entity_climate_changes(
 
 
 async def test_adam_climate_off_mode_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_adam_jip: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -314,7 +314,7 @@ async def test_adam_climate_off_mode_change(
 @pytest.mark.parametrize("chosen_env", ["anna_heatpump_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_anna_climate_entity_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_anna: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -341,7 +341,7 @@ async def test_anna_climate_entity_attributes(
 @pytest.mark.parametrize("chosen_env", ["m_anna_heatpump_cooling"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_anna_2_climate_entity_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_anna: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -362,7 +362,7 @@ async def test_anna_2_climate_entity_attributes(
 @pytest.mark.parametrize("chosen_env", ["m_anna_heatpump_idle"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_anna_3_climate_entity_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_anna: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -380,7 +380,7 @@ async def test_anna_3_climate_entity_attributes(
 @pytest.mark.parametrize("chosen_env", ["anna_heatpump_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_anna_climate_entity_climate_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_anna: MagicMock,
     init_integration: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

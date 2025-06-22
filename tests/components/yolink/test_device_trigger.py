@@ -3,19 +3,19 @@
 from pytest_unordered import unordered
 from yolink.const import ATTR_DEVICE_DIMMER, ATTR_DEVICE_SMART_REMOTER
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.yolink import DOMAIN, YOLINK_EVENT
-from homeassistant.components.yolink.const import DEV_MODEL_FLEX_FOB_YS3604_UC
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.yolink import DOMAIN, YOLINK_EVENT
+from smarthub.components.yolink.const import DEV_MODEL_FLEX_FOB_YS3604_UC
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_get_device_automations
 
 
 async def test_get_triggers(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test we get the expected triggers from a yolink flexfob."""
     config_entry = MockConfigEntry(domain="yolink", data={})
@@ -92,7 +92,7 @@ async def test_get_triggers(
 
 
 async def test_get_triggers_exception(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test get triggers when device type not flexfob."""
     config_entry = MockConfigEntry(domain="yolink", data={})
@@ -112,7 +112,7 @@ async def test_get_triggers_exception(
 
 
 async def test_if_fires_on_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
 ) -> None:

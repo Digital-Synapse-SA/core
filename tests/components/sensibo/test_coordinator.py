@@ -11,10 +11,10 @@ from pysensibo.exceptions import AuthenticationError, SensiboError
 from pysensibo.model import SensiboData
 import pytest
 
-from homeassistant.components.climate import HVACMode
-from homeassistant.components.sensibo.const import DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.climate import HVACMode
+from smarthub.components.sensibo.const import DOMAIN
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import ENTRY_CONFIG
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_coordinator(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     get_data: tuple[SensiboData, dict[str, Any], dict[str, Any]],
     freezer: FrozenDateTimeFactory,

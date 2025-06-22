@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, patch
 from elvia import error as ElviaError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.elvia.const import CONF_METERING_POINT_ID, DOMAIN
-from homeassistant.components.recorder.core import Recorder
-from homeassistant.const import CONF_API_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType, UnknownFlow
+from smarthub import config_entries
+from smarthub.components.elvia.const import CONF_METERING_POINT_ID, DOMAIN
+from smarthub.components.recorder.core import Recorder
+from smarthub.const import CONF_API_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType, UnknownFlow
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ TEST_API_TOKEN = "xxx-xxx-xxx-xxx"
 
 async def test_single_metering_point(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
 ) -> None:
     """Test using the config flow with a single metering point."""
@@ -53,7 +53,7 @@ async def test_single_metering_point(
 
 async def test_multiple_metering_points(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
 ) -> None:
     """Test using the config flow with multiple metering points."""
@@ -102,7 +102,7 @@ async def test_multiple_metering_points(
 
 async def test_no_metering_points(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
 ) -> None:
     """Test using the config flow with no metering points."""
@@ -132,7 +132,7 @@ async def test_no_metering_points(
 
 async def test_bad_data(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
 ) -> None:
     """Test using the config flow with no metering points."""
@@ -162,7 +162,7 @@ async def test_bad_data(
 
 async def test_abort_when_metering_point_id_exist(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
 ) -> None:
     """Test that we abort when the metering point ID exist."""
@@ -207,7 +207,7 @@ async def test_abort_when_metering_point_id_exist(
 )
 async def test_form_exceptions(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: Exception,
     base_error: str,
 ) -> None:

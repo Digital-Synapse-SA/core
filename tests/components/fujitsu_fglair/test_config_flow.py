@@ -5,22 +5,22 @@ from unittest.mock import AsyncMock
 from ayla_iot_unofficial import AylaAuthError
 import pytest
 
-from homeassistant.components.fujitsu_fglair.const import (
+from smarthub.components.fujitsu_fglair.const import (
     CONF_REGION,
     DOMAIN,
     REGION_DEFAULT,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResult, FlowResultType
 
 from .conftest import TEST_PASSWORD, TEST_PASSWORD2, TEST_USERNAME
 
 from tests.common import MockConfigEntry
 
 
-async def _initial_step(hass: HomeAssistant) -> FlowResult:
+async def _initial_step(hass: SmartHub) -> FlowResult:
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
@@ -38,7 +38,7 @@ async def _initial_step(hass: HomeAssistant) -> FlowResult:
 
 
 async def test_full_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_ayla_api: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_ayla_api: AsyncMock
 ) -> None:
     """Test full config flow."""
     result = await _initial_step(hass)
@@ -54,7 +54,7 @@ async def test_full_flow(
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_ayla_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -77,7 +77,7 @@ async def test_duplicate_entry(
     ],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_ayla_api: AsyncMock,
     exception: Exception,
@@ -112,7 +112,7 @@ async def test_form_exceptions(
 
 
 async def test_reauth_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_ayla_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -145,7 +145,7 @@ async def test_reauth_success(
     ],
 )
 async def test_reauth_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     err_msg: str,
     mock_setup_entry: AsyncMock,

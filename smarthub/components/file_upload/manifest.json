@@ -1,0 +1,9 @@
+{
+  "domain": "file_upload",
+  "name": "File Upload",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["http"],
+  "documentation": "https://www.smart-hub.io/integrations/file_upload",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

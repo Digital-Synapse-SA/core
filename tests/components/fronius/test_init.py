@@ -6,11 +6,11 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 from pyfronius import FroniusError
 
-from homeassistant.components.fronius.const import DOMAIN, SOLAR_NET_RESCAN_TIMER
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.fronius.const import DOMAIN, SOLAR_NET_RESCAN_TIMER
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import mock_responses, setup_fronius_integration
 
@@ -20,7 +20,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_unload_config_entry(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that configuration entry supports unloading."""
     mock_responses(aioclient_mock)
@@ -40,7 +40,7 @@ async def test_unload_config_entry(
 
 
 async def test_logger_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup when logger reports an error."""
     # gen24 dataset will raise FroniusError when logger is called
@@ -50,7 +50,7 @@ async def test_logger_error(
 
 
 async def test_inverter_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup when inverter_info reports an error."""
     mock_responses(aioclient_mock)
@@ -63,12 +63,12 @@ async def test_inverter_error(
 
 
 async def test_inverter_night_rescan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
 ) -> None:
-    """Test dynamic adding of an inverter discovered automatically after a Home Assistant reboot during the night."""
+    """Test dynamic adding of an inverter discovered automatically after a SmartHub reboot during the night."""
     mock_responses(aioclient_mock, fixture_set="igplus_v2", night=True)
     config_entry = await setup_fronius_integration(hass, is_logger=True)
     assert config_entry.state is ConfigEntryState.LOADED
@@ -96,7 +96,7 @@ async def test_inverter_night_rescan(
 
 
 async def test_inverter_rescan_interruption(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
@@ -142,7 +142,7 @@ async def test_inverter_rescan_interruption(
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,

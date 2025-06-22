@@ -1,7 +1,7 @@
 """Test SimpliSafe diagnostics."""
 
-from homeassistant.components.diagnostics import REDACTED
-from homeassistant.core import HomeAssistant
+from smarthub.components.diagnostics import REDACTED
+from smarthub.core import SmartHub
 
 from tests.common import ANY
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -9,7 +9,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry,
     hass_client: ClientSessionGenerator,
     setup_simplisafe,

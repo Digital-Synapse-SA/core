@@ -15,7 +15,7 @@ def return_integration_config(
 ) -> dict[str, dict[str, Any]]:
     """Return config."""
     config = {
-        "resource": "https://www.home-assistant.io",
+        "resource": "https://www.smart-hub.io",
         "verify_ssl": True,
         "sensor": sensors,
     }

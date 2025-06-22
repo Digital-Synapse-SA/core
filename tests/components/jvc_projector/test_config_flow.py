@@ -5,22 +5,22 @@ from unittest.mock import AsyncMock
 from jvcprojector import JvcProjectorAuthError, JvcProjectorConnectError
 import pytest
 
-from homeassistant.components.jvc_projector.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.jvc_projector.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import MOCK_HOST, MOCK_PASSWORD, MOCK_PORT
 
 from tests.common import MockConfigEntry
 
-TARGET = "homeassistant.components.jvc_projector.config_flow.JvcProjector"
+TARGET = "smarthub.components.jvc_projector.config_flow.JvcProjector"
 
 
 @pytest.mark.parametrize("mock_device", [TARGET], indirect=True)
 async def test_user_config_flow_success(
-    hass: HomeAssistant, mock_device: AsyncMock
+    hass: SmartHub, mock_device: AsyncMock
 ) -> None:
     """Test user config flow success."""
     result = await hass.config_entries.flow.async_init(
@@ -48,7 +48,7 @@ async def test_user_config_flow_success(
 
 @pytest.mark.parametrize("mock_device", [TARGET], indirect=True)
 async def test_user_config_flow_bad_connect_errors(
-    hass: HomeAssistant, mock_device: AsyncMock
+    hass: SmartHub, mock_device: AsyncMock
 ) -> None:
     """Test errors when connection error occurs."""
     mock_device.connect.side_effect = JvcProjectorConnectError
@@ -82,7 +82,7 @@ async def test_user_config_flow_bad_connect_errors(
 
 @pytest.mark.parametrize("mock_device", [TARGET], indirect=True)
 async def test_user_config_flow_device_exists_abort(
-    hass: HomeAssistant, mock_device: AsyncMock, mock_integration: MockConfigEntry
+    hass: SmartHub, mock_device: AsyncMock, mock_integration: MockConfigEntry
 ) -> None:
     """Test flow aborts when device already configured."""
     result = await hass.config_entries.flow.async_init(
@@ -96,7 +96,7 @@ async def test_user_config_flow_device_exists_abort(
 
 @pytest.mark.parametrize("mock_device", [TARGET], indirect=True)
 async def test_user_config_flow_bad_host_errors(
-    hass: HomeAssistant, mock_device: AsyncMock
+    hass: SmartHub, mock_device: AsyncMock
 ) -> None:
     """Test errors when bad host error occurs."""
     result = await hass.config_entries.flow.async_init(
@@ -126,7 +126,7 @@ async def test_user_config_flow_bad_host_errors(
 
 @pytest.mark.parametrize("mock_device", [TARGET], indirect=True)
 async def test_user_config_flow_bad_auth_errors(
-    hass: HomeAssistant, mock_device: AsyncMock
+    hass: SmartHub, mock_device: AsyncMock
 ) -> None:
     """Test errors when bad auth error occurs."""
     mock_device.connect.side_effect = JvcProjectorAuthError
@@ -160,7 +160,7 @@ async def test_user_config_flow_bad_auth_errors(
 
 @pytest.mark.parametrize("mock_device", [TARGET], indirect=True)
 async def test_reauth_config_flow_success(
-    hass: HomeAssistant, mock_device: AsyncMock, mock_integration: MockConfigEntry
+    hass: SmartHub, mock_device: AsyncMock, mock_integration: MockConfigEntry
 ) -> None:
     """Test reauth config flow success."""
     result = await mock_integration.start_reauth_flow(hass)
@@ -182,7 +182,7 @@ async def test_reauth_config_flow_success(
 
 @pytest.mark.parametrize("mock_device", [TARGET], indirect=True)
 async def test_reauth_config_flow_auth_error(
-    hass: HomeAssistant, mock_device: AsyncMock, mock_integration: MockConfigEntry
+    hass: SmartHub, mock_device: AsyncMock, mock_integration: MockConfigEntry
 ) -> None:
     """Test reauth config flow when connect fails."""
     mock_device.connect.side_effect = JvcProjectorAuthError
@@ -223,7 +223,7 @@ async def test_reauth_config_flow_auth_error(
 
 @pytest.mark.parametrize("mock_device", [TARGET], indirect=True)
 async def test_reauth_config_flow_connect_error(
-    hass: HomeAssistant, mock_device: AsyncMock, mock_integration: MockConfigEntry
+    hass: SmartHub, mock_device: AsyncMock, mock_integration: MockConfigEntry
 ) -> None:
     """Test reauth config flow when connect fails."""
     mock_device.connect.side_effect = JvcProjectorConnectError

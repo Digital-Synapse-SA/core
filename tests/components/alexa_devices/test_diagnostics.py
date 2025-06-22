@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.alexa_devices.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.alexa_devices.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 from .const import TEST_SERIAL_NUMBER
@@ -23,7 +23,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_amazon_devices_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
@@ -44,7 +44,7 @@ async def test_entry_diagnostics(
 
 
 async def test_device_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_amazon_devices_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,

@@ -6,11 +6,11 @@ from airthings_ble import AirthingsDevice, AirthingsDeviceType
 from bleak import BleakError
 import pytest
 
-from homeassistant.components.airthings_ble.const import DOMAIN
-from homeassistant.config_entries import SOURCE_BLUETOOTH, SOURCE_IGNORE, SOURCE_USER
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.airthings_ble.const import DOMAIN
+from smarthub.config_entries import SOURCE_BLUETOOTH, SOURCE_IGNORE, SOURCE_USER
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     UNKNOWN_SERVICE_INFO,
@@ -25,7 +25,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_bluetooth_discovery(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device."""
     with (
         patch_async_ble_device_from_address(WAVE_SERVICE_INFO),
@@ -60,7 +60,7 @@ async def test_bluetooth_discovery(hass: HomeAssistant) -> None:
     assert result["result"].unique_id == "cc:cc:cc:cc:cc:cc"
 
 
-async def test_bluetooth_discovery_no_BLEDevice(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery_no_BLEDevice(hass: SmartHub) -> None:
     """Test discovery via bluetooth but there's no BLEDevice."""
     with patch_async_ble_device_from_address(None):
         result = await hass.config_entries.flow.async_init(
@@ -76,7 +76,7 @@ async def test_bluetooth_discovery_no_BLEDevice(hass: HomeAssistant) -> None:
     ("exc", "reason"), [(Exception(), "unknown"), (BleakError(), "cannot_connect")]
 )
 async def test_bluetooth_discovery_airthings_ble_update_failed(
-    hass: HomeAssistant, exc: Exception, reason: str
+    hass: SmartHub, exc: Exception, reason: str
 ) -> None:
     """Test discovery via bluetooth but there's an exception from airthings-ble."""
     with (
@@ -93,7 +93,7 @@ async def test_bluetooth_discovery_airthings_ble_update_failed(
     assert result["reason"] == reason
 
 
-async def test_bluetooth_discovery_already_setup(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery_already_setup(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device when already setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -109,11 +109,11 @@ async def test_bluetooth_discovery_already_setup(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_user_setup(hass: HomeAssistant) -> None:
+async def test_user_setup(hass: SmartHub) -> None:
     """Test the user initiated form."""
     with (
         patch(
-            "homeassistant.components.airthings_ble.config_flow.async_discovered_service_info",
+            "smarthub.components.airthings_ble.config_flow.async_discovered_service_info",
             return_value=[WAVE_SERVICE_INFO],
         ),
         patch_async_ble_device_from_address(WAVE_SERVICE_INFO),
@@ -140,7 +140,7 @@ async def test_user_setup(hass: HomeAssistant) -> None:
     }
 
     with patch(
-        "homeassistant.components.airthings_ble.async_setup_entry",
+        "smarthub.components.airthings_ble.async_setup_entry",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -153,7 +153,7 @@ async def test_user_setup(hass: HomeAssistant) -> None:
     assert result["result"].unique_id == "cc:cc:cc:cc:cc:cc"
 
 
-async def test_user_setup_replaces_ignored_device(hass: HomeAssistant) -> None:
+async def test_user_setup_replaces_ignored_device(hass: SmartHub) -> None:
     """Test the user initiated form can replace an ignored device."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -163,7 +163,7 @@ async def test_user_setup_replaces_ignored_device(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.airthings_ble.config_flow.async_discovered_service_info",
+            "smarthub.components.airthings_ble.config_flow.async_discovered_service_info",
             return_value=[WAVE_SERVICE_INFO],
         ),
         patch_async_ble_device_from_address(WAVE_SERVICE_INFO),
@@ -190,7 +190,7 @@ async def test_user_setup_replaces_ignored_device(hass: HomeAssistant) -> None:
     }
 
     with patch(
-        "homeassistant.components.airthings_ble.async_setup_entry",
+        "smarthub.components.airthings_ble.async_setup_entry",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -203,10 +203,10 @@ async def test_user_setup_replaces_ignored_device(hass: HomeAssistant) -> None:
     assert result["result"].unique_id == "cc:cc:cc:cc:cc:cc"
 
 
-async def test_user_setup_no_device(hass: HomeAssistant) -> None:
+async def test_user_setup_no_device(hass: SmartHub) -> None:
     """Test the user initiated form without any device detected."""
     with patch(
-        "homeassistant.components.airthings_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.airthings_ble.config_flow.async_discovered_service_info",
         return_value=[],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -216,7 +216,7 @@ async def test_user_setup_no_device(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_user_setup_existing_and_unknown_device(hass: HomeAssistant) -> None:
+async def test_user_setup_existing_and_unknown_device(hass: SmartHub) -> None:
     """Test the user initiated form with existing devices and unknown ones."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -224,7 +224,7 @@ async def test_user_setup_existing_and_unknown_device(hass: HomeAssistant) -> No
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.airthings_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.airthings_ble.config_flow.async_discovered_service_info",
         return_value=[UNKNOWN_SERVICE_INFO, WAVE_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -234,11 +234,11 @@ async def test_user_setup_existing_and_unknown_device(hass: HomeAssistant) -> No
     assert result["reason"] == "no_devices_found"
 
 
-async def test_user_setup_unknown_error(hass: HomeAssistant) -> None:
+async def test_user_setup_unknown_error(hass: SmartHub) -> None:
     """Test the user initiated form with an unknown error."""
     with (
         patch(
-            "homeassistant.components.airthings_ble.config_flow.async_discovered_service_info",
+            "smarthub.components.airthings_ble.config_flow.async_discovered_service_info",
             return_value=[WAVE_SERVICE_INFO],
         ),
         patch_async_ble_device_from_address(WAVE_SERVICE_INFO),
@@ -252,11 +252,11 @@ async def test_user_setup_unknown_error(hass: HomeAssistant) -> None:
     assert result["reason"] == "unknown"
 
 
-async def test_user_setup_unable_to_connect(hass: HomeAssistant) -> None:
+async def test_user_setup_unable_to_connect(hass: SmartHub) -> None:
     """Test the user initiated form with a device that's failing connection."""
     with (
         patch(
-            "homeassistant.components.airthings_ble.config_flow.async_discovered_service_info",
+            "smarthub.components.airthings_ble.config_flow.async_discovered_service_info",
             return_value=[WAVE_SERVICE_INFO],
         ),
         patch_async_ble_device_from_address(WAVE_SERVICE_INFO),
@@ -270,10 +270,10 @@ async def test_user_setup_unable_to_connect(hass: HomeAssistant) -> None:
     assert result["reason"] == "cannot_connect"
 
 
-async def test_unsupported_device(hass: HomeAssistant) -> None:
+async def test_unsupported_device(hass: SmartHub) -> None:
     """Test the user initiated form with an unsupported device."""
     with patch(
-        "homeassistant.components.airthings_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.airthings_ble.config_flow.async_discovered_service_info",
         return_value=[UNKNOWN_SERVICE_INFO, VIEW_PLUS_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(

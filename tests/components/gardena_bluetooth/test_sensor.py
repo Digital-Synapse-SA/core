@@ -6,8 +6,8 @@ from gardena_bluetooth.const import Battery, Sensor, Valve
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from . import setup_entry
 
@@ -34,7 +34,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_entry: MockConfigEntry,
     mock_read_char_raw: dict[str, bytes],
@@ -56,7 +56,7 @@ async def test_setup(
 
 
 async def test_connected_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_entry: MockConfigEntry,
     mock_read_char_raw: dict[str, bytes],

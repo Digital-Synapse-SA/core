@@ -5,12 +5,12 @@ from unittest.mock import MagicMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.sense.const import ACTIVE_UPDATE_RATE
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.sense.const import ACTIVE_UPDATE_RATE
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import setup_platform
 from .const import DEVICE_1_NAME, DEVICE_2_NAME
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_sense: MagicMock,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -31,7 +31,7 @@ async def test_binary_sensors(
 
 
 async def test_on_off_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_sense: MagicMock,
     config_entry: MockConfigEntry,

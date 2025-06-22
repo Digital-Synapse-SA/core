@@ -9,9 +9,9 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -19,9 +19,9 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import async_fire_time_changed, snapshot_platform
 
@@ -32,7 +32,7 @@ from tests.common import async_fire_time_changed, snapshot_platform
     [[Platform.SWITCH]],
 )
 async def test_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -42,7 +42,7 @@ async def test_switch(
 
 
 async def test_switch_timer(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -110,7 +110,7 @@ async def test_switch_timer(
 
 
 async def test_switch_pure_boost(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -167,7 +167,7 @@ async def test_switch_pure_boost(
 
 
 async def test_switch_command_failure(
-    hass: HomeAssistant, load_int: ConfigEntry, mock_client: MagicMock
+    hass: SmartHub, load_int: ConfigEntry, mock_client: MagicMock
 ) -> None:
     """Test the Sensibo switch fails commands."""
 
@@ -176,7 +176,7 @@ async def test_switch_command_failure(
     mock_client.async_set_timer.return_value = {"status": "failure"}
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
     ):
         await hass.services.async_call(
             SWITCH_DOMAIN,
@@ -190,7 +190,7 @@ async def test_switch_command_failure(
     mock_client.async_del_timer.return_value = {"status": "failure"}
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
     ):
         await hass.services.async_call(
             SWITCH_DOMAIN,
@@ -203,7 +203,7 @@ async def test_switch_command_failure(
 
 
 async def test_switch_climate_react(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -253,7 +253,7 @@ async def test_switch_climate_react(
 
 
 async def test_switch_climate_react_no_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -271,7 +271,7 @@ async def test_switch_climate_react_no_data(
     state = hass.states.get("switch.hallway_climate_react")
     assert state.state == STATE_OFF
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,

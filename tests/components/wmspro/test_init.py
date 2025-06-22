@@ -6,10 +6,10 @@ import aiohttp
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.wmspro.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.wmspro.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_config_entry
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_config_entry_device_config_ping_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
 ) -> None:
@@ -29,7 +29,7 @@ async def test_config_entry_device_config_ping_failed(
 
 
 async def test_config_entry_device_config_refresh_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_refresh: AsyncMock,
@@ -54,7 +54,7 @@ async def test_config_entry_device_config_refresh_failed(
     ],
 )
 async def test_cover_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_configuration: AsyncMock,

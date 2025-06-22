@@ -8,11 +8,11 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from tplink_omada_client.clients import OmadaConnectedClient
 
-from homeassistant.components.tplink_omada.const import DOMAIN
-from homeassistant.components.tplink_omada.coordinator import POLL_CLIENTS
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components.tplink_omada.const import DOMAIN
+from smarthub.components.tplink_omada.coordinator import POLL_CLIENTS
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -30,7 +30,7 @@ MOCK_ENTRY_DATA = {
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_omada_clients_only_client: MagicMock,
 ) -> MockConfigEntry:
     """Set up the TP-Link Omada integration for testing."""
@@ -49,7 +49,7 @@ async def init_integration(
 
 
 async def test_device_scanner_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -69,7 +69,7 @@ async def test_device_scanner_created(
 
 
 async def test_device_scanner_update_to_away_nulls_properties(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_omada_clients_only_site_client: MagicMock,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,

@@ -6,10 +6,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.kitchen_sink import DOMAIN, image
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.kitchen_sink import DOMAIN, image
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -18,20 +18,20 @@ from tests.typing import ClientSessionGenerator
 async def image_only() -> None:
     """Enable only the image platform."""
     with patch(
-        "homeassistant.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
+        "smarthub.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
         [Platform.IMAGE],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_comp(hass: HomeAssistant, image_only):
+async def setup_comp(hass: SmartHub, image_only):
     """Set up demo component."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     await hass.async_block_till_done()
 
 
-async def test_states(hass: HomeAssistant) -> None:
+async def test_states(hass: SmartHub) -> None:
     """Test the expected image entities are added."""
     states = hass.states.async_all()
     assert len(states) == 1
@@ -47,7 +47,7 @@ async def test_states(hass: HomeAssistant) -> None:
 
 
 async def test_fetch_image(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test fetching an image with an authenticated client."""
     client = await hass_client()

@@ -8,16 +8,16 @@ from pysmartthings.models import HealthStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.smartthings import MAIN
-from homeassistant.const import (
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.smartthings import MAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration, snapshot_smartthings_entities, trigger_health_update
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -39,7 +39,7 @@ async def test_all_entities(
 
 @pytest.mark.parametrize("device_fixture", ["da_ks_microwave_0101x"])
 async def test_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -64,7 +64,7 @@ async def test_press(
 
 @pytest.mark.parametrize("device_fixture", ["da_ks_microwave_0101x"])
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -88,7 +88,7 @@ async def test_availability(
 
 @pytest.mark.parametrize("device_fixture", ["da_ks_microwave_0101x"])
 async def test_availability_at_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unavailable_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

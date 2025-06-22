@@ -12,7 +12,7 @@ from aioesphomeapi import (
 )
 import pytest
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
@@ -36,8 +36,8 @@ from homeassistant.components.light import (
     STATE_ON,
     ColorMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import MockGenericDeviceEntryType
 
@@ -45,7 +45,7 @@ LIGHT_COLOR_CAPABILITY_UNKNOWN = 1 << 8  # 256
 
 
 async def test_light_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -87,7 +87,7 @@ async def test_light_on_off(
 
 
 async def test_light_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -205,7 +205,7 @@ async def test_light_brightness(
 
 
 async def test_light_legacy_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -254,7 +254,7 @@ async def test_light_legacy_brightness(
 
 
 async def test_light_brightness_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -328,7 +328,7 @@ async def test_light_brightness_on_off(
 
 
 async def test_light_legacy_white_converted_to_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -382,7 +382,7 @@ async def test_light_legacy_white_converted_to_brightness(
 
 
 async def test_light_legacy_white_with_rgb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -446,7 +446,7 @@ async def test_light_legacy_white_with_rgb(
 
 
 async def test_light_brightness_on_off_with_unknown_color_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -521,7 +521,7 @@ async def test_light_brightness_on_off_with_unknown_color_mode(
 
 
 async def test_light_on_and_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -566,7 +566,7 @@ async def test_light_on_and_brightness(
 
 
 async def test_rgb_color_temp_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -661,7 +661,7 @@ async def test_rgb_color_temp_light(
 
 
 async def test_light_rgb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -780,7 +780,7 @@ async def test_light_rgb(
 
 
 async def test_light_rgbw(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -945,7 +945,7 @@ async def test_light_rgbw(
 
 
 async def test_light_rgbww_with_cold_warm_white_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -1147,7 +1147,7 @@ async def test_light_rgbww_with_cold_warm_white_support(
 
 
 async def test_light_rgbww_without_cold_warm_white_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -1379,7 +1379,7 @@ async def test_light_rgbww_without_cold_warm_white_support(
 
 
 async def test_light_color_temp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -1453,7 +1453,7 @@ async def test_light_color_temp(
 
 
 async def test_light_color_temp_no_mireds_set(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -1547,7 +1547,7 @@ async def test_light_color_temp_no_mireds_set(
 
 
 async def test_light_color_temp_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -1631,7 +1631,7 @@ async def test_light_color_temp_legacy(
 
 
 async def test_light_rgb_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -1729,7 +1729,7 @@ async def test_light_rgb_legacy(
 
 
 async def test_light_effects(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -1787,7 +1787,7 @@ async def test_light_effects(
 
 
 async def test_only_cold_warm_white_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -1885,7 +1885,7 @@ async def test_only_cold_warm_white_support(
 
 
 async def test_light_no_color_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:

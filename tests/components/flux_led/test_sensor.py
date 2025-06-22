@@ -1,8 +1,8 @@
 """Tests for flux_led sensor platform."""
 
-from homeassistant.components import flux_led
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import flux_led
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import (
     FLUX_DISCOVERY,
@@ -13,7 +13,7 @@ from . import (
 )
 
 
-async def test_paired_remotes_sensor(hass: HomeAssistant) -> None:
+async def test_paired_remotes_sensor(hass: SmartHub) -> None:
     """Test that the paired remotes sensor has the correct value."""
     _mock_config_entry_for_bulb(hass)
     bulb = _mocked_bulb()

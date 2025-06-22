@@ -7,11 +7,11 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.remote import (
+from smarthub.components.remote import (
     DOMAIN as REMOTE_DOMAIN,
     SERVICE_SEND_COMMAND,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_COMMAND,
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
@@ -19,8 +19,8 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 from .const import (
@@ -36,20 +36,20 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_remote_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test setup of the remote entity."""
-    with patch("homeassistant.components.madvr.PLATFORMS", [Platform.REMOTE]):
+    with patch("smarthub.components.madvr.PLATFORMS", [Platform.REMOTE]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_remote_power(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_madvr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -112,7 +112,7 @@ async def test_remote_power(
 
 
 async def test_send_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_madvr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,

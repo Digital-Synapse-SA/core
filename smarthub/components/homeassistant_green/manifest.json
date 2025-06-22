@@ -1,0 +1,11 @@
+{
+  "domain": "smarthub_green",
+  "name": "SmartHub Green",
+  "after_dependencies": ["hassio"],
+  "codeowners": ["@smart-hub/core"],
+  "config_flow": false,
+  "dependencies": ["hardware", "smarthub_hardware"],
+  "documentation": "https://www.smart-hub.io/integrations/smarthub_green",
+  "integration_type": "hardware",
+  "single_config_entry": true
+}

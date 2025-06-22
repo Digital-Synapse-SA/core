@@ -6,37 +6,37 @@ from unittest.mock import Mock, PropertyMock, patch
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components.cloud import GACTIONS_SCHEMA
-from homeassistant.components.cloud.const import (
+from smarthub.components.cloud import GACTIONS_SCHEMA
+from smarthub.components.cloud.const import (
     DATA_CLOUD,
     PREF_DISABLE_2FA,
     PREF_GOOGLE_DEFAULT_EXPOSE,
     PREF_GOOGLE_ENTITY_CONFIGS,
     PREF_SHOULD_EXPOSE,
 )
-from homeassistant.components.cloud.google_config import CloudGoogleConfig
-from homeassistant.components.cloud.prefs import CloudPreferences
-from homeassistant.components.google_assistant import helpers as ga_helpers
-from homeassistant.components.homeassistant.exposed_entities import (
+from smarthub.components.cloud.google_config import CloudGoogleConfig
+from smarthub.components.cloud.prefs import CloudPreferences
+from smarthub.components.google_assistant import helpers as ga_helpers
+from smarthub.components.smarthub.exposed_entities import (
     DATA_EXPOSED_ENTITIES,
     async_expose_entity,
     async_get_entity_settings,
 )
-from homeassistant.const import (
+from smarthub.const import (
     EVENT_HOMEASSISTANT_START,
     EVENT_HOMEASSISTANT_STARTED,
     EntityCategory,
 )
-from homeassistant.core import CoreState, HomeAssistant, State
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.core import CoreState, SmartHub, State
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 @pytest.fixture
-def mock_conf(hass: HomeAssistant, cloud_prefs: CloudPreferences) -> CloudGoogleConfig:
+def mock_conf(hass: SmartHub, cloud_prefs: CloudPreferences) -> CloudGoogleConfig:
     """Mock Google conf."""
     return CloudGoogleConfig(
         hass,
@@ -47,22 +47,22 @@ def mock_conf(hass: HomeAssistant, cloud_prefs: CloudPreferences) -> CloudGoogle
     )
 
 
-def expose_new(hass: HomeAssistant, expose_new: bool) -> None:
+def expose_new(hass: SmartHub, expose_new: bool) -> None:
     """Enable exposing new entities to Google."""
     exposed_entities = hass.data[DATA_EXPOSED_ENTITIES]
     exposed_entities.async_set_expose_new_entities("cloud.google_assistant", expose_new)
 
 
-def expose_entity(hass: HomeAssistant, entity_id: str, should_expose: bool) -> None:
+def expose_entity(hass: SmartHub, entity_id: str, should_expose: bool) -> None:
     """Expose an entity to Google."""
     async_expose_entity(hass, "cloud.google_assistant", entity_id, should_expose)
 
 
 async def test_google_update_report_state(
-    mock_conf: CloudGoogleConfig, hass: HomeAssistant, cloud_prefs: CloudPreferences
+    mock_conf: CloudGoogleConfig, hass: SmartHub, cloud_prefs: CloudPreferences
 ) -> None:
     """Test Google config responds to updating preference."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     await mock_conf.async_initialize()
     await mock_conf.async_connect_agent_user("mock-user-id")
@@ -72,7 +72,7 @@ async def test_google_update_report_state(
     with (
         patch.object(mock_conf, "async_sync_entities") as mock_sync,
         patch(
-            "homeassistant.components.google_assistant.report_state.async_enable_report_state"
+            "smarthub.components.google_assistant.report_state.async_enable_report_state"
         ) as mock_report_state,
     ):
         await cloud_prefs.async_update(google_report_state=True)
@@ -83,10 +83,10 @@ async def test_google_update_report_state(
 
 
 async def test_google_update_report_state_subscription_expired(
-    mock_conf: CloudGoogleConfig, hass: HomeAssistant, cloud_prefs: CloudPreferences
+    mock_conf: CloudGoogleConfig, hass: SmartHub, cloud_prefs: CloudPreferences
 ) -> None:
     """Test Google config not reporting state when subscription has expired."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     await mock_conf.async_initialize()
     await mock_conf.async_connect_agent_user("mock-user-id")
@@ -96,7 +96,7 @@ async def test_google_update_report_state_subscription_expired(
     with (
         patch.object(mock_conf, "async_sync_entities") as mock_sync,
         patch(
-            "homeassistant.components.google_assistant.report_state.async_enable_report_state"
+            "smarthub.components.google_assistant.report_state.async_enable_report_state"
         ) as mock_report_state,
     ):
         await cloud_prefs.async_update(google_report_state=True)
@@ -107,10 +107,10 @@ async def test_google_update_report_state_subscription_expired(
 
 
 async def test_sync_entities(
-    mock_conf: CloudGoogleConfig, hass: HomeAssistant, cloud_prefs: CloudPreferences
+    mock_conf: CloudGoogleConfig, hass: SmartHub, cloud_prefs: CloudPreferences
 ) -> None:
     """Test sync devices."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     await mock_conf.async_initialize()
     assert len(mock_conf.async_get_agent_users()) == 0
@@ -131,12 +131,12 @@ async def test_sync_entities(
 
 
 async def test_google_update_expose_trigger_sync(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     cloud_prefs: CloudPreferences,
 ) -> None:
     """Test Google config responds to updating exposed entities."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     # Enable exposing new entities to Google
     expose_new(hass, True)
@@ -191,7 +191,7 @@ async def test_google_update_expose_trigger_sync(
 
 @pytest.mark.usefixtures("mock_cloud_login")
 async def test_google_entity_registry_sync(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     cloud_prefs: CloudPreferences,
 ) -> None:
@@ -263,7 +263,7 @@ async def test_google_entity_registry_sync(
 
 @pytest.mark.usefixtures("mock_cloud_login")
 async def test_google_device_registry_sync(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     cloud_prefs: CloudPreferences,
@@ -342,7 +342,7 @@ async def test_google_device_registry_sync(
 
 @pytest.mark.usefixtures("mock_cloud_login")
 async def test_sync_google_when_started(
-    hass: HomeAssistant, cloud_prefs: CloudPreferences
+    hass: SmartHub, cloud_prefs: CloudPreferences
 ) -> None:
     """Test Google config syncs on init."""
     config = CloudGoogleConfig(
@@ -356,7 +356,7 @@ async def test_sync_google_when_started(
 
 @pytest.mark.usefixtures("mock_cloud_login")
 async def test_sync_google_on_home_assistant_start(
-    hass: HomeAssistant, cloud_prefs: CloudPreferences
+    hass: SmartHub, cloud_prefs: CloudPreferences
 ) -> None:
     """Test Google config syncs when home assistant started."""
     config = CloudGoogleConfig(
@@ -374,13 +374,13 @@ async def test_sync_google_on_home_assistant_start(
 
 
 async def test_google_config_expose_entity_prefs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conf: CloudGoogleConfig,
     cloud_prefs: CloudPreferences,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test Google config should expose using prefs."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     entity_entry1 = entity_registry.async_get_or_create(
         "light",
         "test",
@@ -455,7 +455,7 @@ async def test_google_config_expose_entity_prefs(
 
 @pytest.mark.usefixtures("mock_expired_cloud_login")
 def test_enabled_requires_valid_sub(
-    hass: HomeAssistant, cloud_prefs: CloudPreferences
+    hass: SmartHub, cloud_prefs: CloudPreferences
 ) -> None:
     """Test that google config enabled requires a valid Cloud sub."""
     assert cloud_prefs.google_enabled
@@ -470,10 +470,10 @@ def test_enabled_requires_valid_sub(
 
 
 async def test_setup_google_assistant(
-    hass: HomeAssistant, mock_conf: CloudGoogleConfig, cloud_prefs: CloudPreferences
+    hass: SmartHub, mock_conf: CloudGoogleConfig, cloud_prefs: CloudPreferences
 ) -> None:
     """Test that we set up the google_assistant integration if enabled in cloud."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     mock_conf._cloud.subscription_expired = False
 
     assert "google_assistant" not in hass.config.components
@@ -491,7 +491,7 @@ async def test_setup_google_assistant(
 
 @pytest.mark.usefixtures("mock_cloud_login")
 async def test_google_handle_logout(
-    hass: HomeAssistant, cloud_prefs: CloudPreferences
+    hass: SmartHub, cloud_prefs: CloudPreferences
 ) -> None:
     """Test Google config responds to logging out."""
     gconf = CloudGoogleConfig(
@@ -501,7 +501,7 @@ async def test_google_handle_logout(
     await gconf.async_initialize()
 
     with patch(
-        "homeassistant.components.google_assistant.report_state.async_enable_report_state",
+        "smarthub.components.google_assistant.report_state.async_enable_report_state",
     ) as mock_enable:
         gconf.async_enable_report_state()
         await hass.async_block_till_done()
@@ -530,7 +530,7 @@ async def test_google_handle_logout(
 
 @pytest.mark.parametrize("google_settings_version", [1, 2])
 async def test_google_config_migrate_expose_entity_prefs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     entity_registry: er.EntityRegistry,
     google_settings_version: int,
@@ -538,7 +538,7 @@ async def test_google_config_migrate_expose_entity_prefs(
     """Test migrating Google entity config."""
     hass.set_state(CoreState.not_running)
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set("light.state_only", "on")
     entity_exposed = entity_registry.async_get_or_create(
         "light",
@@ -644,14 +644,14 @@ async def test_google_config_migrate_expose_entity_prefs(
 
 
 async def test_google_config_migrate_expose_entity_prefs_v2_no_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test migrating Google entity config from v2 to v3 when no entity is exposed."""
     hass.set_state(CoreState.not_running)
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set("light.state_only", "on")
     entity_migrated = entity_registry.async_get_or_create(
         "light",
@@ -691,14 +691,14 @@ async def test_google_config_migrate_expose_entity_prefs_v2_no_exposed(
 
 
 async def test_google_config_migrate_expose_entity_prefs_v2_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test migrating Google entity config from v2 to v3 when an entity is exposed."""
     hass.set_state(CoreState.not_running)
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set("light.state_only", "on")
     entity_migrated = entity_registry.async_get_or_create(
         "light",
@@ -738,14 +738,14 @@ async def test_google_config_migrate_expose_entity_prefs_v2_exposed(
 
 
 async def test_google_config_migrate_expose_entity_prefs_default_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test migrating Google entity config."""
     hass.set_state(CoreState.not_running)
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     entity_default = entity_registry.async_get_or_create(
         "light",
         "test",
@@ -775,14 +775,14 @@ async def test_google_config_migrate_expose_entity_prefs_default_none(
 
 
 async def test_google_config_migrate_expose_entity_prefs_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test migrating Google entity config."""
     hass.set_state(CoreState.not_running)
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     binary_sensor_supported = entity_registry.async_get_or_create(
         "binary_sensor",
@@ -873,7 +873,7 @@ async def test_google_config_migrate_expose_entity_prefs_default(
 
 @pytest.mark.usefixtures("mock_cloud_login")
 async def test_google_config_get_agent_user_id(
-    hass: HomeAssistant, cloud_prefs: CloudPreferences
+    hass: SmartHub, cloud_prefs: CloudPreferences
 ) -> None:
     """Test overridden get_agent_user_id_from_webhook method."""
     config = CloudGoogleConfig(
@@ -888,7 +888,7 @@ async def test_google_config_get_agent_user_id(
 
 @pytest.mark.usefixtures("mock_cloud_login")
 async def test_google_config_get_agent_users(
-    hass: HomeAssistant, cloud_prefs: CloudPreferences
+    hass: SmartHub, cloud_prefs: CloudPreferences
 ) -> None:
     """Test overridden async_get_agent_users method."""
     username_mock = PropertyMock(return_value="blah")

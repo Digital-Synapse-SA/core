@@ -9,24 +9,24 @@ from zigpy.application import ControllerApplication
 from zigpy.types.basic import uint16_t
 from zigpy.zcl.clusters import lighting
 
-from homeassistant.components.zha import const as zha_const
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha import const as zha_const
+from smarthub.components.zha.helpers import (
     cluster_command_schema_to_vol_schema,
     convert_to_zcl_values,
     create_zha_config,
     exclude_none_values,
     get_zha_data,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import config_validation as cv
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def test_zcl_schema_conversions(hass: HomeAssistant) -> None:
+async def test_zcl_schema_conversions(hass: SmartHub) -> None:
     """Test ZHA ZCL schema conversion helpers."""
     command_schema = lighting.Color.ServerCommandDefs.color_loop_set.schema
     expected_schema = [
@@ -187,7 +187,7 @@ def test_exclude_none_values(
 
 
 async def test_create_zha_config_remove_unused(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_zigpy_connect: ControllerApplication,
 ) -> None:

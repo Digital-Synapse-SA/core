@@ -14,7 +14,7 @@ from nibe.heatpump import Model
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_MODE,
     ATTR_TARGET_TEMP_HIGH,
     ATTR_TARGET_TEMP_LOW,
@@ -24,9 +24,9 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from . import MockConnection, async_add_model
 
@@ -34,7 +34,7 @@ from . import MockConnection, async_add_model
 @pytest.fixture(autouse=True)
 async def fixture_single_platform():
     """Only allow this platform to load."""
-    with patch("homeassistant.components.nibe_heatpump.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.nibe_heatpump.PLATFORMS", [Platform.CLIMATE]):
         yield
 
 
@@ -68,7 +68,7 @@ def _setup_climate_group(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_basic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connection: MockConnection,
     model: Model,
     climate_id: str,
@@ -115,7 +115,7 @@ async def test_basic(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_active_accessory(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connection: MockConnection,
     model: Model,
     climate_id: str,
@@ -143,7 +143,7 @@ async def test_active_accessory(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_set_temperature_supported_cooling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connection: MockConnection,
     model: Model,
     climate_id: str,
@@ -236,7 +236,7 @@ async def test_set_temperature_supported_cooling(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_set_temperature_unsupported_cooling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connection: MockConnection,
     model: Model,
     climate_id: str,
@@ -301,7 +301,7 @@ async def test_set_temperature_unsupported_cooling(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connection: MockConnection,
     model: Model,
     climate_id: str,
@@ -350,7 +350,7 @@ async def test_set_hvac_mode(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_set_invalid_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connection: MockConnection,
     model: Model,
     climate_id: str,

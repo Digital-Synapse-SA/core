@@ -8,10 +8,10 @@ from unittest.mock import Mock, patch
 import pytest
 import voluptuous as vol
 
-from homeassistant import config_entries, data_entry_flow
-from homeassistant.core import Event, HomeAssistant, callback
-from homeassistant.helpers import config_validation as cv
-from homeassistant.util.decorator import Registry
+from smarthub import config_entries, data_entry_flow
+from smarthub.core import Event, SmartHub, callback
+from smarthub.helpers import config_validation as cv
+from smarthub.util.decorator import Registry
 
 from .common import async_capture_events
 
@@ -365,7 +365,7 @@ async def test_discovery_init_flow(manager: MockFlowManager) -> None:
     assert entry["source"] == config_entries.SOURCE_DISCOVERY
 
 
-async def test_finish_callback_change_result_type(hass: HomeAssistant) -> None:
+async def test_finish_callback_change_result_type(hass: SmartHub) -> None:
     """Test finish callback can change result type."""
 
     class TestFlow(data_entry_flow.FlowHandler):
@@ -410,7 +410,7 @@ async def test_finish_callback_change_result_type(hass: HomeAssistant) -> None:
     assert result["result"] == 2
 
 
-async def test_external_step(hass: HomeAssistant, manager: MockFlowManager) -> None:
+async def test_external_step(hass: SmartHub, manager: MockFlowManager) -> None:
     """Test external step logic."""
     manager.hass = hass
 
@@ -460,7 +460,7 @@ async def test_external_step(hass: HomeAssistant, manager: MockFlowManager) -> N
     assert result["title"] == "Hello"
 
 
-async def test_show_progress(hass: HomeAssistant, manager: MockFlowManager) -> None:
+async def test_show_progress(hass: SmartHub, manager: MockFlowManager) -> None:
     """Test show progress logic."""
     manager.hass = hass
     events = []
@@ -581,7 +581,7 @@ async def test_show_progress(hass: HomeAssistant, manager: MockFlowManager) -> N
 
 
 async def test_show_progress_error(
-    hass: HomeAssistant, manager: MockFlowManager
+    hass: SmartHub, manager: MockFlowManager
 ) -> None:
     """Test show progress logic."""
     manager.hass = hass
@@ -646,7 +646,7 @@ async def test_show_progress_error(
 
 
 async def test_show_progress_hidden_from_frontend(
-    hass: HomeAssistant, manager: MockFlowManager
+    hass: SmartHub, manager: MockFlowManager
 ) -> None:
     """Test show progress done is not sent to frontend."""
     manager.hass = hass
@@ -698,7 +698,7 @@ async def test_show_progress_hidden_from_frontend(
 
 
 async def test_show_progress_legacy(
-    hass: HomeAssistant, manager: MockFlowManager, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, manager: MockFlowManager, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test show progress logic.
 
@@ -794,13 +794,13 @@ async def test_show_progress_legacy(
     # Check for deprecation warning
     assert (
         "tests.test_data_entry_flow::TestFlow calls async_show_progress without passing"
-        " a progress task, this is not valid and will break in Home Assistant "
+        " a progress task, this is not valid and will break in SmartHub "
         "Core 2024.8."
     ) in caplog.text
 
 
 async def test_show_progress_fires_only_when_changed(
-    hass: HomeAssistant, manager: MockFlowManager
+    hass: SmartHub, manager: MockFlowManager
 ) -> None:
     """Test show progress change logic."""
     manager.hass = hass
@@ -900,7 +900,7 @@ async def test_abort_flow_exception_step(manager: MockFlowManager) -> None:
     assert form["description_placeholders"] == {"placeholder": "yo"}
 
 
-async def test_abort_flow_exception_finish_flow(hass: HomeAssistant) -> None:
+async def test_abort_flow_exception_finish_flow(hass: SmartHub) -> None:
     """Test that the AbortFlow exception works when finishing a flow."""
 
     class TestFlow(data_entry_flow.FlowHandler):
@@ -1031,7 +1031,7 @@ async def test_manager_abort_calls_async_flow_removed(manager: MockFlowManager) 
     [["target1", "target2"], {"target1": "Target 1", "target2": "Target 2"}],
 )
 async def test_show_menu(
-    hass: HomeAssistant,
+    hass: SmartHub,
     manager: MockFlowManager,
     menu_options: list[str] | dict[str, str],
 ) -> None:

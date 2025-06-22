@@ -7,20 +7,20 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import media_player
-from homeassistant.components.media_player import (
+from smarthub.components import media_player
+from smarthub.components.media_player import (
     ATTR_ENTITY_PICTURE_LOCAL,
     ATTR_INPUT_SOURCE_LIST,
     ATTR_MEDIA_POSITION,
     ATTR_MEDIA_POSITION_UPDATED_AT,
     ATTR_SOUND_MODE_LIST,
 )
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.const import ATTR_ENTITY_PICTURE, ATTR_FRIENDLY_NAME, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.const import ATTR_ENTITY_PICTURE, ATTR_FRIENDLY_NAME, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 from tests.components.recorder.common import async_wait_recording_done
@@ -30,16 +30,16 @@ from tests.components.recorder.common import async_wait_recording_done
 async def media_player_only() -> None:
     """Enable only the media_player platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.MEDIA_PLAYER],
     ):
         yield
 
 
-async def test_exclude_attributes(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_exclude_attributes(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test media_player registered attributes to be excluded."""
     now = dt_util.utcnow()
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await async_setup_component(
         hass, media_player.DOMAIN, {media_player.DOMAIN: {"platform": "demo"}}
     )

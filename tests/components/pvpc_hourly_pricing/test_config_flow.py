@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant import config_entries
-from homeassistant.components.pvpc_hourly_pricing.const import (
+from smarthub import config_entries
+from smarthub.components.pvpc_hourly_pricing.const import (
     ATTR_POWER,
     ATTR_POWER_P3,
     ATTR_TARIFF,
@@ -13,11 +13,11 @@ from homeassistant.components.pvpc_hourly_pricing.const import (
     DOMAIN,
     TARIFFS,
 )
-from homeassistant.const import CONF_API_TOKEN, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.const import CONF_API_TOKEN, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .conftest import check_valid_state
 
@@ -29,7 +29,7 @@ _MOCK_TIME_BAD_AUTH_RESPONSES = datetime(2023, 1, 8, 12, 0, tzinfo=dt_util.UTC)
 
 
 async def test_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
     pvpc_aioclient_mock: AiohttpClientMocker,
@@ -178,7 +178,7 @@ async def test_config_flow(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     pvpc_aioclient_mock: AiohttpClientMocker,
 ) -> None:

@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.ondilo_ico.const import (
+from smarthub import config_entries
+from smarthub.components.ondilo_ico.const import (
     DOMAIN,
     OAUTH2_AUTHORIZE,
     OAUTH2_CLIENT_ID as CLIENT_ID,
     OAUTH2_TOKEN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -21,7 +21,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_abort_if_existing_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Check flow abort when an entry already exist."""
     config_entry.add_to_hass(hass)
@@ -35,7 +35,7 @@ async def test_abort_if_existing_entry(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -74,7 +74,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.ondilo_ico.async_setup_entry", return_value=True
+        "smarthub.components.ondilo_ico.async_setup_entry", return_value=True
     ) as mock_setup:
         await hass.config_entries.flow.async_configure(result["flow_id"])
 

@@ -8,11 +8,11 @@ from unittest.mock import patch
 import pytest
 from pytrafikverket import CameraInfoModel, UnknownError
 
-from homeassistant.components.trafikverket_camera import async_migrate_entry
-from homeassistant.components.trafikverket_camera.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.trafikverket_camera import async_migrate_entry
+from smarthub.components.trafikverket_camera.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import ENTRY_CONFIG, ENTRY_CONFIG_OLD_CONFIG
 
@@ -21,7 +21,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_camera: CameraInfoModel,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -42,7 +42,7 @@ async def test_setup_entry(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         return_value=get_camera,
     ) as mock_tvt_camera:
         await hass.config_entries.async_setup(entry.entry_id)
@@ -53,7 +53,7 @@ async def test_setup_entry(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_camera: CameraInfoModel,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -74,7 +74,7 @@ async def test_unload_entry(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         return_value=get_camera,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -87,7 +87,7 @@ async def test_unload_entry(
 
 
 async def test_migrate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_camera: CameraInfoModel,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -107,7 +107,7 @@ async def test_migrate_entry(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         return_value=get_camera,
     ) as mock_tvt_camera:
         await hass.config_entries.async_setup(entry.entry_id)
@@ -134,7 +134,7 @@ async def test_migrate_entry(
     ],
 )
 async def test_migrate_entry_fails_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_camera: CameraInfoModel,
     aioclient_mock: AiohttpClientMocker,
     version: int,
@@ -157,7 +157,7 @@ async def test_migrate_entry_fails_with_error(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         side_effect=UnknownError,
     ) as mock_tvt_camera:
         await hass.config_entries.async_setup(entry.entry_id)
@@ -183,7 +183,7 @@ async def test_migrate_entry_fails_with_error(
     ],
 )
 async def test_migrate_entry_fails_no_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     version: int,
     unique_id: str,
@@ -221,7 +221,7 @@ async def test_migrate_entry_fails_no_id(
     )
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         return_value=_camera,
     ) as mock_tvt_camera:
         await hass.config_entries.async_setup(entry.entry_id)
@@ -234,7 +234,7 @@ async def test_migrate_entry_fails_no_id(
 
 
 async def test_no_migration_needed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_camera: CameraInfoModel,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -255,7 +255,7 @@ async def test_no_migration_needed(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         return_value=get_camera,
     ):
         assert await async_migrate_entry(hass, entry) is True

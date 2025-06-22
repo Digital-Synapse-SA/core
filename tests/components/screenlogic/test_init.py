@@ -7,14 +7,14 @@ import pytest
 from screenlogicpy import ScreenLogicError, ScreenLogicGateway
 from screenlogicpy.const.common import ScreenLogicConnectionError
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.number import DOMAIN as NUMBER_DOMAIN
-from homeassistant.components.screenlogic import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import slugify
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.number import DOMAIN as NUMBER_DOMAIN
+from smarthub.components.screenlogic import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import slugify
 
 from . import (
     DATA_MIN_MIGRATION,
@@ -116,7 +116,7 @@ def _migration_connect(*args, **kwargs):
     ids=[ent_data.old_name for ent_data in TEST_MIGRATING_ENTITIES],
 )
 async def test_async_migrate_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
@@ -180,7 +180,7 @@ async def test_async_migrate_entries(
 
 
 async def test_entity_migration_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
@@ -219,7 +219,7 @@ async def test_entity_migration_data(
     # This patch simulates bad data being added to ENTITY_MIGRATIONS
     with (
         patch.dict(
-            "homeassistant.components.screenlogic.data.ENTITY_MIGRATIONS",
+            "smarthub.components.screenlogic.data.ENTITY_MIGRATIONS",
             {
                 "missing_device": {
                     "new_key": "state",
@@ -252,7 +252,7 @@ async def test_entity_migration_data(
 
 
 async def test_platform_setup(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test setup for platforms that define expected data."""
 
@@ -293,7 +293,7 @@ async def test_platform_setup(
     [ScreenLogicConnectionError, ScreenLogicError],
 )
 async def test_retry_on_connect_exception(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, exception: Exception
+    hass: SmartHub, mock_config_entry: MockConfigEntry, exception: Exception
 ) -> None:
     """Test setup retries on expected exceptions."""
 

@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock, patch
 from linear_garage_door.errors import InvalidLoginError
 import pytest
 
-from homeassistant.components.linear_garage_door.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.linear_garage_door.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_form(
-    hass: HomeAssistant, mock_linear: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_linear: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -54,7 +54,7 @@ async def test_form(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_linear: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -94,7 +94,7 @@ async def test_reauth(
     [(InvalidLoginError, "invalid_auth"), (Exception, "unknown")],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_linear: AsyncMock,
     mock_setup_entry: AsyncMock,
     side_effect: Exception,

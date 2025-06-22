@@ -6,13 +6,13 @@ from collections.abc import Callable
 
 from mysensors.sensor import Sensor
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.const import ATTR_BATTERY_LEVEL, ATTR_DEVICE_CLASS
-from homeassistant.core import HomeAssistant
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.const import ATTR_BATTERY_LEVEL, ATTR_DEVICE_CLASS
+from smarthub.core import SmartHub
 
 
 async def test_door_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     door_sensor: Sensor,
     receive_message: Callable[[str], None],
 ) -> None:

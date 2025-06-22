@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.humidifier import (
+from smarthub.components.humidifier import (
     ATTR_HUMIDITY,
     ATTR_MODE,
     DOMAIN as HUMIDIFIER_DOMAIN,
@@ -15,21 +15,21 @@ from homeassistant.components.humidifier import (
     SERVICE_SET_HUMIDITY,
     SERVICE_SET_MODE,
 )
-from homeassistant.components.vesync.const import (
+from smarthub.components.vesync.const import (
     VS_HUMIDIFIER_MODE_AUTO,
     VS_HUMIDIFIER_MODE_MANUAL,
     VS_HUMIDIFIER_MODE_SLEEP,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     ENTITY_HUMIDIFIER,
@@ -43,7 +43,7 @@ NoException = nullcontext()
 
 
 async def test_humidifier_state(
-    hass: HomeAssistant, humidifier_config_entry: MockConfigEntry
+    hass: SmartHub, humidifier_config_entry: MockConfigEntry
 ) -> None:
     """Test the resulting setup state is as expected for the platform."""
 
@@ -65,7 +65,7 @@ async def test_humidifier_state(
 
 
 async def test_set_target_humidity_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     humidifier_config_entry: MockConfigEntry,
 ) -> None:
     """Test handling of invalid value in set_humidify method."""
@@ -88,17 +88,17 @@ async def test_set_target_humidity_invalid(
 
 @pytest.mark.parametrize(
     ("api_response", "expectation"),
-    [(True, NoException), (False, pytest.raises(HomeAssistantError))],
+    [(True, NoException), (False, pytest.raises(SmartHubError))],
 )
 async def test_set_target_humidity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     humidifier_config_entry: MockConfigEntry,
     api_response: bool,
     expectation,
 ) -> None:
     """Test handling of return value from VeSyncHumid200300S.set_humidity."""
 
-    # If VeSyncHumid200300S.set_humidity fails (returns False), then HomeAssistantError is raised
+    # If VeSyncHumid200300S.set_humidity fails (returns False), then SmartHubError is raised
     with (
         expectation,
         patch(
@@ -118,10 +118,10 @@ async def test_set_target_humidity(
 
 @pytest.mark.parametrize(
     ("api_response", "expectation"),
-    [(False, pytest.raises(HomeAssistantError)), (True, NoException)],
+    [(False, pytest.raises(SmartHubError)), (True, NoException)],
 )
 async def test_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     humidifier_config_entry: MockConfigEntry,
     api_response: bool,
     expectation,
@@ -129,7 +129,7 @@ async def test_turn_on(
     """Test turn_on method."""
 
     # turn_on returns False indicating failure in which case humidifier.turn_on
-    # raises HomeAssistantError.
+    # raises SmartHubError.
     with (
         expectation,
         patch(
@@ -137,7 +137,7 @@ async def test_turn_on(
         ) as method_mock,
     ):
         with patch(
-            "homeassistant.components.vesync.humidifier.VeSyncHumidifierHA.schedule_update_ha_state"
+            "smarthub.components.vesync.humidifier.VeSyncHumidifierHA.schedule_update_ha_state"
         ) as update_mock:
             await hass.services.async_call(
                 HUMIDIFIER_DOMAIN,
@@ -153,10 +153,10 @@ async def test_turn_on(
 
 @pytest.mark.parametrize(
     ("api_response", "expectation"),
-    [(False, pytest.raises(HomeAssistantError)), (True, NoException)],
+    [(False, pytest.raises(SmartHubError)), (True, NoException)],
 )
 async def test_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     humidifier_config_entry: MockConfigEntry,
     api_response: bool,
     expectation,
@@ -164,7 +164,7 @@ async def test_turn_off(
     """Test turn_off method."""
 
     # turn_off returns False indicating failure in which case humidifier.turn_off
-    # raises HomeAssistantError.
+    # raises SmartHubError.
     with (
         expectation,
         patch(
@@ -172,7 +172,7 @@ async def test_turn_off(
         ) as method_mock,
     ):
         with patch(
-            "homeassistant.components.vesync.humidifier.VeSyncHumidifierHA.schedule_update_ha_state"
+            "smarthub.components.vesync.humidifier.VeSyncHumidifierHA.schedule_update_ha_state"
         ) as update_mock:
             await hass.services.async_call(
                 HUMIDIFIER_DOMAIN,
@@ -187,7 +187,7 @@ async def test_turn_off(
 
 
 async def test_set_mode_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     humidifier_config_entry: MockConfigEntry,
 ) -> None:
     """Test handling of invalid value in set_mode method."""
@@ -195,7 +195,7 @@ async def test_set_mode_invalid(
     with patch(
         "pyvesync.vesyncfan.VeSyncHumid200300S.set_humidity_mode"
     ) as method_mock:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 HUMIDIFIER_DOMAIN,
                 SERVICE_SET_MODE,
@@ -208,17 +208,17 @@ async def test_set_mode_invalid(
 
 @pytest.mark.parametrize(
     ("api_response", "expectation"),
-    [(True, NoException), (False, pytest.raises(HomeAssistantError))],
+    [(True, NoException), (False, pytest.raises(SmartHubError))],
 )
 async def test_set_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     humidifier_config_entry: MockConfigEntry,
     api_response: bool,
     expectation,
 ) -> None:
     """Test handling of value in set_mode method."""
 
-    # If VeSyncHumid200300S.set_humidity_mode fails (returns False), then HomeAssistantError is raised
+    # If VeSyncHumid200300S.set_humidity_mode fails (returns False), then SmartHubError is raised
     with (
         expectation,
         patch(
@@ -237,7 +237,7 @@ async def test_set_mode(
 
 
 async def test_base_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     humidifier_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -248,7 +248,7 @@ async def test_base_unique_id(
 
 
 async def test_invalid_mist_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     humidifier,
     manager,
@@ -259,7 +259,7 @@ async def test_invalid_mist_modes(
     humidifier.mist_modes = ["invalid_mode"]
 
     with patch(
-        "homeassistant.components.vesync.async_generate_device_list",
+        "smarthub.components.vesync.async_generate_device_list",
         return_value=[humidifier],
     ):
         caplog.clear()
@@ -271,7 +271,7 @@ async def test_invalid_mist_modes(
 
 
 async def test_valid_mist_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     humidifier,
     manager,
@@ -282,7 +282,7 @@ async def test_valid_mist_modes(
     humidifier.mist_modes = ["auto", "manual"]
 
     with patch(
-        "homeassistant.components.vesync.async_generate_device_list",
+        "smarthub.components.vesync.async_generate_device_list",
         return_value=[humidifier],
     ):
         caplog.clear()
@@ -295,7 +295,7 @@ async def test_valid_mist_modes(
 
 
 async def test_set_mode_sleep_turns_display_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     humidifier,
     manager,
@@ -310,7 +310,7 @@ async def test_set_mode_sleep_turns_display_off(
     ]
 
     with patch(
-        "homeassistant.components.vesync.async_generate_device_list",
+        "smarthub.components.vesync.async_generate_device_list",
         return_value=[humidifier],
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

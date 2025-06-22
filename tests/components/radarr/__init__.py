@@ -5,15 +5,15 @@ from unittest.mock import patch
 
 from aiohttp.client_exceptions import ClientError
 
-from homeassistant.components.radarr.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.radarr.const import DOMAIN
+from smarthub.const import (
     CONF_API_KEY,
     CONF_URL,
     CONF_VERIFY_SSL,
     CONTENT_TYPE_JSON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -156,7 +156,7 @@ def mock_connection_server_error(
 
 
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     url: str = URL,
     api_key: str = API_KEY,
@@ -167,7 +167,7 @@ async def setup_integration(
     windows: bool = False,
     single_return: bool = False,
 ) -> MockConfigEntry:
-    """Set up the radarr integration in Home Assistant."""
+    """Set up the radarr integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id=unique_id,
@@ -202,13 +202,13 @@ async def setup_integration(
 def patch_async_setup_entry(return_value=True):
     """Patch the async entry setup of radarr."""
     return patch(
-        "homeassistant.components.radarr.async_setup_entry",
+        "smarthub.components.radarr.async_setup_entry",
         return_value=return_value,
     )
 
 
-def create_entry(hass: HomeAssistant) -> MockConfigEntry:
-    """Create Radarr entry in Home Assistant."""
+def create_entry(hass: SmartHub) -> MockConfigEntry:
+    """Create Radarr entry in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={

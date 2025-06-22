@@ -5,17 +5,17 @@ from datetime import timedelta
 from maxcube.cube import MaxCube
 from maxcube.windowshutter import MaxWindowShutter
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     STATE_OFF,
     STATE_ON,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import utcnow
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import utcnow
 
 from tests.common import async_fire_time_changed
 
@@ -24,7 +24,7 @@ BATTERY_ENTITY_ID = f"{ENTITY_ID}_battery"
 
 
 async def test_window_shuttler(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     cube: MaxCube,
     windowshutter: MaxWindowShutter,
@@ -50,7 +50,7 @@ async def test_window_shuttler(
 
 
 async def test_window_shuttler_battery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     cube: MaxCube,
     windowshutter: MaxWindowShutter,

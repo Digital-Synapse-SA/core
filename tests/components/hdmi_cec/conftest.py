@@ -6,10 +6,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.hdmi_cec import DOMAIN
-from homeassistant.const import EVENT_HOMEASSISTANT_START
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.hdmi_cec import DOMAIN
+from smarthub.const import EVENT_HOMEASSISTANT_START
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 type CecEntityCreator = Callable[..., Coroutine[Any, Any, None]]
 type HDMINetworkCreator = Callable[..., Coroutine[Any, Any, MagicMock]]
@@ -22,7 +22,7 @@ def mock_cec_adapter_fixture() -> Generator[MagicMock]:
     Always mocked as it imports the `cec` library which is part of `libcec`.
     """
     with patch(
-        "homeassistant.components.hdmi_cec.CecAdapter", autospec=True
+        "smarthub.components.hdmi_cec.CecAdapter", autospec=True
     ) as mock_cec_adapter:
         yield mock_cec_adapter
 
@@ -31,14 +31,14 @@ def mock_cec_adapter_fixture() -> Generator[MagicMock]:
 def mock_hdmi_network_fixture() -> Generator[MagicMock]:
     """Mock HDMINetwork."""
     with patch(
-        "homeassistant.components.hdmi_cec.HDMINetwork", autospec=True
+        "smarthub.components.hdmi_cec.HDMINetwork", autospec=True
     ) as mock_hdmi_network:
         yield mock_hdmi_network
 
 
 @pytest.fixture
 def create_hdmi_network(
-    hass: HomeAssistant, mock_hdmi_network: MagicMock
+    hass: SmartHub, mock_hdmi_network: MagicMock
 ) -> HDMINetworkCreator:
     """Create an initialized mock hdmi_network."""
 
@@ -57,7 +57,7 @@ def create_hdmi_network(
 
 
 @pytest.fixture
-def create_cec_entity(hass: HomeAssistant) -> CecEntityCreator:
+def create_cec_entity(hass: SmartHub) -> CecEntityCreator:
     """Create a CecEntity."""
 
     async def cec_entity(hdmi_network, device):

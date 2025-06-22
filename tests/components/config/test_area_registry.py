@@ -6,17 +6,17 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components.config import area_registry
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.config import area_registry
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import area_registry as ar
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.helpers import area_registry as ar
+from smarthub.util.dt import utcnow
 
 from tests.common import ANY
 from tests.typing import MockHAClientWebSocket, WebSocketGenerator
@@ -24,7 +24,7 @@ from tests.typing import MockHAClientWebSocket, WebSocketGenerator
 
 @pytest.fixture(name="client")
 async def client_fixture(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> MockHAClientWebSocket:
     """Fixture that can interact with the config manager API."""
     area_registry.async_setup(hass)
@@ -32,7 +32,7 @@ async def client_fixture(
 
 
 @pytest.fixture
-async def mock_temperature_humidity_entity(hass: HomeAssistant) -> None:
+async def mock_temperature_humidity_entity(hass: SmartHub) -> None:
     """Mock temperature and humidity sensors."""
     hass.states.async_set(
         "sensor.mock_temperature",

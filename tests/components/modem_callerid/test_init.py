@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 from phone_modem import exceptions
 
-from homeassistant.components.modem_callerid.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_DEVICE
-from homeassistant.core import HomeAssistant
+from smarthub.components.modem_callerid.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_DEVICE
+from smarthub.core import SmartHub
 
 from . import com_port, patch_init_modem
 
 from tests.common import MockConfigEntry
 
 
-async def test_setup_entry(hass: HomeAssistant) -> None:
+async def test_setup_entry(hass: SmartHub) -> None:
     """Test Modem Caller ID entry setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -24,7 +24,7 @@ async def test_setup_entry(hass: HomeAssistant) -> None:
     with (
         patch("aioserial.AioSerial", autospec=True),
         patch(
-            "homeassistant.components.modem_callerid.PhoneModem._get_response",
+            "smarthub.components.modem_callerid.PhoneModem._get_response",
             return_value="OK",
         ),
         patch("phone_modem.PhoneModem._modem_sm"),
@@ -33,7 +33,7 @@ async def test_setup_entry(hass: HomeAssistant) -> None:
     assert entry.state is ConfigEntryState.LOADED
 
 
-async def test_async_setup_entry_not_ready(hass: HomeAssistant) -> None:
+async def test_async_setup_entry_not_ready(hass: SmartHub) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -49,7 +49,7 @@ async def test_async_setup_entry_not_ready(hass: HomeAssistant) -> None:
     assert not hass.data.get(DOMAIN)
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test unload."""
     entry = MockConfigEntry(
         domain=DOMAIN,

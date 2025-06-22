@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 
-from homeassistant.components.cert_expiry.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.cert_expiry.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_HOST,
     CONF_PORT,
     EVENT_HOMEASSISTANT_STARTED,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import CoreState, SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import HOST, PORT
 from .helpers import future_timestamp, static_datetime
@@ -21,7 +21,7 @@ from .helpers import future_timestamp, static_datetime
 from tests.common import MockConfigEntry
 
 
-async def test_update_unique_id(hass: HomeAssistant) -> None:
+async def test_update_unique_id(hass: SmartHub) -> None:
     """Test updating a config entry without a unique_id."""
     assert hass.state is CoreState.running
 
@@ -34,7 +34,7 @@ async def test_update_unique_id(hass: HomeAssistant) -> None:
     assert not entry.unique_id
 
     with patch(
-        "homeassistant.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
+        "smarthub.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
         return_value=future_timestamp(1),
     ):
         assert await async_setup_component(hass, DOMAIN, {}) is True
@@ -45,7 +45,7 @@ async def test_update_unique_id(hass: HomeAssistant) -> None:
 
 
 @freeze_time(static_datetime())
-async def test_unload_config_entry(hass: HomeAssistant) -> None:
+async def test_unload_config_entry(hass: SmartHub) -> None:
     """Test unloading a config entry."""
     assert hass.state is CoreState.running
 
@@ -62,7 +62,7 @@ async def test_unload_config_entry(hass: HomeAssistant) -> None:
 
     timestamp = future_timestamp(100)
     with patch(
-        "homeassistant.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
+        "smarthub.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
         return_value=timestamp,
     ):
         assert await async_setup_component(hass, DOMAIN, {}) is True
@@ -87,7 +87,7 @@ async def test_unload_config_entry(hass: HomeAssistant) -> None:
     assert state is None
 
 
-async def test_delay_load_during_startup(hass: HomeAssistant) -> None:
+async def test_delay_load_during_startup(hass: SmartHub) -> None:
     """Test delayed loading of a config entry during startup."""
     hass.set_state(CoreState.not_running)
 
@@ -105,7 +105,7 @@ async def test_delay_load_during_startup(hass: HomeAssistant) -> None:
 
     timestamp = future_timestamp(100)
     with patch(
-        "homeassistant.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
+        "smarthub.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
         return_value=timestamp,
     ):
         await hass.async_start()

@@ -8,10 +8,10 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from technove import Station, Status, TechnoVEError
 
-from homeassistant.components.technove.const import DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.technove.const import DOMAIN
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_with_selected_platforms
 
@@ -24,7 +24,7 @@ from tests.common import (
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "mock_technove")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -52,7 +52,7 @@ async def test_sensors(
 )
 @pytest.mark.usefixtures("init_integration")
 async def test_disabled_by_default_sensors(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, entity_id: str
+    hass: SmartHub, entity_registry: er.EntityRegistry, entity_id: str
 ) -> None:
     """Test the disabled by default TechnoVE sensors."""
     assert hass.states.get(entity_id) is None
@@ -64,7 +64,7 @@ async def test_disabled_by_default_sensors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_no_wifi_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_technove: MagicMock,
 ) -> None:
@@ -84,7 +84,7 @@ async def test_no_wifi_support(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_sensor_update_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_technove: MagicMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -103,7 +103,7 @@ async def test_sensor_update_failure(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_sensor_unknown_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_technove: MagicMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:

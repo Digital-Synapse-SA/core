@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from datetime import time, timedelta
 
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .conftest import (
     mock_config_entry,
@@ -17,7 +17,7 @@ from .conftest import (
 from tests.common import async_fire_time_changed
 
 
-async def test_schedule_start_time(hass: HomeAssistant) -> None:
+async def test_schedule_start_time(hass: SmartHub) -> None:
     """Test the frequency schedule start time."""
 
     now = dt_util.now()

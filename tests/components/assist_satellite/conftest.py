@@ -5,8 +5,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from homeassistant.components.assist_pipeline import PipelineEvent
-from homeassistant.components.assist_satellite import (
+from smarthub.components.assist_pipeline import PipelineEvent
+from smarthub.components.assist_satellite import (
     DOMAIN,
     AssistSatelliteAnnouncement,
     AssistSatelliteConfiguration,
@@ -14,12 +14,12 @@ from homeassistant.components.assist_satellite import (
     AssistSatelliteEntityFeature,
     AssistSatelliteWakeWord,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.setup import async_setup_component
-from homeassistant.util.ulid import ulid_hex
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import Platform
+from smarthub.core import SmartHub, callback
+from smarthub.helpers.entity import DeviceInfo
+from smarthub.setup import async_setup_component
+from smarthub.util.ulid import ulid_hex
 
 from tests.common import (
     MockConfigEntry,
@@ -123,7 +123,7 @@ def entity_no_features() -> MockAssistSatellite:
 
 
 @pytest.fixture
-def config_entry(hass: HomeAssistant) -> ConfigEntry:
+def config_entry(hass: SmartHub) -> ConfigEntry:
     """Mock config entry."""
     entry = MockConfigEntry(domain=TEST_DOMAIN)
     entry.add_to_hass(hass)
@@ -132,17 +132,17 @@ def config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 @pytest.fixture
 async def init_components(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity: MockAssistSatellite,
     entity2: MockAssistSatellite,
     entity_no_features: MockAssistSatellite,
 ) -> None:
     """Initialize components."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -151,7 +151,7 @@ async def init_components(
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Unload test config entry."""
         await hass.config_entries.async_forward_entry_unload(

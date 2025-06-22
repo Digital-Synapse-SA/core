@@ -5,9 +5,9 @@ from unittest.mock import MagicMock, patch
 from nessclient import ArmingMode, ArmingState
 import pytest
 
-from homeassistant.components import alarm_control_panel
-from homeassistant.components.alarm_control_panel import AlarmControlPanelState
-from homeassistant.components.ness_alarm import (
+from smarthub.components import alarm_control_panel
+from smarthub.components.alarm_control_panel import AlarmControlPanelState
+from smarthub.components.ness_alarm import (
     ATTR_CODE,
     ATTR_OUTPUT_ID,
     CONF_DEVICE_PORT,
@@ -18,7 +18,7 @@ from homeassistant.components.ness_alarm import (
     SERVICE_AUX,
     SERVICE_PANIC,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_HOST,
     SERVICE_ALARM_ARM_AWAY,
@@ -27,8 +27,8 @@ from homeassistant.const import (
     SERVICE_ALARM_TRIGGER,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 VALID_CONFIG = {
     DOMAIN: {
@@ -42,7 +42,7 @@ VALID_CONFIG = {
 }
 
 
-async def test_setup_platform(hass: HomeAssistant, mock_nessclient) -> None:
+async def test_setup_platform(hass: SmartHub, mock_nessclient) -> None:
     """Test platform setup."""
     await async_setup_component(hass, DOMAIN, VALID_CONFIG)
     assert hass.services.has_service(DOMAIN, "panic")
@@ -57,7 +57,7 @@ async def test_setup_platform(hass: HomeAssistant, mock_nessclient) -> None:
     assert mock_nessclient.update.call_count == 1
 
 
-async def test_panic_service(hass: HomeAssistant, mock_nessclient) -> None:
+async def test_panic_service(hass: SmartHub, mock_nessclient) -> None:
     """Test calling panic service."""
     await async_setup_component(hass, DOMAIN, VALID_CONFIG)
     await hass.services.async_call(
@@ -66,7 +66,7 @@ async def test_panic_service(hass: HomeAssistant, mock_nessclient) -> None:
     mock_nessclient.panic.assert_awaited_once_with("1234")
 
 
-async def test_aux_service(hass: HomeAssistant, mock_nessclient) -> None:
+async def test_aux_service(hass: SmartHub, mock_nessclient) -> None:
     """Test calling aux service."""
     await async_setup_component(hass, DOMAIN, VALID_CONFIG)
     await hass.services.async_call(
@@ -75,7 +75,7 @@ async def test_aux_service(hass: HomeAssistant, mock_nessclient) -> None:
     mock_nessclient.aux.assert_awaited_once_with(1, True)
 
 
-async def test_dispatch_state_change(hass: HomeAssistant, mock_nessclient) -> None:
+async def test_dispatch_state_change(hass: SmartHub, mock_nessclient) -> None:
     """Test calling aux service."""
     await async_setup_component(hass, DOMAIN, VALID_CONFIG)
     await hass.async_block_till_done()
@@ -89,7 +89,7 @@ async def test_dispatch_state_change(hass: HomeAssistant, mock_nessclient) -> No
     )
 
 
-async def test_alarm_disarm(hass: HomeAssistant, mock_nessclient) -> None:
+async def test_alarm_disarm(hass: SmartHub, mock_nessclient) -> None:
     """Test disarm."""
     await async_setup_component(hass, DOMAIN, VALID_CONFIG)
     await hass.async_block_till_done()
@@ -106,7 +106,7 @@ async def test_alarm_disarm(hass: HomeAssistant, mock_nessclient) -> None:
     mock_nessclient.disarm.assert_called_once_with("1234")
 
 
-async def test_alarm_arm_away(hass: HomeAssistant, mock_nessclient) -> None:
+async def test_alarm_arm_away(hass: SmartHub, mock_nessclient) -> None:
     """Test disarm."""
     await async_setup_component(hass, DOMAIN, VALID_CONFIG)
     await hass.async_block_till_done()
@@ -123,7 +123,7 @@ async def test_alarm_arm_away(hass: HomeAssistant, mock_nessclient) -> None:
     mock_nessclient.arm_away.assert_called_once_with("1234")
 
 
-async def test_alarm_arm_home(hass: HomeAssistant, mock_nessclient) -> None:
+async def test_alarm_arm_home(hass: SmartHub, mock_nessclient) -> None:
     """Test disarm."""
     await async_setup_component(hass, DOMAIN, VALID_CONFIG)
     await hass.async_block_till_done()
@@ -140,7 +140,7 @@ async def test_alarm_arm_home(hass: HomeAssistant, mock_nessclient) -> None:
     mock_nessclient.arm_home.assert_called_once_with("1234")
 
 
-async def test_alarm_trigger(hass: HomeAssistant, mock_nessclient) -> None:
+async def test_alarm_trigger(hass: SmartHub, mock_nessclient) -> None:
     """Test disarm."""
     await async_setup_component(hass, DOMAIN, VALID_CONFIG)
     await hass.async_block_till_done()
@@ -157,7 +157,7 @@ async def test_alarm_trigger(hass: HomeAssistant, mock_nessclient) -> None:
     mock_nessclient.panic.assert_called_once_with("1234")
 
 
-async def test_dispatch_zone_change(hass: HomeAssistant, mock_nessclient) -> None:
+async def test_dispatch_zone_change(hass: SmartHub, mock_nessclient) -> None:
     """Test zone change events dispatch a signal to subscribers."""
     await async_setup_component(hass, DOMAIN, VALID_CONFIG)
     await hass.async_block_till_done()
@@ -170,7 +170,7 @@ async def test_dispatch_zone_change(hass: HomeAssistant, mock_nessclient) -> Non
     assert hass.states.is_state("binary_sensor.zone_2", "off")
 
 
-async def test_arming_state_change(hass: HomeAssistant, mock_nessclient) -> None:
+async def test_arming_state_change(hass: SmartHub, mock_nessclient) -> None:
     """Test arming state change handing."""
     states = [
         (ArmingState.UNKNOWN, None, STATE_UNKNOWN),
@@ -254,6 +254,6 @@ def mock_nessclient():
     _mock_factory.return_value = _mock_instance
 
     with patch(
-        "homeassistant.components.ness_alarm.Client", new=_mock_factory, create=True
+        "smarthub.components.ness_alarm.Client", new=_mock_factory, create=True
     ):
         yield _mock_instance

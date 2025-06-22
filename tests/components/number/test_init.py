@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_MODE,
@@ -19,16 +19,16 @@ from homeassistant.components.number import (
     NumberEntityDescription,
     NumberMode,
 )
-from homeassistant.components.number.const import (
+from smarthub.components.number.const import (
     DEVICE_CLASS_UNITS as NUMBER_DEVICE_CLASS_UNITS,
 )
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     DEVICE_CLASS_UNITS as SENSOR_DEVICE_CLASS_UNITS,
     NON_NUMERIC_DEVICE_CLASSES,
     SensorDeviceClass,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_PLATFORM,
@@ -36,13 +36,13 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfVolumeFlowRate,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
-from homeassistant.setup import async_setup_component
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
+from smarthub.setup import async_setup_component
+from smarthub.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from . import common
 
@@ -240,7 +240,7 @@ class MockNumberEntityDescrDeprecated(NumberEntity):
         return 0.5
 
 
-async def test_step(hass: HomeAssistant) -> None:
+async def test_step(hass: SmartHub) -> None:
     """Test the step calculation."""
     number = MockDefaultNumberEntity()
     number.hass = hass
@@ -251,7 +251,7 @@ async def test_step(hass: HomeAssistant) -> None:
     assert number_2.step == 0.1
 
 
-async def test_attributes(hass: HomeAssistant) -> None:
+async def test_attributes(hass: SmartHub) -> None:
     """Test the attributes."""
     number = MockDefaultNumberEntity()
     number.hass = hass
@@ -325,7 +325,7 @@ async def test_attributes(hass: HomeAssistant) -> None:
     }
 
 
-async def test_sync_set_value(hass: HomeAssistant) -> None:
+async def test_sync_set_value(hass: SmartHub) -> None:
     """Test if async set_value calls sync set_value."""
     number = MockDefaultNumberEntity()
     number.hass = hass
@@ -338,7 +338,7 @@ async def test_sync_set_value(hass: HomeAssistant) -> None:
 
 
 async def test_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_number_entities: list[MockNumberEntity],
 ) -> None:
     """Test we can only set valid values."""
@@ -462,7 +462,7 @@ async def test_set_value(
     ],
 )
 async def test_temperature_conversion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unit_system,
     native_unit,
     state_unit,
@@ -550,7 +550,7 @@ RESTORE_DATA = {
 
 
 async def test_restore_number_save_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ) -> None:
     """Test RestoreNumber."""
@@ -617,7 +617,7 @@ async def test_restore_number_save_state(
     ],
 )
 async def test_restore_number_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     native_max_value,
     native_min_value,
@@ -705,7 +705,7 @@ async def test_restore_number_restore_state(
     ],
 )
 async def test_custom_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_class,
     native_unit,
@@ -780,7 +780,7 @@ async def test_custom_unit(
     ],
 )
 async def test_custom_unit_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     native_unit,
     custom_unit,
@@ -838,12 +838,12 @@ async def test_custom_unit_change(
 
 
 async def test_translated_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test translated unit."""
 
     with patch(
-        "homeassistant.helpers.service.translation.async_get_translations",
+        "smarthub.helpers.service.translation.async_get_translations",
         return_value={
             "component.test.entity.number.test_translation_key.unit_of_measurement": "Tests"
         },
@@ -870,12 +870,12 @@ async def test_translated_unit(
 
 
 async def test_translated_unit_with_native_unit_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that translated unit."""
 
     with patch(
-        "homeassistant.helpers.service.translation.async_get_translations",
+        "smarthub.helpers.service.translation.async_get_translations",
         return_value={
             "component.test.entity.number.test_translation_key.unit_of_measurement": "Tests"
         },
@@ -921,7 +921,7 @@ class MockFlow(ConfigFlow):
 
 
 @pytest.fixture(autouse=True)
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -929,11 +929,11 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
         yield
 
 
-async def test_name(hass: HomeAssistant) -> None:
+async def test_name(hass: SmartHub) -> None:
     """Test number name."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -975,7 +975,7 @@ async def test_name(hass: HomeAssistant) -> None:
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -1035,7 +1035,7 @@ async def test_name(hass: HomeAssistant) -> None:
     }
 
 
-def test_device_class_units(hass: HomeAssistant) -> None:
+def test_device_class_units(hass: SmartHub) -> None:
     """Test all numeric device classes have unit."""
     # DEVICE_CLASS_UNITS should include all device classes except:
     # - NumberDeviceClass.MONETARY

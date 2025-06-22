@@ -2,17 +2,17 @@
 
 from aiowebostv import WebOsTvPairError
 
-from homeassistant.components.media_player import ATTR_INPUT_SOURCE_LIST
-from homeassistant.components.webostv.const import CONF_SOURCES, DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import CONF_CLIENT_SECRET, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
+from smarthub.components.media_player import ATTR_INPUT_SOURCE_LIST
+from smarthub.components.webostv.const import CONF_SOURCES, DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import CONF_CLIENT_SECRET, EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
 
 from . import setup_webostv
 from .const import ENTITY_ID
 
 
-async def test_reauth_setup_entry(hass: HomeAssistant, client) -> None:
+async def test_reauth_setup_entry(hass: SmartHub, client) -> None:
     """Test reauth flow triggered by setup entry."""
     client.is_connected.return_value = False
     client.connect.side_effect = WebOsTvPairError
@@ -32,7 +32,7 @@ async def test_reauth_setup_entry(hass: HomeAssistant, client) -> None:
     assert flow["context"].get("entry_id") == entry.entry_id
 
 
-async def test_key_update_setup_entry(hass: HomeAssistant, client) -> None:
+async def test_key_update_setup_entry(hass: SmartHub, client) -> None:
     """Test key update from setup entry."""
     client.client_key = "new_key"
     entry = await setup_webostv(hass)
@@ -41,7 +41,7 @@ async def test_key_update_setup_entry(hass: HomeAssistant, client) -> None:
     assert entry.data[CONF_CLIENT_SECRET] == "new_key"
 
 
-async def test_update_options(hass: HomeAssistant, client) -> None:
+async def test_update_options(hass: SmartHub, client) -> None:
     """Test update options triggers reload."""
     config_entry = await setup_webostv(hass)
 
@@ -61,8 +61,8 @@ async def test_update_options(hass: HomeAssistant, client) -> None:
     assert sources == ["Input02", "Live TV"]
 
 
-async def test_disconnect_on_stop(hass: HomeAssistant, client) -> None:
-    """Test we disconnect the client and clear callbacks when Home Assistants stops."""
+async def test_disconnect_on_stop(hass: SmartHub, client) -> None:
+    """Test we disconnect the client and clear callbacks when SmartHubs stops."""
     config_entry = await setup_webostv(hass)
 
     assert client.disconnect.call_count == 0

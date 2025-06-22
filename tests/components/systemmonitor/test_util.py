@@ -5,7 +5,7 @@ from unittest.mock import Mock
 from psutil._common import sdiskpart
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_disk_setup_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     mock_config_entry: MockConfigEntry,
@@ -42,7 +42,7 @@ async def test_disk_setup_failure(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_disk_util(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     mock_config_entry: MockConfigEntry,

@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.enphase_envoy.const import Platform
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.enphase_envoy.const import Platform
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
@@ -30,7 +30,7 @@ async def test_binary_sensor(
 ) -> None:
     """Test binary sensor platform entities against snapshot."""
     with patch(
-        "homeassistant.components.enphase_envoy.PLATFORMS", [Platform.BINARY_SENSOR]
+        "smarthub.components.enphase_envoy.PLATFORMS", [Platform.BINARY_SENSOR]
     ):
         await setup_integration(hass, config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
@@ -47,14 +47,14 @@ async def test_binary_sensor(
     indirect=["mock_envoy"],
 )
 async def test_no_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test switch platform entities are not created."""
     with patch(
-        "homeassistant.components.enphase_envoy.PLATFORMS", [Platform.BINARY_SENSOR]
+        "smarthub.components.enphase_envoy.PLATFORMS", [Platform.BINARY_SENSOR]
     ):
         await setup_integration(hass, config_entry)
     assert not er.async_entries_for_config_entry(entity_registry, config_entry.entry_id)
@@ -64,13 +64,13 @@ async def test_no_binary_sensor(
     ("mock_envoy"), ["envoy_metered_batt_relay"], indirect=["mock_envoy"]
 )
 async def test_binary_sensor_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test binary sensor entities values and names."""
     with patch(
-        "homeassistant.components.enphase_envoy.PLATFORMS", [Platform.BINARY_SENSOR]
+        "smarthub.components.enphase_envoy.PLATFORMS", [Platform.BINARY_SENSOR]
     ):
         await setup_integration(hass, config_entry)
 

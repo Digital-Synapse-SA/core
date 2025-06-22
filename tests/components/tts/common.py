@@ -11,8 +11,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import media_source
-from homeassistant.components.tts import (
+from smarthub.components import media_source
+from smarthub.components.tts import (
     CONF_LANG,
     DATA_TTS_MANAGER,
     DOMAIN,
@@ -24,12 +24,12 @@ from homeassistant.components.tts import (
     Voice,
     _get_cache_files,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import Platform
+from smarthub.core import SmartHub, callback
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -49,7 +49,7 @@ MOCK_DATA = b"123"
 def mock_tts_get_cache_files_fixture_helper() -> Generator[MagicMock]:
     """Mock the list TTS cache function."""
     with patch(
-        "homeassistant.components.tts._get_cache_files", return_value={}
+        "smarthub.components.tts._get_cache_files", return_value={}
     ) as mock_cache_files:
         yield mock_cache_files
 
@@ -59,7 +59,7 @@ def mock_tts_init_cache_dir_fixture_helper(
 ) -> Generator[MagicMock]:
     """Mock the TTS cache dir in memory."""
     with patch(
-        "homeassistant.components.tts._init_tts_cache_dir",
+        "smarthub.components.tts._init_tts_cache_dir",
         side_effect=init_tts_cache_dir_side_effect,
     ) as mock_cache_dir:
         yield mock_cache_dir
@@ -99,13 +99,13 @@ def mock_tts_cache_dir_fixture_helper(
 def tts_mutagen_mock_fixture_helper() -> Generator[MagicMock]:
     """Mock writing tags."""
     with patch(
-        "homeassistant.components.tts.SpeechManager.write_tags",
+        "smarthub.components.tts.SpeechManager.write_tags",
         side_effect=lambda *args: args[1],
     ) as mock_write_tags:
         yield mock_write_tags
 
 
-async def get_media_source_url(hass: HomeAssistant, media_content_id: str) -> str:
+async def get_media_source_url(hass: SmartHub, media_content_id: str) -> str:
     """Get the media source url."""
     if media_source.DOMAIN not in hass.config.components:
         assert await async_setup_component(hass, media_source.DOMAIN, {})
@@ -115,7 +115,7 @@ async def get_media_source_url(hass: HomeAssistant, media_content_id: str) -> st
 
 
 async def retrieve_media(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, media_content_id: str
+    hass: SmartHub, hass_client: ClientSessionGenerator, media_content_id: str
 ) -> HTTPStatus:
     """Get the media source url."""
     url = await get_media_source_url(hass, media_content_id)
@@ -198,7 +198,7 @@ class MockTTS(MockPlatform):
 
     async def async_get_engine(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         discovery_info: DiscoveryInfoType | None = None,
     ) -> Provider | None:
@@ -207,7 +207,7 @@ class MockTTS(MockPlatform):
 
 
 async def mock_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_provider: MockTTSProvider,
 ) -> None:
     """Set up a test provider."""
@@ -219,14 +219,14 @@ async def mock_setup(
 
 
 async def mock_config_entry_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tts_entity: MockTTSEntity,
     test_domain: str = TEST_DOMAIN,
 ) -> MockConfigEntry:
     """Set up a test tts platform via config entry."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -235,7 +235,7 @@ async def mock_config_entry_setup(
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Unload test config entry."""
         await hass.config_entries.async_forward_entry_unload(config_entry, Platform.TTS)
@@ -251,7 +251,7 @@ async def mock_config_entry_setup(
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -274,7 +274,7 @@ class MockResultStream(ResultStream):
 
     test_set_message: str | None = None
 
-    def __init__(self, hass: HomeAssistant, extension: str, data: bytes) -> None:
+    def __init__(self, hass: SmartHub, extension: str, data: bytes) -> None:
         """Initialize the result stream."""
         super().__init__(
             token="test-token",

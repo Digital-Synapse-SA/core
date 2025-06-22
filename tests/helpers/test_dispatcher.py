@@ -4,15 +4,15 @@ from functools import partial
 
 import pytest
 
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import (
+from smarthub.core import SmartHub, callback
+from smarthub.helpers.dispatcher import (
     async_dispatcher_connect,
     async_dispatcher_send,
 )
-from homeassistant.util.signal_type import SignalType, SignalTypeFormat
+from smarthub.util.signal_type import SignalType, SignalTypeFormat
 
 
-async def test_simple_function(hass: HomeAssistant) -> None:
+async def test_simple_function(hass: SmartHub) -> None:
     """Test simple function (executor)."""
     calls = []
 
@@ -32,7 +32,7 @@ async def test_simple_function(hass: HomeAssistant) -> None:
     assert calls == [3, "bla"]
 
 
-async def test_signal_type(hass: HomeAssistant) -> None:
+async def test_signal_type(hass: SmartHub) -> None:
     """Test dispatcher with SignalType."""
     signal: SignalType[str, int] = SignalType("test")
     calls: list[tuple[str, int]] = []
@@ -58,7 +58,7 @@ async def test_signal_type(hass: HomeAssistant) -> None:
     assert calls == [("Hello", 2), ("World", 3), ("x", 4)]
 
 
-async def test_signal_type_format(hass: HomeAssistant) -> None:
+async def test_signal_type_format(hass: SmartHub) -> None:
     """Test dispatcher with SignalType and format."""
     signal: SignalTypeFormat[str, int] = SignalTypeFormat("test-{}")
     calls: list[tuple[str, int]] = []
@@ -79,7 +79,7 @@ async def test_signal_type_format(hass: HomeAssistant) -> None:
     assert calls == [("Hello", 2), ("x", 4)]
 
 
-async def test_simple_function_unsub(hass: HomeAssistant) -> None:
+async def test_simple_function_unsub(hass: SmartHub) -> None:
     """Test simple function (executor) and unsub."""
     calls1 = []
     calls2 = []
@@ -121,7 +121,7 @@ async def test_simple_function_unsub(hass: HomeAssistant) -> None:
     assert calls2 == [4]
 
 
-async def test_simple_callback(hass: HomeAssistant) -> None:
+async def test_simple_callback(hass: SmartHub) -> None:
     """Test simple callback (async)."""
     calls = []
 
@@ -142,7 +142,7 @@ async def test_simple_callback(hass: HomeAssistant) -> None:
     assert calls == [3, "bla"]
 
 
-async def test_simple_coro(hass: HomeAssistant) -> None:
+async def test_simple_coro(hass: SmartHub) -> None:
     """Test simple coro (async)."""
     calls = []
 
@@ -162,7 +162,7 @@ async def test_simple_coro(hass: HomeAssistant) -> None:
     assert calls == [3, "bla"]
 
 
-async def test_simple_function_multiargs(hass: HomeAssistant) -> None:
+async def test_simple_function_multiargs(hass: SmartHub) -> None:
     """Test simple function (executor)."""
     calls = []
 
@@ -181,7 +181,7 @@ async def test_simple_function_multiargs(hass: HomeAssistant) -> None:
 
 @pytest.mark.no_fail_on_log_exception
 async def test_callback_exception_gets_logged(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test exception raised by signal handler."""
 
@@ -202,7 +202,7 @@ async def test_callback_exception_gets_logged(
 
 @pytest.mark.no_fail_on_log_exception
 async def test_coro_exception_gets_logged(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test exception raised by signal handler."""
 
@@ -219,7 +219,7 @@ async def test_coro_exception_gets_logged(
     assert "when dispatching 'test': ('bad',)" in caplog.text
 
 
-async def test_dispatcher_add_dispatcher(hass: HomeAssistant) -> None:
+async def test_dispatcher_add_dispatcher(hass: SmartHub) -> None:
     """Test adding a dispatcher from a dispatcher."""
     calls = []
 
@@ -241,7 +241,7 @@ async def test_dispatcher_add_dispatcher(hass: HomeAssistant) -> None:
     assert calls == [3, 4, 4, 5, 5]
 
 
-async def test_thread_safety_checks(hass: HomeAssistant) -> None:
+async def test_thread_safety_checks(hass: SmartHub) -> None:
     """Test dispatcher thread safety checks."""
     calls = []
 

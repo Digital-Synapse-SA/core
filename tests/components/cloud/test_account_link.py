@@ -8,13 +8,13 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.cloud import account_link
-from homeassistant.components.cloud.const import DATA_CLOUD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.util.dt import utcnow
+from smarthub import config_entries
+from smarthub.components.cloud import account_link
+from smarthub.components.cloud.const import DATA_CLOUD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed, mock_platform
 
@@ -23,7 +23,7 @@ TEST_DOMAIN = "oauth2_test"
 
 @pytest.fixture
 def flow_handler(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> Generator[type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler]]:
     """Return a registered config flow."""
 
@@ -43,7 +43,7 @@ def flow_handler(
         yield TestFlowHandler
 
 
-async def test_setup_provide_implementation(hass: HomeAssistant) -> None:
+async def test_setup_provide_implementation(hass: SmartHub) -> None:
     """Test that we provide implementations."""
     legacy_entry = MockConfigEntry(
         domain="legacy",
@@ -61,7 +61,7 @@ async def test_setup_provide_implementation(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.cloud.account_link._get_services",
+            "smarthub.components.cloud.account_link._get_services",
             return_value=[
                 {"service": "test", "min_version": "0.1.0"},
                 {"service": "too_new", "min_version": "1000000.0.0"},
@@ -84,7 +84,7 @@ async def test_setup_provide_implementation(hass: HomeAssistant) -> None:
             ],
         ),
         patch(
-            "homeassistant.components.cloud.account_link.HA_VERSION",
+            "smarthub.components.cloud.account_link.HA_VERSION",
             "2022.9.0.dev20220817",
         ),
     ):
@@ -135,7 +135,7 @@ async def test_setup_provide_implementation(hass: HomeAssistant) -> None:
     assert dev_implementations["cloud"].hass is hass
 
 
-async def test_get_services_cached(hass: HomeAssistant) -> None:
+async def test_get_services_cached(hass: SmartHub) -> None:
     """Test that we cache services."""
     hass.data[DATA_CLOUD] = None
 
@@ -167,7 +167,7 @@ async def test_get_services_cached(hass: HomeAssistant) -> None:
         assert await account_link._get_services(hass) == 4
 
 
-async def test_get_services_error(hass: HomeAssistant) -> None:
+async def test_get_services_error(hass: SmartHub) -> None:
     """Test that we cache services."""
     hass.data[DATA_CLOUD] = None
 
@@ -184,14 +184,14 @@ async def test_get_services_error(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
 ) -> None:
     """Test Cloud OAuth2 implementation."""
     hass.data[DATA_CLOUD] = None
 
     impl = account_link.CloudOAuth2Implementation(hass, "test")
-    assert impl.name == "Home Assistant Cloud"
+    assert impl.name == "SmartHub Cloud"
     assert impl.domain == "cloud"
 
     flow_handler.async_register_implementation(hass, impl)

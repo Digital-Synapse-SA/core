@@ -2,10 +2,10 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.vicare.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.vicare.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import MODULE
 from .conftest import Fixture, MockPyViCare
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 # Device migration test can be removed in 2025.4.0
 async def test_device_and_entity_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,

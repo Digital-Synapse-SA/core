@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import SnoozFixture, create_mock_snooz, create_mock_snooz_config_entry
 
@@ -15,7 +15,7 @@ def mock_bluetooth(enable_bluetooth: None) -> None:
 
 
 @pytest.fixture
-async def mock_connected_snooz(hass: HomeAssistant):
+async def mock_connected_snooz(hass: SmartHub):
     """Mock a Snooz configuration entry and device."""
 
     device = await create_mock_snooz()

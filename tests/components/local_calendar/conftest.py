@@ -10,10 +10,10 @@ import urllib
 from aiohttp import ClientWebSocketResponse
 import pytest
 
-from homeassistant.components.local_calendar import LocalCalendarStore
-from homeassistant.components.local_calendar.const import CONF_CALENDAR_NAME, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.local_calendar import LocalCalendarStore
+from smarthub.components.local_calendar.const import CONF_CALENDAR_NAME, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.typing import ClientSessionGenerator, WebSocketGenerator
@@ -28,7 +28,7 @@ class FakeStore(LocalCalendarStore):
     """Mock storage implementation."""
 
     def __init__(
-        self, hass: HomeAssistant, path: Path, ics_content: str, read_side_effect: Any
+        self, hass: SmartHub, path: Path, ics_content: str, read_side_effect: Any
     ) -> None:
         """Initialize FakeStore."""
         super().__init__(hass, path)
@@ -65,13 +65,13 @@ def mock_store(ics_content: str, store_read_side_effect: Any | None) -> Generato
 
     stores: dict[Path, FakeStore] = {}
 
-    def new_store(hass: HomeAssistant, path: Path) -> FakeStore:
+    def new_store(hass: SmartHub, path: Path) -> FakeStore:
         if path not in stores:
             stores[path] = FakeStore(hass, path, ics_content, store_read_side_effect)
         return stores[path]
 
     with patch(
-        "homeassistant.components.local_calendar.LocalCalendarStore", new=new_store
+        "smarthub.components.local_calendar.LocalCalendarStore", new=new_store
     ):
         yield
 
@@ -85,7 +85,7 @@ def mock_time_zone() -> str:
 
 
 @pytest.fixture(autouse=True)
-async def set_time_zone(hass: HomeAssistant, time_zone: str):
+async def set_time_zone(hass: SmartHub, time_zone: str):
     """Set the time zone for the tests."""
     # Set our timezone to CST/Regina so we can check calculations
     # This keeps UTC-6 all year round
@@ -99,7 +99,7 @@ def mock_config_entry() -> MockConfigEntry:
 
 
 @pytest.fixture(name="setup_integration")
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Set up the integration."""
     config_entry.add_to_hass(hass)
     assert await async_setup_component(hass, DOMAIN, {})
@@ -172,7 +172,7 @@ type ClientFixture = Callable[[], Awaitable[Client]]
 
 @pytest.fixture
 async def ws_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> ClientFixture:
     """Fixture for creating the test websocket client."""

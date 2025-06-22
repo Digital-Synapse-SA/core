@@ -4,15 +4,15 @@ from unittest.mock import AsyncMock, patch
 
 from goodwe import InverterError
 
-from homeassistant.components.goodwe.const import (
+from smarthub.components.goodwe.const import (
     CONF_MODEL_FAMILY,
     DEFAULT_NAME,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -27,7 +27,7 @@ def mock_inverter():
     return goodwe_inverter
 
 
-async def test_manual_setup(hass: HomeAssistant) -> None:
+async def test_manual_setup(hass: SmartHub) -> None:
     """Test manually setting up."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -38,11 +38,11 @@ async def test_manual_setup(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.goodwe.config_flow.connect",
+            "smarthub.components.goodwe.config_flow.connect",
             return_value=mock_inverter(),
         ),
         patch(
-            "homeassistant.components.goodwe.async_setup_entry", return_value=True
+            "smarthub.components.goodwe.async_setup_entry", return_value=True
         ) as mock_setup_entry,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -59,7 +59,7 @@ async def test_manual_setup(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_manual_setup_already_exists(hass: HomeAssistant) -> None:
+async def test_manual_setup_already_exists(hass: SmartHub) -> None:
     """Test manually setting up and the device already exists."""
     entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: TEST_HOST}, unique_id=TEST_SERIAL
@@ -74,10 +74,10 @@ async def test_manual_setup_already_exists(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.goodwe.config_flow.connect",
+            "smarthub.components.goodwe.config_flow.connect",
             return_value=mock_inverter(),
         ),
-        patch("homeassistant.components.goodwe.async_setup_entry", return_value=True),
+        patch("smarthub.components.goodwe.async_setup_entry", return_value=True),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {CONF_HOST: TEST_HOST}
@@ -88,7 +88,7 @@ async def test_manual_setup_already_exists(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_manual_setup_device_offline(hass: HomeAssistant) -> None:
+async def test_manual_setup_device_offline(hass: SmartHub) -> None:
     """Test manually setting up, device offline."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -98,7 +98,7 @@ async def test_manual_setup_device_offline(hass: HomeAssistant) -> None:
     assert not result["errors"]
 
     with patch(
-        "homeassistant.components.goodwe.config_flow.connect",
+        "smarthub.components.goodwe.config_flow.connect",
         side_effect=InverterError,
     ):
         result = await hass.config_entries.flow.async_configure(

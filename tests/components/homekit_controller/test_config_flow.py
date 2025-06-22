@@ -14,15 +14,15 @@ from aiohomekit.model.services import ServicesTypes
 from bleak.exc import BleakError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.homekit_controller import config_flow
-from homeassistant.components.homekit_controller.const import KNOWN_DEVICES
-from homeassistant.components.homekit_controller.storage import async_get_entity_storage
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
-from homeassistant.helpers.service_info.zeroconf import (
+from smarthub import config_entries
+from smarthub.components.homekit_controller import config_flow
+from smarthub.components.homekit_controller.const import KNOWN_DEVICES
+from smarthub.components.homekit_controller.storage import async_get_entity_storage
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
@@ -165,7 +165,7 @@ def test_valid_pairing_codes(pairing_code) -> None:
 
 
 def get_flow_context(
-    hass: HomeAssistant, result: config_flow.ConfigFlowResult
+    hass: SmartHub, result: config_flow.ConfigFlowResult
 ) -> dict[str, Any]:
     """Get the flow context from the result of async_init or async_configure."""
     flow = next(
@@ -180,7 +180,7 @@ def get_flow_context(
 def get_device_discovery_info(
     device, upper_case_props=False, missing_csharp=False, paired=False
 ) -> ZeroconfServiceInfo:
-    """Turn a aiohomekit format zeroconf entry into a homeassistant one."""
+    """Turn a aiohomekit format zeroconf entry into a smarthub one."""
     result = ZeroconfServiceInfo(
         ip_address=ip_address("127.0.0.1"),
         ip_addresses=[ip_address("127.0.0.1")],
@@ -237,7 +237,7 @@ def setup_mock_accessory(controller):
 @pytest.mark.parametrize("upper_case_props", [True, False])
 @pytest.mark.parametrize("missing_csharp", [True, False])
 async def test_discovery_works(
-    hass: HomeAssistant, controller, upper_case_props, missing_csharp
+    hass: SmartHub, controller, upper_case_props, missing_csharp
 ) -> None:
     """Test a device being discovered."""
     device = setup_mock_accessory(controller)
@@ -271,7 +271,7 @@ async def test_discovery_works(
     assert result["data"] == {}
 
 
-async def test_abort_duplicate_flow(hass: HomeAssistant, controller) -> None:
+async def test_abort_duplicate_flow(hass: SmartHub, controller) -> None:
     """Already paired."""
     device = setup_mock_accessory(controller)
     discovery_info = get_device_discovery_info(device)
@@ -294,7 +294,7 @@ async def test_abort_duplicate_flow(hass: HomeAssistant, controller) -> None:
     assert result["reason"] == "already_in_progress"
 
 
-async def test_pair_already_paired_1(hass: HomeAssistant, controller) -> None:
+async def test_pair_already_paired_1(hass: SmartHub, controller) -> None:
     """Already paired."""
     device = setup_mock_accessory(controller)
     # Flag device as already paired
@@ -310,7 +310,7 @@ async def test_pair_already_paired_1(hass: HomeAssistant, controller) -> None:
     assert result["reason"] == "already_paired"
 
 
-async def test_unknown_domain_type(hass: HomeAssistant, controller) -> None:
+async def test_unknown_domain_type(hass: SmartHub, controller) -> None:
     """Test that aiohomekit can reject discoveries it doesn't support."""
     device = setup_mock_accessory(controller)
     # Flag device as already paired
@@ -327,7 +327,7 @@ async def test_unknown_domain_type(hass: HomeAssistant, controller) -> None:
     assert result["reason"] == "ignored_model"
 
 
-async def test_id_missing(hass: HomeAssistant, controller) -> None:
+async def test_id_missing(hass: SmartHub, controller) -> None:
     """Test id is missing."""
     device = setup_mock_accessory(controller)
     discovery_info = get_device_discovery_info(device)
@@ -345,7 +345,7 @@ async def test_id_missing(hass: HomeAssistant, controller) -> None:
     assert result["reason"] == "invalid_properties"
 
 
-async def test_discovery_ignored_model(hass: HomeAssistant, controller) -> None:
+async def test_discovery_ignored_model(hass: SmartHub, controller) -> None:
     """Already paired."""
     device = setup_mock_accessory(controller)
     discovery_info = get_device_discovery_info(device)
@@ -363,7 +363,7 @@ async def test_discovery_ignored_model(hass: HomeAssistant, controller) -> None:
 
 
 async def test_discovery_ignored_hk_bridge(
-    hass: HomeAssistant, controller, device_registry: dr.DeviceRegistry
+    hass: SmartHub, controller, device_registry: dr.DeviceRegistry
 ) -> None:
     """Ensure we ignore homekit bridges and accessories created by the homekit integration."""
     device = setup_mock_accessory(controller)
@@ -391,7 +391,7 @@ async def test_discovery_ignored_hk_bridge(
 
 
 async def test_discovery_does_not_ignore_non_homekit(
-    hass: HomeAssistant, controller, device_registry: dr.DeviceRegistry
+    hass: SmartHub, controller, device_registry: dr.DeviceRegistry
 ) -> None:
     """Do not ignore devices that are not from the homekit integration."""
     device = setup_mock_accessory(controller)
@@ -417,7 +417,7 @@ async def test_discovery_does_not_ignore_non_homekit(
     assert result["type"] is FlowResultType.FORM
 
 
-async def test_discovery_broken_pairing_flag(hass: HomeAssistant, controller) -> None:
+async def test_discovery_broken_pairing_flag(hass: SmartHub, controller) -> None:
     """There is already a config entry for the pairing and its pairing flag is wrong in zeroconf.
 
     We have seen this particular implementation error in 2 different devices.
@@ -454,7 +454,7 @@ async def test_discovery_broken_pairing_flag(hass: HomeAssistant, controller) ->
     assert result["reason"] == "already_paired"
 
 
-async def test_discovery_invalid_config_entry(hass: HomeAssistant, controller) -> None:
+async def test_discovery_invalid_config_entry(hass: SmartHub, controller) -> None:
     """There is already a config entry for the pairing id but it's invalid."""
     pairing = await controller.add_paired_device(Accessories(), "00:00:00:00:00:00")
 
@@ -492,7 +492,7 @@ async def test_discovery_invalid_config_entry(hass: HomeAssistant, controller) -
     assert result["type"] is FlowResultType.FORM
 
 
-async def test_discovery_ignored_config_entry(hass: HomeAssistant, controller) -> None:
+async def test_discovery_ignored_config_entry(hass: SmartHub, controller) -> None:
     """There is already a config entry but it is ignored."""
     pairing = await controller.add_paired_device(Accessories(), "00:00:00:00:00:00")
 
@@ -530,7 +530,7 @@ async def test_discovery_ignored_config_entry(hass: HomeAssistant, controller) -
     assert result["reason"] == "already_configured"
 
 
-async def test_discovery_already_configured(hass: HomeAssistant, controller) -> None:
+async def test_discovery_already_configured(hass: SmartHub, controller) -> None:
     """Already configured."""
     entry = MockConfigEntry(
         domain="homekit_controller",
@@ -562,7 +562,7 @@ async def test_discovery_already_configured(hass: HomeAssistant, controller) -> 
 
 
 async def test_discovery_already_configured_update_csharp(
-    hass: HomeAssistant, controller
+    hass: SmartHub, controller
 ) -> None:
     """Already configured and csharp changes."""
     entry = MockConfigEntry(
@@ -603,7 +603,7 @@ async def test_discovery_already_configured_update_csharp(
 
 @pytest.mark.parametrize(("exception", "expected"), PAIRING_START_ABORT_ERRORS)
 async def test_pair_abort_errors_on_start(
-    hass: HomeAssistant, controller, exception, expected
+    hass: SmartHub, controller, exception, expected
 ) -> None:
     """Test various pairing errors."""
 
@@ -627,7 +627,7 @@ async def test_pair_abort_errors_on_start(
 
 @pytest.mark.parametrize(("exception", "expected"), PAIRING_TRY_LATER_ERRORS)
 async def test_pair_try_later_errors_on_start(
-    hass: HomeAssistant, controller, exception, expected
+    hass: SmartHub, controller, exception, expected
 ) -> None:
     """Test various pairing errors."""
 
@@ -666,7 +666,7 @@ async def test_pair_try_later_errors_on_start(
 
 @pytest.mark.parametrize(("exception", "expected"), PAIRING_START_FORM_ERRORS)
 async def test_pair_form_errors_on_start(
-    hass: HomeAssistant, controller, exception, expected
+    hass: SmartHub, controller, exception, expected
 ) -> None:
     """Test various pairing errors."""
 
@@ -717,7 +717,7 @@ async def test_pair_form_errors_on_start(
 
 @pytest.mark.parametrize(("exception", "expected"), PAIRING_FINISH_ABORT_ERRORS)
 async def test_pair_abort_errors_on_finish(
-    hass: HomeAssistant, controller, exception, expected
+    hass: SmartHub, controller, exception, expected
 ) -> None:
     """Test various pairing errors."""
     device = setup_mock_accessory(controller)
@@ -759,7 +759,7 @@ async def test_pair_abort_errors_on_finish(
 
 @pytest.mark.parametrize(("exception", "expected"), PAIRING_FINISH_FORM_ERRORS)
 async def test_pair_form_errors_on_finish(
-    hass: HomeAssistant, controller, exception, expected
+    hass: SmartHub, controller, exception, expected
 ) -> None:
     """Test various pairing errors."""
     device = setup_mock_accessory(controller)
@@ -805,7 +805,7 @@ async def test_pair_form_errors_on_finish(
     }
 
 
-async def test_pair_unknown_errors(hass: HomeAssistant, controller) -> None:
+async def test_pair_unknown_errors(hass: SmartHub, controller) -> None:
     """Test describing unknown errors."""
     device = setup_mock_accessory(controller)
     discovery_info = get_device_discovery_info(device)
@@ -855,7 +855,7 @@ async def test_pair_unknown_errors(hass: HomeAssistant, controller) -> None:
     }
 
 
-async def test_user_works(hass: HomeAssistant, controller) -> None:
+async def test_user_works(hass: SmartHub, controller) -> None:
     """Test user initiated disovers devices."""
     setup_mock_accessory(controller)
 
@@ -890,7 +890,7 @@ async def test_user_works(hass: HomeAssistant, controller) -> None:
 
 
 async def test_user_pairing_with_insecure_setup_code(
-    hass: HomeAssistant, controller
+    hass: SmartHub, controller
 ) -> None:
     """Test user initiated disovers devices."""
     device = setup_mock_accessory(controller)
@@ -934,7 +934,7 @@ async def test_user_pairing_with_insecure_setup_code(
     assert result["title"] == "Koogeek-LS1-20833F"
 
 
-async def test_user_no_devices(hass: HomeAssistant, controller) -> None:
+async def test_user_no_devices(hass: SmartHub, controller) -> None:
     """Test user initiated pairing where no devices discovered."""
     result = await hass.config_entries.flow.async_init(
         "homekit_controller", context={"source": config_entries.SOURCE_USER}
@@ -943,7 +943,7 @@ async def test_user_no_devices(hass: HomeAssistant, controller) -> None:
     assert result["reason"] == "no_devices"
 
 
-async def test_user_no_unpaired_devices(hass: HomeAssistant, controller) -> None:
+async def test_user_no_unpaired_devices(hass: SmartHub, controller) -> None:
     """Test user initiated pairing where no unpaired devices discovered."""
     device = setup_mock_accessory(controller)
 
@@ -961,7 +961,7 @@ async def test_user_no_unpaired_devices(hass: HomeAssistant, controller) -> None
 
 
 async def test_discovery_dismiss_existing_flow_on_paired(
-    hass: HomeAssistant, controller
+    hass: SmartHub, controller
 ) -> None:
     """Test that existing flows get dismissed once paired to something else."""
     device = setup_mock_accessory(controller)
@@ -1004,7 +1004,7 @@ async def test_discovery_dismiss_existing_flow_on_paired(
 
 
 async def test_mdns_update_to_paired_during_pairing(
-    hass: HomeAssistant, controller
+    hass: SmartHub, controller
 ) -> None:
     """Test we do not abort pairing if mdns is updated to reflect paired during pairing."""
     device = setup_mock_accessory(controller)
@@ -1075,10 +1075,10 @@ async def test_mdns_update_to_paired_during_pairing(
     assert result["data"] == {}
 
 
-async def test_discovery_no_bluetooth_support(hass: HomeAssistant, controller) -> None:
+async def test_discovery_no_bluetooth_support(hass: SmartHub, controller) -> None:
     """Test discovery with bluetooth support not available."""
     with patch(
-        "homeassistant.components.homekit_controller.config_flow.aiohomekit_const.BLE_TRANSPORT_SUPPORTED",
+        "smarthub.components.homekit_controller.config_flow.aiohomekit_const.BLE_TRANSPORT_SUPPORTED",
         False,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1090,10 +1090,10 @@ async def test_discovery_no_bluetooth_support(hass: HomeAssistant, controller) -
     assert result["reason"] == "ignored_model"
 
 
-async def test_bluetooth_not_homekit(hass: HomeAssistant, controller) -> None:
+async def test_bluetooth_not_homekit(hass: SmartHub, controller) -> None:
     """Test bluetooth discovery with a non-homekit device."""
     with patch(
-        "homeassistant.components.homekit_controller.config_flow.aiohomekit_const.BLE_TRANSPORT_SUPPORTED",
+        "smarthub.components.homekit_controller.config_flow.aiohomekit_const.BLE_TRANSPORT_SUPPORTED",
         True,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1106,11 +1106,11 @@ async def test_bluetooth_not_homekit(hass: HomeAssistant, controller) -> None:
 
 
 async def test_bluetooth_valid_device_no_discovery(
-    hass: HomeAssistant, controller
+    hass: SmartHub, controller
 ) -> None:
     """Test bluetooth discovery  with a homekit device and discovery fails."""
     with patch(
-        "homeassistant.components.homekit_controller.config_flow.aiohomekit_const.BLE_TRANSPORT_SUPPORTED",
+        "smarthub.components.homekit_controller.config_flow.aiohomekit_const.BLE_TRANSPORT_SUPPORTED",
         True,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1123,13 +1123,13 @@ async def test_bluetooth_valid_device_no_discovery(
 
 
 async def test_bluetooth_valid_device_discovery_paired(
-    hass: HomeAssistant, controller
+    hass: SmartHub, controller
 ) -> None:
     """Test bluetooth discovery  with a homekit device and discovery works."""
     setup_mock_accessory(controller)
 
     with patch(
-        "homeassistant.components.homekit_controller.config_flow.aiohomekit_const.BLE_TRANSPORT_SUPPORTED",
+        "smarthub.components.homekit_controller.config_flow.aiohomekit_const.BLE_TRANSPORT_SUPPORTED",
         True,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1143,14 +1143,14 @@ async def test_bluetooth_valid_device_discovery_paired(
 
 
 async def test_bluetooth_valid_device_discovery_unpaired(
-    hass: HomeAssistant, controller
+    hass: SmartHub, controller
 ) -> None:
     """Test bluetooth discovery with a homekit device and discovery works."""
     setup_mock_accessory(controller)
     storage = await async_get_entity_storage(hass)
 
     with patch(
-        "homeassistant.components.homekit_controller.config_flow.aiohomekit_const.BLE_TRANSPORT_SUPPORTED",
+        "smarthub.components.homekit_controller.config_flow.aiohomekit_const.BLE_TRANSPORT_SUPPORTED",
         True,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1182,7 +1182,7 @@ async def test_bluetooth_valid_device_discovery_unpaired(
 
 
 async def test_discovery_updates_ip_when_config_entry_set_up(
-    hass: HomeAssistant, controller
+    hass: SmartHub, controller
 ) -> None:
     """Already configured updates ip when config entry set up."""
     entry = MockConfigEntry(
@@ -1221,7 +1221,7 @@ async def test_discovery_updates_ip_when_config_entry_set_up(
 
 
 async def test_discovery_updates_ip_config_entry_not_set_up(
-    hass: HomeAssistant, controller
+    hass: SmartHub, controller
 ) -> None:
     """Already configured updates ip when the config entry is not set up."""
     entry = MockConfigEntry(

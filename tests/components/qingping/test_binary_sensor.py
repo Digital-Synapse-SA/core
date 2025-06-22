@@ -3,13 +3,13 @@
 from datetime import timedelta
 import time
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
 )
-from homeassistant.components.qingping.const import DOMAIN
-from homeassistant.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.qingping.const import DOMAIN
+from smarthub.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import LIGHT_AND_SIGNAL_SERVICE_INFO, NO_DATA_SERVICE_INFO
 
@@ -21,7 +21,7 @@ from tests.components.bluetooth import (
 )
 
 
-async def test_binary_sensors(hass: HomeAssistant) -> None:
+async def test_binary_sensors(hass: SmartHub) -> None:
     """Test setting up creates the binary sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -45,7 +45,7 @@ async def test_binary_sensors(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_binary_sensor_restore_state(hass: HomeAssistant) -> None:
+async def test_binary_sensor_restore_state(hass: SmartHub) -> None:
     """Test setting up creates the binary sensors and restoring state."""
     start_monotonic = time.monotonic()
 

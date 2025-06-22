@@ -1,7 +1,7 @@
 """Define tests for the The Things Network sensor."""
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import init_integration
 from .conftest import (
@@ -16,7 +16,7 @@ from .conftest import (
 
 
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mock_ttnclient,

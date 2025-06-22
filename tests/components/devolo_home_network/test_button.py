@@ -6,13 +6,13 @@ from devolo_plc_api.exceptions.device import DevicePasswordProtected, DeviceUnav
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as PLATFORM, SERVICE_PRESS
-from homeassistant.components.devolo_home_network.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as PLATFORM, SERVICE_PRESS
+from smarthub.components.devolo_home_network.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import configure_integration
 from .mock import MockDevice
@@ -20,7 +20,7 @@ from .mock import MockDevice
 
 @pytest.mark.usefixtures("mock_device")
 async def test_button_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test default setup of the button component."""
@@ -69,7 +69,7 @@ async def test_button_setup(
 )
 @pytest.mark.freeze_time("2023-01-13 12:00:00+00:00")
 async def test_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -104,7 +104,7 @@ async def test_button(
     # Emulate device failure
     setattr(api, trigger_method, AsyncMock())
     getattr(api, trigger_method).side_effect = DeviceUnavailable
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             PLATFORM,
             SERVICE_PRESS,
@@ -113,7 +113,7 @@ async def test_button(
         )
 
 
-async def test_auth_failed(hass: HomeAssistant, mock_device: MockDevice) -> None:
+async def test_auth_failed(hass: SmartHub, mock_device: MockDevice) -> None:
     """Test setting unautherized triggers the reauth flow."""
     entry = configure_integration(hass)
     device_name = entry.title.replace(" ", "_").lower()
@@ -124,7 +124,7 @@ async def test_auth_failed(hass: HomeAssistant, mock_device: MockDevice) -> None
 
     mock_device.device.async_start_wps.side_effect = DevicePasswordProtected
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             PLATFORM,
             SERVICE_PRESS,

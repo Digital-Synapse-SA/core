@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, patch
 from aiotractive.exceptions import TractiveError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -14,8 +14,8 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -23,14 +23,14 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test states of the switch."""
-    with patch("homeassistant.components.tractive.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.tractive.PLATFORMS", [Platform.SWITCH]):
         await init_integration(hass, mock_config_entry)
 
         mock_tractive_client.send_switch_event(mock_config_entry)
@@ -39,7 +39,7 @@ async def test_switch(
 
 
 async def test_switch_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -78,7 +78,7 @@ async def test_switch_on(
 
 
 async def test_switch_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -118,7 +118,7 @@ async def test_switch_off(
 
 
 async def test_live_tracking_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -163,7 +163,7 @@ async def test_live_tracking_switch(
 
 
 async def test_switch_on_with_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -195,7 +195,7 @@ async def test_switch_on_with_exception(
 
 
 async def test_switch_off_with_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

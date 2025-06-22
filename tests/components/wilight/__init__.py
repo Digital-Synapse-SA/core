@@ -2,13 +2,13 @@
 
 from pywilight.const import DOMAIN
 
-from homeassistant.components.wilight.config_flow import (
+from smarthub.components.wilight.config_flow import (
     CONF_MODEL_NAME,
     CONF_SERIAL_NUMBER,
 )
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_MANUFACTURER,
     ATTR_UPNP_MODEL_NAME,
     ATTR_UPNP_MODEL_NUMBER,
@@ -71,9 +71,9 @@ MOCK_SSDP_DISCOVERY_INFO_MISSING_MANUFACTURER = SsdpServiceInfo(
 
 
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> MockConfigEntry:
-    """Mock ConfigEntry in Home Assistant."""
+    """Mock ConfigEntry in SmartHub."""
 
     entry = MockConfigEntry(
         domain=DOMAIN,

@@ -2,22 +2,22 @@
 
 from unittest.mock import patch
 
-from homeassistant import config as hass_config
-from homeassistant.components.intent_script import DOMAIN
-from homeassistant.const import ATTR_FRIENDLY_NAME, SERVICE_RELOAD
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub import config as hass_config
+from smarthub.components.intent_script import DOMAIN
+from smarthub.const import ATTR_FRIENDLY_NAME, SERVICE_RELOAD
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     area_registry as ar,
     entity_registry as er,
     floor_registry as fr,
     intent,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from tests.common import async_mock_service, get_fixture_path
 
 
-async def test_intent_script(hass: HomeAssistant) -> None:
+async def test_intent_script(hass: SmartHub) -> None:
     """Test intent scripts work."""
     calls = async_mock_service(hass, "test", "service")
 
@@ -69,7 +69,7 @@ async def test_intent_script(hass: HomeAssistant) -> None:
     assert response.card["simple"]["content"] == "Content for Paulus"
 
 
-async def test_intent_script_wait_response(hass: HomeAssistant) -> None:
+async def test_intent_script_wait_response(hass: SmartHub) -> None:
     """Test intent scripts work."""
     calls = async_mock_service(hass, "test", "service")
 
@@ -124,7 +124,7 @@ async def test_intent_script_wait_response(hass: HomeAssistant) -> None:
     assert response.card["simple"]["content"] == "Content for Paulus"
 
 
-async def test_intent_script_service_response(hass: HomeAssistant) -> None:
+async def test_intent_script_service_response(hass: SmartHub) -> None:
     """Test intent scripts work."""
     calls = async_mock_service(
         hass, "test", "service", response={"some_key": "some value"}
@@ -156,7 +156,7 @@ async def test_intent_script_service_response(hass: HomeAssistant) -> None:
     assert response.speech["plain"]["speech"] == "The service returned some value"
 
 
-async def test_intent_script_falsy_reprompt(hass: HomeAssistant) -> None:
+async def test_intent_script_falsy_reprompt(hass: SmartHub) -> None:
     """Test intent scripts work."""
     calls = async_mock_service(hass, "test", "service")
 
@@ -203,7 +203,7 @@ async def test_intent_script_falsy_reprompt(hass: HomeAssistant) -> None:
 
 
 async def test_intent_script_targets(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
     floor_registry: fr.FloorRegistry,
@@ -294,7 +294,7 @@ async def test_intent_script_targets(
     calls.clear()
 
 
-async def test_reload(hass: HomeAssistant) -> None:
+async def test_reload(hass: SmartHub) -> None:
     """Verify we can reload intent config."""
 
     config = {"intent_script": {"NewIntent1": {"speech": {"text": "HelloWorld123"}}}}

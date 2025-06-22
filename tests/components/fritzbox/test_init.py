@@ -8,12 +8,12 @@ from pyfritzhome import LoginError
 import pytest
 from requests.exceptions import ConnectionError as RequestConnectionError
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.fritzbox.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.fritzbox.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_DEVICES,
     CONF_HOST,
     CONF_PASSWORD,
@@ -22,9 +22,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import FritzDeviceSwitchMock, setup_config_entry
 from .const import CONF_FAKE_AIN, CONF_FAKE_NAME, MOCK_CONFIG
@@ -33,7 +33,7 @@ from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
-async def test_setup(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_setup(hass: SmartHub, fritz: Mock) -> None:
     """Test setup of integration."""
     assert await setup_config_entry(hass, MOCK_CONFIG[DOMAIN][CONF_DEVICES][0])
     entries = hass.config_entries.async_entries()
@@ -73,7 +73,7 @@ async def test_setup(hass: HomeAssistant, fritz: Mock) -> None:
     ],
 )
 async def test_update_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     fritz: Mock,
     entitydata: dict,
@@ -133,7 +133,7 @@ async def test_update_unique_id(
     ],
 )
 async def test_update_unique_id_no_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     fritz: Mock,
     entitydata: dict,
@@ -161,7 +161,7 @@ async def test_update_unique_id_no_change(
     assert entity_migrated.unique_id == unique_id
 
 
-async def test_unload_remove(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_unload_remove(hass: SmartHub, fritz: Mock) -> None:
     """Test unload and remove of integration."""
     fritz().get_devices.return_value = [FritzDeviceSwitchMock()]
     entity_id = f"{SWITCH_DOMAIN}.{CONF_FAKE_NAME}"
@@ -200,8 +200,8 @@ async def test_unload_remove(hass: HomeAssistant, fritz: Mock) -> None:
     assert state is None
 
 
-async def test_logout_on_stop(hass: HomeAssistant, fritz: Mock) -> None:
-    """Test we log out from fritzbox when Home Assistants stops."""
+async def test_logout_on_stop(hass: SmartHub, fritz: Mock) -> None:
+    """Test we log out from fritzbox when SmartHubs stops."""
     fritz().get_devices.return_value = [FritzDeviceSwitchMock()]
     entity_id = f"{SWITCH_DOMAIN}.{CONF_FAKE_NAME}"
 
@@ -230,7 +230,7 @@ async def test_logout_on_stop(hass: HomeAssistant, fritz: Mock) -> None:
 
 
 async def test_remove_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
@@ -275,7 +275,7 @@ async def test_remove_device(
     await hass.async_block_till_done()
 
 
-async def test_raise_config_entry_not_ready_when_offline(hass: HomeAssistant) -> None:
+async def test_raise_config_entry_not_ready_when_offline(hass: SmartHub) -> None:
     """Config entry state is SETUP_RETRY when fritzbox is offline."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -284,7 +284,7 @@ async def test_raise_config_entry_not_ready_when_offline(hass: HomeAssistant) ->
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.fritzbox.coordinator.Fritzhome.login",
+        "smarthub.components.fritzbox.coordinator.Fritzhome.login",
         side_effect=RequestConnectionError(),
     ) as mock_login:
         await hass.config_entries.async_setup(entry.entry_id)
@@ -296,7 +296,7 @@ async def test_raise_config_entry_not_ready_when_offline(hass: HomeAssistant) ->
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_raise_config_entry_error_when_login_fail(hass: HomeAssistant) -> None:
+async def test_raise_config_entry_error_when_login_fail(hass: SmartHub) -> None:
     """Config entry state is SETUP_ERROR when login to fritzbox fail."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -305,7 +305,7 @@ async def test_raise_config_entry_error_when_login_fail(hass: HomeAssistant) -> 
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.fritzbox.coordinator.Fritzhome.login",
+        "smarthub.components.fritzbox.coordinator.Fritzhome.login",
         side_effect=LoginError("user"),
     ) as mock_login:
         await hass.config_entries.async_setup(entry.entry_id)

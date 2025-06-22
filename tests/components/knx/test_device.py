@@ -2,13 +2,13 @@
 
 from typing import Any
 
-from homeassistant.components.knx.const import DOMAIN
-from homeassistant.components.knx.storage.config_store import (
+from smarthub.components.knx.const import DOMAIN
+from smarthub.components.knx.storage.config_store import (
     STORAGE_KEY as KNX_CONFIG_STORAGE_KEY,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import KNXTestKit
 
@@ -16,7 +16,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_create_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     device_registry: dr.DeviceRegistry,
     hass_ws_client: WebSocketGenerator,
@@ -45,7 +45,7 @@ async def test_create_device(
 
 
 async def test_remove_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,

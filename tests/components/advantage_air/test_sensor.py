@@ -3,15 +3,15 @@
 from datetime import timedelta
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.components.advantage_air.const import DOMAIN
-from homeassistant.components.advantage_air.sensor import (
+from smarthub.components.advantage_air.const import DOMAIN
+from smarthub.components.advantage_air.sensor import (
     ADVANTAGE_AIR_SERVICE_SET_TIME_TO,
     ADVANTAGE_AIR_SET_COUNTDOWN_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import add_mock_config
 
@@ -19,7 +19,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_sensor_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_get: AsyncMock,
     mock_update: AsyncMock,
@@ -111,7 +111,7 @@ async def test_sensor_platform(
 
 
 async def test_sensor_platform_disabled_entity(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_get: AsyncMock
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_get: AsyncMock
 ) -> None:
     """Test sensor platform disabled entity."""
 
@@ -124,7 +124,7 @@ async def test_sensor_platform_disabled_entity(
 
     mock_get.reset_mock()
 
-    with patch("homeassistant.config_entries.RELOAD_AFTER_UPDATE_DELAY", 1):
+    with patch("smarthub.config_entries.RELOAD_AFTER_UPDATE_DELAY", 1):
         entity_registry.async_update_entity(entity_id=entity_id, disabled_by=None)
         await hass.async_block_till_done(wait_background_tasks=True)
 

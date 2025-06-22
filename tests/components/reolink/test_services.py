@@ -6,26 +6,26 @@ import pytest
 from reolink_aio.api import Chime
 from reolink_aio.exceptions import InvalidParameterError, ReolinkError
 
-from homeassistant.components.reolink.const import DOMAIN
-from homeassistant.components.reolink.services import ATTR_RINGTONE
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_DEVICE_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.reolink.const import DOMAIN
+from smarthub.components.reolink.services import ATTR_RINGTONE
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_DEVICE_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_play_chime_service_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     test_chime: Chime,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test chime play service."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SELECT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -56,7 +56,7 @@ async def test_play_chime_service_entity(
         )
 
     test_chime.play = AsyncMock(side_effect=ReolinkError("Test error"))
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             "play_chime",
@@ -84,14 +84,14 @@ async def test_play_chime_service_entity(
 
 
 async def test_play_chime_service_unloaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     test_chime: Chime,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test chime play service when config entry is unloaded."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SELECT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED

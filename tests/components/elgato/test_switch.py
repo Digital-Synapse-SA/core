@@ -6,15 +6,15 @@ from elgato import ElgatoError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = [
     pytest.mark.parametrize("device_fixtures", ["key-light-mini"]),
@@ -30,7 +30,7 @@ pytestmark = [
     ],
 )
 async def test_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_elgato: MagicMock,
@@ -73,7 +73,7 @@ async def test_switches(
     mocked_method.side_effect = ElgatoError
 
     with pytest.raises(
-        HomeAssistantError, match="An error occurred while updating the Elgato Light"
+        SmartHubError, match="An error occurred while updating the Elgato Light"
     ):
         await hass.services.async_call(
             SWITCH_DOMAIN,
@@ -85,7 +85,7 @@ async def test_switches(
     assert len(mocked_method.mock_calls) == 3
 
     with pytest.raises(
-        HomeAssistantError, match="An error occurred while updating the Elgato Light"
+        SmartHubError, match="An error occurred while updating the Elgato Light"
     ):
         await hass.services.async_call(
             SWITCH_DOMAIN,

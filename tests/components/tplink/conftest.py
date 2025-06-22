@@ -7,8 +7,8 @@ from unittest.mock import DEFAULT, AsyncMock, patch
 from kasa import DeviceConfig, Module
 import pytest
 
-from homeassistant.components.tplink import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.tplink import DOMAIN
+from smarthub.core import SmartHub
 
 from . import _mocked_device
 from .const import (
@@ -72,7 +72,7 @@ def _get_mock_devices():
 def mock_discovery():
     """Mock python-kasa discovery."""
     with patch.multiple(
-        "homeassistant.components.tplink.Discover",
+        "smarthub.components.tplink.Discover",
         discover=DEFAULT,
         discover_single=DEFAULT,
         try_connect_all=DEFAULT,
@@ -92,7 +92,7 @@ def mock_discovery():
 @pytest.fixture
 def mock_connect():
     """Mock python-kasa connect."""
-    with patch("homeassistant.components.tplink.Device.connect") as mock_connect:
+    with patch("smarthub.components.tplink.Device.connect") as mock_connect:
         devices = _get_mock_devices()
 
         def get_device(config):
@@ -122,7 +122,7 @@ def mock_init() -> Generator[dict[str, AsyncMock]]:
     in the logs during teardown of the hass fixture which calls async_unload.
     """
     with patch.multiple(
-        "homeassistant.components.tplink",
+        "smarthub.components.tplink",
         async_setup=DEFAULT,
         async_setup_entry=DEFAULT,
         async_unload_entry=DEFAULT,
@@ -157,7 +157,7 @@ def mock_camera_config_entry() -> MockConfigEntry:
 
 @pytest.fixture
 async def mock_added_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init,
 ) -> MockConfigEntry:

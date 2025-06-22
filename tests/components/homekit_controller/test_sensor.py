@@ -9,13 +9,13 @@ from aiohomekit.model.services import Service, ServicesTypes
 from aiohomekit.protocol.statuscodes import HapStatusCode
 import pytest
 
-from homeassistant.components.homekit_controller.sensor import (
+from smarthub.components.homekit_controller.sensor import (
     thread_node_capability_to_str,
     thread_status_to_str,
 )
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import TEST_DEVICE_SERVICE_INFO, Helper, setup_test_component
 
@@ -71,7 +71,7 @@ def create_battery_level_sensor(accessory: Accessory) -> Service:
 
 
 async def test_temperature_sensor_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test reading the state of a HomeKit temperature sensor accessory."""
     helper = await setup_test_component(
@@ -99,7 +99,7 @@ async def test_temperature_sensor_read_state(
 
 
 async def test_temperature_sensor_not_added_twice(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """A standalone temperature sensor should not get a characteristic AND a service entity."""
     helper = await setup_test_component(
@@ -115,7 +115,7 @@ async def test_temperature_sensor_not_added_twice(
 
 
 async def test_humidity_sensor_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test reading the state of a HomeKit humidity sensor accessory."""
     helper = await setup_test_component(
@@ -142,7 +142,7 @@ async def test_humidity_sensor_read_state(
 
 
 async def test_light_level_sensor_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test reading the state of a HomeKit temperature sensor accessory."""
     helper = await setup_test_component(
@@ -169,7 +169,7 @@ async def test_light_level_sensor_read_state(
 
 
 async def test_carbon_dioxide_level_sensor_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test reading the state of a HomeKit carbon dioxide sensor accessory."""
     helper = await setup_test_component(
@@ -197,7 +197,7 @@ async def test_carbon_dioxide_level_sensor_read_state(
 
 
 async def test_battery_level_sensor(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test reading the state of a HomeKit battery level sensor."""
     helper = await setup_test_component(
@@ -226,7 +226,7 @@ async def test_battery_level_sensor(
 
 
 async def test_battery_charging(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test reading the state of a HomeKit battery's charging state."""
     helper = await setup_test_component(
@@ -252,7 +252,7 @@ async def test_battery_charging(
 
 
 async def test_battery_low(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test reading the state of a HomeKit battery's low state."""
     helper = await setup_test_component(
@@ -296,7 +296,7 @@ def create_switch_with_sensor(accessory: Accessory) -> Service:
 
 
 async def test_switch_with_sensor(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test a switch service that has a sensor characteristic is correctly handled."""
     helper = await setup_test_component(hass, get_next_aid(), create_switch_with_sensor)
@@ -328,7 +328,7 @@ async def test_switch_with_sensor(
 
 
 async def test_sensor_unavailable(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test a sensor becoming unavailable."""
     helper = await setup_test_component(hass, get_next_aid(), create_switch_with_sensor)
@@ -411,7 +411,7 @@ def test_thread_status_to_str() -> None:
     "fake_ble_pairing",
 )
 async def test_rssi_sensor(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test an rssi sensor."""
     inject_bluetooth_service_info(hass, TEST_DEVICE_SERVICE_INFO)
@@ -435,7 +435,7 @@ async def test_rssi_sensor(
     "fake_ble_pairing",
 )
 async def test_migrate_rssi_sensor_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:

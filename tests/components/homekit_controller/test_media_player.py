@@ -10,13 +10,13 @@ from aiohomekit.model.characteristics import (
 from aiohomekit.model.services import Service, ServicesTypes
 import pytest
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     DOMAIN as MEDIA_PLAYER_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_test_component
 
@@ -71,7 +71,7 @@ def create_tv_service_with_target_media_state(accessory: Accessory) -> Service:
 
 
 async def test_tv_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit fan accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_tv_service)
@@ -102,7 +102,7 @@ async def test_tv_read_state(
 
 
 async def test_tv_read_sources(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the input source of a HomeKit TV."""
     helper = await setup_test_component(hass, get_next_aid(), create_tv_service)
@@ -113,7 +113,7 @@ async def test_tv_read_sources(
 
 
 async def test_play_remote_key(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can play media on a media player."""
     helper = await setup_test_component(hass, get_next_aid(), create_tv_service)
@@ -162,7 +162,7 @@ async def test_play_remote_key(
 
 
 async def test_pause_remote_key(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can pause a media player."""
     helper = await setup_test_component(hass, get_next_aid(), create_tv_service)
@@ -210,7 +210,7 @@ async def test_pause_remote_key(
     )
 
 
-async def test_play(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_play(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test that we can play media on a media player."""
     helper = await setup_test_component(
         hass, get_next_aid(), create_tv_service_with_target_media_state
@@ -261,7 +261,7 @@ async def test_play(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> Non
     )
 
 
-async def test_pause(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_pause(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test that we can turn pause a media player."""
     helper = await setup_test_component(
         hass, get_next_aid(), create_tv_service_with_target_media_state
@@ -311,7 +311,7 @@ async def test_pause(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> No
     )
 
 
-async def test_stop(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_stop(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test that we can  stop a media player."""
     helper = await setup_test_component(
         hass, get_next_aid(), create_tv_service_with_target_media_state
@@ -355,7 +355,7 @@ async def test_stop(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> Non
 
 
 async def test_tv_set_source(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can set the input source of a HomeKit TV."""
     helper = await setup_test_component(hass, get_next_aid(), create_tv_service)
@@ -378,7 +378,7 @@ async def test_tv_set_source(
 
 
 async def test_tv_set_source_fail(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can set the input source of a HomeKit TV."""
     helper = await setup_test_component(hass, get_next_aid(), create_tv_service)
@@ -396,7 +396,7 @@ async def test_tv_set_source_fail(
 
 
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:
@@ -415,7 +415,7 @@ async def test_migrate_unique_id(
     )
 
 
-async def test_turn_on(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_turn_on(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test that we can turn on a media player."""
     helper = await setup_test_component(
         hass, get_next_aid(), create_tv_service_with_target_media_state
@@ -442,7 +442,7 @@ async def test_turn_on(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> 
     )
 
 
-async def test_turn_off(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_turn_off(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test that we can turn off a media player."""
     helper = await setup_test_component(
         hass, get_next_aid(), create_tv_service_with_target_media_state

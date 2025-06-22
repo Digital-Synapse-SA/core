@@ -3,10 +3,10 @@
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.peblar.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.peblar.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 @pytest.mark.parametrize("init_integration", [Platform.UPDATE], indirect=True)
 @pytest.mark.usefixtures("init_integration")
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,

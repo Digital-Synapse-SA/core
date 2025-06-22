@@ -11,11 +11,11 @@ from aiohttp.test_utils import TestClient
 import defusedxml.ElementTree as ET
 import pytest
 
-from homeassistant import setup
-from homeassistant.components import emulated_hue
-from homeassistant.components.emulated_hue import upnp
-from homeassistant.const import CONTENT_TYPE_JSON
-from homeassistant.core import HomeAssistant
+from smarthub import setup
+from smarthub.components import emulated_hue
+from smarthub.components.emulated_hue import upnp
+from smarthub.const import CONTENT_TYPE_JSON
+from smarthub.core import SmartHub
 
 from tests.common import get_test_instance_port
 from tests.typing import ClientSessionGenerator
@@ -51,7 +51,7 @@ def hue_client(
     """Return a hue API client."""
     app = web.Application()
     with unittest.mock.patch(
-        "homeassistant.components.emulated_hue.web.Application", return_value=app
+        "smarthub.components.emulated_hue.web.Application", return_value=app
     ):
 
         async def client():
@@ -61,10 +61,10 @@ def hue_client(
         yield client
 
 
-async def setup_hue(hass: HomeAssistant) -> None:
+async def setup_hue(hass: SmartHub) -> None:
     """Set up the emulated_hue integration."""
     with patch(
-        "homeassistant.components.emulated_hue.async_create_upnp_datagram_endpoint"
+        "smarthub.components.emulated_hue.async_create_upnp_datagram_endpoint"
     ):
         assert await setup.async_setup_component(
             hass,
@@ -159,7 +159,7 @@ MX:3
     assert not mock_transport.sends
 
 
-async def test_description_xml(hass: HomeAssistant, hue_client) -> None:
+async def test_description_xml(hass: SmartHub, hue_client) -> None:
     """Test the description."""
     await setup_hue(hass)
     client = await hue_client()
@@ -176,7 +176,7 @@ async def test_description_xml(hass: HomeAssistant, hue_client) -> None:
         pytest.fail("description.xml is not valid XML!")
 
 
-async def test_create_username(hass: HomeAssistant, hue_client) -> None:
+async def test_create_username(hass: SmartHub, hue_client) -> None:
     """Test the creation of an username."""
     await setup_hue(hass)
     client = await hue_client()
@@ -194,7 +194,7 @@ async def test_create_username(hass: HomeAssistant, hue_client) -> None:
     assert "username" in success_json["success"]
 
 
-async def test_unauthorized_view(hass: HomeAssistant, hue_client) -> None:
+async def test_unauthorized_view(hass: SmartHub, hue_client) -> None:
     """Test unauthorized view."""
     await setup_hue(hass)
     client = await hue_client()
@@ -220,7 +220,7 @@ async def test_unauthorized_view(hass: HomeAssistant, hue_client) -> None:
     assert "1" in error_json["type"]
 
 
-async def test_valid_username_request(hass: HomeAssistant, hue_client) -> None:
+async def test_valid_username_request(hass: SmartHub, hue_client) -> None:
     """Test request with a valid username."""
     await setup_hue(hass)
     client = await hue_client()

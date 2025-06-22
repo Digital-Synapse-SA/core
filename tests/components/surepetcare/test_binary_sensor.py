@@ -1,7 +1,7 @@
 """The tests for the Sure Petcare binary sensor platform."""
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import HOUSEHOLD_ID, HUB_ID
 
@@ -17,7 +17,7 @@ EXPECTED_ENTITY_IDS = {
 
 
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     surepetcare,
     mock_config_entry_setup: MockConfigEntry,

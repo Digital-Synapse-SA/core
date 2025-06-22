@@ -10,18 +10,18 @@ from pyhomeworks.pyhomeworks import (
 )
 import pytest
 
-from homeassistant.components.homeworks import EVENT_BUTTON_PRESS, EVENT_BUTTON_RELEASE
-from homeassistant.components.homeworks.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.components.homeworks import EVENT_BUTTON_PRESS, EVENT_BUTTON_RELEASE
+from smarthub.components.homeworks.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from tests.common import MockConfigEntry, async_capture_events
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:
@@ -41,7 +41,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_load_config_entry_with_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_username_password: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:
@@ -63,7 +63,7 @@ async def test_load_config_entry_with_credentials(
 
 
 async def test_controller_credentials_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_username_password: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:
@@ -86,7 +86,7 @@ async def test_controller_credentials_changed(
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:
@@ -104,7 +104,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_keypad_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:
@@ -147,7 +147,7 @@ async def test_keypad_events(
 
 
 async def test_send_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:
@@ -221,7 +221,7 @@ async def test_send_command(
 
 
 async def test_cleanup_on_ha_shutdown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:

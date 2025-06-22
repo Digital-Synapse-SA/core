@@ -5,16 +5,16 @@ import copy
 import pytest
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.zwave_js.const import DOMAIN
-from homeassistant.components.zwave_js.helpers import get_device_id
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.zwave_js.const import DOMAIN
+from smarthub.components.zwave_js.helpers import get_device_id
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .common import AIR_TEMPERATURE_SENSOR, NOTIFICATION_MOTION_BINARY_SENSOR
 
 
 async def test_unique_id_migration_dupes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     multisensor_6_state,
     client,
@@ -81,7 +81,7 @@ async def test_unique_id_migration_dupes(
     ],
 )
 async def test_unique_id_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     multisensor_6_state,
     client,
@@ -128,7 +128,7 @@ async def test_unique_id_migration(
     ],
 )
 async def test_unique_id_migration_property_key(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hank_binary_switch_state,
     client,
@@ -167,7 +167,7 @@ async def test_unique_id_migration_property_key(
 
 
 async def test_unique_id_migration_notification_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     multisensor_6_state,
     client,
@@ -213,7 +213,7 @@ async def test_unique_id_migration_notification_binary_sensor(
 
 
 async def test_old_entity_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hank_binary_switch_state,
@@ -266,7 +266,7 @@ async def test_old_entity_migration(
 
 
 async def test_different_endpoint_migration_status_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hank_binary_switch_state,
@@ -315,7 +315,7 @@ async def test_different_endpoint_migration_status_sensor(
 
 
 async def test_skip_old_entity_migration_for_multiple(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hank_binary_switch_state,
@@ -380,7 +380,7 @@ async def test_skip_old_entity_migration_for_multiple(
 
 
 async def test_old_entity_migration_notification_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     multisensor_6_state,

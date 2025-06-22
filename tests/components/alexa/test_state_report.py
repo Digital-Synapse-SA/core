@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, patch
 import aiohttp
 import pytest
 
-from homeassistant import core
-from homeassistant.components.alexa import errors, state_report
-from homeassistant.components.alexa.resources import AlexaGlobalCatalog
-from homeassistant.const import PERCENTAGE, UnitOfLength, UnitOfTemperature
-from homeassistant.core import HomeAssistant
+from smarthub import core
+from smarthub.components.alexa import errors, state_report
+from smarthub.components.alexa.resources import AlexaGlobalCatalog
+from smarthub.const import PERCENTAGE, UnitOfLength, UnitOfTemperature
+from smarthub.core import SmartHub
 
 from .test_common import TEST_URL, get_default_config
 
@@ -18,7 +18,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_report_state(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test proactive state reports."""
     aioclient_mock.post(TEST_URL, text="", status=202)
@@ -54,7 +54,7 @@ async def test_report_state(
 
 
 async def test_report_state_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -100,7 +100,7 @@ async def test_report_state_fail(
 
 
 async def test_report_state_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -137,7 +137,7 @@ async def test_report_state_timeout(
 
 
 async def test_report_state_retry(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test proactive state retries once."""
     aioclient_mock.post(
@@ -167,7 +167,7 @@ async def test_report_state_retry(
 
 
 async def test_report_state_unsets_authorized_on_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test proactive state unsets authorized on error."""
     aioclient_mock.post(
@@ -200,7 +200,7 @@ async def test_report_state_unsets_authorized_on_error(
 
 @pytest.mark.parametrize("exc", [errors.NoTokenAvailable, errors.RequireRelink])
 async def test_report_state_unsets_authorized_on_access_token_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, exc: Exception
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, exc: Exception
 ) -> None:
     """Test proactive state unsets authorized on error."""
     aioclient_mock.post(TEST_URL, text="", status=202)
@@ -230,7 +230,7 @@ async def test_report_state_unsets_authorized_on_access_token_error(
 
 
 async def test_report_state_fan(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test proactive state reports with fan instance."""
     aioclient_mock.post(TEST_URL, text="", status=202)
@@ -298,7 +298,7 @@ async def test_report_state_fan(
 
 
 async def test_report_state_humidifier(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test proactive state reports with humidifier instance."""
     aioclient_mock.post(TEST_URL, text="", status=202)
@@ -393,7 +393,7 @@ async def test_report_state_humidifier(
     ],
 )
 async def test_report_state_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     domain: str,
     value: float,
@@ -455,7 +455,7 @@ async def test_report_state_number(
 
 
 async def test_send_add_or_update_message(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test sending an AddOrUpdateReport message."""
     aioclient_mock.post(TEST_URL, text="")
@@ -494,7 +494,7 @@ async def test_send_add_or_update_message(
 
 
 async def test_send_delete_message(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test sending an AddOrUpdateReport message."""
     aioclient_mock.post(TEST_URL, json={"data": "is irrelevant"})
@@ -523,7 +523,7 @@ async def test_send_delete_message(
 
 
 async def test_doorbell_event(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test doorbell press reports."""
     aioclient_mock.post(TEST_URL, text="", status=202)
@@ -590,7 +590,7 @@ async def test_doorbell_event(
 
 
 async def test_doorbell_event_from_unknown(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test doorbell press reports."""
     aioclient_mock.post(TEST_URL, text="", status=202)
@@ -620,7 +620,7 @@ async def test_doorbell_event_from_unknown(
 
 
 async def test_doorbell_event_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -667,7 +667,7 @@ async def test_doorbell_event_fail(
 
 
 async def test_doorbell_event_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -704,7 +704,7 @@ async def test_doorbell_event_timeout(
 
 
 async def test_proactive_mode_filter_states(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test all the cases that filter states."""
     aioclient_mock.post(TEST_URL, text="", status=202)
@@ -746,7 +746,7 @@ async def test_proactive_mode_filter_states(
 
     # unsupported entity should not report
     with patch.dict(
-        "homeassistant.components.alexa.state_report.ENTITY_ADAPTERS", {}, clear=True
+        "smarthub.components.alexa.state_report.ENTITY_ADAPTERS", {}, clear=True
     ):
         hass.states.async_set(
             "binary_sensor.test_contact",
@@ -777,7 +777,7 @@ async def test_proactive_mode_filter_states(
     # If serializes to same properties, it should not report
     aioclient_mock.post(TEST_URL, text="", status=202)
     with patch(
-        "homeassistant.components.alexa.entities.AlexaEntity.serialize_properties",
+        "smarthub.components.alexa.entities.AlexaEntity.serialize_properties",
         return_value=[{"same": "info"}],
     ):
         hass.states.async_set(

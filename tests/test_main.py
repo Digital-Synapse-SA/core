@@ -2,8 +2,8 @@
 
 from unittest.mock import PropertyMock, patch
 
-from homeassistant import __main__ as main
-from homeassistant.const import REQUIRED_PYTHON_VER, RESTART_EXIT_CODE
+from smarthub import __main__ as main
+from smarthub.const import REQUIRED_PYTHON_VER, RESTART_EXIT_CODE
 
 
 @patch("sys.exit")
@@ -92,7 +92,7 @@ def test_restart_after_backup_restore() -> None:
     """Test restarting if we restored a backup."""
     with (
         patch("sys.argv", ["python"]),
-        patch("homeassistant.__main__.restore_backup", return_value=True),
+        patch("smarthub.__main__.restore_backup", return_value=True),
     ):
         exit_code = main.main()
         assert exit_code == RESTART_EXIT_CODE

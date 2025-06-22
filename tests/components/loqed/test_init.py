@@ -7,19 +7,19 @@ from unittest.mock import AsyncMock, patch
 import aiohttp
 from loqedAPI import loqed
 
-from homeassistant.components.loqed.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_WEBHOOK_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.network import get_url
-from homeassistant.setup import async_setup_component
+from smarthub.components.loqed.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_WEBHOOK_ID
+from smarthub.core import SmartHub
+from smarthub.helpers.network import get_url
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.typing import ClientSessionGenerator
 
 
 async def test_webhook_accepts_valid_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     integration: MockConfigEntry,
     lock: loqed.Lock,
@@ -43,7 +43,7 @@ async def test_webhook_accepts_valid_message(
 
 
 async def test_setup_webhook_in_bridge(
-    hass: HomeAssistant, config_entry: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, config_entry: MockConfigEntry, lock: loqed.Lock
 ) -> None:
     """Test webhook setup in loqed bridge."""
     config: dict[str, Any] = {DOMAIN: {}}
@@ -68,7 +68,7 @@ async def test_setup_webhook_in_bridge(
 
 
 async def test_cannot_connect_to_bridge_will_retry(
-    hass: HomeAssistant, config_entry: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, config_entry: MockConfigEntry, lock: loqed.Lock
 ) -> None:
     """Test webhook setup in loqed bridge."""
     config: dict[str, Any] = {DOMAIN: {}}
@@ -84,7 +84,7 @@ async def test_cannot_connect_to_bridge_will_retry(
 
 
 async def test_setup_cloudhook_in_bridge(
-    hass: HomeAssistant, config_entry: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, config_entry: MockConfigEntry, lock: loqed.Lock
 ) -> None:
     """Test webhook setup in loqed bridge."""
     config: dict[str, Any] = {DOMAIN: {}}
@@ -102,11 +102,11 @@ async def test_setup_cloudhook_in_bridge(
             "loqedAPI.loqed.LoqedAPI.async_get_lock_details", return_value=lock_status
         ),
         patch(
-            "homeassistant.components.cloud.async_active_subscription",
+            "smarthub.components.cloud.async_active_subscription",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value=webhooks_fixture[0]["url"],
         ),
     ):
@@ -117,7 +117,7 @@ async def test_setup_cloudhook_in_bridge(
 
 
 async def test_setup_cloudhook_from_entry_in_bridge(
-    hass: HomeAssistant, cloud_config_entry: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, cloud_config_entry: MockConfigEntry, lock: loqed.Lock
 ) -> None:
     """Test webhook setup in loqed bridge."""
     webhooks_fixture = json.loads(
@@ -137,11 +137,11 @@ async def test_setup_cloudhook_from_entry_in_bridge(
             "loqedAPI.loqed.LoqedAPI.async_get_lock_details", return_value=lock_status
         ),
         patch(
-            "homeassistant.components.cloud.async_active_subscription",
+            "smarthub.components.cloud.async_active_subscription",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value=webhooks_fixture[0]["url"],
         ),
     ):
@@ -152,7 +152,7 @@ async def test_setup_cloudhook_from_entry_in_bridge(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, integration: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, integration: MockConfigEntry, lock: loqed.Lock
 ) -> None:
     """Test successful unload of entry."""
 
@@ -165,7 +165,7 @@ async def test_unload_entry(
 
 
 async def test_unload_entry_fails(
-    hass: HomeAssistant, integration: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, integration: MockConfigEntry, lock: loqed.Lock
 ) -> None:
     """Test unsuccessful unload of entry."""
     lock.deleteWebhook = AsyncMock(side_effect=Exception)

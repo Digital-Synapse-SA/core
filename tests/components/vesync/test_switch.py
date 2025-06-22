@@ -7,11 +7,11 @@ import pytest
 import requests_mock
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .common import ALL_DEVICE_NAMES, ENTITY_SWITCH_DISPLAY, mock_devices_response
 
@@ -22,7 +22,7 @@ NoException = nullcontext()
 
 @pytest.mark.parametrize("device_name", ALL_DEVICE_NAMES)
 async def test_switch_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -66,7 +66,7 @@ async def test_switch_state(
     ],
 )
 async def test_turn_on_off_display_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     humidifier_config_entry: MockConfigEntry,
     action: str,
     command: str,
@@ -79,7 +79,7 @@ async def test_turn_on_off_display_success(
             return_value=True,
         ) as method_mock,
         patch(
-            "homeassistant.components.vesync.switch.VeSyncSwitchEntity.schedule_update_ha_state"
+            "smarthub.components.vesync.switch.VeSyncSwitchEntity.schedule_update_ha_state"
         ) as update_mock,
     ):
         await hass.services.async_call(
@@ -102,19 +102,19 @@ async def test_turn_on_off_display_success(
     ],
 )
 async def test_turn_on_off_display_raises_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     humidifier_config_entry: MockConfigEntry,
     action: str,
     command: str,
 ) -> None:
-    """Test switch turn on and off command raises HomeAssistantError."""
+    """Test switch turn on and off command raises SmartHubError."""
 
     with (
         patch(
             command,
             return_value=False,
         ) as method_mock,
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             SWITCH_DOMAIN,

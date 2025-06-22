@@ -7,12 +7,12 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.suez_water.const import DATA_REFRESH_INTERVAL
-from homeassistant.components.suez_water.coordinator import PySuezError
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.suez_water.const import DATA_REFRESH_INTERVAL
+from smarthub.components.suez_water.coordinator import PySuezError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -20,14 +20,14 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 
 async def test_sensors_valid_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     suez_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test that suez_water sensor is loaded and in a valid state."""
-    with patch("homeassistant.components.suez_water.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.suez_water.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_config_entry)
 
     assert mock_config_entry.state is ConfigEntryState.LOADED
@@ -49,7 +49,7 @@ async def test_sensors_valid_state(
     ],
 )
 async def test_sensors_failed_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

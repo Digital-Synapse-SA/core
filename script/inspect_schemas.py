@@ -5,8 +5,8 @@ import importlib
 from pathlib import Path
 import pkgutil
 
-from homeassistant.config import _identify_config_schema
-from homeassistant.scripts.check_config import color
+from smarthub.config import _identify_config_schema
+from smarthub.scripts.check_config import color
 
 
 def explore_module(package):
@@ -32,7 +32,7 @@ def main():
             msg[key] = []
         msg[key].append(item)
 
-    for package in explore_module("homeassistant.components"):
+    for package in explore_module("smarthub.components"):
         module = importlib.import_module(package)
         module_name = getattr(module, "DOMAIN", module.__name__)
 

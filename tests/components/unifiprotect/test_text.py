@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, Mock
 
 from uiprotect.data import Camera, DoorbellMessageType, LCDMessage
 
-from homeassistant.components.unifiprotect.const import DEFAULT_ATTRIBUTION
-from homeassistant.components.unifiprotect.text import CAMERA
-from homeassistant.const import ATTR_ATTRIBUTION, ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.unifiprotect.const import DEFAULT_ATTRIBUTION
+from smarthub.components.unifiprotect.text import CAMERA
+from smarthub.const import ATTR_ATTRIBUTION, ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .utils import (
     MockUFPFixture,
@@ -23,7 +23,7 @@ from .utils import (
 
 
 async def test_text_camera_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, unadopted_camera: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, unadopted_camera: Camera
 ) -> None:
     """Test removing and re-adding a camera device."""
 
@@ -37,7 +37,7 @@ async def test_text_camera_remove(
 
 
 async def test_text_camera_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -66,7 +66,7 @@ async def test_text_camera_setup(
 
 
 async def test_text_camera_set(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test text entity setting value camera devices."""
 

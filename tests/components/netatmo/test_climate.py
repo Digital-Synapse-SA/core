@@ -7,7 +7,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from voluptuous.error import MultipleInvalid
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
     DOMAIN as CLIMATE_DOMAIN,
@@ -20,8 +20,8 @@ from homeassistant.components.climate import (
     SERVICE_TURN_ON,
     HVACMode,
 )
-from homeassistant.components.netatmo.climate import PRESET_FROST_GUARD, PRESET_SCHEDULE
-from homeassistant.components.netatmo.const import (
+from smarthub.components.netatmo.climate import PRESET_FROST_GUARD, PRESET_SCHEDULE
+from smarthub.components.netatmo.const import (
     ATTR_END_DATETIME,
     ATTR_SCHEDULE_NAME,
     ATTR_TARGET_TEMPERATURE,
@@ -33,16 +33,16 @@ from homeassistant.components.netatmo.const import (
     SERVICE_SET_TEMPERATURE_WITH_END_DATETIME,
     SERVICE_SET_TEMPERATURE_WITH_TIME_PERIOD,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     CONF_WEBHOOK_ID,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .common import selected_platforms, simulate_webhook, snapshot_platform_entities
 
@@ -50,7 +50,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     netatmo_auth: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -67,7 +67,7 @@ async def test_entity(
 
 
 async def test_schedule_update_webhook_event(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test schedule update webhook event without schedule_id."""
 
@@ -95,7 +95,7 @@ async def test_schedule_update_webhook_event(
 
 
 async def test_webhook_event_handling_thermostats(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service and webhook event handling with thermostats."""
     with selected_platforms([Platform.CLIMATE]):
@@ -269,7 +269,7 @@ async def test_webhook_event_handling_thermostats(
 
 
 async def test_service_preset_mode_frost_guard_thermostat(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service with frost guard preset for thermostats."""
     with selected_platforms([Platform.CLIMATE]):
@@ -342,7 +342,7 @@ async def test_service_preset_mode_frost_guard_thermostat(
 
 
 async def test_service_preset_modes_thermostat(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service with preset modes for thermostats."""
     with selected_platforms([Platform.CLIMATE]):
@@ -422,7 +422,7 @@ async def test_service_preset_modes_thermostat(
 
 
 async def test_service_set_temperature_with_end_datetime(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service setting temperature with an end datetime."""
     with selected_platforms([Platform.CLIMATE]):
@@ -480,7 +480,7 @@ async def test_service_set_temperature_with_end_datetime(
 
 
 async def test_service_set_temperature_with_time_period(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service setting temperature with an end datetime."""
     with selected_platforms([Platform.CLIMATE]):
@@ -538,7 +538,7 @@ async def test_service_set_temperature_with_time_period(
 
 
 async def test_service_clear_temperature_setting(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service clearing temperature setting."""
     with selected_platforms([Platform.CLIMATE]):
@@ -619,7 +619,7 @@ async def test_service_clear_temperature_setting(
 
 
 async def test_webhook_event_handling_no_data(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service and webhook event handling with erroneous data."""
     with selected_platforms([Platform.CLIMATE]):
@@ -670,7 +670,7 @@ async def test_webhook_event_handling_no_data(
 
 
 async def test_service_schedule_thermostats(
-    hass: HomeAssistant, config_entry, caplog: pytest.LogCaptureFixture, netatmo_auth
+    hass: SmartHub, config_entry, caplog: pytest.LogCaptureFixture, netatmo_auth
 ) -> None:
     """Test service for selecting Netatmo schedule with thermostats."""
     with selected_platforms([Platform.CLIMATE]):
@@ -723,7 +723,7 @@ async def test_service_schedule_thermostats(
 
 
 async def test_service_preset_mode_with_end_time_thermostats(
-    hass: HomeAssistant, config_entry, caplog: pytest.LogCaptureFixture, netatmo_auth
+    hass: SmartHub, config_entry, caplog: pytest.LogCaptureFixture, netatmo_auth
 ) -> None:
     """Test service for set preset mode with end datetime for Netatmo thermostats."""
     with selected_platforms([Platform.CLIMATE]):
@@ -793,7 +793,7 @@ async def test_service_preset_mode_with_end_time_thermostats(
 
 
 async def test_service_preset_mode_already_boost_valves(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service with boost preset for valves when already in boost mode."""
     with selected_platforms([Platform.CLIMATE]):
@@ -873,7 +873,7 @@ async def test_service_preset_mode_already_boost_valves(
 
 
 async def test_service_preset_mode_boost_valves(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service with boost preset for valves."""
     with selected_platforms([Platform.CLIMATE]):
@@ -925,7 +925,7 @@ async def test_service_preset_mode_boost_valves(
 
 
 async def test_service_preset_mode_invalid(
-    hass: HomeAssistant, config_entry, caplog: pytest.LogCaptureFixture, netatmo_auth
+    hass: SmartHub, config_entry, caplog: pytest.LogCaptureFixture, netatmo_auth
 ) -> None:
     """Test service with invalid preset."""
     with selected_platforms([Platform.CLIMATE]):
@@ -943,7 +943,7 @@ async def test_service_preset_mode_invalid(
 
 
 async def test_valves_service_turn_off(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service turn off for valves."""
     with selected_platforms([Platform.CLIMATE]):
@@ -995,7 +995,7 @@ async def test_valves_service_turn_off(
 
 
 async def test_valves_service_turn_on(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service turn on for valves."""
     with selected_platforms([Platform.CLIMATE]):
@@ -1042,7 +1042,7 @@ async def test_valves_service_turn_on(
 
 
 async def test_webhook_home_id_mismatch(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service turn on for valves."""
     with selected_platforms([Platform.CLIMATE]):
@@ -1082,7 +1082,7 @@ async def test_webhook_home_id_mismatch(
 
 
 async def test_webhook_set_point(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test service turn on for valves."""
     with selected_platforms([Platform.CLIMATE]):

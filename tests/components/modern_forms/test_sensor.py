@@ -2,9 +2,9 @@
 
 from datetime import datetime
 
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import ATTR_DEVICE_CLASS
-from homeassistant.core import HomeAssistant
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import ATTR_DEVICE_CLASS
+from smarthub.core import SmartHub
 
 from . import init_integration, modern_forms_timers_set_mock
 
@@ -12,7 +12,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_sensors(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the creation and values of the Modern Forms sensors."""
 
@@ -33,7 +33,7 @@ async def test_sensors(
 
 
 async def test_active_sensors(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the creation and values of the Modern Forms sensors."""
 

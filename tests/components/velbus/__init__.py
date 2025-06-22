@@ -1,11 +1,11 @@
 """Tests for the Velbus component."""
 
-from homeassistant.components.velbus import VelbusConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.components.velbus import VelbusConfigEntry
+from smarthub.core import SmartHub
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: VelbusConfigEntry,
 ) -> None:
     """Load the Velbus integration."""

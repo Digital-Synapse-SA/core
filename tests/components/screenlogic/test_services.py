@@ -8,8 +8,8 @@ import pytest
 from screenlogicpy import ScreenLogicGateway
 from screenlogicpy.device_const.system import COLOR_MODE
 
-from homeassistant.components.screenlogic import DOMAIN
-from homeassistant.components.screenlogic.const import (
+from smarthub.components.screenlogic import DOMAIN
+from smarthub.components.screenlogic.const import (
     ATTR_COLOR_MODE,
     ATTR_CONFIG_ENTRY,
     ATTR_RUNTIME,
@@ -17,10 +17,10 @@ from homeassistant.components.screenlogic.const import (
     SERVICE_START_SUPER_CHLORINATION,
     SERVICE_STOP_SUPER_CHLORINATION,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import device_registry as dr
 
 from . import (
     DATA_FULL_CHEM,
@@ -47,7 +47,7 @@ def dataset_fixture():
 
 @pytest.fixture(name="service_fixture")
 async def setup_screenlogic_services_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     request: pytest.FixtureRequest,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
@@ -103,7 +103,7 @@ async def setup_screenlogic_services_fixture(
     ],
 )
 async def test_service_set_color_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_fixture: dict[str, Any],
     data: dict[str, Any],
     target: dict[str, Any],
@@ -154,7 +154,7 @@ async def test_service_set_color_mode(
     ],
 )
 async def test_service_set_color_mode_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_fixture: dict[str, Any],
     data: dict[str, Any],
     target: dict[str, Any],
@@ -200,7 +200,7 @@ async def test_service_set_color_mode_error(
     ],
 )
 async def test_service_start_super_chlorination(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_fixture: dict[str, Any],
     data: dict[str, Any],
     target: dict[str, Any],
@@ -248,7 +248,7 @@ async def test_service_start_super_chlorination(
     ],
 )
 async def test_service_start_super_chlorination_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_fixture: dict[str, Any],
     data: dict[str, Any],
     target: dict[str, Any],
@@ -290,7 +290,7 @@ async def test_service_start_super_chlorination_error(
     ],
 )
 async def test_service_stop_super_chlorination(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_fixture: dict[str, Any],
     data: dict[str, Any],
     target: dict[str, Any],
@@ -336,7 +336,7 @@ async def test_service_stop_super_chlorination(
     ],
 )
 async def test_service_stop_super_chlorination_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_fixture: dict[str, Any],
     data: dict[str, Any],
     target: dict[str, Any],
@@ -366,7 +366,7 @@ async def test_service_stop_super_chlorination_error(
 
 
 async def test_service_config_entry_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
 ) -> None:

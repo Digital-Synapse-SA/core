@@ -4,22 +4,22 @@ from unittest.mock import Mock
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.calendar import (
+from smarthub.components.calendar import (
     DOMAIN as CALENDAR_DOMAIN,
     EVENT_END_DATETIME,
     EVENT_START_DATETIME,
     SERVICE_GET_EVENTS,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .common import setup_platform
 
 from tests.common import async_fire_time_changed
 
 
-async def test_setup_component(hass: HomeAssistant, service_multiple: Mock) -> None:
+async def test_setup_component(hass: SmartHub, service_multiple: Mock) -> None:
     """Test setup component."""
     await setup_platform(hass, CALENDAR_DOMAIN)
 
@@ -30,7 +30,7 @@ async def test_setup_component(hass: HomeAssistant, service_multiple: Mock) -> N
 
 
 async def test_discount_games(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     service_multiple: Mock,
 ) -> None:
@@ -61,7 +61,7 @@ async def test_discount_games(
 
 
 async def test_free_games(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     service_multiple: Mock,
 ) -> None:
@@ -86,7 +86,7 @@ async def test_free_games(
 
 
 async def test_attribute_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     service_attribute_not_found: Mock,
 ) -> None:
@@ -103,7 +103,7 @@ async def test_attribute_not_found(
 
 
 async def test_christmas_special(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     service_christmas_special: Mock,
 ) -> None:
@@ -122,7 +122,7 @@ async def test_christmas_special(
 
 
 async def test_get_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     service_multiple: Mock,
 ) -> None:

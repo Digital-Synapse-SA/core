@@ -7,10 +7,10 @@ from freezegun.api import freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 def event_only() -> Generator[None]:
     """Enable only the event platform."""
     with patch(
-        "homeassistant.components.bring.PLATFORMS",
+        "smarthub.components.bring.PLATFORMS",
         [Platform.EVENT],
     ):
         yield
@@ -28,7 +28,7 @@ def event_only() -> Generator[None]:
 @pytest.mark.usefixtures("mock_bring_client")
 @freeze_time("2025-01-01T03:30:00.000Z")
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,

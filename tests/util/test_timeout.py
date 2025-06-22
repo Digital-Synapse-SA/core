@@ -1,4 +1,4 @@
-"""Test Home Assistant timeout handler."""
+"""Test SmartHub timeout handler."""
 
 import asyncio
 from contextlib import suppress
@@ -6,8 +6,8 @@ import time
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.util.timeout import TimeoutManager
+from smarthub.core import SmartHub
+from smarthub.util.timeout import TimeoutManager
 
 
 async def test_simple_global_timeout() -> None:
@@ -19,7 +19,7 @@ async def test_simple_global_timeout() -> None:
             await asyncio.sleep(0.3)
 
 
-async def test_simple_global_timeout_with_executor_job(hass: HomeAssistant) -> None:
+async def test_simple_global_timeout_with_executor_job(hass: SmartHub) -> None:
     """Test a simple global timeout with executor job."""
     timeout = TimeoutManager()
 
@@ -49,7 +49,7 @@ async def test_simple_global_timeout_cancel_message() -> None:
 
 
 async def test_simple_zone_timeout_freeze_inside_executor_job(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a simple zone timeout freeze inside an executor job."""
     timeout = TimeoutManager()
@@ -66,7 +66,7 @@ async def test_simple_zone_timeout_freeze_inside_executor_job(
 
 
 async def test_simple_global_timeout_freeze_inside_executor_job(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a simple global timeout freeze inside an executor job."""
     timeout = TimeoutManager()
@@ -80,7 +80,7 @@ async def test_simple_global_timeout_freeze_inside_executor_job(
 
 
 async def test_mix_global_timeout_freeze_and_zone_freeze_inside_executor_job(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a simple global timeout freeze inside an executor job."""
     timeout = TimeoutManager()
@@ -97,7 +97,7 @@ async def test_mix_global_timeout_freeze_and_zone_freeze_inside_executor_job(
 
 
 async def test_mix_global_timeout_freeze_and_zone_freeze_different_order(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a simple global timeout freeze inside an executor job before timeout was set."""
     timeout = TimeoutManager()
@@ -113,7 +113,7 @@ async def test_mix_global_timeout_freeze_and_zone_freeze_different_order(
 
 
 async def test_mix_global_timeout_freeze_and_zone_freeze_other_zone_inside_executor_job(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a simple global timeout freeze other zone inside an executor job."""
     timeout = TimeoutManager()
@@ -132,7 +132,7 @@ async def test_mix_global_timeout_freeze_and_zone_freeze_other_zone_inside_execu
 
 
 async def test_mix_global_timeout_freeze_and_zone_freeze_inside_executor_job_second_job_outside_zone_context(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a simple global timeout freeze inside an executor job with second job outside of zone context."""
     timeout = TimeoutManager()
@@ -149,7 +149,7 @@ async def test_mix_global_timeout_freeze_and_zone_freeze_inside_executor_job_sec
 
 
 async def test_simple_global_timeout_freeze_with_executor_job(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a simple global timeout freeze with executor job."""
     timeout = TimeoutManager()
@@ -159,7 +159,7 @@ async def test_simple_global_timeout_freeze_with_executor_job(
 
 
 async def test_simple_global_timeout_does_not_leak_upward(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a global timeout does not leak upward."""
     timeout = TimeoutManager()
@@ -178,7 +178,7 @@ async def test_simple_global_timeout_does_not_leak_upward(
 
 
 async def test_simple_global_timeout_does_swallow_cancellation(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a global timeout does not swallow cancellation."""
     timeout = TimeoutManager()
@@ -245,7 +245,7 @@ async def test_simple_zone_timeout_cancel_message() -> None:
 
 
 async def test_simple_zone_timeout_does_not_leak_upward(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a zone timeout does not leak upward."""
     timeout = TimeoutManager()
@@ -264,7 +264,7 @@ async def test_simple_zone_timeout_does_not_leak_upward(
 
 
 async def test_simple_zone_timeout_does_swallow_cancellation(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a zone timeout does not swallow cancellation."""
     timeout = TimeoutManager()
@@ -418,7 +418,7 @@ async def test_mix_zone_timeout_trigger_global_cool_down() -> None:
 
 
 async def test_simple_zone_timeout_freeze_without_timeout_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a simple zone timeout freeze on a zone that does not have a timeout set."""
     timeout = TimeoutManager()
@@ -433,7 +433,7 @@ async def test_simple_zone_timeout_freeze_without_timeout_cleanup(
 
 
 async def test_simple_zone_timeout_freeze_without_timeout_cleanup2(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a simple zone timeout freeze on a zone that does not have a timeout set."""
     timeout = TimeoutManager()
@@ -474,7 +474,7 @@ async def test_simple_zone_timeout_zone_with_timeout_exception() -> None:
             await asyncio.sleep(0.3)
 
 
-async def test_multiple_global_freezes(hass: HomeAssistant) -> None:
+async def test_multiple_global_freezes(hass: SmartHub) -> None:
     """Test multiple global freezes."""
     timeout = TimeoutManager()
 

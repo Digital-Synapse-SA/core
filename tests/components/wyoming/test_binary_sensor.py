@@ -2,18 +2,18 @@
 
 import pytest
 
-from homeassistant.components.wyoming.devices import SatelliteDevice
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.wyoming.devices import SatelliteDevice
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import reload_satellite
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_assist_in_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     satellite_config_entry: ConfigEntry,
     satellite_device: SatelliteDevice,
 ) -> None:
@@ -43,7 +43,7 @@ async def test_assist_in_progress(
 
 
 async def test_assist_in_progress_disabled_by_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     satellite_device: SatelliteDevice,
 ) -> None:

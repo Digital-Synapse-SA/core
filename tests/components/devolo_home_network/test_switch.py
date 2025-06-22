@@ -9,13 +9,13 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.devolo_home_network.const import (
+from smarthub.components.devolo_home_network.const import (
     DOMAIN,
     SHORT_UPDATE_INTERVAL,
 )
-from homeassistant.components.switch import DOMAIN as PLATFORM
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as PLATFORM
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -23,10 +23,10 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.update_coordinator import REQUEST_REFRESH_DEFAULT_COOLDOWN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.update_coordinator import REQUEST_REFRESH_DEFAULT_COOLDOWN
 
 from . import configure_integration
 from .mock import MockDevice
@@ -36,7 +36,7 @@ from tests.common import async_fire_time_changed
 
 @pytest.mark.usefixtures("mock_device")
 async def test_switch_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test default setup of the switch component."""
@@ -55,7 +55,7 @@ async def test_switch_setup(
 
 
 async def test_update_guest_wifi_status_auth_failed(
-    hass: HomeAssistant, mock_device: MockDevice
+    hass: SmartHub, mock_device: MockDevice
 ) -> None:
     """Test getting the wifi_status with wrong password triggers the reauth flow."""
     entry = configure_integration(hass)
@@ -78,7 +78,7 @@ async def test_update_guest_wifi_status_auth_failed(
 
 
 async def test_update_enable_guest_wifi(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -148,7 +148,7 @@ async def test_update_enable_guest_wifi(
     mock_device.device.async_set_wifi_guest_access.side_effect = DeviceUnavailable()
 
     with pytest.raises(
-        HomeAssistantError, match=f"Device {entry.title} did not respond"
+        SmartHubError, match=f"Device {entry.title} did not respond"
     ):
         await hass.services.async_call(
             PLATFORM, SERVICE_TURN_ON, {ATTR_ENTITY_ID: state_key}, blocking=True
@@ -159,7 +159,7 @@ async def test_update_enable_guest_wifi(
 
 
 async def test_update_enable_leds(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -223,7 +223,7 @@ async def test_update_enable_leds(
     mock_device.device.async_set_led_setting.side_effect = DeviceUnavailable()
 
     with pytest.raises(
-        HomeAssistantError, match=f"Device {entry.title} did not respond"
+        SmartHubError, match=f"Device {entry.title} did not respond"
     ):
         await hass.services.async_call(
             PLATFORM, SERVICE_TURN_OFF, {ATTR_ENTITY_ID: state_key}, blocking=True
@@ -241,7 +241,7 @@ async def test_update_enable_leds(
     ],
 )
 async def test_device_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
     freezer: FrozenDateTimeFactory,
     name: str,
@@ -278,7 +278,7 @@ async def test_device_failure(
     ],
 )
 async def test_auth_failed(
-    hass: HomeAssistant, mock_device: MockDevice, name: str, set_method: str
+    hass: SmartHub, mock_device: MockDevice, name: str, set_method: str
 ) -> None:
     """Test setting unautherized triggers the reauth flow."""
     entry = configure_integration(hass)
@@ -295,7 +295,7 @@ async def test_auth_failed(
     api = getattr(mock_device.device, set_method)
     api.side_effect = DevicePasswordProtected
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             PLATFORM, SERVICE_TURN_ON, {ATTR_ENTITY_ID: state_key}, blocking=True
         )
@@ -312,7 +312,7 @@ async def test_auth_failed(
     assert flow["context"]["source"] == SOURCE_REAUTH
     assert flow["context"]["entry_id"] == entry.entry_id
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             PLATFORM, SERVICE_TURN_OFF, {"entity_id": state_key}, blocking=True
         )

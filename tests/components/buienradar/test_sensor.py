@@ -2,10 +2,10 @@
 
 from http import HTTPStatus
 
-from homeassistant.components.buienradar.const import DOMAIN
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.buienradar.const import DOMAIN
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -19,7 +19,7 @@ TEST_CFG_DATA = {CONF_LATITUDE: TEST_LATITUDE, CONF_LONGITUDE: TEST_LONGITUDE}
 
 async def test_smoke_test_setup_component(
     aioclient_mock: AiohttpClientMocker,
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Smoke test for successfully set-up with default config."""

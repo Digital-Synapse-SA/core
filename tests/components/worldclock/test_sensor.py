@@ -4,10 +4,10 @@ from datetime import tzinfo
 
 import pytest
 
-from homeassistant.components.worldclock.const import CONF_TIME_FORMAT, DEFAULT_NAME
-from homeassistant.const import CONF_NAME, CONF_TIME_ZONE
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.worldclock.const import CONF_TIME_FORMAT, DEFAULT_NAME
+from smarthub.const import CONF_NAME, CONF_TIME_ZONE
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ async def time_zone() -> tzinfo | None:
 
 
 async def test_time_from_config_entry(
-    hass: HomeAssistant, time_zone: tzinfo | None, loaded_entry: MockConfigEntry
+    hass: SmartHub, time_zone: tzinfo | None, loaded_entry: MockConfigEntry
 ) -> None:
     """Test the time at a different location."""
 
@@ -40,7 +40,7 @@ async def test_time_from_config_entry(
     ],
 )
 async def test_time_format(
-    hass: HomeAssistant, time_zone: tzinfo | None, loaded_entry: MockConfigEntry
+    hass: SmartHub, time_zone: tzinfo | None, loaded_entry: MockConfigEntry
 ) -> None:
     """Test time_format setting."""
 

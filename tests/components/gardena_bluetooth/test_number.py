@@ -13,13 +13,13 @@ from gardena_bluetooth.parse import Characteristic
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
 
 from . import setup_entry
 
@@ -55,7 +55,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_entry: MockConfigEntry,
     mock_read_char_raw: dict[str, bytes],
@@ -94,7 +94,7 @@ async def test_setup(
     ],
 )
 async def test_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry: MockConfigEntry,
     mock_read_char_raw: dict[str, bytes],
     mock_client: Mock,
@@ -122,7 +122,7 @@ async def test_config(
 
 
 async def test_bluetooth_error_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_entry: MockConfigEntry,
     mock_read_char_raw: dict[str, bytes],
@@ -151,7 +151,7 @@ async def test_bluetooth_error_unavailable(
 
 
 async def test_connected_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_entry: MockConfigEntry,
     mock_read_char_raw: dict[str, bytes],

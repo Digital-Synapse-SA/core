@@ -8,13 +8,13 @@ from aiohomekit.model.services import ServicesTypes
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.homekit_controller.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.homekit_controller.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import setup_test_component
 
@@ -82,7 +82,7 @@ def create_doorbell(accessory: Accessory) -> None:
 
 
 async def test_enumerate_remote(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
@@ -134,7 +134,7 @@ async def test_enumerate_remote(
 
 
 async def test_enumerate_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
@@ -185,7 +185,7 @@ async def test_enumerate_button(
 
 
 async def test_enumerate_doorbell(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
@@ -236,7 +236,7 @@ async def test_enumerate_doorbell(
 
 
 async def test_handle_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
@@ -359,7 +359,7 @@ async def test_handle_events(
 
 
 async def test_handle_events_late_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],

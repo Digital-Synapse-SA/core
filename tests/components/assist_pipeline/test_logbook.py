@@ -1,17 +1,17 @@
 """The tests for assist_pipeline logbook."""
 
-from homeassistant.components import assist_pipeline, logbook
-from homeassistant.const import ATTR_DEVICE_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components import assist_pipeline, logbook
+from smarthub.const import ATTR_DEVICE_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.components.logbook.common import MockRow, mock_humanify
 
 
 async def test_recording_event(
-    hass: HomeAssistant, init_components, device_registry: dr.DeviceRegistry
+    hass: SmartHub, init_components, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test recording event."""
     hass.config.components.add("recorder")

@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, Mock, patch
 from mastodon.Mastodon import MastodonAPIError, MediaAttachment
 import pytest
 
-from homeassistant.components.mastodon.const import (
+from smarthub.components.mastodon.const import (
     ATTR_CONFIG_ENTRY_ID,
     ATTR_CONTENT_WARNING,
     ATTR_MEDIA,
@@ -14,9 +14,9 @@ from homeassistant.components.mastodon.const import (
     ATTR_VISIBILITY,
     DOMAIN,
 )
-from homeassistant.components.mastodon.services import SERVICE_POST
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.components.mastodon.services import SERVICE_POST
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from . import setup_integration
 
@@ -94,7 +94,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_service_post(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     payload: dict[str, str],
@@ -153,7 +153,7 @@ async def test_service_post(
     ],
 )
 async def test_post_service_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     payload: dict[str, str],
@@ -169,7 +169,7 @@ async def test_post_service_failed(
 
     mock_mastodon_client.status_post.side_effect = MastodonAPIError
 
-    with pytest.raises(HomeAssistantError, match="Unable to send message"):
+    with pytest.raises(SmartHubError, match="Unable to send message"):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_POST,
@@ -180,7 +180,7 @@ async def test_post_service_failed(
 
 
 async def test_post_media_upload_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -195,7 +195,7 @@ async def test_post_media_upload_failed(
 
     with (
         patch.object(hass.config, "is_allowed_path", return_value=True),
-        pytest.raises(HomeAssistantError, match="Unable to upload image /fail.jpg"),
+        pytest.raises(SmartHubError, match="Unable to upload image /fail.jpg"),
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -207,7 +207,7 @@ async def test_post_media_upload_failed(
 
 
 async def test_post_path_not_whitelisted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -219,7 +219,7 @@ async def test_post_path_not_whitelisted(
     payload = {"status": "test toot", "media": "/fail.jpg"}
 
     with pytest.raises(
-        HomeAssistantError, match="/fail.jpg is not a whitelisted directory"
+        SmartHubError, match="/fail.jpg is not a whitelisted directory"
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -231,7 +231,7 @@ async def test_post_path_not_whitelisted(
 
 
 async def test_service_entry_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

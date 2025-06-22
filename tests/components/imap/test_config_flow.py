@@ -7,17 +7,17 @@ from aioimaplib import AioImapException
 import pytest
 import voluptuous as vol
 
-from homeassistant import config_entries
-from homeassistant.components.imap.const import (
+from smarthub import config_entries
+from smarthub.components.imap.const import (
     CONF_CHARSET,
     CONF_FOLDER,
     CONF_SEARCH,
     DOMAIN,
 )
-from homeassistant.components.imap.errors import InvalidAuth, InvalidFolder
-from homeassistant.const import CONF_NAME, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.imap.errors import InvalidAuth, InvalidFolder
+from smarthub.const import CONF_NAME, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -41,7 +41,7 @@ MOCK_OPTIONS = {
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -50,7 +50,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server"
+        "smarthub.components.imap.config_flow.connect_to_server"
     ) as mock_client:
         mock_client.return_value.search.return_value = (
             "OK",
@@ -67,7 +67,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_entry_already_configured(hass: HomeAssistant) -> None:
+async def test_entry_already_configured(hass: SmartHub) -> None:
     """Test aborting if the entry is already configured."""
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG)
     entry.add_to_hass(hass)
@@ -95,14 +95,14 @@ async def test_entry_already_configured(hass: HomeAssistant) -> None:
     assert result2["reason"] == "already_configured"
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server",
+        "smarthub.components.imap.config_flow.connect_to_server",
         side_effect=InvalidAuth,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -125,7 +125,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     ],
 )
 async def test_form_cannot_connect(
-    hass: HomeAssistant, exc: Exception, error: str
+    hass: SmartHub, exc: Exception, error: str
 ) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
@@ -133,7 +133,7 @@ async def test_form_cannot_connect(
     )
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server",
+        "smarthub.components.imap.config_flow.connect_to_server",
         side_effect=exc,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -150,14 +150,14 @@ async def test_form_cannot_connect(
     } == MOCK_CONFIG
 
 
-async def test_form_invalid_charset(hass: HomeAssistant) -> None:
+async def test_form_invalid_charset(hass: SmartHub) -> None:
     """Test we handle invalid charset."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server"
+        "smarthub.components.imap.config_flow.connect_to_server"
     ) as mock_client:
         mock_client.return_value.search.return_value = (
             "NO",
@@ -171,14 +171,14 @@ async def test_form_invalid_charset(hass: HomeAssistant) -> None:
     assert result2["errors"] == {CONF_CHARSET: "invalid_charset"}
 
 
-async def test_form_invalid_folder(hass: HomeAssistant) -> None:
+async def test_form_invalid_folder(hass: SmartHub) -> None:
     """Test we handle invalid folder selection."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server",
+        "smarthub.components.imap.config_flow.connect_to_server",
         side_effect=InvalidFolder,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -189,14 +189,14 @@ async def test_form_invalid_folder(hass: HomeAssistant) -> None:
     assert result2["errors"] == {CONF_FOLDER: "invalid_folder"}
 
 
-async def test_form_invalid_search(hass: HomeAssistant) -> None:
+async def test_form_invalid_search(hass: SmartHub) -> None:
     """Test we handle invalid search."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server"
+        "smarthub.components.imap.config_flow.connect_to_server"
     ) as mock_client:
         mock_client.return_value.search.return_value = ("BAD", [b"Invalid search"])
         result2 = await hass.config_entries.flow.async_configure(
@@ -207,7 +207,7 @@ async def test_form_invalid_search(hass: HomeAssistant) -> None:
     assert result2["errors"] == {CONF_SEARCH: "invalid_search"}
 
 
-async def test_reauth_success(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_reauth_success(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we can reauth."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -224,7 +224,7 @@ async def test_reauth_success(hass: HomeAssistant, mock_setup_entry: AsyncMock) 
     }
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server"
+        "smarthub.components.imap.config_flow.connect_to_server"
     ) as mock_client:
         mock_client.return_value.search.return_value = (
             "OK",
@@ -243,7 +243,7 @@ async def test_reauth_success(hass: HomeAssistant, mock_setup_entry: AsyncMock) 
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_reauth_failed(hass: HomeAssistant) -> None:
+async def test_reauth_failed(hass: SmartHub) -> None:
     """Test we can reauth."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -256,7 +256,7 @@ async def test_reauth_failed(hass: HomeAssistant) -> None:
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server",
+        "smarthub.components.imap.config_flow.connect_to_server",
         side_effect=InvalidAuth,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -273,7 +273,7 @@ async def test_reauth_failed(hass: HomeAssistant) -> None:
         }
 
 
-async def test_reauth_failed_conn_error(hass: HomeAssistant) -> None:
+async def test_reauth_failed_conn_error(hass: SmartHub) -> None:
     """Test we can reauth."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -286,7 +286,7 @@ async def test_reauth_failed_conn_error(hass: HomeAssistant) -> None:
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server",
+        "smarthub.components.imap.config_flow.connect_to_server",
         side_effect=TimeoutError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -300,7 +300,7 @@ async def test_reauth_failed_conn_error(hass: HomeAssistant) -> None:
         assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_options_form(hass: HomeAssistant) -> None:
+async def test_options_form(hass: SmartHub) -> None:
     """Test we show the options form."""
 
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG)
@@ -318,7 +318,7 @@ async def test_options_form(hass: HomeAssistant) -> None:
 
     # simulate initial search setup error
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server"
+        "smarthub.components.imap.config_flow.connect_to_server"
     ) as mock_client:
         mock_client.return_value.search.return_value = ("BAD", [b"Invalid search"])
         result2 = await hass.config_entries.options.async_configure(
@@ -331,7 +331,7 @@ async def test_options_form(hass: HomeAssistant) -> None:
     new_config["search"] = "UnSeen UnDeleted"
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server"
+        "smarthub.components.imap.config_flow.connect_to_server"
     ) as mock_client:
         mock_client.return_value.search.return_value = ("OK", [b""])
         result3 = await hass.config_entries.options.async_configure(
@@ -345,7 +345,7 @@ async def test_options_form(hass: HomeAssistant) -> None:
         assert entry.data[key] == value
 
 
-async def test_key_options_in_options_form(hass: HomeAssistant) -> None:
+async def test_key_options_in_options_form(hass: SmartHub) -> None:
     """Test we cannot change options if that would cause duplicates."""
 
     entry1 = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG)
@@ -368,7 +368,7 @@ async def test_key_options_in_options_form(hass: HomeAssistant) -> None:
     new_config = MOCK_OPTIONS.copy()
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server"
+        "smarthub.components.imap.config_flow.connect_to_server"
     ) as mock_client:
         mock_client.return_value.search.return_value = ("OK", [b""])
         result2 = await hass.config_entries.options.async_configure(
@@ -408,7 +408,7 @@ async def test_key_options_in_options_form(hass: HomeAssistant) -> None:
     ],
 )
 async def test_advanced_options_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     advanced_options: dict[str, str],
     assert_result: FlowResultType,
 ) -> None:
@@ -431,7 +431,7 @@ async def test_advanced_options_form(
 
     try:
         with patch(
-            "homeassistant.components.imap.config_flow.connect_to_server"
+            "smarthub.components.imap.config_flow.connect_to_server"
         ) as mock_client:
             mock_client.return_value.search.return_value = ("OK", [b""])
             # Option update should fail if FlowResultType.FORM is expected
@@ -454,7 +454,7 @@ async def test_advanced_options_form(
 @pytest.mark.parametrize("cipher_list", ["python_default", "modern", "intermediate"])
 @pytest.mark.parametrize("verify_ssl", [False, True])
 async def test_config_flow_with_cipherlist_and_ssl_verify(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, cipher_list: str, verify_ssl: True
+    hass: SmartHub, mock_setup_entry: AsyncMock, cipher_list: str, verify_ssl: True
 ) -> None:
     """Test with alternate cipherlist or disabled ssl verification."""
     config = MOCK_CONFIG.copy()
@@ -468,7 +468,7 @@ async def test_config_flow_with_cipherlist_and_ssl_verify(
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server"
+        "smarthub.components.imap.config_flow.connect_to_server"
     ) as mock_client:
         mock_client.return_value.search.return_value = (
             "OK",
@@ -487,7 +487,7 @@ async def test_config_flow_with_cipherlist_and_ssl_verify(
 
 @pytest.mark.parametrize("event_message_data", [[], ["headers"], ["text", "headers"]])
 async def test_config_flow_with_event_message_data(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, event_message_data: list
+    hass: SmartHub, mock_setup_entry: AsyncMock, event_message_data: list
 ) -> None:
     """Test with different message data."""
     config = MOCK_CONFIG.copy()
@@ -500,7 +500,7 @@ async def test_config_flow_with_event_message_data(
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server"
+        "smarthub.components.imap.config_flow.connect_to_server"
     ) as mock_client:
         mock_client.return_value.search.return_value = (
             "OK",
@@ -518,7 +518,7 @@ async def test_config_flow_with_event_message_data(
 
 
 async def test_config_flow_from_with_advanced_settings(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test if advanced settings show correctly."""
     config = MOCK_CONFIG.copy()
@@ -532,7 +532,7 @@ async def test_config_flow_from_with_advanced_settings(
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server",
+        "smarthub.components.imap.config_flow.connect_to_server",
         side_effect=TimeoutError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -546,7 +546,7 @@ async def test_config_flow_from_with_advanced_settings(
 
     config["ssl_cipher_list"] = "modern"
     with patch(
-        "homeassistant.components.imap.config_flow.connect_to_server"
+        "smarthub.components.imap.config_flow.connect_to_server"
     ) as mock_client:
         mock_client.return_value.search.return_value = (
             "OK",

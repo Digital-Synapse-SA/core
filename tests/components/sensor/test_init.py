@@ -10,9 +10,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import sensor
-from homeassistant.components.number import NumberDeviceClass
-from homeassistant.components.sensor import (
+from smarthub.components import sensor
+from smarthub.components.number import NumberDeviceClass
+from smarthub.components.sensor import (
     DEVICE_CLASS_STATE_CLASSES,
     DEVICE_CLASS_UNITS,
     DOMAIN,
@@ -24,9 +24,9 @@ from homeassistant.components.sensor import (
     async_rounded_state,
     async_update_suggested_units,
 )
-from homeassistant.components.sensor.const import STATE_CLASS_UNITS, UNIT_CONVERTERS
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import (
+from smarthub.components.sensor.const import STATE_CLASS_UNITS, UNIT_CONVERTERS
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
     STATE_UNKNOWN,
@@ -58,13 +58,13 @@ from homeassistant.const import (
     UnitOfVolumeFlowRate,
     UnitOfVolumetricFlux,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from .common import MockRestoreSensor, MockSensor
 
@@ -118,7 +118,7 @@ TEST_DOMAIN = "test"
     ],
 )
 async def test_temperature_conversion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unit_system,
     native_unit,
     state_unit,
@@ -145,7 +145,7 @@ async def test_temperature_conversion(
 
 @pytest.mark.parametrize("device_class", [None, SensorDeviceClass.PRESSURE])
 async def test_temperature_conversion_wrong_device_class(
-    hass: HomeAssistant, device_class
+    hass: SmartHub, device_class
 ) -> None:
     """Test temperatures are not converted if the sensor has wrong device class."""
     entity0 = MockSensor(
@@ -167,7 +167,7 @@ async def test_temperature_conversion_wrong_device_class(
 
 @pytest.mark.parametrize("state_class", ["measurement", "total_increasing"])
 async def test_deprecated_last_reset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     state_class,
 ) -> None:
@@ -192,7 +192,7 @@ async def test_deprecated_last_reset(
 
 
 async def test_datetime_conversion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test conversion of datetime."""
@@ -242,7 +242,7 @@ async def test_datetime_conversion(
 
 
 async def test_a_sensor_with_a_non_numeric_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test that a sensor with a non numeric device class will be non numeric.
@@ -289,7 +289,7 @@ async def test_a_sensor_with_a_non_numeric_device_class(
     ],
 )
 async def test_deprecated_datetime_str(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_value,
@@ -311,7 +311,7 @@ async def test_deprecated_datetime_str(
 
 
 async def test_reject_timezoneless_datetime_str(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test rejection of timezone-less datetime objects as timestamp."""
@@ -404,7 +404,7 @@ RESTORE_DATA = {
     ],
 )
 async def test_restore_sensor_save_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     native_value,
     native_value_type,
@@ -470,7 +470,7 @@ async def test_restore_sensor_save_state(
     ],
 )
 async def test_restore_sensor_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     native_value,
     native_value_type,
@@ -498,12 +498,12 @@ async def test_restore_sensor_restore_state(
 
 
 async def test_translated_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test translated unit."""
 
     with patch(
-        "homeassistant.helpers.service.translation.async_get_translations",
+        "smarthub.helpers.service.translation.async_get_translations",
         return_value={
             "component.test.entity.sensor.test_translation_key.unit_of_measurement": "Tests"
         },
@@ -530,12 +530,12 @@ async def test_translated_unit(
 
 
 async def test_translated_unit_with_native_unit_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that translated unit."""
 
     with patch(
-        "homeassistant.helpers.service.translation.async_get_translations",
+        "smarthub.helpers.service.translation.async_get_translations",
         return_value={
             "component.test.entity.sensor.test_translation_key.unit_of_measurement": "Tests"
         },
@@ -561,12 +561,12 @@ async def test_translated_unit_with_native_unit_raises(
 
 
 async def test_unit_translation_key_without_platform_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that unit translation key property raises if the entity has no platform yet."""
 
     with patch(
-        "homeassistant.helpers.service.translation.async_get_translations",
+        "smarthub.helpers.service.translation.async_get_translations",
         return_value={
             "component.test.entity.sensor.test_translation_key.unit_of_measurement": "Tests"
         },
@@ -776,7 +776,7 @@ async def test_unit_translation_key_without_platform_raises(
     ],
 )
 async def test_custom_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_class,
     native_unit,
@@ -1069,7 +1069,7 @@ async def test_custom_unit(
     ],
 )
 async def test_custom_unit_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     native_unit,
     custom_unit,
@@ -1168,7 +1168,7 @@ async def test_custom_unit_change(
     ],
 )
 async def test_unit_conversion_priority(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     unit_system,
     native_unit,
@@ -1316,7 +1316,7 @@ async def test_unit_conversion_priority(
     ],
 )
 async def test_unit_conversion_priority_precision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     unit_system,
     native_unit,
@@ -1499,7 +1499,7 @@ async def test_unit_conversion_priority_precision(
     ],
 )
 async def test_unit_conversion_priority_suggested_unit_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     unit_system,
     native_unit,
@@ -1607,7 +1607,7 @@ async def test_unit_conversion_priority_suggested_unit_change(
     ],
 )
 async def test_unit_conversion_priority_suggested_unit_change_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     native_unit_1,
     native_unit_2,
@@ -1726,7 +1726,7 @@ async def test_unit_conversion_priority_suggested_unit_change_2(
     ],
 )
 async def test_default_precision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_class: str,
     native_unit: str,
@@ -1786,7 +1786,7 @@ async def test_default_precision(
     ],
 )
 async def test_suggested_precision_option(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     unit_system,
     native_unit,
@@ -1860,7 +1860,7 @@ async def test_suggested_precision_option(
     ],
 )
 async def test_suggested_precision_option_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     unit_system,
     native_unit,
@@ -1948,7 +1948,7 @@ async def test_suggested_precision_option_update(
     ],
 )
 async def test_unit_conversion_priority_legacy_conversion_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     unit_system,
     native_unit,
@@ -1992,7 +1992,7 @@ def test_device_classes_aligned() -> None:
 
 
 async def test_value_unknown_in_enumeration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test warning on invalid enum value."""
@@ -2014,7 +2014,7 @@ async def test_value_unknown_in_enumeration(
 
 
 async def test_invalid_enumeration_entity_with_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test warning on entities that provide an enum with a device class."""
@@ -2036,7 +2036,7 @@ async def test_invalid_enumeration_entity_with_device_class(
 
 
 async def test_invalid_enumeration_entity_without_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test warning on entities that provide an enum without a device class."""
@@ -2065,7 +2065,7 @@ async def test_invalid_enumeration_entity_without_device_class(
     ],
 )
 async def test_non_numeric_device_class_with_unit_of_measurement(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class: SensorDeviceClass,
 ) -> None:
@@ -2141,7 +2141,7 @@ async def test_non_numeric_device_class_with_unit_of_measurement(
     ],
 )
 async def test_device_classes_with_invalid_unit_of_measurement(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class: SensorDeviceClass,
 ) -> None:
@@ -2172,7 +2172,7 @@ async def test_device_classes_with_invalid_unit_of_measurement(
     [SensorStateClass.MEASUREMENT_ANGLE],
 )
 async def test_state_classes_with_invalid_unit_of_measurement(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     state_class: SensorStateClass,
 ) -> None:
@@ -2221,7 +2221,7 @@ async def test_state_classes_with_invalid_unit_of_measurement(
     ],
 )
 async def test_non_numeric_validation_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     native_value: Any,
     problem: str,
@@ -2264,7 +2264,7 @@ async def test_non_numeric_validation_error(
     ],
 )
 async def test_non_numeric_validation_raise(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     native_value: Any,
     expected: str,
@@ -2313,7 +2313,7 @@ async def test_non_numeric_validation_raise(
     ],
 )
 async def test_numeric_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     native_value: Any,
     expected: str,
@@ -2344,7 +2344,7 @@ async def test_numeric_validation(
 
 
 async def test_numeric_validation_ignores_custom_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test does not error on expected numeric entities."""
@@ -2373,7 +2373,7 @@ async def test_numeric_validation_ignores_custom_device_class(
     list(SensorDeviceClass),
 )
 async def test_device_classes_with_invalid_state_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class: SensorDeviceClass,
 ) -> None:
@@ -2420,7 +2420,7 @@ async def test_device_classes_with_invalid_state_class(
     ],
 )
 async def test_numeric_state_expected_helper(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class: SensorDeviceClass | None,
     state_class: SensorStateClass | None,
@@ -2484,7 +2484,7 @@ async def test_numeric_state_expected_helper(
     ],
 )
 async def test_unit_conversion_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     unit_system_1,
     unit_system_2,
@@ -2689,7 +2689,7 @@ class MockFlow(ConfigFlow):
 
 
 @pytest.fixture(autouse=True)
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -2697,11 +2697,11 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
         yield
 
 
-async def test_name(hass: HomeAssistant) -> None:
+async def test_name(hass: SmartHub) -> None:
     """Test sensor name."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -2743,7 +2743,7 @@ async def test_name(hass: HomeAssistant) -> None:
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -2775,7 +2775,7 @@ async def test_name(hass: HomeAssistant) -> None:
 
 
 def test_async_rounded_state_unregistered_entity_is_passthrough(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test async_rounded_state on unregistered entity is passthrough."""
     hass.states.async_set("sensor.test", "1.004")
@@ -2787,7 +2787,7 @@ def test_async_rounded_state_unregistered_entity_is_passthrough(
 
 
 def test_async_rounded_state_registered_entity_with_display_precision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test async_rounded_state on registered with display precision.
@@ -2809,7 +2809,7 @@ def test_async_rounded_state_registered_entity_with_display_precision(
     assert async_rounded_state(hass, entity_id, state) == "0.0000"
 
 
-def test_device_class_units_state_classes(hass: HomeAssistant) -> None:
+def test_device_class_units_state_classes(hass: SmartHub) -> None:
     """Test all numeric device classes have unit and state class."""
     # DEVICE_CLASS_UNITS should include all device classes except:
     # - SensorDeviceClass.MONETARY
@@ -2822,7 +2822,7 @@ def test_device_class_units_state_classes(hass: HomeAssistant) -> None:
 
 
 async def test_entity_category_config_raises_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test error is raised when entity category is set to config."""
@@ -2848,7 +2848,7 @@ async def test_entity_category_config_raises_error(
     ],
 )
 async def test_suggested_unit_guard_invalid_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
     device_class: SensorDeviceClass,
@@ -2902,7 +2902,7 @@ async def test_suggested_unit_guard_invalid_unit(
     ],
 )
 async def test_suggested_unit_guard_valid_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_class: SensorDeviceClass,
     native_unit: str,

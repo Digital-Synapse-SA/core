@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock, MagicMock
 from ohme import ApiException, AuthException
 import pytest
 
-from homeassistant.components.ohme.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.ohme.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_config_flow_success(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_client: MagicMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_client: MagicMock
 ) -> None:
     """Test config flow."""
 
@@ -45,7 +45,7 @@ async def test_config_flow_success(
     [(AuthException, "invalid_auth"), (ApiException, "unknown")],
 )
 async def test_config_flow_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_client: MagicMock,
     test_exception: Exception,
@@ -87,7 +87,7 @@ async def test_config_flow_fail(
 
 
 async def test_already_configured(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Ensure we can't add the same account twice."""
 
@@ -110,7 +110,7 @@ async def test_already_configured(
     assert result["reason"] == "already_configured"
 
 
-async def test_reauth_form(hass: HomeAssistant, mock_client: MagicMock) -> None:
+async def test_reauth_form(hass: SmartHub, mock_client: MagicMock) -> None:
     """Test reauth form."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -139,7 +139,7 @@ async def test_reauth_form(hass: HomeAssistant, mock_client: MagicMock) -> None:
     [(AuthException, "invalid_auth"), (ApiException, "unknown")],
 )
 async def test_reauth_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     test_exception: Exception,
     expected_error: str,
@@ -184,7 +184,7 @@ async def test_reauth_fail(
     assert result["reason"] == "reauth_successful"
 
 
-async def test_reconfigure_form(hass: HomeAssistant, mock_client: MagicMock) -> None:
+async def test_reconfigure_form(hass: SmartHub, mock_client: MagicMock) -> None:
     """Test reconfigure form."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -218,7 +218,7 @@ async def test_reconfigure_form(hass: HomeAssistant, mock_client: MagicMock) -> 
     [(AuthException, "invalid_auth"), (ApiException, "unknown")],
 )
 async def test_reconfigure_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     test_exception: Exception,
     expected_error: str,

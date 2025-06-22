@@ -7,10 +7,10 @@ from unittest.mock import AsyncMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import config_entries
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.statistics import DOMAIN
-from homeassistant.components.statistics.sensor import (
+from smarthub import config_entries
+from smarthub.components.recorder import Recorder
+from smarthub.components.statistics import DOMAIN
+from smarthub.components.statistics.sensor import (
     CONF_KEEP_LAST_SAMPLE,
     CONF_MAX_AGE,
     CONF_PERCENTILE,
@@ -22,15 +22,15 @@ from homeassistant.components.statistics.sensor import (
     STAT_COUNT,
     STAT_VALUE_MAX,
 )
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_ENTITY_ID, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
-async def test_form_sensor(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form_sensor(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form for sensor."""
 
     result = await hass.config_entries.flow.async_init(
@@ -80,7 +80,7 @@ async def test_form_sensor(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> 
 
 
 async def test_form_binary_sensor(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form for binary sensor."""
 
@@ -130,7 +130,7 @@ async def test_form_binary_sensor(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_options_flow(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
+async def test_options_flow(hass: SmartHub, loaded_entry: MockConfigEntry) -> None:
     """Test options flow."""
 
     result = await hass.config_entries.options.async_init(loaded_entry.entry_id)
@@ -169,7 +169,7 @@ async def test_options_flow(hass: HomeAssistant, loaded_entry: MockConfigEntry) 
 
 
 async def test_validation_options(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test validation."""
 
@@ -240,7 +240,7 @@ async def test_validation_options(
 
 
 async def test_entry_already_exist(
-    hass: HomeAssistant, loaded_entry: MockConfigEntry
+    hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test abort when entry already exist."""
 
@@ -302,7 +302,7 @@ async def test_entry_already_exist(
 )
 async def test_config_flow_preview_success(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     user_input: str,
     snapshot: SnapshotAssertion,
@@ -359,7 +359,7 @@ async def test_config_flow_preview_success(
 
 async def test_options_flow_preview(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -426,7 +426,7 @@ async def test_options_flow_preview(
 
 
 async def test_options_flow_sensor_preview_config_entry_removed(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the option flow preview where the config entry is removed."""
     client = await hass_ws_client(hass)

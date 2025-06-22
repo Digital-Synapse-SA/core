@@ -10,20 +10,20 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components import mqtt
-from homeassistant.components.mqtt.models import MessageCallbackType
-from homeassistant.components.mqtt.util import EnsureJobAfterCooldown
-from homeassistant.config_entries import ConfigEntryDisabler, ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.components import mqtt
+from smarthub.components.mqtt.models import MessageCallbackType
+from smarthub.components.mqtt.util import EnsureJobAfterCooldown
+from smarthub.config_entries import ConfigEntryDisabler, ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import CoreState, SmartHub
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.typing import MqttMockHAClient, MqttMockPahoClient
 
 
 async def test_canceling_debouncer_on_shutdown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     record_calls: MessageCallbackType,
     mock_debouncer: asyncio.Event,
     setup_with_birth_msg_client_mock: MqttMockPahoClient,
@@ -32,7 +32,7 @@ async def test_canceling_debouncer_on_shutdown(
     mqtt_client_mock = setup_with_birth_msg_client_mock
     # Mock we are past initial setup
     await mock_debouncer.wait()
-    with patch("homeassistant.components.mqtt.client.SUBSCRIBE_COOLDOWN", 2):
+    with patch("smarthub.components.mqtt.client.SUBSCRIBE_COOLDOWN", 2):
         mock_debouncer.clear()
         await mqtt.async_subscribe(hass, "test/state1", record_calls)
         async_fire_time_changed(hass, utcnow() + timedelta(seconds=0.1))
@@ -62,7 +62,7 @@ async def test_canceling_debouncer_on_shutdown(
 
 
 async def test_canceling_debouncer_normal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test canceling the debouncer before completion."""
@@ -79,7 +79,7 @@ async def test_canceling_debouncer_normal(
 
 
 async def test_canceling_debouncer_throws(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test canceling the debouncer when HA shuts down."""
@@ -102,7 +102,7 @@ async def test_canceling_debouncer_throws(
 
 
 async def help_create_test_certificate_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_temp_dir: str,
     option: str,
     content: bytes = b"old content",
@@ -131,7 +131,7 @@ async def help_create_test_certificate_file(
 )
 @pytest.mark.parametrize("temp_dir_prefix", ["create-test1"])
 async def test_async_create_certificate_temp_files(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_temp_dir: str,
     option: str,
     content: str,
@@ -172,7 +172,7 @@ async def test_async_create_certificate_temp_files(
 
 @pytest.mark.parametrize("temp_dir_prefix", ["create-test2"])
 async def test_certificate_temp_files_with_auto_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_temp_dir: str,
 ) -> None:
     """Test creating and reading and recovery certificate files with auto mode."""
@@ -199,7 +199,7 @@ async def test_reading_non_exitisting_certificate_file() -> None:
 
 
 async def test_return_default_get_file_path(
-    hass: HomeAssistant, mock_temp_dir: str
+    hass: SmartHub, mock_temp_dir: str
 ) -> None:
     """Test get_file_path returns default."""
 
@@ -214,7 +214,7 @@ async def test_return_default_get_file_path(
 
 
 async def test_waiting_for_client_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
 ) -> None:
     """Test waiting for client while mqtt entry is not yet loaded."""
@@ -250,7 +250,7 @@ async def test_waiting_for_client_not_loaded(
 
 
 async def test_waiting_for_client_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
 ) -> None:
     """Test waiting for client where mqtt entry is loaded."""
@@ -271,7 +271,7 @@ async def test_waiting_for_client_loaded(
 
 
 async def test_waiting_for_client_entry_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
 ) -> None:
     """Test waiting for client where mqtt entry is failing."""
@@ -293,7 +293,7 @@ async def test_waiting_for_client_entry_fails(
     hass.async_create_task(_async_just_in_time_subscribe())
     assert entry.state is ConfigEntryState.NOT_LOADED
     with patch(
-        "homeassistant.components.mqtt.async_setup_entry",
+        "smarthub.components.mqtt.async_setup_entry",
         side_effect=Exception,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -301,7 +301,7 @@ async def test_waiting_for_client_entry_fails(
 
 
 async def test_waiting_for_client_setup_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
 ) -> None:
     """Test waiting for client where mqtt entry is failing during setup."""
@@ -329,9 +329,9 @@ async def test_waiting_for_client_setup_fails(
     assert entry.state is ConfigEntryState.SETUP_ERROR  # type:ignore[comparison-overlap]
 
 
-@patch("homeassistant.components.mqtt.util.AVAILABILITY_TIMEOUT", 0.01)
+@patch("smarthub.components.mqtt.util.AVAILABILITY_TIMEOUT", 0.01)
 async def test_waiting_for_client_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test waiting for client with timeout."""
     hass.set_state(CoreState.starting)
@@ -352,7 +352,7 @@ async def test_waiting_for_client_timeout(
 
 
 async def test_waiting_for_client_with_disabled_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test waiting for client with timeout."""
     hass.set_state(CoreState.starting)

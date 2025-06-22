@@ -5,18 +5,18 @@ from unittest.mock import MagicMock, patch
 from epion import EpionAuthenticationError, EpionConnectionError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.epion.const import DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.epion.const import DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 API_KEY = "test-key-123"
 
 
-async def test_user_flow(hass: HomeAssistant, mock_epion: MagicMock) -> None:
+async def test_user_flow(hass: SmartHub, mock_epion: MagicMock) -> None:
     """Test we can handle a regular successflow setup flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -24,7 +24,7 @@ async def test_user_flow(hass: HomeAssistant, mock_epion: MagicMock) -> None:
     )
 
     with patch(
-        "homeassistant.components.epion.async_setup_entry",
+        "smarthub.components.epion.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -49,7 +49,7 @@ async def test_user_flow(hass: HomeAssistant, mock_epion: MagicMock) -> None:
     ],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant, exception: Exception, error: str, mock_epion: MagicMock
+    hass: SmartHub, exception: Exception, error: str, mock_epion: MagicMock
 ) -> None:
     """Test we can handle Form exceptions."""
 
@@ -69,7 +69,7 @@ async def test_form_exceptions(
     mock_epion.return_value.get_current.side_effect = None
 
     with patch(
-        "homeassistant.components.epion.async_setup_entry",
+        "smarthub.components.epion.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -86,7 +86,7 @@ async def test_form_exceptions(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_duplicate_entry(hass: HomeAssistant, mock_epion: MagicMock) -> None:
+async def test_duplicate_entry(hass: SmartHub, mock_epion: MagicMock) -> None:
     """Test duplicate setup handling."""
     entry = MockConfigEntry(
         domain=DOMAIN,

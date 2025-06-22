@@ -5,17 +5,17 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.kitchen_sink import DOMAIN
-from homeassistant.components.lawn_mower import (
+from smarthub.components.kitchen_sink import DOMAIN
+from smarthub.components.lawn_mower import (
     DOMAIN as LAWN_MOWER_DOMAIN,
     SERVICE_DOCK,
     SERVICE_PAUSE,
     SERVICE_START_MOWING,
     LawnMowerActivity,
 )
-from homeassistant.const import ATTR_ENTITY_ID, EVENT_STATE_CHANGED, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, EVENT_STATE_CHANGED, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_capture_events, async_mock_service
 
@@ -26,20 +26,20 @@ MOWER_SERVICE_ENTITY = "lawn_mower.mower_can_dock"
 async def lawn_mower_only() -> None:
     """Enable only the lawn mower platform."""
     with patch(
-        "homeassistant.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
+        "smarthub.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
         [Platform.LAWN_MOWER],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_comp(hass: HomeAssistant, lawn_mower_only):
+async def setup_comp(hass: SmartHub, lawn_mower_only):
     """Set up demo component."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     await hass.async_block_till_done()
 
 
-async def test_states(hass: HomeAssistant, snapshot: SnapshotAssertion) -> None:
+async def test_states(hass: SmartHub, snapshot: SnapshotAssertion) -> None:
     """Test the expected lawn mower entities are added."""
     states = hass.states.async_all()
     assert set(states) == snapshot
@@ -81,7 +81,7 @@ async def test_states(hass: HomeAssistant, snapshot: SnapshotAssertion) -> None:
     ],
 )
 async def test_mower(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity: str,
     service_call: str,
     activity: LawnMowerActivity,
@@ -111,7 +111,7 @@ async def test_mower(
         SERVICE_PAUSE,
     ],
 )
-async def test_service_calls_mocked(hass: HomeAssistant, service_call) -> None:
+async def test_service_calls_mocked(hass: SmartHub, service_call) -> None:
     """Test the services of a lawn mower."""
     calls = async_mock_service(hass, LAWN_MOWER_DOMAIN, service_call)
     await hass.services.async_call(

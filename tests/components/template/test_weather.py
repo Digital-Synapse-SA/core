@@ -5,9 +5,9 @@ from typing import Any
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import template
-from homeassistant.components.template.const import CONF_PICTURE
-from homeassistant.components.weather import (
+from smarthub.components import template
+from smarthub.components.template.const import CONF_PICTURE
+from smarthub.components.weather import (
     ATTR_WEATHER_APPARENT_TEMPERATURE,
     ATTR_WEATHER_CLOUD_COVERAGE,
     ATTR_WEATHER_DEW_POINT,
@@ -23,7 +23,7 @@ from homeassistant.components.weather import (
     SERVICE_GET_FORECASTS,
     Forecast,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_ENTITY_PICTURE,
     ATTR_ICON,
@@ -31,10 +31,10 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import Context, HomeAssistant, State
-from homeassistant.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import Context, SmartHub, State
+from smarthub.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .conftest import ConfigurationStyle
 
@@ -68,7 +68,7 @@ TEST_REQUIRED = {
 
 
 async def async_setup_modern_format(
-    hass: HomeAssistant, count: int, weather_config: dict[str, Any]
+    hass: SmartHub, count: int, weather_config: dict[str, Any]
 ) -> None:
     """Do setup of weather integration via new format."""
     config = {"template": {"weather": weather_config}}
@@ -86,7 +86,7 @@ async def async_setup_modern_format(
 
 
 async def async_setup_trigger_format(
-    hass: HomeAssistant, count: int, weather_config: dict[str, Any]
+    hass: SmartHub, count: int, weather_config: dict[str, Any]
 ) -> None:
     """Do setup of weather integration via trigger format."""
     config = {"template": {**TEST_STATE_TRIGGER, "weather": weather_config}}
@@ -105,7 +105,7 @@ async def async_setup_trigger_format(
 
 @pytest.fixture
 async def setup_weather(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     weather_config: dict[str, Any],
@@ -150,7 +150,7 @@ async def setup_weather(
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_template_state_text(hass: HomeAssistant) -> None:
+async def test_template_state_text(hass: SmartHub) -> None:
     """Test the state text of a template."""
     for attr, v_attr, value in (
         (
@@ -204,7 +204,7 @@ async def test_template_state_text(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_forecasts(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, service: str
+    hass: SmartHub, snapshot: SnapshotAssertion, service: str
 ) -> None:
     """Test forecast service."""
     for attr, _v_attr, value in (
@@ -329,7 +329,7 @@ async def test_forecasts(
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_forecast_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     service: str,
     expected: dict[str, Any],
@@ -411,7 +411,7 @@ async def test_forecast_invalid(
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_forecast_invalid_is_daytime_missing_in_twice_daily(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     service: str,
     expected: dict[str, Any],
@@ -479,7 +479,7 @@ async def test_forecast_invalid_is_daytime_missing_in_twice_daily(
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_forecast_invalid_datetime_missing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     service: str,
     expected: dict[str, Any],
@@ -546,7 +546,7 @@ async def test_forecast_invalid_datetime_missing(
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_forecast_format_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, service: str
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, service: str
 ) -> None:
     """Test forecast service invalid on incorrect format."""
     for attr, _v_attr, value in (
@@ -659,7 +659,7 @@ SAVED_EXTRA_DATA_WITH_FUTURE_KEY = {
     ],
 )
 async def test_trigger_entity_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     domain: str,
     config: dict,
@@ -737,7 +737,7 @@ async def test_trigger_entity_restore_state(
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_trigger_action(hass: HomeAssistant) -> None:
+async def test_trigger_action(hass: SmartHub) -> None:
     """Test trigger entity with an action works."""
     state = hass.states.get("weather.hello_name")
     assert state is not None
@@ -809,7 +809,7 @@ async def test_trigger_action(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures("start_ha")
 @pytest.mark.freeze_time("2023-10-19 13:50:05")
 async def test_trigger_weather_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     service: str,
 ) -> None:
@@ -910,7 +910,7 @@ async def test_trigger_weather_services(
 
 
 async def test_restore_weather_save_state(
-    hass: HomeAssistant, hass_storage: dict[str, Any], snapshot: SnapshotAssertion
+    hass: SmartHub, hass_storage: dict[str, Any], snapshot: SnapshotAssertion
 ) -> None:
     """Test Restore saved state for Weather trigger template."""
     assert await async_setup_component(
@@ -977,7 +977,7 @@ SAVED_EXTRA_DATA_MISSING_KEY = {
     ],
 )
 async def test_trigger_entity_restore_state_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     saved_attributes: dict,
     saved_extra_data: dict | None,
 ) -> None:
@@ -1015,7 +1015,7 @@ async def test_trigger_entity_restore_state_fail(
     assert state.attributes.get("temperature") is None
 
 
-async def test_new_style_template_state_text(hass: HomeAssistant) -> None:
+async def test_new_style_template_state_text(hass: SmartHub) -> None:
     """Test the state text of a template."""
     assert await async_setup_component(
         hass,
@@ -1105,7 +1105,7 @@ async def test_new_style_template_state_text(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("setup_weather")
 async def test_templated_optional_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     attribute: str,
     expected: str,
     initial_expected_state: str | None,

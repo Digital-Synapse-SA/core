@@ -5,7 +5,7 @@ from datetime import datetime
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.weather import (
+from smarthub.components.weather import (
     ATTR_CONDITION_SUNNY,
     ATTR_WEATHER_APPARENT_TEMPERATURE,
     ATTR_WEATHER_OZONE,
@@ -29,12 +29,12 @@ from homeassistant.components.weather import (
     WeatherEntityFeature,
     round_temperature,
 )
-from homeassistant.components.weather.const import (
+from smarthub.components.weather.const import (
     ATTR_WEATHER_CLOUD_COVERAGE,
     ATTR_WEATHER_DEW_POINT,
     ATTR_WEATHER_HUMIDITY,
 )
-from homeassistant.const import (
+from smarthub.const import (
     PRECISION_HALVES,
     PRECISION_TENTHS,
     PRECISION_WHOLE,
@@ -43,17 +43,17 @@ from homeassistant.const import (
     UnitOfSpeed,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_conversion import (
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_conversion import (
     DistanceConverter,
     PressureConverter,
     SpeedConverter,
     TemperatureConverter,
 )
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
+from smarthub.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from . import MockWeatherTest, create_entity
 
@@ -100,7 +100,7 @@ class MockWeatherEntity(WeatherEntity):
     ],
 )
 async def test_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     native_unit: str,
     state_unit: str,
@@ -156,7 +156,7 @@ async def test_temperature(
     ],
 )
 async def test_temperature_no_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     native_unit: str,
     state_unit: str,
@@ -205,7 +205,7 @@ async def test_temperature_no_unit(
     ],
 )
 async def test_pressure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     native_unit: str,
     state_unit: str,
@@ -234,7 +234,7 @@ async def test_pressure(
     [(UnitOfPressure.HPA, METRIC_SYSTEM), (UnitOfPressure.INHG, US_CUSTOMARY_SYSTEM)],
 )
 async def test_pressure_no_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     native_unit: str,
     state_unit: str,
@@ -273,7 +273,7 @@ async def test_pressure_no_unit(
     ],
 )
 async def test_wind_speed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     native_unit: str,
     state_unit: str,
@@ -312,7 +312,7 @@ async def test_wind_speed(
     ],
 )
 async def test_wind_gust_speed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     native_unit: str,
     state_unit: str,
@@ -347,7 +347,7 @@ async def test_wind_gust_speed(
     ],
 )
 async def test_wind_speed_no_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     native_unit: str,
     state_unit: str,
@@ -371,7 +371,7 @@ async def test_wind_speed_no_unit(
 
 
 async def test_wind_bearing_ozone_and_cloud_coverage_and_uv_index(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
 ) -> None:
     """Test wind bearing, ozone and cloud coverage."""
@@ -397,7 +397,7 @@ async def test_wind_bearing_ozone_and_cloud_coverage_and_uv_index(
 
 
 async def test_humidity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
 ) -> None:
     """Test humidity."""
@@ -412,7 +412,7 @@ async def test_humidity(
 
 
 async def test_custom_units(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, config_flow_fixture: None
+    hass: SmartHub, entity_registry: er.EntityRegistry, config_flow_fixture: None
 ) -> None:
     """Test custom unit."""
     wind_speed_value = 5
@@ -507,7 +507,7 @@ async def test_custom_units(
     )
 
 
-async def test_backwards_compatibility_round_temperature(hass: HomeAssistant) -> None:
+async def test_backwards_compatibility_round_temperature(hass: SmartHub) -> None:
     """Test backward compatibility for rounding temperature."""
 
     assert round_temperature(20.3, PRECISION_HALVES) == 20.5
@@ -516,7 +516,7 @@ async def test_backwards_compatibility_round_temperature(hass: HomeAssistant) ->
     assert round_temperature(None, PRECISION_WHOLE) is None
 
 
-async def test_attr(hass: HomeAssistant) -> None:
+async def test_attr(hass: SmartHub) -> None:
     """Test the _attr attributes."""
 
     weather = MockWeatherEntity()
@@ -540,7 +540,7 @@ async def test_attr(hass: HomeAssistant) -> None:
 
 
 async def test_precision_for_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
 ) -> None:
     """Test the precision for temperature."""
@@ -566,7 +566,7 @@ async def test_precision_for_temperature(
 
 
 async def test_forecast_twice_daily_missing_is_daytime(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     config_flow_fixture: None,
 ) -> None:
@@ -614,7 +614,7 @@ async def test_forecast_twice_daily_missing_is_daytime(
     ],
 )
 async def test_get_forecast(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     forecast_type: str,
     supported_features: int,
@@ -661,7 +661,7 @@ async def test_get_forecast(
 
 
 async def test_get_forecast_no_forecast(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
 ) -> None:
     """Test get forecast service."""
@@ -707,7 +707,7 @@ async def test_get_forecast_no_forecast(
     ],
 )
 async def test_get_forecast_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     forecast_types: list[str],
     supported_features: int,
@@ -737,7 +737,7 @@ async def test_get_forecast_unsupported(
     weather_entity = await create_entity(hass, MockWeatherMockForecast, None, **kwargs)
 
     for forecast_type in forecast_types:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 DOMAIN,
                 SERVICE_GET_FORECASTS,

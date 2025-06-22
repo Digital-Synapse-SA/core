@@ -7,7 +7,7 @@ from kasa import (
     DeviceFamily,
 )
 
-from homeassistant.components.tplink import (
+from smarthub.components.tplink import (
     CONF_AES_KEYS,
     CONF_ALIAS,
     CONF_CAMERA_CREDENTIALS,
@@ -20,8 +20,8 @@ from homeassistant.components.tplink import (
     Credentials,
 )
 
-MODULE = "homeassistant.components.tplink"
-MODULE_CONFIG_FLOW = "homeassistant.components.tplink.config_flow"
+MODULE = "smarthub.components.tplink"
+MODULE_CONFIG_FLOW = "smarthub.components.tplink.config_flow"
 IP_ADDRESS = "127.0.0.1"
 IP_ADDRESS2 = "127.0.0.2"
 IP_ADDRESS3 = "127.0.0.3"

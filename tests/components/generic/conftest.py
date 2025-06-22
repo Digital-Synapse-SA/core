@@ -10,10 +10,10 @@ from PIL import Image
 import pytest
 import respx
 
-from homeassistant import config_entries
-from homeassistant.components.generic.const import DOMAIN
-from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.core import HomeAssistant
+from smarthub import config_entries
+from smarthub.components.generic.const import DOMAIN
+from smarthub.config_entries import ConfigFlowResult
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -76,7 +76,7 @@ def fakeimg_gif(fakeimgbytes_gif: bytes) -> Generator[None]:
 
 
 @pytest.fixture(name="mock_create_stream")
-def mock_create_stream(hass: HomeAssistant) -> Generator[AsyncMock]:
+def mock_create_stream(hass: SmartHub) -> Generator[AsyncMock]:
     """Mock create stream."""
     mock_stream = MagicMock()
     mock_stream.hass = hass
@@ -88,7 +88,7 @@ def mock_create_stream(hass: HomeAssistant) -> Generator[AsyncMock]:
     mock_stream.stop = AsyncMock()
     mock_stream.endpoint_url.return_value = "http://127.0.0.1/nothing"
     with patch(
-        "homeassistant.components.generic.config_flow.create_stream",
+        "smarthub.components.generic.config_flow.create_stream",
         return_value=mock_stream,
     ) as mock_create_stream:
         yield mock_create_stream
@@ -98,14 +98,14 @@ def mock_create_stream(hass: HomeAssistant) -> Generator[AsyncMock]:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setup entry."""
     with patch(
-        "homeassistant.components.generic.async_setup_entry",
+        "smarthub.components.generic.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 @pytest.fixture(name="user_flow")
-async def user_flow_fixture(hass: HomeAssistant) -> ConfigFlowResult:
+async def user_flow_fixture(hass: SmartHub) -> ConfigFlowResult:
     """Initiate a user flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -117,7 +117,7 @@ async def user_flow_fixture(hass: HomeAssistant) -> ConfigFlowResult:
 
 
 @pytest.fixture(name="config_entry")
-def config_entry_fixture(hass: HomeAssistant) -> MockConfigEntry:
+def config_entry_fixture(hass: SmartHub) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -143,7 +143,7 @@ def config_entry_fixture(hass: HomeAssistant) -> MockConfigEntry:
 
 @pytest.fixture(name="setup_entry")
 async def setup_entry_fixture(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> MockConfigEntry:
     """Set up a config entry ready to be used in tests."""
     await hass.config_entries.async_setup(config_entry.entry_id)

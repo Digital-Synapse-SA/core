@@ -2,16 +2,16 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components import button
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components import button
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_opengarage: MagicMock,
     init_integration: MockConfigEntry,
     entity_registry: er.EntityRegistry,

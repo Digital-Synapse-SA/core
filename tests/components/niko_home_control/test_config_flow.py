@@ -2,17 +2,17 @@
 
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.components.niko_home_control.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.niko_home_control.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_niko_home_control_connection: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -36,7 +36,7 @@ async def test_full_flow(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_cannot_connect(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_cannot_connect(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test the cannot connect error."""
 
     result = await hass.config_entries.flow.async_init(
@@ -46,7 +46,7 @@ async def test_cannot_connect(hass: HomeAssistant, mock_setup_entry: AsyncMock) 
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.niko_home_control.config_flow.NHCController.connect",
+        "smarthub.components.niko_home_control.config_flow.NHCController.connect",
         side_effect=Exception,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -58,7 +58,7 @@ async def test_cannot_connect(hass: HomeAssistant, mock_setup_entry: AsyncMock) 
     assert result["errors"] == {"base": "cannot_connect"}
 
     with patch(
-        "homeassistant.components.niko_home_control.config_flow.NHCController.connect",
+        "smarthub.components.niko_home_control.config_flow.NHCController.connect",
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -69,7 +69,7 @@ async def test_cannot_connect(hass: HomeAssistant, mock_setup_entry: AsyncMock) 
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test uniqueness."""
 

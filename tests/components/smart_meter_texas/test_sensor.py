@@ -2,18 +2,18 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.smart_meter_texas.const import (
+from smarthub.components.smart_meter_texas.const import (
     ELECTRIC_METER,
     ESIID,
     METER_NUMBER,
 )
-from homeassistant.const import ATTR_ENTITY_ID, CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .conftest import TEST_ENTITY_ID, refresh_data, setup_integration
 
@@ -21,7 +21,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_sensor(
-    hass: HomeAssistant, config_entry, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, config_entry, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that the sensor is setup."""
     await setup_integration(hass, config_entry, aioclient_mock)
@@ -33,7 +33,7 @@ async def test_sensor(
 
 
 async def test_name(
-    hass: HomeAssistant, config_entry, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, config_entry, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test sensor name property."""
     await setup_integration(hass, config_entry, aioclient_mock)
@@ -44,7 +44,7 @@ async def test_name(
 
 
 async def test_attributes(
-    hass: HomeAssistant, config_entry, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, config_entry, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test meter attributes."""
     await setup_integration(hass, config_entry, aioclient_mock)
@@ -57,7 +57,7 @@ async def test_attributes(
 
 
 async def test_generic_entity_update_service(
-    hass: HomeAssistant, config_entry, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, config_entry, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test generic update entity service homeasasistant/update_entity."""
     await setup_integration(hass, config_entry, aioclient_mock)

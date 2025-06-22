@@ -6,15 +6,15 @@ import pytest
 import pyvera as pv
 from requests.exceptions import RequestException
 
-from homeassistant.components.vera import (
+from smarthub.components.vera import (
     CONF_CONTROLLER,
     CONF_EXCLUDE,
     CONF_LIGHTS,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import ComponentFactory, ConfigSource, new_simple_controller_config
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_init(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     vera_component_factory: ComponentFactory,
 ) -> None:
@@ -50,7 +50,7 @@ async def test_init(
 
 
 async def test_init_from_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     vera_component_factory: ComponentFactory,
 ) -> None:
@@ -78,7 +78,7 @@ async def test_init_from_file(
 
 
 async def test_multiple_controllers_with_legacy_one(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     vera_component_factory: ComponentFactory,
 ) -> None:
@@ -132,7 +132,7 @@ async def test_multiple_controllers_with_legacy_one(
 
 
 async def test_unload(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
     vera_device1: pv.VeraBinarySensor = MagicMock(spec=pv.VeraBinarySensor)
@@ -154,7 +154,7 @@ async def test_unload(
 
 
 async def test_async_setup_entry_error(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
 
@@ -186,7 +186,7 @@ async def test_async_setup_entry_error(
     ],
 )
 async def test_exclude_and_light_ids(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory, options
+    hass: SmartHub, vera_component_factory: ComponentFactory, options
 ) -> None:
     """Test device exclusion, marking switches as lights and fixing the data type."""
     vera_device1: pv.VeraBinarySensor = MagicMock(spec=pv.VeraBinarySensor)

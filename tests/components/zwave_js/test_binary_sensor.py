@@ -6,9 +6,9 @@ import pytest
 from zwave_js_server.event import Event
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import (
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     STATE_OFF,
     STATE_ON,
@@ -16,9 +16,9 @@ from homeassistant.const import (
     EntityCategory,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .common import (
     DISABLED_LEGACY_BINARY_SENSOR,
@@ -38,7 +38,7 @@ def platforms() -> list[str]:
 
 
 async def test_battery_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ring_keypad: Node,
     integration: MockConfigEntry,
@@ -89,7 +89,7 @@ async def test_battery_sensors(
 
 
 async def test_enabled_legacy_sensor(
-    hass: HomeAssistant, ecolink_door_sensor, integration
+    hass: SmartHub, ecolink_door_sensor, integration
 ) -> None:
     """Test enabled legacy boolean binary sensor."""
     node = ecolink_door_sensor
@@ -149,7 +149,7 @@ async def test_enabled_legacy_sensor(
 
 
 async def test_disabled_legacy_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, multisensor_6, integration
+    hass: SmartHub, entity_registry: er.EntityRegistry, multisensor_6, integration
 ) -> None:
     """Test disabled legacy boolean binary sensor."""
     # this node has Notification CC implemented so legacy binary sensor should be disabled
@@ -171,7 +171,7 @@ async def test_disabled_legacy_sensor(
 
 
 async def test_notification_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, multisensor_6, integration
+    hass: SmartHub, entity_registry: er.EntityRegistry, multisensor_6, integration
 ) -> None:
     """Test binary sensor created from Notification CC."""
     state = hass.states.get(NOTIFICATION_MOTION_BINARY_SENSOR)
@@ -193,7 +193,7 @@ async def test_notification_sensor(
 
 
 async def test_notification_off_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     lock_popp_electric_strike_lock_control: Node,
 ) -> None:
     """Test the description off_state attribute of certain notification sensors."""
@@ -225,7 +225,7 @@ async def test_notification_off_state(
 
 
 async def test_property_sensor_door_status(
-    hass: HomeAssistant, lock_august_pro, integration
+    hass: SmartHub, lock_august_pro, integration
 ) -> None:
     """Test property binary sensor with sensor mapping (doorStatus)."""
     node = lock_august_pro
@@ -306,7 +306,7 @@ async def test_property_sensor_door_status(
 
 
 async def test_config_parameter_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     climate_adc_t3000,
     integration,
@@ -334,7 +334,7 @@ async def test_config_parameter_binary_sensor(
 
 
 async def test_smoke_co_notification_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     zcombo_smoke_co_alarm: Node,
     integration: MockConfigEntry,

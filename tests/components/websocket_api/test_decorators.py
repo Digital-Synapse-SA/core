@@ -4,12 +4,12 @@ from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.components import http, websocket_api
-from homeassistant.core import HomeAssistant
+from smarthub.components import http, websocket_api
+from smarthub.core import SmartHub
 
 
 async def test_async_response_request_context(
-    hass: HomeAssistant, websocket_client
+    hass: SmartHub, websocket_client
 ) -> None:
     """Test we can access current request."""
 
@@ -22,7 +22,7 @@ async def test_async_response_request_context(
     @websocket_api.websocket_command({"type": "test-get-request-executor"})
     @websocket_api.async_response
     async def executor_get_request(
-        hass: HomeAssistant,
+        hass: SmartHub,
         connection: websocket_api.ActiveConnection,
         msg: dict[str, Any],
     ) -> None:
@@ -33,7 +33,7 @@ async def test_async_response_request_context(
     @websocket_api.websocket_command({"type": "test-get-request-async"})
     @websocket_api.async_response
     async def async_get_request(
-        hass: HomeAssistant,
+        hass: SmartHub,
         connection: websocket_api.ActiveConnection,
         msg: dict[str, Any],
     ) -> None:
@@ -41,7 +41,7 @@ async def test_async_response_request_context(
 
     @websocket_api.websocket_command({"type": "test-get-request"})
     def get_request(
-        hass: HomeAssistant,
+        hass: SmartHub,
         connection: websocket_api.ActiveConnection,
         msg: dict[str, Any],
     ) -> None:
@@ -51,7 +51,7 @@ async def test_async_response_request_context(
         {"type": "test-get-request-with-arg", vol.Required("arg"): str}
     )
     def get_with_arg_request(
-        hass: HomeAssistant,
+        hass: SmartHub,
         connection: websocket_api.ActiveConnection,
         msg: dict[str, Any],
     ) -> None:
@@ -158,13 +158,13 @@ async def test_async_response_request_context(
     )
 
 
-async def test_supervisor_only(hass: HomeAssistant, websocket_client) -> None:
+async def test_supervisor_only(hass: SmartHub, websocket_client) -> None:
     """Test that only the Supervisor can make requests."""
 
     @websocket_api.ws_require_user(only_supervisor=True)
     @websocket_api.websocket_command({"type": "test-require-supervisor-user"})
     def require_supervisor_request(
-        hass: HomeAssistant,
+        hass: SmartHub,
         connection: websocket_api.ActiveConnection,
         msg: dict[str, Any],
     ) -> None:

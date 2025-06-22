@@ -13,11 +13,11 @@ from xknx.io import (
     SecureConfig,
 )
 
-from homeassistant.components.knx.config_flow import (
+from smarthub.components.knx.config_flow import (
     DEFAULT_ENTRY_DATA,
     DEFAULT_ROUTING_IA,
 )
-from homeassistant.components.knx.const import (
+from smarthub.components.knx.const import (
     CONF_KNX_AUTOMATIC,
     CONF_KNX_CONNECTION_TYPE,
     CONF_KNX_DEFAULT_RATE_LIMIT,
@@ -44,9 +44,9 @@ from homeassistant.components.knx.const import (
     DOMAIN,
     KNXConfigEntryData,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_PORT, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_PORT, Platform
+from smarthub.core import SmartHub
 
 from . import KnxEntityGenerator
 from .conftest import KNXTestKit
@@ -213,7 +213,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
     ],
 )
 async def test_init_connection_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     config_entry_data: KNXConfigEntryData,
     connection_config: ConnectionConfig,
@@ -265,7 +265,7 @@ async def test_init_connection_handling(
 
 
 async def _init_switch_and_wait_for_first_state_updater_run(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     create_ui_entity: KnxEntityGenerator,
     freezer: FrozenDateTimeFactory,
@@ -301,7 +301,7 @@ async def _init_switch_and_wait_for_first_state_updater_run(
 
 
 async def test_default_state_updater_enabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     create_ui_entity: KnxEntityGenerator,
     freezer: FrozenDateTimeFactory,
@@ -319,7 +319,7 @@ async def test_default_state_updater_enabled(
 
 
 async def test_default_state_updater_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     create_ui_entity: KnxEntityGenerator,
     freezer: FrozenDateTimeFactory,
@@ -336,7 +336,7 @@ async def test_default_state_updater_disabled(
 
 
 async def test_async_remove_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
 ) -> None:
     """Test async_setup_entry (for coverage)."""

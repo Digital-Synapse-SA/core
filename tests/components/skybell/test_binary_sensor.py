@@ -1,13 +1,13 @@
 """Binary sensor tests for the Skybell integration."""
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.const import ATTR_DEVICE_CLASS, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.const import ATTR_DEVICE_CLASS, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from .conftest import async_init_integration
 
 
-async def test_binary_sensors(hass: HomeAssistant, connection) -> None:
+async def test_binary_sensors(hass: SmartHub, connection) -> None:
     """Test we get sensor data."""
     await async_init_integration(hass)
 

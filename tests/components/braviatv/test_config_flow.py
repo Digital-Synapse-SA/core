@@ -10,18 +10,18 @@ from pybravia import (
 )
 import pytest
 
-from homeassistant.components.braviatv.const import (
+from smarthub.components.braviatv.const import (
     CONF_NICKNAME,
     CONF_USE_PSK,
     DOMAIN,
     NICKNAME_PREFIX,
 )
-from homeassistant.config_entries import SOURCE_SSDP, SOURCE_USER
-from homeassistant.const import CONF_CLIENT_ID, CONF_HOST, CONF_MAC, CONF_PIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import instance_id
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.config_entries import SOURCE_SSDP, SOURCE_USER
+from smarthub.const import CONF_CLIENT_ID, CONF_HOST, CONF_MAC, CONF_PIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import instance_id
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_MODEL_NAME,
     ATTR_UPNP_UDN,
@@ -92,7 +92,7 @@ FAKE_BRAVIA_SSDP = SsdpServiceInfo(
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_show_form(hass: HomeAssistant) -> None:
+async def test_show_form(hass: SmartHub) -> None:
     """Test that the form is served with no input."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -102,7 +102,7 @@ async def test_show_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_ssdp_discovery(hass: HomeAssistant) -> None:
+async def test_ssdp_discovery(hass: SmartHub) -> None:
     """Test that the device is discovered."""
     uuid = await instance_id.async_get(hass)
     result = await hass.config_entries.flow.async_init(
@@ -154,7 +154,7 @@ async def test_ssdp_discovery(hass: HomeAssistant) -> None:
         }
 
 
-async def test_ssdp_discovery_fake(hass: HomeAssistant) -> None:
+async def test_ssdp_discovery_fake(hass: SmartHub) -> None:
     """Test that not Bravia device is not discovered."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -166,7 +166,7 @@ async def test_ssdp_discovery_fake(hass: HomeAssistant) -> None:
     assert result["reason"] == "not_bravia_device"
 
 
-async def test_ssdp_discovery_exist(hass: HomeAssistant) -> None:
+async def test_ssdp_discovery_exist(hass: SmartHub) -> None:
     """Test that the existed device is not discovered."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -190,7 +190,7 @@ async def test_ssdp_discovery_exist(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_user_invalid_host(hass: HomeAssistant) -> None:
+async def test_user_invalid_host(hass: SmartHub) -> None:
     """Test that errors are shown when the host is invalid."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data={CONF_HOST: "invalid/host"}
@@ -207,7 +207,7 @@ async def test_user_invalid_host(hass: HomeAssistant) -> None:
         (BraviaConnectionError, "cannot_connect"),
     ],
 )
-async def test_pin_form_error(hass: HomeAssistant, side_effect, error_message) -> None:
+async def test_pin_form_error(hass: SmartHub, side_effect, error_message) -> None:
     """Test that PIN form errors are correct."""
     with (
         patch(
@@ -237,7 +237,7 @@ async def test_pin_form_error(hass: HomeAssistant, side_effect, error_message) -
         (BraviaConnectionError, "cannot_connect"),
     ],
 )
-async def test_psk_form_error(hass: HomeAssistant, side_effect, error_message) -> None:
+async def test_psk_form_error(hass: SmartHub, side_effect, error_message) -> None:
     """Test that PSK form errors are correct."""
     with patch(
         "pybravia.BraviaClient.connect",
@@ -256,7 +256,7 @@ async def test_psk_form_error(hass: HomeAssistant, side_effect, error_message) -
         assert result["errors"] == {"base": error_message}
 
 
-async def test_no_ip_control(hass: HomeAssistant) -> None:
+async def test_no_ip_control(hass: SmartHub) -> None:
     """Test that error are shown when IP Control is disabled on the TV."""
     with patch("pybravia.BraviaClient.pair", side_effect=BraviaError):
         result = await hass.config_entries.flow.async_init(
@@ -270,7 +270,7 @@ async def test_no_ip_control(hass: HomeAssistant) -> None:
         assert result["reason"] == "no_ip_control"
 
 
-async def test_duplicate_error(hass: HomeAssistant) -> None:
+async def test_duplicate_error(hass: SmartHub) -> None:
     """Test that error are shown when duplicates are added."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -307,7 +307,7 @@ async def test_duplicate_error(hass: HomeAssistant) -> None:
         assert result["reason"] == "already_configured"
 
 
-async def test_create_entry(hass: HomeAssistant) -> None:
+async def test_create_entry(hass: SmartHub) -> None:
     """Test that entry is added correctly with PIN auth."""
     uuid = await instance_id.async_get(hass)
 
@@ -351,7 +351,7 @@ async def test_create_entry(hass: HomeAssistant) -> None:
         }
 
 
-async def test_create_entry_psk(hass: HomeAssistant) -> None:
+async def test_create_entry_psk(hass: SmartHub) -> None:
     """Test that entry is added correctly with PSK auth."""
     with (
         patch("pybravia.BraviaClient.connect"),
@@ -397,7 +397,7 @@ async def test_create_entry_psk(hass: HomeAssistant) -> None:
         (False, "newpsk"),
     ],
 )
-async def test_reauth_successful(hass: HomeAssistant, use_psk, new_pin) -> None:
+async def test_reauth_successful(hass: SmartHub, use_psk, new_pin) -> None:
     """Test that the reauthorization is successful."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

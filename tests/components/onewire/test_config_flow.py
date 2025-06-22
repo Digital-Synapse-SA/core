@@ -6,19 +6,19 @@ from unittest.mock import AsyncMock, patch
 from pyownet import protocol
 import pytest
 
-from homeassistant.components.onewire.const import (
+from smarthub.components.onewire.const import (
     DOMAIN,
     INPUT_ENTRY_CLEAR_OPTIONS,
     INPUT_ENTRY_DEVICE_SELECTION,
     MANUFACTURER_MAXIM,
 )
-from homeassistant.config_entries import SOURCE_HASSIO, SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.config_entries import SOURCE_HASSIO, SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -58,14 +58,14 @@ async def filled_device_registry(
     return device_registry
 
 
-async def test_user_flow(hass: HomeAssistant) -> None:
+async def test_user_flow(hass: SmartHub) -> None:
     """Test user flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.onewire.onewirehub.protocol.proxy",
+        "smarthub.components.onewire.onewirehub.protocol.proxy",
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -78,7 +78,7 @@ async def test_user_flow(hass: HomeAssistant) -> None:
     assert new_entry.data == {CONF_HOST: "1.2.3.4", CONF_PORT: 1234}
 
 
-async def test_user_flow_recovery(hass: HomeAssistant) -> None:
+async def test_user_flow_recovery(hass: SmartHub) -> None:
     """Test user flow recovery after invalid server."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -86,7 +86,7 @@ async def test_user_flow_recovery(hass: HomeAssistant) -> None:
 
     # Invalid server
     with patch(
-        "homeassistant.components.onewire.onewirehub.protocol.proxy",
+        "smarthub.components.onewire.onewirehub.protocol.proxy",
         side_effect=protocol.ConnError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -100,7 +100,7 @@ async def test_user_flow_recovery(hass: HomeAssistant) -> None:
 
     # Valid server
     with patch(
-        "homeassistant.components.onewire.onewirehub.protocol.proxy",
+        "smarthub.components.onewire.onewirehub.protocol.proxy",
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -114,7 +114,7 @@ async def test_user_flow_recovery(hass: HomeAssistant) -> None:
 
 
 async def test_user_duplicate(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test user duplicate flow."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -138,7 +138,7 @@ async def test_user_duplicate(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_setup_entry: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_setup_entry: AsyncMock
 ) -> None:
     """Test reconfigure flow."""
     result = await config_entry.start_reconfigure_flow(hass)
@@ -148,7 +148,7 @@ async def test_reconfigure_flow(
 
     # Invalid server
     with patch(
-        "homeassistant.components.onewire.onewirehub.protocol.proxy",
+        "smarthub.components.onewire.onewirehub.protocol.proxy",
         side_effect=protocol.ConnError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -162,7 +162,7 @@ async def test_reconfigure_flow(
 
     # Valid server
     with patch(
-        "homeassistant.components.onewire.onewirehub.protocol.proxy",
+        "smarthub.components.onewire.onewirehub.protocol.proxy",
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -177,7 +177,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_duplicate(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_setup_entry: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_setup_entry: AsyncMock
 ) -> None:
     """Test reconfigure duplicate flow."""
     other_config_entry = MockConfigEntry(
@@ -209,7 +209,7 @@ async def test_reconfigure_duplicate(
     assert other_config_entry.data == {CONF_HOST: "2.3.4.5", CONF_PORT: 2345}
 
 
-async def test_hassio_flow(hass: HomeAssistant) -> None:
+async def test_hassio_flow(hass: SmartHub) -> None:
     """Test HassIO discovery flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -222,7 +222,7 @@ async def test_hassio_flow(hass: HomeAssistant) -> None:
 
     # Cannot connect to server => retry
     with patch(
-        "homeassistant.components.onewire.onewirehub.protocol.proxy",
+        "smarthub.components.onewire.onewirehub.protocol.proxy",
         side_effect=protocol.ConnError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -236,7 +236,7 @@ async def test_hassio_flow(hass: HomeAssistant) -> None:
 
     # Connect OK
     with patch(
-        "homeassistant.components.onewire.onewirehub.protocol.proxy",
+        "smarthub.components.onewire.onewirehub.protocol.proxy",
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -250,7 +250,7 @@ async def test_hassio_flow(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("config_entry")
-async def test_hassio_duplicate(hass: HomeAssistant) -> None:
+async def test_hassio_duplicate(hass: SmartHub) -> None:
     """Test HassIO discovery duplicate flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -261,7 +261,7 @@ async def test_hassio_duplicate(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_zeroconf_flow(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow(hass: SmartHub) -> None:
     """Test zeroconf discovery flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -274,7 +274,7 @@ async def test_zeroconf_flow(hass: HomeAssistant) -> None:
 
     # Cannot connect to server => retry
     with patch(
-        "homeassistant.components.onewire.onewirehub.protocol.proxy",
+        "smarthub.components.onewire.onewirehub.protocol.proxy",
         side_effect=protocol.ConnError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -288,7 +288,7 @@ async def test_zeroconf_flow(hass: HomeAssistant) -> None:
 
     # Connect OK
     with patch(
-        "homeassistant.components.onewire.onewirehub.protocol.proxy",
+        "smarthub.components.onewire.onewirehub.protocol.proxy",
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -302,7 +302,7 @@ async def test_zeroconf_flow(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("config_entry")
-async def test_zeroconf_duplicate(hass: HomeAssistant) -> None:
+async def test_zeroconf_duplicate(hass: SmartHub) -> None:
     """Test zeroconf discovery duplicate flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -315,7 +315,7 @@ async def test_zeroconf_duplicate(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("filled_device_registry")
 async def test_user_options_clear(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test clearing the options."""
     assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -339,7 +339,7 @@ async def test_user_options_clear(
 
 @pytest.mark.usefixtures("filled_device_registry")
 async def test_user_options_empty_selection_recovery(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test leaving the selection of devices empty."""
     assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -383,7 +383,7 @@ async def test_user_options_empty_selection_recovery(
 
 @pytest.mark.usefixtures("filled_device_registry")
 async def test_user_options_set_single(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test configuring a single device."""
     # Clear config options to certify functionality when starting from scratch
@@ -420,7 +420,7 @@ async def test_user_options_set_single(
 
 
 async def test_user_options_set_multiple(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     filled_device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -484,7 +484,7 @@ async def test_user_options_set_multiple(
 
 
 async def test_user_options_no_devices(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test that options does not change when no devices are available."""
     assert await hass.config_entries.async_setup(config_entry.entry_id)

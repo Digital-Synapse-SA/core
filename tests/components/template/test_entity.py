@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant.components.template import entity as abstract_entity
-from homeassistant.core import HomeAssistant
+from smarthub.components.template import entity as abstract_entity
+from smarthub.core import SmartHub
 
 
-async def test_template_entity_not_implemented(hass: HomeAssistant) -> None:
+async def test_template_entity_not_implemented(hass: SmartHub) -> None:
     """Test abstract template entity raises not implemented error."""
 
     entity = abstract_entity.AbstractTemplateEntity(None)

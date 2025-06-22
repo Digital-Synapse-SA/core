@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 from aiohttp import ClientError
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .test_init import MOCK_ENVIRON
 
@@ -16,14 +16,14 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_hassio_system_health(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test hassio system health."""
     aioclient_mock.get("http://127.0.0.1/info", json={"result": "ok", "data": {}})
     aioclient_mock.get("http://127.0.0.1/host/info", json={"result": "ok", "data": {}})
     aioclient_mock.get("http://127.0.0.1/os/info", json={"result": "ok", "data": {}})
     aioclient_mock.get("http://127.0.0.1/supervisor/ping", text="")
-    aioclient_mock.get("https://version.home-assistant.io/stable.json", text="")
+    aioclient_mock.get("https://version.smart-hub.io/stable.json", text="")
     aioclient_mock.get(
         "http://127.0.0.1/supervisor/info", json={"result": "ok", "data": {}}
     )
@@ -39,7 +39,7 @@ async def test_hassio_system_health(
         "hassos": True,
     }
     hass.data["hassio_host_info"] = {
-        "operating_system": "Home Assistant OS 5.9",
+        "operating_system": "SmartHub OS 5.9",
         "agent_version": "1337",
         "disk_total": "32.0",
         "disk_used": "30.0",
@@ -73,7 +73,7 @@ async def test_hassio_system_health(
         "healthy": True,
         "host_connectivity": True,
         "supervisor_connectivity": True,
-        "host_os": "Home Assistant OS 5.9",
+        "host_os": "SmartHub OS 5.9",
         "installed_addons": "Awesome Addon (1.0.0)",
         "ntp_synchronized": True,
         "supervisor_api": "ok",
@@ -86,14 +86,14 @@ async def test_hassio_system_health(
 
 
 async def test_hassio_system_health_with_issues(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test hassio system health."""
     aioclient_mock.get("http://127.0.0.1/info", json={"result": "ok", "data": {}})
     aioclient_mock.get("http://127.0.0.1/host/info", json={"result": "ok", "data": {}})
     aioclient_mock.get("http://127.0.0.1/os/info", json={"result": "ok", "data": {}})
     aioclient_mock.get("http://127.0.0.1/supervisor/ping", text="")
-    aioclient_mock.get("https://version.home-assistant.io/stable.json", exc=ClientError)
+    aioclient_mock.get("https://version.smart-hub.io/stable.json", exc=ClientError)
     aioclient_mock.get(
         "http://127.0.0.1/supervisor/info", json={"result": "ok", "data": {}}
     )

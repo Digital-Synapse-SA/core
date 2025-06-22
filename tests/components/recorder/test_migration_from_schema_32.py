@@ -15,34 +15,34 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import Index
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder import (
+from smarthub.components import recorder
+from smarthub.components.recorder import (
     Recorder,
     core,
     db_schema,
     migration,
     statistics,
 )
-from homeassistant.components.recorder.db_schema import (
+from smarthub.components.recorder.db_schema import (
     Events,
     EventTypes,
     MigrationChanges,
     States,
     StatesMeta,
 )
-from homeassistant.components.recorder.models import process_timestamp
-from homeassistant.components.recorder.queries import (
+from smarthub.components.recorder.models import process_timestamp
+from smarthub.components.recorder.queries import (
     get_migration_changes,
     select_event_type_ids,
 )
-from homeassistant.components.recorder.util import (
+from smarthub.components.recorder.util import (
     execute_stmt_lambda_element,
     get_index_by_name,
     session_scope,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
-from homeassistant.util.ulid import bytes_to_ulid, ulid_at_time, ulid_to_bytes
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
+from smarthub.util.ulid import bytes_to_ulid, ulid_at_time, ulid_to_bytes
 
 from .common import (
     async_attach_db_engine,
@@ -54,7 +54,7 @@ from .conftest import instrument_migration
 from tests.common import async_test_home_assistant
 from tests.typing import RecorderInstanceContextManager
 
-CREATE_ENGINE_TARGET = "homeassistant.components.recorder.core.create_engine"
+CREATE_ENGINE_TARGET = "smarthub.components.recorder.core.create_engine"
 SCHEMA_MODULE_32 = "tests.components.recorder.db_schema_32"
 
 
@@ -65,13 +65,13 @@ async def mock_recorder_before_hass(
     """Set up recorder."""
 
 
-async def _async_wait_migration_done(hass: HomeAssistant) -> None:
+async def _async_wait_migration_done(hass: SmartHub) -> None:
     """Wait for the migration to be done."""
     await recorder.get_instance(hass).async_block_till_done()
     await async_recorder_block_till_done(hass)
 
 
-def _get_migration_id(hass: HomeAssistant) -> dict[str, int]:
+def _get_migration_id(hass: SmartHub) -> dict[str, int]:
     with session_scope(hass=hass, read_only=True) as session:
         return dict(execute_stmt_lambda_element(session, get_migration_changes()))
 
@@ -402,7 +402,7 @@ async def test_finish_migrate_events_context_ids(
 ) -> None:
     """Test we re migrate old uuid context ids and ulid context ids to binary format.
 
-    Before PR https://github.com/home-assistant/core/pull/125214, the migrator would
+    Before PR https://github.com/smart-hub/core/pull/125214, the migrator would
     mark the migration as done before ensuring unused indices were dropped. This
     test makes sure we drop the unused indices.
     """
@@ -766,7 +766,7 @@ async def test_finish_migrate_states_context_ids(
 ) -> None:
     """Test we re migrate old uuid context ids and ulid context ids to binary format.
 
-    Before PR https://github.com/home-assistant/core/pull/125214, the migrator would
+    Before PR https://github.com/smart-hub/core/pull/125214, the migrator would
     mark the migration as done before ensuring unused indices were dropped. This
     test makes sure we drop the unused indices.
     """
@@ -1427,7 +1427,7 @@ async def test_migrate_null_event_type_ids(
 
 @pytest.mark.usefixtures("db_schema_32")
 async def test_stats_timestamp_conversion_is_reentrant(
-    hass: HomeAssistant, recorder_mock: Recorder
+    hass: SmartHub, recorder_mock: Recorder
 ) -> None:
     """Test stats migration is reentrant."""
     await async_wait_recording_done(hass)
@@ -1583,7 +1583,7 @@ async def test_stats_timestamp_conversion_is_reentrant(
 
 @pytest.mark.usefixtures("db_schema_32")
 async def test_stats_timestamp_with_one_by_one(
-    hass: HomeAssistant, recorder_mock: Recorder
+    hass: SmartHub, recorder_mock: Recorder
 ) -> None:
     """Test stats migration with one by one."""
     await async_wait_recording_done(hass)
@@ -1809,7 +1809,7 @@ async def test_stats_timestamp_with_one_by_one(
 
 @pytest.mark.usefixtures("db_schema_32")
 async def test_stats_timestamp_with_one_by_one_removes_duplicates(
-    hass: HomeAssistant, recorder_mock: Recorder
+    hass: SmartHub, recorder_mock: Recorder
 ) -> None:
     """Test stats migration with one by one removes duplicates."""
     await async_wait_recording_done(hass)

@@ -15,12 +15,12 @@ from pynordpool import (
 )
 import pytest
 
-from homeassistant.components.nordpool.const import CONF_AREAS, DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import CONF_CURRENCY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.nordpool.const import CONF_AREAS, DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import CONF_CURRENCY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import ENTRY_CONFIG
 
@@ -29,7 +29,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.mark.freeze_time("2024-11-05T10:00:00+00:00")
-async def test_unload_entry(hass: HomeAssistant, get_client: NordPoolClient) -> None:
+async def test_unload_entry(hass: SmartHub, get_client: NordPoolClient) -> None:
     """Test load and unload an entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -57,7 +57,7 @@ async def test_unload_entry(hass: HomeAssistant, get_client: NordPoolClient) -> 
     ],
 )
 async def test_initial_startup_fails(
-    hass: HomeAssistant, get_client: NordPoolClient, error: Exception
+    hass: SmartHub, get_client: NordPoolClient, error: Exception
 ) -> None:
     """Test load and unload an entry."""
     entry = MockConfigEntry(
@@ -69,7 +69,7 @@ async def test_initial_startup_fails(
 
     with (
         patch(
-            "homeassistant.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
+            "smarthub.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
             side_effect=error,
         ),
     ):
@@ -81,7 +81,7 @@ async def test_initial_startup_fails(
 
 @pytest.mark.freeze_time("2024-11-05T10:00:00+00:00")
 async def test_reconfigure_cleans_up_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     get_client: NordPoolClient,
     device_registry: dr.DeviceRegistry,

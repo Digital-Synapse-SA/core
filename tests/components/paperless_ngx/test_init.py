@@ -11,8 +11,8 @@ from pypaperless.exceptions import (
 )
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test loading and unloading the integration."""
@@ -35,7 +35,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_load_config_status_forbidden(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_paperless: AsyncMock,
 ) -> None:
@@ -67,7 +67,7 @@ async def test_load_config_status_forbidden(
     ],
 )
 async def test_setup_config_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_paperless: AsyncMock,
     side_effect: Exception,

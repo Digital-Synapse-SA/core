@@ -6,18 +6,18 @@ import time
 
 import pytest
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
 )
-from homeassistant.components.bthome.const import CONF_SLEEPY_DEVICE, DOMAIN
-from homeassistant.components.sensor import ATTR_STATE_CLASS
-from homeassistant.const import (
+from smarthub.components.bthome.const import CONF_SLEEPY_DEVICE, DOMAIN
+from smarthub.components.sensor import ATTR_STATE_CLASS
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import make_bthome_v1_adv, make_bthome_v2_adv, make_encrypted_bthome_v1_adv
 
@@ -346,7 +346,7 @@ _LOGGER = logging.getLogger(__name__)
     ],
 )
 async def test_v1_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac_address,
     advertisement,
     bind_key,
@@ -1093,7 +1093,7 @@ async def test_v1_sensors(
     ],
 )
 async def test_v2_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac_address,
     advertisement,
     bind_key,
@@ -1134,7 +1134,7 @@ async def test_v2_sensors(
     await hass.async_block_till_done()
 
 
-async def test_unavailable(hass: HomeAssistant) -> None:
+async def test_unavailable(hass: SmartHub) -> None:
     """Test normal device goes to unavailable after 60 minutes."""
     start_monotonic = time.monotonic()
 
@@ -1187,7 +1187,7 @@ async def test_unavailable(hass: HomeAssistant) -> None:
     assert CONF_SLEEPY_DEVICE not in entry.data
 
 
-async def test_sleepy_device(hass: HomeAssistant) -> None:
+async def test_sleepy_device(hass: SmartHub) -> None:
     """Test sleepy device does not go to unavailable after 60 minutes."""
     start_monotonic = time.monotonic()
 
@@ -1240,7 +1240,7 @@ async def test_sleepy_device(hass: HomeAssistant) -> None:
     assert entry.data[CONF_SLEEPY_DEVICE] is True
 
 
-async def test_sleepy_device_restore_state(hass: HomeAssistant) -> None:
+async def test_sleepy_device_restore_state(hass: SmartHub) -> None:
     """Test sleepy device does not go to unavailable after 60 minutes and restores state."""
     start_monotonic = time.monotonic()
 

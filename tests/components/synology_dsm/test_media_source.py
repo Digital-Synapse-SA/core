@@ -9,20 +9,20 @@ import pytest
 from synology_dsm.api.photos import SynoPhotosAlbum, SynoPhotosItem
 from synology_dsm.exceptions import SynologyDSMException
 
-from homeassistant.components.media_player import MediaClass
-from homeassistant.components.media_source import (
+from smarthub.components.media_player import MediaClass
+from smarthub.components.media_source import (
     BrowseError,
     BrowseMedia,
     MediaSourceItem,
     Unresolvable,
 )
-from homeassistant.components.synology_dsm.const import DOMAIN
-from homeassistant.components.synology_dsm.media_source import (
+from smarthub.components.synology_dsm.const import DOMAIN
+from smarthub.components.synology_dsm.media_source import (
     SynologyDsmMediaView,
     SynologyPhotosMediaSource,
     async_get_media_source,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
@@ -30,8 +30,8 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util.aiohttp import MockRequest
+from smarthub.core import SmartHub
+from smarthub.util.aiohttp import MockRequest
 
 from .common import mock_dsm_information
 from .consts import HOST, MACS, PASSWORD, PORT, USE_SSL, USERNAME
@@ -74,7 +74,7 @@ def dsm_with_photos() -> MagicMock:
 
 
 @pytest.mark.usefixtures("setup_media_source")
-async def test_get_media_source(hass: HomeAssistant) -> None:
+async def test_get_media_source(hass: SmartHub) -> None:
     """Test the async_get_media_source function and SynologyPhotosMediaSource constructor."""
 
     source = await async_get_media_source(hass)
@@ -93,7 +93,7 @@ async def test_get_media_source(hass: HomeAssistant) -> None:
     ],
 )
 async def test_resolve_media_bad_identifier(
-    hass: HomeAssistant, identifier: str, exception_msg: str
+    hass: SmartHub, identifier: str, exception_msg: str
 ) -> None:
     """Test resolve_media with bad identifiers."""
     source = await async_get_media_source(hass)
@@ -129,7 +129,7 @@ async def test_resolve_media_bad_identifier(
     ],
 )
 async def test_resolve_media_success(
-    hass: HomeAssistant, identifier: str, url: str, mime_type: str
+    hass: SmartHub, identifier: str, url: str, mime_type: str
 ) -> None:
     """Test successful resolving an item."""
     source = await async_get_media_source(hass)
@@ -141,7 +141,7 @@ async def test_resolve_media_success(
 
 
 @pytest.mark.usefixtures("setup_media_source")
-async def test_browse_media_unconfigured(hass: HomeAssistant) -> None:
+async def test_browse_media_unconfigured(hass: SmartHub) -> None:
     """Test browse_media without any devices being configured."""
     source = await async_get_media_source(hass)
     item = MediaSourceItem(
@@ -153,15 +153,15 @@ async def test_browse_media_unconfigured(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_media_source")
 async def test_browse_media_album_error(
-    hass: HomeAssistant, dsm_with_photos: MagicMock
+    hass: SmartHub, dsm_with_photos: MagicMock
 ) -> None:
     """Test browse_media with unknown album."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=dsm_with_photos,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,
@@ -195,15 +195,15 @@ async def test_browse_media_album_error(
 
 @pytest.mark.usefixtures("setup_media_source")
 async def test_browse_media_get_root(
-    hass: HomeAssistant, dsm_with_photos: MagicMock
+    hass: SmartHub, dsm_with_photos: MagicMock
 ) -> None:
     """Test browse_media returning root media sources."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=dsm_with_photos,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,
@@ -232,15 +232,15 @@ async def test_browse_media_get_root(
 
 @pytest.mark.usefixtures("setup_media_source")
 async def test_browse_media_get_albums(
-    hass: HomeAssistant, dsm_with_photos: MagicMock
+    hass: SmartHub, dsm_with_photos: MagicMock
 ) -> None:
     """Test browse_media returning albums."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=dsm_with_photos,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,
@@ -276,15 +276,15 @@ async def test_browse_media_get_albums(
 
 @pytest.mark.usefixtures("setup_media_source")
 async def test_browse_media_get_items_error(
-    hass: HomeAssistant, dsm_with_photos: MagicMock
+    hass: SmartHub, dsm_with_photos: MagicMock
 ) -> None:
     """Test browse_media returning albums."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=dsm_with_photos,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,
@@ -337,15 +337,15 @@ async def test_browse_media_get_items_error(
 
 @pytest.mark.usefixtures("setup_media_source")
 async def test_browse_media_get_items_thumbnail_error(
-    hass: HomeAssistant, dsm_with_photos: MagicMock
+    hass: SmartHub, dsm_with_photos: MagicMock
 ) -> None:
     """Test browse_media returning albums."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=dsm_with_photos,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,
@@ -379,15 +379,15 @@ async def test_browse_media_get_items_thumbnail_error(
 
 @pytest.mark.usefixtures("setup_media_source")
 async def test_browse_media_get_items(
-    hass: HomeAssistant, dsm_with_photos: MagicMock
+    hass: SmartHub, dsm_with_photos: MagicMock
 ) -> None:
     """Test browse_media returning albums."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=dsm_with_photos,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,
@@ -449,7 +449,7 @@ async def test_browse_media_get_items(
 
 @pytest.mark.usefixtures("setup_media_source")
 async def test_media_view(
-    hass: HomeAssistant, tmp_path: Path, dsm_with_photos: MagicMock
+    hass: SmartHub, tmp_path: Path, dsm_with_photos: MagicMock
 ) -> None:
     """Test SynologyDsmMediaView returning albums."""
     view = SynologyDsmMediaView(hass)
@@ -461,10 +461,10 @@ async def test_media_view(
 
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=dsm_with_photos,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,

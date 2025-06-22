@@ -9,13 +9,13 @@ import pytest
 from uiprotect.data import Camera, Event, EventType, ModelType
 from uiprotect.exceptions import ClientError
 
-from homeassistant.components.unifiprotect.views import (
+from smarthub.components.unifiprotect.views import (
     async_generate_event_video_url,
     async_generate_proxy_event_video_url,
     async_generate_snapshot_url,
     async_generate_thumbnail_url,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .utils import MockUFPFixture, init_entry
 
@@ -23,7 +23,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_thumbnail_bad_nvr_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -44,7 +44,7 @@ async def test_thumbnail_bad_nvr_id(
 
 @pytest.mark.parametrize(("width", "height"), [("test", None), (None, "test")])
 async def test_thumbnail_bad_params(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -68,7 +68,7 @@ async def test_thumbnail_bad_params(
 
 
 async def test_thumbnail_bad_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -88,7 +88,7 @@ async def test_thumbnail_bad_event(
 
 
 async def test_thumbnail_no_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -108,7 +108,7 @@ async def test_thumbnail_no_data(
 
 
 async def test_thumbnail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -130,7 +130,7 @@ async def test_thumbnail(
 
 
 async def test_thumbnail_entry_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -152,7 +152,7 @@ async def test_thumbnail_entry_id(
 
 
 async def test_thumbnail_invalid_entry_entry_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -171,7 +171,7 @@ async def test_thumbnail_invalid_entry_entry_id(
 
 
 async def test_snapshot_bad_nvr_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -193,7 +193,7 @@ async def test_snapshot_bad_nvr_id(
 
 
 async def test_snapshot_bad_camera_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -215,7 +215,7 @@ async def test_snapshot_bad_camera_id(
 
 
 async def test_snapshot_bad_camera_perms(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -239,7 +239,7 @@ async def test_snapshot_bad_camera_perms(
 
 
 async def test_snapshot_bad_timestamp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -261,7 +261,7 @@ async def test_snapshot_bad_timestamp(
 
 
 async def test_snapshot_client_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -284,7 +284,7 @@ async def test_snapshot_client_error(
 
 
 async def test_snapshot_notfound(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -308,7 +308,7 @@ async def test_snapshot_notfound(
 
 @pytest.mark.parametrize(("width", "height"), [("test", None), (None, "test")])
 async def test_snapshot_bad_params(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -333,7 +333,7 @@ async def test_snapshot_bad_params(
 
 
 async def test_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -364,7 +364,7 @@ async def test_snapshot(
 
 @pytest.mark.parametrize(("width", "height"), [(123, None), (None, 456), (123, 456)])
 async def test_snapshot_with_dimensions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -396,7 +396,7 @@ async def test_snapshot_with_dimensions(
 
 
 async def test_video_bad_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     camera: Camera,
     fixed_now: datetime,
@@ -423,7 +423,7 @@ async def test_video_bad_event(
 
 
 async def test_video_bad_event_ongoing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     camera: Camera,
     fixed_now: datetime,
@@ -450,7 +450,7 @@ async def test_video_bad_event_ongoing(
 
 
 async def test_video_bad_perms(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     camera: Camera,
     fixed_now: datetime,
@@ -478,7 +478,7 @@ async def test_video_bad_perms(
 
 
 async def test_video_bad_nvr_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -513,7 +513,7 @@ async def test_video_bad_nvr_id(
 
 
 async def test_video_bad_camera_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -548,7 +548,7 @@ async def test_video_bad_camera_id(
 
 
 async def test_video_bad_camera_perms(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -586,7 +586,7 @@ async def test_video_bad_camera_perms(
 
 @pytest.mark.parametrize(("start", "end"), [("test", None), (None, "test")])
 async def test_video_bad_params(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -626,7 +626,7 @@ async def test_video_bad_params(
 
 
 async def test_video_bad_video(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -661,7 +661,7 @@ async def test_video_bad_video(
 
 
 async def test_video(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -706,7 +706,7 @@ async def test_video(
 
 
 async def test_video_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -752,7 +752,7 @@ async def test_video_entity_id(
 
 
 async def test_video_event_bad_nvr_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     camera: Camera,
     ufp: MockUFPFixture,
@@ -772,7 +772,7 @@ async def test_video_event_bad_nvr_id(
 
 
 async def test_video_event_bad_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -790,7 +790,7 @@ async def test_video_event_bad_event(
 
 
 async def test_video_event_bad_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -808,7 +808,7 @@ async def test_video_event_bad_camera(
 
 
 async def test_video_event_bad_camera_perms(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -849,7 +849,7 @@ async def test_video_event_bad_camera_perms(
 
 
 async def test_video_event_ongoing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -886,7 +886,7 @@ async def test_video_event_ongoing(
 
 
 async def test_event_video_no_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -922,7 +922,7 @@ async def test_event_video_no_data(
 
 
 async def test_event_video(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     ufp: MockUFPFixture,
     camera: Camera,

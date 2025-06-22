@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -20,7 +20,7 @@ def platforms() -> list[str]:
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_ayla_api: AsyncMock,
@@ -34,7 +34,7 @@ async def test_entities(
 
 
 async def test_no_outside_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_ayla_api: AsyncMock,
     integration_setup: Callable[[], Awaitable[bool]],

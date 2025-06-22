@@ -10,21 +10,21 @@ from aioesphomeapi import (
     LockState as ESPHomeLockState,
 )
 
-from homeassistant.components.lock import (
+from smarthub.components.lock import (
     DOMAIN as LOCK_DOMAIN,
     SERVICE_LOCK,
     SERVICE_OPEN,
     SERVICE_UNLOCK,
     LockState,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import MockGenericDeviceEntryType
 
 
 async def test_lock_entity_no_open(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -62,7 +62,7 @@ async def test_lock_entity_no_open(
 
 
 async def test_lock_entity_start_locked(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -89,7 +89,7 @@ async def test_lock_entity_start_locked(
 
 
 async def test_lock_entity_supports_open(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:

@@ -9,17 +9,17 @@ from transmission_rpc.error import (
     TransmissionError,
 )
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.transmission.const import (
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.transmission.const import (
     DEFAULT_PATH,
     DEFAULT_SSL,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_PATH, CONF_SSL
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_PATH, CONF_SSL
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import MOCK_CONFIG_DATA, MOCK_CONFIG_DATA_VERSION_1_1, OLD_MOCK_CONFIG_DATA
 
@@ -33,7 +33,7 @@ def mock_api():
         yield api
 
 
-async def test_successful_config_entry(hass: HomeAssistant) -> None:
+async def test_successful_config_entry(hass: SmartHub) -> None:
     """Test settings up integration from config entry."""
 
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG_DATA)
@@ -44,7 +44,7 @@ async def test_successful_config_entry(hass: HomeAssistant) -> None:
     assert entry.state is ConfigEntryState.LOADED
 
 
-async def test_config_flow_entry_migrate_1_1_to_1_2(hass: HomeAssistant) -> None:
+async def test_config_flow_entry_migrate_1_1_to_1_2(hass: SmartHub) -> None:
     """Test that config flow entry is migrated correctly from v1.1 to v1.2."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -66,7 +66,7 @@ async def test_config_flow_entry_migrate_1_1_to_1_2(hass: HomeAssistant) -> None
 
 
 async def test_setup_failed_connection_error(
-    hass: HomeAssistant, mock_api: MagicMock
+    hass: SmartHub, mock_api: MagicMock
 ) -> None:
     """Test integration failed due to connection error."""
 
@@ -80,7 +80,7 @@ async def test_setup_failed_connection_error(
 
 
 async def test_setup_failed_auth_error(
-    hass: HomeAssistant, mock_api: MagicMock
+    hass: SmartHub, mock_api: MagicMock
 ) -> None:
     """Test integration failed due to invalid credentials error."""
 
@@ -94,7 +94,7 @@ async def test_setup_failed_auth_error(
 
 
 async def test_setup_failed_unexpected_error(
-    hass: HomeAssistant, mock_api: MagicMock
+    hass: SmartHub, mock_api: MagicMock
 ) -> None:
     """Test integration failed due to unexpected error."""
 
@@ -107,7 +107,7 @@ async def test_setup_failed_unexpected_error(
     assert entry.state is ConfigEntryState.SETUP_ERROR
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test removing integration."""
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG_DATA)
     entry.add_to_hass(hass)
@@ -157,7 +157,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
     ],
 )
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     domain: str,
     old_unique_id: str,

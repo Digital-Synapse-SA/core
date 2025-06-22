@@ -7,20 +7,20 @@ from zigpy.const import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
 from zigpy.profiles import zha
 from zigpy.zcl.clusters import general, security
 
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import (
+from smarthub.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     EntityCategory,
     Platform,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er
 
 from .common import find_entity_id
 
@@ -31,7 +31,7 @@ from tests.common import mock_restore_cache
 def select_select_only():
     """Only set up the select and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.BUTTON,
             Platform.DEVICE_TRACKER,
@@ -47,7 +47,7 @@ def select_select_only():
 
 
 async def test_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     setup_zha,
     zigpy_device_mock,
@@ -125,7 +125,7 @@ async def test_select(
     ],
 )
 async def test_select_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     setup_zha,
     zigpy_device_mock,

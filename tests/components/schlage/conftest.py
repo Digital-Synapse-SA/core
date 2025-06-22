@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock, Mock, create_autospec, patch
 from pyschlage.lock import Lock
 import pytest
 
-from homeassistant.components.schlage.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.schlage.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from . import MockSchlageConfigEntry
 
@@ -32,7 +32,7 @@ def mock_config_entry() -> MockSchlageConfigEntry:
 
 @pytest.fixture
 async def mock_added_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockSchlageConfigEntry,
     mock_pyschlage_auth: Mock,
     mock_schlage: Mock,
@@ -52,7 +52,7 @@ async def mock_added_config_entry(
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.schlage.async_setup_entry", return_value=True
+        "smarthub.components.schlage.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 

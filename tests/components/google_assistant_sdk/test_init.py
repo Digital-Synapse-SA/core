@@ -9,14 +9,14 @@ import aiohttp
 from grpc import RpcError
 import pytest
 
-from homeassistant.components import conversation
-from homeassistant.components.google_assistant_sdk import DOMAIN
-from homeassistant.components.google_assistant_sdk.const import SUPPORTED_LANGUAGE_CODES
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components import conversation
+from smarthub.components.google_assistant_sdk import DOMAIN
+from smarthub.components.google_assistant_sdk.const import SUPPORTED_LANGUAGE_CODES
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from .conftest import ComponentSetup, ExpectedCredentials
 
@@ -34,7 +34,7 @@ async def fetch_api_url(hass_client, url):
 
 
 async def test_setup_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
 ) -> None:
     """Test successful setup and unload."""
@@ -54,7 +54,7 @@ async def test_setup_success(
 
 @pytest.mark.parametrize("expires_at", [time.time() - 3600], ids=["expired"])
 async def test_expired_token_refresh_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -96,7 +96,7 @@ async def test_expired_token_refresh_success(
     ids=["failure_requires_reauth", "transient_failure"],
 )
 async def test_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
     status: http.HTTPStatus,
@@ -122,7 +122,7 @@ async def test_expired_token_refresh_failure(
     ids=["default", "english", "spanish"],
 )
 async def test_send_text_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     configured_language_code: str,
     expected_language_code: str,
@@ -140,7 +140,7 @@ async def test_send_text_command(
 
     command = "turn on home assistant unsupported device"
     with patch(
-        "homeassistant.components.google_assistant_sdk.helpers.TextAssistant"
+        "smarthub.components.google_assistant_sdk.helpers.TextAssistant"
     ) as mock_text_assistant:
         await hass.services.async_call(
             DOMAIN,
@@ -156,7 +156,7 @@ async def test_send_text_command(
 
 
 async def test_send_text_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
 ) -> None:
     """Test service call send_text_command calls TextAssistant."""
@@ -171,7 +171,7 @@ async def test_send_text_commands(
     command1_response = "what's the PIN?"
     command2_response = "opened the garage door"
     with patch(
-        "homeassistant.components.google_assistant_sdk.helpers.TextAssistant.assist",
+        "smarthub.components.google_assistant_sdk.helpers.TextAssistant.assist",
         side_effect=[
             (command1_response, None, None),
             (command2_response, None, None),
@@ -205,14 +205,14 @@ async def test_send_text_commands(
     ids=["failure_requires_reauth", "transient_failure"],
 )
 async def test_send_text_command_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
     status: http.HTTPStatus,
     requires_reauth: ConfigEntryState,
 ) -> None:
     """Test failure refreshing token in send_text_command."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await setup_integration()
 
     entries = hass.config_entries.async_entries(DOMAIN)
@@ -238,7 +238,7 @@ async def test_send_text_command_expired_token_refresh_failure(
 
 
 async def test_send_text_command_grpc_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
 ) -> None:
     """Test service call send_text_command when RpcError is raised."""
@@ -247,10 +247,10 @@ async def test_send_text_command_grpc_error(
     command = "turn on home assistant unsupported device"
     with (
         patch(
-            "homeassistant.components.google_assistant_sdk.helpers.TextAssistant.assist",
+            "smarthub.components.google_assistant_sdk.helpers.TextAssistant.assist",
             side_effect=RpcError(),
         ) as mock_assist_call,
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -262,7 +262,7 @@ async def test_send_text_command_grpc_error(
 
 
 async def test_send_text_command_media_player(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -276,7 +276,7 @@ async def test_send_text_command_media_player(
     audio_response1 = b"joke1 audio response bytes"
     audio_response2 = b"joke2 audio response bytes"
     with patch(
-        "homeassistant.components.google_assistant_sdk.helpers.TextAssistant.assist",
+        "smarthub.components.google_assistant_sdk.helpers.TextAssistant.assist",
         side_effect=[
             ("joke1 text", None, audio_response1),
             ("joke2 text", None, audio_response2),
@@ -346,14 +346,14 @@ async def test_send_text_command_media_player(
 
 
 async def test_conversation_agent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test GoogleAssistantConversationAgent."""
     await setup_integration()
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})
 
     entries = hass.config_entries.async_entries(DOMAIN)
@@ -367,7 +367,7 @@ async def test_conversation_agent(
     text1 = "tell me a joke"
     text2 = "tell me another one"
     with patch(
-        "homeassistant.components.google_assistant_sdk.TextAssistant"
+        "smarthub.components.google_assistant_sdk.TextAssistant"
     ) as mock_text_assistant:
         await conversation.async_converse(
             hass, text1, None, Context(), "en-US", config_entry.entry_id
@@ -384,7 +384,7 @@ async def test_conversation_agent(
 
 
 async def test_conversation_agent_refresh_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     setup_integration: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
@@ -392,7 +392,7 @@ async def test_conversation_agent_refresh_token(
     """Test GoogleAssistantConversationAgent when token is expired."""
     await setup_integration()
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})
 
     entries = hass.config_entries.async_entries(DOMAIN)
@@ -403,7 +403,7 @@ async def test_conversation_agent_refresh_token(
     text1 = "tell me a joke"
     text2 = "tell me another one"
     with patch(
-        "homeassistant.components.google_assistant_sdk.TextAssistant"
+        "smarthub.components.google_assistant_sdk.TextAssistant"
     ) as mock_text_assistant:
         await conversation.async_converse(
             hass, text1, None, Context(), "en-US", config_entry.entry_id
@@ -437,14 +437,14 @@ async def test_conversation_agent_refresh_token(
 
 
 async def test_conversation_agent_language_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     setup_integration: ComponentSetup,
 ) -> None:
     """Test GoogleAssistantConversationAgent when language is changed."""
     await setup_integration()
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})
 
     entries = hass.config_entries.async_entries(DOMAIN)
@@ -455,7 +455,7 @@ async def test_conversation_agent_language_changed(
     text1 = "tell me a joke"
     text2 = "cuéntame un chiste"
     with patch(
-        "homeassistant.components.google_assistant_sdk.TextAssistant"
+        "smarthub.components.google_assistant_sdk.TextAssistant"
     ) as mock_text_assistant:
         await conversation.async_converse(
             hass, text1, None, Context(), "en-US", config_entry.entry_id

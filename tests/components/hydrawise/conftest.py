@@ -21,10 +21,10 @@ from pydrawise.schema import (
 )
 import pytest
 
-from homeassistant.components.hydrawise.const import DOMAIN
-from homeassistant.const import CONF_API_KEY, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.hydrawise.const import DOMAIN
+from smarthub.const import CONF_API_KEY, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 
@@ -33,7 +33,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.hydrawise.async_setup_entry", return_value=True
+        "smarthub.components.hydrawise.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -233,7 +233,7 @@ async def mock_added_config_entry(
 
 @pytest.fixture
 async def mock_add_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_pydrawise: AsyncMock,
 ) -> Callable[[], Awaitable[MockConfigEntry]]:

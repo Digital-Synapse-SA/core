@@ -7,7 +7,7 @@ from syrupy.assertion import SnapshotAssertion
 from tesla_fleet_api.exceptions import InvalidCommand
 from teslemetry_stream import Signal
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
     ATTR_TEMPERATURE,
@@ -19,10 +19,10 @@ from homeassistant.components.climate import (
     SERVICE_TURN_ON,
     HVACMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, reload_platform, setup_platform
 from .const import (
@@ -35,7 +35,7 @@ from .const import (
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_legacy: AsyncMock,
@@ -189,7 +189,7 @@ async def test_climate(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -202,7 +202,7 @@ async def test_climate_alt(
     assert_entities(hass, entry.entry_id, entity_registry, snapshot)
 
 
-async def test_invalid_error(hass: HomeAssistant, snapshot: SnapshotAssertion) -> None:
+async def test_invalid_error(hass: SmartHub, snapshot: SnapshotAssertion) -> None:
     """Tests service error is handled."""
 
     await setup_platform(hass, platforms=[Platform.CLIMATE])
@@ -213,7 +213,7 @@ async def test_invalid_error(hass: HomeAssistant, snapshot: SnapshotAssertion) -
             "tesla_fleet_api.teslemetry.Vehicle.auto_conditioning_start",
             side_effect=InvalidCommand,
         ) as mock_on,
-        pytest.raises(HomeAssistantError) as error,
+        pytest.raises(SmartHubError) as error,
     ):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -226,7 +226,7 @@ async def test_invalid_error(hass: HomeAssistant, snapshot: SnapshotAssertion) -
 
 
 @pytest.mark.parametrize("response", COMMAND_ERRORS)
-async def test_errors(hass: HomeAssistant, response: str) -> None:
+async def test_errors(hass: SmartHub, response: str) -> None:
     """Tests service reason is handled."""
 
     await setup_platform(hass, platforms=[Platform.CLIMATE])
@@ -237,7 +237,7 @@ async def test_errors(hass: HomeAssistant, response: str) -> None:
             "tesla_fleet_api.teslemetry.Vehicle.auto_conditioning_start",
             return_value=response,
         ) as mock_on,
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -249,7 +249,7 @@ async def test_errors(hass: HomeAssistant, response: str) -> None:
 
 
 async def test_ignored_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Tests ignored error is handled."""
 
@@ -269,7 +269,7 @@ async def test_ignored_error(
 
 
 async def test_climate_noscope(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_metadata: AsyncMock,
@@ -296,7 +296,7 @@ async def test_climate_noscope(
             blocking=True,
         )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,
@@ -307,7 +307,7 @@ async def test_climate_noscope(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select_streaming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_vehicle_data: AsyncMock,
     mock_add_listener: AsyncMock,

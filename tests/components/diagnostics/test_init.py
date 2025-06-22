@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.system_info import async_get_system_info
-from homeassistant.loader import async_get_integration
-from homeassistant.setup import async_setup_component
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.system_info import async_get_system_info
+from smarthub.loader import async_get_integration
+from smarthub.setup import async_setup_component
 
 from . import _get_diagnostics_for_config_entry, _get_diagnostics_for_device
 
@@ -19,7 +19,7 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 @pytest.fixture(autouse=True)
-async def mock_diagnostics_integration(hass: HomeAssistant) -> None:
+async def mock_diagnostics_integration(hass: SmartHub) -> None:
     """Mock a diagnostics integration."""
     hass.config.components.add("fake_integration")
     mock_platform(
@@ -47,7 +47,7 @@ async def mock_diagnostics_integration(hass: HomeAssistant) -> None:
 
 
 async def test_websocket(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test websocket command."""
     client = await hass_ws_client(hass)
@@ -82,7 +82,7 @@ async def test_websocket(
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_download_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -271,7 +271,7 @@ async def test_download_diagnostics(
 
 
 async def test_failure_scenarios(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test failure scenarios."""
     client = await hass_client()

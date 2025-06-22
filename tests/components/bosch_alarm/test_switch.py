@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -15,8 +15,8 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import call_observable, setup_integration
 
@@ -26,12 +26,12 @@ from tests.common import MockConfigEntry, snapshot_platform
 @pytest.fixture(autouse=True)
 async def platforms() -> AsyncGenerator[None]:
     """Return the platforms to be loaded for this test."""
-    with patch("homeassistant.components.bosch_alarm.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.bosch_alarm.PLATFORMS", [Platform.SWITCH]):
         yield
 
 
 async def test_update_switch_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_panel: AsyncMock,
     output: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -52,7 +52,7 @@ async def test_update_switch_device(
 
 
 async def test_unlock_door(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_panel: AsyncMock,
     door: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -84,7 +84,7 @@ async def test_unlock_door(
 
 
 async def test_secure_door(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_panel: AsyncMock,
     door: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -114,7 +114,7 @@ async def test_secure_door(
 
 
 async def test_cycle_door(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_panel: AsyncMock,
     door: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -135,7 +135,7 @@ async def test_cycle_door(
 
 
 async def test_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_panel: AsyncMock,

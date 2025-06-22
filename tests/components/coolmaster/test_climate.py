@@ -5,7 +5,7 @@ from __future__ import annotations
 from pycoolmasternet_async import SWING_MODES
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
     ATTR_FAN_MODES,
@@ -23,9 +23,9 @@ from homeassistant.components.climate import (
     ClimateEntityFeature,
     HVACMode,
 )
-from homeassistant.components.coolmaster.climate import FAN_MODES
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
+from smarthub.components.coolmaster.climate import FAN_MODES
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     ATTR_SUPPORTED_FEATURES,
@@ -33,12 +33,12 @@ from homeassistant.const import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 
 async def test_climate_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate state."""
@@ -47,7 +47,7 @@ async def test_climate_state(
 
 
 async def test_climate_friendly_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate friendly name."""
@@ -56,7 +56,7 @@ async def test_climate_friendly_name(
 
 
 async def test_climate_supported_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate supported features."""
@@ -76,7 +76,7 @@ async def test_climate_supported_features(
 
 
 async def test_climate_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate current temperature."""
@@ -85,7 +85,7 @@ async def test_climate_temperature(
 
 
 async def test_climate_thermostat(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate thermostat."""
@@ -94,7 +94,7 @@ async def test_climate_thermostat(
 
 
 async def test_climate_hvac_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate hvac modes."""
@@ -110,7 +110,7 @@ async def test_climate_hvac_modes(
 
 
 async def test_climate_fan_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate fan mode."""
@@ -119,7 +119,7 @@ async def test_climate_fan_mode(
 
 
 async def test_climate_fan_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate fan modes."""
@@ -131,7 +131,7 @@ async def test_climate_fan_modes(
 
 
 async def test_climate_swing_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate swing mode."""
@@ -140,7 +140,7 @@ async def test_climate_swing_mode(
 
 
 async def test_climate_swing_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate swing modes."""
@@ -149,7 +149,7 @@ async def test_climate_swing_modes(
 
 
 async def test_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate set temperature."""
@@ -168,7 +168,7 @@ async def test_set_temperature(
 
 
 async def test_set_fan_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate set fan mode."""
@@ -187,7 +187,7 @@ async def test_set_fan_mode(
 
 
 async def test_set_swing_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate set swing mode."""
@@ -206,11 +206,11 @@ async def test_set_swing_mode(
 
 
 async def test_set_swing_mode_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate set swing mode with error."""
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_SWING_MODE,
@@ -223,7 +223,7 @@ async def test_set_swing_mode_error(
 
 
 async def test_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate set hvac mode."""
@@ -242,7 +242,7 @@ async def test_set_hvac_mode(
 
 
 async def test_set_hvac_mode_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate set hvac mode to off."""
@@ -261,7 +261,7 @@ async def test_set_hvac_mode_off(
 
 
 async def test_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate turn on."""
@@ -279,7 +279,7 @@ async def test_turn_on(
 
 
 async def test_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster climate turn off."""

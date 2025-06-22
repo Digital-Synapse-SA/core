@@ -7,11 +7,11 @@ from pypalazzetti.fan import FanType
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import DOMAIN as NUMBER_DOMAIN, SERVICE_SET_VALUE
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.number import DOMAIN as NUMBER_DOMAIN, SERVICE_SET_VALUE
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -22,21 +22,21 @@ FAN_ENTITY_ID = "number.stove_left_fan_speed"
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_palazzetti_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.palazzetti.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.palazzetti.PLATFORMS", [Platform.NUMBER]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_async_set_data_power(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_palazzetti_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -56,7 +56,7 @@ async def test_async_set_data_power(
     # Set value: Error
     mock_palazzetti_client.set_power_mode.side_effect = CommunicationError()
     message = "Could not connect to the device"
-    with pytest.raises(HomeAssistantError, match=message):
+    with pytest.raises(SmartHubError, match=message):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -77,7 +77,7 @@ async def test_async_set_data_power(
 
 
 async def test_async_set_data_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_palazzetti_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -97,7 +97,7 @@ async def test_async_set_data_fan(
     # Set value: Error
     mock_palazzetti_client.set_fan_speed.side_effect = CommunicationError()
     message = "Could not connect to the device"
-    with pytest.raises(HomeAssistantError, match=message):
+    with pytest.raises(SmartHubError, match=message):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,

@@ -4,12 +4,12 @@ from unittest.mock import patch
 
 import steam
 
-from homeassistant.components.steam_online.const import CONF_ACCOUNTS, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.steam_online.const import CONF_ACCOUNTS, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import entity_registry as er
 
 from . import (
     ACCOUNT_1,
@@ -25,12 +25,12 @@ from . import (
 )
 
 
-async def test_flow_user(hass: HomeAssistant) -> None:
+async def test_flow_user(hass: SmartHub) -> None:
     """Test user initialized flow."""
     with (
         patch_interface(),
         patch(
-            "homeassistant.components.steam_online.async_setup_entry",
+            "smarthub.components.steam_online.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -49,7 +49,7 @@ async def test_flow_user(hass: HomeAssistant) -> None:
         assert result["result"].unique_id == ACCOUNT_1
 
 
-async def test_flow_user_cannot_connect(hass: HomeAssistant) -> None:
+async def test_flow_user_cannot_connect(hass: SmartHub) -> None:
     """Test user initialized flow with unreachable server."""
     with patch_interface() as servicemock:
         servicemock.side_effect = steam.api.HTTPTimeoutError
@@ -61,7 +61,7 @@ async def test_flow_user_cannot_connect(hass: HomeAssistant) -> None:
         assert result["errors"]["base"] == "cannot_connect"
 
 
-async def test_flow_user_invalid_auth(hass: HomeAssistant) -> None:
+async def test_flow_user_invalid_auth(hass: SmartHub) -> None:
     """Test user initialized flow with invalid authentication."""
     with patch_interface() as servicemock:
         servicemock.side_effect = steam.api.HTTPError("403")
@@ -73,7 +73,7 @@ async def test_flow_user_invalid_auth(hass: HomeAssistant) -> None:
         assert result["errors"]["base"] == "invalid_auth"
 
 
-async def test_flow_user_invalid_account(hass: HomeAssistant) -> None:
+async def test_flow_user_invalid_account(hass: SmartHub) -> None:
     """Test user initialized flow with invalid account ID."""
     with patch_user_interface_null():
         result = await hass.config_entries.flow.async_init(
@@ -84,7 +84,7 @@ async def test_flow_user_invalid_account(hass: HomeAssistant) -> None:
         assert result["errors"]["base"] == "invalid_account"
 
 
-async def test_flow_user_unknown(hass: HomeAssistant) -> None:
+async def test_flow_user_unknown(hass: SmartHub) -> None:
     """Test user initialized flow with unknown error."""
     with patch_interface() as servicemock:
         servicemock.side_effect = Exception
@@ -96,7 +96,7 @@ async def test_flow_user_unknown(hass: HomeAssistant) -> None:
         assert result["errors"]["base"] == "unknown"
 
 
-async def test_flow_user_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_user_already_configured(hass: SmartHub) -> None:
     """Test user initialized flow with duplicate account."""
     create_entry(hass)
     with patch_interface():
@@ -108,7 +108,7 @@ async def test_flow_user_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_flow_reauth(hass: HomeAssistant) -> None:
+async def test_flow_reauth(hass: SmartHub) -> None:
     """Test reauth step."""
     entry = create_entry(hass)
     result = await entry.start_reauth_flow(hass)
@@ -131,13 +131,13 @@ async def test_flow_reauth(hass: HomeAssistant) -> None:
         assert entry.data == new_conf
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test updating options."""
     entry = create_entry(hass)
     with (
         patch_interface(),
         patch(
-            "homeassistant.components.steam_online.config_flow.MAX_IDS_TO_REQUEST",
+            "smarthub.components.steam_online.config_flow.MAX_IDS_TO_REQUEST",
             return_value=2,
         ),
     ):
@@ -159,14 +159,14 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow_deselect(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test deselecting user."""
     entry = create_entry(hass)
     with (
         patch_interface(),
         patch(
-            "homeassistant.components.steam_online.config_flow.MAX_IDS_TO_REQUEST",
+            "smarthub.components.steam_online.config_flow.MAX_IDS_TO_REQUEST",
             return_value=2,
         ),
     ):
@@ -177,7 +177,7 @@ async def test_options_flow_deselect(
     with (
         patch_interface(),
         patch(
-            "homeassistant.components.steam_online.async_setup_entry",
+            "smarthub.components.steam_online.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -195,7 +195,7 @@ async def test_options_flow_deselect(
     assert len(entity_registry.entities) == 0
 
 
-async def test_options_flow_timeout(hass: HomeAssistant) -> None:
+async def test_options_flow_timeout(hass: SmartHub) -> None:
     """Test updating options timeout getting friends list."""
     entry = create_entry(hass)
     with patch_interface() as servicemock:
@@ -215,7 +215,7 @@ async def test_options_flow_timeout(hass: HomeAssistant) -> None:
     assert result["data"] == CONF_OPTIONS
 
 
-async def test_options_flow_unauthorized(hass: HomeAssistant) -> None:
+async def test_options_flow_unauthorized(hass: SmartHub) -> None:
     """Test updating options when user's friends list is not public."""
     entry = create_entry(hass)
     with patch_interface_private():

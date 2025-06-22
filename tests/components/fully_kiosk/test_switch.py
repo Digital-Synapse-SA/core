@@ -2,18 +2,18 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components import switch
-from homeassistant.components.fully_kiosk.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant, ServiceResponse
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components import switch
+from smarthub.components.fully_kiosk.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub, ServiceResponse
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_mqtt_message
 from tests.typing import MqttMockHAClient
 
 
 async def test_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mock_fully_kiosk: MagicMock,
@@ -89,7 +89,7 @@ async def test_switches(
 
 
 async def test_switches_mqtt_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk: MagicMock,
     mqtt_mock: MqttMockHAClient,
     init_integration: MockConfigEntry,
@@ -150,7 +150,7 @@ def has_subscribed(mqtt_mock: MqttMockHAClient, topic: str) -> bool:
 
 
 async def call_service(
-    hass: HomeAssistant, service: str, entity_id: str
+    hass: SmartHub, service: str, entity_id: str
 ) -> ServiceResponse:
     """Call any service on entity."""
     return await hass.services.async_call(

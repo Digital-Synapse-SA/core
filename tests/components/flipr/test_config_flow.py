@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock
 import pytest
 from requests.exceptions import HTTPError, Timeout
 
-from homeassistant.components.flipr.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.flipr.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def test_full_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_flipr_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_flipr_client: AsyncMock
 ) -> None:
     """Test the full flow."""
 
@@ -52,7 +52,7 @@ async def test_full_flow(
     ],
 )
 async def test_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_flipr_client: AsyncMock,
     exception: Exception,
@@ -93,7 +93,7 @@ async def test_errors(
 
 
 async def test_no_flipr_found(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_flipr_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_flipr_client: AsyncMock
 ) -> None:
     """Test the case where there is no flipr found."""
 

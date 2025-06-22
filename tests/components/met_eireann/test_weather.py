@@ -6,21 +6,21 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.met_eireann import UPDATE_INTERVAL
-from homeassistant.components.met_eireann.const import DOMAIN
-from homeassistant.components.weather import (
+from smarthub.components.met_eireann import UPDATE_INTERVAL
+from smarthub.components.met_eireann.const import DOMAIN
+from smarthub.components.weather import (
     DOMAIN as WEATHER_DOMAIN,
     SERVICE_GET_FORECASTS,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
-async def setup_config_entry(hass: HomeAssistant) -> ConfigEntry:
+async def setup_config_entry(hass: SmartHub) -> ConfigEntry:
     """Create a mock configuration for testing."""
     mock_data = MockConfigEntry(
         domain=DOMAIN,
@@ -34,7 +34,7 @@ async def setup_config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 
 async def test_new_config_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_weather
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_weather
 ) -> None:
     """Test the expected entities are created."""
     await setup_config_entry(hass)
@@ -44,7 +44,7 @@ async def test_new_config_entry(
     assert len(er.async_entries_for_config_entry(entity_registry, entry.entry_id)) == 1
 
 
-async def test_weather(hass: HomeAssistant, mock_weather) -> None:
+async def test_weather(hass: SmartHub, mock_weather) -> None:
     """Test weather entity."""
     await setup_config_entry(hass)
     assert len(hass.states.async_entity_ids("weather")) == 1
@@ -67,7 +67,7 @@ async def test_weather(hass: HomeAssistant, mock_weather) -> None:
     [SERVICE_GET_FORECASTS],
 )
 async def test_forecast_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_weather,
     snapshot: SnapshotAssertion,
     service: str,
@@ -117,7 +117,7 @@ async def test_forecast_service(
 
 @pytest.mark.parametrize("forecast_type", ["daily", "hourly"])
 async def test_forecast_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     mock_weather,

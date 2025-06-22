@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock
 
 from knocki import KnockiConnectionError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -31,7 +31,7 @@ async def test_load_unload_entry(
 
 
 async def test_initialization_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

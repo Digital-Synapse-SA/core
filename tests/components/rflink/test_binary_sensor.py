@@ -9,16 +9,16 @@ from datetime import timedelta
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components.rflink import CONF_RECONNECT_INTERVAL
-from homeassistant.const import (
+from smarthub.components.rflink import CONF_RECONNECT_INTERVAL
+from smarthub.const import (
     EVENT_STATE_CHANGED,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import CoreState, HomeAssistant, State, callback
-from homeassistant.util import dt as dt_util
+from smarthub.core import CoreState, SmartHub, State, callback
+from smarthub.util import dt as dt_util
 
 from .test_init import mock_rflink
 
@@ -47,7 +47,7 @@ CONFIG = {
 
 
 async def test_default_setup(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test all basic functionality of the rflink sensor component."""
     # setup mocking rflink module
@@ -88,7 +88,7 @@ async def test_default_setup(
 
 
 async def test_entity_availability(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """If Rflink device is disconnected, entities should become unavailable."""
     # Make sure Rflink mock does not 'recover' to quickly from the
@@ -130,7 +130,7 @@ async def test_entity_availability(
     assert hass.states.get("binary_sensor.test").state == STATE_ON
 
 
-async def test_off_delay(hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_off_delay(hass: SmartHub, monkeypatch: pytest.MonkeyPatch) -> None:
     """Test off_delay option."""
     # setup mocking rflink module
     event_callback, create, _, _ = await mock_rflink(hass, CONFIG, DOMAIN, monkeypatch)
@@ -194,7 +194,7 @@ async def test_off_delay(hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch) -
 
 
 async def test_restore_state(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Ensure states are restored on startup."""
     mock_restore_cache(

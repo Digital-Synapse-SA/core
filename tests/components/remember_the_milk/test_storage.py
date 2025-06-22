@@ -5,17 +5,17 @@ from unittest.mock import mock_open, patch
 
 import pytest
 
-from homeassistant.components import remember_the_milk as rtm
-from homeassistant.core import HomeAssistant
+from smarthub.components import remember_the_milk as rtm
+from smarthub.core import SmartHub
 
 from .const import JSON_STRING, PROFILE, TOKEN
 
 
-def test_set_get_delete_token(hass: HomeAssistant) -> None:
+def test_set_get_delete_token(hass: SmartHub) -> None:
     """Test set, get and delete token."""
     open_mock = mock_open()
     with patch(
-        "homeassistant.components.remember_the_milk.storage.Path.open", open_mock
+        "smarthub.components.remember_the_milk.storage.Path.open", open_mock
     ):
         config = rtm.RememberTheMilkConfiguration(hass)
         assert open_mock.return_value.write.call_count == 0
@@ -40,11 +40,11 @@ def test_set_get_delete_token(hass: HomeAssistant) -> None:
         assert open_mock.return_value.write.call_count == 2
 
 
-def test_config_load(hass: HomeAssistant) -> None:
+def test_config_load(hass: SmartHub) -> None:
     """Test loading from the file."""
     with (
         patch(
-            "homeassistant.components.remember_the_milk.storage.Path.open",
+            "smarthub.components.remember_the_milk.storage.Path.open",
             mock_open(read_data=JSON_STRING),
         ),
     ):
@@ -58,12 +58,12 @@ def test_config_load(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     "side_effect", [FileNotFoundError("Missing file"), OSError("IO error")]
 )
-def test_config_load_file_error(hass: HomeAssistant, side_effect: Exception) -> None:
+def test_config_load_file_error(hass: SmartHub, side_effect: Exception) -> None:
     """Test loading with file error."""
     config = rtm.RememberTheMilkConfiguration(hass)
     with (
         patch(
-            "homeassistant.components.remember_the_milk.storage.Path.open",
+            "smarthub.components.remember_the_milk.storage.Path.open",
             side_effect=side_effect,
         ),
     ):
@@ -75,12 +75,12 @@ def test_config_load_file_error(hass: HomeAssistant, side_effect: Exception) -> 
     assert rtm_id is None
 
 
-def test_config_load_invalid_data(hass: HomeAssistant) -> None:
+def test_config_load_invalid_data(hass: SmartHub) -> None:
     """Test loading invalid data."""
     config = rtm.RememberTheMilkConfiguration(hass)
     with (
         patch(
-            "homeassistant.components.remember_the_milk.storage.Path.open",
+            "smarthub.components.remember_the_milk.storage.Path.open",
             mock_open(read_data="random characters"),
         ),
     ):
@@ -92,7 +92,7 @@ def test_config_load_invalid_data(hass: HomeAssistant) -> None:
     assert rtm_id is None
 
 
-def test_config_set_delete_id(hass: HomeAssistant) -> None:
+def test_config_set_delete_id(hass: SmartHub) -> None:
     """Test setting and deleting an id from the config."""
     hass_id = "123"
     list_id = "1"
@@ -101,7 +101,7 @@ def test_config_set_delete_id(hass: HomeAssistant) -> None:
     open_mock = mock_open()
     config = rtm.RememberTheMilkConfiguration(hass)
     with patch(
-        "homeassistant.components.remember_the_milk.storage.Path.open", open_mock
+        "smarthub.components.remember_the_milk.storage.Path.open", open_mock
     ):
         config = rtm.RememberTheMilkConfiguration(hass)
         assert open_mock.return_value.write.call_count == 0

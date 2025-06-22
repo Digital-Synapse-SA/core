@@ -2,19 +2,19 @@
 
 from homematicip.base.enums import DoorCommand, DoorState
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_CURRENT_TILT_POSITION,
     CoverState,
 )
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .helper import HomeFactory, async_manipulate_test_data, get_and_check_entity_basics
 
 
 async def test_hmip_cover_shutter(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipCoverShutte."""
     entity_id = "cover.broll_1"
@@ -81,7 +81,7 @@ async def test_hmip_cover_shutter(
 
 
 async def test_hmip_cover_slats(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipCoverSlats."""
     entity_id = "cover.sofa_links"
@@ -157,7 +157,7 @@ async def test_hmip_cover_slats(
 
 
 async def test_hmip_multi_cover_slats(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipCoverSlats."""
     entity_id = "cover.wohnzimmer_fenster"
@@ -237,7 +237,7 @@ async def test_hmip_multi_cover_slats(
 
 
 async def test_hmip_blind_module(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipBlindModule."""
     entity_id = "cover.sonnenschutz_balkontur"
@@ -349,7 +349,7 @@ async def test_hmip_blind_module(
 
 
 async def test_hmip_garage_door_tormatic(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipCoverShutte."""
     entity_id = "cover.garage_door_module"
@@ -398,7 +398,7 @@ async def test_hmip_garage_door_tormatic(
 
 
 async def test_hmip_garage_door_hoermann(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipCoverShutte."""
     entity_id = "cover.garage_door"
@@ -447,7 +447,7 @@ async def test_hmip_garage_door_hoermann(
 
 
 async def test_hmip_cover_shutter_group(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipCoverShutteGroup."""
     entity_id = "cover.rollos_shuttergroup"
@@ -512,7 +512,7 @@ async def test_hmip_cover_shutter_group(
 
 
 async def test_hmip_cover_slats_group(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test slats with HomematicipCoverShutteGroup."""
     entity_id = "cover.rollos_shuttergroup"

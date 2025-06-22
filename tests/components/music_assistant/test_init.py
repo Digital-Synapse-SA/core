@@ -6,10 +6,10 @@ from unittest.mock import AsyncMock, MagicMock
 
 from music_assistant_models.errors import ActionUnavailable
 
-from homeassistant.components.music_assistant.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.music_assistant.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import setup_integration_from_fixtures
 
@@ -17,7 +17,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_remove_config_entry_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     music_assistant_client: MagicMock,

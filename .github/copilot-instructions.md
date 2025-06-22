@@ -1,6 +1,6 @@
 # Instructions for GitHub Copilot
 
-This repository holds the core of Home Assistant, a Python 3 based home
+This repository holds the core of SmartHub, a Python 3 based home
 automation application.
 
 - Python code must be compatible with Python 3.13
@@ -22,21 +22,21 @@ automation application.
     ```
   - Every method and function needs a docstring:
     ```python
-    async def async_setup_entry(hass: HomeAssistant, entry: PeblarConfigEntry) -> bool:
+    async def async_setup_entry(hass: SmartHub, entry: PeblarConfigEntry) -> bool:
         """Set up Peblar from a config entry."""
         ...
     ```
 - All code and comments and other text are written in American English
 - Follow existing code style patterns as much as possible
 - Core locations:
-  - Shared constants: `homeassistant/const.py`, use them instead of hardcoding
+  - Shared constants: `smarthub/const.py`, use them instead of hardcoding
     strings or creating duplicate integration constants.
   - Integration files:
-    - Constants: `homeassistant/components/{domain}/const.py`
-    - Models: `homeassistant/components/{domain}/models.py`
-    - Coordinator: `homeassistant/components/{domain}/coordinator.py`
-    - Config flow: `homeassistant/components/{domain}/config_flow.py`
-    - Platform code: `homeassistant/components/{domain}/{platform}.py`
+    - Constants: `smarthub/components/{domain}/const.py`
+    - Models: `smarthub/components/{domain}/models.py`
+    - Coordinator: `smarthub/components/{domain}/coordinator.py`
+    - Config flow: `smarthub/components/{domain}/config_flow.py`
+    - Platform code: `smarthub/components/{domain}/{platform}.py`
 - All external I/O operations must be async
 - Async patterns:
   - Avoid sleeping in loops
@@ -48,7 +48,7 @@ automation application.
   - For local network polling, the minimum interval is 5 seconds
   - For cloud polling, the minimum interval is 60 seconds
 - Error handling:
-  - Use specific exceptions from `homeassistant.exceptions`
+  - Use specific exceptions from `smarthub.exceptions`
   - Setup failures:
     - Temporary: Raise `ConfigEntryNotReady`
     - Permanent: Use `ConfigEntryError`
@@ -70,7 +70,7 @@ automation application.
     - The ID does not have to contain the integration domain or platform.
     - Acceptable examples:
       - Serial number of a device
-      - MAC address of a device formatted using `homeassistant.helpers.device_registry.format_mac`
+      - MAC address of a device formatted using `smarthub.helpers.device_registry.format_mac`
         Do not obtain the MAC address through arp cache of local network access,
         only use the MAC address provided by discovery or the device itself.
       - Unique identifier that is physically printed on the device or burned into an EEPROM

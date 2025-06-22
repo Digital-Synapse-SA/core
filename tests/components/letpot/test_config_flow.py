@@ -7,17 +7,17 @@ from unittest.mock import AsyncMock
 from letpot.exceptions import LetPotAuthenticationException, LetPotConnectionException
 import pytest
 
-from homeassistant.components.letpot.const import (
+from smarthub.components.letpot.const import (
     CONF_ACCESS_TOKEN_EXPIRES,
     CONF_REFRESH_TOKEN,
     CONF_REFRESH_TOKEN_EXPIRES,
     CONF_USER_ID,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import AUTHENTICATION
 
@@ -40,7 +40,7 @@ def _assert_result_success(result: Any) -> None:
 
 
 async def test_full_flow(
-    hass: HomeAssistant, mock_client: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_client: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test full flow with success."""
     result = await hass.config_entries.flow.async_init(
@@ -70,7 +70,7 @@ async def test_full_flow(
     ],
 )
 async def test_flow_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     exception: Exception,
@@ -108,7 +108,7 @@ async def test_flow_exceptions(
 
 
 async def test_flow_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -138,7 +138,7 @@ async def test_flow_duplicate(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -183,7 +183,7 @@ async def test_reauth_flow(
     ],
 )
 async def test_reauth_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -233,7 +233,7 @@ async def test_reauth_exceptions(
 
 
 async def test_reauth_different_user_id_new(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -271,7 +271,7 @@ async def test_reauth_different_user_id_new(
 
 
 async def test_reauth_different_user_id_existing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.forecast_solar.const import DOMAIN
-from homeassistant.components.sensor import (
+from smarthub.components.forecast_solar.const import DOMAIN
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
@@ -19,14 +19,14 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfPower,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     init_integration: MockConfigEntry,
@@ -174,7 +174,7 @@ async def test_sensors(
     ],
 )
 async def test_disabled_by_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
     entity_id: str,
@@ -210,7 +210,7 @@ async def test_disabled_by_default(
     ],
 )
 async def test_enabling_disable_by_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_forecast_solar: MagicMock,

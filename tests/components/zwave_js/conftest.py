@@ -14,12 +14,12 @@ from zwave_js_server.model.node import Node
 from zwave_js_server.model.node.data_model import NodeDataType
 from zwave_js_server.version import VersionInfo
 
-from homeassistant.components.zwave_js import PLATFORMS
-from homeassistant.components.zwave_js.const import DOMAIN
-from homeassistant.components.zwave_js.helpers import SERVER_VERSION_TIMEOUT
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.util.json import JsonArrayType
+from smarthub.components.zwave_js import PLATFORMS
+from smarthub.components.zwave_js.const import DOMAIN
+from smarthub.components.zwave_js.helpers import SERVER_VERSION_TIMEOUT
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.util.json import JsonArrayType
 
 from tests.common import (
     MockConfigEntry,
@@ -558,7 +558,7 @@ def mock_client_fixture(
 ):
     """Mock a client."""
     with patch(
-        "homeassistant.components.zwave_js.ZwaveClient", autospec=True
+        "smarthub.components.zwave_js.ZwaveClient", autospec=True
     ) as client_class:
         client = client_class.return_value
 
@@ -621,12 +621,12 @@ def mock_get_server_version(
     )
     with (
         patch(
-            "homeassistant.components.zwave_js.helpers.get_server_version",
+            "smarthub.components.zwave_js.helpers.get_server_version",
             side_effect=server_version_side_effect,
             return_value=version_info,
         ) as mock_version,
         patch(
-            "homeassistant.components.zwave_js.helpers.SERVER_VERSION_TIMEOUT",
+            "smarthub.components.zwave_js.helpers.SERVER_VERSION_TIMEOUT",
             new=server_version_timeout,
         ),
     ):
@@ -898,7 +898,7 @@ def ring_keypad_fixture(client: MagicMock, ring_keypad_state: NodeDataType) -> N
 
 @pytest.fixture(name="integration")
 async def integration_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     platforms: list[Platform],
 ) -> MockConfigEntry:
@@ -909,7 +909,7 @@ async def integration_fixture(
         unique_id=str(client.driver.controller.home_id),
     )
     entry.add_to_hass(hass)
-    with patch("homeassistant.components.zwave_js.PLATFORMS", platforms):
+    with patch("smarthub.components.zwave_js.PLATFORMS", platforms):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 

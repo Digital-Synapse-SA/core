@@ -9,12 +9,12 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import FailedZWaveCommand
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.components.zwave_js.const import (
+from smarthub.components.zwave_js.const import (
     ATTR_METER_TYPE,
     ATTR_METER_TYPE_NAME,
     ATTR_VALUE,
@@ -22,13 +22,13 @@ from homeassistant.components.zwave_js.const import (
     SERVICE_REFRESH_VALUE,
     SERVICE_RESET_METER,
 )
-from homeassistant.components.zwave_js.helpers import get_valueless_base_unique_id
-from homeassistant.components.zwave_js.sensor import (
+from smarthub.components.zwave_js.helpers import get_valueless_base_unique_id
+from smarthub.components.zwave_js.sensor import (
     CONTROLLER_STATISTICS_KEY_MAP,
     NODE_STATISTICS_KEY_MAP,
 )
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import (
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -45,10 +45,10 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfTime,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .common import (
     AIR_TEMPERATURE_SENSOR,
@@ -71,7 +71,7 @@ def platforms() -> list[str]:
 
 
 async def test_battery_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ring_keypad: Node,
     integration: MockConfigEntry,
@@ -152,7 +152,7 @@ async def test_battery_sensors(
 
 
 async def test_numeric_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     multisensor_6,
     express_controls_ezmultipli,
@@ -229,7 +229,7 @@ async def test_numeric_sensor(
 
 
 async def test_invalid_multilevel_sensor_scale(
-    hass: HomeAssistant, client, multisensor_6_state, integration
+    hass: SmartHub, client, multisensor_6_state, integration
 ) -> None:
     """Test a multilevel sensor with an invalid scale."""
     node_state = copy.deepcopy(multisensor_6_state)
@@ -263,7 +263,7 @@ async def test_invalid_multilevel_sensor_scale(
 
 
 async def test_energy_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hank_binary_switch,
     integration,
@@ -308,7 +308,7 @@ async def test_energy_sensors(
 
 
 async def test_basic_cc_sensor(
-    hass: HomeAssistant, client, basic_cc_sensor, integration
+    hass: SmartHub, client, basic_cc_sensor, integration
 ) -> None:
     """Test a Basic CC sensor gets discovered correctly."""
     state = hass.states.get("sensor.foo_basic")
@@ -317,7 +317,7 @@ async def test_basic_cc_sensor(
 
 
 async def test_config_parameter_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     climate_adc_t3000,
     lock_id_lock_as_id150,
@@ -361,7 +361,7 @@ async def test_config_parameter_sensor(
 
 
 async def test_controller_status_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, client, integration
+    hass: SmartHub, entity_registry: er.EntityRegistry, client, integration
 ) -> None:
     """Test controller status sensor is created and gets updated on controller state changes."""
     entity_id = "sensor.z_stick_gen5_usb_controller_status"
@@ -398,7 +398,7 @@ async def test_controller_status_sensor(
 
 
 async def test_node_status_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client,
     lock_id_lock_as_id150,
@@ -467,7 +467,7 @@ async def test_node_status_sensor(
 
 
 async def test_node_status_sensor_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client,
     lock_id_lock_as_id150_not_ready,
@@ -513,7 +513,7 @@ async def test_node_status_sensor_not_ready(
 
 
 async def test_reset_meter(
-    hass: HomeAssistant, client, aeon_smart_switch_6, integration
+    hass: SmartHub, client, aeon_smart_switch_6, integration
 ) -> None:
     """Test reset_meter service."""
     client.async_send_command.return_value = {}
@@ -563,7 +563,7 @@ async def test_reset_meter(
         "test", 1, "test"
     )
 
-    with pytest.raises(HomeAssistantError) as err:
+    with pytest.raises(SmartHubError) as err:
         await hass.services.async_call(
             DOMAIN,
             SERVICE_RESET_METER,
@@ -578,7 +578,7 @@ async def test_reset_meter(
 
 
 async def test_meter_attributes(
-    hass: HomeAssistant, client, aeon_smart_switch_6, integration
+    hass: SmartHub, client, aeon_smart_switch_6, integration
 ) -> None:
     """Test meter entity attributes."""
     state = hass.states.get(METER_ENERGY_SENSOR)
@@ -590,7 +590,7 @@ async def test_meter_attributes(
 
 
 async def test_invalid_meter_scale(
-    hass: HomeAssistant, client, aeon_smart_switch_6_state, integration
+    hass: SmartHub, client, aeon_smart_switch_6_state, integration
 ) -> None:
     """Test a meter sensor with an invalid scale."""
     node_state = copy.deepcopy(aeon_smart_switch_6_state)
@@ -626,7 +626,7 @@ async def test_invalid_meter_scale(
 
 
 async def test_special_meters(
-    hass: HomeAssistant, aeon_smart_switch_6_state, client, integration
+    hass: SmartHub, aeon_smart_switch_6_state, client, integration
 ) -> None:
     """Test meters that have special handling."""
     node_data = copy.deepcopy(
@@ -716,7 +716,7 @@ async def test_special_meters(
     assert state.attributes[ATTR_STATE_CLASS] is SensorStateClass.MEASUREMENT
 
 
-async def test_unit_change(hass: HomeAssistant, zp3111, client, integration) -> None:
+async def test_unit_change(hass: SmartHub, zp3111, client, integration) -> None:
     """Test unit change via metadata updated event is handled by numeric sensors."""
     entity_id = "sensor.4_in_1_sensor_air_temperature"
     state = hass.states.get(entity_id)
@@ -820,7 +820,7 @@ NODE_STATISTICS_SUFFIXES_UNKNOWN = {
 
 
 async def test_statistics_sensors_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     zp3111_state,
     client,
@@ -868,7 +868,7 @@ async def test_statistics_sensors_migration(
 
 
 async def test_statistics_sensors_no_last_seen(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     zp3111,
     client,
@@ -1017,7 +1017,7 @@ async def test_statistics_sensors_no_last_seen(
 
 
 async def test_last_seen_statistics_sensors(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, zp3111, client, integration
+    hass: SmartHub, entity_registry: er.EntityRegistry, zp3111, client, integration
 ) -> None:
     """Test last_seen statistics sensors."""
     entity_id = f"{NODE_STATISTICS_ENTITY_PREFIX}last_seen"
@@ -1067,7 +1067,7 @@ ENERGY_PRODUCTION_ENTITY_MAP = {
 
 
 async def test_energy_production_sensors(
-    hass: HomeAssistant, energy_production, client, integration
+    hass: SmartHub, energy_production, client, integration
 ) -> None:
     """Test sensors for Energy Production CC."""
     for entity_id_suffix, state_data in ENERGY_PRODUCTION_ENTITY_MAP.items():

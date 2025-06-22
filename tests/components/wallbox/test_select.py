@@ -4,14 +4,14 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.components.wallbox.const import CHARGER_STATUS_ID_KEY, EcoSmartMode
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant, HomeAssistantError
+from smarthub.components.wallbox.const import CHARGER_STATUS_ID_KEY, EcoSmartMode
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub, SmartHubError
 
 from . import (
     authorisation_response,
@@ -37,7 +37,7 @@ TEST_OPTIONS = [
 def mock_authenticate():
     """Fixture to patch Wallbox methods."""
     with patch(
-        "homeassistant.components.wallbox.Wallbox.authenticate",
+        "smarthub.components.wallbox.Wallbox.authenticate",
         new=Mock(return_value=authorisation_response),
     ):
         yield
@@ -45,17 +45,17 @@ def mock_authenticate():
 
 @pytest.mark.parametrize(("mode", "response"), TEST_OPTIONS)
 async def test_wallbox_select_solar_charging_class(
-    hass: HomeAssistant, entry: MockConfigEntry, mode, response, mock_authenticate
+    hass: SmartHub, entry: MockConfigEntry, mode, response, mock_authenticate
 ) -> None:
     """Test wallbox select class."""
 
     with (
         patch(
-            "homeassistant.components.wallbox.Wallbox.enableEcoSmart",
+            "smarthub.components.wallbox.Wallbox.enableEcoSmart",
             new=Mock(return_value={CHARGER_STATUS_ID_KEY: 193}),
         ),
         patch(
-            "homeassistant.components.wallbox.Wallbox.disableEcoSmart",
+            "smarthub.components.wallbox.Wallbox.disableEcoSmart",
             new=Mock(return_value={CHARGER_STATUS_ID_KEY: 193}),
         ),
     ):
@@ -76,7 +76,7 @@ async def test_wallbox_select_solar_charging_class(
 
 
 async def test_wallbox_select_no_power_boost_class(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox select class."""
 
@@ -89,7 +89,7 @@ async def test_wallbox_select_no_power_boost_class(
 @pytest.mark.parametrize(("mode", "response"), TEST_OPTIONS)
 @pytest.mark.parametrize("error", [http_404_error, ConnectionError])
 async def test_wallbox_select_class_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
     mode,
     response,
@@ -102,14 +102,14 @@ async def test_wallbox_select_class_error(
 
     with (
         patch(
-            "homeassistant.components.wallbox.Wallbox.disableEcoSmart",
+            "smarthub.components.wallbox.Wallbox.disableEcoSmart",
             new=Mock(side_effect=error),
         ),
         patch(
-            "homeassistant.components.wallbox.Wallbox.enableEcoSmart",
+            "smarthub.components.wallbox.Wallbox.enableEcoSmart",
             new=Mock(side_effect=error),
         ),
-        pytest.raises(HomeAssistantError, match="Error communicating with Wallbox API"),
+        pytest.raises(SmartHubError, match="Error communicating with Wallbox API"),
     ):
         await hass.services.async_call(
             SELECT_DOMAIN,

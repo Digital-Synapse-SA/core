@@ -5,11 +5,11 @@ Call init before using it in your tests to ensure clean test data.
 
 from typing import Any, Literal
 
-from homeassistant.components.light import ColorMode, LightEntity
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub.components.light import ColorMode, LightEntity
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_platform import AddEntitiesCallback
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
 
 from tests.common import MockToggleEntity
 
@@ -33,7 +33,7 @@ def init(empty=False):
 
 
 async def async_setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: ConfigType,
     async_add_entities_callback: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,

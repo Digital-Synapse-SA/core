@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.teslemetry.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.teslemetry.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .const import CONFIG
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def setup_platform(
-    hass: HomeAssistant, platforms: list[Platform] | None = None
+    hass: SmartHub, platforms: list[Platform] | None = None
 ) -> MockConfigEntry:
     """Set up the Teslemetry platform."""
 
@@ -27,7 +27,7 @@ async def setup_platform(
     if platforms is None:
         await hass.config_entries.async_setup(mock_entry.entry_id)
     else:
-        with patch("homeassistant.components.teslemetry.PLATFORMS", platforms):
+        with patch("smarthub.components.teslemetry.PLATFORMS", platforms):
             await hass.config_entries.async_setup(mock_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -35,20 +35,20 @@ async def setup_platform(
 
 
 async def reload_platform(
-    hass: HomeAssistant, entry: MockConfigEntry, platforms: list[Platform] | None = None
+    hass: SmartHub, entry: MockConfigEntry, platforms: list[Platform] | None = None
 ):
     """Reload the Teslemetry platform."""
 
     if platforms is None:
         await hass.config_entries.async_reload(entry.entry_id)
     else:
-        with patch("homeassistant.components.teslemetry.PLATFORMS", platforms):
+        with patch("smarthub.components.teslemetry.PLATFORMS", platforms):
             await hass.config_entries.async_reload(entry.entry_id)
     await hass.async_block_till_done()
 
 
 def assert_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_id: str,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -65,7 +65,7 @@ def assert_entities(
 
 
 def assert_entities_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_id: str,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

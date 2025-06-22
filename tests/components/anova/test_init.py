@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 from anova_wifi import AnovaApi
 
-from homeassistant.components.anova.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_DEVICES, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.anova.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_DEVICES, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from . import async_init_integration, create_entry
 
 from tests.common import MockConfigEntry
 
 
-async def test_async_setup_entry(hass: HomeAssistant, anova_api: AnovaApi) -> None:
+async def test_async_setup_entry(hass: SmartHub, anova_api: AnovaApi) -> None:
     """Test a successful setup entry."""
     await async_init_integration(hass)
     state = hass.states.get("sensor.anova_precision_cooker_mode")
@@ -23,7 +23,7 @@ async def test_async_setup_entry(hass: HomeAssistant, anova_api: AnovaApi) -> No
 
 
 async def test_wrong_login(
-    hass: HomeAssistant, anova_api_wrong_login: AnovaApi
+    hass: SmartHub, anova_api_wrong_login: AnovaApi
 ) -> None:
     """Test for setup failure if connection to Anova is missing."""
     entry = create_entry(hass)
@@ -31,7 +31,7 @@ async def test_wrong_login(
     assert entry.state is ConfigEntryState.SETUP_ERROR
 
 
-async def test_unload_entry(hass: HomeAssistant, anova_api: AnovaApi) -> None:
+async def test_unload_entry(hass: SmartHub, anova_api: AnovaApi) -> None:
     """Test successful unload of entry."""
     entry = await async_init_integration(hass)
 
@@ -45,7 +45,7 @@ async def test_unload_entry(hass: HomeAssistant, anova_api: AnovaApi) -> None:
 
 
 async def test_no_devices_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     anova_api_no_devices: AnovaApi,
 ) -> None:
     """Test when there don't seem to be any devices on the account."""
@@ -54,7 +54,7 @@ async def test_no_devices_found(
 
 
 async def test_websocket_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     anova_api_websocket_failure: AnovaApi,
 ) -> None:
     """Test that we successfully handle a websocket failure on setup."""
@@ -63,7 +63,7 @@ async def test_websocket_failure(
 
 
 async def test_migration_removing_devices_in_config_entry(
-    hass: HomeAssistant, anova_api: AnovaApi
+    hass: SmartHub, anova_api: AnovaApi
 ) -> None:
     """Test a successful setup entry."""
     entry = MockConfigEntry(
@@ -80,7 +80,7 @@ async def test_migration_removing_devices_in_config_entry(
     )
     entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.anova.AnovaApi.authenticate"):
+    with patch("smarthub.components.anova.AnovaApi.authenticate"):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 

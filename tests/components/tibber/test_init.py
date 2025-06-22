@@ -2,14 +2,14 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.tibber import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.recorder import Recorder
+from smarthub.components.tibber import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 
 async def test_entry_unload(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_tibber_setup: MagicMock
+    recorder_mock: Recorder, hass: SmartHub, mock_tibber_setup: MagicMock
 ) -> None:
     """Test unloading the entry."""
     entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, "tibber")

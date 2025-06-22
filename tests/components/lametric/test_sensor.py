@@ -2,17 +2,17 @@
 
 import pytest
 
-from homeassistant.components.lametric.const import DOMAIN
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
-from homeassistant.const import (
+from smarthub.components.lametric.const import DOMAIN
+from smarthub.components.sensor import ATTR_STATE_CLASS, SensorStateClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = pytest.mark.usefixtures(
     "entity_registry_enabled_by_default", "init_integration"
@@ -20,7 +20,7 @@ pytestmark = pytest.mark.usefixtures(
 
 
 async def test_wifi_signal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

@@ -10,9 +10,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.config_entries import ConfigFlow
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
+from smarthub.config_entries import ConfigFlow
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
 
 from .common import (
     DEFAULT_LANG,
@@ -51,7 +51,7 @@ def tts_mutagen_mock_fixture_autouse(tts_mutagen_mock: MagicMock) -> None:
 
 
 @pytest.fixture(autouse=True)
-async def internal_url_mock(hass: HomeAssistant) -> None:
+async def internal_url_mock(hass: SmartHub) -> None:
     """Mock internal URL of the instance."""
     await async_process_ha_core_config(
         hass,
@@ -60,7 +60,7 @@ async def internal_url_mock(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-async def mock_tts(hass: HomeAssistant, mock_provider) -> None:
+async def mock_tts(hass: SmartHub, mock_provider) -> None:
     """Mock TTS."""
     mock_integration(hass, MockModule(domain="test"))
     mock_platform(hass, "test.tts", MockTTS(mock_provider))
@@ -90,7 +90,7 @@ def config_flow_test_domain_fixture() -> Iterable[str]:
 
 @pytest.fixture(autouse=True)
 def config_flow_fixture(
-    hass: HomeAssistant, config_flow_test_domains: Iterable[str]
+    hass: SmartHub, config_flow_test_domains: Iterable[str]
 ) -> Generator[None]:
     """Mock config flow."""
     for domain in config_flow_test_domains:
@@ -104,7 +104,7 @@ def config_flow_fixture(
 
 @pytest.fixture(name="setup")
 async def setup_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     request: pytest.FixtureRequest,
     mock_provider: MockTTSProvider,
     mock_tts_entity: MockTTSEntity,

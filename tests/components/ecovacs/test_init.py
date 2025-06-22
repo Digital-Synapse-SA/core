@@ -6,11 +6,11 @@ from deebot_client.exceptions import DeebotError, InvalidAuthenticationError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ecovacs.const import DOMAIN
-from homeassistant.components.ecovacs.controller import EcovacsController
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.ecovacs.const import DOMAIN
+from smarthub.components.ecovacs.controller import EcovacsController
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 
@@ -19,12 +19,12 @@ from tests.common import MockConfigEntry
     "mock_authenticator", "mock_mqtt_client", "mock_device_execute"
 )
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test loading and unloading the integration."""
     with patch(
-        "homeassistant.components.ecovacs.EcovacsController",
+        "smarthub.components.ecovacs.EcovacsController",
         autospec=True,
     ):
         mock_config_entry.add_to_hass(hass)
@@ -49,14 +49,14 @@ async def test_load_unload_config_entry(
 def mock_api_client(mock_authenticator: Mock) -> Mock:
     """Mock the API client."""
     with patch(
-        "homeassistant.components.ecovacs.controller.ApiClient",
+        "smarthub.components.ecovacs.controller.ApiClient",
         autospec=True,
     ) as mock_api_client:
         yield mock_api_client.return_value
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_api_client: Mock,
 ) -> None:
@@ -71,7 +71,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_api_client: Mock,
 ) -> None:
@@ -111,7 +111,7 @@ async def test_devices_in_dr(
     ],
 )
 async def test_all_entities_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_fixture: str,
     entities: int,
 ) -> None:

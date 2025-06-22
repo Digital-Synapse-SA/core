@@ -7,10 +7,10 @@ import pytest
 from zwave_js_server.event import Event
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.zwave_js import DOMAIN
-from homeassistant.components.zwave_js.helpers import get_device_id
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, issue_registry as ir
+from smarthub.components.zwave_js import DOMAIN
+from smarthub.components.zwave_js.helpers import get_device_id
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, issue_registry as ir
 
 from tests.common import MockConfigEntry
 from tests.components.repairs import (
@@ -22,7 +22,7 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 async def _trigger_repair_issue(
-    hass: HomeAssistant, client, multisensor_6_state
+    hass: SmartHub, client, multisensor_6_state
 ) -> Node:
     """Trigger repair issue."""
     # Create a node
@@ -50,7 +50,7 @@ async def _trigger_repair_issue(
 
 
 async def test_device_config_file_changed_confirm_step(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
@@ -116,7 +116,7 @@ async def test_device_config_file_changed_confirm_step(
 
 
 async def test_device_config_file_changed_ignore_step(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
@@ -185,7 +185,7 @@ async def test_device_config_file_changed_ignore_step(
     ["component.zwave_js.issues.invalid_issue.title"],
 )
 async def test_invalid_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     integration,
@@ -232,7 +232,7 @@ async def test_invalid_issue(
 
 
 async def test_abort_confirm(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
@@ -273,7 +273,7 @@ async def test_abort_confirm(
 
 @pytest.mark.usefixtures("client")
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -329,7 +329,7 @@ async def test_migrate_unique_id(
 
 @pytest.mark.usefixtures("client")
 async def test_migrate_unique_id_missing_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:

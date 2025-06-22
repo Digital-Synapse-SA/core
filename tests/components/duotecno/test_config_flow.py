@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock, patch
 from duotecno.exceptions import InvalidPassword
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.duotecno.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.duotecno.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -56,7 +56,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     ],
 )
 async def test_invalid(
-    hass: HomeAssistant, test_side_effect: Exception, test_error: str
+    hass: SmartHub, test_side_effect: Exception, test_error: str
 ) -> None:
     """Test all side_effects on the controller.connect via parameters."""
     result = await hass.config_entries.flow.async_init(
@@ -94,7 +94,7 @@ async def test_invalid(
     }
 
 
-async def test_already_setup(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_already_setup(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test duoteco flow - already setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,

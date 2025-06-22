@@ -6,17 +6,17 @@ from unittest.mock import Mock, patch
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components import folder_watcher
-from homeassistant.components.folder_watcher.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
+from smarthub.components import folder_watcher
+from smarthub.components.folder_watcher.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
 
 from tests.common import MockConfigEntry
 
 
 async def test_invalid_path_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     freezer: FrozenDateTimeFactory,
     issue_registry: ir.IssueRegistry,
@@ -42,7 +42,7 @@ async def test_invalid_path_setup(
 
 
 async def test_valid_path_setup(
-    hass: HomeAssistant, tmp_path: Path, freezer: FrozenDateTimeFactory
+    hass: SmartHub, tmp_path: Path, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test that a valid path is setup."""
     freezer.move_to("2022-04-19 10:31:02+00:00")
@@ -66,7 +66,7 @@ async def test_valid_path_setup(
 
 
 def test_event() -> None:
-    """Check that Home Assistant events are fired correctly on watchdog event."""
+    """Check that SmartHub events are fired correctly on watchdog event."""
 
     class MockPatternMatchingEventHandler:
         """Mock base class for the pattern matcher event handler."""
@@ -75,7 +75,7 @@ def test_event() -> None:
             pass
 
     with patch(
-        "homeassistant.components.folder_watcher.PatternMatchingEventHandler",
+        "smarthub.components.folder_watcher.PatternMatchingEventHandler",
         MockPatternMatchingEventHandler,
     ):
         hass = Mock()
@@ -96,7 +96,7 @@ def test_event() -> None:
 
 
 def test_move_event() -> None:
-    """Check that Home Assistant events are fired correctly on watchdog event."""
+    """Check that SmartHub events are fired correctly on watchdog event."""
 
     class MockPatternMatchingEventHandler:
         """Mock base class for the pattern matcher event handler."""
@@ -105,7 +105,7 @@ def test_move_event() -> None:
             pass
 
     with patch(
-        "homeassistant.components.folder_watcher.PatternMatchingEventHandler",
+        "smarthub.components.folder_watcher.PatternMatchingEventHandler",
         MockPatternMatchingEventHandler,
     ):
         hass = Mock()

@@ -8,7 +8,7 @@ from pypck.lcn_defs import Var, VarUnit, VarValue
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_HVAC_MODE,
     ATTR_TARGET_TEMP_HIGH,
@@ -18,16 +18,16 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.components.lcn.helpers import get_device_connection
-from homeassistant.const import (
+from smarthub.components.lcn.helpers import get_device_connection
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MockConfigEntry, MockModuleConnection, init_integration
 
@@ -35,19 +35,19 @@ from tests.common import snapshot_platform
 
 
 async def test_setup_lcn_climate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the setup of climate."""
-    with patch("homeassistant.components.lcn.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.lcn.PLATFORMS", [Platform.CLIMATE]):
         await init_integration(hass, entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_set_hvac_mode_heat(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_set_hvac_mode_heat(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the hvac mode is set to heat."""
     await init_integration(hass, entry)
 
@@ -95,7 +95,7 @@ async def test_set_hvac_mode_heat(hass: HomeAssistant, entry: MockConfigEntry) -
         assert state.state == HVACMode.HEAT
 
 
-async def test_set_hvac_mode_off(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_set_hvac_mode_off(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the hvac mode is set off."""
     await init_integration(hass, entry)
 
@@ -143,7 +143,7 @@ async def test_set_hvac_mode_off(hass: HomeAssistant, entry: MockConfigEntry) ->
         assert state.state == HVACMode.OFF
 
 
-async def test_set_temperature(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_set_temperature(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the temperature is set."""
     await init_integration(hass, entry)
 
@@ -204,7 +204,7 @@ async def test_set_temperature(hass: HomeAssistant, entry: MockConfigEntry) -> N
 
 
 async def test_pushed_current_temperature_status_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test the climate changes its current temperature on status received."""
@@ -227,7 +227,7 @@ async def test_pushed_current_temperature_status_change(
 
 
 async def test_pushed_setpoint_status_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test the climate changes its setpoint on status received."""
@@ -250,7 +250,7 @@ async def test_pushed_setpoint_status_change(
 
 
 async def test_pushed_lock_status_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test the climate changes its setpoint on status received."""
@@ -273,7 +273,7 @@ async def test_pushed_lock_status_change(
 
 
 async def test_pushed_wrong_input(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test the climate handles wrong input correctly."""
@@ -290,7 +290,7 @@ async def test_pushed_wrong_input(
 
 
 async def test_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test the climate is removed when the config entry is unloaded."""

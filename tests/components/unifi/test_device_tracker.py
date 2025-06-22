@@ -11,8 +11,8 @@ from freezegun.api import FrozenDateTimeFactory, freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.device_tracker import DOMAIN as TRACKER_DOMAIN
-from homeassistant.components.unifi.const import (
+from smarthub.components.device_tracker import DOMAIN as TRACKER_DOMAIN
+from smarthub.components.unifi.const import (
     CONF_BLOCK_CLIENT,
     CONF_CLIENT_SOURCE,
     CONF_IGNORE_WIRED_BUG,
@@ -23,10 +23,10 @@ from homeassistant.components.unifi.const import (
     DEFAULT_DETECTION_TIME,
     DOMAIN,
 )
-from homeassistant.const import STATE_HOME, STATE_NOT_HOME, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.const import STATE_HOME, STATE_NOT_HOME, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .conftest import (
     ConfigEntryFactoryType,
@@ -98,13 +98,13 @@ SWITCH_1 = {
 )
 @pytest.mark.usefixtures("mock_device_registry")
 async def test_entity_and_device_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Validate entity and device data with and without admin rights."""
-    with patch("homeassistant.components.unifi.PLATFORMS", [Platform.DEVICE_TRACKER]):
+    with patch("smarthub.components.unifi.PLATFORMS", [Platform.DEVICE_TRACKER]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -115,7 +115,7 @@ async def test_entity_and_device_data(
 @pytest.mark.parametrize("known_wireless_clients", [[WIRED_BUG_CLIENT["mac"]]])
 @pytest.mark.usefixtures("mock_device_registry")
 async def test_client_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message: WebsocketMessageMock,
     config_entry_factory: ConfigEntryFactoryType,
     client_payload: list[dict[str, Any]],
@@ -167,7 +167,7 @@ async def test_client_state_update(
 @pytest.mark.usefixtures("config_entry_setup")
 @pytest.mark.usefixtures("mock_device_registry")
 async def test_client_state_from_event_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_websocket_message: WebsocketMessageMock,
     client_payload: list[dict[str, Any]],
@@ -249,7 +249,7 @@ async def test_client_state_from_event_source(
     ],
 )
 async def test_tracked_device_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry_factory: ConfigEntryFactoryType,
     mock_websocket_message: WebsocketMessageMock,
@@ -293,7 +293,7 @@ async def test_tracked_device_state_change(
 @pytest.mark.usefixtures("config_entry_setup")
 @pytest.mark.usefixtures("mock_device_registry")
 async def test_remove_clients(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message: WebsocketMessageMock,
     client_payload: list[dict[str, Any]],
 ) -> None:
@@ -316,7 +316,7 @@ async def test_remove_clients(
 @pytest.mark.usefixtures("config_entry_setup")
 @pytest.mark.usefixtures("mock_device_registry")
 async def test_hub_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_state: WebsocketStateManager,
 ) -> None:
     """Verify entities state reflect on hub connection becoming unavailable."""
@@ -337,7 +337,7 @@ async def test_hub_state_change(
 
 @pytest.mark.usefixtures("mock_device_registry")
 async def test_option_ssid_filter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message,
     config_entry_factory: ConfigEntryFactoryType,
     client_payload: list[dict[str, Any]],
@@ -441,7 +441,7 @@ async def test_option_ssid_filter(
 
 @pytest.mark.usefixtures("mock_device_registry")
 async def test_wireless_client_go_wired_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message,
     config_entry_factory: ConfigEntryFactoryType,
     client_payload: list[dict[str, Any]],
@@ -501,7 +501,7 @@ async def test_wireless_client_go_wired_issue(
 @pytest.mark.parametrize("config_entry_options", [{CONF_IGNORE_WIRED_BUG: True}])
 @pytest.mark.usefixtures("mock_device_registry")
 async def test_option_ignore_wired_bug(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message,
     config_entry_factory: ConfigEntryFactoryType,
     client_payload: list[dict[str, Any]],
@@ -578,7 +578,7 @@ async def test_option_ignore_wired_bug(
 )
 @pytest.mark.usefixtures("mock_device_registry")
 async def test_restoring_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,
     config_entry_factory: ConfigEntryFactoryType,
@@ -653,7 +653,7 @@ async def test_restoring_client(
 @pytest.mark.parametrize("device_payload", [[SWITCH_1]])
 @pytest.mark.usefixtures("mock_device_registry")
 async def test_config_entry_options_track(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_setup: MockConfigEntry,
     config_entry_options: MappingProxyType[str, Any],
     counts: tuple[int],

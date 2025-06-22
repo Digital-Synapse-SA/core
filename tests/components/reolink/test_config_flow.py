@@ -15,29 +15,29 @@ from reolink_aio.exceptions import (
     ReolinkError,
 )
 
-from homeassistant import config_entries
-from homeassistant.components.reolink import DEVICE_UPDATE_INTERVAL
-from homeassistant.components.reolink.config_flow import DEFAULT_PROTOCOL
-from homeassistant.components.reolink.const import (
+from smarthub import config_entries
+from smarthub.components.reolink import DEVICE_UPDATE_INTERVAL
+from smarthub.components.reolink.config_flow import DEFAULT_PROTOCOL
+from smarthub.components.reolink.const import (
     CONF_BC_PORT,
     CONF_SUPPORTS_PRIVACY_MODE,
     CONF_USE_HTTPS,
     DOMAIN,
 )
-from homeassistant.components.reolink.exceptions import ReolinkWebhookException
-from homeassistant.components.reolink.host import DEFAULT_TIMEOUT
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.reolink.exceptions import ReolinkWebhookException
+from smarthub.components.reolink.host import DEFAULT_TIMEOUT
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_PROTOCOL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.device_registry import format_mac
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.device_registry import format_mac
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .conftest import (
     DHCP_FORMATTED_MAC,
@@ -61,7 +61,7 @@ pytestmark = pytest.mark.usefixtures("reolink_connect")
 
 
 async def test_config_flow_manual_success(
-    hass: HomeAssistant, mock_setup_entry: MagicMock
+    hass: SmartHub, mock_setup_entry: MagicMock
 ) -> None:
     """Successful flow manually initialized by the user."""
     result = await hass.config_entries.flow.async_init(
@@ -99,7 +99,7 @@ async def test_config_flow_manual_success(
 
 
 async def test_config_flow_privacy_success(
-    hass: HomeAssistant, reolink_connect: MagicMock, mock_setup_entry: MagicMock
+    hass: SmartHub, reolink_connect: MagicMock, mock_setup_entry: MagicMock
 ) -> None:
     """Successful flow when privacy mode is turned on."""
     reolink_connect.baichuan.privacy_mode.return_value = True
@@ -129,7 +129,7 @@ async def test_config_flow_privacy_success(
     assert reolink_connect.baichuan.set_privacy_mode.call_count == 0
     reolink_connect.get_host_data.reset_mock(side_effect=True)
 
-    with patch("homeassistant.components.reolink.config_flow.API_STARTUP_TIME", new=0):
+    with patch("smarthub.components.reolink.config_flow.API_STARTUP_TIME", new=0):
         result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
 
     assert reolink_connect.baichuan.set_privacy_mode.call_count == 1
@@ -154,7 +154,7 @@ async def test_config_flow_privacy_success(
 
 
 async def test_config_flow_errors(
-    hass: HomeAssistant, reolink_connect: MagicMock, mock_setup_entry: MagicMock
+    hass: SmartHub, reolink_connect: MagicMock, mock_setup_entry: MagicMock
 ) -> None:
     """Successful flow manually initialized by the user after some errors."""
     result = await hass.config_entries.flow.async_init(
@@ -317,7 +317,7 @@ async def test_config_flow_errors(
     reolink_connect.logout.reset_mock(side_effect=True)
 
 
-async def test_options_flow(hass: HomeAssistant, mock_setup_entry: MagicMock) -> None:
+async def test_options_flow(hass: SmartHub, mock_setup_entry: MagicMock) -> None:
     """Test specifying non default settings using options flow."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -356,7 +356,7 @@ async def test_options_flow(hass: HomeAssistant, mock_setup_entry: MagicMock) ->
     }
 
 
-async def test_reauth(hass: HomeAssistant, mock_setup_entry: MagicMock) -> None:
+async def test_reauth(hass: SmartHub, mock_setup_entry: MagicMock) -> None:
     """Test a reauth flow."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -401,7 +401,7 @@ async def test_reauth(hass: HomeAssistant, mock_setup_entry: MagicMock) -> None:
 
 
 async def test_reauth_abort_unique_id_mismatch(
-    hass: HomeAssistant, mock_setup_entry: MagicMock, reolink_connect: MagicMock
+    hass: SmartHub, mock_setup_entry: MagicMock, reolink_connect: MagicMock
 ) -> None:
     """Test a reauth flow."""
     config_entry = MockConfigEntry(
@@ -450,7 +450,7 @@ async def test_reauth_abort_unique_id_mismatch(
     reolink_connect.mac_address = TEST_MAC
 
 
-async def test_dhcp_flow(hass: HomeAssistant, mock_setup_entry: MagicMock) -> None:
+async def test_dhcp_flow(hass: SmartHub, mock_setup_entry: MagicMock) -> None:
     """Successful flow from DHCP discovery."""
     dhcp_data = DhcpServiceInfo(
         ip=TEST_HOST,
@@ -491,7 +491,7 @@ async def test_dhcp_flow(hass: HomeAssistant, mock_setup_entry: MagicMock) -> No
 
 
 async def test_dhcp_ip_update_aborted_if_wrong_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     reolink_connect_class: MagicMock,
     reolink_connect: MagicMock,
@@ -586,7 +586,7 @@ async def test_dhcp_ip_update_aborted_if_wrong_mac(
     ],
 )
 async def test_dhcp_ip_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     reolink_connect_class: MagicMock,
     reolink_connect: MagicMock,
@@ -670,7 +670,7 @@ async def test_dhcp_ip_update(
 
 
 async def test_dhcp_ip_update_ingnored_if_still_connected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     reolink_connect_class: MagicMock,
     reolink_connect: MagicMock,
@@ -736,7 +736,7 @@ async def test_dhcp_ip_update_ingnored_if_still_connected(
     reolink_connect_class.reset_mock()
 
 
-async def test_reconfig(hass: HomeAssistant, mock_setup_entry: MagicMock) -> None:
+async def test_reconfig(hass: SmartHub, mock_setup_entry: MagicMock) -> None:
     """Test a reconfiguration flow."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -782,7 +782,7 @@ async def test_reconfig(hass: HomeAssistant, mock_setup_entry: MagicMock) -> Non
 
 
 async def test_reconfig_abort_unique_id_mismatch(
-    hass: HomeAssistant, mock_setup_entry: MagicMock, reolink_connect: MagicMock
+    hass: SmartHub, mock_setup_entry: MagicMock, reolink_connect: MagicMock
 ) -> None:
     """Test a reconfiguration flow aborts if the unique id does not match."""
     config_entry = MockConfigEntry(

@@ -6,10 +6,10 @@ from unittest.mock import AsyncMock, Mock
 
 from uiprotect.data.devices import Camera, Chime, Doorlock
 
-from homeassistant.components.unifiprotect.const import DEFAULT_ATTRIBUTION
-from homeassistant.const import ATTR_ATTRIBUTION, ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.unifiprotect.const import DEFAULT_ATTRIBUTION
+from smarthub.const import ATTR_ATTRIBUTION, ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .utils import (
     MockUFPFixture,
@@ -22,7 +22,7 @@ from .utils import (
 
 
 async def test_button_chime_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, chime: Chime
+    hass: SmartHub, ufp: MockUFPFixture, chime: Chime
 ) -> None:
     """Test removing and re-adding a light device."""
 
@@ -35,7 +35,7 @@ async def test_button_chime_remove(
 
 
 async def test_reboot_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     chime: Chime,
@@ -67,7 +67,7 @@ async def test_reboot_button(
 
 
 async def test_chime_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     chime: Chime,
@@ -98,7 +98,7 @@ async def test_chime_button(
 
 
 async def test_adopt_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorlock: Doorlock,
@@ -142,7 +142,7 @@ async def test_adopt_button(
 
 
 async def test_adopt_button_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorlock: Doorlock,

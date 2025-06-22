@@ -11,7 +11,7 @@ from .hassfest.serializer import format_python_namespace
 tag = sys.argv[1] if len(sys.argv) > 1 else "dev"
 
 req = requests.get(
-    f"https://raw.githubusercontent.com/home-assistant/frontend/{tag}/src/translations/translationMetadata.json"
+    f"https://raw.githubusercontent.com/smart-hub/frontend/{tag}/src/translations/translationMetadata.json"
 )
 data = json.loads(req.content)
 languages = set(data.keys())
@@ -66,7 +66,7 @@ NATIVE_ENTITY_IDS = {
     "tr",  # Türkçe
 }
 
-Path("homeassistant/generated/languages.py").write_text(
+Path("smarthub/generated/languages.py").write_text(
     format_python_namespace(
         {
             "DEFAULT_LANGUAGE": "en",

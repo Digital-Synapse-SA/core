@@ -1,11 +1,11 @@
 """The tests for SleepIQ switch platform."""
 
-from homeassistant.components.sleepiq.coordinator import LONGER_UPDATE_INTERVAL
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components.sleepiq.coordinator import LONGER_UPDATE_INTERVAL
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from .conftest import BED_ID, BED_NAME, BED_NAME_LOWER, setup_platform
 
@@ -13,7 +13,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_setup(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_asyncsleepiq
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_asyncsleepiq
 ) -> None:
     """Test for successfully setting up the SleepIQ platform."""
     entry = await setup_platform(hass, SWITCH_DOMAIN)
@@ -26,7 +26,7 @@ async def test_setup(
     assert entry.unique_id == f"{BED_ID}-pause-mode"
 
 
-async def test_switch_set_states(hass: HomeAssistant, mock_asyncsleepiq) -> None:
+async def test_switch_set_states(hass: SmartHub, mock_asyncsleepiq) -> None:
     """Test button press."""
     await setup_platform(hass, SWITCH_DOMAIN)
 
@@ -49,7 +49,7 @@ async def test_switch_set_states(hass: HomeAssistant, mock_asyncsleepiq) -> None
     mock_asyncsleepiq.beds[BED_ID].set_pause_mode.assert_called_with(True)
 
 
-async def test_switch_get_states(hass: HomeAssistant, mock_asyncsleepiq) -> None:
+async def test_switch_get_states(hass: SmartHub, mock_asyncsleepiq) -> None:
     """Test button press."""
     await setup_platform(hass, SWITCH_DOMAIN)
 

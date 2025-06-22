@@ -2,10 +2,10 @@
 
 from typing import Any
 
-from homeassistant import auth
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import UNDEFINED, UndefinedType
-from homeassistant.setup import async_setup_component
+from smarthub import auth
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import UNDEFINED, UndefinedType
+from smarthub.setup import async_setup_component
 
 from tests.common import ensure_auth_manager_loaded
 from tests.test_util import mock_real_ip
@@ -25,7 +25,7 @@ EMPTY_CONFIG = []
 
 
 async def async_setup_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     provider_configs: list[dict[str, Any]] | UndefinedType = UNDEFINED,
     module_configs: list[dict[str, Any]] | UndefinedType = UNDEFINED,

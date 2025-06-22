@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from weheat.abstractions.discovery import HeatPumpDiscovery
 
-from homeassistant.components.weheat import UnauthorizedException
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.weheat import UnauthorizedException
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -18,7 +18,7 @@ from tests.test_util.aiohttp import ClientResponseError
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_weheat_discover: AsyncMock,
     mock_weheat_heat_pump: AsyncMock,
     mock_heat_pump_info: HeatPumpDiscovery.HeatPumpInfo,
@@ -47,7 +47,7 @@ async def test_setup(
     ],
 )
 async def test_setup_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_weheat_discover: AsyncMock,
     mock_weheat_heat_pump: AsyncMock,
     mock_heat_pump_info: HeatPumpDiscovery.HeatPumpInfo,
@@ -58,7 +58,7 @@ async def test_setup_fail(
     """Test the Weheat setup with invalid token setup."""
     with (
         patch(
-            "homeassistant.components.weheat.OAuth2Session.async_ensure_token_valid",
+            "smarthub.components.weheat.OAuth2Session.async_ensure_token_valid",
             side_effect=ClientResponseError(
                 Mock(real_url="http://example.com"), None, status=setup_exception
             ),
@@ -71,7 +71,7 @@ async def test_setup_fail(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_setup_fail_discover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_weheat_discover: AsyncMock,
     mock_weheat_heat_pump: AsyncMock,
     mock_heat_pump_info: HeatPumpDiscovery.HeatPumpInfo,

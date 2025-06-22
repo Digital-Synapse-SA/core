@@ -6,9 +6,9 @@ from datetime import timedelta
 
 import pytest
 
-from homeassistant.components import lifx
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.const import (
+from smarthub.components import lifx
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     CONF_HOST,
     STATE_OFF,
@@ -16,10 +16,10 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -36,7 +36,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("mock_discovery")
 async def test_hev_cycle_state(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test HEV cycle state binary sensor."""
     config_entry = MockConfigEntry(

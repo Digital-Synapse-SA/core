@@ -1,10 +1,10 @@
 """Test cases for the API stream sensor."""
 
-from homeassistant.auth.providers.homeassistant import HassAuthProvider
-from homeassistant.components.websocket_api.auth import TYPE_AUTH_REQUIRED
-from homeassistant.components.websocket_api.http import URL
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.auth.providers.smarthub import HassAuthProvider
+from smarthub.components.websocket_api.auth import TYPE_AUTH_REQUIRED
+from smarthub.components.websocket_api.http import URL
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .test_auth import test_auth_active_with_token
 
@@ -12,7 +12,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_websocket_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     hass_access_token: str,
     local_auth: HassAuthProvider,

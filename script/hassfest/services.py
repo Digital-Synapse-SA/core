@@ -11,10 +11,10 @@ from typing import Any
 import voluptuous as vol
 from voluptuous.humanize import humanize_error
 
-from homeassistant.const import CONF_SELECTOR
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import config_validation as cv, selector, service
-from homeassistant.util.yaml import load_yaml_dict
+from smarthub.const import CONF_SELECTOR
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import config_validation as cv, selector, service
+from smarthub.util.yaml import load_yaml_dict
 
 from .model import Config, Integration
 
@@ -178,7 +178,7 @@ def validate_services(config: Config, integration: Integration) -> None:  # noqa
                 "services", "Registers services but has no services.yaml"
             )
         return
-    except HomeAssistantError:
+    except SmartHubError:
         integration.add_error("services", "Invalid services.yaml")
         return
 

@@ -4,15 +4,15 @@ from unittest.mock import AsyncMock
 
 from freezegun import freeze_time
 
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import async_init_integration, find_update_callback
 from .const import MOCK_SNOO_DATA
 
 
 @freeze_time("2025-01-01 12:00:00")
-async def test_events(hass: HomeAssistant, bypass_api: AsyncMock) -> None:
+async def test_events(hass: SmartHub, bypass_api: AsyncMock) -> None:
     """Test events and check test values are correctly set."""
     await async_init_integration(hass)
     assert len(hass.states.async_all("event")) == 1
@@ -28,7 +28,7 @@ async def test_events(hass: HomeAssistant, bypass_api: AsyncMock) -> None:
 
 @freeze_time("2025-01-01 12:00:00")
 async def test_events_data_on_startup(
-    hass: HomeAssistant, bypass_api: AsyncMock
+    hass: SmartHub, bypass_api: AsyncMock
 ) -> None:
     """Test events and check test values are correctly set if data exists on first update."""
 

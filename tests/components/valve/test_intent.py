@@ -1,6 +1,6 @@
 """The tests for the valve platform."""
 
-from homeassistant.components.valve import (
+from smarthub.components.valve import (
     ATTR_CURRENT_POSITION,
     DOMAIN,
     SERVICE_CLOSE_VALVE,
@@ -8,14 +8,14 @@ from homeassistant.components.valve import (
     SERVICE_SET_VALVE_POSITION,
     ValveState,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import intent
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import intent
+from smarthub.setup import async_setup_component
 
 from tests.common import async_mock_service
 
 
-async def test_open_valve_intent(hass: HomeAssistant) -> None:
+async def test_open_valve_intent(hass: SmartHub) -> None:
     """Test HassTurnOn intent for valves."""
     assert await async_setup_component(hass, "intent", {})
 
@@ -36,7 +36,7 @@ async def test_open_valve_intent(hass: HomeAssistant) -> None:
     assert call.data == {"entity_id": entity_id}
 
 
-async def test_close_valve_intent(hass: HomeAssistant) -> None:
+async def test_close_valve_intent(hass: SmartHub) -> None:
     """Test HassTurnOff intent for valves."""
     assert await async_setup_component(hass, "intent", {})
 
@@ -57,7 +57,7 @@ async def test_close_valve_intent(hass: HomeAssistant) -> None:
     assert call.data == {"entity_id": entity_id}
 
 
-async def test_set_valve_position(hass: HomeAssistant) -> None:
+async def test_set_valve_position(hass: SmartHub) -> None:
     """Test HassSetPosition intent for valves."""
     assert await async_setup_component(hass, "intent", {})
 

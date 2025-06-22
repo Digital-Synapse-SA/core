@@ -1,9 +1,9 @@
 """Test the ThermoPro config flow."""
 
-from homeassistant.components.sensor import ATTR_STATE_CLASS
-from homeassistant.components.thermopro.const import DOMAIN
-from homeassistant.const import ATTR_FRIENDLY_NAME, ATTR_UNIT_OF_MEASUREMENT
-from homeassistant.core import HomeAssistant
+from smarthub.components.sensor import ATTR_STATE_CLASS
+from smarthub.components.thermopro.const import DOMAIN
+from smarthub.const import ATTR_FRIENDLY_NAME, ATTR_UNIT_OF_MEASUREMENT
+from smarthub.core import SmartHub
 
 from . import TP357_SERVICE_INFO, TP962R_SERVICE_INFO, TP962R_SERVICE_INFO_2
 
@@ -11,7 +11,7 @@ from tests.common import MockConfigEntry
 from tests.components.bluetooth import inject_bluetooth_service_info
 
 
-async def test_sensors_tp962r(hass: HomeAssistant) -> None:
+async def test_sensors_tp962r(hass: SmartHub) -> None:
     """Test setting up creates the sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -93,7 +93,7 @@ async def test_sensors_tp962r(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test setting up creates the sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,

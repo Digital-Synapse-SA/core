@@ -6,11 +6,11 @@ from collections.abc import Callable
 import json
 from typing import Any
 
-from homeassistant.components.fronius.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import UNDEFINED, UndefinedType
+from smarthub.components.fronius.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import UNDEFINED, UndefinedType
 
 from tests.common import MockConfigEntry, load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -20,7 +20,7 @@ MOCK_UID = "123.4567890"
 
 
 async def setup_fronius_integration(
-    hass: HomeAssistant, is_logger: bool = True, unique_id: str = MOCK_UID
+    hass: SmartHub, is_logger: bool = True, unique_id: str = MOCK_UID
 ) -> ConfigEntry:
     """Create the Fronius integration."""
     entry = MockConfigEntry(

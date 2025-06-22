@@ -1,19 +1,19 @@
-"""Test the Home Assistant analytics sensor module."""
+"""Test the SmartHub analytics sensor module."""
 
 from datetime import timedelta
 from unittest.mock import AsyncMock, patch
 
 from freezegun.api import FrozenDateTimeFactory
 import pytest
-from python_homeassistant_analytics import (
+from python_smarthub_analytics import (
     HomeassistantAnalyticsConnectionError,
     HomeassistantAnalyticsNotModifiedError,
 )
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_analytics_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -30,7 +30,7 @@ async def test_all_entities(
 ) -> None:
     """Test all entities."""
     with patch(
-        "homeassistant.components.analytics_insights.PLATFORMS",
+        "smarthub.components.analytics_insights.PLATFORMS",
         [Platform.SENSOR],
     ):
         await setup_integration(hass, mock_config_entry)
@@ -40,7 +40,7 @@ async def test_all_entities(
 
 
 async def test_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_analytics_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -56,13 +56,13 @@ async def test_connection_error(
     await hass.async_block_till_done()
 
     assert (
-        hass.states.get("sensor.homeassistant_analytics_spotify").state
+        hass.states.get("sensor.smarthub_analytics_spotify").state
         == STATE_UNAVAILABLE
     )
 
 
 async def test_data_not_modified(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_analytics_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -70,7 +70,7 @@ async def test_data_not_modified(
     """Test not updating data if its not modified."""
     await setup_integration(hass, mock_config_entry)
 
-    assert hass.states.get("sensor.homeassistant_analytics_spotify").state == "24388"
+    assert hass.states.get("sensor.smarthub_analytics_spotify").state == "24388"
     mock_analytics_client.get_current_analytics.side_effect = (
         HomeassistantAnalyticsNotModifiedError
     )
@@ -79,4 +79,4 @@ async def test_data_not_modified(
     await hass.async_block_till_done()
 
     mock_analytics_client.get_current_analytics.assert_called()
-    assert hass.states.get("sensor.homeassistant_analytics_spotify").state == "24388"
+    assert hass.states.get("sensor.smarthub_analytics_spotify").state == "24388"

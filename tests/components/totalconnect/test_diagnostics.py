@@ -1,7 +1,7 @@
 """Test TotalConnect diagnostics."""
 
-from homeassistant.components.diagnostics import REDACTED
-from homeassistant.core import HomeAssistant
+from smarthub.components.diagnostics import REDACTED
+from smarthub.core import SmartHub
 
 from .common import LOCATION_ID, init_integration
 
@@ -10,7 +10,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test config entry diagnostics."""
     entry = await init_integration(hass)

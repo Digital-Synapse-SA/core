@@ -1,21 +1,21 @@
 """The tests for the Group Binary Sensor platform."""
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.group import DOMAIN
-from homeassistant.const import (
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.group import DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 
 async def test_default_state(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test binary_sensor group default state."""
     hass.states.async_set("binary_sensor.kitchen", "on")
@@ -52,7 +52,7 @@ async def test_default_state(
     assert entry.original_device_class == "presence"
 
 
-async def test_state_reporting_all(hass: HomeAssistant) -> None:
+async def test_state_reporting_all(hass: SmartHub) -> None:
     """Test the state reporting in 'all' mode.
 
     The group state is unavailable if all group members are unavailable.
@@ -148,7 +148,7 @@ async def test_state_reporting_all(hass: HomeAssistant) -> None:
 
 
 async def test_state_reporting_any(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the state reporting in 'any' mode.
 

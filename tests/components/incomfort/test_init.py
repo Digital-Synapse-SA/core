@@ -9,13 +9,13 @@ from freezegun.api import FrozenDateTimeFactory
 from incomfortclient import InvalidGateway, InvalidHeaterList
 import pytest
 
-from homeassistant.components.incomfort import DOMAIN
-from homeassistant.components.incomfort.coordinator import UPDATE_INTERVAL
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.device_registry import DeviceRegistry
+from smarthub.components.incomfort import DOMAIN
+from smarthub.components.incomfort.coordinator import UPDATE_INTERVAL
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.device_registry import DeviceRegistry
 
 from .conftest import MOCK_HEATER_STATUS
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_setup_platforms(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
@@ -39,7 +39,7 @@ async def test_setup_platforms(
     "mock_heater_status", [MOCK_HEATER_STATUS | {"serial_no": "c01d00c0ffee"}]
 )
 async def test_stale_devices_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: DeviceRegistry,
     mock_incomfort: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -85,7 +85,7 @@ async def test_stale_devices_cleanup(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_coordinator_updates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: ConfigEntry,
@@ -144,7 +144,7 @@ async def test_coordinator_updates(
     ],
 )
 async def test_coordinator_update_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     freezer: FrozenDateTimeFactory,
     exc: Exception,
@@ -207,7 +207,7 @@ async def test_coordinator_update_fails(
     ],
 )
 async def test_entry_setup_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: ConfigEntry,
@@ -216,7 +216,7 @@ async def test_entry_setup_fails(
 ) -> None:
     """Test the incomfort coordinator entry setup fails."""
     with patch(
-        "homeassistant.components.incomfort.async_connect_gateway",
+        "smarthub.components.incomfort.async_connect_gateway",
         AsyncMock(side_effect=exc),
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)

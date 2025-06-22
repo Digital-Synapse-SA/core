@@ -11,15 +11,15 @@ from unittest.mock import patch
 from aiohttp import web
 import pytest
 
-from homeassistant.components.backup import (
+from smarthub.components.backup import (
     AddonInfo,
     AgentBackup,
     BackupAgentError,
     BackupNotFound,
     Folder,
 )
-from homeassistant.components.backup.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.backup.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .common import TEST_BACKUP_ABC123, aiter_from_iter, setup_backup_integration
 
@@ -33,8 +33,8 @@ PROTECTED_BACKUP = AgentBackup(
     date="1970-01-01T00:00:00Z",
     extra_metadata={},
     folders=[Folder.MEDIA, Folder.SHARE],
-    homeassistant_included=True,
-    homeassistant_version="2024.12.0",
+    smarthub_included=True,
+    smarthub_version="2024.12.0",
     name="Test",
     protected=True,
     size=13,
@@ -42,7 +42,7 @@ PROTECTED_BACKUP = AgentBackup(
 
 
 async def test_downloading_local_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test downloading a local backup file."""
@@ -52,15 +52,15 @@ async def test_downloading_local_backup(
 
     with (
         patch(
-            "homeassistant.components.backup.backup.CoreLocalBackupAgent.async_get_backup",
+            "smarthub.components.backup.backup.CoreLocalBackupAgent.async_get_backup",
             return_value=TEST_BACKUP_ABC123,
         ),
         patch(
-            "homeassistant.components.backup.backup.CoreLocalBackupAgent.get_backup_path",
+            "smarthub.components.backup.backup.CoreLocalBackupAgent.get_backup_path",
         ),
         patch("pathlib.Path.exists", return_value=True),
         patch(
-            "homeassistant.components.backup.http.FileResponse",
+            "smarthub.components.backup.http.FileResponse",
             return_value=web.Response(text=""),
         ),
     ):
@@ -69,7 +69,7 @@ async def test_downloading_local_backup(
 
 
 async def test_downloading_remote_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test downloading a remote backup."""
@@ -86,7 +86,7 @@ async def test_downloading_remote_backup(
 
 
 async def test_downloading_local_encrypted_backup_file_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test downloading a local backup file."""
@@ -95,11 +95,11 @@ async def test_downloading_local_encrypted_backup_file_not_found(
 
     with (
         patch(
-            "homeassistant.components.backup.backup.CoreLocalBackupAgent.async_get_backup",
+            "smarthub.components.backup.backup.CoreLocalBackupAgent.async_get_backup",
             return_value=TEST_BACKUP_ABC123,
         ),
         patch(
-            "homeassistant.components.backup.backup.CoreLocalBackupAgent.get_backup_path",
+            "smarthub.components.backup.backup.CoreLocalBackupAgent.get_backup_path",
         ),
     ):
         resp = await client.get(
@@ -110,7 +110,7 @@ async def test_downloading_local_encrypted_backup_file_not_found(
 
 @pytest.mark.usefixtures("mock_backups")
 async def test_downloading_local_encrypted_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test downloading a local backup file."""
@@ -119,7 +119,7 @@ async def test_downloading_local_encrypted_backup(
 
 
 async def test_downloading_remote_encrypted_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test downloading a local backup file."""
@@ -143,7 +143,7 @@ async def test_downloading_remote_encrypted_backup(
     ],
 )
 async def test_downloading_remote_encrypted_backup_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     error: Exception,
     status: int,
@@ -177,7 +177,7 @@ async def _test_downloading_encrypted_backup(
         enc_metadata = json.loads(outer_tar.extractfile("./backup.json").read())
         assert enc_metadata["protected"] is True
         with (
-            outer_tar.extractfile("homeassistant.tar.gz") as inner_tar_file,
+            outer_tar.extractfile("smarthub.tar.gz") as inner_tar_file,
             pytest.raises(tarfile.ReadError, match="file could not be opened"),
         ):
             # pylint: disable-next=consider-using-with
@@ -209,7 +209,7 @@ async def _test_downloading_encrypted_backup(
         dec_metadata = json.loads(outer_tar.extractfile("./backup.json").read())
         assert dec_metadata == enc_metadata | {"protected": False}
         with (
-            outer_tar.extractfile("homeassistant.tar.gz") as inner_tar_file,
+            outer_tar.extractfile("smarthub.tar.gz") as inner_tar_file,
             tarfile.open(fileobj=inner_tar_file, mode="r") as inner_tar,
         ):
             assert inner_tar.getnames() == [
@@ -222,7 +222,7 @@ async def _test_downloading_encrypted_backup(
 
 
 async def test_downloading_backup_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test downloading a backup file that does not exist."""
@@ -235,7 +235,7 @@ async def test_downloading_backup_not_found(
 
 
 async def test_downloading_backup_not_found_get_backup_returns_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -255,7 +255,7 @@ async def test_downloading_backup_not_found_get_backup_returns_none(
 
 
 async def test_downloading_as_non_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_admin_user: MockUser,
 ) -> None:
@@ -270,7 +270,7 @@ async def test_downloading_as_non_admin(
 
 
 async def test_uploading_a_backup_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test uploading a backup file."""
@@ -279,7 +279,7 @@ async def test_uploading_a_backup_file(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_receive_backup",
+        "smarthub.components.backup.manager.BackupManager.async_receive_backup",
         return_value=TEST_BACKUP_ABC123.backup_id,
     ) as async_receive_backup_mock:
         resp = await client.post(
@@ -299,7 +299,7 @@ async def test_uploading_a_backup_file(
     ],
 )
 async def test_error_handling_uploading_a_backup_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     error: Exception,
     message: str,
@@ -310,7 +310,7 @@ async def test_error_handling_uploading_a_backup_file(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_receive_backup",
+        "smarthub.components.backup.manager.BackupManager.async_receive_backup",
         side_effect=error,
     ):
         resp = await client.post(

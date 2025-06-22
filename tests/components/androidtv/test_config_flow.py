@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.androidtv.config_flow import (
+from smarthub.components.androidtv.config_flow import (
     APPS_NEW_ID,
     CONF_APP_DELETE,
     CONF_APP_ID,
@@ -15,7 +15,7 @@ from homeassistant.components.androidtv.config_flow import (
     CONF_RULE_VALUES,
     RULES_NEW_ID,
 )
-from homeassistant.components.androidtv.const import (
+from smarthub.components.androidtv.const import (
     CONF_ADB_SERVER_IP,
     CONF_ADB_SERVER_PORT,
     CONF_ADBKEY,
@@ -33,10 +33,10 @@ from homeassistant.components.androidtv.const import (
     PROP_ETHMAC,
     PROP_WIFIMAC,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_DEVICE_CLASS, CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_DEVICE_CLASS, CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .patchers import PATCH_ACCESS, PATCH_ISFILE, PATCH_SETUP_ENTRY
 
@@ -66,7 +66,7 @@ CONFIG_ADB_SERVER = {
 }
 
 CONNECT_METHOD = (
-    "homeassistant.components.androidtv.config_flow.async_connect_androidtv"
+    "smarthub.components.androidtv.config_flow.async_connect_androidtv"
 )
 
 
@@ -95,7 +95,7 @@ class MockConfigDevice:
     ],
 )
 async def test_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     eth_mac: str | None,
     wifi_mac: str | None,
@@ -127,7 +127,7 @@ async def test_user(
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_adbkey(hass: HomeAssistant) -> None:
+async def test_user_adbkey(hass: SmartHub) -> None:
     """Test user step with adbkey file."""
     config_data = CONFIG_PYTHON_ADB.copy()
     config_data[CONF_ADBKEY] = ADBKEY
@@ -155,7 +155,7 @@ async def test_user_adbkey(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_error_both_key_server(hass: HomeAssistant) -> None:
+async def test_error_both_key_server(hass: SmartHub) -> None:
     """Test we abort if both adb key and server are provided."""
     config_data = CONFIG_ADB_SERVER.copy()
 
@@ -186,7 +186,7 @@ async def test_error_both_key_server(hass: HomeAssistant) -> None:
         assert result2["data"] == CONFIG_ADB_SERVER
 
 
-async def test_error_invalid_key(hass: HomeAssistant) -> None:
+async def test_error_invalid_key(hass: SmartHub) -> None:
     """Test we abort if component is already setup."""
     config_data = CONFIG_PYTHON_ADB.copy()
     config_data[CONF_ADBKEY] = ADBKEY
@@ -228,7 +228,7 @@ async def test_error_invalid_key(hass: HomeAssistant) -> None:
     ],
 )
 async def test_invalid_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     eth_mac: str | None,
     wifi_mac: str | None,
@@ -248,7 +248,7 @@ async def test_invalid_mac(
         assert result["reason"] == "invalid_unique_id"
 
 
-async def test_abort_if_host_exist(hass: HomeAssistant) -> None:
+async def test_abort_if_host_exist(hass: SmartHub) -> None:
     """Test we abort if component is already setup."""
     MockConfigEntry(
         domain=DOMAIN, data=CONFIG_ADB_SERVER, unique_id=ETH_MAC
@@ -266,7 +266,7 @@ async def test_abort_if_host_exist(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_abort_if_unique_exist(hass: HomeAssistant) -> None:
+async def test_abort_if_unique_exist(hass: SmartHub) -> None:
     """Test we abort if component is already setup."""
     config_data = CONFIG_ADB_SERVER.copy()
     config_data[CONF_HOST] = "127.0.0.2"
@@ -289,7 +289,7 @@ async def test_abort_if_unique_exist(hass: HomeAssistant) -> None:
         assert result["reason"] == "already_configured"
 
 
-async def test_on_connect_failed(hass: HomeAssistant) -> None:
+async def test_on_connect_failed(hass: SmartHub) -> None:
     """Test when we have errors connecting the router."""
     flow_result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -330,7 +330,7 @@ async def test_on_connect_failed(hass: HomeAssistant) -> None:
         assert result3["data"] == CONFIG_ADB_SERVER
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test config flow options."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

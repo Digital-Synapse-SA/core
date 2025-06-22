@@ -6,16 +6,16 @@ from axis.models.api import CONTEXT
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType, RtspEventMock
 from .const import API_DISCOVERY_PORT_MANAGEMENT, NAME
@@ -64,14 +64,14 @@ PORT_MANAGEMENT_RESPONSE = {
 
 @pytest.mark.parametrize("param_ports_payload", [PORT_DATA])
 async def test_switches_with_port_cgi(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_rtsp_event: RtspEventMock,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that switches are loaded properly using port.cgi."""
-    with patch("homeassistant.components.axis.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.axis.PLATFORMS", [Platform.SWITCH]):
         config_entry = await config_entry_factory()
 
     mock_rtsp_event(
@@ -116,14 +116,14 @@ async def test_switches_with_port_cgi(
 @pytest.mark.parametrize("api_discovery_items", [API_DISCOVERY_PORT_MANAGEMENT])
 @pytest.mark.parametrize("port_management_payload", [PORT_MANAGEMENT_RESPONSE])
 async def test_switches_with_port_management(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_rtsp_event: RtspEventMock,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that switches are loaded properly using port management."""
-    with patch("homeassistant.components.axis.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.axis.PLATFORMS", [Platform.SWITCH]):
         config_entry = await config_entry_factory()
 
     mock_rtsp_event(

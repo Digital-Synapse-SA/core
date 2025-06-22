@@ -9,7 +9,7 @@ from aioesphomeapi import (
     CoverState as ESPHomeCoverState,
 )
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_CURRENT_TILT_POSITION,
     ATTR_POSITION,
@@ -24,14 +24,14 @@ from homeassistant.components.cover import (
     SERVICE_STOP_COVER,
     CoverState,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import MockESPHomeDeviceType
 
 
 async def test_cover_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_cover_entity(
 
 
 async def test_cover_entity_without_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:

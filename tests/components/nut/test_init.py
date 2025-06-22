@@ -6,9 +6,9 @@ from unittest.mock import patch
 from aionut import NUTError, NUTLoginError
 import pytest
 
-from homeassistant.components.nut.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.nut.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
@@ -16,9 +16,9 @@ from homeassistant.const import (
     CONF_USERNAME,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .util import _get_mock_nutclient, async_init_integration
 
@@ -26,7 +26,7 @@ from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
-async def test_config_entry_migrations(hass: HomeAssistant) -> None:
+async def test_config_entry_migrations(hass: SmartHub) -> None:
     """Test that config entries were migrated."""
     mock_pynut = _get_mock_nutclient(
         list_vars={"battery.voltage": "voltage"},
@@ -34,7 +34,7 @@ async def test_config_entry_migrations(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         entry = MockConfigEntry(
@@ -52,7 +52,7 @@ async def test_config_entry_migrations(hass: HomeAssistant) -> None:
         assert CONF_SCAN_INTERVAL not in entry.options
 
 
-async def test_async_setup_entry(hass: HomeAssistant) -> None:
+async def test_async_setup_entry(hass: SmartHub) -> None:
     """Test a successful setup entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -65,7 +65,7 @@ async def test_async_setup_entry(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -87,7 +87,7 @@ async def test_async_setup_entry(hass: HomeAssistant) -> None:
 
 
 async def test_remove_device_valid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -120,7 +120,7 @@ async def test_remove_device_valid(
 
 
 async def test_remove_device_stale(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_remove_device_stale(
 
 
 async def test_config_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test for setup failure if connection to broker is missing."""
@@ -173,11 +173,11 @@ async def test_config_not_ready(
     error_message = f"Error fetching UPS state: {nut_error_message}"
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_ups",
+            "smarthub.components.nut.AIONUTClient.list_ups",
             return_value={"ups1"},
         ),
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_vars",
+            "smarthub.components.nut.AIONUTClient.list_vars",
             side_effect=NUTError(nut_error_message),
         ),
     ):
@@ -189,7 +189,7 @@ async def test_config_not_ready(
 
 
 async def test_auth_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test for setup failure if auth has changed."""
@@ -203,11 +203,11 @@ async def test_auth_fails(
     error_message = f"Device authentication error: {nut_error_message}"
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_ups",
+            "smarthub.components.nut.AIONUTClient.list_ups",
             return_value={"ups1"},
         ),
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_vars",
+            "smarthub.components.nut.AIONUTClient.list_vars",
             side_effect=NUTLoginError(nut_error_message),
         ),
     ):
@@ -223,7 +223,7 @@ async def test_auth_fails(
 
 
 async def test_serial_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test for serial number set on device."""
@@ -246,7 +246,7 @@ async def test_serial_number(
 
 
 async def test_device_location(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test for suggested location on device."""
@@ -272,14 +272,14 @@ async def test_device_location(
     assert device_entry.suggested_area == mock_device_location
 
 
-async def test_update_options(hass: HomeAssistant) -> None:
+async def test_update_options(hass: SmartHub) -> None:
     """Test update options triggers reload."""
     mock_pynut = _get_mock_nutclient(
         list_ups={"ups1": "UPS 1"}, list_vars={"ups.status": "OL"}
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         mock_config_entry = MockConfigEntry(

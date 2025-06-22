@@ -4,15 +4,15 @@ import dataclasses
 
 import pytest
 
-from homeassistant.components.media_player import MediaPlayerDeviceClass
-from homeassistant.components.vizio.const import (
+from smarthub.components.media_player import MediaPlayerDeviceClass
+from smarthub.components.vizio.const import (
     CONF_APPS,
     CONF_APPS_TO_INCLUDE_OR_EXCLUDE,
     CONF_VOLUME_STEP,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_IGNORE, SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_IGNORE, SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import (
     CONF_ACCESS_TOKEN,
     CONF_DEVICE_CLASS,
     CONF_HOST,
@@ -20,8 +20,8 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_PIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import (
     ACCESS_TOKEN,
@@ -45,7 +45,7 @@ from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_bypass_setup")
-async def test_user_flow_minimum_fields(hass: HomeAssistant) -> None:
+async def test_user_flow_minimum_fields(hass: SmartHub) -> None:
     """Test user config flow with minimum fields."""
     # test form shows
     result = await hass.config_entries.flow.async_init(
@@ -66,7 +66,7 @@ async def test_user_flow_minimum_fields(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_bypass_setup")
-async def test_user_flow_all_fields(hass: HomeAssistant) -> None:
+async def test_user_flow_all_fields(hass: SmartHub) -> None:
     """Test user config flow with all fields."""
     # test form shows
     result = await hass.config_entries.flow.async_init(
@@ -90,7 +90,7 @@ async def test_user_flow_all_fields(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_bypass_update")
-async def test_speaker_options_flow(hass: HomeAssistant) -> None:
+async def test_speaker_options_flow(hass: SmartHub) -> None:
     """Test options config flow for speaker."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=MOCK_SPEAKER_CONFIG
@@ -115,7 +115,7 @@ async def test_speaker_options_flow(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_bypass_update")
-async def test_tv_options_flow_no_apps(hass: HomeAssistant) -> None:
+async def test_tv_options_flow_no_apps(hass: SmartHub) -> None:
     """Test options config flow for TV without providing apps option."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=MOCK_USER_VALID_TV_CONFIG
@@ -143,7 +143,7 @@ async def test_tv_options_flow_no_apps(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_bypass_update")
-async def test_tv_options_flow_with_apps(hass: HomeAssistant) -> None:
+async def test_tv_options_flow_with_apps(hass: SmartHub) -> None:
     """Test options config flow for TV with providing apps option."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=MOCK_USER_VALID_TV_CONFIG
@@ -172,7 +172,7 @@ async def test_tv_options_flow_with_apps(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_bypass_update")
-async def test_tv_options_flow_start_with_volume(hass: HomeAssistant) -> None:
+async def test_tv_options_flow_start_with_volume(hass: SmartHub) -> None:
     """Test options config flow for TV with providing apps option after providing volume step in initial config."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=MOCK_USER_VALID_TV_CONFIG
@@ -211,7 +211,7 @@ async def test_tv_options_flow_start_with_volume(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_bypass_setup")
-async def test_user_host_already_configured(hass: HomeAssistant) -> None:
+async def test_user_host_already_configured(hass: SmartHub) -> None:
     """Test host is already configured during user setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -232,7 +232,7 @@ async def test_user_host_already_configured(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_bypass_setup")
-async def test_user_serial_number_already_exists(hass: HomeAssistant) -> None:
+async def test_user_serial_number_already_exists(hass: SmartHub) -> None:
     """Test serial_number is already configured with different host and name during user setup."""
     # Set up new entry
     MockConfigEntry(
@@ -253,7 +253,7 @@ async def test_user_serial_number_already_exists(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_no_unique_id")
-async def test_user_error_on_could_not_connect(hass: HomeAssistant) -> None:
+async def test_user_error_on_could_not_connect(hass: SmartHub) -> None:
     """Test with could_not_connect during user setup due to no connectivity."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=MOCK_USER_VALID_TV_CONFIG
@@ -265,7 +265,7 @@ async def test_user_error_on_could_not_connect(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("vizio_cant_connect")
 async def test_user_error_on_could_not_connect_invalid_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test with could_not_connect during user setup due to invalid token."""
     result = await hass.config_entries.flow.async_init(
@@ -279,7 +279,7 @@ async def test_user_error_on_could_not_connect_invalid_token(
 @pytest.mark.usefixtures(
     "vizio_connect", "vizio_bypass_setup", "vizio_complete_pairing"
 )
-async def test_user_tv_pairing_no_apps(hass: HomeAssistant) -> None:
+async def test_user_tv_pairing_no_apps(hass: SmartHub) -> None:
     """Test pairing config flow when access token not provided for tv during user entry and no apps configured."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=MOCK_TV_CONFIG_NO_TOKEN
@@ -308,7 +308,7 @@ async def test_user_tv_pairing_no_apps(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "vizio_connect", "vizio_bypass_setup", "vizio_start_pairing_failure"
 )
-async def test_user_start_pairing_failure(hass: HomeAssistant) -> None:
+async def test_user_start_pairing_failure(hass: SmartHub) -> None:
     """Test failure to start pairing from user config flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=MOCK_TV_CONFIG_NO_TOKEN
@@ -322,7 +322,7 @@ async def test_user_start_pairing_failure(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "vizio_connect", "vizio_bypass_setup", "vizio_invalid_pin_failure"
 )
-async def test_user_invalid_pin(hass: HomeAssistant) -> None:
+async def test_user_invalid_pin(hass: SmartHub) -> None:
     """Test failure to complete pairing from user config flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=MOCK_TV_CONFIG_NO_TOKEN
@@ -341,7 +341,7 @@ async def test_user_invalid_pin(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_bypass_setup")
-async def test_user_ignore(hass: HomeAssistant) -> None:
+async def test_user_ignore(hass: SmartHub) -> None:
     """Test user config flow doesn't throw an error when there's an existing ignored source."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -360,7 +360,7 @@ async def test_user_ignore(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "vizio_connect", "vizio_bypass_setup", "vizio_guess_device_type"
 )
-async def test_zeroconf_flow(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow(hass: SmartHub) -> None:
     """Test zeroconf config flow."""
     discovery_info = dataclasses.replace(MOCK_ZEROCONF_SERVICE_INFO)
     result = await hass.config_entries.flow.async_init(
@@ -395,7 +395,7 @@ async def test_zeroconf_flow(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "vizio_connect", "vizio_bypass_setup", "vizio_guess_device_type"
 )
-async def test_zeroconf_flow_already_configured(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow_already_configured(hass: SmartHub) -> None:
     """Test entity is already configured during zeroconf setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -419,7 +419,7 @@ async def test_zeroconf_flow_already_configured(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "vizio_connect", "vizio_bypass_setup", "vizio_guess_device_type"
 )
-async def test_zeroconf_flow_with_port_in_host(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow_with_port_in_host(hass: SmartHub) -> None:
     """Test entity is already configured during zeroconf setup when port is in host."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -445,7 +445,7 @@ async def test_zeroconf_flow_with_port_in_host(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "vizio_connect", "vizio_bypass_setup", "vizio_guess_device_type"
 )
-async def test_zeroconf_dupe_fail(hass: HomeAssistant) -> None:
+async def test_zeroconf_dupe_fail(hass: SmartHub) -> None:
     """Test zeroconf config flow when device gets discovered multiple times."""
     discovery_info = dataclasses.replace(MOCK_ZEROCONF_SERVICE_INFO)
     result = await hass.config_entries.flow.async_init(
@@ -469,7 +469,7 @@ async def test_zeroconf_dupe_fail(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "vizio_connect", "vizio_bypass_setup", "vizio_guess_device_type"
 )
-async def test_zeroconf_ignore(hass: HomeAssistant) -> None:
+async def test_zeroconf_ignore(hass: SmartHub) -> None:
     """Test zeroconf discovery doesn't throw an error when there's an existing ignored source."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -488,7 +488,7 @@ async def test_zeroconf_ignore(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_guess_device_type", "vizio_no_unique_id")
-async def test_zeroconf_no_unique_id(hass: HomeAssistant) -> None:
+async def test_zeroconf_no_unique_id(hass: SmartHub) -> None:
     """Test zeroconf discovery aborts when unique_id is None."""
 
     discovery_info = dataclasses.replace(MOCK_ZEROCONF_SERVICE_INFO)
@@ -503,7 +503,7 @@ async def test_zeroconf_no_unique_id(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "vizio_connect", "vizio_bypass_setup", "vizio_guess_device_type"
 )
-async def test_zeroconf_abort_when_ignored(hass: HomeAssistant) -> None:
+async def test_zeroconf_abort_when_ignored(hass: SmartHub) -> None:
     """Test zeroconf discovery aborts when the same host has been ignored."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -529,7 +529,7 @@ async def test_zeroconf_abort_when_ignored(hass: HomeAssistant) -> None:
     "vizio_hostname_check",
     "vizio_guess_device_type",
 )
-async def test_zeroconf_flow_already_configured_hostname(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow_already_configured_hostname(hass: SmartHub) -> None:
     """Test entity is already configured during zeroconf setup when existing entry uses hostname."""
     config = MOCK_SPEAKER_CONFIG.copy()
     config[CONF_HOST] = "hostname"

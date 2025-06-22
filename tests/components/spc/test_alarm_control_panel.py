@@ -4,12 +4,12 @@ from unittest.mock import AsyncMock
 
 from pyspcwebgw.const import AreaMode
 
-from homeassistant.components.alarm_control_panel import AlarmControlPanelState
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.alarm_control_panel import AlarmControlPanelState
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
-async def test_update_alarm_device(hass: HomeAssistant, mock_client: AsyncMock) -> None:
+async def test_update_alarm_device(hass: SmartHub, mock_client: AsyncMock) -> None:
     """Test that alarm panel state changes on incoming websocket data."""
 
     config = {"spc": {"api_url": "http://localhost/", "ws_url": "ws://localhost/"}}

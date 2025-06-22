@@ -7,17 +7,17 @@ from unittest.mock import AsyncMock
 from aiohttp import ClientConnectionError, ClientResponseError
 import pytest
 
-from homeassistant.components.geniushub import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.geniushub import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_local_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_geniushub_client: AsyncMock,
 ) -> None:
@@ -71,7 +71,7 @@ async def test_full_local_flow(
     ],
 )
 async def test_local_flow_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_geniushub_client: AsyncMock,
     exception: Exception,
@@ -119,7 +119,7 @@ async def test_local_flow_exceptions(
 
 
 async def test_local_duplicate_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_geniushub_client: AsyncMock,
     mock_local_config_entry: MockConfigEntry,
 ) -> None:
@@ -151,7 +151,7 @@ async def test_local_duplicate_data(
 
 
 async def test_local_duplicate_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_geniushub_client: AsyncMock,
     mock_local_config_entry: MockConfigEntry,
 ) -> None:
@@ -183,7 +183,7 @@ async def test_local_duplicate_mac(
 
 
 async def test_full_cloud_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_geniushub_client: AsyncMock,
 ) -> None:
@@ -232,7 +232,7 @@ async def test_full_cloud_flow(
     ],
 )
 async def test_cloud_flow_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_geniushub_client: AsyncMock,
     exception: Exception,
@@ -275,7 +275,7 @@ async def test_cloud_flow_exceptions(
 
 
 async def test_cloud_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_geniushub_client: AsyncMock,
     mock_cloud_config_entry: MockConfigEntry,
 ) -> None:

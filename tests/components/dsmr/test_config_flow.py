@@ -9,11 +9,11 @@ import pytest
 import serial
 import serial.tools.list_ports
 
-from homeassistant import config_entries
-from homeassistant.components.dsmr import config_flow
-from homeassistant.components.dsmr.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.dsmr import config_flow
+from smarthub.components.dsmr.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -33,7 +33,7 @@ def com_port():
 
 
 async def test_setup_network(
-    hass: HomeAssistant,
+    hass: SmartHub,
     dsmr_connection_send_validate_fixture: tuple[MagicMock, MagicMock, MagicMock],
 ) -> None:
     """Test we can setup network."""
@@ -54,7 +54,7 @@ async def test_setup_network(
     assert result["step_id"] == "setup_network"
     assert result["errors"] == {}
 
-    with patch("homeassistant.components.dsmr.async_setup_entry", return_value=True):
+    with patch("smarthub.components.dsmr.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
@@ -78,7 +78,7 @@ async def test_setup_network(
 
 
 async def test_setup_network_rfxtrx(
-    hass: HomeAssistant,
+    hass: SmartHub,
     dsmr_connection_send_validate_fixture: tuple[MagicMock, MagicMock, MagicMock],
     rfxtrx_dsmr_connection_send_validate_fixture: tuple[
         MagicMock, MagicMock, MagicMock
@@ -107,7 +107,7 @@ async def test_setup_network_rfxtrx(
     # set-up DSMRProtocol to yield no valid telegram, this will retry with RFXtrxDSMRProtocol
     protocol.telegram = {}
 
-    with patch("homeassistant.components.dsmr.async_setup_entry", return_value=True):
+    with patch("smarthub.components.dsmr.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
@@ -198,7 +198,7 @@ async def test_setup_network_rfxtrx(
 @patch("serial.tools.list_ports.comports", return_value=[com_port()])
 async def test_setup_serial(
     com_mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     dsmr_connection_send_validate_fixture: tuple[MagicMock, MagicMock, MagicMock],
     version: str,
     entry_data: dict[str, Any],
@@ -223,7 +223,7 @@ async def test_setup_serial(
     assert result["step_id"] == "setup_serial"
     assert result["errors"] == {}
 
-    with patch("homeassistant.components.dsmr.async_setup_entry", return_value=True):
+    with patch("smarthub.components.dsmr.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {"port": port.device, "dsmr_version": version},
@@ -238,7 +238,7 @@ async def test_setup_serial(
 @patch("serial.tools.list_ports.comports", return_value=[com_port()])
 async def test_setup_serial_rfxtrx(
     com_mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     dsmr_connection_send_validate_fixture: tuple[MagicMock, MagicMock, MagicMock],
     rfxtrx_dsmr_connection_send_validate_fixture: tuple[
         MagicMock, MagicMock, MagicMock
@@ -269,7 +269,7 @@ async def test_setup_serial_rfxtrx(
     # set-up DSMRProtocol to yield no valid telegram, this will retry with RFXtrxDSMRProtocol
     protocol.telegram = {}
 
-    with patch("homeassistant.components.dsmr.async_setup_entry", return_value=True):
+    with patch("smarthub.components.dsmr.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {"port": port.device, "dsmr_version": "2.2"},
@@ -290,7 +290,7 @@ async def test_setup_serial_rfxtrx(
 @patch("serial.tools.list_ports.comports", return_value=[com_port()])
 async def test_setup_serial_manual(
     com_mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     dsmr_connection_send_validate_fixture: tuple[MagicMock, MagicMock, MagicMock],
 ) -> None:
     """Test we can setup serial with manual entry."""
@@ -320,7 +320,7 @@ async def test_setup_serial_manual(
     assert result["step_id"] == "setup_serial_manual_path"
     assert result["errors"] is None
 
-    with patch("homeassistant.components.dsmr.async_setup_entry", return_value=True):
+    with patch("smarthub.components.dsmr.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {"port": "/dev/ttyUSB0"}
         )
@@ -340,7 +340,7 @@ async def test_setup_serial_manual(
 @patch("serial.tools.list_ports.comports", return_value=[com_port()])
 async def test_setup_serial_fail(
     com_mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     dsmr_connection_send_validate_fixture: tuple[MagicMock, MagicMock, MagicMock],
 ) -> None:
     """Test failed serial connection."""
@@ -372,7 +372,7 @@ async def test_setup_serial_fail(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.dsmr.config_flow.create_dsmr_reader",
+        "smarthub.components.dsmr.config_flow.create_dsmr_reader",
         first_fail_connection_factory,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -388,7 +388,7 @@ async def test_setup_serial_fail(
 @patch("serial.tools.list_ports.comports", return_value=[com_port()])
 async def test_setup_serial_timeout(
     com_mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     dsmr_connection_send_validate_fixture: tuple[MagicMock, MagicMock, MagicMock],
     rfxtrx_dsmr_connection_send_validate_fixture: tuple[
         MagicMock, MagicMock, MagicMock
@@ -433,7 +433,7 @@ async def test_setup_serial_timeout(
     assert result["step_id"] == "setup_serial"
     assert result["errors"] == {}
 
-    with patch("homeassistant.components.dsmr.async_setup_entry", return_value=True):
+    with patch("smarthub.components.dsmr.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {"port": port.device, "dsmr_version": "2.2"}
         )
@@ -446,7 +446,7 @@ async def test_setup_serial_timeout(
 @patch("serial.tools.list_ports.comports", return_value=[com_port()])
 async def test_setup_serial_wrong_telegram(
     com_mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     dsmr_connection_send_validate_fixture: tuple[MagicMock, MagicMock, MagicMock],
     rfxtrx_dsmr_connection_send_validate_fixture: tuple[
         MagicMock, MagicMock, MagicMock
@@ -492,7 +492,7 @@ async def test_setup_serial_wrong_telegram(
     assert result["errors"] == {"base": "cannot_communicate"}
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test options flow."""
 
     entry_data = {
@@ -520,8 +520,8 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     )
 
     with (
-        patch("homeassistant.components.dsmr.async_setup_entry", return_value=True),
-        patch("homeassistant.components.dsmr.async_unload_entry", return_value=True),
+        patch("smarthub.components.dsmr.async_setup_entry", return_value=True),
+        patch("smarthub.components.dsmr.async_unload_entry", return_value=True),
     ):
         assert result["type"] is FlowResultType.CREATE_ENTRY
 

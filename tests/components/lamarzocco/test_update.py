@@ -9,11 +9,11 @@ from pylamarzocco.models import UpdateDetails
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.update import DOMAIN as UPDATE_DOMAIN, SERVICE_INSTALL
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.update import DOMAIN as UPDATE_DOMAIN, SERVICE_INSTALL
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import async_init_integration
 
@@ -25,26 +25,26 @@ from tests.typing import WebSocketGenerator
 def mock_sleep() -> Generator[AsyncMock]:
     """Mock asyncio.sleep."""
     with patch(
-        "homeassistant.components.lamarzocco.update.asyncio.sleep",
+        "smarthub.components.lamarzocco.update.asyncio.sleep",
         return_value=AsyncMock(),
     ) as mock_sleep:
         yield mock_sleep
 
 
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the La Marzocco updates."""
-    with patch("homeassistant.components.lamarzocco.PLATFORMS", [Platform.UPDATE]):
+    with patch("smarthub.components.lamarzocco.PLATFORMS", [Platform.UPDATE]):
         await async_init_integration(hass, mock_config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_update_process(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
@@ -101,7 +101,7 @@ async def test_update_process(
 
 
 async def test_update_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -114,7 +114,7 @@ async def test_update_error(
 
     mock_lamarzocco.update_firmware.side_effect = RequestNotSuccessful("Boom")
 
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,
@@ -127,7 +127,7 @@ async def test_update_error(
 
 
 async def test_update_times_out(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -144,8 +144,8 @@ async def test_update_times_out(
     assert state
 
     with (
-        patch("homeassistant.components.lamarzocco.update.MAX_UPDATE_WAIT", 0),
-        pytest.raises(HomeAssistantError) as exc_info,
+        patch("smarthub.components.lamarzocco.update.MAX_UPDATE_WAIT", 0),
+        pytest.raises(SmartHubError) as exc_info,
     ):
         await hass.services.async_call(
             UPDATE_DOMAIN,

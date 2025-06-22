@@ -354,9 +354,9 @@
           "payload": {
             "device": {
               "mdnsScanData": {
-                "serviceName": "home-2._home-assistant._tcp.local",
+                "serviceName": "home-2._smart-hub._tcp.local",
                 "name": "home-2",
-                "type": "home-assistant",
+                "type": "smart-hub",
                 "protocol": "tcp",
                 "data": [
                   "location_name=Home",
@@ -418,9 +418,9 @@
           "payload": {
             "device": {
               "mdnsScanData": {
-                "serviceName": "home-2._home-assistant._tcp.local",
+                "serviceName": "home-2._smart-hub._tcp.local",
                 "name": "home-2",
-                "type": "home-assistant",
+                "type": "smart-hub",
                 "protocol": "tcp",
                 "data": [
                   "location_name=**REDACTED**",
@@ -483,8 +483,8 @@
         "isProxy": true,
         "deviceInfo": {
           "hwVersion": "UNKNOWN_HW_VERSION",
-          "manufacturer": "Home Assistant",
-          "model": "Home Assistant",
+          "manufacturer": "SmartHub",
+          "model": "SmartHub",
           "swVersion": "2024.3.0.dev0"
         }
       }
@@ -496,8 +496,8 @@
         "isProxy": true,
         "deviceInfo": {
           "hwVersion": "UNKNOWN_HW_VERSION",
-          "manufacturer": "Home Assistant",
-          "model": "Home Assistant",
+          "manufacturer": "SmartHub",
+          "model": "SmartHub",
           "swVersion": "2024.3.0.dev0"
         }
       }
@@ -534,7 +534,7 @@
           "radioType": "WIFI",
           "scanData": {
             "mdnsScanData": {
-              "serviceName": "home-2._home-assistant._tcp.local",
+              "serviceName": "home-2._smart-hub._tcp.local",
               "texts": [
                 "location_name=Home",
                 "uuid=6b45123412341234123412341234aa64",
@@ -596,7 +596,7 @@
           "radioType": "WIFI",
           "scanData": {
             "mdnsScanData": {
-              "serviceName": "home-2._home-assistant._tcp.local",
+              "serviceName": "home-2._smart-hub._tcp.local",
               "texts": [
                 "location_name=**REDACTED**",
                 "uuid=**REDACTED**",
@@ -676,7 +676,7 @@
           "radioType": "WIFI",
           "scanData": {
             "mdnsScanData": {
-              "serviceName": "home-2._home-assistant._tcp.local",
+              "serviceName": "home-2._smart-hub._tcp.local",
               "texts": [
                 "location_name=Home",
                 "uuid=6b45123412341234123412341234aa64",
@@ -738,7 +738,7 @@
           "radioType": "WIFI",
           "scanData": {
             "mdnsScanData": {
-              "serviceName": "home-2._home-assistant._tcp.local",
+              "serviceName": "home-2._smart-hub._tcp.local",
               "texts": [
                 "location_name=**REDACTED**",
                 "uuid=**REDACTED**",
@@ -780,9 +780,9 @@
           "payload": {
             "device": {
               "mdnsScanData": {
-                "serviceName": "home-2._home-assistant._tcp.local",
+                "serviceName": "home-2._smart-hub._tcp.local",
                 "name": "home-2",
-                "type": "home-assistant",
+                "type": "smart-hub",
                 "protocol": "tcp",
                 "data": [
                   "location_name=Home",
@@ -836,9 +836,9 @@
           "payload": {
             "device": {
               "mdnsScanData": {
-                "serviceName": "home-2._home-assistant._tcp.local",
+                "serviceName": "home-2._smart-hub._tcp.local",
                 "name": "home-2",
-                "type": "home-assistant",
+                "type": "smart-hub",
                 "protocol": "tcp",
                 "data": [
                   "location_name=**REDACTED**",
@@ -916,7 +916,7 @@
           "radioType": "WIFI",
           "scanData": {
             "mdnsScanData": {
-              "serviceName": "home-2._home-assistant._tcp.local",
+              "serviceName": "home-2._smart-hub._tcp.local",
               "texts": "unexpected"
             }
           }
@@ -970,7 +970,7 @@
           "radioType": "WIFI",
           "scanData": {
             "mdnsScanData": {
-              "serviceName": "home-2._home-assistant._tcp.local",
+              "serviceName": "home-2._smart-hub._tcp.local",
               "texts": "unexpected"
             }
           }
@@ -1026,7 +1026,7 @@
           "radioType": "WIFI",
           "scanData": {
             "mdnsScanData": {
-              "serviceName": "home-2._home-assistant._tcp.local",
+              "serviceName": "home-2._smart-hub._tcp.local",
               "texts": ["unexpected", 123, 234]
             }
           }
@@ -1080,7 +1080,7 @@
           "radioType": "WIFI",
           "scanData": {
             "mdnsScanData": {
-              "serviceName": "home-2._home-assistant._tcp.local",
+              "serviceName": "home-2._smart-hub._tcp.local",
               "texts": ["unexpected", 123, 234]
             }
           }

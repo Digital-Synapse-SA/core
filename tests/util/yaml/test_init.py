@@ -1,4 +1,4 @@
-"""Test Home Assistant yaml loader."""
+"""Test SmartHub yaml loader."""
 
 from collections.abc import Generator
 import importlib
@@ -12,11 +12,11 @@ import pytest
 import voluptuous as vol
 import yaml as pyyaml
 
-from homeassistant.config import YAML_CONFIG_FILE, load_yaml_config_file
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util import yaml as yaml_util
-from homeassistant.util.yaml import loader as yaml_loader
+from smarthub.config import YAML_CONFIG_FILE, load_yaml_config_file
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.util import yaml as yaml_util
+from smarthub.util.yaml import loader as yaml_loader
 
 from tests.common import extract_stack_to_frame
 
@@ -77,7 +77,7 @@ def test_simple_dict() -> None:
 @pytest.mark.usefixtures("try_both_loaders", "mock_hass_config_yaml")
 def test_unhashable_key() -> None:
     """Test an unhashable key."""
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         load_yaml_config_file(YAML_CONFIG_FILE)
 
 
@@ -85,7 +85,7 @@ def test_unhashable_key() -> None:
 @pytest.mark.usefixtures("try_both_loaders", "mock_hass_config_yaml")
 def test_no_key() -> None:
     """Test item without a key."""
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         yaml_util.load_yaml(YAML_CONFIG_FILE)
 
 
@@ -113,7 +113,7 @@ def test_environment_variable_default() -> None:
 def test_invalid_environment_variable() -> None:
     """Test config file with no environment variable sat."""
     conf = "password: !env_var PASSWORD"
-    with pytest.raises(HomeAssistantError), io.StringIO(conf) as file:
+    with pytest.raises(SmartHubError), io.StringIO(conf) as file:
         yaml_loader.parse_yaml(file)
 
 
@@ -134,7 +134,7 @@ def test_include_yaml(value: Any) -> None:
         assert doc["key"] == value
 
 
-@patch("homeassistant.util.yaml.loader.os.walk")
+@patch("smarthub.util.yaml.loader.os.walk")
 @pytest.mark.parametrize(
     ("hass_config_yaml_files", "value"),
     [
@@ -154,7 +154,7 @@ def test_include_dir_list(mock_walk: Mock, value: Any) -> None:
         assert sorted(doc["key"]) == sorted(value)
 
 
-@patch("homeassistant.util.yaml.loader.os.walk")
+@patch("smarthub.util.yaml.loader.os.walk")
 @pytest.mark.parametrize(
     "hass_config_yaml_files",
     [
@@ -183,7 +183,7 @@ def test_include_dir_list_recursive(mock_walk: Mock) -> None:
         assert sorted(doc["key"]) == sorted(["zero", "one", "two"])
 
 
-@patch("homeassistant.util.yaml.loader.os.walk")
+@patch("smarthub.util.yaml.loader.os.walk")
 @pytest.mark.parametrize(
     ("hass_config_yaml_files", "value"),
     [
@@ -214,7 +214,7 @@ def test_include_dir_named(mock_walk: Mock, value: Any) -> None:
         assert doc["key"] == value
 
 
-@patch("homeassistant.util.yaml.loader.os.walk")
+@patch("smarthub.util.yaml.loader.os.walk")
 @pytest.mark.parametrize(
     "hass_config_yaml_files",
     [
@@ -244,7 +244,7 @@ def test_include_dir_named_recursive(mock_walk: Mock) -> None:
         assert doc["key"] == correct
 
 
-@patch("homeassistant.util.yaml.loader.os.walk")
+@patch("smarthub.util.yaml.loader.os.walk")
 @pytest.mark.parametrize(
     ("hass_config_yaml_files", "value"),
     [
@@ -273,7 +273,7 @@ def test_include_dir_merge_list(mock_walk: Mock, value: Any) -> None:
         assert sorted(doc["key"]) == sorted(value)
 
 
-@patch("homeassistant.util.yaml.loader.os.walk")
+@patch("smarthub.util.yaml.loader.os.walk")
 @pytest.mark.parametrize(
     "hass_config_yaml_files",
     [
@@ -302,7 +302,7 @@ def test_include_dir_merge_list_recursive(mock_walk: Mock) -> None:
         assert sorted(doc["key"]) == sorted(["one", "two", "three", "four"])
 
 
-@patch("homeassistant.util.yaml.loader.os.walk")
+@patch("smarthub.util.yaml.loader.os.walk")
 @pytest.mark.parametrize(
     ("hass_config_yaml_files", "value"),
     [
@@ -340,7 +340,7 @@ def test_include_dir_merge_named(mock_walk: Mock, value: Any) -> None:
         assert doc["key"] == value
 
 
-@patch("homeassistant.util.yaml.loader.os.walk")
+@patch("smarthub.util.yaml.loader.os.walk")
 @pytest.mark.parametrize(
     "hass_config_yaml_files",
     [
@@ -379,7 +379,7 @@ def test_include_dir_merge_named_recursive(mock_walk: Mock) -> None:
 def test_load_yaml_encoding_error(mock_open: Mock) -> None:
     """Test raising a UnicodeDecodeError."""
     mock_open.side_effect = UnicodeDecodeError("", b"", 1, 0, "")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         yaml_loader.load_yaml("test")
 
 
@@ -418,7 +418,7 @@ def test_duplicate_key(caplog: pytest.LogCaptureFixture) -> None:
 @pytest.mark.usefixtures("try_both_loaders", "mock_hass_config_yaml")
 def test_no_recursive_secrets() -> None:
     """Test that loading of secrets from the secrets file fails correctly."""
-    with pytest.raises(HomeAssistantError) as e:
+    with pytest.raises(SmartHubError) as e:
         load_yaml_config_file(YAML_CONFIG_FILE)
 
     assert e.value.args == ("Secrets not supported in this YAML file",)
@@ -452,10 +452,10 @@ def test_c_loader_is_available_in_ci() -> None:
 
 
 @pytest.mark.usefixtures("try_both_loaders")
-async def test_loading_actual_file_with_syntax_error(hass: HomeAssistant) -> None:
+async def test_loading_actual_file_with_syntax_error(hass: SmartHub) -> None:
     """Test loading a real file with syntax errors."""
     fixture_path = pathlib.Path(__file__).parent.joinpath("fixtures", "bad.yaml.txt")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.async_add_executor_job(load_yaml_config_file, fixture_path)
 
 
@@ -463,21 +463,21 @@ async def test_loading_actual_file_with_syntax_error(hass: HomeAssistant) -> Non
 def mock_integration_frame() -> Generator[Mock]:
     """Mock as if we're calling code from inside an integration."""
     correct_frame = Mock(
-        filename="/home/paulus/homeassistant/components/hue/light.py",
+        filename="/home/paulus/smarthub/components/hue/light.py",
         lineno="23",
         line="self.light.is_on",
     )
     with (
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value=correct_frame.line,
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=extract_stack_to_frame(
                 [
                     Mock(
-                        filename="/home/paulus/homeassistant/core.py",
+                        filename="/home/paulus/smarthub/core.py",
                         lineno="23",
                         line="do_something()",
                     ),
@@ -559,9 +559,9 @@ def test_load_yaml_dict(expected_data: Any) -> None:
 @pytest.mark.usefixtures("try_both_loaders", "mock_hass_config_yaml")
 def test_load_yaml_dict_fail() -> None:
     """Test item without a key."""
-    # Make sure we raise a subclass of HomeAssistantError, not
+    # Make sure we raise a subclass of SmartHubError, not
     # annotated_yaml.YAMLException
-    assert issubclass(yaml_loader.YamlTypeError, HomeAssistantError)
+    assert issubclass(yaml_loader.YamlTypeError, SmartHubError)
 
     with pytest.raises(yaml_loader.YamlTypeError):
         yaml_loader.load_yaml_dict(YAML_CONFIG_FILE)
@@ -582,7 +582,7 @@ def test_include_without_parameter(tag: str) -> None:
     """Test include extensions without parameters."""
     with (
         io.StringIO(f"key: {tag}") as file,
-        pytest.raises(HomeAssistantError, match=f"{tag} needs an argument"),
+        pytest.raises(SmartHubError, match=f"{tag} needs an argument"),
     ):
         yaml_loader.parse_yaml(file)
 
@@ -591,8 +591,8 @@ def test_include_without_parameter(tag: str) -> None:
     ("open_exception", "load_yaml_exception"),
     [
         (FileNotFoundError, OSError),
-        (NotADirectoryError, HomeAssistantError),
-        (PermissionError, HomeAssistantError),
+        (NotADirectoryError, SmartHubError),
+        (PermissionError, SmartHubError),
     ],
 )
 @pytest.mark.usefixtures("try_both_loaders")
@@ -600,7 +600,7 @@ def test_load_yaml_wrap_oserror(
     open_exception: Exception,
     load_yaml_exception: Exception,
 ) -> None:
-    """Test load_yaml wraps OSError in HomeAssistantError."""
+    """Test load_yaml wraps OSError in SmartHubError."""
     with (
         patch("annotatedyaml.loader.open", side_effect=open_exception),
         pytest.raises(load_yaml_exception),

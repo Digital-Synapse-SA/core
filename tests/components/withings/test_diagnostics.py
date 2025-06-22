@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, patch
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import prepare_webhook_setup, setup_integration
 
@@ -15,7 +15,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics_polling_instance(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
@@ -31,7 +31,7 @@ async def test_diagnostics_polling_instance(
 
 
 async def test_diagnostics_webhook_instance(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
@@ -49,7 +49,7 @@ async def test_diagnostics_webhook_instance(
 
 
 async def test_diagnostics_cloudhook_instance(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
@@ -58,24 +58,24 @@ async def test_diagnostics_cloudhook_instance(
 ) -> None:
     """Test diagnostics."""
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_active_subscription",
+            "smarthub.components.cloud.async_active_subscription",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ),
         patch(
-            "homeassistant.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
+            "smarthub.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.cloud.async_delete_cloudhook",
+            "smarthub.components.cloud.async_delete_cloudhook",
         ),
         patch(
-            "homeassistant.components.withings.webhook_generate_url",
+            "smarthub.components.withings.webhook_generate_url",
         ),
     ):
         await setup_integration(hass, webhook_config_entry)

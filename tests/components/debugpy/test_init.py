@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.debugpy import (
+from smarthub.components.debugpy import (
     CONF_HOST,
     CONF_PORT,
     CONF_START,
@@ -12,18 +12,18 @@ from homeassistant.components.debugpy import (
     DOMAIN,
     SERVICE_START,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture
 def mock_debugpy():
     """Mock debugpy lib."""
-    with patch("homeassistant.components.debugpy.debugpy") as mocked_debugpy:
+    with patch("smarthub.components.debugpy.debugpy") as mocked_debugpy:
         yield mocked_debugpy
 
 
-async def test_default(hass: HomeAssistant, mock_debugpy) -> None:
+async def test_default(hass: SmartHub, mock_debugpy) -> None:
     """Test if the default settings work."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
 
@@ -32,7 +32,7 @@ async def test_default(hass: HomeAssistant, mock_debugpy) -> None:
     assert len(mock_debugpy.method_calls) == 1
 
 
-async def test_wait_on_startup(hass: HomeAssistant, mock_debugpy) -> None:
+async def test_wait_on_startup(hass: SmartHub, mock_debugpy) -> None:
     """Test if the waiting for client is called."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {CONF_WAIT: True}})
 
@@ -41,7 +41,7 @@ async def test_wait_on_startup(hass: HomeAssistant, mock_debugpy) -> None:
     assert len(mock_debugpy.method_calls) == 2
 
 
-async def test_on_demand(hass: HomeAssistant, mock_debugpy) -> None:
+async def test_on_demand(hass: SmartHub, mock_debugpy) -> None:
     """Test on-demand debugging using a service call."""
     assert await async_setup_component(
         hass,

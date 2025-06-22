@@ -9,12 +9,12 @@ from freezegun.api import FrozenDateTimeFactory
 from py_nextbus.client import NextBusFormatError, NextBusHTTPError
 import pytest
 
-from homeassistant.components.nextbus.const import DOMAIN
-from homeassistant.components.nextbus.coordinator import NextBusDataUpdateCoordinator
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import UpdateFailed
+from smarthub.components.nextbus.const import DOMAIN
+from smarthub.components.nextbus.coordinator import NextBusDataUpdateCoordinator
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers.update_coordinator import UpdateFailed
 
 from . import assert_setup_sensor
 from .const import (
@@ -35,7 +35,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_predictions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nextbus: MagicMock,
     mock_nextbus_lists: MagicMock,
     mock_nextbus_predictions: MagicMock,
@@ -61,7 +61,7 @@ async def test_predictions(
     ],
 )
 async def test_prediction_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nextbus: MagicMock,
     mock_nextbus_lists: MagicMock,
     mock_nextbus_predictions: MagicMock,
@@ -76,7 +76,7 @@ async def test_prediction_exceptions(
 
 
 async def test_custom_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nextbus: MagicMock,
     mock_nextbus_lists: MagicMock,
     mock_nextbus_predictions: MagicMock,
@@ -92,7 +92,7 @@ async def test_custom_name(
 
 
 async def test_verify_no_predictions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nextbus: MagicMock,
     mock_nextbus_lists: MagicMock,
     mock_nextbus_predictions: MagicMock,
@@ -108,7 +108,7 @@ async def test_verify_no_predictions(
 
 
 async def test_verify_no_upcoming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nextbus: MagicMock,
     mock_nextbus_lists: MagicMock,
     mock_nextbus_predictions: MagicMock,
@@ -124,7 +124,7 @@ async def test_verify_no_upcoming(
 
 
 async def test_verify_throttle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nextbus: MagicMock,
     mock_nextbus_lists: MagicMock,
     mock_nextbus_predictions: MagicMock,
@@ -175,7 +175,7 @@ async def test_verify_throttle(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nextbus: MagicMock,
     mock_nextbus_lists: MagicMock,
     mock_nextbus_predictions: MagicMock,

@@ -8,10 +8,10 @@ from aiohttp.test_utils import make_mocked_request
 import pytest
 import voluptuous as vol
 
-from homeassistant import exceptions
-from homeassistant.components import websocket_api
-from homeassistant.components.websocket_api.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub import exceptions
+from smarthub.components import websocket_api
+from smarthub.components.websocket_api.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockUser
 
@@ -38,7 +38,7 @@ from tests.common import MockUser
             "Error handling message: Timeout (timeout) Mock User from 127.0.0.42 (Browser)",
         ),
         (
-            exceptions.HomeAssistantError("Failed to do X"),
+            exceptions.SmartHubError("Failed to do X"),
             websocket_api.ERR_HOME_ASSISTANT_ERROR,
             "Failed to do X",
             "Error handling message: Failed to do X (home_assistant_error) Mock User from 127.0.0.42 (Browser)",
@@ -56,7 +56,7 @@ from tests.common import MockUser
             "Error handling message: Unknown error (unknown_error) Mock User from 127.0.0.42 (Browser)",
         ),
         (
-            exceptions.HomeAssistantError,
+            exceptions.SmartHubError,
             websocket_api.ERR_UNKNOWN_ERROR,
             "Unknown error",
             "Error handling message: Unknown error (unknown_error) Mock User from 127.0.0.42 (Browser)",
@@ -64,7 +64,7 @@ from tests.common import MockUser
     ],
 )
 async def test_exception_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     exc: Exception,
     code: str,
@@ -96,7 +96,7 @@ async def test_exception_handling(
     )
 
     with patch(
-        "homeassistant.components.websocket_api.connection.current_request",
+        "smarthub.components.websocket_api.connection.current_request",
     ) as current_request:
         current_request.get.return_value = mocked_request
         conn = websocket_api.ActiveConnection(

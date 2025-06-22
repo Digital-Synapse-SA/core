@@ -4,9 +4,9 @@ from pycec.const import POWER_OFF, POWER_ON, STATUS_PLAY, STATUS_STILL, STATUS_S
 from pycec.network import PhysicalAddress
 import pytest
 
-from homeassistant.components.hdmi_cec import EVENT_HDMI_CEC_UNAVAILABLE
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.hdmi_cec import EVENT_HDMI_CEC_UNAVAILABLE
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -14,7 +14,7 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import MockHDMIDevice
 from .conftest import CecEntityCreator, HDMINetworkCreator
@@ -22,7 +22,7 @@ from .conftest import CecEntityCreator, HDMINetworkCreator
 
 @pytest.mark.parametrize("config", [{}, {"platform": "switch"}])
 async def test_load_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     config,
@@ -40,7 +40,7 @@ async def test_load_platform(
 
 
 async def test_load_types(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
 ) -> None:
@@ -67,7 +67,7 @@ async def test_load_types(
 
 
 async def test_service_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
 ) -> None:
@@ -89,7 +89,7 @@ async def test_service_on(
 
 
 async def test_service_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
 ) -> None:
@@ -127,7 +127,7 @@ async def test_service_off(
     ],
 )
 async def test_device_status_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     power_status,
@@ -164,7 +164,7 @@ async def test_device_status_change(
     ],
 )
 async def test_friendly_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     device_values,
@@ -220,7 +220,7 @@ async def test_friendly_name(
     ],
 )
 async def test_extra_state_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     device_values,
@@ -252,7 +252,7 @@ async def test_extra_state_attributes(
     ],
 )
 async def test_icon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     device_type,
@@ -268,7 +268,7 @@ async def test_icon(
 
 
 async def test_unavailable_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
 ) -> None:

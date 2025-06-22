@@ -2,9 +2,9 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.device_registry import format_mac
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.device_registry import format_mac
 
 from . import ZEROCONF_NAME
 
@@ -12,7 +12,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_entity_rename(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,

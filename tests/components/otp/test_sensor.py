@@ -3,14 +3,14 @@
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_pyotp")
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     otp_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:

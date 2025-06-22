@@ -32,13 +32,13 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 import voluptuous as vol
 
-from homeassistant.components import conversation
-from homeassistant.const import CONF_LLM_HASS_API
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import chat_session, intent, llm
-from homeassistant.setup import async_setup_component
-from homeassistant.util import ulid as ulid_util
+from smarthub.components import conversation
+from smarthub.const import CONF_LLM_HASS_API
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import chat_session, intent, llm
+from smarthub.setup import async_setup_component
+from smarthub.util import ulid as ulid_util
 
 from tests.common import MockConfigEntry
 
@@ -175,7 +175,7 @@ def create_tool_use_block(
 
 
 async def test_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -203,7 +203,7 @@ async def test_entity(
 
 
 async def test_error_handling(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_init_component
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_init_component
 ) -> None:
     """Test that the default prompt works."""
     with patch(
@@ -226,7 +226,7 @@ async def test_error_handling(
 
 
 async def test_template_error(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that template error handling works."""
     hass.config_entries.async_update_entry(
@@ -252,7 +252,7 @@ async def test_template_error(
 
 
 async def test_template_variables(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that template variables work."""
     context = Context(user_id="12345")
@@ -274,7 +274,7 @@ async def test_template_variables(
         patch(
             "anthropic.resources.messages.AsyncMessages.create", new_callable=AsyncMock
         ) as mock_create,
-        patch("homeassistant.auth.AuthManager.async_get_user", return_value=mock_user),
+        patch("smarthub.auth.AuthManager.async_get_user", return_value=mock_user),
     ):
         mock_create.return_value = stream_generator(
             create_messages(
@@ -299,7 +299,7 @@ async def test_template_variables(
 
 
 async def test_conversation_agent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -308,7 +308,7 @@ async def test_conversation_agent(
     assert agent.supported_languages == "*"
 
 
-@patch("homeassistant.components.anthropic.conversation.llm.AssistAPI._async_get_tools")
+@patch("smarthub.components.anthropic.conversation.llm.AssistAPI._async_get_tools")
 @pytest.mark.parametrize(
     ("tool_call_json_parts", "expected_call_tool_args"),
     [
@@ -325,7 +325,7 @@ async def test_conversation_agent(
 )
 async def test_function_call(
     mock_get_tools,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
     tool_call_json_parts: list[str],
@@ -422,10 +422,10 @@ async def test_function_call(
     )
 
 
-@patch("homeassistant.components.anthropic.conversation.llm.AssistAPI._async_get_tools")
+@patch("smarthub.components.anthropic.conversation.llm.AssistAPI._async_get_tools")
 async def test_function_exception(
     mock_get_tools,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -439,7 +439,7 @@ async def test_function_exception(
     mock_tool.parameters = vol.Schema(
         {vol.Optional("param1", description="Test parameters"): str}
     )
-    mock_tool.async_call.side_effect = HomeAssistantError("Test tool exception")
+    mock_tool.async_call.side_effect = SmartHubError("Test tool exception")
 
     mock_get_tools.return_value = [mock_tool]
 
@@ -493,7 +493,7 @@ async def test_function_exception(
         "role": "user",
         "content": [
             {
-                "content": '{"error": "HomeAssistantError", "error_text": "Test tool exception"}',
+                "content": '{"error": "SmartHubError", "error_text": "Test tool exception"}',
                 "tool_use_id": "toolu_0123456789AbCdEfGhIjKlM",
                 "type": "tool_result",
             }
@@ -517,7 +517,7 @@ async def test_function_exception(
 
 
 async def test_assist_api_tools_conversion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -555,7 +555,7 @@ async def test_assist_api_tools_conversion(
 
 
 async def test_unknown_hass_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     mock_init_component,
@@ -578,7 +578,7 @@ async def test_unknown_hass_api(
 
 
 async def test_conversation_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -628,7 +628,7 @@ async def test_conversation_id(
 
 
 async def test_refusal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -666,7 +666,7 @@ async def test_refusal(
 
 
 async def test_extended_thinking(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_extended_thinking: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -683,7 +683,7 @@ async def test_extended_thinking(
                             "The user has just",
                             ' greeted me with "Hi".',
                             " This is a simple greeting an",
-                            "d doesn't require any Home Assistant function",
+                            "d doesn't require any SmartHub function",
                             " calls. I should respond with",
                             " a friendly greeting and let them know I'm available",
                             " to help with their smart home.",
@@ -707,7 +707,7 @@ async def test_extended_thinking(
 
 
 async def test_redacted_thinking(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_extended_thinking: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -742,10 +742,10 @@ async def test_redacted_thinking(
     assert chat_log.content[2].content == "How can I help you today?"
 
 
-@patch("homeassistant.components.anthropic.conversation.llm.AssistAPI._async_get_tools")
+@patch("smarthub.components.anthropic.conversation.llm.AssistAPI._async_get_tools")
 async def test_extended_thinking_tool_call(
     mock_get_tools,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_extended_thinking: MockConfigEntry,
     mock_init_component,
     snapshot: SnapshotAssertion,
@@ -910,7 +910,7 @@ async def test_extended_thinking_tool_call(
     ],
 )
 async def test_history_conversion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
     snapshot: SnapshotAssertion,

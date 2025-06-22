@@ -9,17 +9,17 @@ import uuid
 
 import pytest
 
-from homeassistant.components.rest.data import DEFAULT_TIMEOUT
-from homeassistant.components.rest.schema import DEFAULT_METHOD, DEFAULT_VERIFY_SSL
-from homeassistant.components.scrape.const import (
+from smarthub.components.rest.data import DEFAULT_TIMEOUT
+from smarthub.components.rest.schema import DEFAULT_METHOD, DEFAULT_VERIFY_SSL
+from smarthub.components.scrape.const import (
     CONF_ENCODING,
     CONF_INDEX,
     CONF_SELECT,
     DEFAULT_ENCODING,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_METHOD,
     CONF_NAME,
     CONF_RESOURCE,
@@ -27,7 +27,7 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import MockRestData
 
@@ -38,7 +38,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Automatically path uuid generator."""
     with patch(
-        "homeassistant.components.scrape.async_setup_entry",
+        "smarthub.components.scrape.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -52,7 +52,7 @@ async def get_config_to_integration_load() -> dict[str, Any]:
     @pytest.mark.parametrize("get_config", [{...}])
     """
     return {
-        CONF_RESOURCE: "https://www.home-assistant.io",
+        CONF_RESOURCE: "https://www.smart-hub.io",
         CONF_METHOD: DEFAULT_METHOD,
         CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,
         CONF_TIMEOUT: DEFAULT_TIMEOUT,
@@ -80,9 +80,9 @@ async def get_data_to_integration_load() -> MockRestData:
 
 @pytest.fixture(name="loaded_entry")
 async def load_integration(
-    hass: HomeAssistant, get_config: dict[str, Any], get_data: MockRestData
+    hass: SmartHub, get_config: dict[str, Any], get_data: MockRestData
 ) -> MockConfigEntry:
-    """Set up the Scrape integration in Home Assistant."""
+    """Set up the Scrape integration in SmartHub."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,
@@ -93,7 +93,7 @@ async def load_integration(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.rest.RestData",
+        "smarthub.components.rest.RestData",
         return_value=get_data,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -106,7 +106,7 @@ async def load_integration(
 def uuid_fixture() -> str:
     """Automatically path uuid generator."""
     with patch(
-        "homeassistant.components.scrape.config_flow.uuid.uuid1",
+        "smarthub.components.scrape.config_flow.uuid.uuid1",
         return_value=uuid.UUID("3699ef88-69e6-11ed-a1eb-0242ac120002"),
     ):
         yield

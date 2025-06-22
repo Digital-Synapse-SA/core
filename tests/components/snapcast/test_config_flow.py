@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries, setup
-from homeassistant.components.snapcast.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries, setup
+from smarthub.components.snapcast.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry", "mock_create_server")
 
 
 async def test_form(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_create_server: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_create_server: AsyncMock
 ) -> None:
     """Test we get the form and handle errors and successful connection."""
     await setup.async_setup_component(hass, "persistent_notification", {})
@@ -68,7 +68,7 @@ async def test_form(
 
 
 async def test_abort(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_create_server: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_create_server: AsyncMock
 ) -> None:
     """Test config flow abort if device is already configured."""
     entry = MockConfigEntry(

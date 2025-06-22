@@ -6,12 +6,12 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.scrape.const import DEFAULT_SCAN_INTERVAL, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.scrape.const import DEFAULT_SCAN_INTERVAL, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import MockRestData, return_integration_config
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.typing import WebSocketGenerator
 
 
-async def test_setup_config(hass: HomeAssistant) -> None:
+async def test_setup_config(hass: SmartHub) -> None:
     """Test setup from yaml."""
     config = {
         DOMAIN: [
@@ -31,7 +31,7 @@ async def test_setup_config(hass: HomeAssistant) -> None:
 
     mocker = MockRestData("test_scrape_sensor")
     with patch(
-        "homeassistant.components.rest.RestData",
+        "smarthub.components.rest.RestData",
         return_value=mocker,
     ) as mock_setup:
         assert await async_setup_component(hass, DOMAIN, config)
@@ -44,7 +44,7 @@ async def test_setup_config(hass: HomeAssistant) -> None:
 
 
 async def test_setup_no_data_fails_with_recovery(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup entry no data fails and recovers."""
     config = {
@@ -57,7 +57,7 @@ async def test_setup_no_data_fails_with_recovery(
 
     mocker = MockRestData("test_scrape_sensor_no_data")
     with patch(
-        "homeassistant.components.rest.RestData",
+        "smarthub.components.rest.RestData",
         return_value=mocker,
     ):
         assert await async_setup_component(hass, DOMAIN, config)
@@ -77,7 +77,7 @@ async def test_setup_no_data_fails_with_recovery(
 
 
 async def test_setup_config_no_configuration(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test setup from yaml missing configuration options."""
     config = {DOMAIN: None}
@@ -89,7 +89,7 @@ async def test_setup_config_no_configuration(
 
 
 async def test_setup_config_no_sensors(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup from yaml with no configured sensors finalize properly."""
     config = {
@@ -108,20 +108,20 @@ async def test_setup_config_no_sensors(
 
     mocker = MockRestData("test_scrape_sensor")
     with patch(
-        "homeassistant.components.rest.RestData",
+        "smarthub.components.rest.RestData",
         return_value=mocker,
     ):
         assert await async_setup_component(hass, DOMAIN, config)
         await hass.async_block_till_done()
 
 
-async def test_setup_entry(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
+async def test_setup_entry(hass: SmartHub, loaded_entry: MockConfigEntry) -> None:
     """Test setup entry."""
 
     assert loaded_entry.state is ConfigEntryState.LOADED
 
 
-async def test_unload_entry(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
+async def test_unload_entry(hass: SmartHub, loaded_entry: MockConfigEntry) -> None:
     """Test unload an entry."""
 
     assert loaded_entry.state is ConfigEntryState.LOADED
@@ -131,7 +131,7 @@ async def test_unload_entry(hass: HomeAssistant, loaded_entry: MockConfigEntry) 
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     loaded_entry: MockConfigEntry,

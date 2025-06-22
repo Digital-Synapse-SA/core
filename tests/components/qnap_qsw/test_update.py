@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from aioqsw.const import API_ERROR_CODE, API_ERROR_MESSAGE, API_RESULT, API_VERSION
 
-from homeassistant.components.update import (
+from smarthub.components.update import (
     ATTR_BACKUP,
     ATTR_IN_PROGRESS,
     ATTR_INSTALLED_VERSION,
@@ -12,8 +12,8 @@ from homeassistant.components.update import (
     DOMAIN as UPDATE_DOMAIN,
     SERVICE_INSTALL,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from .util import (
     FIRMWARE_INFO_MOCK,
@@ -29,7 +29,7 @@ FIRMWARE_UPDATE_LIVE_MOCK = {
 }
 
 
-async def test_qnap_qsw_update(hass: HomeAssistant) -> None:
+async def test_qnap_qsw_update(hass: SmartHub) -> None:
     """Test creation of update entities."""
 
     await async_init_integration(hass)
@@ -49,15 +49,15 @@ async def test_qnap_qsw_update(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.qnap_qsw.QnapQswApi.get_firmware_update_check",
+            "smarthub.components.qnap_qsw.QnapQswApi.get_firmware_update_check",
             return_value=FIRMWARE_UPDATE_CHECK_MOCK,
         ) as mock_firmware_update_check,
         patch(
-            "homeassistant.components.qnap_qsw.QnapQswApi.get_users_verification",
+            "smarthub.components.qnap_qsw.QnapQswApi.get_users_verification",
             return_value=USERS_VERIFICATION_MOCK,
         ) as mock_users_verification,
         patch(
-            "homeassistant.components.qnap_qsw.QnapQswApi.post_firmware_update_live",
+            "smarthub.components.qnap_qsw.QnapQswApi.post_firmware_update_live",
             return_value=FIRMWARE_UPDATE_LIVE_MOCK,
         ) as mock_firmware_update_live,
     ):

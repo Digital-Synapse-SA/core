@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 from aiohttp.client_exceptions import ClientError
 
-from homeassistant.components.pegel_online.const import CONF_STATION, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.pegel_online.const import CONF_STATION, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_LATITUDE,
     CONF_LOCATION,
     CONF_LONGITUDE,
     CONF_RADIUS,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import PegelOnlineMock
 from .const import MOCK_CONFIG_ENTRY_DATA_DRESDEN, MOCK_NEARBY_STATIONS
@@ -28,7 +28,7 @@ MOCK_USER_DATA_STEP1 = {
 MOCK_USER_DATA_STEP2 = {CONF_STATION: "70272185-xxxx-xxxx-xxxx-43bea330dcae"}
 
 
-async def test_user(hass: HomeAssistant) -> None:
+async def test_user(hass: SmartHub) -> None:
     """Test starting a flow by user."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -38,10 +38,10 @@ async def test_user(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.pegel_online.async_setup_entry", return_value=True
+            "smarthub.components.pegel_online.async_setup_entry", return_value=True
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.pegel_online.config_flow.PegelOnline",
+            "smarthub.components.pegel_online.config_flow.PegelOnline",
         ) as pegelonline,
     ):
         pegelonline.return_value = PegelOnlineMock(nearby_stations=MOCK_NEARBY_STATIONS)
@@ -63,7 +63,7 @@ async def test_user(hass: HomeAssistant) -> None:
     assert mock_setup_entry.called
 
 
-async def test_user_already_configured(hass: HomeAssistant) -> None:
+async def test_user_already_configured(hass: SmartHub) -> None:
     """Test starting a flow by user with an already configured statioon."""
     mock_config = MockConfigEntry(
         domain=DOMAIN,
@@ -79,7 +79,7 @@ async def test_user_already_configured(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.pegel_online.config_flow.PegelOnline",
+        "smarthub.components.pegel_online.config_flow.PegelOnline",
     ) as pegelonline:
         pegelonline.return_value = PegelOnlineMock(nearby_stations=MOCK_NEARBY_STATIONS)
         result = await hass.config_entries.flow.async_configure(
@@ -95,7 +95,7 @@ async def test_user_already_configured(hass: HomeAssistant) -> None:
         assert result["reason"] == "already_configured"
 
 
-async def test_connection_error(hass: HomeAssistant) -> None:
+async def test_connection_error(hass: SmartHub) -> None:
     """Test connection error during user flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -105,10 +105,10 @@ async def test_connection_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.pegel_online.async_setup_entry", return_value=True
+            "smarthub.components.pegel_online.async_setup_entry", return_value=True
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.pegel_online.config_flow.PegelOnline",
+            "smarthub.components.pegel_online.config_flow.PegelOnline",
         ) as pegelonline,
     ):
         # connection issue during setup
@@ -140,7 +140,7 @@ async def test_connection_error(hass: HomeAssistant) -> None:
     assert mock_setup_entry.called
 
 
-async def test_user_no_stations(hass: HomeAssistant) -> None:
+async def test_user_no_stations(hass: SmartHub) -> None:
     """Test starting a flow by user which does not find any station."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -150,10 +150,10 @@ async def test_user_no_stations(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.pegel_online.async_setup_entry", return_value=True
+            "smarthub.components.pegel_online.async_setup_entry", return_value=True
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.pegel_online.config_flow.PegelOnline",
+            "smarthub.components.pegel_online.config_flow.PegelOnline",
         ) as pegelonline,
     ):
         # no stations found

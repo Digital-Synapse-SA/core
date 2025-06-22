@@ -6,16 +6,16 @@ from unittest.mock import AsyncMock, PropertyMock
 import blebox_uniapi
 import pytest
 
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
     STATE_UNKNOWN,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import async_setup_entity, mock_feature
 
@@ -58,7 +58,7 @@ def tempsensor_fixture():
 
 
 async def test_init(
-    tempsensor, hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    tempsensor, hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test sensor default state."""
 
@@ -82,7 +82,7 @@ async def test_init(
     assert device.sw_version == "1.23"
 
 
-async def test_update(tempsensor, hass: HomeAssistant) -> None:
+async def test_update(tempsensor, hass: SmartHub) -> None:
     """Test sensor update."""
 
     feature_mock, entity_id = tempsensor
@@ -99,7 +99,7 @@ async def test_update(tempsensor, hass: HomeAssistant) -> None:
 
 
 async def test_update_failure(
-    tempsensor, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    tempsensor, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that update failures are logged."""
 
@@ -113,7 +113,7 @@ async def test_update_failure(
 
 
 async def test_airsensor_init(
-    airsensor, hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    airsensor, hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test airSensor default state."""
 
@@ -136,7 +136,7 @@ async def test_airsensor_init(
     assert device.sw_version == "1.23"
 
 
-async def test_airsensor_update(airsensor, hass: HomeAssistant) -> None:
+async def test_airsensor_update(airsensor, hass: SmartHub) -> None:
     """Test air quality sensor state after update."""
 
     feature_mock, entity_id = airsensor

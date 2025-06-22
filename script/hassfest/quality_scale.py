@@ -7,9 +7,9 @@ from dataclasses import dataclass
 import voluptuous as vol
 from voluptuous.humanize import humanize_error
 
-from homeassistant.const import Platform
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util.yaml import load_yaml_dict
+from smarthub.const import Platform
+from smarthub.exceptions import SmartHubError
+from smarthub.util.yaml import load_yaml_dict
 
 from .model import Config, Integration, ScaledQualityScaleTiers
 from .quality_scale_validation import (
@@ -111,7 +111,7 @@ VALIDATORS = {rule.name: rule.validator for rule in ALL_RULES if rule.validator}
 
 RULE_URL = (
     "Please check the documentation at "
-    "https://developers.home-assistant.io/docs/core/"
+    "https://developers.smart-hub.io/docs/core/"
     "integration-quality-scale/rules/{rule_name}/"
 )
 
@@ -2242,12 +2242,12 @@ NO_QUALITY_SCALE = [
     "hardkernel",
     "hardware",
     "history",
-    "homeassistant",
-    "homeassistant_alerts",
-    "homeassistant_green",
-    "homeassistant_hardware",
-    "homeassistant_sky_connect",
-    "homeassistant_yellow",
+    "smarthub",
+    "smarthub_alerts",
+    "smarthub_green",
+    "smarthub_hardware",
+    "smarthub_sky_connect",
+    "smarthub_yellow",
     "image_upload",
     "input_boolean",
     "input_button",
@@ -2377,7 +2377,7 @@ def validate_iqs_file(config: Config, integration: Integration) -> None:
 
     try:
         data = load_yaml_dict(name)
-    except HomeAssistantError:
+    except SmartHubError:
         integration.add_error("quality_scale", "Invalid quality_scale.yaml")
         return
 

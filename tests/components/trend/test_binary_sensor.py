@@ -7,19 +7,19 @@ from typing import Any
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant import setup
-from homeassistant.components.trend.const import DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub import setup
+from smarthub.components.trend.const import DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub, State
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import ComponentSetup
 
 from tests.common import MockConfigEntry, assert_setup_component, mock_restore_cache
 
 
-async def _setup_legacy_component(hass: HomeAssistant, params: dict[str, Any]) -> None:
+async def _setup_legacy_component(hass: SmartHub, params: dict[str, Any]) -> None:
     """Set up the trend component the legacy way."""
     assert await async_setup_component(
         hass,
@@ -47,7 +47,7 @@ async def _setup_legacy_component(hass: HomeAssistant, params: dict[str, Any]) -
     ids=["up", "down", "up inverted", "down inverted"],
 )
 async def test_basic_trend_setup_from_yaml(
-    hass: HomeAssistant,
+    hass: SmartHub,
     states: list[str],
     inverted: bool,
     expected_state: str,
@@ -84,7 +84,7 @@ async def test_basic_trend_setup_from_yaml(
     ids=["up", "down", "up inverted", "down inverted"],
 )
 async def test_basic_trend(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     setup_component: ComponentSetup,
     states: list[str],
@@ -128,7 +128,7 @@ async def test_basic_trend(
     ids=["up", "up inverted", "down"],
 )
 async def test_using_trendline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
     setup_component: ComponentSetup,
@@ -166,7 +166,7 @@ async def test_using_trendline(
     ids=["up", "down"],
 )
 async def test_attribute_trend(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     setup_component: ComponentSetup,
     attr_values: list[str],
@@ -189,7 +189,7 @@ async def test_attribute_trend(
 
 
 async def test_max_samples(
-    hass: HomeAssistant, config_entry: MockConfigEntry, setup_component: ComponentSetup
+    hass: SmartHub, config_entry: MockConfigEntry, setup_component: ComponentSetup
 ) -> None:
     """Test that sample count is limited correctly."""
     await setup_component(
@@ -209,7 +209,7 @@ async def test_max_samples(
 
 
 async def test_non_numeric(
-    hass: HomeAssistant, config_entry: MockConfigEntry, setup_component: ComponentSetup
+    hass: SmartHub, config_entry: MockConfigEntry, setup_component: ComponentSetup
 ) -> None:
     """Test for non-numeric sensor."""
     await setup_component({"entity_id": "sensor.test_state"})
@@ -223,7 +223,7 @@ async def test_non_numeric(
 
 
 async def test_missing_attribute(
-    hass: HomeAssistant, config_entry: MockConfigEntry, setup_component: ComponentSetup
+    hass: SmartHub, config_entry: MockConfigEntry, setup_component: ComponentSetup
 ) -> None:
     """Test for missing attribute."""
     await setup_component(
@@ -240,7 +240,7 @@ async def test_missing_attribute(
     assert state.state == STATE_UNKNOWN
 
 
-async def test_invalid_name_does_not_create(hass: HomeAssistant) -> None:
+async def test_invalid_name_does_not_create(hass: SmartHub) -> None:
     """Test for invalid name."""
     with assert_setup_component(0):
         assert await setup.async_setup_component(
@@ -258,7 +258,7 @@ async def test_invalid_name_does_not_create(hass: HomeAssistant) -> None:
     assert hass.states.async_all("binary_sensor") == []
 
 
-async def test_invalid_sensor_does_not_create(hass: HomeAssistant) -> None:
+async def test_invalid_sensor_does_not_create(hass: SmartHub) -> None:
     """Test invalid sensor."""
     with assert_setup_component(0):
         assert await setup.async_setup_component(
@@ -276,7 +276,7 @@ async def test_invalid_sensor_does_not_create(hass: HomeAssistant) -> None:
     assert hass.states.async_all("binary_sensor") == []
 
 
-async def test_no_sensors_does_not_create(hass: HomeAssistant) -> None:
+async def test_no_sensors_does_not_create(hass: SmartHub) -> None:
     """Test no sensors."""
     with assert_setup_component(0):
         assert await setup.async_setup_component(
@@ -290,7 +290,7 @@ async def test_no_sensors_does_not_create(hass: HomeAssistant) -> None:
     [("on", "on"), ("off", "off"), ("unknown", "unknown")],
 )
 async def test_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
     setup_component: ComponentSetup,
@@ -332,7 +332,7 @@ async def test_restore_state(
 
 
 async def test_invalid_min_sample(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test if error is logged when min_sample is larger than max_samples."""
@@ -355,7 +355,7 @@ async def test_invalid_min_sample(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -405,7 +405,7 @@ async def test_device_id(
     ],
 )
 async def test_unavailable_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
     setup_component: ComponentSetup,
@@ -440,7 +440,7 @@ async def test_unavailable_source(
 
 
 async def test_invalid_state_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     setup_component: ComponentSetup,
     freezer: FrozenDateTimeFactory,

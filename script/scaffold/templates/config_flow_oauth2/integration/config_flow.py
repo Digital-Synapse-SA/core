@@ -2,7 +2,7 @@
 
 import logging
 
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .const import DOMAIN
 

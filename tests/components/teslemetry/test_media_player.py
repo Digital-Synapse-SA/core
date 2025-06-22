@@ -6,7 +6,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from teslemetry_stream import Signal
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_MEDIA_VOLUME_LEVEL,
     DOMAIN as MEDIA_PLAYER_DOMAIN,
     SERVICE_MEDIA_NEXT_TRACK,
@@ -16,16 +16,16 @@ from homeassistant.components.media_player import (
     SERVICE_VOLUME_SET,
     MediaPlayerState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, assert_entities_alt, reload_platform, setup_platform
 from .const import COMMAND_OK, METADATA_NOSCOPE, VEHICLE_DATA_ALT
 
 
 async def test_media_player(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_legacy: AsyncMock,
@@ -37,7 +37,7 @@ async def test_media_player(
 
 
 async def test_media_player_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -51,7 +51,7 @@ async def test_media_player_alt(
 
 
 async def test_media_player_noscope(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_metadata: AsyncMock,
@@ -65,7 +65,7 @@ async def test_media_player_noscope(
 
 
 async def test_media_player_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_legacy: AsyncMock,
 ) -> None:
@@ -147,7 +147,7 @@ async def test_media_player_services(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_update_streaming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_vehicle_data: AsyncMock,
     mock_add_listener: AsyncMock,

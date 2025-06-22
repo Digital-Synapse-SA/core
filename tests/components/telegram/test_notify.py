@@ -2,20 +2,20 @@
 
 from unittest.mock import patch
 
-from homeassistant import config as hass_config
-from homeassistant.components import notify
-from homeassistant.components.telegram import DOMAIN
-from homeassistant.const import SERVICE_RELOAD
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub import config as hass_config
+from smarthub.components import notify
+from smarthub.components.telegram import DOMAIN
+from smarthub.const import SERVICE_RELOAD
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import get_fixture_path
 
 
-async def test_reload_notify(hass: HomeAssistant) -> None:
+async def test_reload_notify(hass: SmartHub) -> None:
     """Verify we can reload the notify service."""
 
-    with patch("homeassistant.components.telegram_bot.async_setup", return_value=True):
+    with patch("smarthub.components.telegram_bot.async_setup", return_value=True):
         assert await async_setup_component(
             hass,
             notify.DOMAIN,

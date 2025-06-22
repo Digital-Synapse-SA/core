@@ -11,10 +11,10 @@ from aiohttp import ClientError
 from httplib2 import Response
 import pytest
 
-from homeassistant.components.google_tasks import DOMAIN
-from homeassistant.components.google_tasks.const import OAUTH2_TOKEN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.google_tasks import DOMAIN
+from smarthub.components.google_tasks.const import OAUTH2_TOKEN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .conftest import LIST_TASK_LIST_RESPONSE, LIST_TASKS_RESPONSE_WATER
 
@@ -26,7 +26,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
     "api_responses", [[LIST_TASK_LIST_RESPONSE, LIST_TASKS_RESPONSE_WATER]]
 )
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration_setup: Callable[[], Awaitable[bool]],
     config_entry: MockConfigEntry,
     setup_credentials: None,
@@ -50,7 +50,7 @@ async def test_setup(
     "api_responses", [[LIST_TASK_LIST_RESPONSE, LIST_TASKS_RESPONSE_WATER]]
 )
 async def test_expired_token_refresh_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration_setup: Callable[[], Awaitable[bool]],
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,
@@ -102,7 +102,7 @@ async def test_expired_token_refresh_success(
     ids=["unauthorized", "internal_server_error", "client_error"],
 )
 async def test_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration_setup: Callable[[], Awaitable[bool]],
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,
@@ -142,7 +142,7 @@ async def test_expired_token_refresh_failure(
     ],
 )
 async def test_setup_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     mock_http_response: Mock,

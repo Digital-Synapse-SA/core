@@ -5,9 +5,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component
 
@@ -46,7 +46,7 @@ def mock_comfoconnect_command() -> Generator[MagicMock]:
 
 @pytest.fixture
 async def setup_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge_discover: MagicMock,
     mock_comfoconnect_command: MagicMock,
 ) -> None:
@@ -57,7 +57,7 @@ async def setup_sensor(
 
 
 @pytest.mark.usefixtures("setup_sensor")
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test the sensors."""
     state = hass.states.get("sensor.comfoairq_inside_humidity")
     assert state is not None

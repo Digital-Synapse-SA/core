@@ -9,13 +9,13 @@ from unittest.mock import ANY, MagicMock, Mock, call, patch
 
 import pytest
 
-from homeassistant.components import influxdb
-from homeassistant.components.influxdb.const import DEFAULT_BUCKET
-from homeassistant.const import PERCENTAGE, STATE_OFF, STATE_ON, STATE_STANDBY
-from homeassistant.core import HomeAssistant, split_entity_id
-from homeassistant.setup import async_setup_component
+from smarthub.components import influxdb
+from smarthub.components.influxdb.const import DEFAULT_BUCKET
+from smarthub.const import PERCENTAGE, STATE_OFF, STATE_ON, STATE_STANDBY
+from smarthub.core import SmartHub, split_entity_id
+from smarthub.setup import async_setup_component
 
-INFLUX_PATH = "homeassistant.components.influxdb"
+INFLUX_PATH = "smarthub.components.influxdb"
 INFLUX_CLIENT_PATH = f"{INFLUX_PATH}.InfluxDBClient"
 BASE_V1_CONFIG = {}
 BASE_V2_CONFIG = {
@@ -25,7 +25,7 @@ BASE_V2_CONFIG = {
 }
 
 
-async def async_wait_for_queue_to_process(hass: HomeAssistant) -> None:
+async def async_wait_for_queue_to_process(hass: SmartHub) -> None:
     """Wait for the queue to be processed.
 
     In the future we should refactor this away to not have
@@ -119,7 +119,7 @@ def _get_write_api_mock_v2(mock_influx_client):
     indirect=["mock_client"],
 )
 async def test_setup_config_full(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api
+    hass: SmartHub, mock_client, config_ext, get_write_api
 ) -> None:
     """Test the setup with full configuration."""
     config = {
@@ -255,7 +255,7 @@ async def test_setup_config_full(
     indirect=["mock_client"],
 )
 async def test_setup_config_ssl(
-    hass: HomeAssistant, mock_client, config_base, config_ext, expected_client_args
+    hass: SmartHub, mock_client, config_base, config_ext, expected_client_args
 ) -> None:
     """Test the setup with various verify_ssl values."""
     config = {"influxdb": config_base.copy()}
@@ -280,7 +280,7 @@ async def test_setup_config_ssl(
     indirect=["mock_client"],
 )
 async def test_setup_minimal_config(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api
+    hass: SmartHub, mock_client, config_ext, get_write_api
 ) -> None:
     """Test the setup with minimal configuration and defaults."""
     config = {"influxdb": {}}
@@ -325,7 +325,7 @@ async def test_setup_minimal_config(
     indirect=["mock_client"],
 )
 async def test_invalid_config(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api
+    hass: SmartHub, mock_client, config_ext, get_write_api
 ) -> None:
     """Test the setup with invalid config or config options specified for wrong version."""
     config = {"influxdb": {}}
@@ -335,7 +335,7 @@ async def test_invalid_config(
 
 
 async def _setup(
-    hass: HomeAssistant, mock_influx_client, config_ext, get_write_api
+    hass: SmartHub, mock_influx_client, config_ext, get_write_api
 ) -> None:
     """Prepare client for next test and return event handler method."""
     config = {
@@ -371,7 +371,7 @@ async def _setup(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener."""
     await _setup(hass, mock_client, config_ext, get_write_api)
@@ -450,7 +450,7 @@ async def test_event_listener(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_no_units(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener for missing units."""
     await _setup(hass, mock_client, config_ext, get_write_api)
@@ -497,7 +497,7 @@ async def test_event_listener_no_units(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_inf(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener with large or invalid numbers."""
     await _setup(hass, mock_client, config_ext, get_write_api)
@@ -539,7 +539,7 @@ async def test_event_listener_inf(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_states(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener against ignored states."""
     await _setup(hass, mock_client, config_ext, get_write_api)
@@ -566,7 +566,7 @@ async def test_event_listener_states(
         write_api.reset_mock()
 
 
-async def execute_filter_test(hass: HomeAssistant, tests, write_api, get_mock_call):
+async def execute_filter_test(hass: SmartHub, tests, write_api, get_mock_call):
     """Execute all tests for a given filtering test."""
     for test in tests:
         domain, entity_id = split_entity_id(test.id)
@@ -609,7 +609,7 @@ async def execute_filter_test(hass: HomeAssistant, tests, write_api, get_mock_ca
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_denylist(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener against a denylist."""
     config = {"exclude": {"entities": ["fake.denylisted"]}, "include": {}}
@@ -643,7 +643,7 @@ async def test_event_listener_denylist(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_denylist_domain(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener against a domain denylist."""
     config = {"exclude": {"domains": ["another_fake"]}, "include": {}}
@@ -677,7 +677,7 @@ async def test_event_listener_denylist_domain(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_denylist_glob(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener against a glob denylist."""
     config = {"exclude": {"entity_globs": ["*.excluded_*"]}, "include": {}}
@@ -711,7 +711,7 @@ async def test_event_listener_denylist_glob(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_allowlist(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener against an allowlist."""
     config = {"include": {"entities": ["fake.included"]}, "exclude": {}}
@@ -745,7 +745,7 @@ async def test_event_listener_allowlist(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_allowlist_domain(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener against a domain allowlist."""
     config = {"include": {"domains": ["fake"]}, "exclude": {}}
@@ -779,7 +779,7 @@ async def test_event_listener_allowlist_domain(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_allowlist_glob(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener against a glob allowlist."""
     config = {"include": {"entity_globs": ["*.included_*"]}, "exclude": {}}
@@ -813,7 +813,7 @@ async def test_event_listener_allowlist_glob(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_filtered_allowlist(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener against an allowlist filtered by denylist."""
     config = {
@@ -863,7 +863,7 @@ async def test_event_listener_filtered_allowlist(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_filtered_denylist(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener against a domain/glob denylist with an entity id allowlist."""
     config = {
@@ -903,7 +903,7 @@ async def test_event_listener_filtered_denylist(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_invalid_type(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener when an attribute has an invalid type."""
     await _setup(hass, mock_client, config_ext, get_write_api)
@@ -970,7 +970,7 @@ async def test_event_listener_invalid_type(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_default_measurement(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener with a default measurement."""
     config = {"default_measurement": "state"}
@@ -1012,7 +1012,7 @@ async def test_event_listener_default_measurement(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_unit_of_measurement_field(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener for unit of measurement field."""
     config = {"override_measurement": "state"}
@@ -1056,7 +1056,7 @@ async def test_event_listener_unit_of_measurement_field(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_tags_attributes(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener when some attributes should be tags."""
     config = {"tags_attributes": ["friendly_fake"]}
@@ -1104,7 +1104,7 @@ async def test_event_listener_tags_attributes(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_component_override_measurement(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener with overridden measurements."""
     config = {
@@ -1163,7 +1163,7 @@ async def test_event_listener_component_override_measurement(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_component_measurement_attr(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener with a different measurement_attr."""
     config = {
@@ -1229,7 +1229,7 @@ async def test_event_listener_component_measurement_attr(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_ignore_attributes(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener with overridden measurements."""
     config = {
@@ -1314,7 +1314,7 @@ async def test_event_listener_ignore_attributes(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_ignore_attributes_overlapping_entities(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener with overridden measurements."""
     config = {
@@ -1360,7 +1360,7 @@ async def test_event_listener_ignore_attributes_overlapping_entities(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_scheduled_write(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener retries after a write failure."""
     config = {"max_retries": 1}
@@ -1406,7 +1406,7 @@ async def test_event_listener_scheduled_write(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_backlog_full(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener drops old events when backlog gets full."""
     await _setup(hass, mock_client, config_ext, get_write_api)
@@ -1419,7 +1419,7 @@ async def test_event_listener_backlog_full(
         monotonic_time += 60
         return monotonic_time
 
-    with patch("homeassistant.components.influxdb.time.monotonic", new=fast_monotonic):
+    with patch("smarthub.components.influxdb.time.monotonic", new=fast_monotonic):
         hass.states.async_set("entity.id", 1)
         await hass.async_block_till_done()
         await async_wait_for_queue_to_process(hass)
@@ -1446,7 +1446,7 @@ async def test_event_listener_backlog_full(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_event_listener_attribute_name_conflict(
-    hass: HomeAssistant, mock_client, config_ext, get_write_api, get_mock_call
+    hass: SmartHub, mock_client, config_ext, get_write_api, get_mock_call
 ) -> None:
     """Test the event listener when an attribute conflicts with another field."""
     await _setup(hass, mock_client, config_ext, get_write_api)
@@ -1509,7 +1509,7 @@ async def test_event_listener_attribute_name_conflict(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_connection_failure_on_startup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_client,
     config_ext,
@@ -1556,7 +1556,7 @@ async def test_connection_failure_on_startup(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_invalid_inputs_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_client,
     config_ext,
@@ -1669,7 +1669,7 @@ async def test_invalid_inputs_error(
     indirect=["mock_client", "get_mock_call"],
 )
 async def test_precision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client,
     config_ext,
     get_write_api,

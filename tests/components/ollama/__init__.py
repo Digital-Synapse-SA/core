@@ -1,7 +1,7 @@
 """Tests for the Ollama integration."""
 
-from homeassistant.components import ollama
-from homeassistant.helpers import llm
+from smarthub.components import ollama
+from smarthub.helpers import llm
 
 TEST_USER_DATA = {
     ollama.CONF_URL: "http://localhost:11434",

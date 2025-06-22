@@ -9,13 +9,13 @@ from unittest.mock import MagicMock, patch
 from doorbirdpy import DoorBird, DoorBirdScheduleEntry
 import pytest
 
-from homeassistant.components.doorbird.const import (
+from smarthub.components.doorbird.const import (
     CONF_EVENTS,
     DEFAULT_DOORBELL_EVENT,
     DEFAULT_MOTION_EVENT,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import VALID_CONFIG, get_mock_doorbird_api
 
@@ -75,11 +75,11 @@ def patch_doorbird_api_entry_points(api: MagicMock) -> Generator[DoorBird]:
     """Mock the DoorBirdAPI."""
     with (
         patch(
-            "homeassistant.components.doorbird.DoorBird",
+            "smarthub.components.doorbird.DoorBird",
             return_value=api,
         ),
         patch(
-            "homeassistant.components.doorbird.config_flow.DoorBird",
+            "smarthub.components.doorbird.config_flow.DoorBird",
             return_value=api,
         ),
     ):
@@ -88,7 +88,7 @@ def patch_doorbird_api_entry_points(api: MagicMock) -> Generator[DoorBird]:
 
 @pytest.fixture
 async def doorbird_mocker(
-    hass: HomeAssistant,
+    hass: SmartHub,
     doorbird_info: dict[str, Any],
     doorbird_schedule: dict[str, Any],
     doorbird_favorites: dict[str, dict[str, Any]],

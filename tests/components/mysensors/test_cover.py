@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, call
 
 from mysensors.sensor import Sensor
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
     DOMAIN as COVER_DOMAIN,
@@ -17,12 +17,12 @@ from homeassistant.components.cover import (
     SERVICE_STOP_COVER,
     CoverState,
 )
-from homeassistant.const import ATTR_BATTERY_LEVEL, ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_BATTERY_LEVEL, ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 
 async def test_cover_node_percentage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cover_node_percentage: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,
@@ -167,7 +167,7 @@ async def test_cover_node_percentage(
 
 
 async def test_cover_node_binary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cover_node_binary: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,

@@ -6,22 +6,22 @@ from unittest.mock import patch
 import pytest
 from requests.exceptions import ConnectTimeout
 
-from homeassistant.components.dremel_3d_printer.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.dremel_3d_printer.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
-MOCKED_MODEL = "homeassistant.components.dremel_3d_printer.Dremel3DPrinter.get_model"
+MOCKED_MODEL = "smarthub.components.dremel_3d_printer.Dremel3DPrinter.get_model"
 
 
 @pytest.mark.parametrize("model", ["3D45", "3D20"])
 async def test_setup(
-    hass: HomeAssistant, connection, config_entry: MockConfigEntry, model: str
+    hass: SmartHub, connection, config_entry: MockConfigEntry, model: str
 ) -> None:
     """Test load and unload."""
     with patch(MOCKED_MODEL, return_value=model) as mock:
@@ -40,11 +40,11 @@ async def test_setup(
 
 
 async def test_async_setup_entry_not_ready(
-    hass: HomeAssistant, connection, config_entry: MockConfigEntry
+    hass: SmartHub, connection, config_entry: MockConfigEntry
 ) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     with patch(
-        "homeassistant.components.dremel_3d_printer.Dremel3DPrinter",
+        "smarthub.components.dremel_3d_printer.Dremel3DPrinter",
         side_effect=ConnectTimeout,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -55,7 +55,7 @@ async def test_async_setup_entry_not_ready(
 
 
 async def test_update_failed(
-    hass: HomeAssistant, connection, config_entry: MockConfigEntry
+    hass: SmartHub, connection, config_entry: MockConfigEntry
 ) -> None:
     """Test coordinator throws UpdateFailed after failed update."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -63,7 +63,7 @@ async def test_update_failed(
     assert config_entry.state is ConfigEntryState.LOADED
 
     with patch(
-        "homeassistant.components.dremel_3d_printer.Dremel3DPrinter.refresh",
+        "smarthub.components.dremel_3d_printer.Dremel3DPrinter.refresh",
         side_effect=RuntimeError,
     ) as updater:
         next_update = dt_util.utcnow() + timedelta(seconds=10)
@@ -75,7 +75,7 @@ async def test_update_failed(
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     connection,
     config_entry: MockConfigEntry,

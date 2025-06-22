@@ -2,16 +2,16 @@
 
 from unittest.mock import AsyncMock, MagicMock
 
-from homeassistant.components.cpuspeed.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.cpuspeed.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cpuinfo_config_flow: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -37,7 +37,7 @@ async def test_full_user_flow(
 
 
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cpuinfo_config_flow: MagicMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -57,7 +57,7 @@ async def test_already_configured(
 
 
 async def test_not_compatible(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cpuinfo_config_flow: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:

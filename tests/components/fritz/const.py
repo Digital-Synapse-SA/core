@@ -1,7 +1,7 @@
 """Common stuff for Fritz!Tools tests."""
 
-from homeassistant.components.fritz.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.fritz.const import DOMAIN
+from smarthub.const import (
     CONF_DEVICES,
     CONF_HOST,
     CONF_PASSWORD,
@@ -9,7 +9,7 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
 )
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_UDN,
     SsdpServiceInfo,

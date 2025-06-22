@@ -2,10 +2,10 @@
 
 from pathlib import Path
 
-from homeassistant.components.filesize.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_FILE_PATH
-from homeassistant.core import HomeAssistant
+from smarthub.components.filesize.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_FILE_PATH
+from smarthub.core import SmartHub
 
 from . import async_create_file
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, tmp_path: Path
+    hass: SmartHub, mock_config_entry: MockConfigEntry, tmp_path: Path
 ) -> None:
     """Test the Filesize configuration entry loading/unloading."""
     testfile = str(tmp_path.joinpath("file.txt"))
@@ -36,7 +36,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_cannot_access_file(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, tmp_path: Path
+    hass: SmartHub, mock_config_entry: MockConfigEntry, tmp_path: Path
 ) -> None:
     """Test that an file not exist is caught."""
     mock_config_entry.add_to_hass(hass)
@@ -53,7 +53,7 @@ async def test_cannot_access_file(
 
 
 async def test_not_valid_path_to_file(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, tmp_path: Path
+    hass: SmartHub, mock_config_entry: MockConfigEntry, tmp_path: Path
 ) -> None:
     """Test that an invalid path is caught."""
     testfile = str(tmp_path.joinpath("file.txt"))

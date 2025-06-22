@@ -4,13 +4,13 @@ All containing methods are legacy helpers that should not be used by new
 components. Instead call the service directly.
 """
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN,
     AlarmControlPanelEntity,
     AlarmControlPanelEntityFeature,
     AlarmControlPanelState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_CODE,
     ATTR_ENTITY_ID,
     ENTITY_MATCH_ALL,
@@ -22,13 +22,13 @@ from homeassistant.const import (
     SERVICE_ALARM_DISARM,
     SERVICE_ALARM_TRIGGER,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockEntity
 
 
 async def async_alarm_disarm(
-    hass: HomeAssistant, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Send the alarm the command for disarm."""
     data = {}
@@ -41,7 +41,7 @@ async def async_alarm_disarm(
 
 
 async def async_alarm_arm_home(
-    hass: HomeAssistant, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Send the alarm the command for disarm."""
     data = {}
@@ -54,7 +54,7 @@ async def async_alarm_arm_home(
 
 
 async def async_alarm_arm_away(
-    hass: HomeAssistant, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Send the alarm the command for disarm."""
     data = {}
@@ -67,7 +67,7 @@ async def async_alarm_arm_away(
 
 
 async def async_alarm_arm_night(
-    hass: HomeAssistant, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Send the alarm the command for disarm."""
     data = {}
@@ -80,7 +80,7 @@ async def async_alarm_arm_night(
 
 
 async def async_alarm_arm_vacation(
-    hass: HomeAssistant, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Send the alarm the command for vacation mode."""
     data = {}
@@ -95,7 +95,7 @@ async def async_alarm_arm_vacation(
 
 
 async def async_alarm_trigger(
-    hass: HomeAssistant, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Send the alarm the command for disarm."""
     data = {}
@@ -108,7 +108,7 @@ async def async_alarm_trigger(
 
 
 async def async_alarm_arm_custom_bypass(
-    hass: HomeAssistant, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, code: str | None = None, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Send the alarm the command for disarm."""
     data = {}

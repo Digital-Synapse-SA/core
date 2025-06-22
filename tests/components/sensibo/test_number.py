@@ -9,16 +9,16 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import async_fire_time_changed, snapshot_platform
 
@@ -29,7 +29,7 @@ from tests.common import async_fire_time_changed, snapshot_platform
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -54,7 +54,7 @@ async def test_number(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_number_set_value(
-    hass: HomeAssistant, load_int: ConfigEntry, mock_client: MagicMock
+    hass: SmartHub, load_int: ConfigEntry, mock_client: MagicMock
 ) -> None:
     """Test the Sensibo number service."""
 
@@ -63,7 +63,7 @@ async def test_number_set_value(
 
     mock_client.async_set_calibration.return_value = {"status": "failure"}
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,

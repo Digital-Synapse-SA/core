@@ -8,13 +8,13 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.devolo_home_network.const import SHORT_UPDATE_INTERVAL
-from homeassistant.components.image import DOMAIN as PLATFORM
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.devolo_home_network.const import SHORT_UPDATE_INTERVAL
+from smarthub.components.image import DOMAIN as PLATFORM
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import configure_integration
 from .const import GUEST_WIFI_CHANGED
@@ -26,7 +26,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("mock_device")
 async def test_image_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test default setup of the image component."""
@@ -43,7 +43,7 @@ async def test_image_setup(
 
 @pytest.mark.freeze_time("2023-01-13 12:00:00+00:00")
 async def test_guest_wifi_qr(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
     entity_registry: er.EntityRegistry,
     hass_client: ClientSessionGenerator,

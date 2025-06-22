@@ -1,4 +1,4 @@
-"""The tests for the Home Assistant HTTP component."""
+"""The tests for the SmartHub HTTP component."""
 
 from http import HTTPStatus
 from ipaddress import ip_address
@@ -10,19 +10,19 @@ from aiohttp.web_exceptions import HTTPUnauthorized
 from aiohttp.web_middlewares import middleware
 import pytest
 
-from homeassistant.components import http
-from homeassistant.components.http.ban import (
+from smarthub.components import http
+from smarthub.components.http.ban import (
     IP_BANS_FILE,
     KEY_BAN_MANAGER,
     KEY_FAILED_LOGIN_ATTEMPTS,
     process_success_login,
     setup_bans,
 )
-from homeassistant.components.http.view import request_handler_factory
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.http import KEY_AUTHENTICATED, KEY_HASS
-from homeassistant.setup import async_setup_component
+from smarthub.components.http.view import request_handler_factory
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.http import KEY_AUTHENTICATED, KEY_HASS
+from smarthub.setup import async_setup_component
 
 from tests.common import async_get_persistent_notifications
 from tests.test_util import mock_real_ip
@@ -47,14 +47,14 @@ def hassio_env_fixture(supervisor_is_connected: AsyncMock):
 def gethostbyaddr_mock():
     """Fixture to mock out I/O on getting host by address."""
     with patch(
-        "homeassistant.components.http.ban.gethostbyaddr",
+        "smarthub.components.http.ban.gethostbyaddr",
         return_value=("example.com", ["0.0.0.0.in-addr.arpa"], ["0.0.0.0"]),
     ):
         yield
 
 
 async def test_access_from_banned_ip(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test accessing to server from banned IP. Both trusted and not."""
     app = web.Application()
@@ -63,7 +63,7 @@ async def test_access_from_banned_ip(
     set_real_ip = mock_real_ip(app)
 
     with patch(
-        "homeassistant.components.http.ban.load_yaml_config_file",
+        "smarthub.components.http.ban.load_yaml_config_file",
         return_value={
             banned_ip: {"banned_at": "2016-11-16T19:20:03"} for banned_ip in BANNED_IPS
         },
@@ -77,7 +77,7 @@ async def test_access_from_banned_ip(
 
 
 async def test_access_from_banned_ip_with_partially_broken_yaml_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -95,7 +95,7 @@ async def test_access_from_banned_ip_with_partially_broken_yaml_file(
     data["5.3.3.3"] = {"banned_at": "garbage"}
 
     with patch(
-        "homeassistant.components.http.ban.load_yaml_config_file",
+        "smarthub.components.http.ban.load_yaml_config_file",
         return_value=data,
     ):
         client = await aiohttp_client(app)
@@ -114,7 +114,7 @@ async def test_access_from_banned_ip_with_partially_broken_yaml_file(
 
 
 async def test_no_ip_bans_file(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test no ip bans file."""
     app = web.Application()
@@ -123,7 +123,7 @@ async def test_no_ip_bans_file(
     set_real_ip = mock_real_ip(app)
 
     with patch(
-        "homeassistant.components.http.ban.load_yaml_config_file",
+        "smarthub.components.http.ban.load_yaml_config_file",
         side_effect=FileNotFoundError,
     ):
         client = await aiohttp_client(app)
@@ -134,7 +134,7 @@ async def test_no_ip_bans_file(
 
 
 async def test_failure_loading_ip_bans_file(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test failure loading ip bans file."""
     app = web.Application()
@@ -143,8 +143,8 @@ async def test_failure_loading_ip_bans_file(
     set_real_ip = mock_real_ip(app)
 
     with patch(
-        "homeassistant.components.http.ban.load_yaml_config_file",
-        side_effect=HomeAssistantError,
+        "smarthub.components.http.ban.load_yaml_config_file",
+        side_effect=SmartHubError,
     ):
         client = await aiohttp_client(app)
 
@@ -154,7 +154,7 @@ async def test_failure_loading_ip_bans_file(
 
 
 async def test_ip_ban_manager_never_started(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -165,7 +165,7 @@ async def test_ip_ban_manager_never_started(
     set_real_ip = mock_real_ip(app)
 
     with patch(
-        "homeassistant.components.http.ban.load_yaml_config_file",
+        "smarthub.components.http.ban.load_yaml_config_file",
         side_effect=FileNotFoundError,
     ):
         client = await aiohttp_client(app)
@@ -194,7 +194,7 @@ async def test_access_from_supervisor_ip(
     remote_addr,
     bans,
     status,
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     hassio_env,
     resolution_info: AsyncMock,
@@ -212,7 +212,7 @@ async def test_access_from_supervisor_ip(
     mock_real_ip(app)(remote_addr)
 
     with patch(
-        "homeassistant.components.http.ban.load_yaml_config_file",
+        "smarthub.components.http.ban.load_yaml_config_file",
         return_value={},
     ):
         client = await aiohttp_client(app)
@@ -225,7 +225,7 @@ async def test_access_from_supervisor_ip(
 
     with (
         patch.dict(os.environ, {"SUPERVISOR": SUPERVISOR_IP}),
-        patch("homeassistant.components.http.ban.open", m_open, create=True),
+        patch("smarthub.components.http.ban.open", m_open, create=True),
     ):
         resp = await client.get("/")
         assert resp.status == HTTPStatus.UNAUTHORIZED
@@ -238,9 +238,9 @@ async def test_access_from_supervisor_ip(
         assert len(manager.ip_bans_lookup) == bans
 
 
-async def test_ban_middleware_not_loaded_by_config(hass: HomeAssistant) -> None:
+async def test_ban_middleware_not_loaded_by_config(hass: SmartHub) -> None:
     """Test accessing to server from banned IP when feature is off."""
-    with patch("homeassistant.components.http.setup_bans") as mock_setup:
+    with patch("smarthub.components.http.setup_bans") as mock_setup:
         await async_setup_component(
             hass, "http", {"http": {http.CONF_IP_BAN_ENABLED: False}}
         )
@@ -248,16 +248,16 @@ async def test_ban_middleware_not_loaded_by_config(hass: HomeAssistant) -> None:
     assert len(mock_setup.mock_calls) == 0
 
 
-async def test_ban_middleware_loaded_by_default(hass: HomeAssistant) -> None:
+async def test_ban_middleware_loaded_by_default(hass: SmartHub) -> None:
     """Test accessing to server from banned IP when feature is off."""
-    with patch("homeassistant.components.http.setup_bans") as mock_setup:
+    with patch("smarthub.components.http.setup_bans") as mock_setup:
         await async_setup_component(hass, "http", {"http": {}})
 
     assert len(mock_setup.mock_calls) == 1
 
 
 async def test_ip_bans_file_creation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -274,7 +274,7 @@ async def test_ip_bans_file_creation(
     mock_real_ip(app)("200.201.202.204")
 
     with patch(
-        "homeassistant.components.http.ban.load_yaml_config_file",
+        "smarthub.components.http.ban.load_yaml_config_file",
         return_value={
             banned_ip: {"banned_at": "2016-11-16T19:20:03"} for banned_ip in BANNED_IPS
         },
@@ -284,7 +284,7 @@ async def test_ip_bans_file_creation(
     manager = app[KEY_BAN_MANAGER]
     m_open = mock_open()
 
-    with patch("homeassistant.components.http.ban.open", m_open, create=True):
+    with patch("smarthub.components.http.ban.open", m_open, create=True):
         resp = await client.get("/example")
         assert resp.status == HTTPStatus.UNAUTHORIZED
         assert len(manager.ip_bans_lookup) == len(BANNED_IPS)
@@ -315,7 +315,7 @@ async def test_ip_bans_file_creation(
 
 
 async def test_failed_login_attempts_counter(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Testing if failed login attempts counter increased."""
     app = web.Application()
@@ -387,7 +387,7 @@ async def test_failed_login_attempts_counter(
 
 
 async def test_single_ban_file_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that only one item is added to ban file."""
     app = web.Application()
@@ -404,7 +404,7 @@ async def test_single_ban_file_entry(
     manager = app[KEY_BAN_MANAGER]
     m_open = mock_open()
 
-    with patch("homeassistant.components.http.ban.open", m_open, create=True):
+    with patch("smarthub.components.http.ban.open", m_open, create=True):
         remote_ip = ip_address("200.201.202.204")
         await manager.async_add_ban(remote_ip)
         await manager.async_add_ban(remote_ip)

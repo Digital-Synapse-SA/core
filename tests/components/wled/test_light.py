@@ -6,7 +6,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from wled import Device as WLEDDevice, WLEDConnectionError, WLEDError
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
@@ -21,12 +21,12 @@ from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     ColorMode,
 )
-from homeassistant.components.wled.const import (
+from smarthub.components.wled.const import (
     CONF_KEEP_MAIN_LIGHT,
     DOMAIN,
     SCAN_INTERVAL,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_ICON,
     SERVICE_TURN_OFF,
@@ -35,9 +35,9 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import (
     MockConfigEntry,
@@ -49,7 +49,7 @@ pytestmark = pytest.mark.usefixtures("init_integration")
 
 
 async def test_rgb_light_state(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the creation and values of the WLED lights."""
     # First segment of the strip
@@ -84,7 +84,7 @@ async def test_rgb_light_state(
 
 
 async def test_segment_change_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_wled: MagicMock,
 ) -> None:
     """Test the change of state of the WLED segments."""
@@ -125,7 +125,7 @@ async def test_segment_change_state(
 
 
 async def test_main_change_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_wled: MagicMock,
 ) -> None:
     """Test the change of state of the WLED main light control."""
@@ -190,7 +190,7 @@ async def test_main_change_state(
 
 @pytest.mark.parametrize("device_fixture", ["rgb_single_segment"])
 async def test_dynamically_handle_segments(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_wled: MagicMock,
 ) -> None:
@@ -232,7 +232,7 @@ async def test_dynamically_handle_segments(
 
 @pytest.mark.parametrize("device_fixture", ["rgb_single_segment"])
 async def test_single_segment_behavior(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_wled: MagicMock,
 ) -> None:
@@ -294,13 +294,13 @@ async def test_single_segment_behavior(
 
 
 async def test_light_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_wled: MagicMock,
 ) -> None:
     """Test error handling of the WLED lights."""
     mock_wled.segment.side_effect = WLEDError
 
-    with pytest.raises(HomeAssistantError, match="Invalid response from WLED API"):
+    with pytest.raises(SmartHubError, match="Invalid response from WLED API"):
         await hass.services.async_call(
             LIGHT_DOMAIN,
             SERVICE_TURN_OFF,
@@ -315,13 +315,13 @@ async def test_light_error(
 
 
 async def test_light_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_wled: MagicMock,
 ) -> None:
     """Test error handling of the WLED switches."""
     mock_wled.segment.side_effect = WLEDConnectionError
 
-    with pytest.raises(HomeAssistantError, match="Error communicating with WLED API"):
+    with pytest.raises(SmartHubError, match="Error communicating with WLED API"):
         await hass.services.async_call(
             LIGHT_DOMAIN,
             SERVICE_TURN_OFF,
@@ -336,7 +336,7 @@ async def test_light_connection_error(
 
 
 @pytest.mark.parametrize("device_fixture", ["rgbw"])
-async def test_rgbw_light(hass: HomeAssistant, mock_wled: MagicMock) -> None:
+async def test_rgbw_light(hass: SmartHub, mock_wled: MagicMock) -> None:
     """Test RGBW support for WLED."""
     assert (state := hass.states.get("light.wled_rgbw_light"))
     assert state.state == STATE_ON
@@ -363,7 +363,7 @@ async def test_rgbw_light(hass: HomeAssistant, mock_wled: MagicMock) -> None:
 
 @pytest.mark.parametrize("device_fixture", ["rgb_single_segment"])
 async def test_single_segment_with_keep_main_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_wled: MagicMock,
 ) -> None:
@@ -380,7 +380,7 @@ async def test_single_segment_with_keep_main_light(
 
 
 @pytest.mark.parametrize("device_fixture", ["cct"])
-async def test_cct_light(hass: HomeAssistant, mock_wled: MagicMock) -> None:
+async def test_cct_light(hass: SmartHub, mock_wled: MagicMock) -> None:
     """Test CCT support for WLED."""
     assert (state := hass.states.get("light.wled_cct_light"))
     assert state.state == STATE_ON

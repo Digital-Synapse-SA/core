@@ -7,12 +7,12 @@ from unittest.mock import AsyncMock
 import pytest
 from pyvlx import PyVLXException
 
-from homeassistant.components.velux import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER, ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_MAC, CONF_NAME, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.velux import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER, ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_MAC, CONF_NAME, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -24,7 +24,7 @@ DHCP_DISCOVERY = DhcpServiceInfo(
 
 
 async def test_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_velux_client: AsyncMock,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_user_flow(
     ],
 )
 async def test_user_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_velux_client: AsyncMock,
     exception: Exception,
     error: str,
@@ -111,7 +111,7 @@ async def test_user_errors(
 
 
 async def test_user_flow_duplicate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_user_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -139,7 +139,7 @@ async def test_user_flow_duplicate_entry(
 
 
 async def test_dhcp_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_velux_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -180,7 +180,7 @@ async def test_dhcp_discovery(
     ],
 )
 async def test_dhcp_discovery_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_velux_client: AsyncMock,
     exception: Exception,
     error: str,
@@ -225,7 +225,7 @@ async def test_dhcp_discovery_errors(
 
 
 async def test_dhcp_discovery_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_velux_client: AsyncMock,
     mock_discovered_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
@@ -243,7 +243,7 @@ async def test_dhcp_discovery_already_configured(
 
 
 async def test_dhcp_discover_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_velux_client: AsyncMock,
     mock_user_config_entry: MockConfigEntry,
@@ -267,7 +267,7 @@ async def test_dhcp_discover_unique_id(
 
 
 async def test_dhcp_discovery_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_velux_client: AsyncMock,
     mock_user_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,

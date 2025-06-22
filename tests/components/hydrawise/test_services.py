@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock
 
 from pydrawise.schema import Zone
 
-from homeassistant.components.hydrawise.const import (
+from smarthub.components.hydrawise.const import (
     ATTR_DURATION,
     ATTR_UNTIL,
     DOMAIN,
@@ -13,14 +13,14 @@ from homeassistant.components.hydrawise.const import (
     SERVICE_START_WATERING,
     SERVICE_SUSPEND,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_start_watering(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_pydrawise: AsyncMock,
     zones: list[Zone],
@@ -41,7 +41,7 @@ async def test_start_watering(
 
 
 async def test_start_watering_no_duration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_pydrawise: AsyncMock,
     zones: list[Zone],
@@ -57,7 +57,7 @@ async def test_start_watering_no_duration(
 
 
 async def test_resume(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_pydrawise: AsyncMock,
     zones: list[Zone],
@@ -73,7 +73,7 @@ async def test_resume(
 
 
 async def test_suspend(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_pydrawise: AsyncMock,
     zones: list[Zone],

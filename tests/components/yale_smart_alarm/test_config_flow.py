@@ -7,15 +7,15 @@ from unittest.mock import Mock, patch
 import pytest
 from yalesmartalarmclient.exceptions import AuthenticationError, UnknownError
 
-from homeassistant import config_entries
-from homeassistant.components.yale_smart_alarm.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.yale_smart_alarm.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -26,10 +26,10 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+            "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
         ),
         patch(
-            "homeassistant.components.yale_smart_alarm.async_setup_entry",
+            "smarthub.components.yale_smart_alarm.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -63,7 +63,7 @@ async def test_form(hass: HomeAssistant) -> None:
     ],
 )
 async def test_form_invalid_auth(
-    hass: HomeAssistant, sideeffect: Exception, p_error: str
+    hass: SmartHub, sideeffect: Exception, p_error: str
 ) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
@@ -71,7 +71,7 @@ async def test_form_invalid_auth(
     )
 
     with patch(
-        "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+        "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
         side_effect=sideeffect,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -89,10 +89,10 @@ async def test_form_invalid_auth(
 
     with (
         patch(
-            "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+            "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
         ),
         patch(
-            "homeassistant.components.yale_smart_alarm.async_setup_entry",
+            "smarthub.components.yale_smart_alarm.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -115,7 +115,7 @@ async def test_form_invalid_auth(
     }
 
 
-async def test_reauth_flow(hass: HomeAssistant) -> None:
+async def test_reauth_flow(hass: SmartHub) -> None:
     """Test a reauthentication flow."""
     entry = MockConfigEntry(
         title="test-username",
@@ -138,10 +138,10 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+            "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
         ) as mock_yale,
         patch(
-            "homeassistant.components.yale_smart_alarm.async_setup_entry",
+            "smarthub.components.yale_smart_alarm.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -175,7 +175,7 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
     ],
 )
 async def test_reauth_flow_error(
-    hass: HomeAssistant, sideeffect: Exception, p_error: str
+    hass: SmartHub, sideeffect: Exception, p_error: str
 ) -> None:
     """Test a reauthentication flow."""
     entry = MockConfigEntry(
@@ -195,7 +195,7 @@ async def test_reauth_flow_error(
     result = await entry.start_reauth_flow(hass)
 
     with patch(
-        "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+        "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
         side_effect=sideeffect,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -212,11 +212,11 @@ async def test_reauth_flow_error(
 
     with (
         patch(
-            "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+            "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
             return_value="",
         ),
         patch(
-            "homeassistant.components.yale_smart_alarm.async_setup_entry",
+            "smarthub.components.yale_smart_alarm.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -237,7 +237,7 @@ async def test_reauth_flow_error(
     }
 
 
-async def test_reconfigure(hass: HomeAssistant) -> None:
+async def test_reconfigure(hass: SmartHub) -> None:
     """Test reconfigure config flow."""
     entry = MockConfigEntry(
         title="test-username",
@@ -257,11 +257,11 @@ async def test_reconfigure(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+            "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
             return_value="",
         ),
         patch(
-            "homeassistant.components.yale_smart_alarm.async_setup_entry",
+            "smarthub.components.yale_smart_alarm.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -284,7 +284,7 @@ async def test_reconfigure(hass: HomeAssistant) -> None:
     }
 
 
-async def test_reconfigure_username_exist(hass: HomeAssistant) -> None:
+async def test_reconfigure_username_exist(hass: SmartHub) -> None:
     """Test reconfigure config flow abort other username already exist."""
     entry = MockConfigEntry(
         title="test-username",
@@ -317,11 +317,11 @@ async def test_reconfigure_username_exist(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+            "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
             return_value="",
         ),
         patch(
-            "homeassistant.components.yale_smart_alarm.async_setup_entry",
+            "smarthub.components.yale_smart_alarm.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -340,11 +340,11 @@ async def test_reconfigure_username_exist(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+            "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
             return_value="",
         ),
         patch(
-            "homeassistant.components.yale_smart_alarm.async_setup_entry",
+            "smarthub.components.yale_smart_alarm.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -377,7 +377,7 @@ async def test_reconfigure_username_exist(hass: HomeAssistant) -> None:
     ],
 )
 async def test_reconfigure_flow_error(
-    hass: HomeAssistant, sideeffect: Exception, p_error: str
+    hass: SmartHub, sideeffect: Exception, p_error: str
 ) -> None:
     """Test a reauthentication flow."""
     entry = MockConfigEntry(
@@ -397,7 +397,7 @@ async def test_reconfigure_flow_error(
     result = await entry.start_reconfigure_flow(hass)
 
     with patch(
-        "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+        "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
         side_effect=sideeffect,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -416,11 +416,11 @@ async def test_reconfigure_flow_error(
 
     with (
         patch(
-            "homeassistant.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
+            "smarthub.components.yale_smart_alarm.config_flow.YaleSmartAlarmClient",
             return_value="",
         ),
         patch(
-            "homeassistant.components.yale_smart_alarm.async_setup_entry",
+            "smarthub.components.yale_smart_alarm.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -444,7 +444,7 @@ async def test_reconfigure_flow_error(
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_config_entry: tuple[MockConfigEntry, Mock],
 ) -> None:
     """Test options config flow."""
@@ -456,7 +456,7 @@ async def test_options_flow(
     assert result["step_id"] == "init"
 
     with patch(
-        "homeassistant.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
+        "smarthub.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
         return_value=load_config_entry[1],
     ):
         result = await hass.config_entries.options.async_configure(

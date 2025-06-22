@@ -9,26 +9,26 @@ from zigpy.profiles import zha
 from zigpy.zcl.clusters import general
 import zigpy.zcl.foundation as zcl_f
 
-from homeassistant.components.button import (
+from smarthub.components.button import (
     DOMAIN as BUTTON_DOMAIN,
     SERVICE_PRESS,
     ButtonDeviceClass,
 )
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     STATE_UNKNOWN,
     EntityCategory,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import find_entity_id
 
@@ -37,14 +37,14 @@ from .common import find_entity_id
 def button_platform_only():
     """Only set up the button and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (Platform.BINARY_SENSOR, Platform.BUTTON, Platform.SENSOR),
     ):
         yield
 
 
 @pytest.fixture
-async def setup_zha_integration(hass: HomeAssistant, setup_zha):
+async def setup_zha_integration(hass: SmartHub, setup_zha):
     """Set up ZHA component."""
 
     # if we call this in the test itself the test hangs forever
@@ -53,7 +53,7 @@ async def setup_zha_integration(hass: HomeAssistant, setup_zha):
 
 @freeze_time("2021-11-04 17:37:00", tz_offset=-1)
 async def test_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     setup_zha_integration,  # pylint: disable=unused-argument
     zigpy_device_mock,

@@ -1,15 +1,15 @@
 """Tests for the Lutron Caseta integration."""
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import MockBridge, async_setup_integration
 
 
 async def test_button_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a button unique id."""
     await async_setup_integration(hass, MockBridge)
@@ -26,7 +26,7 @@ async def test_button_unique_id(
     )
 
 
-async def test_button_press(hass: HomeAssistant) -> None:
+async def test_button_press(hass: SmartHub) -> None:
     """Test a button press."""
     await async_setup_integration(hass, MockBridge)
 

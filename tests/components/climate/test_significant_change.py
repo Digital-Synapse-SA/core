@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_HUMIDITY,
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
@@ -15,18 +15,18 @@ from homeassistant.components.climate import (
     ATTR_TARGET_TEMP_LOW,
     ATTR_TEMPERATURE,
 )
-from homeassistant.components.climate.significant_change import (
+from smarthub.components.climate.significant_change import (
     async_check_significant_change,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util.unit_system import (
+from smarthub.core import SmartHub
+from smarthub.util.unit_system import (
     METRIC_SYSTEM as METRIC,
     US_CUSTOMARY_SYSTEM as IMPERIAL,
     UnitSystem,
 )
 
 
-async def test_significant_state_change(hass: HomeAssistant) -> None:
+async def test_significant_state_change(hass: SmartHub) -> None:
     """Detect Climate significant state_changes."""
     attrs = {}
     assert not async_check_significant_change(hass, "on", attrs, "on", attrs)
@@ -126,7 +126,7 @@ async def test_significant_state_change(hass: HomeAssistant) -> None:
     ],
 )
 async def test_significant_atributes_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unit_system: UnitSystem,
     old_attrs: dict,
     new_attrs: dict,

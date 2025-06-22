@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.threshold.const import (
+from smarthub.components.threshold.const import (
     ATTR_HYSTERESIS,
     ATTR_LOWER,
     ATTR_POSITION,
@@ -21,7 +21,7 @@ from homeassistant.components.threshold.const import (
     TYPE_RANGE,
     TYPE_UPPER,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITY_ID,
@@ -34,9 +34,9 @@ from homeassistant.const import (
     Platform,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -54,7 +54,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_sensor_upper(
-    hass: HomeAssistant,
+    hass: SmartHub,
     vals: list[float | str | None],
     expected_position: str,
     expected_state: str,
@@ -100,7 +100,7 @@ async def test_sensor_upper(
     ],
 )
 async def test_sensor_lower(
-    hass: HomeAssistant,
+    hass: SmartHub,
     vals: list[float | str | None],
     expected_position: str,
     expected_state: str,
@@ -161,7 +161,7 @@ async def test_sensor_lower(
     ],
 )
 async def test_sensor_upper_hysteresis(
-    hass: HomeAssistant,
+    hass: SmartHub,
     vals: list[float | str | None],
     expected_position: str,
     expected_state: str,
@@ -223,7 +223,7 @@ async def test_sensor_upper_hysteresis(
     ],
 )
 async def test_sensor_lower_hysteresis(
-    hass: HomeAssistant,
+    hass: SmartHub,
     vals: list[float | str | None],
     expected_position: str,
     expected_state: str,
@@ -285,7 +285,7 @@ async def test_sensor_lower_hysteresis(
     ],
 )
 async def test_sensor_in_range_no_hysteresis(
-    hass: HomeAssistant,
+    hass: SmartHub,
     vals: list[float | str | None],
     expected_position: str,
     expected_state: str,
@@ -377,7 +377,7 @@ async def test_sensor_in_range_no_hysteresis(
     ],
 )
 async def test_sensor_in_range_with_hysteresis(
-    hass: HomeAssistant,
+    hass: SmartHub,
     vals: list[float | str | None],
     expected_position: str,
     expected_state: str,
@@ -416,7 +416,7 @@ async def test_sensor_in_range_with_hysteresis(
 
 
 async def test_sensor_in_range_unknown_state(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if source is within the range."""
     config = {
@@ -468,7 +468,7 @@ async def test_sensor_in_range_unknown_state(
     assert "State is not numerical" not in caplog.text
 
 
-async def test_sensor_lower_zero_threshold(hass: HomeAssistant) -> None:
+async def test_sensor_lower_zero_threshold(hass: SmartHub) -> None:
     """Test if a lower threshold of zero is set."""
     config = {
         Platform.BINARY_SENSOR: {
@@ -496,7 +496,7 @@ async def test_sensor_lower_zero_threshold(hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_sensor_upper_zero_threshold(hass: HomeAssistant) -> None:
+async def test_sensor_upper_zero_threshold(hass: SmartHub) -> None:
     """Test if an upper threshold of zero is set."""
     config = {
         Platform.BINARY_SENSOR: {
@@ -525,7 +525,7 @@ async def test_sensor_upper_zero_threshold(hass: HomeAssistant) -> None:
 
 
 async def test_sensor_no_lower_upper(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if no lower or upper has been provided."""
     config = {
@@ -542,7 +542,7 @@ async def test_sensor_no_lower_upper(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock
 from nyt_games import NYTGamesAuthenticationError, NYTGamesError
 import pytest
 
-from homeassistant.components.nyt_games.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.nyt_games.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nyt_games_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -38,7 +38,7 @@ async def test_full_flow(
 
 
 async def test_stripping_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nyt_games_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -67,7 +67,7 @@ async def test_stripping_token(
     ],
 )
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nyt_games_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     exception: Exception,
@@ -101,7 +101,7 @@ async def test_flow_errors(
 
 
 async def test_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nyt_games_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

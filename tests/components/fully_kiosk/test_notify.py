@@ -5,14 +5,14 @@ from unittest.mock import MagicMock
 from fullykiosk import FullyKioskError
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry
 
 
 async def test_notify_text_to_speech(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -31,14 +31,14 @@ async def test_notify_text_to_speech(
 
 
 async def test_notify_text_to_speech_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
     """Test notify text to speech entity raises."""
     mock_fully_kiosk.sendCommand.side_effect = FullyKioskError("error", "status")
     message = "one, two, testing, testing"
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "notify",
             "send_message",
@@ -52,7 +52,7 @@ async def test_notify_text_to_speech_raises(
 
 
 async def test_notify_overlay_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:

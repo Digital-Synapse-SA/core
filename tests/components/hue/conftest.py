@@ -12,14 +12,14 @@ import aiohue.v2 as aiohue_v2
 from aiohue.v2.controllers.events import EventType
 import pytest
 
-from homeassistant.components import hue
-from homeassistant.components.hue.v1 import sensor_base as hue_sensor_base
-from homeassistant.components.hue.v2.device import async_setup_devices
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.json import JsonArrayType
+from smarthub.components import hue
+from smarthub.components.hue.v1 import sensor_base as hue_sensor_base
+from smarthub.components.hue.v2.device import async_setup_devices
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.json import JsonArrayType
 
 from .const import FAKE_BRIDGE, FAKE_BRIDGE_DEVICE
 
@@ -29,11 +29,11 @@ from tests.common import MockConfigEntry, load_json_array_fixture
 @pytest.fixture(autouse=True)
 def no_request_delay() -> Generator[None]:
     """Make the request refresh delay 0 for instant tests."""
-    with patch("homeassistant.components.hue.const.REQUEST_REFRESH_DELAY", 0):
+    with patch("smarthub.components.hue.const.REQUEST_REFRESH_DELAY", 0):
         yield
 
 
-def create_mock_bridge(hass: HomeAssistant, api_version: int = 1) -> Mock:
+def create_mock_bridge(hass: SmartHub, api_version: int = 1) -> Mock:
     """Create a mocked HueBridge instance."""
     bridge = Mock(
         hass=hass,
@@ -195,13 +195,13 @@ def create_mock_api_v2() -> Mock:
 
 
 @pytest.fixture
-def mock_bridge_v1(hass: HomeAssistant) -> Mock:
+def mock_bridge_v1(hass: SmartHub) -> Mock:
     """Mock a Hue bridge with V1 api."""
     return create_mock_bridge(hass, api_version=1)
 
 
 @pytest.fixture
-def mock_bridge_v2(hass: HomeAssistant) -> Mock:
+def mock_bridge_v2(hass: SmartHub) -> Mock:
     """Mock a Hue bridge with V2 api."""
     return create_mock_bridge(hass, api_version=2)
 
@@ -229,7 +229,7 @@ def create_config_entry(
     )
 
 
-async def setup_component(hass: HomeAssistant) -> None:
+async def setup_component(hass: SmartHub) -> None:
     """Mock setup Hue component."""
     with patch.object(hue, "async_setup_entry", return_value=True):
         assert (
@@ -243,7 +243,7 @@ async def setup_component(hass: HomeAssistant) -> None:
 
 
 async def setup_bridge(
-    hass: HomeAssistant, mock_bridge: Mock, config_entry: MockConfigEntry
+    hass: SmartHub, mock_bridge: Mock, config_entry: MockConfigEntry
 ) -> None:
     """Load the Hue integration with the provided bridge."""
     mock_bridge.config_entry = config_entry
@@ -251,14 +251,14 @@ async def setup_bridge(
         hue.migration, "is_v2_bridge", return_value=mock_bridge.api_version == 2
     ):
         config_entry.add_to_hass(hass)
-        with patch("homeassistant.components.hue.HueBridge", return_value=mock_bridge):
+        with patch("smarthub.components.hue.HueBridge", return_value=mock_bridge):
             await hass.config_entries.async_setup(config_entry.entry_id)
 
     assert config_entry.state == ConfigEntryState.LOADED
 
 
 async def setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge: Mock,
     platforms: list[Platform] | tuple[Platform] | Platform,
     hostname: str | None = None,

@@ -7,9 +7,9 @@ from openai import APIConnectionError, AuthenticationError, BadRequestError
 from openai.types.responses import Response, ResponseOutputMessage, ResponseOutputText
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.openai_conversation.config_flow import RECOMMENDED_OPTIONS
-from homeassistant.components.openai_conversation.const import (
+from smarthub import config_entries
+from smarthub.components.openai_conversation.config_flow import RECOMMENDED_OPTIONS
+from smarthub.components.openai_conversation.const import (
     CONF_CHAT_MODEL,
     CONF_MAX_TOKENS,
     CONF_PROMPT,
@@ -29,14 +29,14 @@ from homeassistant.components.openai_conversation.const import (
     RECOMMENDED_MAX_TOKENS,
     RECOMMENDED_TOP_P,
 )
-from homeassistant.const import CONF_LLM_HASS_API
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_LLM_HASS_API
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     # Pretend we already set up a config entry.
     hass.config.components.add("openai_conversation")
@@ -53,10 +53,10 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.openai_conversation.config_flow.openai.resources.models.AsyncModels.list",
+            "smarthub.components.openai_conversation.config_flow.openai.resources.models.AsyncModels.list",
         ),
         patch(
-            "homeassistant.components.openai_conversation.async_setup_entry",
+            "smarthub.components.openai_conversation.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -77,7 +77,7 @@ async def test_form(hass: HomeAssistant) -> None:
 
 
 async def test_options_recommended(
-    hass: HomeAssistant, mock_config_entry, mock_init_component
+    hass: SmartHub, mock_config_entry, mock_init_component
 ) -> None:
     """Test the options flow with recommended settings."""
     options_flow = await hass.config_entries.options.async_init(
@@ -96,7 +96,7 @@ async def test_options_recommended(
 
 
 async def test_options_unsupported_model(
-    hass: HomeAssistant, mock_config_entry, mock_init_component
+    hass: SmartHub, mock_config_entry, mock_init_component
 ) -> None:
     """Test the options form giving error about models not supported."""
     options_flow = await hass.config_entries.options.async_init(
@@ -152,14 +152,14 @@ async def test_options_unsupported_model(
         ),
     ],
 )
-async def test_form_invalid_auth(hass: HomeAssistant, side_effect, error) -> None:
+async def test_form_invalid_auth(hass: SmartHub, side_effect, error) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.openai_conversation.config_flow.openai.resources.models.AsyncModels.list",
+        "smarthub.components.openai_conversation.config_flow.openai.resources.models.AsyncModels.list",
         side_effect=side_effect,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -495,7 +495,7 @@ async def test_form_invalid_auth(hass: HomeAssistant, side_effect, error) -> Non
     ],
 )
 async def test_options_switching(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry,
     mock_init_component,
     current_options,
@@ -534,7 +534,7 @@ async def test_options_switching(
 
 
 async def test_options_web_search_user_location(
-    hass: HomeAssistant, mock_config_entry, mock_init_component
+    hass: SmartHub, mock_config_entry, mock_init_component
 ) -> None:
     """Test fetching user location."""
     options = await hass.config_entries.options.async_init(mock_config_entry.entry_id)

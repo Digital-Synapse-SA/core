@@ -4,15 +4,15 @@ from unittest.mock import AsyncMock, patch
 
 from advantage_air import ApiError
 
-from homeassistant import config_entries
-from homeassistant.components.advantage_air.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.advantage_air.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import TEST_SYSTEM_DATA, USER_INPUT
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test that form shows up."""
 
     result1 = await hass.config_entries.flow.async_init(
@@ -24,11 +24,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.advantage_air.config_flow.advantage_air.async_get",
+            "smarthub.components.advantage_air.config_flow.advantage_air.async_get",
             new=AsyncMock(return_value=TEST_SYSTEM_DATA),
         ) as mock_get,
         patch(
-            "homeassistant.components.advantage_air.async_setup_entry",
+            "smarthub.components.advantage_air.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -49,7 +49,7 @@ async def test_form(hass: HomeAssistant) -> None:
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
     with patch(
-        "homeassistant.components.advantage_air.config_flow.advantage_air.async_get",
+        "smarthub.components.advantage_air.config_flow.advantage_air.async_get",
         new=AsyncMock(return_value=TEST_SYSTEM_DATA),
     ) as mock_get:
         result4 = await hass.config_entries.flow.async_configure(
@@ -59,14 +59,14 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result4["type"] is FlowResultType.ABORT
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
 
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
     with patch(
-        "homeassistant.components.advantage_air.config_flow.advantage_air.async_get",
+        "smarthub.components.advantage_air.config_flow.advantage_air.async_get",
         new=AsyncMock(side_effect=ApiError),
     ) as mock_get:
         result2 = await hass.config_entries.flow.async_configure(

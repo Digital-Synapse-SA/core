@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, call
 import pytest
 from rtmapi import RtmRequestFailedException
 
-from homeassistant.components.remember_the_milk import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.remember_the_milk import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import CONFIG, PROFILE
 
@@ -17,7 +17,7 @@ from .const import CONFIG, PROFILE
     ("valid_token", "entity_state"), [(True, "ok"), (False, "API token invalid")]
 )
 async def test_entity_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     storage: MagicMock,
     valid_token: bool,
@@ -127,7 +127,7 @@ async def test_entity_state(
     ],
 )
 async def test_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     storage: MagicMock,
     get_rtm_id_return_value: Any,
@@ -250,7 +250,7 @@ async def test_services(
     ],
 )
 async def test_services_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     storage: MagicMock,
     caplog: pytest.LogCaptureFixture,

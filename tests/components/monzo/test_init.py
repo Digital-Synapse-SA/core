@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock
 from freezegun.api import FrozenDateTimeFactory
 from monzopy import AuthorisationExpiredError
 
-from homeassistant.components.monzo.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH
-from homeassistant.core import HomeAssistant
+from smarthub.components.monzo.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_api_can_trigger_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     polling_config_entry: MockConfigEntry,
     monzo: AsyncMock,
     freezer: FrozenDateTimeFactory,

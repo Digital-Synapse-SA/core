@@ -11,16 +11,16 @@ from goslideapi.goslideapi import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TOGGLE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_platform
 
@@ -28,7 +28,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_slide_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -49,7 +49,7 @@ async def test_all_entities(
     ],
 )
 async def test_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     mock_slide_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -78,7 +78,7 @@ async def test_services(
     ],
 )
 async def test_service_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     service: str,
     mock_slide_api: AsyncMock,
@@ -90,7 +90,7 @@ async def test_service_exception(
     mock_slide_api.slide_set_touchgo.side_effect = exception
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=f"Error while sending the request setting Touch&Go to {service[5:]} to the device",
     ):
         await hass.services.async_call(

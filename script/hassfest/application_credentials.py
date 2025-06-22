@@ -25,7 +25,7 @@ def generate_and_validate(integrations: dict[str, Integration], config: Config) 
 def validate(integrations: dict[str, Integration], config: Config) -> None:
     """Validate application_credentials data."""
     application_credentials_path = (
-        config.root / "homeassistant/generated/application_credentials.py"
+        config.root / "smarthub/generated/application_credentials.py"
     )
     config.cache["application_credentials"] = content = generate_and_validate(
         integrations, config
@@ -45,7 +45,7 @@ def validate(integrations: dict[str, Integration], config: Config) -> None:
 def generate(integrations: dict[str, Integration], config: Config) -> None:
     """Generate application_credentials data."""
     application_credentials_path = (
-        config.root / "homeassistant/generated/application_credentials.py"
+        config.root / "smarthub/generated/application_credentials.py"
     )
     application_credentials_path.write_text(
         f"{config.cache['application_credentials']}", encoding="utf-8"

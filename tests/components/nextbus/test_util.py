@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.nextbus.util import listify, maybe_first
+from smarthub.components.nextbus.util import listify, maybe_first
 
 
 @pytest.mark.parametrize(

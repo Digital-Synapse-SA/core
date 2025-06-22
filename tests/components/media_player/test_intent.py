@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     DOMAIN,
     SERVICE_MEDIA_NEXT_TRACK,
     SERVICE_MEDIA_PAUSE,
@@ -17,16 +17,16 @@ from homeassistant.components.media_player import (
     SearchMedia,
     intent as media_player_intent,
 )
-from homeassistant.components.media_player.const import MediaPlayerEntityFeature
-from homeassistant.const import (
+from smarthub.components.media_player.const import MediaPlayerEntityFeature
+from smarthub.const import (
     ATTR_SUPPORTED_FEATURES,
     STATE_IDLE,
     STATE_PAUSED,
     STATE_PLAYING,
 )
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     area_registry as ar,
     entity_registry as er,
     floor_registry as fr,
@@ -36,7 +36,7 @@ from homeassistant.helpers import (
 from tests.common import async_mock_service
 
 
-async def test_pause_media_player_intent(hass: HomeAssistant) -> None:
+async def test_pause_media_player_intent(hass: SmartHub) -> None:
     """Test HassMediaPause intent for media players."""
     await media_player_intent.async_setup_intents(hass)
 
@@ -89,7 +89,7 @@ async def test_pause_media_player_intent(hass: HomeAssistant) -> None:
         )
 
 
-async def test_unpause_media_player_intent(hass: HomeAssistant) -> None:
+async def test_unpause_media_player_intent(hass: SmartHub) -> None:
     """Test HassMediaUnpause intent for media players."""
     await media_player_intent.async_setup_intents(hass)
 
@@ -112,7 +112,7 @@ async def test_unpause_media_player_intent(hass: HomeAssistant) -> None:
     assert call.data == {"entity_id": entity_id}
 
 
-async def test_next_media_player_intent(hass: HomeAssistant) -> None:
+async def test_next_media_player_intent(hass: SmartHub) -> None:
     """Test HassMediaNext intent for media players."""
     await media_player_intent.async_setup_intents(hass)
 
@@ -163,7 +163,7 @@ async def test_next_media_player_intent(hass: HomeAssistant) -> None:
         )
 
 
-async def test_previous_media_player_intent(hass: HomeAssistant) -> None:
+async def test_previous_media_player_intent(hass: SmartHub) -> None:
     """Test HassMediaPrevious intent for media players."""
     await media_player_intent.async_setup_intents(hass)
 
@@ -214,7 +214,7 @@ async def test_previous_media_player_intent(hass: HomeAssistant) -> None:
         )
 
 
-async def test_volume_media_player_intent(hass: HomeAssistant) -> None:
+async def test_volume_media_player_intent(hass: SmartHub) -> None:
     """Test HassSetVolume intent for media players."""
     await media_player_intent.async_setup_intents(hass)
 
@@ -256,7 +256,7 @@ async def test_volume_media_player_intent(hass: HomeAssistant) -> None:
 
 
 async def test_multiple_media_players(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
     floor_registry: fr.FloorRegistry,
@@ -545,7 +545,7 @@ async def test_multiple_media_players(
 
 
 async def test_manual_pause_unpause(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -644,7 +644,7 @@ async def test_manual_pause_unpause(
     assert calls[0].data == {"entity_id": device_2.entity_id}
 
 
-async def test_search_and_play_media_player_intent(hass: HomeAssistant) -> None:
+async def test_search_and_play_media_player_intent(hass: SmartHub) -> None:
     """Test HassMediaSearchAndPlay intent for media players."""
     await media_player_intent.async_setup_intents(hass)
 
@@ -767,7 +767,7 @@ async def test_search_and_play_media_player_intent(hass: HomeAssistant) -> None:
         hass,
         DOMAIN,
         SERVICE_PLAY_MEDIA,
-        raise_exception=HomeAssistantError("Play failed"),
+        raise_exception=SmartHubError("Play failed"),
     )
     with pytest.raises(intent.MatchFailedError):
         await intent.async_handle(
@@ -783,7 +783,7 @@ async def test_search_and_play_media_player_intent(hass: HomeAssistant) -> None:
         hass,
         DOMAIN,
         SERVICE_SEARCH_MEDIA,
-        raise_exception=HomeAssistantError("Search failed"),
+        raise_exception=SmartHubError("Search failed"),
     )
     with pytest.raises(intent.IntentHandleError, match="Error searching media"):
         await intent.async_handle(

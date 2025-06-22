@@ -7,7 +7,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from rokuecp import RokuConnectionError, RokuConnectionTimeoutError, RokuError
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_APP_ID,
     ATTR_APP_NAME,
     ATTR_INPUT_SOURCE,
@@ -27,7 +27,7 @@ from homeassistant.components.media_player import (
     MediaPlayerEntityFeature,
     MediaType,
 )
-from homeassistant.components.roku.const import (
+from smarthub.components.roku.const import (
     ATTR_CONTENT_ID,
     ATTR_FORMAT,
     ATTR_KEYWORD,
@@ -36,9 +36,9 @@ from homeassistant.components.roku.const import (
     DOMAIN,
     SERVICE_SEARCH,
 )
-from homeassistant.components.stream import FORMAT_CONTENT_TYPE, HLS_PROVIDER
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.const import (
+from smarthub.components.stream import FORMAT_CONTENT_TYPE, HLS_PROVIDER
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_NAME,
     SERVICE_MEDIA_NEXT_TRACK,
@@ -58,11 +58,11 @@ from homeassistant.const import (
     STATE_STANDBY,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.typing import WebSocketGenerator
@@ -72,7 +72,7 @@ TV_ENTITY_ID = f"{MP_DOMAIN}.58_onn_roku_tv"
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
@@ -105,7 +105,7 @@ async def test_setup(
 
 @pytest.mark.parametrize("mock_device", ["roku/roku3-idle.json"], indirect=True)
 async def test_idle_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -117,7 +117,7 @@ async def test_idle_setup(
 
 @pytest.mark.parametrize("mock_device", ["roku/rokutv-7820x.json"], indirect=True)
 async def test_tv_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
@@ -154,7 +154,7 @@ async def test_tv_setup(
     [RokuConnectionTimeoutError, RokuConnectionError, RokuError],
 )
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_roku: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -184,7 +184,7 @@ async def test_availability(
 
 
 async def test_supported_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -209,7 +209,7 @@ async def test_supported_features(
 
 @pytest.mark.parametrize("mock_device", ["roku/rokutv-7820x.json"], indirect=True)
 async def test_tv_supported_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -233,7 +233,7 @@ async def test_tv_supported_features(
 
 
 async def test_attributes(
-    hass: HomeAssistant, init_integration: MockConfigEntry
+    hass: SmartHub, init_integration: MockConfigEntry
 ) -> None:
     """Test attributes."""
     state = hass.states.get(MAIN_ENTITY_ID)
@@ -248,7 +248,7 @@ async def test_attributes(
 
 @pytest.mark.parametrize("mock_device", ["roku/roku3-app.json"], indirect=True)
 async def test_attributes_app(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -267,7 +267,7 @@ async def test_attributes_app(
     "mock_device", ["roku/roku3-media-playing.json"], indirect=True
 )
 async def test_attributes_app_media_playing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -286,7 +286,7 @@ async def test_attributes_app_media_playing(
 
 @pytest.mark.parametrize("mock_device", ["roku/roku3-media-paused.json"], indirect=True)
 async def test_attributes_app_media_paused(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -305,7 +305,7 @@ async def test_attributes_app_media_paused(
 
 @pytest.mark.parametrize("mock_device", ["roku/roku3-screensaver.json"], indirect=True)
 async def test_attributes_screensaver(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -322,7 +322,7 @@ async def test_attributes_screensaver(
 
 @pytest.mark.parametrize("mock_device", ["roku/rokutv-7820x.json"], indirect=True)
 async def test_tv_attributes(
-    hass: HomeAssistant, init_integration: MockConfigEntry
+    hass: SmartHub, init_integration: MockConfigEntry
 ) -> None:
     """Test attributes for Roku TV."""
     state = hass.states.get(TV_ENTITY_ID)
@@ -338,7 +338,7 @@ async def test_tv_attributes(
 
 
 async def test_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -477,7 +477,7 @@ async def test_services(
 
 
 async def test_services_play_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -528,7 +528,7 @@ async def test_services_play_media(
     ],
 )
 async def test_services_play_media_audio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
     content_type: str,
@@ -554,7 +554,7 @@ async def test_services_play_media_audio(
             "t": "a",
             "songName": resolved_name,
             "songFormat": resolved_format,
-            "artistName": "Home Assistant",
+            "artistName": "SmartHub",
         },
     )
 
@@ -574,7 +574,7 @@ async def test_services_play_media_audio(
     ],
 )
 async def test_services_play_media_video(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
     content_type: str,
@@ -605,7 +605,7 @@ async def test_services_play_media_video(
 
 
 async def test_services_camera_play_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -634,7 +634,7 @@ async def test_services_camera_play_stream(
 
 
 async def test_services_play_media_local_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -678,7 +678,7 @@ async def test_services_play_media_local_source(
 
 @pytest.mark.parametrize("mock_device", ["roku/rokutv-7820x.json"], indirect=True)
 async def test_tv_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
@@ -726,7 +726,7 @@ async def test_tv_services(
 
 
 async def test_media_browse(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration,
     mock_roku,
     hass_ws_client: WebSocketGenerator,
@@ -786,7 +786,7 @@ async def test_media_browse(
 
 
 async def test_media_browse_internal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration,
     mock_roku,
     hass_ws_client: WebSocketGenerator,
@@ -802,7 +802,7 @@ async def test_media_browse_internal(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.helpers.network._get_request_host", return_value="example.local"
+        "smarthub.helpers.network._get_request_host", return_value="example.local"
     ):
         await client.send_json(
             {
@@ -838,7 +838,7 @@ async def test_media_browse_internal(
 
 
 async def test_media_browse_local_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration,
     mock_roku,
     hass_ws_client: WebSocketGenerator,
@@ -960,7 +960,7 @@ async def test_media_browse_local_source(
 
 @pytest.mark.parametrize("mock_device", ["roku/rokutv-7820x.json"], indirect=True)
 async def test_tv_media_browse(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration,
     mock_roku,
     hass_ws_client: WebSocketGenerator,
@@ -1069,7 +1069,7 @@ async def test_tv_media_browse(
 
 
 async def test_integration_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:

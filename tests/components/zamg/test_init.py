@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.weather import DOMAIN as WEATHER_DOMAIN
-from homeassistant.components.zamg.const import CONF_STATION_ID, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.weather import DOMAIN as WEATHER_DOMAIN
+from smarthub.components.zamg.const import CONF_STATION_ID, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import FIXTURE_CONFIG_ENTRY
 from .conftest import (
@@ -62,7 +62,7 @@ from tests.common import MockConfigEntry
 )
 @pytest.mark.usefixtures("mock_zamg_coordinator")
 async def test_migrate_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entitydata: dict,
     old_unique_id: str,
@@ -108,7 +108,7 @@ async def test_migrate_unique_ids(
 )
 @pytest.mark.usefixtures("mock_zamg_coordinator")
 async def test_dont_migrate_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entitydata: dict,
     old_unique_id: str,
@@ -167,7 +167,7 @@ async def test_dont_migrate_unique_ids(
 )
 @pytest.mark.usefixtures("mock_zamg_coordinator")
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entitydata: dict,
     unique_id: str,

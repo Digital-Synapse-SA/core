@@ -5,14 +5,14 @@ from unittest.mock import AsyncMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -33,7 +33,7 @@ MOCK_SWITCH_DEVICE = {
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -49,7 +49,7 @@ async def test_entities(
 
 
 async def test_switch_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -82,7 +82,7 @@ async def test_switch_actions(
 
 
 async def test_switch_callbacks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -118,7 +118,7 @@ async def test_switch_callbacks(
 
 
 async def test_no_switch_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,

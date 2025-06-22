@@ -11,12 +11,12 @@ from aiovodafone.exceptions import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.vodafone_station.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.vodafone_station.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -32,7 +32,7 @@ async def test_all_entities(
 ) -> None:
     """Test all entities."""
     with patch(
-        "homeassistant.components.vodafone_station.PLATFORMS", [Platform.BUTTON]
+        "smarthub.components.vodafone_station.PLATFORMS", [Platform.BUTTON]
     ):
         await setup_integration(hass, mock_config_entry)
 
@@ -40,7 +40,7 @@ async def test_all_entities(
 
 
 async def test_pressing_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -67,7 +67,7 @@ async def test_pressing_button(
     ],
 )
 async def test_button_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,
     side_effect: Exception,
@@ -80,7 +80,7 @@ async def test_button_fails(
 
     mock_vodafone_station_router.restart_router.side_effect = side_effect
 
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             BUTTON_DOMAIN,
             SERVICE_PRESS,

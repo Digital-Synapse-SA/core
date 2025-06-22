@@ -4,33 +4,33 @@ from __future__ import annotations
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.components.automation import (
+from smarthub.components import automation
+from smarthub.components.automation import (
     ATTR_CUR,
     ATTR_LAST_TRIGGERED,
     ATTR_MAX,
     ATTR_MODE,
     CONF_ID,
 )
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_FRIENDLY_NAME
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.const import ATTR_ENTITY_ID, ATTR_FRIENDLY_NAME
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_mock_service
 from tests.components.recorder.common import async_wait_recording_done
 
 
 @pytest.fixture
-def calls(hass: HomeAssistant) -> list[ServiceCall]:
+def calls(hass: SmartHub) -> list[ServiceCall]:
     """Track calls to a mock service."""
     return async_mock_service(hass, "test", "automation")
 
 
 async def test_exclude_attributes(
-    recorder_mock: Recorder, hass: HomeAssistant, calls: list[ServiceCall]
+    recorder_mock: Recorder, hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test automation registered attributes to be excluded."""
     now = dt_util.utcnow()

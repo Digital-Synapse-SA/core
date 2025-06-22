@@ -2,16 +2,16 @@
 
 import pytest
 
-from homeassistant.components import switch
-from homeassistant.const import (
+from smarthub.components import switch
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import discovery
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import discovery
+from smarthub.setup import async_setup_component
 
 from .common import NUMATO_CFG, mockup_raise
 
@@ -22,7 +22,7 @@ MOCKUP_ENTITY_IDS = {
 
 
 async def test_failing_setups_no_entities(
-    hass: HomeAssistant, numato_fixture, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, numato_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """When port setup fails, no entity shall be created."""
     monkeypatch.setattr(numato_fixture.NumatoDeviceMock, "setup", mockup_raise)
@@ -32,8 +32,8 @@ async def test_failing_setups_no_entities(
         assert entity_id not in hass.states.async_entity_ids()
 
 
-async def test_regular_hass_operations(hass: HomeAssistant, numato_fixture) -> None:
-    """Test regular operations from within Home Assistant."""
+async def test_regular_hass_operations(hass: SmartHub, numato_fixture) -> None:
+    """Test regular operations from within SmartHub."""
     assert await async_setup_component(hass, "numato", NUMATO_CFG)
     await hass.async_block_till_done()  # wait until services are registered
     await hass.services.async_call(
@@ -71,9 +71,9 @@ async def test_regular_hass_operations(hass: HomeAssistant, numato_fixture) -> N
 
 
 async def test_failing_hass_operations(
-    hass: HomeAssistant, numato_fixture, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, numato_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Test failing operations called from within Home Assistant.
+    """Test failing operations called from within SmartHub.
 
     Switches remain in their initial 'off' state when the device can't
     be written to.
@@ -117,7 +117,7 @@ async def test_failing_hass_operations(
 
 
 async def test_switch_setup_without_discovery_info(
-    hass: HomeAssistant, config, numato_fixture
+    hass: SmartHub, config, numato_fixture
 ) -> None:
     """Test handling of empty discovery_info."""
     numato_fixture.discover()

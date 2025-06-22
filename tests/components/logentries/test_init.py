@@ -4,29 +4,29 @@ from unittest.mock import ANY, call, patch
 
 import pytest
 
-from homeassistant.components import logentries
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import logentries
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
-async def test_setup_config_full(hass: HomeAssistant) -> None:
+async def test_setup_config_full(hass: SmartHub) -> None:
     """Test setup with all data."""
     config = {"logentries": {"token": "secret"}}
     assert await async_setup_component(hass, logentries.DOMAIN, config)
 
-    with patch("homeassistant.components.logentries.requests.post") as mock_post:
+    with patch("smarthub.components.logentries.requests.post") as mock_post:
         hass.states.async_set("fake.entity", STATE_ON)
         await hass.async_block_till_done()
         assert len(mock_post.mock_calls) == 1
 
 
-async def test_setup_config_defaults(hass: HomeAssistant) -> None:
+async def test_setup_config_defaults(hass: SmartHub) -> None:
     """Test setup with defaults."""
     config = {"logentries": {"token": "token"}}
     assert await async_setup_component(hass, logentries.DOMAIN, config)
 
-    with patch("homeassistant.components.logentries.requests.post") as mock_post:
+    with patch("smarthub.components.logentries.requests.post") as mock_post:
         hass.states.async_set("fake.entity", STATE_ON)
         await hass.async_block_till_done()
         assert len(mock_post.mock_calls) == 1
@@ -46,7 +46,7 @@ def mock_requests():
         yield mock_requests
 
 
-async def test_event_listener(hass: HomeAssistant, mock_dump, mock_requests) -> None:
+async def test_event_listener(hass: SmartHub, mock_dump, mock_requests) -> None:
     """Test event listener."""
     mock_dump.side_effect = lambda x: x
     mock_post = mock_requests.post

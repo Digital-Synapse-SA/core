@@ -7,11 +7,11 @@ from unittest.mock import MagicMock, create_autospec, patch
 import pytest
 import pywemo
 
-from homeassistant.components.wemo import CONF_DISCOVERY, CONF_STATIC
-from homeassistant.components.wemo.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.wemo import CONF_DISCOVERY, CONF_STATIC
+from smarthub.components.wemo.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 MOCK_HOST = "127.0.0.1"
 MOCK_PORT = 50000
@@ -121,7 +121,7 @@ def wemo_entity_suffix_fixture() -> str:
 
 
 async def async_create_wemo_entity(
-    hass: HomeAssistant, pywemo_device: pywemo.WeMoDevice, wemo_entity_suffix: str
+    hass: SmartHub, pywemo_device: pywemo.WeMoDevice, wemo_entity_suffix: str
 ) -> er.RegistryEntry | None:
     """Create a hass entity for a wemo device."""
     assert await async_setup_component(
@@ -146,7 +146,7 @@ async def async_create_wemo_entity(
 
 @pytest.fixture(name="wemo_entity")
 async def async_wemo_entity_fixture(
-    hass: HomeAssistant, pywemo_device: pywemo.WeMoDevice, wemo_entity_suffix: str
+    hass: SmartHub, pywemo_device: pywemo.WeMoDevice, wemo_entity_suffix: str
 ) -> er.RegistryEntry | None:
     """Fixture for a Wemo entity in hass."""
     return await async_create_wemo_entity(hass, pywemo_device, wemo_entity_suffix)
@@ -154,7 +154,7 @@ async def async_wemo_entity_fixture(
 
 @pytest.fixture(name="wemo_dli_entity")
 async def async_wemo_dli_entity_fixture(
-    hass: HomeAssistant, pywemo_dli_device: pywemo.WeMoDevice, wemo_entity_suffix: str
+    hass: SmartHub, pywemo_dli_device: pywemo.WeMoDevice, wemo_entity_suffix: str
 ) -> er.RegistryEntry | None:
     """Fixture for a Wemo entity in hass."""
     return await async_create_wemo_entity(hass, pywemo_dli_device, wemo_entity_suffix)

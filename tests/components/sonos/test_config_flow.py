@@ -5,19 +5,19 @@ from __future__ import annotations
 from ipaddress import ip_address
 from unittest.mock import MagicMock, patch
 
-from homeassistant import config_entries
-from homeassistant.components.media_player import DOMAIN as MP_DOMAIN
-from homeassistant.components.sonos.const import DATA_SONOS_DISCOVERY_MANAGER, DOMAIN
-from homeassistant.const import CONF_HOSTS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_UDN, SsdpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components.media_player import DOMAIN as MP_DOMAIN
+from smarthub.components.sonos.const import DATA_SONOS_DISCOVERY_MANAGER, DOMAIN
+from smarthub.const import CONF_HOSTS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import ATTR_UPNP_UDN, SsdpServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.setup import async_setup_component
 
 
 async def test_user_form(
-    hass: HomeAssistant, zeroconf_payload: ZeroconfServiceInfo
+    hass: SmartHub, zeroconf_payload: ZeroconfServiceInfo
 ) -> None:
     """Test we get the user initiated form."""
 
@@ -46,11 +46,11 @@ async def test_user_form(
     assert result["errors"] is None
     with (
         patch(
-            "homeassistant.components.sonos.async_setup",
+            "smarthub.components.sonos.async_setup",
             return_value=True,
         ) as mock_setup,
         patch(
-            "homeassistant.components.sonos.async_setup_entry",
+            "smarthub.components.sonos.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -67,11 +67,11 @@ async def test_user_form(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_form_already_created(hass: HomeAssistant) -> None:
+async def test_user_form_already_created(hass: SmartHub) -> None:
     """Ensure we abort a flow if the entry is already created from config."""
     config = {DOMAIN: {MP_DOMAIN: {CONF_HOSTS: "192.168.4.2"}}}
     with patch(
-        "homeassistant.components.sonos.async_setup_entry",
+        "smarthub.components.sonos.async_setup_entry",
         return_value=True,
     ):
         await async_setup_component(hass, DOMAIN, config)
@@ -85,7 +85,7 @@ async def test_user_form_already_created(hass: HomeAssistant) -> None:
 
 
 async def test_zeroconf_form(
-    hass: HomeAssistant, zeroconf_payload: ZeroconfServiceInfo
+    hass: SmartHub, zeroconf_payload: ZeroconfServiceInfo
 ) -> None:
     """Test we pass Zeroconf discoveries to the manager."""
 
@@ -100,11 +100,11 @@ async def test_zeroconf_form(
 
     with (
         patch(
-            "homeassistant.components.sonos.async_setup",
+            "smarthub.components.sonos.async_setup",
             return_value=True,
         ) as mock_setup,
         patch(
-            "homeassistant.components.sonos.async_setup_entry",
+            "smarthub.components.sonos.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -124,7 +124,7 @@ async def test_zeroconf_form(
 
 
 async def test_zeroconf_form_not_ipv4(
-    hass: HomeAssistant, zeroconf_payload: ZeroconfServiceInfo
+    hass: SmartHub, zeroconf_payload: ZeroconfServiceInfo
 ) -> None:
     """Test we pass Zeroconf discoveries to the manager."""
     mock_manager = hass.data[DATA_SONOS_DISCOVERY_MANAGER] = MagicMock()
@@ -139,7 +139,7 @@ async def test_zeroconf_form_not_ipv4(
     assert mock_manager.call_count == 0
 
 
-async def test_ssdp_discovery(hass: HomeAssistant, soco) -> None:
+async def test_ssdp_discovery(hass: SmartHub, soco) -> None:
     """Test that SSDP discoveries create a config flow."""
 
     await hass.config_entries.flow.async_init(
@@ -161,11 +161,11 @@ async def test_ssdp_discovery(hass: HomeAssistant, soco) -> None:
 
     with (
         patch(
-            "homeassistant.components.sonos.async_setup",
+            "smarthub.components.sonos.async_setup",
             return_value=True,
         ) as mock_setup,
         patch(
-            "homeassistant.components.sonos.async_setup_entry",
+            "smarthub.components.sonos.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -183,7 +183,7 @@ async def test_ssdp_discovery(hass: HomeAssistant, soco) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_zeroconf_sonos_v1(hass: HomeAssistant) -> None:
+async def test_zeroconf_sonos_v1(hass: SmartHub) -> None:
     """Test we pass sonos devices to the discovery manager with v1 firmware devices."""
 
     mock_manager = hass.data[DATA_SONOS_DISCOVERY_MANAGER] = MagicMock()
@@ -214,11 +214,11 @@ async def test_zeroconf_sonos_v1(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.sonos.async_setup",
+            "smarthub.components.sonos.async_setup",
             return_value=True,
         ) as mock_setup,
         patch(
-            "homeassistant.components.sonos.async_setup_entry",
+            "smarthub.components.sonos.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -238,7 +238,7 @@ async def test_zeroconf_sonos_v1(hass: HomeAssistant) -> None:
 
 
 async def test_zeroconf_form_not_sonos(
-    hass: HomeAssistant, zeroconf_payload: ZeroconfServiceInfo
+    hass: SmartHub, zeroconf_payload: ZeroconfServiceInfo
 ) -> None:
     """Test we abort on non-sonos devices."""
     mock_manager = hass.data[DATA_SONOS_DISCOVERY_MANAGER] = MagicMock()

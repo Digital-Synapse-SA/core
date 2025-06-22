@@ -1,4 +1,4 @@
-"""The tests for the Home Assistant API component."""
+"""The tests for the SmartHub API component."""
 
 import asyncio
 from http import HTTPStatus
@@ -11,11 +11,11 @@ from aiohttp.test_utils import TestClient
 import pytest
 import voluptuous as vol
 
-from homeassistant import const, core as ha
-from homeassistant.auth.models import Credentials
-from homeassistant.bootstrap import DATA_LOGGING
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub import const, core as ha
+from smarthub.auth.models import Credentials
+from smarthub.bootstrap import DATA_LOGGING
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import CLIENT_ID, MockUser, async_mock_service
 from tests.typing import ClientSessionGenerator
@@ -23,15 +23,15 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.fixture
 async def mock_api_client(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> TestClient:
-    """Start the Home Assistant HTTP component and return admin API client."""
+    """Start the SmartHub HTTP component and return admin API client."""
     await async_setup_component(hass, "api", {})
     return await hass_client()
 
 
 async def test_api_list_state_entities(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if the debug interface allows us to list state entities."""
     hass.states.async_set("test.entity", "hello")
@@ -44,7 +44,7 @@ async def test_api_list_state_entities(
     assert remote_data == local_data
 
 
-async def test_api_get_state(hass: HomeAssistant, mock_api_client: TestClient) -> None:
+async def test_api_get_state(hass: SmartHub, mock_api_client: TestClient) -> None:
     """Test if the debug interface allows us to get a state."""
     hass.states.async_set("hello.world", "nice", {"attr": 1})
     resp = await mock_api_client.get("/api/states/hello.world")
@@ -61,7 +61,7 @@ async def test_api_get_state(hass: HomeAssistant, mock_api_client: TestClient) -
 
 
 async def test_api_get_non_existing_state(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if the debug interface allows us to get a state."""
     resp = await mock_api_client.get("/api/states/does_not_exist")
@@ -69,7 +69,7 @@ async def test_api_get_non_existing_state(
 
 
 async def test_api_state_change(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if we can change the state of an entity that exists."""
     hass.states.async_set("test.test", "not_to_be_set")
@@ -82,7 +82,7 @@ async def test_api_state_change(
 
 
 async def test_api_state_change_of_non_existing_entity(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if changing a state of a non existing entity is possible."""
     new_state = "debug_state_change"
@@ -97,7 +97,7 @@ async def test_api_state_change_of_non_existing_entity(
 
 
 async def test_api_state_change_with_bad_entity_id(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if API sends appropriate error if we omit state."""
     resp = await mock_api_client.post(
@@ -108,7 +108,7 @@ async def test_api_state_change_with_bad_entity_id(
 
 
 async def test_api_state_change_with_bad_state(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if API sends appropriate error if we omit state."""
     resp = await mock_api_client.post(
@@ -119,7 +119,7 @@ async def test_api_state_change_with_bad_state(
 
 
 async def test_api_state_change_with_bad_data(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if API sends appropriate error if we omit state."""
     resp = await mock_api_client.post(
@@ -130,7 +130,7 @@ async def test_api_state_change_with_bad_data(
 
 
 async def test_api_state_change_to_zero_value(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if changing a state to a zero value is possible."""
     resp = await mock_api_client.post(
@@ -147,7 +147,7 @@ async def test_api_state_change_to_zero_value(
 
 
 async def test_api_state_change_push(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if we can push a change the state of an entity."""
     hass.states.async_set("test.test", "not_to_be_set")
@@ -173,7 +173,7 @@ async def test_api_state_change_push(
 
 
 async def test_api_fire_event_with_no_data(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if the API allows us to fire an event."""
     test_value = []
@@ -192,7 +192,7 @@ async def test_api_fire_event_with_no_data(
 
 
 async def test_api_fire_event_with_data(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if the API allows us to fire an event."""
     test_value = []
@@ -216,7 +216,7 @@ async def test_api_fire_event_with_data(
 
 
 async def test_api_fire_event_with_invalid_json(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if the API allows us to fire an event."""
     test_value = []
@@ -248,7 +248,7 @@ async def test_api_fire_event_with_invalid_json(
     assert len(test_value) == 0
 
 
-async def test_api_get_config(hass: HomeAssistant, mock_api_client: TestClient) -> None:
+async def test_api_get_config(hass: SmartHub, mock_api_client: TestClient) -> None:
     """Test the return of the configuration."""
     resp = await mock_api_client.get(const.URL_API_CONFIG)
     result = await resp.json()
@@ -269,7 +269,7 @@ async def test_api_get_config(hass: HomeAssistant, mock_api_client: TestClient) 
 
 
 async def test_api_get_components(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test the return of the components."""
     resp = await mock_api_client.get(const.URL_API_COMPONENTS)
@@ -278,7 +278,7 @@ async def test_api_get_components(
 
 
 async def test_api_get_event_listeners(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if we can get the list of events being listened for."""
     resp = await mock_api_client.get(const.URL_API_EVENTS)
@@ -293,7 +293,7 @@ async def test_api_get_event_listeners(
 
 
 async def test_api_get_services(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if we can get a dict describing current services."""
     resp = await mock_api_client.get(const.URL_API_SERVICES)
@@ -307,7 +307,7 @@ async def test_api_get_services(
 
 
 async def test_api_call_service_no_data(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if the API allows us to call a service."""
     test_value = []
@@ -325,7 +325,7 @@ async def test_api_call_service_no_data(
 
 
 async def test_api_call_service_with_data(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if the API allows us to call a service."""
 
@@ -385,7 +385,7 @@ RESP_UNSUPPORTED = {
     ],
 )
 async def test_api_call_service_returns_response_requested_response(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_api_client: TestClient,
     supports_response: ha.SupportsResponse,
     requested_response: bool,
@@ -417,7 +417,7 @@ async def test_api_call_service_returns_response_requested_response(
 
 
 async def test_api_call_service_client_closed(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test that services keep running if client is closed."""
     test_value = []
@@ -456,7 +456,7 @@ async def test_api_call_service_client_closed(
     assert test_value[0] == 1
 
 
-async def test_api_template(hass: HomeAssistant, mock_api_client: TestClient) -> None:
+async def test_api_template(hass: SmartHub, mock_api_client: TestClient) -> None:
     """Test the template API."""
     hass.states.async_set("sensor.temperature", 10)
 
@@ -491,7 +491,7 @@ async def test_api_template(hass: HomeAssistant, mock_api_client: TestClient) ->
 
 
 async def test_api_template_cached(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test the template API uses the cache."""
     hass.states.async_set("sensor.temperature", 30)
@@ -517,7 +517,7 @@ async def test_api_template_cached(
 
 
 async def test_api_template_error(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test the template API."""
     hass.states.async_set("sensor.temperature", 10)
@@ -529,7 +529,7 @@ async def test_api_template_error(
     assert resp.status == HTTPStatus.BAD_REQUEST
 
 
-async def test_stream(hass: HomeAssistant, mock_api_client: TestClient) -> None:
+async def test_stream(hass: SmartHub, mock_api_client: TestClient) -> None:
     """Test the stream."""
     listen_count = _listen_count(hass)
 
@@ -545,7 +545,7 @@ async def test_stream(hass: HomeAssistant, mock_api_client: TestClient) -> None:
 
 
 async def test_stream_with_restricted(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test the stream with restrictions."""
     listen_count = _listen_count(hass)
@@ -586,13 +586,13 @@ async def _stream_next_event(stream):
     return json.loads(conv)
 
 
-def _listen_count(hass: HomeAssistant) -> int:
+def _listen_count(hass: SmartHub) -> int:
     """Return number of event listeners."""
     return sum(hass.bus.async_listeners().values())
 
 
 async def test_api_error_log(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     hass_access_token: str,
     hass_admin_user: MockUser,
@@ -629,7 +629,7 @@ async def test_api_error_log(
 
 
 async def test_api_fire_event_context(
-    hass: HomeAssistant, mock_api_client: TestClient, hass_access_token: str
+    hass: SmartHub, mock_api_client: TestClient, hass_access_token: str
 ) -> None:
     """Test if the API sets right context if we fire an event."""
     test_value = []
@@ -654,7 +654,7 @@ async def test_api_fire_event_context(
 
 
 async def test_api_call_service_context(
-    hass: HomeAssistant, mock_api_client: TestClient, hass_access_token: str
+    hass: SmartHub, mock_api_client: TestClient, hass_access_token: str
 ) -> None:
     """Test if the API sets right context if we call a service."""
     calls = async_mock_service(hass, "test_domain", "test_service")
@@ -672,7 +672,7 @@ async def test_api_call_service_context(
 
 
 async def test_api_set_state_context(
-    hass: HomeAssistant, mock_api_client: TestClient, hass_access_token: str
+    hass: SmartHub, mock_api_client: TestClient, hass_access_token: str
 ) -> None:
     """Test if the API sets right context if we set state."""
     await mock_api_client.post(
@@ -688,7 +688,7 @@ async def test_api_set_state_context(
 
 
 async def test_event_stream_requires_admin(
-    hass: HomeAssistant, mock_api_client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, mock_api_client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test user needs to be admin to access event stream."""
     hass_admin_user.groups = []
@@ -697,7 +697,7 @@ async def test_event_stream_requires_admin(
 
 
 async def test_states(
-    hass: HomeAssistant, mock_api_client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, mock_api_client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test fetching all states as admin."""
     hass.states.async_set("test.entity", "hello")
@@ -711,7 +711,7 @@ async def test_states(
 
 
 async def test_states_view_filters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_read_only_user: MockUser,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -721,7 +721,7 @@ async def test_states_view_filters(
     await async_setup_component(hass, "api", {})
     read_only_user_credential = Credentials(
         id="mock-read-only-credential-id",
-        auth_provider_type="homeassistant",
+        auth_provider_type="smarthub",
         auth_provider_id=None,
         data={"username": "readonly"},
         is_new=False,
@@ -743,7 +743,7 @@ async def test_states_view_filters(
 
 
 async def test_get_entity_state_read_perm(
-    hass: HomeAssistant, mock_api_client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, mock_api_client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test getting a state requires read permission."""
     hass_admin_user.mock_policy({})
@@ -754,7 +754,7 @@ async def test_get_entity_state_read_perm(
 
 
 async def test_post_entity_state_admin(
-    hass: HomeAssistant, mock_api_client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, mock_api_client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test updating state requires admin."""
     hass_admin_user.groups = []
@@ -763,7 +763,7 @@ async def test_post_entity_state_admin(
 
 
 async def test_delete_entity_state_admin(
-    hass: HomeAssistant, mock_api_client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, mock_api_client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test deleting entity requires admin."""
     hass_admin_user.groups = []
@@ -772,7 +772,7 @@ async def test_delete_entity_state_admin(
 
 
 async def test_post_event_admin(
-    hass: HomeAssistant, mock_api_client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, mock_api_client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test sending event requires admin."""
     hass_admin_user.groups = []
@@ -781,7 +781,7 @@ async def test_post_event_admin(
 
 
 async def test_rendering_template_admin(
-    hass: HomeAssistant, mock_api_client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, mock_api_client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test rendering a template requires admin."""
     hass_admin_user.groups = []
@@ -790,7 +790,7 @@ async def test_rendering_template_admin(
 
 
 async def test_api_call_service_not_found(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if the API fails 400 if unknown service."""
     resp = await mock_api_client.post("/api/services/test_domain/test_service")
@@ -798,7 +798,7 @@ async def test_api_call_service_not_found(
 
 
 async def test_api_call_service_bad_data(
-    hass: HomeAssistant, mock_api_client: TestClient
+    hass: SmartHub, mock_api_client: TestClient
 ) -> None:
     """Test if the API fails 400 if unknown service."""
     test_value = []
@@ -818,7 +818,7 @@ async def test_api_call_service_bad_data(
     assert resp.status == HTTPStatus.BAD_REQUEST
 
 
-async def test_api_status(hass: HomeAssistant, mock_api_client: TestClient) -> None:
+async def test_api_status(hass: SmartHub, mock_api_client: TestClient) -> None:
     """Test getting the api status."""
     resp = await mock_api_client.get("/api/")
     assert resp.status == HTTPStatus.OK
@@ -826,7 +826,7 @@ async def test_api_status(hass: HomeAssistant, mock_api_client: TestClient) -> N
     assert json["message"] == "API running."
 
 
-async def test_api_core_state(hass: HomeAssistant, mock_api_client: TestClient) -> None:
+async def test_api_core_state(hass: SmartHub, mock_api_client: TestClient) -> None:
     """Test getting core status."""
     resp = await mock_api_client.get("/api/core/state")
     assert resp.status == HTTPStatus.OK
@@ -847,7 +847,7 @@ async def test_api_core_state(hass: HomeAssistant, mock_api_client: TestClient) 
     ],
 )
 async def test_api_core_state_recorder_migrating(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_api_client: TestClient,
     migration_in_progress: bool,
     migration_is_live: bool,
@@ -855,11 +855,11 @@ async def test_api_core_state_recorder_migrating(
     """Test getting core status."""
     with (
         patch(
-            "homeassistant.helpers.recorder.async_migration_in_progress",
+            "smarthub.helpers.recorder.async_migration_in_progress",
             return_value=migration_in_progress,
         ),
         patch(
-            "homeassistant.helpers.recorder.async_migration_is_live",
+            "smarthub.helpers.recorder.async_migration_is_live",
             return_value=migration_is_live,
         ),
     ):

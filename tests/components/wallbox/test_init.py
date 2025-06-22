@@ -2,12 +2,12 @@
 
 import requests_mock
 
-from homeassistant.components.wallbox.const import (
+from smarthub.components.wallbox.const import (
     CHARGER_MAX_CHARGING_CURRENT_KEY,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import (
     authorisation_response,
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_wallbox_setup_unload_entry(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test Wallbox Unload."""
 
@@ -34,7 +34,7 @@ async def test_wallbox_setup_unload_entry(
 
 
 async def test_wallbox_unload_entry_connection_error(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test Wallbox Unload Connection Error."""
 
@@ -46,7 +46,7 @@ async def test_wallbox_unload_entry_connection_error(
 
 
 async def test_wallbox_refresh_failed_connection_error_auth(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test Wallbox setup with connection error."""
 
@@ -74,7 +74,7 @@ async def test_wallbox_refresh_failed_connection_error_auth(
 
 
 async def test_wallbox_refresh_failed_invalid_auth(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test Wallbox setup with authentication error."""
 
@@ -102,7 +102,7 @@ async def test_wallbox_refresh_failed_invalid_auth(
 
 
 async def test_wallbox_refresh_failed_connection_error(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test Wallbox setup with connection error."""
 
@@ -130,7 +130,7 @@ async def test_wallbox_refresh_failed_connection_error(
 
 
 async def test_wallbox_refresh_failed_read_only(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test Wallbox setup for read-only user."""
 
@@ -142,7 +142,7 @@ async def test_wallbox_refresh_failed_read_only(
 
 
 async def test_wallbox_setup_load_entry_no_eco_mode(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test Wallbox Unload."""
 

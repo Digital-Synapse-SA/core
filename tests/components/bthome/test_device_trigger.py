@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.components.bluetooth import DOMAIN as BLUETOOTH_DOMAIN
-from homeassistant.components.bthome.const import CONF_SUBTYPE, DOMAIN
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.const import (
+from smarthub.components import automation
+from smarthub.components.bluetooth import DOMAIN as BLUETOOTH_DOMAIN
+from smarthub.components.bthome.const import CONF_SUBTYPE, DOMAIN
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.const import (
     CONF_DEVICE_ID,
     CONF_DOMAIN,
     CONF_PLATFORM,
@@ -14,9 +14,9 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant, ServiceCall, callback
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, ServiceCall, callback
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import make_bthome_v2_adv
 
@@ -34,7 +34,7 @@ def get_device_id(mac: str) -> tuple[str, str]:
     return (BLUETOOTH_DOMAIN, mac)
 
 
-async def _async_setup_bthome_device(hass: HomeAssistant, mac: str) -> MockConfigEntry:
+async def _async_setup_bthome_device(hass: SmartHub, mac: str) -> MockConfigEntry:
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id=mac,
@@ -47,7 +47,7 @@ async def _async_setup_bthome_device(hass: HomeAssistant, mac: str) -> MockConfi
     return config_entry
 
 
-async def test_event_long_press(hass: HomeAssistant) -> None:
+async def test_event_long_press(hass: SmartHub) -> None:
     """Make sure that a long press event is fired."""
     mac = "A4:C1:38:8D:18:B2"
     entry = await _async_setup_bthome_device(hass, mac)
@@ -70,7 +70,7 @@ async def test_event_long_press(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_event_rotate_dimmer(hass: HomeAssistant) -> None:
+async def test_event_rotate_dimmer(hass: SmartHub) -> None:
     """Make sure that a rotate dimmer event is fired."""
     mac = "A4:C1:38:8D:18:B2"
     entry = await _async_setup_bthome_device(hass, mac)
@@ -94,7 +94,7 @@ async def test_event_rotate_dimmer(hass: HomeAssistant) -> None:
 
 
 async def test_get_triggers_button(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we get the expected triggers from a BTHome BLE sensor."""
     mac = "A4:C1:38:8D:18:B2"
@@ -131,7 +131,7 @@ async def test_get_triggers_button(
 
 
 async def test_get_triggers_multiple_buttons(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we get the expected triggers for multiple buttons device."""
     mac = "A4:C1:38:8D:18:B2"
@@ -188,7 +188,7 @@ async def test_get_triggers_multiple_buttons(
     ],
 )
 async def test_validate_trigger_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     event_class: str,
     event_type: str,
@@ -242,7 +242,7 @@ async def test_validate_trigger_config(
 
 
 async def test_get_triggers_dimmer(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we get the expected triggers from a BTHome BLE sensor."""
     mac = "A4:C1:38:8D:18:B2"
@@ -279,7 +279,7 @@ async def test_get_triggers_dimmer(
 
 
 async def test_get_triggers_for_invalid_bthome_ble_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we don't get triggers for an invalid device."""
     mac = "A4:C1:38:8D:18:B2"
@@ -311,7 +311,7 @@ async def test_get_triggers_for_invalid_bthome_ble_device(
 
 
 async def test_get_triggers_for_invalid_device_id(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we don't get triggers when using an invalid device_id."""
     mac = "DE:70:E8:B2:39:0C"
@@ -341,7 +341,7 @@ async def test_get_triggers_for_invalid_device_id(
 
 
 async def test_if_fires_on_motion_detected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
 ) -> None:

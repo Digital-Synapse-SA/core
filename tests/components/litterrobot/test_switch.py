@@ -5,14 +5,14 @@ from unittest.mock import MagicMock
 from pylitterbot import Robot
 import pytest
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as PLATFORM_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import setup_integration
 
@@ -21,7 +21,7 @@ PANEL_LOCKOUT_ENTITY_ID = "switch.test_panel_lockout"
 
 
 async def test_switch(
-    hass: HomeAssistant, mock_account: MagicMock, entity_registry: er.EntityRegistry
+    hass: SmartHub, mock_account: MagicMock, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests the switch entity was set up."""
     await setup_integration(hass, mock_account, PLATFORM_DOMAIN)
@@ -43,7 +43,7 @@ async def test_switch(
     ],
 )
 async def test_on_off_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_account: MagicMock,
     entity_id: str,
     robot_command: str,

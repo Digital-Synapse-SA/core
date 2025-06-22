@@ -2,15 +2,15 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.upb.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.upb.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_migrate_entry_minor_version_1_2(hass: HomeAssistant) -> None:
+async def test_migrate_entry_minor_version_1_2(hass: SmartHub) -> None:
     """Test migrating a 1.1 config entry to 1.2."""
-    with patch("homeassistant.components.upb.async_setup_entry", return_value=True):
+    with patch("smarthub.components.upb.async_setup_entry", return_value=True):
         entry = MockConfigEntry(
             domain=DOMAIN,
             data={"protocol": "TCP", "address": "1.2.3.4", "file_path": "upb.upe"},

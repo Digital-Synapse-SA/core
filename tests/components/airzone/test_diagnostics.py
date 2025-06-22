@@ -6,8 +6,8 @@ from aioairzone.const import RAW_HVAC, RAW_VERSION, RAW_WEBSERVER
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.airzone.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.airzone.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .util import (
     HVAC_MOCK,
@@ -21,7 +21,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -30,7 +30,7 @@ async def test_config_entry_diagnostics(
 
     config_entry = hass.config_entries.async_entries(DOMAIN)[0]
     with patch(
-        "homeassistant.components.airzone.AirzoneLocalApi.raw_data",
+        "smarthub.components.airzone.AirzoneLocalApi.raw_data",
         return_value={
             RAW_HVAC: HVAC_MOCK,
             RAW_VERSION: HVAC_VERSION_MOCK,

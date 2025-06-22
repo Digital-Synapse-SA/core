@@ -7,8 +7,8 @@ from google.api_core.exceptions import GoogleAPIError, PermissionDenied
 from google.maps.routing_v2 import Units
 import pytest
 
-from homeassistant.components.google_travel_time.config_flow import default_options
-from homeassistant.components.google_travel_time.const import (
+from smarthub.components.google_travel_time.config_flow import default_options
+from smarthub.components.google_travel_time.const import (
     CONF_ARRIVAL_TIME,
     CONF_DEPARTURE_TIME,
     CONF_TRANSIT_MODE,
@@ -17,11 +17,11 @@ from homeassistant.components.google_travel_time.const import (
     DOMAIN,
     UNITS_METRIC,
 )
-from homeassistant.components.google_travel_time.sensor import SCAN_INTERVAL
-from homeassistant.const import CONF_MODE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.util.unit_system import (
+from smarthub.components.google_travel_time.sensor import SCAN_INTERVAL
+from smarthub.const import CONF_MODE, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.util.unit_system import (
     METRIC_SYSTEM,
     US_CUSTOMARY_SYSTEM,
     UnitSystem,
@@ -44,7 +44,7 @@ def mock_update_empty_fixture(routes_mock: AsyncMock) -> AsyncMock:
     [(MOCK_CONFIG, DEFAULT_OPTIONS)],
 )
 @pytest.mark.usefixtures("routes_mock", "mock_config")
-async def test_sensor(hass: HomeAssistant) -> None:
+async def test_sensor(hass: SmartHub) -> None:
     """Test that sensor works."""
     assert hass.states.get("sensor.google_travel_time").state == "27"
     assert (
@@ -79,7 +79,7 @@ async def test_sensor(hass: HomeAssistant) -> None:
     ("data", "options"),
     [(MOCK_CONFIG, DEFAULT_OPTIONS)],
 )
-async def test_sensor_empty_response(hass: HomeAssistant) -> None:
+async def test_sensor_empty_response(hass: SmartHub) -> None:
     """Test that sensor works for an empty response."""
     assert hass.states.get("sensor.google_travel_time").state == STATE_UNKNOWN
 
@@ -97,7 +97,7 @@ async def test_sensor_empty_response(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("routes_mock", "mock_config")
-async def test_sensor_departure_time(hass: HomeAssistant) -> None:
+async def test_sensor_departure_time(hass: SmartHub) -> None:
     """Test that sensor works for departure time."""
     assert hass.states.get("sensor.google_travel_time").state == "27"
 
@@ -118,7 +118,7 @@ async def test_sensor_departure_time(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("routes_mock", "mock_config")
-async def test_sensor_arrival_time(hass: HomeAssistant) -> None:
+async def test_sensor_arrival_time(hass: SmartHub) -> None:
     """Test that sensor works for arrival time."""
     assert hass.states.get("sensor.google_travel_time").state == "27"
 
@@ -131,7 +131,7 @@ async def test_sensor_arrival_time(hass: HomeAssistant) -> None:
     ],
 )
 async def test_sensor_unit_system(
-    hass: HomeAssistant,
+    hass: SmartHub,
     routes_mock: AsyncMock,
     unit_system: UnitSystem,
     expected_unit_option: str,
@@ -158,7 +158,7 @@ async def test_sensor_unit_system(
     [(MOCK_CONFIG, DEFAULT_OPTIONS)],
 )
 async def test_sensor_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     routes_mock: AsyncMock,
     mock_config: MockConfigEntry,
@@ -178,7 +178,7 @@ async def test_sensor_exception(
     [(MOCK_CONFIG, DEFAULT_OPTIONS)],
 )
 async def test_sensor_routes_api_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     routes_mock: AsyncMock,
     mock_config: MockConfigEntry,

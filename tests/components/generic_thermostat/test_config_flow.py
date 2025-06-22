@@ -5,8 +5,8 @@ from unittest.mock import patch
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.climate import PRESET_AWAY
-from homeassistant.components.generic_thermostat.const import (
+from smarthub.components.climate import PRESET_AWAY
+from smarthub.components.generic_thermostat.const import (
     CONF_AC_MODE,
     CONF_COLD_TOLERANCE,
     CONF_HEATER,
@@ -15,26 +15,26 @@ from homeassistant.components.generic_thermostat.const import (
     CONF_SENSOR,
     DOMAIN,
 )
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
     STATE_OFF,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 SNAPSHOT_FLOW_PROPS = props("type", "title", "result", "error")
 
 
-async def test_config_flow(hass: HomeAssistant, snapshot: SnapshotAssertion) -> None:
+async def test_config_flow(hass: SmartHub, snapshot: SnapshotAssertion) -> None:
     """Test the config flow."""
     with patch(
-        "homeassistant.components.generic_thermostat.async_setup_entry",
+        "smarthub.components.generic_thermostat.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -72,7 +72,7 @@ async def test_config_flow(hass: HomeAssistant, snapshot: SnapshotAssertion) -> 
     assert config_entry.title == "My thermostat"
 
 
-async def test_options(hass: HomeAssistant, snapshot: SnapshotAssertion) -> None:
+async def test_options(hass: SmartHub, snapshot: SnapshotAssertion) -> None:
     """Test reconfiguring."""
 
     config_entry = MockConfigEntry(
@@ -135,11 +135,11 @@ async def test_options(hass: HomeAssistant, snapshot: SnapshotAssertion) -> None
 
 
 async def test_config_flow_preset_accepts_float(
-    hass: HomeAssistant, snapshot: SnapshotAssertion
+    hass: SmartHub, snapshot: SnapshotAssertion
 ) -> None:
     """Test the config flow with preset is a float."""
     with patch(
-        "homeassistant.components.generic_thermostat.async_setup_entry",
+        "smarthub.components.generic_thermostat.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(

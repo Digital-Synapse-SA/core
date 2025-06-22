@@ -2,17 +2,17 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.epic_games_store.const import DOMAIN
-from homeassistant.const import CONF_COUNTRY, CONF_LANGUAGE
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.epic_games_store.const import DOMAIN
+from smarthub.const import CONF_COUNTRY, CONF_LANGUAGE
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import MOCK_COUNTRY, MOCK_LANGUAGE
 
 from tests.common import MockConfigEntry
 
 
-async def setup_platform(hass: HomeAssistant, platform: str) -> MockConfigEntry:
+async def setup_platform(hass: SmartHub, platform: str) -> MockConfigEntry:
     """Set up the Epic Games Store platform."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -24,7 +24,7 @@ async def setup_platform(hass: HomeAssistant, platform: str) -> MockConfigEntry:
     )
     mock_entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.epic_games_store.PLATFORMS", [platform]):
+    with patch("smarthub.components.epic_games_store.PLATFORMS", [platform]):
         assert await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
 

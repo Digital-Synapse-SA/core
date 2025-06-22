@@ -13,22 +13,22 @@ from matter_server.common.helpers.util import dataclass_to_dict
 from matter_server.common.models import CommissioningParameters
 import pytest
 
-from homeassistant.components.matter.api import (
+from smarthub.components.matter.api import (
     DEVICE_ID,
     ERROR_NODE_NOT_FOUND,
     ID,
     TYPE,
 )
-from homeassistant.components.matter.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.matter.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
 async def test_commission(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     matter_client: MagicMock,
     integration: MockConfigEntry,
@@ -64,7 +64,7 @@ async def test_commission(
 
 
 async def test_commission_on_network(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     matter_client: MagicMock,
     integration: MockConfigEntry,
@@ -100,7 +100,7 @@ async def test_commission_on_network(
 
 
 async def test_set_thread_dataset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     matter_client: MagicMock,
     integration: MockConfigEntry,
@@ -140,7 +140,7 @@ async def test_set_thread_dataset(
 
 
 async def test_set_wifi_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     matter_client: MagicMock,
     integration: MockConfigEntry,
@@ -191,7 +191,7 @@ async def test_set_wifi_credentials(
 # setup (mock) integration with a random node fixture
 @pytest.mark.parametrize("node_fixture", ["onoff_light"])
 async def test_node_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     matter_client: MagicMock,
@@ -260,7 +260,7 @@ async def test_node_diagnostics(
 # setup (mock) integration with a random node fixture
 @pytest.mark.parametrize("node_fixture", ["onoff_light"])
 async def test_ping_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     matter_client: MagicMock,
@@ -315,7 +315,7 @@ async def test_ping_node(
 # setup (mock) integration with a random node fixture
 @pytest.mark.parametrize("node_fixture", ["onoff_light"])
 async def test_open_commissioning_window(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     matter_client: MagicMock,
@@ -376,7 +376,7 @@ async def test_open_commissioning_window(
 # setup (mock) integration with a random node fixture
 @pytest.mark.parametrize("node_fixture", ["onoff_light"])
 async def test_remove_matter_fabric(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     matter_client: MagicMock,
@@ -427,7 +427,7 @@ async def test_remove_matter_fabric(
 # setup (mock) integration with a random node fixture
 @pytest.mark.parametrize("node_fixture", ["onoff_light"])
 async def test_interview_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     matter_client: MagicMock,

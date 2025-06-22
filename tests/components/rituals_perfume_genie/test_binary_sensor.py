@@ -1,9 +1,9 @@
 """Tests for the Rituals Perfume Genie binary sensor platform."""
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.const import ATTR_DEVICE_CLASS, STATE_ON, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.const import ATTR_DEVICE_CLASS, STATE_ON, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     init_integration,
@@ -13,7 +13,7 @@ from .common import (
 
 
 async def test_binary_sensors(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the creation and values of the Rituals Perfume Genie binary sensor."""
     config_entry = mock_config_entry(unique_id="binary_sensor_test_diffuser_v1")

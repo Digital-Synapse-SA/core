@@ -7,13 +7,13 @@ import astral.sun
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.const import SUN_EVENT_SUNRISE, SUN_EVENT_SUNSET
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import sun
-from homeassistant.util import dt as dt_util
+from smarthub.const import SUN_EVENT_SUNRISE, SUN_EVENT_SUNSET
+from smarthub.core import SmartHub
+from smarthub.helpers import sun
+from smarthub.util import dt as dt_util
 
 
-def test_next_events(hass: HomeAssistant) -> None:
+def test_next_events(hass: SmartHub) -> None:
     """Test retrieving next sun events."""
     utc_now = datetime(2016, 11, 1, 8, 0, 0, tzinfo=dt_util.UTC)
 
@@ -86,7 +86,7 @@ def test_next_events(hass: HomeAssistant) -> None:
         assert next_setting == sun.get_astral_event_next(hass, SUN_EVENT_SUNSET)
 
 
-def test_date_events(hass: HomeAssistant) -> None:
+def test_date_events(hass: SmartHub) -> None:
     """Test retrieving next sun events."""
     utc_now = datetime(2016, 11, 1, 8, 0, 0, tzinfo=dt_util.UTC)
 
@@ -111,7 +111,7 @@ def test_date_events(hass: HomeAssistant) -> None:
     assert sunset == sun.get_astral_event_date(hass, SUN_EVENT_SUNSET, utc_today)
 
 
-def test_date_events_default_date(hass: HomeAssistant) -> None:
+def test_date_events_default_date(hass: SmartHub) -> None:
     """Test retrieving next sun events."""
     utc_now = datetime(2016, 11, 1, 8, 0, 0, tzinfo=dt_util.UTC)
 
@@ -137,7 +137,7 @@ def test_date_events_default_date(hass: HomeAssistant) -> None:
         assert sunset == sun.get_astral_event_date(hass, SUN_EVENT_SUNSET, utc_today)
 
 
-def test_date_events_accepts_datetime(hass: HomeAssistant) -> None:
+def test_date_events_accepts_datetime(hass: SmartHub) -> None:
     """Test retrieving next sun events."""
     utc_now = datetime(2016, 11, 1, 8, 0, 0, tzinfo=dt_util.UTC)
 
@@ -162,7 +162,7 @@ def test_date_events_accepts_datetime(hass: HomeAssistant) -> None:
     assert sunset == sun.get_astral_event_date(hass, SUN_EVENT_SUNSET, utc_now)
 
 
-def test_is_up(hass: HomeAssistant) -> None:
+def test_is_up(hass: SmartHub) -> None:
     """Test retrieving next sun events."""
     utc_now = datetime(2016, 11, 1, 12, 0, 0, tzinfo=dt_util.UTC)
     with freeze_time(utc_now):
@@ -173,7 +173,7 @@ def test_is_up(hass: HomeAssistant) -> None:
         assert sun.is_up(hass)
 
 
-def test_norway_in_june(hass: HomeAssistant) -> None:
+def test_norway_in_june(hass: SmartHub) -> None:
     """Test location in Norway where the sun doesn't set in summer."""
     hass.config.latitude = 69.6
     hass.config.longitude = 18.8
@@ -190,7 +190,7 @@ def test_norway_in_june(hass: HomeAssistant) -> None:
     assert sun.get_astral_event_date(hass, SUN_EVENT_SUNSET, june) is None
 
 
-def test_impossible_elevation(hass: HomeAssistant) -> None:
+def test_impossible_elevation(hass: SmartHub) -> None:
     """Test altitude where the sun can't set."""
     hass.config.latitude = 69.6
     hass.config.longitude = 18.8

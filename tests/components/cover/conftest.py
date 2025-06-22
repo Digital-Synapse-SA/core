@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.cover import CoverEntityFeature
+from smarthub.components.cover import CoverEntityFeature
 
 from .common import MockCover
 

@@ -5,8 +5,8 @@ from typing import Any
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import fan, template
-from homeassistant.components.fan import (
+from smarthub.components import fan, template
+from smarthub.components.fan import (
     ATTR_DIRECTION,
     ATTR_OSCILLATING,
     ATTR_PERCENTAGE,
@@ -16,10 +16,10 @@ from homeassistant.components.fan import (
     FanEntityFeature,
     NotValidPresetModeError,
 )
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import ConfigurationStyle
 
@@ -124,7 +124,7 @@ UNIQUE_ID_CONFIG = {
 
 
 def _verify(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_state: str,
     expected_percentage: int | None = None,
     expected_oscillating: bool | None = None,
@@ -142,7 +142,7 @@ def _verify(
 
 
 async def async_setup_legacy_format(
-    hass: HomeAssistant, count: int, fan_config: dict[str, Any]
+    hass: SmartHub, count: int, fan_config: dict[str, Any]
 ) -> None:
     """Do setup of fan integration via legacy format."""
     config = {"fan": {"platform": "template", "fans": fan_config}}
@@ -160,7 +160,7 @@ async def async_setup_legacy_format(
 
 
 async def async_setup_modern_format(
-    hass: HomeAssistant, count: int, fan_config: dict[str, Any]
+    hass: SmartHub, count: int, fan_config: dict[str, Any]
 ) -> None:
     """Do setup of fan integration via modern format."""
     config = {"template": {"fan": fan_config}}
@@ -178,21 +178,21 @@ async def async_setup_modern_format(
 
 
 async def async_setup_legacy_named_fan(
-    hass: HomeAssistant, count: int, fan_config: dict[str, Any]
+    hass: SmartHub, count: int, fan_config: dict[str, Any]
 ):
     """Do setup of a named fan via legacy format."""
     await async_setup_legacy_format(hass, count, {TEST_OBJECT_ID: fan_config})
 
 
 async def async_setup_modern_named_fan(
-    hass: HomeAssistant, count: int, fan_config: dict[str, Any]
+    hass: SmartHub, count: int, fan_config: dict[str, Any]
 ):
     """Do setup of a named fan via legacy format."""
     await async_setup_modern_format(hass, count, {"name": TEST_OBJECT_ID, **fan_config})
 
 
 async def async_setup_legacy_format_with_attribute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     attribute: str,
     attribute_template: str,
@@ -214,7 +214,7 @@ async def async_setup_legacy_format_with_attribute(
 
 
 async def async_setup_modern_format_with_attribute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     attribute: str,
     attribute_template: str,
@@ -236,7 +236,7 @@ async def async_setup_modern_format_with_attribute(
 
 @pytest.fixture
 async def setup_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     fan_config: dict[str, Any],
@@ -250,7 +250,7 @@ async def setup_fan(
 
 @pytest.fixture
 async def setup_named_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     fan_config: dict[str, Any],
@@ -264,7 +264,7 @@ async def setup_named_fan(
 
 @pytest.fixture
 async def setup_state_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -294,7 +294,7 @@ async def setup_state_fan(
 
 @pytest.fixture
 async def setup_test_fan_with_extra_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     fan_config: dict[str, Any],
@@ -313,7 +313,7 @@ async def setup_test_fan_with_extra_config(
 
 @pytest.fixture
 async def setup_optimistic_fan_attribute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     extra_config: dict,
@@ -331,7 +331,7 @@ async def setup_optimistic_fan_attribute(
 
 @pytest.fixture
 async def setup_single_attribute_state_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     attribute: str,
@@ -372,7 +372,7 @@ async def setup_single_attribute_state_fan(
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_fan")
-async def test_missing_optional_config(hass: HomeAssistant) -> None:
+async def test_missing_optional_config(hass: SmartHub) -> None:
     """Test: missing optional template is ok."""
     _verify(hass, STATE_ON, None, None, None, None)
 
@@ -395,7 +395,7 @@ async def test_missing_optional_config(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_fan")
-async def test_wrong_template_config(hass: HomeAssistant) -> None:
+async def test_wrong_template_config(hass: SmartHub) -> None:
     """Test: missing 'turn_on' or 'turn_off' will fail."""
     assert hass.states.async_all("fan") == []
 
@@ -407,7 +407,7 @@ async def test_wrong_template_config(hass: HomeAssistant) -> None:
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_fan")
-async def test_state_template(hass: HomeAssistant) -> None:
+async def test_state_template(hass: SmartHub) -> None:
     """Test state template."""
     _verify(hass, STATE_OFF, None, None, None, None)
 
@@ -436,7 +436,7 @@ async def test_state_template(hass: HomeAssistant) -> None:
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_fan")
-async def test_state_template_states(hass: HomeAssistant, expected: str) -> None:
+async def test_state_template_states(hass: SmartHub, expected: str) -> None:
     """Test state template."""
     _verify(hass, expected, None, None, None, None)
 
@@ -459,7 +459,7 @@ async def test_state_template_states(hass: HomeAssistant, expected: str) -> None
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_fan")
-async def test_picture_template(hass: HomeAssistant) -> None:
+async def test_picture_template(hass: SmartHub) -> None:
     """Test picture template."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.attributes.get("entity_picture") in ("", None)
@@ -489,7 +489,7 @@ async def test_picture_template(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_fan")
-async def test_icon_template(hass: HomeAssistant) -> None:
+async def test_icon_template(hass: SmartHub) -> None:
     """Test icon template."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.attributes.get("icon") in ("", None)
@@ -531,7 +531,7 @@ async def test_icon_template(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_fan")
 async def test_percentage_template(
-    hass: HomeAssistant, percent: str, expected: int, calls: list[ServiceCall]
+    hass: SmartHub, percent: str, expected: int, calls: list[ServiceCall]
 ) -> None:
     """Test templates with fan percentages from other entities."""
     hass.states.async_set("sensor.percentage", percent)
@@ -568,7 +568,7 @@ async def test_percentage_template(
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_fan")
 async def test_preset_mode_template(
-    hass: HomeAssistant, preset_mode: str, expected: int
+    hass: SmartHub, preset_mode: str, expected: int
 ) -> None:
     """Test preset_mode template."""
     hass.states.async_set("sensor.preset_mode", preset_mode)
@@ -603,7 +603,7 @@ async def test_preset_mode_template(
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_fan")
 async def test_oscillating_template(
-    hass: HomeAssistant, oscillating: str, expected: bool | None
+    hass: SmartHub, oscillating: str, expected: bool | None
 ) -> None:
     """Test oscillating template."""
     hass.states.async_set("binary_sensor.oscillating", oscillating)
@@ -638,7 +638,7 @@ async def test_oscillating_template(
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_fan")
 async def test_direction_template(
-    hass: HomeAssistant, direction: str, expected: bool | None
+    hass: SmartHub, direction: str, expected: bool | None
 ) -> None:
     """Test direction template."""
     hass.states.async_set("sensor.direction", direction)
@@ -677,7 +677,7 @@ async def test_direction_template(
     ],
 )
 @pytest.mark.usefixtures("setup_named_fan")
-async def test_availability_template_with_entities(hass: HomeAssistant) -> None:
+async def test_availability_template_with_entities(hass: SmartHub) -> None:
     """Test availability tempalates with values from other entities."""
     for state, test_assert in ((STATE_ON, True), (STATE_OFF, False)):
         hass.states.async_set(_STATE_AVAILABILITY_BOOLEAN, state)
@@ -788,7 +788,7 @@ async def test_availability_template_with_entities(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_named_fan")
-async def test_template_with_unavailable_entities(hass: HomeAssistant, states) -> None:
+async def test_template_with_unavailable_entities(hass: SmartHub, states) -> None:
     """Test unavailability with value_template."""
     _verify(hass, states[0], states[1], states[2], states[3], None)
 
@@ -825,7 +825,7 @@ async def test_template_with_unavailable_entities(hass: HomeAssistant, states) -
 )
 @pytest.mark.usefixtures("setup_named_fan")
 async def test_invalid_availability_template_keeps_component_available(
-    hass: HomeAssistant, caplog_setup_text
+    hass: SmartHub, caplog_setup_text
 ) -> None:
     """Test that an invalid availability keeps the device available."""
     assert hass.states.get("fan.test_fan").state != STATE_UNAVAILABLE
@@ -852,7 +852,7 @@ async def test_invalid_availability_template_keeps_component_available(
     ],
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
-async def test_on_off(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_on_off(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test turn on and turn off."""
 
     state = hass.states.get(TEST_ENTITY_ID)
@@ -903,7 +903,7 @@ async def test_on_off(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
 async def test_on_with_extra_attributes(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test turn on and turn off."""
 
@@ -984,7 +984,7 @@ async def test_on_with_extra_attributes(
     ],
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
-async def test_set_invalid_direction_from_initial_stage(hass: HomeAssistant) -> None:
+async def test_set_invalid_direction_from_initial_stage(hass: SmartHub) -> None:
     """Test set invalid direction when fan is in initial state."""
     await common.async_set_direction(hass, TEST_ENTITY_ID, "invalid")
     _verify(hass, STATE_ON, None, None, None, None)
@@ -1011,7 +1011,7 @@ async def test_set_invalid_direction_from_initial_stage(hass: HomeAssistant) -> 
     ],
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
-async def test_set_osc(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_set_osc(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test set oscillating."""
     expected_calls = 0
 
@@ -1048,7 +1048,7 @@ async def test_set_osc(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
-async def test_set_direction(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_set_direction(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test set valid direction."""
     expected_calls = 0
 
@@ -1086,7 +1086,7 @@ async def test_set_direction(hass: HomeAssistant, calls: list[ServiceCall]) -> N
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
 async def test_set_invalid_direction(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test set invalid direction when fan has valid direction."""
     expected_calls = 1
@@ -1120,7 +1120,7 @@ async def test_set_invalid_direction(
     ],
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
-async def test_preset_modes(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_preset_modes(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test preset_modes."""
     expected_calls = 0
     valid_modes = OPTIMISTIC_PRESET_MODE_CONFIG2["preset_modes"]
@@ -1157,7 +1157,7 @@ async def test_preset_modes(hass: HomeAssistant, calls: list[ServiceCall]) -> No
     ],
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
-async def test_set_percentage(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_set_percentage(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test set valid speed percentage."""
     expected_calls = 0
 
@@ -1202,7 +1202,7 @@ async def test_set_percentage(hass: HomeAssistant, calls: list[ServiceCall]) -> 
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
 async def test_increase_decrease_speed(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test set valid increase and decrease speed."""
 
@@ -1239,7 +1239,7 @@ async def test_increase_decrease_speed(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN],
 )
 @pytest.mark.usefixtures("setup_named_fan")
-async def test_optimistic_state(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_optimistic_state(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test a fan without a value_template."""
 
     await common.async_turn_on(hass, TEST_ENTITY_ID)
@@ -1348,7 +1348,7 @@ async def test_optimistic_state(hass: HomeAssistant, calls: list[ServiceCall]) -
 )
 @pytest.mark.usefixtures("setup_optimistic_fan_attribute")
 async def test_optimistic_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     attribute: str,
     action: str,
     verify_attr: str,
@@ -1387,7 +1387,7 @@ async def test_optimistic_attributes(
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
 async def test_increase_decrease_speed_default_speed_count(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test set valid increase and decrease speed."""
     await common.async_turn_on(hass, TEST_ENTITY_ID)
@@ -1424,7 +1424,7 @@ async def test_increase_decrease_speed_default_speed_count(
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
 async def test_set_invalid_osc_from_initial_state(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test set invalid oscillating when fan is in initial state."""
     await common.async_turn_on(hass, TEST_ENTITY_ID)
@@ -1454,7 +1454,7 @@ async def test_set_invalid_osc_from_initial_state(
     ],
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
-async def test_set_invalid_osc(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_set_invalid_osc(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test set invalid oscillating when fan has valid osc."""
     await common.async_turn_on(hass, TEST_ENTITY_ID)
     await common.async_oscillate(hass, TEST_ENTITY_ID, True)
@@ -1495,7 +1495,7 @@ async def test_set_invalid_osc(hass: HomeAssistant, calls: list[ServiceCall]) ->
     ],
 )
 @pytest.mark.usefixtures("setup_fan")
-async def test_unique_id(hass: HomeAssistant) -> None:
+async def test_unique_id(hass: SmartHub) -> None:
     """Test unique_id option only creates one fan per id."""
     assert len(hass.states.async_all()) == 1
 
@@ -1513,7 +1513,7 @@ async def test_unique_id(hass: HomeAssistant) -> None:
     [({"speed_count": 0}, 1), ({"speed_count": 100}, 1), ({"speed_count": 3}, 100 / 3)],
 )
 @pytest.mark.usefixtures("setup_test_fan_with_extra_config")
-async def test_speed_percentage_step(hass: HomeAssistant, percentage_step) -> None:
+async def test_speed_percentage_step(hass: SmartHub, percentage_step) -> None:
     """Test a fan that implements percentage."""
     assert len(hass.states.async_all()) == 1
 
@@ -1532,7 +1532,7 @@ async def test_speed_percentage_step(hass: HomeAssistant, percentage_step) -> No
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN],
 )
 @pytest.mark.usefixtures("setup_named_fan")
-async def test_preset_mode_supported_features(hass: HomeAssistant) -> None:
+async def test_preset_mode_supported_features(hass: SmartHub) -> None:
     """Test a fan that implements preset_mode."""
     assert len(hass.states.async_all()) == 1
 
@@ -1591,7 +1591,7 @@ async def test_preset_mode_supported_features(hass: HomeAssistant) -> None:
     ],
 )
 async def test_empty_action_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supported_features: FanEntityFeature,
     setup_test_fan_with_extra_config,
 ) -> None:
@@ -1603,7 +1603,7 @@ async def test_empty_action_config(
 
 
 async def test_nested_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a template unique_id propagates to switch unique_ids."""
     with assert_setup_component(1, template.DOMAIN):

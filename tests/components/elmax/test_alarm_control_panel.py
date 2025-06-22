@@ -5,10 +5,10 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.elmax.const import POLLING_SECONDS
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.elmax.const import POLLING_SECONDS
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -18,13 +18,13 @@ WAIT = timedelta(seconds=POLLING_SECONDS)
 
 
 async def test_alarm_control_panels(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test alarm control panels."""
     with patch(
-        "homeassistant.components.elmax.ELMAX_PLATFORMS", [Platform.ALARM_CONTROL_PANEL]
+        "smarthub.components.elmax.ELMAX_PLATFORMS", [Platform.ALARM_CONTROL_PANEL]
     ):
         entry = await init_integration(hass)
 

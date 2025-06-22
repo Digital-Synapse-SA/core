@@ -14,13 +14,13 @@ from vulcan import (
 )
 from vulcan.model import Student
 
-from homeassistant import config_entries
-from homeassistant.components.vulcan import config_flow, register
-from homeassistant.components.vulcan.config_flow import ClientConnectionError, Keystore
-from homeassistant.components.vulcan.const import DOMAIN
-from homeassistant.const import CONF_PIN, CONF_REGION, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.vulcan import config_flow, register
+from smarthub.components.vulcan.config_flow import ClientConnectionError, Keystore
+from smarthub.components.vulcan.const import DOMAIN
+from smarthub.const import CONF_PIN, CONF_REGION, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry, async_load_fixture
 
@@ -33,7 +33,7 @@ fake_account = Account(
 )
 
 
-async def test_show_form(hass: HomeAssistant) -> None:
+async def test_show_form(hass: SmartHub) -> None:
     """Test that the form is served with no input."""
     flow = config_flow.VulcanFlowHandler()
     flow.hass = hass
@@ -44,11 +44,11 @@ async def test_show_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "auth"
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Vulcan.get_students")
-@mock.patch("homeassistant.components.vulcan.config_flow.Account.register")
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Vulcan.get_students")
+@mock.patch("smarthub.components.vulcan.config_flow.Account.register")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
 async def test_config_flow_auth_success(
-    mock_keystore, mock_account, mock_student, hass: HomeAssistant
+    mock_keystore, mock_account, mock_student, hass: SmartHub
 ) -> None:
     """Test a successful config flow initialized by the user."""
     mock_keystore.return_value = fake_keystore
@@ -65,7 +65,7 @@ async def test_config_flow_auth_success(
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.vulcan.async_setup_entry",
+        "smarthub.components.vulcan.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -79,11 +79,11 @@ async def test_config_flow_auth_success(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Vulcan.get_students")
-@mock.patch("homeassistant.components.vulcan.config_flow.Account.register")
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Vulcan.get_students")
+@mock.patch("smarthub.components.vulcan.config_flow.Account.register")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
 async def test_config_flow_auth_success_with_multiple_students(
-    mock_keystore, mock_account, mock_student, hass: HomeAssistant
+    mock_keystore, mock_account, mock_student, hass: SmartHub
 ) -> None:
     """Test a successful config flow with multiple students."""
     mock_keystore.return_value = fake_keystore
@@ -113,7 +113,7 @@ async def test_config_flow_auth_success_with_multiple_students(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.vulcan.async_setup_entry",
+        "smarthub.components.vulcan.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -126,11 +126,11 @@ async def test_config_flow_auth_success_with_multiple_students(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Vulcan.get_students")
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
-@mock.patch("homeassistant.components.vulcan.config_flow.Account.register")
+@mock.patch("smarthub.components.vulcan.config_flow.Vulcan.get_students")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Account.register")
 async def test_config_flow_reauth_success(
-    mock_account, mock_keystore, mock_student, hass: HomeAssistant
+    mock_account, mock_keystore, mock_student, hass: SmartHub
 ) -> None:
     """Test a successful config flow reauth."""
     mock_keystore.return_value = fake_keystore
@@ -151,7 +151,7 @@ async def test_config_flow_reauth_success(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.vulcan.async_setup_entry",
+        "smarthub.components.vulcan.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -164,11 +164,11 @@ async def test_config_flow_reauth_success(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Vulcan.get_students")
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
-@mock.patch("homeassistant.components.vulcan.config_flow.Account.register")
+@mock.patch("smarthub.components.vulcan.config_flow.Vulcan.get_students")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Account.register")
 async def test_config_flow_reauth_without_matching_entries(
-    mock_account, mock_keystore, mock_student, hass: HomeAssistant
+    mock_account, mock_keystore, mock_student, hass: SmartHub
 ) -> None:
     """Test a aborted config flow reauth caused by leak of matching entries."""
     mock_keystore.return_value = fake_keystore
@@ -197,10 +197,10 @@ async def test_config_flow_reauth_without_matching_entries(
     assert result["reason"] == "no_matching_entries"
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
-@mock.patch("homeassistant.components.vulcan.config_flow.Account.register")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Account.register")
 async def test_config_flow_reauth_with_errors(
-    mock_account, mock_keystore, hass: HomeAssistant
+    mock_account, mock_keystore, hass: SmartHub
 ) -> None:
     """Test reauth config flow with errors."""
     mock_keystore.return_value = fake_keystore
@@ -216,7 +216,7 @@ async def test_config_flow_reauth_with_errors(
     assert result["step_id"] == "reauth_confirm"
     assert result["errors"] == {}
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=InvalidTokenException,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -229,7 +229,7 @@ async def test_config_flow_reauth_with_errors(
         assert result["errors"] == {"base": "invalid_token"}
 
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=ExpiredTokenException,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -242,7 +242,7 @@ async def test_config_flow_reauth_with_errors(
         assert result["errors"] == {"base": "expired_token"}
 
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=InvalidPINException,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -255,7 +255,7 @@ async def test_config_flow_reauth_with_errors(
         assert result["errors"] == {"base": "invalid_pin"}
 
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=InvalidSymbolException,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -268,7 +268,7 @@ async def test_config_flow_reauth_with_errors(
         assert result["errors"] == {"base": "invalid_symbol"}
 
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=ClientConnectionError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -281,7 +281,7 @@ async def test_config_flow_reauth_with_errors(
         assert result["errors"] == {"base": "cannot_connect"}
 
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=Exception,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -294,11 +294,11 @@ async def test_config_flow_reauth_with_errors(
         assert result["errors"] == {"base": "unknown"}
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Vulcan.get_students")
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
-@mock.patch("homeassistant.components.vulcan.config_flow.Account.register")
+@mock.patch("smarthub.components.vulcan.config_flow.Vulcan.get_students")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Account.register")
 async def test_multiple_config_entries(
-    mock_account, mock_keystore, mock_student, hass: HomeAssistant
+    mock_account, mock_keystore, mock_student, hass: SmartHub
 ) -> None:
     """Test a successful config flow for multiple config entries."""
     mock_keystore.return_value = fake_keystore
@@ -332,7 +332,7 @@ async def test_multiple_config_entries(
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.vulcan.async_setup_entry",
+        "smarthub.components.vulcan.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -345,9 +345,9 @@ async def test_multiple_config_entries(
     assert len(mock_setup_entry.mock_calls) == 2
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Vulcan.get_students")
+@mock.patch("smarthub.components.vulcan.config_flow.Vulcan.get_students")
 async def test_multiple_config_entries_using_saved_credentials(
-    mock_student, hass: HomeAssistant
+    mock_student, hass: SmartHub
 ) -> None:
     """Test a successful config flow for multiple config entries using saved credentials."""
     mock_student.return_value = [
@@ -370,7 +370,7 @@ async def test_multiple_config_entries_using_saved_credentials(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.vulcan.async_setup_entry",
+        "smarthub.components.vulcan.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -383,9 +383,9 @@ async def test_multiple_config_entries_using_saved_credentials(
     assert len(mock_setup_entry.mock_calls) == 2
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Vulcan.get_students")
+@mock.patch("smarthub.components.vulcan.config_flow.Vulcan.get_students")
 async def test_multiple_config_entries_using_saved_credentials_2(
-    mock_student, hass: HomeAssistant
+    mock_student, hass: SmartHub
 ) -> None:
     """Test a successful config flow for multiple config entries using saved credentials (different situation)."""
     mock_student.return_value = [
@@ -418,7 +418,7 @@ async def test_multiple_config_entries_using_saved_credentials_2(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.vulcan.async_setup_entry",
+        "smarthub.components.vulcan.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -431,9 +431,9 @@ async def test_multiple_config_entries_using_saved_credentials_2(
     assert len(mock_setup_entry.mock_calls) == 2
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Vulcan.get_students")
+@mock.patch("smarthub.components.vulcan.config_flow.Vulcan.get_students")
 async def test_multiple_config_entries_using_saved_credentials_3(
-    mock_student, hass: HomeAssistant
+    mock_student, hass: SmartHub
 ) -> None:
     """Test a successful config flow for multiple config entries using saved credentials."""
     mock_student.return_value = [
@@ -475,7 +475,7 @@ async def test_multiple_config_entries_using_saved_credentials_3(
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.vulcan.async_setup_entry",
+        "smarthub.components.vulcan.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -488,9 +488,9 @@ async def test_multiple_config_entries_using_saved_credentials_3(
     assert len(mock_setup_entry.mock_calls) == 3
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Vulcan.get_students")
+@mock.patch("smarthub.components.vulcan.config_flow.Vulcan.get_students")
 async def test_multiple_config_entries_using_saved_credentials_4(
-    mock_student, hass: HomeAssistant
+    mock_student, hass: SmartHub
 ) -> None:
     """Test a successful config flow for multiple config entries using saved credentials (different situation)."""
     mock_student.return_value = [
@@ -542,7 +542,7 @@ async def test_multiple_config_entries_using_saved_credentials_4(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.vulcan.async_setup_entry",
+        "smarthub.components.vulcan.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -556,7 +556,7 @@ async def test_multiple_config_entries_using_saved_credentials_4(
 
 
 async def test_multiple_config_entries_without_valid_saved_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a unsuccessful config flow for multiple config entries without valid saved credentials."""
     MockConfigEntry(
@@ -590,7 +590,7 @@ async def test_multiple_config_entries_without_valid_saved_credentials(
         {"use_saved_credentials": True},
     )
     with patch(
-        "homeassistant.components.vulcan.config_flow.Vulcan.get_students",
+        "smarthub.components.vulcan.config_flow.Vulcan.get_students",
         side_effect=UnauthorizedCertificateException,
     ):
         assert result["type"] is FlowResultType.FORM
@@ -608,7 +608,7 @@ async def test_multiple_config_entries_without_valid_saved_credentials(
 
 
 async def test_multiple_config_entries_using_saved_credentials_with_connections_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a unsuccessful config flow for multiple config entries without valid saved credentials."""
     MockConfigEntry(
@@ -642,7 +642,7 @@ async def test_multiple_config_entries_using_saved_credentials_with_connections_
         {"use_saved_credentials": True},
     )
     with patch(
-        "homeassistant.components.vulcan.config_flow.Vulcan.get_students",
+        "smarthub.components.vulcan.config_flow.Vulcan.get_students",
         side_effect=ClientConnectionError,
     ):
         assert result["type"] is FlowResultType.FORM
@@ -660,7 +660,7 @@ async def test_multiple_config_entries_using_saved_credentials_with_connections_
 
 
 async def test_multiple_config_entries_using_saved_credentials_with_unknown_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a unsuccessful config flow for multiple config entries without valid saved credentials."""
     MockConfigEntry(
@@ -694,7 +694,7 @@ async def test_multiple_config_entries_using_saved_credentials_with_unknown_erro
         {"use_saved_credentials": True},
     )
     with patch(
-        "homeassistant.components.vulcan.config_flow.Vulcan.get_students",
+        "smarthub.components.vulcan.config_flow.Vulcan.get_students",
         side_effect=Exception,
     ):
         assert result["type"] is FlowResultType.FORM
@@ -711,11 +711,11 @@ async def test_multiple_config_entries_using_saved_credentials_with_unknown_erro
         assert result["errors"] == {"base": "unknown"}
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Vulcan.get_students")
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
-@mock.patch("homeassistant.components.vulcan.config_flow.Account.register")
+@mock.patch("smarthub.components.vulcan.config_flow.Vulcan.get_students")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Account.register")
 async def test_student_already_exists(
-    mock_account, mock_keystore, mock_student, hass: HomeAssistant
+    mock_account, mock_keystore, mock_student, hass: SmartHub
 ) -> None:
     """Test config entry when student's entry already exists."""
     mock_keystore.return_value = fake_keystore
@@ -751,14 +751,14 @@ async def test_student_already_exists(
     assert result["reason"] == "all_student_already_configured"
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
 async def test_config_flow_auth_invalid_token(
-    mock_keystore, hass: HomeAssistant
+    mock_keystore, hass: SmartHub
 ) -> None:
     """Test a config flow initialized by the user using invalid token."""
     mock_keystore.return_value = fake_keystore
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=InvalidTokenException,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -779,14 +779,14 @@ async def test_config_flow_auth_invalid_token(
         assert result["errors"] == {"base": "invalid_token"}
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
 async def test_config_flow_auth_invalid_region(
-    mock_keystore, hass: HomeAssistant
+    mock_keystore, hass: SmartHub
 ) -> None:
     """Test a config flow initialized by the user using invalid region."""
     mock_keystore.return_value = fake_keystore
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=InvalidSymbolException,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -807,12 +807,12 @@ async def test_config_flow_auth_invalid_region(
         assert result["errors"] == {"base": "invalid_symbol"}
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
-async def test_config_flow_auth_invalid_pin(mock_keystore, hass: HomeAssistant) -> None:
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
+async def test_config_flow_auth_invalid_pin(mock_keystore, hass: SmartHub) -> None:
     """Test a config flow initialized by the with invalid pin."""
     mock_keystore.return_value = fake_keystore
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=InvalidPINException,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -833,14 +833,14 @@ async def test_config_flow_auth_invalid_pin(mock_keystore, hass: HomeAssistant) 
         assert result["errors"] == {"base": "invalid_pin"}
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
 async def test_config_flow_auth_expired_token(
-    mock_keystore, hass: HomeAssistant
+    mock_keystore, hass: SmartHub
 ) -> None:
     """Test a config flow initialized by the with expired token."""
     mock_keystore.return_value = fake_keystore
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=ExpiredTokenException,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -861,14 +861,14 @@ async def test_config_flow_auth_expired_token(
         assert result["errors"] == {"base": "expired_token"}
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
 async def test_config_flow_auth_connection_error(
-    mock_keystore, hass: HomeAssistant
+    mock_keystore, hass: SmartHub
 ) -> None:
     """Test a config flow with connection error."""
     mock_keystore.return_value = fake_keystore
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=ClientConnectionError,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -889,14 +889,14 @@ async def test_config_flow_auth_connection_error(
         assert result["errors"] == {"base": "cannot_connect"}
 
 
-@mock.patch("homeassistant.components.vulcan.config_flow.Keystore.create")
+@mock.patch("smarthub.components.vulcan.config_flow.Keystore.create")
 async def test_config_flow_auth_unknown_error(
-    mock_keystore, hass: HomeAssistant
+    mock_keystore, hass: SmartHub
 ) -> None:
     """Test a config flow with unknown error."""
     mock_keystore.return_value = fake_keystore
     with patch(
-        "homeassistant.components.vulcan.config_flow.Account.register",
+        "smarthub.components.vulcan.config_flow.Account.register",
         side_effect=Exception,
     ):
         result = await hass.config_entries.flow.async_init(

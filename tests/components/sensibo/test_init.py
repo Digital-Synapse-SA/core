@@ -10,12 +10,12 @@ from freezegun.api import FrozenDateTimeFactory
 from pysensibo.model import SensiboData
 import pytest
 
-from homeassistant.components.sensibo.const import DOMAIN
-from homeassistant.components.sensibo.util import NoUsernameError
-from homeassistant.config_entries import SOURCE_USER, ConfigEntry, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.sensibo.const import DOMAIN
+from smarthub.components.sensibo.util import NoUsernameError
+from smarthub.config_entries import SOURCE_USER, ConfigEntry, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import ENTRY_CONFIG
 
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.typing import WebSocketGenerator
 
 
-async def test_load_unload_entry(hass: HomeAssistant, mock_client: MagicMock) -> None:
+async def test_load_unload_entry(hass: SmartHub, mock_client: MagicMock) -> None:
     """Test setup and unload config entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -45,7 +45,7 @@ async def test_load_unload_entry(hass: HomeAssistant, mock_client: MagicMock) ->
     assert entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_migrate_entry(hass: HomeAssistant, mock_client: MagicMock) -> None:
+async def test_migrate_entry(hass: SmartHub, mock_client: MagicMock) -> None:
     """Test migrate entry unique id."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -65,7 +65,7 @@ async def test_migrate_entry(hass: HomeAssistant, mock_client: MagicMock) -> Non
     assert entry.unique_id == "firstnamelastname"
 
 
-async def test_migrate_entry_fails(hass: HomeAssistant, mock_client: MagicMock) -> None:
+async def test_migrate_entry_fails(hass: SmartHub, mock_client: MagicMock) -> None:
     """Test migrate entry fails."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -88,7 +88,7 @@ async def test_migrate_entry_fails(hass: HomeAssistant, mock_client: MagicMock) 
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     load_int: ConfigEntry,
@@ -126,7 +126,7 @@ async def test_device_remove_devices(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_automatic_device_addition_and_removal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     get_data: tuple[SensiboData, dict[str, Any], dict[str, Any]],

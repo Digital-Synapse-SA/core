@@ -7,12 +7,12 @@ from unittest.mock import patch
 from airly.exceptions import AirlyError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.airly.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components.airly.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from . import API_POINT_URL, init_integration
 
@@ -21,13 +21,13 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test states of the sensor."""
-    with patch("homeassistant.components.airly.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.airly.PLATFORMS", [Platform.SENSOR]):
         entry = await init_integration(hass, aioclient_mock)
 
     entity_entries = er.async_entries_for_config_entry(entity_registry, entry.entry_id)
@@ -40,7 +40,7 @@ async def test_sensor(
 
 
 async def test_availability(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Ensure that we mark the entities unavailable correctly when service is offline."""
     await init_integration(hass, aioclient_mock)
@@ -77,15 +77,15 @@ async def test_availability(
 
 
 async def test_manual_update_entity(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    """Test manual update entity via service homeassistant/update_entity."""
+    """Test manual update entity via service smarthub/update_entity."""
     await init_integration(hass, aioclient_mock)
 
     call_count = aioclient_mock.call_count
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: ["sensor.home_humidity"]},
         blocking=True,

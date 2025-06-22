@@ -17,12 +17,12 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.husqvarna_automower.const import DOMAIN, OAUTH2_TOKEN
-from homeassistant.components.husqvarna_automower.coordinator import SCAN_INTERVAL
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.husqvarna_automower.const import DOMAIN, OAUTH2_TOKEN
+from smarthub.components.husqvarna_automower.coordinator import SCAN_INTERVAL
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import setup_integration
 from .const import TEST_MOWER_ID
@@ -37,7 +37,7 @@ NUMBER_OF_ENTITIES_MOWER_2 = 11
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -60,7 +60,7 @@ async def test_load_unload_entry(
     ],
 )
 async def test_load_missing_scope(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -90,7 +90,7 @@ async def test_load_missing_scope(
     ids=["unauthorized", "internal_server_error"],
 )
 async def test_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
     status: http.HTTPStatus,
@@ -117,7 +117,7 @@ async def test_expired_token_refresh_failure(
     ],
 )
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
@@ -131,7 +131,7 @@ async def test_update_failed(
 
 
 @patch(
-    "homeassistant.components.husqvarna_automower.coordinator.DEFAULT_RECONNECT_TIME", 0
+    "smarthub.components.husqvarna_automower.coordinator.DEFAULT_RECONNECT_TIME", 0
 )
 @pytest.mark.parametrize(
     ("method_path", "exception", "error_msg"),
@@ -149,7 +149,7 @@ async def test_update_failed(
     ],
 )
 async def test_websocket_not_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -204,7 +204,7 @@ async def test_websocket_not_available(
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -222,7 +222,7 @@ async def test_device_info(
 
 
 async def test_coordinator_automatic_registry_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -307,7 +307,7 @@ async def test_coordinator_automatic_registry_cleanup(
 
 
 async def test_add_and_remove_work_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

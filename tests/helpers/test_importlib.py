@@ -6,17 +6,17 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import importlib
+from smarthub.core import SmartHub
+from smarthub.helpers import importlib
 
 from tests.common import MockModule
 
 
-async def test_async_import_module(hass: HomeAssistant) -> None:
+async def test_async_import_module(hass: SmartHub) -> None:
     """Test importing a module."""
     mock_module = MockModule()
     with patch(
-        "homeassistant.helpers.importlib.importlib.import_module",
+        "smarthub.helpers.importlib.importlib.import_module",
         return_value=mock_module,
     ):
         module = await importlib.async_import_module(hass, "test.module")
@@ -24,23 +24,23 @@ async def test_async_import_module(hass: HomeAssistant) -> None:
     assert module is mock_module
 
 
-async def test_async_import_module_on_helper(hass: HomeAssistant) -> None:
+async def test_async_import_module_on_helper(hass: SmartHub) -> None:
     """Test importing the importlib helper."""
     module = await importlib.async_import_module(
-        hass, "homeassistant.helpers.importlib"
+        hass, "smarthub.helpers.importlib"
     )
     assert module is importlib
     module = await importlib.async_import_module(
-        hass, "homeassistant.helpers.importlib"
+        hass, "smarthub.helpers.importlib"
     )
     assert module is importlib
 
 
-async def test_async_import_module_failures(hass: HomeAssistant) -> None:
+async def test_async_import_module_failures(hass: SmartHub) -> None:
     """Test importing a module fails."""
     with (
         patch(
-            "homeassistant.helpers.importlib.importlib.import_module",
+            "smarthub.helpers.importlib.importlib.import_module",
             side_effect=ValueError,
         ),
         pytest.raises(ValueError),
@@ -51,7 +51,7 @@ async def test_async_import_module_failures(hass: HomeAssistant) -> None:
     # The failure should be not be cached
     with (
         patch(
-            "homeassistant.helpers.importlib.importlib.import_module",
+            "smarthub.helpers.importlib.importlib.import_module",
             return_value=mock_module,
         ),
     ):
@@ -59,12 +59,12 @@ async def test_async_import_module_failures(hass: HomeAssistant) -> None:
 
 
 async def test_async_import_module_failure_caches_module_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test importing a module caches ModuleNotFound."""
     with (
         patch(
-            "homeassistant.helpers.importlib.importlib.import_module",
+            "smarthub.helpers.importlib.importlib.import_module",
             side_effect=ModuleNotFoundError,
         ),
         pytest.raises(ModuleNotFoundError),
@@ -76,7 +76,7 @@ async def test_async_import_module_failure_caches_module_not_found(
     with (
         pytest.raises(ModuleNotFoundError),
         patch(
-            "homeassistant.helpers.importlib.importlib.import_module",
+            "smarthub.helpers.importlib.importlib.import_module",
             return_value=mock_module,
         ),
     ):
@@ -85,7 +85,7 @@ async def test_async_import_module_failure_caches_module_not_found(
 
 @pytest.mark.parametrize("eager_start", [True, False])
 async def test_async_import_module_concurrency(
-    hass: HomeAssistant, eager_start: bool
+    hass: SmartHub, eager_start: bool
 ) -> None:
     """Test importing a module with concurrency."""
     mock_module = MockModule()
@@ -95,7 +95,7 @@ async def test_async_import_module_concurrency(
         return mock_module
 
     with patch(
-        "homeassistant.helpers.importlib.importlib.import_module",
+        "smarthub.helpers.importlib.importlib.import_module",
         _mock_import,
     ):
         task1 = hass.async_create_task(

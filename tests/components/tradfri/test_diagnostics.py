@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pytradfri.device import Device
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import setup_integration
 
@@ -15,7 +15,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.parametrize("device", ["air_purifier"], indirect=True)
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device: Device,
 ) -> None:

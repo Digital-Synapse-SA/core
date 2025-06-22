@@ -4,20 +4,20 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import TEST_RESPONSE, assert_entities, setup_platform
 
 
 async def test_numbers(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
+    hass: SmartHub, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests that the number entities are correct."""
 
@@ -28,7 +28,7 @@ async def test_numbers(
     # Test number set value functions
     entity_id = "number.test_charge_current"
     with patch(
-        "homeassistant.components.tessie.number.set_charging_amps",
+        "smarthub.components.tessie.number.set_charging_amps",
     ) as mock_set_charging_amps:
         await hass.services.async_call(
             NUMBER_DOMAIN,
@@ -41,7 +41,7 @@ async def test_numbers(
 
     entity_id = "number.test_charge_limit"
     with patch(
-        "homeassistant.components.tessie.number.set_charge_limit",
+        "smarthub.components.tessie.number.set_charge_limit",
     ) as mock_set_charge_limit:
         await hass.services.async_call(
             NUMBER_DOMAIN,
@@ -54,7 +54,7 @@ async def test_numbers(
 
     entity_id = "number.test_speed_limit"
     with patch(
-        "homeassistant.components.tessie.number.set_speed_limit",
+        "smarthub.components.tessie.number.set_speed_limit",
     ) as mock_set_speed_limit:
         await hass.services.async_call(
             NUMBER_DOMAIN,

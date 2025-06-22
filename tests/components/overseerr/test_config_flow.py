@@ -8,9 +8,9 @@ from python_overseerr.exceptions import (
     OverseerrConnectionError,
 )
 
-from homeassistant.components.overseerr.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.overseerr.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_API_KEY,
     CONF_HOST,
     CONF_PORT,
@@ -18,8 +18,8 @@ from homeassistant.const import (
     CONF_URL,
     CONF_WEBHOOK_ID,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import WEBHOOK_ID
 
@@ -30,14 +30,14 @@ from tests.common import MockConfigEntry
 def patch_webhook_id() -> None:
     """Patch webhook ID generation."""
     with patch(
-        "homeassistant.components.overseerr.config_flow.async_generate_id",
+        "smarthub.components.overseerr.config_flow.async_generate_id",
         return_value=WEBHOOK_ID,
     ):
         yield
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -72,7 +72,7 @@ async def test_full_flow(
     ],
 )
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     exception: Exception,
@@ -106,7 +106,7 @@ async def test_flow_errors(
 
 
 async def test_flow_invalid_host(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -134,7 +134,7 @@ async def test_flow_invalid_host(
 
 
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -158,7 +158,7 @@ async def test_already_configured(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -190,7 +190,7 @@ async def test_reauth_flow(
     ],
 )
 async def test_reauth_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -229,7 +229,7 @@ async def test_reauth_flow_errors(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -266,7 +266,7 @@ async def test_reconfigure_flow(
     ],
 )
 async def test_reconfigure_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

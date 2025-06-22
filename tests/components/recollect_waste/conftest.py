@@ -7,12 +7,12 @@ from unittest.mock import AsyncMock, Mock, patch
 from aiorecollect.client import PickupEvent, PickupType
 import pytest
 
-from homeassistant.components.recollect_waste.const import (
+from smarthub.components.recollect_waste.const import (
     CONF_PLACE_ID,
     CONF_SERVICE_ID,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -28,7 +28,7 @@ def client_fixture(pickup_events):
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any]
 ) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
@@ -62,11 +62,11 @@ def mock_aiorecollect_fixture(client):
     """Define a fixture to patch aiorecollect."""
     with (
         patch(
-            "homeassistant.components.recollect_waste.Client",
+            "smarthub.components.recollect_waste.Client",
             return_value=client,
         ),
         patch(
-            "homeassistant.components.recollect_waste.config_flow.Client",
+            "smarthub.components.recollect_waste.config_flow.Client",
             return_value=client,
         ),
     ):
@@ -75,7 +75,7 @@ def mock_aiorecollect_fixture(client):
 
 @pytest.fixture(name="setup_config_entry")
 async def setup_config_entry_fixture(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_aiorecollect: None
+    hass: SmartHub, config_entry: MockConfigEntry, mock_aiorecollect: None
 ) -> None:
     """Define a fixture to set up recollect_waste."""
     assert await hass.config_entries.async_setup(config_entry.entry_id)

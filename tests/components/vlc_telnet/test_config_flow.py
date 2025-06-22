@@ -8,11 +8,11 @@ from unittest.mock import patch
 from aiovlc.exceptions import AuthError, ConnectError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.vlc_telnet.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
+from smarthub import config_entries
+from smarthub.components.vlc_telnet.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -45,7 +45,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_user_flow(
-    hass: HomeAssistant, input_data: dict[str, Any], entry_data: dict[str, Any]
+    hass: SmartHub, input_data: dict[str, Any], entry_data: dict[str, Any]
 ) -> None:
     """Test successful user flow."""
     result = await hass.config_entries.flow.async_init(
@@ -55,11 +55,11 @@ async def test_user_flow(
     assert result["errors"] is None
 
     with (
-        patch("homeassistant.components.vlc_telnet.config_flow.Client.connect"),
-        patch("homeassistant.components.vlc_telnet.config_flow.Client.login"),
-        patch("homeassistant.components.vlc_telnet.config_flow.Client.disconnect"),
+        patch("smarthub.components.vlc_telnet.config_flow.Client.connect"),
+        patch("smarthub.components.vlc_telnet.config_flow.Client.login"),
+        patch("smarthub.components.vlc_telnet.config_flow.Client.disconnect"),
         patch(
-            "homeassistant.components.vlc_telnet.async_setup_entry",
+            "smarthub.components.vlc_telnet.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -76,7 +76,7 @@ async def test_user_flow(
 
 
 @pytest.mark.parametrize("source", [config_entries.SOURCE_USER])
-async def test_abort_already_configured(hass: HomeAssistant, source: str) -> None:
+async def test_abort_already_configured(hass: SmartHub, source: str) -> None:
     """Test we handle already configured host."""
     entry_data = {
         "password": "test-password",
@@ -108,7 +108,7 @@ async def test_abort_already_configured(hass: HomeAssistant, source: str) -> Non
     ],
 )
 async def test_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     error: str,
     connect_side_effect: Exception | None,
     login_side_effect: Exception | None,
@@ -121,15 +121,15 @@ async def test_errors(
 
     with (
         patch(
-            "homeassistant.components.vlc_telnet.config_flow.Client.connect",
+            "smarthub.components.vlc_telnet.config_flow.Client.connect",
             side_effect=connect_side_effect,
         ),
         patch(
-            "homeassistant.components.vlc_telnet.config_flow.Client.login",
+            "smarthub.components.vlc_telnet.config_flow.Client.login",
             side_effect=login_side_effect,
         ),
         patch(
-            "homeassistant.components.vlc_telnet.config_flow.Client.disconnect",
+            "smarthub.components.vlc_telnet.config_flow.Client.disconnect",
         ),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -141,7 +141,7 @@ async def test_errors(
     assert result2["errors"] == {"base": error}
 
 
-async def test_reauth_flow(hass: HomeAssistant) -> None:
+async def test_reauth_flow(hass: SmartHub) -> None:
     """Test successful reauth flow."""
     entry_data: dict[str, Any] = {
         "password": "old-password",
@@ -156,11 +156,11 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
     result = await entry.start_reauth_flow(hass)
 
     with (
-        patch("homeassistant.components.vlc_telnet.config_flow.Client.connect"),
-        patch("homeassistant.components.vlc_telnet.config_flow.Client.login"),
-        patch("homeassistant.components.vlc_telnet.config_flow.Client.disconnect"),
+        patch("smarthub.components.vlc_telnet.config_flow.Client.connect"),
+        patch("smarthub.components.vlc_telnet.config_flow.Client.login"),
+        patch("smarthub.components.vlc_telnet.config_flow.Client.disconnect"),
         patch(
-            "homeassistant.components.vlc_telnet.async_setup_entry",
+            "smarthub.components.vlc_telnet.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -185,7 +185,7 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
     ],
 )
 async def test_reauth_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     error: str,
     connect_side_effect: Exception | None,
     login_side_effect: Exception | None,
@@ -205,15 +205,15 @@ async def test_reauth_errors(
 
     with (
         patch(
-            "homeassistant.components.vlc_telnet.config_flow.Client.connect",
+            "smarthub.components.vlc_telnet.config_flow.Client.connect",
             side_effect=connect_side_effect,
         ),
         patch(
-            "homeassistant.components.vlc_telnet.config_flow.Client.login",
+            "smarthub.components.vlc_telnet.config_flow.Client.login",
             side_effect=login_side_effect,
         ),
         patch(
-            "homeassistant.components.vlc_telnet.config_flow.Client.disconnect",
+            "smarthub.components.vlc_telnet.config_flow.Client.disconnect",
         ),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -225,14 +225,14 @@ async def test_reauth_errors(
     assert result2["errors"] == {"base": error}
 
 
-async def test_hassio_flow(hass: HomeAssistant) -> None:
+async def test_hassio_flow(hass: SmartHub) -> None:
     """Test successful hassio flow."""
     with (
-        patch("homeassistant.components.vlc_telnet.config_flow.Client.connect"),
-        patch("homeassistant.components.vlc_telnet.config_flow.Client.login"),
-        patch("homeassistant.components.vlc_telnet.config_flow.Client.disconnect"),
+        patch("smarthub.components.vlc_telnet.config_flow.Client.connect"),
+        patch("smarthub.components.vlc_telnet.config_flow.Client.login"),
+        patch("smarthub.components.vlc_telnet.config_flow.Client.disconnect"),
         patch(
-            "homeassistant.components.vlc_telnet.async_setup_entry",
+            "smarthub.components.vlc_telnet.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -266,7 +266,7 @@ async def test_hassio_flow(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_hassio_already_configured(hass: HomeAssistant) -> None:
+async def test_hassio_already_configured(hass: SmartHub) -> None:
     """Test successful hassio flow."""
 
     entry_data = {
@@ -299,7 +299,7 @@ async def test_hassio_already_configured(hass: HomeAssistant) -> None:
     ],
 )
 async def test_hassio_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     error: str,
     connect_side_effect: Exception | None,
     login_side_effect: Exception | None,
@@ -307,15 +307,15 @@ async def test_hassio_errors(
     """Test we handle hassio errors."""
     with (
         patch(
-            "homeassistant.components.vlc_telnet.config_flow.Client.connect",
+            "smarthub.components.vlc_telnet.config_flow.Client.connect",
             side_effect=connect_side_effect,
         ),
         patch(
-            "homeassistant.components.vlc_telnet.config_flow.Client.login",
+            "smarthub.components.vlc_telnet.config_flow.Client.login",
             side_effect=login_side_effect,
         ),
         patch(
-            "homeassistant.components.vlc_telnet.config_flow.Client.disconnect",
+            "smarthub.components.vlc_telnet.config_flow.Client.disconnect",
         ),
     ):
         result = await hass.config_entries.flow.async_init(

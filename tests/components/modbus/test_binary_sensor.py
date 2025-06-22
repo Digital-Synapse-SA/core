@@ -2,9 +2,9 @@
 
 import pytest
 
-from homeassistant.components.binary_sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.homeassistant import SERVICE_UPDATE_ENTITY
-from homeassistant.components.modbus.const import (
+from smarthub.components.binary_sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.smarthub import SERVICE_UPDATE_ENTITY
+from smarthub.components.modbus.const import (
     CALL_TYPE_COIL,
     CALL_TYPE_DISCRETE,
     CALL_TYPE_REGISTER_HOLDING,
@@ -15,7 +15,7 @@ from homeassistant.components.modbus.const import (
     CONF_VIRTUAL_COUNT,
     MODBUS_DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_ADDRESS,
     CONF_BINARY_SENSORS,
@@ -29,9 +29,9 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub, State
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import TEST_ENTITY_NAME, ReadResult
 
@@ -94,7 +94,7 @@ SLAVE_UNIQUE_ID = "ground_floor_sensor"
         },
     ],
 )
-async def test_config_binary_sensor(hass: HomeAssistant, mock_modbus) -> None:
+async def test_config_binary_sensor(hass: SmartHub, mock_modbus) -> None:
     """Run config test for binary sensor."""
     assert SENSOR_DOMAIN in hass.config.components
 
@@ -190,7 +190,7 @@ async def test_config_binary_sensor(hass: HomeAssistant, mock_modbus) -> None:
         ),
     ],
 )
-async def test_all_binary_sensor(hass: HomeAssistant, expected, mock_do_cycle) -> None:
+async def test_all_binary_sensor(hass: SmartHub, expected, mock_do_cycle) -> None:
     """Run test for given config."""
     assert hass.states.get(ENTITY_ID).state == expected
 
@@ -210,9 +210,9 @@ async def test_all_binary_sensor(hass: HomeAssistant, expected, mock_do_cycle) -
     ],
 )
 async def test_service_binary_sensor_update(
-    hass: HomeAssistant, mock_modbus_ha
+    hass: SmartHub, mock_modbus_ha
 ) -> None:
-    """Run test for service homeassistant.update_entity."""
+    """Run test for service smarthub.update_entity."""
 
     await hass.services.async_call(
         HOMEASSISTANT_DOMAIN,
@@ -263,7 +263,7 @@ ENTITY_ID2 = f"{ENTITY_ID}_1"
     ],
 )
 async def test_restore_state_binary_sensor(
-    hass: HomeAssistant, mock_test_state, mock_modbus
+    hass: SmartHub, mock_test_state, mock_modbus
 ) -> None:
     """Run test for binary sensor restore state."""
     assert hass.states.get(ENTITY_ID).state == mock_test_state[0].state
@@ -296,7 +296,7 @@ TEST_NAME = "test_sensor"
         },
     ],
 )
-async def test_config_virtual_binary_sensor(hass: HomeAssistant, mock_modbus) -> None:
+async def test_config_virtual_binary_sensor(hass: SmartHub, mock_modbus) -> None:
     """Run config test for binary sensor."""
     assert SENSOR_DOMAIN in hass.config.components
 
@@ -412,7 +412,7 @@ async def test_config_virtual_binary_sensor(hass: HomeAssistant, mock_modbus) ->
     ],
 )
 async def test_virtual_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     expected,
     slaves,
@@ -430,7 +430,7 @@ async def test_virtual_binary_sensor(
 
 
 async def test_no_discovery_info_binary_sensor(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup without discovery info."""
     assert SENSOR_DOMAIN not in hass.config.components

@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, call, patch
 from govee_local_api import GoveeDevice
 import pytest
 
-from homeassistant.components.govee_light_local.const import DOMAIN
-from homeassistant.components.light import (
+from smarthub.components.govee_light_local.const import DOMAIN
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_BRIGHTNESS_PCT,
     ATTR_COLOR_TEMP_KELVIN,
@@ -17,9 +17,9 @@ from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     ColorMode,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
 
 from .conftest import DEFAULT_CAPABILITIES, SCENE_CAPABILITIES
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_light_known_device(
-    hass: HomeAssistant, mock_govee_api: AsyncMock
+    hass: SmartHub, mock_govee_api: AsyncMock
 ) -> None:
     """Test adding a known device."""
 
@@ -62,7 +62,7 @@ async def test_light_known_device(
 
 
 async def test_light_unknown_device(
-    hass: HomeAssistant, mock_govee_api: AsyncMock
+    hass: SmartHub, mock_govee_api: AsyncMock
 ) -> None:
     """Test adding an unknown device."""
 
@@ -90,7 +90,7 @@ async def test_light_unknown_device(
     assert light.attributes[ATTR_SUPPORTED_COLOR_MODES] == [ColorMode.ONOFF]
 
 
-async def test_light_remove(hass: HomeAssistant, mock_govee_api: AsyncMock) -> None:
+async def test_light_remove(hass: SmartHub, mock_govee_api: AsyncMock) -> None:
     """Test remove device."""
 
     mock_govee_api.devices = [
@@ -117,7 +117,7 @@ async def test_light_remove(hass: HomeAssistant, mock_govee_api: AsyncMock) -> N
 
 
 async def test_light_setup_retry(
-    hass: HomeAssistant, mock_govee_api: AsyncMock
+    hass: SmartHub, mock_govee_api: AsyncMock
 ) -> None:
     """Test setup retry."""
 
@@ -127,7 +127,7 @@ async def test_light_setup_retry(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.govee_light_local.DISCOVERY_TIMEOUT",
+        "smarthub.components.govee_light_local.DISCOVERY_TIMEOUT",
         0,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -135,7 +135,7 @@ async def test_light_setup_retry(
 
 
 async def test_light_setup_retry_eaddrinuse(
-    hass: HomeAssistant, mock_govee_api: AsyncMock
+    hass: SmartHub, mock_govee_api: AsyncMock
 ) -> None:
     """Test retry on address already in use."""
 
@@ -159,7 +159,7 @@ async def test_light_setup_retry_eaddrinuse(
 
 
 async def test_light_setup_error(
-    hass: HomeAssistant, mock_govee_api: AsyncMock
+    hass: SmartHub, mock_govee_api: AsyncMock
 ) -> None:
     """Test setup error."""
 
@@ -182,7 +182,7 @@ async def test_light_setup_error(
     assert entry.state is ConfigEntryState.SETUP_ERROR
 
 
-async def test_light_on_off(hass: HomeAssistant, mock_govee_api: MagicMock) -> None:
+async def test_light_on_off(hass: SmartHub, mock_govee_api: MagicMock) -> None:
     """Test light on and then off."""
 
     mock_govee_api.devices = [
@@ -256,7 +256,7 @@ async def test_light_on_off(hass: HomeAssistant, mock_govee_api: MagicMock) -> N
     ],
 )
 async def test_turn_on_call_order(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_govee_api: MagicMock,
     attribute: str,
     value: str | int | list[int],
@@ -306,7 +306,7 @@ async def test_turn_on_call_order(
     )
 
 
-async def test_light_brightness(hass: HomeAssistant, mock_govee_api: MagicMock) -> None:
+async def test_light_brightness(hass: SmartHub, mock_govee_api: MagicMock) -> None:
     """Test changing brightness."""
     mock_govee_api.devices = [
         GoveeDevice(
@@ -373,7 +373,7 @@ async def test_light_brightness(hass: HomeAssistant, mock_govee_api: MagicMock) 
     mock_govee_api.set_brightness.assert_awaited_with(mock_govee_api.devices[0], 100)
 
 
-async def test_light_color(hass: HomeAssistant, mock_govee_api: MagicMock) -> None:
+async def test_light_color(hass: SmartHub, mock_govee_api: MagicMock) -> None:
     """Test changing brightness."""
     mock_govee_api.devices = [
         GoveeDevice(
@@ -434,7 +434,7 @@ async def test_light_color(hass: HomeAssistant, mock_govee_api: MagicMock) -> No
     )
 
 
-async def test_scene_on(hass: HomeAssistant, mock_govee_api: MagicMock) -> None:
+async def test_scene_on(hass: SmartHub, mock_govee_api: MagicMock) -> None:
     """Test turning on scene."""
 
     mock_govee_api.devices = [
@@ -475,7 +475,7 @@ async def test_scene_on(hass: HomeAssistant, mock_govee_api: MagicMock) -> None:
 
 
 async def test_scene_restore_rgb(
-    hass: HomeAssistant, mock_govee_api: MagicMock
+    hass: SmartHub, mock_govee_api: MagicMock
 ) -> None:
     """Test restore rgb color."""
 
@@ -558,7 +558,7 @@ async def test_scene_restore_rgb(
 
 
 async def test_scene_restore_temperature(
-    hass: HomeAssistant, mock_govee_api: MagicMock
+    hass: SmartHub, mock_govee_api: MagicMock
 ) -> None:
     """Test restore color temperature."""
 
@@ -631,7 +631,7 @@ async def test_scene_restore_temperature(
     assert light.attributes["color_temp_kelvin"] == initial_color
 
 
-async def test_scene_none(hass: HomeAssistant, mock_govee_api: MagicMock) -> None:
+async def test_scene_none(hass: SmartHub, mock_govee_api: MagicMock) -> None:
     """Test turn on 'none' scene."""
 
     mock_govee_api.devices = [

@@ -4,9 +4,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
 
 from .conftest import TEST_NVR_NAME
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -26,7 +26,7 @@ async def test_sensors(
     reolink_connect.hdd_list = [0]
     reolink_connect.hdd_storage.return_value = 95
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SENSOR]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -43,7 +43,7 @@ async def test_sensors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_hdd_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -53,7 +53,7 @@ async def test_hdd_sensors(
     reolink_connect.hdd_storage.return_value = 85
     reolink_connect.hdd_available.return_value = False
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SENSOR]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED

@@ -6,22 +6,22 @@ from freezegun import freeze_time
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.knx import CONF_KNX_EXPOSE, DOMAIN, KNX_ADDRESS
-from homeassistant.components.knx.schema import ExposeSchema
-from homeassistant.const import (
+from smarthub.components.knx import CONF_KNX_EXPOSE, DOMAIN, KNX_ADDRESS
+from smarthub.components.knx.schema import ExposeSchema
+from smarthub.const import (
     CONF_ATTRIBUTE,
     CONF_ENTITY_ID,
     CONF_TYPE,
     CONF_VALUE_TEMPLATE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .conftest import KNXTestKit
 
 from tests.common import async_fire_time_changed
 
 
-async def test_binary_expose(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_binary_expose(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test a binary expose to only send telegrams on state change."""
     entity_id = "fake.entity"
     await knx.setup_integration(
@@ -50,7 +50,7 @@ async def test_binary_expose(hass: HomeAssistant, knx: KNXTestKit) -> None:
     await knx.assert_write("1/1/8", False)
 
 
-async def test_expose_attribute(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_expose_attribute(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test an expose to only send telegrams on attribute change."""
     entity_id = "fake.entity"
     attribute = "fake_attribute"
@@ -115,7 +115,7 @@ async def test_expose_attribute(hass: HomeAssistant, knx: KNXTestKit) -> None:
 
 
 async def test_expose_attribute_with_default(
-    hass: HomeAssistant, knx: KNXTestKit
+    hass: SmartHub, knx: KNXTestKit
 ) -> None:
     """Test an expose to only send telegrams on attribute change."""
     entity_id = "fake.entity"
@@ -181,7 +181,7 @@ async def test_expose_attribute_with_default(
     await knx.assert_write("1/1/8", (0,))
 
 
-async def test_expose_string(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_expose_string(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test an expose to send string values of up to 14 bytes only."""
 
     entity_id = "fake.entity"
@@ -217,7 +217,7 @@ async def test_expose_string(hass: HomeAssistant, knx: KNXTestKit) -> None:
 
 
 async def test_expose_cooldown(
-    hass: HomeAssistant, knx: KNXTestKit, freezer: FrozenDateTimeFactory
+    hass: SmartHub, knx: KNXTestKit, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test an expose with cooldown."""
     cooldown_time = 2
@@ -253,7 +253,7 @@ async def test_expose_cooldown(
 
 
 async def test_expose_value_template(
-    hass: HomeAssistant, knx: KNXTestKit, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, knx: KNXTestKit, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test an expose with value_template."""
     entity_id = "fake.entity"
@@ -308,7 +308,7 @@ async def test_expose_value_template(
     ],
 )
 async def test_expose_conversion_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     knx: KNXTestKit,
     invalid_attribute: str,
@@ -358,7 +358,7 @@ async def test_expose_conversion_exception(
     ],
 )
 async def test_expose_with_date(
-    hass: HomeAssistant, knx: KNXTestKit, time_type: str, raw: tuple[int, ...]
+    hass: SmartHub, knx: KNXTestKit, time_type: str, raw: tuple[int, ...]
 ) -> None:
     """Test an expose with a date."""
     await hass.config.async_set_time_zone("Europe/Vienna")

@@ -4,29 +4,29 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import configure_integration
 from .mocks import HomeControlMock, HomeControlMockSwitch
 
 
 async def test_switch(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup and state change of a switch device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockSwitch()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -71,12 +71,12 @@ async def test_switch(
     assert hass.states.get(f"{SWITCH_DOMAIN}.test").state == STATE_UNAVAILABLE
 
 
-async def test_remove_from_hass(hass: HomeAssistant) -> None:
+async def test_remove_from_hass(hass: SmartHub) -> None:
     """Test removing entity."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockSwitch()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)

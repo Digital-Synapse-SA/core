@@ -6,16 +6,16 @@ from freezegun.api import FrozenDateTimeFactory
 from pyhomeworks.pyhomeworks import HW_KEYPAD_LED_CHANGED
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.homeworks import KEYPAD_LEDSTATE_POLL_COOLDOWN
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.homeworks import KEYPAD_LEDSTATE_POLL_COOLDOWN
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_binary_sensor_attributes_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
     freezer: FrozenDateTimeFactory,

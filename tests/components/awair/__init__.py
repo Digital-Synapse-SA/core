@@ -2,14 +2,14 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.awair.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.components.awair.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def setup_awair(hass: HomeAssistant, fixtures, unique_id, data) -> ConfigEntry:
+async def setup_awair(hass: SmartHub, fixtures, unique_id, data) -> ConfigEntry:
     """Add Awair devices to hass, using specified fixtures for data."""
 
     entry = MockConfigEntry(domain=DOMAIN, unique_id=unique_id, data=data)

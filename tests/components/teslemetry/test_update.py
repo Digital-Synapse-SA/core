@@ -8,12 +8,12 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from teslemetry_stream import Signal
 
-from homeassistant.components.teslemetry.coordinator import VEHICLE_INTERVAL
-from homeassistant.components.teslemetry.update import INSTALLING
-from homeassistant.components.update import DOMAIN as UPDATE_DOMAIN, SERVICE_INSTALL
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.teslemetry.coordinator import VEHICLE_INTERVAL
+from smarthub.components.teslemetry.update import INSTALLING
+from smarthub.components.update import DOMAIN as UPDATE_DOMAIN, SERVICE_INSTALL
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, reload_platform, setup_platform
 from .const import COMMAND_OK, VEHICLE_DATA, VEHICLE_DATA_ALT
@@ -22,7 +22,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_legacy: AsyncMock,
@@ -34,7 +34,7 @@ async def test_update(
 
 
 async def test_update_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -48,7 +48,7 @@ async def test_update_alt(
 
 
 async def test_update_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vehicle_data: AsyncMock,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -87,7 +87,7 @@ async def test_update_services(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_update_streaming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_vehicle_data: AsyncMock,
     mock_add_listener: AsyncMock,

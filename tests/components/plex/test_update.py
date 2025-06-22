@@ -3,15 +3,15 @@
 import pytest
 import requests_mock
 
-from homeassistant.components.update import (
+from smarthub.components.update import (
     DOMAIN as UPDATE_DOMAIN,
     SCAN_INTERVAL as UPDATER_SCAN_INTERVAL,
     SERVICE_INSTALL,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.typing import WebSocketGenerator
@@ -20,7 +20,7 @@ UPDATE_ENTITY = "update.plex_server_1_update"
 
 
 async def test_plex_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
     mock_plex_server,
@@ -60,7 +60,7 @@ async def test_plex_update(
     await hass.async_block_till_done()
     assert hass.states.get(UPDATE_ENTITY).state == STATE_ON
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,
@@ -102,7 +102,7 @@ async def test_plex_update(
 
     # Failed upgrade request
     requests_mock.put("/updater/apply", status_code=500)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,

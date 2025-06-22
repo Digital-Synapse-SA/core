@@ -2,14 +2,14 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.diagnostics import REDACTED
-from homeassistant.components.fully_kiosk.const import DOMAIN
-from homeassistant.components.fully_kiosk.diagnostics import (
+from smarthub.components.diagnostics import REDACTED
+from smarthub.components.fully_kiosk.const import DOMAIN
+from smarthub.components.fully_kiosk.diagnostics import (
     DEVICE_INFO_TO_REDACT,
     SETTINGS_TO_REDACT,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 from tests.components.diagnostics import get_diagnostics_for_device
@@ -17,7 +17,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     hass_client: ClientSessionGenerator,
     mock_fully_kiosk: MagicMock,

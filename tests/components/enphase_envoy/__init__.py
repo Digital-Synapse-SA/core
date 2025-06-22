@@ -1,13 +1,13 @@
 """Tests for the Enphase Envoy integration."""
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     expected_state: ConfigEntryState = ConfigEntryState.LOADED,
 ) -> None:

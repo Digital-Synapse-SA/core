@@ -6,15 +6,15 @@ import uuid
 
 import pytest
 
-from homeassistant import data_entry_flow
-from homeassistant.auth import AuthManager, auth_store, models as auth_models
-from homeassistant.auth.providers import command_line
-from homeassistant.const import CONF_TYPE
-from homeassistant.core import HomeAssistant
+from smarthub import data_entry_flow
+from smarthub.auth import AuthManager, auth_store, models as auth_models
+from smarthub.auth.providers import command_line
+from smarthub.const import CONF_TYPE
+from smarthub.core import SmartHub
 
 
 @pytest.fixture
-async def store(hass: HomeAssistant) -> auth_store.AuthStore:
+async def store(hass: SmartHub) -> auth_store.AuthStore:
     """Mock store."""
     store = auth_store.AuthStore(hass)
     await store.async_load()
@@ -23,7 +23,7 @@ async def store(hass: HomeAssistant) -> auth_store.AuthStore:
 
 @pytest.fixture
 def provider(
-    hass: HomeAssistant, store: auth_store.AuthStore
+    hass: SmartHub, store: auth_store.AuthStore
 ) -> command_line.CommandLineAuthProvider:
     """Mock provider."""
     return command_line.CommandLineAuthProvider(
@@ -42,7 +42,7 @@ def provider(
 
 @pytest.fixture
 def manager(
-    hass: HomeAssistant,
+    hass: SmartHub,
     store: auth_store.AuthStore,
     provider: command_line.CommandLineAuthProvider,
 ) -> AuthManager:

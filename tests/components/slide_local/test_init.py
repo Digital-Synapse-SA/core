@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock
 from goslideapi.goslideapi import ClientConnectionError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_platform
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_slide_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -32,7 +32,7 @@ async def test_device_info(
 
 
 async def test_raise_config_entry_not_ready_when_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_slide_api: AsyncMock,
 ) -> None:
@@ -49,7 +49,7 @@ async def test_raise_config_entry_not_ready_when_offline(
 
 
 async def test_raise_config_entry_not_ready_when_empty_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_slide_api: AsyncMock,
 ) -> None:

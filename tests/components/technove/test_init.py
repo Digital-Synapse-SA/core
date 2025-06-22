@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 from technove import TechnoVEConnectionError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_async_setup_entry(
-    hass: HomeAssistant, init_integration: MockConfigEntry
+    hass: SmartHub, init_integration: MockConfigEntry
 ) -> None:
     """Test a successful setup entry and unload."""
 
@@ -24,7 +24,7 @@ async def test_async_setup_entry(
 
 
 async def test_async_setup_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_technove: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

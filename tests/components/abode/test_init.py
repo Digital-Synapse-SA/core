@@ -8,17 +8,17 @@ from jaraco.abode.exceptions import (
     Exception as AbodeException,
 )
 
-from homeassistant.components.abode.const import DOMAIN
-from homeassistant.components.abode.services import SERVICE_SETTINGS
-from homeassistant.components.alarm_control_panel import DOMAIN as ALARM_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.abode.const import DOMAIN
+from smarthub.components.abode.services import SERVICE_SETTINGS
+from smarthub.components.alarm_control_panel import DOMAIN as ALARM_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_USERNAME
+from smarthub.core import SmartHub
 
 from .common import setup_platform
 
 
-async def test_change_settings(hass: HomeAssistant) -> None:
+async def test_change_settings(hass: SmartHub) -> None:
     """Test change_setting service."""
     await setup_platform(hass, ALARM_DOMAIN)
 
@@ -33,7 +33,7 @@ async def test_change_settings(hass: HomeAssistant) -> None:
         mock_set_setting.assert_called_once()
 
 
-async def test_add_unique_id(hass: HomeAssistant) -> None:
+async def test_add_unique_id(hass: SmartHub) -> None:
     """Test unique_id is set to Abode username."""
     mock_entry = await setup_platform(hass, ALARM_DOMAIN)
     # Set unique_id to None to match previous config entries
@@ -48,7 +48,7 @@ async def test_add_unique_id(hass: HomeAssistant) -> None:
     assert mock_entry.unique_id == mock_entry.data[CONF_USERNAME]
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test unloading the Abode entry."""
     mock_entry = await setup_platform(hass, ALARM_DOMAIN)
 
@@ -61,10 +61,10 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
     mock_events_stop.assert_called_once()
 
 
-async def test_invalid_credentials(hass: HomeAssistant) -> None:
+async def test_invalid_credentials(hass: SmartHub) -> None:
     """Test Abode credentials changing."""
     with patch(
-        "homeassistant.components.abode.Abode",
+        "smarthub.components.abode.Abode",
         side_effect=AbodeAuthenticationException(
             (HTTPStatus.BAD_REQUEST, "auth error")
         ),
@@ -82,10 +82,10 @@ async def test_invalid_credentials(hass: HomeAssistant) -> None:
     assert not hass.config_entries.flow.async_progress()
 
 
-async def test_raise_config_entry_not_ready_when_offline(hass: HomeAssistant) -> None:
+async def test_raise_config_entry_not_ready_when_offline(hass: SmartHub) -> None:
     """Config entry state is SETUP_RETRY when abode is offline."""
     with patch(
-        "homeassistant.components.abode.Abode",
+        "smarthub.components.abode.Abode",
         side_effect=AbodeException("any"),
     ):
         config_entry = await setup_platform(hass, ALARM_DOMAIN)

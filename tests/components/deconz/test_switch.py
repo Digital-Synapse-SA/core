@@ -4,16 +4,16 @@ from collections.abc import Callable
 
 import pytest
 
-from homeassistant.components.deconz.const import DOMAIN
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.switch import (
+from smarthub.components.deconz.const import DOMAIN
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType, WebsocketDataType
 
@@ -53,7 +53,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_power_plugs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
     light_ws_data: WebsocketDataType,
 ) -> None:
@@ -104,7 +104,7 @@ async def test_power_plugs(
     ],
 )
 async def test_remove_legacy_on_off_output_as_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
 ) -> None:

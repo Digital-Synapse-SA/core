@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_CYCLE,
     ATTR_OPTION,
     ATTR_OPTIONS,
@@ -16,10 +16,10 @@ from homeassistant.components.select import (
     SERVICE_SELECT_PREVIOUS,
     SelectEntity,
 )
-from homeassistant.const import ATTR_ENTITY_ID, CONF_PLATFORM, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, CONF_PLATFORM, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.setup import async_setup_component
 
 from tests.common import setup_test_component_platform
 
@@ -31,7 +31,7 @@ class MockSelectEntity(SelectEntity):
     _attr_options = ["option_one", "option_two", "option_three"]
 
 
-async def test_select(hass: HomeAssistant) -> None:
+async def test_select(hass: SmartHub) -> None:
     """Test getting data from the mocked select entity."""
     select = MockSelectEntity()
     assert select.current_option == "option_one"
@@ -93,7 +93,7 @@ async def test_select(hass: HomeAssistant) -> None:
 
 
 async def test_custom_integration_and_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_select_entities: list[MockSelectEntity],
 ) -> None:
     """Test we can only select valid options."""

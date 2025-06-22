@@ -7,7 +7,7 @@ import pytest
 import respx
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .conftest import CALENDER_URL
@@ -20,7 +20,7 @@ from tests.typing import ClientSessionGenerator
 @respx.mock
 @pytest.mark.freeze_time(datetime.datetime(2023, 6, 5))
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
     config_entry: MockConfigEntry,

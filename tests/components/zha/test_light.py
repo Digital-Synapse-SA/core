@@ -9,20 +9,20 @@ from zigpy.zcl import Cluster
 from zigpy.zcl.clusters import general, lighting
 import zigpy.zcl.foundation as zcl_f
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     FLASH_LONG,
     FLASH_SHORT,
     ColorMode,
 )
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
 
 from .common import (
     async_shift_time,
@@ -78,7 +78,7 @@ LIGHT_COLOR = {
 def light_platform_only():
     """Only set up the light and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.BINARY_SENSOR,
             Platform.DEVICE_TRACKER,
@@ -113,7 +113,7 @@ def light_platform_only():
     [(LIGHT_ON_OFF, (1, 0, 0)), (LIGHT_LEVEL, (1, 1, 0)), (LIGHT_COLOR, (1, 1, 6))],
 )
 async def test_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_zha,
     zigpy_device_mock,
     device,
@@ -193,7 +193,7 @@ async def test_light(
     new=AsyncMock(return_value=[sentinel.data, zcl_f.Status.SUCCESS]),
 )
 async def test_on_with_off_color(
-    hass: HomeAssistant, setup_zha, zigpy_device_mock
+    hass: SmartHub, setup_zha, zigpy_device_mock
 ) -> None:
     """Test turning on the light and sending color commands before on/level commands for supporting lights."""
 
@@ -359,7 +359,7 @@ async def test_on_with_off_color(
 
 
 async def async_test_on_off_from_light(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test on off functionality from the light."""
     # turn on at light
@@ -374,7 +374,7 @@ async def async_test_on_off_from_light(
 
 
 async def async_test_on_from_light(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test on off functionality from the light."""
     # turn on at light
@@ -384,7 +384,7 @@ async def async_test_on_from_light(
 
 
 async def async_test_on_off_from_hass(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test on off functionality from hass."""
     # turn on via UI
@@ -407,9 +407,9 @@ async def async_test_on_off_from_hass(
 
 
 async def async_test_off_from_hass(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
-    """Test turning off the light from Home Assistant."""
+    """Test turning off the light from SmartHub."""
 
     # turn off via UI
     cluster.request.reset_mock()
@@ -429,7 +429,7 @@ async def async_test_off_from_hass(
 
 
 async def async_test_level_on_off_from_hass(
-    hass: HomeAssistant,
+    hass: SmartHub,
     on_off_cluster: Cluster,
     level_cluster: Cluster,
     entity_id: str,
@@ -513,7 +513,7 @@ async def async_test_level_on_off_from_hass(
 
 
 async def async_test_dimmer_from_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cluster: Cluster,
     entity_id: str,
     level: int,
@@ -533,7 +533,7 @@ async def async_test_dimmer_from_light(
 
 
 async def async_test_flash_from_hass(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str, flash
+    hass: SmartHub, cluster: Cluster, entity_id: str, flash
 ):
     """Test flash functionality from hass."""
     # turn on via UI
@@ -575,7 +575,7 @@ async def async_test_flash_from_hass(
     new=AsyncMock(return_value=[sentinel.data, zcl_f.Status.SUCCESS]),
 )
 async def test_light_exception_on_creation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_zha,
     zigpy_device_mock,
     caplog: pytest.LogCaptureFixture,
@@ -588,7 +588,7 @@ async def test_light_exception_on_creation(
 
     gateway.get_or_create_device(zigpy_device)
     with patch(
-        "homeassistant.components.zha.light.Light.__init__", side_effect=Exception
+        "smarthub.components.zha.light.Light.__init__", side_effect=Exception
     ):
         await gateway.async_device_initialized(zigpy_device)
         await hass.async_block_till_done(wait_background_tasks=True)

@@ -4,7 +4,7 @@
   "codeowners": [],
   "config_flow": false,
   "dependencies": [],
-  "documentation": "https://www.home-assistant.io/integrations/NEW_DOMAIN",
+  "documentation": "https://www.smart-hub.io/integrations/NEW_DOMAIN",
   "homekit": {},
   "iot_class": "IOT_CLASS",
   "quality_scale": "bronze",

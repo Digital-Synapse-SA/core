@@ -1,9 +1,9 @@
-"""Test for a Home Assistant bridge that changes climate features at runtime."""
+"""Test for a SmartHub bridge that changes climate features at runtime."""
 
-from homeassistant.components.climate import ATTR_SWING_MODES, ClimateEntityFeature
-from homeassistant.const import ATTR_SUPPORTED_FEATURES
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.climate import ATTR_SWING_MODES, ClimateEntityFeature
+from smarthub.const import ATTR_SUPPORTED_FEATURES
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from ..common import (
     device_config_changed,
@@ -13,7 +13,7 @@ from ..common import (
 
 
 async def test_cover_add_feature_at_runtime(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that new features can be added at runtime."""
 

@@ -1,0 +1,8 @@
+{
+  "domain": "shell_command",
+  "name": "Shell Command",
+  "codeowners": ["@smart-hub/core"],
+  "documentation": "https://www.smart-hub.io/integrations/shell_command",
+  "iot_class": "local_push",
+  "quality_scale": "internal"
+}

@@ -3,12 +3,12 @@
 from ipaddress import ip_address
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.volumio.config_flow import CannotConnectError
-from homeassistant.components.volumio.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.volumio.config_flow import CannotConnectError
+from smarthub.components.volumio.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -39,7 +39,7 @@ TEST_DISCOVERY_RESULT = {
 }
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -49,11 +49,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.volumio.config_flow.Volumio.get_system_info",
+            "smarthub.components.volumio.config_flow.Volumio.get_system_info",
             return_value=TEST_SYSTEM_INFO,
         ),
         patch(
-            "homeassistant.components.volumio.async_setup_entry",
+            "smarthub.components.volumio.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -70,7 +70,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_updates_unique_id(hass: HomeAssistant) -> None:
+async def test_form_updates_unique_id(hass: SmartHub) -> None:
     """Test a duplicate id aborts and updates existing entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -90,11 +90,11 @@ async def test_form_updates_unique_id(hass: HomeAssistant) -> None:
     )
     with (
         patch(
-            "homeassistant.components.volumio.config_flow.Volumio.get_system_info",
+            "smarthub.components.volumio.config_flow.Volumio.get_system_info",
             return_value=TEST_SYSTEM_INFO,
         ),
         patch(
-            "homeassistant.components.volumio.async_setup_entry",
+            "smarthub.components.volumio.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -110,7 +110,7 @@ async def test_form_updates_unique_id(hass: HomeAssistant) -> None:
     assert entry.data == {**TEST_SYSTEM_INFO, **TEST_CONNECTION}
 
 
-async def test_empty_system_info(hass: HomeAssistant) -> None:
+async def test_empty_system_info(hass: SmartHub) -> None:
     """Test old volumio versions with empty system info."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -120,11 +120,11 @@ async def test_empty_system_info(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.volumio.config_flow.Volumio.get_system_info",
+            "smarthub.components.volumio.config_flow.Volumio.get_system_info",
             return_value={},
         ),
         patch(
-            "homeassistant.components.volumio.async_setup_entry",
+            "smarthub.components.volumio.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -146,14 +146,14 @@ async def test_empty_system_info(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.volumio.config_flow.Volumio.get_system_info",
+        "smarthub.components.volumio.config_flow.Volumio.get_system_info",
         side_effect=CannotConnectError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -165,14 +165,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_exception(hass: HomeAssistant) -> None:
+async def test_form_exception(hass: SmartHub) -> None:
     """Test we handle generic error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.volumio.config_flow.Volumio.get_system_info",
+        "smarthub.components.volumio.config_flow.Volumio.get_system_info",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -184,7 +184,7 @@ async def test_form_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_discovery(hass: HomeAssistant) -> None:
+async def test_discovery(hass: SmartHub) -> None:
     """Test discovery flow works."""
 
     result = await hass.config_entries.flow.async_init(
@@ -193,11 +193,11 @@ async def test_discovery(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.volumio.config_flow.Volumio.get_system_info",
+            "smarthub.components.volumio.config_flow.Volumio.get_system_info",
             return_value=TEST_SYSTEM_INFO,
         ),
         patch(
-            "homeassistant.components.volumio.async_setup_entry",
+            "smarthub.components.volumio.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -217,7 +217,7 @@ async def test_discovery(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_discovery_cannot_connect(hass: HomeAssistant) -> None:
+async def test_discovery_cannot_connect(hass: SmartHub) -> None:
     """Test discovery aborts if cannot connect."""
 
     result = await hass.config_entries.flow.async_init(
@@ -225,7 +225,7 @@ async def test_discovery_cannot_connect(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.volumio.config_flow.Volumio.get_system_info",
+        "smarthub.components.volumio.config_flow.Volumio.get_system_info",
         side_effect=CannotConnectError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -237,7 +237,7 @@ async def test_discovery_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["reason"] == "cannot_connect"
 
 
-async def test_discovery_duplicate_data(hass: HomeAssistant) -> None:
+async def test_discovery_duplicate_data(hass: SmartHub) -> None:
     """Test discovery aborts if same mDNS packet arrives."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_ZEROCONF}, data=TEST_DISCOVERY
@@ -252,7 +252,7 @@ async def test_discovery_duplicate_data(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_in_progress"
 
 
-async def test_discovery_updates_unique_id(hass: HomeAssistant) -> None:
+async def test_discovery_updates_unique_id(hass: SmartHub) -> None:
     """Test a duplicate discovery id aborts and updates existing entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -269,7 +269,7 @@ async def test_discovery_updates_unique_id(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.volumio.async_setup_entry",
+        "smarthub.components.volumio.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(

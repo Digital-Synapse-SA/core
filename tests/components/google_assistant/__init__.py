@@ -2,8 +2,8 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.google_assistant import http
-from homeassistant.core import HomeAssistant
+from smarthub.components.google_assistant import http
+from smarthub.core import SmartHub
 
 
 def mock_google_config_store(agent_user_ids=None):
@@ -25,7 +25,7 @@ class MockConfig(http.GoogleConfig):
         agent_user_ids=None,
         enabled=True,
         entity_config=None,
-        hass: HomeAssistant | None = None,
+        hass: SmartHub | None = None,
         secure_devices_pin=None,
         should_2fa=None,
         should_expose=None,

@@ -1,0 +1,9 @@
+{
+  "domain": "xiaomi",
+  "name": "Xiaomi",
+  "codeowners": [],
+  "dependencies": ["ffmpeg"],
+  "documentation": "https://www.smart-hub.io/integrations/xiaomi",
+  "iot_class": "local_polling",
+  "quality_scale": "legacy"
+}

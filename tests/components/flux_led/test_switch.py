@@ -2,24 +2,24 @@
 
 from flux_led.const import MODE_MUSIC
 
-from homeassistant.components import flux_led
-from homeassistant.components.flux_led.const import (
+from smarthub.components import flux_led
+from smarthub.components.flux_led.const import (
     CONF_REMOTE_ACCESS_ENABLED,
     CONF_REMOTE_ACCESS_HOST,
     CONF_REMOTE_ACCESS_PORT,
     DOMAIN,
 )
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_HOST,
     CONF_NAME,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -36,7 +36,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_switch_on_off(hass: HomeAssistant) -> None:
+async def test_switch_on_off(hass: SmartHub) -> None:
     """Test a smart plug."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -73,7 +73,7 @@ async def test_switch_on_off(hass: HomeAssistant) -> None:
 
 
 async def test_remote_access_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a remote access switch unique id."""
     config_entry = MockConfigEntry(
@@ -100,7 +100,7 @@ async def test_remote_access_unique_id(
 
 
 async def test_effects_speed_unique_id_no_discovery(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a remote access switch unique id when discovery fails."""
     config_entry = MockConfigEntry(
@@ -126,7 +126,7 @@ async def test_effects_speed_unique_id_no_discovery(
     )
 
 
-async def test_remote_access_on_off(hass: HomeAssistant) -> None:
+async def test_remote_access_on_off(hass: SmartHub) -> None:
     """Test enable/disable remote access."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -166,7 +166,7 @@ async def test_remote_access_on_off(hass: HomeAssistant) -> None:
     assert config_entry.data[CONF_REMOTE_ACCESS_ENABLED] is True
 
 
-async def test_music_mode_switch(hass: HomeAssistant) -> None:
+async def test_music_mode_switch(hass: SmartHub) -> None:
     """Test music mode switch."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

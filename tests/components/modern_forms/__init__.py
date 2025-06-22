@@ -7,16 +7,16 @@ from typing import Any
 
 from aiomodernforms.const import COMMAND_QUERY_STATIC_DATA
 
-from homeassistant.components.modern_forms.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_MAC, CONTENT_TYPE_JSON
-from homeassistant.core import HomeAssistant
+from smarthub.components.modern_forms.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_MAC, CONTENT_TYPE_JSON
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker, AiohttpClientMockResponse
 
 
 async def modern_forms_call_mock(
-    hass: HomeAssistant, method: str, url: str, data: dict[str, Any]
+    hass: SmartHub, method: str, url: str, data: dict[str, Any]
 ) -> AiohttpClientMockResponse:
     """Set up the basic returns based on info or status request."""
     if COMMAND_QUERY_STATIC_DATA in data:
@@ -31,7 +31,7 @@ async def modern_forms_call_mock(
 
 
 async def modern_forms_no_light_call_mock(
-    hass: HomeAssistant, method: str, url: str, data: dict[str, Any]
+    hass: SmartHub, method: str, url: str, data: dict[str, Any]
 ) -> AiohttpClientMockResponse:
     """Set up the basic returns based on info or status request."""
     if COMMAND_QUERY_STATIC_DATA in data:
@@ -46,7 +46,7 @@ async def modern_forms_no_light_call_mock(
 
 
 async def modern_forms_timers_set_mock(
-    hass: HomeAssistant, method: str, url: str, data: dict[str, Any]
+    hass: SmartHub, method: str, url: str, data: dict[str, Any]
 ) -> AiohttpClientMockResponse:
     """Set up the basic returns based on info or status request."""
     if COMMAND_QUERY_STATIC_DATA in data:
@@ -61,7 +61,7 @@ async def modern_forms_timers_set_mock(
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     rgbw: bool = False,
     skip_setup: bool = False,
@@ -69,7 +69,7 @@ async def init_integration(
         [str, str, dict[str, Any]], Coroutine[Any, Any, AiohttpClientMockResponse]
     ] = modern_forms_call_mock,
 ) -> MockConfigEntry:
-    """Set up the Modern Forms integration in Home Assistant."""
+    """Set up the Modern Forms integration in SmartHub."""
 
     aioclient_mock.post(
         "http://192.168.1.123:80/mf",

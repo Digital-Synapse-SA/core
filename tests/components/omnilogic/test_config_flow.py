@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 from omnilogic import LoginException, OmniLogicException
 
-from homeassistant import config_entries
-from homeassistant.components.omnilogic.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.omnilogic.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 DATA = {"username": "test-username", "password": "test-password"}
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -25,11 +25,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.omnilogic.config_flow.OmniLogic.connect",
+            "smarthub.components.omnilogic.config_flow.OmniLogic.connect",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.omnilogic.async_setup_entry",
+            "smarthub.components.omnilogic.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -45,7 +45,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_already_configured(hass: HomeAssistant) -> None:
+async def test_already_configured(hass: SmartHub) -> None:
     """Test config flow when Omnilogic component is already setup."""
     MockConfigEntry(domain="omnilogic", data=DATA).add_to_hass(hass)
 
@@ -57,7 +57,7 @@ async def test_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_with_invalid_credentials(hass: HomeAssistant) -> None:
+async def test_with_invalid_credentials(hass: SmartHub) -> None:
     """Test with invalid credentials."""
 
     result = await hass.config_entries.flow.async_init(
@@ -65,7 +65,7 @@ async def test_with_invalid_credentials(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.omnilogic.OmniLogic.connect",
+        "smarthub.components.omnilogic.OmniLogic.connect",
         side_effect=LoginException,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -78,7 +78,7 @@ async def test_with_invalid_credentials(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test if invalid response or no connection returned from Hayward."""
 
     result = await hass.config_entries.flow.async_init(
@@ -86,7 +86,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.omnilogic.OmniLogic.connect",
+        "smarthub.components.omnilogic.OmniLogic.connect",
         side_effect=OmniLogicException,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -99,7 +99,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_with_unknown_error(hass: HomeAssistant) -> None:
+async def test_with_unknown_error(hass: SmartHub) -> None:
     """Test with unknown error response from Hayward."""
 
     result = await hass.config_entries.flow.async_init(
@@ -107,7 +107,7 @@ async def test_with_unknown_error(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.omnilogic.OmniLogic.connect",
+        "smarthub.components.omnilogic.OmniLogic.connect",
         side_effect=Exception,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -120,7 +120,7 @@ async def test_with_unknown_error(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "unknown"}
 
 
-async def test_option_flow(hass: HomeAssistant) -> None:
+async def test_option_flow(hass: SmartHub) -> None:
     """Test option flow."""
     entry = MockConfigEntry(domain=DOMAIN, data=DATA)
     entry.add_to_hass(hass)
@@ -128,7 +128,7 @@ async def test_option_flow(hass: HomeAssistant) -> None:
     assert not entry.options
 
     with patch(
-        "homeassistant.components.omnilogic.async_setup_entry", return_value=True
+        "smarthub.components.omnilogic.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.options.async_init(
             entry.entry_id,

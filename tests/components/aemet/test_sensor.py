@@ -2,15 +2,15 @@
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.weather import ATTR_CONDITION_SNOWY
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.weather import ATTR_CONDITION_SNOWY
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .util import async_init_integration
 
 
 async def test_aemet_forecast_create_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test creation of forecast sensors."""
@@ -71,7 +71,7 @@ async def test_aemet_forecast_create_sensors(
 
 
 async def test_aemet_weather_create_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test creation of weather sensors."""

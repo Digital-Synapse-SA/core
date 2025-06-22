@@ -7,10 +7,10 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from tesla_fleet_api.exceptions import VehicleOffline
 
-from homeassistant.components.tesla_fleet.coordinator import VEHICLE_INTERVAL
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.tesla_fleet.coordinator import VEHICLE_INTERVAL
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, assert_entities_alt, setup_platform
 from .const import VEHICLE_DATA_ALT
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     normal_config_entry: MockConfigEntry,
@@ -33,7 +33,7 @@ async def test_binary_sensor(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensor_refresh(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -54,7 +54,7 @@ async def test_binary_sensor_refresh(
 
 
 async def test_binary_sensor_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vehicle_data: AsyncMock,
     normal_config_entry: MockConfigEntry,
 ) -> None:

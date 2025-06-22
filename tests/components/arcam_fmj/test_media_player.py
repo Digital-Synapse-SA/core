@@ -6,17 +6,17 @@ from unittest.mock import ANY, PropertyMock, patch
 from arcam.fmj import ConnectionFailed, DecodeMode2CH, DecodeModeMCH, SourceCodes
 import pytest
 
-from homeassistant.components.arcam_fmj.const import (
+from smarthub.components.arcam_fmj.const import (
     SIGNAL_CLIENT_DATA,
     SIGNAL_CLIENT_STARTED,
     SIGNAL_CLIENT_STOPPED,
 )
-from homeassistant.components.arcam_fmj.media_player import ArcamFmj
-from homeassistant.components.homeassistant import (
+from smarthub.components.arcam_fmj.media_player import ArcamFmj
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_MEDIA_VOLUME_LEVEL,
     ATTR_SOUND_MODE,
@@ -25,15 +25,15 @@ from homeassistant.components.media_player import (
     SERVICE_VOLUME_SET,
     MediaType,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_IDENTIFIERS,
     ATTR_MANUFACTURER,
     ATTR_MODEL,
     ATTR_NAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import MOCK_HOST, MOCK_UUID
 
@@ -63,7 +63,7 @@ async def test_properties(player, state) -> None:
     assert not player.should_poll
 
 
-async def test_powered_off(hass: HomeAssistant, player, state) -> None:
+async def test_powered_off(hass: SmartHub, player, state) -> None:
     """Test properties in powered off state."""
     state.get_source.return_value = None
     state.get_power.return_value = None
@@ -120,7 +120,7 @@ async def test_name(player) -> None:
     assert data.attributes["friendly_name"] == "Zone 1"
 
 
-async def test_update(hass: HomeAssistant, player_setup: str, state) -> None:
+async def test_update(hass: SmartHub, player_setup: str, state) -> None:
     """Test update."""
     await hass.services.async_call(
         HA_DOMAIN,
@@ -132,7 +132,7 @@ async def test_update(hass: HomeAssistant, player_setup: str, state) -> None:
 
 
 async def test_update_lost(
-    hass: HomeAssistant, player_setup: str, state, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, player_setup: str, state, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test update, with connection loss is ignored."""
     state.update.side_effect = ConnectionFailed()
@@ -152,7 +152,7 @@ async def test_update_lost(
     [("PVR", SourceCodes.PVR), ("BD", SourceCodes.BD), ("INVALID", None)],
 )
 async def test_select_source(
-    hass: HomeAssistant, player_setup, state, source, value
+    hass: SmartHub, player_setup, state, source, value
 ) -> None:
     """Test selection of source."""
     await hass.services.async_call(
@@ -256,7 +256,7 @@ async def test_volume_level(player, state) -> None:
 
 @pytest.mark.parametrize(("volume", "call"), [(0.0, 0), (0.5, 50), (1.0, 99)])
 async def test_set_volume_level(
-    hass: HomeAssistant, player_setup: str, state, volume, call
+    hass: SmartHub, player_setup: str, state, volume, call
 ) -> None:
     """Test setting volume."""
 
@@ -271,13 +271,13 @@ async def test_set_volume_level(
 
 
 async def test_set_volume_level_lost(
-    hass: HomeAssistant, player_setup: str, state
+    hass: SmartHub, player_setup: str, state
 ) -> None:
     """Test setting volume, with a lost connection."""
 
     state.set_volume.side_effect = ConnectionFailed()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "media_player",
             SERVICE_VOLUME_SET,
@@ -361,7 +361,7 @@ async def test_added_to_hass(player, state) -> None:
     """Test addition to hass."""
 
     with patch(
-        "homeassistant.components.arcam_fmj.media_player.async_dispatcher_connect"
+        "smarthub.components.arcam_fmj.media_player.async_dispatcher_connect"
     ) as connect:
         await player.async_added_to_hass()
 

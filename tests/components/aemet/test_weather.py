@@ -7,9 +7,9 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.aemet.const import ATTRIBUTION
-from homeassistant.components.aemet.coordinator import WEATHER_UPDATE_INTERVAL
-from homeassistant.components.weather import (
+from smarthub.components.aemet.const import ATTRIBUTION
+from smarthub.components.aemet.coordinator import WEATHER_UPDATE_INTERVAL
+from smarthub.components.weather import (
     ATTR_CONDITION_SNOWY,
     ATTR_WEATHER_HUMIDITY,
     ATTR_WEATHER_PRESSURE,
@@ -20,8 +20,8 @@ from homeassistant.components.weather import (
     DOMAIN as WEATHER_DOMAIN,
     SERVICE_GET_FORECASTS,
 )
-from homeassistant.const import ATTR_ATTRIBUTION
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ATTRIBUTION
+from smarthub.core import SmartHub
 
 from .util import async_init_integration, mock_api_call
 
@@ -29,7 +29,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_aemet_weather(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test states of the weather."""
@@ -58,7 +58,7 @@ async def test_aemet_weather(
     [SERVICE_GET_FORECASTS],
 )
 async def test_forecast_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
     service: str,
@@ -96,7 +96,7 @@ async def test_forecast_service(
 
 @pytest.mark.parametrize("forecast_type", ["daily", "hourly"])
 async def test_forecast_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -129,7 +129,7 @@ async def test_forecast_subscription(
     assert forecast1 == snapshot
 
     with patch(
-        "homeassistant.components.aemet.AEMET.api_call",
+        "smarthub.components.aemet.AEMET.api_call",
         side_effect=mock_api_call,
     ):
         freezer.tick(WEATHER_UPDATE_INTERVAL + datetime.timedelta(seconds=1))

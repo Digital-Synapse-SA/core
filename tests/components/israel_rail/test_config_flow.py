@@ -2,10 +2,10 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.israel_rail import CONF_DESTINATION, CONF_START, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.israel_rail import CONF_DESTINATION, CONF_START, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import VALID_CONFIG
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_create_entry(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_israelrail: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_israelrail: AsyncMock
 ) -> None:
     """Test that the user step works."""
     result = await hass.config_entries.flow.async_init(
@@ -35,7 +35,7 @@ async def test_create_entry(
 
 
 async def test_flow_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_israelrail: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -66,7 +66,7 @@ async def test_flow_fails(
 
 
 async def test_flow_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_israelrail: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,

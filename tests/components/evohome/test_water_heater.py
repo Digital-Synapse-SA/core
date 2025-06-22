@@ -12,19 +12,19 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.water_heater import (
+from smarthub.components.water_heater import (
     ATTR_AWAY_MODE,
     ATTR_OPERATION_MODE,
     SERVICE_SET_AWAY_MODE,
     SERVICE_SET_OPERATION_MODE,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .conftest import setup_evohome
 from .const import TEST_INSTALLS_WITH_DHW
@@ -34,7 +34,7 @@ DHW_ENTITY_ID = "water_heater.domestic_hot_water"
 
 @pytest.mark.parametrize("install", TEST_INSTALLS_WITH_DHW)
 async def test_setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, str],
     install: str,
     snapshot: SnapshotAssertion,
@@ -55,7 +55,7 @@ async def test_setup_platform(
 
 @pytest.mark.parametrize("install", TEST_INSTALLS_WITH_DHW)
 async def test_set_operation_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     evohome: EvohomeClient,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -123,7 +123,7 @@ async def test_set_operation_mode(
 
 
 @pytest.mark.parametrize("install", TEST_INSTALLS_WITH_DHW)
-async def test_set_away_mode(hass: HomeAssistant, evohome: EvohomeClient) -> None:
+async def test_set_away_mode(hass: SmartHub, evohome: EvohomeClient) -> None:
     """Test SERVICE_SET_AWAY_MODE of an evohome DHW zone."""
 
     # set_away_mode: off
@@ -156,7 +156,7 @@ async def test_set_away_mode(hass: HomeAssistant, evohome: EvohomeClient) -> Non
 
 
 @pytest.mark.parametrize("install", TEST_INSTALLS_WITH_DHW)
-async def test_turn_off(hass: HomeAssistant, evohome: EvohomeClient) -> None:
+async def test_turn_off(hass: SmartHub, evohome: EvohomeClient) -> None:
     """Test SERVICE_TURN_OFF of an evohome DHW zone."""
 
     # turn_off
@@ -174,7 +174,7 @@ async def test_turn_off(hass: HomeAssistant, evohome: EvohomeClient) -> None:
 
 
 @pytest.mark.parametrize("install", TEST_INSTALLS_WITH_DHW)
-async def test_turn_on(hass: HomeAssistant, evohome: EvohomeClient) -> None:
+async def test_turn_on(hass: SmartHub, evohome: EvohomeClient) -> None:
     """Test SERVICE_TURN_ON of an evohome DHW zone."""
 
     # turn_on

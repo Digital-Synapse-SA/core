@@ -8,14 +8,14 @@ import io
 import av
 import numpy as np
 
-from homeassistant.components.camera import DynamicStreamSettings
-from homeassistant.components.stream.core import Orientation, Segment
-from homeassistant.components.stream.fmp4utils import (
+from smarthub.components.camera import DynamicStreamSettings
+from smarthub.components.stream.core import Orientation, Segment
+from smarthub.components.stream.fmp4utils import (
     TRANSFORM_MATRIX_TOP,
     XYW_ROW,
     find_box,
 )
-from homeassistant.util import dt as dt_util
+from smarthub.util import dt as dt_util
 
 FAKE_TIME = dt_util.utcnow()
 

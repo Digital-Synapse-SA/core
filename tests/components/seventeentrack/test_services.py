@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.seventeentrack import DOMAIN
-from homeassistant.components.seventeentrack.const import (
+from smarthub.components.seventeentrack import DOMAIN
+from smarthub.components.seventeentrack.const import (
     SERVICE_ARCHIVE_PACKAGE,
     SERVICE_GET_PACKAGES,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr
 
 from . import init_integration
 from .conftest import (
@@ -28,7 +28,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_get_packages_from_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -51,7 +51,7 @@ async def test_get_packages_from_list(
 
 
 async def test_get_all_packages(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -73,7 +73,7 @@ async def test_get_all_packages(
 
 
 async def test_service_called_with_unloaded_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -81,7 +81,7 @@ async def test_service_called_with_unloaded_entry(
     """Test service call with not ready config entry."""
     await init_integration(hass, mock_config_entry)
     mock_config_entry.mock_state(hass, ConfigEntryState.SETUP_ERROR)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_GET_PACKAGES,
@@ -94,7 +94,7 @@ async def test_service_called_with_unloaded_entry(
 
 
 async def test_service_called_with_non_17track_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -115,7 +115,7 @@ async def test_service_called_with_non_17track_device(
         identifiers={(other_domain, "1")},
     )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_GET_PACKAGES,
@@ -128,7 +128,7 @@ async def test_service_called_with_non_17track_device(
 
 
 async def test_archive_package(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -151,7 +151,7 @@ async def test_archive_package(
 
 
 async def test_packages_with_none_timestamp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

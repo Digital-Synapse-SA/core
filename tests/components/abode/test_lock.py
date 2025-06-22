@@ -2,16 +2,16 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.abode import ATTR_DEVICE_ID
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN, LockState
-from homeassistant.const import (
+from smarthub.components.abode import ATTR_DEVICE_ID
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN, LockState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     SERVICE_LOCK,
     SERVICE_UNLOCK,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_platform
 
@@ -19,7 +19,7 @@ DEVICE_ID = "lock.test_lock"
 
 
 async def test_entity_registry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests that the devices are registered in the entity registry."""
     await setup_platform(hass, LOCK_DOMAIN)
@@ -28,7 +28,7 @@ async def test_entity_registry(
     assert entry.unique_id == "51cab3b545d2o34ed7fz02731bda5324"
 
 
-async def test_attributes(hass: HomeAssistant) -> None:
+async def test_attributes(hass: SmartHub) -> None:
     """Test the lock attributes are correct."""
     await setup_platform(hass, LOCK_DOMAIN)
 
@@ -41,7 +41,7 @@ async def test_attributes(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_FRIENDLY_NAME) == "Test Lock"
 
 
-async def test_lock(hass: HomeAssistant) -> None:
+async def test_lock(hass: SmartHub) -> None:
     """Test the lock can be locked."""
     await setup_platform(hass, LOCK_DOMAIN)
 
@@ -53,7 +53,7 @@ async def test_lock(hass: HomeAssistant) -> None:
         mock_lock.assert_called_once()
 
 
-async def test_unlock(hass: HomeAssistant) -> None:
+async def test_unlock(hass: SmartHub) -> None:
     """Test the lock can be unlocked."""
     await setup_platform(hass, LOCK_DOMAIN)
 

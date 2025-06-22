@@ -9,11 +9,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from hass_nabucasa.voice import STTResponse, VoiceError
 import pytest
 
-from homeassistant.components.assist_pipeline.pipeline import STORAGE_KEY
-from homeassistant.components.cloud.const import DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.assist_pipeline.pipeline import STORAGE_KEY
+from smarthub.components.cloud.const import DOMAIN
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import PIPELINE_DATA
 
@@ -22,8 +22,8 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.fixture(autouse=True)
 async def delay_save_fixture() -> AsyncGenerator[None]:
-    """Load the homeassistant integration."""
-    with patch("homeassistant.helpers.collection.SAVE_DELAY", new=0):
+    """Load the smarthub integration."""
+    with patch("smarthub.helpers.collection.SAVE_DELAY", new=0):
         yield
 
 
@@ -38,7 +38,7 @@ async def delay_save_fixture() -> AsyncGenerator[None]:
     ],
 )
 async def test_cloud_speech(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     hass_client: ClientSessionGenerator,
     mock_process_stt: AsyncMock,
@@ -86,7 +86,7 @@ async def test_cloud_speech(
 
 
 async def test_migrating_pipelines(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
@@ -136,7 +136,7 @@ async def test_migrating_pipelines(
     )
     assert hass_storage[STORAGE_KEY]["data"]["items"][0]["language"] == "language_1"
     assert (
-        hass_storage[STORAGE_KEY]["data"]["items"][0]["name"] == "Home Assistant Cloud"
+        hass_storage[STORAGE_KEY]["data"]["items"][0]["name"] == "SmartHub Cloud"
     )
     assert hass_storage[STORAGE_KEY]["data"]["items"][0]["stt_language"] == "language_1"
     assert hass_storage[STORAGE_KEY]["data"]["items"][0]["tts_language"] == "language_1"

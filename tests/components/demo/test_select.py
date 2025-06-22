@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     ATTR_OPTIONS,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.setup import async_setup_component
 
 ENTITY_SPEED = "select.speed"
 
@@ -22,14 +22,14 @@ ENTITY_SPEED = "select.speed"
 async def select_only() -> None:
     """Enable only the select platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.SELECT],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_demo_select(hass: HomeAssistant, select_only) -> None:
+async def setup_demo_select(hass: SmartHub, select_only) -> None:
     """Initialize setup demo select entity."""
     assert await async_setup_component(
         hass, SELECT_DOMAIN, {"select": {"platform": "demo"}}
@@ -37,7 +37,7 @@ async def setup_demo_select(hass: HomeAssistant, select_only) -> None:
     await hass.async_block_till_done()
 
 
-def test_setup_params(hass: HomeAssistant) -> None:
+def test_setup_params(hass: SmartHub) -> None:
     """Test the initial parameters."""
     state = hass.states.get(ENTITY_SPEED)
     assert state
@@ -49,7 +49,7 @@ def test_setup_params(hass: HomeAssistant) -> None:
     ]
 
 
-async def test_select_option_bad_attr(hass: HomeAssistant) -> None:
+async def test_select_option_bad_attr(hass: SmartHub) -> None:
     """Test selecting a different option with invalid option value."""
     state = hass.states.get(ENTITY_SPEED)
     assert state
@@ -69,7 +69,7 @@ async def test_select_option_bad_attr(hass: HomeAssistant) -> None:
     assert state.state == "ridiculous_speed"
 
 
-async def test_select_option(hass: HomeAssistant) -> None:
+async def test_select_option(hass: SmartHub) -> None:
     """Test selecting of a option."""
     state = hass.states.get(ENTITY_SPEED)
     assert state

@@ -8,10 +8,10 @@ from pysmlight.sse import MessageEvent
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.smlight.const import SCAN_INTERNET_INTERVAL
-from homeassistant.const import STATE_ON, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.smlight.const import SCAN_INTERNET_INTERVAL
+from smarthub.const import STATE_ON, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import get_mock_event_function
 from .conftest import setup_integration
@@ -41,7 +41,7 @@ def platforms() -> list[Platform]:
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_all_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -55,7 +55,7 @@ async def test_all_binary_sensors(
 
 
 async def test_disabled_by_default_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -73,7 +73,7 @@ async def test_disabled_by_default_sensors(
 
 
 async def test_internet_sensor_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,

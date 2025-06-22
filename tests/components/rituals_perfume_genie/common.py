@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from homeassistant.components.rituals_perfume_genie.const import ACCOUNT_HASH, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.rituals_perfume_genie.const import ACCOUNT_HASH, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -83,14 +83,14 @@ def mock_diffuser_v2_no_battery_no_cartridge() -> MagicMock:
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_diffusers: list[MagicMock],
 ) -> None:
     """Initialize the Rituals Perfume Genie integration with the given Config Entry and Diffuser list."""
     mock_config_entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.rituals_perfume_genie.Account.get_devices",
+        "smarthub.components.rituals_perfume_genie.Account.get_devices",
         return_value=mock_diffusers,
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)

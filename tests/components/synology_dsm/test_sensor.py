@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, MagicMock, Mock, patch
 import pytest
 from synology_dsm.api.core.external_usb import SynoCoreExternalUSBDevice
 
-from homeassistant.components.synology_dsm.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.synology_dsm.const import DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
@@ -14,8 +14,8 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import mock_dsm_information
 from .consts import HOST, MACS, PASSWORD, PORT, SERIAL, USE_SSL, USERNAME
@@ -26,7 +26,7 @@ from tests.common import MockConfigEntry
 @pytest.fixture
 def mock_dsm_with_usb():
     """Mock a successful service with USB support."""
-    with patch("homeassistant.components.synology_dsm.common.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.common.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 
@@ -101,7 +101,7 @@ def mock_dsm_with_usb():
 @pytest.fixture
 def mock_dsm_without_usb():
     """Mock a successful service without USB devices."""
-    with patch("homeassistant.components.synology_dsm.common.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.common.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 
@@ -118,12 +118,12 @@ def mock_dsm_without_usb():
 
 @pytest.fixture
 async def setup_dsm_with_usb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dsm_with_usb: MagicMock,
 ):
     """Mock setup of synology dsm config entry with USB."""
     with patch(
-        "homeassistant.components.synology_dsm.common.SynologyDSM",
+        "smarthub.components.synology_dsm.common.SynologyDSM",
         return_value=mock_dsm_with_usb,
     ):
         entry = MockConfigEntry(
@@ -147,12 +147,12 @@ async def setup_dsm_with_usb(
 
 @pytest.fixture
 async def setup_dsm_without_usb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dsm_without_usb: MagicMock,
 ):
     """Mock setup of synology dsm config entry without USB."""
     with patch(
-        "homeassistant.components.synology_dsm.common.SynologyDSM",
+        "smarthub.components.synology_dsm.common.SynologyDSM",
         return_value=mock_dsm_without_usb,
     ):
         entry = MockConfigEntry(
@@ -175,7 +175,7 @@ async def setup_dsm_without_usb(
 
 
 async def test_external_usb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     setup_dsm_with_usb: MagicMock,
 ) -> None:
@@ -234,7 +234,7 @@ async def test_external_usb(
 
 
 async def test_no_external_usb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_without_usb: MagicMock,
 ) -> None:
     """Test Synology DSM without USB."""

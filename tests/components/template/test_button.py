@@ -7,12 +7,12 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import setup
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.template import DOMAIN
-from homeassistant.components.template.button import DEFAULT_NAME
-from homeassistant.components.template.const import CONF_PICTURE
-from homeassistant.const import (
+from smarthub import setup
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.template import DOMAIN
+from smarthub.components.template.button import DEFAULT_NAME
+from smarthub.components.template.const import CONF_PICTURE
+from smarthub.const import (
     ATTR_ENTITY_PICTURE,
     ATTR_ICON,
     CONF_DEVICE_CLASS,
@@ -21,8 +21,8 @@ from homeassistant.const import (
     CONF_ICON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, assert_setup_component
 
@@ -40,7 +40,7 @@ _TEST_OPTIONS_BUTTON = "button.test"
     ],
 )
 async def test_setup_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     config_entry_extra_options: dict[str, str],
 ) -> None:
@@ -74,7 +74,7 @@ async def test_setup_config_entry(
     assert state == snapshot
 
 
-async def test_missing_optional_config(hass: HomeAssistant) -> None:
+async def test_missing_optional_config(hass: SmartHub) -> None:
     """Test: missing optional template is ok."""
     with assert_setup_component(1, "template"):
         assert await setup.async_setup_component(
@@ -97,7 +97,7 @@ async def test_missing_optional_config(hass: HomeAssistant) -> None:
 
 
 async def test_missing_emtpy_press_action_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test: missing optional template is ok."""
@@ -135,7 +135,7 @@ async def test_missing_emtpy_press_action_config(
     )
 
 
-async def test_missing_required_keys(hass: HomeAssistant) -> None:
+async def test_missing_required_keys(hass: SmartHub) -> None:
     """Test: missing required fields will fail."""
     with assert_setup_component(0, "template"):
         assert await setup.async_setup_component(
@@ -152,7 +152,7 @@ async def test_missing_required_keys(hass: HomeAssistant) -> None:
 
 
 async def test_all_optional_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
     calls: list[ServiceCall],
@@ -220,7 +220,7 @@ async def test_all_optional_config(
     assert entity_registry.async_get_entity_id("button", "template", "test-test")
 
 
-async def test_name_template(hass: HomeAssistant) -> None:
+async def test_name_template(hass: SmartHub) -> None:
     """Test: name template."""
     with assert_setup_component(1, "template"):
         assert await setup.async_setup_component(
@@ -258,7 +258,7 @@ async def test_name_template(hass: HomeAssistant) -> None:
     ],
 )
 async def test_templated_optional_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     field: str,
     attribute: str,
     test_template: str,
@@ -293,7 +293,7 @@ async def test_templated_optional_config(
     )
 
 
-async def test_unique_id(hass: HomeAssistant) -> None:
+async def test_unique_id(hass: SmartHub) -> None:
     """Test: unique id is ok."""
     with assert_setup_component(1, "template"):
         assert await setup.async_setup_component(
@@ -318,7 +318,7 @@ async def test_unique_id(hass: HomeAssistant) -> None:
 
 
 def _verify(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_value: str,
     attributes: dict[str, Any] | None = None,
     entity_id: str = _TEST_BUTTON,
@@ -333,7 +333,7 @@ def _verify(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

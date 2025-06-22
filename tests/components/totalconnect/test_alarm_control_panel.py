@@ -12,18 +12,18 @@ from total_connect_client.exceptions import (
     TotalConnectError,
 )
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_DOMAIN,
     AlarmControlPanelState,
 )
-from homeassistant.components.totalconnect.alarm_control_panel import (
+from smarthub.components.totalconnect.alarm_control_panel import (
     SERVICE_ALARM_ARM_AWAY_INSTANT,
     SERVICE_ALARM_ARM_HOME_INSTANT,
 )
-from homeassistant.components.totalconnect.const import DOMAIN
-from homeassistant.components.totalconnect.coordinator import SCAN_INTERVAL
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.totalconnect.const import DOMAIN
+from smarthub.components.totalconnect.coordinator import SCAN_INTERVAL
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_ALARM_ARM_AWAY,
     SERVICE_ALARM_ARM_HOME,
@@ -31,10 +31,10 @@ from homeassistant.const import (
     SERVICE_ALARM_DISARM,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 from .common import (
     LOCATION_ID,
@@ -67,12 +67,12 @@ DELAY = timedelta(seconds=10)
 
 
 async def test_attributes(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test the alarm control panel attributes are correct."""
     entry = await setup_platform(hass, ALARM_DOMAIN)
     with patch(
-        "homeassistant.components.totalconnect.TotalConnectClient.request",
+        "smarthub.components.totalconnect.TotalConnectClient.request",
         return_value=RESPONSE_DISARMED,
     ) as mock_request:
         await async_update_entity(hass, ENTITY_ID)
@@ -84,7 +84,7 @@ async def test_attributes(
 
 
 async def test_arm_home_success(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test arm home method success."""
     responses = [RESPONSE_DISARMED, RESPONSE_ARM_SUCCESS, RESPONSE_ARMED_STAY]
@@ -110,7 +110,7 @@ async def test_arm_home_success(
         assert hass.states.get(ENTITY_ID_2).state == AlarmControlPanelState.DISARMED
 
 
-async def test_arm_home_failure(hass: HomeAssistant) -> None:
+async def test_arm_home_failure(hass: SmartHub) -> None:
     """Test arm home method failure."""
     responses = [RESPONSE_DISARMED, RESPONSE_ARM_FAILURE, RESPONSE_USER_CODE_INVALID]
     await setup_platform(hass, ALARM_DOMAIN)
@@ -120,7 +120,7 @@ async def test_arm_home_failure(hass: HomeAssistant) -> None:
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.DISARMED
         assert mock_request.call_count == 1
 
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 ALARM_DOMAIN, SERVICE_ALARM_ARM_HOME, DATA, blocking=True
             )
@@ -130,7 +130,7 @@ async def test_arm_home_failure(hass: HomeAssistant) -> None:
         assert mock_request.call_count == 2
 
         # config entry usercode is invalid
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 ALARM_DOMAIN, SERVICE_ALARM_ARM_HOME, DATA, blocking=True
             )
@@ -143,7 +143,7 @@ async def test_arm_home_failure(hass: HomeAssistant) -> None:
 
 
 async def test_arm_home_instant_success(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test arm home instant method success."""
     responses = [RESPONSE_DISARMED, RESPONSE_ARM_SUCCESS, RESPONSE_ARMED_STAY]
@@ -167,7 +167,7 @@ async def test_arm_home_instant_success(
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.ARMED_HOME
 
 
-async def test_arm_home_instant_failure(hass: HomeAssistant) -> None:
+async def test_arm_home_instant_failure(hass: SmartHub) -> None:
     """Test arm home instant method failure."""
     responses = [RESPONSE_DISARMED, RESPONSE_ARM_FAILURE, RESPONSE_USER_CODE_INVALID]
     await setup_platform(hass, ALARM_DOMAIN)
@@ -177,7 +177,7 @@ async def test_arm_home_instant_failure(hass: HomeAssistant) -> None:
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.DISARMED
         assert mock_request.call_count == 1
 
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 DOMAIN, SERVICE_ALARM_ARM_HOME_INSTANT, DATA, blocking=True
             )
@@ -187,7 +187,7 @@ async def test_arm_home_instant_failure(hass: HomeAssistant) -> None:
         assert mock_request.call_count == 2
 
         # usercode is invalid
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 DOMAIN, SERVICE_ALARM_ARM_HOME_INSTANT, DATA, blocking=True
             )
@@ -200,7 +200,7 @@ async def test_arm_home_instant_failure(hass: HomeAssistant) -> None:
 
 
 async def test_arm_away_instant_success(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test arm home instant method success."""
     responses = [RESPONSE_DISARMED, RESPONSE_ARM_SUCCESS, RESPONSE_ARMED_AWAY]
@@ -224,7 +224,7 @@ async def test_arm_away_instant_success(
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.ARMED_AWAY
 
 
-async def test_arm_away_instant_failure(hass: HomeAssistant) -> None:
+async def test_arm_away_instant_failure(hass: SmartHub) -> None:
     """Test arm home instant method failure."""
     responses = [RESPONSE_DISARMED, RESPONSE_ARM_FAILURE, RESPONSE_USER_CODE_INVALID]
     await setup_platform(hass, ALARM_DOMAIN)
@@ -234,7 +234,7 @@ async def test_arm_away_instant_failure(hass: HomeAssistant) -> None:
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.DISARMED
         assert mock_request.call_count == 1
 
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 DOMAIN, SERVICE_ALARM_ARM_AWAY_INSTANT, DATA, blocking=True
             )
@@ -244,7 +244,7 @@ async def test_arm_away_instant_failure(hass: HomeAssistant) -> None:
         assert mock_request.call_count == 2
 
         # usercode is invalid
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 DOMAIN, SERVICE_ALARM_ARM_AWAY_INSTANT, DATA, blocking=True
             )
@@ -257,7 +257,7 @@ async def test_arm_away_instant_failure(hass: HomeAssistant) -> None:
 
 
 async def test_arm_away_success(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test arm away method success."""
     responses = [RESPONSE_DISARMED, RESPONSE_ARM_SUCCESS, RESPONSE_ARMED_AWAY]
@@ -280,7 +280,7 @@ async def test_arm_away_success(
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.ARMED_AWAY
 
 
-async def test_arm_away_failure(hass: HomeAssistant) -> None:
+async def test_arm_away_failure(hass: SmartHub) -> None:
     """Test arm away method failure."""
     responses = [RESPONSE_DISARMED, RESPONSE_ARM_FAILURE, RESPONSE_USER_CODE_INVALID]
     await setup_platform(hass, ALARM_DOMAIN)
@@ -290,7 +290,7 @@ async def test_arm_away_failure(hass: HomeAssistant) -> None:
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.DISARMED
         assert mock_request.call_count == 1
 
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 ALARM_DOMAIN, SERVICE_ALARM_ARM_AWAY, DATA, blocking=True
             )
@@ -300,7 +300,7 @@ async def test_arm_away_failure(hass: HomeAssistant) -> None:
         assert mock_request.call_count == 2
 
         # usercode is invalid
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 ALARM_DOMAIN, SERVICE_ALARM_ARM_AWAY, DATA, blocking=True
             )
@@ -313,7 +313,7 @@ async def test_arm_away_failure(hass: HomeAssistant) -> None:
 
 
 async def test_disarm_success(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test disarm method success."""
     responses = [RESPONSE_ARMED_AWAY, RESPONSE_DISARM_SUCCESS, RESPONSE_DISARMED]
@@ -336,7 +336,7 @@ async def test_disarm_success(
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.DISARMED
 
 
-async def test_disarm_failure(hass: HomeAssistant) -> None:
+async def test_disarm_failure(hass: SmartHub) -> None:
     """Test disarm method failure."""
     responses = [
         RESPONSE_ARMED_AWAY,
@@ -350,7 +350,7 @@ async def test_disarm_failure(hass: HomeAssistant) -> None:
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.ARMED_AWAY
         assert mock_request.call_count == 1
 
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 ALARM_DOMAIN, SERVICE_ALARM_DISARM, DATA, blocking=True
             )
@@ -360,7 +360,7 @@ async def test_disarm_failure(hass: HomeAssistant) -> None:
         assert mock_request.call_count == 2
 
         # usercode is invalid
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 ALARM_DOMAIN, SERVICE_ALARM_DISARM, DATA, blocking=True
             )
@@ -373,7 +373,7 @@ async def test_disarm_failure(hass: HomeAssistant) -> None:
 
 
 async def test_disarm_code_required(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test disarm with code."""
     responses = [RESPONSE_ARMED_AWAY, RESPONSE_DISARM_SUCCESS, RESPONSE_DISARMED]
@@ -411,7 +411,7 @@ async def test_disarm_code_required(
 
 
 async def test_arm_night_success(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test arm night method success."""
     responses = [RESPONSE_DISARMED, RESPONSE_ARM_SUCCESS, RESPONSE_ARMED_NIGHT]
@@ -434,7 +434,7 @@ async def test_arm_night_success(
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.ARMED_NIGHT
 
 
-async def test_arm_night_failure(hass: HomeAssistant) -> None:
+async def test_arm_night_failure(hass: SmartHub) -> None:
     """Test arm night method failure."""
     responses = [RESPONSE_DISARMED, RESPONSE_ARM_FAILURE, RESPONSE_USER_CODE_INVALID]
     await setup_platform(hass, ALARM_DOMAIN)
@@ -444,7 +444,7 @@ async def test_arm_night_failure(hass: HomeAssistant) -> None:
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.DISARMED
         assert mock_request.call_count == 1
 
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 ALARM_DOMAIN, SERVICE_ALARM_ARM_NIGHT, DATA, blocking=True
             )
@@ -454,7 +454,7 @@ async def test_arm_night_failure(hass: HomeAssistant) -> None:
         assert mock_request.call_count == 2
 
         # usercode is invalid
-        with pytest.raises(HomeAssistantError) as err:
+        with pytest.raises(SmartHubError) as err:
             await hass.services.async_call(
                 ALARM_DOMAIN, SERVICE_ALARM_ARM_NIGHT, DATA, blocking=True
             )
@@ -466,7 +466,7 @@ async def test_arm_night_failure(hass: HomeAssistant) -> None:
         assert mock_request.call_count == 3
 
 
-async def test_arming(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+async def test_arming(hass: SmartHub, freezer: FrozenDateTimeFactory) -> None:
     """Test arming."""
     responses = [RESPONSE_DISARMED, RESPONSE_SUCCESS, RESPONSE_ARMING]
     await setup_platform(hass, ALARM_DOMAIN)
@@ -488,7 +488,7 @@ async def test_arming(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> No
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.ARMING
 
 
-async def test_disarming(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+async def test_disarming(hass: SmartHub, freezer: FrozenDateTimeFactory) -> None:
     """Test disarming."""
     responses = [RESPONSE_ARMED_AWAY, RESPONSE_SUCCESS, RESPONSE_DISARMING]
     await setup_platform(hass, ALARM_DOMAIN)
@@ -510,7 +510,7 @@ async def test_disarming(hass: HomeAssistant, freezer: FrozenDateTimeFactory) ->
         assert hass.states.get(ENTITY_ID).state == AlarmControlPanelState.DISARMING
 
 
-async def test_armed_custom(hass: HomeAssistant) -> None:
+async def test_armed_custom(hass: SmartHub) -> None:
     """Test armed custom."""
     responses = [RESPONSE_ARMED_CUSTOM]
     await setup_platform(hass, ALARM_DOMAIN)
@@ -524,7 +524,7 @@ async def test_armed_custom(hass: HomeAssistant) -> None:
         assert mock_request.call_count == 1
 
 
-async def test_unknown(hass: HomeAssistant) -> None:
+async def test_unknown(hass: SmartHub) -> None:
     """Test unknown arm status."""
     responses = [RESPONSE_UNKNOWN]
     await setup_platform(hass, ALARM_DOMAIN)
@@ -536,7 +536,7 @@ async def test_unknown(hass: HomeAssistant) -> None:
 
 
 async def test_other_update_failures(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test other failures seen during updates."""
     responses = [
@@ -591,7 +591,7 @@ async def test_other_update_failures(
         assert mock_request.call_count == 6
 
 
-async def test_authentication_error(hass: HomeAssistant) -> None:
+async def test_authentication_error(hass: SmartHub) -> None:
     """Test other failures seen during updates."""
     entry = await setup_platform(hass, ALARM_DOMAIN)
 

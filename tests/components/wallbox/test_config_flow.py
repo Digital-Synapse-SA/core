@@ -5,9 +5,9 @@ import json
 
 import requests_mock
 
-from homeassistant import config_entries
-from homeassistant.components.wallbox import config_flow
-from homeassistant.components.wallbox.const import (
+from smarthub import config_entries
+from smarthub.components.wallbox import config_flow
+from smarthub.components.wallbox.const import (
     CHARGER_ADDED_ENERGY_KEY,
     CHARGER_ADDED_RANGE_KEY,
     CHARGER_CHARGING_POWER_KEY,
@@ -17,9 +17,9 @@ from homeassistant.components.wallbox.const import (
     CHARGER_MAX_CHARGING_CURRENT_KEY,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     authorisation_response,
@@ -43,7 +43,7 @@ test_response = json.loads(
 )
 
 
-async def test_show_set_form(hass: HomeAssistant) -> None:
+async def test_show_set_form(hass: SmartHub) -> None:
     """Test that the setup form is served."""
     flow = config_flow.WallboxConfigFlow()
     flow.hass = hass
@@ -53,7 +53,7 @@ async def test_show_set_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_form_cannot_authenticate(hass: HomeAssistant) -> None:
+async def test_form_cannot_authenticate(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -83,7 +83,7 @@ async def test_form_cannot_authenticate(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -113,7 +113,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_validate_input(hass: HomeAssistant) -> None:
+async def test_form_validate_input(hass: SmartHub) -> None:
     """Test we can validate input."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -143,7 +143,7 @@ async def test_form_validate_input(hass: HomeAssistant) -> None:
     assert result2["data"]["station"] == "12345"
 
 
-async def test_form_reauth(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_form_reauth(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test we handle reauth flow."""
     await setup_integration(hass, entry)
     assert entry.state is ConfigEntryState.LOADED
@@ -178,7 +178,7 @@ async def test_form_reauth(hass: HomeAssistant, entry: MockConfigEntry) -> None:
     await hass.config_entries.async_unload(entry.entry_id)
 
 
-async def test_form_reauth_invalid(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_form_reauth_invalid(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test we handle reauth invalid flow."""
     await setup_integration(hass, entry)
     assert entry.state is ConfigEntryState.LOADED

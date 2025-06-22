@@ -19,12 +19,12 @@ from . import assert_adds_messages, assert_no_messages
 @pytest.mark.parametrize(
     ("module_name", "expected_platform", "in_platforms"),
     [
-        ("homeassistant", None, False),
-        ("homeassistant.components", None, False),
-        ("homeassistant.components.pylint_test", "__init__", False),
-        ("homeassistant.components.pylint_test.config_flow", "config_flow", False),
-        ("homeassistant.components.pylint_test.light", "light", True),
-        ("homeassistant.components.pylint_test.light.v1", None, False),
+        ("smarthub", None, False),
+        ("smarthub.components", None, False),
+        ("smarthub.components.pylint_test", "__init__", False),
+        ("smarthub.components.pylint_test.config_flow", "config_flow", False),
+        ("smarthub.components.pylint_test.light", "light", True),
+        ("smarthub.components.pylint_test.light.v1", None, False),
     ],
 )
 def test_regex_get_module_platform(
@@ -115,7 +115,7 @@ def test_ignore_no_annotations(
 
     func_node = astroid.extract_node(
         code,
-        "homeassistant.components.pylint_test.light",
+        "smarthub.components.pylint_test.light",
     )
     type_hint_checker.visit_module(func_node.parent)
 
@@ -150,7 +150,7 @@ def test_bypass_ignore_no_annotations(
 
     func_node = astroid.extract_node(
         code,
-        "homeassistant.components.pylint_test",
+        "smarthub.components.pylint_test",
     )
     type_hint_checker.visit_module(func_node.parent)
 
@@ -190,7 +190,7 @@ def test_dont_ignore_partial_annotations(
     """Ensure that _is_valid_type is run if there is at least one annotation."""
     func_node = astroid.extract_node(
         code,
-        "homeassistant.components.pylint_test",
+        "smarthub.components.pylint_test",
     )
     type_hint_checker.visit_module(func_node.parent)
 
@@ -208,14 +208,14 @@ def test_invalid_discovery_info(
     func_node, discovery_info_node = astroid.extract_node(
         """
     async def async_setup_scanner( #@
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         async_see: AsyncSeeCallback,
         discovery_info: dict[str, Any] | None = None, #@
     ) -> bool:
         pass
     """,
-        "homeassistant.components.pylint_test.device_tracker",
+        "smarthub.components.pylint_test.device_tracker",
     )
     type_hint_checker.visit_module(func_node.parent)
 
@@ -241,14 +241,14 @@ def test_valid_discovery_info(
     func_node = astroid.extract_node(
         """
     async def async_setup_scanner( #@
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         async_see: AsyncSeeCallback,
         discovery_info: DiscoveryInfoType | None = None,
     ) -> bool:
         pass
     """,
-        "homeassistant.components.pylint_test.device_tracker",
+        "smarthub.components.pylint_test.device_tracker",
     )
     type_hint_checker.visit_module(func_node.parent)
 
@@ -263,12 +263,12 @@ def test_invalid_list_dict_str_any(
     func_node = astroid.extract_node(
         """
     async def async_get_triggers( #@
-        hass: HomeAssistant,
+        hass: SmartHub,
         device_id: str
     ) -> list:
         pass
     """,
-        "homeassistant.components.pylint_test.device_trigger",
+        "smarthub.components.pylint_test.device_trigger",
     )
     type_hint_checker.visit_module(func_node.parent)
 
@@ -297,12 +297,12 @@ def test_valid_list_dict_str_any(
     func_node = astroid.extract_node(
         """
     async def async_get_triggers( #@
-        hass: HomeAssistant,
+        hass: SmartHub,
         device_id: str
     ) -> list[dict[str, Any]]:
         pass
     """,
-        "homeassistant.components.pylint_test.device_trigger",
+        "smarthub.components.pylint_test.device_trigger",
     )
     type_hint_checker.visit_module(func_node.parent)
 
@@ -339,7 +339,7 @@ def test_invalid_config_flow_step(
         ):
             pass
     """,
-        "homeassistant.components.pylint_test.config_flow",
+        "smarthub.components.pylint_test.config_flow",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -451,7 +451,7 @@ def test_invalid_flow_step(
     """Ensure invalid hints are rejected for flow step."""
     class_node, func_node = astroid.extract_node(
         code,
-        "homeassistant.components.pylint_test.config_flow",
+        "smarthub.components.pylint_test.config_flow",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -508,7 +508,7 @@ def test_valid_flow_step(
     """Ensure valid hints are accepted for flow step."""
     class_node = astroid.extract_node(
         code,
-        "homeassistant.components.pylint_test.config_flow",
+        "smarthub.components.pylint_test.config_flow",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -543,7 +543,7 @@ def test_invalid_config_flow_async_get_options_flow(
         ) -> AxisOptionsFlow:
             return AxisOptionsFlow(config_entry)
     """,
-        "homeassistant.components.pylint_test.config_flow",
+        "smarthub.components.pylint_test.config_flow",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -603,7 +603,7 @@ def test_valid_config_flow_async_get_options_flow(
             return AxisOptionsFlow(config_entry)
 
     """,
-        "homeassistant.components.pylint_test.config_flow",
+        "smarthub.components.pylint_test.config_flow",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -641,7 +641,7 @@ def test_invalid_entity_properties(
         ) -> bool:
             pass
     """,
-        "homeassistant.components.pylint_test.lock",
+        "smarthub.components.pylint_test.lock",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -708,7 +708,7 @@ def test_ignore_invalid_entity_properties(
         ):
             pass
     """,
-        "homeassistant.components.pylint_test.lock",
+        "smarthub.components.pylint_test.lock",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -746,7 +746,7 @@ def test_named_arguments(
         ) -> bool:
             pass
     """,
-        "homeassistant.components.pylint_test.fan",
+        "smarthub.components.pylint_test.fan",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -829,7 +829,7 @@ def test_invalid_mapping_return_type(
         ){return_hint}:
             pass
     """,
-        "homeassistant.components.pylint_test.fan",
+        "smarthub.components.pylint_test.fan",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -892,7 +892,7 @@ def test_valid_mapping_return_type(
         ){return_hint}:
             pass
     """,
-        "homeassistant.components.pylint_test.fan",
+        "smarthub.components.pylint_test.fan",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -939,7 +939,7 @@ def test_valid_long_tuple(
         ) -> tuple[int, int, int, int, int]:
             pass
     """,
-        "homeassistant.components.pylint_test.light",
+        "smarthub.components.pylint_test.light",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -980,7 +980,7 @@ def test_invalid_long_tuple(
         ) -> tuple[int, int, int, int, float]:
             pass
     """,
-        "homeassistant.components.pylint_test.light",
+        "smarthub.components.pylint_test.light",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -1032,7 +1032,7 @@ def test_invalid_device_class(
         ):
             pass
     """,
-        "homeassistant.components.pylint_test.cover",
+        "smarthub.components.pylint_test.cover",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -1072,7 +1072,7 @@ def test_media_player_entity(
         async def async_get_media_image(self) -> tuple[bytes | None, str | None]:
             pass
     """,
-        "homeassistant.components.pylint_test.media_player",
+        "smarthub.components.pylint_test.media_player",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -1105,7 +1105,7 @@ def test_humidifier_entity(
         def async_set_humidity(self, humidity: float) -> None:
             pass
     """,
-        "homeassistant.components.pylint_test.humidifier",
+        "smarthub.components.pylint_test.humidifier",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -1142,7 +1142,7 @@ def test_number_entity(linter: UnittestLinter, type_hint_checker: BaseChecker) -
         def native_value(self) -> int:
             pass
     """,
-        "homeassistant.components.pylint_test.number",
+        "smarthub.components.pylint_test.number",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -1175,7 +1175,7 @@ def test_vacuum_entity(linter: UnittestLinter, type_hint_checker: BaseChecker) -
         ) -> None:
             pass
     """,
-        "homeassistant.components.pylint_test.vacuum",
+        "smarthub.components.pylint_test.vacuum",
     )
     type_hint_checker.visit_module(class_node.parent)
 
@@ -1193,7 +1193,7 @@ def test_notify_get_service(
         pass
 
     async def async_get_service( #@
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         discovery_info: DiscoveryInfoType | None = None,
     ) -> CustomNotificationService:
@@ -1202,7 +1202,7 @@ def test_notify_get_service(
     class CustomNotificationService(BaseNotificationService):
         pass
     """,
-        "homeassistant.components.pylint_test.notify",
+        "smarthub.components.pylint_test.notify",
     )
     type_hint_checker.visit_module(func_node.parent)
 
@@ -1219,7 +1219,7 @@ def test_pytest_function(
     func_node = astroid.extract_node(
         """
     async def test_sample( #@
-        hass: HomeAssistant,
+        hass: SmartHub,
         caplog: pytest.LogCaptureFixture,
         aiohttp_server: Callable[[], TestServer],
         unused_tcp_port_factory: Callable[[], int],
@@ -1328,7 +1328,7 @@ def test_pytest_invalid_function(
         pylint.testutils.MessageTest(
             msg_id="hass-argument-type",
             node=hass_node,
-            args=("hass", "HomeAssistant", "test_sample"),
+            args=("hass", "SmartHub", "test_sample"),
             line=3,
             col_offset=4,
             end_line=3,
@@ -1346,7 +1346,7 @@ def test_pytest_fixture(linter: UnittestLinter, type_hint_checker: BaseChecker) 
 
     @pytest.fixture
     def sample_fixture( #@
-        hass: HomeAssistant,
+        hass: SmartHub,
         caplog: pytest.LogCaptureFixture,
         capsys: pytest.CaptureFixture[str],
         aiohttp_server: Callable[[], TestServer],
@@ -1409,7 +1409,7 @@ def test_pytest_invalid_fixture(
         pylint.testutils.MessageTest(
             msg_id="hass-argument-type",
             node=hass_node,
-            args=("hass", "HomeAssistant", "sample_fixture"),
+            args=("hass", "SmartHub", "sample_fixture"),
             line=6,
             col_offset=4,
             end_line=6,
@@ -1434,13 +1434,13 @@ def test_valid_generic(
     func_node = astroid.extract_node(
         f"""
     async def async_setup_entry( #@
-        hass: HomeAssistant,
+        hass: SmartHub,
         entry: {entry_annotation},
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
         pass
     """,
-        "homeassistant.components.pylint_test.notify",
+        "smarthub.components.pylint_test.notify",
     )
     type_hint_checker.visit_module(func_node.parent)
 
@@ -1466,13 +1466,13 @@ def test_invalid_generic(
     func_node, entry_node = astroid.extract_node(
         f"""
     async def async_setup_entry( #@
-        hass: HomeAssistant,
+        hass: SmartHub,
         entry: {entry_annotation}, #@
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
         pass
     """,
-        "homeassistant.components.pylint_test.notify",
+        "smarthub.components.pylint_test.notify",
     )
     type_hint_checker.visit_module(func_node.parent)
 

@@ -1,9 +1,9 @@
 """Utility to setup the Insteon integration."""
 
-from homeassistant.components.insteon.api import async_load_api
-from homeassistant.components.insteon.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.insteon.api import async_load_api
+from smarthub.components.insteon.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .const import MOCK_USER_INPUT_PLM
 from .mock_devices import MockDevices
@@ -13,7 +13,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def async_mock_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     config_data: dict | None = None,
     config_options: dict | None = None,

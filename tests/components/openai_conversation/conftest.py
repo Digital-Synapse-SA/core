@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.const import CONF_LLM_HASS_API
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import llm
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_LLM_HASS_API
+from smarthub.core import SmartHub
+from smarthub.helpers import llm
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Mock a config entry."""
     entry = MockConfigEntry(
         title="OpenAI",
@@ -28,7 +28,7 @@ def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 @pytest.fixture
 def mock_config_entry_with_assist(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> MockConfigEntry:
     """Mock a config entry with assist."""
     hass.config_entries.async_update_entry(
@@ -39,7 +39,7 @@ def mock_config_entry_with_assist(
 
 @pytest.fixture
 async def mock_init_component(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Initialize integration."""
     with patch(
@@ -50,6 +50,6 @@ async def mock_init_component(
 
 
 @pytest.fixture(autouse=True)
-async def setup_ha(hass: HomeAssistant) -> None:
-    """Set up Home Assistant."""
-    assert await async_setup_component(hass, "homeassistant", {})
+async def setup_ha(hass: SmartHub) -> None:
+    """Set up SmartHub."""
+    assert await async_setup_component(hass, "smarthub", {})

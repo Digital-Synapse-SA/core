@@ -7,20 +7,20 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.recorder.statistics import statistics_during_period
-from homeassistant.components.suez_water.const import (
+from smarthub.components.recorder.statistics import statistics_during_period
+from smarthub.components.suez_water.const import (
     CONF_COUNTER_ID,
     DATA_REFRESH_INTERVAL,
     DOMAIN,
 )
-from homeassistant.components.suez_water.coordinator import (
+from smarthub.components.suez_water.coordinator import (
     PySuezError,
     TelemetryMeasure,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_USERNAME
-from homeassistant.core import HomeAssistant
-import homeassistant.util.dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_USERNAME
+from smarthub.core import SmartHub
+import smarthub.util.dt as dt_util
 
 from . import setup_integration
 from .conftest import MOCK_DATA
@@ -30,7 +30,7 @@ from tests.components.recorder.common import async_wait_recording_done
 
 
 async def test_initialization_setup_api_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -43,7 +43,7 @@ async def test_initialization_setup_api_error(
 
 
 async def test_init_auth_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -55,7 +55,7 @@ async def test_init_auth_failed(
 
 
 async def test_init_refresh_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -67,7 +67,7 @@ async def test_init_refresh_failed(
 
 
 async def test_init_statistics_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -80,7 +80,7 @@ async def test_init_statistics_failed(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_statistics_no_price(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -123,7 +123,7 @@ async def test_statistics_no_price(
     ],
 )
 async def test_statistics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -220,7 +220,7 @@ async def test_statistics(
 
 
 async def _test_for_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
     snapshot: SnapshotAssertion,
     statistic: str,
@@ -247,7 +247,7 @@ async def _test_for_data(
 
 
 async def test_migration_version_rollback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
 ) -> None:
     """Test that downgrading from a future version is not possible."""
@@ -263,7 +263,7 @@ async def test_migration_version_rollback(
 
 
 async def test_no_migration_current_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
 ) -> None:
     """Test that a current version does not migrate."""
@@ -280,7 +280,7 @@ async def test_no_migration_current_version(
 
 
 async def test_migration_version_1_to_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     suez_client: AsyncMock,
 ) -> None:
     """Test that a migration from 1 to 2 changes the unique_id."""

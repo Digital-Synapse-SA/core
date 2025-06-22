@@ -12,9 +12,9 @@ from plugwise.exceptions import (
 )
 import pytest
 
-from homeassistant.components.plugwise.const import DEFAULT_PORT, DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF, ConfigFlowResult
-from homeassistant.const import (
+from smarthub.components.plugwise.const import DEFAULT_PORT, DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF, ConfigFlowResult
+from smarthub.const import (
     CONF_HOST,
     CONF_NAME,
     CONF_PASSWORD,
@@ -22,9 +22,9 @@ from homeassistant.const import (
     CONF_SOURCE,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -96,7 +96,7 @@ TEST_DISCOVERY_ADAM = ZeroconfServiceInfo(
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_smile_config_flow: MagicMock,
 ) -> None:
@@ -140,7 +140,7 @@ async def test_form(
     ],
 )
 async def test_zeroconf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_smile_config_flow: MagicMock,
     discovery: ZeroconfServiceInfo,
@@ -179,7 +179,7 @@ async def test_zeroconf_flow(
 
 
 async def test_zeroconf_flow_stretch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_smile_config_flow: MagicMock,
 ) -> None:
@@ -214,7 +214,7 @@ async def test_zeroconf_flow_stretch(
 
 
 async def test_zercoconf_discovery_update_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_smile_config_flow: MagicMock,
 ) -> None:
@@ -268,7 +268,7 @@ async def test_zercoconf_discovery_update_configuration(
     ],
 )
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_smile_config_flow: MagicMock,
     side_effect: Exception,
@@ -318,7 +318,7 @@ async def test_flow_errors(
 
 
 async def test_user_abort_existing_anna(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_smile_config_flow: MagicMock,
 ) -> None:
@@ -353,7 +353,7 @@ async def test_user_abort_existing_anna(
 
 
 async def test_zeroconf_abort_existing_anna(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_smile_config_flow: MagicMock,
 ) -> None:
@@ -381,7 +381,7 @@ async def test_zeroconf_abort_existing_anna(
 
 
 async def test_zeroconf_abort_anna_with_existing_config_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_adam: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -395,7 +395,7 @@ async def test_zeroconf_abort_anna_with_existing_config_entries(
     assert result.get("reason") == "anna_with_adam"
 
 
-async def test_zeroconf_abort_anna_with_adam(hass: HomeAssistant) -> None:
+async def test_zeroconf_abort_anna_with_adam(hass: SmartHub) -> None:
     """Test we abort Anna discovery when an Adam is also discovered."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -439,7 +439,7 @@ async def test_zeroconf_abort_anna_with_adam(hass: HomeAssistant) -> None:
 
 
 async def _start_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     host_ip: str,
 ) -> ConfigFlowResult:
@@ -457,7 +457,7 @@ async def _start_reconfigure_flow(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_adam: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -472,7 +472,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_flow_smile_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_adam: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -498,7 +498,7 @@ async def test_reconfigure_flow_smile_mismatch(
     ],
 )
 async def test_reconfigure_flow_connect_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_adam: AsyncMock,
     mock_config_entry: MockConfigEntry,
     side_effect: Exception,

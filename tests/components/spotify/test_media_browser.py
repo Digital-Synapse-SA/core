@@ -5,11 +5,11 @@ from unittest.mock import MagicMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.media_player import BrowseError
-from homeassistant.components.spotify import DOMAIN
-from homeassistant.components.spotify.browse_media import async_browse_media
-from homeassistant.const import CONF_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.media_player import BrowseError
+from smarthub.components.spotify import DOMAIN
+from smarthub.components.spotify.browse_media import async_browse_media
+from smarthub.const import CONF_ID
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .conftest import SCOPES
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_browse_media_root(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -52,7 +52,7 @@ async def test_browse_media_root(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_browse_media_categories(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -70,7 +70,7 @@ async def test_browse_media_categories(
 )
 @pytest.mark.usefixtures("setup_credentials")
 async def test_browse_media_playlists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_id: str,
     mock_spotify: MagicMock,
     snapshot: SnapshotAssertion,
@@ -121,7 +121,7 @@ async def test_browse_media_playlists(
 )
 @pytest.mark.usefixtures("setup_credentials")
 async def test_browsing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
@@ -147,7 +147,7 @@ async def test_browsing(
 )
 @pytest.mark.usefixtures("setup_credentials")
 async def test_invalid_spotify_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     media_content_id: str | None,
@@ -164,7 +164,7 @@ async def test_invalid_spotify_url(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_browsing_not_loaded_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

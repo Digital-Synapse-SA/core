@@ -1,8 +1,8 @@
 """Tests for the Holiday integration."""
 
-from homeassistant.components.holiday.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.holiday.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -12,7 +12,7 @@ MOCK_CONFIG_DATA = {
 }
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test removing integration."""
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG_DATA)
     entry.add_to_hass(hass)

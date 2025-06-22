@@ -9,15 +9,15 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 import voluptuous as vol
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     collection,
     entity_component,
     entity_registry as er,
     storage,
 )
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.util.dt import utcnow
+from smarthub.helpers.typing import ConfigType
+from smarthub.util.dt import utcnow
 
 from tests.common import flush_store
 from tests.typing import WebSocketGenerator
@@ -194,7 +194,7 @@ async def test_yaml_collection_skipping_duplicate_ids() -> None:
     )
 
 
-async def test_storage_collection(hass: HomeAssistant) -> None:
+async def test_storage_collection(hass: SmartHub) -> None:
     """Test storage collection."""
     store = storage.Store(hass, 1, "test-data")
     await store.async_save(
@@ -258,7 +258,7 @@ async def test_storage_collection(hass: HomeAssistant) -> None:
 
 
 async def test_storage_collection_update_modifiet_at(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -335,7 +335,7 @@ async def test_storage_collection_update_modifiet_at(
     assert modified_3 == modified_2
 
 
-async def test_attach_entity_component_collection(hass: HomeAssistant) -> None:
+async def test_attach_entity_component_collection(hass: SmartHub) -> None:
     """Test attaching collection to entity component."""
     ent_comp = entity_component.EntityComponent(_LOGGER, "test", hass)
     await ent_comp.async_setup({})
@@ -376,7 +376,7 @@ async def test_attach_entity_component_collection(hass: HomeAssistant) -> None:
 
 
 async def test_entity_component_collection_abort(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test aborted entity adding is handled."""
     ent_comp = entity_component.EntityComponent(_LOGGER, "test", hass)
@@ -444,7 +444,7 @@ async def test_entity_component_collection_abort(
 
 
 async def test_entity_component_collection_entity_removed(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test entity removal is handled."""
     ent_comp = entity_component.EntityComponent(_LOGGER, "test", hass)
@@ -514,7 +514,7 @@ async def test_entity_component_collection_entity_removed(
 
 
 async def test_storage_collection_websocket(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test exposing a storage collection via websockets."""
     store = storage.Store(hass, 1, "test-data")
@@ -647,7 +647,7 @@ async def test_storage_collection_websocket(
 
 
 async def test_storage_collection_websocket_subscribe(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test exposing a storage collection via websockets."""
     store = storage.Store(hass, 1, "test-data")

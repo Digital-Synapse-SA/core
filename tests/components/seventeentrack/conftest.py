@@ -6,13 +6,13 @@ from unittest.mock import AsyncMock, patch
 from pyseventeentrack.package import Package
 import pytest
 
-from homeassistant.components.seventeentrack.const import (
+from smarthub.components.seventeentrack.const import (
     CONF_SHOW_ARCHIVED,
     CONF_SHOW_DELIVERED,
     DEFAULT_SHOW_ARCHIVED,
     DEFAULT_SHOW_DELIVERED,
 )
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
 
 from tests.common import MockConfigEntry
 
@@ -77,7 +77,7 @@ VALID_PLATFORM_CONFIG_FULL = {
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.seventeentrack.async_setup_entry", return_value=True
+        "smarthub.components.seventeentrack.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -113,11 +113,11 @@ def mock_seventeentrack():
     mock_seventeentrack_api = AsyncMock()
     with (
         patch(
-            "homeassistant.components.seventeentrack.SeventeenTrackClient",
+            "smarthub.components.seventeentrack.SeventeenTrackClient",
             return_value=mock_seventeentrack_api,
         ),
         patch(
-            "homeassistant.components.seventeentrack.config_flow.SeventeenTrackClient",
+            "smarthub.components.seventeentrack.config_flow.SeventeenTrackClient",
             return_value=mock_seventeentrack_api,
         ) as mock_seventeentrack_api,
     ):

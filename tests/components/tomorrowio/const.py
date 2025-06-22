@@ -1,6 +1,6 @@
 """Constants for tomorrowio tests."""
 
-from homeassistant.const import (
+from smarthub.const import (
     CONF_API_KEY,
     CONF_LATITUDE,
     CONF_LOCATION,

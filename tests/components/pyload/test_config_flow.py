@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock
 from pyloadapi.exceptions import CannotConnect, InvalidAuth, ParserError
 import pytest
 
-from homeassistant.components.pyload.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.pyload.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import NEW_INPUT, REAUTH_INPUT, USER_INPUT
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_pyloadapi: AsyncMock,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_form(
     ],
 )
 async def test_form_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_pyloadapi: AsyncMock,
     exception: Exception,
@@ -81,7 +81,7 @@ async def test_form_errors(
 
 
 async def test_flow_user_already_configured(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_pyloadapi: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_pyloadapi: AsyncMock
 ) -> None:
     """Test we abort user data set when entry is already configured."""
 
@@ -104,7 +104,7 @@ async def test_flow_user_already_configured(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
 ) -> None:
@@ -137,7 +137,7 @@ async def test_reauth(
     ],
 )
 async def test_reauth_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
     side_effect: Exception,
@@ -176,7 +176,7 @@ async def test_reauth_errors(
 
 
 async def test_reconfiguration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
 ) -> None:
@@ -209,7 +209,7 @@ async def test_reconfiguration(
     ],
 )
 async def test_reconfigure_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
     side_effect: Exception,

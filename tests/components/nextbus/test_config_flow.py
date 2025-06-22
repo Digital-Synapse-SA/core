@@ -5,18 +5,18 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant import config_entries, setup
-from homeassistant.components.nextbus.const import CONF_AGENCY, CONF_ROUTE, DOMAIN
-from homeassistant.const import CONF_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries, setup
+from smarthub.components.nextbus.const import CONF_AGENCY, CONF_ROUTE, DOMAIN
+from smarthub.const import CONF_STOP
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 @pytest.fixture
 def mock_setup_entry() -> Generator[MagicMock]:
     """Create a mock for the nextbus component setup."""
     with patch(
-        "homeassistant.components.nextbus.async_setup_entry",
+        "smarthub.components.nextbus.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -25,12 +25,12 @@ def mock_setup_entry() -> Generator[MagicMock]:
 @pytest.fixture
 def mock_nextbus() -> Generator[MagicMock]:
     """Create a mock py_nextbus module."""
-    with patch("homeassistant.components.nextbus.config_flow.NextBusClient") as client:
+    with patch("smarthub.components.nextbus.config_flow.NextBusClient") as client:
         yield client
 
 
 async def test_user_config(
-    hass: HomeAssistant, mock_setup_entry: MagicMock, mock_nextbus_lists: MagicMock
+    hass: SmartHub, mock_setup_entry: MagicMock, mock_nextbus_lists: MagicMock
 ) -> None:
     """Test we get the form."""
     await setup.async_setup_component(hass, "persistent_notification", {})

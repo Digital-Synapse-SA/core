@@ -10,9 +10,9 @@ import httpx
 import pytest
 import respx
 
-from homeassistant.components import image, mqtt
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components import image, mqtt
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .common import (
     help_custom_config,
@@ -60,7 +60,7 @@ DEFAULT_CONFIG = {
     [{mqtt.DOMAIN: {image.DOMAIN: {"image_topic": "test/image", "name": "Test"}}}],
 )
 async def test_run_image_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mqtt_mock_entry: MqttMockHAClientGenerator,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_run_image_setup(
     ],
 )
 async def test_run_image_b64_encoded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
@@ -160,7 +160,7 @@ async def test_run_image_b64_encoded(
     ],
 )
 async def test_image_b64_encoded_with_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mqtt_mock_entry: MqttMockHAClientGenerator,
 ) -> None:
@@ -210,7 +210,7 @@ async def test_image_b64_encoded_with_availability(
     ],
 )
 async def test_image_from_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
@@ -292,7 +292,7 @@ async def test_image_from_url(
     ],
 )
 async def test_image_from_url_with_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mqtt_mock_entry: MqttMockHAClientGenerator,
 ) -> None:
@@ -353,7 +353,7 @@ async def test_image_from_url_with_template(
     ],
 )
 async def test_image_from_url_content_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     content_type: str,
@@ -421,7 +421,7 @@ async def test_image_from_url_content_type(
     ],
 )
 async def test_image_from_url_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     side_effect: Exception,
@@ -512,7 +512,7 @@ async def test_image_config_fails(
 
 @pytest.mark.parametrize("hass_config", [DEFAULT_CONFIG])
 async def test_availability_when_connection_lost(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability after MQTT disconnection."""
     await help_test_availability_when_connection_lost(
@@ -522,7 +522,7 @@ async def test_availability_when_connection_lost(
 
 @pytest.mark.parametrize("hass_config", [DEFAULT_CONFIG])
 async def test_availability_without_topic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability without defined availability topic."""
     await help_test_availability_without_topic(
@@ -531,7 +531,7 @@ async def test_availability_without_topic(
 
 
 async def test_default_availability_payload(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability by default payload with defined topic."""
     await help_test_default_availability_payload(
@@ -540,7 +540,7 @@ async def test_default_availability_payload(
 
 
 async def test_custom_availability_payload(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability by custom payload with defined topic."""
     await help_test_custom_availability_payload(
@@ -549,7 +549,7 @@ async def test_custom_availability_payload(
 
 
 async def test_setting_attribute_via_mqtt_json_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_attribute_via_mqtt_json_message(
@@ -558,7 +558,7 @@ async def test_setting_attribute_via_mqtt_json_message(
 
 
 async def test_setting_attribute_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_attribute_with_template(
@@ -567,7 +567,7 @@ async def test_setting_attribute_with_template(
 
 
 async def test_update_with_json_attrs_not_dict(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -578,7 +578,7 @@ async def test_update_with_json_attrs_not_dict(
 
 
 async def test_update_with_json_attrs_bad_json(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -589,7 +589,7 @@ async def test_update_with_json_attrs_bad_json(
 
 
 async def test_discovery_update_attr(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered MQTTAttributes."""
     await help_test_discovery_update_attr(
@@ -619,14 +619,14 @@ async def test_discovery_update_attr(
     ],
 )
 async def test_unique_id(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test unique id option only creates one image per unique_id."""
     await help_test_unique_id(hass, mqtt_mock_entry, image.DOMAIN)
 
 
 async def test_discovery_removal_image(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test removal of discovered image."""
     data = json.dumps(DEFAULT_CONFIG[mqtt.DOMAIN][image.DOMAIN])
@@ -634,7 +634,7 @@ async def test_discovery_removal_image(
 
 
 async def test_discovery_update_image(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered image."""
     config1 = {"name": "Beer", "image_topic": "test_topic"}
@@ -646,12 +646,12 @@ async def test_discovery_update_image(
 
 
 async def test_discovery_update_unchanged_image(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered image."""
     data1 = '{ "name": "Beer", "image_topic": "test_topic"}'
     with patch(
-        "homeassistant.components.mqtt.image.MqttImage.discovery_update"
+        "smarthub.components.mqtt.image.MqttImage.discovery_update"
     ) as discovery_update:
         await help_test_discovery_update_unchanged(
             hass, mqtt_mock_entry, image.DOMAIN, data1, discovery_update
@@ -660,7 +660,7 @@ async def test_discovery_update_unchanged_image(
 
 @pytest.mark.no_fail_on_log_exception
 async def test_discovery_broken(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test handling of bad discovery message."""
     data1 = '{ "name": "Beer" }'
@@ -670,7 +670,7 @@ async def test_discovery_broken(
 
 
 async def test_entity_device_info_with_connection(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT image device registry integration."""
     await help_test_entity_device_info_with_connection(
@@ -679,7 +679,7 @@ async def test_entity_device_info_with_connection(
 
 
 async def test_entity_device_info_with_identifier(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT image device registry integration."""
     await help_test_entity_device_info_with_identifier(
@@ -688,7 +688,7 @@ async def test_entity_device_info_with_identifier(
 
 
 async def test_entity_device_info_update(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test device registry update."""
     await help_test_entity_device_info_update(
@@ -697,7 +697,7 @@ async def test_entity_device_info_update(
 
 
 async def test_entity_device_info_remove(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test device registry remove."""
     await help_test_entity_device_info_remove(
@@ -706,7 +706,7 @@ async def test_entity_device_info_remove(
 
 
 async def test_entity_id_update_subscriptions(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT subscriptions are managed when entity_id is updated."""
     await help_test_entity_id_update_subscriptions(
@@ -715,7 +715,7 @@ async def test_entity_id_update_subscriptions(
 
 
 async def test_entity_id_update_discovery_update(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT discovery update when entity_id is updated."""
     await help_test_entity_id_update_discovery_update(
@@ -724,7 +724,7 @@ async def test_entity_id_update_discovery_update(
 
 
 async def test_entity_debug_info_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT debug info."""
     await help_test_entity_debug_info_message(
@@ -739,7 +739,7 @@ async def test_entity_debug_info_message(
 
 
 async def test_reloadable(
-    hass: HomeAssistant, mqtt_client_mock: MqttMockPahoClient
+    hass: SmartHub, mqtt_client_mock: MqttMockPahoClient
 ) -> None:
     """Test reloading the MQTT platform."""
     domain = image.DOMAIN
@@ -749,7 +749,7 @@ async def test_reloadable(
 
 @pytest.mark.parametrize("hass_config", [DEFAULT_CONFIG])
 async def test_setup_manual_entity_from_yaml(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test setup manual configured MQTT entity."""
     await mqtt_mock_entry()
@@ -758,7 +758,7 @@ async def test_setup_manual_entity_from_yaml(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test unloading the config entry."""
     domain = image.DOMAIN
@@ -791,7 +791,7 @@ async def test_unload_entry(
     ],
 )
 async def test_skipped_async_ha_write_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     topic: str,
     payload1: str,
@@ -817,7 +817,7 @@ async def test_skipped_async_ha_write_state(
     ],
 )
 async def test_value_template_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

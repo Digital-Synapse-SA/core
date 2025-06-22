@@ -5,10 +5,10 @@ from unittest.mock import patch
 from switchbot_api import Device
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switchbot_cloud.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.switchbot_cloud.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import configure_integration
 
@@ -16,7 +16,7 @@ from tests.common import async_load_json_object_fixture, snapshot_platform
 
 
 async def test_meter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_list_devices,
@@ -37,14 +37,14 @@ async def test_meter(
         hass, "meter_status.json", DOMAIN
     )
 
-    with patch("homeassistant.components.switchbot_cloud.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.switchbot_cloud.PLATFORMS", [Platform.SENSOR]):
         entry = await configure_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
 async def test_meter_no_coordinator_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_list_devices,
@@ -63,7 +63,7 @@ async def test_meter_no_coordinator_data(
 
     mock_get_status.return_value = None
 
-    with patch("homeassistant.components.switchbot_cloud.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.switchbot_cloud.PLATFORMS", [Platform.SENSOR]):
         entry = await configure_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)

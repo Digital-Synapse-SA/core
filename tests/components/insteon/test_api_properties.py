@@ -10,10 +10,10 @@ from pyinsteon.config.extended_property import ExtendedProperty
 from pyinsteon.constants import RelayMode, ToggleMode
 import pytest
 
-from homeassistant.components import insteon
-from homeassistant.components.insteon.api import async_load_api
-from homeassistant.components.insteon.api.device import INSTEON_DEVICE_NOT_FOUND
-from homeassistant.components.insteon.api.properties import (
+from smarthub.components import insteon
+from smarthub.components.insteon.api import async_load_api
+from smarthub.components.insteon.api.device import INSTEON_DEVICE_NOT_FOUND
+from smarthub.components.insteon.api.properties import (
     DEVICE_ADDRESS,
     ID,
     PROPERTY_NAME,
@@ -23,7 +23,7 @@ from homeassistant.components.insteon.api.properties import (
     SHOW_ADVANCED,
     TYPE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .mock_devices import MockDevices
 
@@ -44,7 +44,7 @@ def iolinc_properties_data_fixture():
 
 
 async def _setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     address: str,
     properties_data: dict[str, Any],
@@ -59,7 +59,7 @@ async def _setup(
 
 
 async def test_get_properties(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     kpl_properties_data,
     iolinc_properties_data,
@@ -121,7 +121,7 @@ async def test_get_properties(
 
 
 async def test_get_read_only_properties(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, iolinc_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, iolinc_properties_data
 ) -> None:
     """Test getting an Insteon device's properties."""
     mock_read_only = ExtendedProperty(
@@ -161,7 +161,7 @@ async def test_get_read_only_properties(
 
 
 async def test_get_unknown_properties(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, iolinc_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, iolinc_properties_data
 ) -> None:
     """Test getting an Insteon device's properties."""
 
@@ -201,7 +201,7 @@ async def test_get_unknown_properties(
 
 
 async def test_change_bool_property(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Test changing a bool type properties."""
     ws_client, devices = await _setup(
@@ -224,7 +224,7 @@ async def test_change_bool_property(
 
 
 async def test_change_int_property(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Test changing a int type properties."""
     ws_client, devices = await _setup(
@@ -248,7 +248,7 @@ async def test_change_int_property(
 
 
 async def test_change_ramp_rate_property(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Test changing an Insteon device's ramp rate properties."""
     ws_client, devices = await _setup(
@@ -272,7 +272,7 @@ async def test_change_ramp_rate_property(
 
 
 async def test_change_radio_button_group(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Test changing an Insteon device's properties."""
     ws_client, devices = await _setup(
@@ -318,7 +318,7 @@ async def test_change_radio_button_group(
 
 
 async def test_change_toggle_property(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Update a button's toggle mode."""
     ws_client, devices = await _setup(
@@ -344,7 +344,7 @@ async def test_change_toggle_property(
 
 
 async def test_change_relay_mode(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, iolinc_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, iolinc_properties_data
 ) -> None:
     """Update a device's relay mode."""
     ws_client, devices = await _setup(
@@ -369,7 +369,7 @@ async def test_change_relay_mode(
 
 
 async def test_change_float_property(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, iolinc_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, iolinc_properties_data
 ) -> None:
     """Update a float type property."""
     ws_client, devices = await _setup(
@@ -395,7 +395,7 @@ async def test_change_float_property(
 
 
 async def test_write_properties(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Test getting an Insteon device's properties."""
     ws_client, devices = await _setup(
@@ -413,7 +413,7 @@ async def test_write_properties(
 
 
 async def test_write_properties_failure(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Test getting an Insteon device's properties."""
     ws_client, devices = await _setup(
@@ -430,7 +430,7 @@ async def test_write_properties_failure(
 
 
 async def test_load_properties(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Test getting an Insteon device's properties."""
     ws_client, devices = await _setup(
@@ -449,7 +449,7 @@ async def test_load_properties(
 
 
 async def test_load_properties_failure(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Test getting an Insteon device's properties."""
     ws_client, devices = await _setup(
@@ -468,7 +468,7 @@ async def test_load_properties_failure(
 
 
 async def test_reset_properties(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Test getting an Insteon device's properties."""
     ws_client, devices = await _setup(
@@ -491,7 +491,7 @@ async def test_reset_properties(
 
 
 async def test_bad_address(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, kpl_properties_data
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, kpl_properties_data
 ) -> None:
     """Test for a bad Insteon address."""
     ws_client, devices = await _setup(

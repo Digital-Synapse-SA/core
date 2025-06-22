@@ -3,12 +3,12 @@
 This device has a non-standard programmable stateless switch service that has a
 service-label-index despite not being linked to a service-label.
 
-https://github.com/home-assistant/core/pull/39090
+https://github.com/smart-hub/core/pull/39090
 """
 
-from homeassistant.components.sensor import SensorStateClass
-from homeassistant.const import PERCENTAGE, EntityCategory
-from homeassistant.core import HomeAssistant
+from smarthub.components.sensor import SensorStateClass
+from smarthub.const import PERCENTAGE, EntityCategory
+from smarthub.core import SmartHub
 
 from ..common import (
     HUB_TEST_ACCESSORY_ID,
@@ -21,7 +21,7 @@ from ..common import (
 )
 
 
-async def test_aqara_switch_setup(hass: HomeAssistant) -> None:
+async def test_aqara_switch_setup(hass: SmartHub) -> None:
     """Test that a Aqara Switch can be correctly setup in HA."""
     accessories = await setup_accessories_from_file(hass, "aqara_switch.json")
     await setup_test_accessories(hass, accessories)

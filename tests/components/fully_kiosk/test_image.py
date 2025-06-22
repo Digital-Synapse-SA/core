@@ -5,15 +5,15 @@ from unittest.mock import MagicMock
 
 from fullykiosk import FullyKioskError
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 from tests.typing import ClientSessionGenerator
 
 
 async def test_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_client: ClientSessionGenerator,
     mock_fully_kiosk: MagicMock,

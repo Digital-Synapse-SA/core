@@ -7,12 +7,12 @@ from aiohttp import ClientError, web_exceptions
 from pydaikin.exceptions import DaikinException
 import pytest
 
-from homeassistant.components.daikin.const import KEY_MAC
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_API_KEY, CONF_HOST, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.daikin.const import KEY_MAC
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_API_KEY, CONF_HOST, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -29,7 +29,7 @@ def mock_daikin():
         return Appliance
 
     with patch(
-        "homeassistant.components.daikin.config_flow.DaikinFactory"
+        "smarthub.components.daikin.config_flow.DaikinFactory"
     ) as Appliance:
         type(Appliance).mac = PropertyMock(return_value="AABBCCDDEEFF")
         Appliance.side_effect = mock_daikin_factory
@@ -39,14 +39,14 @@ def mock_daikin():
 @pytest.fixture
 def mock_daikin_discovery():
     """Mock pydaikin Discovery."""
-    with patch("homeassistant.components.daikin.config_flow.Discovery") as Discovery:
+    with patch("smarthub.components.daikin.config_flow.Discovery") as Discovery:
         Discovery().poll.return_value = {
             "127.0.01": {"mac": "AABBCCDDEEFF", "id": "test"}
         }.values()
         yield Discovery
 
 
-async def test_user(hass: HomeAssistant, mock_daikin) -> None:
+async def test_user(hass: SmartHub, mock_daikin) -> None:
     """Test user config."""
     result = await hass.config_entries.flow.async_init(
         "daikin",
@@ -67,7 +67,7 @@ async def test_user(hass: HomeAssistant, mock_daikin) -> None:
     assert result["data"][KEY_MAC] == MAC
 
 
-async def test_abort_if_already_setup(hass: HomeAssistant, mock_daikin) -> None:
+async def test_abort_if_already_setup(hass: SmartHub, mock_daikin) -> None:
     """Test we abort if Daikin is already setup."""
     MockConfigEntry(domain="daikin", unique_id=MAC).add_to_hass(hass)
     result = await hass.config_entries.flow.async_init(
@@ -90,7 +90,7 @@ async def test_abort_if_already_setup(hass: HomeAssistant, mock_daikin) -> None:
         (Exception, "unknown"),
     ],
 )
-async def test_device_abort(hass: HomeAssistant, mock_daikin, s_effect, reason) -> None:
+async def test_device_abort(hass: SmartHub, mock_daikin, s_effect, reason) -> None:
     """Test device abort."""
     mock_daikin.side_effect = s_effect
 
@@ -104,7 +104,7 @@ async def test_device_abort(hass: HomeAssistant, mock_daikin, s_effect, reason) 
     assert result["step_id"] == "user"
 
 
-async def test_api_password_abort(hass: HomeAssistant) -> None:
+async def test_api_password_abort(hass: SmartHub) -> None:
     """Test device abort."""
     result = await hass.config_entries.flow.async_init(
         "daikin",
@@ -135,7 +135,7 @@ async def test_api_password_abort(hass: HomeAssistant) -> None:
     ],
 )
 async def test_discovery_zeroconf(
-    hass: HomeAssistant, mock_daikin, mock_daikin_discovery, source, data, unique_id
+    hass: SmartHub, mock_daikin, mock_daikin_discovery, source, data, unique_id
 ) -> None:
     """Test discovery/zeroconf step."""
     result = await hass.config_entries.flow.async_init(

@@ -3,15 +3,15 @@
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.netgear_lte.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.netgear_lte.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

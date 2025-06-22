@@ -4,9 +4,9 @@ import pytest
 import requests_mock
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .common import ALL_DEVICE_NAMES, mock_devices_response
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.parametrize("device_name", ALL_DEVICE_NAMES)
 async def test_light_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,

@@ -10,15 +10,15 @@ from pypck.connection import (
 )
 import pytest
 
-from homeassistant import config_entries, data_entry_flow
-from homeassistant.components.lcn.config_flow import LcnFlowHandler, validate_connection
-from homeassistant.components.lcn.const import (
+from smarthub import config_entries, data_entry_flow
+from smarthub.components.lcn.config_flow import LcnFlowHandler, validate_connection
+from smarthub.components.lcn.const import (
     CONF_ACKNOWLEDGE,
     CONF_DIM_MODE,
     CONF_SK_NUM_TRIES,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_BASE,
     CONF_DEVICES,
     CONF_ENTITIES,
@@ -28,7 +28,7 @@ from homeassistant.const import (
     CONF_PORT,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -51,7 +51,7 @@ IMPORT_DATA = {
 }
 
 
-async def test_show_form(hass: HomeAssistant) -> None:
+async def test_show_form(hass: SmartHub) -> None:
     """Test that the form is served with no input."""
     flow = LcnFlowHandler()
     flow.hass = hass
@@ -62,11 +62,11 @@ async def test_show_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_step_user(hass: HomeAssistant) -> None:
+async def test_step_user(hass: SmartHub) -> None:
     """Test for user step."""
     with (
-        patch("homeassistant.components.lcn.PchkConnectionManager.async_connect"),
-        patch("homeassistant.components.lcn.async_setup_entry", return_value=True),
+        patch("smarthub.components.lcn.PchkConnectionManager.async_connect"),
+        patch("smarthub.components.lcn.async_setup_entry", return_value=True),
     ):
         data = CONNECTION_DATA.copy()
         result = await hass.config_entries.flow.async_init(
@@ -83,12 +83,12 @@ async def test_step_user(hass: HomeAssistant) -> None:
 
 
 async def test_step_user_existing_host(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test for user defined host already exists."""
     entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.lcn.PchkConnectionManager.async_connect"):
+    with patch("smarthub.components.lcn.PchkConnectionManager.async_connect"):
         config_data = entry.data.copy()
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}, data=config_data
@@ -108,11 +108,11 @@ async def test_step_user_existing_host(
     ],
 )
 async def test_step_user_error(
-    hass: HomeAssistant, error: type[Exception], errors: dict[str, str]
+    hass: SmartHub, error: type[Exception], errors: dict[str, str]
 ) -> None:
     """Test for error in user step is handled correctly."""
     with patch(
-        "homeassistant.components.lcn.PchkConnectionManager.async_connect",
+        "smarthub.components.lcn.PchkConnectionManager.async_connect",
         side_effect=error,
     ):
         data = CONNECTION_DATA.copy()
@@ -125,7 +125,7 @@ async def test_step_user_error(
         assert result["errors"] == errors
 
 
-async def test_step_reconfigure(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_step_reconfigure(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test for reconfigure step."""
     entry.add_to_hass(hass)
     old_entry_data = entry.data.copy()
@@ -135,8 +135,8 @@ async def test_step_reconfigure(hass: HomeAssistant, entry: MockConfigEntry) -> 
     assert result["step_id"] == "reconfigure"
 
     with (
-        patch("homeassistant.components.lcn.PchkConnectionManager.async_connect"),
-        patch("homeassistant.components.lcn.async_setup_entry", return_value=True),
+        patch("smarthub.components.lcn.PchkConnectionManager.async_connect"),
+        patch("smarthub.components.lcn.async_setup_entry", return_value=True),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -160,7 +160,7 @@ async def test_step_reconfigure(hass: HomeAssistant, entry: MockConfigEntry) -> 
     ],
 )
 async def test_step_reconfigure_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
     error: type[Exception],
     errors: dict[str, str],
@@ -173,7 +173,7 @@ async def test_step_reconfigure_error(
     assert result["step_id"] == "reconfigure"
 
     with patch(
-        "homeassistant.components.lcn.PchkConnectionManager.async_connect",
+        "smarthub.components.lcn.PchkConnectionManager.async_connect",
         side_effect=error,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -191,10 +191,10 @@ async def test_validate_connection() -> None:
 
     with (
         patch(
-            "homeassistant.components.lcn.PchkConnectionManager.async_connect"
+            "smarthub.components.lcn.PchkConnectionManager.async_connect"
         ) as async_connect,
         patch(
-            "homeassistant.components.lcn.PchkConnectionManager.async_close"
+            "smarthub.components.lcn.PchkConnectionManager.async_close"
         ) as async_close,
     ):
         result = await validate_connection(data=data)

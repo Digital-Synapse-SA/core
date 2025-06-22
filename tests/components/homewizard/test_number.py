@@ -7,14 +7,14 @@ from homewizard_energy.models import CombinedModels, Measurement, State, System
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import number
-from homeassistant.components.homewizard.const import UPDATE_INTERVAL
-from homeassistant.components.number import ATTR_VALUE, SERVICE_SET_VALUE
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components import number
+from smarthub.components.homewizard.const import UPDATE_INTERVAL
+from smarthub.components.number import ATTR_VALUE, SERVICE_SET_VALUE
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
@@ -25,7 +25,7 @@ pytestmark = [
 
 @pytest.mark.parametrize("device_fixture", ["HWE-SKT-11", "HWE-SKT-21"])
 async def test_number_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_homewizardenergy: MagicMock,
@@ -72,7 +72,7 @@ async def test_number_entities(
 
     mock_homewizardenergy.system.side_effect = RequestError
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"^An error occurred while communicating with your HomeWizard Energy device$",
     ):
         await hass.services.async_call(
@@ -87,7 +87,7 @@ async def test_number_entities(
 
     mock_homewizardenergy.system.side_effect = DisabledError
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"^The local API is disabled$",
     ):
         await hass.services.async_call(
@@ -104,6 +104,6 @@ async def test_number_entities(
 @pytest.mark.parametrize(
     "device_fixture", ["HWE-P1", "HWE-WTR", "SDM230", "SDM630", "HWE-KWH1", "HWE-KWH3"]
 )
-async def test_entities_not_created_for_device(hass: HomeAssistant) -> None:
+async def test_entities_not_created_for_device(hass: SmartHub) -> None:
     """Does not load number when device has no support for it."""
     assert not hass.states.get("number.device_status_light_brightness")

@@ -1,12 +1,12 @@
 """Add tests for Tedee components."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def setup_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Set up the acaia integration for testing."""
     mock_config_entry.add_to_hass(hass)

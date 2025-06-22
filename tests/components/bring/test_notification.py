@@ -6,22 +6,22 @@ from unittest.mock import AsyncMock
 from bring_api import BringNotificationType, BringRequestException
 import pytest
 
-from homeassistant.components.bring.const import (
+from smarthub.components.bring.const import (
     ATTR_ITEM_NAME,
     ATTR_NOTIFICATION_TYPE,
     DOMAIN,
     SERVICE_PUSH_NOTIFICATION,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry
 
 
 async def test_send_notification(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -51,7 +51,7 @@ async def test_send_notification(
 
 
 async def test_send_notification_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -64,7 +64,7 @@ async def test_send_notification_exception(
     assert bring_config_entry.state is ConfigEntryState.LOADED
     mock_bring_client.notify.side_effect = BringRequestException
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Failed to send push notification for Bring! due to a connection error, try again later",
     ):
         await hass.services.async_call(
@@ -79,7 +79,7 @@ async def test_send_notification_exception(
 
 
 async def test_send_notification_service_validation_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -92,7 +92,7 @@ async def test_send_notification_service_validation_error(
     assert bring_config_entry.state is ConfigEntryState.LOADED
     mock_bring_client.notify.side_effect = ValueError
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape(
             "This action requires field item, please enter a valid value for item"
         ),

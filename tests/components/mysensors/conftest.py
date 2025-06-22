@@ -13,24 +13,24 @@ from mysensors.persistence import MySensorsJSONDecoder
 from mysensors.sensor import Sensor
 import pytest
 
-from homeassistant.components.mqtt import DOMAIN as MQTT_DOMAIN
-from homeassistant.components.mysensors.config_flow import DEFAULT_BAUD_RATE
-from homeassistant.components.mysensors.const import (
+from smarthub.components.mqtt import DOMAIN as MQTT_DOMAIN
+from smarthub.components.mysensors.config_flow import DEFAULT_BAUD_RATE
+from smarthub.components.mysensors.const import (
     CONF_BAUD_RATE,
     CONF_GATEWAY_TYPE,
     CONF_GATEWAY_TYPE_SERIAL,
     CONF_VERSION,
     DOMAIN,
 )
-from homeassistant.const import CONF_DEVICE
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_DEVICE
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, load_fixture
 
 
 @pytest.fixture(name="mqtt")
-def mock_mqtt_fixture(hass: HomeAssistant) -> None:
+def mock_mqtt_fixture(hass: SmartHub) -> None:
     """Mock the MQTT integration."""
     hass.config.components.add(MQTT_DOMAIN)
 
@@ -38,7 +38,7 @@ def mock_mqtt_fixture(hass: HomeAssistant) -> None:
 @pytest.fixture(name="is_serial_port")
 def is_serial_port_fixture() -> Generator[MagicMock]:
     """Patch the serial port check."""
-    with patch("homeassistant.components.mysensors.gateway.cv.isdevice") as is_device:
+    with patch("smarthub.components.mysensors.gateway.cv.isdevice") as is_device:
         is_device.side_effect = lambda device: device
         yield is_device
 
@@ -114,7 +114,7 @@ def transport_write(transport: MagicMock) -> MagicMock:
 
 
 @pytest.fixture(name="serial_entry")
-async def serial_entry_fixture(hass: HomeAssistant) -> MockConfigEntry:
+async def serial_entry_fixture(hass: SmartHub) -> MockConfigEntry:
     """Create a config entry for a serial gateway."""
     return MockConfigEntry(
         domain=DOMAIN,
@@ -135,13 +135,13 @@ def config_entry_fixture(serial_entry: MockConfigEntry) -> MockConfigEntry:
 
 @pytest.fixture(name="integration")
 async def integration_fixture(
-    hass: HomeAssistant, transport: MagicMock, config_entry: MockConfigEntry
+    hass: SmartHub, transport: MagicMock, config_entry: MockConfigEntry
 ) -> AsyncGenerator[MockConfigEntry]:
     """Set up the mysensors integration with a config entry."""
     config: dict[str, Any] = {}
     config_entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.mysensors.entity.Debouncer", autospec=True
+        "smarthub.components.mysensors.entity.Debouncer", autospec=True
     ) as debouncer_class:
 
         def debouncer(

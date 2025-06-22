@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, PropertyMock
 import blebox_uniapi
 import pytest
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.const import ATTR_DEVICE_CLASS, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.const import ATTR_DEVICE_CLASS, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import async_setup_entity, mock_feature
 
@@ -30,7 +30,7 @@ def airsensor_fixture() -> tuple[AsyncMock, str]:
 
 
 async def test_init(
-    rainsensor: AsyncMock, device_registry: dr.DeviceRegistry, hass: HomeAssistant
+    rainsensor: AsyncMock, device_registry: dr.DeviceRegistry, hass: SmartHub
 ) -> None:
     """Test binary_sensor initialisation."""
     _, entity_id = rainsensor

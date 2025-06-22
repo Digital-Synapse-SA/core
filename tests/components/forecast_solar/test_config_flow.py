@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.forecast_solar.const import (
+from smarthub.components.forecast_solar.const import (
     CONF_AZIMUTH,
     CONF_DAMPING_EVENING,
     CONF_DAMPING_MORNING,
@@ -13,15 +13,15 @@ from homeassistant.components.forecast_solar.const import (
     CONF_MODULES_POWER,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_user_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_user_flow(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test the full user configuration flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -62,7 +62,7 @@ async def test_user_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> No
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_options_flow_invalid_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test options config flow when API key is invalid."""
@@ -121,7 +121,7 @@ async def test_options_flow_invalid_api(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test config flow options."""
@@ -163,7 +163,7 @@ async def test_options_flow(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_options_flow_without_key(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test config flow options."""

@@ -8,20 +8,20 @@ from pylamarzocco.const import ModelName
 from pylamarzocco.exceptions import AuthFail, RequestNotSuccessful
 import pytest
 
-from homeassistant.components.lamarzocco.config_flow import CONF_MACHINE
-from homeassistant.components.lamarzocco.const import CONF_USE_BLUETOOTH, DOMAIN
-from homeassistant.config_entries import (
+from smarthub.components.lamarzocco.config_flow import CONF_MACHINE
+from smarthub.components.lamarzocco.const import CONF_USE_BLUETOOTH, DOMAIN
+from smarthub.config_entries import (
     SOURCE_BLUETOOTH,
     SOURCE_DHCP,
     SOURCE_USER,
     ConfigEntryState,
     ConfigFlowResult,
 )
-from homeassistant.const import CONF_ADDRESS, CONF_MAC, CONF_PASSWORD, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.const import CONF_ADDRESS, CONF_MAC, CONF_PASSWORD, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import USER_INPUT, async_init_integration, get_bluetooth_service_info
 
@@ -32,13 +32,13 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.lamarzocco.async_setup_entry", return_value=True
+        "smarthub.components.lamarzocco.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 async def __do_successful_user_step(
-    hass: HomeAssistant, result: ConfigFlowResult, mock_cloud_client: MagicMock
+    hass: SmartHub, result: ConfigFlowResult, mock_cloud_client: MagicMock
 ) -> ConfigFlowResult:
     """Successfully configure the user step."""
     result2 = await hass.config_entries.flow.async_configure(
@@ -53,7 +53,7 @@ async def __do_successful_user_step(
 
 
 async def __do_sucessful_machine_selection_step(
-    hass: HomeAssistant, result2: ConfigFlowResult
+    hass: SmartHub, result2: ConfigFlowResult
 ) -> None:
     """Successfully configure the machine selection step."""
 
@@ -73,7 +73,7 @@ async def __do_sucessful_machine_selection_step(
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_client: MagicMock,
 ) -> None:
     """Test we get the form."""
@@ -89,7 +89,7 @@ async def test_form(
 
 
 async def test_form_abort_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort if already configured."""
@@ -130,7 +130,7 @@ async def test_form_abort_already_configured(
     ],
 )
 async def test_form_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_client: MagicMock,
     side_effect: Exception,
     error: str,
@@ -158,7 +158,7 @@ async def test_form_invalid_auth(
 
 
 async def test_form_no_machines(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_client: MagicMock,
 ) -> None:
     """Test we don't have any devices."""
@@ -187,7 +187,7 @@ async def test_form_no_machines(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_client: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -213,7 +213,7 @@ async def test_reauth_flow(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_client: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -230,7 +230,7 @@ async def test_reconfigure_flow(
 
     with (
         patch(
-            "homeassistant.components.lamarzocco.config_flow.async_discovered_service_info",
+            "smarthub.components.lamarzocco.config_flow.async_discovered_service_info",
             return_value=[service_info],
         ),
     ):
@@ -278,7 +278,7 @@ async def test_reconfigure_flow(
     ],
 )
 async def test_reconfigure_flow_no_machines(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_client: MagicMock,
     mock_config_entry: MockConfigEntry,
     discovered: list[BluetoothServiceInfo],
@@ -296,7 +296,7 @@ async def test_reconfigure_flow_no_machines(
 
     with (
         patch(
-            "homeassistant.components.lamarzocco.config_flow.async_discovered_service_info",
+            "smarthub.components.lamarzocco.config_flow.async_discovered_service_info",
             return_value=discovered,
         ),
     ):
@@ -316,7 +316,7 @@ async def test_reconfigure_flow_no_machines(
 
 
 async def test_bluetooth_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_cloud_client: MagicMock,
 ) -> None:
@@ -348,7 +348,7 @@ async def test_bluetooth_discovery(
 
 
 async def test_bluetooth_discovery_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -366,7 +366,7 @@ async def test_bluetooth_discovery_already_configured(
 
 
 async def test_bluetooth_discovery_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_cloud_client: MagicMock,
 ) -> None:
@@ -411,7 +411,7 @@ async def test_bluetooth_discovery_errors(
 
 
 async def test_dhcp_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
 ) -> None:
     """Test dhcp discovery."""
@@ -442,7 +442,7 @@ async def test_dhcp_discovery(
 
 
 async def test_dhcp_discovery_abort_on_hostname_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test dhcp discovery aborts when hostname was changed manually."""
@@ -461,7 +461,7 @@ async def test_dhcp_discovery_abort_on_hostname_changed(
 
 
 async def test_dhcp_already_configured_and_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -486,7 +486,7 @@ async def test_dhcp_already_configured_and_update(
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test options flow."""

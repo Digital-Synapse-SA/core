@@ -18,9 +18,9 @@ from zwave_js_server.exceptions import FailedCommand
 from zwave_js_server.model.node import Node
 from zwave_js_server.version import VersionInfo
 
-from homeassistant import config_entries, data_entry_flow
-from homeassistant.components.zwave_js.config_flow import TITLE, get_usb_ports
-from homeassistant.components.zwave_js.const import (
+from smarthub import config_entries, data_entry_flow
+from smarthub.components.zwave_js.config_flow import TITLE, get_usb_ports
+from smarthub.components.zwave_js.const import (
     ADDON_SLUG,
     CONF_ADDON_DEVICE,
     CONF_ADDON_LR_S2_ACCESS_CONTROL_KEY,
@@ -38,13 +38,13 @@ from homeassistant.components.zwave_js.const import (
     CONF_USB_PATH,
     DOMAIN,
 )
-from homeassistant.components.zwave_js.helpers import SERVER_VERSION_TIMEOUT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
-from homeassistant.helpers.service_info.usb import UsbServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.zwave_js.helpers import SERVER_VERSION_TIMEOUT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.helpers.service_info.usb import UsbServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry, async_capture_events
 
@@ -118,7 +118,7 @@ def get_addon_discovery_info_fixture(get_addon_discovery_info: AsyncMock) -> Asy
 def setup_entry_fixture() -> Generator[AsyncMock]:
     """Mock entry setup."""
     with patch(
-        "homeassistant.components.zwave_js.async_setup_entry", return_value=True
+        "smarthub.components.zwave_js.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -127,7 +127,7 @@ def setup_entry_fixture() -> Generator[AsyncMock]:
 def unload_entry_fixture() -> Generator[AsyncMock]:
     """Mock entry unload."""
     with patch(
-        "homeassistant.components.zwave_js.async_unload_entry", return_value=True
+        "smarthub.components.zwave_js.async_unload_entry", return_value=True
     ) as mock_unload_entry:
         yield mock_unload_entry
 
@@ -136,7 +136,7 @@ def unload_entry_fixture() -> Generator[AsyncMock]:
 def mock_supervisor_fixture() -> Generator[None]:
     """Mock Supervisor."""
     with patch(
-        "homeassistant.components.zwave_js.config_flow.is_hassio", return_value=True
+        "smarthub.components.zwave_js.config_flow.is_hassio", return_value=True
     ):
         yield
 
@@ -145,7 +145,7 @@ def mock_supervisor_fixture() -> Generator[None]:
 def mock_addon_setup_time() -> Generator[None]:
     """Mock add-on setup sleep time."""
     with patch(
-        "homeassistant.components.zwave_js.config_flow.ADDON_SETUP_TIMEOUT", new=0
+        "smarthub.components.zwave_js.config_flow.ADDON_SETUP_TIMEOUT", new=0
     ):
         yield
 
@@ -168,7 +168,7 @@ def serial_port_fixture() -> ListPortInfo:
 def mock_list_ports_fixture(serial_port) -> Generator[MagicMock]:
     """Mock list ports."""
     with patch(
-        "homeassistant.components.zwave_js.config_flow.list_ports.comports"
+        "smarthub.components.zwave_js.config_flow.list_ports.comports"
     ) as mock_list_ports:
         another_port = copy(serial_port)
         another_port.device = "/new"
@@ -188,7 +188,7 @@ def mock_list_ports_fixture(serial_port) -> Generator[MagicMock]:
 def mock_usb_serial_by_id_fixture() -> Generator[MagicMock]:
     """Mock usb serial by id."""
     with patch(
-        "homeassistant.components.zwave_js.config_flow.usb.get_serial_by_id"
+        "smarthub.components.zwave_js.config_flow.usb.get_serial_by_id"
     ) as mock_usb_serial_by_id:
         mock_usb_serial_by_id.side_effect = lambda x: x
         yield mock_usb_serial_by_id
@@ -204,7 +204,7 @@ def mock_sdk_version(client: MagicMock) -> Generator[None]:
         client.driver.controller.data["sdkVersion"] = original_sdk_version
 
 
-async def test_manual(hass: HomeAssistant) -> None:
+async def test_manual(hass: SmartHub) -> None:
     """Test we create an entry with manual step."""
 
     result = await hass.config_entries.flow.async_init(
@@ -214,10 +214,10 @@ async def test_manual(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -277,7 +277,7 @@ async def slow_server_version(*args: Any) -> Any:
         ),
     ],
 )
-async def test_manual_errors(hass: HomeAssistant, url: str, error: str) -> None:
+async def test_manual_errors(hass: SmartHub, url: str, error: str) -> None:
     """Test all errors with a manual set up."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -321,7 +321,7 @@ async def test_manual_errors(hass: HomeAssistant, url: str, error: str) -> None:
     ],
 )
 async def test_reconfigure_manual_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
     url: str,
     error: str,
@@ -350,7 +350,7 @@ async def test_reconfigure_manual_errors(
     assert result["errors"] == {"base": error}
 
 
-async def test_manual_already_configured(hass: HomeAssistant) -> None:
+async def test_manual_already_configured(hass: SmartHub) -> None:
     """Test that only one unique instance is allowed."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -387,7 +387,7 @@ async def test_manual_already_configured(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("supervisor", "addon_running")
 async def test_supervisor_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
 ) -> None:
     """Test flow started from Supervisor discovery."""
@@ -413,10 +413,10 @@ async def test_supervisor_discovery(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -443,7 +443,7 @@ async def test_supervisor_discovery(
 
 @pytest.mark.usefixtures("supervisor")
 @pytest.mark.parametrize("server_version_side_effect", [TimeoutError()])
-async def test_supervisor_discovery_cannot_connect(hass: HomeAssistant) -> None:
+async def test_supervisor_discovery_cannot_connect(hass: SmartHub) -> None:
     """Test Supervisor discovery and cannot connect."""
 
     result = await hass.config_entries.flow.async_init(
@@ -462,7 +462,7 @@ async def test_supervisor_discovery_cannot_connect(hass: HomeAssistant) -> None:
 
 
 async def test_clean_discovery_on_user_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor,
     addon_running,
     addon_options,
@@ -513,10 +513,10 @@ async def test_clean_discovery_on_user_create(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -549,7 +549,7 @@ async def test_clean_discovery_on_user_create(
 
 @pytest.mark.usefixtures("supervisor", "addon_running")
 async def test_abort_discovery_with_existing_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
 ) -> None:
     """Test discovery flow is aborted if an entry already exists."""
@@ -580,7 +580,7 @@ async def test_abort_discovery_with_existing_entry(
 
 
 @pytest.mark.usefixtures("supervisor", "addon_installed", "addon_info")
-async def test_abort_hassio_discovery_with_existing_flow(hass: HomeAssistant) -> None:
+async def test_abort_hassio_discovery_with_existing_flow(hass: SmartHub) -> None:
     """Test hassio discovery flow is aborted when another discovery has happened."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -606,7 +606,7 @@ async def test_abort_hassio_discovery_with_existing_flow(hass: HomeAssistant) ->
 
 
 @pytest.mark.usefixtures("supervisor", "addon_installed", "addon_info")
-async def test_abort_hassio_discovery_for_other_addon(hass: HomeAssistant) -> None:
+async def test_abort_hassio_discovery_for_other_addon(hass: SmartHub) -> None:
     """Test hassio discovery flow is aborted for a non official add-on discovery."""
     result2 = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -646,12 +646,12 @@ async def test_abort_hassio_discovery_for_other_addon(hass: HomeAssistant) -> No
                 manufacturer="Nabu Casa",
             ),
             "/dev/zwa2",
-            "Home Assistant Connect ZWA-2",
+            "SmartHub Connect ZWA-2",
         ),
     ],
 )
 async def test_usb_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
     mock_usb_serial_by_id: MagicMock,
     set_addon_options: AsyncMock,
@@ -721,10 +721,10 @@ async def test_usb_discovery(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -754,7 +754,7 @@ async def test_usb_discovery(
 
 @pytest.mark.usefixtures("supervisor", "addon_installed")
 async def test_usb_discovery_addon_not_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
     mock_usb_serial_by_id: MagicMock,
     set_addon_options: AsyncMock,
@@ -824,10 +824,10 @@ async def test_usb_discovery_addon_not_running(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -857,7 +857,7 @@ async def test_usb_discovery_addon_not_running(
 
 @pytest.mark.usefixtures("supervisor", "addon_running")
 async def test_usb_discovery_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
     mock_usb_serial_by_id: MagicMock,
     set_addon_options: AsyncMock,
@@ -991,7 +991,7 @@ async def test_usb_discovery_migration(
 
 @pytest.mark.usefixtures("supervisor", "addon_running")
 async def test_usb_discovery_migration_restore_driver_ready_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
     mock_usb_serial_by_id: MagicMock,
     set_addon_options: AsyncMock,
@@ -1090,7 +1090,7 @@ async def test_usb_discovery_migration_restore_driver_ready_timeout(
     assert restart_addon.call_args == call("core_zwave_js")
 
     with patch(
-        ("homeassistant.components.zwave_js.config_flow.DRIVER_READY_TIMEOUT"),
+        ("smarthub.components.zwave_js.config_flow.DRIVER_READY_TIMEOUT"),
         new=0,
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
@@ -1119,7 +1119,7 @@ async def test_usb_discovery_migration_restore_driver_ready_timeout(
 
 @pytest.mark.usefixtures("supervisor", "addon_installed")
 async def test_discovery_addon_not_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
     set_addon_options: AsyncMock,
     start_addon: AsyncMock,
@@ -1179,10 +1179,10 @@ async def test_discovery_addon_not_running(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -1212,7 +1212,7 @@ async def test_discovery_addon_not_running(
 
 @pytest.mark.usefixtures("supervisor", "addon_not_installed", "addon_info")
 async def test_discovery_addon_not_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
     set_addon_options: AsyncMock,
     start_addon: AsyncMock,
@@ -1279,10 +1279,10 @@ async def test_discovery_addon_not_installed(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -1311,7 +1311,7 @@ async def test_discovery_addon_not_installed(
 
 
 @pytest.mark.usefixtures("supervisor", "addon_info")
-async def test_abort_usb_discovery_with_existing_flow(hass: HomeAssistant) -> None:
+async def test_abort_usb_discovery_with_existing_flow(hass: SmartHub) -> None:
     """Test usb discovery flow is aborted when another discovery has happened."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -1337,7 +1337,7 @@ async def test_abort_usb_discovery_with_existing_flow(hass: HomeAssistant) -> No
 
 
 @pytest.mark.usefixtures("supervisor", "addon_installed")
-async def test_usb_discovery_with_existing_usb_flow(hass: HomeAssistant) -> None:
+async def test_usb_discovery_with_existing_usb_flow(hass: SmartHub) -> None:
     """Test usb discovery allows more than one USB flow in progress."""
     first_usb_info = UsbServiceInfo(
         device="/dev/other_device",
@@ -1377,7 +1377,7 @@ async def test_usb_discovery_with_existing_usb_flow(hass: HomeAssistant) -> None
 
 
 @pytest.mark.usefixtures("supervisor", "addon_info")
-async def test_abort_usb_discovery_addon_required(hass: HomeAssistant) -> None:
+async def test_abort_usb_discovery_addon_required(hass: SmartHub) -> None:
     """Test usb discovery aborted when existing entry not using add-on."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1396,7 +1396,7 @@ async def test_abort_usb_discovery_addon_required(hass: HomeAssistant) -> None:
     assert result["reason"] == "addon_required"
 
 
-async def test_usb_discovery_requires_supervisor(hass: HomeAssistant) -> None:
+async def test_usb_discovery_requires_supervisor(hass: SmartHub) -> None:
     """Test usb discovery flow is aborted when there is no supervisor."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -1409,7 +1409,7 @@ async def test_usb_discovery_requires_supervisor(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("supervisor", "addon_running")
 async def test_usb_discovery_same_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
     mock_usb_serial_by_id: MagicMock,
 ) -> None:
@@ -1431,7 +1431,7 @@ async def test_usb_discovery_same_device(
     [CP2652_ZIGBEE_DISCOVERY_INFO],
 )
 async def test_abort_usb_discovery_aborts_specific_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     usb_discovery_info: UsbServiceInfo,
 ) -> None:
     """Test usb discovery flow is aborted on specific devices."""
@@ -1445,7 +1445,7 @@ async def test_abort_usb_discovery_aborts_specific_devices(
 
 
 @pytest.mark.usefixtures("supervisor")
-async def test_not_addon(hass: HomeAssistant) -> None:
+async def test_not_addon(hass: SmartHub) -> None:
     """Test opting out of add-on on Supervisor."""
 
     result = await hass.config_entries.flow.async_init(
@@ -1471,10 +1471,10 @@ async def test_not_addon(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -1506,7 +1506,7 @@ async def test_not_addon(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("supervisor", "addon_running")
 async def test_addon_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
 ) -> None:
     """Test add-on already running on Supervisor."""
@@ -1534,10 +1534,10 @@ async def test_addon_running(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -1626,7 +1626,7 @@ async def test_addon_running(
     ],
 )
 async def test_addon_running_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
     abort_reason: str,
 ) -> None:
@@ -1658,7 +1658,7 @@ async def test_addon_running_failures(
 
 @pytest.mark.usefixtures("supervisor", "addon_running")
 async def test_addon_running_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
 ) -> None:
     """Test that only one unique instance is allowed when add-on is running."""
@@ -1721,7 +1721,7 @@ async def test_addon_running_already_configured(
 
 @pytest.mark.usefixtures("supervisor", "addon_installed", "addon_info")
 async def test_addon_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     set_addon_options: AsyncMock,
     start_addon: AsyncMock,
 ) -> None:
@@ -1781,10 +1781,10 @@ async def test_addon_installed(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -1815,7 +1815,7 @@ async def test_addon_installed(
 @pytest.mark.usefixtures("supervisor", "addon_installed", "addon_info")
 @pytest.mark.parametrize("start_addon_side_effect", [SupervisorError()])
 async def test_addon_installed_start_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     set_addon_options: AsyncMock,
     start_addon: AsyncMock,
 ) -> None:
@@ -1904,7 +1904,7 @@ async def test_addon_installed_start_failure(
     ],
 )
 async def test_addon_installed_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     set_addon_options: AsyncMock,
     start_addon: AsyncMock,
 ) -> None:
@@ -1974,7 +1974,7 @@ async def test_addon_installed_failures(
 @pytest.mark.usefixtures("supervisor", "addon_installed", "addon_info")
 @pytest.mark.parametrize("set_addon_options_side_effect", [SupervisorError()])
 async def test_addon_installed_set_options_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     set_addon_options: AsyncMock,
     start_addon: AsyncMock,
 ) -> None:
@@ -2036,7 +2036,7 @@ async def test_addon_installed_set_options_failure(
 
 
 @pytest.mark.usefixtures("supervisor", "addon_installed")
-async def test_addon_installed_usb_ports_failure(hass: HomeAssistant) -> None:
+async def test_addon_installed_usb_ports_failure(hass: SmartHub) -> None:
     """Test usb ports failure when add-on is installed."""
 
     result = await hass.config_entries.flow.async_init(
@@ -2054,7 +2054,7 @@ async def test_addon_installed_usb_ports_failure(hass: HomeAssistant) -> None:
     assert result["step_id"] == "on_supervisor"
 
     with patch(
-        "homeassistant.components.zwave_js.config_flow.async_get_usb_ports",
+        "smarthub.components.zwave_js.config_flow.async_get_usb_ports",
         side_effect=OSError("test_error"),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -2067,7 +2067,7 @@ async def test_addon_installed_usb_ports_failure(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("supervisor", "addon_installed", "addon_info")
 async def test_addon_installed_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     set_addon_options: AsyncMock,
     start_addon: AsyncMock,
 ) -> None:
@@ -2161,7 +2161,7 @@ async def test_addon_installed_already_configured(
 
 @pytest.mark.usefixtures("supervisor", "addon_not_installed", "addon_info")
 async def test_addon_not_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
     set_addon_options: AsyncMock,
     start_addon: AsyncMock,
@@ -2231,10 +2231,10 @@ async def test_addon_not_installed(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -2264,7 +2264,7 @@ async def test_addon_not_installed(
 
 @pytest.mark.usefixtures("supervisor", "addon_not_installed")
 async def test_install_addon_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
 ) -> None:
     """Test add-on install failure."""
@@ -2302,7 +2302,7 @@ async def test_install_addon_failure(
 
 
 async def test_reconfigure_manual(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
 ) -> None:
@@ -2340,7 +2340,7 @@ async def test_reconfigure_manual(
 
 
 async def test_reconfigure_manual_different_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
 ) -> None:
     """Test reconfigure flow manual step connecting to different device."""
@@ -2370,7 +2370,7 @@ async def test_reconfigure_manual_different_device(
 
 @pytest.mark.usefixtures("supervisor")
 async def test_reconfigure_not_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
 ) -> None:
@@ -2419,7 +2419,7 @@ async def test_reconfigure_not_addon(
 
 @pytest.mark.usefixtures("supervisor")
 async def test_reconfigure_not_addon_with_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_entry: AsyncMock,
     unload_entry: AsyncMock,
     integration: MockConfigEntry,
@@ -2486,7 +2486,7 @@ async def test_reconfigure_not_addon_with_addon(
 
 @pytest.mark.usefixtures("supervisor")
 async def test_reconfigure_not_addon_with_addon_stop_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_entry: AsyncMock,
     unload_entry: AsyncMock,
     integration: MockConfigEntry,
@@ -2595,7 +2595,7 @@ async def test_reconfigure_not_addon_with_addon_stop_fail(
     ],
 )
 async def test_reconfigure_addon_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
     addon_options: dict[str, Any],
@@ -2716,7 +2716,7 @@ async def test_reconfigure_addon_running(
     ],
 )
 async def test_reconfigure_addon_running_no_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
     addon_options: dict[str, Any],
@@ -2844,7 +2844,7 @@ async def different_device_server_version(*args):
     ],
 )
 async def test_reconfigure_different_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
     addon_options: dict[str, Any],
@@ -2997,7 +2997,7 @@ async def test_reconfigure_different_device(
     ],
 )
 async def test_reconfigure_addon_restart_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
     addon_options: dict[str, Any],
@@ -3087,7 +3087,7 @@ async def test_reconfigure_addon_restart_failed(
 @pytest.mark.usefixtures("supervisor", "addon_running", "restart_addon")
 @pytest.mark.parametrize("server_version_side_effect", [aiohttp.ClientError("Boom")])
 async def test_reconfigure_addon_running_server_info_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
     addon_options: dict[str, Any],
@@ -3213,7 +3213,7 @@ async def test_reconfigure_addon_running_server_info_failure(
     ],
 )
 async def test_reconfigure_addon_not_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     install_addon: AsyncMock,
     integration: MockConfigEntry,
@@ -3299,7 +3299,7 @@ async def test_reconfigure_addon_not_installed(
     assert client.disconnect.call_count == 1
 
 
-async def test_zeroconf(hass: HomeAssistant) -> None:
+async def test_zeroconf(hass: SmartHub) -> None:
     """Test zeroconf discovery."""
 
     result = await hass.config_entries.flow.async_init(
@@ -3321,10 +3321,10 @@ async def test_zeroconf(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -3350,7 +3350,7 @@ async def test_zeroconf(hass: HomeAssistant) -> None:
 
 
 async def test_reconfigure_migrate_no_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
 ) -> None:
     """Test migration flow fails when not using add-on."""
@@ -3375,7 +3375,7 @@ async def test_reconfigure_migrate_no_addon(
 
 @pytest.mark.usefixtures("mock_sdk_version")
 async def test_reconfigure_migrate_low_sdk_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
 ) -> None:
     """Test migration flow fails with too low controller SDK version."""
@@ -3419,7 +3419,7 @@ async def test_reconfigure_migrate_low_sdk_version(
     ],
 )
 async def test_reconfigure_migrate_with_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     device_registry: dr.DeviceRegistry,
     multisensor_6: Node,
@@ -3648,7 +3648,7 @@ async def test_reconfigure_migrate_with_addon(
 
 @pytest.mark.usefixtures("supervisor", "addon_running")
 async def test_reconfigure_migrate_reset_driver_ready_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
     restart_addon: AsyncMock,
@@ -3720,7 +3720,7 @@ async def test_reconfigure_migrate_reset_driver_ready_timeout(
 
     with (
         patch(
-            ("homeassistant.components.zwave_js.config_flow.DRIVER_READY_TIMEOUT"),
+            ("smarthub.components.zwave_js.config_flow.DRIVER_READY_TIMEOUT"),
             new=0,
         ),
         patch("pathlib.Path.write_bytes") as mock_file,
@@ -3798,7 +3798,7 @@ async def test_reconfigure_migrate_reset_driver_ready_timeout(
 
 @pytest.mark.usefixtures("supervisor", "addon_running")
 async def test_reconfigure_migrate_restore_driver_ready_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
     restart_addon: AsyncMock,
@@ -3909,7 +3909,7 @@ async def test_reconfigure_migrate_restore_driver_ready_timeout(
     assert restart_addon.call_args == call("core_zwave_js")
 
     with patch(
-        ("homeassistant.components.zwave_js.config_flow.DRIVER_READY_TIMEOUT"),
+        ("smarthub.components.zwave_js.config_flow.DRIVER_READY_TIMEOUT"),
         new=0,
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
@@ -3937,7 +3937,7 @@ async def test_reconfigure_migrate_restore_driver_ready_timeout(
 
 
 async def test_reconfigure_migrate_backup_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
     client: MagicMock,
 ) -> None:
@@ -3971,7 +3971,7 @@ async def test_reconfigure_migrate_backup_failure(
 
 
 async def test_reconfigure_migrate_backup_file_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
     client: MagicMock,
 ) -> None:
@@ -4019,7 +4019,7 @@ async def test_reconfigure_migrate_backup_file_failure(
 
 @pytest.mark.usefixtures("supervisor", "addon_running")
 async def test_reconfigure_migrate_start_addon_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
     restart_addon: AsyncMock,
@@ -4105,7 +4105,7 @@ async def test_reconfigure_migrate_start_addon_failure(
 
 @pytest.mark.usefixtures("supervisor", "addon_running", "restart_addon")
 async def test_reconfigure_migrate_restore_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
     set_addon_options: AsyncMock,
@@ -4219,7 +4219,7 @@ async def test_reconfigure_migrate_restore_failure(
 
 
 async def test_get_driver_failure_intent_migrate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
 ) -> None:
     """Test get driver failure in intent migrate step."""
@@ -4243,7 +4243,7 @@ async def test_get_driver_failure_intent_migrate(
 
 
 async def test_get_driver_failure_instruct_unplug(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
 ) -> None:
@@ -4293,7 +4293,7 @@ async def test_get_driver_failure_instruct_unplug(
 
 
 async def test_hard_reset_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
     client: MagicMock,
 ) -> None:
@@ -4343,7 +4343,7 @@ async def test_hard_reset_failure(
 
 
 async def test_choose_serial_port_usb_ports_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
     client: MagicMock,
 ) -> None:
@@ -4397,7 +4397,7 @@ async def test_choose_serial_port_usb_ports_failure(
     assert entry.state is config_entries.ConfigEntryState.NOT_LOADED
 
     with patch(
-        "homeassistant.components.zwave_js.config_flow.async_get_usb_ports",
+        "smarthub.components.zwave_js.config_flow.async_get_usb_ports",
         side_effect=OSError("test_error"),
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
@@ -4407,7 +4407,7 @@ async def test_choose_serial_port_usb_ports_failure(
 
 @pytest.mark.usefixtures("supervisor", "addon_installed")
 async def test_configure_addon_usb_ports_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
 ) -> None:
     """Test configure addon usb ports failure."""
@@ -4425,7 +4425,7 @@ async def test_configure_addon_usb_ports_failure(
     assert result["step_id"] == "on_supervisor_reconfigure"
 
     with patch(
-        "homeassistant.components.zwave_js.config_flow.async_get_usb_ports",
+        "smarthub.components.zwave_js.config_flow.async_get_usb_ports",
         side_effect=OSError("test_error"),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -4465,7 +4465,7 @@ async def test_get_usb_ports_sorting() -> None:
 
 @pytest.mark.usefixtures("supervisor", "addon_not_installed", "addon_info")
 async def test_intent_recommended_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
     start_addon: AsyncMock,
     set_addon_options: AsyncMock,
@@ -4531,10 +4531,10 @@ async def test_intent_recommended_user(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -4581,12 +4581,12 @@ async def test_intent_recommended_user(
                 manufacturer="Nabu Casa",
             ),
             "/dev/zwa2",
-            "Home Assistant Connect ZWA-2",
+            "SmartHub Connect ZWA-2",
         ),
     ],
 )
 async def test_recommended_usb_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
     mock_usb_serial_by_id: MagicMock,
     set_addon_options: AsyncMock,
@@ -4641,10 +4641,10 @@ async def test_recommended_usb_discovery(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.async_setup", return_value=True
+            "smarthub.components.zwave_js.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.zwave_js.async_setup_entry",
+            "smarthub.components.zwave_js.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):

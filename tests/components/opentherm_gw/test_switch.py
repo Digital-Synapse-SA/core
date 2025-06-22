@@ -4,22 +4,22 @@ from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
 
-from homeassistant.components.opentherm_gw import DOMAIN
-from homeassistant.components.opentherm_gw.const import OpenThermDeviceIdentifier
-from homeassistant.components.switch import (
+from smarthub.components.opentherm_gw import DOMAIN
+from smarthub.components.opentherm_gw.const import OpenThermDeviceIdentifier
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_ID,
     STATE_OFF,
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -28,7 +28,7 @@ from tests.common import MockConfigEntry
     "entity_key", ["central_heating_1_override", "central_heating_2_override"]
 )
 async def test_switch_added_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_pyotgw: MagicMock,
@@ -62,7 +62,7 @@ async def test_switch_added_disabled(
     ],
 )
 async def test_ch_override_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_pyotgw: MagicMock,

@@ -2,8 +2,8 @@
 
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.components.intellifire import CONF_USER_ID
-from homeassistant.components.intellifire.const import (
+from smarthub.components.intellifire import CONF_USER_ID
+from smarthub.components.intellifire.const import (
     API_MODE_CLOUD,
     API_MODE_LOCAL,
     CONF_AUTH_COOKIE,
@@ -13,21 +13,21 @@ from homeassistant.components.intellifire.const import (
     CONF_WEB_CLIENT_ID,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_API_KEY,
     CONF_HOST,
     CONF_IP_ADDRESS,
     CONF_PASSWORD,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_minor_migration(
-    hass: HomeAssistant, mock_config_entry_old, mock_apis_single_fp
+    hass: SmartHub, mock_config_entry_old, mock_apis_single_fp
 ) -> None:
     """With the new library we are going to end up rewriting the config entries."""
     mock_config_entry_old.add_to_hass(hass)
@@ -46,7 +46,7 @@ async def test_minor_migration(
     }
 
 
-async def test_minor_migration_error(hass: HomeAssistant, mock_apis_single_fp) -> None:
+async def test_minor_migration_error(hass: SmartHub, mock_apis_single_fp) -> None:
     """Test the case where we completely fail to initialize."""
     mock_config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -67,7 +67,7 @@ async def test_minor_migration_error(hass: HomeAssistant, mock_apis_single_fp) -
     assert mock_config_entry.state is ConfigEntryState.MIGRATION_ERROR
 
 
-async def test_init_with_no_username(hass: HomeAssistant, mock_apis_single_fp) -> None:
+async def test_init_with_no_username(hass: SmartHub, mock_apis_single_fp) -> None:
     """Test the case where we completely fail to initialize."""
     mock_config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -93,14 +93,14 @@ async def test_init_with_no_username(hass: HomeAssistant, mock_apis_single_fp) -
 
 
 async def test_connectivity_bad(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_current,
     mock_apis_single_fp,
 ) -> None:
     """Test a timeout error on the setup flow."""
 
     with patch(
-        "homeassistant.components.intellifire.UnifiedFireplace.build_fireplace_from_common",
+        "smarthub.components.intellifire.UnifiedFireplace.build_fireplace_from_common",
         new_callable=AsyncMock,
         side_effect=TimeoutError,
     ):

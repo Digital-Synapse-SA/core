@@ -4,9 +4,9 @@ from typing import Any
 
 import pytest
 
-from homeassistant import setup
-from homeassistant.components.command_line.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub import setup
+from smarthub.components.command_line.const import DOMAIN
+from smarthub.core import SmartHub
 
 
 @pytest.fixture(name="get_config")
@@ -62,8 +62,8 @@ async def get_config_to_integration_load() -> dict[str, Any]:
 
 
 @pytest.fixture(name="load_yaml_integration")
-async def load_int(hass: HomeAssistant, get_config: dict[str, Any]) -> None:
-    """Set up the Command Line integration in Home Assistant."""
+async def load_int(hass: SmartHub, get_config: dict[str, Any]) -> None:
+    """Set up the Command Line integration in SmartHub."""
     await setup.async_setup_component(
         hass,
         DOMAIN,

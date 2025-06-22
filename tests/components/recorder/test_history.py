@@ -11,19 +11,19 @@ from unittest.mock import patch, sentinel
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder import Recorder, history
-from homeassistant.components.recorder.db_schema import (
+from smarthub.components import recorder
+from smarthub.components.recorder import Recorder, history
+from smarthub.components.recorder.db_schema import (
     StateAttributes,
     States,
     StatesMeta,
 )
-from homeassistant.components.recorder.filters import Filters
-from homeassistant.components.recorder.models import process_timestamp
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.json import JSONEncoder
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder.filters import Filters
+from smarthub.components.recorder.models import process_timestamp
+from smarthub.components.recorder.util import session_scope
+from smarthub.core import SmartHub, State
+from smarthub.helpers.json import JSONEncoder
+from smarthub.util import dt as dt_util
 
 from .common import (
     assert_dict_of_states_equal_without_context_and_last_changed,
@@ -49,7 +49,7 @@ def multiple_start_time_chunk_sizes(
     to call _generate_significant_states_with_session_stmt multiple times.
     """
     with patch(
-        "homeassistant.components.recorder.history.modern.MAX_IDS_FOR_INDEXED_GROUP_BY",
+        "smarthub.components.recorder.history.modern.MAX_IDS_FOR_INDEXED_GROUP_BY",
         ids_for_start_time_chunk_sizes,
     ):
         yield
@@ -68,7 +68,7 @@ def setup_recorder(recorder_mock: Recorder) -> recorder.Recorder:
 
 
 async def test_get_full_significant_states_with_session_entity_no_matches(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test getting states at a specific point in time for entities that never have been recorded."""
     now = dt_util.utcnow()
@@ -93,7 +93,7 @@ async def test_get_full_significant_states_with_session_entity_no_matches(
 
 
 async def test_significant_states_with_session_entity_minimal_response_no_matches(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test getting states at a specific point in time for entities that never have been recorded."""
     now = dt_util.utcnow()
@@ -124,7 +124,7 @@ async def test_significant_states_with_session_entity_minimal_response_no_matche
 
 
 async def test_significant_states_with_session_single_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test get_significant_states_with_session with a single entity."""
     hass.states.async_set("demo.id", "any", {"attr": True})
@@ -153,7 +153,7 @@ async def test_significant_states_with_session_single_entity(
     ],
 )
 async def test_state_changes_during_period(
-    hass: HomeAssistant, attributes, no_attributes, limit
+    hass: SmartHub, attributes, no_attributes, limit
 ) -> None:
     """Test state change during period."""
     entity_id = "media_player.test"
@@ -192,7 +192,7 @@ async def test_state_changes_during_period(
 
 
 async def test_state_changes_during_period_last_reported(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test state change during period."""
     entity_id = "media_player.test"
@@ -226,7 +226,7 @@ async def test_state_changes_during_period_last_reported(
 
 
 async def test_state_changes_during_period_descending(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test state change during period descending."""
     entity_id = "media_player.test"
@@ -328,7 +328,7 @@ async def test_state_changes_during_period_descending(
     )
 
 
-async def test_get_last_state_changes(hass: HomeAssistant) -> None:
+async def test_get_last_state_changes(hass: SmartHub) -> None:
     """Test number of state changes."""
     entity_id = "sensor.test"
 
@@ -358,7 +358,7 @@ async def test_get_last_state_changes(hass: HomeAssistant) -> None:
 
 
 async def test_get_last_state_changes_last_reported(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test number of state changes."""
     entity_id = "sensor.test"
@@ -388,7 +388,7 @@ async def test_get_last_state_changes_last_reported(
     assert_multiple_states_equal_without_context(states, hist[entity_id])
 
 
-async def test_get_last_state_change(hass: HomeAssistant) -> None:
+async def test_get_last_state_change(hass: SmartHub) -> None:
     """Test getting the last state change for an entity."""
     entity_id = "sensor.test"
 
@@ -418,7 +418,7 @@ async def test_get_last_state_change(hass: HomeAssistant) -> None:
 
 
 async def test_ensure_state_can_be_copied(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Ensure a state can pass though copy().
 
@@ -449,7 +449,7 @@ async def test_ensure_state_can_be_copied(
 
 
 @pytest.mark.usefixtures("multiple_start_time_chunk_sizes")
-async def test_get_significant_states(hass: HomeAssistant) -> None:
+async def test_get_significant_states(hass: SmartHub) -> None:
     """Test that only significant states are returned.
 
     We should get back every thermostat change that
@@ -465,7 +465,7 @@ async def test_get_significant_states(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("multiple_start_time_chunk_sizes")
 async def test_get_significant_states_minimal_response(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that only significant states are returned.
 
@@ -536,7 +536,7 @@ async def test_get_significant_states_minimal_response(
 @pytest.mark.usefixtures("multiple_start_time_chunk_sizes")
 @pytest.mark.parametrize("time_zone", ["Europe/Berlin", "US/Hawaii", "UTC"])
 async def test_get_significant_states_with_initial(
-    time_zone, hass: HomeAssistant
+    time_zone, hass: SmartHub
 ) -> None:
     """Test that only significant states are returned.
 
@@ -568,7 +568,7 @@ async def test_get_significant_states_with_initial(
 
 @pytest.mark.usefixtures("multiple_start_time_chunk_sizes")
 async def test_get_significant_states_without_initial(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that only significant states are returned.
 
@@ -603,7 +603,7 @@ async def test_get_significant_states_without_initial(
 
 @pytest.mark.usefixtures("multiple_start_time_chunk_sizes")
 async def test_get_significant_states_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that only significant states are returned for one entity."""
     zero, four, states = record_states(hass)
@@ -622,7 +622,7 @@ async def test_get_significant_states_entity_id(
 
 @pytest.mark.usefixtures("multiple_start_time_chunk_sizes")
 async def test_get_significant_states_multiple_entity_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that only significant states are returned for one entity."""
     zero, four, states = record_states(hass)
@@ -644,7 +644,7 @@ async def test_get_significant_states_multiple_entity_ids(
 
 
 async def test_get_significant_states_are_ordered(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test order of results from get_significant_states.
 
@@ -663,7 +663,7 @@ async def test_get_significant_states_are_ordered(
 
 
 async def test_get_significant_states_only(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test significant states when significant_states_only is set."""
     entity_id = "sensor.test"
@@ -725,7 +725,7 @@ async def test_get_significant_states_only(
 
 
 async def test_get_significant_states_only_minimal_response(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test significant states when significant_states_only is True."""
     now = dt_util.utcnow()
@@ -752,7 +752,7 @@ async def test_get_significant_states_only_minimal_response(
 
 
 def record_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> tuple[datetime, datetime, dict[str, list[State]]]:
     """Record some test states.
 
@@ -837,7 +837,7 @@ def record_states(
 
 
 async def test_get_full_significant_states_handles_empty_last_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test getting states when last_changed is null."""
     now = dt_util.utcnow()
@@ -932,7 +932,7 @@ async def test_get_full_significant_states_handles_empty_last_changed(
 
 
 async def test_state_changes_during_period_multiple_entities_single_test(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test state change during period with multiple entities in the same test.
 
@@ -955,7 +955,7 @@ async def test_state_changes_during_period_multiple_entities_single_test(
 
 @pytest.mark.freeze_time("2039-01-19 03:14:07.555555-00:00")
 async def test_get_full_significant_states_past_year_2038(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we can store times past year 2038."""
     past_2038_time = dt_util.parse_datetime("2039-01-19 03:14:07.555555-00:00")
@@ -988,7 +988,7 @@ async def test_get_full_significant_states_past_year_2038(
 
 
 async def test_get_significant_states_without_entity_ids_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test at least one entity id is required for get_significant_states."""
     now = dt_util.utcnow()
@@ -997,7 +997,7 @@ async def test_get_significant_states_without_entity_ids_raises(
 
 
 async def test_state_changes_during_period_without_entity_ids_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test at least one entity id is required for state_changes_during_period."""
     now = dt_util.utcnow()
@@ -1006,7 +1006,7 @@ async def test_state_changes_during_period_without_entity_ids_raises(
 
 
 async def test_get_significant_states_with_filters_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test passing filters is no longer supported."""
     now = dt_util.utcnow()
@@ -1017,7 +1017,7 @@ async def test_get_significant_states_with_filters_raises(
 
 
 async def test_get_significant_states_with_non_existent_entity_ids_returns_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test get_significant_states returns an empty dict when entities not in the db."""
     now = dt_util.utcnow()
@@ -1025,7 +1025,7 @@ async def test_get_significant_states_with_non_existent_entity_ids_returns_empty
 
 
 async def test_state_changes_during_period_with_non_existent_entity_ids_returns_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test state_changes_during_period returns an empty dict when entities not in the db."""
     now = dt_util.utcnow()
@@ -1035,7 +1035,7 @@ async def test_state_changes_during_period_with_non_existent_entity_ids_returns_
 
 
 async def test_get_last_state_changes_with_non_existent_entity_ids_returns_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test get_last_state_changes returns an empty dict when entities not in the db."""
     assert history.get_last_state_changes(hass, 1, "nonexistent.entity") == {}

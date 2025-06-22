@@ -5,11 +5,11 @@ from unittest.mock import patch
 from huum.exceptions import Forbidden
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.huum.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.huum.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -17,7 +17,7 @@ TEST_USERNAME = "test-username"
 TEST_PASSWORD = "test-password"
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -28,11 +28,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.huum.config_flow.Huum.status",
+            "smarthub.components.huum.config_flow.Huum.status",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.huum.async_setup_entry",
+            "smarthub.components.huum.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -54,7 +54,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_signup_flow_already_set_up(hass: HomeAssistant) -> None:
+async def test_signup_flow_already_set_up(hass: SmartHub) -> None:
     """Test that we handle already existing entities with same id."""
     mock_config_entry = MockConfigEntry(
         title="Huum Sauna",
@@ -73,11 +73,11 @@ async def test_signup_flow_already_set_up(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.huum.config_flow.Huum.status",
+            "smarthub.components.huum.config_flow.Huum.status",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.huum.async_setup_entry",
+            "smarthub.components.huum.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -103,7 +103,7 @@ async def test_signup_flow_already_set_up(hass: HomeAssistant) -> None:
     ],
 )
 async def test_huum_errors(
-    hass: HomeAssistant, raises: Exception, error_base: str
+    hass: SmartHub, raises: Exception, error_base: str
 ) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
@@ -111,7 +111,7 @@ async def test_huum_errors(
     )
 
     with patch(
-        "homeassistant.components.huum.config_flow.Huum.status",
+        "smarthub.components.huum.config_flow.Huum.status",
         side_effect=raises,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -127,11 +127,11 @@ async def test_huum_errors(
 
     with (
         patch(
-            "homeassistant.components.huum.config_flow.Huum.status",
+            "smarthub.components.huum.config_flow.Huum.status",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.huum.async_setup_entry",
+            "smarthub.components.huum.async_setup_entry",
             return_value=True,
         ),
     ):

@@ -1,12 +1,12 @@
 """The sensor tests for the nexia platform."""
 
-from homeassistant.const import PERCENTAGE, UnitOfTemperature
-from homeassistant.core import HomeAssistant
+from smarthub.const import PERCENTAGE, UnitOfTemperature
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 
-async def test_create_sensors(hass: HomeAssistant) -> None:
+async def test_create_sensors(hass: SmartHub) -> None:
     """Test creation of sensors."""
 
     await async_init_integration(hass)

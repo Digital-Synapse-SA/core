@@ -28,9 +28,9 @@ from habiticalib import (
 )
 import pytest
 
-from homeassistant.components.habitica.const import CONF_API_USER, DEFAULT_URL, DOMAIN
-from homeassistant.const import CONF_API_KEY, CONF_URL
-from homeassistant.core import HomeAssistant
+from smarthub.components.habitica.const import CONF_API_USER, DEFAULT_URL, DOMAIN
+from smarthub.const import CONF_API_KEY, CONF_URL
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture, load_fixture
 
@@ -59,7 +59,7 @@ def mock_config_entry() -> MockConfigEntry:
 
 
 @pytest.fixture
-async def set_tz(hass: HomeAssistant) -> None:
+async def set_tz(hass: SmartHub) -> None:
     """Fixture to set timezone."""
     await hass.config.async_set_time_zone("Europe/Berlin")
 
@@ -75,15 +75,15 @@ def mock_get_tasks(task_type: TaskFilter | None = None) -> HabiticaTasksResponse
 
 
 @pytest.fixture(name="habitica")
-async def mock_habiticalib(hass: HomeAssistant) -> AsyncGenerator[AsyncMock]:
+async def mock_habiticalib(hass: SmartHub) -> AsyncGenerator[AsyncMock]:
     """Mock habiticalib."""
 
     with (
         patch(
-            "homeassistant.components.habitica.Habitica", autospec=True
+            "smarthub.components.habitica.Habitica", autospec=True
         ) as mock_client,
         patch(
-            "homeassistant.components.habitica.config_flow.Habitica", new=mock_client
+            "smarthub.components.habitica.config_flow.Habitica", new=mock_client
         ),
     ):
         client = mock_client.return_value
@@ -162,7 +162,7 @@ async def mock_habiticalib(hass: HomeAssistant) -> AsyncGenerator[AsyncMock]:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.habitica.async_setup_entry", return_value=True
+        "smarthub.components.habitica.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -171,7 +171,7 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 def mock_uuid4() -> Generator[MagicMock]:
     """Mock uuid4."""
     with patch(
-        "homeassistant.components.habitica.services.uuid4", autospec=True
+        "smarthub.components.habitica.services.uuid4", autospec=True
     ) as mock_uuid4:
         mock_uuid4.return_value = UUID("12345678-1234-5678-1234-567812345678")
         yield mock_uuid4

@@ -8,13 +8,13 @@ from unittest.mock import AsyncMock
 from aioesphomeapi import APIClient, BinarySensorInfo, BinarySensorState, DeviceInfo
 import pytest
 
-from homeassistant.components.esphome import repairs
-from homeassistant.components.esphome.const import DOMAIN
-from homeassistant.components.esphome.manager import DEVICE_CONFLICT_ISSUE_FORMAT
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import (
+from smarthub.components.esphome import repairs
+from smarthub.components.esphome.const import DOMAIN
+from smarthub.components.esphome.manager import DEVICE_CONFLICT_ISSUE_FORMAT
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
@@ -32,7 +32,7 @@ from tests.components.repairs import (
 from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
-async def test_create_fix_flow_raises_on_unknown_issue_id(hass: HomeAssistant) -> None:
+async def test_create_fix_flow_raises_on_unknown_issue_id(hass: SmartHub) -> None:
     """Test create_fix_flow raises on unknown issue_id."""
 
     with pytest.raises(ValueError):
@@ -40,7 +40,7 @@ async def test_create_fix_flow_raises_on_unknown_issue_id(hass: HomeAssistant) -
 
 
 async def test_device_conflict_manual(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
@@ -117,7 +117,7 @@ async def test_device_conflict_manual(
 
 
 async def test_device_conflict_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,

@@ -2,16 +2,16 @@
 
 from unittest.mock import patch
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
-async def test_random_binary_sensor_on(hass: HomeAssistant) -> None:
+async def test_random_binary_sensor_on(hass: SmartHub) -> None:
     """Test the Random binary sensor."""
     config = {"binary_sensor": {"platform": "random", "name": "test"}}
 
     with patch(
-        "homeassistant.components.random.binary_sensor.getrandbits",
+        "smarthub.components.random.binary_sensor.getrandbits",
         return_value=1,
     ):
         assert await async_setup_component(
@@ -26,12 +26,12 @@ async def test_random_binary_sensor_on(hass: HomeAssistant) -> None:
     assert state.state == "on"
 
 
-async def test_random_binary_sensor_off(hass: HomeAssistant) -> None:
+async def test_random_binary_sensor_off(hass: SmartHub) -> None:
     """Test the Random binary sensor."""
     config = {"binary_sensor": {"platform": "random", "name": "test"}}
 
     with patch(
-        "homeassistant.components.random.binary_sensor.getrandbits",
+        "smarthub.components.random.binary_sensor.getrandbits",
         return_value=False,
     ):
         assert await async_setup_component(

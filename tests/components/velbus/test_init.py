@@ -6,14 +6,14 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from velbusaio.exceptions import VelbusConnectionFailed
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.velbus import VelbusConfigEntry
-from homeassistant.components.velbus.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, CONF_NAME, CONF_PORT, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.velbus import VelbusConfigEntry
+from smarthub.components.velbus.const import DOMAIN
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, CONF_NAME, CONF_PORT, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import init_integration
 from .const import PORT_TCP
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_setup_connection_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: VelbusConfigEntry,
     controller: MagicMock,
 ) -> None:
@@ -33,7 +33,7 @@ async def test_setup_connection_failed(
 
 
 async def test_setup_start_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: VelbusConfigEntry,
     controller: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -48,7 +48,7 @@ async def test_setup_start_failed(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
 ) -> None:
     """Test being able to unload an entry."""
@@ -66,7 +66,7 @@ async def test_unload_entry(
 
 
 async def test_device_identifier_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -102,7 +102,7 @@ async def test_device_identifier_migration(
 
 
 async def test_migrate_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     controller: MagicMock,
 ) -> None:
     """Test successful migration of entry data."""
@@ -126,7 +126,7 @@ async def test_migrate_config_entry(
     [("vid:pid_serial_manufacturer_decription", "serial"), (None, None)],
 )
 async def test_migrate_config_entry_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     controller: AsyncMock,
     unique_id: str,
     expected: str,
@@ -146,7 +146,7 @@ async def test_migrate_config_entry_unique_id(
 
 
 async def test_api_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_relay: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -154,7 +154,7 @@ async def test_api_call(
     await init_integration(hass, config_entry)
 
     mock_relay.turn_on.side_effect = OSError()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -164,7 +164,7 @@ async def test_api_call(
 
 
 async def test_device_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,

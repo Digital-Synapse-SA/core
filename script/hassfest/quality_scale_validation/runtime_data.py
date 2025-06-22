@@ -1,12 +1,12 @@
 """Enforce that the integration uses ConfigEntry.runtime_data to store runtime data.
 
-https://developers.home-assistant.io/docs/core/integration-quality-scale/rules/runtime-data
+https://developers.smart-hub.io/docs/core/integration-quality-scale/rules/runtime-data
 """
 
 import ast
 import re
 
-from homeassistant.const import Platform
+from smarthub.const import Platform
 from script.hassfest import ast_parse_module
 from script.hassfest.model import Config, Integration
 

@@ -9,15 +9,15 @@ from myuplink import Device, DevicePoint, System
 import orjson
 import pytest
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.myuplink.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.setup import async_setup_component
-from homeassistant.util.json import json_loads
+from smarthub.components.myuplink.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.setup import async_setup_component
+from smarthub.util.json import json_loads
 
 from .const import CLIENT_ID, CLIENT_SECRET, UNIQUE_ID
 
@@ -31,7 +31,7 @@ def mock_expires_at() -> float:
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant, expires_at: float) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub, expires_at: float) -> MockConfigEntry:
     """Return the default mocked config entry."""
     config_entry = MockConfigEntry(
         minor_version=2,
@@ -56,7 +56,7 @@ def mock_config_entry(hass: HomeAssistant, expires_at: float) -> MockConfigEntry
 
 
 @pytest.fixture(autouse=True)
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -141,7 +141,7 @@ def mock_myuplink_client(
     """Mock a myuplink client."""
 
     with patch(
-        "homeassistant.components.myuplink.MyUplinkAPI",
+        "smarthub.components.myuplink.MyUplinkAPI",
         autospec=True,
     ) as mock_client:
         client = mock_client.return_value
@@ -160,7 +160,7 @@ def mock_myuplink_client(
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_myuplink_client: MagicMock,
 ) -> MockConfigEntry:
@@ -181,20 +181,20 @@ def platforms() -> list[str]:
 
 @pytest.fixture
 async def setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     platforms,
 ) -> AsyncGenerator[None]:
     """Set up one or all platforms."""
 
-    with patch(f"homeassistant.components.{DOMAIN}.PLATFORMS", platforms):
+    with patch(f"smarthub.components.{DOMAIN}.PLATFORMS", platforms):
         assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
         yield
 
 
 @pytest.fixture
-async def access_token(hass: HomeAssistant) -> str:
+async def access_token(hass: SmartHub) -> str:
     """Return a valid access token."""
     return config_entry_oauth2_flow._encode_jwt(
         hass,

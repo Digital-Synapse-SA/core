@@ -3,12 +3,12 @@
 from ipaddress import ip_address
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.baf.const import DOMAIN
-from homeassistant.const import CONF_IP_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.baf.const import DOMAIN
+from smarthub.const import CONF_IP_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from . import MOCK_NAME, MOCK_UUID, MockBAFDevice
 
@@ -21,10 +21,10 @@ def _patch_device_config_flow(side_effect=None):
     def _create_mock_baf(*args, **kwargs):
         return MockBAFDevice(side_effect)
 
-    return patch("homeassistant.components.baf.config_flow.Device", _create_mock_baf)
+    return patch("smarthub.components.baf.config_flow.Device", _create_mock_baf)
 
 
-async def test_form_user(hass: HomeAssistant) -> None:
+async def test_form_user(hass: SmartHub) -> None:
     """Test we get the user form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -36,7 +36,7 @@ async def test_form_user(hass: HomeAssistant) -> None:
     with (
         _patch_device_config_flow(),
         patch(
-            "homeassistant.components.baf.async_setup_entry",
+            "smarthub.components.baf.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -52,7 +52,7 @@ async def test_form_user(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -68,7 +68,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {CONF_IP_ADDRESS: "cannot_connect"}
 
 
-async def test_form_unknown_exception(hass: HomeAssistant) -> None:
+async def test_form_unknown_exception(hass: SmartHub) -> None:
     """Test we handle unknown exceptions."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -84,7 +84,7 @@ async def test_form_unknown_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_zeroconf_discovery(hass: HomeAssistant) -> None:
+async def test_zeroconf_discovery(hass: SmartHub) -> None:
     """Test we can setup from zeroconf discovery."""
 
     result = await hass.config_entries.flow.async_init(
@@ -104,7 +104,7 @@ async def test_zeroconf_discovery(hass: HomeAssistant) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.baf.async_setup_entry",
+        "smarthub.components.baf.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -119,7 +119,7 @@ async def test_zeroconf_discovery(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_zeroconf_updates_existing_ip(hass: HomeAssistant) -> None:
+async def test_zeroconf_updates_existing_ip(hass: SmartHub) -> None:
     """Test we can setup from zeroconf discovery."""
     entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_IP_ADDRESS: "127.0.0.2"}, unique_id=MOCK_UUID
@@ -143,7 +143,7 @@ async def test_zeroconf_updates_existing_ip(hass: HomeAssistant) -> None:
     assert entry.data[CONF_IP_ADDRESS] == "127.0.0.1"
 
 
-async def test_zeroconf_rejects_ipv6(hass: HomeAssistant) -> None:
+async def test_zeroconf_rejects_ipv6(hass: SmartHub) -> None:
     """Test zeroconf discovery rejects ipv6."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -162,7 +162,7 @@ async def test_zeroconf_rejects_ipv6(hass: HomeAssistant) -> None:
     assert result["reason"] == "ipv6_not_supported"
 
 
-async def test_user_flow_is_not_blocked_by_discovery(hass: HomeAssistant) -> None:
+async def test_user_flow_is_not_blocked_by_discovery(hass: SmartHub) -> None:
     """Test we can setup from the user flow when there is also a discovery."""
     discovery_result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -188,7 +188,7 @@ async def test_user_flow_is_not_blocked_by_discovery(hass: HomeAssistant) -> Non
     with (
         _patch_device_config_flow(),
         patch(
-            "homeassistant.components.baf.async_setup_entry",
+            "smarthub.components.baf.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):

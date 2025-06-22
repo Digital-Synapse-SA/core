@@ -2,8 +2,8 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -11,7 +11,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_flipr_client: AsyncMock,
 ) -> None:

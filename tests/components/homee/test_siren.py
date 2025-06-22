@@ -5,15 +5,15 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.siren import (
+from smarthub.components.siren import (
     DOMAIN as SIREN_DOMAIN,
     SERVICE_TOGGLE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import async_update_attribute_value, build_mock_node, setup_integration
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def setup_siren(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homee: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homee: MagicMock
 ) -> None:
     """Setups the integration siren tests."""
     mock_homee.nodes = [build_mock_node("siren.json")]
@@ -38,7 +38,7 @@ async def setup_siren(
     ],
 )
 async def test_siren_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     service: str,
@@ -56,7 +56,7 @@ async def test_siren_services(
 
 
 async def test_siren_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
 ) -> None:
@@ -73,14 +73,14 @@ async def test_siren_state(
 
 
 async def test_siren_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test siren snapshot."""
-    with patch("homeassistant.components.homee.PLATFORMS", [Platform.SIREN]):
+    with patch("smarthub.components.homee.PLATFORMS", [Platform.SIREN]):
         await setup_siren(hass, mock_config_entry, mock_homee)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

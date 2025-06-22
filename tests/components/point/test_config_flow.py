@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.application_credentials import (
+from smarthub import config_entries
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.point.const import DOMAIN, OAUTH2_AUTHORIZE, OAUTH2_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.setup import async_setup_component
+from smarthub.components.point.const import DOMAIN, OAUTH2_AUTHORIZE, OAUTH2_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -26,7 +26,7 @@ REDIRECT_URL = "https://example.com/auth/external/callback"
 
 
 @pytest.fixture(autouse=True)
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -38,7 +38,7 @@ async def setup_credentials(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -77,7 +77,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.point.async_setup_entry", return_value=True
+        "smarthub.components.point.async_setup_entry", return_value=True
     ) as mock_setup:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -104,7 +104,7 @@ async def test_full_flow(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauthentication_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     unique_id: str | None,
@@ -146,9 +146,9 @@ async def test_reauthentication_flow(
     )
 
     with (
-        patch("homeassistant.components.point.api.AsyncConfigEntryAuth"),
+        patch("smarthub.components.point.api.AsyncConfigEntryAuth"),
         patch(
-            f"homeassistant.components.{DOMAIN}.async_setup_entry", return_value=True
+            f"smarthub.components.{DOMAIN}.async_setup_entry", return_value=True
         ),
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])

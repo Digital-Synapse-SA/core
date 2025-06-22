@@ -1,12 +1,12 @@
 """Test VoIP select."""
 
-from homeassistant.components.voip.devices import VoIPDevice
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.components.voip.devices import VoIPDevice
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
 
 
 async def test_pipeline_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     voip_device: VoIPDevice,
 ) -> None:
@@ -21,7 +21,7 @@ async def test_pipeline_select(
 
 
 async def test_vad_sensitivity_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     voip_device: VoIPDevice,
 ) -> None:

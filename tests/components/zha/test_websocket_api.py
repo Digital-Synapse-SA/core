@@ -34,20 +34,20 @@ from zigpy.zcl.clusters import closures, general, security
 from zigpy.zcl.clusters.general import Groups
 import zigpy.zdo.types as zdo_types
 
-from homeassistant.components.websocket_api import (
+from smarthub.components.websocket_api import (
     ERR_INVALID_FORMAT,
     ERR_NOT_FOUND,
     TYPE_RESULT,
 )
-from homeassistant.components.zha import DOMAIN
-from homeassistant.components.zha.const import EZSP_OVERWRITE_EUI64
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha import DOMAIN
+from smarthub.components.zha.const import EZSP_OVERWRITE_EUI64
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.components.zha.websocket_api import (
+from smarthub.components.zha.websocket_api import (
     ATTR_DURATION,
     ATTR_INSTALL_CODE,
     ATTR_QR_CODE,
@@ -62,8 +62,8 @@ from homeassistant.components.zha.websocket_api import (
     TYPE,
     async_load_api,
 )
-from homeassistant.const import ATTR_MODEL, ATTR_NAME, Platform
-from homeassistant.core import Context, HomeAssistant
+from smarthub.const import ATTR_MODEL, ATTR_NAME, Platform
+from smarthub.core import Context, SmartHub
 
 from .conftest import FIXTURE_GRP_ID, FIXTURE_GRP_NAME
 from .data import BASE_CUSTOM_CONFIGURATION, CONFIG_WITH_ALARM_OPTIONS
@@ -82,7 +82,7 @@ if TYPE_CHECKING:
 def required_platform_only():
     """Only set up the required and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.ALARM_CONTROL_PANEL,
             Platform.SELECT,
@@ -95,7 +95,7 @@ def required_platform_only():
 
 @pytest.fixture
 async def zha_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_zha,
     zigpy_device_mock,
@@ -146,7 +146,7 @@ async def zha_client(
     return await hass_ws_client(hass)
 
 
-async def test_device_clusters(hass: HomeAssistant, zha_client) -> None:
+async def test_device_clusters(hass: SmartHub, zha_client) -> None:
     """Test getting device cluster info."""
     await zha_client.send_json(
         {ID: 5, TYPE: "zha/devices/clusters", ATTR_IEEE: IEEE_SWITCH_DEVICE}
@@ -261,7 +261,7 @@ async def test_get_zha_config(zha_client) -> None:
 
 
 async def test_get_zha_config_with_alarm(
-    hass: HomeAssistant, zha_client, zigpy_device_mock
+    hass: SmartHub, zha_client, zigpy_device_mock
 ) -> None:
     """Test getting ZHA custom configuration."""
 
@@ -305,7 +305,7 @@ async def test_get_zha_config_with_alarm(
 
 
 async def test_update_zha_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     zha_client,
     app_controller: ControllerApplication,
@@ -389,7 +389,7 @@ async def test_get_group_not_found(zha_client) -> None:
 
 
 async def test_list_groupable_devices(
-    hass: HomeAssistant, zha_client, zigpy_app_controller
+    hass: SmartHub, zha_client, zigpy_app_controller
 ) -> None:
     """Test getting ZHA devices that have a group cluster."""
     # Ensure the coordinator doesn't have a group cluster
@@ -443,7 +443,7 @@ async def test_list_groupable_devices(
     assert len(device_endpoints) == 0
 
 
-async def test_add_group(hass: HomeAssistant, zha_client) -> None:
+async def test_add_group(hass: SmartHub, zha_client) -> None:
     """Test adding and getting a new ZHA zigbee group."""
     await zha_client.send_json(
         {
@@ -518,7 +518,7 @@ async def test_remove_group(zha_client) -> None:
     assert len(groups) == 0
 
 
-async def test_add_group_member(hass: HomeAssistant, zha_client) -> None:
+async def test_add_group_member(hass: SmartHub, zha_client) -> None:
     """Test adding a ZHA zigbee group member."""
     await zha_client.send_json(
         {
@@ -556,7 +556,7 @@ async def test_add_group_member(hass: HomeAssistant, zha_client) -> None:
     assert added_group["members"][0]["device"]["ieee"] == IEEE_GROUPABLE_DEVICE
 
 
-async def test_remove_group_member(hass: HomeAssistant, zha_client) -> None:
+async def test_remove_group_member(hass: SmartHub, zha_client) -> None:
     """Test removing a ZHA zigbee group member."""
     await zha_client.send_json(
         {
@@ -596,7 +596,7 @@ async def test_remove_group_member(hass: HomeAssistant, zha_client) -> None:
 
 @pytest.fixture
 async def app_controller(
-    hass: HomeAssistant, setup_zha, zigpy_app_controller: ControllerApplication
+    hass: SmartHub, setup_zha, zigpy_app_controller: ControllerApplication
 ) -> ControllerApplication:
     """Fixture for zigpy Application Controller."""
     await setup_zha()
@@ -622,7 +622,7 @@ async def app_controller(
     ],
 )
 async def test_permit_ha12(
-    hass: HomeAssistant,
+    hass: SmartHub,
     app_controller: ControllerApplication,
     hass_admin_user: MockUser,
     params,
@@ -666,7 +666,7 @@ IC_TEST_PARAMS = (
 
 @pytest.mark.parametrize(("params", "src_ieee", "code"), IC_TEST_PARAMS)
 async def test_permit_with_install_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     app_controller: ControllerApplication,
     hass_admin_user: MockUser,
     params,
@@ -722,7 +722,7 @@ IC_FAIL_PARAMS = (
 
 @pytest.mark.parametrize("params", IC_FAIL_PARAMS)
 async def test_permit_with_install_code_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     app_controller: ControllerApplication,
     hass_admin_user: MockUser,
     params,
@@ -782,7 +782,7 @@ IC_QR_CODE_TEST_PARAMS = (
 
 @pytest.mark.parametrize(("params", "src_ieee", "code"), IC_QR_CODE_TEST_PARAMS)
 async def test_permit_with_qr_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     app_controller: ControllerApplication,
     hass_admin_user: MockUser,
     params,
@@ -1029,7 +1029,7 @@ async def test_websocket_change_channel(
     """Test websocket API to migrate the network to a new channel."""
 
     with patch(
-        "homeassistant.components.zha.websocket_api.async_change_channel",
+        "smarthub.components.zha.websocket_api.async_change_channel",
         autospec=True,
     ) as change_channel_mock:
         await zha_client.send_json(
@@ -1061,7 +1061,7 @@ async def test_websocket_bind_unbind_devices(
 
     command_type, req = operation
     with patch(
-        "homeassistant.components.zha.websocket_api.async_binding_operation",
+        "smarthub.components.zha.websocket_api.async_binding_operation",
         autospec=True,
     ) as binding_operation_mock:
         await zha_client.send_json(
@@ -1090,7 +1090,7 @@ async def test_websocket_bind_unbind_devices(
 @pytest.mark.parametrize("command_type", ["bind", "unbind"])
 async def test_websocket_bind_unbind_group(
     command_type: str,
-    hass: HomeAssistant,
+    hass: SmartHub,
     app_controller: ControllerApplication,
     zha_client,
 ) -> None:
@@ -1100,7 +1100,7 @@ async def test_websocket_bind_unbind_group(
     gateway_mock = MagicMock()
 
     with patch(
-        "homeassistant.components.zha.websocket_api.get_zha_gateway",
+        "smarthub.components.zha.websocket_api.get_zha_gateway",
         return_value=gateway_mock,
     ):
         device_mock = MagicMock()
@@ -1138,7 +1138,7 @@ async def test_websocket_bind_unbind_group(
 
 
 async def test_websocket_reconfigure(
-    hass: HomeAssistant, zha_client: MockHAClientWebSocket, zigpy_device_mock
+    hass: SmartHub, zha_client: MockHAClientWebSocket, zigpy_device_mock
 ) -> None:
     """Test websocket API to reconfigure a device."""
     gateway = get_zha_gateway(hass)

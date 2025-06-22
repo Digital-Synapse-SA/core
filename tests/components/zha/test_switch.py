@@ -7,16 +7,16 @@ from zigpy.profiles import zha
 from zigpy.zcl.clusters import general
 import zigpy.zcl.foundation as zcl_f
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.zha.helpers import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import find_entity_id, send_attributes_report
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
@@ -29,7 +29,7 @@ OFF = 0
 def switch_platform_only():
     """Only set up the switch and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.DEVICE_TRACKER,
             Platform.SENSOR,
@@ -40,7 +40,7 @@ def switch_platform_only():
         yield
 
 
-async def test_switch(hass: HomeAssistant, setup_zha, zigpy_device_mock) -> None:
+async def test_switch(hass: SmartHub, setup_zha, zigpy_device_mock) -> None:
     """Test ZHA switch platform."""
 
     await setup_zha()
@@ -131,11 +131,11 @@ async def test_switch(hass: HomeAssistant, setup_zha, zigpy_device_mock) -> None
         assert state
         assert state.state == STATE_OFF
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     cluster.read_attributes.reset_mock()
     await hass.services.async_call(
-        "homeassistant", "update_entity", {"entity_id": entity_id}, blocking=True
+        "smarthub", "update_entity", {"entity_id": entity_id}, blocking=True
     )
     assert len(cluster.read_attributes.mock_calls) == 1
     assert cluster.read_attributes.call_args == call(

@@ -9,21 +9,21 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components.group import DOMAIN
-from homeassistant.components.group.sensor import (
+from smarthub import config as hass_config
+from smarthub.components.group import DOMAIN
+from smarthub.components.group.sensor import (
     ATTR_LAST_ENTITY_ID,
     ATTR_MAX_ENTITY_ID,
     ATTR_MIN_ENTITY_ID,
     DEFAULT_NAME,
 )
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_ICON,
@@ -34,9 +34,9 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from tests.common import get_fixture_path
 
@@ -68,7 +68,7 @@ PRODUCT_VALUE = prod(VALUES)
     ],
 )
 async def test_sensors2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     sensor_type: str,
     result: str,
@@ -117,7 +117,7 @@ async def test_sensors2(
     assert entity.unique_id == "very_unique_id"
 
 
-async def test_sensors_attributes_defined(hass: HomeAssistant) -> None:
+async def test_sensors_attributes_defined(hass: SmartHub) -> None:
     """Test the sensors."""
     config = {
         SENSOR_DOMAIN: {
@@ -159,7 +159,7 @@ async def test_sensors_attributes_defined(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == "m³"
 
 
-async def test_not_enough_sensor_value(hass: HomeAssistant) -> None:
+async def test_not_enough_sensor_value(hass: SmartHub) -> None:
     """Test that there is nothing done if not enough values available."""
     config = {
         SENSOR_DOMAIN: {
@@ -208,7 +208,7 @@ async def test_not_enough_sensor_value(hass: HomeAssistant) -> None:
     assert state.attributes.get("max_entity_id") is None
 
 
-async def test_reload(hass: HomeAssistant) -> None:
+async def test_reload(hass: SmartHub) -> None:
     """Verify we can reload sensors."""
     hass.states.async_set("sensor.test_1", 12345)
     hass.states.async_set("sensor.test_2", 45678)
@@ -250,7 +250,7 @@ async def test_reload(hass: HomeAssistant) -> None:
 
 
 async def test_sensor_incorrect_state_with_ignore_non_numeric(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that non numeric values are ignored in a group."""
     config = {
@@ -291,7 +291,7 @@ async def test_sensor_incorrect_state_with_ignore_non_numeric(
 
 
 async def test_sensor_incorrect_state_with_not_ignore_non_numeric(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that non numeric values cause a group to be unknown."""
     config = {
@@ -329,7 +329,7 @@ async def test_sensor_incorrect_state_with_not_ignore_non_numeric(
     assert state.state == "20.0"
 
 
-async def test_sensor_require_all_states(hass: HomeAssistant) -> None:
+async def test_sensor_require_all_states(hass: SmartHub) -> None:
     """Test the sum sensor with missing state require all."""
     config = {
         SENSOR_DOMAIN: {
@@ -357,7 +357,7 @@ async def test_sensor_require_all_states(hass: HomeAssistant) -> None:
     assert state.state == STATE_UNKNOWN
 
 
-async def test_sensor_calculated_properties(hass: HomeAssistant) -> None:
+async def test_sensor_calculated_properties(hass: SmartHub) -> None:
     """Test the sensor calculating device_class, state_class and unit of measurement."""
     config = {
         SENSOR_DOMAIN: {
@@ -427,7 +427,7 @@ async def test_sensor_calculated_properties(hass: HomeAssistant) -> None:
 
 
 async def test_sensor_with_uoms_but_no_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -524,7 +524,7 @@ async def test_sensor_with_uoms_but_no_device_class(
 
 
 async def test_sensor_calculated_properties_not_same(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test the sensor calculating device_class, state_class and unit of measurement not same."""
     config = {
@@ -588,7 +588,7 @@ async def test_sensor_calculated_properties_not_same(
     )
 
 
-async def test_sensor_calculated_result_fails_on_uom(hass: HomeAssistant) -> None:
+async def test_sensor_calculated_result_fails_on_uom(hass: SmartHub) -> None:
     """Test the sensor calculating fails as UoM not part of device class."""
     config = {
         SENSOR_DOMAIN: {
@@ -659,7 +659,7 @@ async def test_sensor_calculated_result_fails_on_uom(hass: HomeAssistant) -> Non
 
 
 async def test_sensor_calculated_properties_not_convertible_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test the sensor calculating device_class, state_class and unit of measurement when device class not convertible."""
@@ -742,7 +742,7 @@ async def test_sensor_calculated_properties_not_convertible_device_class(
     ) in caplog.text
 
 
-async def test_last_sensor(hass: HomeAssistant) -> None:
+async def test_last_sensor(hass: SmartHub) -> None:
     """Test the last sensor."""
     config = {
         SENSOR_DOMAIN: {
@@ -768,7 +768,7 @@ async def test_last_sensor(hass: HomeAssistant) -> None:
 
 
 async def test_sensors_attributes_added_when_entity_info_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the sensor calculate attributes once all entities attributes are available."""
     config = {
@@ -817,7 +817,7 @@ async def test_sensors_attributes_added_when_entity_info_available(
 
 
 async def test_sensor_state_class_no_uom_not_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test when input sensors drops unit of measurement."""
@@ -885,7 +885,7 @@ async def test_sensor_state_class_no_uom_not_available(
 
 
 async def test_sensor_different_attributes_ignore_non_numeric(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test the sensor handles calculating attributes when using ignore_non_numeric."""

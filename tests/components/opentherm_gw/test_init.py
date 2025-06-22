@@ -4,12 +4,12 @@ from unittest.mock import MagicMock
 
 from pyotgw.vars import OTGW, OTGW_ABOUT
 
-from homeassistant.components.opentherm_gw.const import (
+from smarthub.components.opentherm_gw.const import (
     DOMAIN,
     OpenThermDeviceIdentifier,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import MOCK_GATEWAY_ID, VERSION_TEST
 
@@ -20,7 +20,7 @@ MINIMAL_STATUS_UPD = {OTGW: {OTGW_ABOUT: f"OpenTherm Gateway {VERSION_NEW}"}}
 
 
 async def test_device_registry_insert(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
     mock_pyotgw: MagicMock,
@@ -39,7 +39,7 @@ async def test_device_registry_insert(
 
 
 async def test_device_registry_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
     mock_pyotgw: MagicMock,

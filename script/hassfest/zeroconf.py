@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from homeassistant.loader import (
+from smarthub.loader import (
     async_process_zeroconf_match_dict,
     homekit_always_discover,
 )
@@ -84,7 +84,7 @@ def generate_and_validate(integrations: dict[str, Integration]) -> str:
 
 def validate(integrations: dict[str, Integration], config: Config) -> None:
     """Validate zeroconf file."""
-    zeroconf_path = config.root / "homeassistant/generated/zeroconf.py"
+    zeroconf_path = config.root / "smarthub/generated/zeroconf.py"
     config.cache["zeroconf"] = content = generate_and_validate(integrations)
 
     if config.specific_integrations:
@@ -100,5 +100,5 @@ def validate(integrations: dict[str, Integration], config: Config) -> None:
 
 def generate(integrations: dict[str, Integration], config: Config) -> None:
     """Generate zeroconf file."""
-    zeroconf_path = config.root / "homeassistant/generated/zeroconf.py"
+    zeroconf_path = config.root / "smarthub/generated/zeroconf.py"
     zeroconf_path.write_text(f"{config.cache['zeroconf']}")

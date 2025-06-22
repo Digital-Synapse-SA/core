@@ -1,12 +1,12 @@
 """Tests for the LinkPlay integration."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Fixture for setting up the component."""

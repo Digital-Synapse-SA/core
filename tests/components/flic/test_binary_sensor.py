@@ -2,9 +2,9 @@
 
 from unittest import mock
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 
 class _MockFlicClient:
@@ -32,7 +32,7 @@ class _MockFlicClient:
 
 
 async def test_button_uid(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test UID assignment for Flic buttons."""
     address_to_name = {

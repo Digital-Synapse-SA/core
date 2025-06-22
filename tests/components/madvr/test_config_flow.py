@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.madvr.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.madvr.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import MOCK_CONFIG, MOCK_MAC, MOCK_MAC_NEW
 
@@ -19,12 +19,12 @@ from tests.common import MockConfigEntry
 @pytest.fixture(autouse=True)
 async def avoid_wait() -> AsyncGenerator[None]:
     """Mock sleep."""
-    with patch("homeassistant.components.madvr.config_flow.RETRY_INTERVAL", 0):
+    with patch("smarthub.components.madvr.config_flow.RETRY_INTERVAL", 0):
         yield
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_madvr_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -52,7 +52,7 @@ async def test_full_flow(
 
 
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_madvr_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -110,7 +110,7 @@ async def test_flow_errors(
 
 
 async def test_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_madvr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -129,7 +129,7 @@ async def test_duplicate(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_madvr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -166,7 +166,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_new_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_madvr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -194,7 +194,7 @@ async def test_reconfigure_new_device(
 
 
 async def test_reconfigure_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_madvr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

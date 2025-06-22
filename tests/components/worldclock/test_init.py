@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_unload_entry(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
+async def test_unload_entry(hass: SmartHub, loaded_entry: MockConfigEntry) -> None:
     """Test unload an entry."""
 
     assert loaded_entry.state is ConfigEntryState.LOADED

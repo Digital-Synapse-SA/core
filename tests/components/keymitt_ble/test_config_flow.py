@@ -2,10 +2,10 @@
 
 from unittest.mock import ANY, AsyncMock, patch
 
-from homeassistant.config_entries import SOURCE_BLUETOOTH, SOURCE_USER
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_BLUETOOTH, SOURCE_USER
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     SERVICE_INFO,
@@ -22,11 +22,11 @@ DOMAIN = "keymitt_ble"
 def patch_microbot_api():
     """Patch MicroBot API."""
     return patch(
-        "homeassistant.components.keymitt_ble.config_flow.MicroBotApiClient", AsyncMock
+        "smarthub.components.keymitt_ble.config_flow.MicroBotApiClient", AsyncMock
     )
 
 
-async def test_bluetooth_discovery(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -48,7 +48,7 @@ async def test_bluetooth_discovery(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_bluetooth_discovery_already_setup(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery_already_setup(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device when already setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -68,11 +68,11 @@ async def test_bluetooth_discovery_already_setup(hass: HomeAssistant) -> None:
         assert result["reason"] == "already_configured"
 
 
-async def test_user_setup(hass: HomeAssistant) -> None:
+async def test_user_setup(hass: SmartHub) -> None:
     """Test the user initiated form with valid mac."""
 
     with patch(
-        "homeassistant.components.keymitt_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.keymitt_ble.config_flow.async_discovered_service_info",
         return_value=[SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -108,7 +108,7 @@ async def test_user_setup(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_setup_already_configured(hass: HomeAssistant) -> None:
+async def test_user_setup_already_configured(hass: SmartHub) -> None:
     """Test the user initiated form with valid mac."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -119,7 +119,7 @@ async def test_user_setup_already_configured(hass: HomeAssistant) -> None:
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.keymitt_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.keymitt_ble.config_flow.async_discovered_service_info",
         return_value=[SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -129,12 +129,12 @@ async def test_user_setup_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_user_no_devices(hass: HomeAssistant) -> None:
+async def test_user_no_devices(hass: SmartHub) -> None:
     """Test the user initiated form with valid mac."""
     with (
         patch_microbot_api(),
         patch(
-            "homeassistant.components.keymitt_ble.config_flow.async_discovered_service_info",
+            "smarthub.components.keymitt_ble.config_flow.async_discovered_service_info",
             return_value=[],
         ),
     ):
@@ -145,13 +145,13 @@ async def test_user_no_devices(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_no_link(hass: HomeAssistant) -> None:
+async def test_no_link(hass: SmartHub) -> None:
     """Test the user initiated form with invalid response."""
 
     with (
         patch_microbot_api(),
         patch(
-            "homeassistant.components.keymitt_ble.config_flow.async_discovered_service_info",
+            "smarthub.components.keymitt_ble.config_flow.async_discovered_service_info",
             return_value=[SERVICE_INFO],
         ),
     ):
@@ -172,7 +172,7 @@ async def test_no_link(hass: HomeAssistant) -> None:
     assert result2["step_id"] == "link"
     with (
         patch(
-            "homeassistant.components.keymitt_ble.config_flow.MicroBotApiClient",
+            "smarthub.components.keymitt_ble.config_flow.MicroBotApiClient",
             MockMicroBotApiClientFail,
         ),
         patch_async_setup_entry() as mock_setup_entry,

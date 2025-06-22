@@ -5,10 +5,10 @@ from unittest.mock import patch
 import pytest
 from triggercmd import TRIGGERcmdConnectionError
 
-from homeassistant.components.triggercmd.const import CONF_TOKEN, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.triggercmd.const import CONF_TOKEN, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -18,7 +18,7 @@ invalid_token_with_length_100_or_more_and_no_id = "eyJhbGciOiJIUzI1NiIsInR5cCI6I
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test config flow happy path."""
     result = await hass.config_entries.flow.async_init(
@@ -32,11 +32,11 @@ async def test_full_flow(
 
     with (
         patch(
-            "homeassistant.components.triggercmd.client.async_connection_test",
+            "smarthub.components.triggercmd.client.async_connection_test",
             return_value=200,
         ),
         patch(
-            "homeassistant.components.triggercmd.ha.Hub",
+            "smarthub.components.triggercmd.ha.Hub",
         ),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -57,7 +57,7 @@ async def test_full_flow(
     ],
 )
 async def test_config_flow_user_invalid_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     test_input: str,
     expected: dict,
 ) -> None:
@@ -69,11 +69,11 @@ async def test_config_flow_user_invalid_token(
 
     with (
         patch(
-            "homeassistant.components.triggercmd.client.async_connection_test",
+            "smarthub.components.triggercmd.client.async_connection_test",
             return_value=200,
         ),
         patch(
-            "homeassistant.components.triggercmd.ha.Hub",
+            "smarthub.components.triggercmd.ha.Hub",
         ),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -93,7 +93,7 @@ async def test_config_flow_user_invalid_token(
         assert result["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_config_flow_entry_already_configured(hass: HomeAssistant) -> None:
+async def test_config_flow_entry_already_configured(hass: SmartHub) -> None:
     """Test user input for config_entry that already exists."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -108,7 +108,7 @@ async def test_config_flow_entry_already_configured(hass: HomeAssistant) -> None
 
     with (
         patch(
-            "homeassistant.components.triggercmd.client.async_connection_test",
+            "smarthub.components.triggercmd.client.async_connection_test",
             return_value=200,
         ),
     ):
@@ -121,7 +121,7 @@ async def test_config_flow_entry_already_configured(hass: HomeAssistant) -> None
     assert result["type"] is FlowResultType.ABORT
 
 
-async def test_config_flow_connection_error(hass: HomeAssistant) -> None:
+async def test_config_flow_connection_error(hass: SmartHub) -> None:
     """Test a connection error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -130,7 +130,7 @@ async def test_config_flow_connection_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.triggercmd.client.async_connection_test",
+            "smarthub.components.triggercmd.client.async_connection_test",
             side_effect=TRIGGERcmdConnectionError,
         ),
     ):
@@ -146,11 +146,11 @@ async def test_config_flow_connection_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.triggercmd.client.async_connection_test",
+            "smarthub.components.triggercmd.client.async_connection_test",
             return_value=200,
         ),
         patch(
-            "homeassistant.components.triggercmd.ha.Hub",
+            "smarthub.components.triggercmd.ha.Hub",
         ),
     ):
         result = await hass.config_entries.flow.async_configure(

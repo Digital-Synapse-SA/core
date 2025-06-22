@@ -9,23 +9,23 @@ from unittest.mock import ANY, Mock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import conversation
-from homeassistant.components.assist_pipeline.const import (
+from smarthub.components import conversation
+from smarthub.components.assist_pipeline.const import (
     DOMAIN,
     SAMPLE_CHANNELS,
     SAMPLE_RATE,
     SAMPLE_WIDTH,
 )
-from homeassistant.components.assist_pipeline.pipeline import (
+from smarthub.components.assist_pipeline.pipeline import (
     DeviceAudioQueue,
     Pipeline,
     PipelineData,
     async_get_pipelines,
     async_update_pipeline,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import chat_session, device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import chat_session, device_registry as dr
 
 from .conftest import (
     BYTES_ONE_SECOND,
@@ -43,7 +43,7 @@ from tests.typing import WebSocketGenerator
 def mock_chat_session_id() -> Generator[Mock]:
     """Mock the conversation ID of chat sessions."""
     with patch(
-        "homeassistant.helpers.chat_session.ulid_now", return_value="mock-ulid"
+        "smarthub.helpers.chat_session.ulid_now", return_value="mock-ulid"
     ) as mock_ulid_now:
         yield mock_ulid_now
 
@@ -63,7 +63,7 @@ def mock_tts_token() -> Generator[None]:
     ],
 )
 async def test_text_only_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -130,7 +130,7 @@ async def test_text_only_pipeline(
 
 
 async def test_audio_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -140,7 +140,7 @@ async def test_audio_pipeline(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         await client.send_json_auto_id(
             {
@@ -224,7 +224,7 @@ async def test_audio_pipeline(
 
 
 async def test_audio_pipeline_with_wake_word_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -234,7 +234,7 @@ async def test_audio_pipeline_with_wake_word_timeout(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         await client.send_json_auto_id(
             {
@@ -282,7 +282,7 @@ async def test_audio_pipeline_with_wake_word_timeout(
 
 
 async def test_audio_pipeline_with_wake_word_no_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -292,7 +292,7 @@ async def test_audio_pipeline_with_wake_word_no_timeout(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         await client.send_json_auto_id(
             {
@@ -389,7 +389,7 @@ async def test_audio_pipeline_with_wake_word_no_timeout(
 
 
 async def test_audio_pipeline_no_wake_word_engine(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -398,7 +398,7 @@ async def test_audio_pipeline_no_wake_word_engine(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.components.wake_word.async_default_entity", return_value=None
+        "smarthub.components.wake_word.async_default_entity", return_value=None
     ):
         await client.send_json_auto_id(
             {
@@ -419,7 +419,7 @@ async def test_audio_pipeline_no_wake_word_engine(
 
 
 async def test_audio_pipeline_no_wake_word_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -429,11 +429,11 @@ async def test_audio_pipeline_no_wake_word_entity(
 
     with (
         patch(
-            "homeassistant.components.wake_word.async_default_entity",
+            "smarthub.components.wake_word.async_default_entity",
             return_value="wake_word.bad-entity-id",
         ),
         patch(
-            "homeassistant.components.wake_word.async_get_wake_word_detection_entity",
+            "smarthub.components.wake_word.async_get_wake_word_detection_entity",
             return_value=None,
         ),
     ):
@@ -456,7 +456,7 @@ async def test_audio_pipeline_no_wake_word_entity(
 
 
 async def test_intent_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -469,7 +469,7 @@ async def test_intent_timeout(
         await asyncio.sleep(3600)
 
     with patch(
-        "homeassistant.components.conversation.async_converse",
+        "smarthub.components.conversation.async_converse",
         new=sleepy_converse,
     ):
         await client.send_json_auto_id(
@@ -528,7 +528,7 @@ async def test_intent_timeout(
 
 
 async def test_text_pipeline_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -541,7 +541,7 @@ async def test_text_pipeline_timeout(
         await asyncio.sleep(3600)
 
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.PipelineInput.execute",
+        "smarthub.components.assist_pipeline.pipeline.PipelineInput.execute",
         new=sleepy_run,
     ):
         await client.send_json_auto_id(
@@ -581,7 +581,7 @@ async def test_text_pipeline_timeout(
 
 
 async def test_intent_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -591,7 +591,7 @@ async def test_intent_failed(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.components.conversation.async_converse",
+        "smarthub.components.conversation.async_converse",
         side_effect=RuntimeError,
     ):
         await client.send_json_auto_id(
@@ -649,7 +649,7 @@ async def test_intent_failed(
 
 
 async def test_audio_pipeline_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -662,7 +662,7 @@ async def test_audio_pipeline_timeout(
         await asyncio.sleep(3600)
 
     with patch(
-        "homeassistant.components.assist_pipeline.pipeline.PipelineInput.execute",
+        "smarthub.components.assist_pipeline.pipeline.PipelineInput.execute",
         new=sleepy_run,
     ):
         await client.send_json_auto_id(
@@ -704,14 +704,14 @@ async def test_audio_pipeline_timeout(
 
 
 async def test_stt_provider_missing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test events from a pipeline run with a non-existent STT provider."""
     with patch(
-        "homeassistant.components.stt.async_get_speech_to_text_entity",
+        "smarthub.components.stt.async_get_speech_to_text_entity",
         return_value=None,
     ):
         client = await hass_ws_client(hass)
@@ -734,7 +734,7 @@ async def test_stt_provider_missing(
 
 
 async def test_stt_provider_bad_metadata(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     mock_stt_provider_entity,
@@ -762,7 +762,7 @@ async def test_stt_provider_bad_metadata(
 
 
 async def test_stt_stream_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -836,7 +836,7 @@ async def test_stt_stream_failed(
 
 
 async def test_tts_provider_missing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     mock_tts_provider,
@@ -864,7 +864,7 @@ async def test_tts_provider_missing(
 
 
 async def test_tts_provider_bad_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     mock_tts_provider,
@@ -874,8 +874,8 @@ async def test_tts_provider_bad_options(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.components.tts.SpeechManager.process_options",
-        side_effect=HomeAssistantError("Language not supported"),
+        "smarthub.components.tts.SpeechManager.process_options",
+        side_effect=SmartHubError("Language not supported"),
     ):
         await client.send_json_auto_id(
             {
@@ -893,7 +893,7 @@ async def test_tts_provider_bad_options(
 
 
 async def test_invalid_stage_order(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, init_components
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, init_components
 ) -> None:
     """Test pipeline run with invalid stage order."""
     client = await hass_ws_client(hass)
@@ -913,7 +913,7 @@ async def test_invalid_stage_order(
 
 
 async def test_add_pipeline(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, init_components
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, init_components
 ) -> None:
     """Test we can add a pipeline."""
     client = await hass_ws_client(hass)
@@ -985,7 +985,7 @@ async def test_add_pipeline(
 
 
 async def test_add_pipeline_missing_language(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, init_components
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, init_components
 ) -> None:
     """Test we can't add a pipeline without specifying stt or tts language."""
     client = await hass_ws_client(hass)
@@ -1035,7 +1035,7 @@ async def test_add_pipeline_missing_language(
 
 
 async def test_delete_pipeline(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, init_components
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, init_components
 ) -> None:
     """Test we can delete a pipeline."""
     client = await hass_ws_client(hass)
@@ -1131,7 +1131,7 @@ async def test_delete_pipeline(
 
 
 async def test_get_pipeline(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, init_components
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, init_components
 ) -> None:
     """Test we can get a pipeline."""
     client = await hass_ws_client(hass)
@@ -1150,7 +1150,7 @@ async def test_get_pipeline(
         "conversation_language": "en",
         "id": ANY,
         "language": "en",
-        "name": "Home Assistant",
+        "name": "SmartHub",
         "stt_engine": "stt.mock_stt",
         "stt_language": "en-US",
         "tts_engine": "tts.test",
@@ -1175,7 +1175,7 @@ async def test_get_pipeline(
         "conversation_language": "en",
         "id": ANY,
         "language": "en",
-        "name": "Home Assistant",
+        "name": "SmartHub",
         # It found these defaults
         "stt_engine": "stt.mock_stt",
         "stt_language": "en-US",
@@ -1248,7 +1248,7 @@ async def test_get_pipeline(
 
 
 async def test_list_pipelines(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, init_components
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, init_components
 ) -> None:
     """Test we can list pipelines."""
     client = await hass_ws_client(hass)
@@ -1263,7 +1263,7 @@ async def test_list_pipelines(
                 "conversation_language": "en",
                 "id": ANY,
                 "language": "en",
-                "name": "Home Assistant",
+                "name": "SmartHub",
                 "stt_engine": "stt.mock_stt",
                 "stt_language": "en-US",
                 "tts_engine": "tts.test",
@@ -1279,7 +1279,7 @@ async def test_list_pipelines(
 
 
 async def test_update_pipeline(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, init_components
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, init_components
 ) -> None:
     """Test we can list pipelines."""
     client = await hass_ws_client(hass)
@@ -1436,7 +1436,7 @@ async def test_update_pipeline(
 
 
 async def test_set_preferred_pipeline(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, init_components
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, init_components
 ) -> None:
     """Test updating the preferred pipeline."""
     client = await hass_ws_client(hass)
@@ -1478,7 +1478,7 @@ async def test_set_preferred_pipeline(
 
 
 async def test_set_preferred_pipeline_wrong_id(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, init_components
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, init_components
 ) -> None:
     """Test updating the preferred pipeline."""
     client = await hass_ws_client(hass)
@@ -1491,7 +1491,7 @@ async def test_set_preferred_pipeline_wrong_id(
 
 
 async def test_audio_pipeline_debug(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -1501,7 +1501,7 @@ async def test_audio_pipeline_debug(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         await client.send_json_auto_id(
             {
@@ -1599,7 +1599,7 @@ async def test_audio_pipeline_debug(
 
 
 async def test_pipeline_debug_list_runs_wrong_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
 ) -> None:
@@ -1615,7 +1615,7 @@ async def test_pipeline_debug_list_runs_wrong_pipeline(
 
 
 async def test_pipeline_debug_get_run_wrong_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
 ) -> None:
@@ -1638,7 +1638,7 @@ async def test_pipeline_debug_get_run_wrong_pipeline(
 
 
 async def test_pipeline_debug_get_run_wrong_pipeline_run(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
 ) -> None:
@@ -1695,7 +1695,7 @@ async def test_pipeline_debug_get_run_wrong_pipeline_run(
 
 
 async def test_list_pipeline_languages(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
 ) -> None:
@@ -1711,7 +1711,7 @@ async def test_list_pipeline_languages(
 
 
 async def test_list_pipeline_languages_with_aliases(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
 ) -> None:
@@ -1720,15 +1720,15 @@ async def test_list_pipeline_languages_with_aliases(
 
     with (
         patch(
-            "homeassistant.components.conversation.async_get_conversation_languages",
+            "smarthub.components.conversation.async_get_conversation_languages",
             return_value={"he", "nb"},
         ),
         patch(
-            "homeassistant.components.stt.async_get_speech_to_text_languages",
+            "smarthub.components.stt.async_get_speech_to_text_languages",
             return_value={"he", "no"},
         ),
         patch(
-            "homeassistant.components.tts.async_get_text_to_speech_languages",
+            "smarthub.components.tts.async_get_text_to_speech_languages",
             return_value={"iw", "nb"},
         ),
     ):
@@ -1741,7 +1741,7 @@ async def test_list_pipeline_languages_with_aliases(
 
 
 async def test_audio_pipeline_with_enhancements(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -1751,7 +1751,7 @@ async def test_audio_pipeline_with_enhancements(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         await client.send_json_auto_id(
             {
@@ -1844,7 +1844,7 @@ async def test_audio_pipeline_with_enhancements(
 
 
 async def test_wake_word_cooldown_same_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     mock_wake_word_provider_entity: MockWakeWordEntity,
     hass_ws_client: WebSocketGenerator,
@@ -1926,7 +1926,7 @@ async def test_wake_word_cooldown_same_id(
 
 
 async def test_wake_word_cooldown_different_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     mock_wake_word_provider_entity: MockWakeWordEntity,
     hass_ws_client: WebSocketGenerator,
@@ -2002,7 +2002,7 @@ async def test_wake_word_cooldown_different_ids(
 
 
 async def test_wake_word_cooldown_different_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     mock_wake_word_provider_entity: MockWakeWordEntity,
     mock_wake_word_provider_entity2: MockWakeWordEntity2,
@@ -2131,7 +2131,7 @@ async def test_wake_word_cooldown_different_entities(
 
 
 async def test_device_capture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
@@ -2236,7 +2236,7 @@ async def test_device_capture(
 
 
 async def test_device_capture_override(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
@@ -2373,7 +2373,7 @@ async def test_device_capture_override(
 
 
 async def test_device_capture_queue_full(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
@@ -2398,7 +2398,7 @@ async def test_device_capture_queue_full(
             super().put_nowait(item)
 
     with patch(
-        "homeassistant.components.assist_pipeline.websocket_api.DeviceAudioQueue"
+        "smarthub.components.assist_pipeline.websocket_api.DeviceAudioQueue"
     ) as mock:
         mock.return_value = DeviceAudioQueue(queue=FakeQueue())
 
@@ -2468,7 +2468,7 @@ async def test_device_capture_queue_full(
 
 
 async def test_pipeline_empty_tts_output(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     snapshot: SnapshotAssertion,
@@ -2518,7 +2518,7 @@ async def test_pipeline_empty_tts_output(
 
 
 async def test_pipeline_list_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     assist_device,
 ) -> None:
@@ -2537,7 +2537,7 @@ async def test_pipeline_list_devices(
 
 
 async def test_stt_cooldown_same_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     mock_stt_provider,
     hass_ws_client: WebSocketGenerator,
@@ -2608,7 +2608,7 @@ async def test_stt_cooldown_same_id(
 
 
 async def test_stt_cooldown_different_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     mock_stt_provider,
     hass_ws_client: WebSocketGenerator,
@@ -2672,7 +2672,7 @@ async def test_stt_cooldown_different_ids(
 
 
 async def test_intent_progress_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
 ) -> None:
@@ -2705,7 +2705,7 @@ async def test_intent_progress_event(
 
             return await orig_converse(**kwargs)
 
-    with patch("homeassistant.components.conversation.async_converse", mock_converse):
+    with patch("smarthub.components.conversation.async_converse", mock_converse):
         await client.send_json_auto_id(
             {
                 "type": "assist_pipeline/run",

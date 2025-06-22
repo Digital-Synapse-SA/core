@@ -9,10 +9,10 @@ import pytest
 from python_overseerr import OverseerrConnectionError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.overseerr import DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.overseerr import DOMAIN
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import call_webhook, setup_integration
 
@@ -27,7 +27,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.freeze_time("2023-10-21")
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -35,7 +35,7 @@ async def test_entities(
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.overseerr.PLATFORMS", [Platform.EVENT]):
+    with patch("smarthub.components.overseerr.PLATFORMS", [Platform.EVENT]):
         await setup_integration(hass, mock_config_entry)
 
     client = await hass_client_no_auth()
@@ -54,7 +54,7 @@ async def test_entities(
 
 @pytest.mark.freeze_time("2023-10-21")
 async def test_event_does_not_write_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -88,7 +88,7 @@ async def test_event_does_not_write_state(
 
 
 async def test_event_goes_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -114,7 +114,7 @@ async def test_event_goes_unavailable(
 
 
 async def test_not_push_based(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_overseerr_client_needs_change: AsyncMock,
 ) -> None:
@@ -130,7 +130,7 @@ async def test_not_push_based(
 
 
 async def test_cant_fetch_webhook_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_overseerr_client: AsyncMock,
 ) -> None:
@@ -146,7 +146,7 @@ async def test_cant_fetch_webhook_config(
 
 
 async def test_not_push_based_but_was_before(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_overseerr_client_needs_change: AsyncMock,
     entity_registry: er.EntityRegistry,

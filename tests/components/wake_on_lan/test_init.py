@@ -7,15 +7,15 @@ from unittest.mock import patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.wake_on_lan import DOMAIN, SERVICE_SEND_MAGIC_PACKET
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.wake_on_lan import DOMAIN, SERVICE_SEND_MAGIC_PACKET
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
-async def test_unload_entry(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
+async def test_unload_entry(hass: SmartHub, loaded_entry: MockConfigEntry) -> None:
     """Test unload an entry."""
 
     assert loaded_entry.state is ConfigEntryState.LOADED
@@ -24,9 +24,9 @@ async def test_unload_entry(hass: HomeAssistant, loaded_entry: MockConfigEntry) 
     assert loaded_entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_send_magic_packet(hass: HomeAssistant) -> None:
+async def test_send_magic_packet(hass: SmartHub) -> None:
     """Test of send magic packet service call."""
-    with patch("homeassistant.components.wake_on_lan.wakeonlan") as mocked_wakeonlan:
+    with patch("smarthub.components.wake_on_lan.wakeonlan") as mocked_wakeonlan:
         mac = "aa:bb:cc:dd:ee:ff"
         bc_ip = "192.168.255.255"
         bc_port = 999

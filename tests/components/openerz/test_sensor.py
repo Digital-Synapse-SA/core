@@ -2,9 +2,9 @@
 
 from unittest.mock import MagicMock, patch
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 MOCK_CONFIG = {
     "sensor": {
@@ -16,10 +16,10 @@ MOCK_CONFIG = {
 }
 
 
-async def test_sensor_state(hass: HomeAssistant) -> None:
+async def test_sensor_state(hass: SmartHub) -> None:
     """Test whether default waste type set properly."""
     with patch(
-        "homeassistant.components.openerz.sensor.OpenERZConnector"
+        "smarthub.components.openerz.sensor.OpenERZConnector"
     ) as patched_connector:
         pickup_instance = MagicMock()
         pickup_instance.find_next_pickup.return_value = "2020-12-12"

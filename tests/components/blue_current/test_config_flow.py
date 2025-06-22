@@ -4,21 +4,21 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.blue_current import DOMAIN
-from homeassistant.components.blue_current.config_flow import (
+from smarthub import config_entries
+from smarthub.components.blue_current import DOMAIN
+from smarthub.components.blue_current.config_flow import (
     AlreadyConnected,
     InvalidApiToken,
     RequestLimitReached,
     WebsocketError,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test if the form is created."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -27,7 +27,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
 
 
-async def test_user(hass: HomeAssistant) -> None:
+async def test_user(hass: SmartHub) -> None:
     """Test if the api token is set."""
 
     result = await hass.config_entries.flow.async_init(
@@ -38,15 +38,15 @@ async def test_user(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.blue_current.config_flow.Client.validate_api_token",
+            "smarthub.components.blue_current.config_flow.Client.validate_api_token",
             return_value="1234",
         ),
         patch(
-            "homeassistant.components.blue_current.config_flow.Client.get_email",
+            "smarthub.components.blue_current.config_flow.Client.get_email",
             return_value="test@email.com",
         ),
         patch(
-            "homeassistant.components.blue_current.async_setup_entry",
+            "smarthub.components.blue_current.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -73,10 +73,10 @@ async def test_user(hass: HomeAssistant) -> None:
         (WebsocketError(), "cannot_connect"),
     ],
 )
-async def test_flow_fails(hass: HomeAssistant, error: Exception, message: str) -> None:
+async def test_flow_fails(hass: SmartHub, error: Exception, message: str) -> None:
     """Test bluecurrent api errors during configuration flow."""
     with patch(
-        "homeassistant.components.blue_current.config_flow.Client.validate_api_token",
+        "smarthub.components.blue_current.config_flow.Client.validate_api_token",
         side_effect=error,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -89,15 +89,15 @@ async def test_flow_fails(hass: HomeAssistant, error: Exception, message: str) -
 
     with (
         patch(
-            "homeassistant.components.blue_current.config_flow.Client.validate_api_token",
+            "smarthub.components.blue_current.config_flow.Client.validate_api_token",
             return_value="1234",
         ),
         patch(
-            "homeassistant.components.blue_current.config_flow.Client.get_email",
+            "smarthub.components.blue_current.config_flow.Client.get_email",
             return_value="test@email.com",
         ),
         patch(
-            "homeassistant.components.blue_current.async_setup_entry",
+            "smarthub.components.blue_current.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -122,7 +122,7 @@ async def test_flow_fails(hass: HomeAssistant, error: Exception, message: str) -
     ],
 )
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     customer_id: str,
     reason: str,
@@ -136,18 +136,18 @@ async def test_reauth(
 
     with (
         patch(
-            "homeassistant.components.blue_current.config_flow.Client.validate_api_token",
+            "smarthub.components.blue_current.config_flow.Client.validate_api_token",
             return_value=customer_id,
         ),
         patch(
-            "homeassistant.components.blue_current.config_flow.Client.get_email",
+            "smarthub.components.blue_current.config_flow.Client.get_email",
             return_value="test@email.com",
         ),
         patch(
-            "homeassistant.components.blue_current.config_flow.Client.wait_for_charge_points",
+            "smarthub.components.blue_current.config_flow.Client.wait_for_charge_points",
         ),
         patch(
-            "homeassistant.components.blue_current.Client.connect",
+            "smarthub.components.blue_current.Client.connect",
             lambda self, on_data, on_open: hass.loop.create_future(),
         ),
     ):

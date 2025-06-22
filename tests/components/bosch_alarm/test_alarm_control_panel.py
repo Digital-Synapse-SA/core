@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_CONTROL_PANEL_DOMAIN,
     AlarmControlPanelState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_ALARM_ARM_AWAY,
     SERVICE_ALARM_ARM_HOME,
@@ -18,8 +18,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import call_observable, setup_integration
 
@@ -30,13 +30,13 @@ from tests.common import MockConfigEntry, snapshot_platform
 async def platforms() -> AsyncGenerator[None]:
     """Return the platforms to be loaded for this test."""
     with patch(
-        "homeassistant.components.bosch_alarm.PLATFORMS", [Platform.ALARM_CONTROL_PANEL]
+        "smarthub.components.bosch_alarm.PLATFORMS", [Platform.ALARM_CONTROL_PANEL]
     ):
         yield
 
 
 async def test_update_alarm_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_panel: AsyncMock,
     area: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -123,7 +123,7 @@ async def test_update_alarm_device(
 
 
 async def test_alarm_control_panel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_panel: AsyncMock,
@@ -136,7 +136,7 @@ async def test_alarm_control_panel(
 
 
 async def test_alarm_control_panel_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_panel: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

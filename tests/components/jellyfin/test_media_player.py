@@ -3,8 +3,8 @@
 from datetime import timedelta
 from unittest.mock import MagicMock
 
-from homeassistant.components.jellyfin.const import DOMAIN
-from homeassistant.components.media_player import (
+from smarthub.components.jellyfin.const import DOMAIN
+from smarthub.components.media_player import (
     ATTR_MEDIA_ALBUM_ARTIST,
     ATTR_MEDIA_ALBUM_NAME,
     ATTR_MEDIA_ARTIST,
@@ -24,16 +24,16 @@ from homeassistant.components.media_player import (
     MediaPlayerState,
     MediaType,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_ENTITY_PICTURE,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import async_load_json_fixture
 
@@ -42,7 +42,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_media_player(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
@@ -97,7 +97,7 @@ async def test_media_player(
 
 
 async def test_media_player_music(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,
@@ -138,7 +138,7 @@ async def test_media_player_music(
 
 
 async def test_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,
     mock_api: MagicMock,
@@ -253,7 +253,7 @@ async def test_services(
 
 
 async def test_browse_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,
@@ -364,7 +364,7 @@ async def test_browse_media(
 
 
 async def test_new_client_connected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,
     mock_api: MagicMock,

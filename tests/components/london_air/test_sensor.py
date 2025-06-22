@@ -4,9 +4,9 @@ from http import HTTPStatus
 
 import requests_mock
 
-from homeassistant.components.london_air.sensor import CONF_LOCATIONS, URL
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.london_air.sensor import CONF_LOCATIONS, URL
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_load_fixture
 
@@ -14,7 +14,7 @@ VALID_CONFIG = {"sensor": {"platform": "london_air", CONF_LOCATIONS: ["Merton"]}
 
 
 async def test_valid_state(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test for operational london_air sensor with proper attributes."""
     requests_mock.get(
@@ -51,7 +51,7 @@ async def test_valid_state(
 
 
 async def test_api_failure(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test for failure in the API."""
     requests_mock.get(URL, status_code=HTTPStatus.SERVICE_UNAVAILABLE)

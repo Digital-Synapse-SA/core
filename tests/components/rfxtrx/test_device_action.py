@@ -8,12 +8,12 @@ import pytest
 from pytest_unordered import unordered
 import RFXtrx
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.rfxtrx import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.rfxtrx import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .conftest import create_rfx_test_cfg
 
@@ -47,7 +47,7 @@ async def test_device_test_data(rfxtrx, device: DeviceTestData) -> None:
     }
 
 
-async def setup_entry(hass: HomeAssistant, devices: dict[str, Any]) -> None:
+async def setup_entry(hass: SmartHub, devices: dict[str, Any]) -> None:
     """Construct a config setup."""
     entry_data = create_rfx_test_cfg(devices=devices)
     mock_entry = MockConfigEntry(domain="rfxtrx", unique_id=DOMAIN, data=entry_data)
@@ -79,7 +79,7 @@ def _get_expected_actions(data):
     ],
 )
 async def test_get_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     device: DeviceTestData,
     expected,
@@ -136,7 +136,7 @@ async def test_get_actions(
     ],
 )
 async def test_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     rfxtrx: RFXtrx.Connect,
     device: DeviceTestData,
@@ -179,7 +179,7 @@ async def test_action(
 
 
 async def test_invalid_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.switch_as_x.config_flow import SwitchAsXConfigFlowHandler
-from homeassistant.components.switch_as_x.const import (
+from smarthub import config_entries
+from smarthub.components.switch_as_x.config_flow import SwitchAsXConfigFlowHandler
+from smarthub.components.switch_as_x.const import (
     CONF_INVERT,
     CONF_TARGET_DOMAIN,
     DOMAIN,
 )
-from homeassistant.const import CONF_ENTITY_ID, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import CONF_ENTITY_ID, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import entity_registry as er
 
 from . import PLATFORMS_TO_TEST, STATE_MAP
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry, get_schema_suggested_value
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     target_domain: Platform,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -74,7 +74,7 @@ async def test_config_flow(
 )
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_config_flow_registered_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
     mock_setup_entry: AsyncMock,
@@ -128,7 +128,7 @@ async def test_config_flow_registered_entity(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     target_domain: Platform,
 ) -> None:
     """Test reconfiguring."""

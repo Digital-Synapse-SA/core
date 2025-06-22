@@ -8,8 +8,8 @@ from typing import Any
 from nio import MatrixRoom, RoomMessageText
 import pytest
 
-from homeassistant.components.matrix import MatrixBot, RoomID
-from homeassistant.core import Event, HomeAssistant
+from smarthub.components.matrix import MatrixBot, RoomID
+from smarthub.core import Event, SmartHub
 
 from .conftest import (
     MOCK_EXPRESSION_COMMANDS,
@@ -126,7 +126,7 @@ self_command_global = partial(
     ),
 )
 async def test_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matrix_bot: MatrixBot,
     command_events: list[Event],
     command_params: CommandTestParameters,
@@ -155,7 +155,7 @@ async def test_commands(
     ),
 )
 async def test_non_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matrix_bot: MatrixBot,
     command_events: list[Event],
     command_params: CommandTestParameters,
@@ -172,7 +172,7 @@ async def test_non_commands(
     assert len(command_events) == 0
 
 
-async def test_commands_parsing(hass: HomeAssistant, matrix_bot: MatrixBot) -> None:
+async def test_commands_parsing(hass: SmartHub, matrix_bot: MatrixBot) -> None:
     """Test that the configured commands were parsed correctly."""
 
     await hass.async_start()

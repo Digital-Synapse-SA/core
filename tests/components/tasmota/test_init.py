@@ -4,11 +4,11 @@ import copy
 import json
 from unittest.mock import call
 
-from homeassistant.components.tasmota.const import DEFAULT_PREFIX, DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.tasmota.const import DEFAULT_PREFIX, DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .test_common import DEFAULT_CONFIG, DEFAULT_SENSOR_CONFIG, remove_device
 
@@ -22,7 +22,7 @@ from tests.typing import MqttMockHAClient, WebSocketGenerator
 
 
 async def test_device_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
@@ -66,7 +66,7 @@ async def test_device_remove(
 
 
 async def test_device_remove_non_tasmota_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     hass_ws_client: WebSocketGenerator,
     mqtt_mock: MqttMockHAClient,
@@ -76,7 +76,7 @@ async def test_device_remove_non_tasmota_device(
     assert await async_setup_component(hass, "config", {})
 
     async def async_remove_config_entry_device(
-        hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
+        hass: SmartHub, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
     ) -> bool:
         return True
 
@@ -111,7 +111,7 @@ async def test_device_remove_non_tasmota_device(
 
 
 async def test_device_remove_stale_tasmota_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     hass_ws_client: WebSocketGenerator,
     mqtt_mock: MqttMockHAClient,
@@ -142,7 +142,7 @@ async def test_device_remove_stale_tasmota_device(
 
 
 async def test_tasmota_ws_remove_discovered_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     hass_ws_client: WebSocketGenerator,
     mqtt_mock: MqttMockHAClient,

@@ -4,10 +4,10 @@ from unittest.mock import ANY
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.const import ATTR_ENTITY_ID, ENTITY_MATCH_ALL, SERVICE_TURN_OFF
-from homeassistant.core import HassJobType, HomeAssistant, ServiceCall
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.const import ATTR_ENTITY_ID, ENTITY_MATCH_ALL, SERVICE_TURN_OFF
+from smarthub.core import HassJobType, SmartHub, ServiceCall
+from smarthub.setup import async_setup_component
 
 from tests.common import async_fire_mqtt_message, mock_component
 from tests.typing import MqttMockHAClient, MqttMockHAClientGenerator
@@ -20,7 +20,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 @pytest.fixture(autouse=True)
 async def setup_comp(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> MqttMockHAClient:
     """Initialize components."""
     mock_component(hass, "group")
@@ -28,7 +28,7 @@ async def setup_comp(
 
 
 async def test_if_fires_on_topic_match(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test if message is fired on topic match."""
     assert await async_setup_component(
@@ -71,7 +71,7 @@ async def test_if_fires_on_topic_match(
 
 
 async def test_if_fires_on_topic_and_payload_match(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test if message is fired on topic and payload match."""
     assert await async_setup_component(
@@ -95,7 +95,7 @@ async def test_if_fires_on_topic_and_payload_match(
 
 
 async def test_if_fires_on_topic_and_payload_match2(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test if message is fired on topic and payload match.
 
@@ -122,7 +122,7 @@ async def test_if_fires_on_topic_and_payload_match2(
 
 
 async def test_if_fires_on_templated_topic_and_payload_match(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test if message is fired on templated topic and payload match."""
     assert await async_setup_component(
@@ -154,7 +154,7 @@ async def test_if_fires_on_templated_topic_and_payload_match(
 
 
 async def test_if_fires_on_payload_template(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test if message is fired on templated topic and payload match."""
     assert await async_setup_component(
@@ -187,7 +187,7 @@ async def test_if_fires_on_payload_template(
 
 
 async def test_non_allowed_templates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -213,7 +213,7 @@ async def test_non_allowed_templates(
 
 
 async def test_if_not_fires_on_topic_but_no_payload_match(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test if message is not fired on topic but no payload."""
     assert await async_setup_component(
@@ -237,7 +237,7 @@ async def test_if_not_fires_on_topic_but_no_payload_match(
 
 
 async def test_encoding_default(
-    hass: HomeAssistant, service_calls: list[ServiceCall], setup_comp
+    hass: SmartHub, service_calls: list[ServiceCall], setup_comp
 ) -> None:
     """Test default encoding."""
     assert await async_setup_component(
@@ -257,7 +257,7 @@ async def test_encoding_default(
 
 
 async def test_encoding_custom(
-    hass: HomeAssistant, service_calls: list[ServiceCall], setup_comp
+    hass: SmartHub, service_calls: list[ServiceCall], setup_comp
 ) -> None:
     """Test default encoding."""
     assert await async_setup_component(

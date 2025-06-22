@@ -4,9 +4,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components.icloud.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.icloud.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .const import MOCK_CONFIG, USERNAME
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 def mock_controller_2fa_service():
     """Mock a successful 2fa service."""
     with patch(
-        "homeassistant.components.icloud.account.PyiCloudService"
+        "smarthub.components.icloud.account.PyiCloudService"
     ) as service_mock:
         service_mock.return_value.requires_2fa = True
         service_mock.return_value.requires_2sa = True
@@ -27,7 +27,7 @@ def mock_controller_2fa_service():
 
 
 @pytest.mark.usefixtures("service_2fa")
-async def test_setup_2fa(hass: HomeAssistant) -> None:
+async def test_setup_2fa(hass: SmartHub) -> None:
     """Test that invalid login triggers reauth flow."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data=MOCK_CONFIG, entry_id="test", unique_id=USERNAME

@@ -9,12 +9,12 @@ from aiohomeconnect.model import HomeAppliance, OptionKey, ProgramKey, SettingKe
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.home_connect.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import device_registry as dr
-import homeassistant.helpers.issue_registry as ir
+from smarthub.components.home_connect.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import device_registry as dr
+import smarthub.helpers.issue_registry as ir
 
 from tests.common import MockConfigEntry
 from tests.typing import ClientSessionGenerator
@@ -176,7 +176,7 @@ SERVICES_SET_PROGRAM_AND_OPTIONS = [
     SERVICE_KV_CALL_PARAMS + SERVICE_COMMAND_CALL_PARAMS + SERVICE_PROGRAM_CALL_PARAMS,
 )
 async def test_key_value_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -223,7 +223,7 @@ async def test_key_value_services(
     ],
 )
 async def test_programs_and_options_actions_deprecation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     issue_registry: ir.IssueRegistry,
@@ -292,7 +292,7 @@ async def test_programs_and_options_actions_deprecation(
     ),
 )
 async def test_set_program_and_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -334,7 +334,7 @@ async def test_set_program_and_options(
     ),
 )
 async def test_set_program_and_options_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
@@ -353,7 +353,7 @@ async def test_set_program_and_options_exceptions(
     )
 
     service_call["service_data"]["device_id"] = device_entry.id
-    with pytest.raises(HomeAssistantError, match=error_regex):
+    with pytest.raises(SmartHubError, match=error_regex):
         await hass.services.async_call(**service_call)
 
 
@@ -363,7 +363,7 @@ async def test_set_program_and_options_exceptions(
     SERVICE_KV_CALL_PARAMS + SERVICE_COMMAND_CALL_PARAMS + SERVICE_PROGRAM_CALL_PARAMS,
 )
 async def test_services_exception_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
@@ -371,7 +371,7 @@ async def test_services_exception_device_id(
     appliance: HomeAppliance,
     service_call: dict[str, Any],
 ) -> None:
-    """Raise a HomeAssistantError when there is an API error."""
+    """Raise a SmartHubError when there is an API error."""
     assert await integration_setup(client_with_exception)
     assert config_entry.state is ConfigEntryState.LOADED
 
@@ -382,12 +382,12 @@ async def test_services_exception_device_id(
 
     service_call["service_data"]["device_id"] = device_entry.id
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(**service_call)
 
 
 async def test_services_appliance_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -433,7 +433,7 @@ async def test_services_appliance_not_found(
     SERVICE_KV_CALL_PARAMS + SERVICE_COMMAND_CALL_PARAMS + SERVICE_PROGRAM_CALL_PARAMS,
 )
 async def test_services_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
@@ -454,7 +454,7 @@ async def test_services_exception(
 
     service_name = service_call["service"]
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=SERVICE_VALIDATION_ERROR_MAPPING[service_name],
     ):
         await hass.services.async_call(**service_call)

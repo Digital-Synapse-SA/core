@@ -3,15 +3,15 @@
 from numato_gpio import NumatoGpioError
 import pytest
 
-from homeassistant.components import numato
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import numato
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import NUMATO_CFG, mockup_raise, mockup_return
 
 
 async def test_setup_no_devices(
-    hass: HomeAssistant, numato_fixture, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, numato_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test handling of an 'empty' discovery.
 
@@ -24,7 +24,7 @@ async def test_setup_no_devices(
 
 
 async def test_fail_setup_raising_discovery(
-    hass: HomeAssistant, numato_fixture, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, numato_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test handling of an exception during discovery.
 
@@ -36,7 +36,7 @@ async def test_fail_setup_raising_discovery(
 
 
 async def test_hass_numato_api_wrong_port_directions(
-    hass: HomeAssistant, numato_fixture
+    hass: SmartHub, numato_fixture
 ) -> None:
     """Test handling of wrong port directions.
 
@@ -57,9 +57,9 @@ async def test_hass_numato_api_wrong_port_directions(
 
 
 async def test_hass_numato_api_errors(
-    hass: HomeAssistant, numato_fixture, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, numato_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Test whether Home Assistant numato API (re-)raises errors."""
+    """Test whether SmartHub numato API (re-)raises errors."""
     numato_fixture.discover()
     monkeypatch.setattr(numato_fixture.devices[0], "setup", mockup_raise)
     monkeypatch.setattr(numato_fixture.devices[0], "adc_read", mockup_raise)
@@ -76,7 +76,7 @@ async def test_hass_numato_api_errors(
         api.write_output(0, 2, 1)
 
 
-async def test_invalid_port_number(hass: HomeAssistant, numato_fixture, config) -> None:
+async def test_invalid_port_number(hass: SmartHub, numato_fixture, config) -> None:
     """Test validation of ADC port number type."""
     sensorports_cfg = config["numato"]["devices"][0]["sensors"]["ports"]
     port1_config = sensorports_cfg["1"]
@@ -88,7 +88,7 @@ async def test_invalid_port_number(hass: HomeAssistant, numato_fixture, config) 
 
 
 async def test_too_low_adc_port_number(
-    hass: HomeAssistant, numato_fixture, config
+    hass: SmartHub, numato_fixture, config
 ) -> None:
     """Test handling of failing component setup.
 
@@ -102,7 +102,7 @@ async def test_too_low_adc_port_number(
 
 
 async def test_too_high_adc_port_number(
-    hass: HomeAssistant, numato_fixture, config
+    hass: SmartHub, numato_fixture, config
 ) -> None:
     """Test handling of failing component setup.
 
@@ -115,7 +115,7 @@ async def test_too_high_adc_port_number(
 
 
 async def test_invalid_adc_range_value_type(
-    hass: HomeAssistant, numato_fixture, config
+    hass: SmartHub, numato_fixture, config
 ) -> None:
     """Test validation of ADC range config's types.
 
@@ -128,7 +128,7 @@ async def test_invalid_adc_range_value_type(
 
 
 async def test_invalid_adc_source_range_length(
-    hass: HomeAssistant, numato_fixture, config
+    hass: SmartHub, numato_fixture, config
 ) -> None:
     """Test validation of ADC range config's length.
 
@@ -141,7 +141,7 @@ async def test_invalid_adc_source_range_length(
 
 
 async def test_invalid_adc_source_range_order(
-    hass: HomeAssistant, numato_fixture, config
+    hass: SmartHub, numato_fixture, config
 ) -> None:
     """Test validation of ADC range config's order.
 
@@ -154,7 +154,7 @@ async def test_invalid_adc_source_range_order(
 
 
 async def test_invalid_adc_destination_range_value_type(
-    hass: HomeAssistant, numato_fixture, config
+    hass: SmartHub, numato_fixture, config
 ) -> None:
     """Test validation of ADC range .
 
@@ -167,7 +167,7 @@ async def test_invalid_adc_destination_range_value_type(
 
 
 async def test_invalid_adc_destination_range_length(
-    hass: HomeAssistant, numato_fixture, config
+    hass: SmartHub, numato_fixture, config
 ) -> None:
     """Test validation of ADC range config's length.
 
@@ -180,7 +180,7 @@ async def test_invalid_adc_destination_range_length(
 
 
 async def test_invalid_adc_destination_range_order(
-    hass: HomeAssistant, numato_fixture, config
+    hass: SmartHub, numato_fixture, config
 ) -> None:
     """Test validation of ADC range config's order.
 

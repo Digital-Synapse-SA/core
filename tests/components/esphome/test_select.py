@@ -5,17 +5,17 @@ from unittest.mock import call
 from aioesphomeapi import APIClient, SelectInfo, SelectState, VoiceAssistantFeature
 import pytest
 
-from homeassistant.components.assist_satellite import (
+from smarthub.components.assist_satellite import (
     AssistSatelliteConfiguration,
     AssistSatelliteWakeWord,
 )
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from .common import get_satellite_entity
 from .conftest import MockESPHomeDeviceType, MockGenericDeviceEntryType
@@ -23,7 +23,7 @@ from .conftest import MockESPHomeDeviceType, MockGenericDeviceEntryType
 
 @pytest.mark.usefixtures("mock_voice_assistant_v1_entry")
 async def test_pipeline_selector(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test assist pipeline selector."""
 
@@ -34,7 +34,7 @@ async def test_pipeline_selector(
 
 @pytest.mark.usefixtures("mock_voice_assistant_v1_entry")
 async def test_vad_sensitivity_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test VAD sensitivity select.
 
@@ -48,7 +48,7 @@ async def test_vad_sensitivity_select(
 
 @pytest.mark.usefixtures("mock_voice_assistant_v1_entry")
 async def test_wake_word_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that wake word select is unavailable initially."""
     state = hass.states.get("select.test_wake_word")
@@ -57,7 +57,7 @@ async def test_wake_word_select(
 
 
 async def test_select_generic_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -93,7 +93,7 @@ async def test_select_generic_entity(
 
 
 async def test_wake_word_select_no_wake_words(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -125,7 +125,7 @@ async def test_wake_word_select_no_wake_words(
 
 
 async def test_wake_word_select_zero_max_wake_words(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_wake_word_select_zero_max_wake_words(
 
 
 async def test_wake_word_select_no_active_wake_words(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:

@@ -12,9 +12,9 @@ from matter_server.common.helpers.util import dataclass_from_dict
 from matter_server.common.models import EventType, MatterNodeData
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -31,7 +31,7 @@ def load_and_parse_node_fixture(fixture: str) -> dict[str, Any]:
 
 
 async def setup_integration_with_node_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     node_fixture: str,
     client: MagicMock,
     override_attributes: dict[str, Any] | None = None,
@@ -79,7 +79,7 @@ def set_node_attribute(
 
 
 async def trigger_subscription_callback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     event: EventType = EventType.ATTRIBUTE_UPDATED,
     data: Any = None,
@@ -95,7 +95,7 @@ async def trigger_subscription_callback(
 
 
 def snapshot_matter_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     platform: Platform,

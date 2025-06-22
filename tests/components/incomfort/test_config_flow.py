@@ -7,13 +7,13 @@ from aiohttp import ClientResponseError
 from incomfortclient import InvalidGateway, InvalidHeaterList
 import pytest
 
-from homeassistant.components.incomfort.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER, ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.incomfort.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER, ConfigEntry
+from smarthub.const import CONF_HOST, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .conftest import MOCK_CONFIG, MOCK_CONFIG_DHCP
 
@@ -33,7 +33,7 @@ DHCP_SERVICE_INFO_ALT = DhcpServiceInfo(
 
 
 async def test_form(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_incomfort: MagicMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_incomfort: MagicMock
 ) -> None:
     """Test we get the full form."""
     result = await hass.config_entries.flow.async_init(
@@ -54,7 +54,7 @@ async def test_form(
 
 
 async def test_entry_already_configured(
-    hass: HomeAssistant, mock_incomfort: MagicMock
+    hass: SmartHub, mock_incomfort: MagicMock
 ) -> None:
     """Test aborting if the entry is already configured."""
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG)
@@ -100,7 +100,7 @@ async def test_entry_already_configured(
     ],
 )
 async def test_form_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     exc: Exception,
     error: str,
@@ -131,7 +131,7 @@ async def test_form_validation(
 
 
 async def test_dhcp_flow_simple(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -186,7 +186,7 @@ async def test_dhcp_flow_simple(
 
 
 async def test_dhcp_flow_migrates_existing_entry_without_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -227,7 +227,7 @@ async def test_dhcp_flow_migrates_existing_entry_without_unique_id(
 
 
 async def test_dhcp_flow_wih_auth(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_incomfort: MagicMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_incomfort: MagicMock
 ) -> None:
     """Test dhcp flow for with authentication."""
     result = await hass.config_entries.flow.async_init(
@@ -264,7 +264,7 @@ async def test_dhcp_flow_wih_auth(
 
 
 async def test_reauth_flow_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -284,7 +284,7 @@ async def test_reauth_flow_success(
 
 
 async def test_reauth_flow_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -316,7 +316,7 @@ async def test_reauth_flow_failure(
 
 
 async def test_reconfigure_flow_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -336,7 +336,7 @@ async def test_reconfigure_flow_success(
 
 
 async def test_reconfigure_flow_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -376,7 +376,7 @@ async def test_reconfigure_flow_failure(
     ],
 )
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     user_input: dict[str, Any],
     legacy_setpoint_status: bool,
@@ -391,7 +391,7 @@ async def test_options_flow(
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "init"
 
-    with patch("homeassistant.components.incomfort.async_setup_entry") as restart_mock:
+    with patch("smarthub.components.incomfort.async_setup_entry") as restart_mock:
         result2 = await hass.config_entries.options.async_configure(
             result["flow_id"], user_input
         )

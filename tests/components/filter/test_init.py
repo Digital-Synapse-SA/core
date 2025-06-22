@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.recorder import Recorder
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_unload_entry(
-    recorder_mock: Recorder, hass: HomeAssistant, loaded_entry: MockConfigEntry
+    recorder_mock: Recorder, hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test unload an entry."""
 

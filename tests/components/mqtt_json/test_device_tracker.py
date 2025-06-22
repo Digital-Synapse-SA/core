@@ -8,17 +8,17 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.device_tracker.legacy import (
+from smarthub.components.device_tracker.legacy import (
     DOMAIN as DT_DOMAIN,
     YAML_DEVICES,
     AsyncSeeCallback,
 )
-from homeassistant.components.mqtt import DOMAIN as MQTT_DOMAIN
-from homeassistant.config_entries import ConfigEntryDisabler
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from homeassistant.setup import async_setup_component
+from smarthub.components.mqtt import DOMAIN as MQTT_DOMAIN
+from smarthub.config_entries import ConfigEntryDisabler
+from smarthub.const import CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub.setup import async_setup_component
 
 from tests.common import async_fire_mqtt_message
 from tests.typing import MqttMockHAClient
@@ -35,7 +35,7 @@ LOCATION_MESSAGE_INCOMPLETE = {"longitude": 2.0}
 
 @pytest.fixture(autouse=True)
 async def setup_comp(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> AsyncGenerator[None]:
     """Initialize components."""
     yaml_devices = hass.config.path(YAML_DEVICES)
@@ -45,7 +45,7 @@ async def setup_comp(
 
 
 async def test_setup_fails_without_mqtt_being_setup(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Ensure mqtt is started when we setup the component."""
     # Simulate MQTT is was removed
@@ -70,11 +70,11 @@ async def test_setup_fails_without_mqtt_being_setup(
     assert "MQTT integration is not available" in caplog.text
 
 
-async def test_ensure_device_tracker_platform_validation(hass: HomeAssistant) -> None:
+async def test_ensure_device_tracker_platform_validation(hass: SmartHub) -> None:
     """Test if platform validation was done."""
 
     async def mock_setup_scanner(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         see: AsyncSeeCallback,
         discovery_info: DiscoveryInfoType | None = None,
@@ -84,7 +84,7 @@ async def test_ensure_device_tracker_platform_validation(hass: HomeAssistant) ->
         return True
 
     with patch(
-        "homeassistant.components.mqtt_json.device_tracker.async_setup_scanner",
+        "smarthub.components.mqtt_json.device_tracker.async_setup_scanner",
         autospec=True,
         side_effect=mock_setup_scanner,
     ) as mock_sp:
@@ -99,7 +99,7 @@ async def test_ensure_device_tracker_platform_validation(hass: HomeAssistant) ->
         assert mock_sp.call_count == 1
 
 
-async def test_json_message(hass: HomeAssistant) -> None:
+async def test_json_message(hass: SmartHub) -> None:
     """Test json location message."""
     dev_id = "zanzito"
     topic = "location/zanzito"
@@ -119,7 +119,7 @@ async def test_json_message(hass: HomeAssistant) -> None:
 
 
 async def test_non_json_message(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test receiving a non JSON message."""
     dev_id = "zanzito"
@@ -141,7 +141,7 @@ async def test_non_json_message(
 
 
 async def test_incomplete_message(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test receiving an incomplete message."""
     dev_id = "zanzito"
@@ -165,7 +165,7 @@ async def test_incomplete_message(
     )
 
 
-async def test_single_level_wildcard_topic(hass: HomeAssistant) -> None:
+async def test_single_level_wildcard_topic(hass: SmartHub) -> None:
     """Test single level wildcard topic."""
     dev_id = "zanzito"
     subscription = "location/+/zanzito"
@@ -186,7 +186,7 @@ async def test_single_level_wildcard_topic(hass: HomeAssistant) -> None:
     assert state.attributes.get("longitude") == 1.0
 
 
-async def test_multi_level_wildcard_topic(hass: HomeAssistant) -> None:
+async def test_multi_level_wildcard_topic(hass: SmartHub) -> None:
     """Test multi level wildcard topic."""
     dev_id = "zanzito"
     subscription = "location/#"
@@ -207,7 +207,7 @@ async def test_multi_level_wildcard_topic(hass: HomeAssistant) -> None:
     assert state.attributes.get("longitude") == 1.0
 
 
-async def test_single_level_wildcard_topic_not_matching(hass: HomeAssistant) -> None:
+async def test_single_level_wildcard_topic_not_matching(hass: SmartHub) -> None:
     """Test not matching single level wildcard topic."""
     dev_id = "zanzito"
     entity_id = f"{DT_DOMAIN}.{dev_id}"
@@ -227,7 +227,7 @@ async def test_single_level_wildcard_topic_not_matching(hass: HomeAssistant) -> 
     assert hass.states.get(entity_id) is None
 
 
-async def test_multi_level_wildcard_topic_not_matching(hass: HomeAssistant) -> None:
+async def test_multi_level_wildcard_topic_not_matching(hass: SmartHub) -> None:
     """Test not matching multi level wildcard topic."""
     dev_id = "zanzito"
     entity_id = f"{DT_DOMAIN}.{dev_id}"

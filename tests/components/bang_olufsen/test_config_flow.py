@@ -6,11 +6,11 @@ from aiohttp.client_exceptions import ClientConnectorError
 from mozart_api.exceptions import ApiException
 import pytest
 
-from homeassistant.components.bang_olufsen.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.bang_olufsen.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import (
     TEST_DATA_CREATE_ENTRY,
@@ -25,7 +25,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_config_flow_timeout_error(
-    hass: HomeAssistant, mock_mozart_client: AsyncMock
+    hass: SmartHub, mock_mozart_client: AsyncMock
 ) -> None:
     """Test we handle timeout_error."""
     mock_mozart_client.get_beolink_self.side_effect = TimeoutError()
@@ -42,7 +42,7 @@ async def test_config_flow_timeout_error(
 
 
 async def test_config_flow_client_connector_error(
-    hass: HomeAssistant, mock_mozart_client: AsyncMock
+    hass: SmartHub, mock_mozart_client: AsyncMock
 ) -> None:
     """Test we handle client_connector_error."""
     mock_mozart_client.get_beolink_self.side_effect = ClientConnectorError(
@@ -60,7 +60,7 @@ async def test_config_flow_client_connector_error(
     assert mock_mozart_client.get_beolink_self.call_count == 1
 
 
-async def test_config_flow_invalid_ip(hass: HomeAssistant) -> None:
+async def test_config_flow_invalid_ip(hass: SmartHub) -> None:
     """Test we handle invalid_ip."""
 
     result_user = await hass.config_entries.flow.async_init(
@@ -73,7 +73,7 @@ async def test_config_flow_invalid_ip(hass: HomeAssistant) -> None:
 
 
 async def test_config_flow_api_exception(
-    hass: HomeAssistant, mock_mozart_client: AsyncMock
+    hass: SmartHub, mock_mozart_client: AsyncMock
 ) -> None:
     """Test we handle api_exception."""
     mock_mozart_client.get_beolink_self.side_effect = ApiException()
@@ -89,7 +89,7 @@ async def test_config_flow_api_exception(
     assert mock_mozart_client.get_beolink_self.call_count == 1
 
 
-async def test_config_flow(hass: HomeAssistant, mock_mozart_client: AsyncMock) -> None:
+async def test_config_flow(hass: SmartHub, mock_mozart_client: AsyncMock) -> None:
     """Test config flow."""
 
     result_init = await hass.config_entries.flow.async_init(
@@ -113,7 +113,7 @@ async def test_config_flow(hass: HomeAssistant, mock_mozart_client: AsyncMock) -
 
 
 async def test_config_flow_zeroconf(
-    hass: HomeAssistant, mock_mozart_client: AsyncMock
+    hass: SmartHub, mock_mozart_client: AsyncMock
 ) -> None:
     """Test zeroconf discovery."""
 
@@ -137,7 +137,7 @@ async def test_config_flow_zeroconf(
     assert mock_mozart_client.get_beolink_self.call_count == 1
 
 
-async def test_config_flow_zeroconf_not_mozart_device(hass: HomeAssistant) -> None:
+async def test_config_flow_zeroconf_not_mozart_device(hass: SmartHub) -> None:
     """Test zeroconf discovery of invalid device."""
 
     result_user = await hass.config_entries.flow.async_init(
@@ -150,7 +150,7 @@ async def test_config_flow_zeroconf_not_mozart_device(hass: HomeAssistant) -> No
     assert result_user["reason"] == "not_mozart_device"
 
 
-async def test_config_flow_zeroconf_ipv6(hass: HomeAssistant) -> None:
+async def test_config_flow_zeroconf_ipv6(hass: SmartHub) -> None:
     """Test zeroconf discovery with IPv6 IP address."""
 
     result_user = await hass.config_entries.flow.async_init(
@@ -164,7 +164,7 @@ async def test_config_flow_zeroconf_ipv6(hass: HomeAssistant) -> None:
 
 
 async def test_config_flow_zeroconf_invalid_ip(
-    hass: HomeAssistant, mock_mozart_client: AsyncMock
+    hass: SmartHub, mock_mozart_client: AsyncMock
 ) -> None:
     """Test zeroconf discovery with invalid IP address."""
     mock_mozart_client.get_beolink_self.side_effect = ClientConnectorError(

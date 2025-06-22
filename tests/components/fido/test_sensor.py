@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, patch
 from pyfido.client import PyFidoError
 import pytest
 
-from homeassistant.components.fido import sensor as fido
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.fido import sensor as fido
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component
 
@@ -41,9 +41,9 @@ class FidoClientMockError(FidoClientMock):
         raise PyFidoError("Fake Error")
 
 
-async def test_fido_sensor(hass: HomeAssistant) -> None:
+async def test_fido_sensor(hass: SmartHub) -> None:
     """Test the Fido number sensor."""
-    with patch("homeassistant.components.fido.sensor.FidoClient", new=FidoClientMock):
+    with patch("smarthub.components.fido.sensor.FidoClient", new=FidoClientMock):
         config = {
             "sensor": {
                 "platform": "fido",
@@ -63,7 +63,7 @@ async def test_fido_sensor(hass: HomeAssistant) -> None:
         assert state.state == "100.33"
 
 
-async def test_error(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_error(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test the Fido sensor errors."""
     caplog.set_level(logging.ERROR)
 
@@ -75,6 +75,6 @@ async def test_error(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> N
         "monitored_variables": ["balance", "data_remaining"],
     }
     fake_async_add_entities = MagicMock()
-    with patch("homeassistant.components.fido.sensor.FidoClient", FidoClientMockError):
+    with patch("smarthub.components.fido.sensor.FidoClient", FidoClientMockError):
         await fido.async_setup_platform(hass, config, fake_async_add_entities)
     assert fake_async_add_entities.called is False

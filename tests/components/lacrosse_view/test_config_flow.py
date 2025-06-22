@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock, patch
 from lacrosse_view import Location, LoginError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.lacrosse_view.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.lacrosse_view.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -65,7 +65,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_auth_false(hass: HomeAssistant) -> None:
+async def test_form_auth_false(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -87,7 +87,7 @@ async def test_form_auth_false(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -106,7 +106,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_login_first(hass: HomeAssistant) -> None:
+async def test_form_login_first(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -128,7 +128,7 @@ async def test_form_login_first(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_no_locations(hass: HomeAssistant) -> None:
+async def test_form_no_locations(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -153,14 +153,14 @@ async def test_form_no_locations(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "no_locations"}
 
 
-async def test_form_unexpected_error(hass: HomeAssistant) -> None:
+async def test_form_unexpected_error(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.lacrosse_view.config_flow.validate_input",
+        "smarthub.components.lacrosse_view.config_flow.validate_input",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -176,7 +176,7 @@ async def test_form_unexpected_error(hass: HomeAssistant) -> None:
 
 
 async def test_already_configured_device(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle invalid auth."""
     mock_config_entry = MockConfigEntry(
@@ -235,7 +235,7 @@ async def test_already_configured_device(
     assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_reauth(hass: HomeAssistant) -> None:
+async def test_reauth(hass: SmartHub) -> None:
     """Test reauthentication."""
     data = {
         "username": "test-username",

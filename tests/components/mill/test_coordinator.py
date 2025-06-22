@@ -4,17 +4,17 @@ from unittest.mock import AsyncMock
 
 from mill import Heater, Mill, Sensor
 
-from homeassistant.components.mill.const import DOMAIN
-from homeassistant.components.mill.coordinator import MillHistoricDataUpdateCoordinator
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.statistics import statistics_during_period
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.mill.const import DOMAIN
+from smarthub.components.mill.coordinator import MillHistoricDataUpdateCoordinator
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.statistics import statistics_during_period
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.components.recorder.common import async_wait_recording_done
 
 
-async def test_mill_historic_data(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_mill_historic_data(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test historic data from Mill."""
 
     data = {
@@ -92,7 +92,7 @@ async def test_mill_historic_data(recorder_mock: Recorder, hass: HomeAssistant) 
 
 
 async def test_mill_historic_data_no_heater(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test historic data from Mill."""
 
@@ -129,7 +129,7 @@ async def test_mill_historic_data_no_heater(
 
 
 async def test_mill_historic_data_no_data(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test historic data from Mill."""
 
@@ -188,7 +188,7 @@ async def test_mill_historic_data_no_data(
 
 
 async def test_mill_historic_data_invalid_data(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test historic data from Mill."""
 

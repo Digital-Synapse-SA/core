@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import pytest
 from voluptuous.error import MultipleInvalid
 
-from homeassistant.components.rflink import (
+from smarthub.components.rflink import (
     CONF_KEEPALIVE_IDLE,
     CONF_RECONNECT_INTERVAL,
     DATA_ENTITY_LOOKUP,
@@ -18,7 +18,7 @@ from homeassistant.components.rflink import (
     TMP_ENTITY,
     RflinkCommand,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_HOST,
     CONF_PORT,
@@ -26,14 +26,14 @@ from homeassistant.const import (
     SERVICE_STOP_COVER,
     SERVICE_TURN_OFF,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 
 async def mock_rflink(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config,
     domain,
     monkeypatch: pytest.MonkeyPatch,
@@ -68,7 +68,7 @@ async def mock_rflink(
 
     mock_create = Mock(wraps=create_rflink_connection)
     monkeypatch.setattr(
-        "homeassistant.components.rflink.create_rflink_connection", mock_create
+        "smarthub.components.rflink.create_rflink_connection", mock_create
     )
 
     await async_setup_component(hass, "rflink", config)
@@ -85,7 +85,7 @@ async def mock_rflink(
 
 
 async def test_version_banner(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test sending unknown commands doesn't cause issues."""
     # use sensor domain during testing main platform
@@ -112,7 +112,7 @@ async def test_version_banner(
 
 
 async def test_send_no_wait(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test command sending without ack."""
     domain = "switch"
@@ -138,7 +138,7 @@ async def test_send_no_wait(
 
 
 async def test_cover_send_no_wait(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test command sending to a cover device without ack."""
     domain = "cover"
@@ -164,7 +164,7 @@ async def test_cover_send_no_wait(
 
 
 async def test_send_command(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test send_command service."""
     domain = "rflink"
@@ -184,7 +184,7 @@ async def test_send_command(
 
 
 async def test_send_command_invalid_arguments(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test send_command service."""
     domain = "rflink"
@@ -219,7 +219,7 @@ async def test_send_command_invalid_arguments(
 
 
 async def test_send_command_event_propagation(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test event propagation for send_command service."""
     domain = "light"
@@ -263,7 +263,7 @@ async def test_send_command_event_propagation(
 
 
 async def test_reconnecting_after_disconnect(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """An unexpected disconnect should cause a reconnect."""
     domain = "sensor"
@@ -289,7 +289,7 @@ async def test_reconnecting_after_disconnect(
 
 
 async def test_reconnecting_after_failure(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """A failure to reconnect should be retried."""
     domain = "sensor"
@@ -318,7 +318,7 @@ async def test_reconnecting_after_failure(
 
 
 async def test_error_when_not_connected(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Sending command should error when not connected."""
     domain = "switch"
@@ -350,7 +350,7 @@ async def test_error_when_not_connected(
 
 
 async def test_async_send_command_error(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Sending command should error when protocol fails."""
     domain = "rflink"
@@ -373,7 +373,7 @@ async def test_async_send_command_error(
 
 
 async def test_race_condition(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test race condition for unknown components."""
     domain = "light"
@@ -414,12 +414,12 @@ async def test_not_connected() -> None:
     """Test Error when sending commands to a disconnected device."""
     test_device = RflinkCommand("DUMMY_DEVICE")
     RflinkCommand.set_rflink_protocol(None)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await test_device._async_handle_command("turn_on")
 
 
 async def test_keepalive(
-    hass: HomeAssistant,
+    hass: SmartHub,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -449,7 +449,7 @@ async def test_keepalive(
 
 
 async def test_keepalive_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -479,7 +479,7 @@ async def test_keepalive_2(
 
 
 async def test_keepalive_3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -499,7 +499,7 @@ async def test_keepalive_3(
 
 
 async def test_default_keepalive(
-    hass: HomeAssistant,
+    hass: SmartHub,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -520,7 +520,7 @@ async def test_default_keepalive(
 
 
 async def test_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -559,7 +559,7 @@ async def test_unique_id(
 
 
 async def test_enable_debug_logs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

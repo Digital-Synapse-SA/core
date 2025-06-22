@@ -7,17 +7,17 @@ from unittest.mock import patch
 from aioguardian.errors import GuardianError
 import pytest
 
-from homeassistant.components.guardian import CONF_UID, DOMAIN
-from homeassistant.components.guardian.config_flow import (
+from smarthub.components.guardian import CONF_UID, DOMAIN
+from smarthub.components.guardian.config_flow import (
     async_get_pin_from_discovery_hostname,
     async_get_pin_from_uid,
 )
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_IP_ADDRESS, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -25,7 +25,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 @pytest.mark.usefixtures("config_entry", "setup_guardian")
-async def test_duplicate_error(hass: HomeAssistant, config: dict[str, Any]) -> None:
+async def test_duplicate_error(hass: SmartHub, config: dict[str, Any]) -> None:
     """Test that errors are shown when duplicate entries are added."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=config
@@ -34,7 +34,7 @@ async def test_duplicate_error(hass: HomeAssistant, config: dict[str, Any]) -> N
     assert result["reason"] == "already_configured"
 
 
-async def test_connect_error(hass: HomeAssistant, config: dict[str, Any]) -> None:
+async def test_connect_error(hass: SmartHub, config: dict[str, Any]) -> None:
     """Test that the config entry errors out if the device cannot connect."""
     with patch(
         "aioguardian.client.Client.connect",
@@ -60,7 +60,7 @@ async def test_get_pin_from_uid() -> None:
 
 
 @pytest.mark.usefixtures("setup_guardian")
-async def test_step_user(hass: HomeAssistant, config: dict[str, Any]) -> None:
+async def test_step_user(hass: SmartHub, config: dict[str, Any]) -> None:
     """Test the user step."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -81,7 +81,7 @@ async def test_step_user(hass: HomeAssistant, config: dict[str, Any]) -> None:
 
 
 @pytest.mark.usefixtures("setup_guardian")
-async def test_step_zeroconf(hass: HomeAssistant) -> None:
+async def test_step_zeroconf(hass: SmartHub) -> None:
     """Test the zeroconf step."""
     zeroconf_data = ZeroconfServiceInfo(
         ip_address=ip_address("192.168.1.100"),
@@ -111,7 +111,7 @@ async def test_step_zeroconf(hass: HomeAssistant) -> None:
     }
 
 
-async def test_step_zeroconf_already_in_progress(hass: HomeAssistant) -> None:
+async def test_step_zeroconf_already_in_progress(hass: SmartHub) -> None:
     """Test the zeroconf step aborting because it's already in progress."""
     zeroconf_data = ZeroconfServiceInfo(
         ip_address=ip_address("192.168.1.100"),
@@ -137,7 +137,7 @@ async def test_step_zeroconf_already_in_progress(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_guardian")
-async def test_step_dhcp(hass: HomeAssistant) -> None:
+async def test_step_dhcp(hass: SmartHub) -> None:
     """Test the dhcp step."""
     dhcp_data = DhcpServiceInfo(
         ip="192.168.1.100",
@@ -163,7 +163,7 @@ async def test_step_dhcp(hass: HomeAssistant) -> None:
     }
 
 
-async def test_step_dhcp_already_in_progress(hass: HomeAssistant) -> None:
+async def test_step_dhcp_already_in_progress(hass: SmartHub) -> None:
     """Test the zeroconf step aborting because it's already in progress."""
     dhcp_data = DhcpServiceInfo(
         ip="192.168.1.100",
@@ -184,7 +184,7 @@ async def test_step_dhcp_already_in_progress(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_in_progress"
 
 
-async def test_step_dhcp_already_setup_match_mac(hass: HomeAssistant) -> None:
+async def test_step_dhcp_already_setup_match_mac(hass: SmartHub) -> None:
     """Test we abort if the device is already setup with matching unique id and discovered via DHCP."""
     entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_IP_ADDRESS: "1.2.3.4"}, unique_id="guardian_ABCD"
@@ -204,7 +204,7 @@ async def test_step_dhcp_already_setup_match_mac(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_step_dhcp_already_setup_match_ip(hass: HomeAssistant) -> None:
+async def test_step_dhcp_already_setup_match_ip(hass: SmartHub) -> None:
     """Test we abort if the device is already setup with matching ip and discovered via DHCP."""
     entry = MockConfigEntry(
         domain=DOMAIN,

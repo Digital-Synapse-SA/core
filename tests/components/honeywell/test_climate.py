@@ -10,7 +10,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_FAN_MODE,
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
@@ -28,7 +28,7 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.components.honeywell.climate import (
+from smarthub.components.honeywell.climate import (
     DOMAIN,
     MODE_PERMANENT_HOLD,
     MODE_TEMPORARY_HOLD,
@@ -36,17 +36,17 @@ from homeassistant.components.honeywell.climate import (
     RETRY,
     SCAN_INTERVAL,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import init_integration, reset_mock
 
@@ -56,7 +56,7 @@ FAN_ACTION = "fan_action"
 
 
 async def test_no_thermostat_options(
-    hass: HomeAssistant, device: MagicMock, config_entry: MagicMock
+    hass: SmartHub, device: MagicMock, config_entry: MagicMock
 ) -> None:
     """Test the setup of the climate entities when there are no additional options available."""
     device._data = {}
@@ -67,7 +67,7 @@ async def test_no_thermostat_options(
 
 
 async def test_static_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device: MagicMock,
     config_entry: MagicMock,
@@ -89,7 +89,7 @@ async def test_static_attributes(
 
 
 async def test_dynamic_attributes(
-    hass: HomeAssistant, device: MagicMock, config_entry: MagicMock
+    hass: SmartHub, device: MagicMock, config_entry: MagicMock
 ) -> None:
     """Test dynamic attributes."""
     await init_integration(hass, config_entry)
@@ -146,7 +146,7 @@ async def test_dynamic_attributes(
 
 
 async def test_mode_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: MagicMock,
     config_entry: MagicMock,
     caplog: pytest.LogCaptureFixture,
@@ -201,7 +201,7 @@ async def test_mode_service_calls(
 
     device.set_system_mode.reset_mock()
     device.set_system_mode.side_effect = aiosomecomfort.SomeComfortError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_HVAC_MODE,
@@ -212,7 +212,7 @@ async def test_mode_service_calls(
 
     device.set_system_mode.reset_mock()
     device.set_system_mode.side_effect = aiosomecomfort.UnexpectedResponse
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_HVAC_MODE,
@@ -222,7 +222,7 @@ async def test_mode_service_calls(
 
 
 async def test_fan_modes_service_calls(
-    hass: HomeAssistant, device: MagicMock, config_entry: MagicMock
+    hass: SmartHub, device: MagicMock, config_entry: MagicMock
 ) -> None:
     """Test controlling the fan modes through service calls."""
     await init_integration(hass, config_entry)
@@ -260,7 +260,7 @@ async def test_fan_modes_service_calls(
     device.set_fan_mode.reset_mock()
 
     device.set_fan_mode.side_effect = aiosomecomfort.SomeComfortError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_FAN_MODE,
@@ -269,7 +269,7 @@ async def test_fan_modes_service_calls(
         )
 
     device.set_fan_mode.side_effect = aiosomecomfort.UnexpectedResponse
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_FAN_MODE,
@@ -279,7 +279,7 @@ async def test_fan_modes_service_calls(
 
 
 async def test_service_calls_off_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: MagicMock,
     config_entry: MagicMock,
     caplog: pytest.LogCaptureFixture,
@@ -340,7 +340,7 @@ async def test_service_calls_off_mode(
     device.set_setpoint_heat.side_effect = aiosomecomfort.UnexpectedResponse
     caplog.clear()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,
@@ -445,7 +445,7 @@ async def test_service_calls_off_mode(
 
 
 async def test_service_calls_cool_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: MagicMock,
     config_entry: MagicMock,
     caplog: pytest.LogCaptureFixture,
@@ -539,7 +539,7 @@ async def test_service_calls_cool_mode(
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -569,7 +569,7 @@ async def test_service_calls_cool_mode(
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
     caplog.clear()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -581,7 +581,7 @@ async def test_service_calls_cool_mode(
     assert "Couldn't set permanent hold" in caplog.text
 
     reset_mock(device)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -596,7 +596,7 @@ async def test_service_calls_cool_mode(
     caplog.clear()
 
     device.set_hold_cool.side_effect = aiosomecomfort.SomeComfortError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -613,7 +613,7 @@ async def test_service_calls_cool_mode(
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -631,7 +631,7 @@ async def test_service_calls_cool_mode(
 
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -650,7 +650,7 @@ async def test_service_calls_cool_mode(
     device.raw_ui_data["StatusCool"] = 2
     device.system_mode = "Junk"
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -664,7 +664,7 @@ async def test_service_calls_cool_mode(
 
 
 async def test_service_calls_heat_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: MagicMock,
     config_entry: MagicMock,
     caplog: pytest.LogCaptureFixture,
@@ -704,7 +704,7 @@ async def test_service_calls_heat_mode(
     assert "Invalid temperature" in caplog.text
 
     device.set_hold_heat.side_effect = aiosomecomfort.UnexpectedResponse
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,
@@ -749,7 +749,7 @@ async def test_service_calls_heat_mode(
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -781,7 +781,7 @@ async def test_service_calls_heat_mode(
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -826,7 +826,7 @@ async def test_service_calls_heat_mode(
 
     device.set_hold_heat.side_effect = aiosomecomfort.UnexpectedResponse
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -836,7 +836,7 @@ async def test_service_calls_heat_mode(
 
     reset_mock(device)
     caplog.clear()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -850,7 +850,7 @@ async def test_service_calls_heat_mode(
     device.set_hold_heat.reset_mock()
     device.set_hold_cool.reset_mock()
     device.set_hold_heat.side_effect = aiosomecomfort.SomeComfortError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -865,7 +865,7 @@ async def test_service_calls_heat_mode(
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -882,7 +882,7 @@ async def test_service_calls_heat_mode(
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -897,7 +897,7 @@ async def test_service_calls_heat_mode(
 
 
 async def test_service_calls_auto_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: MagicMock,
     config_entry: MagicMock,
     caplog: pytest.LogCaptureFixture,
@@ -999,7 +999,7 @@ async def test_service_calls_auto_mode(
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -1028,7 +1028,7 @@ async def test_service_calls_auto_mode(
     reset_mock(device)
     caplog.clear()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -1041,7 +1041,7 @@ async def test_service_calls_auto_mode(
 
     reset_mock(device)
     device.set_hold_cool.side_effect = aiosomecomfort.SomeComfortError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -1059,7 +1059,7 @@ async def test_service_calls_auto_mode(
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -1076,7 +1076,7 @@ async def test_service_calls_auto_mode(
     device.raw_ui_data["StatusHeat"] = 2
     device.raw_ui_data["StatusCool"] = 2
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_PRESET_MODE,
@@ -1090,7 +1090,7 @@ async def test_service_calls_auto_mode(
 
 
 async def test_async_update_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: MagicMock,
     config_entry: MagicMock,
     client: MagicMock,
@@ -1194,7 +1194,7 @@ async def test_async_update_errors(
 
 
 async def test_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: MagicMock,
     config_entry: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -1214,7 +1214,7 @@ async def test_unique_id(
 
 
 async def test_preset_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: MagicMock,
     config_entry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,

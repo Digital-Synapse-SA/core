@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import selected_platforms, snapshot_platform_entities
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     netatmo_auth: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -35,7 +35,7 @@ async def test_entity(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_button_setup_and_services(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test setup and services."""
     with selected_platforms([Platform.BUTTON]):

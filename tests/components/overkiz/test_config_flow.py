@@ -16,12 +16,12 @@ from pyoverkiz.exceptions import (
 )
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.overkiz.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.overkiz.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -74,7 +74,7 @@ FAKE_ZERO_CONF_INFO_LOCAL = ZeroconfServiceInfo(
 )
 
 
-async def test_form_cloud(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form_cloud(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -116,7 +116,7 @@ async def test_form_cloud(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> N
 
 
 async def test_form_only_cloud_supported(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -151,7 +151,7 @@ async def test_form_only_cloud_supported(
 
 
 async def test_form_local_happy_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test local API configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -218,7 +218,7 @@ async def test_form_local_happy_flow(
     ],
 )
 async def test_form_invalid_auth_cloud(
-    hass: HomeAssistant, side_effect: Exception, error: str
+    hass: SmartHub, side_effect: Exception, error: str
 ) -> None:
     """Test we handle invalid auth (cloud)."""
     result = await hass.config_entries.flow.async_init(
@@ -274,7 +274,7 @@ async def test_form_invalid_auth_cloud(
     ],
 )
 async def test_form_invalid_auth_local(
-    hass: HomeAssistant, side_effect: Exception, error: str
+    hass: SmartHub, side_effect: Exception, error: str
 ) -> None:
     """Test we handle invalid auth (local)."""
     result = await hass.config_entries.flow.async_init(
@@ -322,7 +322,7 @@ async def test_form_invalid_auth_local(
     ],
 )
 async def test_form_invalid_cozytouch_auth(
-    hass: HomeAssistant, side_effect: Exception, error: str
+    hass: SmartHub, side_effect: Exception, error: str
 ) -> None:
     """Test we handle invalid auth (cloud)."""
     result = await hass.config_entries.flow.async_init(
@@ -353,7 +353,7 @@ async def test_form_invalid_cozytouch_auth(
 
 
 async def test_cloud_abort_on_duplicate_entry(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form."""
 
@@ -402,7 +402,7 @@ async def test_cloud_abort_on_duplicate_entry(
 
 
 async def test_local_abort_on_duplicate_entry(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test local API configuration is aborted if gateway already exists."""
 
@@ -461,7 +461,7 @@ async def test_local_abort_on_duplicate_entry(
 
 
 async def test_cloud_allow_multiple_unique_entries(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form."""
 
@@ -516,7 +516,7 @@ async def test_cloud_allow_multiple_unique_entries(
     }
 
 
-async def test_cloud_reauth_success(hass: HomeAssistant) -> None:
+async def test_cloud_reauth_success(hass: SmartHub) -> None:
     """Test reauthentication flow."""
 
     mock_entry = MockConfigEntry(
@@ -558,7 +558,7 @@ async def test_cloud_reauth_success(hass: HomeAssistant) -> None:
         assert mock_entry.data["password"] == TEST_PASSWORD2
 
 
-async def test_cloud_reauth_wrong_account(hass: HomeAssistant) -> None:
+async def test_cloud_reauth_wrong_account(hass: SmartHub) -> None:
     """Test reauthentication flow."""
 
     mock_entry = MockConfigEntry(
@@ -598,7 +598,7 @@ async def test_cloud_reauth_wrong_account(hass: HomeAssistant) -> None:
         assert result["reason"] == "reauth_wrong_account"
 
 
-async def test_local_reauth_legacy(hass: HomeAssistant) -> None:
+async def test_local_reauth_legacy(hass: SmartHub) -> None:
     """Test legacy reauthentication flow with username/password."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -648,7 +648,7 @@ async def test_local_reauth_legacy(hass: HomeAssistant) -> None:
         assert mock_entry.data["verify_ssl"] is True
 
 
-async def test_local_reauth_success(hass: HomeAssistant) -> None:
+async def test_local_reauth_success(hass: SmartHub) -> None:
     """Test modern local reauth flow."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -698,7 +698,7 @@ async def test_local_reauth_success(hass: HomeAssistant) -> None:
         assert "password" not in mock_entry.data
 
 
-async def test_local_reauth_wrong_account(hass: HomeAssistant) -> None:
+async def test_local_reauth_wrong_account(hass: SmartHub) -> None:
     """Test local reauth flow with wrong gateway account."""
 
     mock_entry = MockConfigEntry(
@@ -744,7 +744,7 @@ async def test_local_reauth_wrong_account(hass: HomeAssistant) -> None:
         assert result3["reason"] == "reauth_wrong_account"
 
 
-async def test_dhcp_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_dhcp_flow(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test that DHCP discovery for new bridge works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -796,7 +796,7 @@ async def test_dhcp_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> No
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_dhcp_flow_already_configured(hass: HomeAssistant) -> None:
+async def test_dhcp_flow_already_configured(hass: SmartHub) -> None:
     """Test that DHCP doesn't setup already configured gateways."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -819,7 +819,7 @@ async def test_dhcp_flow_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_zeroconf_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_zeroconf_flow(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test that zeroconf discovery for new bridge works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -871,7 +871,7 @@ async def test_zeroconf_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -
 
 
 async def test_local_zeroconf_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test that zeroconf discovery for new local bridge works."""
     result = await hass.config_entries.flow.async_init(
@@ -927,7 +927,7 @@ async def test_local_zeroconf_flow(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_zeroconf_flow_already_configured(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow_already_configured(hass: SmartHub) -> None:
     """Test that zeroconf doesn't setup already configured gateways."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

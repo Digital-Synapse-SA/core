@@ -6,15 +6,15 @@ from aiohttp.test_utils import TestClient
 from defusedxml import ElementTree
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
 
 @pytest.fixture
 async def mock_http_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> TestClient:
     """Set up test fixture."""
@@ -42,7 +42,7 @@ async def test_get_nonexistant_feed(mock_http_client) -> None:
     assert resp.status == HTTPStatus.NOT_FOUND
 
 
-async def test_get_rss_feed(mock_http_client, hass: HomeAssistant) -> None:
+async def test_get_rss_feed(mock_http_client, hass: SmartHub) -> None:
     """Test if we can retrieve the correct rss feed."""
     hass.states.async_set("test.test1", "a_state_1")
     hass.states.async_set("test.test2", "a_state_2")

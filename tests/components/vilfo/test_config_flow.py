@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock
 import pytest
 from vilfo.exceptions import AuthenticationException, VilfoException
 
-from homeassistant.components.vilfo.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.vilfo.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -41,7 +41,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vilfo_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_is_valid_host: AsyncMock,
@@ -76,7 +76,7 @@ async def test_full_flow(
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vilfo_client: AsyncMock,
     mock_is_valid_host: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -118,7 +118,7 @@ async def test_form_invalid_auth(
     [(VilfoException, "cannot_connect"), (Exception, "unknown")],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vilfo_client: AsyncMock,
     mock_is_valid_host: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -151,7 +151,7 @@ async def test_form_exceptions(
 
 
 async def test_form_wrong_host(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_is_valid_host: AsyncMock,
 ) -> None:
     """Test we handle wrong host errors."""
@@ -169,7 +169,7 @@ async def test_form_wrong_host(
 
 
 async def test_form_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vilfo_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

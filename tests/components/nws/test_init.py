@@ -1,15 +1,15 @@
 """Tests for init module."""
 
-from homeassistant.components.nws.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.nws.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .const import NWS_CONFIG
 
 from tests.common import MockConfigEntry
 
 
-async def test_unload_entry(hass: HomeAssistant, mock_simple_nws) -> None:
+async def test_unload_entry(hass: SmartHub, mock_simple_nws) -> None:
     """Test that nws setup with config yaml."""
     entry = MockConfigEntry(
         domain=DOMAIN,

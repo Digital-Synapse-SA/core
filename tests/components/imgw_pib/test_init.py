@@ -4,11 +4,11 @@ from unittest.mock import AsyncMock, patch
 
 from imgw_pib import ApiError
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_PLATFORM
-from homeassistant.components.imgw_pib.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_PLATFORM
+from smarthub.components.imgw_pib.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -16,12 +16,12 @@ from tests.common import MockConfigEntry
 
 
 async def test_config_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test for setup failure if the connection to the service fails."""
     with patch(
-        "homeassistant.components.imgw_pib.ImgwPib.create",
+        "smarthub.components.imgw_pib.ImgwPib.create",
         side_effect=ApiError("API Error"),
     ):
         await init_integration(hass, mock_config_entry)
@@ -30,7 +30,7 @@ async def test_config_not_ready(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imgw_pib_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_unload_entry(
 
 
 async def test_remove_binary_sensor_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imgw_pib_client: AsyncMock,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,

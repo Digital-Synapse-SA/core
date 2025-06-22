@@ -4,13 +4,13 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.sensor import ATTR_STATE_CLASS
-from homeassistant.components.switchbot.const import (
+from smarthub.components.sensor import ATTR_STATE_CLASS
+from smarthub.components.switchbot.const import (
     CONF_ENCRYPTION_KEY,
     CONF_KEY_ID,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ADDRESS,
@@ -18,8 +18,8 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_SENSOR_TYPE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import (
     CIRCULATOR_FAN_SERVICE_INFO,
@@ -38,7 +38,7 @@ from tests.components.bluetooth import inject_bluetooth_service_info
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test setting up creates the sensors."""
     await async_setup_component(hass, DOMAIN, {})
     inject_bluetooth_service_info(hass, WOHAND_SERVICE_INFO)
@@ -78,7 +78,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_co2_sensor(hass: HomeAssistant) -> None:
+async def test_co2_sensor(hass: SmartHub) -> None:
     """Test setting up creates the co2 sensor for a WoTHPc."""
     await async_setup_component(hass, DOMAIN, {})
     inject_bluetooth_service_info(hass, WOMETERTHPC_SERVICE_INFO)
@@ -124,13 +124,13 @@ async def test_co2_sensor(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_relay_switch_1pm_sensor(hass: HomeAssistant) -> None:
+async def test_relay_switch_1pm_sensor(hass: SmartHub) -> None:
     """Test setting up creates the relay switch 1PM sensor."""
     await async_setup_component(hass, DOMAIN, {})
     inject_bluetooth_service_info(hass, WORELAY_SWITCH_1PM_SERVICE_INFO)
 
     with patch(
-        "homeassistant.components.switchbot.switch.switchbot.SwitchbotRelaySwitch.get_basic_info",
+        "smarthub.components.switchbot.switch.switchbot.SwitchbotRelaySwitch.get_basic_info",
         new=AsyncMock(
             return_value={
                 "power": 4.9,
@@ -198,7 +198,7 @@ async def test_relay_switch_1pm_sensor(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_leak_sensor(hass: HomeAssistant) -> None:
+async def test_leak_sensor(hass: SmartHub) -> None:
     """Test setting up the leak detector."""
     await async_setup_component(hass, DOMAIN, {})
     inject_bluetooth_service_info(hass, LEAK_SERVICE_INFO)
@@ -240,7 +240,7 @@ async def test_leak_sensor(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_remote(hass: HomeAssistant) -> None:
+async def test_remote(hass: SmartHub) -> None:
     """Test setting up the remote sensor."""
     await async_setup_component(hass, DOMAIN, {})
     inject_bluetooth_service_info(hass, REMOTE_SERVICE_INFO)
@@ -279,7 +279,7 @@ async def test_remote(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_hub2_sensor(hass: HomeAssistant) -> None:
+async def test_hub2_sensor(hass: SmartHub) -> None:
     """Test setting up creates the sensor for WoHub2."""
     await async_setup_component(hass, DOMAIN, {})
     inject_bluetooth_service_info(hass, WOHUB2_SERVICE_INFO)
@@ -337,7 +337,7 @@ async def test_hub2_sensor(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_hubmini_matter_sensor(hass: HomeAssistant) -> None:
+async def test_hubmini_matter_sensor(hass: SmartHub) -> None:
     """Test setting up creates the sensor for HubMini Matter."""
     await async_setup_component(hass, DOMAIN, {})
     inject_bluetooth_service_info(hass, HUBMINI_MATTER_SERVICE_INFO)
@@ -383,7 +383,7 @@ async def test_hubmini_matter_sensor(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_fan_sensors(hass: HomeAssistant) -> None:
+async def test_fan_sensors(hass: SmartHub) -> None:
     """Test setting up creates the sensors."""
     await async_setup_component(hass, DOMAIN, {})
     inject_bluetooth_service_info(hass, CIRCULATOR_FAN_SERVICE_INFO)
@@ -401,7 +401,7 @@ async def test_fan_sensors(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.switchbot.fan.switchbot.SwitchbotFan.update",
+        "smarthub.components.switchbot.fan.switchbot.SwitchbotFan.update",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -427,7 +427,7 @@ async def test_fan_sensors(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_hub3_sensor(hass: HomeAssistant) -> None:
+async def test_hub3_sensor(hass: SmartHub) -> None:
     """Test setting up creates the sensor for Hub3."""
     await async_setup_component(hass, DOMAIN, {})
     inject_bluetooth_service_info(hass, HUB3_SERVICE_INFO)

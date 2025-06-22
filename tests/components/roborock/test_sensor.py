@@ -13,8 +13,8 @@ from roborock.const import (
 from roborock.roborock_message import RoborockMessage, RoborockMessageProtocol
 from roborock.version_1_apis import RoborockMqttClientV1
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from .mock_data import CONSUMABLE, STATUS, USER_DATA
 
@@ -27,7 +27,7 @@ def platforms() -> list[Platform]:
     return [Platform.SENSOR]
 
 
-async def test_sensors(hass: HomeAssistant, setup_entry: MockConfigEntry) -> None:
+async def test_sensors(hass: SmartHub, setup_entry: MockConfigEntry) -> None:
     """Test sensors and check test values are correctly set."""
     assert len(hass.states.async_all("sensor")) == 42
     assert hass.states.get("sensor.roborock_s7_maxv_main_brush_time_left").state == str(
@@ -80,7 +80,7 @@ async def test_sensors(hass: HomeAssistant, setup_entry: MockConfigEntry) -> Non
 
 
 async def test_listener_update(
-    hass: HomeAssistant, setup_entry: MockConfigEntry
+    hass: SmartHub, setup_entry: MockConfigEntry
 ) -> None:
     """Test that when we receive a mqtt topic, we successfully update the entity."""
     assert hass.states.get("sensor.roborock_s7_maxv_status").state == "charging"

@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock
 from aiokem import AuthenticationCredentialsError
 import pytest
 
-from homeassistant.components.rehlko import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.rehlko import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .conftest import TEST_EMAIL, TEST_PASSWORD, TEST_SUBJECT
 
@@ -24,7 +24,7 @@ DHCP_DISCOVERY = DhcpServiceInfo(
 
 
 async def test_configure_entry(
-    hass: HomeAssistant, mock_rehlko: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_rehlko: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we can configure the entry."""
     result = await hass.config_entries.flow.async_init(
@@ -60,7 +60,7 @@ async def test_configure_entry(
     ],
 )
 async def test_configure_entry_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rehlko: AsyncMock,
     error: Exception,
     conf_error: dict[str, str],
@@ -107,7 +107,7 @@ async def test_configure_entry_exceptions(
 
 
 async def test_already_configured(
-    hass: HomeAssistant, rehlko_config_entry: MockConfigEntry, mock_rehlko: AsyncMock
+    hass: SmartHub, rehlko_config_entry: MockConfigEntry, mock_rehlko: AsyncMock
 ) -> None:
     """Test if entry is already configured."""
     rehlko_config_entry.add_to_hass(hass)
@@ -129,7 +129,7 @@ async def test_already_configured(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     rehlko_config_entry: MockConfigEntry,
     mock_rehlko: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -152,7 +152,7 @@ async def test_reauth(
 
 
 async def test_reauth_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     rehlko_config_entry: MockConfigEntry,
     mock_rehlko: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -186,7 +186,7 @@ async def test_reauth_exception(
 
 
 async def test_dhcp_discovery(
-    hass: HomeAssistant, mock_rehlko: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_rehlko: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we can setup from dhcp discovery."""
     result = await hass.config_entries.flow.async_init(
@@ -207,7 +207,7 @@ async def test_dhcp_discovery(
 
 
 async def test_dhcp_discovery_already_set_up(
-    hass: HomeAssistant, rehlko_config_entry: MockConfigEntry, mock_rehlko: AsyncMock
+    hass: SmartHub, rehlko_config_entry: MockConfigEntry, mock_rehlko: AsyncMock
 ) -> None:
     """Test DHCP discovery aborts if already set up."""
     rehlko_config_entry.add_to_hass(hass)

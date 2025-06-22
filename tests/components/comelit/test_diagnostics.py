@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -17,7 +17,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics_bridge(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
@@ -38,7 +38,7 @@ async def test_entry_diagnostics_bridge(
 
 
 async def test_entry_diagnostics_vedo(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vedo: AsyncMock,
     mock_vedo_config_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,

@@ -9,9 +9,9 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import setup
-from homeassistant.components import binary_sensor, template
-from homeassistant.const import (
+from smarthub import setup
+from smarthub.components import binary_sensor, template
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     EVENT_HOMEASSISTANT_START,
     STATE_OFF,
@@ -19,11 +19,11 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import Context, CoreState, HomeAssistant, State
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import Context, CoreState, SmartHub, State
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -70,7 +70,7 @@ from tests.common import (
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_setup_minimal(hass: HomeAssistant, entity_id, name, attributes) -> None:
+async def test_setup_minimal(hass: SmartHub, entity_id, name, attributes) -> None:
     """Test the setup."""
     state = hass.states.get(entity_id)
     assert state is not None
@@ -115,7 +115,7 @@ async def test_setup_minimal(hass: HomeAssistant, entity_id, name, attributes) -
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_setup(hass: HomeAssistant, entity_id) -> None:
+async def test_setup(hass: SmartHub, entity_id) -> None:
     """Test the setup."""
     state = hass.states.get(entity_id)
     assert state is not None
@@ -132,7 +132,7 @@ async def test_setup(hass: HomeAssistant, entity_id) -> None:
     ],
 )
 async def test_setup_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     config_entry_extra_options: dict[str, str],
 ) -> None:
@@ -232,7 +232,7 @@ async def test_setup_config_entry(
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_setup_invalid_sensors(hass: HomeAssistant, count) -> None:
+async def test_setup_invalid_sensors(hass: SmartHub, count) -> None:
     """Test setup with no sensors."""
     assert len(hass.states.async_entity_ids("binary_sensor")) == count
 
@@ -279,7 +279,7 @@ async def test_setup_invalid_sensors(hass: HomeAssistant, count) -> None:
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_icon_template(hass: HomeAssistant, entity_id) -> None:
+async def test_icon_template(hass: SmartHub, entity_id) -> None:
     """Test icon template."""
     state = hass.states.get(entity_id)
     assert state.attributes.get("icon") == ""
@@ -332,7 +332,7 @@ async def test_icon_template(hass: HomeAssistant, entity_id) -> None:
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_entity_picture_template(hass: HomeAssistant, entity_id) -> None:
+async def test_entity_picture_template(hass: SmartHub, entity_id) -> None:
     """Test entity_picture template."""
     state = hass.states.get(entity_id)
     assert state.attributes.get("entity_picture") == ""
@@ -381,7 +381,7 @@ async def test_entity_picture_template(hass: HomeAssistant, entity_id) -> None:
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_attribute_templates(hass: HomeAssistant, entity_id) -> None:
+async def test_attribute_templates(hass: SmartHub, entity_id) -> None:
     """Test attribute_templates template."""
     state = hass.states.get(entity_id)
     assert state.attributes.get("test_attribute") == "It ."
@@ -397,7 +397,7 @@ async def test_attribute_templates(hass: HomeAssistant, entity_id) -> None:
 async def setup_mock():
     """Do setup of sensor mock."""
     with patch(
-        "homeassistant.components.template.binary_sensor."
+        "smarthub.components.template.binary_sensor."
         "BinarySensorTemplate._update_state"
     ) as _update_state:
         yield _update_state
@@ -426,7 +426,7 @@ async def setup_mock():
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_match_all(hass: HomeAssistant, setup_mock) -> None:
+async def test_match_all(hass: SmartHub, setup_mock) -> None:
     """Test template that is rerendered on any state lifecycle."""
     init_calls = len(setup_mock.mock_calls)
 
@@ -454,7 +454,7 @@ async def test_match_all(hass: HomeAssistant, setup_mock) -> None:
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_event(hass: HomeAssistant) -> None:
+async def test_event(hass: SmartHub) -> None:
     """Test the event."""
     state = hass.states.get("binary_sensor.test")
     assert state.state == STATE_OFF
@@ -565,7 +565,7 @@ async def test_event(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_template_delay_on_off(hass: HomeAssistant) -> None:
+async def test_template_delay_on_off(hass: SmartHub) -> None:
     """Test binary sensor template delay on."""
     # Ensure the initial state is not on
     assert hass.states.get("binary_sensor.test_on").state != STATE_ON
@@ -645,7 +645,7 @@ async def test_template_delay_on_off(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_available_without_availability_template(
-    hass: HomeAssistant, entity_id
+    hass: SmartHub, entity_id
 ) -> None:
     """Ensure availability is true without an availability_template."""
     state = hass.states.get(entity_id)
@@ -694,7 +694,7 @@ async def test_available_without_availability_template(
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_availability_template(hass: HomeAssistant, entity_id) -> None:
+async def test_availability_template(hass: SmartHub, entity_id) -> None:
     """Test availability template."""
     hass.states.async_set("sensor.test_state", STATE_OFF)
     await hass.async_block_till_done()
@@ -731,7 +731,7 @@ async def test_availability_template(hass: HomeAssistant, entity_id) -> None:
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_invalid_attribute_template(
-    hass: HomeAssistant, caplog_setup_text
+    hass: SmartHub, caplog_setup_text
 ) -> None:
     """Test that errors are logged if rendering template fails."""
     hass.states.async_set("binary_sensor.test_sensor", STATE_ON)
@@ -759,7 +759,7 @@ async def test_invalid_attribute_template(
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_invalid_availability_template_keeps_component_available(
-    hass: HomeAssistant, caplog_setup_text
+    hass: SmartHub, caplog_setup_text
 ) -> None:
     """Test that an invalid availability keeps the device available."""
 
@@ -768,7 +768,7 @@ async def test_invalid_availability_template_keeps_component_available(
 
 
 async def test_no_update_template_match_all(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that we do not update sensors that match on all."""
 
@@ -866,7 +866,7 @@ async def test_no_update_template_match_all(
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test unique_id option only creates one binary sensor per id."""
     assert len(hass.states.async_all()) == 2
@@ -902,7 +902,7 @@ async def test_unique_id(
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_template_validation_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test binary sensor template delay on."""
     caplog.set_level(logging.ERROR)
@@ -966,7 +966,7 @@ async def test_template_validation_error(
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_availability_icon_picture(hass: HomeAssistant, entity_id) -> None:
+async def test_availability_icon_picture(hass: SmartHub, entity_id) -> None:
     """Test name, icon and picture templates are rendered at setup."""
     state = hass.states.get(entity_id)
     assert state.state == "unavailable"
@@ -1032,7 +1032,7 @@ async def test_availability_icon_picture(hass: HomeAssistant, entity_id) -> None
     ],
 )
 async def test_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count,
     domain,
     config,
@@ -1125,7 +1125,7 @@ async def test_restore_state(
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_trigger_entity(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test trigger entity works."""
     await hass.async_block_till_done()
@@ -1195,7 +1195,7 @@ async def test_trigger_entity(
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_template_with_trigger_templated_delay_on(hass: HomeAssistant) -> None:
+async def test_template_with_trigger_templated_delay_on(hass: SmartHub) -> None:
     """Test binary sensor template with template delay on."""
     state = hass.states.get("binary_sensor.test")
     assert state.state == STATE_UNKNOWN
@@ -1261,7 +1261,7 @@ async def test_template_with_trigger_templated_delay_on(hass: HomeAssistant) -> 
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_trigger_template_delay_with_multiple_triggers(
-    hass: HomeAssistant, delay_state: str
+    hass: SmartHub, delay_state: str
 ) -> None:
     """Test trigger based binary sensor with multiple triggers occurring during the delay."""
     future = dt_util.utcnow()
@@ -1313,7 +1313,7 @@ async def test_trigger_template_delay_with_multiple_triggers(
     ],
 )
 async def test_trigger_entity_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count,
     domain,
     config,
@@ -1388,7 +1388,7 @@ async def test_trigger_entity_restore_state(
 )
 @pytest.mark.parametrize("restored_state", [STATE_ON, STATE_OFF])
 async def test_trigger_entity_restore_state_auto_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count,
     domain,
     config,
@@ -1451,7 +1451,7 @@ async def test_trigger_entity_restore_state_auto_off(
     ],
 )
 async def test_trigger_entity_restore_state_auto_off_expired(
-    hass: HomeAssistant, count, domain, config, freezer: FrozenDateTimeFactory
+    hass: SmartHub, count, domain, config, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test restoring trigger template binary sensor."""
 
@@ -1484,7 +1484,7 @@ async def test_trigger_entity_restore_state_auto_off_expired(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

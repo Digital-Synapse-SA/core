@@ -8,15 +8,15 @@ from matter_server.common.helpers.util import create_attribute_path_from_attribu
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.water_heater import (
+from smarthub.components.water_heater import (
     STATE_ECO,
     STATE_HIGH_DEMAND,
     STATE_OFF,
     WaterHeaterEntityFeature,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -27,7 +27,7 @@ from .common import (
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_water_heaters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -37,7 +37,7 @@ async def test_water_heaters(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_water_heater"])
 async def test_water_heater(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -61,7 +61,7 @@ async def test_water_heater(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_water_heater"])
 async def test_water_heater_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -95,7 +95,7 @@ async def test_water_heater_set_temperature(
     [(STATE_OFF, 0), (STATE_ECO, 4), (STATE_HIGH_DEMAND, 4)],
 )
 async def test_water_heater_set_operation_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     operation_mode: str,
@@ -128,7 +128,7 @@ async def test_water_heater_set_operation_mode(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_water_heater"])
 async def test_water_heater_boostmode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -195,7 +195,7 @@ async def test_water_heater_boostmode(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_water_heater"])
 async def test_update_from_water_heater(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -223,7 +223,7 @@ async def test_update_from_water_heater(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_water_heater"])
 async def test_water_heater_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

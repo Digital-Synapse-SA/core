@@ -13,17 +13,17 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.calendar import (
+from smarthub.components.calendar import (
     DOMAIN as CALENDAR_DOMAIN,
     EVENT_END_DATETIME,
     EVENT_START_DATETIME,
     SERVICE_GET_EVENTS,
 )
-from homeassistant.components.husqvarna_automower.const import DOMAIN
-from homeassistant.components.husqvarna_automower.coordinator import SCAN_INTERVAL
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.husqvarna_automower.const import DOMAIN
+from smarthub.components.husqvarna_automower.coordinator import SCAN_INTERVAL
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -58,7 +58,7 @@ def get_events_fixture(
 
 @pytest.mark.freeze_time(datetime.datetime(2023, 6, 5, 12))
 async def test_calendar_state_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -73,7 +73,7 @@ async def test_calendar_state_off(
 
 @pytest.mark.freeze_time(datetime.datetime(2023, 6, 5, 19))
 async def test_calendar_state_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -88,7 +88,7 @@ async def test_calendar_state_on(
 
 @pytest.mark.freeze_time(datetime.datetime(2023, 6, 5))
 async def test_empty_calendar(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -129,7 +129,7 @@ async def test_empty_calendar(
     ],
 )
 async def test_calendar_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,

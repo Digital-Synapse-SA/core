@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
     ATTR_TILT_POSITION,
@@ -21,9 +21,9 @@ from homeassistant.components.cover import (
     SERVICE_STOP_COVER_TILT,
     CoverState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType, WebsocketDataType
 
@@ -52,7 +52,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
     ],
 )
 async def test_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
@@ -60,7 +60,7 @@ async def test_cover(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that all supported cover entities are created."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.COVER]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -141,14 +141,14 @@ async def test_cover(
     ],
 )
 async def test_tilt_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that tilting a cover works."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.COVER]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -222,14 +222,14 @@ async def test_tilt_cover(
     ],
 )
 async def test_level_controllable_output_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that tilting a cover works."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.COVER]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 

@@ -2,11 +2,11 @@
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry,
     setup_voip,
 ) -> None:
@@ -15,7 +15,7 @@ async def test_unload_entry(
 
 
 async def test_user_management(
-    hass: HomeAssistant, config_entry, setup_voip, snapshot: SnapshotAssertion
+    hass: SmartHub, config_entry, setup_voip, snapshot: SnapshotAssertion
 ) -> None:
     """Test creating and removing voip user."""
     user = await hass.auth.async_get_user(config_entry.data["user"])

@@ -6,7 +6,7 @@ from unittest.mock import Mock
 from motionblindsble.const import MotionBlindType, MotionRunningType
 import pytest
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_POSITION,
     ATTR_TILT_POSITION,
     DOMAIN as COVER_DOMAIN,
@@ -20,8 +20,8 @@ from homeassistant.components.cover import (
     SERVICE_STOP_COVER_TILT,
     CoverState,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -44,7 +44,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_cover_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motion_device: Mock,
     name: str,
@@ -76,7 +76,7 @@ async def test_cover_service(
     ],
 )
 async def test_cover_update_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motion_device: Mock,
     name: str,
@@ -104,7 +104,7 @@ async def test_cover_update_running(
     ],
 )
 async def test_cover_update_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motion_device: Mock,
     name: str,

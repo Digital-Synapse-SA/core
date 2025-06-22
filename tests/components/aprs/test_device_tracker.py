@@ -7,8 +7,8 @@ import aprslib
 from aprslib import IS
 import pytest
 
-from homeassistant.components.aprs import device_tracker
-from homeassistant.core import HomeAssistant
+from smarthub.components.aprs import device_tracker
+from smarthub.core import SmartHub
 
 DEFAULT_PORT = 14580
 
@@ -333,10 +333,10 @@ def test_aprs_listener_rx_msg_object(mock_ais: MagicMock) -> None:
     )
 
 
-async def test_setup_scanner(hass: HomeAssistant) -> None:
+async def test_setup_scanner(hass: SmartHub) -> None:
     """Test setup_scanner."""
     with patch(
-        "homeassistant.components.aprs.device_tracker.AprsListenerThread"
+        "smarthub.components.aprs.device_tracker.AprsListenerThread"
     ) as listener:
         config = {
             "username": TEST_CALLSIGN,
@@ -357,7 +357,7 @@ async def test_setup_scanner(hass: HomeAssistant) -> None:
         )
 
 
-async def test_setup_scanner_timeout(hass: HomeAssistant) -> None:
+async def test_setup_scanner_timeout(hass: SmartHub) -> None:
     """Test setup_scanner failure from timeout."""
     with patch.object(IS, "connect", side_effect=TimeoutError):
         config = {

@@ -7,15 +7,15 @@ from unittest.mock import AsyncMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from tests.common import MockConfigEntry, snapshot_platform
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_helper: AsyncMock,

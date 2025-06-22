@@ -5,9 +5,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.remember_the_milk import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.remember_the_milk import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import CONFIG, PROFILE, TOKEN
 
@@ -17,7 +17,7 @@ def configure_id() -> Generator[str]:
     """Fixture to return a configure_id."""
     mock_id = "1-1"
     with patch(
-        "homeassistant.components.configurator.Configurator._generate_unique_id"
+        "smarthub.components.configurator.Configurator._generate_unique_id"
     ) as generate_id:
         generate_id.return_value = mock_id
         yield mock_id
@@ -28,7 +28,7 @@ def configure_id() -> Generator[str]:
     [(TOKEN, True, "configured"), (None, False, "configure")],
 )
 async def test_configurator(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     storage: MagicMock,
     configure_id: str,

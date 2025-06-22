@@ -4,15 +4,15 @@ from unittest.mock import Mock, patch
 
 from aiohttp import ClientResponseError
 
-from homeassistant import config_entries
-from homeassistant.components.volvooncall.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.volvooncall.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -23,7 +23,7 @@ async def test_form(hass: HomeAssistant) -> None:
     with (
         patch("volvooncall.Connection.get"),
         patch(
-            "homeassistant.components.volvooncall.async_setup_entry",
+            "smarthub.components.volvooncall.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -51,7 +51,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -78,7 +78,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_flow_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_already_configured(hass: SmartHub) -> None:
     """Test we handle a flow that has already been configured."""
     first_entry = MockConfigEntry(domain=DOMAIN, unique_id="test-username")
     first_entry.add_to_hass(hass)
@@ -92,7 +92,7 @@ async def test_flow_already_configured(hass: HomeAssistant) -> None:
     with (
         patch("volvooncall.Connection.get"),
         patch(
-            "homeassistant.components.volvooncall.async_setup_entry",
+            "smarthub.components.volvooncall.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -112,7 +112,7 @@ async def test_flow_already_configured(hass: HomeAssistant) -> None:
     assert result2["reason"] == "already_configured"
 
 
-async def test_form_other_exception(hass: HomeAssistant) -> None:
+async def test_form_other_exception(hass: SmartHub) -> None:
     """Test we handle other exceptions."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -137,7 +137,7 @@ async def test_form_other_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_reauth(hass: HomeAssistant) -> None:
+async def test_reauth(hass: SmartHub) -> None:
     """Test that we handle the reauth flow."""
 
     first_entry = MockConfigEntry(

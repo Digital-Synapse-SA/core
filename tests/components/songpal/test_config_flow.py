@@ -4,17 +4,17 @@ import copy
 import dataclasses
 from unittest.mock import patch
 
-from homeassistant.components.songpal.const import CONF_ENDPOINT, DOMAIN
-from homeassistant.config_entries import (
+from smarthub.components.songpal.const import CONF_ENDPOINT, DOMAIN
+from smarthub.config_entries import (
     SOURCE_IMPORT,
     SOURCE_SSDP,
     SOURCE_USER,
     ConfigFlowResult,
 )
-from homeassistant.const import CONF_HOST, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.const import CONF_HOST, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_UDN,
     SsdpServiceInfo,
@@ -51,7 +51,7 @@ SSDP_DATA = SsdpServiceInfo(
 )
 
 
-def _flow_next(hass: HomeAssistant, flow_id: str) -> ConfigFlowResult:
+def _flow_next(hass: SmartHub, flow_id: str) -> ConfigFlowResult:
     return next(
         flow
         for flow in hass.config_entries.flow.async_progress()
@@ -61,12 +61,12 @@ def _flow_next(hass: HomeAssistant, flow_id: str) -> ConfigFlowResult:
 
 def _patch_setup():
     return patch(
-        "homeassistant.components.songpal.async_setup_entry",
+        "smarthub.components.songpal.async_setup_entry",
         return_value=True,
     )
 
 
-async def test_flow_ssdp(hass: HomeAssistant) -> None:
+async def test_flow_ssdp(hass: SmartHub) -> None:
     """Test working ssdp flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -91,7 +91,7 @@ async def test_flow_ssdp(hass: HomeAssistant) -> None:
         assert result["data"] == CONF_DATA
 
 
-async def test_flow_user(hass: HomeAssistant) -> None:
+async def test_flow_user(hass: SmartHub) -> None:
     """Test working user initialized flow."""
     mocked_device = _create_mocked_device()
 
@@ -120,7 +120,7 @@ async def test_flow_user(hass: HomeAssistant) -> None:
     mocked_device.get_interface_information.assert_called_once()
 
 
-async def test_flow_import(hass: HomeAssistant) -> None:
+async def test_flow_import(hass: SmartHub) -> None:
     """Test working import flow."""
     mocked_device = _create_mocked_device()
 
@@ -136,7 +136,7 @@ async def test_flow_import(hass: HomeAssistant) -> None:
     mocked_device.get_interface_information.assert_not_called()
 
 
-async def test_flow_import_without_name(hass: HomeAssistant) -> None:
+async def test_flow_import_without_name(hass: SmartHub) -> None:
     """Test import flow without optional name."""
     mocked_device = _create_mocked_device()
 
@@ -152,7 +152,7 @@ async def test_flow_import_without_name(hass: HomeAssistant) -> None:
     mocked_device.get_interface_information.assert_called_once()
 
 
-def _create_mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def _create_mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     MockConfigEntry(
         domain=DOMAIN,
         unique_id="uuid:0000",
@@ -160,7 +160,7 @@ def _create_mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
     ).add_to_hass(hass)
 
 
-async def test_ssdp_bravia(hass: HomeAssistant) -> None:
+async def test_ssdp_bravia(hass: SmartHub) -> None:
     """Test discovering a bravia TV."""
     ssdp_data = dataclasses.replace(SSDP_DATA)
     ssdp_data.upnp = copy.deepcopy(ssdp_data.upnp)
@@ -176,7 +176,7 @@ async def test_ssdp_bravia(hass: HomeAssistant) -> None:
     assert result["reason"] == "not_songpal_device"
 
 
-async def test_sddp_exist(hass: HomeAssistant) -> None:
+async def test_sddp_exist(hass: SmartHub) -> None:
     """Test discovering existed device."""
     _create_mock_config_entry(hass)
     result = await hass.config_entries.flow.async_init(
@@ -188,7 +188,7 @@ async def test_sddp_exist(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_user_exist(hass: HomeAssistant) -> None:
+async def test_user_exist(hass: SmartHub) -> None:
     """Test user adding existed device."""
     mocked_device = _create_mocked_device()
     _create_mock_config_entry(hass)
@@ -204,7 +204,7 @@ async def test_user_exist(hass: HomeAssistant) -> None:
     mocked_device.get_interface_information.assert_called_once()
 
 
-async def test_import_exist(hass: HomeAssistant) -> None:
+async def test_import_exist(hass: SmartHub) -> None:
     """Test importing existed device."""
     mocked_device = _create_mocked_device()
     _create_mock_config_entry(hass)
@@ -220,7 +220,7 @@ async def test_import_exist(hass: HomeAssistant) -> None:
     mocked_device.get_interface_information.assert_not_called()
 
 
-async def test_user_invalid(hass: HomeAssistant) -> None:
+async def test_user_invalid(hass: SmartHub) -> None:
     """Test using adding invalid config."""
     mocked_device = _create_mocked_device(True)
     _create_mock_config_entry(hass)
@@ -237,7 +237,7 @@ async def test_user_invalid(hass: HomeAssistant) -> None:
     mocked_device.get_interface_information.assert_not_called()
 
 
-async def test_import_invalid(hass: HomeAssistant) -> None:
+async def test_import_invalid(hass: SmartHub) -> None:
     """Test importing invalid config."""
     mocked_device = _create_mocked_device(True)
     _create_mock_config_entry(hass)

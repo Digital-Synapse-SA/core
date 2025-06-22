@@ -5,24 +5,24 @@ from typing import Any
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import setup
-from homeassistant.components import select, template
-from homeassistant.components.input_select import (
+from smarthub import setup
+from smarthub.components import select, template
+from smarthub.components.input_select import (
     ATTR_OPTION as INPUT_SELECT_ATTR_OPTION,
     ATTR_OPTIONS as INPUT_SELECT_ATTR_OPTIONS,
     DOMAIN as INPUT_SELECT_DOMAIN,
     SERVICE_SELECT_OPTION as INPUT_SELECT_SERVICE_SELECT_OPTION,
     SERVICE_SET_OPTIONS,
 )
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION as SELECT_ATTR_OPTION,
     ATTR_OPTIONS as SELECT_ATTR_OPTIONS,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION as SELECT_SERVICE_SELECT_OPTION,
 )
-from homeassistant.components.template import DOMAIN
-from homeassistant.components.template.const import CONF_PICTURE
-from homeassistant.const import (
+from smarthub.components.template import DOMAIN
+from smarthub.components.template.const import CONF_PICTURE
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_ENTITY_PICTURE,
     ATTR_ICON,
@@ -30,9 +30,9 @@ from homeassistant.const import (
     CONF_ICON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import Context, HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import Context, SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import ConfigurationStyle
 
@@ -63,7 +63,7 @@ TEST_OPTIONS = {
 
 
 async def async_setup_modern_format(
-    hass: HomeAssistant, count: int, select_config: dict[str, Any]
+    hass: SmartHub, count: int, select_config: dict[str, Any]
 ) -> None:
     """Do setup of select integration via new format."""
     config = {"template": {"select": select_config}}
@@ -81,7 +81,7 @@ async def async_setup_modern_format(
 
 
 async def async_setup_trigger_format(
-    hass: HomeAssistant, count: int, select_config: dict[str, Any]
+    hass: SmartHub, count: int, select_config: dict[str, Any]
 ) -> None:
     """Do setup of select integration via trigger format."""
     config = {"template": {**TEST_STATE_TRIGGER, "select": select_config}}
@@ -100,7 +100,7 @@ async def async_setup_trigger_format(
 
 @pytest.fixture
 async def setup_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     select_config: dict[str, Any],
@@ -117,7 +117,7 @@ async def setup_select(
 
 
 async def test_setup_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the config flow."""
@@ -143,7 +143,7 @@ async def test_setup_config_entry(
     assert state == snapshot
 
 
-async def test_missing_optional_config(hass: HomeAssistant) -> None:
+async def test_missing_optional_config(hass: SmartHub) -> None:
     """Test: missing optional template is ok."""
     with assert_setup_component(1, "template"):
         assert await setup.async_setup_component(
@@ -167,7 +167,7 @@ async def test_missing_optional_config(hass: HomeAssistant) -> None:
     _verify(hass, "a", ["a", "b"])
 
 
-async def test_multiple_configs(hass: HomeAssistant) -> None:
+async def test_multiple_configs(hass: SmartHub) -> None:
     """Test: multiple select entities get created."""
     with assert_setup_component(1, "template"):
         assert await setup.async_setup_component(
@@ -199,7 +199,7 @@ async def test_multiple_configs(hass: HomeAssistant) -> None:
     _verify(hass, "a", ["a", "b"], f"{_TEST_SELECT}_2")
 
 
-async def test_missing_required_keys(hass: HomeAssistant) -> None:
+async def test_missing_required_keys(hass: SmartHub) -> None:
     """Test: missing required fields will fail."""
     with assert_setup_component(0, "template"):
         assert await setup.async_setup_component(
@@ -251,7 +251,7 @@ async def test_missing_required_keys(hass: HomeAssistant) -> None:
 
 
 async def test_templates_with_entities(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, calls: list[ServiceCall]
+    hass: SmartHub, entity_registry: er.EntityRegistry, calls: list[ServiceCall]
 ) -> None:
     """Test templates with values from other entities."""
     with assert_setup_component(1, "input_select"):
@@ -349,7 +349,7 @@ async def test_templates_with_entities(
     assert calls[-1].data["option"] == "c"
 
 
-async def test_trigger_select(hass: HomeAssistant) -> None:
+async def test_trigger_select(hass: SmartHub) -> None:
     """Test trigger based template select."""
     events = async_capture_events(hass, "test_number_event")
     action_events = async_capture_events(hass, "action_event")
@@ -431,7 +431,7 @@ async def test_trigger_select(hass: HomeAssistant) -> None:
 
 
 def _verify(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_current_option: str,
     expected_options: list[str],
     entity_name: str = _TEST_SELECT,
@@ -471,7 +471,7 @@ def _verify(
 )
 @pytest.mark.usefixtures("setup_select")
 async def test_templated_optional_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     attribute: str,
     expected: str,
     initial_expected_state: str | None,
@@ -489,7 +489,7 @@ async def test_templated_optional_config(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -548,7 +548,7 @@ async def test_device_id(
         ConfigurationStyle.MODERN,
     ],
 )
-async def test_empty_action_config(hass: HomeAssistant, setup_select) -> None:
+async def test_empty_action_config(hass: SmartHub, setup_select) -> None:
     """Test configuration with empty script."""
     await hass.services.async_call(
         select.DOMAIN,

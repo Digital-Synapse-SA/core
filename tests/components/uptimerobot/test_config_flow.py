@@ -5,11 +5,11 @@ from unittest.mock import patch
 import pytest
 from pyuptimerobot import UptimeRobotAuthenticationException, UptimeRobotException
 
-from homeassistant import config_entries
-from homeassistant.components.uptimerobot.const import DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.uptimerobot.const import DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .common import (
     MOCK_UPTIMEROBOT_ACCOUNT,
@@ -24,7 +24,7 @@ from .common import (
 from tests.common import MockConfigEntry
 
 
-async def test_user(hass: HomeAssistant) -> None:
+async def test_user(hass: SmartHub) -> None:
     """Test user flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -39,7 +39,7 @@ async def test_user(hass: HomeAssistant) -> None:
             return_value=mock_uptimerobot_api_response(key=MockApiResponseKey.ACCOUNT),
         ),
         patch(
-            "homeassistant.components.uptimerobot.async_setup_entry",
+            "smarthub.components.uptimerobot.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -56,7 +56,7 @@ async def test_user(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_key_read_only(hass: HomeAssistant) -> None:
+async def test_user_key_read_only(hass: SmartHub) -> None:
     """Test user flow with read only key."""
 
     result = await hass.config_entries.flow.async_init(
@@ -87,7 +87,7 @@ async def test_user_key_read_only(hass: HomeAssistant) -> None:
         (UptimeRobotAuthenticationException, "invalid_api_key"),
     ],
 )
-async def test_exception_thrown(hass: HomeAssistant, exception, error_key) -> None:
+async def test_exception_thrown(hass: SmartHub, exception, error_key) -> None:
     """Test user flow throwing exceptions."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -106,7 +106,7 @@ async def test_exception_thrown(hass: HomeAssistant, exception, error_key) -> No
     assert result2["errors"]["base"] == error_key
 
 
-async def test_api_error(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_api_error(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test expected API error is catch."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -126,7 +126,7 @@ async def test_api_error(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) 
 
 
 async def test_user_unique_id_already_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test creating an entry where the unique_id already exists."""
     entry = MockConfigEntry(**MOCK_UPTIMEROBOT_CONFIG_ENTRY_DATA)
@@ -144,7 +144,7 @@ async def test_user_unique_id_already_exists(
             return_value=mock_uptimerobot_api_response(key=MockApiResponseKey.ACCOUNT),
         ),
         patch(
-            "homeassistant.components.uptimerobot.async_setup_entry",
+            "smarthub.components.uptimerobot.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -160,7 +160,7 @@ async def test_user_unique_id_already_exists(
 
 
 async def test_reauthentication(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test UptimeRobot reauthentication."""
     old_entry = MockConfigEntry(**MOCK_UPTIMEROBOT_CONFIG_ENTRY_DATA)
@@ -178,7 +178,7 @@ async def test_reauthentication(
             return_value=mock_uptimerobot_api_response(key=MockApiResponseKey.ACCOUNT),
         ),
         patch(
-            "homeassistant.components.uptimerobot.async_setup_entry",
+            "smarthub.components.uptimerobot.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -193,7 +193,7 @@ async def test_reauthentication(
 
 
 async def test_reauthentication_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test UptimeRobot reauthentication failure."""
     old_entry = MockConfigEntry(**MOCK_UPTIMEROBOT_CONFIG_ENTRY_DATA)
@@ -211,7 +211,7 @@ async def test_reauthentication_failure(
             return_value=mock_uptimerobot_api_response(key=MockApiResponseKey.ERROR),
         ),
         patch(
-            "homeassistant.components.uptimerobot.async_setup_entry",
+            "smarthub.components.uptimerobot.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -227,7 +227,7 @@ async def test_reauthentication_failure(
 
 
 async def test_reauthentication_failure_no_existing_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test UptimeRobot reauthentication with no existing entry."""
     old_entry = MockConfigEntry(
@@ -247,7 +247,7 @@ async def test_reauthentication_failure_no_existing_entry(
             return_value=mock_uptimerobot_api_response(key=MockApiResponseKey.ACCOUNT),
         ),
         patch(
-            "homeassistant.components.uptimerobot.async_setup_entry",
+            "smarthub.components.uptimerobot.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -262,7 +262,7 @@ async def test_reauthentication_failure_no_existing_entry(
 
 
 async def test_reauthentication_failure_account_not_matching(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test UptimeRobot reauthentication failure when using another account."""
     old_entry = MockConfigEntry(**MOCK_UPTIMEROBOT_CONFIG_ENTRY_DATA)
@@ -283,7 +283,7 @@ async def test_reauthentication_failure_account_not_matching(
             ),
         ),
         patch(
-            "homeassistant.components.uptimerobot.async_setup_entry",
+            "smarthub.components.uptimerobot.async_setup_entry",
             return_value=True,
         ),
     ):

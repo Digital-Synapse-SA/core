@@ -8,13 +8,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 from tesla_wall_connector.wall_connector import Lifetime, Version, Vitals
 
-from homeassistant.components.tesla_wall_connector.const import (
+from smarthub.components.tesla_wall_connector.const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
-from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.const import CONF_HOST, CONF_SCAN_INTERVAL
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -34,7 +34,7 @@ def mock_wall_connector_version():
 async def mock_wall_connector_setup():
     """Mock component setup."""
     with patch(
-        "homeassistant.components.tesla_wall_connector.async_setup_entry",
+        "smarthub.components.tesla_wall_connector.async_setup_entry",
         return_value=True,
     ):
         yield
@@ -52,7 +52,7 @@ def get_default_version_data():
 
 
 async def create_wall_connector_entry(
-    hass: HomeAssistant, side_effect=None, vitals_data=None, lifetime_data=None
+    hass: SmartHub, side_effect=None, vitals_data=None, lifetime_data=None
 ) -> MockConfigEntry:
     """Create a wall connector entry in hass."""
     entry = MockConfigEntry(
@@ -122,7 +122,7 @@ class EntityAndExpectedValues:
 
 
 async def _test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entities_and_expected_values,
     vitals_first_update: Vitals,
     vitals_second_update: Vitals,

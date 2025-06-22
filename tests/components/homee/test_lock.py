@@ -5,15 +5,15 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.lock import (
+from smarthub.components.lock import (
     DOMAIN as LOCK_DOMAIN,
     SERVICE_LOCK,
     SERVICE_UNLOCK,
     LockState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import build_mock_node, setup_integration
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def setup_lock(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homee: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homee: MagicMock
 ) -> None:
     """Setups the integration lock tests."""
     mock_homee.nodes = [build_mock_node("lock.json")]
@@ -37,7 +37,7 @@ async def setup_lock(
     ],
 )
 async def test_lock_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     service: str,
@@ -64,7 +64,7 @@ async def test_lock_services(
     ],
 )
 async def test_lock_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     target_value: float,
@@ -92,7 +92,7 @@ async def test_lock_state(
     ],
 )
 async def test_lock_changed_by(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     attr_changed_by: int,
@@ -112,7 +112,7 @@ async def test_lock_changed_by(
 
 
 async def test_lock_changed_by_unknown_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
 ) -> None:
@@ -129,14 +129,14 @@ async def test_lock_changed_by_unknown_user(
 
 
 async def test_lock_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the lock snapshots."""
-    with patch("homeassistant.components.homee.PLATFORMS", [Platform.LOCK]):
+    with patch("smarthub.components.homee.PLATFORMS", [Platform.LOCK]):
         await setup_lock(hass, mock_config_entry, mock_homee)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

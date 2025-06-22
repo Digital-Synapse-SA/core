@@ -5,12 +5,12 @@ from unittest.mock import Mock, PropertyMock, patch
 
 from romy import RomyRobot
 
-from homeassistant import config_entries
-from homeassistant.components.romy.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import (
+from smarthub import config_entries
+from smarthub.components.romy.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
@@ -44,12 +44,12 @@ INPUT_CONFIG_HOST = {
 }
 
 
-async def test_show_user_form_robot_is_offline_and_locked(hass: HomeAssistant) -> None:
+async def test_show_user_form_robot_is_offline_and_locked(hass: SmartHub) -> None:
     """Test that the user set up form with config."""
 
     # Robot not reachable
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(False, False),
     ):
         result1 = await hass.config_entries.flow.async_init(
@@ -64,7 +64,7 @@ async def test_show_user_form_robot_is_offline_and_locked(hass: HomeAssistant) -
 
     # Robot is locked
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(True, False),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -76,7 +76,7 @@ async def test_show_user_form_robot_is_offline_and_locked(hass: HomeAssistant) -
 
     # Robot is initialized and unlocked
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(True, True),
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -87,11 +87,11 @@ async def test_show_user_form_robot_is_offline_and_locked(hass: HomeAssistant) -
         assert result3["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_show_user_form_robot_unlock_with_password(hass: HomeAssistant) -> None:
+async def test_show_user_form_robot_unlock_with_password(hass: SmartHub) -> None:
     """Test that the user set up form with config."""
 
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(True, False),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -101,7 +101,7 @@ async def test_show_user_form_robot_unlock_with_password(hass: HomeAssistant) ->
         )
 
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(True, False),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -113,7 +113,7 @@ async def test_show_user_form_robot_unlock_with_password(hass: HomeAssistant) ->
         assert result2["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(False, False),
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -125,7 +125,7 @@ async def test_show_user_form_robot_unlock_with_password(hass: HomeAssistant) ->
         assert result3["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(True, True),
     ):
         result4 = await hass.config_entries.flow.async_configure(
@@ -136,12 +136,12 @@ async def test_show_user_form_robot_unlock_with_password(hass: HomeAssistant) ->
         assert result4["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_show_user_form_robot_reachable_again(hass: HomeAssistant) -> None:
+async def test_show_user_form_robot_reachable_again(hass: SmartHub) -> None:
     """Test that the user set up form with config."""
 
     # Robot not reachable
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(False, False),
     ):
         result1 = await hass.config_entries.flow.async_init(
@@ -156,7 +156,7 @@ async def test_show_user_form_robot_reachable_again(hass: HomeAssistant) -> None
 
     # Robot is locked
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(True, True),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -178,11 +178,11 @@ DISCOVERY_INFO = ZeroconfServiceInfo(
 )
 
 
-async def test_zero_conf_locked_interface_robot(hass: HomeAssistant) -> None:
+async def test_zero_conf_locked_interface_robot(hass: SmartHub) -> None:
     """Test zerconf which discovered locked robot."""
 
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(True, False),
     ):
         result1 = await hass.config_entries.flow.async_init(
@@ -195,7 +195,7 @@ async def test_zero_conf_locked_interface_robot(hass: HomeAssistant) -> None:
     assert result1["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(True, True),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -206,11 +206,11 @@ async def test_zero_conf_locked_interface_robot(hass: HomeAssistant) -> None:
         assert result2["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_zero_conf_uninitialized_robot(hass: HomeAssistant) -> None:
+async def test_zero_conf_uninitialized_robot(hass: SmartHub) -> None:
     """Test zerconf which discovered locked robot."""
 
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(False, False),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -223,11 +223,11 @@ async def test_zero_conf_uninitialized_robot(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.ABORT
 
 
-async def test_zero_conf_unlocked_interface_robot(hass: HomeAssistant) -> None:
+async def test_zero_conf_unlocked_interface_robot(hass: SmartHub) -> None:
     """Test zerconf which discovered already unlocked robot."""
 
     with patch(
-        "homeassistant.components.romy.config_flow.romy.create_romy",
+        "smarthub.components.romy.config_flow.romy.create_romy",
         return_value=_create_mocked_romy(True, True),
     ):
         result = await hass.config_entries.flow.async_init(

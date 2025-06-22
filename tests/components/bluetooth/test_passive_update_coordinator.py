@@ -10,20 +10,20 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     DOMAIN,
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
     BluetoothChange,
     BluetoothScanningMode,
 )
-from homeassistant.components.bluetooth.passive_update_coordinator import (
+from smarthub.components.bluetooth.passive_update_coordinator import (
     PassiveBluetoothCoordinatorEntity,
     PassiveBluetoothDataUpdateCoordinator,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     inject_bluetooth_service_info,
@@ -54,7 +54,7 @@ class MyCoordinator(PassiveBluetoothDataUpdateCoordinator):
 
     def __init__(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         logger: logging.Logger,
         device_id: str,
         mode: BluetoothScanningMode,
@@ -74,7 +74,7 @@ class MyCoordinator(PassiveBluetoothDataUpdateCoordinator):
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_basic_usage(hass: HomeAssistant) -> None:
+async def test_basic_usage(hass: SmartHub) -> None:
     """Test basic usage of the PassiveBluetoothDataUpdateCoordinator."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     coordinator = MyCoordinator(
@@ -104,7 +104,7 @@ async def test_basic_usage(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
 async def test_context_compatiblity_with_data_update_coordinator(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test contexts can be passed for compatibility with DataUpdateCoordinator."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -141,7 +141,7 @@ async def test_context_compatiblity_with_data_update_coordinator(
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
 async def test_unavailable_callbacks_mark_the_coordinator_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that the coordinator goes unavailable when the bluetooth stack no longer sees the device."""
     start_monotonic = time.monotonic()
@@ -200,7 +200,7 @@ async def test_unavailable_callbacks_mark_the_coordinator_unavailable(
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_passive_bluetooth_coordinator_entity(hass: HomeAssistant) -> None:
+async def test_passive_bluetooth_coordinator_entity(hass: SmartHub) -> None:
     """Test integration of PassiveBluetoothDataUpdateCoordinator with PassiveBluetoothCoordinatorEntity."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     coordinator = MyCoordinator(

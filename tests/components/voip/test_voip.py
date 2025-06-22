@@ -11,21 +11,21 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from voip_utils import CallInfo
 
-from homeassistant.components import assist_pipeline, assist_satellite, tts, voip
-from homeassistant.components.assist_satellite import AssistSatelliteEntity
+from smarthub.components import assist_pipeline, assist_satellite, tts, voip
+from smarthub.components.assist_satellite import AssistSatelliteEntity
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.assist_satellite.entity import AssistSatelliteState
-from homeassistant.components.voip import DOMAIN, HassVoipDatagramProtocol
-from homeassistant.components.voip.assist_satellite import Tones, VoipAssistSatellite
-from homeassistant.components.voip.devices import VoIPDevice, VoIPDevices
-from homeassistant.components.voip.voip import PreRecordMessageProtocol, make_protocol
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import EntityComponent
-from homeassistant.setup import async_setup_component
+from smarthub.components.assist_satellite.entity import AssistSatelliteState
+from smarthub.components.voip import DOMAIN, HassVoipDatagramProtocol
+from smarthub.components.voip.assist_satellite import Tones, VoipAssistSatellite
+from smarthub.components.voip.devices import VoIPDevice, VoIPDevices
+from smarthub.components.voip.voip import PreRecordMessageProtocol, make_protocol
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import EntityComponent
+from smarthub.setup import async_setup_component
 
 from tests.components.tts.common import MockResultStream
 
@@ -51,7 +51,7 @@ def _empty_wav(framerate=16000) -> bytes:
 
 
 def async_get_satellite_entity(
-    hass: HomeAssistant, domain: str, unique_id_prefix: str
+    hass: SmartHub, domain: str, unique_id_prefix: str
 ) -> AssistSatelliteEntity | None:
     """Get Assist satellite entity."""
     ent_reg = er.async_get(hass)
@@ -69,7 +69,7 @@ def async_get_satellite_entity(
 
 
 async def test_is_valid_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
     call_info: CallInfo,
@@ -94,7 +94,7 @@ async def test_is_valid_call(
 
 
 async def test_calls_not_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
     call_info: CallInfo,
@@ -130,7 +130,7 @@ async def test_calls_not_allowed(
 
 
 async def test_pipeline_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
     call_info: CallInfo,
@@ -140,7 +140,7 @@ async def test_pipeline_not_found(
     assert await async_setup_component(hass, "voip", {})
 
     with patch(
-        "homeassistant.components.voip.voip.async_get_pipeline", return_value=None
+        "smarthub.components.voip.voip.async_get_pipeline", return_value=None
     ):
         protocol: PreRecordMessageProtocol = make_protocol(
             hass, voip_devices, call_info
@@ -151,7 +151,7 @@ async def test_pipeline_not_found(
 
 
 async def test_satellite_prepared(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
     call_info: CallInfo,
@@ -179,7 +179,7 @@ async def test_satellite_prepared(
 
     with (
         patch(
-            "homeassistant.components.voip.voip.async_get_pipeline",
+            "smarthub.components.voip.voip.async_get_pipeline",
             return_value=pipeline,
         ),
     ):
@@ -188,7 +188,7 @@ async def test_satellite_prepared(
 
 
 async def test_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
     call_info: CallInfo,
@@ -210,7 +210,7 @@ async def test_pipeline(
     bad_chunk = bytes([1, 2, 3, 4])
 
     async def async_pipeline_from_audio_stream(
-        hass: HomeAssistant,
+        hass: SmartHub,
         context: Context,
         *args,
         device_id: str | None,
@@ -329,7 +329,7 @@ async def test_pipeline(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
         patch.object(satellite, "tts_response_finished", tts_response_finished),
@@ -366,7 +366,7 @@ async def test_pipeline(
 
 
 async def test_stt_stream_timeout(
-    hass: HomeAssistant, voip_devices: VoIPDevices, voip_device: VoIPDevice
+    hass: SmartHub, voip_devices: VoIPDevices, voip_device: VoIPDevice
 ) -> None:
     """Test timeout in STT stream during pipeline run."""
     assert await async_setup_component(hass, "voip", {})
@@ -383,7 +383,7 @@ async def test_stt_stream_timeout(
             pass
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
         new=async_pipeline_from_audio_stream,
     ):
         satellite._tones = Tones(0)
@@ -403,7 +403,7 @@ async def test_stt_stream_timeout(
 
 
 async def test_tts_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
 ) -> None:
@@ -465,7 +465,7 @@ async def test_tts_timeout(
         await asyncio.sleep(2)
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
         new=async_pipeline_from_audio_stream,
     ):
         satellite._tts_extra_timeout = 0.001
@@ -502,7 +502,7 @@ async def test_tts_timeout(
 
 
 async def test_tts_wrong_extension(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
 ) -> None:
@@ -556,7 +556,7 @@ async def test_tts_wrong_extension(
         )
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
         new=async_pipeline_from_audio_stream,
     ):
         original_send_tts = satellite._send_tts
@@ -595,7 +595,7 @@ async def test_tts_wrong_extension(
 
 
 async def test_tts_wrong_wav_format(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
 ) -> None:
@@ -649,7 +649,7 @@ async def test_tts_wrong_wav_format(
         )
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
         new=async_pipeline_from_audio_stream,
     ):
         original_send_tts = satellite._send_tts
@@ -688,7 +688,7 @@ async def test_tts_wrong_wav_format(
 
 
 async def test_empty_tts_output(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
 ) -> None:
@@ -739,11 +739,11 @@ async def test_empty_tts_output(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
         patch(
-            "homeassistant.components.voip.assist_satellite.VoipAssistSatellite._send_tts",
+            "smarthub.components.voip.assist_satellite.VoipAssistSatellite._send_tts",
         ) as mock_send_tts,
     ):
         satellite.connection_made(Mock())
@@ -773,7 +773,7 @@ async def test_empty_tts_output(
 
 
 async def test_pipeline_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
     snapshot: SnapshotAssertion,
@@ -806,7 +806,7 @@ async def test_pipeline_error(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
     ):
@@ -826,7 +826,7 @@ async def test_pipeline_error(
 
 @pytest.mark.usefixtures("socket_enabled")
 async def test_announce(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
 ) -> None:
@@ -840,7 +840,7 @@ async def test_announce(
         & assist_satellite.AssistSatelliteEntityFeature.ANNOUNCE
     )
 
-    with pytest.raises(HomeAssistantError) as err:
+    with pytest.raises(SmartHubError) as err:
         await hass.services.async_call(
             "assist_satellite",
             "announce",
@@ -868,7 +868,7 @@ async def test_announce(
 
     with (
         patch(
-            "homeassistant.components.voip.assist_satellite.VoipAssistSatellite._send_tts",
+            "smarthub.components.voip.assist_satellite.VoipAssistSatellite._send_tts",
         ) as mock_send_tts,
     ):
         announce_task = hass.async_create_background_task(
@@ -894,7 +894,7 @@ async def test_announce(
 
 @pytest.mark.usefixtures("socket_enabled")
 async def test_voip_id_is_ip_address(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
 ) -> None:
@@ -924,7 +924,7 @@ async def test_voip_id_is_ip_address(
     with (
         patch.object(voip_device, "voip_id", "192.168.68.10"),
         patch(
-            "homeassistant.components.voip.assist_satellite.VoipAssistSatellite._send_tts",
+            "smarthub.components.voip.assist_satellite.VoipAssistSatellite._send_tts",
         ) as mock_send_tts,
     ):
         announce_task = hass.async_create_background_task(
@@ -954,7 +954,7 @@ async def test_voip_id_is_ip_address(
 
 @pytest.mark.usefixtures("socket_enabled")
 async def test_announce_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
 ) -> None:
@@ -985,7 +985,7 @@ async def test_announce_timeout(
     # Very short timeout which will trigger because we don't send any audio in
     with (
         patch(
-            "homeassistant.components.voip.assist_satellite._ANNOUNCEMENT_RING_TIMEOUT",
+            "smarthub.components.voip.assist_satellite._ANNOUNCEMENT_RING_TIMEOUT",
             0.01,
         ),
     ):
@@ -996,7 +996,7 @@ async def test_announce_timeout(
 
 @pytest.mark.usefixtures("socket_enabled")
 async def test_start_conversation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
 ) -> None:
@@ -1029,7 +1029,7 @@ async def test_start_conversation(
         tts_sent.set()
 
     async def async_pipeline_from_audio_stream(
-        hass: HomeAssistant,
+        hass: SmartHub,
         context: Context,
         *args,
         device_id: str | None,
@@ -1068,11 +1068,11 @@ async def test_start_conversation(
 
     with (
         patch(
-            "homeassistant.components.voip.assist_satellite.VoipAssistSatellite._send_tts",
+            "smarthub.components.voip.assist_satellite.VoipAssistSatellite._send_tts",
             new=_send_tts,
         ),
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
     ):
@@ -1104,7 +1104,7 @@ async def test_start_conversation(
 
 @pytest.mark.usefixtures("socket_enabled")
 async def test_start_conversation_user_doesnt_pick_up(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     voip_device: VoIPDevice,
 ) -> None:
@@ -1135,7 +1135,7 @@ async def test_start_conversation_user_doesnt_pick_up(
     # Very short timeout which will trigger because we don't send any audio in
     with (
         patch(
-            "homeassistant.components.voip.assist_satellite._ANNOUNCEMENT_RING_TIMEOUT",
+            "smarthub.components.voip.assist_satellite._ANNOUNCEMENT_RING_TIMEOUT",
             0.1,
         ),
     ):

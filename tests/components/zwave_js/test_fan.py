@@ -8,7 +8,7 @@ from zwave_js_server.const import CommandClass
 from zwave_js_server.event import Event
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     ATTR_PERCENTAGE_STEP,
     ATTR_PRESET_MODE,
@@ -19,8 +19,8 @@ from homeassistant.components.fan import (
     FanEntityFeature,
     NotValidPresetModeError,
 )
-from homeassistant.components.zwave_js.fan import ATTR_FAN_STATE
-from homeassistant.const import (
+from smarthub.components.zwave_js.fan import ATTR_FAN_STATE
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     SERVICE_TURN_OFF,
@@ -31,9 +31,9 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 
 @pytest.fixture
@@ -43,7 +43,7 @@ def platforms() -> list[str]:
 
 
 async def test_generic_fan(
-    hass: HomeAssistant, client, fan_generic, integration
+    hass: SmartHub, client, fan_generic, integration
 ) -> None:
     """Test the fan entity for a generic fan that lacks specific speed configuration."""
     node = fan_generic
@@ -229,7 +229,7 @@ async def test_generic_fan(
 
 
 async def test_configurable_speeds_fan(
-    hass: HomeAssistant, client, hs_fc200, integration
+    hass: SmartHub, client, hs_fc200, integration
 ) -> None:
     """Test a fan entity with configurable speeds."""
     node = hs_fc200
@@ -299,7 +299,7 @@ async def test_configurable_speeds_fan(
 
 
 async def test_configurable_speeds_fan_with_missing_config_value(
-    hass: HomeAssistant, client, hs_fc200_state, integration
+    hass: SmartHub, client, hs_fc200_state, integration
 ) -> None:
     """Test a fan entity with configurable speeds."""
     entity_id = "fan.scene_capable_fan_control_switch"
@@ -327,7 +327,7 @@ async def test_configurable_speeds_fan_with_missing_config_value(
 
 
 async def test_configurable_speeds_fan_with_bad_config_value(
-    hass: HomeAssistant, client, hs_fc200_state, integration
+    hass: SmartHub, client, hs_fc200_state, integration
 ) -> None:
     """Test a fan entity with configurable speeds."""
     entity_id = "fan.scene_capable_fan_control_switch"
@@ -356,7 +356,7 @@ async def test_configurable_speeds_fan_with_bad_config_value(
     assert state.state == STATE_UNAVAILABLE
 
 
-async def test_ge_12730_fan(hass: HomeAssistant, client, ge_12730, integration) -> None:
+async def test_ge_12730_fan(hass: SmartHub, client, ge_12730, integration) -> None:
     """Test a GE 12730 fan with 3 fixed speeds."""
     node = ge_12730
     node_id = 24
@@ -448,7 +448,7 @@ async def test_ge_12730_fan(hass: HomeAssistant, client, ge_12730, integration) 
 
 
 async def test_inovelli_lzw36(
-    hass: HomeAssistant, client, inovelli_lzw36, integration
+    hass: SmartHub, client, inovelli_lzw36, integration
 ) -> None:
     """Test an LZW36."""
     node = inovelli_lzw36
@@ -556,7 +556,7 @@ async def test_inovelli_lzw36(
 
 
 async def test_leviton_zw4sf_fan(
-    hass: HomeAssistant, client, leviton_zw4sf, integration
+    hass: SmartHub, client, leviton_zw4sf, integration
 ) -> None:
     """Test a Leviton ZW4SF fan with 4 fixed speeds."""
     node = leviton_zw4sf
@@ -627,7 +627,7 @@ async def test_leviton_zw4sf_fan(
 
 
 async def test_thermostat_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_adc_t3000,
     integration,
@@ -867,7 +867,7 @@ async def test_thermostat_fan(
 
 
 async def test_thermostat_fan_without_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus,
     integration,
@@ -899,7 +899,7 @@ async def test_thermostat_fan_without_off(
     assert state.state == STATE_UNKNOWN
 
     # Test turning off
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             FAN_DOMAIN,
             SERVICE_TURN_OFF,
@@ -913,7 +913,7 @@ async def test_thermostat_fan_without_off(
     client.async_send_command.reset_mock()
 
     # Test turning on
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             FAN_DOMAIN,
             SERVICE_TURN_ON,
@@ -928,7 +928,7 @@ async def test_thermostat_fan_without_off(
 
 
 async def test_thermostat_fan_without_preset_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_adc_t3000_missing_fan_mode_states,
     integration,
@@ -961,7 +961,7 @@ async def test_thermostat_fan_without_preset_modes(
 
 
 async def test_honeywell_39358_fan(
-    hass: HomeAssistant, client, fan_honeywell_39358, integration
+    hass: SmartHub, client, fan_honeywell_39358, integration
 ) -> None:
     """Test a Honeywell 39358 fan with 3 fixed speeds."""
     node = fan_honeywell_39358

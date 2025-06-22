@@ -7,10 +7,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.recorder.statistics import statistics_during_period
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.recorder.statistics import statistics_during_period
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import extend_statistics
 
@@ -20,7 +20,7 @@ from tests.components.recorder.common import async_wait_recording_done
 
 @pytest.mark.usefixtures("recorder_mock", "entity_registry_enabled_by_default")
 async def test_statistics_import(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     mock_ista: MagicMock,
@@ -88,7 +88,7 @@ async def test_statistics_import(
 
 @pytest.mark.usefixtures("recorder_mock", "mock_ista")
 async def test_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
 ) -> None:
     """Test remove config entry and clear statistics."""

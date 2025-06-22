@@ -4,13 +4,13 @@ from unittest.mock import MagicMock, patch
 
 from homewizard_energy.errors import DisabledError
 
-from homeassistant.components.homewizard.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.homewizard.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.components.repairs import (
@@ -22,7 +22,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_repair_acquires_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homewizardenergy: MagicMock,
     mock_homewizardenergy_v2: MagicMock,
@@ -41,7 +41,7 @@ async def test_repair_acquires_token(
     )
     await hass.async_block_till_done()
 
-    with patch("homeassistant.components.homewizard.has_v2_api", return_value=True):
+    with patch("smarthub.components.homewizard.has_v2_api", return_value=True):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
 

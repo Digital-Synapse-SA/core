@@ -6,19 +6,19 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 import voluptuous as vol
 
-from homeassistant import config
-from homeassistant.const import SERVICE_RELOAD
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigValidationError, HomeAssistantError
-from homeassistant.helpers.entity_component import EntityComponent
-from homeassistant.helpers.entity_platform import async_get_platforms
-from homeassistant.helpers.reload import (
+from smarthub import config
+from smarthub.const import SERVICE_RELOAD
+from smarthub.core import SmartHub
+from smarthub.exceptions import ConfigValidationError, SmartHubError
+from smarthub.helpers.entity_component import EntityComponent
+from smarthub.helpers.entity_platform import async_get_platforms
+from smarthub.helpers.reload import (
     async_get_platform_without_config_entry,
     async_integration_yaml_config,
     async_reload_integration_platforms,
     async_setup_reload_service,
 )
-from homeassistant.loader import async_get_integration
+from smarthub.loader import async_get_integration
 
 from tests.common import (
     MockModule,
@@ -33,7 +33,7 @@ DOMAIN = "test_domain"
 PLATFORM = "test_platform"
 
 
-async def test_reload_platform(hass: HomeAssistant) -> None:
+async def test_reload_platform(hass: SmartHub) -> None:
     """Test the polling of only updated entities."""
     component_setup = Mock(return_value=True)
 
@@ -73,7 +73,7 @@ async def test_reload_platform(hass: HomeAssistant) -> None:
     assert not async_get_platform_without_config_entry(hass, PLATFORM, DOMAIN)
 
 
-async def test_setup_reload_service(hass: HomeAssistant) -> None:
+async def test_setup_reload_service(hass: SmartHub) -> None:
     """Test setting up a reload service."""
     component_setup = Mock(return_value=True)
 
@@ -113,7 +113,7 @@ async def test_setup_reload_service(hass: HomeAssistant) -> None:
 
 
 async def test_setup_reload_service_when_async_process_component_config_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test setting up a reload service with the config processing failing."""
     component_setup = Mock(return_value=True)
@@ -161,7 +161,7 @@ async def test_setup_reload_service_when_async_process_component_config_fails(
 
 
 async def test_setup_reload_service_with_platform_that_provides_async_reset_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test setting up a reload service using a platform that has its own async_reset_platform."""
     component_setup = AsyncMock(return_value=True)
@@ -209,7 +209,7 @@ async def test_setup_reload_service_with_platform_that_provides_async_reset_plat
     assert len(async_reset_platform_called) == 1
 
 
-async def test_async_integration_yaml_config(hass: HomeAssistant) -> None:
+async def test_async_integration_yaml_config(hass: SmartHub) -> None:
     """Test loading yaml config for an integration."""
     mock_integration(hass, MockModule(DOMAIN))
 
@@ -224,7 +224,7 @@ async def test_async_integration_yaml_config(hass: HomeAssistant) -> None:
         assert processed_config == {DOMAIN: [{"name": "one"}, {"name": "two"}]}
 
 
-async def test_async_integration_failing_yaml_config(hass: HomeAssistant) -> None:
+async def test_async_integration_failing_yaml_config(hass: SmartHub) -> None:
     """Test reloading yaml config for an integration fails.
 
     In case an integration reloads its yaml configuration it should throw when
@@ -244,7 +244,7 @@ async def test_async_integration_failing_yaml_config(hass: HomeAssistant) -> Non
             await async_integration_yaml_config(hass, DOMAIN, raise_on_failure=True)
 
 
-async def test_async_integration_failing_on_reload(hass: HomeAssistant) -> None:
+async def test_async_integration_failing_on_reload(hass: SmartHub) -> None:
     """Test reloading yaml config for an integration fails with an other exception.
 
     In case an integration reloads its yaml configuration it should throw when
@@ -256,16 +256,16 @@ async def test_async_integration_failing_on_reload(hass: HomeAssistant) -> None:
     with (
         patch.object(config, "YAML_CONFIG_FILE", yaml_path),
         patch(
-            "homeassistant.config.async_process_component_config",
-            side_effect=HomeAssistantError(),
+            "smarthub.config.async_process_component_config",
+            side_effect=SmartHubError(),
         ),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         # Test fetching yaml config does raise when the raise_on_failure option is set
         await async_integration_yaml_config(hass, DOMAIN, raise_on_failure=True)
 
 
-async def test_async_integration_missing_yaml_config(hass: HomeAssistant) -> None:
+async def test_async_integration_missing_yaml_config(hass: SmartHub) -> None:
     """Test loading missing yaml config for an integration."""
     mock_integration(hass, MockModule(DOMAIN))
 

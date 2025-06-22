@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, patch
 
 from govee_local_api import GoveeDevice
 
-from homeassistant import config_entries
-from homeassistant.components.govee_light_local.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.govee_light_local.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import DEFAULT_CAPABILITIES
 
@@ -26,14 +26,14 @@ def _get_devices(mock_govee_api: AsyncMock) -> list[GoveeDevice]:
 
 
 async def test_creating_entry_has_no_devices(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_govee_api: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_govee_api: AsyncMock
 ) -> None:
     """Test setting up Govee with no devices."""
 
     mock_govee_api.devices = []
 
     with patch(
-        "homeassistant.components.govee_light_local.config_flow.DISCOVERY_TIMEOUT",
+        "smarthub.components.govee_light_local.config_flow.DISCOVERY_TIMEOUT",
         0,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -53,7 +53,7 @@ async def test_creating_entry_has_no_devices(
 
 
 async def test_creating_entry_has_with_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_govee_api: AsyncMock,
 ) -> None:
@@ -78,7 +78,7 @@ async def test_creating_entry_has_with_devices(
 
 
 async def test_creating_entry_errno(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_govee_api: AsyncMock,
 ) -> None:

@@ -37,7 +37,7 @@ COPROCESSOR_VERSION = "OPENTHREAD/thread-reference-20200818-1740-g33cc75ed3; NRF
 
 ROUTER_DISCOVERY_HASS = {
     "type_": "_meshcop._udp.local.",
-    "name": "HomeAssistant OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
+    "name": "SmartHub OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
     "addresses": [b"\xc0\xa8\x00s"],
     "port": 49153,
     "weight": 0,
@@ -46,7 +46,7 @@ ROUTER_DISCOVERY_HASS = {
     "properties": {
         b"rv": b"1",
         b"id": b"#\x0cj\x1a\xc5\x7foK\xe2b\xac\xf3.^\xf5,",
-        b"vn": b"HomeAssistant",
+        b"vn": b"SmartHub",
         b"mn": b"OpenThreadBorderRouter",
         b"nn": b"OpenThread HC",
         b"xp": b"\xe6\x0f\xc7\xc1\x86!,\xe5",

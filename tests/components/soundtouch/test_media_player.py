@@ -5,7 +5,7 @@ from typing import Any
 
 from requests_mock import Mocker
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_MEDIA_ALBUM_NAME,
     ATTR_MEDIA_ARTIST,
@@ -17,29 +17,29 @@ from homeassistant.components.media_player import (
     ATTR_MEDIA_VOLUME_MUTED,
     DOMAIN as MEDIA_PLAYER_DOMAIN,
 )
-from homeassistant.components.soundtouch.const import (
+from smarthub.components.soundtouch.const import (
     DOMAIN,
     SERVICE_ADD_ZONE_SLAVE,
     SERVICE_CREATE_ZONE,
     SERVICE_PLAY_EVERYWHERE,
     SERVICE_REMOVE_ZONE_SLAVE,
 )
-from homeassistant.components.soundtouch.media_player import (
+from smarthub.components.soundtouch.media_player import (
     ATTR_SOUNDTOUCH_GROUP,
     ATTR_SOUNDTOUCH_ZONE,
 )
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import STATE_OFF, STATE_PAUSED, STATE_PLAYING
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import STATE_OFF, STATE_PAUSED, STATE_PLAYING
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .conftest import DEVICE_1_ENTITY_ID, DEVICE_2_ENTITY_ID
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def setup_soundtouch(hass: HomeAssistant, *mock_entries: MockConfigEntry):
+async def setup_soundtouch(hass: SmartHub, *mock_entries: MockConfigEntry):
     """Initialize media_player for tests."""
     assert await async_setup_component(hass, MEDIA_PLAYER_DOMAIN, {})
 
@@ -50,7 +50,7 @@ async def setup_soundtouch(hass: HomeAssistant, *mock_entries: MockConfigEntry):
 
 
 async def _test_key_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock_key,
     service: str,
     service_data: dict[str, Any],
@@ -64,7 +64,7 @@ async def _test_key_service(
 
 
 async def test_playing_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
 ) -> None:
@@ -81,7 +81,7 @@ async def test_playing_media(
 
 
 async def test_playing_radio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_radio,
 ) -> None:
@@ -94,7 +94,7 @@ async def test_playing_radio(
 
 
 async def test_playing_aux(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_aux,
 ) -> None:
@@ -107,7 +107,7 @@ async def test_playing_aux(
 
 
 async def test_playing_bluetooth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_bluetooth,
 ) -> None:
@@ -123,7 +123,7 @@ async def test_playing_bluetooth(
 
 
 async def test_get_volume_level(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
 ) -> None:
@@ -135,7 +135,7 @@ async def test_get_volume_level(
 
 
 async def test_get_state_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_standby,
 ) -> None:
@@ -147,7 +147,7 @@ async def test_get_state_off(
 
 
 async def test_get_state_pause(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp_paused,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_get_state_pause(
 
 
 async def test_is_muted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
     device1_volume_muted: str,
@@ -175,7 +175,7 @@ async def test_is_muted(
 
 
 async def test_should_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
     device1_requests_mock_key,
@@ -192,7 +192,7 @@ async def test_should_turn_off(
 
 
 async def test_should_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_standby,
     device1_requests_mock_key,
@@ -209,7 +209,7 @@ async def test_should_turn_on(
 
 
 async def test_volume_up(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
     device1_requests_mock_key,
@@ -226,7 +226,7 @@ async def test_volume_up(
 
 
 async def test_volume_down(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
     device1_requests_mock_key,
@@ -243,7 +243,7 @@ async def test_volume_down(
 
 
 async def test_set_volume_level(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
     device1_requests_mock_volume,
@@ -263,7 +263,7 @@ async def test_set_volume_level(
 
 
 async def test_mute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
     device1_requests_mock_key,
@@ -280,7 +280,7 @@ async def test_mute(
 
 
 async def test_play(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp_paused,
     device1_requests_mock_key,
@@ -297,7 +297,7 @@ async def test_play(
 
 
 async def test_pause(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
     device1_requests_mock_key,
@@ -314,7 +314,7 @@ async def test_pause(
 
 
 async def test_play_pause(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
     device1_requests_mock_key,
@@ -331,7 +331,7 @@ async def test_play_pause(
 
 
 async def test_next_previous_track(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_upnp,
     device1_requests_mock_key,
@@ -356,7 +356,7 @@ async def test_next_previous_track(
 
 
 async def test_play_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_standby,
     device1_requests_mock_select,
@@ -377,7 +377,7 @@ async def test_play_media(
     )
     assert device1_requests_mock_select.call_count == 1
     assert (
-        'location="http://homeassistant:8123/media/local/test.mp3"'
+        'location="http://smarthub:8123/media/local/test.mp3"'
         in device1_requests_mock_select.last_request.text
     )
 
@@ -396,7 +396,7 @@ async def test_play_media(
 
 
 async def test_play_media_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_standby,
     device1_requests_mock_dlna,
@@ -420,7 +420,7 @@ async def test_play_media_url(
 
 
 async def test_select_source_aux(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_standby,
     device1_requests_mock_select,
@@ -440,7 +440,7 @@ async def test_select_source_aux(
 
 
 async def test_select_source_bluetooth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_standby,
     device1_requests_mock_select,
@@ -460,7 +460,7 @@ async def test_select_source_bluetooth(
 
 
 async def test_select_source_invalid_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device1_requests_mock_standby,
     device1_requests_mock_select,
@@ -482,7 +482,7 @@ async def test_select_source_invalid_source(
 
 
 async def test_play_everywhere(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device2_config: MockConfigEntry,
     device1_requests_mock_standby,
@@ -523,7 +523,7 @@ async def test_play_everywhere(
 
 
 async def test_create_zone(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device2_config: MockConfigEntry,
     device1_requests_mock_standby,
@@ -567,7 +567,7 @@ async def test_create_zone(
 
 
 async def test_remove_zone_slave(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device2_config: MockConfigEntry,
     device1_requests_mock_standby,
@@ -609,7 +609,7 @@ async def test_remove_zone_slave(
 
 
 async def test_add_zone_slave(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device2_config: MockConfigEntry,
     device1_requests_mock_standby,
@@ -651,7 +651,7 @@ async def test_add_zone_slave(
 
 
 async def test_zone_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device1_config: MockConfigEntry,
     device2_config: MockConfigEntry,
     device1_requests_mock_standby,

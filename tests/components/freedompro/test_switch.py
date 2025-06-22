@@ -3,12 +3,12 @@
 from datetime import timedelta
 from unittest.mock import ANY, patch
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN, SERVICE_TURN_ON
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.util.dt import utcnow
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN, SERVICE_TURN_ON
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.util.dt import utcnow
 
 from .conftest import get_states_response_for_uid
 
@@ -18,7 +18,7 @@ uid = "3WRRJR6RCZQZSND8VP0YTO3YXCSOFPKBMW8T51TU-LQ*1JKU1MVWHQL-Z9SCUS85VFXMRGNDC
 
 
 async def test_switch_get_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -37,7 +37,7 @@ async def test_switch_get_state(
     states_response = get_states_response_for_uid(uid)
     states_response[0]["state"]["on"] = True
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         async_fire_time_changed(hass, utcnow() + timedelta(hours=2))
@@ -55,7 +55,7 @@ async def test_switch_get_state(
 
 
 async def test_switch_set_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -66,7 +66,7 @@ async def test_switch_set_off(
     states_response = get_states_response_for_uid(uid)
     states_response[0]["state"]["on"] = True
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         await async_update_entity(hass, entity_id)
@@ -83,7 +83,7 @@ async def test_switch_set_off(
     assert entry.unique_id == uid
 
     with patch(
-        "homeassistant.components.freedompro.switch.put_state"
+        "smarthub.components.freedompro.switch.put_state"
     ) as mock_put_state:
         await hass.services.async_call(
             SWITCH_DOMAIN,
@@ -96,7 +96,7 @@ async def test_switch_set_off(
     states_response = get_states_response_for_uid(uid)
     states_response[0]["state"]["on"] = False
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         async_fire_time_changed(hass, utcnow() + timedelta(hours=2))
@@ -107,7 +107,7 @@ async def test_switch_set_off(
 
 
 async def test_switch_set_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -124,7 +124,7 @@ async def test_switch_set_on(
     assert entry.unique_id == uid
 
     with patch(
-        "homeassistant.components.freedompro.switch.put_state"
+        "smarthub.components.freedompro.switch.put_state"
     ) as mock_put_state:
         await hass.services.async_call(
             SWITCH_DOMAIN,
@@ -137,7 +137,7 @@ async def test_switch_set_on(
     states_response = get_states_response_for_uid(uid)
     states_response[0]["state"]["on"] = True
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         async_fire_time_changed(hass, utcnow() + timedelta(hours=2))

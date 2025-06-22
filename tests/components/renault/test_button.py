@@ -7,12 +7,12 @@ import pytest
 from renault_api.kamereon import schemas
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.renault.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.renault.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import async_load_fixture, snapshot_platform
 
@@ -22,13 +22,13 @@ pytestmark = pytest.mark.usefixtures("patch_renault_account", "patch_get_vehicle
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.renault.PLATFORMS", [Platform.BUTTON]):
+    with patch("smarthub.components.renault.PLATFORMS", [Platform.BUTTON]):
         yield
 
 
 @pytest.mark.usefixtures("fixtures_with_data")
 async def test_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -43,7 +43,7 @@ async def test_buttons(
 @pytest.mark.usefixtures("fixtures_with_no_data")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_button_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -58,7 +58,7 @@ async def test_button_empty(
 @pytest.mark.usefixtures("fixtures_with_invalid_upstream_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_button_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -73,7 +73,7 @@ async def test_button_errors(
 @pytest.mark.usefixtures("fixtures_with_access_denied_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_button_access_denied(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -88,7 +88,7 @@ async def test_button_access_denied(
 @pytest.mark.usefixtures("fixtures_with_not_supported_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_button_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -103,7 +103,7 @@ async def test_button_not_supported(
 @pytest.mark.usefixtures("fixtures_with_data")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_button_start_charge(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test that button invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -131,7 +131,7 @@ async def test_button_start_charge(
 @pytest.mark.usefixtures("fixtures_with_data")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_button_stop_charge(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test that button invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -159,7 +159,7 @@ async def test_button_stop_charge(
 @pytest.mark.usefixtures("fixtures_with_data")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_button_start_air_conditioner(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test that button invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)

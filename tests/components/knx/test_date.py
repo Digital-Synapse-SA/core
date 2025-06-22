@@ -1,21 +1,21 @@
 """Test KNX date."""
 
-from homeassistant.components.date import (
+from smarthub.components.date import (
     ATTR_DATE,
     DOMAIN as DATE_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.components.knx.const import CONF_RESPOND_TO_READ, KNX_ADDRESS
-from homeassistant.components.knx.schema import DateSchema
-from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant, State
+from smarthub.components.knx.const import CONF_RESPOND_TO_READ, KNX_ADDRESS
+from smarthub.components.knx.schema import DateSchema
+from smarthub.const import CONF_NAME
+from smarthub.core import SmartHub, State
 
 from .conftest import KNXTestKit
 
 from tests.common import mock_restore_cache
 
 
-async def test_date(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_date(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX date."""
     test_address = "1/1/1"
     await knx.setup_integration(
@@ -49,7 +49,7 @@ async def test_date(hass: HomeAssistant, knx: KNXTestKit) -> None:
     assert state.state == "2003-02-01"
 
 
-async def test_date_restore_and_respond(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_date_restore_and_respond(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX date with passive_address, restoring state and respond_to_read."""
     test_address = "1/1/1"
     test_passive_address = "3/3/3"

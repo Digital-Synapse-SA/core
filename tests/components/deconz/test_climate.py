@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_FAN_MODE,
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
@@ -24,16 +24,16 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.deconz.climate import (
+from smarthub.components.deconz.climate import (
     DECONZ_FAN_SMART,
     DECONZ_PRESET_AUTO,
     DECONZ_PRESET_MANUAL,
 )
-from homeassistant.components.deconz.const import CONF_ALLOW_CLIP_SENSOR
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, STATE_OFF, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.deconz.const import CONF_ALLOW_CLIP_SENSOR
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, STATE_OFF, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType, WebsocketDataType
 
@@ -77,7 +77,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
     ],
 )
 async def test_simple_climate_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
@@ -88,7 +88,7 @@ async def test_simple_climate_device(
 
     This is a simple water heater that only supports setting temperature and on and off.
     """
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.CLIMATE]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -164,7 +164,7 @@ async def test_simple_climate_device(
     ],
 )
 async def test_climate_device_without_cooling_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
@@ -172,7 +172,7 @@ async def test_climate_device_without_cooling_support(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test successful creation of sensor entities."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.CLIMATE]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -303,7 +303,7 @@ async def test_climate_device_without_cooling_support(
     ],
 )
 async def test_climate_device_with_cooling_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
@@ -311,7 +311,7 @@ async def test_climate_device_with_cooling_support(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test successful creation of sensor entities."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.CLIMATE]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -379,7 +379,7 @@ async def test_climate_device_with_cooling_support(
     ],
 )
 async def test_climate_device_with_fan_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
@@ -387,7 +387,7 @@ async def test_climate_device_with_fan_support(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test successful creation of sensor entities."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.CLIMATE]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -484,7 +484,7 @@ async def test_climate_device_with_fan_support(
     ],
 )
 async def test_climate_device_with_preset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
     sensor_ws_data: WebsocketDataType,
@@ -492,7 +492,7 @@ async def test_climate_device_with_preset(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test successful creation of sensor entities."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.CLIMATE]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -573,13 +573,13 @@ async def test_climate_device_with_preset(
 )
 @pytest.mark.parametrize("config_entry_options", [{CONF_ALLOW_CLIP_SENSOR: True}])
 async def test_clip_climate_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test successful creation of sensor entities."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.CLIMATE]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -628,7 +628,7 @@ async def test_clip_climate_device(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_verify_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sensor_ws_data: WebsocketDataType,
 ) -> None:
     """Test that state update properly."""
@@ -648,7 +648,7 @@ async def test_verify_state_update(
 
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_add_new_climate_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sensor_ws_data: WebsocketDataType,
 ) -> None:
     """Test that adding a new climate device works."""
@@ -697,7 +697,7 @@ async def test_add_new_climate_device(
 )
 @pytest.mark.parametrize("config_entry_options", [{CONF_ALLOW_CLIP_SENSOR: False}])
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_not_allow_clip_thermostat(hass: HomeAssistant) -> None:
+async def test_not_allow_clip_thermostat(hass: SmartHub) -> None:
     """Test that CLIP thermostats are not allowed."""
     assert len(hass.states.async_all()) == 0
 
@@ -728,7 +728,7 @@ async def test_not_allow_clip_thermostat(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_no_mode_no_state(hass: HomeAssistant) -> None:
+async def test_no_mode_no_state(hass: SmartHub) -> None:
     """Test that a climate device without mode and state works."""
     assert len(hass.states.async_all()) == 2
 
@@ -777,7 +777,7 @@ async def test_no_mode_no_state(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_boost_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sensor_ws_data: WebsocketDataType,
 ) -> None:
     """Test that a climate device with boost mode and different state works."""

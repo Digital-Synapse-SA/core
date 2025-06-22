@@ -1,4 +1,4 @@
-"""Tests for Home Assistant View."""
+"""Tests for SmartHub View."""
 
 from decimal import Decimal
 from http import HTTPStatus
@@ -13,12 +13,12 @@ from aiohttp.web_exceptions import (
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.http import KEY_HASS
-from homeassistant.components.http.view import (
-    HomeAssistantView,
+from smarthub.components.http import KEY_HASS
+from smarthub.components.http.view import (
+    SmartHubView,
     request_handler_factory,
 )
-from homeassistant.exceptions import ServiceNotFound, Unauthorized
+from smarthub.exceptions import ServiceNotFound, Unauthorized
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ def mock_request_with_stopping() -> Mock:
 async def test_invalid_json(caplog: pytest.LogCaptureFixture) -> None:
     """Test trying to return invalid JSON."""
     with pytest.raises(HTTPInternalServerError):
-        HomeAssistantView.json({"hello": Decimal("2.0")})
+        SmartHubView.json({"hello": Decimal("2.0")})
 
     assert (
         "Unable to serialize to JSON. Bad data found at $.hello=2.0(<class 'decimal.Decimal'>"
@@ -46,7 +46,7 @@ async def test_invalid_json(caplog: pytest.LogCaptureFixture) -> None:
 
 async def test_nan_serialized_to_null() -> None:
     """Test nan serialized to null JSON."""
-    response = HomeAssistantView.json(float("NaN"))
+    response = SmartHubView.json(float("NaN"))
     assert json.loads(response.body.decode("utf-8")) is None
 
 

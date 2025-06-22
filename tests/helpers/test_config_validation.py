@@ -17,16 +17,16 @@ import py
 import pytest
 import voluptuous as vol
 
-import homeassistant
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+import smarthub
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     config_validation as cv,
     issue_registry as ir,
     selector,
     template,
 )
-from homeassistant.helpers.config_validation import TRIGGER_SCHEMA
+from smarthub.helpers.config_validation import TRIGGER_SCHEMA
 
 
 def test_boolean() -> None:
@@ -129,9 +129,9 @@ def test_url() -> None:
     for value in (
         "http://localhost",
         "https://localhost/test/index.html",
-        "http://home-assistant.io",
-        "http://home-assistant.io/test/",
-        "https://community.home-assistant.io/",
+        "http://smart-hub.io",
+        "http://smart-hub.io/test/",
+        "https://community.smart-hub.io/",
     ):
         assert schema(value)
 
@@ -148,7 +148,7 @@ def test_configuration_url() -> None:
         "http//ha.io",
         "http://??,**",
         "https://??,**",
-        "homeassistant://??,**",
+        "smarthub://??,**",
     ):
         with pytest.raises(vol.MultipleInvalid):
             schema(value)
@@ -156,11 +156,11 @@ def test_configuration_url() -> None:
     for value in (
         "http://localhost",
         "https://localhost/test/index.html",
-        "http://home-assistant.io",
-        "http://home-assistant.io/test/",
-        "https://community.home-assistant.io/",
-        "homeassistant://api",
-        "homeassistant://api/hassio_ingress/XXXXXXX",
+        "http://smart-hub.io",
+        "http://smart-hub.io/test/",
+        "https://community.smart-hub.io/",
+        "smarthub://api",
+        "smarthub://api/hassio_ingress/XXXXXXX",
     ):
         assert schema(value)
 
@@ -171,15 +171,15 @@ def test_url_no_path() -> None:
 
     for value in (
         "https://localhost/test/index.html",
-        "http://home-assistant.io/test/",
+        "http://smart-hub.io/test/",
     ):
         with pytest.raises(vol.MultipleInvalid):
             schema(value)
 
     for value in (
         "http://localhost",
-        "http://home-assistant.io",
-        "https://community.home-assistant.io/",
+        "http://smart-hub.io",
+        "https://community.smart-hub.io/",
     ):
         assert schema(value)
 
@@ -419,17 +419,17 @@ def test_service() -> None:
     with pytest.raises(vol.MultipleInvalid):
         schema("invalid_turn_on")
 
-    schema("homeassistant.turn_on")
+    schema("smarthub.turn_on")
 
 
 @pytest.mark.parametrize(
     "config",
     [
-        {"service": "homeassistant.turn_on"},
-        {"service": "homeassistant.turn_on", "entity_id": "light.kitchen"},
+        {"service": "smarthub.turn_on"},
+        {"service": "smarthub.turn_on", "entity_id": "light.kitchen"},
         {"service": "light.turn_on", "entity_id": "all"},
         {
-            "service": "homeassistant.turn_on",
+            "service": "smarthub.turn_on",
             "entity_id": ["light.kitchen", "light.ceiling"],
         },
         {
@@ -438,11 +438,11 @@ def test_service() -> None:
             "alias": "turn on kitchen lights",
         },
         {"service": "scene.turn_on", "metadata": {}},
-        {"action": "homeassistant.turn_on"},
-        {"action": "homeassistant.turn_on", "entity_id": "light.kitchen"},
+        {"action": "smarthub.turn_on"},
+        {"action": "smarthub.turn_on", "entity_id": "light.kitchen"},
         {"action": "light.turn_on", "entity_id": "all"},
         {
-            "action": "homeassistant.turn_on",
+            "action": "smarthub.turn_on",
             "entity_id": ["light.kitchen", "light.ceiling"],
         },
         {
@@ -453,7 +453,7 @@ def test_service() -> None:
         {"action": "scene.turn_on", "metadata": {}},
     ],
 )
-def test_service_schema(hass: HomeAssistant, config: dict[str, Any]) -> None:
+def test_service_schema(hass: SmartHub, config: dict[str, Any]) -> None:
     """Test service_schema validation."""
     validated = cv.SERVICE_SCHEMA(config)
 
@@ -473,31 +473,31 @@ def test_service_schema(hass: HomeAssistant, config: dict[str, Any]) -> None:
         None,
         {"data": {"entity_id": "light.kitchen"}},
         {
-            "service": "homeassistant.turn_on",
-            "service_template": "homeassistant.turn_on",
+            "service": "smarthub.turn_on",
+            "service_template": "smarthub.turn_on",
         },
-        {"service": "homeassistant.turn_on", "data": None},
+        {"service": "smarthub.turn_on", "data": None},
         {
-            "service": "homeassistant.turn_on",
+            "service": "smarthub.turn_on",
             "data_template": {"brightness": "{{ no_end"},
         },
         {
-            "service": "homeassistant.turn_on",
-            "action": "homeassistant.turn_on",
+            "service": "smarthub.turn_on",
+            "action": "smarthub.turn_on",
         },
         {
-            "action": "homeassistant.turn_on",
-            "service_template": "homeassistant.turn_on",
+            "action": "smarthub.turn_on",
+            "service_template": "smarthub.turn_on",
         },
-        {"action": "homeassistant.turn_on", "data": None},
+        {"action": "smarthub.turn_on", "data": None},
         {
-            "action": "homeassistant.turn_on",
+            "action": "smarthub.turn_on",
             "data_template": {"brightness": "{{ no_end"},
         },
     ],
 )
 def test_invalid_service_schema(
-    hass: HomeAssistant, config: dict[str, Any] | None
+    hass: SmartHub, config: dict[str, Any] | None
 ) -> None:
     """Test service_schema validation fails."""
     with pytest.raises(vol.MultipleInvalid):
@@ -570,7 +570,7 @@ def test_slug() -> None:
         schema(value)
 
 
-def test_string(hass: HomeAssistant) -> None:
+def test_string(hass: SmartHub) -> None:
     """Test string validation."""
     schema = vol.Schema(cv.string)
 
@@ -625,7 +625,7 @@ def test_string_with_no_html() -> None:
         3,
         "Hello",
         "**Hello**",
-        "This has no HTML [Link](https://home-assistant.io)",
+        "This has no HTML [Link](https://smart-hub.io)",
     ):
         schema(value)
 
@@ -655,7 +655,7 @@ def test_x10_address() -> None:
     schema("C11")
 
 
-def test_template(hass: HomeAssistant) -> None:
+def test_template(hass: SmartHub) -> None:
     """Test template validator."""
     schema = vol.Schema(cv.template)
 
@@ -673,9 +673,9 @@ def test_template(hass: HomeAssistant) -> None:
         "Hello",
         "{{ beer }}",
         "{% if 1 == 1 %}Hello{% else %}World{% endif %}",
-        # Function 'expand' added as an extension by Home Assistant
+        # Function 'expand' added as an extension by SmartHub
         "{{ expand('group.foo')|map(attribute='entity_id')|list }}",
-        # Filter 'expand' added as an extension by Home Assistant
+        # Filter 'expand' added as an extension by SmartHub
         "{{ ['group.foo']|expand|map(attribute='entity_id')|list }}",
         # Non existing function 'no_such_function' is not detected by Jinja2
         "{{ no_such_function('group.foo')|map(attribute='entity_id')|list }}",
@@ -684,7 +684,7 @@ def test_template(hass: HomeAssistant) -> None:
         schema(value)
 
 
-async def test_template_no_hass(hass: HomeAssistant) -> None:
+async def test_template_no_hass(hass: SmartHub) -> None:
     """Test template validator."""
     schema = vol.Schema(cv.template)
 
@@ -693,7 +693,7 @@ async def test_template_no_hass(hass: HomeAssistant) -> None:
         "{{ partial_print }",
         "{% if True %}Hello",
         ["test"],
-        # Filter added as an extension by Home Assistant
+        # Filter added as an extension by SmartHub
         "{{ ['group.foo']|expand|map(attribute='entity_id')|list }}",
     ):
         with pytest.raises(vol.Invalid):
@@ -704,7 +704,7 @@ async def test_template_no_hass(hass: HomeAssistant) -> None:
         "Hello",
         "{{ beer }}",
         "{% if 1 == 1 %}Hello{% else %}World{% endif %}",
-        # Function 'expand' added as an extension by Home Assistant, no error
+        # Function 'expand' added as an extension by SmartHub, no error
         # because non existing functions are not detected by Jinja2
         "{{ expand('group.foo')|map(attribute='entity_id')|list }}",
         # Non existing function 'no_such_function' is not detected by Jinja2
@@ -714,7 +714,7 @@ async def test_template_no_hass(hass: HomeAssistant) -> None:
         await hass.async_add_executor_job(schema, value)
 
 
-def test_dynamic_template(hass: HomeAssistant) -> None:
+def test_dynamic_template(hass: SmartHub) -> None:
     """Test dynamic template validator."""
     schema = vol.Schema(cv.dynamic_template)
 
@@ -732,9 +732,9 @@ def test_dynamic_template(hass: HomeAssistant) -> None:
     options = (
         "{{ beer }}",
         "{% if 1 == 1 %}Hello{% else %}World{% endif %}",
-        # Function 'expand' added as an extension by Home Assistant
+        # Function 'expand' added as an extension by SmartHub
         "{{ expand('group.foo')|map(attribute='entity_id')|list }}",
-        # Filter 'expand' added as an extension by Home Assistant
+        # Filter 'expand' added as an extension by SmartHub
         "{{ ['group.foo']|expand|map(attribute='entity_id')|list }}",
         # Non existing function 'no_such_function' is not detected by Jinja2
         "{{ no_such_function('group.foo')|map(attribute='entity_id')|list }}",
@@ -743,7 +743,7 @@ def test_dynamic_template(hass: HomeAssistant) -> None:
         schema(value)
 
 
-async def test_dynamic_template_no_hass(hass: HomeAssistant) -> None:
+async def test_dynamic_template_no_hass(hass: SmartHub) -> None:
     """Test dynamic template validator."""
     schema = vol.Schema(cv.dynamic_template)
 
@@ -754,7 +754,7 @@ async def test_dynamic_template_no_hass(hass: HomeAssistant) -> None:
         "{% if True %}Hello",
         ["test"],
         "just a string",
-        # Filter added as an extension by Home Assistant
+        # Filter added as an extension by SmartHub
         "{{ ['group.foo']|expand|map(attribute='entity_id')|list }}",
     ):
         with pytest.raises(vol.Invalid):
@@ -763,7 +763,7 @@ async def test_dynamic_template_no_hass(hass: HomeAssistant) -> None:
     options = (
         "{{ beer }}",
         "{% if 1 == 1 %}Hello{% else %}World{% endif %}",
-        # Function 'expand' added as an extension by Home Assistant, no error
+        # Function 'expand' added as an extension by SmartHub, no error
         # because non existing functions are not detected by Jinja2
         "{{ expand('group.foo')|map(attribute='entity_id')|list }}",
         # Non existing function 'no_such_function' is not detected by Jinja2
@@ -922,7 +922,7 @@ def schema():
 @pytest.fixture
 def version(monkeypatch: pytest.MonkeyPatch) -> None:
     """Patch the version used for testing to 0.5.0."""
-    monkeypatch.setattr(homeassistant.const, "__version__", "0.5.0")
+    monkeypatch.setattr(smarthub.const, "__version__", "0.5.0")
 
 
 def test_deprecated_with_no_optionals(caplog: pytest.LogCaptureFixture, schema) -> None:
@@ -940,7 +940,7 @@ def test_deprecated_with_no_optionals(caplog: pytest.LogCaptureFixture, schema) 
     assert len(caplog.records) == 1
     assert caplog.records[0].name in [
         __name__,
-        "homeassistant.helpers.config_validation",
+        "smarthub.helpers.config_validation",
     ]
     assert (
         "The 'mars' option is deprecated, please remove it from your configuration"
@@ -1048,7 +1048,7 @@ def test_deprecated_with_default(caplog: pytest.LogCaptureFixture, schema) -> No
 
     test_data = {"mars": True}
     with patch(
-        "homeassistant.helpers.config_validation.get_integration_logger",
+        "smarthub.helpers.config_validation.get_integration_logger",
         return_value=logging.getLogger(__name__),
     ):
         output = deprecated_schema(test_data.copy())
@@ -1616,7 +1616,7 @@ def test_empty_schema_cant_find_module() -> None:
 
 
 def test_config_entry_only_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -1647,14 +1647,14 @@ def test_config_entry_only_schema_cant_find_module() -> None:
 
 
 def test_config_entry_only_schema_no_hass(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test if the hass context is not set in our context."""
     with patch(
-        "homeassistant.helpers.config_validation.async_get_hass",
-        side_effect=HomeAssistantError,
+        "smarthub.helpers.config_validation.async_get_hass",
+        side_effect=SmartHubError,
     ):
         cv.config_entry_only_config_schema("test_domain")(
             {"test_domain": {"foo": "bar"}}
@@ -1668,7 +1668,7 @@ def test_config_entry_only_schema_no_hass(
 
 
 def test_platform_only_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -1754,7 +1754,7 @@ def test_determine_script_action_non_ambiguous() -> None:
     assert cv.determine_script_action({"delay": "00:00:05"}) == "delay"
 
 
-async def test_async_validate(hass: HomeAssistant, tmpdir: py.path.local) -> None:
+async def test_async_validate(hass: SmartHub, tmpdir: py.path.local) -> None:
     """Test the async_validate helper."""
     validator_calls: dict[str, list[int]] = {}
 
@@ -1763,7 +1763,7 @@ async def test_async_validate(hass: HomeAssistant, tmpdir: py.path.local) -> Non
         calls.append(threading.get_ident())
         return real_func(*args)
 
-    CV_PREFIX = "homeassistant.helpers.config_validation"
+    CV_PREFIX = "smarthub.helpers.config_validation"
     with (
         patch(f"{CV_PREFIX}.isdir", wraps=partial(_mock_validator_schema, cv.isdir)),
         patch(f"{CV_PREFIX}.string", wraps=partial(_mock_validator_schema, cv.string)),
@@ -1927,7 +1927,7 @@ async def test_trigger_backwards_compatibility() -> None:
 
 
 async def test_is_entity_service_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test cv.is_entity_service_schema."""
     for schema in (

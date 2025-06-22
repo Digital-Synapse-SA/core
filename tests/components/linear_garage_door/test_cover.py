@@ -6,16 +6,16 @@ from unittest.mock import AsyncMock
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
     CoverState,
 )
-from homeassistant.components.linear_garage_door import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.linear_garage_door import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -28,7 +28,7 @@ from tests.common import (
 
 
 async def test_covers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_linear: AsyncMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -42,7 +42,7 @@ async def test_covers(
 
 
 async def test_open_cover(
-    hass: HomeAssistant, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that opening the cover works as intended."""
 
@@ -68,7 +68,7 @@ async def test_open_cover(
 
 
 async def test_close_cover(
-    hass: HomeAssistant, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that closing the cover works as intended."""
 
@@ -94,7 +94,7 @@ async def test_close_cover(
 
 
 async def test_update_cover_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_linear: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

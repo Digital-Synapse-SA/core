@@ -11,16 +11,16 @@ from aioruckus.const import (
 )
 from aioruckus.exceptions import AuthenticationError
 
-from homeassistant import config_entries
-from homeassistant.components.ruckus_unleashed.const import (
+from smarthub import config_entries
+from smarthub.components.ruckus_unleashed.const import (
     API_SYS_SYSINFO,
     API_SYS_SYSINFO_SERIAL,
     DOMAIN,
 )
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.util import utcnow
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.util import utcnow
 
 from . import (
     CONFIG,
@@ -33,7 +33,7 @@ from . import (
 from tests.common import async_fire_time_changed
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -44,7 +44,7 @@ async def test_form(hass: HomeAssistant) -> None:
     with (
         RuckusAjaxApiPatchContext(),
         patch(
-            "homeassistant.components.ruckus_unleashed.async_setup_entry",
+            "smarthub.components.ruckus_unleashed.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -60,7 +60,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result2["data"] == CONFIG
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -78,7 +78,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_user_reauth(hass: HomeAssistant) -> None:
+async def test_form_user_reauth(hass: SmartHub) -> None:
     """Test reauth."""
     entry = mock_config_entry()
     entry.add_to_hass(hass)
@@ -108,7 +108,7 @@ async def test_form_user_reauth(hass: HomeAssistant) -> None:
     assert result2["reason"] == "reauth_successful"
 
 
-async def test_form_user_reauth_different_unique_id(hass: HomeAssistant) -> None:
+async def test_form_user_reauth_different_unique_id(hass: SmartHub) -> None:
     """Test reauth."""
     entry = mock_config_entry()
     entry.add_to_hass(hass)
@@ -140,7 +140,7 @@ async def test_form_user_reauth_different_unique_id(hass: HomeAssistant) -> None
     assert result2["errors"] == {"base": "invalid_host"}
 
 
-async def test_form_user_reauth_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_user_reauth_invalid_auth(hass: SmartHub) -> None:
     """Test reauth."""
     entry = mock_config_entry()
     entry.add_to_hass(hass)
@@ -172,7 +172,7 @@ async def test_form_user_reauth_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_user_reauth_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_user_reauth_cannot_connect(hass: SmartHub) -> None:
     """Test reauth."""
     entry = mock_config_entry()
     entry.add_to_hass(hass)
@@ -204,7 +204,7 @@ async def test_form_user_reauth_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_user_reauth_general_exception(hass: HomeAssistant) -> None:
+async def test_form_user_reauth_general_exception(hass: SmartHub) -> None:
     """Test reauth."""
     entry = mock_config_entry()
     entry.add_to_hass(hass)
@@ -235,7 +235,7 @@ async def test_form_user_reauth_general_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -253,7 +253,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_general_exception(hass: HomeAssistant) -> None:
+async def test_form_general_exception(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -270,7 +270,7 @@ async def test_form_general_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_unexpected_response(hass: HomeAssistant) -> None:
+async def test_form_unexpected_response(hass: SmartHub) -> None:
     """Test we handle unknown error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -290,7 +290,7 @@ async def test_form_unexpected_response(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_duplicate_error(hass: HomeAssistant) -> None:
+async def test_form_duplicate_error(hass: SmartHub) -> None:
     """Test we handle duplicate error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}

@@ -2,22 +2,22 @@
 
 from unittest.mock import Mock
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_EFFECT,
     DOMAIN as LIGHT_DOMAIN,
     ColorMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
-from homeassistant.util.json import JsonArrayType
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
+from smarthub.util.json import JsonArrayType
 
 from .conftest import setup_platform
 from .const import FAKE_DEVICE, FAKE_LIGHT, FAKE_ZIGBEE_CONNECTIVITY
 
 
 async def test_lights(
-    hass: HomeAssistant, mock_bridge_v2: Mock, v2_resources_test_data: JsonArrayType
+    hass: SmartHub, mock_bridge_v2: Mock, v2_resources_test_data: JsonArrayType
 ) -> None:
     """Test if all v2 lights get created with correct features."""
     await mock_bridge_v2.api.load_test_data(v2_resources_test_data)
@@ -85,7 +85,7 @@ async def test_lights(
 
 
 async def test_light_turn_on_service(
-    hass: HomeAssistant, mock_bridge_v2: Mock, v2_resources_test_data: JsonArrayType
+    hass: SmartHub, mock_bridge_v2: Mock, v2_resources_test_data: JsonArrayType
 ) -> None:
     """Test calling the turn on service on a light."""
     await mock_bridge_v2.api.load_test_data(v2_resources_test_data)
@@ -271,7 +271,7 @@ async def test_light_turn_on_service(
 
 
 async def test_light_turn_off_service(
-    hass: HomeAssistant, mock_bridge_v2: Mock, v2_resources_test_data: JsonArrayType
+    hass: SmartHub, mock_bridge_v2: Mock, v2_resources_test_data: JsonArrayType
 ) -> None:
     """Test calling the turn off service on a light."""
     await mock_bridge_v2.api.load_test_data(v2_resources_test_data)
@@ -360,7 +360,7 @@ async def test_light_turn_off_service(
     assert mock_bridge_v2.mock_requests[4]["json"]["identify"]["action"] == "identify"
 
 
-async def test_light_added(hass: HomeAssistant, mock_bridge_v2: Mock) -> None:
+async def test_light_added(hass: SmartHub, mock_bridge_v2: Mock) -> None:
     """Test new light added to bridge."""
     await mock_bridge_v2.api.load_test_data([FAKE_DEVICE, FAKE_ZIGBEE_CONNECTIVITY])
 
@@ -383,7 +383,7 @@ async def test_light_added(hass: HomeAssistant, mock_bridge_v2: Mock) -> None:
 
 
 async def test_light_availability(
-    hass: HomeAssistant, mock_bridge_v2: Mock, v2_resources_test_data: JsonArrayType
+    hass: SmartHub, mock_bridge_v2: Mock, v2_resources_test_data: JsonArrayType
 ) -> None:
     """Test light availability property."""
     await mock_bridge_v2.api.load_test_data(v2_resources_test_data)
@@ -415,7 +415,7 @@ async def test_light_availability(
 
 
 async def test_grouped_lights(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_bridge_v2: Mock,
     v2_resources_test_data: JsonArrayType,
@@ -647,7 +647,7 @@ async def test_grouped_lights(
 
 
 async def test_light_turn_on_service_deprecation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge_v2: Mock,
     v2_resources_test_data: JsonArrayType,
     issue_registry: ir.IssueRegistry,

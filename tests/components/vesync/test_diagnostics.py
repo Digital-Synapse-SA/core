@@ -6,12 +6,12 @@ from pyvesync.helpers import Helpers
 from syrupy.assertion import SnapshotAssertion
 from syrupy.matchers import path_type
 
-from homeassistant.components.vesync.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.setup import async_setup_component
+from smarthub.components.vesync.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.typing import ConfigType
+from smarthub.setup import async_setup_component
 
 from .common import (
     call_api_side_effect__no_devices,
@@ -27,7 +27,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_async_get_config_entry_diagnostics__no_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: ConfigEntry,
     config: ConfigType,
@@ -46,7 +46,7 @@ async def test_async_get_config_entry_diagnostics__no_devices(
 
 
 async def test_async_get_config_entry_diagnostics__single_humidifier(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: ConfigEntry,
     config: ConfigType,
@@ -65,7 +65,7 @@ async def test_async_get_config_entry_diagnostics__single_humidifier(
 
 
 async def test_async_get_device_diagnostics__single_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     hass_client: ClientSessionGenerator,
     config_entry: ConfigEntry,

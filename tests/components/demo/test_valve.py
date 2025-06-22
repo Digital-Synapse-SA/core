@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.demo import DOMAIN, valve as demo_valve
-from homeassistant.components.valve import (
+from smarthub.components.demo import DOMAIN, valve as demo_valve
+from smarthub.components.valve import (
     DOMAIN as VALVE_DOMAIN,
     SERVICE_CLOSE_VALVE,
     SERVICE_OPEN_VALVE,
     ValveState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, EVENT_STATE_CHANGED, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, EVENT_STATE_CHANGED, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_capture_events
 
@@ -25,14 +25,14 @@ ORCHARD = "valve.orchard"
 async def valve_only() -> None:
     """Enable only the valve platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.VALVE],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_comp(hass: HomeAssistant, valve_only: None):
+async def setup_comp(hass: SmartHub, valve_only: None):
     """Set up demo component."""
     assert await async_setup_component(
         hass, VALVE_DOMAIN, {VALVE_DOMAIN: {"platform": DOMAIN}}
@@ -41,7 +41,7 @@ async def setup_comp(hass: HomeAssistant, valve_only: None):
 
 
 @patch.object(demo_valve, "OPEN_CLOSE_DELAY", 0)
-async def test_closing(hass: HomeAssistant) -> None:
+async def test_closing(hass: SmartHub) -> None:
     """Test the closing of a valve."""
     state = hass.states.get(FRONT_GARDEN)
     assert state.state == ValveState.OPEN
@@ -64,7 +64,7 @@ async def test_closing(hass: HomeAssistant) -> None:
 
 
 @patch.object(demo_valve, "OPEN_CLOSE_DELAY", 0)
-async def test_opening(hass: HomeAssistant) -> None:
+async def test_opening(hass: SmartHub) -> None:
     """Test the opening of a valve."""
     state = hass.states.get(ORCHARD)
     assert state.state == ValveState.CLOSED

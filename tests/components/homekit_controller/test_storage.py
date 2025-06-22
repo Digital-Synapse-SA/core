@@ -7,9 +7,9 @@ from aiohomekit.model import Accessory
 from aiohomekit.model.characteristics import CharacteristicsTypes
 from aiohomekit.model.services import ServicesTypes
 
-from homeassistant.components.homekit_controller.const import ENTITY_MAP
-from homeassistant.components.homekit_controller.storage import EntityMapStorage
-from homeassistant.core import HomeAssistant
+from smarthub.components.homekit_controller.const import ENTITY_MAP
+from smarthub.components.homekit_controller.storage import EntityMapStorage
+from smarthub.core import SmartHub
 
 from .common import setup_platform, setup_test_component
 
@@ -17,7 +17,7 @@ from tests.common import flush_store
 
 
 async def test_load_from_storage(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test that entity map can be correctly loaded from cache."""
     hkid = "00:00:00:00:00:00"
@@ -32,7 +32,7 @@ async def test_load_from_storage(
 
 
 async def test_storage_is_removed(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test entity map storage removal is idempotent."""
     await setup_platform(hass)
@@ -52,7 +52,7 @@ async def test_storage_is_removed(
     assert hass_storage[ENTITY_MAP]["data"]["pairings"] == {}
 
 
-async def test_storage_is_removed_idempotent(hass: HomeAssistant) -> None:
+async def test_storage_is_removed_idempotent(hass: SmartHub) -> None:
     """Test entity map storage removal is idempotent."""
     await setup_platform(hass)
 
@@ -74,7 +74,7 @@ def create_lightbulb_service(accessory: Accessory) -> None:
 
 
 async def test_storage_is_updated_on_add(
-    hass: HomeAssistant, hass_storage: dict[str, Any], get_next_aid: Callable[[], int]
+    hass: SmartHub, hass_storage: dict[str, Any], get_next_aid: Callable[[], int]
 ) -> None:
     """Test entity map storage is cleaned up on adding an accessory."""
     await setup_test_component(hass, get_next_aid(), create_lightbulb_service)

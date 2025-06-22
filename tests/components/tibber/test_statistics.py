@@ -2,11 +2,11 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.statistics import statistics_during_period
-from homeassistant.components.tibber.coordinator import TibberDataCoordinator
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.statistics import statistics_during_period
+from smarthub.components.tibber.coordinator import TibberDataCoordinator
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .test_common import CONSUMPTION_DATA_1, PRODUCTION_DATA_1, mock_get_homes
 
@@ -15,7 +15,7 @@ from tests.components.recorder.common import async_wait_recording_done
 
 
 async def test_async_setup_entry(
-    recorder_mock: Recorder, hass: HomeAssistant, config_entry: MockConfigEntry
+    recorder_mock: Recorder, hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test setup Tibber."""
     tibber_connection = AsyncMock()

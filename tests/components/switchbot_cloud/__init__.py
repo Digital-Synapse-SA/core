@@ -1,13 +1,13 @@
 """Tests for the SwitchBot Cloud integration."""
 
-from homeassistant.components.switchbot_cloud.const import DOMAIN
-from homeassistant.const import CONF_API_KEY, CONF_API_TOKEN
-from homeassistant.core import HomeAssistant
+from smarthub.components.switchbot_cloud.const import DOMAIN
+from smarthub.const import CONF_API_KEY, CONF_API_TOKEN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def configure_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def configure_integration(hass: SmartHub) -> MockConfigEntry:
     """Configure the integration."""
     config = {
         CONF_API_TOKEN: "test-token",

@@ -6,9 +6,9 @@ from unittest.mock import ANY, AsyncMock, patch
 from kasa import Module, TimeoutError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import stream
-from homeassistant.components.tplink import (
+from smarthub import config_entries
+from smarthub.components import stream
+from smarthub.components.tplink import (
     DOMAIN,
     AuthenticationError,
     Credentials,
@@ -16,16 +16,16 @@ from homeassistant.components.tplink import (
     DeviceConfig,
     KasaException,
 )
-from homeassistant.components.tplink.config_flow import TPLinkConfigFlow
-from homeassistant.components.tplink.const import (
+from smarthub.components.tplink.config_flow import TPLinkConfigFlow
+from smarthub.components.tplink.const import (
     CONF_CAMERA_CREDENTIALS,
     CONF_CONNECTION_PARAMETERS,
     CONF_CREDENTIALS_HASH,
     CONF_DEVICE_CONFIG,
     CONF_LIVE_VIEW,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     CONF_ALIAS,
     CONF_DEVICE,
     CONF_HOST,
@@ -34,9 +34,9 @@ from homeassistant.const import (
     CONF_PORT,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import _mocked_device, _patch_connect, _patch_discovery, _patch_single_discovery
 from .conftest import override_side_effect
@@ -88,7 +88,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_discovery(
-    hass: HomeAssistant, device_config, expected_entry_data, credentials_hash
+    hass: SmartHub, device_config, expected_entry_data, credentials_hash
 ) -> None:
     """Test setting up discovery."""
     ip_address = device_config.host
@@ -168,7 +168,7 @@ async def test_discovery(
 
 @pytest.mark.usefixtures("mock_init")
 async def test_discovery_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -210,7 +210,7 @@ async def test_discovery_camera(
     assert not result["errors"]
 
     with patch(
-        "homeassistant.components.stream.async_check_stream_client_error",
+        "smarthub.components.stream.async_check_stream_client_error",
         return_value=None,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -231,7 +231,7 @@ async def test_discovery_camera(
 
 @pytest.mark.usefixtures("mock_init")
 async def test_discovery_pick_device_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -278,7 +278,7 @@ async def test_discovery_pick_device_camera(
     assert not result["errors"]
 
     with patch(
-        "homeassistant.components.stream.async_check_stream_client_error",
+        "smarthub.components.stream.async_check_stream_client_error",
         return_value=None,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -299,7 +299,7 @@ async def test_discovery_pick_device_camera(
 
 @pytest.mark.usefixtures("mock_init")
 async def test_discovery_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -345,7 +345,7 @@ async def test_discovery_auth(
 
 @pytest.mark.usefixtures("mock_init")
 async def test_discovery_auth_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -390,7 +390,7 @@ async def test_discovery_auth_camera(
     assert not result["errors"]
 
     with patch(
-        "homeassistant.components.stream.async_check_stream_client_error",
+        "smarthub.components.stream.async_check_stream_client_error",
         return_value=None,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -419,7 +419,7 @@ async def test_discovery_auth_camera(
 )
 @pytest.mark.usefixtures("mock_init")
 async def test_discovery_auth_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect: AsyncMock,
     error_type: Exception,
     errors_msg: str,
@@ -477,7 +477,7 @@ async def test_discovery_auth_errors(
 
 @pytest.mark.usefixtures("mock_init")
 async def test_discovery_new_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect: AsyncMock,
 ) -> None:
     """Test setting up discovery with new credentials."""
@@ -502,7 +502,7 @@ async def test_discovery_new_credentials(
     assert mock_connect["connect"].call_count == 1
 
     with patch(
-        "homeassistant.components.tplink.config_flow.get_credentials",
+        "smarthub.components.tplink.config_flow.get_credentials",
         return_value=Credentials("fake_user", "fake_pass"),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -526,16 +526,16 @@ async def test_discovery_new_credentials(
 
 @pytest.mark.usefixtures("mock_init")
 async def test_discovery_new_credentials_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect: AsyncMock,
 ) -> None:
     """Test setting up discovery with new invalid credentials."""
     mock_device = mock_connect["mock_devices"][IP_ADDRESS]
 
     with (
-        patch("homeassistant.components.tplink.Discover.discover", return_value={}),
+        patch("smarthub.components.tplink.Discover.discover", return_value={}),
         patch(
-            "homeassistant.components.tplink.config_flow.get_credentials",
+            "smarthub.components.tplink.config_flow.get_credentials",
             return_value=None,
         ),
         override_side_effect(mock_connect["connect"], AuthenticationError),
@@ -559,7 +559,7 @@ async def test_discovery_new_credentials_invalid(
 
     with (
         patch(
-            "homeassistant.components.tplink.config_flow.get_credentials",
+            "smarthub.components.tplink.config_flow.get_credentials",
             return_value=Credentials("fake_user", "fake_pass"),
         ),
         override_side_effect(mock_connect["connect"], AuthenticationError),
@@ -586,7 +586,7 @@ async def test_discovery_new_credentials_invalid(
     assert result3["context"]["unique_id"] == MAC_ADDRESS
 
 
-async def test_discovery_with_existing_device_present(hass: HomeAssistant) -> None:
+async def test_discovery_with_existing_device_present(hass: SmartHub) -> None:
     """Test setting up discovery."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: IP_ADDRESS2}, unique_id="dd:dd:dd:dd:dd:dd"
@@ -666,7 +666,7 @@ async def test_discovery_with_existing_device_present(hass: HomeAssistant) -> No
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_discovery_no_device(hass: HomeAssistant) -> None:
+async def test_discovery_no_device(hass: SmartHub) -> None:
     """Test discovery without device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -680,7 +680,7 @@ async def test_discovery_no_device(hass: HomeAssistant) -> None:
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_manual(hass: HomeAssistant) -> None:
+async def test_manual(hass: SmartHub) -> None:
     """Test manually setup."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -740,7 +740,7 @@ async def test_manual(hass: HomeAssistant) -> None:
 
 
 async def test_manual_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -776,7 +776,7 @@ async def test_manual_camera(
     # Test unknown error
     with (
         patch(
-            "homeassistant.components.stream.async_check_stream_client_error",
+            "smarthub.components.stream.async_check_stream_client_error",
             side_effect=stream.StreamOpenClientError(
                 "Stream was not found", error_code=stream.StreamClientError.NotFound
             ),
@@ -799,7 +799,7 @@ async def test_manual_camera(
     # Test unknown error
     with (
         patch(
-            "homeassistant.components.stream.async_check_stream_client_error",
+            "smarthub.components.stream.async_check_stream_client_error",
             side_effect=stream.StreamOpenClientError(
                 "Request is unauthorized",
                 error_code=stream.StreamClientError.Unauthorized,
@@ -820,7 +820,7 @@ async def test_manual_camera(
     assert result["errors"] == {"base": "invalid_camera_auth"}
 
     with patch(
-        "homeassistant.components.stream.async_check_stream_client_error",
+        "smarthub.components.stream.async_check_stream_client_error",
         return_value=None,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -854,7 +854,7 @@ async def test_manual_camera(
     ],
 )
 async def test_manual_camera_no_hls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
     exception: Exception,
@@ -878,10 +878,10 @@ async def test_manual_camera_no_hls(
     # Test stream error
     with (
         patch(
-            "homeassistant.components.stream.async_check_stream_client_error",
+            "smarthub.components.stream.async_check_stream_client_error",
             side_effect=exception,
         ),
-        patch("homeassistant.components.ffmpeg.async_get_image", return_value=None),
+        patch("smarthub.components.ffmpeg.async_get_image", return_value=None),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -900,11 +900,11 @@ async def test_manual_camera_no_hls(
     # async_get_image will succeed
     with (
         patch(
-            "homeassistant.components.stream.async_check_stream_client_error",
+            "smarthub.components.stream.async_check_stream_client_error",
             side_effect=exception,
         ),
         patch(
-            "homeassistant.components.ffmpeg.async_get_image",
+            "smarthub.components.ffmpeg.async_get_image",
             return_value=SMALLEST_VALID_JPEG_BYTES,
         ),
     ):
@@ -927,7 +927,7 @@ async def test_manual_camera_no_hls(
 
 
 async def test_manual_camera_no_live_view(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -961,7 +961,7 @@ async def test_manual_camera_no_live_view(
     assert result["data"][CONF_LIVE_VIEW] is False
 
 
-async def test_manual_no_capabilities(hass: HomeAssistant) -> None:
+async def test_manual_no_capabilities(hass: SmartHub) -> None:
     """Test manually setup without successful get_capabilities."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -989,7 +989,7 @@ async def test_manual_no_capabilities(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_init")
 async def test_manual_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -1029,7 +1029,7 @@ async def test_manual_auth(
 
 
 async def test_manual_auth_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -1064,7 +1064,7 @@ async def test_manual_auth_camera(
     assert result["step_id"] == "camera_auth_confirm"
 
     with patch(
-        "homeassistant.components.stream.async_check_stream_client_error",
+        "smarthub.components.stream.async_check_stream_client_error",
         return_value=None,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -1095,7 +1095,7 @@ async def test_manual_auth_camera(
 )
 @pytest.mark.usefixtures("mock_init")
 async def test_manual_auth_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
     error_type: Exception,
@@ -1157,7 +1157,7 @@ async def test_manual_auth_errors(
     ],
 )
 async def test_manual_port_override(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect: AsyncMock,
     mock_discovery: AsyncMock,
     host_str: str,
@@ -1232,7 +1232,7 @@ async def test_manual_port_override(
 
 
 async def test_manual_port_override_invalid(
-    hass: HomeAssistant, mock_connect: AsyncMock, mock_discovery: AsyncMock
+    hass: SmartHub, mock_connect: AsyncMock, mock_discovery: AsyncMock
 ) -> None:
     """Test manually setup."""
     result = await hass.config_entries.flow.async_init(
@@ -1257,7 +1257,7 @@ async def test_manual_port_override_invalid(
     assert result2["context"]["unique_id"] == MAC_ADDRESS
 
 
-async def test_discovered_by_discovery_and_dhcp(hass: HomeAssistant) -> None:
+async def test_discovered_by_discovery_and_dhcp(hass: SmartHub) -> None:
     """Test we get the form with discovery and abort for dhcp source when we get both."""
 
     with _patch_discovery(), _patch_single_discovery(), _patch_connect():
@@ -1351,7 +1351,7 @@ async def test_discovered_by_discovery_and_dhcp(hass: HomeAssistant) -> None:
     ],
 )
 async def test_discovered_by_dhcp_or_discovery(
-    hass: HomeAssistant, source: str, data: dict
+    hass: SmartHub, source: str, data: dict
 ) -> None:
     """Test we can setup when discovered from dhcp or discovery."""
 
@@ -1405,7 +1405,7 @@ async def test_discovered_by_dhcp_or_discovery(
     ],
 )
 async def test_discovered_by_dhcp_or_discovery_failed_to_get_device(
-    hass: HomeAssistant, source: str, data: dict
+    hass: SmartHub, source: str, data: dict
 ) -> None:
     """Test we abort if we cannot get the unique id when discovered from dhcp."""
 
@@ -1423,7 +1423,7 @@ async def test_discovered_by_dhcp_or_discovery_failed_to_get_device(
 
 
 async def test_integration_discovery_with_ip_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -1431,7 +1431,7 @@ async def test_integration_discovery_with_ip_change(
     """Test integration updates ip address from discovery."""
     mock_config_entry.add_to_hass(hass)
     with (
-        patch("homeassistant.components.tplink.Discover.discover", return_value={}),
+        patch("smarthub.components.tplink.Discover.discover", return_value={}),
         override_side_effect(mock_connect["connect"], KasaException()),
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -1479,7 +1479,7 @@ async def test_integration_discovery_with_ip_change(
 
     with (
         patch(
-            "homeassistant.components.tplink.async_create_clientsession",
+            "smarthub.components.tplink.async_create_clientsession",
             return_value="Foo",
         ),
         override_side_effect(mock_connect["connect"], lambda *_, **__: bulb),
@@ -1495,7 +1495,7 @@ async def test_integration_discovery_with_ip_change(
 
 
 async def test_integration_discovery_with_connection_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -1512,7 +1512,7 @@ async def test_integration_discovery_with_connection_change(
     )
     mock_config_entry.add_to_hass(hass)
     with (
-        patch("homeassistant.components.tplink.Discover.discover", return_value={}),
+        patch("smarthub.components.tplink.Discover.discover", return_value={}),
         override_side_effect(mock_connect["connect"], KasaException()),
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -1549,7 +1549,7 @@ async def test_integration_discovery_with_connection_change(
 
     with (
         patch(
-            "homeassistant.components.tplink.async_create_clientsession",
+            "smarthub.components.tplink.async_create_clientsession",
             return_value="Foo",
         ),
         override_side_effect(mock_connect["connect"], lambda *_, **__: bulb),
@@ -1582,7 +1582,7 @@ async def test_integration_discovery_with_connection_change(
 
 
 async def test_dhcp_discovery_with_ip_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -1590,7 +1590,7 @@ async def test_dhcp_discovery_with_ip_change(
     """Test dhcp discovery with an IP change."""
     mock_config_entry.add_to_hass(hass)
     with (
-        patch("homeassistant.components.tplink.Discover.discover", return_value={}),
+        patch("smarthub.components.tplink.Discover.discover", return_value={}),
         override_side_effect(mock_connect["connect"], KasaException()),
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -1614,7 +1614,7 @@ async def test_dhcp_discovery_with_ip_change(
 
 
 async def test_dhcp_discovery_discover_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -1638,7 +1638,7 @@ async def test_dhcp_discovery_discover_fail(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -1672,7 +1672,7 @@ async def test_reauth(
 
 
 async def test_reauth_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -1695,7 +1695,7 @@ async def test_reauth_camera(
     assert result["step_id"] == "camera_auth_confirm"
 
     with patch(
-        "homeassistant.components.stream.async_check_stream_client_error",
+        "smarthub.components.stream.async_check_stream_client_error",
         return_value=None,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -1715,7 +1715,7 @@ async def test_reauth_camera(
 
 
 async def test_reauth_try_connect_all(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -1750,7 +1750,7 @@ async def test_reauth_try_connect_all(
 
 
 async def test_reauth_try_connect_all_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -1801,7 +1801,7 @@ async def test_reauth_try_connect_all_fail(
 
 
 async def test_reauth_update_with_encryption_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
     caplog: pytest.LogCaptureFixture,
@@ -1821,7 +1821,7 @@ async def test_reauth_update_with_encryption_change(
     assert mock_config_entry.data[CONF_CREDENTIALS_HASH] == CREDENTIALS_HASH_AES
 
     with (
-        patch("homeassistant.components.tplink.Discover.discover", return_value={}),
+        patch("smarthub.components.tplink.Discover.discover", return_value={}),
         override_side_effect(mock_connect["connect"], AuthenticationError()),
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -1884,7 +1884,7 @@ async def test_reauth_update_with_encryption_change(
 
 
 async def test_reauth_update_from_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -1892,7 +1892,7 @@ async def test_reauth_update_from_discovery(
     """Test reauth flow."""
     mock_config_entry.add_to_hass(hass)
     with (
-        patch("homeassistant.components.tplink.Discover.discover", return_value={}),
+        patch("smarthub.components.tplink.Discover.discover", return_value={}),
         override_side_effect(mock_connect["connect"], AuthenticationError()),
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -1933,7 +1933,7 @@ async def test_reauth_update_from_discovery(
 
 
 async def test_reauth_update_from_discovery_with_ip_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -1941,7 +1941,7 @@ async def test_reauth_update_from_discovery_with_ip_change(
     """Test reauth flow."""
     mock_config_entry.add_to_hass(hass)
     with (
-        patch("homeassistant.components.tplink.Discover.discover", return_value={}),
+        patch("smarthub.components.tplink.Discover.discover", return_value={}),
         override_side_effect(mock_connect["connect"], AuthenticationError()),
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -1982,7 +1982,7 @@ async def test_reauth_update_from_discovery_with_ip_change(
 
 
 async def test_reauth_no_update_if_config_and_ip_the_same(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -2043,7 +2043,7 @@ async def test_reauth_no_update_if_config_and_ip_the_same(
     ids=["invalid-auth", "unknown-error"],
 )
 async def test_reauth_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -2108,7 +2108,7 @@ async def test_reauth_errors(
     ids=["invalid-auth", "unknown-error"],
 )
 async def test_pick_device_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
     error_type: type[Exception],
@@ -2151,7 +2151,7 @@ async def test_pick_device_errors(
 
 @pytest.mark.usefixtures("mock_init")
 async def test_discovery_timeout_try_connect_all(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -2177,7 +2177,7 @@ async def test_discovery_timeout_try_connect_all(
 
 @pytest.mark.usefixtures("mock_init")
 async def test_discovery_timeout_try_connect_all_needs_creds(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -2215,7 +2215,7 @@ async def test_discovery_timeout_try_connect_all_needs_creds(
 
 @pytest.mark.usefixtures("mock_init")
 async def test_discovery_timeout_try_connect_all_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -2252,7 +2252,7 @@ async def test_discovery_timeout_try_connect_all_fail(
 
 
 async def test_reauth_update_other_flows(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -2272,7 +2272,7 @@ async def test_reauth_update_other_flows(
     mock_config_entry.add_to_hass(hass)
     mock_config_entry2.add_to_hass(hass)
     with (
-        patch("homeassistant.components.tplink.Discover.discover", return_value={}),
+        patch("smarthub.components.tplink.Discover.discover", return_value={}),
         override_side_effect(mock_connect["connect"], AuthenticationError()),
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -2312,7 +2312,7 @@ async def test_reauth_update_other_flows(
 
 
 async def test_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -2335,7 +2335,7 @@ async def test_reconfigure(
 
 
 async def test_reconfigure_auth_discovered(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -2392,7 +2392,7 @@ async def test_reconfigure_auth_discovered(
 
 
 async def test_reconfigure_auth_try_connect_all(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -2430,7 +2430,7 @@ async def test_reconfigure_auth_try_connect_all(
 
 
 async def test_reconfigure_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
@@ -2453,7 +2453,7 @@ async def test_reconfigure_camera(
     assert result["step_id"] == "camera_auth_confirm"
 
     with patch(
-        "homeassistant.components.stream.async_check_stream_client_error",
+        "smarthub.components.stream.async_check_stream_client_error",
         return_value=None,
     ):
         result = await hass.config_entries.flow.async_configure(

@@ -5,21 +5,21 @@ from typing import Any
 
 from aiohttp.test_utils import TestClient
 
-from homeassistant.components.repairs.issue_handler import (  # noqa: F401
+from smarthub.components.repairs.issue_handler import (  # noqa: F401
     async_process_repairs_platforms,
 )
-from homeassistant.components.repairs.websocket_api import (
+from smarthub.components.repairs.websocket_api import (
     RepairsFlowIndexView,
     RepairsFlowResourceView,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import WebSocketGenerator
 
 
 async def get_repairs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ):
     """Return the repairs list of issues."""

@@ -9,7 +9,7 @@ from aioesphomeapi import (
     ValveState as ESPHomeValveState,
 )
 
-from homeassistant.components.valve import (
+from smarthub.components.valve import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
     DOMAIN as VALVE_DOMAIN,
@@ -19,14 +19,14 @@ from homeassistant.components.valve import (
     SERVICE_STOP_VALVE,
     ValveState,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import MockESPHomeDeviceType
 
 
 async def test_valve_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -124,7 +124,7 @@ async def test_valve_entity(
 
 
 async def test_valve_entity_without_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:

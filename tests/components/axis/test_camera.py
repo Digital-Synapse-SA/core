@@ -5,12 +5,12 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import camera
-from homeassistant.components.axis.const import CONF_STREAM_PROFILE
-from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components import camera
+from smarthub.components.axis.const import CONF_STREAM_PROFILE
+from smarthub.components.camera import DOMAIN as CAMERA_DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType
 from .const import MAC, NAME
@@ -22,7 +22,7 @@ from tests.common import snapshot_platform
 def mock_getrandbits():
     """Mock camera access token which normally is randomized."""
     with patch(
-        "homeassistant.components.camera.SystemRandom.getrandbits",
+        "smarthub.components.camera.SystemRandom.getrandbits",
         return_value=1,
     ):
         yield
@@ -47,14 +47,14 @@ root.Properties.System.SerialNumber={MAC}
     ],
 )
 async def test_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     snapshot: SnapshotAssertion,
     stream_profile: str,
 ) -> None:
     """Test that Axis camera platform is loaded properly."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.CAMERA]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.CAMERA]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -74,6 +74,6 @@ async def test_camera(
 
 @pytest.mark.parametrize("param_properties_payload", [PROPERTY_DATA])
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_camera_disabled(hass: HomeAssistant) -> None:
+async def test_camera_disabled(hass: SmartHub) -> None:
     """Test that Axis camera platform is loaded properly but does not create camera entity."""
     assert len(hass.states.async_entity_ids(CAMERA_DOMAIN)) == 0

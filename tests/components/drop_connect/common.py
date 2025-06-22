@@ -2,7 +2,7 @@
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.drop_connect.const import (
+from smarthub.components.drop_connect.const import (
     CONF_COMMAND_TOPIC,
     CONF_DATA_TOPIC,
     CONF_DEVICE_DESC,
@@ -13,10 +13,10 @@ from homeassistant.components.drop_connect.const import (
     CONF_HUB_ID,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -247,7 +247,7 @@ def config_entry_ro_filter() -> ConfigEntry:
 
 
 def help_assert_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     config_entry: ConfigEntry,

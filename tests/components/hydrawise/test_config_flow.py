@@ -7,11 +7,11 @@ from pydrawise.exceptions import NotAuthorizedError
 from pydrawise.schema import User
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.hydrawise.const import DOMAIN
-from homeassistant.const import CONF_API_KEY, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.hydrawise.const import DOMAIN
+from smarthub.const import CONF_API_KEY, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_auth: AsyncMock,
     mock_pydrawise: AsyncMock,
@@ -57,7 +57,7 @@ async def test_form(
 
 
 async def test_form_api_error(
-    hass: HomeAssistant, mock_auth: AsyncMock, mock_pydrawise: AsyncMock, user: User
+    hass: SmartHub, mock_auth: AsyncMock, mock_pydrawise: AsyncMock, user: User
 ) -> None:
     """Test we handle API errors."""
     mock_pydrawise.get_user.side_effect = ClientError("XXX")
@@ -83,7 +83,7 @@ async def test_form_api_error(
 
 
 async def test_form_auth_connect_timeout(
-    hass: HomeAssistant, mock_auth: AsyncMock, mock_pydrawise: AsyncMock
+    hass: SmartHub, mock_auth: AsyncMock, mock_pydrawise: AsyncMock
 ) -> None:
     """Test we handle connection timeout errors."""
     mock_auth.check.side_effect = TimeoutError
@@ -111,7 +111,7 @@ async def test_form_auth_connect_timeout(
 
 
 async def test_form_client_connect_timeout(
-    hass: HomeAssistant, mock_auth: AsyncMock, mock_pydrawise: AsyncMock, user: User
+    hass: SmartHub, mock_auth: AsyncMock, mock_pydrawise: AsyncMock, user: User
 ) -> None:
     """Test we handle API errors."""
     mock_pydrawise.get_user.side_effect = TimeoutError
@@ -137,7 +137,7 @@ async def test_form_client_connect_timeout(
 
 
 async def test_form_not_authorized_error(
-    hass: HomeAssistant, mock_auth: AsyncMock, mock_pydrawise: AsyncMock
+    hass: SmartHub, mock_auth: AsyncMock, mock_pydrawise: AsyncMock
 ) -> None:
     """Test we handle API errors."""
     mock_auth.check.side_effect = NotAuthorizedError
@@ -162,7 +162,7 @@ async def test_form_not_authorized_error(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     user: User,
     mock_auth: AsyncMock,
     mock_pydrawise: AsyncMock,
@@ -203,7 +203,7 @@ async def test_reauth(
 
 
 async def test_reauth_fails(
-    hass: HomeAssistant, mock_auth: AsyncMock, mock_pydrawise: AsyncMock, user: User
+    hass: SmartHub, mock_auth: AsyncMock, mock_pydrawise: AsyncMock, user: User
 ) -> None:
     """Test that the reauth flow handles API errors."""
     mock_config_entry = MockConfigEntry(

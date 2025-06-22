@@ -6,9 +6,9 @@ from unittest.mock import patch
 from lacrosse_view import Sensor
 import pytest
 
-from homeassistant.components.lacrosse_view.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.lacrosse_view.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import (
     MOCK_ENTRY_DATA,
@@ -29,7 +29,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_entities_added(hass: HomeAssistant) -> None:
+async def test_entities_added(hass: SmartHub) -> None:
     """Test the entities are added."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY_DATA)
     config_entry.add_to_hass(hass)
@@ -54,7 +54,7 @@ async def test_entities_added(hass: HomeAssistant) -> None:
 
 
 async def test_sensor_permission(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if it raises a warning when there is no permission to read the sensor."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY_DATA)
@@ -84,7 +84,7 @@ async def test_sensor_permission(
 
 
 async def test_field_not_supported(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if it raises a warning when the field is not supported."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY_DATA)
@@ -121,7 +121,7 @@ async def test_field_not_supported(
     ],
 )
 async def test_field_types(
-    hass: HomeAssistant, test_input: Sensor, expected: Any, entity_id: str
+    hass: SmartHub, test_input: Sensor, expected: Any, entity_id: str
 ) -> None:
     """Test the different data types for fields."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY_DATA)
@@ -149,7 +149,7 @@ async def test_field_types(
     assert hass.states.get(f"sensor.test_{entity_id}").state == expected
 
 
-async def test_no_field(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_no_field(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test behavior when the expected field is not present."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY_DATA)
     config_entry.add_to_hass(hass)
@@ -176,7 +176,7 @@ async def test_no_field(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -
     assert hass.states.get("sensor.test_temperature").state == "unavailable"
 
 
-async def test_field_data_missing(hass: HomeAssistant) -> None:
+async def test_field_data_missing(hass: SmartHub) -> None:
     """Test behavior when field data is missing."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY_DATA)
     config_entry.add_to_hass(hass)
@@ -203,7 +203,7 @@ async def test_field_data_missing(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_temperature").state == "unknown"
 
 
-async def test_no_readings(hass: HomeAssistant) -> None:
+async def test_no_readings(hass: SmartHub) -> None:
     """Test behavior when there are no readings."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY_DATA)
     config_entry.add_to_hass(hass)
@@ -230,7 +230,7 @@ async def test_no_readings(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_temperature").state == "unavailable"
 
 
-async def test_other_error(hass: HomeAssistant) -> None:
+async def test_other_error(hass: SmartHub) -> None:
     """Test behavior when there is an error."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY_DATA)
     config_entry.add_to_hass(hass)

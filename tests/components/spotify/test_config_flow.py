@@ -6,18 +6,18 @@ from unittest.mock import MagicMock, patch
 import pytest
 from spotifyaio import SpotifyConnectionError
 
-from homeassistant.components.spotify.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.components.spotify.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
 from tests.typing import ClientSessionGenerator
 
 
-async def test_abort_if_no_configuration(hass: HomeAssistant) -> None:
+async def test_abort_if_no_configuration(hass: SmartHub) -> None:
     """Check flow aborts when no configuration is present."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -30,7 +30,7 @@ async def test_abort_if_no_configuration(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures("current_request_with_host")
 @pytest.mark.usefixtures("setup_credentials")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_spotify: MagicMock,
@@ -76,7 +76,7 @@ async def test_full_flow(
     )
 
     with (
-        patch("homeassistant.components.spotify.async_setup_entry", return_value=True),
+        patch("smarthub.components.spotify.async_setup_entry", return_value=True),
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -98,7 +98,7 @@ async def test_full_flow(
 @pytest.mark.usefixtures("current_request_with_host")
 @pytest.mark.usefixtures("setup_credentials")
 async def test_abort_if_spotify_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_spotify: MagicMock,
@@ -139,7 +139,7 @@ async def test_abort_if_spotify_error(
 @pytest.mark.usefixtures("current_request_with_host")
 @pytest.mark.usefixtures("setup_credentials")
 async def test_reauthentication(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_spotify: MagicMock,
@@ -176,7 +176,7 @@ async def test_reauthentication(
     )
 
     with (
-        patch("homeassistant.components.spotify.async_setup_entry", return_value=True),
+        patch("smarthub.components.spotify.async_setup_entry", return_value=True),
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -194,7 +194,7 @@ async def test_reauthentication(
 @pytest.mark.usefixtures("current_request_with_host")
 @pytest.mark.usefixtures("setup_credentials")
 async def test_reauth_account_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_spotify: MagicMock,

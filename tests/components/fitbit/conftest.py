@@ -10,14 +10,14 @@ from unittest.mock import patch
 import pytest
 from requests_mock.mocker import Mocker
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.fitbit.const import DOMAIN, OAUTH_SCOPES
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.fitbit.const import DOMAIN, OAUTH_SCOPES
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -95,7 +95,7 @@ def mock_config_entry(
 
 
 @pytest.fixture
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -140,7 +140,7 @@ def platforms() -> list[Platform]:
 
 @pytest.fixture(name="integration_setup")
 async def mock_integration_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     platforms: list[str],
 ) -> Callable[[], Awaitable[bool]]:
@@ -148,7 +148,7 @@ async def mock_integration_setup(
     config_entry.add_to_hass(hass)
 
     async def run() -> bool:
-        with patch(f"homeassistant.components.{DOMAIN}.PLATFORMS", platforms):
+        with patch(f"smarthub.components.{DOMAIN}.PLATFORMS", platforms):
             result = await hass.config_entries.async_setup(config_entry.entry_id)
             await hass.async_block_till_done()
         return result

@@ -1,13 +1,13 @@
 """Test Qbus light entities."""
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     DOMAIN as LIGHT_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from tests.common import async_fire_mqtt_message
 from tests.typing import MqttMockHAClient
@@ -37,7 +37,7 @@ _LIGHT_ENTITY_ID = "light.media_room"
 
 
 async def test_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     setup_integration: None,
 ) -> None:

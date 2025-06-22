@@ -4,15 +4,15 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.airtouch5.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.airtouch5.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_success(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_success(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -42,7 +42,7 @@ async def test_success(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_cannot_connect(hass: HomeAssistant) -> None:
+async def test_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}

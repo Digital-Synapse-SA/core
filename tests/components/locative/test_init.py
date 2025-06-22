@@ -6,16 +6,16 @@ from unittest.mock import patch
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import locative
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
-from homeassistant.components.device_tracker.legacy import Device
-from homeassistant.components.locative import DOMAIN, TRACKER_UPDATE
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.dispatcher import DATA_DISPATCHER
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components import locative
+from smarthub.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
+from smarthub.components.device_tracker.legacy import Device
+from smarthub.components.locative import DOMAIN, TRACKER_UPDATE
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.dispatcher import DATA_DISPATCHER
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -27,18 +27,18 @@ def mock_dev_track(mock_device_tracker_conf: list[Device]) -> None:
 
 @pytest.fixture
 async def locative_client(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> TestClient:
     """Locative mock client."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     await hass.async_block_till_done()
 
-    with patch("homeassistant.components.device_tracker.legacy.update_config"):
+    with patch("smarthub.components.device_tracker.legacy.update_config"):
         return await hass_client()
 
 
 @pytest.fixture
-async def webhook_id(hass: HomeAssistant, locative_client: TestClient) -> str:
+async def webhook_id(hass: SmartHub, locative_client: TestClient) -> str:
     """Initialize the Geofency component and get the webhook_id."""
     await async_process_ha_core_config(
         hass,
@@ -117,7 +117,7 @@ async def test_missing_data(locative_client: TestClient, webhook_id: str) -> Non
 
 
 async def test_enter_and_exit(
-    hass: HomeAssistant, locative_client: TestClient, webhook_id: str
+    hass: SmartHub, locative_client: TestClient, webhook_id: str
 ) -> None:
     """Test when there is a known zone."""
     url = f"/api/webhook/{webhook_id}"
@@ -178,7 +178,7 @@ async def test_enter_and_exit(
 
 
 async def test_exit_after_enter(
-    hass: HomeAssistant, locative_client: TestClient, webhook_id: str
+    hass: SmartHub, locative_client: TestClient, webhook_id: str
 ) -> None:
     """Test when an exit message comes after an enter message."""
     url = f"/api/webhook/{webhook_id}"
@@ -222,7 +222,7 @@ async def test_exit_after_enter(
 
 
 async def test_exit_first(
-    hass: HomeAssistant, locative_client: TestClient, webhook_id: str
+    hass: SmartHub, locative_client: TestClient, webhook_id: str
 ) -> None:
     """Test when an exit message is sent first on a new device."""
     url = f"/api/webhook/{webhook_id}"
@@ -245,7 +245,7 @@ async def test_exit_first(
 
 
 async def test_two_devices(
-    hass: HomeAssistant, locative_client: TestClient, webhook_id: str
+    hass: SmartHub, locative_client: TestClient, webhook_id: str
 ) -> None:
     """Test updating two different devices."""
     url = f"/api/webhook/{webhook_id}"
@@ -284,7 +284,7 @@ async def test_two_devices(
     reason="The device_tracker component does not support unloading yet."
 )
 async def test_load_unload_entry(
-    hass: HomeAssistant, locative_client: TestClient, webhook_id: str
+    hass: SmartHub, locative_client: TestClient, webhook_id: str
 ) -> None:
     """Test that the appropriate dispatch signals are added and removed."""
     url = f"/api/webhook/{webhook_id}"

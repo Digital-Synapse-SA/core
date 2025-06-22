@@ -6,14 +6,14 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.feedreader.event import (
+from smarthub.components.feedreader.event import (
     ATTR_CONTENT,
     ATTR_DESCRIPTION,
     ATTR_LINK,
     ATTR_TITLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import create_mock_entry
 from .const import VALID_CONFIG_DEFAULT
@@ -22,13 +22,13 @@ from tests.common import async_fire_time_changed
 
 
 async def test_event_entity(
-    hass: HomeAssistant, feed_one_event, feed_two_event, feed_only_summary
+    hass: SmartHub, feed_one_event, feed_two_event, feed_only_summary
 ) -> None:
     """Test feed event entity."""
     entry = create_mock_entry(VALID_CONFIG_DEFAULT)
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.feedreader.coordinator.feedparser.http.get",
+        "smarthub.components.feedreader.coordinator.feedparser.http.get",
         side_effect=[feed_one_event, feed_two_event, feed_only_summary],
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -72,7 +72,7 @@ async def test_event_entity(
     ],
 )
 async def test_event_htmlentities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     fixture_name,
     request: pytest.FixtureRequest,
@@ -81,7 +81,7 @@ async def test_event_htmlentities(
     entry = create_mock_entry(VALID_CONFIG_DEFAULT)
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.feedreader.coordinator.feedparser.http.get",
+        "smarthub.components.feedreader.coordinator.feedparser.http.get",
         side_effect=[request.getfixturevalue(fixture_name)],
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)

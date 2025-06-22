@@ -5,14 +5,14 @@ from __future__ import annotations
 from typing import Any
 from unittest.mock import patch
 
-from homeassistant.components import mikrotik
-from homeassistant.components.mikrotik.const import (
+from smarthub.components import mikrotik
+from smarthub.components.mikrotik.const import (
     CONF_ARP_PING,
     CONF_DETECTION_TIME,
     CONF_FORCE_DHCP,
     DEFAULT_DETECTION_TIME,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_HOST,
     CONF_NAME,
     CONF_PASSWORD,
@@ -20,7 +20,7 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -168,7 +168,7 @@ ARP_DATA = [
 ]
 
 
-async def setup_mikrotik_entry(hass: HomeAssistant, **kwargs: Any) -> None:
+async def setup_mikrotik_entry(hass: SmartHub, **kwargs: Any) -> None:
     """Set up Mikrotik integration successfully."""
     support_wireless: bool = kwargs.get("support_wireless", True)
     support_wifiwave2: bool = kwargs.get("support_wifiwave2", False)

@@ -8,17 +8,17 @@ import urllib
 
 import pytest
 
-from homeassistant.components.remote_calendar.const import CONF_CALENDAR_NAME, DOMAIN
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
+from smarthub.components.remote_calendar.const import CONF_CALENDAR_NAME, DOMAIN
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.typing import ClientSessionGenerator
 
-CALENDAR_NAME = "Home Assistant Events"
+CALENDAR_NAME = "SmartHub Events"
 TEST_ENTITY = "calendar.home_assistant_events"
 CALENDER_URL = "https://some.calendar.com/calendar.ics"
-FRIENDLY_NAME = "Home Assistant Events"
+FRIENDLY_NAME = "SmartHub Events"
 
 
 @pytest.fixture(name="time_zone")
@@ -30,7 +30,7 @@ def mock_time_zone() -> str:
 
 
 @pytest.fixture(autouse=True)
-async def set_time_zone(hass: HomeAssistant, time_zone: str):
+async def set_time_zone(hass: SmartHub, time_zone: str):
     """Set the time zone for the tests."""
     # Set our timezone to CST/Regina so we can check calculations
     # This keeps UTC-6 all year round

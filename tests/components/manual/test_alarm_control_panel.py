@@ -6,17 +6,17 @@ from unittest.mock import MagicMock, patch
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components import alarm_control_panel
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components import alarm_control_panel
+from smarthub.components.alarm_control_panel import (
     AlarmControlPanelEntityFeature,
     AlarmControlPanelState,
 )
-from homeassistant.components.demo import alarm_control_panel as demo
-from homeassistant.components.manual.alarm_control_panel import (
+from smarthub.components.demo import alarm_control_panel as demo
+from smarthub.components.manual.alarm_control_panel import (
     ATTR_NEXT_STATE,
     ATTR_PREVIOUS_STATE,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_CODE,
     ATTR_ENTITY_ID,
     SERVICE_ALARM_ARM_AWAY,
@@ -25,10 +25,10 @@ from homeassistant.const import (
     SERVICE_ALARM_ARM_NIGHT,
     SERVICE_ALARM_ARM_VACATION,
 )
-from homeassistant.core import CoreState, HomeAssistant, State
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import CoreState, SmartHub, State
+from smarthub.exceptions import ServiceValidationError
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed, mock_component, mock_restore_cache
 from tests.components.alarm_control_panel import common
@@ -36,7 +36,7 @@ from tests.components.alarm_control_panel import common
 CODE = "HELLO_CODE"
 
 
-async def test_setup_demo_platform(hass: HomeAssistant) -> None:
+async def test_setup_demo_platform(hass: SmartHub) -> None:
     """Test setup."""
     mock = MagicMock()
     add_entities = mock.MagicMock()
@@ -57,7 +57,7 @@ async def test_setup_demo_platform(hass: HomeAssistant) -> None:
         (SERVICE_ALARM_ARM_VACATION, AlarmControlPanelState.ARMED_VACATION),
     ],
 )
-async def test_no_pending(hass: HomeAssistant, service, expected_state) -> None:
+async def test_no_pending(hass: SmartHub, service, expected_state) -> None:
     """Test no pending after arming."""
     assert await async_setup_component(
         hass,
@@ -102,7 +102,7 @@ async def test_no_pending(hass: HomeAssistant, service, expected_state) -> None:
     ],
 )
 async def test_no_pending_when_code_not_req(
-    hass: HomeAssistant, service, expected_state
+    hass: SmartHub, service, expected_state
 ) -> None:
     """Test no pending when code not required."""
     assert await async_setup_component(
@@ -148,7 +148,7 @@ async def test_no_pending_when_code_not_req(
         (SERVICE_ALARM_ARM_VACATION, AlarmControlPanelState.ARMED_VACATION),
     ],
 )
-async def test_with_pending(hass: HomeAssistant, service, expected_state) -> None:
+async def test_with_pending(hass: SmartHub, service, expected_state) -> None:
     """Test with pending after arming."""
     assert await async_setup_component(
         hass,
@@ -183,7 +183,7 @@ async def test_with_pending(hass: HomeAssistant, service, expected_state) -> Non
 
     future = dt_util.utcnow() + timedelta(seconds=1)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -216,7 +216,7 @@ async def test_with_pending(hass: HomeAssistant, service, expected_state) -> Non
         (SERVICE_ALARM_ARM_VACATION, AlarmControlPanelState.ARMED_VACATION),
     ],
 )
-async def test_with_invalid_code(hass: HomeAssistant, service, expected_state) -> None:
+async def test_with_invalid_code(hass: SmartHub, service, expected_state) -> None:
     """Attempt to arm without a valid code."""
     assert await async_setup_component(
         hass,
@@ -264,7 +264,7 @@ async def test_with_invalid_code(hass: HomeAssistant, service, expected_state) -
         (SERVICE_ALARM_ARM_VACATION, AlarmControlPanelState.ARMED_VACATION),
     ],
 )
-async def test_with_template_code(hass: HomeAssistant, service, expected_state) -> None:
+async def test_with_template_code(hass: SmartHub, service, expected_state) -> None:
     """Attempt to arm with a template-based code."""
     assert await async_setup_component(
         hass,
@@ -310,7 +310,7 @@ async def test_with_template_code(hass: HomeAssistant, service, expected_state) 
     ],
 )
 async def test_with_specific_pending(
-    hass: HomeAssistant, service, expected_state
+    hass: SmartHub, service, expected_state
 ) -> None:
     """Test arming with specific pending."""
     assert await async_setup_component(
@@ -340,7 +340,7 @@ async def test_with_specific_pending(
 
     future = dt_util.utcnow() + timedelta(seconds=2)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -349,7 +349,7 @@ async def test_with_specific_pending(
     assert hass.states.get(entity_id).state == expected_state
 
 
-async def test_trigger_no_pending(hass: HomeAssistant) -> None:
+async def test_trigger_no_pending(hass: SmartHub) -> None:
     """Test triggering when no pending submitted method."""
     assert await async_setup_component(
         hass,
@@ -375,7 +375,7 @@ async def test_trigger_no_pending(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=60)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -386,7 +386,7 @@ async def test_trigger_no_pending(hass: HomeAssistant) -> None:
     assert state.state == AlarmControlPanelState.TRIGGERED
 
 
-async def test_trigger_with_delay(hass: HomeAssistant) -> None:
+async def test_trigger_with_delay(hass: SmartHub) -> None:
     """Test trigger method and switch from pending to triggered."""
     assert await async_setup_component(
         hass,
@@ -420,7 +420,7 @@ async def test_trigger_with_delay(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=1)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -431,7 +431,7 @@ async def test_trigger_with_delay(hass: HomeAssistant) -> None:
     assert state.state == AlarmControlPanelState.TRIGGERED
 
 
-async def test_trigger_zero_trigger_time(hass: HomeAssistant) -> None:
+async def test_trigger_zero_trigger_time(hass: SmartHub) -> None:
     """Test disabled trigger."""
     assert await async_setup_component(
         hass,
@@ -457,7 +457,7 @@ async def test_trigger_zero_trigger_time(hass: HomeAssistant) -> None:
     assert hass.states.get(entity_id).state == AlarmControlPanelState.DISARMED
 
 
-async def test_trigger_zero_trigger_time_with_pending(hass: HomeAssistant) -> None:
+async def test_trigger_zero_trigger_time_with_pending(hass: SmartHub) -> None:
     """Test disabled trigger."""
     assert await async_setup_component(
         hass,
@@ -483,7 +483,7 @@ async def test_trigger_zero_trigger_time_with_pending(hass: HomeAssistant) -> No
     assert hass.states.get(entity_id).state == AlarmControlPanelState.DISARMED
 
 
-async def test_trigger_with_pending(hass: HomeAssistant) -> None:
+async def test_trigger_with_pending(hass: SmartHub) -> None:
     """Test arm home method."""
     assert await async_setup_component(
         hass,
@@ -513,7 +513,7 @@ async def test_trigger_with_pending(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=2)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -525,7 +525,7 @@ async def test_trigger_with_pending(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -535,7 +535,7 @@ async def test_trigger_with_pending(hass: HomeAssistant) -> None:
     assert state.state == AlarmControlPanelState.DISARMED
 
 
-async def test_trigger_with_unused_specific_delay(hass: HomeAssistant) -> None:
+async def test_trigger_with_unused_specific_delay(hass: SmartHub) -> None:
     """Test trigger method and switch from pending to triggered."""
     assert await async_setup_component(
         hass,
@@ -570,7 +570,7 @@ async def test_trigger_with_unused_specific_delay(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -581,7 +581,7 @@ async def test_trigger_with_unused_specific_delay(hass: HomeAssistant) -> None:
     assert state.state == AlarmControlPanelState.TRIGGERED
 
 
-async def test_trigger_with_specific_delay(hass: HomeAssistant) -> None:
+async def test_trigger_with_specific_delay(hass: SmartHub) -> None:
     """Test trigger method and switch from pending to triggered."""
     assert await async_setup_component(
         hass,
@@ -616,7 +616,7 @@ async def test_trigger_with_specific_delay(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=1)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -627,7 +627,7 @@ async def test_trigger_with_specific_delay(hass: HomeAssistant) -> None:
     assert state.state == AlarmControlPanelState.TRIGGERED
 
 
-async def test_trigger_with_pending_and_delay(hass: HomeAssistant) -> None:
+async def test_trigger_with_pending_and_delay(hass: SmartHub) -> None:
     """Test trigger method and switch from pending to triggered."""
     assert await async_setup_component(
         hass,
@@ -661,7 +661,7 @@ async def test_trigger_with_pending_and_delay(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=1)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -673,7 +673,7 @@ async def test_trigger_with_pending_and_delay(hass: HomeAssistant) -> None:
 
     future += timedelta(seconds=1)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -684,7 +684,7 @@ async def test_trigger_with_pending_and_delay(hass: HomeAssistant) -> None:
     assert state.state == AlarmControlPanelState.TRIGGERED
 
 
-async def test_trigger_with_pending_and_specific_delay(hass: HomeAssistant) -> None:
+async def test_trigger_with_pending_and_specific_delay(hass: SmartHub) -> None:
     """Test trigger method and switch from pending to triggered."""
     assert await async_setup_component(
         hass,
@@ -719,7 +719,7 @@ async def test_trigger_with_pending_and_specific_delay(hass: HomeAssistant) -> N
 
     future = dt_util.utcnow() + timedelta(seconds=1)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -731,7 +731,7 @@ async def test_trigger_with_pending_and_specific_delay(hass: HomeAssistant) -> N
 
     future += timedelta(seconds=1)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -742,7 +742,7 @@ async def test_trigger_with_pending_and_specific_delay(hass: HomeAssistant) -> N
     assert state.state == AlarmControlPanelState.TRIGGERED
 
 
-async def test_trigger_with_specific_pending(hass: HomeAssistant) -> None:
+async def test_trigger_with_specific_pending(hass: SmartHub) -> None:
     """Test arm home method."""
     assert await async_setup_component(
         hass,
@@ -768,7 +768,7 @@ async def test_trigger_with_specific_pending(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=2)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -780,7 +780,7 @@ async def test_trigger_with_specific_pending(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -789,7 +789,7 @@ async def test_trigger_with_specific_pending(hass: HomeAssistant) -> None:
     assert hass.states.get(entity_id).state == AlarmControlPanelState.DISARMED
 
 
-async def test_trigger_with_disarm_after_trigger(hass: HomeAssistant) -> None:
+async def test_trigger_with_disarm_after_trigger(hass: SmartHub) -> None:
     """Test disarm after trigger."""
     assert await async_setup_component(
         hass,
@@ -818,7 +818,7 @@ async def test_trigger_with_disarm_after_trigger(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -827,7 +827,7 @@ async def test_trigger_with_disarm_after_trigger(hass: HomeAssistant) -> None:
     assert hass.states.get(entity_id).state == AlarmControlPanelState.DISARMED
 
 
-async def test_trigger_with_zero_specific_trigger_time(hass: HomeAssistant) -> None:
+async def test_trigger_with_zero_specific_trigger_time(hass: SmartHub) -> None:
     """Test trigger method."""
     assert await async_setup_component(
         hass,
@@ -855,7 +855,7 @@ async def test_trigger_with_zero_specific_trigger_time(hass: HomeAssistant) -> N
 
 
 async def test_trigger_with_unused_zero_specific_trigger_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test disarm after trigger."""
     assert await async_setup_component(
@@ -886,7 +886,7 @@ async def test_trigger_with_unused_zero_specific_trigger_time(
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -895,7 +895,7 @@ async def test_trigger_with_unused_zero_specific_trigger_time(
     assert hass.states.get(entity_id).state == AlarmControlPanelState.DISARMED
 
 
-async def test_trigger_with_specific_trigger_time(hass: HomeAssistant) -> None:
+async def test_trigger_with_specific_trigger_time(hass: SmartHub) -> None:
     """Test disarm after trigger."""
     assert await async_setup_component(
         hass,
@@ -924,7 +924,7 @@ async def test_trigger_with_specific_trigger_time(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -933,7 +933,7 @@ async def test_trigger_with_specific_trigger_time(hass: HomeAssistant) -> None:
     assert hass.states.get(entity_id).state == AlarmControlPanelState.DISARMED
 
 
-async def test_trigger_with_no_disarm_after_trigger(hass: HomeAssistant) -> None:
+async def test_trigger_with_no_disarm_after_trigger(hass: SmartHub) -> None:
     """Test disarm after trigger."""
     assert await async_setup_component(
         hass,
@@ -967,7 +967,7 @@ async def test_trigger_with_no_disarm_after_trigger(hass: HomeAssistant) -> None
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -977,7 +977,7 @@ async def test_trigger_with_no_disarm_after_trigger(hass: HomeAssistant) -> None
 
 
 async def test_back_to_back_trigger_with_no_disarm_after_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test disarm after trigger."""
     assert await async_setup_component(
@@ -1012,7 +1012,7 @@ async def test_back_to_back_trigger_with_no_disarm_after_trigger(
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -1028,7 +1028,7 @@ async def test_back_to_back_trigger_with_no_disarm_after_trigger(
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -1037,7 +1037,7 @@ async def test_back_to_back_trigger_with_no_disarm_after_trigger(
     assert hass.states.get(entity_id).state == AlarmControlPanelState.ARMED_AWAY
 
 
-async def test_disarm_while_pending_trigger(hass: HomeAssistant) -> None:
+async def test_disarm_while_pending_trigger(hass: SmartHub) -> None:
     """Test disarming while pending state."""
     assert await async_setup_component(
         hass,
@@ -1067,7 +1067,7 @@ async def test_disarm_while_pending_trigger(hass: HomeAssistant) -> None:
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -1076,7 +1076,7 @@ async def test_disarm_while_pending_trigger(hass: HomeAssistant) -> None:
     assert hass.states.get(entity_id).state == AlarmControlPanelState.DISARMED
 
 
-async def test_disarm_during_trigger_with_invalid_code(hass: HomeAssistant) -> None:
+async def test_disarm_during_trigger_with_invalid_code(hass: SmartHub) -> None:
     """Test disarming while code is invalid."""
     assert await async_setup_component(
         hass,
@@ -1112,7 +1112,7 @@ async def test_disarm_during_trigger_with_invalid_code(hass: HomeAssistant) -> N
 
     future = dt_util.utcnow() + timedelta(seconds=5)
     with patch(
-        "homeassistant.components.manual.alarm_control_panel.dt_util.utcnow",
+        "smarthub.components.manual.alarm_control_panel.dt_util.utcnow",
         return_value=future,
     ):
         async_fire_time_changed(hass, future)
@@ -1123,7 +1123,7 @@ async def test_disarm_during_trigger_with_invalid_code(hass: HomeAssistant) -> N
     assert state.state == AlarmControlPanelState.TRIGGERED
 
 
-async def test_disarm_with_template_code(hass: HomeAssistant) -> None:
+async def test_disarm_with_template_code(hass: SmartHub) -> None:
     """Attempt to disarm with a valid or invalid template-based code."""
     assert await async_setup_component(
         hass,
@@ -1161,7 +1161,7 @@ async def test_disarm_with_template_code(hass: HomeAssistant) -> None:
     assert state.state == AlarmControlPanelState.DISARMED
 
 
-async def test_arm_away_after_disabled_disarmed(hass: HomeAssistant) -> None:
+async def test_arm_away_after_disabled_disarmed(hass: SmartHub) -> None:
     """Test pending state with and without zero trigger time."""
     assert await async_setup_component(
         hass,
@@ -1235,7 +1235,7 @@ async def test_arm_away_after_disabled_disarmed(hass: HomeAssistant) -> None:
         (AlarmControlPanelState.DISARMED),
     ],
 )
-async def test_restore_state(hass: HomeAssistant, expected_state) -> None:
+async def test_restore_state(hass: SmartHub, expected_state) -> None:
     """Ensure state is restored on startup."""
     mock_restore_cache(hass, (State("alarm_control_panel.test", expected_state),))
 
@@ -1272,7 +1272,7 @@ async def test_restore_state(hass: HomeAssistant, expected_state) -> None:
         (AlarmControlPanelState.ARMED_VACATION),
     ],
 )
-async def test_restore_state_arming(hass: HomeAssistant, expected_state) -> None:
+async def test_restore_state_arming(hass: SmartHub, expected_state) -> None:
     """Ensure ARMING state is restored on startup."""
     time = dt_util.utcnow() - timedelta(seconds=15)
     entity_id = "alarm_control_panel.test"
@@ -1328,7 +1328,7 @@ async def test_restore_state_arming(hass: HomeAssistant, expected_state) -> None
         (AlarmControlPanelState.DISARMED),
     ],
 )
-async def test_restore_state_pending(hass: HomeAssistant, previous_state) -> None:
+async def test_restore_state_pending(hass: SmartHub, previous_state) -> None:
     """Ensure PENDING state is restored on startup."""
     time = dt_util.utcnow() - timedelta(seconds=15)
     entity_id = "alarm_control_panel.test"
@@ -1401,7 +1401,7 @@ async def test_restore_state_pending(hass: HomeAssistant, previous_state) -> Non
         (AlarmControlPanelState.DISARMED),
     ],
 )
-async def test_restore_state_triggered(hass: HomeAssistant, previous_state) -> None:
+async def test_restore_state_triggered(hass: SmartHub, previous_state) -> None:
     """Ensure PENDING state is resolved to TRIGGERED on startup."""
     time = dt_util.utcnow() - timedelta(seconds=75)
     entity_id = "alarm_control_panel.test"
@@ -1454,7 +1454,7 @@ async def test_restore_state_triggered(hass: HomeAssistant, previous_state) -> N
     assert state.state == previous_state
 
 
-async def test_restore_state_triggered_long_ago(hass: HomeAssistant) -> None:
+async def test_restore_state_triggered_long_ago(hass: SmartHub) -> None:
     """Ensure TRIGGERED state is resolved on startup."""
     time = dt_util.utcnow() - timedelta(seconds=125)
     entity_id = "alarm_control_panel.test"
@@ -1496,7 +1496,7 @@ async def test_restore_state_triggered_long_ago(hass: HomeAssistant) -> None:
     assert state.state == AlarmControlPanelState.DISARMED
 
 
-async def test_default_arming_states(hass: HomeAssistant) -> None:
+async def test_default_arming_states(hass: SmartHub) -> None:
     """Test default arming_states."""
     assert await async_setup_component(
         hass,
@@ -1521,7 +1521,7 @@ async def test_default_arming_states(hass: HomeAssistant) -> None:
     )
 
 
-async def test_arming_states(hass: HomeAssistant) -> None:
+async def test_arming_states(hass: SmartHub) -> None:
     """Test arming_states."""
     assert await async_setup_component(
         hass,
@@ -1544,7 +1544,7 @@ async def test_arming_states(hass: HomeAssistant) -> None:
     )
 
 
-async def test_invalid_arming_states(hass: HomeAssistant) -> None:
+async def test_invalid_arming_states(hass: SmartHub) -> None:
     """Test invalid arming_states."""
     assert await async_setup_component(
         hass,

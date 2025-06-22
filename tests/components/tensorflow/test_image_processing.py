@@ -2,17 +2,17 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.components.image_processing import DOMAIN as IMAGE_PROCESSING_DOMAINN
-from homeassistant.components.tensorflow import CONF_GRAPH, DOMAIN
-from homeassistant.const import CONF_ENTITY_ID, CONF_MODEL, CONF_PLATFORM, CONF_SOURCE
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.image_processing import DOMAIN as IMAGE_PROCESSING_DOMAINN
+from smarthub.components.tensorflow import CONF_GRAPH, DOMAIN
+from smarthub.const import CONF_ENTITY_ID, CONF_MODEL, CONF_PLATFORM, CONF_SOURCE
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 
 @patch.dict("sys.modules", tensorflow=Mock())
 async def test_repair_issue_is_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test repair issue is created."""

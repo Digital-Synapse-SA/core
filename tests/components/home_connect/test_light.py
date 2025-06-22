@@ -18,18 +18,18 @@ from aiohomeconnect.model import (
 from aiohomeconnect.model.error import HomeConnectApiError, HomeConnectError
 import pytest
 
-from homeassistant.components.home_connect.const import (
+from smarthub.components.home_connect.const import (
     BSH_AMBIENT_LIGHT_COLOR_CUSTOM_COLOR,
     DOMAIN,
 )
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_HS_COLOR,
     ATTR_RGB_COLOR,
     DOMAIN as LIGHT_DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -38,9 +38,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -55,7 +55,7 @@ def platforms() -> list[str]:
 
 @pytest.mark.parametrize("appliance", ["Hood"], indirect=True)
 async def test_paired_depaired_devices_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -116,7 +116,7 @@ async def test_paired_depaired_devices_flow(
     indirect=["appliance"],
 )
 async def test_connected_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -174,7 +174,7 @@ async def test_connected_devices(
 
 @pytest.mark.parametrize("appliance", ["Hood"], indirect=True)
 async def test_light_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -338,7 +338,7 @@ async def test_light_availability(
     indirect=["appliance"],
 )
 async def test_light_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -392,7 +392,7 @@ async def test_light_functionality(
     indirect=["appliance"],
 )
 async def test_light_color_different_than_custom(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -555,7 +555,7 @@ async def test_light_color_different_than_custom(
     ],
 )
 async def test_light_exception_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -589,7 +589,7 @@ async def test_light_exception_handling(
         await client_with_exception.set_setting()
 
     service_data[ATTR_ENTITY_ID] = entity_id
-    with pytest.raises(HomeAssistantError, match=exception_match):
+    with pytest.raises(SmartHubError, match=exception_match):
         await hass.services.async_call(
             LIGHT_DOMAIN, service, service_data, blocking=True
         )

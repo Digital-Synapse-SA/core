@@ -5,14 +5,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
-from homeassistant.components.vacuum import (
+from smarthub.components.bluetooth import BluetoothServiceInfoBleak
+from smarthub.components.vacuum import (
     DOMAIN as VACUUM_DOMAIN,
     SERVICE_RETURN_TO_BASE,
     SERVICE_START,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from . import (
     K10_POR_COMBO_VACUUM_SERVICE_INFO,
@@ -41,7 +41,7 @@ from tests.components.bluetooth import inject_bluetooth_service_info
     [(SERVICE_START, "clean_up"), (SERVICE_RETURN_TO_BASE, "return_to_dock")],
 )
 async def test_vacuum_controlling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_factory: Callable[[str], MockConfigEntry],
     sensor_type: str,
     service: str,
@@ -58,7 +58,7 @@ async def test_vacuum_controlling(
     mocked_instance = AsyncMock(return_value=True)
 
     with patch.multiple(
-        "homeassistant.components.switchbot.vacuum.switchbot.SwitchbotVacuum",
+        "smarthub.components.switchbot.vacuum.switchbot.SwitchbotVacuum",
         update=MagicMock(return_value=None),
         **{mock_method: mocked_instance},
     ):

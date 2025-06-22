@@ -4,18 +4,18 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 @pytest.fixture
 def mock_error_handler():
     """Create a mock for add_error_handler."""
-    with patch("homeassistant.components.risco.RiscoLocal.add_error_handler") as mock:
+    with patch("smarthub.components.risco.RiscoLocal.add_error_handler") as mock:
         yield mock
 
 
 async def test_connection_reset(
-    hass: HomeAssistant, two_zone_local, mock_error_handler, setup_risco_local
+    hass: SmartHub, two_zone_local, mock_error_handler, setup_risco_local
 ) -> None:
     """Test config entry reload on connection reset."""
 

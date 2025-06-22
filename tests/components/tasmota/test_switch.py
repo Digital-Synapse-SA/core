@@ -11,9 +11,9 @@ from hatasmota.utils import (
 )
 import pytest
 
-from homeassistant.components.tasmota.const import DEFAULT_PREFIX
-from homeassistant.const import ATTR_ASSUMED_STATE, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.components.tasmota.const import DEFAULT_PREFIX
+from smarthub.const import ATTR_ASSUMED_STATE, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
 
 from .test_common import (
     DEFAULT_CONFIG,
@@ -36,7 +36,7 @@ from tests.typing import MqttMockHAClient, MqttMockPahoClient
 
 
 async def test_controlling_state_via_mqtt(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test state update via MQTT."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -82,7 +82,7 @@ async def test_controlling_state_via_mqtt(
 
 
 async def test_sending_mqtt_commands(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test the sending MQTT commands."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -126,12 +126,12 @@ async def test_sending_mqtt_commands(
 
 
 async def test_relay_as_light(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test relay does not show up as switch in light mode."""
     config = copy.deepcopy(DEFAULT_CONFIG)
     config["rl"][0] = 1
-    config["so"]["30"] = 1  # Enforce Home Assistant auto-discovery as light
+    config["so"]["30"] = 1  # Enforce SmartHub auto-discovery as light
     mac = config["mac"]
 
     async_fire_mqtt_message(
@@ -148,7 +148,7 @@ async def test_relay_as_light(
 
 
 async def test_availability_when_connection_lost(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -162,7 +162,7 @@ async def test_availability_when_connection_lost(
 
 
 async def test_deep_sleep_availability_when_connection_lost(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -176,7 +176,7 @@ async def test_deep_sleep_availability_when_connection_lost(
 
 
 async def test_availability(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test availability."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -185,7 +185,7 @@ async def test_availability(
 
 
 async def test_deep_sleep_availability(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test availability."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -194,7 +194,7 @@ async def test_deep_sleep_availability(
 
 
 async def test_availability_discovery_update(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test availability discovery update."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -205,7 +205,7 @@ async def test_availability_discovery_update(
 
 
 async def test_availability_poll_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -220,7 +220,7 @@ async def test_availability_poll_state(
 
 
 async def test_discovery_removal_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     caplog: pytest.LogCaptureFixture,
     setup_tasmota,
@@ -237,7 +237,7 @@ async def test_discovery_removal_switch(
 
 
 async def test_discovery_removal_relay_as_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     caplog: pytest.LogCaptureFixture,
     setup_tasmota,
@@ -245,10 +245,10 @@ async def test_discovery_removal_relay_as_light(
     """Test removal of discovered relay as light."""
     config1 = copy.deepcopy(DEFAULT_CONFIG)
     config1["rl"][0] = 1
-    config1["so"]["30"] = 0  # Disable Home Assistant auto-discovery as light
+    config1["so"]["30"] = 0  # Disable SmartHub auto-discovery as light
     config2 = copy.deepcopy(DEFAULT_CONFIG)
     config2["rl"][0] = 1
-    config2["so"]["30"] = 1  # Enforce Home Assistant auto-discovery as light
+    config2["so"]["30"] = 1  # Enforce SmartHub auto-discovery as light
 
     await help_test_discovery_removal(
         hass, mqtt_mock, caplog, Platform.SWITCH, config1, config2
@@ -256,7 +256,7 @@ async def test_discovery_removal_relay_as_light(
 
 
 async def test_discovery_update_unchanged_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     caplog: pytest.LogCaptureFixture,
     setup_tasmota,
@@ -265,7 +265,7 @@ async def test_discovery_update_unchanged_switch(
     config = copy.deepcopy(DEFAULT_CONFIG)
     config["rl"][0] = 1
     with patch(
-        "homeassistant.components.tasmota.switch.TasmotaSwitch.discovery_update"
+        "smarthub.components.tasmota.switch.TasmotaSwitch.discovery_update"
     ) as discovery_update:
         await help_test_discovery_update_unchanged(
             hass, mqtt_mock, caplog, Platform.SWITCH, config, discovery_update
@@ -273,7 +273,7 @@ async def test_discovery_update_unchanged_switch(
 
 
 async def test_discovery_device_remove(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test device registry remove."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -285,7 +285,7 @@ async def test_discovery_device_remove(
 
 
 async def test_entity_id_update_subscriptions(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test MQTT subscriptions are managed when entity_id is updated."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -301,7 +301,7 @@ async def test_entity_id_update_subscriptions(
 
 
 async def test_entity_id_update_discovery_update(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test MQTT discovery update when entity_id is updated."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -312,7 +312,7 @@ async def test_entity_id_update_discovery_update(
 
 
 async def test_no_device_name(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test name of switches when no device name is set.
 

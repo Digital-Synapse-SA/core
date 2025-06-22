@@ -5,10 +5,10 @@ from unittest.mock import MagicMock
 from aiosomecomfort.exceptions import SomeComfortError
 import pytest
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import init_integration
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_emheat_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     device: MagicMock,
 ) -> None:
@@ -46,7 +46,7 @@ async def test_emheat_switch(
     device.set_system_mode.reset_mock()
     device.system_mode = "heat"
     device.set_system_mode.side_effect = SomeComfortError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -58,7 +58,7 @@ async def test_emheat_switch(
     device.set_system_mode.reset_mock()
     device.system_mode = "emheat"
     device.set_system_mode.side_effect = SomeComfortError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,

@@ -8,14 +8,14 @@ from unittest.mock import call
 from bond_async import Action, DeviceType, Direction
 import pytest
 
-from homeassistant import core
-from homeassistant.components import fan
-from homeassistant.components.bond.const import (
+from smarthub import core
+from smarthub.components import fan
+from smarthub.components.bond.const import (
     DOMAIN,
     SERVICE_SET_FAN_SPEED_TRACKED_STATE,
 )
-from homeassistant.components.bond.fan import PRESET_MODE_BREEZE
-from homeassistant.components.fan import (
+from smarthub.components.bond.fan import PRESET_MODE_BREEZE
+from smarthub.components.fan import (
     ATTR_DIRECTION,
     ATTR_PERCENTAGE,
     ATTR_PRESET_MODE,
@@ -29,16 +29,16 @@ from homeassistant.components.fan import (
     FanEntityFeature,
     NotValidPresetModeError,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import utcnow
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import utcnow
 
 from .common import (
     ceiling_fan,
@@ -62,7 +62,7 @@ def ceiling_fan_with_breeze(name: str):
 
 
 async def turn_fan_on(
-    hass: core.HomeAssistant,
+    hass: core.SmartHub,
     fan_id: str,
     percentage: int | None = None,
     preset_mode: str | None = None,
@@ -83,7 +83,7 @@ async def turn_fan_on(
 
 
 async def test_entity_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -103,7 +103,7 @@ async def test_entity_registry(
     assert device.configuration_url == "http://some host"
 
 
-async def test_non_standard_speed_list(hass: HomeAssistant) -> None:
+async def test_non_standard_speed_list(hass: SmartHub) -> None:
     """Tests that the device is registered with custom speed list if number of supported speeds differs form 3."""
     await setup_platform(
         hass,
@@ -133,7 +133,7 @@ async def test_non_standard_speed_list(hass: HomeAssistant) -> None:
         )
 
 
-async def test_fan_speed_with_no_max_speed(hass: HomeAssistant) -> None:
+async def test_fan_speed_with_no_max_speed(hass: SmartHub) -> None:
     """Tests that fans without max speed (increase/decrease controls) map speed to HA standard."""
     await setup_platform(
         hass,
@@ -147,7 +147,7 @@ async def test_fan_speed_with_no_max_speed(hass: HomeAssistant) -> None:
     assert hass.states.get("fan.name_1").attributes["percentage"] == 100
 
 
-async def test_turn_on_fan_with_speed(hass: HomeAssistant) -> None:
+async def test_turn_on_fan_with_speed(hass: SmartHub) -> None:
     """Tests that turn on command delegates to set speed API."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
@@ -159,7 +159,7 @@ async def test_turn_on_fan_with_speed(hass: HomeAssistant) -> None:
     mock_set_speed.assert_called_with("test-device-id", Action.set_speed(1))
 
 
-async def test_turn_on_fan_with_percentage_3_speeds(hass: HomeAssistant) -> None:
+async def test_turn_on_fan_with_percentage_3_speeds(hass: SmartHub) -> None:
     """Tests that turn on command delegates to set speed API."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
@@ -183,7 +183,7 @@ async def test_turn_on_fan_with_percentage_3_speeds(hass: HomeAssistant) -> None
     mock_set_speed.assert_called_with("test-device-id", Action.set_speed(3))
 
 
-async def test_turn_on_fan_with_percentage_6_speeds(hass: HomeAssistant) -> None:
+async def test_turn_on_fan_with_percentage_6_speeds(hass: SmartHub) -> None:
     """Tests that turn on command delegates to set speed API."""
     await setup_platform(
         hass,
@@ -211,7 +211,7 @@ async def test_turn_on_fan_with_percentage_6_speeds(hass: HomeAssistant) -> None
     mock_set_speed.assert_called_with("test-device-id", Action.set_speed(6))
 
 
-async def test_turn_on_fan_preset_mode(hass: HomeAssistant) -> None:
+async def test_turn_on_fan_preset_mode(hass: SmartHub) -> None:
     """Tests that turn on command delegates to breeze on API."""
     await setup_platform(
         hass,
@@ -243,7 +243,7 @@ async def test_turn_on_fan_preset_mode(hass: HomeAssistant) -> None:
     mock_set_preset_mode.assert_called_with("test-device-id", Action(Action.BREEZE_ON))
 
 
-async def test_turn_on_fan_preset_mode_not_supported(hass: HomeAssistant) -> None:
+async def test_turn_on_fan_preset_mode_not_supported(hass: SmartHub) -> None:
     """Tests calling breeze mode on a fan that does not support it raises."""
     await setup_platform(
         hass,
@@ -276,7 +276,7 @@ async def test_turn_on_fan_preset_mode_not_supported(hass: HomeAssistant) -> Non
         )
 
 
-async def test_turn_on_fan_with_off_with_breeze(hass: HomeAssistant) -> None:
+async def test_turn_on_fan_with_off_with_breeze(hass: SmartHub) -> None:
     """Tests that turn off command delegates to turn off API."""
     await setup_platform(
         hass,
@@ -299,7 +299,7 @@ async def test_turn_on_fan_with_off_with_breeze(hass: HomeAssistant) -> None:
     ]
 
 
-async def test_turn_on_fan_without_speed(hass: HomeAssistant) -> None:
+async def test_turn_on_fan_without_speed(hass: SmartHub) -> None:
     """Tests that turn on command delegates to turn on API."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
@@ -311,7 +311,7 @@ async def test_turn_on_fan_without_speed(hass: HomeAssistant) -> None:
     mock_turn_on.assert_called_with("test-device-id", Action.turn_on())
 
 
-async def test_turn_on_fan_with_off_percentage(hass: HomeAssistant) -> None:
+async def test_turn_on_fan_with_off_percentage(hass: SmartHub) -> None:
     """Tests that turn off command delegates to turn off API."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
@@ -323,7 +323,7 @@ async def test_turn_on_fan_with_off_percentage(hass: HomeAssistant) -> None:
     mock_turn_off.assert_called_with("test-device-id", Action.turn_off())
 
 
-async def test_set_speed_off(hass: HomeAssistant) -> None:
+async def test_set_speed_off(hass: SmartHub) -> None:
     """Tests that set_speed(off) command delegates to turn off API."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
@@ -341,7 +341,7 @@ async def test_set_speed_off(hass: HomeAssistant) -> None:
     mock_turn_off.assert_called_with("test-device-id", Action.turn_off())
 
 
-async def test_turn_off_fan(hass: HomeAssistant) -> None:
+async def test_turn_off_fan(hass: SmartHub) -> None:
     """Tests that turn off command delegates to API."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
@@ -359,7 +359,7 @@ async def test_turn_off_fan(hass: HomeAssistant) -> None:
     mock_turn_off.assert_called_once_with("test-device-id", Action.turn_off())
 
 
-async def test_set_speed_belief_speed_zero(hass: HomeAssistant) -> None:
+async def test_set_speed_belief_speed_zero(hass: SmartHub) -> None:
     """Tests that set power belief service delegates to API."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
@@ -379,14 +379,14 @@ async def test_set_speed_belief_speed_zero(hass: HomeAssistant) -> None:
     )
 
 
-async def test_set_speed_belief_speed_api_error(hass: HomeAssistant) -> None:
+async def test_set_speed_belief_speed_api_error(hass: SmartHub) -> None:
     """Tests that set power belief service delegates to API."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
     )
 
     with (
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
         patch_bond_action_returns_clientresponseerror(),
         patch_bond_device_state(),
     ):
@@ -398,7 +398,7 @@ async def test_set_speed_belief_speed_api_error(hass: HomeAssistant) -> None:
         )
 
 
-async def test_set_speed_belief_speed_100(hass: HomeAssistant) -> None:
+async def test_set_speed_belief_speed_100(hass: SmartHub) -> None:
     """Tests that set power belief service delegates to API."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
@@ -417,7 +417,7 @@ async def test_set_speed_belief_speed_100(hass: HomeAssistant) -> None:
     mock_action.assert_called_with("test-device-id", Action.set_speed_belief(3))
 
 
-async def test_update_reports_fan_on(hass: HomeAssistant) -> None:
+async def test_update_reports_fan_on(hass: SmartHub) -> None:
     """Tests that update command sets correct state when Bond API reports fan power is on."""
     await setup_platform(hass, FAN_DOMAIN, ceiling_fan("name-1"))
 
@@ -428,7 +428,7 @@ async def test_update_reports_fan_on(hass: HomeAssistant) -> None:
     assert hass.states.get("fan.name_1").state == "on"
 
 
-async def test_update_reports_fan_off(hass: HomeAssistant) -> None:
+async def test_update_reports_fan_off(hass: SmartHub) -> None:
     """Tests that update command sets correct state when Bond API reports fan power is off."""
     await setup_platform(hass, FAN_DOMAIN, ceiling_fan("name-1"))
 
@@ -439,7 +439,7 @@ async def test_update_reports_fan_off(hass: HomeAssistant) -> None:
     assert hass.states.get("fan.name_1").state == "off"
 
 
-async def test_update_reports_direction_forward(hass: HomeAssistant) -> None:
+async def test_update_reports_direction_forward(hass: SmartHub) -> None:
     """Tests that update command sets correct direction when Bond API reports fan direction is forward."""
     await setup_platform(hass, FAN_DOMAIN, ceiling_fan("name-1"))
 
@@ -450,7 +450,7 @@ async def test_update_reports_direction_forward(hass: HomeAssistant) -> None:
     assert hass.states.get("fan.name_1").attributes[ATTR_DIRECTION] == DIRECTION_FORWARD
 
 
-async def test_update_reports_direction_reverse(hass: HomeAssistant) -> None:
+async def test_update_reports_direction_reverse(hass: SmartHub) -> None:
     """Tests that update command sets correct direction when Bond API reports fan direction is reverse."""
     await setup_platform(hass, FAN_DOMAIN, ceiling_fan("name-1"))
 
@@ -461,7 +461,7 @@ async def test_update_reports_direction_reverse(hass: HomeAssistant) -> None:
     assert hass.states.get("fan.name_1").attributes[ATTR_DIRECTION] == DIRECTION_REVERSE
 
 
-async def test_set_fan_direction(hass: HomeAssistant) -> None:
+async def test_set_fan_direction(hass: SmartHub) -> None:
     """Tests that set direction command delegates to API."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
@@ -481,7 +481,7 @@ async def test_set_fan_direction(hass: HomeAssistant) -> None:
     )
 
 
-async def test_fan_available(hass: HomeAssistant) -> None:
+async def test_fan_available(hass: SmartHub) -> None:
     """Tests that available state is updated based on API errors."""
     await help_test_entity_available(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), "fan.name_1"
@@ -489,7 +489,7 @@ async def test_fan_available(hass: HomeAssistant) -> None:
 
 
 async def test_setup_smart_by_bond_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -520,7 +520,7 @@ async def test_setup_smart_by_bond_fan(
 
 
 async def test_setup_hub_template_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:

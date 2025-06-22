@@ -2,26 +2,26 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.dlink.const import DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.dlink.const import DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .conftest import CONF_DATA
 
 from tests.common import AsyncMock, MockConfigEntry
 
 
-async def test_switch_state(hass: HomeAssistant, mocked_plug: AsyncMock) -> None:
+async def test_switch_state(hass: SmartHub, mocked_plug: AsyncMock) -> None:
     """Test we get the switch status."""
     with patch(
-        "homeassistant.components.dlink.SmartPlug",
+        "smarthub.components.dlink.SmartPlug",
         return_value=mocked_plug,
     ):
         entry = MockConfigEntry(domain=DOMAIN, data=CONF_DATA)
@@ -51,11 +51,11 @@ async def test_switch_state(hass: HomeAssistant, mocked_plug: AsyncMock) -> None
 
 
 async def test_switch_no_value(
-    hass: HomeAssistant, mocked_plug_legacy: AsyncMock
+    hass: SmartHub, mocked_plug_legacy: AsyncMock
 ) -> None:
     """Test we handle 'N/A' being passed by the pypi package."""
     with patch(
-        "homeassistant.components.dlink.SmartPlug",
+        "smarthub.components.dlink.SmartPlug",
         return_value=mocked_plug_legacy,
     ):
         entry = MockConfigEntry(domain=DOMAIN, data=CONF_DATA)

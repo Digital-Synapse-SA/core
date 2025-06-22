@@ -2,8 +2,8 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -11,7 +11,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_init_invalid_auth(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_connection: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_connection: MagicMock
 ) -> None:
     """Test init invalid authentication behavior."""
     mock_connection.refresh_token.return_value = False

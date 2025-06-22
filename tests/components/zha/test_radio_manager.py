@@ -11,12 +11,12 @@ import zigpy.config
 from zigpy.config import CONF_DEVICE_PATH
 import zigpy.types
 
-from homeassistant.components.zha import radio_manager
-from homeassistant.components.zha.const import DOMAIN
-from homeassistant.components.zha.radio_manager import ProbeResult, ZhaRadioManager
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.service_info.usb import UsbServiceInfo
+from smarthub.components.zha import radio_manager
+from smarthub.components.zha.const import DOMAIN
+from smarthub.components.zha.radio_manager import ProbeResult, ZhaRadioManager
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers.service_info.usb import UsbServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -26,14 +26,14 @@ PROBE_FUNCTION_PATH = "zigbee.application.ControllerApplication.probe"
 @pytest.fixture(autouse=True)
 def disable_platform_only():
     """Disable platforms to speed up tests."""
-    with patch("homeassistant.components.zha.PLATFORMS", []):
+    with patch("smarthub.components.zha.PLATFORMS", []):
         yield
 
 
 @pytest.fixture(autouse=True)
 def reduce_reconnect_timeout():
     """Reduces reconnect timeout to speed up tests."""
-    with patch("homeassistant.components.zha.radio_manager.RETRY_DELAY_S", 0.0001):
+    with patch("smarthub.components.zha.radio_manager.RETRY_DELAY_S", 0.0001):
         yield
 
 
@@ -98,15 +98,15 @@ def mock_connect_zigpy_app() -> Generator[MagicMock]:
     )
 
     with patch(
-        "homeassistant.components.zha.radio_manager.ZhaRadioManager.connect_zigpy_app",
+        "smarthub.components.zha.radio_manager.ZhaRadioManager.connect_zigpy_app",
         return_value=mock_connect_app,
     ):
         yield mock_connect_app
 
 
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 async def test_migrate_matching_port(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect_zigpy_app,
 ) -> None:
     """Test automatic migration."""
@@ -161,12 +161,12 @@ async def test_migrate_matching_port(
 
 
 @patch(
-    "homeassistant.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
+    "smarthub.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
     mock_detect_radio_type(),
 )
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 async def test_migrate_matching_port_usb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect_zigpy_app,
 ) -> None:
     """Test automatic migration."""
@@ -213,7 +213,7 @@ async def test_migrate_matching_port_usb(
 
 
 async def test_migrate_matching_port_config_entry_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect_zigpy_app,
 ) -> None:
     """Test automatic migration."""
@@ -268,12 +268,12 @@ async def test_migrate_matching_port_config_entry_not_loaded(
 
 
 @patch(
-    "homeassistant.components.zha.radio_manager.ZhaRadioManager.async_restore_backup_step_1",
+    "smarthub.components.zha.radio_manager.ZhaRadioManager.async_restore_backup_step_1",
     side_effect=OSError,
 )
 async def test_migrate_matching_port_retry(
     mock_restore_backup_step_1,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect_zigpy_app,
 ) -> None:
     """Test automatic migration."""
@@ -330,7 +330,7 @@ async def test_migrate_matching_port_retry(
 
 
 async def test_migrate_non_matching_port(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect_zigpy_app,
 ) -> None:
     """Test automatic migration."""
@@ -378,7 +378,7 @@ async def test_migrate_non_matching_port(
 
 
 async def test_migrate_initiate_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect_zigpy_app,
 ) -> None:
     """Test retries with failure."""
@@ -427,7 +427,7 @@ async def test_migrate_initiate_failure(
 
 
 @pytest.fixture(name="radio_manager")
-def zha_radio_manager(hass: HomeAssistant) -> ZhaRadioManager:
+def zha_radio_manager(hass: SmartHub) -> ZhaRadioManager:
     """Fixture for an instance of `ZhaRadioManager`."""
     radio_manager = ZhaRadioManager()
     radio_manager.hass = hass
@@ -458,9 +458,9 @@ async def test_detect_radio_type_failure_wrong_firmware(
 ) -> None:
     """Test radio type detection, wrong firmware."""
     with (
-        patch("homeassistant.components.zha.radio_manager.AUTOPROBE_RADIOS", ()),
+        patch("smarthub.components.zha.radio_manager.AUTOPROBE_RADIOS", ()),
         patch(
-            "homeassistant.components.zha.radio_manager.repairs.wrong_silabs_firmware.warn_on_wrong_silabs_firmware",
+            "smarthub.components.zha.radio_manager.repairs.wrong_silabs_firmware.warn_on_wrong_silabs_firmware",
             return_value=True,
         ),
     ):
@@ -476,9 +476,9 @@ async def test_detect_radio_type_failure_no_detect(
 ) -> None:
     """Test radio type detection, no firmware detected."""
     with (
-        patch("homeassistant.components.zha.radio_manager.AUTOPROBE_RADIOS", ()),
+        patch("smarthub.components.zha.radio_manager.AUTOPROBE_RADIOS", ()),
         patch(
-            "homeassistant.components.zha.radio_manager.repairs.wrong_silabs_firmware.warn_on_wrong_silabs_firmware",
+            "smarthub.components.zha.radio_manager.repairs.wrong_silabs_firmware.warn_on_wrong_silabs_firmware",
             return_value=False,
         ),
     ):

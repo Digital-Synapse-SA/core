@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -14,13 +14,13 @@ from tests.common import snapshot_platform
 
 
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test binary sensors."""
     with patch(
-        "homeassistant.components.moehlenhoff_alpha2.PLATFORMS",
+        "smarthub.components.moehlenhoff_alpha2.PLATFORMS",
         [Platform.BINARY_SENSOR],
     ):
         entry = await init_integration(hass)

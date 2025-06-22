@@ -2,16 +2,16 @@
 
 import pytest
 
-from homeassistant.components.min_max.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.min_max.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.parametrize("platform", ["sensor"])
 async def test_setup_and_remove_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     platform: str,
 ) -> None:

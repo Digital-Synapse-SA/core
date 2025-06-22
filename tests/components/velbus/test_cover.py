@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import ATTR_POSITION, DOMAIN as COVER_DOMAIN
-from homeassistant.const import (
+from smarthub.components.cover import ATTR_POSITION, DOMAIN as COVER_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
@@ -14,8 +14,8 @@ from homeassistant.const import (
     SERVICE_STOP_COVER,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -23,13 +23,13 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.velbus.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.velbus.PLATFORMS", [Platform.COVER]):
         await init_integration(hass, config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
@@ -43,7 +43,7 @@ async def test_entities(
     ],
 )
 async def test_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_id: str,
     entity_num: int,
@@ -75,7 +75,7 @@ async def test_actions(
 
 
 async def test_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_cover: AsyncMock,
 ) -> None:

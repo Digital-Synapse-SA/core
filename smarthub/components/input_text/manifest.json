@@ -1,0 +1,8 @@
+{
+  "domain": "input_text",
+  "name": "Input Text",
+  "codeowners": ["@smart-hub/core"],
+  "documentation": "https://www.smart-hub.io/integrations/input_text",
+  "integration_type": "helper",
+  "quality_scale": "internal"
+}

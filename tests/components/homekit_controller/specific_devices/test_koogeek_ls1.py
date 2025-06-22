@@ -8,11 +8,11 @@ from aiohomekit.model import CharacteristicsTypes, ServicesTypes
 from aiohomekit.testing import FakeController, FakePairing
 import pytest
 
-from homeassistant.components.homekit_controller.connection import (
+from smarthub.components.homekit_controller.connection import (
     MAX_POLL_FAILURES_TO_DECLARE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from ..common import Helper, setup_accessories_from_file, setup_test_accessories
 
@@ -22,10 +22,10 @@ LIGHT_ON = ("lightbulb", "on")
 
 
 @pytest.mark.parametrize("failure_cls", [AccessoryDisconnectedError, EncryptionError])
-async def test_recover_from_failure(hass: HomeAssistant, failure_cls) -> None:
+async def test_recover_from_failure(hass: SmartHub, failure_cls) -> None:
     """Test that entity actually recovers from a network connection drop.
 
-    See https://github.com/home-assistant/core/issues/18949
+    See https://github.com/smart-hub/core/issues/18949
     """
     accessories = await setup_accessories_from_file(hass, "koogeek_ls1.json")
     config_entry, pairing = await setup_test_accessories(hass, accessories)

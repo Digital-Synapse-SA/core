@@ -18,7 +18,7 @@ env:
 jobs:
   init:
     name: Initialize build
-    if: github.repository_owner == 'home-assistant'
+    if: github.repository_owner == 'smart-hub'
     runs-on: ubuntu-latest
     outputs:
       architectures: ${{ steps.info.outputs.architectures }}
@@ -38,24 +38,24 @@ jobs:
 
       - name: Get information
         id: info
-        uses: home-assistant/actions/helpers/info@master
+        uses: smart-hub/actions/helpers/info@master
 
       - name: Get version
         id: version
-        uses: home-assistant/actions/helpers/version@master
+        uses: smart-hub/actions/helpers/version@master
         with:
           type: ${{ env.BUILD_TYPE }}
 
       - name: Verify version
-        uses: home-assistant/actions/helpers/verify-version@master
+        uses: smart-hub/actions/helpers/verify-version@master
         with:
           ignore-dev: true
 
       - name: Fail if translations files are checked in
         run: |
-          if [ -n "$(find homeassistant/components/*/translations -type f)" ]; then
+          if [ -n "$(find smarthub/components/*/translations -type f)" ]; then
               echo "Translations files are checked in, please remove the following files:"
-              find homeassistant/components/*/translations -type f
+              find smarthub/components/*/translations -type f
               exit 1
           fi
 
@@ -66,7 +66,7 @@ jobs:
 
       - name: Archive translations
         shell: bash
-        run: find ./homeassistant/components/*/translations -name "*.json" | tar zcvf translations.tar.gz -T -
+        run: find ./smarthub/components/*/translations -name "*.json" | tar zcvf translations.tar.gz -T -
 
       - name: Upload translations
         uses: actions/upload-artifact@v4.6.2
@@ -77,7 +77,7 @@ jobs:
 
   build_base:
     name: Build ${{ matrix.arch }} base core image
-    if: github.repository_owner == 'home-assistant'
+    if: github.repository_owner == 'smart-hub'
     needs: init
     runs-on: ubuntu-latest
     permissions:
@@ -97,7 +97,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v11
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
-          repo: home-assistant/frontend
+          repo: smart-hub/frontend
           branch: dev
           workflow: nightly.yaml
           workflow_conclusion: success
@@ -135,31 +135,31 @@ jobs:
             echo "Found frontend wheel, setting version to: ${BASH_REMATCH[1]}"
             frontend_version="${BASH_REMATCH[1]}" yq \
               --inplace e -o json \
-              '.requirements = ["home-assistant-frontend=="+env(frontend_version)]' \
-              homeassistant/components/frontend/manifest.json
+              '.requirements = ["smart-hub-frontend=="+env(frontend_version)]' \
+              smarthub/components/frontend/manifest.json
 
-            sed -i "s|home-assistant-frontend==.*|home-assistant-frontend==${BASH_REMATCH[1]}|" \
-              homeassistant/package_constraints.txt
+            sed -i "s|smart-hub-frontend==.*|smart-hub-frontend==${BASH_REMATCH[1]}|" \
+              smarthub/package_constraints.txt
 
-            sed -i "s|home-assistant-frontend==.*||" requirements_all.txt
+            sed -i "s|smart-hub-frontend==.*||" requirements_all.txt
           fi
 
           if [[ "$(ls home_assistant_intents*.whl)" =~ ^home_assistant_intents-(.*)-py3-none-any.whl$ ]]; then
             echo "Found intents wheel, setting version to: ${BASH_REMATCH[1]}"
             yq \
               --inplace e -o json \
-              'del(.requirements[] | select(contains("home-assistant-intents")))' \
-              homeassistant/components/conversation/manifest.json
+              'del(.requirements[] | select(contains("smart-hub-intents")))' \
+              smarthub/components/conversation/manifest.json
 
             intents_version="${BASH_REMATCH[1]}" yq \
               --inplace e -o json \
-              '.requirements += ["home-assistant-intents=="+env(intents_version)]' \
-              homeassistant/components/conversation/manifest.json
+              '.requirements += ["smart-hub-intents=="+env(intents_version)]' \
+              smarthub/components/conversation/manifest.json
 
-            sed -i "s|home-assistant-intents==.*|home-assistant-intents==${BASH_REMATCH[1]}|" \
-              homeassistant/package_constraints.txt
+            sed -i "s|smart-hub-intents==.*|smart-hub-intents==${BASH_REMATCH[1]}|" \
+              smarthub/package_constraints.txt
 
-            sed -i "s|home-assistant-intents==.*||" requirements_all.txt
+            sed -i "s|smart-hub-intents==.*||" requirements_all.txt
           fi
 
       - name: Adjustments for armhf
@@ -197,7 +197,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build base image
-        uses: home-assistant/builder@2025.03.0
+        uses: smart-hub/builder@2025.03.0
         with:
           args: |
             $BUILD_ARGS \
@@ -208,7 +208,7 @@ jobs:
 
   build_machine:
     name: Build ${{ matrix.machine }} machine core image
-    if: github.repository_owner == 'home-assistant'
+    if: github.repository_owner == 'smart-hub'
     needs: ["init", "build_base"]
     runs-on: ubuntu-latest
     permissions:
@@ -263,7 +263,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build base image
-        uses: home-assistant/builder@2025.03.0
+        uses: smart-hub/builder@2025.03.0
         with:
           args: |
             $BUILD_ARGS \
@@ -274,7 +274,7 @@ jobs:
   publish_ha:
     name: Publish version files
     environment: ${{ needs.init.outputs.channel }}
-    if: github.repository_owner == 'home-assistant'
+    if: github.repository_owner == 'smart-hub'
     needs: ["init", "build_machine"]
     runs-on: ubuntu-latest
     steps:
@@ -282,33 +282,33 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: Initialize git
-        uses: home-assistant/actions/helpers/git-init@master
+        uses: smart-hub/actions/helpers/git-init@master
         with:
           name: ${{ secrets.GIT_NAME }}
           email: ${{ secrets.GIT_EMAIL }}
           token: ${{ secrets.GIT_TOKEN }}
 
       - name: Update version file
-        uses: home-assistant/actions/helpers/version-push@master
+        uses: smart-hub/actions/helpers/version-push@master
         with:
-          key: "homeassistant[]"
-          key-description: "Home Assistant Core"
+          key: "smarthub[]"
+          key-description: "SmartHub Core"
           version: ${{ needs.init.outputs.version }}
           channel: ${{ needs.init.outputs.channel }}
 
       - name: Update version file (stable -> beta)
         if: needs.init.outputs.channel == 'stable'
-        uses: home-assistant/actions/helpers/version-push@master
+        uses: smart-hub/actions/helpers/version-push@master
         with:
-          key: "homeassistant[]"
-          key-description: "Home Assistant Core"
+          key: "smarthub[]"
+          key-description: "SmartHub Core"
           version: ${{ needs.init.outputs.version }}
           channel: beta
 
   publish_container:
     name: Publish meta container for ${{ matrix.registry }}
     environment: ${{ needs.init.outputs.channel }}
-    if: github.repository_owner == 'home-assistant'
+    if: github.repository_owner == 'smart-hub'
     needs: ["init", "build_base"]
     runs-on: ubuntu-latest
     permissions:
@@ -318,7 +318,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        registry: ["ghcr.io/home-assistant", "docker.io/homeassistant"]
+        registry: ["ghcr.io/smart-hub", "docker.io/smarthub"]
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4.2.2
@@ -329,14 +329,14 @@ jobs:
           cosign-release: "v2.2.3"
 
       - name: Login to DockerHub
-        if: matrix.registry == 'docker.io/homeassistant'
+        if: matrix.registry == 'docker.io/smarthub'
         uses: docker/login-action@v3.4.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to GitHub Container Registry
-        if: matrix.registry == 'ghcr.io/home-assistant'
+        if: matrix.registry == 'ghcr.io/smart-hub'
         uses: docker/login-action@v3.4.0
         with:
           registry: ghcr.io
@@ -353,40 +353,40 @@ jobs:
             local tag_r=${2}
             local registry=${{ matrix.registry }}
 
-            docker manifest create "${registry}/home-assistant:${tag_l}" \
-              "${registry}/amd64-homeassistant:${tag_r}" \
-              "${registry}/i386-homeassistant:${tag_r}" \
-              "${registry}/armhf-homeassistant:${tag_r}" \
-              "${registry}/armv7-homeassistant:${tag_r}" \
-              "${registry}/aarch64-homeassistant:${tag_r}"
+            docker manifest create "${registry}/smart-hub:${tag_l}" \
+              "${registry}/amd64-smarthub:${tag_r}" \
+              "${registry}/i386-smarthub:${tag_r}" \
+              "${registry}/armhf-smarthub:${tag_r}" \
+              "${registry}/armv7-smarthub:${tag_r}" \
+              "${registry}/aarch64-smarthub:${tag_r}"
 
-            docker manifest annotate "${registry}/home-assistant:${tag_l}" \
-              "${registry}/amd64-homeassistant:${tag_r}" \
+            docker manifest annotate "${registry}/smart-hub:${tag_l}" \
+              "${registry}/amd64-smarthub:${tag_r}" \
               --os linux --arch amd64
 
-            docker manifest annotate "${registry}/home-assistant:${tag_l}" \
-              "${registry}/i386-homeassistant:${tag_r}" \
+            docker manifest annotate "${registry}/smart-hub:${tag_l}" \
+              "${registry}/i386-smarthub:${tag_r}" \
               --os linux --arch 386
 
-            docker manifest annotate "${registry}/home-assistant:${tag_l}" \
-              "${registry}/armhf-homeassistant:${tag_r}" \
+            docker manifest annotate "${registry}/smart-hub:${tag_l}" \
+              "${registry}/armhf-smarthub:${tag_r}" \
               --os linux --arch arm --variant=v6
 
-            docker manifest annotate "${registry}/home-assistant:${tag_l}" \
-              "${registry}/armv7-homeassistant:${tag_r}" \
+            docker manifest annotate "${registry}/smart-hub:${tag_l}" \
+              "${registry}/armv7-smarthub:${tag_r}" \
               --os linux --arch arm --variant=v7
 
-            docker manifest annotate "${registry}/home-assistant:${tag_l}" \
-              "${registry}/aarch64-homeassistant:${tag_r}" \
+            docker manifest annotate "${registry}/smart-hub:${tag_l}" \
+              "${registry}/aarch64-smarthub:${tag_r}" \
               --os linux --arch arm64 --variant=v8
 
-            docker manifest push --purge "${registry}/home-assistant:${tag_l}"
-            cosign sign --yes "${registry}/home-assistant:${tag_l}"
+            docker manifest push --purge "${registry}/smart-hub:${tag_l}"
+            cosign sign --yes "${registry}/smart-hub:${tag_l}"
           }
 
           function validate_image() {
             local image=${1}
-            if ! cosign verify --certificate-oidc-issuer https://token.actions.githubusercontent.com --certificate-identity-regexp https://github.com/home-assistant/core/.* "${image}"; then
+            if ! cosign verify --certificate-oidc-issuer https://token.actions.githubusercontent.com --certificate-identity-regexp https://github.com/smart-hub/core/.* "${image}"; then
               echo "Invalid signature!"
               exit 1
             fi
@@ -396,31 +396,31 @@ jobs:
             local image=${1}
             local tag=${2}
 
-            docker tag "ghcr.io/home-assistant/${image}:${tag}" "docker.io/homeassistant/${image}:${tag}"
-            docker push "docker.io/homeassistant/${image}:${tag}"
-            cosign sign --yes "docker.io/homeassistant/${image}:${tag}"
+            docker tag "ghcr.io/smart-hub/${image}:${tag}" "docker.io/smarthub/${image}:${tag}"
+            docker push "docker.io/smarthub/${image}:${tag}"
+            cosign sign --yes "docker.io/smarthub/${image}:${tag}"
           }
 
           # Pull images from github container registry and verify signature
-          docker pull "ghcr.io/home-assistant/amd64-homeassistant:${{ needs.init.outputs.version }}"
-          docker pull "ghcr.io/home-assistant/i386-homeassistant:${{ needs.init.outputs.version }}"
-          docker pull "ghcr.io/home-assistant/armhf-homeassistant:${{ needs.init.outputs.version }}"
-          docker pull "ghcr.io/home-assistant/armv7-homeassistant:${{ needs.init.outputs.version }}"
-          docker pull "ghcr.io/home-assistant/aarch64-homeassistant:${{ needs.init.outputs.version }}"
+          docker pull "ghcr.io/smart-hub/amd64-smarthub:${{ needs.init.outputs.version }}"
+          docker pull "ghcr.io/smart-hub/i386-smarthub:${{ needs.init.outputs.version }}"
+          docker pull "ghcr.io/smart-hub/armhf-smarthub:${{ needs.init.outputs.version }}"
+          docker pull "ghcr.io/smart-hub/armv7-smarthub:${{ needs.init.outputs.version }}"
+          docker pull "ghcr.io/smart-hub/aarch64-smarthub:${{ needs.init.outputs.version }}"
 
-          validate_image "ghcr.io/home-assistant/amd64-homeassistant:${{ needs.init.outputs.version }}"
-          validate_image "ghcr.io/home-assistant/i386-homeassistant:${{ needs.init.outputs.version }}"
-          validate_image "ghcr.io/home-assistant/armhf-homeassistant:${{ needs.init.outputs.version }}"
-          validate_image "ghcr.io/home-assistant/armv7-homeassistant:${{ needs.init.outputs.version }}"
-          validate_image "ghcr.io/home-assistant/aarch64-homeassistant:${{ needs.init.outputs.version }}"
+          validate_image "ghcr.io/smart-hub/amd64-smarthub:${{ needs.init.outputs.version }}"
+          validate_image "ghcr.io/smart-hub/i386-smarthub:${{ needs.init.outputs.version }}"
+          validate_image "ghcr.io/smart-hub/armhf-smarthub:${{ needs.init.outputs.version }}"
+          validate_image "ghcr.io/smart-hub/armv7-smarthub:${{ needs.init.outputs.version }}"
+          validate_image "ghcr.io/smart-hub/aarch64-smarthub:${{ needs.init.outputs.version }}"
 
-          if [[ "${{ matrix.registry }}" ==  "docker.io/homeassistant" ]]; then
+          if [[ "${{ matrix.registry }}" ==  "docker.io/smarthub" ]]; then
             # Upload images to dockerhub
-            push_dockerhub "amd64-homeassistant" "${{ needs.init.outputs.version }}"
-            push_dockerhub "i386-homeassistant" "${{ needs.init.outputs.version }}"
-            push_dockerhub "armhf-homeassistant" "${{ needs.init.outputs.version }}"
-            push_dockerhub "armv7-homeassistant" "${{ needs.init.outputs.version }}"
-            push_dockerhub "aarch64-homeassistant" "${{ needs.init.outputs.version }}"
+            push_dockerhub "amd64-smarthub" "${{ needs.init.outputs.version }}"
+            push_dockerhub "i386-smarthub" "${{ needs.init.outputs.version }}"
+            push_dockerhub "armhf-smarthub" "${{ needs.init.outputs.version }}"
+            push_dockerhub "armv7-smarthub" "${{ needs.init.outputs.version }}"
+            push_dockerhub "aarch64-smarthub" "${{ needs.init.outputs.version }}"
           fi
 
           # Create version tag
@@ -451,7 +451,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    if: github.repository_owner == 'home-assistant' && needs.init.outputs.publish == 'true'
+    if: github.repository_owner == 'smart-hub' && needs.init.outputs.publish == 'true'
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4.2.2
@@ -474,7 +474,7 @@ jobs:
       - name: Build package
         shell: bash
         run: |
-          # Remove dist, build, and homeassistant.egg-info
+          # Remove dist, build, and smarthub.egg-info
           # when build locally for testing!
           pip install build
           python -m build
@@ -493,10 +493,10 @@ jobs:
       attestations: write
       id-token: write
     needs: ["init"]
-    if: github.repository_owner == 'home-assistant'
+    if: github.repository_owner == 'smart-hub'
     env:
-      HASSFEST_IMAGE_NAME: ghcr.io/home-assistant/hassfest
-      HASSFEST_IMAGE_TAG: ghcr.io/home-assistant/hassfest:${{ needs.init.outputs.version }}
+      HASSFEST_IMAGE_NAME: ghcr.io/smart-hub/hassfest
+      HASSFEST_IMAGE_TAG: ghcr.io/smart-hub/hassfest:${{ needs.init.outputs.version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

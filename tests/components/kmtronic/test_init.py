@@ -1,15 +1,15 @@
 """The tests for the KMtronic component."""
 
-from homeassistant.components.kmtronic.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.kmtronic.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_unload_config_entry(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test entry unloading."""
 
@@ -39,7 +39,7 @@ async def test_unload_config_entry(
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Tests configuration entry not ready."""
 

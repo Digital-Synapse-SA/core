@@ -6,16 +6,16 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from teslemetry_stream import Signal
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
     SERVICE_STOP_COVER,
     CoverState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, setup_platform
 from .const import COMMAND_OK, METADATA_NOSCOPE, VEHICLE_DATA_ALT
@@ -23,7 +23,7 @@ from .const import COMMAND_OK, METADATA_NOSCOPE, VEHICLE_DATA_ALT
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_legacy: AsyncMock,
@@ -36,7 +36,7 @@ async def test_cover(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_cover_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -51,7 +51,7 @@ async def test_cover_alt(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_cover_noscope(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_metadata: AsyncMock,
@@ -66,7 +66,7 @@ async def test_cover_noscope(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_cover_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Tests that the cover entities are correct."""
 
@@ -222,7 +222,7 @@ async def test_cover_services(
 
 
 async def test_cover_streaming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,

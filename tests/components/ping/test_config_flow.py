@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.ping import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.ping import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry
     ],
 )
 @pytest.mark.usefixtures("patch_setup")
-async def test_form(hass: HomeAssistant, host, expected) -> None:
+async def test_form(hass: SmartHub, host, expected) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -57,7 +57,7 @@ async def test_form(hass: HomeAssistant, host, expected) -> None:
     ],
 )
 @pytest.mark.usefixtures("patch_setup")
-async def test_options(hass: HomeAssistant, host: str, expected_host: str) -> None:
+async def test_options(hass: SmartHub, host: str, expected_host: str) -> None:
     """Test options flow."""
 
     config_entry = MockConfigEntry(

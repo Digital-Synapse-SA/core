@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 
-from homeassistant.components import geonetnz_quakes
-from homeassistant.components.geonetnz_quakes import DEFAULT_SCAN_INTERVAL
-from homeassistant.components.geonetnz_quakes.sensor import (
+from smarthub.components import geonetnz_quakes
+from smarthub.components.geonetnz_quakes import DEFAULT_SCAN_INTERVAL
+from smarthub.components.geonetnz_quakes.sensor import (
     ATTR_CREATED,
     ATTR_LAST_UPDATE,
     ATTR_LAST_UPDATE_SUCCESSFUL,
@@ -15,15 +15,15 @@ from homeassistant.components.geonetnz_quakes.sensor import (
     ATTR_STATUS,
     ATTR_UPDATED,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ICON,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_RADIUS,
     EVENT_HOMEASSISTANT_START,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import _generate_mock_feed_entry
 
@@ -32,7 +32,7 @@ from tests.common import async_fire_time_changed
 CONFIG = {geonetnz_quakes.DOMAIN: {CONF_RADIUS: 200}}
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test the general setup of the integration."""
     # Set up some mock feed entries for this test.
     mock_entry_1 = _generate_mock_feed_entry(

@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock, patch
 from pyecoforest.exceptions import EcoforestAuthenticationRequired
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.ecoforest.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.ecoforest.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_form(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_device, config
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_device, config
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -47,7 +47,7 @@ async def test_form(
 
 
 async def test_form_device_already_configured(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, config_entry, mock_device, config
+    hass: SmartHub, mock_setup_entry: AsyncMock, config_entry, mock_device, config
 ) -> None:
     """Test device already exists."""
     result = await hass.config_entries.flow.async_init(
@@ -84,7 +84,7 @@ async def test_form_device_already_configured(
     ],
 )
 async def test_flow_fails(
-    hass: HomeAssistant, error: Exception, message: str, mock_device, config
+    hass: SmartHub, error: Exception, message: str, mock_device, config
 ) -> None:
     """Test we handle failed flow."""
     result = await hass.config_entries.flow.async_init(

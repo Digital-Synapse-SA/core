@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.voip.devices import VoIPDevice
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import intent as intent_helper
+from smarthub.components.voip.devices import VoIPDevice
+from smarthub.core import SmartHub
+from smarthub.helpers import intent as intent_helper
 
 
 @pytest.mark.parametrize(
@@ -23,7 +23,7 @@ from homeassistant.helpers import intent as intent_helper
     ],
 )
 async def test_timer_events(
-    hass: HomeAssistant, voip_device: VoIPDevice, intent_args: dict, message: str
+    hass: SmartHub, voip_device: VoIPDevice, intent_args: dict, message: str
 ) -> None:
     """Test for timer events."""
 
@@ -40,10 +40,10 @@ async def test_timer_events(
 
     with (
         patch(
-            "homeassistant.components.voip.assist_satellite.VoipAssistSatellite._resolve_announcement_media_id",
+            "smarthub.components.voip.assist_satellite.VoipAssistSatellite._resolve_announcement_media_id",
         ) as mock_resolve,
         patch(
-            "homeassistant.components.voip.assist_satellite.VoipAssistSatellite.async_announce",
+            "smarthub.components.voip.assist_satellite.VoipAssistSatellite.async_announce",
         ) as mock_announce,
     ):
         await intent_helper.async_handle(

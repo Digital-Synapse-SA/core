@@ -5,17 +5,17 @@ from unittest.mock import patch
 from aiohttp import ClientSession
 import pytest
 
-from homeassistant.components.iotty import api
-from homeassistant.components.iotty.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.components.iotty import api
+from smarthub.components.iotty.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import config_entry_oauth2_flow
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_api_create_fail(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test API creation with no session."""
 
@@ -27,7 +27,7 @@ async def test_api_create_fail(
 
 
 async def test_api_create_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     aiohttp_client_session: None,
     local_oauth_impl: ClientSession,
@@ -45,10 +45,10 @@ async def test_api_create_ok(
 
 
 @patch(
-    "homeassistant.helpers.config_entry_oauth2_flow.OAuth2Session.valid_token", False
+    "smarthub.helpers.config_entry_oauth2_flow.OAuth2Session.valid_token", False
 )
 async def test_api_getaccesstoken_tokennotvalid_reloadtoken(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_aioclient: None,

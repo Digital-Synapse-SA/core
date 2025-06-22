@@ -5,15 +5,15 @@ from __future__ import annotations
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("setup_integration")
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:

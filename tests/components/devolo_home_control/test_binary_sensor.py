@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import configure_integration
 from .mocks import (
@@ -19,14 +19,14 @@ from .mocks import (
 
 
 async def test_binary_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup and state change of a binary sensor device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockBinarySensor()
     test_gateway.devices["Test"].status = 0
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -57,14 +57,14 @@ async def test_binary_sensor(
 
 
 async def test_remote_control(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup and state change of a remote control device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockRemoteControl()
     test_gateway.devices["Test"].status = 0
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -96,11 +96,11 @@ async def test_remote_control(
     )
 
 
-async def test_disabled(hass: HomeAssistant) -> None:
+async def test_disabled(hass: SmartHub) -> None:
     """Test setup of a disabled device."""
     entry = configure_integration(hass)
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[HomeControlMockDisabledBinarySensor(), HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -109,12 +109,12 @@ async def test_disabled(hass: HomeAssistant) -> None:
     assert hass.states.get(f"{BINARY_SENSOR_DOMAIN}.test_door") is None
 
 
-async def test_remove_from_hass(hass: HomeAssistant) -> None:
+async def test_remove_from_hass(hass: SmartHub) -> None:
     """Test removing entity."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockBinarySensor()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)

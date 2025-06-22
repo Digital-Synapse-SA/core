@@ -6,11 +6,11 @@ from aiohttp import ClientResponseError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -22,7 +22,7 @@ ENTITY_ID = "button.washing_machine_start"
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_button_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -35,7 +35,7 @@ async def test_button_states(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_button_states_api_push(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -49,7 +49,7 @@ async def test_button_states_api_push(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_button_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: MockConfigEntry,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_button_press(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_api_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: MockConfigEntry,
 ) -> None:
@@ -73,7 +73,7 @@ async def test_api_failure(
     mock_miele_client.send_action.side_effect = ClientResponseError("test", "Test")
 
     with pytest.raises(
-        HomeAssistantError, match=f"Failed to set state for {ENTITY_ID}"
+        SmartHubError, match=f"Failed to set state for {ENTITY_ID}"
     ):
         await hass.services.async_call(
             TEST_PLATFORM, SERVICE_PRESS, {ATTR_ENTITY_ID: ENTITY_ID}, blocking=True

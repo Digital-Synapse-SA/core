@@ -5,10 +5,10 @@ from typing import Any
 from pypck.lcn_addr import LcnAddr
 import pytest
 
-from homeassistant.components.lcn import AddressType
-from homeassistant.components.lcn.const import CONF_DOMAIN_DATA
-from homeassistant.components.lcn.helpers import get_device_config
-from homeassistant.const import (
+from smarthub.components.lcn import AddressType
+from smarthub.components.lcn.const import CONF_DOMAIN_DATA
+from smarthub.components.lcn.helpers import get_device_config
+from smarthub.const import (
     CONF_ADDRESS,
     CONF_DEVICES,
     CONF_DOMAIN,
@@ -16,7 +16,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_TYPE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .conftest import MockConfigEntry, init_integration
 
@@ -56,7 +56,7 @@ ENTITIES_DELETE_PAYLOAD = {
 
 
 async def test_lcn_devices_command(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
 ) -> None:
     """Test lcn/devices command."""
     await init_integration(hass, entry)
@@ -82,7 +82,7 @@ async def test_lcn_devices_command(
     ],
 )
 async def test_lcn_entities_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entry: MockConfigEntry,
     payload,
@@ -113,7 +113,7 @@ async def test_lcn_entities_command(
 
 
 async def test_lcn_devices_scan_command(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
 ) -> None:
     """Test lcn/devices/scan command."""
     # add new module which is not stored in config_entry
@@ -136,7 +136,7 @@ async def test_lcn_devices_scan_command(
 
 
 async def test_lcn_devices_add_command(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
 ) -> None:
     """Test lcn/devices/add command."""
     await init_integration(hass, entry)
@@ -153,7 +153,7 @@ async def test_lcn_devices_add_command(
 
 
 async def test_lcn_devices_delete_command(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
 ) -> None:
     """Test lcn/devices/delete command."""
     await init_integration(hass, entry)
@@ -171,7 +171,7 @@ async def test_lcn_devices_delete_command(
 
 
 async def test_lcn_entities_add_command(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
 ) -> None:
     """Test lcn/entities/add command."""
     await init_integration(hass, entry)
@@ -194,7 +194,7 @@ async def test_lcn_entities_add_command(
 
 
 async def test_lcn_entities_delete_command(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
 ) -> None:
     """Test lcn/entities/delete command."""
     await init_integration(hass, entry)
@@ -250,7 +250,7 @@ async def test_lcn_entities_delete_command(
     ],
 )
 async def test_lcn_command_host_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entry: MockConfigEntry,
     payload: dict[str, str],
@@ -278,7 +278,7 @@ async def test_lcn_command_host_error(
     ],
 )
 async def test_lcn_command_address_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entry: MockConfigEntry,
     payload: dict[str, Any],
@@ -299,7 +299,7 @@ async def test_lcn_command_address_error(
 
 
 async def test_lcn_entities_add_existing_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entry: MockConfigEntry,
 ) -> None:

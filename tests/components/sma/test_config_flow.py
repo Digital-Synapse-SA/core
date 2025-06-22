@@ -9,11 +9,11 @@ from pysma.exceptions import (
 )
 import pytest
 
-from homeassistant.components.sma.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.sma.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import (
     MOCK_DEVICE,
@@ -39,7 +39,7 @@ DHCP_DISCOVERY_DUPLICATE = DhcpServiceInfo(
 
 
 async def test_form(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_sma_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_sma_client: AsyncMock
 ) -> None:
     """Test we get the form."""
 
@@ -72,7 +72,7 @@ async def test_form(
     ],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MockConfigEntry,
     exception: Exception,
     error: str,
@@ -83,7 +83,7 @@ async def test_form_exceptions(
     )
 
     with patch(
-        "homeassistant.components.sma.pysma.SMA.new_session", side_effect=exception
+        "smarthub.components.sma.pysma.SMA.new_session", side_effect=exception
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -95,7 +95,7 @@ async def test_form_exceptions(
 
 
 async def test_form_already_configured(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_sma_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_sma_client: AsyncMock
 ) -> None:
     """Test starting a flow by user when already configured."""
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_INPUT, unique_id="123456789")
@@ -118,7 +118,7 @@ async def test_form_already_configured(
 
 
 async def test_dhcp_discovery(
-    hass: HomeAssistant, mock_setup_entry: MockConfigEntry, mock_sma_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: MockConfigEntry, mock_sma_client: AsyncMock
 ) -> None:
     """Test we can setup from dhcp discovery."""
     result = await hass.config_entries.flow.async_init(
@@ -142,7 +142,7 @@ async def test_dhcp_discovery(
 
 
 async def test_dhcp_already_configured(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test starting a flow by dhcp when already configured."""
     mock_config_entry.add_to_hass(hass)
@@ -164,7 +164,7 @@ async def test_dhcp_already_configured(
     ],
 )
 async def test_dhcp_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MockConfigEntry,
     mock_sma_client: AsyncMock,
     exception: Exception,
@@ -177,7 +177,7 @@ async def test_dhcp_exceptions(
         data=DHCP_DISCOVERY,
     )
 
-    with patch("homeassistant.components.sma.pysma.SMA") as mock_sma:
+    with patch("smarthub.components.sma.pysma.SMA") as mock_sma:
         mock_sma_instance = mock_sma.return_value
         mock_sma_instance.new_session = AsyncMock(side_effect=exception)
 
@@ -189,7 +189,7 @@ async def test_dhcp_exceptions(
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": error}
 
-    with patch("homeassistant.components.sma.pysma.SMA") as mock_sma:
+    with patch("smarthub.components.sma.pysma.SMA") as mock_sma:
         mock_sma_instance = mock_sma.return_value
         mock_sma_instance.new_session = AsyncMock(return_value=True)
         mock_sma_instance.device_info = AsyncMock(return_value=MOCK_DEVICE)
@@ -207,7 +207,7 @@ async def test_dhcp_exceptions(
 
 
 async def test_full_flow_reauth(
-    hass: HomeAssistant, mock_setup_entry: MockConfigEntry, mock_sma_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: MockConfigEntry, mock_sma_client: AsyncMock
 ) -> None:
     """Test the full flow of the config flow."""
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_INPUT, unique_id="123456789")
@@ -246,7 +246,7 @@ async def test_full_flow_reauth(
     ],
 )
 async def test_reauth_flow_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
     error: str,
@@ -257,7 +257,7 @@ async def test_reauth_flow_exceptions(
 
     result = await entry.start_reauth_flow(hass)
 
-    with patch("homeassistant.components.sma.pysma.SMA") as mock_sma:
+    with patch("smarthub.components.sma.pysma.SMA") as mock_sma:
         mock_sma_instance = mock_sma.return_value
         mock_sma_instance.new_session = AsyncMock(side_effect=exception)
         result = await hass.config_entries.flow.async_configure(

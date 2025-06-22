@@ -6,14 +6,14 @@ from datetime import timedelta
 from typing import Any
 from unittest.mock import patch
 
-from homeassistant import setup
-from homeassistant.components import lifx
-from homeassistant.components.lifx import DOMAIN, discovery
-from homeassistant.const import CONF_HOST, EVENT_HOMEASSISTANT_STARTED
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub import setup
+from smarthub.components import lifx
+from smarthub.components.lifx import DOMAIN, discovery
+from smarthub.const import CONF_HOST, EVENT_HOMEASSISTANT_STARTED
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     IP_ADDRESS,
@@ -30,7 +30,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_migration_device_online_end_to_end(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -85,7 +85,7 @@ async def test_migration_device_online_end_to_end(
 
 
 async def test_discovery_is_more_frequent_during_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -138,7 +138,7 @@ async def test_discovery_is_more_frequent_during_migration(
         _patch_config_flow_try_connect(device=bulb),
         patch.object(discovery, "DEFAULT_TIMEOUT", 0),
         patch(
-            "homeassistant.components.lifx.discovery.LifxDiscovery", MockLifxDiscovery
+            "smarthub.components.lifx.discovery.LifxDiscovery", MockLifxDiscovery
         ),
     ):
         await async_setup_component(hass, lifx.DOMAIN, {lifx.DOMAIN: {}})
@@ -163,7 +163,7 @@ async def test_discovery_is_more_frequent_during_migration(
 
 
 async def test_migration_device_online_end_to_end_after_downgrade(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -214,7 +214,7 @@ async def test_migration_device_online_end_to_end_after_downgrade(
 
 
 async def test_migration_device_online_end_to_end_ignores_other_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

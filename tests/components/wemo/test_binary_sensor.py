@@ -4,18 +4,18 @@ import pytest
 import pywemo
 from pywemo import StandbyState
 
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.wemo.binary_sensor import (
+from smarthub.components.wemo.binary_sensor import (
     InsightBinarySensor,
     MakerBinarySensor,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .entity_test_helpers import EntityTestHelpers
 
@@ -30,7 +30,7 @@ class TestMotion(EntityTestHelpers):
 
     async def test_binary_sensor_registry_state_callback(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         pywemo_registry: pywemo.SubscriptionRegistry,
         pywemo_device: pywemo.WeMoDevice,
         wemo_entity: er.RegistryEntry,
@@ -50,7 +50,7 @@ class TestMotion(EntityTestHelpers):
 
     async def test_binary_sensor_update_entity(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         pywemo_registry: pywemo.SubscriptionRegistry,
         pywemo_device: pywemo.WeMoDevice,
         wemo_entity: er.RegistryEntry,
@@ -94,7 +94,7 @@ class TestMaker(EntityTestHelpers):
 
     async def test_registry_state_callback(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         pywemo_registry: pywemo.SubscriptionRegistry,
         pywemo_device: pywemo.WeMoDevice,
         wemo_entity: er.RegistryEntry,
@@ -128,7 +128,7 @@ class TestInsight(EntityTestHelpers):
 
     async def test_registry_state_callback(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         pywemo_registry: pywemo.SubscriptionRegistry,
         pywemo_device: pywemo.WeMoDevice,
         wemo_entity: er.RegistryEntry,

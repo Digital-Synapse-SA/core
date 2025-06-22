@@ -5,8 +5,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components.forked_daapd.browse_media import create_media_content_id
-from homeassistant.components.forked_daapd.const import (
+from smarthub.components.forked_daapd.browse_media import create_media_content_id
+from smarthub.components.forked_daapd.const import (
     CONF_LIBRESPOT_JAVA_PORT,
     CONF_MAX_PLAYLISTS,
     CONF_TTS_PAUSE_TIME,
@@ -19,7 +19,7 @@ from homeassistant.components.forked_daapd.const import (
     SUPPORTED_FEATURES,
     SUPPORTED_FEATURES_ZONE,
 )
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_MEDIA_ALBUM_ARTIST,
     ATTR_MEDIA_ALBUM_NAME,
@@ -55,8 +55,8 @@ from homeassistant.components.media_player import (
     MediaPlayerEnqueue,
     MediaType,
 )
-from homeassistant.components.media_source import PlayMedia
-from homeassistant.const import (
+from smarthub.components.media_source import PlayMedia
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     ATTR_SUPPORTED_FEATURES,
@@ -64,7 +64,7 @@ from homeassistant.const import (
     STATE_PAUSED,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant, ServiceResponse
+from smarthub.core import SmartHub, ServiceResponse
 
 from tests.common import MockConfigEntry, async_mock_signal
 
@@ -301,7 +301,7 @@ async def get_request_return_values_fixture() -> dict[str, Any]:
 
 @pytest.fixture(name="mock_api_object")
 async def mock_api_object_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     get_request_return_values: dict[str, Any],
 ) -> Mock:
@@ -313,7 +313,7 @@ async def mock_api_object_fixture(
         return get_request_return_values[update_type]
 
     with patch(
-        "homeassistant.components.forked_daapd.ForkedDaapdAPI",
+        "smarthub.components.forked_daapd.ForkedDaapdAPI",
         autospec=True,
     ) as mock_api:
         mock_api.return_value.get_request.side_effect = get_request_side_effect
@@ -348,7 +348,7 @@ async def mock_api_object_fixture(
 
 @pytest.mark.usefixtures("mock_api_object")
 async def test_unload_config_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test the player is set unavailable when the config entry is unloaded."""
     assert hass.states.get(TEST_MASTER_ENTITY_NAME)
@@ -359,7 +359,7 @@ async def test_unload_config_entry(
 
 
 @pytest.mark.usefixtures("mock_api_object")
-def test_master_state(hass: HomeAssistant) -> None:
+def test_master_state(hass: SmartHub) -> None:
     """Test master state attributes."""
     state = hass.states.get(TEST_MASTER_ENTITY_NAME)
     assert state.state == STATE_PAUSED
@@ -380,7 +380,7 @@ def test_master_state(hass: HomeAssistant) -> None:
 
 
 async def test_no_update_when_get_request_returns_none(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_api_object: Mock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_api_object: Mock
 ) -> None:
     """Test when get request returns None."""
 
@@ -406,7 +406,7 @@ async def test_no_update_when_get_request_returns_none(
 
 
 async def _service_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_name: str,
     service: str,
     additional_service_data: dict[str, Any] | None = None,
@@ -422,7 +422,7 @@ async def _service_call(
     )
 
 
-async def test_zone(hass: HomeAssistant, mock_api_object: Mock) -> None:
+async def test_zone(hass: SmartHub, mock_api_object: Mock) -> None:
     """Test zone attributes and methods."""
     zone_entity_name = TEST_ZONE_ENTITY_NAMES[0]
     state = hass.states.get(zone_entity_name)
@@ -461,7 +461,7 @@ async def test_zone(hass: HomeAssistant, mock_api_object: Mock) -> None:
     mock_api_object.change_output.assert_any_call(output_id, selected=True)
 
 
-async def test_last_outputs_master(hass: HomeAssistant, mock_api_object: Mock) -> None:
+async def test_last_outputs_master(hass: SmartHub, mock_api_object: Mock) -> None:
     """Test restoration of _last_outputs."""
     # Test turning on sends API call
     await _service_call(hass, TEST_MASTER_ENTITY_NAME, SERVICE_TURN_ON)
@@ -478,7 +478,7 @@ async def test_last_outputs_master(hass: HomeAssistant, mock_api_object: Mock) -
 
 
 async def test_bunch_of_stuff_master(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_request_return_values: dict[str, Any],
     mock_api_object: Mock,
 ) -> None:
@@ -565,7 +565,7 @@ async def test_bunch_of_stuff_master(
 
 
 @pytest.mark.usefixtures("mock_api_object")
-async def test_async_play_media_from_paused(hass: HomeAssistant) -> None:
+async def test_async_play_media_from_paused(hass: SmartHub) -> None:
     """Test async play media from paused."""
     initial_state = hass.states.get(TEST_MASTER_ENTITY_NAME)
     await _service_call(
@@ -583,7 +583,7 @@ async def test_async_play_media_from_paused(hass: HomeAssistant) -> None:
 
 
 async def test_async_play_media_announcement_from_stopped(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_request_return_values: dict[str, Any],
     mock_api_object: Mock,
 ) -> None:
@@ -612,7 +612,7 @@ async def test_async_play_media_announcement_from_stopped(
 
 
 @pytest.mark.usefixtures("mock_api_object")
-async def test_async_play_media_unsupported(hass: HomeAssistant) -> None:
+async def test_async_play_media_unsupported(hass: SmartHub) -> None:
     """Test async play media on unsupported media type."""
     initial_state = hass.states.get(TEST_MASTER_ENTITY_NAME)
     await _service_call(
@@ -629,11 +629,11 @@ async def test_async_play_media_unsupported(hass: HomeAssistant) -> None:
 
 
 async def test_async_play_media_announcement_tts_timeout(
-    hass: HomeAssistant, mock_api_object: Mock
+    hass: SmartHub, mock_api_object: Mock
 ) -> None:
     """Test async play media announcement with TTS timeout."""
     mock_api_object.add_to_queue.side_effect = None
-    with patch("homeassistant.components.forked_daapd.media_player.TTS_TIMEOUT", 0):
+    with patch("smarthub.components.forked_daapd.media_player.TTS_TIMEOUT", 0):
         initial_state = hass.states.get(TEST_MASTER_ENTITY_NAME)
         await _service_call(
             hass,
@@ -651,7 +651,7 @@ async def test_async_play_media_announcement_tts_timeout(
 
 
 async def test_use_pipe_control_with_no_api(
-    hass: HomeAssistant, mock_api_object: Mock
+    hass: SmartHub, mock_api_object: Mock
 ) -> None:
     """Test using pipe control with no api set."""
     await _service_call(
@@ -665,7 +665,7 @@ async def test_use_pipe_control_with_no_api(
 
 
 @pytest.mark.usefixtures("mock_api_object")
-async def test_clear_source(hass: HomeAssistant) -> None:
+async def test_clear_source(hass: SmartHub) -> None:
     """Test changing source to clear."""
     await _service_call(
         hass,
@@ -679,14 +679,14 @@ async def test_clear_source(hass: HomeAssistant) -> None:
 
 @pytest.fixture(name="pipe_control_api_object")
 async def pipe_control_api_object_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     get_request_return_values: dict[str, Any],
     mock_api_object: Mock,
 ) -> Mock:
     """Fixture for mock librespot_java api."""
     with patch(
-        "homeassistant.components.forked_daapd.media_player.LibrespotJavaAPI",
+        "smarthub.components.forked_daapd.media_player.LibrespotJavaAPI",
         autospec=True,
     ) as pipe_control_api:
         hass.config_entries.async_update_entry(config_entry, options=OPTIONS_DATA)
@@ -713,7 +713,7 @@ async def pipe_control_api_object_fixture(
 
 
 async def test_librespot_java_stuff(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_request_return_values: dict[str, Any],
     mock_api_object: Mock,
     pipe_control_api_object: Mock,
@@ -752,7 +752,7 @@ async def test_librespot_java_stuff(
 
 
 @pytest.mark.usefixtures("pipe_control_api_object")
-async def test_librespot_java_play_announcement(hass: HomeAssistant) -> None:
+async def test_librespot_java_play_announcement(hass: SmartHub) -> None:
     """Test play announcement with librespot-java pipe."""
     initial_state = hass.states.get(TEST_MASTER_ENTITY_NAME)
     await _service_call(
@@ -771,13 +771,13 @@ async def test_librespot_java_play_announcement(hass: HomeAssistant) -> None:
 
 
 async def test_librespot_java_play_media_pause_timeout(
-    hass: HomeAssistant, pipe_control_api_object: Mock
+    hass: SmartHub, pipe_control_api_object: Mock
 ) -> None:
     """Test play media with librespot-java pipe."""
     # test media play with pause timeout
     pipe_control_api_object.player_pause.side_effect = None
     with patch(
-        "homeassistant.components.forked_daapd.media_player.CALLBACK_TIMEOUT", 0
+        "smarthub.components.forked_daapd.media_player.CALLBACK_TIMEOUT", 0
     ):
         initial_state = hass.states.get(TEST_MASTER_ENTITY_NAME)
         await _service_call(
@@ -794,7 +794,7 @@ async def test_librespot_java_play_media_pause_timeout(
         assert state.last_updated > initial_state.last_updated
 
 
-async def test_unsupported_update(hass: HomeAssistant, mock_api_object: Mock) -> None:
+async def test_unsupported_update(hass: SmartHub, mock_api_object: Mock) -> None:
     """Test unsupported update type."""
     last_updated = hass.states.get(TEST_MASTER_ENTITY_NAME).last_updated
     updater_update = mock_api_object.start_websocket_handler.call_args[0][2]
@@ -804,11 +804,11 @@ async def test_unsupported_update(hass: HomeAssistant, mock_api_object: Mock) ->
 
 
 async def test_invalid_websocket_port(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test invalid websocket port on async_init."""
     with patch(
-        "homeassistant.components.forked_daapd.ForkedDaapdAPI",
+        "smarthub.components.forked_daapd.ForkedDaapdAPI",
         autospec=True,
     ) as mock_api:
         mock_api.return_value.get_request.return_value = SAMPLE_CONFIG_NO_WEBSOCKET
@@ -818,7 +818,7 @@ async def test_invalid_websocket_port(
         assert hass.states.get(TEST_MASTER_ENTITY_NAME).state == STATE_UNAVAILABLE
 
 
-async def test_websocket_disconnect(hass: HomeAssistant, mock_api_object: Mock) -> None:
+async def test_websocket_disconnect(hass: SmartHub, mock_api_object: Mock) -> None:
     """Test websocket disconnection."""
     assert hass.states.get(TEST_MASTER_ENTITY_NAME).state != STATE_UNAVAILABLE
     assert hass.states.get(TEST_ZONE_ENTITY_NAMES[0]).state != STATE_UNAVAILABLE
@@ -830,7 +830,7 @@ async def test_websocket_disconnect(hass: HomeAssistant, mock_api_object: Mock) 
 
 
 async def test_async_play_media_enqueue(
-    hass: HomeAssistant, mock_api_object: Mock
+    hass: SmartHub, mock_api_object: Mock
 ) -> None:
     """Test async play media with different enqueue options."""
     initial_state = hass.states.get(TEST_MASTER_ENTITY_NAME)
@@ -907,7 +907,7 @@ async def test_async_play_media_enqueue(
     )
 
 
-async def test_play_owntone_media(hass: HomeAssistant, mock_api_object: Mock) -> None:
+async def test_play_owntone_media(hass: SmartHub, mock_api_object: Mock) -> None:
     """Test async play media with an owntone source."""
     initial_state = hass.states.get(TEST_MASTER_ENTITY_NAME)
     await _service_call(
@@ -933,7 +933,7 @@ async def test_play_owntone_media(hass: HomeAssistant, mock_api_object: Mock) ->
     )
 
 
-async def test_play_spotify_media(hass: HomeAssistant, mock_api_object: Mock) -> None:
+async def test_play_spotify_media(hass: SmartHub, mock_api_object: Mock) -> None:
     """Test async play media with a spotify source."""
     initial_state = hass.states.get(TEST_MASTER_ENTITY_NAME)
     await _service_call(
@@ -957,11 +957,11 @@ async def test_play_spotify_media(hass: HomeAssistant, mock_api_object: Mock) ->
     )
 
 
-async def test_play_media_source(hass: HomeAssistant, mock_api_object: Mock) -> None:
+async def test_play_media_source(hass: SmartHub, mock_api_object: Mock) -> None:
     """Test async play media with a spotify source."""
     initial_state = hass.states.get(TEST_MASTER_ENTITY_NAME)
     with patch(
-        "homeassistant.components.media_source.async_resolve_media",
+        "smarthub.components.media_source.async_resolve_media",
         return_value=PlayMedia("http://my_hass/song.m4a", "audio/aac"),
     ):
         await _service_call(

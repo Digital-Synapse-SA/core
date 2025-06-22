@@ -10,18 +10,18 @@ from aioshelly.const import MODEL_25
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.shelly.const import (
+from smarthub.components.shelly.const import (
     CONF_GEN,
     CONF_SLEEP_PERIOD,
     DOMAIN,
     REST_SENSORS_UPDATE_INTERVAL,
     RPC_SENSORS_POLLING_INTERVAL,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_MODEL
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.device_registry import (
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_HOST, CONF_MODEL
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.device_registry import (
     CONNECTION_NETWORK_MAC,
     DeviceEntry,
     DeviceRegistry,
@@ -34,7 +34,7 @@ MOCK_MAC = "123456789ABC"
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int | None,
     model=MODEL_25,
     sleep_period=0,
@@ -42,7 +42,7 @@ async def init_integration(
     skip_setup: bool = False,
     data: dict[str, Any] | None = None,
 ) -> MockConfigEntry:
-    """Set up the Shelly integration in Home Assistant."""
+    """Set up the Shelly integration in SmartHub."""
     if data is None:
         data = {
             CONF_HOST: "192.168.1.37",
@@ -88,7 +88,7 @@ def inject_rpc_device_event(
 
 
 async def mock_rest_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     seconds=REST_SENSORS_UPDATE_INTERVAL,
 ) -> None:
@@ -99,7 +99,7 @@ async def mock_rest_update(
 
 
 async def mock_polling_rpc_update(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Move time to create polling RPC sensors update event."""
     freezer.tick(timedelta(seconds=RPC_SENSORS_POLLING_INTERVAL))
@@ -108,7 +108,7 @@ async def mock_polling_rpc_update(
 
 
 def register_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     domain: str,
     object_id: str,
     unique_id: str,
@@ -132,7 +132,7 @@ def register_entity(
 
 
 def get_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     domain: str,
     unique_id: str,
 ) -> str | None:

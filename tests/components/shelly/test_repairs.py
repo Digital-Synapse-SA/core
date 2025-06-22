@@ -5,15 +5,15 @@ from unittest.mock import Mock
 from aioshelly.exceptions import DeviceConnectionError, RpcCallError
 import pytest
 
-from homeassistant.components.shelly.const import (
+from smarthub.components.shelly.const import (
     BLE_SCANNER_FIRMWARE_UNSUPPORTED_ISSUE_ID,
     CONF_BLE_SCANNER_MODE,
     DOMAIN,
     BLEScannerMode,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from . import MOCK_MAC, init_integration
 
@@ -26,7 +26,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_ble_scanner_unsupported_firmware_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_rpc_device: Mock,
     issue_registry: ir.IssueRegistry,
@@ -59,7 +59,7 @@ async def test_ble_scanner_unsupported_firmware_issue(
 
 
 async def test_unsupported_firmware_issue_update_not_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -97,7 +97,7 @@ async def test_unsupported_firmware_issue_update_not_available(
     "exception", [DeviceConnectionError, RpcCallError(999, "Unknown error")]
 )
 async def test_unsupported_firmware_issue_exc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_rpc_device: Mock,
     issue_registry: ir.IssueRegistry,

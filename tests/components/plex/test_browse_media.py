@@ -6,13 +6,13 @@ from unittest.mock import Mock, patch
 import requests_mock
 from yarl import URL
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
 )
-from homeassistant.components.plex.const import CONF_SERVER_IDENTIFIER, PLEX_URI_SCHEME
-from homeassistant.components.websocket_api import ERR_UNKNOWN_ERROR, TYPE_RESULT
-from homeassistant.core import HomeAssistant
+from smarthub.components.plex.const import CONF_SERVER_IDENTIFIER, PLEX_URI_SCHEME
+from smarthub.components.websocket_api import ERR_UNKNOWN_ERROR, TYPE_RESULT
+from smarthub.core import SmartHub
 
 from .const import DEFAULT_DATA
 
@@ -115,7 +115,7 @@ class MockPlexStation:
 
 
 async def test_browse_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_plex_server,
     requests_mock: requests_mock.Mocker,

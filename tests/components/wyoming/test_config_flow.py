@@ -7,12 +7,12 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from wyoming.info import Info
 
-from homeassistant import config_entries
-from homeassistant.components.wyoming.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.wyoming.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from . import EMPTY_INFO, SATELLITE_INFO, STT_INFO, TTS_INFO
 
@@ -41,7 +41,7 @@ ZEROCONF_DISCOVERY = ZeroconfServiceInfo(
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_form_stt(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form_stt(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -50,7 +50,7 @@ async def test_form_stt(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> Non
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=STT_INFO,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -71,7 +71,7 @@ async def test_form_stt(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> Non
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_tts(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form_tts(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -80,7 +80,7 @@ async def test_form_tts(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> Non
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=TTS_INFO,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -101,14 +101,14 @@ async def test_form_tts(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> Non
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=None,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -123,14 +123,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_no_supported_services(hass: HomeAssistant) -> None:
+async def test_no_supported_services(hass: SmartHub) -> None:
     """Test we handle no supported services error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=EMPTY_INFO,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -147,7 +147,7 @@ async def test_no_supported_services(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("info", [STT_INFO, TTS_INFO])
 async def test_hassio_addon_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     snapshot: SnapshotAssertion,
     info: Info,
@@ -164,7 +164,7 @@ async def test_hassio_addon_discovery(
     assert result.get("description_placeholders") == {"addon": "Piper"}
 
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=info,
     ) as mock_wyoming:
         result2 = await hass.config_entries.flow.async_configure(result["flow_id"], {})
@@ -176,7 +176,7 @@ async def test_hassio_addon_discovery(
     assert len(mock_wyoming.mock_calls) == 1
 
 
-async def test_hassio_addon_already_configured(hass: HomeAssistant) -> None:
+async def test_hassio_addon_already_configured(hass: SmartHub) -> None:
     """Test we abort discovery if the add-on is already configured."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -194,7 +194,7 @@ async def test_hassio_addon_already_configured(hass: HomeAssistant) -> None:
     assert entry.unique_id == "1234"
 
 
-async def test_hassio_addon_cannot_connect(hass: HomeAssistant) -> None:
+async def test_hassio_addon_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -203,7 +203,7 @@ async def test_hassio_addon_cannot_connect(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=None,
     ):
         result2 = await hass.config_entries.flow.async_configure(result["flow_id"], {})
@@ -212,7 +212,7 @@ async def test_hassio_addon_cannot_connect(hass: HomeAssistant) -> None:
     assert result2.get("errors") == {"base": "cannot_connect"}
 
 
-async def test_hassio_addon_no_supported_services(hass: HomeAssistant) -> None:
+async def test_hassio_addon_no_supported_services(hass: SmartHub) -> None:
     """Test we handle no supported services error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -221,7 +221,7 @@ async def test_hassio_addon_no_supported_services(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=EMPTY_INFO,
     ):
         result2 = await hass.config_entries.flow.async_configure(result["flow_id"], {})
@@ -231,13 +231,13 @@ async def test_hassio_addon_no_supported_services(hass: HomeAssistant) -> None:
 
 
 async def test_zeroconf_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test config flow initiated by Supervisor."""
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=SATELLITE_INFO,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -258,14 +258,14 @@ async def test_zeroconf_discovery(
 
 
 async def test_zeroconf_discovery_no_port(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test discovery when the zeroconf service does not have a port."""
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch.object(ZEROCONF_DISCOVERY, "port", None),
@@ -281,13 +281,13 @@ async def test_zeroconf_discovery_no_port(
 
 
 async def test_zeroconf_discovery_no_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test discovery when there are no supported services on the client."""
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=Info(),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -301,7 +301,7 @@ async def test_zeroconf_discovery_no_services(
 
 
 async def test_zeroconf_discovery_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -313,7 +313,7 @@ async def test_zeroconf_discovery_already_configured(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=SATELLITE_INFO,
     ):
         result = await hass.config_entries.flow.async_init(

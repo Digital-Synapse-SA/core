@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock, patch
 from aioambient import OpenAPI
 import pytest
 
-from homeassistant.components.ambient_network.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.ambient_network.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 @pytest.mark.parametrize("config_entry", ["AA:AA:AA:AA:AA:AA"], indirect=True)
 async def test_happy_path(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     open_api: OpenAPI,
     aioambient: AsyncMock,
@@ -58,7 +58,7 @@ async def test_happy_path(
 
 
 async def test_no_station_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioambient: AsyncMock,
     open_api: OpenAPI,
 ) -> None:

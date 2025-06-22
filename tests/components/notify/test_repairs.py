@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.notify import DOMAIN, migrate_notify_issue
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.notify import DOMAIN, migrate_notify_issue
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, MockModule, mock_integration
 from tests.components.repairs import (
@@ -26,7 +26,7 @@ THERMOSTAT_ID = 0
     [(None, "migrate_notify_test"), ("bla", "migrate_notify_test_bla")],
 )
 async def test_notify_migration_repair_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
     service_name: str | None,

@@ -3,15 +3,15 @@
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration, snapshot_whirlpool_entities, trigger_attr_callback
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -28,7 +28,7 @@ async def test_all_entities(
     ],
 )
 async def test_simple_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     mock_fixture: str,
     mock_method: str,

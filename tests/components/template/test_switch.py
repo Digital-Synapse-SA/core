@@ -5,11 +5,11 @@ from typing import Any
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import switch, template
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.template.switch import rewrite_legacy_to_modern_conf
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components import switch, template
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.template.switch import rewrite_legacy_to_modern_conf
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -17,11 +17,11 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import CoreState, HomeAssistant, ServiceCall, State
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.template import Template
-from homeassistant.setup import async_setup_component
+from smarthub.core import CoreState, SmartHub, ServiceCall, State
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.template import Template
+from smarthub.setup import async_setup_component
 
 from .conftest import ConfigurationStyle
 
@@ -72,7 +72,7 @@ UNIQUE_ID_CONFIG = {
 
 
 async def async_setup_legacy_format(
-    hass: HomeAssistant, count: int, switch_config: dict[str, Any]
+    hass: SmartHub, count: int, switch_config: dict[str, Any]
 ) -> None:
     """Do setup of switch integration via legacy format."""
     config = {"switch": {"platform": "template", "switches": switch_config}}
@@ -89,7 +89,7 @@ async def async_setup_legacy_format(
 
 
 async def async_setup_modern_format(
-    hass: HomeAssistant, count: int, switch_config: dict[str, Any]
+    hass: SmartHub, count: int, switch_config: dict[str, Any]
 ) -> None:
     """Do setup of switch integration via modern format."""
     config = {"template": {"switch": switch_config}}
@@ -107,7 +107,7 @@ async def async_setup_modern_format(
 
 
 async def async_setup_trigger_format(
-    hass: HomeAssistant, count: int, switch_config: dict[str, Any]
+    hass: SmartHub, count: int, switch_config: dict[str, Any]
 ) -> None:
     """Do setup of switch integration via modern format."""
     config = {"template": {**TEST_EVENT_TRIGGER, "switch": switch_config}}
@@ -125,7 +125,7 @@ async def async_setup_trigger_format(
 
 
 async def async_ensure_triggered_entity_updates(
-    hass: HomeAssistant, style: ConfigurationStyle, **kwargs
+    hass: SmartHub, style: ConfigurationStyle, **kwargs
 ) -> None:
     """Trigger template entities."""
     if style == ConfigurationStyle.TRIGGER:
@@ -135,7 +135,7 @@ async def async_ensure_triggered_entity_updates(
 
 @pytest.fixture
 async def setup_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     switch_config: dict[str, Any],
@@ -151,7 +151,7 @@ async def setup_switch(
 
 @pytest.fixture
 async def setup_state_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -190,7 +190,7 @@ async def setup_state_switch(
 
 @pytest.fixture
 async def setup_single_attribute_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     attribute: str,
@@ -234,7 +234,7 @@ async def setup_single_attribute_switch(
 
 @pytest.fixture
 async def setup_optimistic_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
 ) -> None:
@@ -269,7 +269,7 @@ async def setup_optimistic_switch(
 
 @pytest.fixture
 async def setup_single_attribute_optimistic_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     attribute: str,
@@ -308,7 +308,7 @@ async def setup_single_attribute_optimistic_switch(
         )
 
 
-async def test_legacy_to_modern_config(hass: HomeAssistant) -> None:
+async def test_legacy_to_modern_config(hass: SmartHub) -> None:
     """Test the conversion of legacy template to modern template."""
     config = {
         "foo": {
@@ -345,7 +345,7 @@ async def test_legacy_to_modern_config(hass: HomeAssistant) -> None:
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 async def test_setup(
-    hass: HomeAssistant, style: ConfigurationStyle, setup_state_switch
+    hass: SmartHub, style: ConfigurationStyle, setup_state_switch
 ) -> None:
     """Test template."""
     await async_ensure_triggered_entity_updates(hass, style)
@@ -357,7 +357,7 @@ async def test_setup(
 
 @pytest.mark.parametrize("state_key", ["value_template", "state"])
 async def test_setup_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     state_key: str,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -391,7 +391,7 @@ async def test_setup_config_entry(
 
 @pytest.mark.parametrize("state_key", ["value_template", "state"])
 async def test_flow_preview(
-    hass: HomeAssistant,
+    hass: SmartHub,
     state_key: str,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -437,7 +437,7 @@ async def test_flow_preview(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 async def test_template_state_text(
-    hass: HomeAssistant, style: ConfigurationStyle, setup_state_switch
+    hass: SmartHub, style: ConfigurationStyle, setup_state_switch
 ) -> None:
     """Test the state text of a template."""
     hass.states.async_set(TEST_STATE_ENTITY_ID, STATE_ON)
@@ -470,7 +470,7 @@ async def test_template_state_text(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 async def test_template_state_boolean(
-    hass: HomeAssistant, expected: str, style: ConfigurationStyle, setup_state_switch
+    hass: SmartHub, expected: str, style: ConfigurationStyle, setup_state_switch
 ) -> None:
     """Test the setting of the state with boolean template."""
     await async_ensure_triggered_entity_updates(hass, style)
@@ -491,7 +491,7 @@ async def test_template_state_boolean(
     ],
 )
 async def test_icon_template(
-    hass: HomeAssistant, style: ConfigurationStyle, setup_single_attribute_switch
+    hass: SmartHub, style: ConfigurationStyle, setup_single_attribute_switch
 ) -> None:
     """Test the state text of a template."""
     state = hass.states.get(TEST_ENTITY_ID)
@@ -511,7 +511,7 @@ async def test_icon_template(
     [("icon", "icon", "mdi:icon"), ("picture", "entity_picture", "picture.jpg")],
 )
 async def test_attributes_with_optimistic_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_attr: str,
     attribute: str,
     expected: str,
@@ -601,7 +601,7 @@ async def test_attributes_with_optimistic_state(
     ],
 )
 async def test_entity_picture_template(
-    hass: HomeAssistant, style: ConfigurationStyle, setup_single_attribute_switch
+    hass: SmartHub, style: ConfigurationStyle, setup_single_attribute_switch
 ) -> None:
     """Test entity_picture template."""
     state = hass.states.get(TEST_ENTITY_ID)
@@ -621,12 +621,12 @@ async def test_entity_picture_template(
     "style",
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
-async def test_template_syntax_error(hass: HomeAssistant, setup_state_switch) -> None:
+async def test_template_syntax_error(hass: SmartHub, setup_state_switch) -> None:
     """Test templating syntax error."""
     assert hass.states.async_all("switch") == []
 
 
-async def test_invalid_legacy_slug_does_not_create(hass: HomeAssistant) -> None:
+async def test_invalid_legacy_slug_does_not_create(hass: SmartHub) -> None:
     """Test invalid legacy slug."""
     with assert_setup_component(0, "switch"):
         assert await async_setup_component(
@@ -673,7 +673,7 @@ async def test_invalid_legacy_slug_does_not_create(hass: HomeAssistant) -> None:
     ],
 )
 async def test_invalid_switch_does_not_create(
-    hass: HomeAssistant, config: dict, domain: str
+    hass: SmartHub, config: dict, domain: str
 ) -> None:
     """Test invalid switch."""
     with assert_setup_component(0, domain):
@@ -708,7 +708,7 @@ async def test_invalid_switch_does_not_create(
     ],
 )
 async def test_no_switches_does_not_create(
-    hass: HomeAssistant, config: dict, domain: str, count: int
+    hass: SmartHub, config: dict, domain: str, count: int
 ) -> None:
     """Test if there are no switches no creation."""
     with assert_setup_component(count, domain):
@@ -754,7 +754,7 @@ async def test_no_switches_does_not_create(
     ],
 )
 async def test_missing_on_does_not_create(
-    hass: HomeAssistant, config: dict, domain: str
+    hass: SmartHub, config: dict, domain: str
 ) -> None:
     """Test missing on."""
     with assert_setup_component(0, domain):
@@ -800,7 +800,7 @@ async def test_missing_on_does_not_create(
     ],
 )
 async def test_missing_off_does_not_create(
-    hass: HomeAssistant, config: dict, domain: str
+    hass: SmartHub, config: dict, domain: str
 ) -> None:
     """Test missing off."""
     with assert_setup_component(0, domain):
@@ -821,7 +821,7 @@ async def test_missing_off_does_not_create(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 async def test_on_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     style: ConfigurationStyle,
     setup_state_switch,
     calls: list[ServiceCall],
@@ -853,7 +853,7 @@ async def test_on_action(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 async def test_on_action_optimistic(
-    hass: HomeAssistant, setup_optimistic_switch, calls: list[ServiceCall]
+    hass: SmartHub, setup_optimistic_switch, calls: list[ServiceCall]
 ) -> None:
     """Test on action in optimistic mode."""
     hass.states.async_set(TEST_ENTITY_ID, STATE_OFF)
@@ -885,7 +885,7 @@ async def test_on_action_optimistic(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 async def test_off_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     style: ConfigurationStyle,
     setup_state_switch,
     calls: list[ServiceCall],
@@ -917,7 +917,7 @@ async def test_off_action(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 async def test_off_action_optimistic(
-    hass: HomeAssistant, setup_optimistic_switch, calls: list[ServiceCall]
+    hass: SmartHub, setup_optimistic_switch, calls: list[ServiceCall]
 ) -> None:
     """Test off action in optimistic mode."""
     hass.states.async_set(TEST_ENTITY_ID, STATE_ON)
@@ -999,7 +999,7 @@ async def test_off_action_optimistic(
     ],
 )
 async def test_restore_state(
-    hass: HomeAssistant, count: int, domain: str, config: dict[str, Any]
+    hass: SmartHub, count: int, domain: str, config: dict[str, Any]
 ) -> None:
     """Test state restoration."""
     mock_restore_cache(
@@ -1040,7 +1040,7 @@ async def test_restore_state(
     ],
 )
 async def test_available_template_with_entities(
-    hass: HomeAssistant, style: ConfigurationStyle, setup_single_attribute_switch
+    hass: SmartHub, style: ConfigurationStyle, setup_single_attribute_switch
 ) -> None:
     """Test availability templates with values from other entities."""
     hass.states.async_set(TEST_STATE_ENTITY_ID, STATE_ON)
@@ -1092,7 +1092,7 @@ async def test_available_template_with_entities(
     ],
 )
 async def test_invalid_availability_template_keeps_component_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     config: dict[str, Any],
     domain: str,
@@ -1136,13 +1136,13 @@ async def test_invalid_availability_template_keeps_component_available(
         ),
     ],
 )
-async def test_unique_id(hass: HomeAssistant, setup_switch) -> None:
+async def test_unique_id(hass: SmartHub, setup_switch) -> None:
     """Test unique_id option only creates one switch per id."""
     assert len(hass.states.async_all("switch")) == 1
 
 
 async def test_nested_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a template unique_id propagates to switch unique_ids."""
     with assert_setup_component(1, template.DOMAIN):
@@ -1186,7 +1186,7 @@ async def test_nested_unique_id(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1247,7 +1247,7 @@ async def test_device_id(
         ),
     ],
 )
-async def test_empty_action_config(hass: HomeAssistant, setup_switch) -> None:
+async def test_empty_action_config(hass: SmartHub, setup_switch) -> None:
     """Test configuration with empty script."""
     await hass.services.async_call(
         switch.DOMAIN,

@@ -7,7 +7,7 @@ from dynalite_devices_lib.cover import DynaliteTimeCoverWithTiltDevice
 from dynalite_devices_lib.dynalitebase import DynaliteBaseDevice
 import pytest
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_CURRENT_TILT_POSITION,
     ATTR_POSITION,
@@ -15,9 +15,9 @@ from homeassistant.components.cover import (
     CoverDeviceClass,
     CoverState,
 )
-from homeassistant.const import ATTR_DEVICE_CLASS, ATTR_FRIENDLY_NAME
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.const import ATTR_DEVICE_CLASS, ATTR_FRIENDLY_NAME
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
 
 from .common import (
     ATTR_ARGS,
@@ -50,7 +50,7 @@ def mock_device() -> Mock:
     return mock_dev
 
 
-async def test_cover_setup(hass: HomeAssistant, mock_device: Mock) -> None:
+async def test_cover_setup(hass: SmartHub, mock_device: Mock) -> None:
     """Test a successful setup."""
     await create_entity_from_device(hass, mock_device)
     entity_state = hass.states.get("cover.name")
@@ -89,11 +89,11 @@ async def test_cover_setup(hass: HomeAssistant, mock_device: Mock) -> None:
     )
 
 
-async def test_cover_without_tilt(hass: HomeAssistant, mock_device: Mock) -> None:
+async def test_cover_without_tilt(hass: SmartHub, mock_device: Mock) -> None:
     """Test a cover with no tilt."""
     mock_device.has_tilt = False
     await create_entity_from_device(hass, mock_device)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "cover", "open_cover_tilt", {"entity_id": "cover.name"}, blocking=True
         )
@@ -102,7 +102,7 @@ async def test_cover_without_tilt(hass: HomeAssistant, mock_device: Mock) -> Non
 
 
 async def check_cover_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     update_func: Callable[[DynaliteBaseDevice | None], None],
     device: Mock,
     closing: bool,
@@ -120,7 +120,7 @@ async def check_cover_position(
     assert entity_state.state == expected
 
 
-async def test_cover_positions(hass: HomeAssistant, mock_device: Mock) -> None:
+async def test_cover_positions(hass: SmartHub, mock_device: Mock) -> None:
     """Test that the state updates in the various positions."""
     update_func = await create_entity_from_device(hass, mock_device)
     await check_cover_position(
@@ -137,7 +137,7 @@ async def test_cover_positions(hass: HomeAssistant, mock_device: Mock) -> None:
     )
 
 
-async def test_cover_restore_state(hass: HomeAssistant, mock_device: Mock) -> None:
+async def test_cover_restore_state(hass: SmartHub, mock_device: Mock) -> None:
     """Test restore from cache."""
     mock_restore_cache(
         hass,
@@ -150,7 +150,7 @@ async def test_cover_restore_state(hass: HomeAssistant, mock_device: Mock) -> No
 
 
 async def test_cover_restore_state_bad_cache(
-    hass: HomeAssistant, mock_device: Mock
+    hass: SmartHub, mock_device: Mock
 ) -> None:
     """Test restore from a cache without the attribute."""
     mock_restore_cache(

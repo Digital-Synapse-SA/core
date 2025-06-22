@@ -4,16 +4,16 @@ from unittest.mock import call
 
 import pytest
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import PlayerMocks
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_set_sleep_timer(
-    hass: HomeAssistant,
+    hass: SmartHub,
     player_mocks: PlayerMocks,
     setup_config_entry: None,
 ) -> None:
@@ -30,7 +30,7 @@ async def test_set_sleep_timer(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_clear_sleep_timer(
-    hass: HomeAssistant,
+    hass: SmartHub,
     player_mocks: PlayerMocks,
     setup_config_entry: None,
 ) -> None:

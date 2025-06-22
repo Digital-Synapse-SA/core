@@ -5,26 +5,26 @@ from datetime import timedelta
 from flux_led.const import COLOR_MODE_RGB as FLUX_COLOR_MODE_RGB
 import pytest
 
-from homeassistant.components import flux_led
-from homeassistant.components.flux_led import number as flux_number
-from homeassistant.components.flux_led.const import DOMAIN
-from homeassistant.components.number import (
+from smarthub.components import flux_led
+from smarthub.components.flux_led import number as flux_number
+from smarthub.components.flux_led.const import DOMAIN
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_HOST,
     CONF_NAME,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -42,7 +42,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_effects_speed_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a number unique id."""
     config_entry = MockConfigEntry(
@@ -61,7 +61,7 @@ async def test_effects_speed_unique_id(
 
 
 async def test_effects_speed_unique_id_no_discovery(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a number unique id."""
     config_entry = MockConfigEntry(
@@ -78,7 +78,7 @@ async def test_effects_speed_unique_id_no_discovery(
     assert entity_registry.async_get(entity_id).unique_id == config_entry.entry_id
 
 
-async def test_rgb_light_effect_speed(hass: HomeAssistant) -> None:
+async def test_rgb_light_effect_speed(hass: SmartHub) -> None:
     """Test an rgb light with an effect."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -100,7 +100,7 @@ async def test_rgb_light_effect_speed(hass: HomeAssistant) -> None:
 
     light_entity_id = "light.bulb_rgbcw_ddeeff"
     number_entity_id = "number.bulb_rgbcw_ddeeff_effect_speed"
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -140,7 +140,7 @@ async def test_rgb_light_effect_speed(hass: HomeAssistant) -> None:
     assert state.state == "50"
 
 
-async def test_original_addressable_light_effect_speed(hass: HomeAssistant) -> None:
+async def test_original_addressable_light_effect_speed(hass: SmartHub) -> None:
     """Test an original addressable light with an effect."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -174,7 +174,7 @@ async def test_original_addressable_light_effect_speed(hass: HomeAssistant) -> N
 
     await async_mock_device_turn_off(hass, bulb)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -197,7 +197,7 @@ async def test_original_addressable_light_effect_speed(hass: HomeAssistant) -> N
     assert state.state == "100"
 
 
-async def test_addressable_light_effect_speed(hass: HomeAssistant) -> None:
+async def test_addressable_light_effect_speed(hass: SmartHub) -> None:
     """Test an addressable light with an effect."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -255,7 +255,7 @@ async def test_addressable_light_effect_speed(hass: HomeAssistant) -> None:
     assert state.state == "100"
 
 
-async def test_addressable_light_pixel_config(hass: HomeAssistant) -> None:
+async def test_addressable_light_pixel_config(hass: SmartHub) -> None:
     """Test an addressable light pixel config."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -379,7 +379,7 @@ async def test_addressable_light_pixel_config(hass: HomeAssistant) -> None:
 
 
 async def test_addressable_light_pixel_config_music_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test an addressable light pixel config with music pixels disabled."""
     config_entry = MockConfigEntry(

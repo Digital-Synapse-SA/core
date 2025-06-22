@@ -2,28 +2,28 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.automation import DOMAIN as AUTOMATION_DOMAIN
-from homeassistant.components.ring import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, translation
-from homeassistant.setup import async_setup_component
+from smarthub.components.automation import DOMAIN as AUTOMATION_DOMAIN
+from smarthub.components.ring import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, translation
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
-async def setup_platform(hass: HomeAssistant, platform: Platform) -> None:
+async def setup_platform(hass: SmartHub, platform: Platform) -> None:
     """Set up the ring platform and prerequisites."""
     if not hass.config_entries.async_has_entries(DOMAIN):
         MockConfigEntry(
             domain=DOMAIN, data={"username": "foo", "token": {}}
         ).add_to_hass(hass)
-    with patch("homeassistant.components.ring.PLATFORMS", [platform]):
+    with patch("smarthub.components.ring.PLATFORMS", [platform]):
         assert await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done(wait_background_tasks=True)
 
 
-async def setup_automation(hass: HomeAssistant, alias: str, entity_id: str) -> None:
+async def setup_automation(hass: SmartHub, alias: str, entity_id: str) -> None:
     """Set up an automation for tests."""
     assert await async_setup_component(
         hass,
@@ -39,7 +39,7 @@ async def setup_automation(hass: HomeAssistant, alias: str, entity_id: str) -> N
 
 
 async def async_check_entity_translations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_id: str,
     platform_domain: str,

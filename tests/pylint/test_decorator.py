@@ -16,7 +16,7 @@ from . import assert_adds_messages, assert_no_messages
 def test_good_callback(linter: UnittestLinter, decorator_checker: BaseChecker) -> None:
     """Test good `@callback` decorator."""
     code = """
-    from homeassistant.core import callback
+    from smarthub.core import callback
 
     @callback
     def setup(
@@ -36,7 +36,7 @@ def test_good_callback(linter: UnittestLinter, decorator_checker: BaseChecker) -
 def test_bad_callback(linter: UnittestLinter, decorator_checker: BaseChecker) -> None:
     """Test bad `@callback` decorator."""
     code = """
-    from homeassistant.core import callback
+    from smarthub.core import callback
 
     @callback
     async def setup(

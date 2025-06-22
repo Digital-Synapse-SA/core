@@ -6,10 +6,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components import onboarding
-from homeassistant.components.cloud import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import onboarding
+from smarthub.components.cloud import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import register_auth_provider
 from tests.typing import ClientSessionGenerator
@@ -24,15 +24,15 @@ def mock_onboarding_storage(hass_storage, data):
 
 
 @pytest.fixture(autouse=True)
-async def auth_active(hass: HomeAssistant) -> None:
+async def auth_active(hass: SmartHub) -> None:
     """Ensure auth is always active."""
-    await register_auth_provider(hass, {"type": "homeassistant"})
+    await register_auth_provider(hass, {"type": "smarthub"})
 
 
 @pytest.fixture(name="setup_cloud", autouse=True)
-async def setup_cloud_fixture(hass: HomeAssistant, cloud: MagicMock) -> None:
+async def setup_cloud_fixture(hass: SmartHub, cloud: MagicMock) -> None:
     """Fixture that sets up cloud."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
 
@@ -55,7 +55,7 @@ async def setup_cloud_fixture(hass: HomeAssistant, cloud: MagicMock) -> None:
     ],
 )
 async def test_onboarding_view_after_done(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     cloud: MagicMock,
@@ -77,7 +77,7 @@ async def test_onboarding_view_after_done(
 
 
 async def test_onboarding_cloud_forgot_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     cloud: MagicMock,
@@ -101,7 +101,7 @@ async def test_onboarding_cloud_forgot_password(
 
 
 async def test_onboarding_cloud_login(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     cloud: MagicMock,
@@ -125,7 +125,7 @@ async def test_onboarding_cloud_login(
 
 
 async def test_onboarding_cloud_logout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     cloud: MagicMock,
@@ -146,7 +146,7 @@ async def test_onboarding_cloud_logout(
 
 
 async def test_onboarding_cloud_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     cloud: MagicMock,

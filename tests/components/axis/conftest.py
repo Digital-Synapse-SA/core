@@ -12,8 +12,8 @@ from axis.rtsp import Signal, State
 import pytest
 import respx
 
-from homeassistant.components.axis.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.axis.const import DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_MODEL,
     CONF_NAME,
@@ -21,7 +21,7 @@ from homeassistant.const import (
     CONF_PORT,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .const import (
     API_DISCOVERY_RESPONSE,
@@ -75,7 +75,7 @@ class _RtspClientMock(Protocol):
 def fixture_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.axis.async_setup_entry", return_value=True
+        "smarthub.components.axis.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -281,7 +281,7 @@ def fixture_default_requests(mock_requests: Callable[[str], None]) -> None:
 
 @pytest.fixture(name="config_entry_factory")
 async def fixture_config_entry_factory(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_requests: Callable[[str], None],
 ) -> ConfigEntryFactoryType:

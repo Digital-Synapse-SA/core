@@ -4,30 +4,30 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.homeassistant_hardware.helpers import (
+from smarthub.components.smarthub_hardware.helpers import (
     async_notify_firmware_info,
 )
-from homeassistant.components.homeassistant_hardware.util import (
+from smarthub.components.smarthub_hardware.util import (
     ApplicationType,
     FirmwareInfo,
 )
-from homeassistant.components.homeassistant_yellow.const import RADIO_DEVICE
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.smarthub_yellow.const import RADIO_DEVICE
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 UPDATE_ENTITY_ID = "update.home_assistant_yellow_radio_firmware"
 
 
-async def test_yellow_update_entity(hass: HomeAssistant) -> None:
+async def test_yellow_update_entity(hass: SmartHub) -> None:
     """Test the Yellow firmware update entity."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     # Set up the Yellow integration
     yellow_config_entry = MockConfigEntry(
-        title="Home Assistant Yellow",
-        domain="homeassistant_yellow",
+        title="SmartHub Yellow",
+        domain="smarthub_yellow",
         data={
             "firmware": "ezsp",
             "firmware_version": "7.3.1.0 build 0",
@@ -40,10 +40,10 @@ async def test_yellow_update_entity(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.homeassistant_yellow.is_hassio", return_value=True
+            "smarthub.components.smarthub_yellow.is_hassio", return_value=True
         ),
         patch(
-            "homeassistant.components.homeassistant_yellow.get_os_info",
+            "smarthub.components.smarthub_yellow.get_os_info",
             return_value={"board": "yellow"},
         ),
     ):
@@ -105,15 +105,15 @@ async def test_yellow_update_entity(hass: HomeAssistant) -> None:
     ],
 )
 async def test_yellow_update_entity_state(
-    hass: HomeAssistant, firmware: str, version: str, expected: str
+    hass: SmartHub, firmware: str, version: str, expected: str
 ) -> None:
     """Test the Yellow firmware update entity with different firmware types."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     # Set up the Yellow integration
     yellow_config_entry = MockConfigEntry(
-        title="Home Assistant Yellow",
-        domain="homeassistant_yellow",
+        title="SmartHub Yellow",
+        domain="smarthub_yellow",
         data={
             "firmware": firmware,
             "firmware_version": version,
@@ -126,10 +126,10 @@ async def test_yellow_update_entity_state(
 
     with (
         patch(
-            "homeassistant.components.homeassistant_yellow.is_hassio", return_value=True
+            "smarthub.components.smarthub_yellow.is_hassio", return_value=True
         ),
         patch(
-            "homeassistant.components.homeassistant_yellow.get_os_info",
+            "smarthub.components.smarthub_yellow.get_os_info",
             return_value={"board": "yellow"},
         ),
     ):

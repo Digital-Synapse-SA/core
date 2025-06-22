@@ -4,20 +4,20 @@ from unittest.mock import patch
 
 from requests.exceptions import ConnectTimeout
 
-from homeassistant.components.dremel_3d_printer.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.dremel_3d_printer.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import CONF_DATA, patch_async_setup_entry
 
 from tests.common import MockConfigEntry
 
-MOCK = "homeassistant.components.dremel_3d_printer.config_flow.Dremel3DPrinter"
+MOCK = "smarthub.components.dremel_3d_printer.config_flow.Dremel3DPrinter"
 
 
-async def test_full_user_flow_implementation(hass: HomeAssistant, connection) -> None:
+async def test_full_user_flow_implementation(hass: SmartHub, connection) -> None:
     """Test the full manual user flow from start to finish."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={CONF_SOURCE: SOURCE_USER}
@@ -37,7 +37,7 @@ async def test_full_user_flow_implementation(hass: HomeAssistant, connection) ->
 
 
 async def test_already_configured(
-    hass: HomeAssistant, connection, config_entry: MockConfigEntry
+    hass: SmartHub, connection, config_entry: MockConfigEntry
 ) -> None:
     """Test we abort if the device is already configured."""
     result = await hass.config_entries.flow.async_init(
@@ -47,7 +47,7 @@ async def test_already_configured(
     assert result["reason"] == "already_configured"
 
 
-async def test_cannot_connect(hass: HomeAssistant, connection) -> None:
+async def test_cannot_connect(hass: SmartHub, connection) -> None:
     """Test we show user form on connection error."""
     with patch(MOCK, side_effect=ConnectTimeout):
         result = await hass.config_entries.flow.async_init(
@@ -67,7 +67,7 @@ async def test_cannot_connect(hass: HomeAssistant, connection) -> None:
     assert result["data"] == CONF_DATA
 
 
-async def test_unknown_error(hass: HomeAssistant, connection) -> None:
+async def test_unknown_error(hass: SmartHub, connection) -> None:
     """Test we show user form on unknown error."""
     with patch(MOCK, side_effect=Exception):
         result = await hass.config_entries.flow.async_init(

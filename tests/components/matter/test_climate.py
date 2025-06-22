@@ -8,10 +8,10 @@ from matter_server.common.helpers.util import create_attribute_path_from_attribu
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import ClimateEntityFeature, HVACAction, HVACMode
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.climate import ClimateEntityFeature, HVACAction, HVACMode
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -22,7 +22,7 @@ from .common import (
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_climates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -32,7 +32,7 @@ async def test_climates(
 
 @pytest.mark.parametrize("node_fixture", ["thermostat"])
 async def test_thermostat_base(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -146,7 +146,7 @@ async def test_thermostat_base(
 
 @pytest.mark.parametrize("node_fixture", ["thermostat"])
 async def test_thermostat_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -299,7 +299,7 @@ async def test_thermostat_service_calls(
 
 @pytest.mark.parametrize("node_fixture", ["room_airconditioner"])
 async def test_room_airconditioner(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

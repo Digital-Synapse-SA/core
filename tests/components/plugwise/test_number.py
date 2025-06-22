@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 @pytest.mark.parametrize("chosen_env", ["anna_heatpump_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_anna_number_entities(
-    hass: HomeAssistant, mock_smile_anna: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_anna: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test creation of a number."""
     state = hass.states.get("number.opentherm_maximum_boiler_temperature_setpoint")
@@ -30,7 +30,7 @@ async def test_anna_number_entities(
 @pytest.mark.parametrize("chosen_env", ["anna_heatpump_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_anna_max_boiler_temp_change(
-    hass: HomeAssistant, mock_smile_anna: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_anna: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test changing of number entities."""
     await hass.services.async_call(
@@ -52,7 +52,7 @@ async def test_anna_max_boiler_temp_change(
 @pytest.mark.parametrize("chosen_env", ["m_adam_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [False], indirect=True)
 async def test_adam_dhw_setpoint_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_adam_heat_cool: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -78,7 +78,7 @@ async def test_adam_dhw_setpoint_change(
 
 
 async def test_adam_temperature_offset(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test creation of the temperature_offset number."""
     state = hass.states.get("number.zone_thermostat_jessie_temperature_offset")
@@ -90,7 +90,7 @@ async def test_adam_temperature_offset(
 
 
 async def test_adam_temperature_offset_change(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test changing of the temperature_offset number."""
     await hass.services.async_call(
@@ -110,7 +110,7 @@ async def test_adam_temperature_offset_change(
 
 
 async def test_adam_temperature_offset_out_of_bounds_change(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test changing of the temperature_offset number beyond limits."""
     with pytest.raises(ServiceValidationError, match="valid range"):

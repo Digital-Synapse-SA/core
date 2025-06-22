@@ -6,7 +6,7 @@ from pypalazzetti.exceptions import CommunicationError, ValidationError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_FAN_MODE,
     ATTR_HVAC_MODE,
     DOMAIN as CLIMATE_DOMAIN,
@@ -15,11 +15,11 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.components.palazzetti.const import FAN_AUTO, FAN_HIGH
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.palazzetti.const import FAN_AUTO, FAN_HIGH
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -29,21 +29,21 @@ ENTITY_ID = "climate.stove"
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_palazzetti_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.palazzetti.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.palazzetti.PLATFORMS", [Platform.CLIMATE]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_async_set_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_palazzetti_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -71,7 +71,7 @@ async def test_async_set_data(
 
     # Set HVAC Mode: Error
     mock_palazzetti_client.set_on.side_effect = CommunicationError()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_HVAC_MODE,
@@ -100,7 +100,7 @@ async def test_async_set_data(
 
     # Set Temperature: Error
     mock_palazzetti_client.set_target_temperature.side_effect = CommunicationError()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,
@@ -147,7 +147,7 @@ async def test_async_set_data(
 
     # Set Fan Mode: Error
     mock_palazzetti_client.set_fan_speed.side_effect = CommunicationError()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_FAN_MODE,

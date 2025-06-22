@@ -6,25 +6,25 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.rpi_power import binary_sensor
-from homeassistant.components.rpi_power.binary_sensor import (
+from smarthub.components.rpi_power import binary_sensor
+from smarthub.components.rpi_power.binary_sensor import (
     DESCRIPTION_NORMALIZED,
     DESCRIPTION_UNDER_VOLTAGE,
 )
-from homeassistant.components.rpi_power.const import DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.rpi_power.const import DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed, patch
 
 ENTITY_ID = "binary_sensor.rpi_power_status"
 
-MODULE = "homeassistant.components.rpi_power.binary_sensor.new_under_voltage"
+MODULE = "smarthub.components.rpi_power.binary_sensor.new_under_voltage"
 
 
-async def _async_setup_component(hass: HomeAssistant, detected: bool) -> MagicMock:
+async def _async_setup_component(hass: SmartHub, detected: bool) -> MagicMock:
     mocked_under_voltage = MagicMock()
     type(mocked_under_voltage).get = MagicMock(return_value=detected)
     entry = MockConfigEntry(domain=DOMAIN)
@@ -35,7 +35,7 @@ async def _async_setup_component(hass: HomeAssistant, detected: bool) -> MagicMo
     return mocked_under_voltage
 
 
-async def test_new(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_new(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test new entry."""
     await _async_setup_component(hass, False)
     state = hass.states.get(ENTITY_ID)
@@ -44,7 +44,7 @@ async def test_new(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> Non
 
 
 async def test_new_detected(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test new entry with under voltage detected."""
     mocked_under_voltage = await _async_setup_component(hass, True)

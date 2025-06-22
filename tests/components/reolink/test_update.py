@@ -9,13 +9,13 @@ import pytest
 from reolink_aio.exceptions import ApiError, ReolinkError
 from reolink_aio.software_version import NewSoftwareVersion
 
-from homeassistant.components.reolink.update import POLL_AFTER_INSTALL, POLL_PROGRESS
-from homeassistant.components.update import DOMAIN as UPDATE_DOMAIN, SERVICE_INSTALL
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util.dt import utcnow
+from smarthub.components.reolink.update import POLL_AFTER_INSTALL, POLL_PROGRESS
+from smarthub.components.update import DOMAIN as UPDATE_DOMAIN, SERVICE_INSTALL
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.util.dt import utcnow
 
 from .conftest import TEST_CAM_NAME, TEST_NVR_NAME
 
@@ -28,7 +28,7 @@ TEST_RELEASE_NOTES = "bugfix 1, bugfix 2"
 
 @pytest.mark.parametrize("entity_name", [TEST_NVR_NAME, TEST_CAM_NAME])
 async def test_no_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     entity_name: str,
@@ -36,7 +36,7 @@ async def test_no_update(
     """Test update state when no update available."""
     reolink_connect.camera_name.return_value = TEST_CAM_NAME
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.UPDATE]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.UPDATE]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -47,7 +47,7 @@ async def test_no_update(
 
 @pytest.mark.parametrize("entity_name", [TEST_NVR_NAME, TEST_CAM_NAME])
 async def test_update_str(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     entity_name: str,
@@ -56,7 +56,7 @@ async def test_update_str(
     reolink_connect.camera_name.return_value = TEST_CAM_NAME
     reolink_connect.firmware_update_available.return_value = "New firmware available"
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.UPDATE]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.UPDATE]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -67,7 +67,7 @@ async def test_update_str(
 
 @pytest.mark.parametrize("entity_name", [TEST_NVR_NAME, TEST_CAM_NAME])
 async def test_update_firm(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     hass_ws_client: WebSocketGenerator,
@@ -85,7 +85,7 @@ async def test_update_firm(
     )
     reolink_connect.firmware_update_available.return_value = new_firmware
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.UPDATE]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.UPDATE]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -136,7 +136,7 @@ async def test_update_firm(
     assert hass.states.get(entity_id).attributes["update_percentage"] is None
 
     reolink_connect.update_firmware.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,
@@ -147,7 +147,7 @@ async def test_update_firm(
     reolink_connect.update_firmware.side_effect = ApiError(
         "Test error", translation_key="firmware_rate_limit"
     )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,
@@ -169,7 +169,7 @@ async def test_update_firm(
 
 @pytest.mark.parametrize("entity_name", [TEST_NVR_NAME, TEST_CAM_NAME])
 async def test_update_firm_keeps_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     hass_ws_client: WebSocketGenerator,
@@ -185,7 +185,7 @@ async def test_update_firm_keeps_available(
     )
     reolink_connect.firmware_update_available.return_value = new_firmware
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.UPDATE]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.UPDATE]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -199,7 +199,7 @@ async def test_update_firm_keeps_available(
     reolink_connect.update_firmware = mock_update_firmware
 
     # test install
-    with patch("homeassistant.components.reolink.update.POLL_PROGRESS", 0.000001):
+    with patch("smarthub.components.reolink.update.POLL_PROGRESS", 0.000001):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,

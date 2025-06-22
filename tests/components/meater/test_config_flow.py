@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock
 from meater import AuthenticationError, ServiceUnavailableError
 import pytest
 
-from homeassistant.components.meater import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.meater import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_user_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_meater_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_meater_client: AsyncMock
 ) -> None:
     """Test that the user flow works."""
     result = await hass.config_entries.flow.async_init(
@@ -47,7 +47,7 @@ async def test_user_flow(
     ],
 )
 async def test_user_flow_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_meater_client: AsyncMock,
     exception: Exception,
@@ -80,7 +80,7 @@ async def test_user_flow_exceptions(
 
 
 async def test_duplicate_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_meater_client: AsyncMock,
 ) -> None:
@@ -101,7 +101,7 @@ async def test_duplicate_error(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_meater_client: AsyncMock,
 ) -> None:

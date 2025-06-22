@@ -7,16 +7,16 @@ control of RFLink switch devices.
 
 import pytest
 
-from homeassistant.components.light import ATTR_BRIGHTNESS
-from homeassistant.components.rflink.entity import EVENT_BUTTON_PRESSED
-from homeassistant.const import (
+from smarthub.components.light import ATTR_BRIGHTNESS
+from smarthub.components.rflink.entity import EVENT_BUTTON_PRESSED
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import CoreState, HomeAssistant, State, callback
+from smarthub.core import CoreState, SmartHub, State, callback
 
 from .test_init import mock_rflink
 
@@ -41,7 +41,7 @@ CONFIG = {
 
 
 async def test_default_setup(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test all basic functionality of the RFLink switch component."""
     # setup mocking rflink module
@@ -151,7 +151,7 @@ async def test_default_setup(
 
 
 async def test_firing_bus_event(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Incoming RFLink command events should be put on the HA event bus."""
     config = {
@@ -188,7 +188,7 @@ async def test_firing_bus_event(
 
 
 async def test_signal_repetitions(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Command should be sent amount of configured repetitions."""
     config = {
@@ -246,7 +246,7 @@ async def test_signal_repetitions(
 
 
 async def test_signal_repetitions_alternation(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Simultaneously switching entities must alternate repetitions."""
     config = {
@@ -279,7 +279,7 @@ async def test_signal_repetitions_alternation(
 
 
 async def test_signal_repetitions_cancelling(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Cancel outstanding repetitions when state changed."""
     config = {
@@ -315,7 +315,7 @@ async def test_signal_repetitions_cancelling(
 
 
 async def test_type_toggle(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test toggle type lights (on/on)."""
     config = {
@@ -362,7 +362,7 @@ async def test_type_toggle(
 
 
 async def test_set_level_command(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test 'set_level=XX' events."""
     config = {
@@ -451,7 +451,7 @@ async def test_set_level_command(
 
 
 async def test_group_alias(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Group aliases should only respond to group commands (allon/alloff)."""
     config = {
@@ -490,7 +490,7 @@ async def test_group_alias(
 
 
 async def test_nogroup_alias(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Non group aliases should not respond to group commands."""
     config = {
@@ -525,7 +525,7 @@ async def test_nogroup_alias(
 
 
 async def test_nogroup_device_id(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Device id that do not respond to group commands (allon/alloff)."""
     config = {
@@ -555,7 +555,7 @@ async def test_nogroup_device_id(
 
 
 async def test_disable_automatic_add(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """If disabled new devices should not be automatically added."""
     config = {
@@ -575,7 +575,7 @@ async def test_disable_automatic_add(
 
 
 async def test_restore_state(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Ensure states are restored on startup."""
     config = {

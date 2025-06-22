@@ -1,0 +1,9 @@
+{
+  "domain": "zone",
+  "name": "Zone",
+  "codeowners": ["@smart-hub/core"],
+  "config_flow": false,
+  "documentation": "https://www.smart-hub.io/integrations/zone",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

@@ -5,18 +5,18 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.forked_daapd.const import (
+from smarthub.components.forked_daapd.const import (
     CONF_LIBRESPOT_JAVA_PORT,
     CONF_MAX_PLAYLISTS,
     CONF_TTS_PAUSE_TIME,
     CONF_TTS_VOLUME,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF, ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF, ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -55,7 +55,7 @@ def config_entry_fixture():
     )
 
 
-async def test_show_form(hass: HomeAssistant) -> None:
+async def test_show_form(hass: SmartHub) -> None:
     """Test that the form is served with no input."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -65,15 +65,15 @@ async def test_show_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_config_flow(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_config_flow(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test that the user step works."""
     with (
         patch(
-            "homeassistant.components.forked_daapd.config_flow.ForkedDaapdAPI.test_connection",
+            "smarthub.components.forked_daapd.config_flow.ForkedDaapdAPI.test_connection",
             new=AsyncMock(),
         ) as mock_test_connection,
         patch(
-            "homeassistant.components.forked_daapd.ForkedDaapdAPI.get_request",
+            "smarthub.components.forked_daapd.ForkedDaapdAPI.get_request",
             autospec=True,
         ) as mock_get_request,
     ):
@@ -101,7 +101,7 @@ async def test_config_flow(hass: HomeAssistant, config_entry: MockConfigEntry) -
 
 
 async def test_zeroconf_updates_title(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test that zeroconf updates title and aborts with same host."""
     MockConfigEntry(domain=DOMAIN, data={CONF_HOST: "different host"}).add_to_hass(hass)
@@ -126,11 +126,11 @@ async def test_zeroconf_updates_title(
 
 
 async def test_config_flow_no_websocket(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test config flow setup without websocket enabled on server."""
     with patch(
-        "homeassistant.components.forked_daapd.config_flow.ForkedDaapdAPI.test_connection",
+        "smarthub.components.forked_daapd.config_flow.ForkedDaapdAPI.test_connection",
         new=AsyncMock(),
     ) as mock_test_connection:
         # test invalid config data
@@ -141,7 +141,7 @@ async def test_config_flow_no_websocket(
         assert result["type"] is FlowResultType.FORM
 
 
-async def test_config_flow_zeroconf_invalid(hass: HomeAssistant) -> None:
+async def test_config_flow_zeroconf_invalid(hass: SmartHub) -> None:
     """Test that an invalid zeroconf entry doesn't work."""
     # test with no discovery properties
     discovery_info = ZeroconfServiceInfo(
@@ -205,7 +205,7 @@ async def test_config_flow_zeroconf_invalid(hass: HomeAssistant) -> None:
     assert result["reason"] == "not_forked_daapd"
 
 
-async def test_config_flow_zeroconf_valid(hass: HomeAssistant) -> None:
+async def test_config_flow_zeroconf_valid(hass: SmartHub) -> None:
     """Test that a valid zeroconf entry works."""
     discovery_info = ZeroconfServiceInfo(
         ip_address=ip_address("192.168.1.1"),
@@ -226,11 +226,11 @@ async def test_config_flow_zeroconf_valid(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
 
 
-async def test_options_flow(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_options_flow(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test config flow options."""
 
     with patch(
-        "homeassistant.components.forked_daapd.ForkedDaapdAPI.get_request",
+        "smarthub.components.forked_daapd.ForkedDaapdAPI.get_request",
         autospec=True,
     ) as mock_get_request:
         mock_get_request.return_value = SAMPLE_CONFIG
@@ -254,12 +254,12 @@ async def test_options_flow(hass: HomeAssistant, config_entry: MockConfigEntry) 
 
 
 async def test_async_setup_entry_not_ready(
-    hass: HomeAssistant, config_entry: MockConfigEntry, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, config_entry: MockConfigEntry, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that a PlatformNotReady exception is thrown during platform setup."""
 
     with patch(
-        "homeassistant.components.forked_daapd.ForkedDaapdAPI",
+        "smarthub.components.forked_daapd.ForkedDaapdAPI",
         autospec=True,
     ) as mock_api:
         mock_api.return_value.get_request.return_value = None

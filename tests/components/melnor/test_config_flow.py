@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock
 import pytest
 import voluptuous as vol
 
-from homeassistant import config_entries
-from homeassistant.components.melnor.const import DOMAIN
-from homeassistant.const import CONF_ADDRESS, CONF_MAC
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.melnor.const import DOMAIN
+from smarthub.const import CONF_ADDRESS, CONF_MAC
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import (
     FAKE_ADDRESS_1,
@@ -20,7 +20,7 @@ from .conftest import (
 
 
 async def test_user_step_no_devices(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle no devices found."""
     with patch_async_discovered_service_info([]):
@@ -36,7 +36,7 @@ async def test_user_step_no_devices(
 
 
 async def test_user_step_discovered_devices(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we properly handle device picking."""
 
@@ -65,7 +65,7 @@ async def test_user_step_discovered_devices(
 
 
 async def test_user_step_with_existing_device(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we properly handle device picking."""
 
@@ -105,7 +105,7 @@ async def test_user_step_with_existing_device(
 
 
 async def test_bluetooth_discovered(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we short circuit to config entry creation."""
 
@@ -123,7 +123,7 @@ async def test_bluetooth_discovered(
 
 
 async def test_bluetooth_confirm(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we short circuit to config entry creation."""
 

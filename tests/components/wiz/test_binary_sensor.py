@@ -1,12 +1,12 @@
 """Tests for WiZ binary_sensor platform."""
 
-from homeassistant.components import wiz
-from homeassistant.components.wiz.binary_sensor import OCCUPANCY_UNIQUE_ID
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import wiz
+from smarthub.components.wiz.binary_sensor import OCCUPANCY_UNIQUE_ID
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import (
     FAKE_IP,
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_binary_sensor_created_from_push_updates(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a binary sensor created from push updates."""
     bulb, _ = await async_setup_integration(hass)
@@ -41,7 +41,7 @@ async def test_binary_sensor_created_from_push_updates(
 
 
 async def test_binary_sensor_restored_from_registry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a binary sensor restored from registry with state unknown."""
     entry = MockConfigEntry(
@@ -76,7 +76,7 @@ async def test_binary_sensor_restored_from_registry(
 
 
 async def test_binary_sensor_never_created_no_error_on_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a binary sensor does not error on unload."""
     _, entry = await async_setup_integration(hass)

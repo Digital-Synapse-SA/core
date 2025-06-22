@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 from pynzbgetapi import NZBGetAPIException
 
-from homeassistant.components.nzbget.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_VERIFY_SSL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.nzbget.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_VERIFY_SSL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     ENTRY_CONFIG,
@@ -22,7 +22,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_user_form(hass: HomeAssistant) -> None:
+async def test_user_form(hass: SmartHub) -> None:
     """Test we get the user initiated form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -50,7 +50,7 @@ async def test_user_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_form_show_advanced_options(hass: HomeAssistant) -> None:
+async def test_user_form_show_advanced_options(hass: SmartHub) -> None:
     """Test we get the user initiated form with advanced options shown."""
 
     result = await hass.config_entries.flow.async_init(
@@ -83,14 +83,14 @@ async def test_user_form_show_advanced_options(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_user_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nzbget.coordinator.NZBGetAPI.version",
+        "smarthub.components.nzbget.coordinator.NZBGetAPI.version",
         side_effect=NZBGetAPIException(),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -102,14 +102,14 @@ async def test_user_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_user_form_unexpected_exception(hass: HomeAssistant) -> None:
+async def test_user_form_unexpected_exception(hass: SmartHub) -> None:
     """Test we handle unexpected exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nzbget.coordinator.NZBGetAPI.version",
+        "smarthub.components.nzbget.coordinator.NZBGetAPI.version",
         side_effect=Exception(),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -121,7 +121,7 @@ async def test_user_form_unexpected_exception(hass: HomeAssistant) -> None:
     assert result["reason"] == "unknown"
 
 
-async def test_user_form_single_instance_allowed(hass: HomeAssistant) -> None:
+async def test_user_form_single_instance_allowed(hass: SmartHub) -> None:
     """Test that configuring more than one instance is rejected."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRY_CONFIG)
     entry.add_to_hass(hass)

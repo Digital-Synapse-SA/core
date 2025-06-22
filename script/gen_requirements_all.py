@@ -13,7 +13,7 @@ import sys
 import tomllib
 from typing import Any
 
-from homeassistant.util.yaml.loader import load_yaml
+from smarthub.util.yaml.loader import load_yaml
 from script.hassfest.model import Config, Integration
 
 # Requirements which can't be installed on all systems because they rely on additional
@@ -93,17 +93,17 @@ OVERRIDDEN_REQUIREMENTS_ACTIONS = {
 }
 
 URL_PIN = (
-    "https://developers.home-assistant.io/docs/"
+    "https://developers.smart-hub.io/docs/"
     "creating_platform_code_review.html#1-requirements"
 )
 
 
 CONSTRAINT_PATH = (
-    Path(__file__).parent.parent / "homeassistant" / "package_constraints.txt"
+    Path(__file__).parent.parent / "smarthub" / "package_constraints.txt"
 )
 CONSTRAINT_BASE = """
 # Constrain pycryptodome to avoid vulnerability
-# see https://github.com/home-assistant/core/pull/16238
+# see https://github.com/smart-hub/core/pull/16238
 pycryptodome>=3.6.6
 
 # Constrain httplib2 to protect against GHSA-93xj-8mrv-444m
@@ -148,7 +148,7 @@ numpy==2.3.0
 pandas==2.3.0
 
 # Constrain multidict to avoid typing issues
-# https://github.com/home-assistant/core/pull/67046
+# https://github.com/smart-hub/core/pull/67046
 multidict>=6.0.2
 
 # Version 2.0 added typing, prevent accidental fallbacks
@@ -260,11 +260,11 @@ PACKAGE_REGEX = re.compile(r"^(?:--.+\s)?([-_\.\w\d]+).*==.+$")
 def has_tests(module: str) -> bool:
     """Test if a module has tests.
 
-    Module format: homeassistant.components.hue
+    Module format: smarthub.components.hue
     Test if exists: tests/components/hue/__init__.py
     """
     path = (
-        Path(module.replace(".", "/").replace("homeassistant", "tests", 1))
+        Path(module.replace(".", "/").replace("smarthub", "tests", 1))
         / "__init__.py"
     )
     return path.exists()
@@ -304,7 +304,7 @@ def gather_recursive_requirements(
 
     seen.add(domain)
     integration = Integration(
-        Path(f"homeassistant/components/{domain}"), _get_hassfest_config()
+        Path(f"smarthub/components/{domain}"), _get_hassfest_config()
     )
     integration.load_manifest()
     reqs = {x for x in integration.requirements if x not in CONSTRAINT_BASE}
@@ -384,7 +384,7 @@ def gather_requirements_from_manifests(
             continue
 
         process_requirements(
-            errors, integration.requirements, f"homeassistant.components.{domain}", reqs
+            errors, integration.requirements, f"smarthub.components.{domain}", reqs
         )
 
 
@@ -393,8 +393,8 @@ def gather_requirements_from_modules(
 ) -> None:
     """Collect the requirements from the modules directly."""
     for package in sorted(
-        explore_module("homeassistant.scripts", True)
-        + explore_module("homeassistant.auth", True)
+        explore_module("smarthub.scripts", True)
+        + explore_module("smarthub.auth", True)
     ):
         try:
             module = importlib.import_module(package)
@@ -449,9 +449,9 @@ def requirements_output() -> str:
     """Generate output for requirements."""
     output = [
         GENERATED_MESSAGE,
-        "-c homeassistant/package_constraints.txt\n",
+        "-c smarthub/package_constraints.txt\n",
         "\n",
-        "# Home Assistant Core\n",
+        "# SmartHub Core\n",
     ]
     output.append("\n".join(core_requirements()))
     output.append("\n")
@@ -462,7 +462,7 @@ def requirements_output() -> str:
 def requirements_all_output(reqs: dict[str, list[str]]) -> str:
     """Generate output for requirements_all."""
     output = [
-        "# Home Assistant Core, full dependency set\n",
+        "# SmartHub Core, full dependency set\n",
         GENERATED_MESSAGE,
         "-r requirements.txt\n",
     ]
@@ -474,7 +474,7 @@ def requirements_all_output(reqs: dict[str, list[str]]) -> str:
 def requirements_all_action_output(reqs: dict[str, list[str]], action: str) -> str:
     """Generate output for requirements_all_{action}."""
     output = [
-        f"# Home Assistant Core, full dependency set for {action}\n",
+        f"# SmartHub Core, full dependency set for {action}\n",
         GENERATED_MESSAGE,
         "-r requirements.txt\n",
     ]
@@ -486,7 +486,7 @@ def requirements_all_action_output(reqs: dict[str, list[str]], action: str) -> s
 def requirements_test_all_output(reqs: dict[str, list[str]]) -> str:
     """Generate output for test_requirements."""
     output = [
-        "# Home Assistant tests, full dependency set\n",
+        "# SmartHub tests, full dependency set\n",
         GENERATED_MESSAGE,
         "-r requirements_test.txt\n",
     ]
@@ -496,7 +496,7 @@ def requirements_test_all_output(reqs: dict[str, list[str]]) -> str:
         for requirement, modules in reqs.items()
         if any(
             # Always install requirements that are not part of integrations
-            not mdl.startswith("homeassistant.components.")
+            not mdl.startswith("smarthub.components.")
             or
             # Install tests for integrations that have tests
             has_tests(mdl)
@@ -592,7 +592,7 @@ def main(validate: bool, ci: bool) -> int:
         ("requirements_all.txt", reqs_all_file),
         ("requirements_test_pre_commit.txt", reqs_pre_commit_file),
         ("requirements_test_all.txt", reqs_test_all_file),
-        ("homeassistant/package_constraints.txt", constraints),
+        ("smarthub/package_constraints.txt", constraints),
     ]
     if ci:
         files.extend(

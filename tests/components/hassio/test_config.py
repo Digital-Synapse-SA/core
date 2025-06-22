@@ -7,10 +7,10 @@ from uuid import UUID
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.auth.const import GROUP_ID_ADMIN
-from homeassistant.components.hassio.const import DATA_CONFIG_STORE, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.auth.const import GROUP_ID_ADMIN
+from smarthub.components.hassio.const import DATA_CONFIG_STORE, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockUser
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -27,13 +27,13 @@ def mock_all(
     addon_info: AsyncMock,
 ) -> None:
     """Mock all setup requests."""
-    aioclient_mock.post("http://127.0.0.1/homeassistant/options", json={"result": "ok"})
+    aioclient_mock.post("http://127.0.0.1/smarthub/options", json={"result": "ok"})
     aioclient_mock.post("http://127.0.0.1/supervisor/options", json={"result": "ok"})
     aioclient_mock.get(
         "http://127.0.0.1/info",
         json={
             "result": "ok",
-            "data": {"supervisor": "222", "homeassistant": "0.110.0", "hassos": None},
+            "data": {"supervisor": "222", "smarthub": "0.110.0", "hassos": None},
         },
     )
     aioclient_mock.get(
@@ -77,7 +77,7 @@ def mock_all(
                         "version": "2.0.0",
                         "version_latest": "2.0.1",
                         "repository": "core",
-                        "url": "https://github.com/home-assistant/addons/test",
+                        "url": "https://github.com/smart-hub/addons/test",
                     },
                 ],
             },
@@ -136,7 +136,7 @@ def mock_all(
     ],
 )
 async def test_load_config_store(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     hass_storage: dict[str, Any],
@@ -152,7 +152,7 @@ async def test_load_config_store(
     await hass.auth.async_update_user(user, group_ids=[GROUP_ID_ADMIN])
 
     with (
-        patch("homeassistant.components.hassio.config.STORE_DELAY_SAVE", 0),
+        patch("smarthub.components.hassio.config.STORE_DELAY_SAVE", 0),
         patch("uuid.uuid4", return_value=UUID(bytes=b"very_very_random", version=4)),
     ):
         assert await async_setup_component(hass, "hassio", {})
@@ -164,7 +164,7 @@ async def test_load_config_store(
 
 @pytest.mark.usefixtures("hassio_env")
 async def test_save_config_store(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     hass_storage: dict[str, Any],
@@ -172,7 +172,7 @@ async def test_save_config_store(
 ) -> None:
     """Test saving the config store."""
     with (
-        patch("homeassistant.components.hassio.config.STORE_DELAY_SAVE", 0),
+        patch("smarthub.components.hassio.config.STORE_DELAY_SAVE", 0),
         patch("uuid.uuid4", return_value=UUID(bytes=b"very_very_random", version=4)),
     ):
         assert await async_setup_component(hass, "hassio", {})

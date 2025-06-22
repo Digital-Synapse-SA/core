@@ -6,11 +6,11 @@ from freezegun import freeze_time
 import pytest
 from zwave_js_server.event import Event
 
-from homeassistant.components.event import ATTR_EVENT_TYPE
-from homeassistant.components.zwave_js.const import ATTR_VALUE
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.event import ATTR_EVENT_TYPE
+from smarthub.components.zwave_js.const import ATTR_VALUE
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 BASIC_EVENT_VALUE_ENTITY = "event.honeywell_in_wall_smart_fan_control_event_value"
 CENTRAL_SCENE_ENTITY = "event.node_51_scene_002"
@@ -23,7 +23,7 @@ def platforms() -> list[str]:
 
 
 async def test_basic(
-    hass: HomeAssistant, client, fan_honeywell_39358, integration
+    hass: SmartHub, client, fan_honeywell_39358, integration
 ) -> None:
     """Test the Basic CC event entity."""
     dt_util.now()
@@ -72,7 +72,7 @@ async def test_basic(
 
 
 async def test_central_scene(
-    hass: HomeAssistant, client, central_scene_node, integration
+    hass: SmartHub, client, central_scene_node, integration
 ) -> None:
     """Test the Central Scene CC event entity."""
     dt_util.now()

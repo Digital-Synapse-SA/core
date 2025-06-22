@@ -4,12 +4,12 @@ from unittest.mock import patch
 
 from fivem import FiveMServerOfflineError
 
-from homeassistant import config_entries
-from homeassistant.components.fivem.config_flow import DEFAULT_PORT
-from homeassistant.components.fivem.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.fivem.config_flow import DEFAULT_PORT
+from smarthub.components.fivem.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 USER_INPUT = {
     CONF_HOST: "fivem.dummyserver.com",
@@ -49,7 +49,7 @@ def _mock_fivem_info_invalid_game_name():
     return info
 
 
-async def test_show_config_form(hass: HomeAssistant) -> None:
+async def test_show_config_form(hass: SmartHub) -> None:
     """Test if initial configuration form is shown."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -59,7 +59,7 @@ async def test_show_config_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -73,7 +73,7 @@ async def test_form(hass: HomeAssistant) -> None:
             return_value=_mock_fivem_info_success(),
         ),
         patch(
-            "homeassistant.components.fivem.async_setup_entry",
+            "smarthub.components.fivem.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -89,7 +89,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -109,7 +109,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_invalid(hass: HomeAssistant) -> None:
+async def test_form_invalid(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -129,7 +129,7 @@ async def test_form_invalid(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_invalid_game_name(hass: HomeAssistant) -> None:
+async def test_form_invalid_game_name(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}

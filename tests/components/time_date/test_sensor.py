@@ -5,17 +5,17 @@ from unittest.mock import ANY, Mock, patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.time_date.const import OPTION_TYPES
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import event
-from homeassistant.util import dt as dt_util
+from smarthub.components.time_date.const import OPTION_TYPES
+from smarthub.core import SmartHub
+from smarthub.helpers import event
+from smarthub.util import dt as dt_util
 
 from . import load_int
 
 from tests.common import async_fire_time_changed
 
 
-@patch("homeassistant.components.time_date.sensor.async_track_point_in_utc_time")
+@patch("smarthub.components.time_date.sensor.async_track_point_in_utc_time")
 @pytest.mark.parametrize(
     ("display_option", "start_time", "tracked_time"),
     [
@@ -38,7 +38,7 @@ from tests.common import async_fire_time_changed
 )
 async def test_intervals(
     mock_track_interval: Mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     display_option: str,
     start_time,
@@ -53,7 +53,7 @@ async def test_intervals(
     mock_track_interval.assert_called_once_with(hass, ANY, tracked_time)
 
 
-async def test_states(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+async def test_states(hass: SmartHub, freezer: FrozenDateTimeFactory) -> None:
     """Test states of sensors."""
     await hass.config.async_set_time_zone("UTC")
     now = dt_util.utc_from_timestamp(1495068856)
@@ -106,7 +106,7 @@ async def test_states(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> No
 
 
 async def test_states_non_default_timezone(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test states of sensors in a timezone other than UTC."""
     await hass.config.async_set_time_zone("America/New_York")
@@ -182,7 +182,7 @@ async def test_states_non_default_timezone(
 
 
 @patch(
-    "homeassistant.components.time_date.sensor.async_track_point_in_utc_time",
+    "smarthub.components.time_date.sensor.async_track_point_in_utc_time",
     side_effect=event.async_track_point_in_utc_time,
 )
 @pytest.mark.parametrize(
@@ -226,7 +226,7 @@ async def test_states_non_default_timezone(
 )
 async def test_timezone_intervals(
     mock_track_interval: Mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     time_zone: str,
     start_time,
@@ -244,7 +244,7 @@ async def test_timezone_intervals(
     assert next_time.timestamp() == tracked_time
 
 
-async def test_icons(hass: HomeAssistant) -> None:
+async def test_icons(hass: SmartHub) -> None:
     """Test attributes of sensors."""
     for option in OPTION_TYPES:
         await load_int(hass, option)

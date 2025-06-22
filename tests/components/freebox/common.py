@@ -2,17 +2,17 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.freebox.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.freebox.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import MOCK_HOST, MOCK_PORT
 
 from tests.common import MockConfigEntry
 
 
-async def setup_platform(hass: HomeAssistant, platform: str) -> MockConfigEntry:
+async def setup_platform(hass: SmartHub, platform: str) -> MockConfigEntry:
     """Set up the Freebox platform."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -21,7 +21,7 @@ async def setup_platform(hass: HomeAssistant, platform: str) -> MockConfigEntry:
     )
     mock_entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.freebox.PLATFORMS", [platform]):
+    with patch("smarthub.components.freebox.PLATFORMS", [platform]):
         assert await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
 

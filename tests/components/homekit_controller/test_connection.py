@@ -11,19 +11,19 @@ from aiohomekit.model.services import Service, ServicesTypes
 from aiohomekit.testing import FakeController
 import pytest
 
-from homeassistant.components.homekit_controller.const import (
+from smarthub.components.homekit_controller.const import (
     DEBOUNCE_COOLDOWN,
     DOMAIN,
     IDENTIFIER_ACCESSORY_ID,
     IDENTIFIER_LEGACY_ACCESSORY_ID,
     IDENTIFIER_LEGACY_SERIAL_NUMBER,
 )
-from homeassistant.components.thread import async_add_dataset, dataset_store
-from homeassistant.const import STATE_OFF, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.components.thread import async_add_dataset, dataset_store
+from smarthub.const import STATE_OFF, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 from .common import (
     setup_accessories_from_file,
@@ -105,7 +105,7 @@ DEVICE_MIGRATION_TESTS = [
 
 @pytest.mark.parametrize("variant", DEVICE_MIGRATION_TESTS)
 async def test_migrate_device_id_no_serial_skip_if_other_owner(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     variant: DeviceMigrationTest,
 ) -> None:
@@ -138,7 +138,7 @@ async def test_migrate_device_id_no_serial_skip_if_other_owner(
 
 @pytest.mark.parametrize("variant", DEVICE_MIGRATION_TESTS)
 async def test_migrate_device_id_no_serial(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     variant: DeviceMigrationTest,
 ) -> None:
@@ -175,7 +175,7 @@ async def test_migrate_device_id_no_serial(
     assert device.manufacturer == variant.manufacturer
 
 
-async def test_migrate_ble_unique_id(hass: HomeAssistant) -> None:
+async def test_migrate_ble_unique_id(hass: SmartHub) -> None:
     """Test that a config entry with incorrect unique_id is repaired."""
     accessories = await setup_accessories_from_file(hass, "anker_eufycam.json")
 
@@ -199,7 +199,7 @@ async def test_migrate_ble_unique_id(hass: HomeAssistant) -> None:
     assert config_entry.unique_id == "02:03:ef:02:03:ef"
 
 
-async def test_thread_provision_no_creds(hass: HomeAssistant) -> None:
+async def test_thread_provision_no_creds(hass: SmartHub) -> None:
     """Test that we don't migrate to thread when there are no creds available."""
     accessories = await setup_accessories_from_file(hass, "nanoleaf_strip_nl55.json")
 
@@ -220,7 +220,7 @@ async def test_thread_provision_no_creds(hass: HomeAssistant) -> None:
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "button",
             "press",
@@ -232,7 +232,7 @@ async def test_thread_provision_no_creds(hass: HomeAssistant) -> None:
 
 
 async def test_thread_provision(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that a when a thread provision works the config entry is updated."""
     await async_add_dataset(
@@ -300,7 +300,7 @@ async def test_thread_provision(
     )
 
 
-async def test_thread_provision_migration_failed(hass: HomeAssistant) -> None:
+async def test_thread_provision_migration_failed(hass: SmartHub) -> None:
     """Test that when a device 'migrates' but doesn't show up in CoAP, we remain in BLE mode."""
     await async_add_dataset(
         hass,
@@ -335,7 +335,7 @@ async def test_thread_provision_migration_failed(hass: HomeAssistant) -> None:
     # Make sure not disoverable via CoAP
     del fake_controller.discoveries["00:00:00:00:00:00"]
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "button",
             "press",
@@ -349,7 +349,7 @@ async def test_thread_provision_migration_failed(hass: HomeAssistant) -> None:
 
 
 async def test_poll_firmware_version_only_all_watchable_accessory_mode(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we only poll firmware if available and all chars are watchable accessory mode."""
 
@@ -405,7 +405,7 @@ async def test_poll_firmware_version_only_all_watchable_accessory_mode(
 
 
 async def test_manual_poll_all_chars(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that a manual poll will check all chars."""
 

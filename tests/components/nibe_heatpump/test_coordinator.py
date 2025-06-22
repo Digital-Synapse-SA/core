@@ -9,8 +9,8 @@ from nibe.heatpump import Model
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from . import MockConnection, async_add_model
 
@@ -18,13 +18,13 @@ from . import MockConnection, async_add_model
 @pytest.fixture(autouse=True)
 async def fixture_single_platform():
     """Only allow this platform to load."""
-    with patch("homeassistant.components.nibe_heatpump.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.nibe_heatpump.PLATFORMS", [Platform.NUMBER]):
         yield
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_partial_refresh(
-    hass: HomeAssistant,
+    hass: SmartHub,
     coils: dict[int, Any],
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -47,7 +47,7 @@ async def test_partial_refresh(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_invalid_coil(
-    hass: HomeAssistant,
+    hass: SmartHub,
     coils: dict[int, Any],
     snapshot: SnapshotAssertion,
     freezer_ticker: Any,
@@ -69,7 +69,7 @@ async def test_invalid_coil(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_pushed_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     coils: dict[int, Any],
     snapshot: SnapshotAssertion,
     mock_connection: MockConnection,
@@ -99,7 +99,7 @@ async def test_pushed_update(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_shutdown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     coils: dict[int, Any],
     mock_connection: MockConnection,
     freezer_ticker: Any,

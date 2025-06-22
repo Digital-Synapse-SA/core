@@ -7,8 +7,8 @@ import pytest
 from sfrbox_api.models import SystemInfo
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
 
 from tests.components.diagnostics import get_diagnostics_for_config_entry
 from tests.typing import ClientSessionGenerator
@@ -21,13 +21,13 @@ pytestmark = pytest.mark.usefixtures(
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.sfr_box.PLATFORMS", []):
+    with patch("smarthub.components.sfr_box.PLATFORMS", []):
         yield
 
 
 @pytest.mark.parametrize("net_infra", ["adsl", "ftth"])
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,

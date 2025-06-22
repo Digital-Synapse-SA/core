@@ -12,12 +12,12 @@ from bring_api import (
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.bring import async_setup_entry
-from homeassistant.components.bring.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryDisabler, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.bring import async_setup_entry
+from smarthub.components.bring.const import DOMAIN
+from smarthub.config_entries import ConfigEntryDisabler, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from smarthub.helpers import device_registry as dr
 
 from .conftest import UUID
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, async_load_fi
 
 
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
 ) -> None:
     """Mock setup of the bring integration."""
@@ -36,7 +36,7 @@ async def setup_integration(
 
 @pytest.mark.usefixtures("mock_bring_client")
 async def test_load_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
 ) -> None:
     """Test loading and unloading of the config entry."""
@@ -60,7 +60,7 @@ async def test_load_unload(
     ],
 )
 async def test_init_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bring_client: AsyncMock,
     status: ConfigEntryState,
     exception: Exception,
@@ -81,7 +81,7 @@ async def test_init_failure(
     ],
 )
 async def test_init_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bring_client: AsyncMock,
     exception: Exception,
     expected: Exception,
@@ -105,7 +105,7 @@ async def test_init_exceptions(
     ],
 )
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
     exception: Exception,
@@ -122,7 +122,7 @@ async def test_config_entry_not_ready(
 
 @pytest.mark.parametrize("exception", [BringRequestException, BringParseException])
 async def test_config_entry_not_ready_udpdate_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
     exception: Exception,
@@ -148,7 +148,7 @@ async def test_config_entry_not_ready_udpdate_failed(
     ],
 )
 async def test_activity_coordinator_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
     exception: Exception,
@@ -173,7 +173,7 @@ async def test_activity_coordinator_errors(
     ],
 )
 async def test_config_entry_not_ready_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
     exception: Exception | None,
@@ -195,7 +195,7 @@ async def test_config_entry_not_ready_auth_error(
 
 @pytest.mark.usefixtures("mock_bring_client")
 async def test_coordinator_skips_deactivated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
     mock_bring_client: AsyncMock,
@@ -223,7 +223,7 @@ async def test_coordinator_skips_deactivated(
 
 
 async def test_purge_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
     device_registry: dr.DeviceRegistry,
@@ -256,7 +256,7 @@ async def test_purge_devices(
 
 
 async def test_create_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
     device_registry: dr.DeviceRegistry,
@@ -292,7 +292,7 @@ async def test_create_devices(
 
 @pytest.mark.usefixtures("mock_bring_client")
 async def test_coordinator_update_intervals(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
     mock_bring_client: AsyncMock,

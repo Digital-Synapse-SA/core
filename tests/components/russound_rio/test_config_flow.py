@@ -3,12 +3,12 @@
 from ipaddress import ip_address
 from unittest.mock import AsyncMock
 
-from homeassistant.components.russound_rio.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF, ConfigFlowResult
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.russound_rio.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF, ConfigFlowResult
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .const import MOCK_CONFIG, MOCK_RECONFIGURATION_CONFIG, MODEL
 
@@ -33,7 +33,7 @@ ZEROCONF_DISCOVERY = ZeroconfServiceInfo(
 
 
 async def test_form(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_russound_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_russound_client: AsyncMock
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -55,7 +55,7 @@ async def test_form(
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_russound_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_russound_client: AsyncMock
 ) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
@@ -84,7 +84,7 @@ async def test_form_cannot_connect(
 
 
 async def test_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_russound_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -109,7 +109,7 @@ async def test_duplicate(
 
 
 async def test_zeroconf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_russound_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -136,7 +136,7 @@ async def test_zeroconf_flow(
 
 
 async def test_zeroconf_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_russound_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -174,7 +174,7 @@ async def test_zeroconf_flow_errors(
 
 
 async def test_zeroconf_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_russound_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -192,7 +192,7 @@ async def test_zeroconf_duplicate(
 
 
 async def test_zeroconf_duplicate_different_ip(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_russound_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -234,7 +234,7 @@ async def test_zeroconf_duplicate_different_ip(
 
 
 async def test_user_flow_works_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_russound_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -262,7 +262,7 @@ async def test_user_flow_works_discovery(
 
 
 async def _start_reconfigure_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> ConfigFlowResult:
     """Initialize a reconfigure flow."""
     mock_config_entry.add_to_hass(hass)
@@ -276,7 +276,7 @@ async def _start_reconfigure_flow(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_russound_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -302,7 +302,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_unique_id_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_russound_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

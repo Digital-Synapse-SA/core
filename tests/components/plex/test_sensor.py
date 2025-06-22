@@ -8,13 +8,13 @@ import pytest
 import requests.exceptions
 import requests_mock
 
-from homeassistant.components.plex.const import PLEX_UPDATE_LIBRARY_SIGNAL
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.util import dt as dt_util
+from smarthub.components.plex.const import PLEX_UPDATE_LIBRARY_SIGNAL
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.dispatcher import async_dispatcher_send
+from smarthub.util import dt as dt_util
 
 from .helpers import trigger_plex_update, wait_for_debouncer
 
@@ -73,7 +73,7 @@ class MockPlexTVEpisode(MockPlexMedia):
 
 
 async def test_library_sensor_values(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
     setup_plex_server,

@@ -4,22 +4,22 @@ from unittest.mock import MagicMock, patch
 
 from ismartgate import GogoGate2Api
 
-from homeassistant.components.gogogate2 import DEVICE_TYPE_GOGOGATE2
-from homeassistant.components.gogogate2.const import DEVICE_TYPE_ISMARTGATE, DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.gogogate2 import DEVICE_TYPE_GOGOGATE2
+from smarthub.components.gogogate2.const import DEVICE_TYPE_ISMARTGATE, DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import (
     CONF_DEVICE,
     CONF_IP_ADDRESS,
     CONF_PASSWORD,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-@patch("homeassistant.components.gogogate2.common.GogoGate2Api")
-async def test_config_update(gogogate2api_mock, hass: HomeAssistant) -> None:
+@patch("smarthub.components.gogogate2.common.GogoGate2Api")
+async def test_config_update(gogogate2api_mock, hass: SmartHub) -> None:
     """Test config setup where the config is updated."""
 
     api = MagicMock(GogoGate2Api)
@@ -47,8 +47,8 @@ async def test_config_update(gogogate2api_mock, hass: HomeAssistant) -> None:
     }
 
 
-@patch("homeassistant.components.gogogate2.common.ISmartGateApi")
-async def test_config_no_update(ismartgateapi_mock, hass: HomeAssistant) -> None:
+@patch("smarthub.components.gogogate2.common.ISmartGateApi")
+async def test_config_no_update(ismartgateapi_mock, hass: SmartHub) -> None:
     """Test config setup where the data is not updated."""
     api = MagicMock(GogoGate2Api)
     api.async_info.side_effect = Exception("Error")
@@ -76,7 +76,7 @@ async def test_config_no_update(ismartgateapi_mock, hass: HomeAssistant) -> None
     }
 
 
-async def test_api_failure_on_startup(hass: HomeAssistant) -> None:
+async def test_api_failure_on_startup(hass: SmartHub) -> None:
     """Test api failure on startup raises ConfigEntryNotReady."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -92,7 +92,7 @@ async def test_api_failure_on_startup(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.gogogate2.common.ISmartGateApi.async_info",
+            "smarthub.components.gogogate2.common.ISmartGateApi.async_info",
             side_effect=TimeoutError,
         ),
     ):

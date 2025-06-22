@@ -8,9 +8,9 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.husqvarna_automower.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.husqvarna_automower.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .const import TEST_MOWER_ID
 
@@ -26,7 +26,7 @@ from tests.typing import ClientSessionGenerator
     datetime.datetime(2023, 6, 5, tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"))
 )
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
     mock_automower_client: AsyncMock,
@@ -47,7 +47,7 @@ async def test_entry_diagnostics(
     datetime.datetime(2023, 6, 5, tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"))
 )
 async def test_device_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
     mock_automower_client: AsyncMock,

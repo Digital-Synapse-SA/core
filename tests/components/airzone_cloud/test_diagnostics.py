@@ -17,9 +17,9 @@ from aioairzone_cloud.const import (
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.airzone_cloud.const import DOMAIN
-from homeassistant.const import CONF_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.airzone_cloud.const import DOMAIN
+from smarthub.const import CONF_ID
+from smarthub.core import SmartHub
 
 from .util import CONFIG, WS_ID, WS_ID_AIDOO, WS_ID_AIDOO_PRO, async_init_integration
 
@@ -99,7 +99,7 @@ RAW_DATA_MOCK = {
 
 
 async def test_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -108,7 +108,7 @@ async def test_config_entry_diagnostics(
 
     config_entry = hass.config_entries.async_entries(DOMAIN)[0]
     with patch(
-        "homeassistant.components.airzone_cloud.AirzoneCloudApi.raw_data",
+        "smarthub.components.airzone_cloud.AirzoneCloudApi.raw_data",
         return_value=RAW_DATA_MOCK,
     ):
         result = await get_diagnostics_for_config_entry(hass, hass_client, config_entry)

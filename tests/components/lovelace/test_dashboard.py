@@ -7,10 +7,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components import frontend
-from homeassistant.components.lovelace import const, dashboard
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import frontend
+from smarthub.components.lovelace import const, dashboard
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component, async_capture_events
 from tests.typing import WebSocketGenerator
@@ -18,19 +18,19 @@ from tests.typing import WebSocketGenerator
 
 @pytest.fixture(autouse=True)
 def mock_onboarding_done() -> Generator[MagicMock]:
-    """Mock that Home Assistant is currently onboarding.
+    """Mock that SmartHub is currently onboarding.
 
     Enabled to prevent creating default dashboards during test execution.
     """
     with patch(
-        "homeassistant.components.onboarding.async_is_onboarded",
+        "smarthub.components.onboarding.async_is_onboarded",
         return_value=True,
     ) as mock_onboarding:
         yield mock_onboarding
 
 
 async def test_lovelace_from_storage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -85,7 +85,7 @@ async def test_lovelace_from_storage(
 
 
 async def test_lovelace_from_storage_save_before_load(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -105,7 +105,7 @@ async def test_lovelace_from_storage_save_before_load(
 
 
 async def test_lovelace_from_storage_delete(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -137,7 +137,7 @@ async def test_lovelace_from_storage_delete(
 
 
 async def test_lovelace_from_yaml(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we load lovelace config from yaml."""
     assert await async_setup_component(hass, "lovelace", {"lovelace": {"mode": "YAML"}})
@@ -163,7 +163,7 @@ async def test_lovelace_from_yaml(
     events = async_capture_events(hass, const.EVENT_LOVELACE_UPDATED)
 
     with patch(
-        "homeassistant.components.lovelace.dashboard.load_yaml_dict",
+        "smarthub.components.lovelace.dashboard.load_yaml_dict",
         return_value={"hello": "yo"},
     ):
         await client.send_json({"id": 7, "type": "lovelace/config"})
@@ -176,7 +176,7 @@ async def test_lovelace_from_yaml(
 
     # Fake new data to see we fire event
     with patch(
-        "homeassistant.components.lovelace.dashboard.load_yaml_dict",
+        "smarthub.components.lovelace.dashboard.load_yaml_dict",
         return_value={"hello": "yo2"},
     ):
         await client.send_json({"id": 8, "type": "lovelace/config", "force": True})
@@ -190,11 +190,11 @@ async def test_lovelace_from_yaml(
     # Make sure when the mtime changes, we reload the config
     with (
         patch(
-            "homeassistant.components.lovelace.dashboard.load_yaml_dict",
+            "smarthub.components.lovelace.dashboard.load_yaml_dict",
             return_value={"hello": "yo3"},
         ),
         patch(
-            "homeassistant.components.lovelace.dashboard.os.path.getmtime",
+            "smarthub.components.lovelace.dashboard.os.path.getmtime",
             return_value=time.time(),
         ),
     ):
@@ -209,11 +209,11 @@ async def test_lovelace_from_yaml(
     # If the mtime is lower, preserve the cache
     with (
         patch(
-            "homeassistant.components.lovelace.dashboard.load_yaml_dict",
+            "smarthub.components.lovelace.dashboard.load_yaml_dict",
             return_value={"hello": "yo4"},
         ),
         patch(
-            "homeassistant.components.lovelace.dashboard.os.path.getmtime",
+            "smarthub.components.lovelace.dashboard.os.path.getmtime",
             return_value=0,
         ),
     ):
@@ -228,7 +228,7 @@ async def test_lovelace_from_yaml(
 
 @pytest.mark.parametrize("url_path", ["test-panel", "test-panel-no-sidebar"])
 async def test_dashboard_from_yaml(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, url_path
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, url_path
 ) -> None:
     """Test we load lovelace dashboard config from yaml."""
     assert await async_setup_component(
@@ -305,7 +305,7 @@ async def test_dashboard_from_yaml(
     events = async_capture_events(hass, const.EVENT_LOVELACE_UPDATED)
 
     with patch(
-        "homeassistant.components.lovelace.dashboard.load_yaml_dict",
+        "smarthub.components.lovelace.dashboard.load_yaml_dict",
         return_value={"hello": "yo"},
     ):
         await client.send_json(
@@ -320,7 +320,7 @@ async def test_dashboard_from_yaml(
 
     # Fake new data to see we fire event
     with patch(
-        "homeassistant.components.lovelace.dashboard.load_yaml_dict",
+        "smarthub.components.lovelace.dashboard.load_yaml_dict",
         return_value={"hello": "yo2"},
     ):
         await client.send_json(
@@ -334,7 +334,7 @@ async def test_dashboard_from_yaml(
     assert len(events) == 1
 
 
-async def test_wrong_key_dashboard_from_yaml(hass: HomeAssistant) -> None:
+async def test_wrong_key_dashboard_from_yaml(hass: SmartHub) -> None:
     """Test we don't load lovelace dashboard without hyphen config from yaml."""
     with assert_setup_component(0, "lovelace"):
         assert not await async_setup_component(
@@ -358,7 +358,7 @@ async def test_wrong_key_dashboard_from_yaml(hass: HomeAssistant) -> None:
 
 
 async def test_storage_dashboards(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -503,7 +503,7 @@ async def test_storage_dashboards(
 
 
 async def test_websocket_list_dashboards(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test listing dashboards both storage + YAML."""
     assert await async_setup_component(

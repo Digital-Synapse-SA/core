@@ -6,9 +6,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import mqtt, siren
-from homeassistant.components.siren import ATTR_VOLUME_LEVEL
-from homeassistant.const import (
+from smarthub.components import mqtt, siren
+from smarthub.components.siren import ATTR_VOLUME_LEVEL
+from smarthub.const import (
     ATTR_ASSUMED_STATE,
     ATTR_ENTITY_ID,
     ENTITY_MATCH_ALL,
@@ -18,7 +18,7 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import (
     help_custom_config,
@@ -60,7 +60,7 @@ DEFAULT_CONFIG = {
 
 
 async def async_turn_on(
-    hass: HomeAssistant, entity_id: str, parameters: dict[str, Any]
+    hass: SmartHub, entity_id: str, parameters: dict[str, Any]
 ) -> None:
     """Turn all or specified siren on."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
@@ -70,7 +70,7 @@ async def async_turn_on(
 
 
 async def async_turn_off(
-    hass: HomeAssistant, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Turn all or specified siren off."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
@@ -95,7 +95,7 @@ async def async_turn_off(
     ],
 )
 async def test_controlling_state_via_topic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the controlling state via topic."""
     await mqtt_mock_entry()
@@ -132,7 +132,7 @@ async def test_controlling_state_via_topic(
     ],
 )
 async def test_sending_mqtt_commands_and_optimistic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the sending MQTT commands in optimistic mode."""
     await hass.async_block_till_done()
@@ -178,7 +178,7 @@ async def test_sending_mqtt_commands_and_optimistic(
     ],
 )
 async def test_controlling_state_via_topic_and_json_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the controlling state via topic and JSON message."""
     await mqtt_mock_entry()
@@ -219,7 +219,7 @@ async def test_controlling_state_via_topic_and_json_message(
     ],
 )
 async def test_controlling_state_and_attributes_with_json_message_without_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -315,7 +315,7 @@ async def test_controlling_state_and_attributes_with_json_message_without_templa
     ],
 )
 async def test_filtering_not_supported_attributes_optimistic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test setting attributes with support flags optimistic."""
     await mqtt_mock_entry()
@@ -413,7 +413,7 @@ async def test_filtering_not_supported_attributes_optimistic(
     ],
 )
 async def test_filtering_not_supported_attributes_via_state(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test setting attributes with support flags via state."""
     await mqtt_mock_entry()
@@ -470,7 +470,7 @@ async def test_filtering_not_supported_attributes_via_state(
 
 @pytest.mark.parametrize("hass_config", [DEFAULT_CONFIG])
 async def test_availability_when_connection_lost(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability after MQTT disconnection."""
     await help_test_availability_when_connection_lost(
@@ -480,7 +480,7 @@ async def test_availability_when_connection_lost(
 
 @pytest.mark.parametrize("hass_config", [DEFAULT_CONFIG])
 async def test_availability_without_topic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability without defined availability topic."""
     await help_test_availability_without_topic(
@@ -489,7 +489,7 @@ async def test_availability_without_topic(
 
 
 async def test_default_availability_payload(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability by default payload with defined topic."""
     config = {
@@ -515,7 +515,7 @@ async def test_default_availability_payload(
 
 
 async def test_custom_availability_payload(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability by custom payload with defined topic."""
     config = {
@@ -560,7 +560,7 @@ async def test_custom_availability_payload(
     ],
 )
 async def test_custom_state_payload(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the state payload."""
     await mqtt_mock_entry()
@@ -581,7 +581,7 @@ async def test_custom_state_payload(
 
 
 async def test_setting_attribute_via_mqtt_json_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_attribute_via_mqtt_json_message(
@@ -590,7 +590,7 @@ async def test_setting_attribute_via_mqtt_json_message(
 
 
 async def test_setting_blocked_attribute_via_mqtt_json_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_blocked_attribute_via_mqtt_json_message(
@@ -599,7 +599,7 @@ async def test_setting_blocked_attribute_via_mqtt_json_message(
 
 
 async def test_setting_attribute_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_attribute_with_template(
@@ -608,7 +608,7 @@ async def test_setting_attribute_with_template(
 
 
 async def test_update_with_json_attrs_not_dict(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -619,7 +619,7 @@ async def test_update_with_json_attrs_not_dict(
 
 
 async def test_update_with_json_attrs_bad_json(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -630,7 +630,7 @@ async def test_update_with_json_attrs_bad_json(
 
 
 async def test_discovery_update_attr(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered MQTTAttributes."""
     await help_test_discovery_update_attr(
@@ -662,14 +662,14 @@ async def test_discovery_update_attr(
     ],
 )
 async def test_unique_id(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test unique id option only creates one siren per unique_id."""
     await help_test_unique_id(hass, mqtt_mock_entry, siren.DOMAIN)
 
 
 async def test_discovery_removal_siren(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test removal of discovered siren."""
     data = (
@@ -681,7 +681,7 @@ async def test_discovery_removal_siren(
 
 
 async def test_discovery_update_siren_topic_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered siren."""
     config1 = copy.deepcopy(DEFAULT_CONFIG[mqtt.DOMAIN][siren.DOMAIN])
@@ -717,7 +717,7 @@ async def test_discovery_update_siren_topic_template(
 
 
 async def test_discovery_update_siren_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered siren."""
     config1 = copy.deepcopy(DEFAULT_CONFIG[mqtt.DOMAIN][siren.DOMAIN])
@@ -775,7 +775,7 @@ async def test_discovery_update_siren_template(
     ],
 )
 async def test_command_templates(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test siren with command templates optimistic."""
     mqtt_mock = await mqtt_mock_entry()
@@ -840,7 +840,7 @@ async def test_command_templates(
 
 
 async def test_discovery_update_unchanged_siren(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered siren."""
     data1 = (
@@ -850,7 +850,7 @@ async def test_discovery_update_unchanged_siren(
         '  "command_topic": "test_topic" }'
     )
     with patch(
-        "homeassistant.components.mqtt.siren.MqttSiren.discovery_update"
+        "smarthub.components.mqtt.siren.MqttSiren.discovery_update"
     ) as discovery_update:
         await help_test_discovery_update_unchanged(
             hass,
@@ -863,7 +863,7 @@ async def test_discovery_update_unchanged_siren(
 
 @pytest.mark.no_fail_on_log_exception
 async def test_discovery_broken(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test handling of bad discovery message."""
     data1 = '{ "name": "Beer" }'
@@ -876,7 +876,7 @@ async def test_discovery_broken(
 
 
 async def test_entity_device_info_with_connection(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT siren device registry integration."""
     await help_test_entity_device_info_with_connection(
@@ -885,7 +885,7 @@ async def test_entity_device_info_with_connection(
 
 
 async def test_entity_device_info_with_identifier(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT siren device registry integration."""
     await help_test_entity_device_info_with_identifier(
@@ -894,7 +894,7 @@ async def test_entity_device_info_with_identifier(
 
 
 async def test_entity_device_info_update(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test device registry update."""
     await help_test_entity_device_info_update(
@@ -903,7 +903,7 @@ async def test_entity_device_info_update(
 
 
 async def test_entity_device_info_remove(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test device registry remove."""
     await help_test_entity_device_info_remove(
@@ -912,7 +912,7 @@ async def test_entity_device_info_remove(
 
 
 async def test_entity_id_update_subscriptions(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT subscriptions are managed when entity_id is updated."""
     await help_test_entity_id_update_subscriptions(
@@ -921,7 +921,7 @@ async def test_entity_id_update_subscriptions(
 
 
 async def test_entity_id_update_discovery_update(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT discovery update when entity_id is updated."""
     await help_test_entity_id_update_discovery_update(
@@ -930,7 +930,7 @@ async def test_entity_id_update_discovery_update(
 
 
 async def test_entity_debug_info_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT debug info."""
     await help_test_entity_debug_info_message(
@@ -963,7 +963,7 @@ async def test_entity_debug_info_message(
     ],
 )
 async def test_publishing_with_custom_encoding(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
     service: str,
@@ -992,7 +992,7 @@ async def test_publishing_with_custom_encoding(
 
 
 async def test_reloadable(
-    hass: HomeAssistant, mqtt_client_mock: MqttMockPahoClient
+    hass: SmartHub, mqtt_client_mock: MqttMockPahoClient
 ) -> None:
     """Test reloading the MQTT platform."""
     domain = siren.DOMAIN
@@ -1005,7 +1005,7 @@ async def test_reloadable(
     [("state_topic", "ON", None, "on")],
 )
 async def test_encoding_subscribable_topics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     topic: str,
     value: str,
@@ -1031,7 +1031,7 @@ async def test_encoding_subscribable_topics(
     ids=["platform_key", "listed"],
 )
 async def test_setup_manual_entity_from_yaml(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test setup manual configured MQTT entity."""
     await mqtt_mock_entry()
@@ -1040,7 +1040,7 @@ async def test_setup_manual_entity_from_yaml(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test unloading the config entry."""
     domain = siren.DOMAIN
@@ -1089,7 +1089,7 @@ async def test_unload_entry(
     ],
 )
 async def test_skipped_async_ha_write_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     topic: str,
     payload1: str,
@@ -1116,7 +1116,7 @@ async def test_skipped_async_ha_write_state(
     ],
 )
 async def test_value_template_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

@@ -4,15 +4,15 @@ from collections.abc import Callable
 
 import pytest
 
-from homeassistant.components.siren import ATTR_DURATION, DOMAIN as SIREN_DOMAIN
-from homeassistant.const import (
+from smarthub.components.siren import ATTR_DURATION, DOMAIN as SIREN_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .conftest import WebsocketDataType
 
@@ -32,7 +32,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_sirens(
-    hass: HomeAssistant,
+    hass: SmartHub,
     light_ws_data: WebsocketDataType,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
 ) -> None:

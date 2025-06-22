@@ -7,18 +7,18 @@ from deebot_client.events.water_info import WaterAmount, WaterAmountEvent
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import select
-from homeassistant.components.ecovacs.const import DOMAIN
-from homeassistant.components.ecovacs.controller import EcovacsController
-from homeassistant.const import (
+from smarthub.components import select
+from smarthub.components.ecovacs.const import DOMAIN
+from smarthub.components.ecovacs.controller import EcovacsController
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_OPTION,
     SERVICE_SELECT_OPTION,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .util import block_till_done
 
@@ -31,7 +31,7 @@ def platforms() -> Platform | list[Platform]:
     return Platform.SELECT
 
 
-async def notify_events(hass: HomeAssistant, event_bus: EventBus):
+async def notify_events(hass: SmartHub, event_bus: EventBus):
     """Notify events."""
     event_bus.notify(WaterAmountEvent(WaterAmount.ULTRAHIGH))
     await block_till_done(hass, event_bus)
@@ -50,7 +50,7 @@ async def notify_events(hass: HomeAssistant, event_bus: EventBus):
     ],
 )
 async def test_selects(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -91,7 +91,7 @@ async def test_selects(
     ],
 )
 async def test_selects_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     controller: EcovacsController,
     entity_id: list[str],
     current_state: str,

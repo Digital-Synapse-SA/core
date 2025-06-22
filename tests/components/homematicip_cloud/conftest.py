@@ -8,20 +8,20 @@ from homematicip.base.enums import WeatherCondition, WeatherDayTime
 from homematicip.connection.rest_connection import RestConnection
 import pytest
 
-from homeassistant.components.homematicip_cloud import (
+from smarthub.components.homematicip_cloud import (
     DOMAIN,
     async_setup as hmip_async_setup,
 )
-from homeassistant.components.homematicip_cloud.const import (
+from smarthub.components.homematicip_cloud.const import (
     HMIPC_AUTHTOKEN,
     HMIPC_HAPID,
     HMIPC_NAME,
     HMIPC_PIN,
 )
-from homeassistant.components.homematicip_cloud.hap import HomematicipHAP
-from homeassistant.config_entries import SOURCE_IMPORT
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType
+from smarthub.components.homematicip_cloud.hap import HomematicipHAP
+from smarthub.config_entries import SOURCE_IMPORT
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import ConfigType
 
 from .helper import AUTH_TOKEN, HAPID, HAPPIN, HomeFactory
 
@@ -63,7 +63,7 @@ def hmip_config_entry_fixture() -> MockConfigEntry:
 
 @pytest.fixture(name="default_mock_hap_factory")
 async def default_mock_hap_factory_fixture(
-    hass: HomeAssistant, mock_connection, hmip_config_entry: MockConfigEntry
+    hass: SmartHub, mock_connection, hmip_config_entry: MockConfigEntry
 ) -> HomeFactory:
     """Create a mocked homematic access point."""
     return HomeFactory(hass, mock_connection, hmip_config_entry)
@@ -91,7 +91,7 @@ def dummy_config_fixture() -> ConfigType:
 
 @pytest.fixture(name="mock_hap_with_service")
 async def mock_hap_with_service_fixture(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory, dummy_config
+    hass: SmartHub, default_mock_hap_factory: HomeFactory, dummy_config
 ) -> HomematicipHAP:
     """Create a fake homematic access point with hass services."""
     mock_hap = await default_mock_hap_factory.async_get_mock_hap()
@@ -132,7 +132,7 @@ def simple_mock_home_fixture():
     )
 
     with patch(
-        "homeassistant.components.homematicip_cloud.hap.AsyncHome",
+        "smarthub.components.homematicip_cloud.hap.AsyncHome",
         autospec=True,
         return_value=mock_home,
     ):
@@ -145,7 +145,7 @@ def mock_connection_init_fixture():
 
     with (
         patch(
-            "homeassistant.components.homematicip_cloud.hap.AsyncHome.init_async",
+            "smarthub.components.homematicip_cloud.hap.AsyncHome.init_async",
             return_value=None,
             new_callable=AsyncMock,
         ),

@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.velbus.const import (
+from smarthub.components.velbus.const import (
     CONF_CONFIG_ENTRY,
     CONF_INTERFACE,
     CONF_MEMO_TEXT,
@@ -15,10 +15,10 @@ from homeassistant.components.velbus.const import (
     SERVICE_SET_MEMO_TEXT,
     SERVICE_SYNC,
 )
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import issue_registry as ir
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import issue_registry as ir
 
 from . import init_integration
 
@@ -26,7 +26,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_global_services_with_interface(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -70,7 +70,7 @@ async def test_global_services_with_interface(
 
 
 async def test_global_survices_with_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test services directed at the bus with a config_entry."""
@@ -112,7 +112,7 @@ async def test_global_survices_with_config_entry(
 
 
 async def test_set_memo_text(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: AsyncMock,
 ) -> None:
@@ -149,7 +149,7 @@ async def test_set_memo_text(
 
 
 async def test_clear_cache(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test the clear_cache service."""

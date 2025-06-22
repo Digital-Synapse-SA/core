@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
     ATTR_TEMPERATURE,
@@ -16,17 +16,17 @@ from homeassistant.components.climate import (
     SERVICE_TURN_OFF,
     HVACMode,
 )
-from homeassistant.components.tessie.const import TessieClimateKeeper
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.tessie.const import TessieClimateKeeper
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .common import ERROR_UNKNOWN, TEST_RESPONSE, assert_entities, setup_platform
 
 
 async def test_climate(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
+    hass: SmartHub, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests that the climate entity is correct."""
 
@@ -38,7 +38,7 @@ async def test_climate(
 
     # Test setting climate on
     with patch(
-        "homeassistant.components.tessie.climate.start_climate_preconditioning",
+        "smarthub.components.tessie.climate.start_climate_preconditioning",
         return_value=TEST_RESPONSE,
     ) as mock_set:
         await hass.services.async_call(
@@ -54,11 +54,11 @@ async def test_climate(
     # Test setting climate temp
     with (
         patch(
-            "homeassistant.components.tessie.climate.set_temperature",
+            "smarthub.components.tessie.climate.set_temperature",
             return_value=TEST_RESPONSE,
         ) as mock_set,
         patch(
-            "homeassistant.components.tessie.climate.start_climate_preconditioning",
+            "smarthub.components.tessie.climate.start_climate_preconditioning",
             return_value=TEST_RESPONSE,
         ) as mock_set2,
     ):
@@ -79,7 +79,7 @@ async def test_climate(
 
     # Test setting climate preset
     with patch(
-        "homeassistant.components.tessie.climate.set_climate_keeper_mode",
+        "smarthub.components.tessie.climate.set_climate_keeper_mode",
         return_value=TEST_RESPONSE,
     ) as mock_set:
         await hass.services.async_call(
@@ -94,7 +94,7 @@ async def test_climate(
 
     # Test setting climate off
     with patch(
-        "homeassistant.components.tessie.climate.stop_climate",
+        "smarthub.components.tessie.climate.stop_climate",
         return_value=TEST_RESPONSE,
     ) as mock_set:
         await hass.services.async_call(
@@ -108,7 +108,7 @@ async def test_climate(
     assert state.state == HVACMode.OFF
 
 
-async def test_errors(hass: HomeAssistant) -> None:
+async def test_errors(hass: SmartHub) -> None:
     """Tests errors are handled."""
 
     await setup_platform(hass, [Platform.CLIMATE])
@@ -117,10 +117,10 @@ async def test_errors(hass: HomeAssistant) -> None:
     # Test setting climate on with unknown error
     with (
         patch(
-            "homeassistant.components.tessie.climate.stop_climate",
+            "smarthub.components.tessie.climate.stop_climate",
             side_effect=ERROR_UNKNOWN,
         ) as mock_set,
-        pytest.raises(HomeAssistantError) as error,
+        pytest.raises(SmartHubError) as error,
     ):
         await hass.services.async_call(
             CLIMATE_DOMAIN,

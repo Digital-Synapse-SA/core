@@ -1,15 +1,15 @@
 """Test KNX notify."""
 
-from homeassistant.components import notify
-from homeassistant.components.knx.const import KNX_ADDRESS
-from homeassistant.components.knx.schema import NotifySchema
-from homeassistant.const import CONF_NAME, CONF_TYPE
-from homeassistant.core import HomeAssistant
+from smarthub.components import notify
+from smarthub.components.knx.const import KNX_ADDRESS
+from smarthub.components.knx.schema import NotifySchema
+from smarthub.const import CONF_NAME, CONF_TYPE
+from smarthub.core import SmartHub
 
 from .conftest import KNXTestKit
 
 
-async def test_notify_simple(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_notify_simple(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX notify can send to one device."""
     await knx.setup_integration(
         {
@@ -47,7 +47,7 @@ async def test_notify_simple(hass: HomeAssistant, knx: KNXTestKit) -> None:
 
 
 async def test_notify_multiple_sends_with_different_encodings(
-    hass: HomeAssistant, knx: KNXTestKit
+    hass: SmartHub, knx: KNXTestKit
 ) -> None:
     """Test KNX notify `type` configuration."""
     await knx.setup_integration(

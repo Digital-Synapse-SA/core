@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_POSITION,
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
@@ -12,9 +12,9 @@ from homeassistant.components.cover import (
     SERVICE_SET_COVER_POSITION,
     SERVICE_STOP_COVER,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import selected_platforms, snapshot_platform_entities
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     netatmo_auth: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -39,7 +39,7 @@ async def test_entity(
 
 
 async def test_cover_setup_and_services(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test setup and services."""
     with selected_platforms([Platform.COVER]):

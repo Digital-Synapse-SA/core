@@ -4,9 +4,9 @@ from unittest.mock import Mock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import MockConfigEntry, setup_platform
 
@@ -14,7 +14,7 @@ from tests.common import snapshot_platform
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -27,7 +27,7 @@ async def test_states(
 
 
 async def test_button_opens_door(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     mock_ring_devices,
 ) -> None:

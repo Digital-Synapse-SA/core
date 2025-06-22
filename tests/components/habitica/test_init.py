@@ -8,9 +8,9 @@ from aiohttp import ClientError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.habitica.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.habitica.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.core import SmartHub
 
 from .conftest import (
     ERROR_BAD_REQUEST,
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("habitica")
 async def test_entry_setup_unload(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test integration setup and unload."""
 
@@ -49,7 +49,7 @@ async def test_entry_setup_unload(
     ],
 )
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     exception: Exception,
@@ -65,7 +65,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_config_entry_auth_failed(
-    hass: HomeAssistant, config_entry: MockConfigEntry, habitica: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, habitica: AsyncMock
 ) -> None:
     """Test config entry auth failed setup error."""
 
@@ -90,7 +90,7 @@ async def test_config_entry_auth_failed(
 
 @pytest.mark.parametrize("exception", [ERROR_NOT_FOUND, ClientError])
 async def test_coordinator_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     exception: Exception,
@@ -106,7 +106,7 @@ async def test_coordinator_update_failed(
 
 
 async def test_coordinator_rate_limited(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     caplog: pytest.LogCaptureFixture,

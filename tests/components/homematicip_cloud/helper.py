@@ -15,14 +15,14 @@ from homematicip.device import Device
 from homematicip.group import Group
 from homematicip.home import Home
 
-from homeassistant.components.homematicip_cloud import DOMAIN
-from homeassistant.components.homematicip_cloud.entity import (
+from smarthub.components.homematicip_cloud import DOMAIN
+from smarthub.components.homematicip_cloud.entity import (
     ATTR_IS_GROUP,
     ATTR_MODEL_TYPE,
 )
-from homeassistant.components.homematicip_cloud.hap import HomematicipHAP
-from homeassistant.core import HomeAssistant, State
-from homeassistant.setup import async_setup_component
+from smarthub.components.homematicip_cloud.hap import HomematicipHAP
+from smarthub.core import SmartHub, State
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -33,7 +33,7 @@ FIXTURE_DATA = load_fixture("homematicip_cloud.json", "homematicip_cloud")
 
 
 def get_and_check_entity_basics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_hap: HomematicipHAP,
     entity_id: str,
     entity_name: str,
@@ -57,7 +57,7 @@ def get_and_check_entity_basics(
 
 
 async def async_manipulate_test_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hmip_device: HomeMaticIPObject,
     attribute: str,
     new_value: Any,
@@ -86,7 +86,7 @@ class HomeFactory:
 
     def __init__(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         mock_connection,
         hmip_config_entry: MockConfigEntry,
     ) -> None:
@@ -113,7 +113,7 @@ class HomeFactory:
 
         self.hmip_config_entry.add_to_hass(self.hass)
         with patch(
-            "homeassistant.components.homematicip_cloud.hap.HomematicipHAP.get_hap",
+            "smarthub.components.homematicip_cloud.hap.HomematicipHAP.get_hap",
             return_value=mock_home,
         ):
             assert await async_setup_component(self.hass, DOMAIN, {})

@@ -5,16 +5,16 @@ from unittest.mock import patch
 from pybotvac.neato import Neato
 import pytest
 
-from homeassistant import config_entries, setup
-from homeassistant.components.application_credentials import (
+from smarthub import config_entries, setup
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.neato.const import NEATO_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.components.neato.const import NEATO_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -30,7 +30,7 @@ OAUTH2_TOKEN = VENDOR.token_endpoint
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -75,7 +75,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.neato.async_setup_entry", return_value=True
+        "smarthub.components.neato.async_setup_entry", return_value=True
     ) as mock_setup:
         await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -83,7 +83,7 @@ async def test_full_flow(
     assert len(mock_setup.mock_calls) == 1
 
 
-async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
+async def test_abort_if_already_setup(hass: SmartHub) -> None:
     """Test we abort if Neato is already setup."""
     entry = MockConfigEntry(
         domain=NEATO_DOMAIN,
@@ -101,7 +101,7 @@ async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -150,7 +150,7 @@ async def test_reauth(
 
     # Update entry
     with patch(
-        "homeassistant.components.neato.async_setup_entry", return_value=True
+        "smarthub.components.neato.async_setup_entry", return_value=True
     ) as mock_setup:
         result3 = await hass.config_entries.flow.async_configure(result2["flow_id"])
         await hass.async_block_till_done()

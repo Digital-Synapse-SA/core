@@ -2,22 +2,22 @@
 
 from datetime import timedelta
 
-from homeassistant import config_entries
-from homeassistant.components.switch import (
+from smarthub import config_entries
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ASSUMED_STATE,
     ATTR_ENTITY_ID,
     STATE_OFF,
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .test_common import get_device_discovery_payload, send_discovery_message
 
@@ -25,7 +25,7 @@ from tests.common import async_fire_mqtt_message, async_fire_time_changed
 from tests.typing import MqttMockHAClient
 
 
-async def call_service(hass: HomeAssistant, entity_id, service, **kwargs):
+async def call_service(hass: SmartHub, entity_id, service, **kwargs):
     """Call a service."""
     await hass.services.async_call(
         SWITCH_DOMAIN,
@@ -36,7 +36,7 @@ async def call_service(hass: HomeAssistant, entity_id, service, **kwargs):
 
 
 async def test_available_relay(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_pglab
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_pglab
 ) -> None:
     """Check if relay are properly created when two E-Relay boards are connected."""
 
@@ -54,7 +54,7 @@ async def test_available_relay(
 
 
 async def test_change_state_via_mqtt(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_pglab
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_pglab
 ) -> None:
     """Test state update via MQTT."""
 
@@ -97,7 +97,7 @@ async def test_change_state_via_mqtt(
 
 
 async def test_mqtt_state_by_calling_service(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_pglab
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_pglab
 ) -> None:
     """Calling service to turn ON/OFF relay and check mqtt state."""
 
@@ -138,7 +138,7 @@ async def test_mqtt_state_by_calling_service(
 
 
 async def test_discovery_update(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_pglab
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_pglab
 ) -> None:
     """Update discovery message and  check if relay are property updated."""
 
@@ -182,7 +182,7 @@ async def test_discovery_update(
 
 
 async def test_disable_entity_state_change_via_mqtt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_pglab,

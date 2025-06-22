@@ -6,7 +6,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -17,7 +17,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_diagnostics_polling_instance(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_spotify: AsyncMock,
     mock_config_entry: MockConfigEntry,

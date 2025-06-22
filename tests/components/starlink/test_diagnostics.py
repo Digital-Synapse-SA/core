@@ -2,9 +2,9 @@
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.starlink.const import DOMAIN
-from homeassistant.const import CONF_IP_ADDRESS
-from homeassistant.core import HomeAssistant
+from smarthub.components.starlink.const import DOMAIN
+from smarthub.const import CONF_IP_ADDRESS
+from smarthub.core import SmartHub
 
 from .patchers import (
     HISTORY_STATS_SUCCESS_PATCHER,
@@ -19,7 +19,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:

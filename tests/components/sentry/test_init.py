@@ -5,8 +5,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components.sentry import process_before_send
-from homeassistant.components.sentry.const import (
+from smarthub.components.sentry import process_before_send
+from smarthub.components.sentry.const import (
     CONF_DSN,
     CONF_ENVIRONMENT,
     CONF_EVENT_CUSTOM_COMPONENTS,
@@ -16,13 +16,13 @@ from homeassistant.components.sentry.const import (
     CONF_TRACING_SAMPLE_RATE,
     DOMAIN,
 )
-from homeassistant.const import __version__ as current_version
-from homeassistant.core import HomeAssistant
+from smarthub.const import __version__ as current_version
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_setup_entry(hass: HomeAssistant) -> None:
+async def test_setup_entry(hass: SmartHub) -> None:
     """Test integration setup from entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -32,15 +32,15 @@ async def test_setup_entry(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.sentry.AioHttpIntegration"
+            "smarthub.components.sentry.AioHttpIntegration"
         ) as sentry_aiohttp_mock,
         patch(
-            "homeassistant.components.sentry.SqlalchemyIntegration"
+            "smarthub.components.sentry.SqlalchemyIntegration"
         ) as sentry_sqlalchemy_mock,
         patch(
-            "homeassistant.components.sentry.LoggingIntegration"
+            "smarthub.components.sentry.LoggingIntegration"
         ) as sentry_logging_mock,
-        patch("homeassistant.components.sentry.sentry_sdk") as sentry_mock,
+        patch("smarthub.components.sentry.sentry_sdk") as sentry_mock,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
@@ -78,7 +78,7 @@ async def test_setup_entry(hass: HomeAssistant) -> None:
     assert call_args["before_send"]
 
 
-async def test_setup_entry_with_tracing(hass: HomeAssistant) -> None:
+async def test_setup_entry_with_tracing(hass: SmartHub) -> None:
     """Test integration setup from entry with tracing enabled."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -88,10 +88,10 @@ async def test_setup_entry_with_tracing(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.sentry.AioHttpIntegration"),
-        patch("homeassistant.components.sentry.SqlalchemyIntegration"),
-        patch("homeassistant.components.sentry.LoggingIntegration"),
-        patch("homeassistant.components.sentry.sentry_sdk") as sentry_mock,
+        patch("smarthub.components.sentry.AioHttpIntegration"),
+        patch("smarthub.components.sentry.SqlalchemyIntegration"),
+        patch("smarthub.components.sentry.LoggingIntegration"),
+        patch("smarthub.components.sentry.sentry_sdk") as sentry_mock,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
@@ -108,7 +108,7 @@ async def test_setup_entry_with_tracing(hass: HomeAssistant) -> None:
     assert call_args["traces_sample_rate"] == 0.5
 
 
-async def test_process_before_send(hass: HomeAssistant) -> None:
+async def test_process_before_send(hass: SmartHub) -> None:
     """Test regular use of the Sentry process before sending function."""
     hass.config.components.add("puppies")
     hass.config.components.add("a_integration")
@@ -133,7 +133,7 @@ async def test_process_before_send(hass: HomeAssistant) -> None:
     assert result["contexts"]
     assert result["contexts"]
 
-    ha_context = result["contexts"]["Home Assistant"]
+    ha_context = result["contexts"]["SmartHub"]
     assert ha_context["channel"] == "test"
     assert ha_context["custom_components"] == "fridge_opener\nironing_robot"
     assert ha_context["integrations"] == "a_integration\npuppies"
@@ -147,7 +147,7 @@ async def test_process_before_send(hass: HomeAssistant) -> None:
     assert user["id"] == "12345"
 
 
-async def test_event_with_platform_context(hass: HomeAssistant) -> None:
+async def test_event_with_platform_context(hass: SmartHub) -> None:
     """Test extraction of platform context information during Sentry events."""
 
     current_platform_mock = Mock()
@@ -155,7 +155,7 @@ async def test_event_with_platform_context(hass: HomeAssistant) -> None:
     current_platform_mock.get().domain = "light"
 
     with patch(
-        "homeassistant.components.sentry.entity_platform.current_platform",
+        "smarthub.components.sentry.entity_platform.current_platform",
         new=current_platform_mock,
     ):
         result = process_before_send(
@@ -178,7 +178,7 @@ async def test_event_with_platform_context(hass: HomeAssistant) -> None:
     current_platform_mock.get().domain = "switch"
 
     with patch(
-        "homeassistant.components.sentry.entity_platform.current_platform",
+        "smarthub.components.sentry.entity_platform.current_platform",
         new=current_platform_mock,
     ):
         result = process_before_send(
@@ -203,15 +203,15 @@ async def test_event_with_platform_context(hass: HomeAssistant) -> None:
     [
         ("adguard", {"package": "adguard"}),
         (
-            "homeassistant.components.hue.coordinator",
+            "smarthub.components.hue.coordinator",
             {"integration": "hue", "custom_component": "no"},
         ),
         (
-            "homeassistant.components.hue.light",
+            "smarthub.components.hue.light",
             {"integration": "hue", "platform": "light", "custom_component": "no"},
         ),
         (
-            "homeassistant.components.ironing_robot.switch",
+            "smarthub.components.ironing_robot.switch",
             {
                 "integration": "ironing_robot",
                 "platform": "switch",
@@ -219,14 +219,14 @@ async def test_event_with_platform_context(hass: HomeAssistant) -> None:
             },
         ),
         (
-            "homeassistant.components.ironing_robot",
+            "smarthub.components.ironing_robot",
             {"integration": "ironing_robot", "custom_component": "yes"},
         ),
-        ("homeassistant.helpers.network", {"helpers": "network"}),
+        ("smarthub.helpers.network", {"helpers": "network"}),
         ("tuyapi.test", {"package": "tuyapi"}),
     ],
 )
-async def test_logger_event_extraction(hass: HomeAssistant, logger, tags) -> None:
+async def test_logger_event_extraction(hass: SmartHub, logger, tags) -> None:
     """Test extraction of information from Sentry logger events."""
 
     result = process_before_send(
@@ -258,18 +258,18 @@ async def test_logger_event_extraction(hass: HomeAssistant, logger, tags) -> Non
         ("adguard", {CONF_EVENT_THIRD_PARTY_PACKAGES: True}, True),
         ("adguard", {CONF_EVENT_THIRD_PARTY_PACKAGES: False}, False),
         (
-            "homeassistant.components.ironing_robot.switch",
+            "smarthub.components.ironing_robot.switch",
             {CONF_EVENT_CUSTOM_COMPONENTS: True},
             True,
         ),
         (
-            "homeassistant.components.ironing_robot.switch",
+            "smarthub.components.ironing_robot.switch",
             {CONF_EVENT_CUSTOM_COMPONENTS: False},
             False,
         ),
     ],
 )
-async def test_filter_log_events(hass: HomeAssistant, logger, options, event) -> None:
+async def test_filter_log_events(hass: SmartHub, logger, options, event) -> None:
     """Test filtering of events based on configuration options."""
     result = process_before_send(
         hass,
@@ -298,7 +298,7 @@ async def test_filter_log_events(hass: HomeAssistant, logger, options, event) ->
     ],
 )
 async def test_filter_handled_events(
-    hass: HomeAssistant, handled, options, event
+    hass: SmartHub, handled, options, event
 ) -> None:
     """Tests filtering of handled events based on configuration options."""
     result = process_before_send(

@@ -4,16 +4,16 @@ import logging
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.setup import async_setup_component
 
 from .conftest import KNXTestKit
 
 
 async def test_telegram_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     knx: KNXTestKit,
 ) -> None:
@@ -96,7 +96,7 @@ async def test_telegram_trigger(
     ],
 )
 async def test_telegram_trigger_dpt_option(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     knx: KNXTestKit,
     payload: tuple[int, ...],
@@ -183,7 +183,7 @@ async def test_telegram_trigger_dpt_option(
     ],
 )
 async def test_telegram_trigger_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     knx: KNXTestKit,
     group_value_options: dict[str, bool],
@@ -260,7 +260,7 @@ async def test_telegram_trigger_options(
 
 
 async def test_remove_telegram_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     knx: KNXTestKit,
 ) -> None:
@@ -306,7 +306,7 @@ async def test_remove_telegram_trigger(
 
 
 async def test_invalid_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

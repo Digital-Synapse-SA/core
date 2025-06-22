@@ -2,23 +2,23 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.homekit.const import (
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.homekit.const import (
     CHAR_CONFIGURED_NAME,
     CHAR_PROGRAMMABLE_SWITCH_EVENT,
     SERV_STATELESS_PROGRAMMABLE_SWITCH,
 )
-from homeassistant.components.homekit.type_triggers import DeviceTriggerAccessory
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.homekit.type_triggers import DeviceTriggerAccessory
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_get_device_automations
 
 
 async def test_programmable_switch_button_fires_on_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     demo_cleanup,
     entity_registry: er.EntityRegistry,
@@ -28,7 +28,7 @@ async def test_programmable_switch_button_fires_on_trigger(
 
     demo_config_entry = MockConfigEntry(domain="domain")
     demo_config_entry.add_to_hass(hass)
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "demo", {"demo": {}})
     await hass.async_block_till_done()
     hass.states.async_set("light.ceiling_lights", STATE_OFF)

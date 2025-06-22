@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock, Mock
 
 from uiprotect.data import Camera, CloudAccount, ModelType, Version
 
-from homeassistant.components.unifiprotect.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH
-from homeassistant.core import HomeAssistant
+from smarthub.components.unifiprotect.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH
+from smarthub.core import SmartHub
 
 from .utils import MockUFPFixture, init_entry
 
@@ -22,7 +22,7 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 async def test_ea_warning_ignore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
@@ -53,7 +53,7 @@ async def test_ea_warning_ignore(
 
     flow_id = data["flow_id"]
     assert data["description_placeholders"] == {
-        "learn_more": "https://www.home-assistant.io/integrations/unifiprotect#software-support",
+        "learn_more": "https://www.smart-hub.io/integrations/unifiprotect#software-support",
         "version": str(version),
     }
     assert data["step_id"] == "start"
@@ -62,7 +62,7 @@ async def test_ea_warning_ignore(
 
     flow_id = data["flow_id"]
     assert data["description_placeholders"] == {
-        "learn_more": "https://www.home-assistant.io/integrations/unifiprotect#software-support",
+        "learn_more": "https://www.smart-hub.io/integrations/unifiprotect#software-support",
         "version": str(version),
     }
     assert data["step_id"] == "confirm"
@@ -73,7 +73,7 @@ async def test_ea_warning_ignore(
 
 
 async def test_ea_warning_fix(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
@@ -104,7 +104,7 @@ async def test_ea_warning_fix(
 
     flow_id = data["flow_id"]
     assert data["description_placeholders"] == {
-        "learn_more": "https://www.home-assistant.io/integrations/unifiprotect#software-support",
+        "learn_more": "https://www.smart-hub.io/integrations/unifiprotect#software-support",
         "version": str(version),
     }
     assert data["step_id"] == "start"
@@ -126,7 +126,7 @@ async def test_ea_warning_fix(
 
 
 async def test_cloud_user_fix(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     cloud_account: CloudAccount,
     hass_client: ClientSessionGenerator,
@@ -167,7 +167,7 @@ async def test_cloud_user_fix(
 
 
 async def test_rtsp_read_only_ignore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     hass_client: ClientSessionGenerator,
@@ -216,7 +216,7 @@ async def test_rtsp_read_only_ignore(
 
 
 async def test_rtsp_read_only_fix(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     hass_client: ClientSessionGenerator,
@@ -261,7 +261,7 @@ async def test_rtsp_read_only_fix(
 
 
 async def test_rtsp_writable_fix(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     hass_client: ClientSessionGenerator,
@@ -311,7 +311,7 @@ async def test_rtsp_writable_fix(
 
 
 async def test_rtsp_writable_fix_when_not_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     hass_client: ClientSessionGenerator,
@@ -366,7 +366,7 @@ async def test_rtsp_writable_fix_when_not_setup(
 
 
 async def test_rtsp_no_fix_if_third_party(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     hass_ws_client: WebSocketGenerator,

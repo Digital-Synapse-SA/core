@@ -7,7 +7,7 @@ from py_aosmith.models import OperationMode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.water_heater import (
+from smarthub.components.water_heater import (
     ATTR_AWAY_MODE,
     ATTR_OPERATION_MODE,
     ATTR_TEMPERATURE,
@@ -20,10 +20,10 @@ from homeassistant.components.water_heater import (
     STATE_HEAT_PUMP,
     WaterHeaterEntityFeature,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_SUPPORTED_FEATURES, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_SUPPORTED_FEATURES, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -31,7 +31,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 @pytest.fixture(autouse=True)
 async def platforms() -> AsyncGenerator[None]:
     """Return the platforms to be loaded for this test."""
-    with patch("homeassistant.components.aosmith.PLATFORMS", [Platform.WATER_HEATER]):
+    with patch("smarthub.components.aosmith.PLATFORMS", [Platform.WATER_HEATER]):
         yield
 
 
@@ -40,7 +40,7 @@ async def platforms() -> AsyncGenerator[None]:
     [False, True],
 )
 async def test_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -54,7 +54,7 @@ async def test_state(
     [False],
 )
 async def test_state_away_mode_unsupported(
-    hass: HomeAssistant, init_integration: MockConfigEntry
+    hass: SmartHub, init_integration: MockConfigEntry
 ) -> None:
     """Test that away mode is not supported if the water heater does not support vacation mode."""
     state = hass.states.get("water_heater.my_water_heater")
@@ -74,7 +74,7 @@ async def test_state_away_mode_unsupported(
     ],
 )
 async def test_set_operation_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
     hass_mode: str,
@@ -95,12 +95,12 @@ async def test_set_operation_mode(
 
 
 async def test_unsupported_operation_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
     """Test setting the operation mode with an unsupported mode."""
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             WATER_HEATER_DOMAIN,
             SERVICE_SET_OPERATION_MODE,
@@ -113,7 +113,7 @@ async def test_unsupported_operation_mode(
 
 
 async def test_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -138,7 +138,7 @@ async def test_set_temperature(
     ],
 )
 async def test_away_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
     hass_away_mode: bool,

@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 @pytest.fixture(autouse=True)
-def config_zones(hass: HomeAssistant):
+def config_zones(hass: SmartHub):
     """Set up zones for test."""
     hass.config.components.add("zone")
     hass.states.async_set(

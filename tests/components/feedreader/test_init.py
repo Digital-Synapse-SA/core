@@ -10,11 +10,11 @@ import urllib.error
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.feedreader.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.util import dt as dt_util
+from smarthub.components.feedreader.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import Event, SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.util import dt as dt_util
 
 from . import async_setup_config_entry, create_mock_entry
 from .const import (
@@ -33,7 +33,7 @@ from tests.common import async_fire_time_changed
     [VALID_CONFIG_DEFAULT, VALID_CONFIG_1, VALID_CONFIG_100, VALID_CONFIG_5],
 )
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     events: list[Event],
     feed_one_event: bytes,
     hass_storage: dict[str, Any],
@@ -54,14 +54,14 @@ async def test_setup(
 
 
 async def test_setup_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     feed_one_event,
 ) -> None:
     """Test setup error."""
     entry = create_mock_entry(VALID_CONFIG_DEFAULT)
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.feedreader.coordinator.feedparser.http.get"
+        "smarthub.components.feedreader.coordinator.feedparser.http.get"
     ) as feedreader:
         feedreader.side_effect = urllib.error.URLError("Test")
         feedreader.return_value = feed_one_event
@@ -71,7 +71,7 @@ async def test_setup_error(
 
 
 async def test_storage_data_writing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     events: list[Event],
     feed_one_event: bytes,
     hass_storage: dict[str, Any],
@@ -80,7 +80,7 @@ async def test_storage_data_writing(
     storage_data: dict[str, str] = {URL: "2018-04-30T05:10:00+00:00"}
 
     with (
-        patch("homeassistant.components.feedreader.coordinator.DELAY_SAVE", new=0),
+        patch("smarthub.components.feedreader.coordinator.DELAY_SAVE", new=0),
     ):
         assert await async_setup_config_entry(
             hass, VALID_CONFIG_DEFAULT, return_value=feed_one_event
@@ -93,7 +93,7 @@ async def test_storage_data_writing(
     assert hass_storage[DOMAIN]["data"] == storage_data
 
 
-async def test_feed(hass: HomeAssistant, events, feed_one_event) -> None:
+async def test_feed(hass: SmartHub, events, feed_one_event) -> None:
     """Test simple rss feed with valid data."""
     assert await async_setup_config_entry(
         hass, VALID_CONFIG_DEFAULT, return_value=feed_one_event
@@ -111,7 +111,7 @@ async def test_feed(hass: HomeAssistant, events, feed_one_event) -> None:
     assert events[0].data.published_parsed.tm_min == 10
 
 
-async def test_atom_feed(hass: HomeAssistant, events, feed_atom_event) -> None:
+async def test_atom_feed(hass: SmartHub, events, feed_atom_event) -> None:
     """Test simple atom feed with valid data."""
     assert await async_setup_config_entry(
         hass, VALID_CONFIG_DEFAULT, return_value=feed_atom_event
@@ -130,12 +130,12 @@ async def test_atom_feed(hass: HomeAssistant, events, feed_atom_event) -> None:
 
 
 async def test_feed_identical_timestamps(
-    hass: HomeAssistant, events, feed_identically_timed_events
+    hass: SmartHub, events, feed_identically_timed_events
 ) -> None:
     """Test feed with 2 entries with identical timestamps."""
     with (
         patch(
-            "homeassistant.components.feedreader.coordinator.StoredData.get_timestamp",
+            "smarthub.components.feedreader.coordinator.StoredData.get_timestamp",
             return_value=gmtime(
                 datetime.fromisoformat("1970-01-01T00:00:00.0+0000").timestamp()
             ),
@@ -185,7 +185,7 @@ async def test_feed_identical_timestamps(
 
 
 async def test_feed_with_only_summary(
-    hass: HomeAssistant, events, feed_only_summary
+    hass: SmartHub, events, feed_only_summary
 ) -> None:
     """Test simple feed with only summary, no content."""
     assert await async_setup_config_entry(
@@ -200,7 +200,7 @@ async def test_feed_with_only_summary(
 
 
 async def test_feed_updates(
-    hass: HomeAssistant, events, feed_one_event, feed_two_event
+    hass: SmartHub, events, feed_one_event, feed_two_event
 ) -> None:
     """Test feed updates."""
     side_effect = [
@@ -212,7 +212,7 @@ async def test_feed_updates(
     entry = create_mock_entry(VALID_CONFIG_DEFAULT)
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.feedreader.coordinator.feedparser.http.get",
+        "smarthub.components.feedreader.coordinator.feedparser.http.get",
         side_effect=side_effect,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -236,7 +236,7 @@ async def test_feed_updates(
 
 
 async def test_feed_default_max_length(
-    hass: HomeAssistant, events, feed_21_events
+    hass: SmartHub, events, feed_21_events
 ) -> None:
     """Test long feed beyond the default 20 entry limit."""
     assert await async_setup_config_entry(
@@ -247,7 +247,7 @@ async def test_feed_default_max_length(
     assert len(events) == 20
 
 
-async def test_feed_max_length(hass: HomeAssistant, events, feed_21_events) -> None:
+async def test_feed_max_length(hass: SmartHub, events, feed_21_events) -> None:
     """Test long feed beyond a configured 5 entry limit."""
     assert await async_setup_config_entry(
         hass, VALID_CONFIG_5, return_value=feed_21_events
@@ -258,7 +258,7 @@ async def test_feed_max_length(hass: HomeAssistant, events, feed_21_events) -> N
 
 
 async def test_feed_without_publication_date_and_title(
-    hass: HomeAssistant, events, feed_three_events
+    hass: SmartHub, events, feed_three_events
 ) -> None:
     """Test simple feed with entry without publication date and title."""
     assert await async_setup_config_entry(
@@ -270,7 +270,7 @@ async def test_feed_without_publication_date_and_title(
 
 
 async def test_feed_with_unrecognized_publication_date(
-    hass: HomeAssistant, events, feed_four_events
+    hass: SmartHub, events, feed_four_events
 ) -> None:
     """Test simple feed with entry with unrecognized publication date."""
     assert await async_setup_config_entry(
@@ -282,7 +282,7 @@ async def test_feed_with_unrecognized_publication_date(
 
 
 async def test_feed_without_items(
-    hass: HomeAssistant, events, feed_without_items, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, events, feed_without_items, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test simple feed without any items."""
     assert "No new entries to be published in feed" not in caplog.text
@@ -295,7 +295,7 @@ async def test_feed_without_items(
     assert len(events) == 0
 
 
-async def test_feed_invalid_data(hass: HomeAssistant, events) -> None:
+async def test_feed_invalid_data(hass: SmartHub, events) -> None:
     """Test feed with invalid data."""
     assert await async_setup_config_entry(
         hass, VALID_CONFIG_DEFAULT, return_value=bytes("INVALID DATA", "utf-8")
@@ -306,7 +306,7 @@ async def test_feed_invalid_data(hass: HomeAssistant, events) -> None:
 
 
 async def test_feed_parsing_failed(
-    hass: HomeAssistant, events, feed_one_event, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, events, feed_one_event, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test feed where parsing fails."""
     assert "Error fetching feed data" not in caplog.text
@@ -322,7 +322,7 @@ async def test_feed_parsing_failed(
 
 
 async def test_feed_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
     feed_one_event,
@@ -331,7 +331,7 @@ async def test_feed_errors(
     entry = create_mock_entry(VALID_CONFIG_DEFAULT)
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.feedreader.coordinator.feedparser.http.get"
+        "smarthub.components.feedreader.coordinator.feedparser.http.get"
     ) as feedreader:
         # success setup
         feedreader.return_value = feed_one_event
@@ -359,7 +359,7 @@ async def test_feed_errors(
         # no feed returned
         freezer.tick(timedelta(hours=1, seconds=1))
         with patch(
-            "homeassistant.components.feedreader.coordinator.feedparser.parse",
+            "smarthub.components.feedreader.coordinator.feedparser.parse",
             return_value=None,
         ):
             async_fire_time_changed(hass)
@@ -379,14 +379,14 @@ async def test_feed_errors(
 
 
 async def test_feed_atom_htmlentities(
-    hass: HomeAssistant, feed_atom_htmlentities, device_registry: dr.DeviceRegistry
+    hass: SmartHub, feed_atom_htmlentities, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test ATOM feed author with HTML Entities."""
 
     entry = create_mock_entry(VALID_CONFIG_DEFAULT)
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.feedreader.coordinator.feedparser.http.get",
+        "smarthub.components.feedreader.coordinator.feedparser.http.get",
         side_effect=[feed_atom_htmlentities],
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)

@@ -5,14 +5,14 @@ from time import sleep
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_event_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

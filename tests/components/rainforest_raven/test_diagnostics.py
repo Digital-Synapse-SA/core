@@ -6,7 +6,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import create_mock_entry
 
@@ -17,7 +17,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.fixture
 async def mock_entry_no_meters(
-    hass: HomeAssistant, mock_device: AsyncMock
+    hass: SmartHub, mock_device: AsyncMock
 ) -> MockConfigEntry:
     """Mock a RAVEn config entry with no meters."""
     mock_entry = create_mock_entry(True)
@@ -28,7 +28,7 @@ async def mock_entry_no_meters(
 
 
 async def test_entry_diagnostics_no_meters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_entry_no_meters: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -41,7 +41,7 @@ async def test_entry_diagnostics_no_meters(
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

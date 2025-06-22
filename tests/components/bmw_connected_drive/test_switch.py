@@ -8,10 +8,10 @@ import pytest
 import respx
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import (
     REMOTE_SERVICE_EXC_REASON,
@@ -26,7 +26,7 @@ from tests.common import snapshot_platform
 @pytest.mark.usefixtures("bmw_fixture")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entity_state_attrs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_entity_state_attrs(
 
     # Setup component
     with patch(
-        "homeassistant.components.bmw_connected_drive.PLATFORMS",
+        "smarthub.components.bmw_connected_drive.PLATFORMS",
         [Platform.SWITCH],
     ):
         mock_config_entry = await setup_mocked_integration(hass)
@@ -52,7 +52,7 @@ async def test_entity_state_attrs(
     ],
 )
 async def test_service_call_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     new_value: str,
     old_value: str,
@@ -84,18 +84,18 @@ async def test_service_call_success(
     [
         (
             MyBMWRemoteServiceError(REMOTE_SERVICE_EXC_REASON),
-            HomeAssistantError,
+            SmartHubError,
             REMOTE_SERVICE_EXC_TRANSLATION,
         ),
         (
             MyBMWAPIError(REMOTE_SERVICE_EXC_REASON),
-            HomeAssistantError,
+            SmartHubError,
             REMOTE_SERVICE_EXC_TRANSLATION,
         ),
     ],
 )
 async def test_service_call_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     raised: Exception,
     expected: Exception,
     exc_translation: str,

@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 import pywilight
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_DIRECTION,
     ATTR_PERCENTAGE,
     DIRECTION_FORWARD,
@@ -14,15 +14,15 @@ from homeassistant.components.fan import (
     SERVICE_SET_DIRECTION,
     SERVICE_SET_PERCENTAGE,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import (
     HOST,
@@ -57,7 +57,7 @@ def mock_dummy_device_from_host_light_fan():
 
 
 async def test_loading_light_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     dummy_device_from_host_light_fan,
 ) -> None:
@@ -78,7 +78,7 @@ async def test_loading_light_fan(
 
 
 async def test_on_off_fan_state(
-    hass: HomeAssistant, dummy_device_from_host_light_fan
+    hass: SmartHub, dummy_device_from_host_light_fan
 ) -> None:
     """Test the change of state of the fan switches."""
     await setup_integration(hass)
@@ -125,7 +125,7 @@ async def test_on_off_fan_state(
 
 
 async def test_speed_fan_state(
-    hass: HomeAssistant, dummy_device_from_host_light_fan
+    hass: SmartHub, dummy_device_from_host_light_fan
 ) -> None:
     """Test the change of speed of the fan switches."""
     await setup_integration(hass)
@@ -171,7 +171,7 @@ async def test_speed_fan_state(
 
 
 async def test_direction_fan_state(
-    hass: HomeAssistant, dummy_device_from_host_light_fan
+    hass: SmartHub, dummy_device_from_host_light_fan
 ) -> None:
     """Test the change of direction of the fan switches."""
     await setup_integration(hass)

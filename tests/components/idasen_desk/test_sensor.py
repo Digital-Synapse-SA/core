@@ -4,8 +4,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import init_integration
 
@@ -13,7 +13,7 @@ EXPECTED_INITIAL_HEIGHT = "1"
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_height_sensor(hass: HomeAssistant, mock_desk_api: MagicMock) -> None:
+async def test_height_sensor(hass: SmartHub, mock_desk_api: MagicMock) -> None:
     """Test height sensor."""
     await init_integration(hass)
 
@@ -32,7 +32,7 @@ async def test_height_sensor(hass: HomeAssistant, mock_desk_api: MagicMock) -> N
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_desk_api: MagicMock,
 ) -> None:
     """Test sensor available property."""

@@ -7,18 +7,18 @@ from unittest.mock import AsyncMock, Mock, call, patch
 from hyperion import const
 import pytest
 
-from homeassistant.components.hyperion import (
+from smarthub.components.hyperion import (
     get_hyperion_device_id,
     light as hyperion_light,
 )
-from homeassistant.components.hyperion.const import (
+from smarthub.components.hyperion.const import (
     CONF_EFFECT_HIDE_LIST,
     DEFAULT_ORIGIN,
     DOMAIN,
     HYPERION_MANUFACTURER_NAME,
     HYPERION_MODEL_NAME,
 )
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_EFFECT,
     ATTR_HS_COLOR,
@@ -26,8 +26,8 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntityFeature,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntry, ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_HOST,
     CONF_PORT,
@@ -36,8 +36,8 @@ from homeassistant.const import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import (
     TEST_AUTH_NOT_REQUIRED_RESP,
@@ -63,7 +63,7 @@ from . import (
 
 
 def _get_config_entry_from_unique_id(
-    hass: HomeAssistant, unique_id: str
+    hass: SmartHub, unique_id: str
 ) -> ConfigEntry | None:
     for entry in hass.config_entries.async_entries(domain=DOMAIN):
         if entry.unique_id == TEST_SYSINFO_ID:
@@ -71,14 +71,14 @@ def _get_config_entry_from_unique_id(
     return None
 
 
-async def test_setup_config_entry(hass: HomeAssistant) -> None:
+async def test_setup_config_entry(hass: SmartHub) -> None:
     """Test setting up the component via config entries."""
     await setup_test_config_entry(hass, hyperion_client=create_mock_client())
     assert hass.states.get(TEST_ENTITY_ID_1) is not None
 
 
 async def test_setup_config_entry_not_ready_connect_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the component not being ready."""
     client = create_mock_client()
@@ -88,7 +88,7 @@ async def test_setup_config_entry_not_ready_connect_fail(
 
 
 async def test_setup_config_entry_not_ready_switch_instance_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the component not being ready."""
     client = create_mock_client()
@@ -99,7 +99,7 @@ async def test_setup_config_entry_not_ready_switch_instance_fail(
 
 
 async def test_setup_config_entry_not_ready_load_state_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the component not being ready."""
     client = create_mock_client()
@@ -116,7 +116,7 @@ async def test_setup_config_entry_not_ready_load_state_fail(
 
 
 async def test_setup_config_entry_dynamic_instances(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test dynamic changes in the instance configuration."""
@@ -129,7 +129,7 @@ async def test_setup_config_entry_dynamic_instances(
     entity_client.instances = master_client.instances
 
     with patch(
-        "homeassistant.components.hyperion.client.HyperionClient",
+        "smarthub.components.hyperion.client.HyperionClient",
         side_effect=[master_client, entity_client, entity_client],
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -146,7 +146,7 @@ async def test_setup_config_entry_dynamic_instances(
     ]
 
     with patch(
-        "homeassistant.components.hyperion.client.HyperionClient",
+        "smarthub.components.hyperion.client.HyperionClient",
         return_value=entity_client,
     ):
         await instance_callback(
@@ -174,7 +174,7 @@ async def test_setup_config_entry_dynamic_instances(
         f"{const.KEY_INSTANCE}-{const.KEY_UPDATE}"
     ]
     with patch(
-        "homeassistant.components.hyperion.client.HyperionClient",
+        "smarthub.components.hyperion.client.HyperionClient",
         return_value=entity_client,
     ):
         await instance_callback(
@@ -194,7 +194,7 @@ async def test_setup_config_entry_dynamic_instances(
 
     # == Inject a new instances update (re-add instance 1, but not running)
     with patch(
-        "homeassistant.components.hyperion.client.HyperionClient",
+        "smarthub.components.hyperion.client.HyperionClient",
         return_value=entity_client,
     ):
         await instance_callback(
@@ -215,7 +215,7 @@ async def test_setup_config_entry_dynamic_instances(
 
     # == Inject a new instances update (re-add instance 1, running)
     with patch(
-        "homeassistant.components.hyperion.client.HyperionClient",
+        "smarthub.components.hyperion.client.HyperionClient",
         return_value=entity_client,
     ):
         await instance_callback(
@@ -231,7 +231,7 @@ async def test_setup_config_entry_dynamic_instances(
     assert hass.states.get(TEST_ENTITY_ID_3) is not None
 
 
-async def test_light_basic_properties(hass: HomeAssistant) -> None:
+async def test_light_basic_properties(hass: SmartHub) -> None:
     """Test the basic properties."""
     client = create_mock_client()
     client.priorities = [{const.KEY_PRIORITY: TEST_PRIORITY}]
@@ -253,7 +253,7 @@ async def test_light_basic_properties(hass: HomeAssistant) -> None:
     assert entity_state.attributes["supported_features"] == LightEntityFeature.EFFECT
 
 
-async def test_light_async_turn_on(hass: HomeAssistant) -> None:
+async def test_light_async_turn_on(hass: SmartHub) -> None:
     """Test turning the light on."""
     client = create_mock_client()
     client.priorities = [{const.KEY_PRIORITY: TEST_PRIORITY}]
@@ -459,7 +459,7 @@ async def test_light_async_turn_on(hass: HomeAssistant) -> None:
 
 
 async def test_light_async_turn_on_fail_async_send_set_effect(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test async_send_set_effect failure when turning on the light."""
     client = create_mock_client()
@@ -474,12 +474,12 @@ async def test_light_async_turn_on_fail_async_send_set_effect(
         blocking=True,
     )
     assert client.method_calls[-1] == call.async_send_set_effect(
-        priority=180, effect={"name": "Warm Mood Blobs"}, origin="Home Assistant"
+        priority=180, effect={"name": "Warm Mood Blobs"}, origin="SmartHub"
     )
 
 
 async def test_light_async_turn_on_fail_async_send_set_color(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test async_send_set_color failure when turning on the light."""
     client = create_mock_client()
@@ -494,12 +494,12 @@ async def test_light_async_turn_on_fail_async_send_set_color(
         blocking=True,
     )
     assert client.method_calls[-1] == call.async_send_set_color(
-        priority=180, color=(0, 0, 255), origin="Home Assistant"
+        priority=180, color=(0, 0, 255), origin="SmartHub"
     )
 
 
 async def test_light_async_turn_off_fail_async_send_send_clear(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test async_send_clear failure when turning off the light."""
     client = create_mock_client()
@@ -515,7 +515,7 @@ async def test_light_async_turn_off_fail_async_send_send_clear(
     assert client.method_calls[-1] == call.async_send_clear(priority=TEST_PRIORITY)
 
 
-async def test_light_async_turn_off(hass: HomeAssistant) -> None:
+async def test_light_async_turn_off(hass: SmartHub) -> None:
     """Test turning the light off."""
     client = create_mock_client()
     await setup_test_config_entry(hass, hyperion_client=client)
@@ -535,7 +535,7 @@ async def test_light_async_turn_off(hass: HomeAssistant) -> None:
 
 
 async def test_light_async_updates_from_hyperion_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test receiving a variety of Hyperion client callbacks."""
     client = create_mock_client()
@@ -644,7 +644,7 @@ async def test_light_async_updates_from_hyperion_client(
     assert entity_state.state == "on"
 
 
-async def test_full_state_loaded_on_start(hass: HomeAssistant) -> None:
+async def test_full_state_loaded_on_start(hass: SmartHub) -> None:
     """Test receiving a variety of Hyperion client callbacks."""
     client = create_mock_client()
 
@@ -671,7 +671,7 @@ async def test_full_state_loaded_on_start(hass: HomeAssistant) -> None:
     assert entity_state.attributes["hs_color"] == (180.0, 100.0)
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test unload."""
     client = create_mock_client()
     await setup_test_config_entry(hass, hyperion_client=client)
@@ -686,7 +686,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
 
 
 async def test_version_log_warning(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant
+    caplog: pytest.LogCaptureFixture, hass: SmartHub
 ) -> None:
     """Test warning on old version."""
     client = create_mock_client()
@@ -697,7 +697,7 @@ async def test_version_log_warning(
 
 
 async def test_version_no_log_warning(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant
+    caplog: pytest.LogCaptureFixture, hass: SmartHub
 ) -> None:
     """Test no warning on acceptable version."""
     client = create_mock_client()
@@ -707,7 +707,7 @@ async def test_version_no_log_warning(
     assert "Please consider upgrading" not in caplog.text
 
 
-async def test_setup_entry_no_token_reauth(hass: HomeAssistant) -> None:
+async def test_setup_entry_no_token_reauth(hass: SmartHub) -> None:
     """Verify a reauth flow when auth is required but no token provided."""
     client = create_mock_client()
     config_entry = add_test_config_entry(hass)
@@ -715,7 +715,7 @@ async def test_setup_entry_no_token_reauth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.hyperion.client.HyperionClient",
+            "smarthub.components.hyperion.client.HyperionClient",
             return_value=client,
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_flow_init,
@@ -736,7 +736,7 @@ async def test_setup_entry_no_token_reauth(hass: HomeAssistant) -> None:
         assert config_entry.state is ConfigEntryState.SETUP_ERROR
 
 
-async def test_setup_entry_bad_token_reauth(hass: HomeAssistant) -> None:
+async def test_setup_entry_bad_token_reauth(hass: SmartHub) -> None:
     """Verify a reauth flow when a bad token is provided."""
     client = create_mock_client()
     config_entry = add_test_config_entry(
@@ -749,7 +749,7 @@ async def test_setup_entry_bad_token_reauth(hass: HomeAssistant) -> None:
     client.async_client_login = AsyncMock(return_value=False)
     with (
         patch(
-            "homeassistant.components.hyperion.client.HyperionClient",
+            "smarthub.components.hyperion.client.HyperionClient",
             return_value=client,
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_flow_init,
@@ -770,7 +770,7 @@ async def test_setup_entry_bad_token_reauth(hass: HomeAssistant) -> None:
         assert config_entry.state is ConfigEntryState.SETUP_ERROR
 
 
-async def test_light_option_effect_hide_list(hass: HomeAssistant) -> None:
+async def test_light_option_effect_hide_list(hass: SmartHub) -> None:
     """Test the effect_hide_list option."""
     client = create_mock_client()
     client.effects = [{const.KEY_NAME: "One"}, {const.KEY_NAME: "Two"}]
@@ -790,7 +790,7 @@ async def test_light_option_effect_hide_list(hass: HomeAssistant) -> None:
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

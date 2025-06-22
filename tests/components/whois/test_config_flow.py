@@ -13,18 +13,18 @@ from whois.exceptions import (
     WhoisQuotaExceeded,
 )
 
-from homeassistant.components.whois.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.whois.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_whois")
 async def test_full_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -59,7 +59,7 @@ async def test_full_user_flow(
     ],
 )
 async def test_full_flow_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_whois: MagicMock,
     snapshot: SnapshotAssertion,
@@ -106,7 +106,7 @@ async def test_full_flow_with_error(
 
 @pytest.mark.usefixtures("mock_whois")
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

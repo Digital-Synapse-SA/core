@@ -6,9 +6,9 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import EntityCategory, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import EntityCategory, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 from .const import DEFAULT_NETWORKING_STATE, DEFAULT_TELEMETRY_STATE, MOCK_WEBHOOK_ID
@@ -19,7 +19,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_entry: MockConfigEntry,
     mock_watergate_client: Generator[AsyncMock],
@@ -28,20 +28,20 @@ async def test_sensor(
 ) -> None:
     """Test states of the sensor."""
     freezer.move_to("2021-01-09 12:00:00+00:00")
-    with patch("homeassistant.components.watergate.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.watergate.PLATFORMS", [Platform.SENSOR]):
         await init_integration(hass, mock_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_entry.entry_id)
 
 
 async def test_diagnostics_are_disabled_by_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_entry: MockConfigEntry,
     mock_watergate_client: Generator[AsyncMock],
 ) -> None:
     """Test if all diagnostic entities are disabled by default."""
-    with patch("homeassistant.components.watergate.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.watergate.PLATFORMS", [Platform.SENSOR]):
         await init_integration(hass, mock_entry)
 
     entries = [
@@ -58,7 +58,7 @@ async def test_diagnostics_are_disabled_by_default(
 
 
 async def test_telemetry_webhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mock_entry: MockConfigEntry,
     mock_watergate_client: Generator[AsyncMock],
@@ -92,7 +92,7 @@ async def test_telemetry_webhook(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_wifi_webhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mock_entry: MockConfigEntry,
     mock_watergate_client: Generator[AsyncMock],
@@ -126,7 +126,7 @@ async def test_wifi_webhook(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_power_supply_webhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mock_entry: MockConfigEntry,
     mock_watergate_client: Generator[AsyncMock],

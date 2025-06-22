@@ -1,13 +1,13 @@
 """The tests for the PG LAB Electronics cover."""
 
-from homeassistant.components import cover
-from homeassistant.components.cover import (
+from smarthub.components import cover
+from smarthub.components.cover import (
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
     SERVICE_STOP_COVER,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ASSUMED_STATE,
     STATE_CLOSED,
     STATE_CLOSING,
@@ -15,7 +15,7 @@ from homeassistant.const import (
     STATE_OPENING,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .test_common import get_device_discovery_payload, send_discovery_message
 
@@ -29,7 +29,7 @@ COVER_FEATURES = (
 )
 
 
-async def call_service(hass: HomeAssistant, entity_id, service, **kwargs):
+async def call_service(hass: SmartHub, entity_id, service, **kwargs):
     """Call a service."""
     await hass.services.async_call(
         COVER_DOMAIN,
@@ -40,7 +40,7 @@ async def call_service(hass: HomeAssistant, entity_id, service, **kwargs):
 
 
 async def test_cover_features(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_pglab
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_pglab
 ) -> None:
     """Test cover features."""
 
@@ -60,7 +60,7 @@ async def test_cover_features(
 
 
 async def test_cover_availability(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_pglab
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_pglab
 ) -> None:
     """Check if covers are properly created."""
 
@@ -84,7 +84,7 @@ async def test_cover_availability(
 
 
 async def test_cover_change_state_via_mqtt(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_pglab
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_pglab
 ) -> None:
     """Test state update via MQTT."""
     payload = get_device_discovery_payload(
@@ -125,7 +125,7 @@ async def test_cover_change_state_via_mqtt(
 
 
 async def test_cover_mqtt_state_by_calling_service(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_pglab
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_pglab
 ) -> None:
     """Calling service to OPEN/CLOSE cover and check mqtt state."""
 

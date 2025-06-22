@@ -6,18 +6,18 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components import sensor
-from homeassistant.components.foobot import sensor as foobot
-from homeassistant.const import (
+from smarthub.components import sensor
+from smarthub.components.foobot import sensor as foobot
+from smarthub.const import (
     CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
     CONCENTRATION_PARTS_PER_BILLION,
     CONCENTRATION_PARTS_PER_MILLION,
     PERCENTAGE,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import PlatformNotReady
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.exceptions import PlatformNotReady
+from smarthub.setup import async_setup_component
 
 from tests.common import async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -30,7 +30,7 @@ VALID_CONFIG = {
 
 
 async def test_default_setup(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the default setup."""
     aioclient_mock.get(
@@ -60,7 +60,7 @@ async def test_default_setup(
 
 
 async def test_setup_timeout_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Expected failures caused by a timeout in API response."""
     fake_async_add_entities = MagicMock()
@@ -71,7 +71,7 @@ async def test_setup_timeout_error(
 
 
 async def test_setup_permanent_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Expected failures caused by permanent errors in API response."""
     fake_async_add_entities = MagicMock()
@@ -86,7 +86,7 @@ async def test_setup_permanent_error(
 
 
 async def test_setup_temporary_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Expected failures caused by temporary errors in API response."""
     fake_async_add_entities = MagicMock()

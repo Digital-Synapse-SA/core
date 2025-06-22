@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.deprecation import (
+from smarthub.core import SmartHub
+from smarthub.helpers.deprecation import (
     DeprecatedAlias,
     DeprecatedConstant,
     DeprecatedConstantEnum,
@@ -21,7 +21,7 @@ from homeassistant.helpers.deprecation import (
     dir_with_deprecated_constants,
     get_deprecated,
 )
-from homeassistant.helpers.frame import MissingIntegrationFrame
+from smarthub.helpers.frame import MissingIntegrationFrame
 
 from tests.common import MockModule, extract_stack_to_frame, mock_integration
 
@@ -115,7 +115,7 @@ def test_config_get_deprecated_new(mock_get_logger) -> None:
     assert not mock_logger.warning.called
 
 
-@deprecated_class("homeassistant.blah.NewClass")
+@deprecated_class("smarthub.blah.NewClass")
 class MockDeprecatedClass:
     """Mock class for deprecated testing."""
 
@@ -182,20 +182,20 @@ def test_deprecated_function_called_from_built_in_integration(
 
     with (
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value="await session.close()",
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=extract_stack_to_frame(
                 [
                     Mock(
-                        filename="/home/paulus/homeassistant/core.py",
+                        filename="/home/paulus/smarthub/core.py",
                         lineno="23",
                         line="do_something()",
                     ),
                     Mock(
-                        filename="/home/paulus/homeassistant/components/hue/light.py",
+                        filename="/home/paulus/smarthub/components/hue/light.py",
                         lineno="23",
                         line="await session.close()",
                     ),
@@ -224,7 +224,7 @@ def test_deprecated_function_called_from_built_in_integration(
     ],
 )
 def test_deprecated_function_called_from_custom_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     breaks_in_ha_version: str | None,
     extra_msg: str,
@@ -242,15 +242,15 @@ def test_deprecated_function_called_from_custom_integration(
 
     with (
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value="await session.close()",
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=extract_stack_to_frame(
                 [
                     Mock(
-                        filename="/home/paulus/homeassistant/core.py",
+                        filename="/home/paulus/smarthub/core.py",
                         lineno="23",
                         line="do_something()",
                     ),
@@ -344,7 +344,7 @@ def _get_value(
 @pytest.mark.parametrize(
     ("module_name", "extra_extra_msg"),
     [
-        ("homeassistant.components.hue.light", ""),  # builtin integration
+        ("smarthub.components.hue.light", ""),  # builtin integration
         (
             "config.custom_components.hue.light",
             ", please report it to the author of the 'hue' custom integration",
@@ -369,19 +369,19 @@ def test_check_if_deprecated_constant(
     }
     filename = f"/home/paulus/{module_name.replace('.', '/')}.py"
 
-    # mock sys.modules for homeassistant/helpers/frame.py#get_integration_frame
+    # mock sys.modules for smarthub/helpers/frame.py#get_integration_frame
     with (
         patch.dict(sys.modules, {module_name: Mock(__file__=filename)}),
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value="await session.close()",
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=extract_stack_to_frame(
                 [
                     Mock(
-                        filename="/home/paulus/homeassistant/core.py",
+                        filename="/home/paulus/smarthub/core.py",
                         lineno="23",
                         line="do_something()",
                     ),
@@ -447,7 +447,7 @@ def test_check_if_deprecated_constant(
 @pytest.mark.parametrize(
     ("module_name"),
     [
-        "homeassistant.components.hue.light",  # builtin integration
+        "smarthub.components.hue.light",  # builtin integration
         "config.custom_components.hue.light",  # custom component integration
     ],
 )
@@ -468,7 +468,7 @@ def test_check_if_deprecated_constant_integration_not_found(
     }
 
     with patch(
-        "homeassistant.helpers.frame.get_current_frame",
+        "smarthub.helpers.frame.get_current_frame",
         side_effect=MissingIntegrationFrame,
     ):
         value = check_if_deprecated_constant("TEST_CONSTANT", module_globals)
@@ -489,7 +489,7 @@ def test_test_check_if_deprecated_constant_invalid(
     Test check_if_deprecated_constant raises an attribute error and creates a log entry
     on an invalid deprecation type.
     """
-    module_name = "homeassistant.components.hue.light"
+    module_name = "smarthub.components.hue.light"
     module_globals = {"__name__": module_name, "_DEPRECATED_TEST_CONSTANT": 1}
     name = "TEST_CONSTANT"
 
@@ -526,7 +526,7 @@ def test_dir_with_deprecated_constants(
 @pytest.mark.parametrize(
     ("module_name", "extra_extra_msg"),
     [
-        ("homeassistant.components.hue.light", ""),  # builtin integration
+        ("smarthub.components.hue.light", ""),  # builtin integration
         (
             "config.custom_components.hue.light",
             ", please report it to the author of the 'hue' custom integration",
@@ -556,19 +556,19 @@ def test_enum_with_deprecated_members(
         CATS = "cats/cm"
         DOGS = "dogs/cm"
 
-    # mock sys.modules for homeassistant/helpers/frame.py#get_integration_frame
+    # mock sys.modules for smarthub/helpers/frame.py#get_integration_frame
     with (
         patch.dict(sys.modules, {module_name: Mock(__file__=filename)}),
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value="await session.close()",
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=extract_stack_to_frame(
                 [
                     Mock(
-                        filename="/home/paulus/homeassistant/core.py",
+                        filename="/home/paulus/smarthub/core.py",
                         lineno="23",
                         line="do_something()",
                     ),
@@ -630,7 +630,7 @@ def test_enum_with_deprecated_members_integration_not_found(
         DOGS = "dogs/cm"
 
     with patch(
-        "homeassistant.helpers.frame.get_current_frame",
+        "smarthub.helpers.frame.get_current_frame",
         side_effect=MissingIntegrationFrame,
     ):
         TestEnum.CATS  # noqa: B018

@@ -11,12 +11,12 @@ from tesla_fleet_api.exceptions import (
     TeslaFleetError,
 )
 
-from homeassistant.components.teslemetry.coordinator import VEHICLE_INTERVAL
-from homeassistant.components.teslemetry.models import TeslemetryData
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.teslemetry.coordinator import VEHICLE_INTERVAL
+from smarthub.components.teslemetry.models import TeslemetryData
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_platform
 from .const import PRODUCTS_MODERN, VEHICLE_DATA_ALT
@@ -28,7 +28,7 @@ ERRORS = [
 ]
 
 
-async def test_load_unload(hass: HomeAssistant) -> None:
+async def test_load_unload(hass: SmartHub) -> None:
     """Test load and unload."""
 
     entry = await setup_platform(hass)
@@ -42,7 +42,7 @@ async def test_load_unload(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize(("side_effect", "state"), ERRORS)
 async def test_init_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_products: AsyncMock,
     side_effect: TeslaFleetError,
     state: ConfigEntryState,
@@ -56,7 +56,7 @@ async def test_init_error(
 
 # Test devices
 async def test_devices(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, device_registry: dr.DeviceRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test device registry."""
     entry = await setup_platform(hass)
@@ -68,7 +68,7 @@ async def test_devices(
 
 @pytest.mark.parametrize(("side_effect", "state"), ERRORS)
 async def test_vehicle_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vehicle_data: AsyncMock,
     side_effect: TeslaFleetError,
     state: ConfigEntryState,
@@ -82,7 +82,7 @@ async def test_vehicle_refresh_error(
 # Test Energy Live Coordinator
 @pytest.mark.parametrize(("side_effect", "state"), ERRORS)
 async def test_energy_live_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_live_status: AsyncMock,
     side_effect: TeslaFleetError,
     state: ConfigEntryState,
@@ -96,7 +96,7 @@ async def test_energy_live_refresh_error(
 # Test Energy Site Coordinator
 @pytest.mark.parametrize(("side_effect", "state"), ERRORS)
 async def test_energy_site_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_site_info: AsyncMock,
     side_effect: TeslaFleetError,
     state: ConfigEntryState,
@@ -110,7 +110,7 @@ async def test_energy_site_refresh_error(
 # Test Energy History Coordinator
 @pytest.mark.parametrize(("side_effect", "state"), ERRORS)
 async def test_energy_history_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_energy_history: AsyncMock,
     side_effect: TeslaFleetError,
     state: ConfigEntryState,
@@ -122,7 +122,7 @@ async def test_energy_history_refresh_error(
 
 
 async def test_vehicle_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_add_listener: AsyncMock,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -167,7 +167,7 @@ async def test_vehicle_stream(
 
 
 async def test_no_live_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_live_status: AsyncMock,
 ) -> None:
     """Test coordinator refresh with an error."""
@@ -178,7 +178,7 @@ async def test_no_live_status(
 
 
 async def test_modern_no_poll(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vehicle_data: AsyncMock,
     mock_products: AsyncMock,
     freezer: FrozenDateTimeFactory,

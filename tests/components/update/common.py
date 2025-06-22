@@ -3,7 +3,7 @@
 import logging
 from typing import Any
 
-from homeassistant.components.update import UpdateEntity
+from smarthub.components.update import UpdateEntity
 
 _LOGGER = logging.getLogger(__name__)
 

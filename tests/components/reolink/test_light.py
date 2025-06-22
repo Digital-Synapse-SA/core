@@ -5,17 +5,17 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 from reolink_aio.exceptions import InvalidParameterError, ReolinkError
 
-from homeassistant.components.light import ATTR_BRIGHTNESS, DOMAIN as LIGHT_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.light import ATTR_BRIGHTNESS, DOMAIN as LIGHT_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import TEST_NVR_NAME
 
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_light_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -31,7 +31,7 @@ async def test_light_state(
     reolink_connect.whiteled_state.return_value = True
     reolink_connect.whiteled_brightness.return_value = 100
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.LIGHT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -44,7 +44,7 @@ async def test_light_state(
 
 
 async def test_light_brightness_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -52,7 +52,7 @@ async def test_light_brightness_none(
     reolink_connect.whiteled_state.return_value = True
     reolink_connect.whiteled_brightness.return_value = None
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.LIGHT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -65,12 +65,12 @@ async def test_light_brightness_none(
 
 
 async def test_light_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test light turn off service."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.LIGHT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -86,7 +86,7 @@ async def test_light_turn_off(
     reolink_connect.set_whiteled.assert_called_with(0, state=False)
 
     reolink_connect.set_whiteled.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             LIGHT_DOMAIN,
             SERVICE_TURN_OFF,
@@ -98,12 +98,12 @@ async def test_light_turn_off(
 
 
 async def test_light_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test light turn on service."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.LIGHT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -121,7 +121,7 @@ async def test_light_turn_on(
     )
 
     reolink_connect.set_whiteled.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             LIGHT_DOMAIN,
             SERVICE_TURN_ON,
@@ -130,7 +130,7 @@ async def test_light_turn_on(
         )
 
     reolink_connect.set_whiteled.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             LIGHT_DOMAIN,
             SERVICE_TURN_ON,
@@ -139,7 +139,7 @@ async def test_light_turn_on(
         )
 
     reolink_connect.set_whiteled.side_effect = InvalidParameterError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             LIGHT_DOMAIN,
             SERVICE_TURN_ON,
@@ -151,14 +151,14 @@ async def test_light_turn_on(
 
 
 async def test_host_light_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test host light entity state with status led."""
     reolink_connect.state_light = True
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.LIGHT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -170,7 +170,7 @@ async def test_host_light_state(
 
 
 async def test_host_light_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -183,7 +183,7 @@ async def test_host_light_turn_off(
 
     reolink_connect.supported = mock_supported
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.LIGHT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -199,7 +199,7 @@ async def test_host_light_turn_off(
     reolink_connect.set_state_light.assert_called_with(False)
 
     reolink_connect.set_state_light.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             LIGHT_DOMAIN,
             SERVICE_TURN_OFF,
@@ -211,7 +211,7 @@ async def test_host_light_turn_off(
 
 
 async def test_host_light_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -224,7 +224,7 @@ async def test_host_light_turn_on(
 
     reolink_connect.supported = mock_supported
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.LIGHT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -240,7 +240,7 @@ async def test_host_light_turn_on(
     reolink_connect.set_state_light.assert_called_with(True)
 
     reolink_connect.set_state_light.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             LIGHT_DOMAIN,
             SERVICE_TURN_ON,

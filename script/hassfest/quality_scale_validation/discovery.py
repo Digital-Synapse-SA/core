@@ -1,6 +1,6 @@
 """Enforce that the integration supports discovery.
 
-https://developers.home-assistant.io/docs/core/integration-quality-scale/rules/discovery/
+https://developers.smart-hub.io/docs/core/integration-quality-scale/rules/discovery/
 """
 
 import ast

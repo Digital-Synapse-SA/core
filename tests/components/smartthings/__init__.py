@@ -7,15 +7,15 @@ from pysmartthings import Attribute, Capability, DeviceEvent, DeviceHealthEvent
 from pysmartthings.models import HealthStatus
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.smartthings.const import MAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.smartthings.const import MAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
 
@@ -24,7 +24,7 @@ async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) 
 
 
 def snapshot_smartthings_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     platform: Platform,
@@ -49,7 +49,7 @@ def set_attribute_value(
 
 
 async def trigger_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock: AsyncMock,
     device_id: str,
     capability: Capability,
@@ -82,7 +82,7 @@ async def trigger_update(
 
 
 async def trigger_health_update(
-    hass: HomeAssistant, mock: AsyncMock, device_id: str, status: HealthStatus
+    hass: SmartHub, mock: AsyncMock, device_id: str, status: HealthStatus
 ) -> None:
     """Trigger a health update."""
     event = DeviceHealthEvent("abc", "abc", status)

@@ -9,14 +9,14 @@ from pydrawise.schema import Controller, ControllerWaterUseSummary, User, Zone
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.hydrawise.const import (
+from smarthub.components.hydrawise.const import (
     MAIN_SCAN_INTERVAL,
     WATER_USE_SCAN_INTERVAL,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.unit_system import (
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.unit_system import (
     METRIC_SYSTEM,
     US_CUSTOMARY_SYSTEM,
     UnitSystem,
@@ -27,14 +27,14 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 @pytest.mark.freeze_time("2023-10-01 00:00:00+00:00")
 async def test_all_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_add_config_entry: Callable[[], Awaitable[MockConfigEntry]],
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that all sensors are working."""
     with patch(
-        "homeassistant.components.hydrawise.PLATFORMS",
+        "smarthub.components.hydrawise.PLATFORMS",
         [Platform.SENSOR],
     ):
         config_entry = await mock_add_config_entry()
@@ -43,7 +43,7 @@ async def test_all_sensors(
 
 @pytest.mark.freeze_time("2023-10-01 00:00:00+00:00")
 async def test_suspended_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zones: list[Zone],
     mock_add_config_entry: Callable[[], Awaitable[MockConfigEntry]],
 ) -> None:
@@ -58,7 +58,7 @@ async def test_suspended_state(
 
 @pytest.mark.freeze_time("2024-11-01 00:00:00+00:00")
 async def test_usage_refresh(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_pydrawise: AsyncMock,
     controller_water_use_summary: ControllerWaterUseSummary,
@@ -85,7 +85,7 @@ async def test_usage_refresh(
 
 
 async def test_no_sensor_and_water_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     controller: Controller,
     controller_water_use_summary: ControllerWaterUseSummary,
     mock_add_config_entry: Callable[[], Awaitable[MockConfigEntry]],
@@ -131,7 +131,7 @@ async def test_no_sensor_and_water_state(
     ],
 )
 async def test_volume_unit_conversion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unit_system: UnitSystem,
     hydrawise_unit_system: str,
     expected_state: str,

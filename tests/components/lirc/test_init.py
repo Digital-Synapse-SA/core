@@ -2,18 +2,18 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 
 @patch.dict("sys.modules", lirc=Mock())
 async def test_repair_issue_is_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test repair issue is created."""
-    from homeassistant.components.lirc import DOMAIN  # noqa: PLC0415
+    from smarthub.components.lirc import DOMAIN  # noqa: PLC0415
 
     assert await async_setup_component(
         hass,

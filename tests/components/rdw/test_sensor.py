@@ -1,21 +1,21 @@
 """Tests for the sensors provided by the RDW integration."""
 
-from homeassistant.components.rdw.const import DOMAIN
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.rdw.const import DOMAIN
+from smarthub.components.sensor import ATTR_STATE_CLASS, SensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
     ATTR_UNIT_OF_MEASUREMENT,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_vehicle_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,

@@ -9,9 +9,9 @@ from typing import Any
 from pynordpool import API, NordPoolClient
 import pytest
 
-from homeassistant.components.nordpool.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
+from smarthub.components.nordpool.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
 
 from . import ENTRY_CONFIG
 
@@ -20,8 +20,8 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.fixture
-async def load_int(hass: HomeAssistant, get_client: NordPoolClient) -> MockConfigEntry:
-    """Set up the Nord Pool integration in Home Assistant."""
+async def load_int(hass: SmartHub, get_client: NordPoolClient) -> MockConfigEntry:
+    """Set up the Nord Pool integration in SmartHub."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,
@@ -38,7 +38,7 @@ async def load_int(hass: HomeAssistant, get_client: NordPoolClient) -> MockConfi
 
 @pytest.fixture(name="get_client")
 async def get_data_from_library(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     load_json: list[dict[str, Any]],
 ) -> AsyncGenerator[NordPoolClient]:

@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 from miio import DeviceException
 import pytest
 
-from homeassistant.components.vacuum import (
+from smarthub.components.vacuum import (
     ATTR_BATTERY_ICON,
     ATTR_FAN_SPEED,
     ATTR_FAN_SPEED_LIST,
@@ -23,12 +23,12 @@ from homeassistant.components.vacuum import (
     SERVICE_STOP,
     VacuumActivity,
 )
-from homeassistant.components.xiaomi_miio.const import (
+from smarthub.components.xiaomi_miio.const import (
     CONF_FLOW_TYPE,
     DOMAIN,
     MODELS_VACUUM,
 )
-from homeassistant.components.xiaomi_miio.vacuum import (
+from smarthub.components.xiaomi_miio.vacuum import (
     ATTR_ERROR,
     ATTR_TIMERS,
     CONF_DEVICE,
@@ -40,7 +40,7 @@ from homeassistant.components.xiaomi_miio.vacuum import (
     SERVICE_START_REMOTE_CONTROL,
     SERVICE_STOP_REMOTE_CONTROL,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     CONF_HOST,
@@ -49,8 +49,8 @@ from homeassistant.const import (
     CONF_TOKEN,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import TEST_MAC
 
@@ -116,7 +116,7 @@ def mirobo_is_got_error_fixture():
     mock_vacuum.timer.return_value = [mock_timer_1, mock_timer_2]
 
     with patch(
-        "homeassistant.components.xiaomi_miio.RoborockVacuum"
+        "smarthub.components.xiaomi_miio.RoborockVacuum"
     ) as mock_vacuum_cls:
         mock_vacuum_cls.return_value = mock_vacuum
         yield mock_vacuum
@@ -154,7 +154,7 @@ def mirobo_old_speeds_fixture(
     )
 
     with patch(
-        "homeassistant.components.xiaomi_miio.RoborockVacuum"
+        "smarthub.components.xiaomi_miio.RoborockVacuum"
     ) as mock_vacuum_cls:
         mock_vacuum_cls.return_value = mock_vacuum
         yield mock_vacuum
@@ -216,13 +216,13 @@ def mirobo_is_on_fixture():
     mock_vacuum.timer.return_value = [mock_timer_1, mock_timer_2]
 
     with patch(
-        "homeassistant.components.xiaomi_miio.RoborockVacuum"
+        "smarthub.components.xiaomi_miio.RoborockVacuum"
     ) as mock_vacuum_cls:
         mock_vacuum_cls.return_value = mock_vacuum
         yield mock_vacuum
 
 
-async def test_xiaomi_exceptions(hass: HomeAssistant, mock_mirobo_is_on) -> None:
+async def test_xiaomi_exceptions(hass: SmartHub, mock_mirobo_is_on) -> None:
     """Test error logging on exceptions."""
     entity_name = "test_vacuum_cleaner_error"
     entity_id = await setup_component(hass, entity_name)
@@ -254,7 +254,7 @@ async def test_xiaomi_exceptions(hass: HomeAssistant, mock_mirobo_is_on) -> None
 
 
 async def test_xiaomi_vacuum_services(
-    hass: HomeAssistant, mock_mirobo_is_got_error
+    hass: SmartHub, mock_mirobo_is_got_error
 ) -> None:
     """Test vacuum supported features."""
     entity_name = "test_vacuum_cleaner_1"
@@ -434,7 +434,7 @@ async def test_xiaomi_vacuum_services(
     ],
 )
 async def test_xiaomi_specific_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mirobo_is_on,
     service,
     service_data,
@@ -483,7 +483,7 @@ async def test_xiaomi_specific_services(
 
 
 async def test_xiaomi_vacuum_fanspeeds(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, mock_mirobo_fanspeeds
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, mock_mirobo_fanspeeds
 ) -> None:
     """Test Xiaomi vacuum fanspeeds."""
     entity_name = "test_vacuum_cleaner_2"
@@ -532,7 +532,7 @@ async def test_xiaomi_vacuum_fanspeeds(
     assert "Fan speed step not recognized" in caplog.text
 
 
-async def setup_component(hass: HomeAssistant, entity_name: str) -> str:
+async def setup_component(hass: SmartHub, entity_name: str) -> str:
     """Set up vacuum component."""
     entity_id = f"{VACUUM_DOMAIN}.{entity_name}"
 

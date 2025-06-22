@@ -13,18 +13,18 @@ from freezegun.api import freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.notify import (
+from smarthub.components.notify import (
     ATTR_MESSAGE,
     ATTR_TITLE,
     DOMAIN as NOTIFY_DOMAIN,
     SERVICE_SEND_MESSAGE,
 )
-from homeassistant.components.ntfy.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.ntfy.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import AsyncMock, MockConfigEntry, snapshot_platform
 
@@ -33,7 +33,7 @@ from tests.common import AsyncMock, MockConfigEntry, snapshot_platform
 async def notify_only() -> AsyncGenerator[None]:
     """Enable only the notify platform."""
     with patch(
-        "homeassistant.components.ntfy.PLATFORMS",
+        "smarthub.components.ntfy.PLATFORMS",
         [Platform.NOTIFY],
     ):
         yield
@@ -41,7 +41,7 @@ async def notify_only() -> AsyncGenerator[None]:
 
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_notify_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -59,7 +59,7 @@ async def test_notify_platform(
 
 @freeze_time("2025-01-09T12:00:00+00:00")
 async def test_send_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_aiontfy: AsyncMock,
 ) -> None:
@@ -113,7 +113,7 @@ async def test_send_message(
     ],
 )
 async def test_send_message_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_aiontfy: AsyncMock,
     exception: Exception,
@@ -129,7 +129,7 @@ async def test_send_message_exception(
 
     mock_aiontfy.publish.side_effect = exception
 
-    with pytest.raises(HomeAssistantError, match=error_msg):
+    with pytest.raises(SmartHubError, match=error_msg):
         await hass.services.async_call(
             NOTIFY_DOMAIN,
             SERVICE_SEND_MESSAGE,
@@ -147,7 +147,7 @@ async def test_send_message_exception(
 
 
 async def test_send_message_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_aiontfy: AsyncMock,
 ) -> None:
@@ -163,7 +163,7 @@ async def test_send_message_reauth_flow(
         NtfyUnauthorizedAuthenticationError(40101, 401, "unauthorized"),
     )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NOTIFY_DOMAIN,
             SERVICE_SEND_MESSAGE,

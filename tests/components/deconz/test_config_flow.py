@@ -6,12 +6,12 @@ from unittest.mock import patch
 import pydeconz
 import pytest
 
-from homeassistant.components.deconz.config_flow import (
+from smarthub.components.deconz.config_flow import (
     CONF_MANUAL_INPUT,
     CONF_SERIAL,
     DECONZ_MANUFACTURERURL,
 )
-from homeassistant.components.deconz.const import (
+from smarthub.components.deconz.const import (
     CONF_ALLOW_CLIP_SENSOR,
     CONF_ALLOW_DECONZ_GROUPS,
     CONF_ALLOW_NEW_DEVICES,
@@ -19,12 +19,12 @@ from homeassistant.components.deconz.const import (
     DOMAIN,
     HASSIO_CONFIGURATION_URL,
 )
-from homeassistant.config_entries import SOURCE_HASSIO, SOURCE_SSDP, SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_HOST, CONF_PORT, CONTENT_TYPE_JSON
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.config_entries import SOURCE_HASSIO, SOURCE_SSDP, SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_HOST, CONF_PORT, CONTENT_TYPE_JSON
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_MANUFACTURER_URL,
     ATTR_UPNP_SERIAL,
     SsdpServiceInfo,
@@ -39,10 +39,10 @@ BAD_BRIDGEID = "0000000000000000"
 
 
 async def test_flow_discovered_bridges(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that config flow works for discovered bridges."""
-    logging.getLogger("homeassistant.components.deconz").setLevel(logging.DEBUG)
+    logging.getLogger("smarthub.components.deconz").setLevel(logging.DEBUG)
     aioclient_mock.get(
         pydeconz.utils.URL_DISCOVER,
         json=[
@@ -86,7 +86,7 @@ async def test_flow_discovered_bridges(
 
 
 async def test_flow_manual_configuration_decision(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that config flow for one discovered bridge works."""
     aioclient_mock.get(
@@ -140,10 +140,10 @@ async def test_flow_manual_configuration_decision(
 
 
 async def test_flow_manual_configuration(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that config flow works with manual configuration after no discovered bridges."""
-    logging.getLogger("homeassistant.components.deconz").setLevel(logging.DEBUG)
+    logging.getLogger("smarthub.components.deconz").setLevel(logging.DEBUG)
     aioclient_mock.get(
         pydeconz.utils.URL_DISCOVER,
         json=[],
@@ -191,7 +191,7 @@ async def test_flow_manual_configuration(
 
 
 async def test_manual_configuration_after_discovery_timeout(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test failed discovery fallbacks to manual configuration."""
     aioclient_mock.get(pydeconz.utils.URL_DISCOVER, exc=TimeoutError)
@@ -206,7 +206,7 @@ async def test_manual_configuration_after_discovery_timeout(
 
 
 async def test_manual_configuration_after_discovery_ResponseError(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test failed discovery fallbacks to manual configuration."""
     aioclient_mock.get(pydeconz.utils.URL_DISCOVER, exc=pydeconz.errors.ResponseError)
@@ -221,7 +221,7 @@ async def test_manual_configuration_after_discovery_ResponseError(
 
 
 async def test_manual_configuration_update_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     config_entry_setup: MockConfigEntry,
 ) -> None:
@@ -270,7 +270,7 @@ async def test_manual_configuration_update_configuration(
 
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_manual_configuration_dont_update_configuration(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that _create_entry work and that bridgeid can be requested."""
     aioclient_mock.get(
@@ -315,7 +315,7 @@ async def test_manual_configuration_dont_update_configuration(
 
 
 async def test_manual_configuration_timeout_get_bridge(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that _create_entry handles a timeout."""
     aioclient_mock.get(
@@ -365,7 +365,7 @@ async def test_manual_configuration_timeout_get_bridge(
     ],
 )
 async def test_link_step_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     raised_error: Exception,
     error_string: str,
@@ -400,7 +400,7 @@ async def test_link_step_fails(
 
 
 async def test_reauth_flow_update_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     config_entry_setup: MockConfigEntry,
 ) -> None:
@@ -433,7 +433,7 @@ async def test_reauth_flow_update_configuration(
 
 
 async def test_flow_ssdp_discovery(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that config flow for one discovered bridge works."""
     result = await hass.config_entries.flow.async_init(
@@ -477,11 +477,11 @@ async def test_flow_ssdp_discovery(
 
 
 async def test_ssdp_discovery_update_configuration(
-    hass: HomeAssistant, config_entry_setup: MockConfigEntry
+    hass: SmartHub, config_entry_setup: MockConfigEntry
 ) -> None:
     """Test if a discovered bridge is configured but updates with new attributes."""
     with patch(
-        "homeassistant.components.deconz.async_setup_entry",
+        "smarthub.components.deconz.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -506,7 +506,7 @@ async def test_ssdp_discovery_update_configuration(
 
 
 async def test_ssdp_discovery_dont_update_configuration(
-    hass: HomeAssistant, config_entry_setup: MockConfigEntry
+    hass: SmartHub, config_entry_setup: MockConfigEntry
 ) -> None:
     """Test if a discovered bridge has already been configured."""
 
@@ -531,7 +531,7 @@ async def test_ssdp_discovery_dont_update_configuration(
 
 @pytest.mark.parametrize("config_entry_source", [SOURCE_HASSIO])
 async def test_ssdp_discovery_dont_update_existing_hassio_configuration(
-    hass: HomeAssistant, config_entry_setup: MockConfigEntry
+    hass: SmartHub, config_entry_setup: MockConfigEntry
 ) -> None:
     """Test to ensure the SSDP discovery does not update an Hass.io entry."""
     result = await hass.config_entries.flow.async_init(
@@ -553,7 +553,7 @@ async def test_ssdp_discovery_dont_update_existing_hassio_configuration(
     assert config_entry_setup.data[CONF_HOST] == "1.2.3.4"
 
 
-async def test_flow_hassio_discovery(hass: HomeAssistant) -> None:
+async def test_flow_hassio_discovery(hass: SmartHub) -> None:
     """Test hassio discovery flow works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -582,7 +582,7 @@ async def test_flow_hassio_discovery(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.deconz.async_setup_entry",
+        "smarthub.components.deconz.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -600,12 +600,12 @@ async def test_flow_hassio_discovery(hass: HomeAssistant) -> None:
 
 
 async def test_hassio_discovery_update_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_setup: MockConfigEntry,
 ) -> None:
     """Test we can update an existing config entry."""
     with patch(
-        "homeassistant.components.deconz.async_setup_entry",
+        "smarthub.components.deconz.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -634,7 +634,7 @@ async def test_hassio_discovery_update_configuration(
 
 
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_hassio_discovery_dont_update_configuration(hass: HomeAssistant) -> None:
+async def test_hassio_discovery_dont_update_configuration(hass: SmartHub) -> None:
     """Test we can update an existing config entry."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -657,7 +657,7 @@ async def test_hassio_discovery_dont_update_configuration(hass: HomeAssistant) -
 
 
 async def test_option_flow(
-    hass: HomeAssistant, config_entry_setup: MockConfigEntry
+    hass: SmartHub, config_entry_setup: MockConfigEntry
 ) -> None:
     """Test config flow options."""
     result = await hass.config_entries.options.async_init(config_entry_setup.entry_id)

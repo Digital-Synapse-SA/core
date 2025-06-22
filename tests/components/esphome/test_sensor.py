@@ -14,31 +14,31 @@ from aioesphomeapi import (
     TextSensorState,
 )
 
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ICON,
     ATTR_UNIT_OF_MEASUREMENT,
     STATE_UNKNOWN,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MockESPHomeDeviceType, MockGenericDeviceEntryType
 
 
 async def test_generic_numeric_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
     """Test a generic sensor entity."""
-    logging.getLogger("homeassistant.components.esphome").setLevel(logging.DEBUG)
+    logging.getLogger("smarthub.components.esphome").setLevel(logging.DEBUG)
     entity_info = [
         SensorInfo(
             object_id="mysensor",
@@ -89,7 +89,7 @@ async def test_generic_numeric_sensor(
 
 
 async def test_generic_numeric_sensor_with_entity_category_and_icon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
@@ -126,7 +126,7 @@ async def test_generic_numeric_sensor_with_entity_category_and_icon(
 
 
 async def test_generic_numeric_sensor_state_class_measurement(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
@@ -164,7 +164,7 @@ async def test_generic_numeric_sensor_state_class_measurement(
 
 
 async def test_generic_numeric_sensor_device_class_timestamp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -192,7 +192,7 @@ async def test_generic_numeric_sensor_device_class_timestamp(
 
 
 async def test_generic_numeric_sensor_legacy_last_reset_convert(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -222,7 +222,7 @@ async def test_generic_numeric_sensor_legacy_last_reset_convert(
 
 
 async def test_generic_numeric_sensor_no_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -249,7 +249,7 @@ async def test_generic_numeric_sensor_no_state(
 
 
 async def test_generic_numeric_sensor_nan_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -276,7 +276,7 @@ async def test_generic_numeric_sensor_nan_state(
 
 
 async def test_generic_numeric_sensor_missing_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -303,7 +303,7 @@ async def test_generic_numeric_sensor_missing_state(
 
 
 async def test_generic_text_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -330,7 +330,7 @@ async def test_generic_text_sensor(
 
 
 async def test_generic_text_sensor_missing_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -357,7 +357,7 @@ async def test_generic_text_sensor_missing_state(
 
 
 async def test_generic_text_sensor_device_class_timestamp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -386,7 +386,7 @@ async def test_generic_text_sensor_device_class_timestamp(
 
 
 async def test_generic_text_sensor_device_class_date(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -415,7 +415,7 @@ async def test_generic_text_sensor_device_class_date(
 
 
 async def test_generic_numeric_sensor_empty_string_uom(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:

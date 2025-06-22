@@ -14,16 +14,16 @@ from plugwise.exceptions import (
 )
 import pytest
 
-from homeassistant.components.plugwise.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.plugwise.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 HA_PLUGWISE_SMILE_ASYNC_UPDATE = (
-    "homeassistant.components.plugwise.coordinator.Smile.async_update"
+    "smarthub.components.plugwise.coordinator.Smile.async_update"
 )
 HEATER_ID = "1cbf783bb11e4a7c8a6843dee3a86927"  # Opentherm device_id for migration
 PLUG_ID = "cd0ddb54ef694e11ac18ed1cbce5dbbd"  # VCR device_id for migration
@@ -64,7 +64,7 @@ TOM = {
 @pytest.mark.parametrize("chosen_env", ["anna_heatpump_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smile_anna: MagicMock,
 ) -> None:
@@ -96,7 +96,7 @@ async def test_load_unload_config_entry(
     ],
 )
 async def test_gateway_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smile_anna: MagicMock,
     side_effect: Exception,
@@ -118,7 +118,7 @@ async def test_gateway_config_entry_not_ready(
     "gateway_id", ["a455b61e52394b2db5081ce025a430f3"], indirect=True
 )
 async def test_device_in_dr(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smile_p1: MagicMock,
     device_registry: dr.DeviceRegistry,
@@ -158,7 +158,7 @@ async def test_device_in_dr(
     ],
 )
 async def test_migrate_unique_id_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_smile_anna: MagicMock,
@@ -210,7 +210,7 @@ async def test_migrate_unique_id_temperature(
     ],
 )
 async def test_migrate_unique_id_relay(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_smile_adam: MagicMock,
@@ -237,7 +237,7 @@ async def test_migrate_unique_id_relay(
 @pytest.mark.parametrize("chosen_env", ["m_adam_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_update_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smile_adam_heat_cool: MagicMock,
     device_registry: dr.DeviceRegistry,

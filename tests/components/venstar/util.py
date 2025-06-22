@@ -2,11 +2,11 @@
 
 import requests_mock
 
-from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN
-from homeassistant.components.venstar.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.climate import DOMAIN as CLIMATE_DOMAIN
+from smarthub.components.venstar.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_load_fixture
 
@@ -16,7 +16,7 @@ TEST_MODELS = ["t2k", "colortouch"]
 def mock_venstar_devices(f):
     """Decorate function to mock a Venstar Colortouch and T2000 thermostat API."""
 
-    async def wrapper(hass: HomeAssistant) -> None:
+    async def wrapper(hass: SmartHub) -> None:
         # Mock thermostats are:
         # Venstar T2000, FW 4.38
         # Venstar "colortouch" T7850, FW 5.1
@@ -46,10 +46,10 @@ def mock_venstar_devices(f):
 
 
 async def async_init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     skip_setup: bool = False,
 ):
-    """Set up the venstar integration in Home Assistant."""
+    """Set up the venstar integration in SmartHub."""
     platform_config = [
         {
             CONF_PLATFORM: "venstar",

@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, call
 
 from mysensors.sensor import Sensor
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
     ATTR_HVAC_MODE,
@@ -20,12 +20,12 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.const import ATTR_BATTERY_LEVEL, ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_BATTERY_LEVEL, ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 
 async def test_hvac_node_auto(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hvac_node_auto: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,
@@ -142,7 +142,7 @@ async def test_hvac_node_auto(
 
 
 async def test_hvac_node_heat(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hvac_node_heat: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,
@@ -254,7 +254,7 @@ async def test_hvac_node_heat(
 
 
 async def test_hvac_node_cool(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hvac_node_cool: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,
@@ -366,7 +366,7 @@ async def test_hvac_node_cool(
 
 
 async def test_hvac_node_only_hvac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hvac_node_only_hvac: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,

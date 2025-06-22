@@ -4,17 +4,17 @@ from unittest.mock import ANY, call
 
 import pytest
 
-from homeassistant.components import mqtt_statestream as statestream
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import CoreState, HomeAssistant, State
-from homeassistant.setup import async_setup_component
+from smarthub.components import mqtt_statestream as statestream
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import CoreState, SmartHub, State
+from smarthub.setup import async_setup_component
 
 from tests.common import MockEntity, MockEntityPlatform, mock_state_change_event
 from tests.typing import MqttMockHAClient
 
 
 async def add_statestream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     base_topic=None,
     publish_attributes=None,
     publish_timestamps=None,
@@ -39,21 +39,21 @@ async def add_statestream(
 
 
 async def test_fails_with_no_base(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Setup should fail if no base_topic is set."""
     assert await add_statestream(hass) is False
 
 
 async def test_setup_succeeds_without_attributes(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the success of the setup with a valid base_topic."""
     assert await add_statestream(hass, base_topic="pub")
 
 
 async def test_setup_and_stop_waits_for_ha(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the success of the setup with a valid base_topic."""
     e_id = "fake.entity"
@@ -102,7 +102,7 @@ async def test_setup_and_stop_waits_for_ha(
 # The exception is raised by mqtt.async_publish.
 @pytest.mark.xfail
 async def test_startup_no_mqtt(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test startup without MQTT support."""
     e_id = "fake.entity"
@@ -116,14 +116,14 @@ async def test_startup_no_mqtt(
 
 
 async def test_setup_succeeds_with_attributes(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test setup with a valid base_topic and publish_attributes."""
     assert await add_statestream(hass, base_topic="pub", publish_attributes=True)
 
 
 async def test_state_changed_event_sends_message(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the sending of a new message if event changed."""
     e_id = "fake.entity"
@@ -169,7 +169,7 @@ async def test_state_changed_event_sends_message(
 
 
 async def test_state_changed_event_sends_message_and_timestamp(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the sending of a message and timestamps if event changed."""
     e_id = "another.entity"
@@ -202,7 +202,7 @@ async def test_state_changed_event_sends_message_and_timestamp(
 
 
 async def test_state_changed_attr_sends_message(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the sending of a new message if attribute changed."""
     e_id = "fake.entity"
@@ -236,7 +236,7 @@ async def test_state_changed_attr_sends_message(
 
 
 async def test_state_changed_event_include_domain(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test that filtering on included domain works as expected."""
     base_topic = "pub"
@@ -274,7 +274,7 @@ async def test_state_changed_event_include_domain(
 
 
 async def test_state_changed_event_include_entity(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test that filtering on included entity works as expected."""
     base_topic = "pub"
@@ -312,7 +312,7 @@ async def test_state_changed_event_include_entity(
 
 
 async def test_state_changed_event_exclude_domain(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test that filtering on excluded domain works as expected."""
     base_topic = "pub"
@@ -350,7 +350,7 @@ async def test_state_changed_event_exclude_domain(
 
 
 async def test_state_changed_event_exclude_entity(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test that filtering on excluded entity works as expected."""
     base_topic = "pub"
@@ -388,7 +388,7 @@ async def test_state_changed_event_exclude_entity(
 
 
 async def test_state_changed_event_exclude_domain_include_entity(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test filtering with excluded domain and included entity."""
     base_topic = "pub"
@@ -426,7 +426,7 @@ async def test_state_changed_event_exclude_domain_include_entity(
 
 
 async def test_state_changed_event_include_domain_exclude_entity(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test filtering with included domain and excluded entity."""
     base_topic = "pub"
@@ -464,7 +464,7 @@ async def test_state_changed_event_include_domain_exclude_entity(
 
 
 async def test_state_changed_event_include_globs(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test that filtering on included glob works as expected."""
     base_topic = "pub"
@@ -504,7 +504,7 @@ async def test_state_changed_event_include_globs(
 
 
 async def test_state_changed_event_exclude_globs(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test that filtering on excluded globs works as expected."""
     base_topic = "pub"
@@ -542,7 +542,7 @@ async def test_state_changed_event_exclude_globs(
 
 
 async def test_state_changed_event_exclude_domain_globs_include_entity(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test filtering with excluded domain and glob and included entity."""
     base_topic = "pub"
@@ -600,7 +600,7 @@ async def test_state_changed_event_exclude_domain_globs_include_entity(
 
 
 async def test_state_changed_event_include_domain_globs_exclude_entity(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test filtering with included domain and glob and excluded entity."""
     base_topic = "pub"

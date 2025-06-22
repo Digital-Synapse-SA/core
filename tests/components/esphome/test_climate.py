@@ -16,7 +16,7 @@ from aioesphomeapi import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_HUMIDITY,
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
@@ -40,15 +40,15 @@ from homeassistant.components.climate import (
     SWING_BOTH,
     HVACMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from .conftest import MockGenericDeviceEntryType
 
 
 async def test_climate_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -98,7 +98,7 @@ async def test_climate_entity(
 
 
 async def test_climate_entity_with_step_and_two_point(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -174,7 +174,7 @@ async def test_climate_entity_with_step_and_two_point(
 
 
 async def test_climate_entity_with_step_and_target_temp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -326,7 +326,7 @@ async def test_climate_entity_with_step_and_target_temp(
 
 
 async def test_climate_entity_with_humidity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -388,7 +388,7 @@ async def test_climate_entity_with_humidity(
 
 
 async def test_climate_entity_with_inf_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -443,7 +443,7 @@ async def test_climate_entity_with_inf_value(
 
 
 async def test_climate_entity_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
     snapshot: SnapshotAssertion,
@@ -499,7 +499,7 @@ async def test_climate_entity_attributes(
 
 
 async def test_climate_entity_attribute_current_temperature_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:

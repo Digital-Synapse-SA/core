@@ -10,19 +10,19 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_OFF,
     STATE_ON,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed, snapshot_platform
 
@@ -34,7 +34,7 @@ from tests.common import async_fire_time_changed, snapshot_platform
     [[Platform.BUTTON]],
 )
 async def test_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -50,7 +50,7 @@ async def test_button(
     [[Platform.BINARY_SENSOR, Platform.BUTTON, Platform.SENSOR]],
 )
 async def test_button_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -101,7 +101,7 @@ async def test_button_update(
 
 
 async def test_button_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
 ) -> None:
@@ -112,7 +112,7 @@ async def test_button_failure(
     mock_client.async_reset_filter.return_value = {"status": "failure"}
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
     ):
         await hass.services.async_call(
             BUTTON_DOMAIN,

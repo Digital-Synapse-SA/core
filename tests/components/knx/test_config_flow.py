@@ -11,15 +11,15 @@ from xknx.knxip.dib import TunnelingSlotStatus
 from xknx.secure.keyring import sync_load_keyring
 from xknx.telegram import IndividualAddress
 
-from homeassistant import config_entries
-from homeassistant.components.knx.config_flow import (
+from smarthub import config_entries
+from smarthub.components.knx.config_flow import (
     CONF_KEYRING_FILE,
     CONF_KNX_GATEWAY,
     CONF_KNX_TUNNELING_TYPE,
     DEFAULT_ENTRY_DATA,
     OPTION_MANUAL_TUNNEL,
 )
-from homeassistant.components.knx.const import (
+from smarthub.components.knx.const import (
     CONF_KNX_AUTOMATIC,
     CONF_KNX_CONNECTION_TYPE,
     CONF_KNX_DEFAULT_STATE_UPDATER,
@@ -46,9 +46,9 @@ from homeassistant.components.knx.const import (
     CONF_KNX_TUNNELING_TCP_SECURE,
     DOMAIN,
 )
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResult, FlowResultType
 
 from tests.common import MockConfigEntry, get_fixture_path
 
@@ -64,9 +64,9 @@ GATEWAY_INDIVIDUAL_ADDRESS = IndividualAddress("1.0.0")
 def fixture_knx_setup():
     """Mock KNX entry setup."""
     with (
-        patch("homeassistant.components.knx.async_setup", return_value=True),
+        patch("smarthub.components.knx.async_setup", return_value=True),
         patch(
-            "homeassistant.components.knx.async_setup_entry", return_value=True
+            "smarthub.components.knx.async_setup_entry", return_value=True
         ) as mock_async_setup_entry,
     ):
         yield mock_async_setup_entry
@@ -77,10 +77,10 @@ def patch_file_upload(return_value=FIXTURE_KEYRING, side_effect=None):
     """Patch file upload. Yields the Keyring instance (return_value)."""
     with (
         patch(
-            "homeassistant.components.knx.storage.keyring.process_uploaded_file"
+            "smarthub.components.knx.storage.keyring.process_uploaded_file"
         ) as file_upload_mock,
         patch(
-            "homeassistant.components.knx.storage.keyring.sync_load_keyring",
+            "smarthub.components.knx.storage.keyring.sync_load_keyring",
             return_value=return_value,
             side_effect=side_effect,
         ),
@@ -149,7 +149,7 @@ class GatewayScannerMock:
             yield gateway
 
 
-async def test_user_single_instance(hass: HomeAssistant) -> None:
+async def test_user_single_instance(hass: SmartHub) -> None:
     """Test we only allow a single config flow."""
     MockConfigEntry(domain=DOMAIN).add_to_hass(hass)
 
@@ -161,11 +161,11 @@ async def test_user_single_instance(hass: HomeAssistant) -> None:
 
 
 @patch(
-    "homeassistant.components.knx.config_flow.GatewayScanner",
+    "smarthub.components.knx.config_flow.GatewayScanner",
     return_value=GatewayScannerMock(),
 )
 async def test_routing_setup(
-    gateway_scanner_mock, hass: HomeAssistant, knx_setup
+    gateway_scanner_mock, hass: SmartHub, knx_setup
 ) -> None:
     """Test routing setup."""
     result = await hass.config_entries.flow.async_init(
@@ -210,11 +210,11 @@ async def test_routing_setup(
 
 
 @patch(
-    "homeassistant.components.knx.config_flow.GatewayScanner",
+    "smarthub.components.knx.config_flow.GatewayScanner",
     return_value=GatewayScannerMock(),
 )
 async def test_routing_setup_advanced(
-    gateway_scanner_mock, hass: HomeAssistant, knx_setup
+    gateway_scanner_mock, hass: SmartHub, knx_setup
 ) -> None:
     """Test routing setup with advanced options."""
     result = await hass.config_entries.flow.async_init(
@@ -284,11 +284,11 @@ async def test_routing_setup_advanced(
 
 
 @patch(
-    "homeassistant.components.knx.config_flow.GatewayScanner",
+    "smarthub.components.knx.config_flow.GatewayScanner",
     return_value=GatewayScannerMock(),
 )
 async def test_routing_secure_manual_setup(
-    gateway_scanner_mock, hass: HomeAssistant, knx_setup
+    gateway_scanner_mock, hass: SmartHub, knx_setup
 ) -> None:
     """Test routing secure setup with manual key config."""
     result = await hass.config_entries.flow.async_init(
@@ -373,11 +373,11 @@ async def test_routing_secure_manual_setup(
 
 
 @patch(
-    "homeassistant.components.knx.config_flow.GatewayScanner",
+    "smarthub.components.knx.config_flow.GatewayScanner",
     return_value=GatewayScannerMock(),
 )
 async def test_routing_secure_keyfile(
-    gateway_scanner_mock, hass: HomeAssistant, knx_setup
+    gateway_scanner_mock, hass: SmartHub, knx_setup
 ) -> None:
     """Test routing secure setup with keyfile."""
     result = await hass.config_entries.flow.async_init(
@@ -514,12 +514,12 @@ async def test_routing_secure_keyfile(
     ],
 )
 @patch(
-    "homeassistant.components.knx.config_flow.GatewayScanner",
+    "smarthub.components.knx.config_flow.GatewayScanner",
     return_value=GatewayScannerMock(),
 )
 async def test_tunneling_setup_manual(
     gateway_scanner_mock: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx_setup,
     user_input,
     title,
@@ -543,7 +543,7 @@ async def test_tunneling_setup_manual(
     assert result2["errors"] == {"base": "no_tunnel_discovered"}
 
     with patch(
-        "homeassistant.components.knx.config_flow.request_description",
+        "smarthub.components.knx.config_flow.request_description",
         return_value=_gateway_descriptor(
             user_input[CONF_HOST],
             user_input[CONF_PORT],
@@ -563,12 +563,12 @@ async def test_tunneling_setup_manual(
 
 
 @patch(
-    "homeassistant.components.knx.config_flow.GatewayScanner",
+    "smarthub.components.knx.config_flow.GatewayScanner",
     return_value=GatewayScannerMock(),
 )
 async def test_tunneling_setup_manual_request_description_error(
     gateway_scanner_mock: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx_setup,
 ) -> None:
     """Test tunneling if no gateway was found found (or `manual` option was chosen)."""
@@ -586,7 +586,7 @@ async def test_tunneling_setup_manual_request_description_error(
 
     # TCP configured but not supported by gateway
     with patch(
-        "homeassistant.components.knx.config_flow.request_description",
+        "smarthub.components.knx.config_flow.request_description",
         return_value=_gateway_descriptor(
             "192.168.0.1",
             3671,
@@ -608,7 +608,7 @@ async def test_tunneling_setup_manual_request_description_error(
         }
     # TCP configured but Secure required by gateway
     with patch(
-        "homeassistant.components.knx.config_flow.request_description",
+        "smarthub.components.knx.config_flow.request_description",
         return_value=_gateway_descriptor(
             "192.168.0.1",
             3671,
@@ -631,7 +631,7 @@ async def test_tunneling_setup_manual_request_description_error(
         }
     # Secure configured but not enabled on gateway
     with patch(
-        "homeassistant.components.knx.config_flow.request_description",
+        "smarthub.components.knx.config_flow.request_description",
         return_value=_gateway_descriptor(
             "192.168.0.1",
             3671,
@@ -654,7 +654,7 @@ async def test_tunneling_setup_manual_request_description_error(
         }
     # No connection to gateway
     with patch(
-        "homeassistant.components.knx.config_flow.request_description",
+        "smarthub.components.knx.config_flow.request_description",
         side_effect=CommunicationError(""),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -669,7 +669,7 @@ async def test_tunneling_setup_manual_request_description_error(
         assert result["errors"] == {"base": "cannot_connect"}
     # OK configuration
     with patch(
-        "homeassistant.components.knx.config_flow.request_description",
+        "smarthub.components.knx.config_flow.request_description",
         return_value=_gateway_descriptor(
             "192.168.0.1",
             3671,
@@ -700,17 +700,17 @@ async def test_tunneling_setup_manual_request_description_error(
 
 
 @patch(
-    "homeassistant.components.knx.config_flow.GatewayScanner",
+    "smarthub.components.knx.config_flow.GatewayScanner",
     return_value=GatewayScannerMock(),
 )
 @patch(
-    "homeassistant.components.knx.config_flow.request_description",
+    "smarthub.components.knx.config_flow.request_description",
     return_value=_gateway_descriptor("192.168.0.2", 3675),
 )
 async def test_tunneling_setup_for_local_ip(
     request_description_mock: MagicMock,
     gateway_scanner_mock: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx_setup,
 ) -> None:
     """Test tunneling if only one gateway is found."""
@@ -796,13 +796,13 @@ async def test_tunneling_setup_for_local_ip(
 
 
 async def test_tunneling_setup_for_multiple_found_gateways(
-    hass: HomeAssistant, knx_setup
+    hass: SmartHub, knx_setup
 ) -> None:
     """Test tunneling if multiple gateways are found."""
     gateway_udp = _gateway_descriptor("192.168.0.1", 3675)
     gateway_tcp = _gateway_descriptor("192.168.1.100", 3675, True)
     with patch(
-        "homeassistant.components.knx.config_flow.GatewayScanner"
+        "smarthub.components.knx.config_flow.GatewayScanner"
     ) as gateway_scanner_mock:
         gateway_scanner_mock.return_value = GatewayScannerMock(
             [gateway_udp, gateway_tcp]
@@ -844,13 +844,13 @@ async def test_tunneling_setup_for_multiple_found_gateways(
 
 
 async def test_tunneling_setup_tcp_endpoint_select_skip(
-    hass: HomeAssistant, knx_setup
+    hass: SmartHub, knx_setup
 ) -> None:
     """Test tunneling TCP endpoint selection skipped if no slot info found."""
     gateway_udp = _gateway_descriptor("192.168.0.1", 3675)
     gateway_tcp_no_slots = _gateway_descriptor("192.168.1.100", 3675, True, slots=False)
     with patch(
-        "homeassistant.components.knx.config_flow.GatewayScanner"
+        "smarthub.components.knx.config_flow.GatewayScanner"
     ) as gateway_scanner_mock:
         gateway_scanner_mock.return_value = GatewayScannerMock(
             [gateway_udp, gateway_tcp_no_slots]
@@ -892,12 +892,12 @@ async def test_tunneling_setup_tcp_endpoint_select_skip(
 
 
 async def test_tunneling_setup_tcp_endpoint_select(
-    hass: HomeAssistant, knx_setup
+    hass: SmartHub, knx_setup
 ) -> None:
     """Test tunneling TCP endpoint selection."""
     gateway_tcp = _gateway_descriptor("192.168.1.100", 3675, True)
     with patch(
-        "homeassistant.components.knx.config_flow.GatewayScanner"
+        "smarthub.components.knx.config_flow.GatewayScanner"
     ) as gateway_scanner_mock:
         gateway_scanner_mock.return_value = GatewayScannerMock([gateway_tcp])
         result = await hass.config_entries.flow.async_init(
@@ -958,11 +958,11 @@ async def test_tunneling_setup_tcp_endpoint_select(
     ],
 )
 async def test_manual_tunnel_step_with_found_gateway(
-    hass: HomeAssistant, gateway
+    hass: SmartHub, gateway
 ) -> None:
     """Test manual tunnel if gateway was found and tunneling is selected."""
     with patch(
-        "homeassistant.components.knx.config_flow.GatewayScanner"
+        "smarthub.components.knx.config_flow.GatewayScanner"
     ) as gateway_scanner_mock:
         gateway_scanner_mock.return_value = GatewayScannerMock([gateway])
         result = await hass.config_entries.flow.async_init(
@@ -993,11 +993,11 @@ async def test_manual_tunnel_step_with_found_gateway(
 
 
 async def test_form_with_automatic_connection_handling(
-    hass: HomeAssistant, knx_setup
+    hass: SmartHub, knx_setup
 ) -> None:
     """Test we get the form."""
     with patch(
-        "homeassistant.components.knx.config_flow.GatewayScanner"
+        "smarthub.components.knx.config_flow.GatewayScanner"
     ) as gateway_scanner_mock:
         gateway_scanner_mock.return_value = GatewayScannerMock(
             [_gateway_descriptor("192.168.0.1", 3675)]
@@ -1032,7 +1032,7 @@ async def test_form_with_automatic_connection_handling(
     knx_setup.assert_called_once()
 
 
-async def _get_menu_step_secure_tunnel(hass: HomeAssistant) -> FlowResult:
+async def _get_menu_step_secure_tunnel(hass: SmartHub) -> FlowResult:
     """Return flow in secure_tunnel menu step."""
     gateway = _gateway_descriptor(
         "192.168.0.1",
@@ -1041,7 +1041,7 @@ async def _get_menu_step_secure_tunnel(hass: HomeAssistant) -> FlowResult:
         requires_secure=True,
     )
     with patch(
-        "homeassistant.components.knx.config_flow.GatewayScanner"
+        "smarthub.components.knx.config_flow.GatewayScanner"
     ) as gateway_scanner_mock:
         gateway_scanner_mock.return_value = GatewayScannerMock([gateway])
         result = await hass.config_entries.flow.async_init(
@@ -1070,7 +1070,7 @@ async def _get_menu_step_secure_tunnel(hass: HomeAssistant) -> FlowResult:
 
 
 @patch(
-    "homeassistant.components.knx.config_flow.request_description",
+    "smarthub.components.knx.config_flow.request_description",
     return_value=_gateway_descriptor(
         "192.168.0.1",
         3675,
@@ -1080,7 +1080,7 @@ async def _get_menu_step_secure_tunnel(hass: HomeAssistant) -> FlowResult:
 )
 async def test_get_secure_menu_step_manual_tunnelling(
     request_description_mock: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test flow reaches secure_tunnellinn menu step from manual tunneling configuration."""
     gateway = _gateway_descriptor(
@@ -1090,7 +1090,7 @@ async def test_get_secure_menu_step_manual_tunnelling(
         requires_secure=True,
     )
     with patch(
-        "homeassistant.components.knx.config_flow.GatewayScanner"
+        "smarthub.components.knx.config_flow.GatewayScanner"
     ) as gateway_scanner_mock:
         gateway_scanner_mock.return_value = GatewayScannerMock([gateway])
         result = await hass.config_entries.flow.async_init(
@@ -1128,7 +1128,7 @@ async def test_get_secure_menu_step_manual_tunnelling(
     assert result3["step_id"] == "secure_key_source_menu_tunnel"
 
 
-async def test_configure_secure_tunnel_manual(hass: HomeAssistant, knx_setup) -> None:
+async def test_configure_secure_tunnel_manual(hass: SmartHub, knx_setup) -> None:
     """Test configure tunneling secure keys manually."""
     menu_step = await _get_menu_step_secure_tunnel(hass)
 
@@ -1165,7 +1165,7 @@ async def test_configure_secure_tunnel_manual(hass: HomeAssistant, knx_setup) ->
     knx_setup.assert_called_once()
 
 
-async def test_configure_secure_knxkeys(hass: HomeAssistant, knx_setup) -> None:
+async def test_configure_secure_knxkeys(hass: SmartHub, knx_setup) -> None:
     """Test configure secure knxkeys."""
     menu_step = await _get_menu_step_secure_tunnel(hass)
 
@@ -1214,7 +1214,7 @@ async def test_configure_secure_knxkeys(hass: HomeAssistant, knx_setup) -> None:
     knx_setup.assert_called_once()
 
 
-async def test_configure_secure_knxkeys_invalid_signature(hass: HomeAssistant) -> None:
+async def test_configure_secure_knxkeys_invalid_signature(hass: SmartHub) -> None:
     """Test configure secure knxkeys but file was not found."""
     menu_step = await _get_menu_step_secure_tunnel(hass)
 
@@ -1244,7 +1244,7 @@ async def test_configure_secure_knxkeys_invalid_signature(hass: HomeAssistant) -
         )
 
 
-async def test_configure_secure_knxkeys_no_tunnel_for_host(hass: HomeAssistant) -> None:
+async def test_configure_secure_knxkeys_no_tunnel_for_host(hass: SmartHub) -> None:
     """Test configure secure knxkeys but file was not found."""
     menu_step = await _get_menu_step_secure_tunnel(hass)
 
@@ -1270,7 +1270,7 @@ async def test_configure_secure_knxkeys_no_tunnel_for_host(hass: HomeAssistant) 
 
 
 async def test_options_flow_connection_type(
-    hass: HomeAssistant, knx, mock_config_entry: MockConfigEntry
+    hass: SmartHub, knx, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test options flow changing interface."""
     # run one option flow test with a set up integration (knx fixture)
@@ -1282,7 +1282,7 @@ async def test_options_flow_connection_type(
     menu_step = await hass.config_entries.options.async_init(mock_config_entry.entry_id)
 
     with patch(
-        "homeassistant.components.knx.config_flow.GatewayScanner"
+        "smarthub.components.knx.config_flow.GatewayScanner"
     ) as gateway_scanner_mock:
         gateway_scanner_mock.return_value = GatewayScannerMock([gateway])
         result = await hass.config_entries.options.async_configure(
@@ -1329,7 +1329,7 @@ async def test_options_flow_connection_type(
 
 
 async def test_options_flow_secure_manual_to_keyfile(
-    hass: HomeAssistant, knx_setup
+    hass: SmartHub, knx_setup
 ) -> None:
     """Test options flow changing secure credential source."""
     mock_config_entry = MockConfigEntry(
@@ -1361,7 +1361,7 @@ async def test_options_flow_secure_manual_to_keyfile(
     await hass.config_entries.async_setup(mock_config_entry.entry_id)
     menu_step = await hass.config_entries.options.async_init(mock_config_entry.entry_id)
     with patch(
-        "homeassistant.components.knx.config_flow.GatewayScanner"
+        "smarthub.components.knx.config_flow.GatewayScanner"
     ) as gateway_scanner_mock:
         gateway_scanner_mock.return_value = GatewayScannerMock([gateway])
         result = await hass.config_entries.options.async_configure(
@@ -1433,7 +1433,7 @@ async def test_options_flow_secure_manual_to_keyfile(
     knx_setup.assert_called_once()
 
 
-async def test_options_flow_routing(hass: HomeAssistant, knx_setup) -> None:
+async def test_options_flow_routing(hass: SmartHub, knx_setup) -> None:
     """Test options flow changing routing settings."""
     mock_config_entry = MockConfigEntry(
         title="KNX",
@@ -1449,7 +1449,7 @@ async def test_options_flow_routing(hass: HomeAssistant, knx_setup) -> None:
     menu_step = await hass.config_entries.options.async_init(mock_config_entry.entry_id)
 
     with patch(
-        "homeassistant.components.knx.config_flow.GatewayScanner"
+        "smarthub.components.knx.config_flow.GatewayScanner"
     ) as gateway_scanner_mock:
         gateway_scanner_mock.return_value = GatewayScannerMock([gateway])
         result = await hass.config_entries.options.async_configure(
@@ -1492,7 +1492,7 @@ async def test_options_flow_routing(hass: HomeAssistant, knx_setup) -> None:
 
 
 async def test_options_communication_settings(
-    hass: HomeAssistant, knx_setup, mock_config_entry: MockConfigEntry
+    hass: SmartHub, knx_setup, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test options flow changing communication settings."""
     mock_config_entry.add_to_hass(hass)
@@ -1526,7 +1526,7 @@ async def test_options_communication_settings(
     knx_setup.assert_called_once()
 
 
-async def test_options_update_keyfile(hass: HomeAssistant, knx_setup) -> None:
+async def test_options_update_keyfile(hass: SmartHub, knx_setup) -> None:
     """Test options flow updating keyfile when tunnel endpoint is already configured."""
     start_data = {
         **DEFAULT_ENTRY_DATA,
@@ -1578,7 +1578,7 @@ async def test_options_update_keyfile(hass: HomeAssistant, knx_setup) -> None:
     knx_setup.assert_called_once()
 
 
-async def test_options_keyfile_upload(hass: HomeAssistant, knx_setup) -> None:
+async def test_options_keyfile_upload(hass: SmartHub, knx_setup) -> None:
     """Test options flow uploading a keyfile for the first time."""
     start_data = {
         **DEFAULT_ENTRY_DATA,

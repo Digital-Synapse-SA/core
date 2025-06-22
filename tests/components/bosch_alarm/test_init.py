@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -15,14 +15,14 @@ from tests.common import MockConfigEntry
 @pytest.fixture(autouse=True)
 def disable_platform_only():
     """Disable platforms to speed up tests."""
-    with patch("homeassistant.components.bosch_alarm.PLATFORMS", []):
+    with patch("smarthub.components.bosch_alarm.PLATFORMS", []):
         yield
 
 
 @pytest.mark.parametrize("model", ["solution_3000"])
 @pytest.mark.parametrize("exception", [PermissionError()])
 async def test_incorrect_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_panel: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
@@ -36,7 +36,7 @@ async def test_incorrect_auth(
 @pytest.mark.parametrize("model", ["solution_3000"])
 @pytest.mark.parametrize("exception", [TimeoutError()])
 async def test_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_panel: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,

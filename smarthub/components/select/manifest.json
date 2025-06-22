@@ -1,0 +1,8 @@
+{
+  "domain": "select",
+  "name": "Select",
+  "codeowners": ["@smart-hub/core"],
+  "documentation": "https://www.smart-hub.io/integrations/select",
+  "integration_type": "entity",
+  "quality_scale": "internal"
+}

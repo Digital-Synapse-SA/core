@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.samsungtv.const import (
+from smarthub.components.samsungtv.const import (
     CONF_SESSION_ID,
     CONF_SSDP_MAIN_TV_AGENT_LOCATION,
     CONF_SSDP_RENDERING_CONTROL_LOCATION,
@@ -17,10 +17,10 @@ from homeassistant.components.samsungtv.const import (
     UPNP_SVC_MAIN_TV_AGENT,
     UPNP_SVC_RENDERING_CONTROL,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_MAC, CONF_MODEL, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_MAC, CONF_MODEL, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_samsungtv_entry
 from .const import (
@@ -46,7 +46,7 @@ from tests.common import MockConfigEntry, async_load_json_object_fixture
     "rest_api_failing",
 )
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_data: dict[str, Any],
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,
@@ -62,7 +62,7 @@ async def test_setup(
 
 @pytest.mark.usefixtures("remote_websocket")
 async def test_setup_h_j_model(
-    hass: HomeAssistant, rest_api: Mock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, rest_api: Mock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test Samsung TV integration is setup."""
     rest_api.rest_device_info.return_value = await async_load_json_object_fixture(
@@ -78,7 +78,7 @@ async def test_setup_h_j_model(
 
 
 @pytest.mark.usefixtures("remote_websocket")
-async def test_setup_updates_from_ssdp(hass: HomeAssistant) -> None:
+async def test_setup_updates_from_ssdp(hass: SmartHub) -> None:
     """Test setting up the entry fetches data from ssdp cache."""
     entry = MockConfigEntry(
         domain="samsungtv", data=ENTRYDATA_WEBSOCKET, entry_id="sample-entry-id"
@@ -88,7 +88,7 @@ async def test_setup_updates_from_ssdp(hass: HomeAssistant) -> None:
     assert not entry.data.get(CONF_SSDP_MAIN_TV_AGENT_LOCATION)
     assert not entry.data.get(CONF_SSDP_RENDERING_CONTROL_LOCATION)
 
-    async def _mock_async_get_discovery_info_by_st(hass: HomeAssistant, mock_st: str):
+    async def _mock_async_get_discovery_info_by_st(hass: SmartHub, mock_st: str):
         if mock_st == UPNP_SVC_RENDERING_CONTROL:
             return [MOCK_SSDP_DATA_RENDERING_CONTROL_ST]
         if mock_st == UPNP_SVC_MAIN_TV_AGENT:
@@ -96,7 +96,7 @@ async def test_setup_updates_from_ssdp(hass: HomeAssistant) -> None:
         raise ValueError(f"Unknown st {mock_st}")
 
     with patch(
-        "homeassistant.components.samsungtv.ssdp.async_get_discovery_info_by_st",
+        "smarthub.components.samsungtv.ssdp.async_get_discovery_info_by_st",
         _mock_async_get_discovery_info_by_st,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -111,7 +111,7 @@ async def test_setup_updates_from_ssdp(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
-async def test_reauth_triggered_encrypted(hass: HomeAssistant) -> None:
+async def test_reauth_triggered_encrypted(hass: SmartHub) -> None:
     """Test reauth flow is triggered for encrypted TVs."""
     encrypted_entry_data = {**ENTRYDATA_ENCRYPTED_WEBSOCKET}
     del encrypted_entry_data[CONF_TOKEN]
@@ -128,7 +128,7 @@ async def test_reauth_triggered_encrypted(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_websocket", "rest_api")
-async def test_incorrectly_formatted_mac_fixed(hass: HomeAssistant) -> None:
+async def test_incorrectly_formatted_mac_fixed(hass: SmartHub) -> None:
     """Test incorrectly formatted mac is corrected."""
     # Incorrect MAC cleanup introduced in #110599, can be removed in 2026.3
     await setup_samsungtv_entry(

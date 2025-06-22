@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.overseerr import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.overseerr import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import call_webhook, setup_integration
 
@@ -20,21 +20,21 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.overseerr.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.overseerr.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_webhook_trigger_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,

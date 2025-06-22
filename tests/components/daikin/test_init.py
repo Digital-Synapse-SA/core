@@ -7,12 +7,12 @@ from aiohttp import ClientConnectionError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.daikin import update_unique_id
-from homeassistant.components.daikin.const import DOMAIN, KEY_MAC
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.daikin import update_unique_id
+from smarthub.components.daikin.const import DOMAIN, KEY_MAC
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .test_config_flow import HOST, MAC
 
@@ -27,7 +27,7 @@ def mock_daikin():
         """Mock the init function in pydaikin."""
         return Appliance
 
-    with patch("homeassistant.components.daikin.DaikinFactory") as Appliance:
+    with patch("smarthub.components.daikin.DaikinFactory") as Appliance:
         Appliance.side_effect = mock_daikin_factory
         type(Appliance).update_status = AsyncMock()
         type(Appliance).device_ip = PropertyMock(return_value=HOST)
@@ -51,7 +51,7 @@ INVALID_DATA = {**DATA, "name": None, "mac": HOST}
 
 
 async def test_duplicate_removal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mock_daikin,
@@ -69,7 +69,7 @@ async def test_duplicate_removal(
     type(mock_daikin).values = PropertyMock(return_value=INVALID_DATA)
 
     with patch(
-        "homeassistant.components.daikin.async_migrate_unique_id", return_value=None
+        "smarthub.components.daikin.async_migrate_unique_id", return_value=None
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
 
@@ -115,7 +115,7 @@ async def test_duplicate_removal(
 
 
 async def test_unique_id_migrate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mock_daikin,
@@ -168,7 +168,7 @@ async def test_unique_id_migrate(
 
 
 async def test_client_update_connection_error(
-    hass: HomeAssistant, mock_daikin, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_daikin, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test client connection error on update."""
     config_entry = MockConfigEntry(
@@ -196,7 +196,7 @@ async def test_client_update_connection_error(
     assert mock_daikin.update_status.call_count == 2
 
 
-async def test_client_connection_error(hass: HomeAssistant, mock_daikin) -> None:
+async def test_client_connection_error(hass: SmartHub, mock_daikin) -> None:
     """Test client connection error on setup."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -212,7 +212,7 @@ async def test_client_connection_error(hass: HomeAssistant, mock_daikin) -> None
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_timeout_error(hass: HomeAssistant, mock_daikin) -> None:
+async def test_timeout_error(hass: SmartHub, mock_daikin) -> None:
     """Test timeout error on setup."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

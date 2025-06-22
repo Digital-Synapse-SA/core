@@ -3,14 +3,14 @@
 from aioesphomeapi import APIClient, Event, EventInfo
 import pytest
 
-from homeassistant.components.event import EventDeviceClass
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.event import EventDeviceClass
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 
 @pytest.mark.freeze_time("2024-04-24 00:00:00+00:00")
 async def test_generic_event_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device,
 ) -> None:

@@ -7,9 +7,9 @@ from unittest.mock import MagicMock, mock_open, patch
 import pytest
 import voluptuous as vol
 
-from homeassistant import core
-from homeassistant.components import light
-from homeassistant.const import (
+from smarthub import core
+from smarthub.components import light
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_PLATFORM,
     ENTITY_MATCH_ALL,
@@ -19,10 +19,10 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, Unauthorized
-from homeassistant.setup import async_setup_component
-from homeassistant.util import color as color_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, Unauthorized
+from smarthub.setup import async_setup_component
+from smarthub.util import color as color_util
 
 from .common import MockLight
 
@@ -39,7 +39,7 @@ from tests.common import (
 orig_Profiles = light.Profiles
 
 
-async def test_methods(hass: HomeAssistant) -> None:
+async def test_methods(hass: SmartHub) -> None:
     """Test if methods call the services as expected."""
     # Test is_on
     hass.states.async_set("light.test", STATE_ON)
@@ -120,7 +120,7 @@ async def test_methods(hass: HomeAssistant) -> None:
 
 
 async def test_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_light_profiles,
     mock_light_entities: list[MockLight],
 ) -> None:
@@ -517,7 +517,7 @@ async def test_services(
     ],
 )
 async def test_light_profiles(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_light_profiles,
     profile_name,
     expected_data,
@@ -568,7 +568,7 @@ async def test_light_profiles(
 
 
 async def test_default_profiles_group(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_light_profiles,
     mock_light_entities: list[MockLight],
 ) -> None:
@@ -790,7 +790,7 @@ async def test_default_profiles_group(
     ],
 )
 async def test_default_profiles_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_light_profiles,
     extra_call_params,
     expected_params_state_was_off,
@@ -862,7 +862,7 @@ async def test_default_profiles_light(
 
 
 async def test_light_context(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
     mock_light_entities: list[MockLight],
 ) -> None:
@@ -890,7 +890,7 @@ async def test_light_context(
 
 
 async def test_light_turn_on_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_read_only_user: MockUser,
     mock_light_entities: list[MockLight],
 ) -> None:
@@ -915,7 +915,7 @@ async def test_light_turn_on_auth(
         )
 
 
-async def test_light_brightness_step(hass: HomeAssistant) -> None:
+async def test_light_brightness_step(hass: SmartHub) -> None:
     """Test that light context works."""
     entities = [
         MockLight("Test_0", STATE_ON),
@@ -971,7 +971,7 @@ async def test_light_brightness_step(hass: HomeAssistant) -> None:
     assert entity0.state == "off"  # 40 - 126; brightness is 0, light should turn off
 
 
-async def test_light_brightness_step_pct(hass: HomeAssistant) -> None:
+async def test_light_brightness_step_pct(hass: SmartHub) -> None:
     """Test that percentage based brightness steps work as expected."""
     entity = MockLight("Test_0", STATE_ON)
 
@@ -1015,7 +1015,7 @@ async def test_light_brightness_step_pct(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_light_brightness_pct_conversion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_light_entities: list[MockLight],
 ) -> None:
     """Test that light brightness percent conversion."""
@@ -1085,7 +1085,7 @@ async def test_light_brightness_pct_conversion(
     assert data["brightness"] == 255
 
 
-async def test_profiles(hass: HomeAssistant) -> None:
+async def test_profiles(hass: SmartHub) -> None:
     """Test profiles loading."""
     profiles = orig_Profiles(hass)
     await profiles.async_initialize()
@@ -1102,7 +1102,7 @@ async def test_profiles(hass: HomeAssistant) -> None:
 
 
 @patch("os.path.isfile", MagicMock(side_effect=(True, False)))
-async def test_profile_load_optional_hs_color(hass: HomeAssistant) -> None:
+async def test_profile_load_optional_hs_color(hass: SmartHub) -> None:
     """Test profile loading with profiles containing no xy color."""
 
     csv_file = """the first line is skipped
@@ -1176,7 +1176,7 @@ invalid_no_brightness_no_color_no_transition,,,
 
 @pytest.mark.parametrize("light_state", [STATE_ON, STATE_OFF])
 async def test_light_backwards_compatibility_supported_color_modes(
-    hass: HomeAssistant, light_state: Literal["on", "off"]
+    hass: SmartHub, light_state: Literal["on", "off"]
 ) -> None:
     """Test supported_color_modes if not implemented by the entity."""
     entities = [
@@ -1259,7 +1259,7 @@ async def test_light_backwards_compatibility_supported_color_modes(
         assert state.attributes["color_mode"] == light.ColorMode.UNKNOWN
 
 
-async def test_light_backwards_compatibility_color_mode(hass: HomeAssistant) -> None:
+async def test_light_backwards_compatibility_color_mode(hass: SmartHub) -> None:
     """Test color_mode if not implemented by the entity."""
     entities = [
         MockLight("Test_0", STATE_ON),
@@ -1335,7 +1335,7 @@ async def test_light_backwards_compatibility_color_mode(hass: HomeAssistant) -> 
     assert state.attributes["color_mode"] == light.ColorMode.HS
 
 
-async def test_light_service_call_rgbw(hass: HomeAssistant) -> None:
+async def test_light_service_call_rgbw(hass: SmartHub) -> None:
     """Test rgbw functionality in service calls."""
     entity0 = MockLight("Test_rgbw", STATE_ON)
     entity0.supported_color_modes = {light.ColorMode.RGBW}
@@ -1363,7 +1363,7 @@ async def test_light_service_call_rgbw(hass: HomeAssistant) -> None:
     assert data == {"brightness": 255, "rgbw_color": (10, 20, 30, 40)}
 
 
-async def test_light_state_off(hass: HomeAssistant) -> None:
+async def test_light_state_off(hass: SmartHub) -> None:
     """Test rgbw color conversion in state updates."""
     entities = [
         MockLight("Test_onoff", STATE_OFF),
@@ -1434,7 +1434,7 @@ async def test_light_state_off(hass: HomeAssistant) -> None:
     }
 
 
-async def test_light_state_rgbw(hass: HomeAssistant) -> None:
+async def test_light_state_rgbw(hass: SmartHub) -> None:
     """Test rgbw color conversion in state updates."""
     entity0 = MockLight("Test_rgbw", STATE_ON)
     setup_test_component_platform(hass, light.DOMAIN, [entity0])
@@ -1465,7 +1465,7 @@ async def test_light_state_rgbw(hass: HomeAssistant) -> None:
     }
 
 
-async def test_light_state_rgbww(hass: HomeAssistant) -> None:
+async def test_light_state_rgbww(hass: SmartHub) -> None:
     """Test rgbww color conversion in state updates."""
     entity0 = MockLight("Test_rgbww", STATE_ON)
     setup_test_component_platform(hass, light.DOMAIN, [entity0])
@@ -1496,7 +1496,7 @@ async def test_light_state_rgbww(hass: HomeAssistant) -> None:
     }
 
 
-async def test_light_service_call_color_conversion(hass: HomeAssistant) -> None:
+async def test_light_service_call_color_conversion(hass: SmartHub) -> None:
     """Test color conversion in service calls."""
     entities = [
         MockLight("Test_hs", STATE_ON),
@@ -1940,7 +1940,7 @@ async def test_light_service_call_color_conversion(hass: HomeAssistant) -> None:
 
 
 async def test_light_service_call_color_conversion_named_tuple(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a named tuple (RGBColor) is handled correctly."""
     entities = [
@@ -2019,7 +2019,7 @@ async def test_light_service_call_color_conversion_named_tuple(
     assert data == {"brightness": 64, "rgbww_color": (128, 0, 0, 0, 0)}
 
 
-async def test_light_service_call_color_temp_emulation(hass: HomeAssistant) -> None:
+async def test_light_service_call_color_temp_emulation(hass: SmartHub) -> None:
     """Test color conversion in service calls."""
     entities = [
         MockLight("Test_hs_ct", STATE_ON),
@@ -2077,7 +2077,7 @@ async def test_light_service_call_color_temp_emulation(hass: HomeAssistant) -> N
     assert data == {"brightness": 255, "hs_color": (27.001, 19.243)}
 
 
-async def test_light_service_call_color_temp_conversion(hass: HomeAssistant) -> None:
+async def test_light_service_call_color_temp_conversion(hass: SmartHub) -> None:
     """Test color temp conversion in service calls."""
     entities = [
         MockLight("Test_rgbww_ct", STATE_ON),
@@ -2130,7 +2130,7 @@ async def test_light_service_call_color_temp_conversion(hass: HomeAssistant) -> 
     _, data = entity0.last_call("turn_on")
     assert data == {"brightness": 255, "color_temp": 153, "color_temp_kelvin": 6535}
     _, data = entity1.last_call("turn_on")
-    # Home Assistant uses RGBCW so a mireds of 153 should be maximum cold at 100% brightness so 255
+    # SmartHub uses RGBCW so a mireds of 153 should be maximum cold at 100% brightness so 255
     assert data == {"brightness": 255, "rgbww_color": (0, 0, 0, 255, 0)}
 
     await hass.services.async_call(
@@ -2149,7 +2149,7 @@ async def test_light_service_call_color_temp_conversion(hass: HomeAssistant) -> 
     _, data = entity0.last_call("turn_on")
     assert data == {"brightness": 128, "color_temp": 500, "color_temp_kelvin": 2000}
     _, data = entity1.last_call("turn_on")
-    # Home Assistant uses RGBCW so a mireds of 500 should be maximum warm at 50% brightness so 128
+    # SmartHub uses RGBCW so a mireds of 500 should be maximum warm at 50% brightness so 128
     assert data == {"brightness": 128, "rgbww_color": (0, 0, 0, 0, 128)}
 
     await hass.services.async_call(
@@ -2168,7 +2168,7 @@ async def test_light_service_call_color_temp_conversion(hass: HomeAssistant) -> 
     _, data = entity0.last_call("turn_on")
     assert data == {"brightness": 255, "color_temp": 327, "color_temp_kelvin": 3058}
     _, data = entity1.last_call("turn_on")
-    # Home Assistant uses RGBCW so a mireds of 328 should be the midway point at 100% brightness so 127 (rounding), 128
+    # SmartHub uses RGBCW so a mireds of 328 should be the midway point at 100% brightness so 127 (rounding), 128
     assert data == {"brightness": 255, "rgbww_color": (0, 0, 0, 127, 128)}
 
     await hass.services.async_call(
@@ -2208,7 +2208,7 @@ async def test_light_service_call_color_temp_conversion(hass: HomeAssistant) -> 
     assert data == {"brightness": 255, "rgbww_color": (0, 0, 0, 66, 189)}
 
 
-async def test_light_mired_color_temp_conversion(hass: HomeAssistant) -> None:
+async def test_light_mired_color_temp_conversion(hass: SmartHub) -> None:
     """Test color temp conversion from K to legacy mired."""
     entities = [
         MockLight("Test_rgbww_ct", STATE_ON),
@@ -2254,7 +2254,7 @@ async def test_light_mired_color_temp_conversion(hass: HomeAssistant) -> None:
     assert state.attributes["color_temp_kelvin"] == 3500
 
 
-async def test_light_service_call_white_mode(hass: HomeAssistant) -> None:
+async def test_light_service_call_white_mode(hass: SmartHub) -> None:
     """Test color_mode white in service calls."""
     entity0 = MockLight("Test_white", STATE_ON)
     entity0.supported_color_modes = {light.ColorMode.HS, light.ColorMode.WHITE}
@@ -2353,7 +2353,7 @@ async def test_light_service_call_white_mode(hass: HomeAssistant) -> None:
     assert data == {"white": 128}
 
 
-async def test_light_state_color_conversion(hass: HomeAssistant) -> None:
+async def test_light_state_color_conversion(hass: SmartHub) -> None:
     """Test color conversion in state updates."""
     entities = [
         MockLight("Test_hs", STATE_ON),
@@ -2420,7 +2420,7 @@ async def test_light_state_color_conversion(hass: HomeAssistant) -> None:
 
 
 async def test_services_filter_parameters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_light_profiles,
     mock_light_entities: list[MockLight],
 ) -> None:
@@ -2618,16 +2618,16 @@ def test_filter_supported_color_modes() -> None:
 
     # Supported color modes must not be empty
     supported = set()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         light.filter_supported_color_modes(supported)
 
     # ColorMode.WHITE must be combined with a color mode supporting color
     supported = {light.ColorMode.WHITE}
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         light.filter_supported_color_modes(supported)
 
     supported = {light.ColorMode.WHITE, light.ColorMode.COLOR_TEMP}
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         light.filter_supported_color_modes(supported)
 
     supported = {light.ColorMode.WHITE, light.ColorMode.HS}
@@ -2653,7 +2653,7 @@ def test_filter_supported_color_modes() -> None:
 
 
 def test_deprecated_supported_features_ints(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test deprecated supported features ints."""
 
@@ -2685,7 +2685,7 @@ def test_deprecated_supported_features_ints(
     ],
 )
 async def test_report_no_color_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     color_mode: str,
     supported_color_modes: set[str],
@@ -2715,7 +2715,7 @@ async def test_report_no_color_mode(
     ],
 )
 async def test_report_no_color_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     color_mode: str,
     supported_color_modes: set[str],
@@ -2763,7 +2763,7 @@ async def test_report_no_color_modes(
     ],
 )
 async def test_report_invalid_color_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     color_mode: str,
     supported_color_modes: set[str],
@@ -2823,7 +2823,7 @@ async def test_report_invalid_color_mode(
     ],
 )
 def test_report_invalid_color_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     color_mode: str,
     supported_color_modes: set[str],
@@ -2873,7 +2873,7 @@ def test_report_invalid_color_modes(
     ids=["with_kelvin", "with_mired_values", "with_mired_defaults"],
 )
 def test_missing_kelvin_property_warnings(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     attributes: dict[str, int | None],
     expected_warnings: dict[str, bool],
@@ -2979,7 +2979,7 @@ def test_deprecated_color_mode_constants_enums(
 
 
 async def test_deprecated_turn_on_arguments(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test color temp conversion in service calls."""
     entity = MockLight("Test_ct", STATE_ON, {light.ColorMode.COLOR_TEMP})

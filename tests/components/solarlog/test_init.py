@@ -10,13 +10,13 @@ from solarlog_cli.solarlog_exceptions import (
     SolarLogUpdateError,
 )
 
-from homeassistant.components.solarlog.const import CONF_HAS_PWD, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.components.solarlog.const import CONF_HAS_PWD, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ConfigEntryNotReady
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import setup_platform
 from .const import HOST
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_solarlog_connector: AsyncMock,
 ) -> None:
@@ -47,7 +47,7 @@ async def test_load_unload(
     ],
 )
 async def test_setup_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: SolarLogError,
     error: str,
     mock_config_entry: MockConfigEntry,
@@ -76,7 +76,7 @@ async def test_setup_error(
     ],
 )
 async def test_auth_error_during_first_refresh(
-    hass: HomeAssistant,
+    hass: SmartHub,
     login_side_effect: Exception | None,
     login_return_value: bool,
     entry_state: str,
@@ -105,7 +105,7 @@ async def test_auth_error_during_first_refresh(
     ],
 )
 async def test_other_exceptions_during_first_refresh(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: SolarLogError,
     mock_config_entry: MockConfigEntry,
     mock_solarlog_connector: AsyncMock,
@@ -130,7 +130,7 @@ async def test_other_exceptions_during_first_refresh(
     ],
 )
 async def test_migrate_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     minor_version: int,
     suffix: str,
     device_registry: DeviceRegistry,

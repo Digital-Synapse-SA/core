@@ -2,15 +2,15 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.radio_browser.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.radio_browser.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_full_user_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_full_user_flow(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test the full user configuration flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -31,7 +31,7 @@ async def test_full_user_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) 
 
 
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -47,7 +47,7 @@ async def test_already_configured(
 
 
 async def test_onboarding_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test the onboarding configuration flow."""
     result = await hass.config_entries.flow.async_init(

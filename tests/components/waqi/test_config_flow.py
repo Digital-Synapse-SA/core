@@ -7,18 +7,18 @@ from unittest.mock import AsyncMock, patch
 from aiowaqi import WAQIAirQuality, WAQIAuthenticationError, WAQIConnectionError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.waqi.config_flow import CONF_MAP
-from homeassistant.components.waqi.const import CONF_STATION_NUMBER, DOMAIN
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components.waqi.config_flow import CONF_MAP
+from smarthub.components.waqi.const import CONF_STATION_NUMBER, DOMAIN
+from smarthub.const import (
     CONF_API_KEY,
     CONF_LATITUDE,
     CONF_LOCATION,
     CONF_LONGITUDE,
     CONF_METHOD,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import async_load_fixture
 
@@ -43,7 +43,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
     ],
 )
 async def test_full_map_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     method: str,
     payload: dict[str, Any],
@@ -121,7 +121,7 @@ async def test_full_map_flow(
     ],
 )
 async def test_flow_errors(
-    hass: HomeAssistant, exception: Exception, error: str
+    hass: SmartHub, exception: Exception, error: str
 ) -> None:
     """Test we handle errors during configuration."""
     result = await hass.config_entries.flow.async_init(
@@ -230,7 +230,7 @@ async def test_flow_errors(
     ],
 )
 async def test_error_in_second_step(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     method: str,
     payload: dict[str, Any],

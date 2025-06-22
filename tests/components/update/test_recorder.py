@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.components.update.const import (
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.components.update.const import (
     ATTR_DISPLAY_PRECISION,
     ATTR_IN_PROGRESS,
     ATTR_INSTALLED_VERSION,
@@ -14,10 +14,10 @@ from homeassistant.components.update.const import (
     ATTR_UPDATE_PERCENTAGE,
     DOMAIN,
 )
-from homeassistant.const import ATTR_ENTITY_PICTURE, CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_PICTURE, CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .common import MockUpdateEntity
 
@@ -27,7 +27,7 @@ from tests.components.recorder.common import async_wait_recording_done
 
 async def test_exclude_attributes(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
 ) -> None:
     """Test update attributes to be excluded."""
@@ -41,7 +41,7 @@ async def test_exclude_attributes(
     assert state.attributes[ATTR_UPDATE_PERCENTAGE] == 50
     assert (
         state.attributes[ATTR_ENTITY_PICTURE]
-        == "https://brands.home-assistant.io/_/test/icon.png"
+        == "https://brands.smart-hub.io/_/test/icon.png"
     )
     await async_setup_component(hass, DOMAIN, {})
 

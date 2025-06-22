@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 import pyvera as pv
 
-from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_HS_COLOR
-from homeassistant.core import HomeAssistant
+from smarthub.components.light import ATTR_BRIGHTNESS, ATTR_HS_COLOR
+from smarthub.core import SmartHub
 
 from .common import ComponentFactory, new_simple_controller_config
 
 
 async def test_light(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
     vera_device: pv.VeraDimmer = MagicMock(spec=pv.VeraDimmer)

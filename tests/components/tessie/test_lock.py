@@ -5,22 +5,22 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.lock import (
+from smarthub.components.lock import (
     DOMAIN as LOCK_DOMAIN,
     SERVICE_LOCK,
     SERVICE_UNLOCK,
     LockState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from .common import assert_entities, setup_platform
 
 
 async def test_locks(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
+    hass: SmartHub, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests that the lock entity is correct."""
 
@@ -30,7 +30,7 @@ async def test_locks(
 
     # Test lock set value functions
     entity_id = "lock.test_lock"
-    with patch("homeassistant.components.tessie.lock.lock") as mock_run:
+    with patch("smarthub.components.tessie.lock.lock") as mock_run:
         await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_LOCK,
@@ -40,7 +40,7 @@ async def test_locks(
         mock_run.assert_called_once()
     assert hass.states.get(entity_id).state == LockState.LOCKED
 
-    with patch("homeassistant.components.tessie.lock.unlock") as mock_run:
+    with patch("smarthub.components.tessie.lock.unlock") as mock_run:
         await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_UNLOCK,
@@ -61,7 +61,7 @@ async def test_locks(
         )
 
     with patch(
-        "homeassistant.components.tessie.lock.open_unlock_charge_port"
+        "smarthub.components.tessie.lock.open_unlock_charge_port"
     ) as mock_run:
         await hass.services.async_call(
             LOCK_DOMAIN,

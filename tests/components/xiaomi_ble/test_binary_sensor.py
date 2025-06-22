@@ -3,18 +3,18 @@
 from datetime import timedelta
 import time
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
 )
-from homeassistant.components.xiaomi_ble.const import CONF_SLEEPY_DEVICE, DOMAIN
-from homeassistant.const import (
+from smarthub.components.xiaomi_ble.const import CONF_SLEEPY_DEVICE, DOMAIN
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import make_advertisement
 
@@ -26,7 +26,7 @@ from tests.components.bluetooth import (
 )
 
 
-async def test_door_problem_sensors(hass: HomeAssistant) -> None:
+async def test_door_problem_sensors(hass: SmartHub) -> None:
     """Test setting up a door binary sensor with additional problem sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -70,7 +70,7 @@ async def test_door_problem_sensors(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_light_motion(hass: HomeAssistant) -> None:
+async def test_light_motion(hass: SmartHub) -> None:
     """Test setting up a light and motion binary sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -106,7 +106,7 @@ async def test_light_motion(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_moisture(hass: HomeAssistant) -> None:
+async def test_moisture(hass: SmartHub) -> None:
     """Test setting up a moisture binary sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -140,7 +140,7 @@ async def test_moisture(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_opening(hass: HomeAssistant) -> None:
+async def test_opening(hass: SmartHub) -> None:
     """Test setting up a opening binary sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -175,7 +175,7 @@ async def test_opening(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_opening_problem_sensors(hass: HomeAssistant) -> None:
+async def test_opening_problem_sensors(hass: SmartHub) -> None:
     """Test setting up a opening binary sensor with additional problem sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -230,7 +230,7 @@ async def test_opening_problem_sensors(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_smoke(hass: HomeAssistant) -> None:
+async def test_smoke(hass: SmartHub) -> None:
     """Test setting up a smoke binary sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -262,7 +262,7 @@ async def test_smoke(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_power(hass: HomeAssistant) -> None:
+async def test_power(hass: SmartHub) -> None:
     """Test setting up a power binary sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -293,7 +293,7 @@ async def test_power(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_unavailable(hass: HomeAssistant) -> None:
+async def test_unavailable(hass: SmartHub) -> None:
     """Test normal device goes to unavailable after 60 minutes."""
     start_monotonic = time.monotonic()
 
@@ -349,7 +349,7 @@ async def test_unavailable(hass: HomeAssistant) -> None:
     assert CONF_SLEEPY_DEVICE not in entry.data
 
 
-async def test_sleepy_device(hass: HomeAssistant) -> None:
+async def test_sleepy_device(hass: SmartHub) -> None:
     """Test sleepy device does not go to unavailable after 60 minutes."""
     start_monotonic = time.monotonic()
 
@@ -404,7 +404,7 @@ async def test_sleepy_device(hass: HomeAssistant) -> None:
     assert entry.data[CONF_SLEEPY_DEVICE] is True
 
 
-async def test_sleepy_device_restore_state(hass: HomeAssistant) -> None:
+async def test_sleepy_device_restore_state(hass: SmartHub) -> None:
     """Test sleepy device does not go to unavailable after 60 minutes and restores state."""
     start_monotonic = time.monotonic()
 

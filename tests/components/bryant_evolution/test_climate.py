@@ -9,8 +9,8 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.bryant_evolution.climate import SCAN_INTERVAL
-from homeassistant.components.climate import (
+from smarthub.components.bryant_evolution.climate import SCAN_INTERVAL
+from smarthub.components.climate import (
     ATTR_FAN_MODE,
     ATTR_HVAC_ACTION,
     ATTR_HVAC_MODE,
@@ -21,16 +21,16 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACAction,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def trigger_polling(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+async def trigger_polling(hass: SmartHub, freezer: FrozenDateTimeFactory) -> None:
     """Trigger a polling event."""
     freezer.tick(SCAN_INTERVAL + timedelta(seconds=1))
     async_fire_time_changed(hass)
@@ -38,7 +38,7 @@ async def trigger_polling(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -
 
 
 async def test_setup_integration_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_evolution_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -50,7 +50,7 @@ async def test_setup_integration_success(
 
 
 async def test_set_temperature_mode_cool(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_evolution_entry: MockConfigEntry,
     mock_evolution_client_factory: Generator[AsyncMock],
     freezer: FrozenDateTimeFactory,
@@ -81,7 +81,7 @@ async def test_set_temperature_mode_cool(
 
 
 async def test_set_temperature_mode_heat(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_evolution_entry: MockConfigEntry,
     mock_evolution_client_factory: Generator[AsyncMock],
     freezer: FrozenDateTimeFactory,
@@ -109,7 +109,7 @@ async def test_set_temperature_mode_heat(
 
 
 async def test_set_temperature_mode_heat_cool(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_evolution_entry: MockConfigEntry,
     mock_evolution_client_factory: Generator[AsyncMock],
     freezer: FrozenDateTimeFactory,
@@ -145,7 +145,7 @@ async def test_set_temperature_mode_heat_cool(
 
 
 async def test_set_fan_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_evolution_entry: MockConfigEntry,
     mock_evolution_client_factory: Generator[AsyncMock],
 ) -> None:
@@ -173,7 +173,7 @@ async def test_set_fan_mode(
     [("heat_cool", "auto"), ("heat", "heat"), ("cool", "cool"), ("off", "off")],
 )
 async def test_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_evolution_entry: MockConfigEntry,
     mock_evolution_client_factory: Generator[AsyncMock],
     hvac_mode,
@@ -201,7 +201,7 @@ async def test_set_hvac_mode(
     [(62, HVACAction.HEATING), (70, HVACAction.OFF), (80, HVACAction.COOLING)],
 )
 async def test_read_hvac_action_heat_cool(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_evolution_entry: MockConfigEntry,
     mock_evolution_client_factory: Generator[AsyncMock],
     freezer: FrozenDateTimeFactory,
@@ -234,7 +234,7 @@ async def test_read_hvac_action_heat_cool(
     ],
 )
 async def test_read_hvac_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_evolution_entry: MockConfigEntry,
     mock_evolution_client_factory: Generator[AsyncMock],
     freezer: FrozenDateTimeFactory,

@@ -7,19 +7,19 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import sensor
-from homeassistant.components.mqtt import CONF_QOS, CONF_STATE_TOPIC, DEFAULT_QOS
-from homeassistant.const import (
+from smarthub.components import sensor
+from smarthub.components.mqtt import CONF_QOS, CONF_STATE_TOPIC, DEFAULT_QOS
+from smarthub.const import (
     CONF_DEVICE_ID,
     CONF_NAME,
     CONF_PLATFORM,
     CONF_TIMEOUT,
     CONF_UNIQUE_ID,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_mqtt_message
 from tests.typing import MqttMockHAClient
@@ -42,7 +42,7 @@ REALLY_FAR_MESSAGE = {"id": DEVICE_ID, "name": NAME, "distance": 20}
 
 
 async def send_message(
-    hass: HomeAssistant, topic: str, message: dict[str, Any]
+    hass: SmartHub, topic: str, message: dict[str, Any]
 ) -> None:
     """Test the sending of a message."""
     async_fire_mqtt_message(hass, topic, json.dumps(message))
@@ -50,19 +50,19 @@ async def send_message(
     await hass.async_block_till_done()
 
 
-async def assert_state(hass: HomeAssistant, room: str) -> None:
+async def assert_state(hass: SmartHub, room: str) -> None:
     """Test the assertion of a room state."""
     state = hass.states.get(SENSOR_STATE)
     assert state.state == room
 
 
-async def assert_distance(hass: HomeAssistant, distance: int) -> None:
+async def assert_distance(hass: SmartHub, distance: int) -> None:
     """Test the assertion of a distance state."""
     state = hass.states.get(SENSOR_STATE)
     assert state.attributes.get("distance") == distance
 
 
-async def test_no_mqtt(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_no_mqtt(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test no mqtt available."""
     assert await async_setup_component(
         hass,
@@ -84,7 +84,7 @@ async def test_no_mqtt(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) ->
     assert "MQTT integration is not available" in caplog.text
 
 
-async def test_room_update(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_room_update(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test the updating between rooms."""
     assert await async_setup_component(
         hass,
@@ -115,14 +115,14 @@ async def test_room_update(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> 
     await assert_distance(hass, 1)
 
     time = dt_util.utcnow() + datetime.timedelta(seconds=7)
-    with patch("homeassistant.helpers.condition.dt_util.utcnow", return_value=time):
+    with patch("smarthub.helpers.condition.dt_util.utcnow", return_value=time):
         await send_message(hass, BEDROOM_TOPIC, FAR_MESSAGE)
         await assert_state(hass, BEDROOM)
         await assert_distance(hass, 10)
 
 
 async def test_unique_id_is_set(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, entity_registry: er.EntityRegistry, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the updating between rooms."""
     unique_name = "my_unique_name_0123456789"

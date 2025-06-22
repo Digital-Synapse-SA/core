@@ -8,14 +8,14 @@ from unittest.mock import AsyncMock, MagicMock, call, patch
 from aioimaplib import AUTH, NONAUTH, SELECTED, AioImapException, Response
 import pytest
 
-from homeassistant.components.imap import DOMAIN
-from homeassistant.components.imap.const import CONF_CHARSET
-from homeassistant.components.imap.errors import InvalidAuth, InvalidFolder
-from homeassistant.components.sensor import SensorStateClass
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.util.dt import utcnow
+from smarthub.components.imap import DOMAIN
+from smarthub.components.imap.const import CONF_CHARSET
+from smarthub.components.imap.errors import InvalidAuth, InvalidFolder
+from smarthub.components.sensor import SensorStateClass
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.util.dt import utcnow
 
 from .const import (
     BAD_RESPONSE,
@@ -59,7 +59,7 @@ from tests.common import MockConfigEntry, async_capture_events, async_fire_time_
 )
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 async def test_entry_startup_and_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imap_protocol: MagicMock,
     cipher_list: str | None,
     verify_ssl: bool | None,
@@ -90,7 +90,7 @@ async def test_entry_startup_and_unload(
     ],
 )
 async def test_entry_startup_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imap_protocol: MagicMock,
     effect: Exception,
 ) -> None:
@@ -99,7 +99,7 @@ async def test_entry_startup_fails(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.imap.connect_to_server",
+        "smarthub.components.imap.connect_to_server",
         side_effect=effect,
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id) is False
@@ -140,7 +140,7 @@ async def test_entry_startup_fails(
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 @pytest.mark.parametrize("charset", ["utf-8", "us-ascii"], ids=["utf-8", "us-ascii"])
 async def test_receiving_message_successfully(
-    hass: HomeAssistant, mock_imap_protocol: MagicMock, valid_date: bool, charset: str
+    hass: SmartHub, mock_imap_protocol: MagicMock, valid_date: bool, charset: str
 ) -> None:
     """Test receiving a message successfully."""
     event_called = async_capture_events(hass, "imap_content")
@@ -188,7 +188,7 @@ async def test_receiving_message_successfully(
 )
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 async def test_receiving_message_with_invalid_encoding(
-    hass: HomeAssistant, mock_imap_protocol: MagicMock
+    hass: SmartHub, mock_imap_protocol: MagicMock
 ) -> None:
     """Test receiving a message successfully."""
     event_called = async_capture_events(hass, "imap_content")
@@ -223,7 +223,7 @@ async def test_receiving_message_with_invalid_encoding(
 @pytest.mark.parametrize("imap_fetch", [TEST_FETCH_RESPONSE_NO_SUBJECT_TO_FROM])
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 async def test_receiving_message_no_subject_to_from(
-    hass: HomeAssistant, mock_imap_protocol: MagicMock
+    hass: SmartHub, mock_imap_protocol: MagicMock
 ) -> None:
     """Test receiving a message successfully without subject, to and from in body."""
     event_called = async_capture_events(hass, "imap_content")
@@ -263,7 +263,7 @@ async def test_receiving_message_no_subject_to_from(
     ("imap_login_state", "success"), [(AUTH, True), (NONAUTH, False)]
 )
 async def test_initial_authentication_error(
-    hass: HomeAssistant, mock_imap_protocol: MagicMock, success: bool
+    hass: SmartHub, mock_imap_protocol: MagicMock, success: bool
 ) -> None:
     """Test authentication error when starting the entry."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG)
@@ -280,7 +280,7 @@ async def test_initial_authentication_error(
     ("imap_select_state", "success"), [(AUTH, False), (SELECTED, True)]
 )
 async def test_initial_invalid_folder_error(
-    hass: HomeAssistant, mock_imap_protocol: MagicMock, success: bool
+    hass: SmartHub, mock_imap_protocol: MagicMock, success: bool
 ) -> None:
     """Test invalid folder error when starting the entry."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG)
@@ -292,10 +292,10 @@ async def test_initial_invalid_folder_error(
     assert (state is not None) == success
 
 
-@patch("homeassistant.components.imap.coordinator.MAX_ERRORS", 1)
+@patch("smarthub.components.imap.coordinator.MAX_ERRORS", 1)
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 async def test_late_authentication_retry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_imap_protocol: MagicMock,
 ) -> None:
@@ -333,10 +333,10 @@ async def test_late_authentication_retry(
     assert state.state == STATE_UNAVAILABLE
 
 
-@patch("homeassistant.components.imap.coordinator.MAX_ERRORS", 0)
+@patch("smarthub.components.imap.coordinator.MAX_ERRORS", 0)
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 async def test_late_authentication_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_imap_protocol: MagicMock,
 ) -> None:
@@ -376,7 +376,7 @@ async def test_late_authentication_error(
 
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 async def test_late_folder_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_imap_protocol: MagicMock,
 ) -> None:
@@ -428,7 +428,7 @@ async def test_late_folder_error(
     ids=["AioImapException", "TimeoutError"],
 )
 async def test_handle_cleanup_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_imap_protocol: MagicMock,
     imap_close: Exception,
@@ -471,7 +471,7 @@ async def test_handle_cleanup_exception(
     ids=["AioImapException", "TimeoutError"],
 )
 async def test_lost_connection_with_imap_push(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_imap_protocol: MagicMock,
     imap_wait_server_push_exception: AioImapException | TimeoutError,
@@ -493,7 +493,7 @@ async def test_lost_connection_with_imap_push(
 
 @pytest.mark.parametrize("imap_has_capability", [True], ids=["push"])
 async def test_fetch_number_of_messages(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_imap_protocol: MagicMock,
 ) -> None:
@@ -528,7 +528,7 @@ async def test_fetch_number_of_messages(
 )
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 async def test_reset_last_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imap_protocol: MagicMock,
     valid_date: bool,
     empty_search_reponse: tuple[str, list[bytes]],
@@ -626,9 +626,9 @@ async def test_reset_last_message(
     "imap_fetch", [(TEST_FETCH_RESPONSE_TEXT_PLAIN)], ids=["plain"]
 )
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
-@patch("homeassistant.components.imap.coordinator.MAX_EVENT_DATA_BYTES", 500)
+@patch("smarthub.components.imap.coordinator.MAX_EVENT_DATA_BYTES", 500)
 async def test_event_skipped_message_too_large(
-    hass: HomeAssistant, mock_imap_protocol: MagicMock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_imap_protocol: MagicMock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test skipping event when message is to large."""
     event_called = async_capture_events(hass, "imap_content")
@@ -654,7 +654,7 @@ async def test_event_skipped_message_too_large(
 )
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 async def test_message_is_truncated(
-    hass: HomeAssistant, mock_imap_protocol: MagicMock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_imap_protocol: MagicMock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test truncating message text in event data."""
     event_called = async_capture_events(hass, "imap_content")
@@ -687,7 +687,7 @@ async def test_message_is_truncated(
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
 @pytest.mark.parametrize("event_message_data", [[], ["text"], ["text", "headers"]])
 async def test_message_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imap_protocol: MagicMock,
     caplog: pytest.LogCaptureFixture,
     event_message_data: list,
@@ -732,7 +732,7 @@ async def test_message_data(
     ids=["subject_test", "sender_filter", "body_filter", "template_error"],
 )
 async def test_custom_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imap_protocol: MagicMock,
     caplog: pytest.LogCaptureFixture,
     custom_template: str,
@@ -785,7 +785,7 @@ async def test_custom_template(
     ids=["enforce_poll", "poll", "auto_push", "auto_poll"],
 )
 async def test_enforce_polling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imap_protocol: MagicMock,
     enable_push: bool,
     should_poll: True,
@@ -830,7 +830,7 @@ async def test_enforce_polling(
     [(TEST_SEARCH_RESPONSE, TEST_FETCH_RESPONSE_TEXT_PLAIN)],
 )
 @pytest.mark.parametrize("imap_has_capability", [True, False], ids=["push", "poll"])
-async def test_services(hass: HomeAssistant, mock_imap_protocol: MagicMock) -> None:
+async def test_services(hass: SmartHub, mock_imap_protocol: MagicMock) -> None:
     """Test receiving a message successfully."""
     event_called = async_capture_events(hass, "imap_content")
 
@@ -918,7 +918,7 @@ async def test_services(hass: HomeAssistant, mock_imap_protocol: MagicMock) -> N
     }
     for translation_key, attrs in exceptions.items():
         with patch(
-            "homeassistant.components.imap.connect_to_server", side_effect=attrs["exc"]
+            "smarthub.components.imap.connect_to_server", side_effect=attrs["exc"]
         ):
             data = {"entry": config_entry.entry_id, "uid": "1"}
             with pytest.raises(ServiceValidationError) as exc:

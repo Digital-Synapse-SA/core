@@ -10,16 +10,16 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from azure.eventhub.aio import EventHubProducerClient
 import pytest
 
-from homeassistant.components.azure_event_hub.const import (
+from smarthub.components.azure_event_hub.const import (
     CONF_FILTER,
     CONF_SEND_INTERVAL,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from .const import AZURE_EVENT_HUB_PATH, BASIC_OPTIONS, PRODUCER_PATH, SAS_CONFIG_FULL
 
@@ -44,7 +44,7 @@ def mock_filter_schema() -> dict[str, Any]:
 
 @pytest.fixture(name="entry")
 async def mock_entry_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     filter_schema: dict[str, Any],
     mock_create_batch: MagicMock,
     mock_send_batch: AsyncMock,
@@ -77,7 +77,7 @@ async def mock_entry_fixture(
 # fixtures for init tests
 @pytest.fixture(name="entry_with_one_event")
 def mock_entry_with_one_event(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> MockConfigEntry:
     """Use the entry and add a single test event to the queue."""
     assert entry.state is ConfigEntryState.LOADED

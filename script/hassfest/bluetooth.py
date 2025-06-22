@@ -28,7 +28,7 @@ def generate_and_validate(integrations: dict[str, Integration]) -> str:
 
 def validate(integrations: dict[str, Integration], config: Config) -> None:
     """Validate bluetooth file."""
-    bluetooth_path = config.root / "homeassistant/generated/bluetooth.py"
+    bluetooth_path = config.root / "smarthub/generated/bluetooth.py"
     config.cache["bluetooth"] = content = generate_and_validate(integrations)
 
     if config.specific_integrations:
@@ -44,5 +44,5 @@ def validate(integrations: dict[str, Integration], config: Config) -> None:
 
 def generate(integrations: dict[str, Integration], config: Config) -> None:
     """Generate bluetooth file."""
-    bluetooth_path = config.root / "homeassistant/generated/bluetooth.py"
+    bluetooth_path = config.root / "smarthub/generated/bluetooth.py"
     bluetooth_path.write_text(f"{config.cache['bluetooth']}")

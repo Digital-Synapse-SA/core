@@ -10,18 +10,18 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.tomorrowio.config_flow import (
+from smarthub.components.tomorrowio.config_flow import (
     _get_config_schema,
     _get_unique_id,
 )
-from homeassistant.components.tomorrowio.const import (
+from smarthub.components.tomorrowio.const import (
     ATTRIBUTION,
     CONF_TIMESTEP,
     DEFAULT_NAME,
     DEFAULT_TIMESTEP,
     DOMAIN,
 )
-from homeassistant.components.weather import (
+from smarthub.components.weather import (
     ATTR_CONDITION_SUNNY,
     ATTR_WEATHER_HUMIDITY,
     ATTR_WEATHER_OZONE,
@@ -38,11 +38,11 @@ from homeassistant.components.weather import (
     DOMAIN as WEATHER_DOMAIN,
     SERVICE_GET_FORECASTS,
 )
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY, SOURCE_USER
-from homeassistant.const import ATTR_ATTRIBUTION, ATTR_FRIENDLY_NAME, CONF_NAME
-from homeassistant.core import HomeAssistant, State, callback
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY, SOURCE_USER
+from smarthub.const import ATTR_ATTRIBUTION, ATTR_FRIENDLY_NAME, CONF_NAME
+from smarthub.core import SmartHub, State, callback
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .const import API_V4_ENTRY_DATA
 
@@ -51,7 +51,7 @@ from tests.typing import WebSocketGenerator
 
 
 @callback
-def _enable_entity(hass: HomeAssistant, entity_name: str) -> None:
+def _enable_entity(hass: SmartHub, entity_name: str) -> None:
     """Enable disabled entity."""
     ent_reg = er.async_get(hass)
     entry = ent_reg.async_get(entity_name)
@@ -60,7 +60,7 @@ def _enable_entity(hass: HomeAssistant, entity_name: str) -> None:
     assert updated_entry.disabled is False
 
 
-async def _setup_config_entry(hass: HomeAssistant, config: dict[str, Any]) -> State:
+async def _setup_config_entry(hass: SmartHub, config: dict[str, Any]) -> State:
     """Set up entry and return entity state."""
     data = _get_config_schema(hass, SOURCE_USER)(config)
     data[CONF_NAME] = DEFAULT_NAME
@@ -77,7 +77,7 @@ async def _setup_config_entry(hass: HomeAssistant, config: dict[str, Any]) -> St
     await hass.async_block_till_done()
 
 
-async def _setup(hass: HomeAssistant, config: dict[str, Any]) -> State:
+async def _setup(hass: SmartHub, config: dict[str, Any]) -> State:
     """Set up entry and return entity state."""
     with freeze_time(datetime(2021, 3, 6, 23, 59, 59, tzinfo=dt_util.UTC)):
         await _setup_config_entry(hass, config)
@@ -85,7 +85,7 @@ async def _setup(hass: HomeAssistant, config: dict[str, Any]) -> State:
     return hass.states.get("weather.tomorrow_io_daily")
 
 
-async def _setup_legacy(hass: HomeAssistant, config: dict[str, Any]) -> State:
+async def _setup_legacy(hass: SmartHub, config: dict[str, Any]) -> State:
     """Set up entry and return entity state."""
     registry = er.async_get(hass)
     data = _get_config_schema(hass, SOURCE_USER)(config)
@@ -115,7 +115,7 @@ async def _setup_legacy(hass: HomeAssistant, config: dict[str, Any]) -> State:
 
 
 async def test_new_config_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the expected entities are created."""
     await _setup(hass, API_V4_ENTRY_DATA)
@@ -126,7 +126,7 @@ async def test_new_config_entry(
 
 
 async def test_legacy_config_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the expected entities are created."""
     data = _get_config_schema(hass, SOURCE_USER)(API_V4_ENTRY_DATA)
@@ -143,7 +143,7 @@ async def test_legacy_config_entry(
     assert len(er.async_entries_for_config_entry(entity_registry, entry.entry_id)) == 30
 
 
-async def test_v4_weather(hass: HomeAssistant, tomorrowio_config_entry_update) -> None:
+async def test_v4_weather(hass: SmartHub, tomorrowio_config_entry_update) -> None:
     """Test v4 weather data."""
     weather_state = await _setup(hass, API_V4_ENTRY_DATA)
 
@@ -220,7 +220,7 @@ async def test_v4_weather(hass: HomeAssistant, tomorrowio_config_entry_update) -
     assert weather_state.attributes[ATTR_WEATHER_WIND_SPEED_UNIT] == "km/h"
 
 
-async def test_v4_weather_legacy_entities(hass: HomeAssistant) -> None:
+async def test_v4_weather_legacy_entities(hass: SmartHub) -> None:
     """Test v4 weather data."""
     weather_state = await _setup_legacy(hass, API_V4_ENTRY_DATA)
     assert weather_state.state == ATTR_CONDITION_SUNNY
@@ -246,7 +246,7 @@ async def test_v4_weather_legacy_entities(hass: HomeAssistant) -> None:
 )
 @freeze_time(datetime(2021, 3, 6, 23, 59, 59, tzinfo=dt_util.UTC))
 async def test_v4_forecast_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     service: str,
 ) -> None:
@@ -269,7 +269,7 @@ async def test_v4_forecast_service(
 
 
 async def test_v4_bad_forecast(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     tomorrowio_config_entry_update,
     snapshot: SnapshotAssertion,
@@ -306,7 +306,7 @@ async def test_v4_bad_forecast(
 
 @pytest.mark.parametrize("forecast_type", ["daily", "hourly"])
 async def test_forecast_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,

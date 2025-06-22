@@ -2,9 +2,9 @@
 
 import pytest
 
-from homeassistant.components import light
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.state import async_reproduce_state
+from smarthub.components import light
+from smarthub.core import SmartHub, State
+from smarthub.helpers.state import async_reproduce_state
 
 from tests.common import async_mock_service
 
@@ -28,7 +28,7 @@ NONE_XY_COLOR = {"xy_color": None}
 
 
 async def test_reproducing_states(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reproducing Light states."""
     hass.states.async_set("light.entity_off", "off", {})
@@ -141,7 +141,7 @@ async def test_reproducing_states(
     ],
 )
 async def test_filter_color_modes(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, color_mode
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, color_mode
 ) -> None:
     """Test filtering of parameters according to color mode."""
     hass.states.async_set("light.entity", "off", {})
@@ -194,7 +194,7 @@ async def test_filter_color_modes(
 
 
 async def test_filter_color_modes_missing_attributes(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test warning on missing attribute when filtering for color mode."""
     color_mode = light.ColorMode.COLOR_TEMP
@@ -270,7 +270,7 @@ async def test_filter_color_modes_missing_attributes(
         NONE_XY_COLOR,
     ],
 )
-async def test_filter_none(hass: HomeAssistant, saved_state) -> None:
+async def test_filter_none(hass: SmartHub, saved_state) -> None:
     """Test filtering of parameters which are None."""
     hass.states.async_set("light.entity", "off", {})
 

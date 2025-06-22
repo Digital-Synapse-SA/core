@@ -2,18 +2,18 @@
 
 from unittest.mock import Mock
 
-from homeassistant.components import media_player
-from homeassistant.components.dlna_dmr.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.setup import async_setup_component
+from smarthub.components import media_player
+from smarthub.components.dlna_dmr.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
 async def test_resource_lifecycle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     domain_data_mock: Mock,
     config_entry_mock: MockConfigEntry,
     ssdp_scanner_mock: Mock,

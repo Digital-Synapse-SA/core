@@ -7,12 +7,12 @@ from unittest.mock import MagicMock, call, mock_open, patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components import notify
-from homeassistant.components.file import DOMAIN
-from homeassistant.components.notify import ATTR_TITLE_DEFAULT
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.util import dt as dt_util
+from smarthub.components import notify
+from smarthub.components.file import DOMAIN
+from smarthub.components.notify import ATTR_TITLE_DEFAULT
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 
@@ -29,7 +29,7 @@ from tests.common import MockConfigEntry
 )
 @pytest.mark.parametrize("timestamp", [False, True], ids=["no_timestamp", "timestamp"])
 async def test_notify_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_is_allowed_path: MagicMock,
     timestamp: bool,
@@ -57,8 +57,8 @@ async def test_notify_file(
 
     m_open = mock_open()
     with (
-        patch("homeassistant.components.file.notify.open", m_open, create=True),
-        patch("homeassistant.components.file.notify.os.stat") as mock_st,
+        patch("smarthub.components.file.notify.open", m_open, create=True),
+        patch("smarthub.components.file.notify.os.stat") as mock_st,
     ):
         mock_st.return_value.st_size = 0
         title = (
@@ -102,7 +102,7 @@ async def test_notify_file(
     ids=["not_allowed"],
 )
 async def test_notify_file_not_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_is_allowed_path: MagicMock,
     config: dict[str, Any],
@@ -149,7 +149,7 @@ async def test_notify_file_not_allowed(
     ids=["not_allowed"],
 )
 async def test_notify_file_write_access_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_is_allowed_path: MagicMock,
     service: str,
@@ -176,8 +176,8 @@ async def test_notify_file_write_access_failed(
 
     m_open = mock_open()
     with (
-        patch("homeassistant.components.file.notify.open", m_open, create=True),
-        patch("homeassistant.components.file.notify.os.stat") as mock_st,
+        patch("smarthub.components.file.notify.open", m_open, create=True),
+        patch("smarthub.components.file.notify.os.stat") as mock_st,
     ):
         mock_st.side_effect = OSError("Access Failed")
         with pytest.raises(ServiceValidationError) as exc:

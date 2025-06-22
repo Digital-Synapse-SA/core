@@ -4,15 +4,15 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from homeassistant.components.stookwijzer.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.stookwijzer.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def test_full_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stookwijzer: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -42,7 +42,7 @@ async def test_full_user_flow(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stookwijzer: MagicMock,
 ) -> None:
     """Test user configuration flow while connection fails."""

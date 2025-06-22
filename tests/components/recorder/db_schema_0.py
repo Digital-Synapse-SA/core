@@ -21,9 +21,9 @@ from sqlalchemy import (
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm.session import Session
 
-from homeassistant.core import Event, EventOrigin, State, split_entity_id
-from homeassistant.helpers.json import JSONEncoder
-from homeassistant.util import dt as dt_util
+from smarthub.core import Event, EventOrigin, State, split_entity_id
+from smarthub.helpers.json import JSONEncoder
+from smarthub.util import dt as dt_util
 
 # SQLAlchemy Schema
 Base = declarative_base()

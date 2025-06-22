@@ -7,13 +7,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import config
-from homeassistant.components.config import script
-from homeassistant.const import STATE_OFF, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import yaml as yaml_util
+from smarthub.components import config
+from smarthub.components.config import script
+from smarthub.const import STATE_OFF, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import yaml as yaml_util
 
 from tests.typing import ClientSessionGenerator
 
@@ -24,14 +24,14 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 @pytest.fixture(autouse=True)
-async def setup_script(hass: HomeAssistant, script_config: dict[str, Any]) -> None:
+async def setup_script(hass: SmartHub, script_config: dict[str, Any]) -> None:
     """Set up script integration."""
     assert await async_setup_component(hass, "script", {"script": script_config})
 
 
 @pytest.mark.parametrize("script_config", [{}])
 async def test_get_script_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_config_store: dict[str, Any],
 ) -> None:
@@ -56,7 +56,7 @@ async def test_get_script_config(
 
 @pytest.mark.parametrize("script_config", [{}])
 async def test_update_script_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_config_store: dict[str, Any],
 ) -> None:
@@ -94,7 +94,7 @@ async def test_update_script_config(
 
 @pytest.mark.parametrize("script_config", [{}])
 async def test_invalid_object_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_config_store: dict[str, Any],
 ) -> None:
@@ -156,7 +156,7 @@ async def test_invalid_object_id(
     ],
 )
 async def test_update_script_config_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_config_store: dict[str, Any],
     caplog: pytest.LogCaptureFixture,
@@ -206,7 +206,7 @@ async def test_update_script_config_with_error(
     ],
 )
 async def test_update_script_config_with_blueprint_substitution_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_config_store: dict[str, Any],
     caplog: pytest.LogCaptureFixture,
@@ -225,7 +225,7 @@ async def test_update_script_config_with_blueprint_substitution_error(
     hass_config_store["scripts.yaml"] = orig_data
 
     with patch(
-        "homeassistant.components.blueprint.models.BlueprintInputs.async_substitute",
+        "smarthub.components.blueprint.models.BlueprintInputs.async_substitute",
         side_effect=yaml_util.UndefinedSubstitution("blah"),
     ):
         resp = await client.post(
@@ -244,7 +244,7 @@ async def test_update_script_config_with_blueprint_substitution_error(
 
 @pytest.mark.parametrize("script_config", [{}])
 async def test_update_remove_key_script_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_config_store: dict[str, Any],
 ) -> None:
@@ -290,7 +290,7 @@ async def test_update_remove_key_script_config(
     ],
 )
 async def test_delete_script(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     entity_registry: er.EntityRegistry,
     hass_config_store: dict[str, Any],
@@ -329,7 +329,7 @@ async def test_delete_script(
 
 @pytest.mark.parametrize("script_config", [{}])
 async def test_api_calls_require_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_read_only_access_token: str,
     hass_config_store: dict[str, Any],

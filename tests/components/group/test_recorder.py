@@ -6,25 +6,25 @@ from datetime import timedelta
 
 import pytest
 
-from homeassistant.components import group
-from homeassistant.components.group import ATTR_AUTO, ATTR_ENTITY_ID, ATTR_ORDER
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.const import ATTR_FRIENDLY_NAME, STATE_ON
-from homeassistant.core import HomeAssistant, split_entity_id
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import group
+from smarthub.components.group import ATTR_AUTO, ATTR_ENTITY_ID, ATTR_ORDER
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.const import ATTR_FRIENDLY_NAME, STATE_ON
+from smarthub.core import SmartHub, split_entity_id
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 from tests.components.recorder.common import async_wait_recording_done
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant():
+async def setup_smarthub():
     """Override the fixture in group.conftest."""
 
 
-async def test_exclude_attributes(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_exclude_attributes(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test number registered attributes to be excluded."""
     now = dt_util.utcnow()
     hass.states.async_set("light.bowl", STATE_ON)

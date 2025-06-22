@@ -5,18 +5,18 @@ from unittest.mock import AsyncMock, Mock
 from hass_nabucasa import Cloud
 import pytest
 
-from homeassistant.components.cloud.subscription import (
+from smarthub.components.cloud.subscription import (
     async_migrate_paypal_agreement,
     async_subscription_info,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from smarthub.core import SmartHub
+from smarthub.helpers.aiohttp_client import async_get_clientsession
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.fixture(name="mocked_cloud")
-async def mocked_cloud_object(hass: HomeAssistant) -> Cloud:
+async def mocked_cloud_object(hass: SmartHub) -> Cloud:
     """Mock cloud object."""
     return Mock(
         accounts_server="accounts.nabucasa.com",

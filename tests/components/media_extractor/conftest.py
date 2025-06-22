@@ -6,22 +6,22 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.media_extractor import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.media_extractor import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import MockYoutubeDL
 from .const import AUDIO_QUERY
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant):
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub):
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
 @pytest.fixture(autouse=True)
-async def setup_media_player(hass: HomeAssistant) -> None:
+async def setup_media_player(hass: SmartHub) -> None:
     """Set up the demo media player."""
     await async_setup_component(
         hass, "media_player", {"media_player": {"platform": "demo"}}
@@ -30,10 +30,10 @@ async def setup_media_player(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture(name="mock_youtube_dl")
-async def setup_mock_yt_dlp(hass: HomeAssistant) -> MockYoutubeDL:
+async def setup_mock_yt_dlp(hass: SmartHub) -> MockYoutubeDL:
     """Mock YoutubeDL."""
     mock = MockYoutubeDL({})
-    with patch("homeassistant.components.media_extractor.YoutubeDL", return_value=mock):
+    with patch("smarthub.components.media_extractor.YoutubeDL", return_value=mock):
         yield mock
 
 
@@ -53,6 +53,6 @@ def audio_media_extractor_config() -> dict[str, Any]:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.media_extractor.async_setup_entry", return_value=True
+        "smarthub.components.media_extractor.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry

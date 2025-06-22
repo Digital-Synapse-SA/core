@@ -4,10 +4,10 @@ from collections.abc import Generator
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from python_homeassistant_analytics import CurrentAnalytics
-from python_homeassistant_analytics.models import Addon, CustomIntegration, Integration
+from python_smarthub_analytics import CurrentAnalytics
+from python_smarthub_analytics.models import Addon, CustomIntegration, Integration
 
-from homeassistant.components.analytics_insights.const import (
+from smarthub.components.analytics_insights.const import (
     CONF_TRACKED_ADDONS,
     CONF_TRACKED_CUSTOM_INTEGRATIONS,
     CONF_TRACKED_INTEGRATIONS,
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, load_fixture, load_json_object_fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.analytics_insights.async_setup_entry",
+        "smarthub.components.analytics_insights.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -32,11 +32,11 @@ def mock_analytics_client() -> Generator[AsyncMock]:
     """Mock a Homeassistant Analytics client."""
     with (
         patch(
-            "homeassistant.components.analytics_insights.HomeassistantAnalyticsClient",
+            "smarthub.components.analytics_insights.HomeassistantAnalyticsClient",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.analytics_insights.config_flow.HomeassistantAnalyticsClient",
+            "smarthub.components.analytics_insights.config_flow.HomeassistantAnalyticsClient",
             new=mock_client,
         ),
     ):

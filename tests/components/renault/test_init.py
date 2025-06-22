@@ -9,11 +9,11 @@ import pytest
 from renault_api.gigya.exceptions import GigyaException, InvalidCredentialsException
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.renault.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.renault.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntry, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from tests.typing import WebSocketGenerator
 
@@ -21,14 +21,14 @@ from tests.typing import WebSocketGenerator
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.renault.PLATFORMS", []):
+    with patch("smarthub.components.renault.PLATFORMS", []):
         yield
 
 
 @pytest.mark.usefixtures("patch_renault_account", "patch_get_vehicles")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_setup_unload_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test entry setup and unload."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -44,7 +44,7 @@ async def test_setup_unload_entry(
 
 
 async def test_setup_entry_bad_password(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test entry setup and unload."""
     # Create a mock entry so we don't have to go through config flow
@@ -66,7 +66,7 @@ async def test_setup_entry_bad_password(
 
 @pytest.mark.parametrize("side_effect", [aiohttp.ClientConnectionError, GigyaException])
 async def test_setup_entry_exception(
-    hass: HomeAssistant, config_entry: ConfigEntry, side_effect: Any
+    hass: SmartHub, config_entry: ConfigEntry, side_effect: Any
 ) -> None:
     """Test ConfigEntryNotReady when API raises an exception during entry setup."""
     # In this case we are testing the condition where async_setup_entry raises
@@ -84,7 +84,7 @@ async def test_setup_entry_exception(
 
 @pytest.mark.usefixtures("patch_renault_account")
 async def test_setup_entry_kamereon_exception(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test ConfigEntryNotReady when API raises an exception during entry setup."""
     # In this case we are testing the condition where renault_hub fails to retrieve
@@ -103,7 +103,7 @@ async def test_setup_entry_kamereon_exception(
 @pytest.mark.usefixtures("patch_renault_account", "patch_get_vehicles")
 @pytest.mark.parametrize("vehicle_type", ["missing_details"], indirect=True)
 async def test_setup_entry_missing_vehicle_details(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test ConfigEntryNotReady when vehicleDetails is missing."""
     # In this case we are testing the condition where renault_hub fails to retrieve
@@ -117,7 +117,7 @@ async def test_setup_entry_missing_vehicle_details(
 
 @pytest.mark.usefixtures("patch_renault_account", "patch_get_vehicles")
 async def test_device_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,
@@ -136,7 +136,7 @@ async def test_device_registry(
 @pytest.mark.usefixtures("patch_renault_account", "patch_get_vehicles")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_registry_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry: ConfigEntry,
     hass_ws_client: WebSocketGenerator,

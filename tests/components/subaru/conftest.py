@@ -7,9 +7,9 @@ from unittest.mock import patch
 import pytest
 from subarulink.const import COUNTRY_USA
 
-from homeassistant import config_entries
-from homeassistant.components.homeassistant import DOMAIN as HA_DOMAIN
-from homeassistant.components.subaru.const import (
+from smarthub import config_entries
+from smarthub.components.smarthub import DOMAIN as HA_DOMAIN
+from smarthub.components.subaru.const import (
     CONF_UPDATE_ENABLED,
     DOMAIN,
     FETCH_INTERVAL,
@@ -22,24 +22,24 @@ from homeassistant.components.subaru.const import (
     VEHICLE_MODEL_YEAR,
     VEHICLE_NAME,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_COUNTRY,
     CONF_DEVICE_ID,
     CONF_PASSWORD,
     CONF_PIN,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import UNDEFINED, UndefinedType
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import UNDEFINED, UndefinedType
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .api_responses import TEST_VIN_2_EV, VEHICLE_DATA, VEHICLE_STATUS_EV
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
-MOCK_API = "homeassistant.components.subaru.SubaruAPI."
+MOCK_API = "smarthub.components.subaru.SubaruAPI."
 MOCK_API_DEVICE_REGISTERED = f"{MOCK_API}device_registered"
 MOCK_API_2FA_CONTACTS = f"{MOCK_API}contact_methods"
 MOCK_API_2FA_REQUEST = f"{MOCK_API}request_auth_code"
@@ -100,14 +100,14 @@ TEST_DEVICE_NAME = "test_vehicle_2"
 TEST_ENTITY_ID = f"sensor.{TEST_DEVICE_NAME}_odometer"
 
 
-def advance_time_to_next_fetch(hass: HomeAssistant) -> None:
+def advance_time_to_next_fetch(hass: SmartHub) -> None:
     """Fast forward time to next fetch."""
     future = dt_util.utcnow() + timedelta(seconds=FETCH_INTERVAL + 30)
     async_fire_time_changed(hass, future)
 
 
 async def setup_subaru_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry,
     vehicle_list: list[str] | UndefinedType = UNDEFINED,
     vehicle_data: dict[str, Any] | UndefinedType = UNDEFINED,
@@ -181,7 +181,7 @@ async def setup_subaru_config_entry(
 
 
 @pytest.fixture
-async def subaru_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+async def subaru_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Create a Subaru config entry prior to setup."""
     await async_setup_component(hass, HA_DOMAIN, {})
     config_entry = MockConfigEntry(**TEST_CONFIG_ENTRY)
@@ -191,7 +191,7 @@ async def subaru_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 @pytest.fixture
 async def ev_entry(
-    hass: HomeAssistant, subaru_config_entry: MockConfigEntry
+    hass: SmartHub, subaru_config_entry: MockConfigEntry
 ) -> MockConfigEntry:
     """Create a Subaru entry representing an EV vehicle with full STARLINK subscription."""
     await setup_subaru_config_entry(hass, subaru_config_entry)

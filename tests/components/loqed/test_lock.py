@@ -2,22 +2,22 @@
 
 from loqedAPI import loqed
 
-from homeassistant.components.lock import LockState
-from homeassistant.components.loqed import LoqedDataCoordinator
-from homeassistant.components.loqed.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.lock import LockState
+from smarthub.components.loqed import LoqedDataCoordinator
+from smarthub.components.loqed.const import DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_LOCK,
     SERVICE_OPEN,
     SERVICE_UNLOCK,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_lock_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
 ) -> None:
     """Test the lock entity."""
@@ -30,7 +30,7 @@ async def test_lock_entity(
 
 
 async def test_lock_responds_to_bolt_state_updates(
-    hass: HomeAssistant, integration: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, integration: MockConfigEntry, lock: loqed.Lock
 ) -> None:
     """Tests the lock responding to updates."""
     coordinator: LoqedDataCoordinator = hass.data[DOMAIN][integration.entry_id]
@@ -46,7 +46,7 @@ async def test_lock_responds_to_bolt_state_updates(
 
 
 async def test_lock_transition_to_unlocked(
-    hass: HomeAssistant, integration: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, integration: MockConfigEntry, lock: loqed.Lock
 ) -> None:
     """Tests the lock transitions to unlocked state."""
 
@@ -60,7 +60,7 @@ async def test_lock_transition_to_unlocked(
 
 
 async def test_lock_transition_to_locked(
-    hass: HomeAssistant, integration: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, integration: MockConfigEntry, lock: loqed.Lock
 ) -> None:
     """Tests the lock transitions to locked state."""
 
@@ -74,7 +74,7 @@ async def test_lock_transition_to_locked(
 
 
 async def test_lock_transition_to_open(
-    hass: HomeAssistant, integration: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, integration: MockConfigEntry, lock: loqed.Lock
 ) -> None:
     """Tests the lock transitions to open state."""
 

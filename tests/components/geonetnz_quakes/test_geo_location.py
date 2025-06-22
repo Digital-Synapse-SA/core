@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.geo_location import ATTR_SOURCE
-from homeassistant.components.geonetnz_quakes import DEFAULT_SCAN_INTERVAL, DOMAIN
-from homeassistant.components.geonetnz_quakes.geo_location import (
+from smarthub.components.geo_location import ATTR_SOURCE
+from smarthub.components.geonetnz_quakes import DEFAULT_SCAN_INTERVAL, DOMAIN
+from smarthub.components.geonetnz_quakes.geo_location import (
     ATTR_DEPTH,
     ATTR_EXTERNAL_ID,
     ATTR_LOCALITY,
@@ -15,7 +15,7 @@ from homeassistant.components.geonetnz_quakes.geo_location import (
     ATTR_MMI,
     ATTR_QUALITY,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
@@ -27,11 +27,11 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_START,
     UnitOfLength,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from . import _generate_mock_feed_entry
 
@@ -41,7 +41,7 @@ CONFIG = {DOMAIN: {CONF_RADIUS: 200}}
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -173,7 +173,7 @@ async def test_setup(
 
 
 async def test_setup_imperial(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test the setup of the integration using imperial unit system."""
     hass.config.units = US_CUSTOMARY_SYSTEM

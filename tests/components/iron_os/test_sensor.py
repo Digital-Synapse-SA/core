@@ -8,11 +8,11 @@ from pynecil import LiveDataResponse
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.iron_os.coordinator import SCAN_INTERVAL
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.iron_os.coordinator import SCAN_INTERVAL
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 async def sensor_only() -> AsyncGenerator[None]:
     """Enable only the sensor platform."""
     with patch(
-        "homeassistant.components.iron_os.PLATFORMS",
+        "smarthub.components.iron_os.PLATFORMS",
         [Platform.SENSOR],
     ):
         yield
@@ -29,7 +29,7 @@ async def sensor_only() -> AsyncGenerator[None]:
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -48,7 +48,7 @@ async def test_sensors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     mock_pynecil: AsyncMock,
@@ -77,7 +77,7 @@ async def test_sensors_unavailable(
     "entity_registry_enabled_by_default", "ble_device", "mock_pynecil"
 )
 async def test_tip_detection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pynecil: AsyncMock,
     ble_device: MagicMock,

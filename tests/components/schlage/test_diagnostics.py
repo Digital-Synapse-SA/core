@@ -2,7 +2,7 @@
 
 from unittest.mock import Mock
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import MockSchlageConfigEntry
 
@@ -11,7 +11,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_added_config_entry: MockSchlageConfigEntry,
     mock_lock: Mock,

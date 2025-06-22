@@ -6,7 +6,7 @@ from unittest.mock import call, patch
 import pytest
 from uvcclient import camera, nvr
 
-from homeassistant.components.camera import (
+from smarthub.components.camera import (
     DEFAULT_CONTENT_TYPE,
     SERVICE_DISABLE_MOTION,
     SERVICE_ENABLE_MOTION,
@@ -15,11 +15,11 @@ from homeassistant.components.camera import (
     async_get_image,
     async_get_stream_source,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from tests.common import async_fire_time_changed
 
@@ -27,7 +27,7 @@ from tests.common import async_fire_time_changed
 @pytest.fixture(name="mock_remote")
 def mock_remote_fixture(camera_info):
     """Mock the nvr.UVCRemote class."""
-    with patch("homeassistant.components.uvc.camera.nvr.UVCRemote") as mock_remote:
+    with patch("smarthub.components.uvc.camera.nvr.UVCRemote") as mock_remote:
 
         def setup(host, port, apikey, ssl=False):
             """Set instance attributes."""
@@ -95,7 +95,7 @@ def camera_info_fixture():
 def camera_v320_fixture():
     """Mock the v320 camera."""
     with patch(
-        "homeassistant.components.uvc.camera.uvc_camera.UVCCameraClientV320"
+        "smarthub.components.uvc.camera.uvc_camera.UVCCameraClientV320"
     ) as camera:
         camera.return_value.get_snapshot.return_value = "test_image"
         yield camera
@@ -105,14 +105,14 @@ def camera_v320_fixture():
 def camera_v313_fixture():
     """Mock the v320 camera."""
     with patch(
-        "homeassistant.components.uvc.camera.uvc_camera.UVCCameraClient"
+        "smarthub.components.uvc.camera.uvc_camera.UVCCameraClient"
     ) as camera:
         camera.return_value.get_snapshot.return_value = "test_image"
         yield camera
 
 
 async def test_setup_full_config(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_remote, camera_info
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_remote, camera_info
 ) -> None:
     """Test the setup with full configuration."""
     config = {
@@ -165,7 +165,7 @@ async def test_setup_full_config(
 
 
 async def test_setup_partial_config(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_remote
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_remote
 ) -> None:
     """Test the setup with partial configuration."""
     config = {"platform": "uvc", "nvr": "foo", "key": "secret"}
@@ -200,7 +200,7 @@ async def test_setup_partial_config(
 
 
 async def test_setup_partial_config_v31x(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_remote
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_remote
 ) -> None:
     """Test the setup with a v3.1.x server."""
     config = {"platform": "uvc", "nvr": "foo", "key": "secret"}
@@ -245,7 +245,7 @@ async def test_setup_partial_config_v31x(
     ],
 )
 async def test_setup_incomplete_config(
-    hass: HomeAssistant, mock_remote, config
+    hass: SmartHub, mock_remote, config
 ) -> None:
     """Test the setup with incomplete or invalid configuration."""
     assert await async_setup_component(hass, "camera", config)
@@ -264,7 +264,7 @@ async def test_setup_incomplete_config(
     ],
 )
 async def test_setup_nvr_errors_during_indexing(
-    hass: HomeAssistant, mock_remote, error, ready_states
+    hass: SmartHub, mock_remote, error, ready_states
 ) -> None:
     """Set up test for NVR errors during indexing."""
     config = {"platform": "uvc", "nvr": "foo", "key": "secret"}
@@ -296,7 +296,7 @@ async def test_setup_nvr_errors_during_indexing(
     ],
 )
 async def test_setup_nvr_errors_during_initialization(
-    hass: HomeAssistant, mock_remote, error, ready_states
+    hass: SmartHub, mock_remote, error, ready_states
 ) -> None:
     """Set up test for NVR errors during initialization."""
     config = {"platform": "uvc", "nvr": "foo", "key": "secret"}
@@ -322,7 +322,7 @@ async def test_setup_nvr_errors_during_initialization(
     assert len(camera_states) == ready_states
 
 
-async def test_properties(hass: HomeAssistant, mock_remote) -> None:
+async def test_properties(hass: SmartHub, mock_remote) -> None:
     """Test the properties."""
     config = {"platform": "uvc", "nvr": "foo", "key": "secret"}
     assert await async_setup_component(hass, "camera", {"camera": config})
@@ -343,7 +343,7 @@ async def test_properties(hass: HomeAssistant, mock_remote) -> None:
 
 
 async def test_motion_recording_mode_properties(
-    hass: HomeAssistant, mock_remote
+    hass: SmartHub, mock_remote
 ) -> None:
     """Test the properties."""
     config = {"platform": "uvc", "nvr": "foo", "key": "secret"}
@@ -409,7 +409,7 @@ async def test_motion_recording_mode_properties(
     assert state.state == CameraState.RECORDING
 
 
-async def test_stream(hass: HomeAssistant, mock_remote) -> None:
+async def test_stream(hass: SmartHub, mock_remote) -> None:
     """Test the RTSP stream URI."""
     config = {"platform": "uvc", "nvr": "foo", "key": "secret"}
     assert await async_setup_component(hass, "camera", {"camera": config})
@@ -420,7 +420,7 @@ async def test_stream(hass: HomeAssistant, mock_remote) -> None:
     assert stream_source == "rtsp://foo:7447/uuid_rtspchannel_0"
 
 
-async def test_login(hass: HomeAssistant, mock_remote, camera_v320) -> None:
+async def test_login(hass: SmartHub, mock_remote, camera_v320) -> None:
     """Test the login."""
     config = {"platform": "uvc", "nvr": "foo", "key": "secret"}
     assert await async_setup_component(hass, "camera", {"camera": config})
@@ -435,7 +435,7 @@ async def test_login(hass: HomeAssistant, mock_remote, camera_v320) -> None:
     assert image.content == "test_image"
 
 
-async def test_login_v31x(hass: HomeAssistant, mock_remote, camera_v313) -> None:
+async def test_login_v31x(hass: SmartHub, mock_remote, camera_v313) -> None:
     """Test login with v3.1.x server."""
     mock_remote.return_value.server_version = (3, 1, 3)
     config = {"platform": "uvc", "nvr": "foo", "key": "secret"}
@@ -455,7 +455,7 @@ async def test_login_v31x(hass: HomeAssistant, mock_remote, camera_v313) -> None
     "error", [OSError, camera.CameraConnectError, camera.CameraAuthError]
 )
 async def test_login_tries_both_addrs_and_caches(
-    hass: HomeAssistant, mock_remote, camera_v320, error
+    hass: SmartHub, mock_remote, camera_v320, error
 ) -> None:
     """Test the login tries."""
     responses = [0]
@@ -505,7 +505,7 @@ async def test_login_tries_both_addrs_and_caches(
 
 
 async def test_login_fails_both_properly(
-    hass: HomeAssistant, mock_remote, camera_v320
+    hass: SmartHub, mock_remote, camera_v320
 ) -> None:
     """Test if login fails properly."""
     camera_v320.return_value.login.side_effect = OSError
@@ -513,7 +513,7 @@ async def test_login_fails_both_properly(
     assert await async_setup_component(hass, "camera", {"camera": config})
     await hass.async_block_till_done()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await async_get_image(hass, "camera.front")
 
     assert camera_v320.return_value.get_snapshot.call_count == 0
@@ -522,12 +522,12 @@ async def test_login_fails_both_properly(
 @pytest.mark.parametrize(
     ("source_error", "raised_error", "snapshot_calls"),
     [
-        (camera.CameraConnectError, HomeAssistantError, 1),
+        (camera.CameraConnectError, SmartHubError, 1),
         (camera.CameraAuthError, camera.CameraAuthError, 2),
     ],
 )
 async def test_camera_image_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_remote,
     camera_v320,
     source_error,
@@ -547,7 +547,7 @@ async def test_camera_image_error(
 
 
 async def test_enable_disable_motion_detection(
-    hass: HomeAssistant, mock_remote, camera_info
+    hass: SmartHub, mock_remote, camera_info
 ) -> None:
     """Test enable and disable motion detection."""
 

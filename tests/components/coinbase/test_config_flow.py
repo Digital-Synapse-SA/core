@@ -7,16 +7,16 @@ from coinbase.wallet.error import AuthenticationError
 import pytest
 from requests.models import Response
 
-from homeassistant import config_entries
-from homeassistant.components.coinbase.const import (
+from smarthub import config_entries
+from smarthub.components.coinbase.const import (
     CONF_CURRENCIES,
     CONF_EXCHANGE_PRECISION,
     CONF_EXCHANGE_RATES,
     DOMAIN,
 )
-from homeassistant.const import CONF_API_KEY, CONF_API_TOKEN, CONF_API_VERSION
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_API_KEY, CONF_API_TOKEN, CONF_API_VERSION
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .common import (
     init_mock_coinbase,
@@ -30,7 +30,7 @@ from .common import (
 from .const import BAD_CURRENCY, BAD_EXCHANGE_RATE, GOOD_CURRENCY, GOOD_EXCHANGE_RATE
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -50,7 +50,7 @@ async def test_form(hass: HomeAssistant) -> None:
             return_value=mock_get_exchange_rates(),
         ),
         patch(
-            "homeassistant.components.coinbase.async_setup_entry",
+            "smarthub.components.coinbase.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -71,7 +71,7 @@ async def test_form(hass: HomeAssistant) -> None:
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
@@ -151,7 +151,7 @@ async def test_form_invalid_auth(
     )
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -173,7 +173,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_catch_all_exception(hass: HomeAssistant) -> None:
+async def test_form_catch_all_exception(hass: SmartHub) -> None:
     """Test we handle unknown exceptions."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -195,7 +195,7 @@ async def test_form_catch_all_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_option_form(hass: HomeAssistant) -> None:
+async def test_option_form(hass: SmartHub) -> None:
     """Test we handle a good wallet currency option."""
 
     with (
@@ -209,7 +209,7 @@ async def test_option_form(hass: HomeAssistant) -> None:
             return_value=mock_get_exchange_rates(),
         ),
         patch(
-            "homeassistant.components.coinbase.update_listener"
+            "smarthub.components.coinbase.update_listener"
         ) as mock_update_listener,
     ):
         config_entry = await init_mock_coinbase(hass)
@@ -229,7 +229,7 @@ async def test_option_form(hass: HomeAssistant) -> None:
         assert len(mock_update_listener.mock_calls) == 1
 
 
-async def test_form_bad_account_currency(hass: HomeAssistant) -> None:
+async def test_form_bad_account_currency(hass: SmartHub) -> None:
     """Test we handle a bad currency option."""
     with (
         patch(
@@ -258,7 +258,7 @@ async def test_form_bad_account_currency(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "currency_unavailable"}
 
 
-async def test_form_bad_exchange_rate(hass: HomeAssistant) -> None:
+async def test_form_bad_exchange_rate(hass: SmartHub) -> None:
     """Test we handle a bad exchange rate."""
     with (
         patch(
@@ -286,7 +286,7 @@ async def test_form_bad_exchange_rate(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "exchange_rate_unavailable"}
 
 
-async def test_option_catch_all_exception(hass: HomeAssistant) -> None:
+async def test_option_catch_all_exception(hass: SmartHub) -> None:
     """Test we handle an unknown exception in the option flow."""
     with (
         patch(
@@ -320,7 +320,7 @@ async def test_option_catch_all_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_v3(hass: HomeAssistant) -> None:
+async def test_form_v3(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -340,7 +340,7 @@ async def test_form_v3(hass: HomeAssistant) -> None:
             return_value={"data": mock_get_exchange_rates()},
         ),
         patch(
-            "homeassistant.components.coinbase.async_setup_entry",
+            "smarthub.components.coinbase.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -360,7 +360,7 @@ async def test_form_v3(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_option_form_v3(hass: HomeAssistant) -> None:
+async def test_option_form_v3(hass: SmartHub) -> None:
     """Test we handle a good wallet currency option."""
 
     with (
@@ -374,7 +374,7 @@ async def test_option_form_v3(hass: HomeAssistant) -> None:
             return_value={"data": mock_get_exchange_rates()},
         ),
         patch(
-            "homeassistant.components.coinbase.update_listener"
+            "smarthub.components.coinbase.update_listener"
         ) as mock_update_listener,
     ):
         config_entry = await init_mock_coinbase_v3(hass)

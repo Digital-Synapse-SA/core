@@ -2,11 +2,11 @@
 
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.components.goalzero.const import DEFAULT_NAME, DOMAIN
-from homeassistant.const import CONF_HOST, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import format_mac
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.goalzero.const import DEFAULT_NAME, DOMAIN
+from smarthub.const import CONF_HOST, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import format_mac
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -26,8 +26,8 @@ CONF_DHCP_FLOW = DhcpServiceInfo(
 )
 
 
-def create_entry(hass: HomeAssistant):
-    """Add config entry in Home Assistant."""
+def create_entry(hass: SmartHub):
+    """Add config entry in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         data=CONF_DATA,
@@ -51,17 +51,17 @@ async def create_mocked_yeti():
 def patch_config_flow_yeti(mocked_yeti):
     """Patch Goal Zero config flow."""
     return patch(
-        "homeassistant.components.goalzero.config_flow.Yeti",
+        "smarthub.components.goalzero.config_flow.Yeti",
         return_value=mocked_yeti,
     )
 
 
 async def async_init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     skip_setup: bool = False,
 ) -> MockConfigEntry:
-    """Set up the Goal Zero integration in Home Assistant."""
+    """Set up the Goal Zero integration in SmartHub."""
     entry = create_entry(hass)
     base_url = f"http://{HOST}/"
     aioclient_mock.get(

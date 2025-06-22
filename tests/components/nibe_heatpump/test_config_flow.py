@@ -12,10 +12,10 @@ from nibe.exceptions import (
 )
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.nibe_heatpump import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.nibe_heatpump import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 MOCK_FLOW_NIBEGW_USERDATA = {
     "model": "F1155",
@@ -37,7 +37,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def _get_connection_form(
-    hass: HomeAssistant, connection_type: str
+    hass: SmartHub, connection_type: str
 ) -> config_entries.ConfigFlowResult:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -55,7 +55,7 @@ async def _get_connection_form(
 
 
 async def test_nibegw_form(
-    hass: HomeAssistant, coils: dict[int, Any], mock_setup_entry: Mock
+    hass: SmartHub, coils: dict[int, Any], mock_setup_entry: Mock
 ) -> None:
     """Test we get the form."""
     result = await _get_connection_form(hass, "nibegw")
@@ -82,7 +82,7 @@ async def test_nibegw_form(
 
 
 async def test_modbus_form(
-    hass: HomeAssistant, coils: dict[int, Any], mock_setup_entry: Mock
+    hass: SmartHub, coils: dict[int, Any], mock_setup_entry: Mock
 ) -> None:
     """Test we get the form."""
     result = await _get_connection_form(hass, "modbus")
@@ -106,7 +106,7 @@ async def test_modbus_form(
 
 
 async def test_modbus_invalid_url(
-    hass: HomeAssistant, mock_connection_construct: Mock
+    hass: SmartHub, mock_connection_construct: Mock
 ) -> None:
     """Test we handle invalid auth."""
     result = await _get_connection_form(hass, "modbus")
@@ -120,7 +120,7 @@ async def test_modbus_invalid_url(
     assert result2["errors"] == {"modbus_url": "url"}
 
 
-async def test_nibegw_address_inuse(hass: HomeAssistant, mock_connection: Mock) -> None:
+async def test_nibegw_address_inuse(hass: SmartHub, mock_connection: Mock) -> None:
     """Test we handle invalid auth."""
     result = await _get_connection_form(hass, "nibegw")
 
@@ -152,7 +152,7 @@ async def test_nibegw_address_inuse(hass: HomeAssistant, mock_connection: Mock) 
     ],
 )
 async def test_read_timeout(
-    hass: HomeAssistant, mock_connection: Mock, connection_type: str, data: dict
+    hass: SmartHub, mock_connection: Mock, connection_type: str, data: dict
 ) -> None:
     """Test we handle cannot connect error."""
     result = await _get_connection_form(hass, connection_type)
@@ -173,7 +173,7 @@ async def test_read_timeout(
     ],
 )
 async def test_write_timeout(
-    hass: HomeAssistant, mock_connection: Mock, connection_type: str, data: dict
+    hass: SmartHub, mock_connection: Mock, connection_type: str, data: dict
 ) -> None:
     """Test we handle cannot connect error."""
     result = await _get_connection_form(hass, connection_type)
@@ -194,7 +194,7 @@ async def test_write_timeout(
     ],
 )
 async def test_unexpected_exception(
-    hass: HomeAssistant, mock_connection: Mock, connection_type: str, data: dict
+    hass: SmartHub, mock_connection: Mock, connection_type: str, data: dict
 ) -> None:
     """Test we handle cannot connect error."""
     result = await _get_connection_form(hass, connection_type)
@@ -215,7 +215,7 @@ async def test_unexpected_exception(
     ],
 )
 async def test_nibegw_invalid_host(
-    hass: HomeAssistant, mock_connection: Mock, connection_type: str, data: dict
+    hass: SmartHub, mock_connection: Mock, connection_type: str, data: dict
 ) -> None:
     """Test we handle cannot connect error."""
     result = await _get_connection_form(hass, connection_type)
@@ -239,7 +239,7 @@ async def test_nibegw_invalid_host(
     ],
 )
 async def test_model_missing_coil(
-    hass: HomeAssistant, mock_connection: Mock, connection_type: str, data: dict
+    hass: SmartHub, mock_connection: Mock, connection_type: str, data: dict
 ) -> None:
     """Test we handle cannot connect error."""
     result = await _get_connection_form(hass, connection_type)

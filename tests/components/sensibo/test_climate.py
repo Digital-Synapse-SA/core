@@ -10,7 +10,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from voluptuous import MultipleInvalid
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_FAN_MODE,
     ATTR_HVAC_MODE,
     ATTR_SWING_HORIZONTAL_MODE,
@@ -25,7 +25,7 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.components.sensibo.climate import (
+from smarthub.components.sensibo.climate import (
     ATTR_AC_INTEGRATION,
     ATTR_GEO_INTEGRATION,
     ATTR_HIGH_TEMPERATURE_STATE,
@@ -48,9 +48,9 @@ from homeassistant.components.sensibo.climate import (
     SERVICE_GET_DEVICE_CAPABILITIES,
     _find_valid_target_temp,
 )
-from homeassistant.components.sensibo.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
+from smarthub.components.sensibo.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_MODE,
     ATTR_STATE,
@@ -62,10 +62,10 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed, snapshot_platform
 
@@ -90,7 +90,7 @@ async def test_climate_find_valid_targets() -> None:
     [[Platform.CLIMATE]],
 )
 async def test_climate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     load_int: ConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -108,7 +108,7 @@ async def test_climate(
 
 
 async def test_climate_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -134,7 +134,7 @@ async def test_climate_fan(
     }
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Climate fan mode not_in_ha is not supported by the integration",
     ):
         await hass.services.async_call(
@@ -174,7 +174,7 @@ async def test_climate_fan(
     async_fire_time_changed(hass)
     await hass.async_block_till_done()
 
-    with pytest.raises(HomeAssistantError, match="service_not_supported"):
+    with pytest.raises(SmartHubError, match="service_not_supported"):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_FAN_MODE,
@@ -187,7 +187,7 @@ async def test_climate_fan(
 
 
 async def test_climate_swing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -217,7 +217,7 @@ async def test_climate_swing(
     await hass.async_block_till_done()
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Climate swing mode not_in_ha is not supported by the integration",
     ):
         await hass.services.async_call(
@@ -255,7 +255,7 @@ async def test_climate_swing(
     async_fire_time_changed(hass)
     await hass.async_block_till_done()
 
-    with pytest.raises(HomeAssistantError, match="service_not_supported"):
+    with pytest.raises(SmartHubError, match="service_not_supported"):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_SWING_MODE,
@@ -268,7 +268,7 @@ async def test_climate_swing(
 
 
 async def test_climate_horizontal_swing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -302,7 +302,7 @@ async def test_climate_horizontal_swing(
     await hass.async_block_till_done()
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Climate horizontal swing mode not_in_ha is not supported by the integration",
     ):
         await hass.services.async_call(
@@ -341,7 +341,7 @@ async def test_climate_horizontal_swing(
     async_fire_time_changed(hass)
     await hass.async_block_till_done()
 
-    with pytest.raises(HomeAssistantError, match="service_not_supported"):
+    with pytest.raises(SmartHubError, match="service_not_supported"):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_SWING_HORIZONTAL_MODE,
@@ -357,7 +357,7 @@ async def test_climate_horizontal_swing(
 
 
 async def test_climate_temperatures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -465,7 +465,7 @@ async def test_climate_temperatures(
     async_fire_time_changed(hass)
     await hass.async_block_till_done()
 
-    with pytest.raises(HomeAssistantError, match="service_not_supported"):
+    with pytest.raises(SmartHubError, match="service_not_supported"):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,
@@ -478,7 +478,7 @@ async def test_climate_temperatures(
 
 
 async def test_climate_temperature_is_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -523,7 +523,7 @@ async def test_climate_temperature_is_none(
 
 
 async def test_climate_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -584,7 +584,7 @@ async def test_climate_hvac_mode(
 
 
 async def test_climate_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -629,7 +629,7 @@ async def test_climate_on_off(
 
 
 async def test_climate_service_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -652,7 +652,7 @@ async def test_climate_service_failed(
         "result": {"status": "Error", "failureReason": "Did not work"}
     }
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_TURN_OFF,
@@ -665,7 +665,7 @@ async def test_climate_service_failed(
 
 
 async def test_climate_assumed_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -700,7 +700,7 @@ async def test_climate_assumed_state(
 
 
 async def test_climate_no_fan_no_swing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -733,7 +733,7 @@ async def test_climate_no_fan_no_swing(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate_set_timer(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -759,7 +759,7 @@ async def test_climate_set_timer(
             blocking=True,
         )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_ENABLE_TIMER,
@@ -808,7 +808,7 @@ async def test_climate_set_timer(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate_pure_boost(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -899,7 +899,7 @@ async def test_climate_pure_boost(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate_climate_react(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -1043,7 +1043,7 @@ async def test_climate_climate_react(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate_climate_react_fahrenheit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -1172,7 +1172,7 @@ async def test_climate_climate_react_fahrenheit(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate_full_ac_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -1245,7 +1245,7 @@ async def test_climate_full_ac_state(
 
 
 async def test_climate_fan_mode_and_swing_mode_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -1282,7 +1282,7 @@ async def test_climate_fan_mode_and_swing_mode_not_supported(
 
 
 async def test_climate_get_device_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,

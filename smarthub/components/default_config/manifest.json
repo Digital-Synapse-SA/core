@@ -1,0 +1,29 @@
+{
+  "domain": "default_config",
+  "name": "Default Config",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": [
+    "assist_pipeline",
+    "bluetooth",
+    "cloud",
+    "conversation",
+    "dhcp",
+    "energy",
+    "go2rtc",
+    "history",
+    "smarthub_alerts",
+    "logbook",
+    "media_source",
+    "mobile_app",
+    "my",
+    "ssdp",
+    "stream",
+    "sun",
+    "usb",
+    "webhook",
+    "zeroconf"
+  ],
+  "documentation": "https://www.smart-hub.io/integrations/default_config",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

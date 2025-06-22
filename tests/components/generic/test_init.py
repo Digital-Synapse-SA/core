@@ -2,14 +2,14 @@
 
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("fakeimg_png")
-async def test_unload_entry(hass: HomeAssistant, setup_entry: MockConfigEntry) -> None:
+async def test_unload_entry(hass: SmartHub, setup_entry: MockConfigEntry) -> None:
     """Test unloading the generic IP Camera entry."""
     assert setup_entry.state is ConfigEntryState.LOADED
 
@@ -19,7 +19,7 @@ async def test_unload_entry(hass: HomeAssistant, setup_entry: MockConfigEntry) -
 
 
 async def test_reload_on_title_change(
-    hass: HomeAssistant, setup_entry: MockConfigEntry
+    hass: SmartHub, setup_entry: MockConfigEntry
 ) -> None:
     """Test the integration gets reloaded when the title is updated."""
     assert setup_entry.state is ConfigEntryState.LOADED

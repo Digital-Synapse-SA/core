@@ -1,12 +1,12 @@
 """Tests for the StreamLabs integration."""
 
-from homeassistant.core import HomeAssistant
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.core import SmartHub
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from tests.common import MockConfigEntry
 
 
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
 

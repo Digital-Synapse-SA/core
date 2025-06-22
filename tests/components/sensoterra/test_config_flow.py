@@ -6,11 +6,11 @@ from jwt import DecodeError
 import pytest
 from sensoterra.customerapi import InvalidAuth as StInvalidAuth, Timeout as StTimeout
 
-from homeassistant.components.sensoterra.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.sensoterra.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import API_EMAIL, API_PASSWORD, API_TOKEN, HASS_UUID
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_customer_api_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_full_flow(
 
 
 async def test_form_unique_id(
-    hass: HomeAssistant, mock_customer_api_client: AsyncMock
+    hass: SmartHub, mock_customer_api_client: AsyncMock
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -81,7 +81,7 @@ async def test_form_unique_id(
     ],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_customer_api_client: AsyncMock,
     exception: Exception,

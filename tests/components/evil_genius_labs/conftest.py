@@ -6,10 +6,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.json import JsonObjectType
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.json import JsonObjectType
 
 from tests.common import (
     MockConfigEntry,
@@ -38,7 +38,7 @@ def product_fixture() -> dict[str, str]:
 
 
 @pytest.fixture
-def config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def config_entry(hass: SmartHub) -> MockConfigEntry:
     """Evil genius labs config entry."""
     entry = MockConfigEntry(domain="evil_genius_labs", data={"host": "192.168.1.113"})
     entry.add_to_hass(hass)
@@ -47,7 +47,7 @@ def config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 @pytest.fixture
 async def setup_evil_genius_labs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     all_fixture: dict[str, Any],
     info_fixture: JsonObjectType,
@@ -69,7 +69,7 @@ async def setup_evil_genius_labs(
             return_value=product_fixture,
         ),
         patch(
-            "homeassistant.components.evil_genius_labs.PLATFORMS",
+            "smarthub.components.evil_genius_labs.PLATFORMS",
             platforms,
         ),
     ):

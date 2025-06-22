@@ -5,7 +5,7 @@ from unittest.mock import patch
 from motionmount import MotionMountSystemError
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import MAC, ZEROCONF_NAME
 
@@ -25,14 +25,14 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_error_status_sensor_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     system_status: MotionMountSystemError,
     state: str,
 ) -> None:
     """Tests the state attributes."""
     with patch(
-        "homeassistant.components.motionmount.motionmount.MotionMount",
+        "smarthub.components.motionmount.motionmount.MotionMount",
         autospec=True,
     ) as motionmount_mock:
         motionmount_mock.return_value.name = ZEROCONF_NAME

@@ -8,16 +8,16 @@ import weakref
 
 import pytest
 
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import debounce
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub, callback
+from smarthub.helpers import debounce
+from smarthub.util.dt import utcnow
 
 from tests.common import async_fire_time_changed
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def test_immediate_works(hass: HomeAssistant) -> None:
+async def test_immediate_works(hass: SmartHub) -> None:
     """Test immediate works."""
     calls = []
     debouncer = debounce.Debouncer(
@@ -71,7 +71,7 @@ async def test_immediate_works(hass: HomeAssistant) -> None:
     assert debouncer._job.target == debouncer.function
 
 
-async def test_immediate_works_with_schedule_call(hass: HomeAssistant) -> None:
+async def test_immediate_works_with_schedule_call(hass: SmartHub) -> None:
     """Test immediate works with scheduled calls."""
     calls = []
     debouncer = debounce.Debouncer(
@@ -129,7 +129,7 @@ async def test_immediate_works_with_schedule_call(hass: HomeAssistant) -> None:
     assert debouncer._job.target == debouncer.function
 
 
-async def test_immediate_works_with_callback_function(hass: HomeAssistant) -> None:
+async def test_immediate_works_with_callback_function(hass: SmartHub) -> None:
     """Test immediate works with callback function."""
     calls = []
     debouncer = debounce.Debouncer(
@@ -150,7 +150,7 @@ async def test_immediate_works_with_callback_function(hass: HomeAssistant) -> No
     debouncer.async_cancel()
 
 
-async def test_immediate_works_with_executor_function(hass: HomeAssistant) -> None:
+async def test_immediate_works_with_executor_function(hass: SmartHub) -> None:
     """Test immediate works with executor function."""
     calls = []
     debouncer = debounce.Debouncer(
@@ -172,7 +172,7 @@ async def test_immediate_works_with_executor_function(hass: HomeAssistant) -> No
 
 
 async def test_immediate_works_with_passed_callback_function_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test immediate works with a callback function that raises."""
     calls = []
@@ -236,7 +236,7 @@ async def test_immediate_works_with_passed_callback_function_raises(
 
 
 async def test_immediate_works_with_passed_coroutine_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test immediate works with a coroutine that raises."""
     calls = []
@@ -298,7 +298,7 @@ async def test_immediate_works_with_passed_coroutine_raises(
     assert debouncer._job.target == debouncer.function
 
 
-async def test_not_immediate_works(hass: HomeAssistant) -> None:
+async def test_not_immediate_works(hass: SmartHub) -> None:
     """Test immediate works."""
     calls = []
     debouncer = debounce.Debouncer(
@@ -349,7 +349,7 @@ async def test_not_immediate_works(hass: HomeAssistant) -> None:
     assert debouncer._job.target == debouncer.function
 
 
-async def test_not_immediate_works_schedule_call(hass: HomeAssistant) -> None:
+async def test_not_immediate_works_schedule_call(hass: SmartHub) -> None:
     """Test immediate works with schedule call."""
     calls = []
     debouncer = debounce.Debouncer(
@@ -404,7 +404,7 @@ async def test_not_immediate_works_schedule_call(hass: HomeAssistant) -> None:
     assert debouncer._job.target == debouncer.function
 
 
-async def test_immediate_works_with_function_swapped(hass: HomeAssistant) -> None:
+async def test_immediate_works_with_function_swapped(hass: SmartHub) -> None:
     """Test immediate works and we can change out the function."""
     calls = []
 
@@ -466,7 +466,7 @@ async def test_immediate_works_with_function_swapped(hass: HomeAssistant) -> Non
     assert debouncer._job.target == debouncer.function
 
 
-async def test_shutdown(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_shutdown(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test shutdown."""
     calls = []
     future = asyncio.Future()
@@ -501,7 +501,7 @@ async def test_shutdown(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -
 
 
 async def test_background(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test background tasks are created when background is True."""
     calls = []
@@ -532,10 +532,10 @@ async def test_background(
     assert len(calls) == 2
 
 
-async def test_shutdown_releases_parent_class(hass: HomeAssistant) -> None:
+async def test_shutdown_releases_parent_class(hass: SmartHub) -> None:
     """Test shutdown releases parent class.
 
-    See https://github.com/home-assistant/core/issues/137237
+    See https://github.com/smart-hub/core/issues/137237
     """
     calls = []
 

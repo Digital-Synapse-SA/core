@@ -7,9 +7,9 @@ from matter_server.client.models.node import MatterNode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -20,7 +20,7 @@ from .common import (
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_valves(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -30,7 +30,7 @@ async def test_valves(
 
 @pytest.mark.parametrize("node_fixture", ["valve"])
 async def test_valve(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

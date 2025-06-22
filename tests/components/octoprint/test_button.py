@@ -6,17 +6,17 @@ from freezegun import freeze_time
 from pyoctoprintapi import OctoprintPrinterInfo
 import pytest
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.octoprint import OctoprintDataUpdateCoordinator
-from homeassistant.components.octoprint.button import InvalidPrinterState
-from homeassistant.components.octoprint.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.octoprint import OctoprintDataUpdateCoordinator
+from smarthub.components.octoprint.button import InvalidPrinterState
+from smarthub.components.octoprint.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from . import init_integration
 
 
-async def test_pause_job(hass: HomeAssistant) -> None:
+async def test_pause_job(hass: SmartHub) -> None:
     """Test the pause job button."""
     await init_integration(hass, BUTTON_DOMAIN)
 
@@ -75,7 +75,7 @@ async def test_pause_job(hass: HomeAssistant) -> None:
             )
 
 
-async def test_resume_job(hass: HomeAssistant) -> None:
+async def test_resume_job(hass: SmartHub) -> None:
     """Test the resume job button."""
     await init_integration(hass, BUTTON_DOMAIN)
 
@@ -134,7 +134,7 @@ async def test_resume_job(hass: HomeAssistant) -> None:
             )
 
 
-async def test_stop_job(hass: HomeAssistant) -> None:
+async def test_stop_job(hass: SmartHub) -> None:
     """Test the stop job button."""
     await init_integration(hass, BUTTON_DOMAIN)
 
@@ -195,7 +195,7 @@ async def test_stop_job(hass: HomeAssistant) -> None:
 
 
 @freeze_time("2023-01-01 00:00")
-async def test_shutdown_system(hass: HomeAssistant) -> None:
+async def test_shutdown_system(hass: SmartHub) -> None:
     """Test the shutdown system button."""
     await init_integration(hass, BUTTON_DOMAIN)
 
@@ -203,7 +203,7 @@ async def test_shutdown_system(hass: HomeAssistant) -> None:
 
     # Test shutting down the system
     with patch(
-        "homeassistant.components.octoprint.coordinator.OctoprintClient.shutdown"
+        "smarthub.components.octoprint.coordinator.OctoprintClient.shutdown"
     ) as shutdown_command:
         await hass.services.async_call(
             BUTTON_DOMAIN,
@@ -220,7 +220,7 @@ async def test_shutdown_system(hass: HomeAssistant) -> None:
 
 
 @freeze_time("2023-01-01 00:00")
-async def test_reboot_system(hass: HomeAssistant) -> None:
+async def test_reboot_system(hass: SmartHub) -> None:
     """Test the reboot system button."""
     await init_integration(hass, BUTTON_DOMAIN)
 
@@ -228,7 +228,7 @@ async def test_reboot_system(hass: HomeAssistant) -> None:
 
     # Test rebooting the system
     with patch(
-        "homeassistant.components.octoprint.coordinator.OctoprintClient.reboot_system"
+        "smarthub.components.octoprint.coordinator.OctoprintClient.reboot_system"
     ) as reboot_command:
         await hass.services.async_call(
             BUTTON_DOMAIN,
@@ -247,7 +247,7 @@ async def test_reboot_system(hass: HomeAssistant) -> None:
 
 
 @freeze_time("2023-01-01 00:00")
-async def test_restart_octoprint(hass: HomeAssistant) -> None:
+async def test_restart_octoprint(hass: SmartHub) -> None:
     """Test the restart octoprint button."""
     await init_integration(hass, BUTTON_DOMAIN)
 
@@ -255,7 +255,7 @@ async def test_restart_octoprint(hass: HomeAssistant) -> None:
 
     # Test restarting octoprint
     with patch(
-        "homeassistant.components.octoprint.coordinator.OctoprintClient.restart"
+        "smarthub.components.octoprint.coordinator.OctoprintClient.restart"
     ) as restart_command:
         await hass.services.async_call(
             BUTTON_DOMAIN,

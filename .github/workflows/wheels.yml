@@ -11,7 +11,7 @@ on:
       - rc
     paths:
       - ".github/workflows/wheels.yml"
-      - "homeassistant/package_constraints.txt"
+      - "smarthub/package_constraints.txt"
       - "requirements_all.txt"
       - "requirements.txt"
       - "script/gen_requirements_all.py"
@@ -26,7 +26,7 @@ concurrency:
 jobs:
   init:
     name: Initialize wheels builder
-    if: github.repository_owner == 'home-assistant'
+    if: github.repository_owner == 'smart-hub'
     runs-on: ubuntu-latest
     outputs:
       architectures: ${{ steps.info.outputs.architectures }}
@@ -51,14 +51,14 @@ jobs:
 
       - name: Get information
         id: info
-        uses: home-assistant/actions/helpers/info@master
+        uses: smart-hub/actions/helpers/info@master
 
       - name: Create requirements_diff file
         run: |
           if [[ ${{ github.event_name }} =~ (schedule|workflow_dispatch) ]]; then
             touch requirements_diff.txt
           else
-            curl -s -o requirements_diff.txt https://raw.githubusercontent.com/home-assistant/core/master/requirements.txt
+            curl -s -o requirements_diff.txt https://raw.githubusercontent.com/smart-hub/core/master/requirements.txt
           fi
 
       - name: Write env-file
@@ -125,7 +125,7 @@ jobs:
 
   core:
     name: Build Core wheels ${{ matrix.abi }} for ${{ matrix.arch }} (musllinux_1_2)
-    if: github.repository_owner == 'home-assistant'
+    if: github.repository_owner == 'smart-hub'
     needs: init
     runs-on: ubuntu-latest
     strategy:
@@ -159,7 +159,7 @@ jobs:
           sed -i "/uv/d" requirements_diff.txt
 
       - name: Build wheels
-        uses: home-assistant/wheels@2025.03.0
+        uses: smart-hub/wheels@2025.03.0
         with:
           abi: ${{ matrix.abi }}
           tag: musllinux_1_2
@@ -168,13 +168,13 @@ jobs:
           env-file: true
           apk: "libffi-dev;openssl-dev;yaml-dev;nasm;zlib-ng-dev"
           skip-binary: aiohttp;multidict;propcache;yarl;SQLAlchemy
-          constraints: "homeassistant/package_constraints.txt"
+          constraints: "smarthub/package_constraints.txt"
           requirements-diff: "requirements_diff.txt"
           requirements: "requirements.txt"
 
   integrations:
     name: Build wheels ${{ matrix.abi }} for ${{ matrix.arch }}
-    if: github.repository_owner == 'home-assistant'
+    if: github.repository_owner == 'smart-hub'
     needs: init
     runs-on: ubuntu-latest
     strategy:
@@ -213,13 +213,13 @@ jobs:
           fi
 
           # Do not pin numpy in wheels building
-          sed -i "/numpy/d" homeassistant/package_constraints.txt
+          sed -i "/numpy/d" smarthub/package_constraints.txt
           # Don't build wheels for uv as uv requires a greater version of rust as currently available on alpine
           sed -i "/uv/d" requirements.txt
           sed -i "/uv/d" requirements_diff.txt
 
       - name: Build wheels
-        uses: home-assistant/wheels@2025.03.0
+        uses: smart-hub/wheels@2025.03.0
         with:
           abi: ${{ matrix.abi }}
           tag: musllinux_1_2
@@ -228,6 +228,6 @@ jobs:
           env-file: true
           apk: "bluez-dev;libffi-dev;openssl-dev;glib-dev;eudev-dev;libxml2-dev;libxslt-dev;libpng-dev;libjpeg-turbo-dev;tiff-dev;cups-dev;gmp-dev;mpfr-dev;mpc1-dev;ffmpeg-dev;gammu-dev;yaml-dev;openblas-dev;fftw-dev;lapack-dev;gfortran;blas-dev;eigen-dev;freetype-dev;glew-dev;harfbuzz-dev;hdf5-dev;libdc1394-dev;libtbb-dev;mesa-dev;openexr-dev;openjpeg-dev;uchardet-dev;nasm;zlib-ng-dev"
           skip-binary: aiohttp;charset-normalizer;grpcio;multidict;SQLAlchemy;propcache;protobuf;pymicro-vad;yarl
-          constraints: "homeassistant/package_constraints.txt"
+          constraints: "smarthub/package_constraints.txt"
           requirements-diff: "requirements_diff.txt"
           requirements: "requirements_all.txt"

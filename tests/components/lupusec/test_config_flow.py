@@ -6,17 +6,17 @@ from unittest.mock import patch
 from lupupy import LupusecException
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.lupusec.const import DOMAIN
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components.lupusec.const import DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_IP_ADDRESS,
     CONF_NAME,
     CONF_PASSWORD,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -40,7 +40,7 @@ MOCK_IMPORT_STEP_NAME = {
 }
 
 
-async def test_form_valid_input(hass: HomeAssistant) -> None:
+async def test_form_valid_input(hass: SmartHub) -> None:
     """Test handling valid user input."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -50,11 +50,11 @@ async def test_form_valid_input(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.lupusec.async_setup_entry",
+            "smarthub.components.lupusec.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.lupusec.config_flow.lupupy.Lupusec",
+            "smarthub.components.lupusec.config_flow.lupupy.Lupusec",
         ) as mock_initialize_lupusec,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -79,7 +79,7 @@ async def test_form_valid_input(hass: HomeAssistant) -> None:
     ],
 )
 async def test_flow_user_init_data_error_and_recover(
-    hass: HomeAssistant, raise_error, text_error
+    hass: SmartHub, raise_error, text_error
 ) -> None:
     """Test exceptions and recovery."""
     result = await hass.config_entries.flow.async_init(
@@ -89,7 +89,7 @@ async def test_flow_user_init_data_error_and_recover(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.lupusec.config_flow.lupupy.Lupusec",
+        "smarthub.components.lupusec.config_flow.lupupy.Lupusec",
         side_effect=raise_error,
     ) as mock_initialize_lupusec:
         result2 = await hass.config_entries.flow.async_configure(
@@ -106,11 +106,11 @@ async def test_flow_user_init_data_error_and_recover(
     # Recover
     with (
         patch(
-            "homeassistant.components.lupusec.async_setup_entry",
+            "smarthub.components.lupusec.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.lupusec.config_flow.lupupy.Lupusec",
+            "smarthub.components.lupusec.config_flow.lupupy.Lupusec",
         ) as mock_initialize_lupusec,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -127,7 +127,7 @@ async def test_flow_user_init_data_error_and_recover(
     assert len(mock_initialize_lupusec.mock_calls) == 1
 
 
-async def test_flow_user_init_data_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_user_init_data_already_configured(hass: SmartHub) -> None:
     """Test duplicate config entry.."""
 
     entry = MockConfigEntry(

@@ -9,30 +9,30 @@ from zwave_js_server.const import CommandClass
 from zwave_js_server.event import Event
 from zwave_js_server.model.node import Node
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.device_automation.exceptions import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.device_automation.exceptions import (
     InvalidDeviceAutomationConfig,
 )
-from homeassistant.components.zwave_js import DOMAIN, device_trigger
-from homeassistant.components.zwave_js.helpers import (
+from smarthub.components.zwave_js import DOMAIN, device_trigger
+from smarthub.components.zwave_js.helpers import (
     async_get_node_status_sensor_entity_id,
     get_device_id,
 )
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     config_validation as cv,
     device_registry as dr,
     entity_registry as er,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from tests.common import async_get_device_automations
 
 
 async def test_no_controller_triggers(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, client, integration
+    hass: SmartHub, device_registry: dr.DeviceRegistry, client, integration
 ) -> None:
     """Test that we do not get triggers for the controller."""
     device = device_registry.async_get_device(
@@ -48,7 +48,7 @@ async def test_no_controller_triggers(
 
 
 async def test_get_notification_notification_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -74,7 +74,7 @@ async def test_get_notification_notification_triggers(
 
 
 async def test_if_notification_notification_fires(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -174,7 +174,7 @@ async def test_if_notification_notification_fires(
 
 
 async def test_get_trigger_capabilities_notification_notification(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -210,7 +210,7 @@ async def test_get_trigger_capabilities_notification_notification(
 
 
 async def test_if_entry_control_notification_fires(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -309,7 +309,7 @@ async def test_if_entry_control_notification_fires(
 
 
 async def test_get_trigger_capabilities_entry_control_notification(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -343,7 +343,7 @@ async def test_get_trigger_capabilities_entry_control_notification(
 
 
 async def test_get_node_status_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client,
@@ -377,7 +377,7 @@ async def test_get_node_status_triggers(
 
 
 async def test_if_node_status_change_fires(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client,
@@ -460,7 +460,7 @@ async def test_if_node_status_change_fires(
 
 
 async def test_if_node_status_change_fires_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client,
@@ -543,7 +543,7 @@ async def test_if_node_status_change_fires_legacy(
 
 
 async def test_get_trigger_capabilities_node_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client,
@@ -604,7 +604,7 @@ async def test_get_trigger_capabilities_node_status(
 
 
 async def test_get_basic_value_notification_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     ge_in_wall_dimmer_switch,
@@ -634,7 +634,7 @@ async def test_get_basic_value_notification_triggers(
 
 
 async def test_if_basic_value_notification_fires(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     ge_in_wall_dimmer_switch,
@@ -748,7 +748,7 @@ async def test_if_basic_value_notification_fires(
 
 
 async def test_get_trigger_capabilities_basic_value_notification(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     ge_in_wall_dimmer_switch,
@@ -789,7 +789,7 @@ async def test_get_trigger_capabilities_basic_value_notification(
 
 
 async def test_get_central_scene_value_notification_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     wallmote_central_scene,
@@ -819,7 +819,7 @@ async def test_get_central_scene_value_notification_triggers(
 
 
 async def test_if_central_scene_value_notification_fires(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     wallmote_central_scene,
@@ -939,7 +939,7 @@ async def test_if_central_scene_value_notification_fires(
 
 
 async def test_get_trigger_capabilities_central_scene_value_notification(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     wallmote_central_scene,
@@ -979,7 +979,7 @@ async def test_get_trigger_capabilities_central_scene_value_notification(
 
 
 async def test_get_scene_activation_value_notification_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     hank_binary_switch,
@@ -1009,7 +1009,7 @@ async def test_get_scene_activation_value_notification_triggers(
 
 
 async def test_if_scene_activation_value_notification_fires(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     hank_binary_switch,
@@ -1123,7 +1123,7 @@ async def test_if_scene_activation_value_notification_fires(
 
 
 async def test_get_trigger_capabilities_scene_activation_value_notification(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     hank_binary_switch,
@@ -1164,7 +1164,7 @@ async def test_get_trigger_capabilities_scene_activation_value_notification(
 
 
 async def test_get_value_updated_value_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -1189,7 +1189,7 @@ async def test_get_value_updated_value_triggers(
 
 
 async def test_if_value_updated_value_fires(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -1285,7 +1285,7 @@ async def test_if_value_updated_value_fires(
 
 
 async def test_value_updated_value_no_driver(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -1360,7 +1360,7 @@ async def test_value_updated_value_no_driver(
 
 
 async def test_get_trigger_capabilities_value_updated_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -1414,7 +1414,7 @@ async def test_get_trigger_capabilities_value_updated_value(
 
 
 async def test_get_value_updated_config_parameter_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -1444,7 +1444,7 @@ async def test_get_value_updated_config_parameter_triggers(
 
 
 async def test_if_value_updated_config_parameter_fires(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -1519,7 +1519,7 @@ async def test_if_value_updated_config_parameter_fires(
 
 
 async def test_get_trigger_capabilities_value_updated_config_parameter_range(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -1567,7 +1567,7 @@ async def test_get_trigger_capabilities_value_updated_config_parameter_range(
 
 
 async def test_get_trigger_capabilities_value_updated_config_parameter_enumerated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     lock_schlage_be469,
@@ -1613,19 +1613,19 @@ async def test_get_trigger_capabilities_value_updated_config_parameter_enumerate
 
 
 async def test_failure_scenarios(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client,
     hank_binary_switch,
     integration,
 ) -> None:
     """Test failure scenarios."""
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await device_trigger.async_attach_trigger(
             hass, {"type": "failed.test", "device_id": "invalid_device_id"}, None, {}
         )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await device_trigger.async_attach_trigger(
             hass,
             {"type": "event.failed_type", "device_id": "invalid_device_id"},
@@ -1638,12 +1638,12 @@ async def test_failure_scenarios(
     )
     assert device
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await device_trigger.async_attach_trigger(
             hass, {"type": "failed.test", "device_id": device.id}, None, {}
         )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await device_trigger.async_attach_trigger(
             hass,
             {"type": "event.failed_type", "device_id": device.id},
@@ -1651,7 +1651,7 @@ async def test_failure_scenarios(
             {},
         )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await device_trigger.async_attach_trigger(
             hass,
             {"type": "state.failed_type", "device_id": device.id},
@@ -1661,11 +1661,11 @@ async def test_failure_scenarios(
 
     with (
         patch(
-            "homeassistant.components.zwave_js.device_trigger.async_get_node_from_device_id",
+            "smarthub.components.zwave_js.device_trigger.async_get_node_from_device_id",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.zwave_js.helpers.get_zwave_value_from_config",
+            "smarthub.components.zwave_js.helpers.get_zwave_value_from_config",
             return_value=None,
         ),
     ):
@@ -1676,7 +1676,7 @@ async def test_failure_scenarios(
             == {}
         )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_get_node_status_sensor_entity_id(hass, "invalid_device_id")
 
     INVALID_CONFIG = {

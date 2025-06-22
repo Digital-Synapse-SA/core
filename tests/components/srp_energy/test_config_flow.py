@@ -4,11 +4,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.srp_energy.const import CONF_IS_TOU, DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import CONF_ID, CONF_PASSWORD, CONF_SOURCE, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.srp_energy.const import CONF_IS_TOU, DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import CONF_ID, CONF_PASSWORD, CONF_SOURCE, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     ACCNT_ID,
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("mock_srp_energy_config_flow")
 async def test_show_form(
-    hass: HomeAssistant, capsys: pytest.CaptureFixture[str]
+    hass: SmartHub, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """Test show configuration form."""
     result = await hass.config_entries.flow.async_init(
@@ -39,7 +39,7 @@ async def test_show_form(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.srp_energy.async_setup_entry",
+        "smarthub.components.srp_energy.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -63,7 +63,7 @@ async def test_show_form(
 
 
 async def test_form_invalid_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_srp_energy_config_flow: MagicMock,
 ) -> None:
     """Test flow to handle invalid account error."""
@@ -82,7 +82,7 @@ async def test_form_invalid_account(
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_srp_energy_config_flow: MagicMock,
 ) -> None:
     """Test flow to handle invalid authentication error."""
@@ -101,7 +101,7 @@ async def test_form_invalid_auth(
 
 
 async def test_form_unknown_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_srp_energy_config_flow: MagicMock,
 ) -> None:
     """Test flow to handle invalid authentication error."""
@@ -120,7 +120,7 @@ async def test_form_unknown_error(
 
 
 async def test_flow_entry_already_configured(
-    hass: HomeAssistant, init_integration: MockConfigEntry
+    hass: SmartHub, init_integration: MockConfigEntry
 ) -> None:
     """Test user input for config_entry that already exists."""
     # Verify mock config setup from fixture
@@ -143,7 +143,7 @@ async def test_flow_entry_already_configured(
 
 
 async def test_flow_multiple_configs(
-    hass: HomeAssistant, init_integration: MockConfigEntry
+    hass: SmartHub, init_integration: MockConfigEntry
 ) -> None:
     """Test multiple config entries."""
     # Verify mock config setup from fixture

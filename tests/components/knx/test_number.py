@@ -2,18 +2,18 @@
 
 import pytest
 
-from homeassistant.components.knx.const import CONF_RESPOND_TO_READ, KNX_ADDRESS
-from homeassistant.components.knx.schema import NumberSchema
-from homeassistant.const import CONF_NAME, CONF_TYPE
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.components.knx.const import CONF_RESPOND_TO_READ, KNX_ADDRESS
+from smarthub.components.knx.schema import NumberSchema
+from smarthub.const import CONF_NAME, CONF_TYPE
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import ServiceValidationError
 
 from .conftest import KNXTestKit
 
 from tests.common import mock_restore_cache_with_extra_data
 
 
-async def test_number_set_value(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_number_set_value(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX number with passive_address and respond_to_read restoring state."""
     test_address = "1/1/1"
     await knx.setup_integration(
@@ -62,7 +62,7 @@ async def test_number_set_value(hass: HomeAssistant, knx: KNXTestKit) -> None:
     assert state.state == "90"
 
 
-async def test_number_restore_and_respond(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_number_restore_and_respond(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX number with passive_address and respond_to_read restoring state."""
     test_address = "1/1/1"
     test_passive_address = "3/3/3"

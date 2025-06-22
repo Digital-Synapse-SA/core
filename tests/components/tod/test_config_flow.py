@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.tod.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.tod.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry, get_schema_suggested_value
 
 
 @pytest.mark.parametrize("platform", ["sensor"])
-async def test_config_flow(hass: HomeAssistant, platform) -> None:
+async def test_config_flow(hass: SmartHub, platform) -> None:
     """Test the config flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -22,7 +22,7 @@ async def test_config_flow(hass: HomeAssistant, platform) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.tod.async_setup_entry",
+        "smarthub.components.tod.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -56,7 +56,7 @@ async def test_config_flow(hass: HomeAssistant, platform) -> None:
 
 
 @pytest.mark.freeze_time("2022-03-16 17:37:00", tz_offset=-7)
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test reconfiguring."""
     # Setup the config entry
     config_entry = MockConfigEntry(

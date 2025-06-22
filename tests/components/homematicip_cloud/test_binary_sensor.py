@@ -2,7 +2,7 @@
 
 from homematicip.base.enums import SmokeDetectorAlarmType, WindowState
 
-from homeassistant.components.homematicip_cloud.binary_sensor import (
+from smarthub.components.homematicip_cloud.binary_sensor import (
     ATTR_ACCELERATION_SENSOR_MODE,
     ATTR_ACCELERATION_SENSOR_NEUTRAL_POSITION,
     ATTR_ACCELERATION_SENSOR_SENSITIVITY,
@@ -14,21 +14,21 @@ from homeassistant.components.homematicip_cloud.binary_sensor import (
     ATTR_WATER_LEVEL_DETECTED,
     ATTR_WINDOW_STATE,
 )
-from homeassistant.components.homematicip_cloud.entity import (
+from smarthub.components.homematicip_cloud.entity import (
     ATTR_EVENT_DELAY,
     ATTR_GROUP_MEMBER_UNREACHABLE,
     ATTR_LOW_BATTERY,
     ATTR_RSSI_DEVICE,
     ATTR_SABOTAGE,
 )
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .helper import HomeFactory, async_manipulate_test_data, get_and_check_entity_basics
 
 
 async def test_hmip_home_cloud_connection_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipCloudConnectionSensor."""
     entity_id = "binary_sensor.cloud_connection"
@@ -51,7 +51,7 @@ async def test_hmip_home_cloud_connection_sensor(
 
 
 async def test_hmip_acceleration_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipAccelerationSensor."""
     entity_id = "binary_sensor.garagentor"
@@ -90,7 +90,7 @@ async def test_hmip_acceleration_sensor(
 
 
 async def test_hmip_tilt_vibration_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipTiltVibrationSensor."""
     entity_id = "binary_sensor.garage_neigungs_und_erschutterungssensor"
@@ -128,7 +128,7 @@ async def test_hmip_tilt_vibration_sensor(
 
 
 async def test_hmip_contact_interface(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipContactInterface."""
     entity_id = "binary_sensor.kontakt_schnittstelle_unterputz_1_fach"
@@ -153,7 +153,7 @@ async def test_hmip_contact_interface(
 
 
 async def test_hmip_shutter_contact(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipShutterContact."""
     entity_id = "binary_sensor.fenstergriffsensor"
@@ -195,7 +195,7 @@ async def test_hmip_shutter_contact(
 
 
 async def test_hmip_shutter_contact_optical(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipShutterContact."""
     entity_id = "binary_sensor.sitzplatzture"
@@ -227,7 +227,7 @@ async def test_hmip_shutter_contact_optical(
 
 
 async def test_hmip_motion_detector(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipMotionDetector."""
     entity_id = "binary_sensor.bewegungsmelder_fur_55er_rahmen_innen"
@@ -248,7 +248,7 @@ async def test_hmip_motion_detector(
 
 
 async def test_hmip_presence_detector(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipPresenceDetector."""
     entity_id = "binary_sensor.spi_1"
@@ -274,7 +274,7 @@ async def test_hmip_presence_detector(
 
 
 async def test_hmip_pluggable_mains_failure_surveillance_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipPresenceDetector."""
     entity_id = "binary_sensor.netzausfalluberwachung"
@@ -295,7 +295,7 @@ async def test_hmip_pluggable_mains_failure_surveillance_sensor(
 
 
 async def test_hmip_smoke_detector(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipSmokeDetector."""
     entity_id = "binary_sensor.rauchwarnmelder"
@@ -329,7 +329,7 @@ async def test_hmip_smoke_detector(
 
 
 async def test_hmip_water_detector(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipWaterDetector."""
     entity_id = "binary_sensor.wassersensor"
@@ -366,7 +366,7 @@ async def test_hmip_water_detector(
 
 
 async def test_hmip_storm_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipStormSensor."""
     entity_id = "binary_sensor.weather_sensor_plus_storm"
@@ -387,7 +387,7 @@ async def test_hmip_storm_sensor(
 
 
 async def test_hmip_rain_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipRainSensor."""
     entity_id = "binary_sensor.wettersensor_pro_raining"
@@ -408,7 +408,7 @@ async def test_hmip_rain_sensor(
 
 
 async def test_hmip_sunshine_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipSunshineSensor."""
     entity_id = "binary_sensor.wettersensor_pro_sunshine"
@@ -430,7 +430,7 @@ async def test_hmip_sunshine_sensor(
 
 
 async def test_hmip_battery_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipSunshineSensor."""
     entity_id = "binary_sensor.wohnungsture_battery"
@@ -451,7 +451,7 @@ async def test_hmip_battery_sensor(
 
 
 async def test_hmip_security_zone_sensor_group(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipSecurityZoneSensorGroup."""
     entity_id = "binary_sensor.internal_securityzone"
@@ -488,7 +488,7 @@ async def test_hmip_security_zone_sensor_group(
 
 
 async def test_hmip_security_sensor_group(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipSecuritySensorGroup."""
     entity_id = "binary_sensor.buro_sensors"
@@ -562,7 +562,7 @@ async def test_hmip_security_sensor_group(
 
 
 async def test_hmip_multi_contact_interface(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipMultiContactInterface."""
     entity_id = "binary_sensor.wired_eingangsmodul_32_fach_channel5"

@@ -5,17 +5,17 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import config_entries
-from homeassistant.components.threshold.const import DOMAIN
-from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.threshold.const import DOMAIN
+from smarthub.const import ATTR_UNIT_OF_MEASUREMENT, UnitOfTemperature
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry, get_schema_suggested_value
 from tests.typing import WebSocketGenerator
 
 
-async def test_config_flow(hass: HomeAssistant) -> None:
+async def test_config_flow(hass: SmartHub) -> None:
     """Test the config flow."""
     input_sensor = "sensor.input"
 
@@ -26,7 +26,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.threshold.async_setup_entry",
+        "smarthub.components.threshold.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -65,7 +65,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize(("extra_input_data", "error"), [({}, "need_lower_upper")])
-async def test_fail(hass: HomeAssistant, extra_input_data, error) -> None:
+async def test_fail(hass: SmartHub, extra_input_data, error) -> None:
     """Test not providing lower or upper limit fails."""
     input_sensor = "sensor.input"
 
@@ -88,7 +88,7 @@ async def test_fail(hass: HomeAssistant, extra_input_data, error) -> None:
     assert result["errors"] == {"base": error}
 
 
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test reconfiguring."""
     input_sensor = "sensor.input"
     hass.states.async_set(input_sensor, "10")
@@ -186,7 +186,7 @@ async def test_options(hass: HomeAssistant) -> None:
     ids=("success", "missing_upper_lower", "missing_entity_id"),
 )
 async def test_config_flow_preview_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     user_input: str,
     snapshot: SnapshotAssertion,
@@ -227,7 +227,7 @@ async def test_config_flow_preview_success(
 
 
 async def test_options_flow_preview(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -286,7 +286,7 @@ async def test_options_flow_preview(
 
 
 async def test_options_flow_sensor_preview_config_entry_removed(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the option flow preview where the config entry is removed."""
     client = await hass_ws_client(hass)

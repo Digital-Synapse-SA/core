@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from sentry_sdk.utils import BadDsn
 
-from homeassistant.components.sentry.const import (
+from smarthub.components.sentry.const import (
     CONF_ENVIRONMENT,
     CONF_EVENT_CUSTOM_COMPONENTS,
     CONF_EVENT_HANDLED,
@@ -16,14 +16,14 @@ from homeassistant.components.sentry.const import (
     CONF_TRACING_SAMPLE_RATE,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_full_user_flow_implementation(hass: HomeAssistant) -> None:
+async def test_full_user_flow_implementation(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -33,9 +33,9 @@ async def test_full_user_flow_implementation(hass: HomeAssistant) -> None:
     assert result.get("errors") == {}
 
     with (
-        patch("homeassistant.components.sentry.config_flow.Dsn"),
+        patch("smarthub.components.sentry.config_flow.Dsn"),
         patch(
-            "homeassistant.components.sentry.async_setup_entry",
+            "smarthub.components.sentry.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -54,7 +54,7 @@ async def test_full_user_flow_implementation(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_integration_already_exists(hass: HomeAssistant) -> None:
+async def test_integration_already_exists(hass: SmartHub) -> None:
     """Test we only allow a single config flow."""
     MockConfigEntry(domain=DOMAIN).add_to_hass(hass)
 
@@ -65,14 +65,14 @@ async def test_integration_already_exists(hass: HomeAssistant) -> None:
     assert result.get("reason") == "single_instance_allowed"
 
 
-async def test_user_flow_bad_dsn(hass: HomeAssistant) -> None:
+async def test_user_flow_bad_dsn(hass: SmartHub) -> None:
     """Test we handle bad dsn error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.sentry.config_flow.Dsn",
+        "smarthub.components.sentry.config_flow.Dsn",
         side_effect=BadDsn,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -84,14 +84,14 @@ async def test_user_flow_bad_dsn(hass: HomeAssistant) -> None:
     assert result2.get("errors") == {"base": "bad_dsn"}
 
 
-async def test_user_flow_unknown_exception(hass: HomeAssistant) -> None:
+async def test_user_flow_unknown_exception(hass: SmartHub) -> None:
     """Test we handle any unknown exception error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.sentry.config_flow.Dsn",
+        "smarthub.components.sentry.config_flow.Dsn",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -103,7 +103,7 @@ async def test_user_flow_unknown_exception(hass: HomeAssistant) -> None:
     assert result2.get("errors") == {"base": "unknown"}
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test options config flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -111,7 +111,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     )
     entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.sentry.async_setup_entry", return_value=True):
+    with patch("smarthub.components.sentry.async_setup_entry", return_value=True):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 

@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock
 from syrupy.assertion import SnapshotAssertion
 from tesla_fleet_api.exceptions import VehicleOffline
 
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, setup_platform
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_device_tracker(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     normal_config_entry: MockConfigEntry,
@@ -27,7 +27,7 @@ async def test_device_tracker(
 
 
 async def test_device_tracker_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vehicle_data: AsyncMock,
     normal_config_entry: MockConfigEntry,
 ) -> None:

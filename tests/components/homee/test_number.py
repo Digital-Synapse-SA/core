@@ -5,14 +5,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import build_mock_node, setup_integration
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def setup_numbers(
-    hass: HomeAssistant, mock_homee: MagicMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_homee: MagicMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Set up the number platform."""
     mock_homee.nodes = [build_mock_node("numbers.json")]
@@ -36,7 +36,7 @@ async def setup_numbers(
     ],
 )
 async def test_value_fn(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_id: str,
@@ -56,7 +56,7 @@ async def test_value_fn(
     ],
 )
 async def test_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_id: str,
@@ -78,7 +78,7 @@ async def test_set_value(
 
 
 async def test_set_value_not_editable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -96,14 +96,14 @@ async def test_set_value_not_editable(
 
 
 async def test_number_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the multisensor snapshot."""
-    with patch("homeassistant.components.homee.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.homee.PLATFORMS", [Platform.NUMBER]):
         await setup_numbers(hass, mock_homee, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

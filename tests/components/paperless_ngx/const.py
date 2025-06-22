@@ -1,6 +1,6 @@
 """Constants for the Paperless NGX integration tests."""
 
-from homeassistant.const import CONF_API_KEY, CONF_URL, CONF_VERIFY_SSL
+from smarthub.const import CONF_API_KEY, CONF_URL, CONF_VERIFY_SSL
 
 USER_INPUT_ONE = {
     CONF_URL: "https://192.168.69.16:8000",

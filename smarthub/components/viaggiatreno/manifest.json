@@ -1,0 +1,8 @@
+{
+  "domain": "viaggiatreno",
+  "name": "Trenitalia ViaggiaTreno",
+  "codeowners": [],
+  "documentation": "https://www.smart-hub.io/integrations/viaggiatreno",
+  "iot_class": "cloud_polling",
+  "quality_scale": "legacy"
+}

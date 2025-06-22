@@ -6,21 +6,21 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from teslemetry_stream import Signal
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, assert_entities_alt, reload_platform, setup_platform
 from .const import COMMAND_OK, VEHICLE_DATA_ALT
 
 
 async def test_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_legacy: AsyncMock,
@@ -32,7 +32,7 @@ async def test_switch(
 
 
 async def test_switch_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -88,7 +88,7 @@ async def test_switch_alt(
     ],
 )
 async def test_switch_services(
-    hass: HomeAssistant, name: str, on: str, off: str
+    hass: SmartHub, name: str, on: str, off: str
 ) -> None:
     """Tests that the switch service calls work."""
 
@@ -125,7 +125,7 @@ async def test_switch_services(
 
 
 async def test_switch_streaming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,

@@ -4,19 +4,19 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import threshold
-from homeassistant.components.threshold.config_flow import ConfigFlowHandler
-from homeassistant.components.threshold.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.event import async_track_entity_registry_updated_event
+from smarthub.components import threshold
+from smarthub.components.threshold.config_flow import ConfigFlowHandler
+from smarthub.components.threshold.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import Event, SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.event import async_track_entity_registry_updated_event
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-def sensor_config_entry(hass: HomeAssistant) -> er.RegistryEntry:
+def sensor_config_entry(hass: SmartHub) -> er.RegistryEntry:
     """Fixture to create a sensor config entry."""
     sensor_config_entry = MockConfigEntry()
     sensor_config_entry.add_to_hass(hass)
@@ -53,7 +53,7 @@ def sensor_entity_entry(
 
 @pytest.fixture
 def threshold_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sensor_entity_entry: er.RegistryEntry,
 ) -> MockConfigEntry:
     """Fixture to create a threshold config entry."""
@@ -77,7 +77,7 @@ def threshold_config_entry(
     return config_entry
 
 
-def track_entity_registry_actions(hass: HomeAssistant, entity_id: str) -> list[str]:
+def track_entity_registry_actions(hass: SmartHub, entity_id: str) -> list[str]:
     """Track entity registry actions for an entity."""
     events = []
 
@@ -92,7 +92,7 @@ def track_entity_registry_actions(hass: HomeAssistant, entity_id: str) -> list[s
 
 @pytest.mark.parametrize("platform", ["binary_sensor"])
 async def test_setup_and_remove_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     platform: str,
 ) -> None:
@@ -145,7 +145,7 @@ async def test_setup_and_remove_config_entry(
 
 
 @pytest.mark.parametrize("platform", ["sensor"])
-async def test_entry_changed(hass: HomeAssistant, platform) -> None:
+async def test_entry_changed(hass: SmartHub, platform) -> None:
     """Test reconfiguring."""
 
     device_registry = dr.async_get(hass)
@@ -206,7 +206,7 @@ async def test_entry_changed(hass: HomeAssistant, platform) -> None:
 
 
 async def test_device_cleaning(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -292,7 +292,7 @@ async def test_device_cleaning(
 
 
 async def test_async_handle_source_entity_changes_source_entity_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     threshold_config_entry: MockConfigEntry,
@@ -322,7 +322,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed(
     # Remove the source sensor's config entry from the device, this removes the
     # source sensor
     with patch(
-        "homeassistant.components.threshold.async_unload_entry",
+        "smarthub.components.threshold.async_unload_entry",
         wraps=threshold.async_unload_entry,
     ) as mock_unload_entry:
         device_registry.async_update_device(
@@ -344,7 +344,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed(
 
 
 async def test_async_handle_source_entity_changes_source_entity_removed_from_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     threshold_config_entry: MockConfigEntry,
@@ -365,7 +365,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed_from_dev
 
     # Remove the source sensor from the device
     with patch(
-        "homeassistant.components.threshold.async_unload_entry",
+        "smarthub.components.threshold.async_unload_entry",
         wraps=threshold.async_unload_entry,
     ) as mock_unload_entry:
         entity_registry.async_update_entity(
@@ -386,7 +386,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed_from_dev
 
 
 async def test_async_handle_source_entity_changes_source_entity_moved_other_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     threshold_config_entry: MockConfigEntry,
@@ -415,7 +415,7 @@ async def test_async_handle_source_entity_changes_source_entity_moved_other_devi
 
     # Move the source sensor to another device
     with patch(
-        "homeassistant.components.threshold.async_unload_entry",
+        "smarthub.components.threshold.async_unload_entry",
         wraps=threshold.async_unload_entry,
     ) as mock_unload_entry:
         entity_registry.async_update_entity(
@@ -438,7 +438,7 @@ async def test_async_handle_source_entity_changes_source_entity_moved_other_devi
 
 
 async def test_async_handle_source_entity_new_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     threshold_config_entry: MockConfigEntry,
@@ -459,7 +459,7 @@ async def test_async_handle_source_entity_new_entity_id(
 
     # Change the source entity's entity ID
     with patch(
-        "homeassistant.components.threshold.async_unload_entry",
+        "smarthub.components.threshold.async_unload_entry",
         wraps=threshold.async_unload_entry,
     ) as mock_unload_entry:
         entity_registry.async_update_entity(

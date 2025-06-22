@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 from aioairzone_cloud.exceptions import AirzoneCloudError, LoginError
 
-from homeassistant.components.airzone_cloud.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import CONF_ID, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.airzone_cloud.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import CONF_ID, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .util import (
     CONFIG,
@@ -21,36 +21,36 @@ from .util import (
 )
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test that the form is served with valid input."""
 
     with (
         patch(
-            "homeassistant.components.airzone_cloud.async_setup_entry",
+            "smarthub.components.airzone_cloud.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_device_config",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_device_config",
             side_effect=mock_get_device_config,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_device_status",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_device_status",
             side_effect=mock_get_device_status,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_installation",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_installation",
             return_value=GET_INSTALLATION_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_installations",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_installations",
             return_value=GET_INSTALLATIONS_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_webserver",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_webserver",
             side_effect=mock_get_webserver,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.login",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.login",
             return_value=None,
         ),
     ):
@@ -96,32 +96,32 @@ async def test_form(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_installations_list_error(hass: HomeAssistant) -> None:
+async def test_installations_list_error(hass: SmartHub) -> None:
     """Test connection error."""
 
     with (
         patch(
-            "homeassistant.components.airzone_cloud.async_setup_entry",
+            "smarthub.components.airzone_cloud.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_device_config",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_device_config",
             side_effect=mock_get_device_config,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_device_status",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_device_status",
             side_effect=mock_get_device_status,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_installations",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_installations",
             side_effect=AirzoneCloudError,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_webserver",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_webserver",
             side_effect=mock_get_webserver,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.login",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.login",
             return_value=None,
         ),
     ):
@@ -146,11 +146,11 @@ async def test_installations_list_error(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_login_error(hass: HomeAssistant) -> None:
+async def test_login_error(hass: SmartHub) -> None:
     """Test login error."""
 
     with patch(
-        "homeassistant.components.airzone_cloud.AirzoneCloudApi.login",
+        "smarthub.components.airzone_cloud.AirzoneCloudApi.login",
         side_effect=LoginError,
     ):
         result = await hass.config_entries.flow.async_init(

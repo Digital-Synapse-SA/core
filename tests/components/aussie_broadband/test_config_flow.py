@@ -5,11 +5,11 @@ from unittest.mock import patch
 from aiohttp import ClientConnectionError
 from aussiebb.asyncio import AuthenticationException
 
-from homeassistant import config_entries
-from homeassistant.components.aussie_broadband.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.aussie_broadband.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .common import FAKE_DATA, FAKE_SERVICES
 
@@ -19,7 +19,7 @@ TEST_USERNAME = FAKE_DATA[CONF_USERNAME]
 TEST_PASSWORD = FAKE_DATA[CONF_PASSWORD]
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result1 = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -32,7 +32,7 @@ async def test_form(hass: HomeAssistant) -> None:
         patch("aussiebb.asyncio.AussieBB.login", return_value=True),
         patch("aussiebb.asyncio.AussieBB.get_services", return_value=FAKE_SERVICES),
         patch(
-            "homeassistant.components.aussie_broadband.async_setup_entry",
+            "smarthub.components.aussie_broadband.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -48,7 +48,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_already_configured(hass: HomeAssistant) -> None:
+async def test_already_configured(hass: SmartHub) -> None:
     """Test already configured."""
     # Setup an entry
     result1 = await hass.config_entries.flow.async_init(
@@ -62,7 +62,7 @@ async def test_already_configured(hass: HomeAssistant) -> None:
             "aussiebb.asyncio.AussieBB.get_services", return_value=[FAKE_SERVICES[0]]
         ),
         patch(
-            "homeassistant.components.aussie_broadband.async_setup_entry",
+            "smarthub.components.aussie_broadband.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -83,7 +83,7 @@ async def test_already_configured(hass: HomeAssistant) -> None:
             "aussiebb.asyncio.AussieBB.get_services", return_value=[FAKE_SERVICES[0]]
         ),
         patch(
-            "homeassistant.components.aussie_broadband.async_setup_entry",
+            "smarthub.components.aussie_broadband.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -97,7 +97,7 @@ async def test_already_configured(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_no_services(hass: HomeAssistant) -> None:
+async def test_no_services(hass: SmartHub) -> None:
     """Test when there are no services."""
     result1 = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -110,7 +110,7 @@ async def test_no_services(hass: HomeAssistant) -> None:
         patch("aussiebb.asyncio.AussieBB.login", return_value=True),
         patch("aussiebb.asyncio.AussieBB.get_services", return_value=[]),
         patch(
-            "homeassistant.components.aussie_broadband.async_setup_entry",
+            "smarthub.components.aussie_broadband.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -125,7 +125,7 @@ async def test_no_services(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test invalid auth is handled."""
     result1 = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -144,7 +144,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_network_issue(hass: HomeAssistant) -> None:
+async def test_form_network_issue(hass: SmartHub) -> None:
     """Test network issues are handled."""
     result1 = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -163,7 +163,7 @@ async def test_form_network_issue(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_reauth(hass: HomeAssistant) -> None:
+async def test_reauth(hass: SmartHub) -> None:
     """Test reauth flow."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,

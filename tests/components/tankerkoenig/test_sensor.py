@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.tankerkoenig import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.tankerkoenig import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import PRICES_MISSING_FUELTYPE, STATION_MISSING_FUELTYPE
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("setup_integration")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tankerkoenig: AsyncMock,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -42,7 +42,7 @@ async def test_sensor(
 
 
 async def test_sensor_missing_fueltype(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tankerkoenig: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:

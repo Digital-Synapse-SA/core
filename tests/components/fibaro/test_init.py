@@ -2,8 +2,8 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from .conftest import init_integration
 
@@ -11,7 +11,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_unload_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_light: Mock,
@@ -22,7 +22,7 @@ async def test_unload_integration(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_light]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.LIGHT]):
         await init_integration(hass, mock_config_entry)
         # Act
         await hass.config_entries.async_unload(mock_config_entry.entry_id)

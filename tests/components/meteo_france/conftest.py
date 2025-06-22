@@ -5,10 +5,10 @@ from unittest.mock import patch
 from meteofrance_api.model import CurrentPhenomenons, Forecast, Rain
 import pytest
 
-from homeassistant.components.meteo_france.const import CONF_CITY, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
+from smarthub.components.meteo_france.const import CONF_CITY, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry, load_json_object_fixture
 @pytest.fixture(autouse=True)
 def patch_requests():
     """Stub out services that makes requests."""
-    with patch("homeassistant.components.meteo_france.MeteoFranceClient") as mock_data:
+    with patch("smarthub.components.meteo_france.MeteoFranceClient") as mock_data:
         mock_data = mock_data.return_value
         mock_data.get_forecast.return_value = Forecast(
             load_json_object_fixture("raw_forecast.json", DOMAIN)
@@ -31,7 +31,7 @@ def patch_requests():
 
 
 @pytest.fixture(name="config_entry")
-def get_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def get_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Create and register mock config entry."""
     entry_data = {
         CONF_CITY: "La Clusaz",

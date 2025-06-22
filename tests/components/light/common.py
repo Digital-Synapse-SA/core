@@ -6,7 +6,7 @@ components. Instead call the service directly.
 
 from typing import Any, Literal
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_BRIGHTNESS_PCT,
     ATTR_COLOR_NAME,
@@ -27,20 +27,20 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntity,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ENTITY_MATCH_ALL,
     SERVICE_TOGGLE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockToggleEntity
 
 
 async def async_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str = ENTITY_MATCH_ALL,
     transition: float | None = None,
     brightness: int | None = None,
@@ -84,7 +84,7 @@ async def async_turn_on(
 
 
 async def async_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str = ENTITY_MATCH_ALL,
     transition: float | None = None,
     flash: str | None = None,
@@ -104,7 +104,7 @@ async def async_turn_off(
 
 
 async def async_toggle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str = ENTITY_MATCH_ALL,
     transition: float | None = None,
     brightness: int | None = None,

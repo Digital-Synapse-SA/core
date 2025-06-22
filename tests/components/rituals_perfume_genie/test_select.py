@@ -2,28 +2,28 @@
 
 import pytest
 
-from homeassistant.components.homeassistant import SERVICE_UPDATE_ENTITY
-from homeassistant.components.select import (
+from smarthub.components.smarthub import SERVICE_UPDATE_ENTITY
+from smarthub.components.select import (
     ATTR_OPTION,
     ATTR_OPTIONS,
     DOMAIN as SELECT_DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_SELECT_OPTION,
     EntityCategory,
     UnitOfArea,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import init_integration, mock_config_entry, mock_diffuser
 
 
 async def test_select_entity(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the creation and state of the diffuser select entity."""
     config_entry = mock_config_entry(unique_id="select_test")
@@ -42,12 +42,12 @@ async def test_select_entity(
     assert entry.entity_category == EntityCategory.CONFIG
 
 
-async def test_select_option(hass: HomeAssistant) -> None:
+async def test_select_option(hass: SmartHub) -> None:
     """Test selecting of a option."""
     config_entry = mock_config_entry(unique_id="select_invalid_option_test")
     diffuser = mock_diffuser(hublot="lot123", room_size_square_meter=60)
     await init_integration(hass, config_entry, [diffuser])
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     diffuser.room_size_square_meter = 30
 
     state = hass.states.get("select.genie_room_size")
@@ -61,7 +61,7 @@ async def test_select_option(hass: HomeAssistant) -> None:
         blocking=True,
     )
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         SERVICE_UPDATE_ENTITY,
         {ATTR_ENTITY_ID: ["select.genie_room_size"]},
         blocking=True,
@@ -73,12 +73,12 @@ async def test_select_option(hass: HomeAssistant) -> None:
     assert state.state == "30"
 
 
-async def test_select_invalid_option(hass: HomeAssistant) -> None:
+async def test_select_invalid_option(hass: SmartHub) -> None:
     """Test selecting an invalid option."""
     config_entry = mock_config_entry(unique_id="select_invalid_option_test")
     diffuser = mock_diffuser(hublot="lot123", room_size_square_meter=60)
     await init_integration(hass, config_entry, [diffuser])
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     state = hass.states.get("select.genie_room_size")
     assert state
@@ -92,7 +92,7 @@ async def test_select_invalid_option(hass: HomeAssistant) -> None:
             blocking=True,
         )
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         SERVICE_UPDATE_ENTITY,
         {ATTR_ENTITY_ID: ["select.genie_room_size"]},
         blocking=True,

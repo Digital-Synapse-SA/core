@@ -2,21 +2,21 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.sense.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.sense.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
 async def setup_platform(
-    hass: HomeAssistant, config_entry: MockConfigEntry, platform: Platform
+    hass: SmartHub, config_entry: MockConfigEntry, platform: Platform
 ) -> MockConfigEntry:
     """Set up the Sense platform."""
     config_entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.sense.PLATFORMS", [platform]):
+    with patch("smarthub.components.sense.PLATFORMS", [platform]):
         assert await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
 

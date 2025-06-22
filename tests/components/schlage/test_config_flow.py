@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, Mock
 from pyschlage.exceptions import Error as PyschlageError, NotAuthorizedError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.schlage.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.schlage.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import MockSchlageConfigEntry
 
@@ -25,7 +25,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
     ],
 )
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_pyschlage_auth: Mock,
     username: str,
@@ -57,7 +57,7 @@ async def test_form(
 
 
 async def test_form_requires_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_pyschlage_auth: Mock,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_form_requires_unique_id(
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant, mock_pyschlage_auth: Mock
+    hass: SmartHub, mock_pyschlage_auth: Mock
 ) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
@@ -102,7 +102,7 @@ async def test_form_invalid_auth(
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_unknown(hass: HomeAssistant, mock_pyschlage_auth: Mock) -> None:
+async def test_form_unknown(hass: SmartHub, mock_pyschlage_auth: Mock) -> None:
     """Test we handle unknown error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -122,7 +122,7 @@ async def test_form_unknown(hass: HomeAssistant, mock_pyschlage_auth: Mock) -> N
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockSchlageConfigEntry,
     mock_pyschlage_auth: Mock,
 ) -> None:
@@ -150,7 +150,7 @@ async def test_reauth(
 
 
 async def test_reauth_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockSchlageConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_pyschlage_auth: Mock,
@@ -178,7 +178,7 @@ async def test_reauth_invalid_auth(
 
 
 async def test_reauth_wrong_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockSchlageConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_pyschlage_auth: Mock,

@@ -11,14 +11,14 @@ import axis as axislib
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import axis
-from homeassistant.components.axis.const import DOMAIN
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.config_entries import SOURCE_ZEROCONF, ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components import axis
+from smarthub.components.axis.const import DOMAIN
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.config_entries import SOURCE_ZEROCONF, ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .conftest import RtspEventMock, RtspStateType
 from .const import (
@@ -51,7 +51,7 @@ async def test_device_registry_entry(
 @pytest.mark.parametrize("api_discovery_items", [API_DISCOVERY_MQTT])
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_device_support_mqtt(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Successful setup."""
     mqtt_call = call(f"axis/{MAC}/#", mock.ANY, 0, "utf-8", ANY)
@@ -83,7 +83,7 @@ async def test_device_support_mqtt_low_privilege(mqtt_mock: MqttMockHAClient) ->
 
 
 async def test_update_address(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_setup: MockConfigEntry,
     mock_requests: Callable[[str], None],
 ) -> None:
@@ -112,7 +112,7 @@ async def test_update_address(
 
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_device_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rtsp_event: RtspEventMock,
     mock_rtsp_signal_state: RtspStateType,
 ) -> None:
@@ -149,7 +149,7 @@ async def test_device_unavailable(
 
 @pytest.mark.usefixtures("mock_default_requests")
 async def test_device_trigger_reauth_flow(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Failed authentication trigger a reauthentication flow."""
     config_entry.add_to_hass(hass)
@@ -194,7 +194,7 @@ async def test_shutdown(config_entry_data: MappingProxyType[str, Any]) -> None:
 )
 @pytest.mark.usefixtures("mock_default_requests")
 async def test_get_axis_api_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     side_effect: Exception,
     state: ConfigEntryState,
@@ -202,7 +202,7 @@ async def test_get_axis_api_errors(
     """Failed setup schedules a retry of setup."""
     config_entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.axis.hub.api.axis.interfaces.vapix.Vapix.initialize",
+        "smarthub.components.axis.hub.api.axis.interfaces.vapix.Vapix.initialize",
         side_effect=side_effect,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

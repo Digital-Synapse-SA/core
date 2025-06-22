@@ -5,10 +5,10 @@ from __future__ import annotations
 from aiohttp.client_exceptions import ClientError
 import pytest
 
-from homeassistant.components.netgear_lte.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONTENT_TYPE_JSON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.netgear_lte.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONTENT_TYPE_JSON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -55,8 +55,8 @@ def mock_connection(aioclient_mock: AiohttpClientMocker) -> None:
 
 
 @pytest.fixture(name="config_entry")
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
-    """Create Netgear LTE entry in Home Assistant."""
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
+    """Create Netgear LTE entry in SmartHub."""
     return MockConfigEntry(
         domain=DOMAIN, data=CONF_DATA, unique_id="FFFFFFFFFFFFF", title="Netgear LM1200"
     )
@@ -64,11 +64,11 @@ def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 @pytest.fixture(name="setup_integration")
 async def mock_setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     connection: None,
 ) -> None:
-    """Set up the Netgear LTE integration in Home Assistant."""
+    """Set up the Netgear LTE integration in SmartHub."""
     config_entry.add_to_hass(hass)
     assert await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
@@ -76,11 +76,11 @@ async def mock_setup_integration(
 
 @pytest.fixture(name="setup_cannot_connect")
 async def setup_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     cannot_connect: None,
 ) -> None:
-    """Set up the Netgear LTE integration in Home Assistant."""
+    """Set up the Netgear LTE integration in SmartHub."""
     config_entry.add_to_hass(hass)
     assert await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()

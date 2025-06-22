@@ -5,10 +5,10 @@ from uuid import uuid4
 
 import pytest
 
-from homeassistant.components.ialarm.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.ialarm.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 @pytest.fixture(name="ialarm_api")
 def ialarm_api_fixture():
     """Set up IAlarm API fixture."""
-    with patch("homeassistant.components.ialarm.IAlarm") as mock_ialarm_api:
+    with patch("smarthub.components.ialarm.IAlarm") as mock_ialarm_api:
         yield mock_ialarm_api
 
 
@@ -30,7 +30,7 @@ def mock_config_fixture():
     )
 
 
-async def test_setup_entry(hass: HomeAssistant, ialarm_api, mock_config_entry) -> None:
+async def test_setup_entry(hass: SmartHub, ialarm_api, mock_config_entry) -> None:
     """Test setup entry."""
     ialarm_api.return_value.get_mac = Mock(return_value="00:00:54:12:34:56")
 
@@ -43,7 +43,7 @@ async def test_setup_entry(hass: HomeAssistant, ialarm_api, mock_config_entry) -
 
 
 async def test_setup_not_ready(
-    hass: HomeAssistant, ialarm_api, mock_config_entry
+    hass: SmartHub, ialarm_api, mock_config_entry
 ) -> None:
     """Test setup failed because we can't connect to the alarm system."""
     ialarm_api.return_value.get_mac = Mock(side_effect=ConnectionError)
@@ -54,7 +54,7 @@ async def test_setup_not_ready(
     assert mock_config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_unload_entry(hass: HomeAssistant, ialarm_api, mock_config_entry) -> None:
+async def test_unload_entry(hass: SmartHub, ialarm_api, mock_config_entry) -> None:
     """Test being able to unload an entry."""
     ialarm_api.return_value.get_mac = Mock(return_value="00:00:54:12:34:56")
 

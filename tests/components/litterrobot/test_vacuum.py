@@ -8,16 +8,16 @@ from unittest.mock import MagicMock
 from pylitterbot import Robot
 import pytest
 
-from homeassistant.components.litterrobot.vacuum import SERVICE_SET_SLEEP_MODE
-from homeassistant.components.vacuum import (
+from smarthub.components.litterrobot.vacuum import SERVICE_SET_SLEEP_MODE
+from smarthub.components.vacuum import (
     DOMAIN as VACUUM_DOMAIN,
     SERVICE_START,
     SERVICE_STOP,
     VacuumActivity,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
 
 from .common import DOMAIN, VACUUM_ENTITY_ID
 from .conftest import setup_integration
@@ -30,7 +30,7 @@ COMPONENT_SERVICE_DOMAIN = {
 
 
 async def test_vacuum(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_account: MagicMock
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_account: MagicMock
 ) -> None:
     """Tests the vacuum entity was set up."""
     entity_registry.async_get_or_create(
@@ -54,7 +54,7 @@ async def test_vacuum(
 
 
 async def test_no_robots(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_account_with_no_robots: MagicMock,
 ) -> None:
@@ -68,7 +68,7 @@ async def test_no_robots(
 
 
 async def test_vacuum_with_error(
-    hass: HomeAssistant, mock_account_with_error: MagicMock
+    hass: SmartHub, mock_account_with_error: MagicMock
 ) -> None:
     """Tests a vacuum entity with an error."""
     await setup_integration(hass, mock_account_with_error, VACUUM_DOMAIN)
@@ -90,7 +90,7 @@ async def test_vacuum_with_error(
     ],
 )
 async def test_activities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_account_with_litterrobot_4: MagicMock,
     robot_data: dict[str, str | bool],
     expected_state: str,
@@ -120,7 +120,7 @@ async def test_activities(
     ],
 )
 async def test_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_account: MagicMock,
     caplog: pytest.LogCaptureFixture,
     service: str,

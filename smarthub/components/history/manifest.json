@@ -1,0 +1,9 @@
+{
+  "domain": "history",
+  "name": "History",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["http", "recorder"],
+  "documentation": "https://www.smart-hub.io/integrations/history",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

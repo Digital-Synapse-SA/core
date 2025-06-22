@@ -10,20 +10,20 @@ from apple_weatherkit.client import (
 )
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.weatherkit.config_flow import (
+from smarthub import config_entries
+from smarthub.components.weatherkit.config_flow import (
     WeatherKitUnsupportedLocationError,
 )
-from homeassistant.components.weatherkit.const import (
+from smarthub.components.weatherkit.const import (
     CONF_KEY_ID,
     CONF_KEY_PEM,
     CONF_SERVICE_ID,
     CONF_TEAM_ID,
     DOMAIN,
 )
-from homeassistant.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import EXAMPLE_CONFIG_DATA
 
@@ -35,13 +35,13 @@ EXAMPLE_USER_INPUT = {
         CONF_LONGITUDE: 135.74817234593166,
     },
     CONF_KEY_ID: "QABCDEFG123",
-    CONF_SERVICE_ID: "io.home-assistant.testing",
+    CONF_SERVICE_ID: "io.smart-hub.testing",
     CONF_TEAM_ID: "ABCD123456",
     CONF_KEY_PEM: "-----BEGIN PRIVATE KEY-----\nwhateverkey\n-----END PRIVATE KEY-----",
 }
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form and create an entry."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -50,7 +50,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.weatherkit.WeatherKitApiClient.get_availability",
+        "smarthub.components.weatherkit.WeatherKitApiClient.get_availability",
         return_value=[DataSetType.CURRENT_WEATHER],
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -78,7 +78,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     ],
 )
 async def test_error_handling(
-    hass: HomeAssistant, exception: Exception, expected_error: str
+    hass: SmartHub, exception: Exception, expected_error: str
 ) -> None:
     """Test that we handle various exceptions and generate appropriate errors."""
     result = await hass.config_entries.flow.async_init(
@@ -86,7 +86,7 @@ async def test_error_handling(
     )
 
     with patch(
-        "homeassistant.components.weatherkit.WeatherKitApiClient.get_availability",
+        "smarthub.components.weatherkit.WeatherKitApiClient.get_availability",
         side_effect=exception,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -98,14 +98,14 @@ async def test_error_handling(
     assert result["errors"] == {"base": expected_error}
 
 
-async def test_form_unsupported_location(hass: HomeAssistant) -> None:
+async def test_form_unsupported_location(hass: SmartHub) -> None:
     """Test we handle when WeatherKit does not support the location."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.weatherkit.WeatherKitApiClient.get_availability",
+        "smarthub.components.weatherkit.WeatherKitApiClient.get_availability",
         return_value=[],
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -118,7 +118,7 @@ async def test_form_unsupported_location(hass: HomeAssistant) -> None:
 
     # Test that we can recover from this error by changing the location
     with patch(
-        "homeassistant.components.weatherkit.WeatherKitApiClient.get_availability",
+        "smarthub.components.weatherkit.WeatherKitApiClient.get_availability",
         return_value=[DataSetType.CURRENT_WEATHER],
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -150,7 +150,7 @@ async def test_form_unsupported_location(hass: HomeAssistant) -> None:
     ids=["Correct footer", "No footer", "Trailing characters", "Em dash in footer"],
 )
 async def test_auto_fix_key_input(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     input_header: str,
     input_footer: str,
@@ -163,7 +163,7 @@ async def test_auto_fix_key_input(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.weatherkit.WeatherKitApiClient.get_availability",
+        "smarthub.components.weatherkit.WeatherKitApiClient.get_availability",
         return_value=[DataSetType.CURRENT_WEATHER],
     ):
         user_input = EXAMPLE_USER_INPUT.copy()

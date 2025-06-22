@@ -8,14 +8,14 @@ import wave
 
 import pytest
 
-from homeassistant.components import tts
-from homeassistant.components.media_player import (
+from smarthub.components import tts
+from smarthub.components.media_player import (
     ATTR_MEDIA_CONTENT_ID,
     DOMAIN as DOMAIN_MP,
     SERVICE_PLAY_MEDIA,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component, async_mock_service
 from tests.components.tts.common import retrieve_media
@@ -38,7 +38,7 @@ def mock_tts_cache_dir_autouse(mock_tts_cache_dir: Path) -> None:
     """Mock the TTS cache dir with empty dir."""
 
 
-async def test_setup_component(hass: HomeAssistant) -> None:
+async def test_setup_component(hass: SmartHub) -> None:
     """Test setup component."""
     config = {tts.DOMAIN: {"platform": "marytts"}}
 
@@ -48,7 +48,7 @@ async def test_setup_component(hass: HomeAssistant) -> None:
 
 
 async def test_service_say(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test service call say."""
     calls = async_mock_service(hass, DOMAIN_MP, SERVICE_PLAY_MEDIA)
@@ -60,7 +60,7 @@ async def test_service_say(
         await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.marytts.tts.MaryTTS.speak",
+        "smarthub.components.marytts.tts.MaryTTS.speak",
         return_value=get_empty_wav(),
     ) as mock_speak:
         await hass.services.async_call(
@@ -68,7 +68,7 @@ async def test_service_say(
             "marytts_say",
             {
                 "entity_id": "media_player.something",
-                tts.ATTR_MESSAGE: "HomeAssistant",
+                tts.ATTR_MESSAGE: "SmartHub",
             },
             blocking=True,
         )
@@ -81,13 +81,13 @@ async def test_service_say(
         )
 
     mock_speak.assert_called_once()
-    mock_speak.assert_called_with("HomeAssistant", {})
+    mock_speak.assert_called_with("SmartHub", {})
 
     assert len(calls) == 1
 
 
 async def test_service_say_with_effect(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test service call say with effects."""
     calls = async_mock_service(hass, DOMAIN_MP, SERVICE_PLAY_MEDIA)
@@ -99,7 +99,7 @@ async def test_service_say_with_effect(
         await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.marytts.tts.MaryTTS.speak",
+        "smarthub.components.marytts.tts.MaryTTS.speak",
         return_value=get_empty_wav(),
     ) as mock_speak:
         await hass.services.async_call(
@@ -107,7 +107,7 @@ async def test_service_say_with_effect(
             "marytts_say",
             {
                 "entity_id": "media_player.something",
-                tts.ATTR_MESSAGE: "HomeAssistant",
+                tts.ATTR_MESSAGE: "SmartHub",
             },
             blocking=True,
         )
@@ -120,13 +120,13 @@ async def test_service_say_with_effect(
         )
 
     mock_speak.assert_called_once()
-    mock_speak.assert_called_with("HomeAssistant", {"Volume": "amount:2.0;"})
+    mock_speak.assert_called_with("SmartHub", {"Volume": "amount:2.0;"})
 
     assert len(calls) == 1
 
 
 async def test_service_say_http_error(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test service call say."""
     calls = async_mock_service(hass, DOMAIN_MP, SERVICE_PLAY_MEDIA)
@@ -138,7 +138,7 @@ async def test_service_say_http_error(
         await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.marytts.tts.MaryTTS.speak",
+        "smarthub.components.marytts.tts.MaryTTS.speak",
         side_effect=Exception(),
     ) as mock_speak:
         await hass.services.async_call(
@@ -146,7 +146,7 @@ async def test_service_say_http_error(
             "marytts_say",
             {
                 "entity_id": "media_player.something",
-                tts.ATTR_MESSAGE: "HomeAssistant",
+                tts.ATTR_MESSAGE: "SmartHub",
             },
         )
         await hass.async_block_till_done()

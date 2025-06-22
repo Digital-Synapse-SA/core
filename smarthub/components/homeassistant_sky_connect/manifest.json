@@ -1,0 +1,23 @@
+{
+  "domain": "smarthub_sky_connect",
+  "name": "SmartHub Connect ZBT-1",
+  "codeowners": ["@smart-hub/core"],
+  "config_flow": true,
+  "dependencies": ["hardware", "usb", "smarthub_hardware"],
+  "documentation": "https://www.smart-hub.io/integrations/smarthub_sky_connect",
+  "integration_type": "hardware",
+  "usb": [
+    {
+      "vid": "10C4",
+      "pid": "EA60",
+      "description": "*skyconnect v1.0*",
+      "known_devices": ["SkyConnect v1.0"]
+    },
+    {
+      "vid": "10C4",
+      "pid": "EA60",
+      "description": "*home assistant connect zbt-1*",
+      "known_devices": ["SmartHub Connect ZBT-1"]
+    }
+  ]
+}

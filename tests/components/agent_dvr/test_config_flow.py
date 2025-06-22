@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant.components.agent_dvr.const import DOMAIN, SERVER_URL
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PORT, CONTENT_TYPE_JSON
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.agent_dvr.const import DOMAIN, SERVER_URL
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PORT, CONTENT_TYPE_JSON
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import init_integration
 
@@ -16,7 +16,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_show_user_form(hass: HomeAssistant) -> None:
+async def test_show_user_form(hass: SmartHub) -> None:
     """Test that the user set up form is served."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -28,7 +28,7 @@ async def test_show_user_form(hass: HomeAssistant) -> None:
 
 
 async def test_user_device_exists_abort(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we abort flow if Agent device already configured."""
     await init_integration(hass, aioclient_mock)
@@ -43,7 +43,7 @@ async def test_user_device_exists_abort(
 
 
 async def test_connection_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we show user form on Agent connection error."""
 
@@ -61,7 +61,7 @@ async def test_connection_error(
 
 
 async def test_full_user_flow_implementation(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the full manual user flow from start to finish."""
     aioclient_mock.get(

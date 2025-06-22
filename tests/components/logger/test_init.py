@@ -8,27 +8,27 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components import logger
-from homeassistant.components.logger import LOGSEVERITY
-from homeassistant.components.logger.helpers import SAVE_DELAY_LONG
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import logger
+from smarthub.components.logger import LOGSEVERITY
+from smarthub.components.logger.helpers import SAVE_DELAY_LONG
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_call_logger_set_level, async_fire_time_changed
 
-HASS_NS = "unused.homeassistant"
+HASS_NS = "unused.smarthub"
 COMPONENTS_NS = f"{HASS_NS}.components"
 ZONE_NS = f"{COMPONENTS_NS}.zone"
 GROUP_NS = f"{COMPONENTS_NS}.group"
 CONFIGED_NS = "otherlibx"
 UNCONFIG_NS = "unconfigurednamespace"
 INTEGRATION = "test_component"
-INTEGRATION_NS = f"homeassistant.components.{INTEGRATION}"
+INTEGRATION_NS = f"smarthub.components.{INTEGRATION}"
 
 
 async def test_log_filtering(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test logging filters."""
 
@@ -96,7 +96,7 @@ async def test_log_filtering(
         )
 
 
-async def test_setting_level(hass: HomeAssistant) -> None:
+async def test_setting_level(hass: SmartHub) -> None:
     """Test we set log levels."""
     mocks = defaultdict(Mock)
 
@@ -161,7 +161,7 @@ async def test_setting_level(hass: HomeAssistant) -> None:
     )
 
 
-async def test_can_set_level_from_yaml(hass: HomeAssistant) -> None:
+async def test_can_set_level_from_yaml(hass: SmartHub) -> None:
     """Test logger propagation."""
 
     assert await async_setup_component(
@@ -186,7 +186,7 @@ async def test_can_set_level_from_yaml(hass: HomeAssistant) -> None:
 
 
 async def test_can_set_level_from_store(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test setting up logs from store."""
     hass_storage["core.logger"] = {
@@ -225,7 +225,7 @@ async def test_can_set_level_from_store(
     _reset_logging()
 
 
-async def _assert_log_levels(hass: HomeAssistant) -> None:
+async def _assert_log_levels(hass: SmartHub) -> None:
     assert logging.getLogger(UNCONFIG_NS).level == logging.NOTSET
     assert logging.getLogger(UNCONFIG_NS).isEnabledFor(logging.CRITICAL) is True
     assert (
@@ -317,7 +317,7 @@ def _reset_logging():
 
 
 async def test_can_set_integration_level_from_store(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test setting up integration logs from store."""
     hass_storage["core.logger"] = {
@@ -342,7 +342,7 @@ async def test_can_set_integration_level_from_store(
 
 
 async def test_chattier_log_level_wins_1(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test chattier log level in store takes precedence."""
     hass_storage["core.logger"] = {
@@ -377,7 +377,7 @@ async def test_chattier_log_level_wins_1(
 
 
 async def test_chattier_log_level_wins_2(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test chattier log level in yaml takes precedence."""
     hass_storage["core.logger"] = {
@@ -404,7 +404,7 @@ async def test_chattier_log_level_wins_2(
 
 
 async def test_log_once_removed_from_store(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test logs with persistence "once" are removed from the store at startup."""
     store_contents = {

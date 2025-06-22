@@ -7,14 +7,14 @@ from aiocomelit.const import CLIMATE, WATT
 from aiocomelit.exceptions import CannotAuthenticate, CannotConnect, CannotRetrieveData
 import pytest
 
-from homeassistant.components.climate import HVACMode
-from homeassistant.components.comelit.const import DOMAIN
-from homeassistant.components.humidifier import ATTR_HUMIDITY
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN, SERVICE_TURN_ON
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.climate import HVACMode
+from smarthub.components.comelit.const import DOMAIN
+from smarthub.components.humidifier import ATTR_HUMIDITY
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN, SERVICE_TURN_ON
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import setup_integration
 
@@ -27,7 +27,7 @@ ENTITY_ID_3 = "humidifier.climate0_humidifier"
 
 
 async def test_device_remove_stale(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -82,7 +82,7 @@ async def test_device_remove_stale(
     ],
 )
 async def test_bridge_api_call_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
     side_effect: Exception,
@@ -99,7 +99,7 @@ async def test_bridge_api_call_exceptions(
     mock_serial_bridge.set_device_status.side_effect = side_effect
 
     # Call API
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -113,7 +113,7 @@ async def test_bridge_api_call_exceptions(
 
 
 async def test_bridge_api_call_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:

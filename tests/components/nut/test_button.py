@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.nut.const import INTEGRATION_SUPPORTED_COMMANDS
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.nut.const import INTEGRATION_SUPPORTED_COMMANDS
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .util import async_init_integration
 
@@ -24,7 +24,7 @@ from .util import async_init_integration
     ],
 )
 async def test_buttons_ups(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, model: str
+    hass: SmartHub, entity_registry: er.EntityRegistry, model: str
 ) -> None:
     """Tests that there are no standard buttons."""
 
@@ -53,7 +53,7 @@ async def test_buttons_ups(
     ],
 )
 async def test_buttons_pdu_dynamic_outlets(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     model: str,
     unique_id_base: str,

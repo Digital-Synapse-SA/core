@@ -2,15 +2,15 @@
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from homeassistant.components.rdw.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.rdw.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_rdw: AsyncMock,
 ) -> None:
@@ -29,12 +29,12 @@ async def test_load_unload_config_entry(
 
 
 @patch(
-    "homeassistant.components.rdw.RDW.vehicle",
+    "smarthub.components.rdw.RDW.vehicle",
     side_effect=RuntimeError,
 )
 async def test_config_entry_not_ready(
     mock_request: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the RDW configuration entry not ready."""

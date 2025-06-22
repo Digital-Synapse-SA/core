@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.scene import DOMAIN as SCENE_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.scene import DOMAIN as SCENE_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration, snapshot_smartthings_entities
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_smartthings: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -28,7 +28,7 @@ async def test_all_entities(
 
 
 async def test_activate_scene(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smartthings: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

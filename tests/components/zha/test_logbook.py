@@ -7,16 +7,16 @@ from zha.application.const import ZHA_EVENT
 import zigpy.profiles.zha
 from zigpy.zcl.clusters import general
 
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import CONF_DEVICE_ID, CONF_UNIQUE_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_DEVICE_ID, CONF_UNIQUE_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
 
@@ -41,12 +41,12 @@ DOWN = "down"
 @pytest.fixture(autouse=True)
 def sensor_platform_only():
     """Only set up the sensor and required base platforms to speed up tests."""
-    with patch("homeassistant.components.zha.PLATFORMS", (Platform.SENSOR,)):
+    with patch("smarthub.components.zha.PLATFORMS", (Platform.SENSOR,)):
         yield
 
 
 @pytest.fixture
-async def mock_devices(hass: HomeAssistant, setup_zha, zigpy_device_mock):
+async def mock_devices(hass: SmartHub, setup_zha, zigpy_device_mock):
     """IAS device fixture."""
 
     await setup_zha()
@@ -74,7 +74,7 @@ async def mock_devices(hass: HomeAssistant, setup_zha, zigpy_device_mock):
 
 
 async def test_zha_logbook_event_device_with_triggers(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, mock_devices
+    hass: SmartHub, device_registry: dr.DeviceRegistry, mock_devices
 ) -> None:
     """Test ZHA logbook events with device and triggers."""
 
@@ -161,7 +161,7 @@ async def test_zha_logbook_event_device_with_triggers(
 
 
 async def test_zha_logbook_event_device_no_triggers(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, mock_devices
+    hass: SmartHub, device_registry: dr.DeviceRegistry, mock_devices
 ) -> None:
     """Test ZHA logbook events with device and without triggers."""
 
@@ -250,7 +250,7 @@ async def test_zha_logbook_event_device_no_triggers(
 
 
 async def test_zha_logbook_event_device_no_device(
-    hass: HomeAssistant, mock_devices
+    hass: SmartHub, mock_devices
 ) -> None:
     """Test ZHA logbook events without device and without triggers."""
 

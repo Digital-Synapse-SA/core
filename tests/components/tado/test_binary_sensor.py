@@ -1,12 +1,12 @@
 """The sensor tests for the tado platform."""
 
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 
-async def test_air_con_create_binary_sensors(hass: HomeAssistant) -> None:
+async def test_air_con_create_binary_sensors(hass: SmartHub) -> None:
     """Test creation of aircon sensors."""
 
     await async_init_integration(hass)
@@ -24,7 +24,7 @@ async def test_air_con_create_binary_sensors(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_heater_create_binary_sensors(hass: HomeAssistant) -> None:
+async def test_heater_create_binary_sensors(hass: SmartHub) -> None:
     """Test creation of heater sensors."""
 
     await async_init_integration(hass)
@@ -45,7 +45,7 @@ async def test_heater_create_binary_sensors(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_water_heater_create_binary_sensors(hass: HomeAssistant) -> None:
+async def test_water_heater_create_binary_sensors(hass: SmartHub) -> None:
     """Test creation of water heater sensors."""
 
     await async_init_integration(hass)
@@ -60,7 +60,7 @@ async def test_water_heater_create_binary_sensors(hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_home_create_binary_sensors(hass: HomeAssistant) -> None:
+async def test_home_create_binary_sensors(hass: SmartHub) -> None:
     """Test creation of home binary sensors."""
 
     await async_init_integration(hass)

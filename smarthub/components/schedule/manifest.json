@@ -1,0 +1,8 @@
+{
+  "domain": "schedule",
+  "name": "Schedule",
+  "codeowners": ["@smart-hub/core"],
+  "documentation": "https://www.smart-hub.io/integrations/schedule",
+  "integration_type": "helper",
+  "quality_scale": "internal"
+}

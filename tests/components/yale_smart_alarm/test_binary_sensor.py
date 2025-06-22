@@ -7,9 +7,9 @@ from unittest.mock import Mock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, snapshot_platform
     [[Platform.BINARY_SENSOR]],
 )
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_config_entry: tuple[MockConfigEntry, Mock],
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

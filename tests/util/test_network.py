@@ -1,8 +1,8 @@
-"""Test Home Assistant volume utility functions."""
+"""Test SmartHub volume utility functions."""
 
 from ipaddress import ip_address
 
-from homeassistant.util import network as network_util
+from smarthub.util import network as network_util
 
 
 def test_is_loopback() -> None:

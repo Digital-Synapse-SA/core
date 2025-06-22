@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import init_integration, mock_weather_response
 
@@ -17,7 +17,7 @@ from . import init_integration, mock_weather_response
     ],
 )
 async def test_sensor_values(
-    hass: HomeAssistant, entity_name: str, expected_value: Any
+    hass: SmartHub, entity_name: str, expected_value: Any
 ) -> None:
     """Test that various sensor values match what we expect."""
     with mock_weather_response():

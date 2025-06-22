@@ -7,8 +7,8 @@ from unittest.mock import AsyncMock
 from python_opensky import OpenSkyError
 from python_opensky.exceptions import OpenSkyUnauthenticatedError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     opensky_client: AsyncMock,
 ) -> None:
@@ -32,7 +32,7 @@ async def test_load_unload_entry(
 
 
 async def test_load_entry_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     opensky_client: AsyncMock,
 ) -> None:
@@ -46,7 +46,7 @@ async def test_load_entry_failure(
 
 
 async def test_load_entry_authentication_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_authenticated: MockConfigEntry,
     opensky_client: AsyncMock,
 ) -> None:

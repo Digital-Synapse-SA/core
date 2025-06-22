@@ -4,13 +4,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import setup
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import discovery
-from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub import setup
+from smarthub.const import Platform
+from smarthub.core import SmartHub, callback
+from smarthub.helpers import discovery
+from smarthub.helpers.dispatcher import async_dispatcher_send
+from smarthub.helpers.entity_platform import AddEntitiesCallback
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
 
 from tests.common import MockModule, MockPlatform, mock_integration, mock_platform
 
@@ -18,11 +18,11 @@ from tests.common import MockModule, MockPlatform, mock_integration, mock_platfo
 @pytest.fixture
 def mock_setup_component():
     """Mock setup component."""
-    with patch("homeassistant.setup.async_setup_component", return_value=True) as mock:
+    with patch("smarthub.setup.async_setup_component", return_value=True) as mock:
         yield mock
 
 
-async def test_listen(hass: HomeAssistant, mock_setup_component) -> None:
+async def test_listen(hass: SmartHub, mock_setup_component) -> None:
     """Test discovery listen/discover combo."""
     calls_single = []
 
@@ -48,7 +48,7 @@ async def test_listen(hass: HomeAssistant, mock_setup_component) -> None:
     assert calls_single[0] == ("test service", "discovery info")
 
 
-async def test_platform(hass: HomeAssistant, mock_setup_component) -> None:
+async def test_platform(hass: SmartHub, mock_setup_component) -> None:
     """Test discover platform method."""
     calls = []
 
@@ -102,7 +102,7 @@ async def test_platform(hass: HomeAssistant, mock_setup_component) -> None:
     assert len(calls) == 1
 
 
-async def test_circular_import(hass: HomeAssistant) -> None:
+async def test_circular_import(hass: SmartHub) -> None:
     """Test we don't break doing circular import.
 
     This test will have test_component discover the switch.test_circular
@@ -117,7 +117,7 @@ async def test_circular_import(hass: HomeAssistant) -> None:
     component_calls = []
     platform_calls = []
 
-    def component_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    def component_setup(hass: SmartHub, config: ConfigType) -> bool:
         """Set up mock component."""
         discovery.load_platform(
             hass, Platform.SWITCH, "test_circular", {"key": "value"}, config
@@ -126,7 +126,7 @@ async def test_circular_import(hass: HomeAssistant) -> None:
         return True
 
     def setup_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         add_entities_callback: AddEntitiesCallback,
         discovery_info: DiscoveryInfoType | None = None,
@@ -160,7 +160,7 @@ async def test_circular_import(hass: HomeAssistant) -> None:
     assert "switch" in hass.config.components
 
 
-async def test_1st_discovers_2nd_component(hass: HomeAssistant) -> None:
+async def test_1st_discovers_2nd_component(hass: SmartHub) -> None:
     """Test that we don't break if one component discovers the other.
 
     If the first component fires a discovery event to set up the
@@ -169,14 +169,14 @@ async def test_1st_discovers_2nd_component(hass: HomeAssistant) -> None:
     """
     component_calls = []
 
-    async def component1_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    async def component1_setup(hass: SmartHub, config: ConfigType) -> bool:
         """Set up mock component."""
         await discovery.async_discover(
             hass, "test_component2", {}, "test_component2", {}
         )
         return True
 
-    def component2_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    def component2_setup(hass: SmartHub, config: ConfigType) -> bool:
         """Set up mock component."""
         component_calls.append(1)
         return True

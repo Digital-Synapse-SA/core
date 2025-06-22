@@ -6,7 +6,7 @@ from astroid import nodes
 from pylint.checkers import BaseChecker
 from pylint.lint import PyLinter
 
-from homeassistant.const import Platform
+from smarthub.const import Platform
 
 _BASE_ENTITY_MODULES: set[str] = {
     "BaseCoordinatorEntity",
@@ -127,7 +127,7 @@ class HassEnforceClassModule(BaseChecker):
         root_name = node.root().name
 
         # we only want to check components
-        if not root_name.startswith("homeassistant.components."):
+        if not root_name.startswith("smarthub.components."):
             return
         parts = root_name.split(".")
         current_integration = parts[2]

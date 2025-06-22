@@ -10,11 +10,11 @@ from sense_energy import (
     SenseMFARequiredException,
 )
 
-from homeassistant import config_entries
-from homeassistant.components.sense.const import DOMAIN
-from homeassistant.const import CONF_CODE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.sense.const import DOMAIN
+from smarthub.const import CONF_CODE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import MOCK_CONFIG
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 def mock_sense():
     """Mock Sense object for authenticatation."""
     with patch(
-        "homeassistant.components.sense.config_flow.ASyncSenseable"
+        "smarthub.components.sense.config_flow.ASyncSenseable"
     ) as mock_sense:
         mock_sense.return_value.authenticate = AsyncMock(return_value=True)
         mock_sense.return_value.validate_mfa = AsyncMock(return_value=True)
@@ -37,7 +37,7 @@ def mock_sense():
         yield mock_sense
 
 
-async def test_form(hass: HomeAssistant, mock_sense) -> None:
+async def test_form(hass: SmartHub, mock_sense) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -47,7 +47,7 @@ async def test_form(hass: HomeAssistant, mock_sense) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.sense.async_setup_entry",
+        "smarthub.components.sense.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -62,7 +62,7 @@ async def test_form(hass: HomeAssistant, mock_sense) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -81,7 +81,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_mfa_required(hass: HomeAssistant, mock_sense) -> None:
+async def test_form_mfa_required(hass: SmartHub, mock_sense) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -108,7 +108,7 @@ async def test_form_mfa_required(hass: HomeAssistant, mock_sense) -> None:
     assert result3["data"] == MOCK_CONFIG
 
 
-async def test_form_mfa_required_wrong(hass: HomeAssistant, mock_sense) -> None:
+async def test_form_mfa_required_wrong(hass: SmartHub, mock_sense) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -136,7 +136,7 @@ async def test_form_mfa_required_wrong(hass: HomeAssistant, mock_sense) -> None:
     assert result3["step_id"] == "validation"
 
 
-async def test_form_mfa_required_timeout(hass: HomeAssistant, mock_sense) -> None:
+async def test_form_mfa_required_timeout(hass: SmartHub, mock_sense) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -162,7 +162,7 @@ async def test_form_mfa_required_timeout(hass: HomeAssistant, mock_sense) -> Non
     assert result3["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_mfa_required_exception(hass: HomeAssistant, mock_sense) -> None:
+async def test_form_mfa_required_exception(hass: SmartHub, mock_sense) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -188,7 +188,7 @@ async def test_form_mfa_required_exception(hass: HomeAssistant, mock_sense) -> N
     assert result3["errors"] == {"base": "unknown"}
 
 
-async def test_form_timeout(hass: HomeAssistant) -> None:
+async def test_form_timeout(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -207,7 +207,7 @@ async def test_form_timeout(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -226,7 +226,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_unknown_exception(hass: HomeAssistant) -> None:
+async def test_form_unknown_exception(hass: SmartHub) -> None:
     """Test we handle unknown error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -245,7 +245,7 @@ async def test_form_unknown_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_reauth_no_form(hass: HomeAssistant, mock_sense) -> None:
+async def test_reauth_no_form(hass: SmartHub, mock_sense) -> None:
     """Test reauth where no form needed."""
 
     # set up initially
@@ -256,7 +256,7 @@ async def test_reauth_no_form(hass: HomeAssistant, mock_sense) -> None:
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.config_entries.ConfigEntries.async_reload",
+        "smarthub.config_entries.ConfigEntries.async_reload",
         return_value=True,
     ):
         result = await entry.start_reauth_flow(hass)
@@ -264,7 +264,7 @@ async def test_reauth_no_form(hass: HomeAssistant, mock_sense) -> None:
     assert result["reason"] == "reauth_successful"
 
 
-async def test_reauth_password(hass: HomeAssistant, mock_sense) -> None:
+async def test_reauth_password(hass: SmartHub, mock_sense) -> None:
     """Test reauth form."""
 
     # set up initially
@@ -282,7 +282,7 @@ async def test_reauth_password(hass: HomeAssistant, mock_sense) -> None:
 
     mock_sense.return_value.authenticate.side_effect = None
     with patch(
-        "homeassistant.components.sense.async_setup_entry",
+        "smarthub.components.sense.async_setup_entry",
         return_value=True,
     ):
         result2 = await hass.config_entries.flow.async_configure(

@@ -4,35 +4,35 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
     DOMAIN as COVER_DOMAIN,
     CoverState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
     SERVICE_SET_COVER_POSITION,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import configure_integration
 from .mocks import HomeControlMock, HomeControlMockCover
 
 
 async def test_cover(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup and state change of a cover device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockCover()
     test_gateway.devices["Test"].multi_level_switch_property["devolo.Blinds"].value = 20
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -86,12 +86,12 @@ async def test_cover(
     assert hass.states.get(f"{COVER_DOMAIN}.test").state == STATE_UNAVAILABLE
 
 
-async def test_remove_from_hass(hass: HomeAssistant) -> None:
+async def test_remove_from_hass(hass: SmartHub) -> None:
     """Test removing entity."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockCover()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)

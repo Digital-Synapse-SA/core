@@ -8,20 +8,20 @@ from unittest.mock import patch
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components import utility_meter
-from homeassistant.components.select import (
+from smarthub.components import utility_meter
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.components.utility_meter import (
+from smarthub.components.utility_meter import (
     select as um_select,
     sensor as um_sensor,
 )
-from homeassistant.components.utility_meter.config_flow import ConfigFlowHandler
-from homeassistant.components.utility_meter.const import DOMAIN, SERVICE_RESET
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
+from smarthub.components.utility_meter.config_flow import ConfigFlowHandler
+from smarthub.components.utility_meter.const import DOMAIN, SERVICE_RESET
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_PLATFORM,
@@ -29,17 +29,17 @@ from homeassistant.const import (
     Platform,
     UnitOfEnergy,
 )
-from homeassistant.core import Event, HomeAssistant, State
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.event import async_track_entity_registry_updated_event
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import Event, SmartHub, State
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.event import async_track_entity_registry_updated_event
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, mock_restore_cache
 
 
 @pytest.fixture
-def sensor_config_entry(hass: HomeAssistant) -> er.RegistryEntry:
+def sensor_config_entry(hass: SmartHub) -> er.RegistryEntry:
     """Fixture to create a sensor config entry."""
     sensor_config_entry = MockConfigEntry()
     sensor_config_entry.add_to_hass(hass)
@@ -76,7 +76,7 @@ def sensor_entity_entry(
 
 @pytest.fixture
 def utility_meter_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sensor_entity_entry: er.RegistryEntry,
     tariffs: list[str],
 ) -> MockConfigEntry:
@@ -104,7 +104,7 @@ def utility_meter_config_entry(
     return config_entry
 
 
-def track_entity_registry_actions(hass: HomeAssistant, entity_id: str) -> list[str]:
+def track_entity_registry_actions(hass: SmartHub, entity_id: str) -> list[str]:
     """Track entity registry actions for an entity."""
     events = []
 
@@ -117,7 +117,7 @@ def track_entity_registry_actions(hass: HomeAssistant, entity_id: str) -> list[s
     return events
 
 
-async def test_restore_state(hass: HomeAssistant) -> None:
+async def test_restore_state(hass: SmartHub) -> None:
     """Test utility sensor restore state."""
     config = {
         "utility_meter": {
@@ -153,7 +153,7 @@ async def test_restore_state(hass: HomeAssistant) -> None:
         "select.energy_bill",
     ],
 )
-async def test_services(hass: HomeAssistant, meter) -> None:
+async def test_services(hass: SmartHub, meter) -> None:
     """Test energy sensor reset service."""
     config = {
         "utility_meter": {
@@ -262,7 +262,7 @@ async def test_services(hass: HomeAssistant, meter) -> None:
     assert state.state == "4"
 
 
-async def test_services_config_entry(hass: HomeAssistant) -> None:
+async def test_services_config_entry(hass: SmartHub) -> None:
     """Test energy sensor reset service."""
     config_entry = MockConfigEntry(
         data={},
@@ -388,7 +388,7 @@ async def test_services_config_entry(hass: HomeAssistant) -> None:
     assert state.state == "4"
 
 
-async def test_cron(hass: HomeAssistant) -> None:
+async def test_cron(hass: SmartHub) -> None:
     """Test cron pattern."""
 
     config = {
@@ -403,7 +403,7 @@ async def test_cron(hass: HomeAssistant) -> None:
     assert await async_setup_component(hass, DOMAIN, config)
 
 
-async def test_cron_and_meter(hass: HomeAssistant) -> None:
+async def test_cron_and_meter(hass: SmartHub) -> None:
     """Test cron pattern and meter type fails."""
     config = {
         "utility_meter": {
@@ -418,7 +418,7 @@ async def test_cron_and_meter(hass: HomeAssistant) -> None:
     assert not await async_setup_component(hass, DOMAIN, config)
 
 
-async def test_both_cron_and_meter(hass: HomeAssistant) -> None:
+async def test_both_cron_and_meter(hass: SmartHub) -> None:
     """Test cron pattern and meter type passes in different meter."""
     config = {
         "utility_meter": {
@@ -437,7 +437,7 @@ async def test_both_cron_and_meter(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_cron_and_offset(hass: HomeAssistant) -> None:
+async def test_cron_and_offset(hass: SmartHub) -> None:
     """Test cron pattern and offset fails."""
 
     config = {
@@ -453,7 +453,7 @@ async def test_cron_and_offset(hass: HomeAssistant) -> None:
     assert not await async_setup_component(hass, DOMAIN, config)
 
 
-async def test_bad_cron(hass: HomeAssistant) -> None:
+async def test_bad_cron(hass: SmartHub) -> None:
     """Test bad cron pattern."""
 
     config = {
@@ -463,7 +463,7 @@ async def test_bad_cron(hass: HomeAssistant) -> None:
     assert not await async_setup_component(hass, DOMAIN, config)
 
 
-async def test_setup_missing_discovery(hass: HomeAssistant) -> None:
+async def test_setup_missing_discovery(hass: SmartHub) -> None:
     """Test setup with configuration missing discovery_info."""
     assert not await um_select.async_setup_platform(hass, {CONF_PLATFORM: DOMAIN}, None)
     assert not await um_sensor.async_setup_platform(hass, {CONF_PLATFORM: DOMAIN}, None)
@@ -487,7 +487,7 @@ async def test_setup_missing_discovery(hass: HomeAssistant) -> None:
     ],
 )
 async def test_setup_and_remove_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     tariffs: str,
     expected_entities: list[str],
@@ -531,7 +531,7 @@ async def test_setup_and_remove_config_entry(
 
 
 async def test_device_cleaning(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -634,7 +634,7 @@ async def test_device_cleaning(
     ],
 )
 async def test_async_handle_source_entity_changes_source_entity_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     utility_meter_config_entry: MockConfigEntry,
@@ -672,7 +672,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed(
     # Remove the source sensor's config entry from the device, this removes the
     # source sensor
     with patch(
-        "homeassistant.components.utility_meter.async_unload_entry",
+        "smarthub.components.utility_meter.async_unload_entry",
         wraps=utility_meter.async_unload_entry,
     ) as mock_unload_entry:
         device_registry.async_update_device(
@@ -709,7 +709,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed(
     ],
 )
 async def test_async_handle_source_entity_changes_source_entity_removed_from_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     utility_meter_config_entry: MockConfigEntry,
@@ -738,7 +738,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed_from_dev
 
     # Remove the source sensor from the device
     with patch(
-        "homeassistant.components.utility_meter.async_unload_entry",
+        "smarthub.components.utility_meter.async_unload_entry",
         wraps=utility_meter.async_unload_entry,
     ) as mock_unload_entry:
         entity_registry.async_update_entity(
@@ -774,7 +774,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed_from_dev
     ],
 )
 async def test_async_handle_source_entity_changes_source_entity_moved_other_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     utility_meter_config_entry: MockConfigEntry,
@@ -811,7 +811,7 @@ async def test_async_handle_source_entity_changes_source_entity_moved_other_devi
 
     # Move the source sensor to another device
     with patch(
-        "homeassistant.components.utility_meter.async_unload_entry",
+        "smarthub.components.utility_meter.async_unload_entry",
         wraps=utility_meter.async_unload_entry,
     ) as mock_unload_entry:
         entity_registry.async_update_entity(
@@ -849,7 +849,7 @@ async def test_async_handle_source_entity_changes_source_entity_moved_other_devi
     ],
 )
 async def test_async_handle_source_entity_new_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     utility_meter_config_entry: MockConfigEntry,
@@ -878,7 +878,7 @@ async def test_async_handle_source_entity_new_entity_id(
 
     # Change the source entity's entity ID
     with patch(
-        "homeassistant.components.utility_meter.async_unload_entry",
+        "smarthub.components.utility_meter.async_unload_entry",
         wraps=utility_meter.async_unload_entry,
     ) as mock_unload_entry:
         entity_registry.async_update_entity(

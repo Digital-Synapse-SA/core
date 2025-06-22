@@ -5,16 +5,16 @@ from unittest.mock import patch
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.switchbot.const import (
+from smarthub.components.switchbot.const import (
     CONF_ENCRYPTION_KEY,
     CONF_KEY_ID,
     CONF_RETRY_COUNT,
     DEFAULT_RETRY_COUNT,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ADDRESS, CONF_NAME, CONF_SENSOR_TYPE
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_ADDRESS, CONF_NAME, CONF_SENSOR_TYPE
+from smarthub.core import SmartHub
 
 from . import WORELAY_SWITCH_1PM_SERVICE_INFO
 
@@ -25,7 +25,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_diagnostics(
     inject_bluetooth_service_info(hass, WORELAY_SWITCH_1PM_SERVICE_INFO)
 
     with patch(
-        "homeassistant.components.switchbot.switch.switchbot.SwitchbotRelaySwitch.update",
+        "smarthub.components.switchbot.switch.switchbot.SwitchbotRelaySwitch.update",
         return_value=None,
     ):
         mock_config_entry = MockConfigEntry(

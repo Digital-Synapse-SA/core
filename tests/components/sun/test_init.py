@@ -8,17 +8,17 @@ import astral.sun
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components import sun
-from homeassistant.components.sun import entity
-from homeassistant.const import EVENT_STATE_CHANGED
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import sun
+from smarthub.components.sun import entity
+from smarthub.const import EVENT_STATE_CHANGED
+from smarthub.core import SmartHub, callback
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_setting_rising(hass: HomeAssistant) -> None:
+async def test_setting_rising(hass: SmartHub) -> None:
     """Test retrieving sun setting and rising."""
     utc_now = datetime(2016, 11, 1, 8, 0, 0, tzinfo=dt_util.UTC)
     with freeze_time(utc_now):
@@ -108,7 +108,7 @@ async def test_setting_rising(hass: HomeAssistant) -> None:
 
 
 async def test_state_change(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if the state changes at next setting/rising."""
     now = datetime(2016, 6, 1, 8, 0, 0, tzinfo=dt_util.UTC)
@@ -132,7 +132,7 @@ async def test_state_change(
     assert hass.states.get(entity.ENTITY_ID).state == sun.STATE_ABOVE_HORIZON
 
     # Update core configuration
-    with patch("homeassistant.helpers.condition.dt_util.utcnow", return_value=now):
+    with patch("smarthub.helpers.condition.dt_util.utcnow", return_value=now):
         await hass.config.async_update(longitude=hass.config.longitude + 90)
         await hass.async_block_till_done()
 
@@ -158,14 +158,14 @@ async def test_state_change(
     assert hass.states.get(entity.ENTITY_ID).state == sun.STATE_BELOW_HORIZON
 
 
-async def test_norway_in_june(hass: HomeAssistant) -> None:
+async def test_norway_in_june(hass: SmartHub) -> None:
     """Test location in Norway where the sun doesn't set in summer."""
     hass.config.latitude = 69.6
     hass.config.longitude = 18.8
 
     june = datetime(2016, 6, 1, tzinfo=dt_util.UTC)
 
-    with patch("homeassistant.helpers.condition.dt_util.utcnow", return_value=june):
+    with patch("smarthub.helpers.condition.dt_util.utcnow", return_value=june):
         assert await async_setup_component(hass, sun.DOMAIN, {sun.DOMAIN: {}})
 
     state = hass.states.get(entity.ENTITY_ID)
@@ -182,7 +182,7 @@ async def test_norway_in_june(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.skip
-async def test_state_change_count(hass: HomeAssistant) -> None:
+async def test_state_change_count(hass: SmartHub) -> None:
     """Count the number of state change events in a location."""
     # Skipped because it's a bit slow. Has been validated with
     # multiple lattitudes and dates
@@ -212,7 +212,7 @@ async def test_state_change_count(hass: HomeAssistant) -> None:
     assert len(events) < 721
 
 
-async def test_setup_and_remove_config_entry(hass: HomeAssistant) -> None:
+async def test_setup_and_remove_config_entry(hass: SmartHub) -> None:
     """Test setting up and removing a config entry."""
     # Setup the config entry
     config_entry = MockConfigEntry(domain=sun.DOMAIN)

@@ -5,18 +5,18 @@ from collections.abc import Generator
 import pytest
 from watergate_local_api import WatergateApiException
 
-from homeassistant.components.watergate.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_IP_ADDRESS, CONF_WEBHOOK_ID
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.watergate.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_IP_ADDRESS, CONF_WEBHOOK_ID
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import DEFAULT_DEVICE_STATE, DEFAULT_SERIAL_NUMBER, MOCK_WEBHOOK_ID
 
-from tests.common import AsyncMock, HomeAssistant, MockConfigEntry
+from tests.common import AsyncMock, SmartHub, MockConfigEntry
 
 
 async def test_step_user_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_watergate_client: Generator[AsyncMock],
     mock_webhook_id_generation: Generator[None],
     user_input: dict[str, str],
@@ -46,7 +46,7 @@ async def test_step_user_form(
     [AsyncMock(return_value=None), AsyncMock(side_effect=WatergateApiException)],
 )
 async def test_step_user_form_with_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_watergate_client: Generator[AsyncMock],
     user_input: dict[str, str],
     client_result: AsyncMock,
@@ -83,7 +83,7 @@ async def test_step_user_form_with_exception(
 
 
 async def test_abort_if_id_is_not_unique(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_watergate_client: Generator[AsyncMock],
     mock_entry: MockConfigEntry,
     user_input: dict[str, str],

@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock
 from pyituran.exceptions import IturanApiError, IturanAuthError
 import pytest
 
-from homeassistant.components.ituran.const import (
+from smarthub.components.ituran.const import (
     CONF_ID_OR_PASSPORT,
     CONF_MOBILE_ID,
     CONF_OTP,
     CONF_PHONE_NUMBER,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER, ConfigFlowResult
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER, ConfigFlowResult
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 from .const import MOCK_CONFIG_DATA
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry
 
 
 async def __do_successful_user_step(
-    hass: HomeAssistant, result: ConfigFlowResult, mock_ituran: AsyncMock
+    hass: SmartHub, result: ConfigFlowResult, mock_ituran: AsyncMock
 ):
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -41,7 +41,7 @@ async def __do_successful_user_step(
 
 
 async def __do_successful_otp_step(
-    hass: HomeAssistant,
+    hass: SmartHub,
     result: ConfigFlowResult,
     mock_ituran: AsyncMock,
 ):
@@ -65,7 +65,7 @@ async def __do_successful_otp_step(
 
 
 async def test_full_user_flow(
-    hass: HomeAssistant, mock_ituran: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_ituran: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test the full user configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -80,7 +80,7 @@ async def test_full_user_flow(
 
 
 async def test_invalid_auth(
-    hass: HomeAssistant, mock_ituran: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_ituran: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test invalid credentials configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -109,7 +109,7 @@ async def test_invalid_auth(
 
 
 async def test_invalid_otp(
-    hass: HomeAssistant, mock_ituran: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_ituran: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test invalid OTP configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -141,7 +141,7 @@ async def test_invalid_otp(
     [(IturanApiError, "cannot_connect"), (Exception, "unknown")],
 )
 async def test_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ituran: AsyncMock,
     mock_setup_entry: AsyncMock,
     exception: Exception,
@@ -187,7 +187,7 @@ async def test_errors(
 
 
 async def test_already_authenticated(
-    hass: HomeAssistant, mock_ituran: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_ituran: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test user already authenticated configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -215,7 +215,7 @@ async def test_already_authenticated(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ituran: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

@@ -1,0 +1,41 @@
+"""Provides device conditions for lights."""
+
+from __future__ import annotations
+
+import voluptuous as vol
+
+from smarthub.components.device_automation import toggle_entity
+from smarthub.const import CONF_DOMAIN
+from smarthub.core import SmartHub, callback
+from smarthub.helpers.condition import ConditionCheckerType
+from smarthub.helpers.typing import ConfigType
+
+from .const import DOMAIN
+
+# mypy: disallow-any-generics
+
+CONDITION_SCHEMA = toggle_entity.CONDITION_SCHEMA.extend(
+    {vol.Required(CONF_DOMAIN): DOMAIN}
+)
+
+
+@callback
+def async_condition_from_config(
+    hass: SmartHub, config: ConfigType
+) -> ConditionCheckerType:
+    """Evaluate state based on configuration."""
+    return toggle_entity.async_condition_from_config(hass, config)
+
+
+async def async_get_conditions(
+    hass: SmartHub, device_id: str
+) -> list[dict[str, str]]:
+    """List device conditions."""
+    return await toggle_entity.async_get_conditions(hass, device_id, DOMAIN)
+
+
+async def async_get_condition_capabilities(
+    hass: SmartHub, config: ConfigType
+) -> dict[str, vol.Schema]:
+    """List condition capabilities."""
+    return await toggle_entity.async_get_condition_capabilities(hass, config)

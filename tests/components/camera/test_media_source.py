@@ -4,22 +4,22 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from homeassistant.components import media_source
-from homeassistant.components.camera import CameraCapabilities
-from homeassistant.components.camera.const import StreamType
-from homeassistant.components.stream import FORMAT_CONTENT_TYPE
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import media_source
+from smarthub.components.camera import CameraCapabilities
+from smarthub.components.camera.const import StreamType
+from smarthub.components.stream import FORMAT_CONTENT_TYPE
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(autouse=True)
-async def setup_media_source(hass: HomeAssistant) -> None:
+async def setup_media_source(hass: SmartHub) -> None:
     """Set up media source."""
     assert await async_setup_component(hass, "media_source", {})
 
 
 @pytest.mark.usefixtures("mock_camera_with_device", "mock_camera")
-async def test_device_with_device(hass: HomeAssistant) -> None:
+async def test_device_with_device(hass: SmartHub) -> None:
     """Test browsing when camera has a device and a name."""
     item = await media_source.async_browse_media(hass, "media-source://camera")
     assert item.not_shown == 2
@@ -28,7 +28,7 @@ async def test_device_with_device(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_camera_with_no_name", "mock_camera")
-async def test_device_with_no_name(hass: HomeAssistant) -> None:
+async def test_device_with_no_name(hass: SmartHub) -> None:
     """Test browsing when camera has device and name == None."""
     item = await media_source.async_browse_media(hass, "media-source://camera")
     assert item.not_shown == 2
@@ -37,7 +37,7 @@ async def test_device_with_no_name(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_camera_hls")
-async def test_browsing_hls(hass: HomeAssistant) -> None:
+async def test_browsing_hls(hass: SmartHub) -> None:
     """Test browsing HLS camera media source."""
     item = await media_source.async_browse_media(hass, "media-source://camera")
     assert item is not None
@@ -55,7 +55,7 @@ async def test_browsing_hls(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_camera")
-async def test_browsing_mjpeg(hass: HomeAssistant) -> None:
+async def test_browsing_mjpeg(hass: SmartHub) -> None:
     """Test browsing MJPEG camera media source."""
     item = await media_source.async_browse_media(hass, "media-source://camera")
     assert item is not None
@@ -67,14 +67,14 @@ async def test_browsing_mjpeg(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_camera_webrtc")
-async def test_browsing_webrtc(hass: HomeAssistant) -> None:
+async def test_browsing_webrtc(hass: SmartHub) -> None:
     """Test browsing WebRTC camera media source."""
     # 3 cameras:
     # one only supports WebRTC (no stream source)
     # one raises when getting the source
     # One has a stream source, and should be the only browsable one
     with patch(
-        "homeassistant.components.camera.Camera.stream_source",
+        "smarthub.components.camera.Camera.stream_source",
         side_effect=["test", None, Exception],
     ):
         item = await media_source.async_browse_media(hass, "media-source://camera")
@@ -93,13 +93,13 @@ async def test_browsing_webrtc(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_camera")
-async def test_resolving(hass: HomeAssistant) -> None:
+async def test_resolving(hass: SmartHub) -> None:
     """Test resolving."""
     # Adding stream enables HLS camera
     hass.config.components.add("stream")
 
     with patch(
-        "homeassistant.components.camera.media_source._async_stream_endpoint_url",
+        "smarthub.components.camera.media_source._async_stream_endpoint_url",
         return_value="http://example.com/stream",
     ):
         item = await media_source.async_resolve_media(
@@ -111,7 +111,7 @@ async def test_resolving(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_camera")
-async def test_resolving_errors(hass: HomeAssistant) -> None:
+async def test_resolving_errors(hass: SmartHub) -> None:
     """Test resolving."""
 
     with pytest.raises(media_source.Unresolvable) as exc_info:
@@ -131,7 +131,7 @@ async def test_resolving_errors(hass: HomeAssistant) -> None:
     with (
         pytest.raises(media_source.Unresolvable) as exc_info,
         patch(
-            "homeassistant.components.camera.Camera.camera_capabilities",
+            "smarthub.components.camera.Camera.camera_capabilities",
             new_callable=PropertyMock(
                 return_value=CameraCapabilities({StreamType.WEB_RTC})
             ),

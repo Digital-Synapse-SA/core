@@ -2,14 +2,14 @@
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.ecowitt.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components.ecowitt.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 
-async def test_create_entry(hass: HomeAssistant) -> None:
+async def test_create_entry(hass: SmartHub) -> None:
     """Test we can create a config entry."""
     await async_setup_component(hass, "http", {})
 
@@ -20,7 +20,7 @@ async def test_create_entry(hass: HomeAssistant) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.ecowitt.async_setup_entry",
+        "smarthub.components.ecowitt.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(

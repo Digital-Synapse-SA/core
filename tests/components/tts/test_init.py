@@ -9,8 +9,8 @@ from unittest.mock import MagicMock, Mock, patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components import ffmpeg, tts
-from homeassistant.components.media_player import (
+from smarthub.components import ffmpeg, tts
+from smarthub.components.media_player import (
     ATTR_MEDIA_ANNOUNCE,
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
@@ -18,12 +18,12 @@ from homeassistant.components.media_player import (
     SERVICE_PLAY_MEDIA,
     MediaType,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .common import (
     DEFAULT_LANG,
@@ -46,7 +46,7 @@ ORIG_WRITE_TAGS = tts.SpeechManager.write_tags
 
 
 async def test_config_entry_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts_entity: MockTTSEntity,
     freezer: FrozenDateTimeFactory,
@@ -99,7 +99,7 @@ async def test_config_entry_unload(
 @pytest.mark.parametrize(
     "setup", ["mock_setup", "mock_config_entry_setup"], indirect=True
 )
-async def test_setup_component(hass: HomeAssistant, setup: str) -> None:
+async def test_setup_component(hass: SmartHub, setup: str) -> None:
     """Set up a TTS platform with defaults."""
     assert hass.services.has_service(tts.DOMAIN, "clear_cache")
     assert f"test.{tts.DOMAIN}" in hass.config.components
@@ -110,7 +110,7 @@ async def test_setup_component(hass: HomeAssistant, setup: str) -> None:
     "setup", ["mock_setup", "mock_config_entry_setup"], indirect=True
 )
 async def test_setup_component_no_access_cache_folder(
-    hass: HomeAssistant, mock_tts_init_cache_dir: MagicMock, setup: str
+    hass: SmartHub, mock_tts_init_cache_dir: MagicMock, setup: str
 ) -> None:
     """Set up a TTS platform with defaults."""
     assert not hass.services.has_service(tts.DOMAIN, "test_say")
@@ -143,7 +143,7 @@ async def test_setup_component_no_access_cache_folder(
     indirect=["setup"],
 )
 async def test_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -161,7 +161,7 @@ async def test_service(
     )
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         assert len(calls) == 1
         assert calls[0].data[ATTR_MEDIA_ANNOUNCE] is True
@@ -206,7 +206,7 @@ async def test_service(
     indirect=["setup"],
 )
 async def test_service_default_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -226,7 +226,7 @@ async def test_service_default_language(
     assert calls[0].data[ATTR_MEDIA_CONTENT_TYPE] == MediaType.MUSIC
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         assert await get_media_source_url(
             hass, calls[0].data[ATTR_MEDIA_CONTENT_ID]
@@ -270,7 +270,7 @@ async def test_service_default_language(
     indirect=["setup"],
 )
 async def test_service_default_special_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -290,7 +290,7 @@ async def test_service_default_special_language(
     assert calls[0].data[ATTR_MEDIA_CONTENT_TYPE] == MediaType.MUSIC
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         assert await get_media_source_url(
             hass, calls[0].data[ATTR_MEDIA_CONTENT_ID]
@@ -330,7 +330,7 @@ async def test_service_default_special_language(
     indirect=["setup"],
 )
 async def test_service_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -350,7 +350,7 @@ async def test_service_language(
     assert calls[0].data[ATTR_MEDIA_CONTENT_TYPE] == MediaType.MUSIC
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         assert await get_media_source_url(
             hass, calls[0].data[ATTR_MEDIA_CONTENT_ID]
@@ -390,7 +390,7 @@ async def test_service_language(
     indirect=["setup"],
 )
 async def test_service_wrong_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -400,7 +400,7 @@ async def test_service_wrong_language(
     """Set up a TTS platform and call service."""
     calls = async_mock_service(hass, DOMAIN_MP, SERVICE_PLAY_MEDIA)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             tts.DOMAIN,
             tts_service,
@@ -444,7 +444,7 @@ async def test_service_wrong_language(
     indirect=["setup"],
 )
 async def test_service_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -466,7 +466,7 @@ async def test_service_options(
     assert calls[0].data[ATTR_MEDIA_CONTENT_TYPE] == MediaType.MUSIC
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         assert await get_media_source_url(
             hass, calls[0].data[ATTR_MEDIA_CONTENT_ID]
@@ -528,7 +528,7 @@ class MockEntityWithDefaults(MockTTSEntity):
     indirect=["setup"],
 )
 async def test_service_default_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -550,7 +550,7 @@ async def test_service_default_options(
     assert calls[0].data[ATTR_MEDIA_CONTENT_TYPE] == MediaType.MUSIC
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         assert await get_media_source_url(
             hass, calls[0].data[ATTR_MEDIA_CONTENT_ID]
@@ -599,7 +599,7 @@ async def test_service_default_options(
     indirect=["setup"],
 )
 async def test_merge_default_service_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -624,7 +624,7 @@ async def test_merge_default_service_options(
     assert calls[0].data[ATTR_MEDIA_CONTENT_TYPE] == MediaType.MUSIC
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         assert await get_media_source_url(
             hass, calls[0].data[ATTR_MEDIA_CONTENT_ID]
@@ -669,7 +669,7 @@ async def test_merge_default_service_options(
     indirect=["setup"],
 )
 async def test_service_wrong_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -679,7 +679,7 @@ async def test_service_wrong_options(
     """Set up a TTS platform and call service with wrong options."""
     calls = async_mock_service(hass, DOMAIN_MP, SERVICE_PLAY_MEDIA)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             tts.DOMAIN,
             tts_service,
@@ -725,7 +725,7 @@ async def test_service_wrong_options(
     indirect=["setup"],
 )
 async def test_service_clear_cache(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -786,7 +786,7 @@ async def test_service_clear_cache(
     indirect=["setup"],
 )
 async def test_service_receive_voice(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts_cache_dir: Path,
     setup: str,
@@ -858,7 +858,7 @@ async def test_service_receive_voice(
     indirect=["setup"],
 )
 async def test_service_receive_voice_german(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts_cache_dir: Path,
     setup: str,
@@ -899,7 +899,7 @@ async def test_service_receive_voice_german(
     indirect=["setup"],
 )
 async def test_web_view_wrong_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup: str,
     expected_url_suffix: str,
@@ -922,7 +922,7 @@ async def test_web_view_wrong_file(
     indirect=["setup"],
 )
 async def test_web_view_wrong_filename(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup: str,
     expected_url_suffix: str,
@@ -967,7 +967,7 @@ async def test_web_view_wrong_filename(
     indirect=["setup"],
 )
 async def test_service_without_cache(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     setup: str,
     tts_service: str,
@@ -1015,7 +1015,7 @@ class MockEntityBoom(MockTTSEntity):
 
 @pytest.mark.parametrize("mock_provider", [MockProviderBoom(DEFAULT_LANG)])
 async def test_setup_legacy_cache_dir(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     mock_provider: MockTTSProvider,
 ) -> None:
@@ -1043,7 +1043,7 @@ async def test_setup_legacy_cache_dir(
     assert len(calls) == 1
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         assert await get_media_source_url(
             hass, calls[0].data[ATTR_MEDIA_CONTENT_ID]
@@ -1053,7 +1053,7 @@ async def test_setup_legacy_cache_dir(
 
 @pytest.mark.parametrize("mock_tts_entity", [MockEntityBoom(DEFAULT_LANG)])
 async def test_setup_cache_dir(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_cache_dir: Path,
     mock_tts_entity: MockTTSEntity,
 ) -> None:
@@ -1081,7 +1081,7 @@ async def test_setup_cache_dir(
 
     assert len(calls) == 1
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         assert await get_media_source_url(
             hass, calls[0].data[ATTR_MEDIA_CONTENT_ID]
@@ -1137,7 +1137,7 @@ class MockEntityEmpty(MockTTSEntity):
     indirect=["setup"],
 )
 async def test_service_get_tts_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup: str,
     tts_service: str,
@@ -1160,7 +1160,7 @@ async def test_service_get_tts_error(
 
 
 async def test_legacy_cannot_retrieve_without_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_provider: MockTTSProvider,
     mock_tts_cache_dir: Path,
     hass_client: ClientSessionGenerator,
@@ -1183,7 +1183,7 @@ async def test_legacy_cannot_retrieve_without_token(
 
 
 async def test_cannot_retrieve_without_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_entity: MockTTSEntity,
     mock_tts_cache_dir: Path,
     hass_client: ClientSessionGenerator,
@@ -1221,7 +1221,7 @@ async def test_web_get_url(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         url = "/api/tts_get_url"
         data |= {"message": "There is someone at the door."}
@@ -1247,7 +1247,7 @@ async def test_web_get_url(
     indirect=["setup"],
 )
 async def test_web_get_url_missing_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup: str,
     data: dict[str, Any],
@@ -1305,7 +1305,7 @@ async def test_tags_with_wave() -> None:
     ],
 )
 async def test_generate_media_source_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup: str,
     result_engine: str,
     engine: str | None,
@@ -1345,14 +1345,14 @@ async def test_generate_media_source_id(
     ],
 )
 async def test_generate_media_source_id_invalid_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup: str,
     engine: str | None,
     language: str | None,
     options: dict[str, Any] | None,
 ) -> None:
     """Test generating a media source ID."""
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         tts.generate_media_source_id(hass, "msg", engine, language, options, None)
 
 
@@ -1364,7 +1364,7 @@ async def test_generate_media_source_id_invalid_options(
     ],
     indirect=["setup"],
 )
-def test_resolve_engine(hass: HomeAssistant, setup: str, engine_id: str) -> None:
+def test_resolve_engine(hass: SmartHub, setup: str, engine_id: str) -> None:
     """Test resolving engine."""
     assert tts.async_resolve_engine(hass, None) == engine_id
     assert tts.async_resolve_engine(hass, engine_id) == engine_id
@@ -1379,7 +1379,7 @@ def test_resolve_engine(hass: HomeAssistant, setup: str, engine_id: str) -> None
 
 
 async def test_legacy_fetching_in_async(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test async fetching of data for a legacy provider."""
     tts_audio: asyncio.Future[bytes] = asyncio.Future()
@@ -1443,8 +1443,8 @@ async def test_legacy_fetching_in_async(
         hass, "test message 2", "test", "en_US", None, None
     )
     tts_audio = asyncio.Future()
-    tts_audio.set_exception(HomeAssistantError("test error"))
-    with pytest.raises(HomeAssistantError):
+    tts_audio.set_exception(SmartHubError("test error"))
+    with pytest.raises(SmartHubError):
         assert await tts.async_get_media_source_audio(hass, media_source_id)
 
     tts_audio = asyncio.Future()
@@ -1456,7 +1456,7 @@ async def test_legacy_fetching_in_async(
 
 
 async def test_fetching_in_async(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test async fetching of data."""
     tts_audio: asyncio.Future[bytes] = asyncio.Future()
@@ -1510,8 +1510,8 @@ async def test_fetching_in_async(
         hass, "test message 2", "tts.test", "en_US", None, None
     )
     tts_audio = asyncio.Future()
-    tts_audio.set_exception(HomeAssistantError("test error"))
-    with pytest.raises(HomeAssistantError):
+    tts_audio.set_exception(SmartHubError("test error"))
+    with pytest.raises(SmartHubError):
         assert await tts.async_get_media_source_audio(hass, media_source_id)
 
     tts_audio = asyncio.Future()
@@ -1530,7 +1530,7 @@ async def test_fetching_in_async(
     indirect=["setup"],
 )
 async def test_ws_list_engines_filter_deprecated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup: str,
     engine_id: str,
@@ -1570,7 +1570,7 @@ async def test_ws_list_engines_filter_deprecated(
     indirect=["setup"],
 )
 async def test_ws_list_engines(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup: str,
     engine_id: str,
@@ -1649,7 +1649,7 @@ async def test_ws_list_engines(
 
 
 async def test_ws_list_engines_deprecated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_tts_entity: MockTTSEntity,
 ) -> None:
@@ -1706,7 +1706,7 @@ async def test_ws_list_engines_deprecated(
     indirect=["setup"],
 )
 async def test_ws_get_engine(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup: str,
     engine_id: str,
@@ -1734,7 +1734,7 @@ async def test_ws_get_engine(
     indirect=["setup"],
 )
 async def test_ws_get_engine_none_existing(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, setup: str, engine_id: str
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, setup: str, engine_id: str
 ) -> None:
     """Test getting a non existing tts engine."""
     client = await hass_ws_client()
@@ -1755,7 +1755,7 @@ async def test_ws_get_engine_none_existing(
     indirect=["setup"],
 )
 async def test_ws_list_voices(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, setup: str, engine_id: str
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, setup: str, engine_id: str
 ) -> None:
     """Test listing supported voices for a tts engine and language."""
     client = await hass_ws_client()
@@ -1805,7 +1805,7 @@ async def test_ws_list_voices(
     }
 
 
-async def test_async_convert_audio_error(hass: HomeAssistant) -> None:
+async def test_async_convert_audio_error(hass: SmartHub) -> None:
     """Test that ffmpeg failing during audio conversion will raise an error."""
     assert await async_setup_component(hass, ffmpeg.DOMAIN, {})
 
@@ -1821,7 +1821,7 @@ async def test_async_convert_audio_error(hass: HomeAssistant) -> None:
 
 
 async def test_default_engine_prefer_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_entity: MockTTSEntity,
     mock_provider: MockTTSProvider,
 ) -> None:
@@ -1853,7 +1853,7 @@ async def test_default_engine_prefer_entity(
     ],
 )
 async def test_default_engine_prefer_cloud_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_provider: MockTTSProvider,
     config_flow_test_domains: str,
 ) -> None:
@@ -1878,7 +1878,7 @@ async def test_default_engine_prefer_cloud_entity(
     assert tts.async_default_engine(hass) == "tts.cloud_tts_entity"
 
 
-async def test_stream(hass: HomeAssistant, mock_tts_entity: MockTTSEntity) -> None:
+async def test_stream(hass: SmartHub, mock_tts_entity: MockTTSEntity) -> None:
     """Test creating streams."""
     await mock_config_entry_setup(hass, mock_tts_entity)
 

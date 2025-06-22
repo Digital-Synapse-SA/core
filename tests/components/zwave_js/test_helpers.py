@@ -7,16 +7,16 @@ import voluptuous as vol
 from zwave_js_server.const import SecurityClass
 from zwave_js_server.model.controller import ProvisioningEntry
 
-from homeassistant.components.zwave_js.const import DOMAIN
-from homeassistant.components.zwave_js.helpers import (
+from smarthub.components.zwave_js.const import DOMAIN
+from smarthub.components.zwave_js.helpers import (
     async_get_node_status_sensor_entity_id,
     async_get_nodes_from_area_id,
     async_get_provisioning_entry_from_device_id,
     get_value_state_schema,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import area_registry as ar, device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import area_registry as ar, device_registry as dr
 
 from tests.common import MockConfigEntry
 
@@ -30,7 +30,7 @@ def platforms() -> list[str]:
 
 
 async def test_async_get_node_status_sensor_entity_id(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test async_get_node_status_sensor_entity_id for non zwave_js device."""
     config_entry = MockConfigEntry()
@@ -43,7 +43,7 @@ async def test_async_get_node_status_sensor_entity_id(
 
 
 async def test_async_get_nodes_from_area_id(
-    hass: HomeAssistant, area_registry: ar.AreaRegistry
+    hass: SmartHub, area_registry: ar.AreaRegistry
 ) -> None:
     """Test async_get_nodes_from_area_id."""
     area = area_registry.async_create("test")
@@ -51,7 +51,7 @@ async def test_async_get_nodes_from_area_id(
 
 
 async def test_get_value_state_schema_boolean_config_value(
-    hass: HomeAssistant, client, aeon_smart_switch_6
+    hass: SmartHub, client, aeon_smart_switch_6
 ) -> None:
     """Test get_value_state_schema for boolean config value."""
     schema_validator = get_value_state_schema(
@@ -62,7 +62,7 @@ async def test_get_value_state_schema_boolean_config_value(
 
 
 async def test_async_get_provisioning_entry_from_device_id(
-    hass: HomeAssistant, client, device_registry: dr.DeviceRegistry, integration
+    hass: SmartHub, client, device_registry: dr.DeviceRegistry, integration
 ) -> None:
     """Test async_get_provisioning_entry_from_device_id function."""
     device = device_registry.async_get_or_create(

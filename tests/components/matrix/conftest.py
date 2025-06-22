@@ -26,7 +26,7 @@ from nio import (
 from PIL import Image
 import pytest
 
-from homeassistant.components.matrix import (
+from smarthub.components.matrix import (
     CONF_COMMANDS,
     CONF_EXPRESSION,
     CONF_HOMESERVER,
@@ -38,18 +38,18 @@ from homeassistant.components.matrix import (
     RoomAnyID,
     RoomID,
 )
-from homeassistant.components.matrix.const import DOMAIN
-from homeassistant.components.matrix.notify import CONF_DEFAULT_ROOM
-from homeassistant.components.notify import DOMAIN as NOTIFY_DOMAIN
-from homeassistant.const import (
+from smarthub.components.matrix.const import DOMAIN
+from smarthub.components.matrix.notify import CONF_DEFAULT_ROOM
+from smarthub.components.notify import DOMAIN as NOTIFY_DOMAIN
+from smarthub.const import (
     CONF_NAME,
     CONF_PASSWORD,
     CONF_PLATFORM,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import Event, SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_capture_events
 
@@ -72,7 +72,7 @@ TEST_DEVICE_ID = "FAKEID"
 TEST_PASSWORD = "password"
 TEST_TOKEN = "access_token"
 
-NIO_IMPORT_PREFIX = "homeassistant.components.matrix.nio."
+NIO_IMPORT_PREFIX = "smarthub.components.matrix.nio."
 
 
 class _MockAsyncClient(AsyncClient):
@@ -243,14 +243,14 @@ MOCK_EXPRESSION_COMMANDS = {
 @pytest.fixture
 def mock_client():
     """Return mocked AsyncClient."""
-    with patch("homeassistant.components.matrix.AsyncClient", _MockAsyncClient) as mock:
+    with patch("smarthub.components.matrix.AsyncClient", _MockAsyncClient) as mock:
         yield mock
 
 
 @pytest.fixture
 def mock_save_json():
     """Prevent saving test access_tokens."""
-    with patch("homeassistant.components.matrix.save_json") as mock:
+    with patch("smarthub.components.matrix.save_json") as mock:
         yield mock
 
 
@@ -258,7 +258,7 @@ def mock_save_json():
 def mock_load_json():
     """Mock loading access_tokens from a file."""
     with patch(
-        "homeassistant.components.matrix.load_json_object",
+        "smarthub.components.matrix.load_json_object",
         return_value={TEST_MXID: TEST_TOKEN},
     ) as mock:
         yield mock
@@ -268,14 +268,14 @@ def mock_load_json():
 def mock_allowed_path():
     """Allow using NamedTemporaryFile for mock image."""
     with patch(
-        "homeassistant.core_config.Config.is_allowed_path", return_value=True
+        "smarthub.core_config.Config.is_allowed_path", return_value=True
     ) as mock:
         yield mock
 
 
 @pytest.fixture
 async def matrix_bot(
-    hass: HomeAssistant, mock_client, mock_save_json, mock_allowed_path
+    hass: SmartHub, mock_client, mock_save_json, mock_allowed_path
 ) -> MatrixBot:
     """Set up Matrix and Notify component.
 
@@ -296,13 +296,13 @@ async def matrix_bot(
 
 
 @pytest.fixture
-def matrix_events(hass: HomeAssistant) -> list[Event]:
+def matrix_events(hass: SmartHub) -> list[Event]:
     """Track event calls."""
     return async_capture_events(hass, DOMAIN)
 
 
 @pytest.fixture
-def command_events(hass: HomeAssistant) -> list[Event]:
+def command_events(hass: SmartHub) -> list[Event]:
     """Track event calls."""
     return async_capture_events(hass, EVENT_MATRIX_COMMAND)
 

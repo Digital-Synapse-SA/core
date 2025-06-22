@@ -8,8 +8,8 @@ from pysuez import AggregatedData, PriceResult
 from pysuez.const import ATTRIBUTION
 import pytest
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.suez_water.const import CONF_COUNTER_ID, DOMAIN
+from smarthub.components.recorder import Recorder
+from smarthub.components.suez_water.const import CONF_COUNTER_ID, DOMAIN
 
 from tests.common import MockConfigEntry
 from tests.conftest import RecorderInstanceContextManager
@@ -44,7 +44,7 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry(recorder_mock: Recorder) -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.suez_water.async_setup_entry", return_value=True
+        "smarthub.components.suez_water.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -54,10 +54,10 @@ def mock_suez_client(recorder_mock: Recorder) -> Generator[AsyncMock]:
     """Create mock for suez_water external api."""
     with (
         patch(
-            "homeassistant.components.suez_water.coordinator.SuezClient", autospec=True
+            "smarthub.components.suez_water.coordinator.SuezClient", autospec=True
         ) as mock_client,
         patch(
-            "homeassistant.components.suez_water.config_flow.SuezClient",
+            "smarthub.components.suez_water.config_flow.SuezClient",
             new=mock_client,
         ),
     ):

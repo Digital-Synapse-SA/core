@@ -5,8 +5,8 @@ from freezegun import freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.auth.models import Credentials
-from homeassistant.core import HomeAssistant
+from smarthub.auth.models import Credentials
+from smarthub.core import SmartHub
 
 from .conftest import TEST_ENTITY, Client
 
@@ -16,9 +16,9 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 async def generate_new_hass_access_token(
-    hass: HomeAssistant, hass_admin_user: MockUser, hass_admin_credential: Credentials
+    hass: SmartHub, hass_admin_user: MockUser, hass_admin_credential: Credentials
 ) -> str:
-    """Return an access token to access Home Assistant."""
+    """Return an access token to access SmartHub."""
     await hass.auth.async_link_user(hass_admin_user, hass_admin_credential)
 
     refresh_token = await hass.auth.async_create_refresh_token(
@@ -28,7 +28,7 @@ async def generate_new_hass_access_token(
 
 
 def _get_test_client_generator(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator, new_token: str
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator, new_token: str
 ):
     """Return a test client generator.""."""
 
@@ -43,7 +43,7 @@ def _get_test_client_generator(
 @freeze_time("2023-03-13 12:05:00-07:00")
 @pytest.mark.usefixtures("socket_enabled")
 async def test_empty_calendar(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_admin_user: MockUser,
     hass_admin_credential: Credentials,
@@ -71,7 +71,7 @@ async def test_empty_calendar(
 @freeze_time("2023-03-13 12:05:00-07:00")
 @pytest.mark.usefixtures("socket_enabled")
 async def test_api_date_time_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_admin_user: MockUser,
     hass_admin_credential: Credentials,

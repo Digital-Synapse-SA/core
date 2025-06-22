@@ -6,13 +6,13 @@ from unittest.mock import AsyncMock, patch
 from microBeesPy import Bee, MicroBees, Profile
 import pytest
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.microbees.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.microbees.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -36,7 +36,7 @@ def mock_scopes() -> list[str]:
 
 
 @pytest.fixture(autouse=True)
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -55,7 +55,7 @@ def mock_expires_at() -> int:
 
 @pytest.fixture(name="config_entry")
 def mock_config_entry(expires_at: int, scopes: list[str]) -> MockConfigEntry:
-    """Create YouTube entry in Home Assistant."""
+    """Create YouTube entry in SmartHub."""
     return MockConfigEntry(
         domain=DOMAIN,
         title=TITLE,
@@ -86,11 +86,11 @@ def mock_microbees():
 
     with (
         patch(
-            "homeassistant.components.microbees.config_flow.MicroBees",
+            "smarthub.components.microbees.config_flow.MicroBees",
             return_value=mock,
         ) as mock,
         patch(
-            "homeassistant.components.microbees.MicroBees",
+            "smarthub.components.microbees.MicroBees",
             return_value=mock,
         ),
     ):

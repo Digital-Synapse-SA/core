@@ -6,16 +6,16 @@ from pyopenuv.errors import InvalidApiKeyError
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.openuv import CONF_FROM_WINDOW, CONF_TO_WINDOW, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.openuv import CONF_FROM_WINDOW, CONF_TO_WINDOW, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_API_KEY,
     CONF_ELEVATION,
     CONF_LATITUDE,
     CONF_LONGITUDE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import TEST_API_KEY, TEST_ELEVATION, TEST_LATITUDE, TEST_LONGITUDE
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_create_entry(hass: HomeAssistant, client, config, mock_pyopenuv) -> None:
+async def test_create_entry(hass: SmartHub, client, config, mock_pyopenuv) -> None:
     """Test creating an entry."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -56,7 +56,7 @@ async def test_create_entry(hass: HomeAssistant, client, config, mock_pyopenuv) 
 
 
 async def test_duplicate_error(
-    hass: HomeAssistant, config, config_entry, setup_config_entry
+    hass: SmartHub, config, config_entry, setup_config_entry
 ) -> None:
     """Test that errors are shown when duplicates are added."""
     result = await hass.config_entries.flow.async_init(
@@ -67,7 +67,7 @@ async def test_duplicate_error(
 
 
 async def test_options_flow(
-    hass: HomeAssistant, config_entry, setup_config_entry
+    hass: SmartHub, config_entry, setup_config_entry
 ) -> None:
     """Test config flow options."""
     result = await hass.config_entries.options.async_init(config_entry.entry_id)
@@ -107,7 +107,7 @@ async def test_options_flow(
 
 
 async def test_step_reauth(
-    hass: HomeAssistant, config, config_entry: MockConfigEntry, setup_config_entry
+    hass: SmartHub, config, config_entry: MockConfigEntry, setup_config_entry
 ) -> None:
     """Test that the reauth step works."""
     result = await config_entry.start_reauth_flow(hass)

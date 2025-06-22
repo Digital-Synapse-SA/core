@@ -1,0 +1,9 @@
+{
+  "domain": "script",
+  "name": "Scripts",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["blueprint", "trace"],
+  "documentation": "https://www.smart-hub.io/integrations/script",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

@@ -6,14 +6,14 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.prusalink import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.prusalink import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Mock a PrusaLink config entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,

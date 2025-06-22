@@ -1,6 +1,6 @@
 """Tests for the EufyLife integration."""
 
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
 
 NOT_EUFYLIFE_SERVICE_INFO = BluetoothServiceInfo(
     name="Not it",

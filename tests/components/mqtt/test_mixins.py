@@ -5,21 +5,21 @@ from unittest.mock import call, patch
 
 import pytest
 
-from homeassistant.components import mqtt, sensor
-from homeassistant.components.mqtt.sensor import DEFAULT_NAME as DEFAULT_SENSOR_NAME
-from homeassistant.config_entries import ConfigSubentryData
-from homeassistant.const import (
+from smarthub.components import mqtt, sensor
+from smarthub.components.mqtt.sensor import DEFAULT_NAME as DEFAULT_SENSOR_NAME
+from smarthub.config_entries import ConfigSubentryData
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     EVENT_HOMEASSISTANT_STARTED,
     EVENT_STATE_CHANGED,
 )
-from homeassistant.core import CoreState, HomeAssistant, callback
-from homeassistant.helpers import (
+from smarthub.core import CoreState, SmartHub, callback
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
 )
-from homeassistant.util import slugify
+from smarthub.util import slugify
 
 from .common import (
     MOCK_NOTIFY_SUBENTRY_DATA_SINGLE,
@@ -50,7 +50,7 @@ from tests.typing import MqttMockHAClientGenerator
     ],
 )
 async def test_availability_with_shared_state_topic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the state is not changed twice.
 
@@ -306,10 +306,10 @@ async def test_availability_with_shared_state_topic(
         "entity_name_startswith_device_name2",
     ],
 )
-@patch("homeassistant.components.mqtt.client.DISCOVERY_COOLDOWN", 0.0)
+@patch("smarthub.components.mqtt.client.DISCOVERY_COOLDOWN", 0.0)
 @pytest.mark.usefixtures("mqtt_client_mock")
 async def test_default_entity_and_device_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
     entity_id: str,
@@ -357,7 +357,7 @@ async def test_default_entity_and_device_name(
 
 
 async def test_name_attribute_is_set_or_not(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test frendly name with device_class set.
 
@@ -366,7 +366,7 @@ async def test_name_attribute_is_set_or_not(
     await mqtt_mock_entry()
     async_fire_mqtt_message(
         hass,
-        "homeassistant/binary_sensor/bla/config",
+        "smarthub/binary_sensor/bla/config",
         '{ "name": "Gate", "state_topic": "test-topic", "device_class": "door", '
         '"object_id": "gate",'
         '"device": {"identifiers": "very_unique", "name": "xyz_door_sensor"}'
@@ -382,7 +382,7 @@ async def test_name_attribute_is_set_or_not(
     # Remove the name in a discovery update
     async_fire_mqtt_message(
         hass,
-        "homeassistant/binary_sensor/bla/config",
+        "smarthub/binary_sensor/bla/config",
         '{ "state_topic": "test-topic", "device_class": "door", '
         '"object_id": "gate",'
         '"device": {"identifiers": "very_unique", "name": "xyz_door_sensor"}'
@@ -398,7 +398,7 @@ async def test_name_attribute_is_set_or_not(
     # Set the name to `null` in a discovery update
     async_fire_mqtt_message(
         hass,
-        "homeassistant/binary_sensor/bla/config",
+        "smarthub/binary_sensor/bla/config",
         '{ "name": null, "state_topic": "test-topic", "device_class": "door", '
         '"object_id": "gate",'
         '"device": {"identifiers": "very_unique", "name": "xyz_door_sensor"}'
@@ -455,7 +455,7 @@ async def test_name_attribute_is_set_or_not(
     ],
 )
 async def test_value_template_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -481,7 +481,7 @@ async def test_value_template_fails(
     ],
 )
 async def test_loading_subentries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     mqtt_config_subentries_data: tuple[dict[str, Any]],
     device_registry: dr.DeviceRegistry,
@@ -534,7 +534,7 @@ async def test_loading_subentries(
     ],
 )
 async def test_loading_subentry_with_bad_component_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     mqtt_config_subentries_data: tuple[dict[str, Any]],
     device_registry: dr.DeviceRegistry,
@@ -566,7 +566,7 @@ async def test_loading_subentry_with_bad_component_schema(
     ],
 )
 async def test_qos_on_mqt_device_from_subentry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     mqtt_config_subentries_data: tuple[dict[str, Any]],
     device_registry: dr.DeviceRegistry,

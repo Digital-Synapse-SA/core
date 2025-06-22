@@ -3,24 +3,24 @@
 from datetime import timedelta
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.geonetnz_quakes import (
+from smarthub import config_entries
+from smarthub.components.geonetnz_quakes import (
     CONF_MINIMUM_MAGNITUDE,
     CONF_MMI,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_RADIUS,
     CONF_SCAN_INTERVAL,
     CONF_UNIT_SYSTEM,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_duplicate_error(hass: HomeAssistant, config_entry) -> None:
+async def test_duplicate_error(hass: SmartHub, config_entry) -> None:
     """Test that errors are shown when duplicates are added."""
     conf = {CONF_LATITUDE: -41.2, CONF_LONGITUDE: 174.7, CONF_RADIUS: 25}
     config_entry.add_to_hass(hass)
@@ -32,7 +32,7 @@ async def test_duplicate_error(hass: HomeAssistant, config_entry) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_show_form(hass: HomeAssistant) -> None:
+async def test_show_form(hass: SmartHub) -> None:
     """Test that the form is served with no input."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -41,7 +41,7 @@ async def test_show_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_step_import(hass: HomeAssistant) -> None:
+async def test_step_import(hass: SmartHub) -> None:
     """Test that the import step works."""
     conf = {
         CONF_LATITUDE: -41.2,
@@ -55,11 +55,11 @@ async def test_step_import(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.geonetnz_quakes.async_setup_entry",
+            "smarthub.components.geonetnz_quakes.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.geonetnz_quakes.async_setup", return_value=True
+            "smarthub.components.geonetnz_quakes.async_setup", return_value=True
         ),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -78,7 +78,7 @@ async def test_step_import(hass: HomeAssistant) -> None:
     }
 
 
-async def test_step_user(hass: HomeAssistant) -> None:
+async def test_step_user(hass: SmartHub) -> None:
     """Test that the user step works."""
     hass.config.latitude = -41.2
     hass.config.longitude = 174.7
@@ -86,11 +86,11 @@ async def test_step_user(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.geonetnz_quakes.async_setup_entry",
+            "smarthub.components.geonetnz_quakes.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.geonetnz_quakes.async_setup", return_value=True
+            "smarthub.components.geonetnz_quakes.async_setup", return_value=True
         ),
     ):
         result = await hass.config_entries.flow.async_init(

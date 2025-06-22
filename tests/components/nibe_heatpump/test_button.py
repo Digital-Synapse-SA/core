@@ -8,14 +8,14 @@ from nibe.coil_groups import UNIT_COILGROUPS
 from nibe.heatpump import Model
 import pytest
 
-from homeassistant.components.button import DOMAIN as PLATFORM_DOMAIN, SERVICE_PRESS
-from homeassistant.const import (
+from smarthub.components.button import DOMAIN as PLATFORM_DOMAIN, SERVICE_PRESS
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import async_add_model
 
@@ -23,7 +23,7 @@ from . import async_add_model
 @pytest.fixture(autouse=True)
 async def fixture_single_platform():
     """Only allow this platform to load."""
-    with patch("homeassistant.components.nibe_heatpump.PLATFORMS", [Platform.BUTTON]):
+    with patch("smarthub.components.nibe_heatpump.PLATFORMS", [Platform.BUTTON]):
         yield
 
 
@@ -35,7 +35,7 @@ async def fixture_single_platform():
     ],
 )
 async def test_reset_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connection: AsyncMock,
     model: Model,
     entity_id: str,

@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 from aiohttp import ClientError
 
-from homeassistant.components.nightscout.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
+from smarthub.components.nightscout.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
 
 from . import init_integration
 
 from tests.common import MockConfigEntry
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass)
 
@@ -28,7 +28,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
     assert not hass.data.get(DOMAIN)
 
 
-async def test_async_setup_raises_entry_not_ready(hass: HomeAssistant) -> None:
+async def test_async_setup_raises_entry_not_ready(hass: SmartHub) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -37,7 +37,7 @@ async def test_async_setup_raises_entry_not_ready(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.nightscout.NightscoutAPI.get_server_status",
+        "smarthub.components.nightscout.NightscoutAPI.get_server_status",
         side_effect=ClientError(),
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

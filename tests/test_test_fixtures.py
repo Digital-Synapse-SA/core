@@ -10,10 +10,10 @@ from aiohttp import web
 import pytest
 import pytest_socket
 
-from homeassistant.core import HomeAssistant, async_get_hass
-from homeassistant.helpers import translation
-from homeassistant.helpers.http import HomeAssistantView
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, async_get_hass
+from smarthub.helpers import translation
+from smarthub.helpers.http import SmartHubView
+from smarthub.setup import async_setup_component
 
 from .common import MockModule, mock_integration
 from .conftest import evict_faked_translations
@@ -34,7 +34,7 @@ def test_sockets_enabled() -> None:
         mysocket.connect(("127.0.0.2", 1234))
 
 
-async def test_hass_cv(hass: HomeAssistant) -> None:
+async def test_hass_cv(hass: SmartHub) -> None:
     """Test hass context variable.
 
     When tests are using the `hass`, this tests that the hass context variable was set
@@ -43,10 +43,10 @@ async def test_hass_cv(hass: HomeAssistant) -> None:
     assert async_get_hass() is hass
 
 
-def register_view(hass: HomeAssistant) -> None:
+def register_view(hass: SmartHub) -> None:
     """Register a view."""
 
-    class TestView(HomeAssistantView):
+    class TestView(SmartHubView):
         """Test view to serve the test."""
 
         requires_auth = False
@@ -61,7 +61,7 @@ def register_view(hass: HomeAssistant) -> None:
 
 
 async def test_aiohttp_client_frozen_router_view(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test aiohttp_client fixture patches frozen router for views."""
@@ -78,7 +78,7 @@ async def test_aiohttp_client_frozen_router_view(
     assert result["test"] is True
 
 
-async def test_evict_faked_translations_assumptions(hass: HomeAssistant) -> None:
+async def test_evict_faked_translations_assumptions(hass: SmartHub) -> None:
     """Test assumptions made when detecting translations for mocked integrations.
 
     If this test fails, the evict_faked_translations may need to be updated.
@@ -87,11 +87,11 @@ async def test_evict_faked_translations_assumptions(hass: HomeAssistant) -> None
     assert integration.file_path == pathlib.Path("")
 
 
-async def test_evict_faked_translations(hass: HomeAssistant, translations_once) -> None:
+async def test_evict_faked_translations(hass: SmartHub, translations_once) -> None:
     """Test the evict_faked_translations fixture."""
     cache: translation._TranslationsCacheData = translations_once.kwargs["return_value"]
     fake_domain = "test"
-    real_domain = "homeassistant"
+    real_domain = "smarthub"
 
     # Evict the real domain from the cache in case it's been loaded before
     cache.loaded["en"].discard(real_domain)

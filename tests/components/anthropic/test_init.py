@@ -11,8 +11,8 @@ from anthropic import (
 from httpx import URL, Request, Response
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -47,7 +47,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_init_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
     side_effect,

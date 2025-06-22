@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.local_todo.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.local_todo.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import STORAGE_KEY, TODO_NAME
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -42,7 +42,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
 
 
 async def test_duplicate_todo_list_name(
-    hass: HomeAssistant, setup_integration: None, config_entry: MockConfigEntry
+    hass: SmartHub, setup_integration: None, config_entry: MockConfigEntry
 ) -> None:
     """Test two todo-lists cannot be added with the same name."""
 

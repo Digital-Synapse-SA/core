@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import notify
-from homeassistant.components.demo import DOMAIN, notify as demo
-from homeassistant.const import Platform
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import notify
+from smarthub.components.demo import DOMAIN, notify as demo
+from smarthub.const import Platform
+from smarthub.core import Event, SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_capture_events
 
@@ -18,14 +18,14 @@ from tests.common import MockConfigEntry, async_capture_events
 def notify_only() -> Generator[None]:
     """Enable only the notify platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.NOTIFY],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_notify(hass: HomeAssistant, notify_only: None) -> None:
+async def setup_notify(hass: SmartHub, notify_only: None) -> None:
     """Initialize setup demo Notify entity."""
     entry = MockConfigEntry(domain=DOMAIN)
     entry.add_to_hass(hass)
@@ -36,12 +36,12 @@ async def setup_notify(hass: HomeAssistant, notify_only: None) -> None:
 
 
 @pytest.fixture
-def events(hass: HomeAssistant) -> list[Event]:
+def events(hass: SmartHub) -> list[Event]:
     """Fixture that catches notify events."""
     return async_capture_events(hass, demo.EVENT_NOTIFY)
 
 
-async def test_sending_message(hass: HomeAssistant, events: list[Event]) -> None:
+async def test_sending_message(hass: SmartHub, events: list[Event]) -> None:
     """Test sending a message."""
     data = {
         "entity_id": "notify.notifier",
@@ -64,7 +64,7 @@ async def test_sending_message(hass: HomeAssistant, events: list[Event]) -> None
 
 
 async def test_calling_notify_from_script_loaded_from_yaml(
-    hass: HomeAssistant, events: list[Event]
+    hass: SmartHub, events: list[Event]
 ) -> None:
     """Test if we can call a notify from a script."""
     step = {

@@ -2,10 +2,10 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.geo_location import DOMAIN as GEO_LOCATION_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.geo_location import DOMAIN as GEO_LOCATION_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import _generate_mock_feed_entry
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_component_unload_config_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test that loading and unloading of a config entry works."""
     config_entry.add_to_hass(hass)
@@ -32,7 +32,7 @@ async def test_component_unload_config_entry(
 
 
 async def test_remove_orphaned_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,
 ) -> None:

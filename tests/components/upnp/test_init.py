@@ -11,8 +11,8 @@ from async_upnp_client.exceptions import UpnpCommunicationError
 from async_upnp_client.profiles.igd import IgdDevice
 import pytest
 
-from homeassistant.components import ssdp
-from homeassistant.components.upnp.const import (
+from smarthub.components import ssdp
+from smarthub.components.upnp.const import (
     CONFIG_ENTRY_FORCE_POLL,
     CONFIG_ENTRY_LOCATION,
     CONFIG_ENTRY_MAC_ADDRESS,
@@ -21,8 +21,8 @@ from homeassistant.components.upnp.const import (
     CONFIG_ENTRY_UDN,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_UDN, SsdpServiceInfo
+from smarthub.core import SmartHub
+from smarthub.helpers.service_info.ssdp import ATTR_UPNP_UDN, SsdpServiceInfo
 
 from .conftest import (
     TEST_DISCOVERY,
@@ -38,7 +38,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("ssdp_instant_discovery", "mock_mac_address_from_host")
 async def test_async_setup_entry_default(
-    hass: HomeAssistant, mock_igd_device: IgdDevice
+    hass: SmartHub, mock_igd_device: IgdDevice
 ) -> None:
     """Test async_setup_entry."""
     entry = MockConfigEntry(
@@ -64,7 +64,7 @@ async def test_async_setup_entry_default(
 
 
 @pytest.mark.usefixtures("ssdp_instant_discovery", "mock_no_mac_address_from_host")
-async def test_async_setup_entry_default_no_mac_address(hass: HomeAssistant) -> None:
+async def test_async_setup_entry_default_no_mac_address(hass: SmartHub) -> None:
     """Test async_setup_entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -91,7 +91,7 @@ async def test_async_setup_entry_default_no_mac_address(hass: HomeAssistant) -> 
     "mock_mac_address_from_host",
 )
 async def test_async_setup_entry_multi_location(
-    hass: HomeAssistant, mock_async_create_device: AsyncMock
+    hass: SmartHub, mock_async_create_device: AsyncMock
 ) -> None:
     """Test async_setup_entry for a device both seen via IPv4 and IPv6.
 
@@ -122,7 +122,7 @@ async def test_async_setup_entry_multi_location(
 
 @pytest.mark.usefixtures("mock_mac_address_from_host")
 async def test_async_setup_udn_mismatch(
-    hass: HomeAssistant, mock_async_create_device: AsyncMock
+    hass: SmartHub, mock_async_create_device: AsyncMock
 ) -> None:
     """Test async_setup_entry for a device which reports a different UDN from SSDP-discovery and device description."""
     test_discovery = copy.deepcopy(TEST_DISCOVERY)
@@ -145,7 +145,7 @@ async def test_async_setup_udn_mismatch(
 
     # Set up device discovery callback.
     async def register_callback(
-        hass: HomeAssistant,
+        hass: SmartHub,
         callback: Callable[
             [SsdpServiceInfo, ssdp.SsdpChange], Coroutine[Any, Any, None] | None
         ],
@@ -157,11 +157,11 @@ async def test_async_setup_udn_mismatch(
 
     with (
         patch(
-            "homeassistant.components.ssdp.async_register_callback",
+            "smarthub.components.ssdp.async_register_callback",
             side_effect=register_callback,
         ),
         patch(
-            "homeassistant.components.ssdp.async_get_discovery_info_by_st",
+            "smarthub.components.ssdp.async_get_discovery_info_by_st",
             return_value=[test_discovery],
         ),
     ):
@@ -179,7 +179,7 @@ async def test_async_setup_udn_mismatch(
     "mock_mac_address_from_host",
 )
 async def test_async_setup_entry_force_poll(
-    hass: HomeAssistant, mock_igd_device: IgdDevice
+    hass: SmartHub, mock_igd_device: IgdDevice
 ) -> None:
     """Test async_setup_entry with forced polling."""
     entry = MockConfigEntry(
@@ -215,7 +215,7 @@ async def test_async_setup_entry_force_poll(
     "mock_mac_address_from_host",
 )
 async def test_async_setup_entry_force_poll_subscribe_error(
-    hass: HomeAssistant, mock_igd_device: IgdDevice
+    hass: SmartHub, mock_igd_device: IgdDevice
 ) -> None:
     """Test async_setup_entry where subscribing fails."""
     entry = MockConfigEntry(

@@ -34,16 +34,16 @@ from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.orm.session import Session
 
-from homeassistant.components.recorder.const import ALL_DOMAIN_EXCLUDE_ATTRS, JSON_DUMP
-from homeassistant.const import (
+from smarthub.components.recorder.const import ALL_DOMAIN_EXCLUDE_ATTRS, JSON_DUMP
+from smarthub.const import (
     MAX_LENGTH_EVENT_CONTEXT_ID,
     MAX_LENGTH_EVENT_EVENT_TYPE,
     MAX_LENGTH_EVENT_ORIGIN,
     MAX_LENGTH_STATE_ENTITY_ID,
     MAX_LENGTH_STATE_STATE,
 )
-from homeassistant.core import Context, Event, EventOrigin, State, split_entity_id
-from homeassistant.util import dt as dt_util
+from smarthub.core import Context, Event, EventOrigin, State, split_entity_id
+from smarthub.util import dt as dt_util
 
 # SQLAlchemy Schema
 Base = declarative_base()

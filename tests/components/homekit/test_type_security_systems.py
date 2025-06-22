@@ -3,26 +3,26 @@
 from pyhap.loader import get_loader
 import pytest
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_CONTROL_PANEL_DOMAIN,
     AlarmControlPanelEntityFeature,
     AlarmControlPanelState,
 )
-from homeassistant.components.homekit.const import ATTR_VALUE
-from homeassistant.components.homekit.type_security_systems import SecuritySystem
-from homeassistant.const import (
+from smarthub.components.homekit.const import ATTR_VALUE
+from smarthub.components.homekit.type_security_systems import SecuritySystem
+from smarthub.const import (
     ATTR_CODE,
     ATTR_ENTITY_ID,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import Event, HomeAssistant
+from smarthub.core import Event, SmartHub
 
 from tests.common import async_mock_service
 
 
 async def test_switch_set_state(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     code = "1234"
@@ -122,7 +122,7 @@ async def test_switch_set_state(
 
 @pytest.mark.parametrize("config", [{}, {ATTR_CODE: None}])
 async def test_no_alarm_code(
-    hass: HomeAssistant, hk_driver, config, events: list[Event]
+    hass: SmartHub, hk_driver, config, events: list[Event]
 ) -> None:
     """Test accessory if security_system doesn't require an alarm_code."""
     entity_id = "alarm_control_panel.test"
@@ -146,7 +146,7 @@ async def test_no_alarm_code(
     assert events[-1].data[ATTR_VALUE] is None
 
 
-async def test_arming(hass: HomeAssistant, hk_driver) -> None:
+async def test_arming(hass: SmartHub, hk_driver) -> None:
     """Test to make sure arming sets the right state."""
     entity_id = "alarm_control_panel.test"
 
@@ -197,7 +197,7 @@ async def test_arming(hass: HomeAssistant, hk_driver) -> None:
     assert acc.char_current_state.value == 4
 
 
-async def test_supported_states(hass: HomeAssistant, hk_driver) -> None:
+async def test_supported_states(hass: SmartHub, hk_driver) -> None:
     """Test different supported states."""
     code = "1234"
     config = {ATTR_CODE: code}
@@ -324,7 +324,7 @@ async def test_supported_states(hass: HomeAssistant, hk_driver) -> None:
     ],
 )
 async def test_handle_non_alarm_states(
-    hass: HomeAssistant, hk_driver, events: list[Event], state: str
+    hass: SmartHub, hk_driver, events: list[Event], state: str
 ) -> None:
     """Test we can handle states that should not raise."""
     code = "1234"

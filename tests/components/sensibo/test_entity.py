@@ -7,21 +7,21 @@ from unittest.mock import MagicMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_FAN_MODE,
     DOMAIN as CLIMATE_DOMAIN,
     SERVICE_SET_FAN_MODE,
 )
-from homeassistant.components.sensibo.const import SENSIBO_ERRORS
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.sensibo.const import SENSIBO_ERRORS
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr
 
 
 async def test_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     load_int: ConfigEntry,
     snapshot: SnapshotAssertion,
@@ -39,7 +39,7 @@ async def test_device(
 
 @pytest.mark.parametrize("p_error", SENSIBO_ERRORS)
 async def test_entity_failed_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     p_error: Exception,
     load_int: ConfigEntry,
     mock_client: MagicMock,
@@ -65,7 +65,7 @@ async def test_entity_failed_service_calls(
 
     mock_client.async_set_ac_state_property.side_effect = p_error
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_FAN_MODE,

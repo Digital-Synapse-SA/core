@@ -6,15 +6,15 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from switchbot.devices.device import SwitchbotOperationError
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
 
 from . import WOHAND_SERVICE_INFO
 
@@ -23,7 +23,7 @@ from tests.components.bluetooth import inject_bluetooth_service_info
 
 
 async def test_switchbot_switch_with_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_factory: Callable[[str], MockConfigEntry],
 ) -> None:
     """Test that Switchbot Switch restores state correctly after reboot."""
@@ -46,7 +46,7 @@ async def test_switchbot_switch_with_restore_state(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.switchbot.switch.switchbot.Switchbot.switch_mode",
+        "smarthub.components.switchbot.switch.switchbot.Switchbot.switch_mode",
         return_value=False,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -74,7 +74,7 @@ async def test_switchbot_switch_with_restore_state(
     ],
 )
 async def test_exception_handling_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_factory: Callable[[str], MockConfigEntry],
     service: str,
     mock_method: str,
@@ -89,14 +89,14 @@ async def test_exception_handling_switch(
     entity_id = "switch.test_name"
 
     patch_target = (
-        f"homeassistant.components.switchbot.switch.switchbot.Switchbot.{mock_method}"
+        f"smarthub.components.switchbot.switch.switchbot.Switchbot.{mock_method}"
     )
 
     with patch(patch_target, new=AsyncMock(side_effect=exception)):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
-        with pytest.raises(HomeAssistantError, match=error_message):
+        with pytest.raises(SmartHubError, match=error_message):
             await hass.services.async_call(
                 SWITCH_DOMAIN,
                 service,

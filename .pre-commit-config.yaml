@@ -6,7 +6,7 @@ repos:
         args:
           - --fix
       - id: ruff-format
-        files: ^((homeassistant|pylint|script|tests)/.+)?[^/]+\.(py|pyi)$
+        files: ^((smarthub|pylint|script|tests)/.+)?[^/]+\.(py|pyi)$
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:
@@ -16,7 +16,7 @@ repos:
           - --skip="./.*,*.csv,*.json,*.ambr"
           - --quiet-level=2
         exclude_types: [csv, json, html]
-        exclude: ^tests/fixtures/|homeassistant/generated/|tests/components/.*/snapshots/
+        exclude: ^tests/fixtures/|smarthub/generated/|tests/components/.*/snapshots/
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -50,7 +50,7 @@ repos:
           - --py311-plus
           - --force
           - --keep-updates
-        files: ^(homeassistant|tests|script)/.+\.py$
+        files: ^(smarthub|tests|script)/.+\.py$
   - repo: local
     hooks:
       # Run mypy through our wrapper script in order to get the possible
@@ -63,35 +63,35 @@ repos:
         language: script
         require_serial: true
         types_or: [python, pyi]
-        files: ^(homeassistant|pylint)/.+\.(py|pyi)$
+        files: ^(smarthub|pylint)/.+\.(py|pyi)$
       - id: pylint
         name: pylint
         entry: script/run-in-env.sh pylint --ignore-missing-annotations=y
         language: script
         require_serial: true
         types_or: [python, pyi]
-        files: ^(homeassistant|tests)/.+\.(py|pyi)$
+        files: ^(smarthub|tests)/.+\.(py|pyi)$
       - id: gen_requirements_all
         name: gen_requirements_all
         entry: script/run-in-env.sh python3 -m script.gen_requirements_all
         pass_filenames: false
         language: script
         types: [text]
-        files: ^(homeassistant/.+/manifest\.json|homeassistant/brands/.+\.json|pyproject\.toml|\.pre-commit-config\.yaml|script/gen_requirements_all\.py)$
+        files: ^(smarthub/.+/manifest\.json|smarthub/brands/.+\.json|pyproject\.toml|\.pre-commit-config\.yaml|script/gen_requirements_all\.py)$
       - id: hassfest
         name: hassfest
         entry: script/run-in-env.sh python3 -m script.hassfest
         pass_filenames: false
         language: script
         types: [text]
-        files: ^(homeassistant/.+/(icons|manifest|strings)\.json|homeassistant/.+/(quality_scale)\.yaml|homeassistant/brands/.*\.json|homeassistant/.+/services\.yaml|script/hassfest/(?!metadata|mypy_config).+\.py|requirements.+\.txt)$
+        files: ^(smarthub/.+/(icons|manifest|strings)\.json|smarthub/.+/(quality_scale)\.yaml|smarthub/brands/.*\.json|smarthub/.+/services\.yaml|script/hassfest/(?!metadata|mypy_config).+\.py|requirements.+\.txt)$
       - id: hassfest-metadata
         name: hassfest-metadata
         entry: script/run-in-env.sh python3 -m script.hassfest -p metadata,docker
         pass_filenames: false
         language: script
         types: [text]
-        files: ^(script/hassfest/metadata\.py|homeassistant/const\.py$|pyproject\.toml|homeassistant/components/go2rtc/const\.py)$
+        files: ^(script/hassfest/metadata\.py|smarthub/const\.py$|pyproject\.toml|smarthub/components/go2rtc/const\.py)$
       - id: hassfest-mypy-config
         name: hassfest-mypy-config
         entry: script/run-in-env.sh python3 -m script.hassfest -p mypy_config

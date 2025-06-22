@@ -8,14 +8,14 @@ from nextdns import ApiError, InvalidApiKeyError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.nextdns.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.nextdns.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import init_integration
 
@@ -23,23 +23,23 @@ from tests.common import snapshot_platform
 
 
 async def test_button(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test states of the button."""
-    with patch("homeassistant.components.nextdns.PLATFORMS", [Platform.BUTTON]):
+    with patch("smarthub.components.nextdns.PLATFORMS", [Platform.BUTTON]):
         entry = await init_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_button_press(hass: HomeAssistant) -> None:
+async def test_button_press(hass: SmartHub) -> None:
     """Test button press."""
     await init_integration(hass)
 
     now = dt_util.utcnow()
     with (
-        patch("homeassistant.components.nextdns.NextDns.clear_logs") as mock_clear_logs,
-        patch("homeassistant.core.dt_util.utcnow", return_value=now),
+        patch("smarthub.components.nextdns.NextDns.clear_logs") as mock_clear_logs,
+        patch("smarthub.core.dt_util.utcnow", return_value=now),
     ):
         await hass.services.async_call(
             BUTTON_DOMAIN,
@@ -65,14 +65,14 @@ async def test_button_press(hass: HomeAssistant) -> None:
         ClientError,
     ],
 )
-async def test_button_failure(hass: HomeAssistant, exc: Exception) -> None:
-    """Tests that the press action throws HomeAssistantError."""
+async def test_button_failure(hass: SmartHub, exc: Exception) -> None:
+    """Tests that the press action throws SmartHubError."""
     await init_integration(hass)
 
     with (
-        patch("homeassistant.components.nextdns.NextDns.clear_logs", side_effect=exc),
+        patch("smarthub.components.nextdns.NextDns.clear_logs", side_effect=exc),
         pytest.raises(
-            HomeAssistantError,
+            SmartHubError,
             match="An error occurred while calling the NextDNS API method for button.fake_profile_clear_logs",
         ),
     ):
@@ -84,12 +84,12 @@ async def test_button_failure(hass: HomeAssistant, exc: Exception) -> None:
         )
 
 
-async def test_button_auth_error(hass: HomeAssistant) -> None:
+async def test_button_auth_error(hass: SmartHub) -> None:
     """Tests that the press action starts re-auth flow."""
     entry = await init_integration(hass)
 
     with patch(
-        "homeassistant.components.nextdns.NextDns.clear_logs",
+        "smarthub.components.nextdns.NextDns.clear_logs",
         side_effect=InvalidApiKeyError,
     ):
         await hass.services.async_call(

@@ -8,10 +8,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.acaia.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.acaia.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -19,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("init_integration")
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test loading and unloading the integration."""
@@ -36,7 +36,7 @@ async def test_load_unload_config_entry(
     "exception", [AcaiaError, AcaiaDeviceNotFound("Boom"), TimeoutError]
 )
 async def test_update_exception_leads_to_active_disconnect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_scale: MagicMock,
     freezer: FrozenDateTimeFactory,
     exception: Exception,

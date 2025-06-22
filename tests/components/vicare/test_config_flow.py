@@ -9,12 +9,12 @@ from PyViCare.PyViCareUtils import (
 )
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.vicare.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER
-from homeassistant.const import CONF_CLIENT_ID, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.vicare.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER
+from smarthub.const import CONF_CLIENT_ID, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import MOCK_MAC, MODULE
 
@@ -36,7 +36,7 @@ DHCP_INFO = DhcpServiceInfo(
 
 
 async def test_user_create_entry(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, snapshot: SnapshotAssertion
+    hass: SmartHub, mock_setup_entry: AsyncMock, snapshot: SnapshotAssertion
 ) -> None:
     """Test that the user step works."""
     # start user flow
@@ -94,7 +94,7 @@ async def test_user_create_entry(
     mock_setup_entry.assert_called_once()
 
 
-async def test_step_reauth(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_step_reauth(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test reauth flow."""
     new_password = "ABCD"
     new_client_id = "EFGH"
@@ -146,7 +146,7 @@ async def test_step_reauth(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> 
 
 
 async def test_form_dhcp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, snapshot: SnapshotAssertion
+    hass: SmartHub, mock_setup_entry: AsyncMock, snapshot: SnapshotAssertion
 ) -> None:
     """Test we can setup from dhcp."""
 
@@ -175,7 +175,7 @@ async def test_form_dhcp(
     mock_setup_entry.assert_called_once()
 
 
-async def test_dhcp_single_instance_allowed(hass: HomeAssistant) -> None:
+async def test_dhcp_single_instance_allowed(hass: SmartHub) -> None:
     """Test that configuring more than one instance is rejected."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -192,7 +192,7 @@ async def test_dhcp_single_instance_allowed(hass: HomeAssistant) -> None:
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_user_input_single_instance_allowed(hass: HomeAssistant) -> None:
+async def test_user_input_single_instance_allowed(hass: SmartHub) -> None:
     """Test that configuring more than one instance is rejected."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,

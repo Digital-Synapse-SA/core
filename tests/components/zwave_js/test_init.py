@@ -22,20 +22,20 @@ from zwave_js_server.model.controller import ProvisioningEntry
 from zwave_js_server.model.node import Node, NodeDataType
 from zwave_js_server.model.version import VersionInfo
 
-from homeassistant.components.hassio import HassioAPIError
-from homeassistant.components.persistent_notification import async_dismiss
-from homeassistant.components.zwave_js import DOMAIN
-from homeassistant.components.zwave_js.helpers import get_device_id, get_device_id_ext
-from homeassistant.config_entries import ConfigEntryDisabler, ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.helpers import (
+from smarthub.components.hassio import HassioAPIError
+from smarthub.components.persistent_notification import async_dismiss
+from smarthub.components.zwave_js import DOMAIN
+from smarthub.components.zwave_js.helpers import get_device_id, get_device_id_ext
+from smarthub.config_entries import ConfigEntryDisabler, ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import CoreState, SmartHub
+from smarthub.helpers import (
     area_registry as ar,
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from .common import AIR_TEMPERATURE_SENSOR, EATON_RF9640_ENTITY
 
@@ -53,12 +53,12 @@ CONTROLLER_PATCH_PREFIX = "zwave_js_server.model.controller.Controller"
 @pytest.fixture(name="connect_timeout")
 def connect_timeout_fixture() -> Generator[int]:
     """Mock the connect timeout."""
-    with patch("homeassistant.components.zwave_js.CONNECT_TIMEOUT", new=0) as timeout:
+    with patch("smarthub.components.zwave_js.CONNECT_TIMEOUT", new=0) as timeout:
         yield timeout
 
 
 async def test_entry_setup_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
 ) -> None:
@@ -76,7 +76,7 @@ async def test_entry_setup_unload(
 
 @pytest.mark.usefixtures("integration")
 async def test_home_assistant_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
 ) -> None:
     """Test we clean up on home assistant stop."""
@@ -86,7 +86,7 @@ async def test_home_assistant_stop(
 
 
 @pytest.mark.usefixtures("client", "connect_timeout")
-async def test_initialized_timeout(hass: HomeAssistant) -> None:
+async def test_initialized_timeout(hass: SmartHub) -> None:
     """Test we handle a timeout during client initialization."""
     entry = MockConfigEntry(domain="zwave_js", data={"url": "ws://test.org"})
     entry.add_to_hass(hass)
@@ -98,7 +98,7 @@ async def test_initialized_timeout(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("client")
-async def test_enabled_statistics(hass: HomeAssistant) -> None:
+async def test_enabled_statistics(hass: SmartHub) -> None:
     """Test that we enabled statistics if the entry is opted in."""
     entry = MockConfigEntry(
         domain="zwave_js",
@@ -115,7 +115,7 @@ async def test_enabled_statistics(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("client")
-async def test_disabled_statistics(hass: HomeAssistant) -> None:
+async def test_disabled_statistics(hass: SmartHub) -> None:
     """Test that we disabled statistics if the entry is opted out."""
     entry = MockConfigEntry(
         domain="zwave_js",
@@ -132,7 +132,7 @@ async def test_disabled_statistics(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("client")
-async def test_noop_statistics(hass: HomeAssistant) -> None:
+async def test_noop_statistics(hass: SmartHub) -> None:
     """Test that we don't make statistics calls if user hasn't set preference."""
     entry = MockConfigEntry(domain="zwave_js", data={"url": "ws://test.org"})
     entry.add_to_hass(hass)
@@ -152,7 +152,7 @@ async def test_noop_statistics(hass: HomeAssistant) -> None:
 
 
 async def test_driver_ready_timeout_during_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     listen_block: asyncio.Event,
 ) -> None:
@@ -171,7 +171,7 @@ async def test_driver_ready_timeout_during_setup(
     entry.add_to_hass(hass)
     assert client.disconnect.call_count == 0
 
-    with patch("homeassistant.components.zwave_js.DRIVER_READY_TIMEOUT", new=0):
+    with patch("smarthub.components.zwave_js.DRIVER_READY_TIMEOUT", new=0):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
@@ -189,7 +189,7 @@ async def test_driver_ready_timeout_during_setup(
     ],
 )
 async def test_listen_done_during_setup_before_forward_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     listen_block: asyncio.Event,
     listen_result: asyncio.Future[None],
@@ -222,7 +222,7 @@ async def test_listen_done_during_setup_before_forward_entry(
 
 
 async def test_not_connected_during_setup_after_forward_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     listen_block: asyncio.Event,
     listen_result: asyncio.Future[None],
@@ -270,7 +270,7 @@ async def test_not_connected_during_setup_after_forward_entry(
     ],
 )
 async def test_listen_done_during_setup_after_forward_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     listen_block: asyncio.Event,
     listen_result: asyncio.Future[None],
@@ -339,7 +339,7 @@ async def test_listen_done_during_setup_after_forward_entry(
     ],
 )
 async def test_listen_done_after_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     integration: MockConfigEntry,
     listen_block: asyncio.Event,
@@ -368,7 +368,7 @@ async def test_listen_done_after_setup(
 @pytest.mark.usefixtures("client")
 @pytest.mark.parametrize("platforms", [[Platform.SENSOR]])
 async def test_new_entity_on_value_added(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6: Node,
     integration: MockConfigEntry,
 ) -> None:
@@ -406,7 +406,7 @@ async def test_new_entity_on_value_added(
 
 @pytest.mark.usefixtures("integration")
 async def test_on_node_added_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     multisensor_6_state: NodeDataType,
     client: MagicMock,
@@ -436,7 +436,7 @@ async def test_on_node_added_ready(
 
 
 async def test_on_node_added_preprovisioned(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     multisensor_6_state,
     client,
@@ -477,7 +477,7 @@ async def test_on_node_added_preprovisioned(
 
 @pytest.mark.usefixtures("integration")
 async def test_on_node_added_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     zp3111_not_ready_state: NodeDataType,
@@ -515,7 +515,7 @@ async def test_on_node_added_not_ready(
 
 
 async def test_existing_node_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
     multisensor_6: Node,
@@ -544,7 +544,7 @@ async def test_existing_node_ready(
 
 
 async def test_existing_node_reinterview(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: Client,
     multisensor_6_state: NodeDataType,
@@ -603,7 +603,7 @@ async def test_existing_node_reinterview(
 
 
 async def test_existing_node_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -632,7 +632,7 @@ async def test_existing_node_not_ready(
 
 
 async def test_existing_node_not_replaced_when_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -764,7 +764,7 @@ async def test_existing_node_not_replaced_when_not_ready(
 
 @pytest.mark.usefixtures("client")
 async def test_null_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     null_name_check: Node,
     integration: MockConfigEntry,
 ) -> None:
@@ -775,7 +775,7 @@ async def test_null_name(
 
 @pytest.mark.usefixtures("addon_installed", "addon_info")
 async def test_start_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
     set_addon_options: AsyncMock,
     start_addon: AsyncMock,
@@ -828,7 +828,7 @@ async def test_start_addon(
 
 @pytest.mark.usefixtures("addon_not_installed", "addon_info")
 async def test_install_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
     set_addon_options: AsyncMock,
     start_addon: AsyncMock,
@@ -877,7 +877,7 @@ async def test_install_addon(
 @pytest.mark.usefixtures("addon_installed", "addon_info", "set_addon_options")
 @pytest.mark.parametrize("addon_info_side_effect", [SupervisorError("Boom")])
 async def test_addon_info_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
     start_addon: AsyncMock,
 ) -> None:
@@ -937,7 +937,7 @@ async def test_addon_info_failure(
     ],
 )
 async def test_addon_options_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
     addon_options: dict[str, Any],
     start_addon: AsyncMock,
@@ -1014,7 +1014,7 @@ async def test_addon_options_changed(
     ],
 )
 async def test_update_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     addon_info: AsyncMock,
     create_backup: AsyncMock,
@@ -1060,7 +1060,7 @@ async def test_update_addon(
 
 
 async def test_issue_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -1112,7 +1112,7 @@ async def test_issue_registry(
     ],
 )
 async def test_stop_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_options: dict[str, Any],
     stop_addon: AsyncMock,
     stop_addon_side_effect: Exception | None,
@@ -1153,7 +1153,7 @@ async def test_stop_addon(
 
 @pytest.mark.usefixtures("addon_installed")
 async def test_remove_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     stop_addon: AsyncMock,
     create_backup: AsyncMock,
     uninstall_addon: AsyncMock,
@@ -1269,7 +1269,7 @@ async def test_remove_entry(
 
 @pytest.mark.usefixtures("climate_radio_thermostat_ct100_plus", "lock_schlage_be469")
 async def test_removed_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
     integration: MockConfigEntry,
@@ -1304,7 +1304,7 @@ async def test_removed_device(
 
 @pytest.mark.usefixtures("client", "eaton_rf9640_dimmer")
 async def test_suggested_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1323,7 +1323,7 @@ async def test_suggested_area(
 
 
 async def test_node_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     multisensor_6_state,
     client: MagicMock,
@@ -1354,7 +1354,7 @@ async def test_node_removed(
 
 
 async def test_replace_same_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     multisensor_6: Node,
     multisensor_6_state: NodeDataType,
@@ -1464,7 +1464,7 @@ async def test_replace_same_node(
 
 
 async def test_replace_different_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     multisensor_6: Node,
     multisensor_6_state: NodeDataType,
@@ -1695,7 +1695,7 @@ async def test_replace_different_node(
 
 
 async def test_node_model_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     zp3111: Node,
@@ -1786,7 +1786,7 @@ async def test_node_model_change(
 
 @pytest.mark.usefixtures("zp3111", "integration")
 async def test_disabled_node_status_entity_on_node_replaced(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zp3111_state: NodeDataType,
     client: MagicMock,
 ) -> None:
@@ -1815,7 +1815,7 @@ async def test_disabled_node_status_entity_on_node_replaced(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_remove_entity_on_value_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zp3111: Node,
     client: MagicMock,
     integration: MockConfigEntry,
@@ -1940,7 +1940,7 @@ async def test_remove_entity_on_value_removed(
 
 
 async def test_identify_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     multisensor_6: Node,
     integration: MockConfigEntry,
@@ -1991,7 +1991,7 @@ async def test_identify_event(
 
 
 async def test_server_logging(
-    hass: HomeAssistant, client: MagicMock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, client: MagicMock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test automatic server logging functionality."""
 
@@ -2090,7 +2090,7 @@ async def test_server_logging(
 
 
 async def test_factory_reset_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
     multisensor_6: Node,

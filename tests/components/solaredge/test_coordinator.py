@@ -5,14 +5,14 @@ from unittest.mock import AsyncMock, patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.solaredge.const import (
+from smarthub.components.solaredge.const import (
     CONF_SITE_ID,
     DEFAULT_NAME,
     DOMAIN,
     OVERVIEW_UPDATE_DELAY,
 )
-from homeassistant.const import CONF_API_KEY, CONF_NAME, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_API_KEY, CONF_NAME, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -25,9 +25,9 @@ def enable_all_entities(entity_registry_enabled_by_default: None) -> None:
     """Make sure all entities are enabled."""
 
 
-@patch("homeassistant.components.solaredge.SolarEdge")
+@patch("smarthub.components.solaredge.SolarEdge")
 async def test_solaredgeoverviewdataservice_energy_values_validity(
-    mock_solaredge, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    mock_solaredge, hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test overview energy data validity."""
     mock_config_entry = MockConfigEntry(

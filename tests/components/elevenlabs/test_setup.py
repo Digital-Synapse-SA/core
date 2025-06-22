@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_async_client: MagicMock,
     mock_entry: MockConfigEntry,
 ) -> None:
@@ -25,7 +25,7 @@ async def test_setup(
 
 
 async def test_setup_connect_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_async_client_connect_error: MagicMock,
     mock_entry: MockConfigEntry,
 ) -> None:

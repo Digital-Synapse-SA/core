@@ -8,10 +8,10 @@ from unittest.mock import mock_open, patch
 from aiohttp.hdrs import AUTHORIZATION
 from aiohttp.test_utils import TestClient
 
-from homeassistant.components.html5 import notify as html5
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components.html5 import notify as html5
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -72,7 +72,7 @@ PUBLISH_URL = "/api/notify.html5/callback"
 
 
 async def mock_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     registrations: dict[str, Any] | None = None,
 ) -> TestClient:
@@ -81,7 +81,7 @@ async def mock_client(
         registrations = {}
 
     with patch(
-        "homeassistant.components.html5.notify._load_config", return_value=registrations
+        "smarthub.components.html5.notify._load_config", return_value=registrations
     ):
         await async_setup_component(hass, "notify", {"notify": VAPID_CONF})
         await hass.async_block_till_done()
@@ -89,18 +89,18 @@ async def mock_client(
     return await hass_client()
 
 
-async def test_get_service_with_no_json(hass: HomeAssistant) -> None:
+async def test_get_service_with_no_json(hass: SmartHub) -> None:
     """Test empty json file."""
     await async_setup_component(hass, "http", {})
     m = mock_open()
-    with patch("homeassistant.util.json.open", m, create=True):
+    with patch("smarthub.util.json.open", m, create=True):
         service = await html5.async_get_service(hass, {}, VAPID_CONF)
 
     assert service is not None
 
 
-@patch("homeassistant.components.html5.notify.WebPusher")
-async def test_dismissing_message(mock_wp, hass: HomeAssistant) -> None:
+@patch("smarthub.components.html5.notify.WebPusher")
+async def test_dismissing_message(mock_wp, hass: SmartHub) -> None:
     """Test dismissing message."""
     await async_setup_component(hass, "http", {})
     mock_wp().send().status_code = 201
@@ -108,7 +108,7 @@ async def test_dismissing_message(mock_wp, hass: HomeAssistant) -> None:
     data = {"device": SUBSCRIPTION_1}
 
     m = mock_open(read_data=json.dumps(data))
-    with patch("homeassistant.util.json.open", m, create=True):
+    with patch("smarthub.util.json.open", m, create=True):
         service = await html5.async_get_service(hass, {}, VAPID_CONF)
         service.hass = hass
 
@@ -128,8 +128,8 @@ async def test_dismissing_message(mock_wp, hass: HomeAssistant) -> None:
     assert payload["tag"] == "test"
 
 
-@patch("homeassistant.components.html5.notify.WebPusher")
-async def test_sending_message(mock_wp, hass: HomeAssistant) -> None:
+@patch("smarthub.components.html5.notify.WebPusher")
+async def test_sending_message(mock_wp, hass: SmartHub) -> None:
     """Test sending message."""
     await async_setup_component(hass, "http", {})
     mock_wp().send().status_code = 201
@@ -137,7 +137,7 @@ async def test_sending_message(mock_wp, hass: HomeAssistant) -> None:
     data = {"device": SUBSCRIPTION_1}
 
     m = mock_open(read_data=json.dumps(data))
-    with patch("homeassistant.util.json.open", m, create=True):
+    with patch("smarthub.util.json.open", m, create=True):
         service = await html5.async_get_service(hass, {}, VAPID_CONF)
         service.hass = hass
 
@@ -159,8 +159,8 @@ async def test_sending_message(mock_wp, hass: HomeAssistant) -> None:
     assert payload["icon"] == "beer.png"
 
 
-@patch("homeassistant.components.html5.notify.WebPusher")
-async def test_fcm_key_include(mock_wp, hass: HomeAssistant) -> None:
+@patch("smarthub.components.html5.notify.WebPusher")
+async def test_fcm_key_include(mock_wp, hass: SmartHub) -> None:
     """Test if the FCM header is included."""
     await async_setup_component(hass, "http", {})
     mock_wp().send().status_code = 201
@@ -168,7 +168,7 @@ async def test_fcm_key_include(mock_wp, hass: HomeAssistant) -> None:
     data = {"chrome": SUBSCRIPTION_5}
 
     m = mock_open(read_data=json.dumps(data))
-    with patch("homeassistant.util.json.open", m, create=True):
+    with patch("smarthub.util.json.open", m, create=True):
         service = await html5.async_get_service(hass, {}, VAPID_CONF)
         service.hass = hass
 
@@ -184,8 +184,8 @@ async def test_fcm_key_include(mock_wp, hass: HomeAssistant) -> None:
     assert mock_wp.mock_calls[3][2]["headers"]["Authorization"] is not None
 
 
-@patch("homeassistant.components.html5.notify.WebPusher")
-async def test_fcm_send_with_unknown_priority(mock_wp, hass: HomeAssistant) -> None:
+@patch("smarthub.components.html5.notify.WebPusher")
+async def test_fcm_send_with_unknown_priority(mock_wp, hass: SmartHub) -> None:
     """Test if the gcm_key is only included for GCM endpoints."""
     await async_setup_component(hass, "http", {})
     mock_wp().send().status_code = 201
@@ -193,7 +193,7 @@ async def test_fcm_send_with_unknown_priority(mock_wp, hass: HomeAssistant) -> N
     data = {"chrome": SUBSCRIPTION_5}
 
     m = mock_open(read_data=json.dumps(data))
-    with patch("homeassistant.util.json.open", m, create=True):
+    with patch("smarthub.util.json.open", m, create=True):
         service = await html5.async_get_service(hass, {}, VAPID_CONF)
         service.hass = hass
 
@@ -209,8 +209,8 @@ async def test_fcm_send_with_unknown_priority(mock_wp, hass: HomeAssistant) -> N
     assert mock_wp.mock_calls[3][2]["headers"]["priority"] == "normal"
 
 
-@patch("homeassistant.components.html5.notify.WebPusher")
-async def test_fcm_no_targets(mock_wp, hass: HomeAssistant) -> None:
+@patch("smarthub.components.html5.notify.WebPusher")
+async def test_fcm_no_targets(mock_wp, hass: SmartHub) -> None:
     """Test if the gcm_key is only included for GCM endpoints."""
     await async_setup_component(hass, "http", {})
     mock_wp().send().status_code = 201
@@ -218,7 +218,7 @@ async def test_fcm_no_targets(mock_wp, hass: HomeAssistant) -> None:
     data = {"chrome": SUBSCRIPTION_5}
 
     m = mock_open(read_data=json.dumps(data))
-    with patch("homeassistant.util.json.open", m, create=True):
+    with patch("smarthub.util.json.open", m, create=True):
         service = await html5.async_get_service(hass, {}, VAPID_CONF)
         service.hass = hass
 
@@ -234,8 +234,8 @@ async def test_fcm_no_targets(mock_wp, hass: HomeAssistant) -> None:
     assert mock_wp.mock_calls[3][2]["headers"]["priority"] == "normal"
 
 
-@patch("homeassistant.components.html5.notify.WebPusher")
-async def test_fcm_additional_data(mock_wp, hass: HomeAssistant) -> None:
+@patch("smarthub.components.html5.notify.WebPusher")
+async def test_fcm_additional_data(mock_wp, hass: SmartHub) -> None:
     """Test if the gcm_key is only included for GCM endpoints."""
     await async_setup_component(hass, "http", {})
     mock_wp().send().status_code = 201
@@ -243,7 +243,7 @@ async def test_fcm_additional_data(mock_wp, hass: HomeAssistant) -> None:
     data = {"chrome": SUBSCRIPTION_5}
 
     m = mock_open(read_data=json.dumps(data))
-    with patch("homeassistant.util.json.open", m, create=True):
+    with patch("smarthub.util.json.open", m, create=True):
         service = await html5.async_get_service(hass, {}, VAPID_CONF)
         service.hass = hass
 
@@ -260,12 +260,12 @@ async def test_fcm_additional_data(mock_wp, hass: HomeAssistant) -> None:
 
 
 async def test_registering_new_device_view(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the HTML view works."""
     client = await mock_client(hass, hass_client)
 
-    with patch("homeassistant.components.html5.notify.save_json") as mock_save:
+    with patch("smarthub.components.html5.notify.save_json") as mock_save:
         resp = await client.post(REGISTER_URL, data=json.dumps(SUBSCRIPTION_1))
 
     assert resp.status == HTTPStatus.OK
@@ -274,7 +274,7 @@ async def test_registering_new_device_view(
 
 
 async def test_registering_new_device_view_with_name(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the HTML view works with name attribute."""
     client = await mock_client(hass, hass_client)
@@ -282,7 +282,7 @@ async def test_registering_new_device_view_with_name(
     SUB_WITH_NAME = SUBSCRIPTION_1.copy()
     SUB_WITH_NAME["name"] = "test device"
 
-    with patch("homeassistant.components.html5.notify.save_json") as mock_save:
+    with patch("smarthub.components.html5.notify.save_json") as mock_save:
         resp = await client.post(REGISTER_URL, data=json.dumps(SUB_WITH_NAME))
 
     assert resp.status == HTTPStatus.OK
@@ -291,12 +291,12 @@ async def test_registering_new_device_view_with_name(
 
 
 async def test_registering_new_device_expiration_view(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the HTML view works."""
     client = await mock_client(hass, hass_client)
 
-    with patch("homeassistant.components.html5.notify.save_json") as mock_save:
+    with patch("smarthub.components.html5.notify.save_json") as mock_save:
         resp = await client.post(REGISTER_URL, data=json.dumps(SUBSCRIPTION_4))
 
     assert resp.status == HTTPStatus.OK
@@ -304,15 +304,15 @@ async def test_registering_new_device_expiration_view(
 
 
 async def test_registering_new_device_fails_view(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test subs. are not altered when registering a new device fails."""
     registrations = {}
     client = await mock_client(hass, hass_client, registrations)
 
     with patch(
-        "homeassistant.components.html5.notify.save_json",
-        side_effect=HomeAssistantError(),
+        "smarthub.components.html5.notify.save_json",
+        side_effect=SmartHubError(),
     ):
         resp = await client.post(REGISTER_URL, data=json.dumps(SUBSCRIPTION_4))
 
@@ -321,13 +321,13 @@ async def test_registering_new_device_fails_view(
 
 
 async def test_registering_existing_device_view(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test subscription is updated when registering existing device."""
     registrations = {}
     client = await mock_client(hass, hass_client, registrations)
 
-    with patch("homeassistant.components.html5.notify.save_json") as mock_save:
+    with patch("smarthub.components.html5.notify.save_json") as mock_save:
         await client.post(REGISTER_URL, data=json.dumps(SUBSCRIPTION_1))
         resp = await client.post(REGISTER_URL, data=json.dumps(SUBSCRIPTION_4))
 
@@ -337,7 +337,7 @@ async def test_registering_existing_device_view(
 
 
 async def test_registering_existing_device_view_with_name(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test subscription is updated when reg'ing existing device with name."""
     registrations = {}
@@ -346,7 +346,7 @@ async def test_registering_existing_device_view_with_name(
     SUB_WITH_NAME = SUBSCRIPTION_1.copy()
     SUB_WITH_NAME["name"] = "test device"
 
-    with patch("homeassistant.components.html5.notify.save_json") as mock_save:
+    with patch("smarthub.components.html5.notify.save_json") as mock_save:
         await client.post(REGISTER_URL, data=json.dumps(SUB_WITH_NAME))
         resp = await client.post(REGISTER_URL, data=json.dumps(SUBSCRIPTION_4))
 
@@ -356,15 +356,15 @@ async def test_registering_existing_device_view_with_name(
 
 
 async def test_registering_existing_device_fails_view(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test sub. is not updated when registering existing device fails."""
     registrations = {}
     client = await mock_client(hass, hass_client, registrations)
 
-    with patch("homeassistant.components.html5.notify.save_json") as mock_save:
+    with patch("smarthub.components.html5.notify.save_json") as mock_save:
         await client.post(REGISTER_URL, data=json.dumps(SUBSCRIPTION_1))
-        mock_save.side_effect = HomeAssistantError
+        mock_save.side_effect = SmartHubError
         resp = await client.post(REGISTER_URL, data=json.dumps(SUBSCRIPTION_4))
 
     assert resp.status == HTTPStatus.INTERNAL_SERVER_ERROR
@@ -372,7 +372,7 @@ async def test_registering_existing_device_fails_view(
 
 
 async def test_registering_new_device_validation(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test various errors when registering a new device."""
     client = await mock_client(hass, hass_client)
@@ -386,7 +386,7 @@ async def test_registering_new_device_validation(
     resp = await client.post(REGISTER_URL, data=json.dumps({"browser": "chrome"}))
     assert resp.status == HTTPStatus.BAD_REQUEST
 
-    with patch("homeassistant.components.html5.notify.save_json", return_value=False):
+    with patch("smarthub.components.html5.notify.save_json", return_value=False):
         resp = await client.post(
             REGISTER_URL,
             data=json.dumps({"browser": "chrome", "subscription": "sub info"}),
@@ -395,13 +395,13 @@ async def test_registering_new_device_validation(
 
 
 async def test_unregistering_device_view(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the HTML unregister view works."""
     registrations = {"some device": SUBSCRIPTION_1, "other device": SUBSCRIPTION_2}
     client = await mock_client(hass, hass_client, registrations)
 
-    with patch("homeassistant.components.html5.notify.save_json") as mock_save:
+    with patch("smarthub.components.html5.notify.save_json") as mock_save:
         resp = await client.delete(
             REGISTER_URL,
             data=json.dumps({"subscription": SUBSCRIPTION_1["subscription"]}),
@@ -413,13 +413,13 @@ async def test_unregistering_device_view(
 
 
 async def test_unregister_device_view_handle_unknown_subscription(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the HTML unregister view handles unknown subscriptions."""
     registrations = {}
     client = await mock_client(hass, hass_client, registrations)
 
-    with patch("homeassistant.components.html5.notify.save_json") as mock_save:
+    with patch("smarthub.components.html5.notify.save_json") as mock_save:
         resp = await client.delete(
             REGISTER_URL,
             data=json.dumps({"subscription": SUBSCRIPTION_3["subscription"]}),
@@ -431,15 +431,15 @@ async def test_unregister_device_view_handle_unknown_subscription(
 
 
 async def test_unregistering_device_view_handles_save_error(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the HTML unregister view handles save errors."""
     registrations = {"some device": SUBSCRIPTION_1, "other device": SUBSCRIPTION_2}
     client = await mock_client(hass, hass_client, registrations)
 
     with patch(
-        "homeassistant.components.html5.notify.save_json",
-        side_effect=HomeAssistantError(),
+        "smarthub.components.html5.notify.save_json",
+        side_effect=SmartHubError(),
     ):
         resp = await client.delete(
             REGISTER_URL,
@@ -454,7 +454,7 @@ async def test_unregistering_device_view_handles_save_error(
 
 
 async def test_callback_view_no_jwt(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the notification callback view works without JWT."""
     client = await mock_client(hass, hass_client)
@@ -469,13 +469,13 @@ async def test_callback_view_no_jwt(
 
 
 async def test_callback_view_with_jwt(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the notification callback view works with JWT."""
     registrations = {"device": SUBSCRIPTION_1}
     client = await mock_client(hass, hass_client, registrations)
 
-    with patch("homeassistant.components.html5.notify.WebPusher") as mock_wp:
+    with patch("smarthub.components.html5.notify.WebPusher") as mock_wp:
         mock_wp().send().status_code = 201
         await hass.services.async_call(
             "notify",
@@ -507,12 +507,12 @@ async def test_callback_view_with_jwt(
 
 
 async def test_send_fcm_without_targets(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the notification is send with FCM without targets."""
     registrations = {"device": SUBSCRIPTION_5}
     await mock_client(hass, hass_client, registrations)
-    with patch("homeassistant.components.html5.notify.WebPusher") as mock_wp:
+    with patch("smarthub.components.html5.notify.WebPusher") as mock_wp:
         mock_wp().send().status_code = 201
         await hass.services.async_call(
             "notify",
@@ -528,15 +528,15 @@ async def test_send_fcm_without_targets(
 
 
 async def test_send_fcm_expired(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the FCM target is removed when expired."""
     registrations = {"device": SUBSCRIPTION_5}
     await mock_client(hass, hass_client, registrations)
 
     with (
-        patch("homeassistant.components.html5.notify.WebPusher") as mock_wp,
-        patch("homeassistant.components.html5.notify.save_json"),
+        patch("smarthub.components.html5.notify.WebPusher") as mock_wp,
+        patch("smarthub.components.html5.notify.save_json"),
     ):
         mock_wp().send().status_code = 410
         await hass.services.async_call(
@@ -550,17 +550,17 @@ async def test_send_fcm_expired(
 
 
 async def test_send_fcm_expired_save_fails(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the FCM target remains after expiry if save_json fails."""
     registrations = {"device": SUBSCRIPTION_5}
     await mock_client(hass, hass_client, registrations)
 
     with (
-        patch("homeassistant.components.html5.notify.WebPusher") as mock_wp,
+        patch("smarthub.components.html5.notify.WebPusher") as mock_wp,
         patch(
-            "homeassistant.components.html5.notify.save_json",
-            side_effect=HomeAssistantError(),
+            "smarthub.components.html5.notify.save_json",
+            side_effect=SmartHubError(),
         ),
     ):
         mock_wp().send().status_code = 410

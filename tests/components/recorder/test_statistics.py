@@ -10,16 +10,16 @@ import pytest
 from sqlalchemy import select
 import voluptuous as vol
 
-from homeassistant import exceptions
-from homeassistant.components import recorder
-from homeassistant.components.recorder import Recorder, history, statistics
-from homeassistant.components.recorder.db_schema import StatisticsShortTerm
-from homeassistant.components.recorder.models import (
+from smarthub import exceptions
+from smarthub.components import recorder
+from smarthub.components.recorder import Recorder, history, statistics
+from smarthub.components.recorder.db_schema import StatisticsShortTerm
+from smarthub.components.recorder.models import (
     StatisticMeanType,
     datetime_to_timestamp_or_none,
     process_timestamp,
 )
-from homeassistant.components.recorder.statistics import (
+from smarthub.components.recorder.statistics import (
     STATISTIC_UNIT_TO_UNIT_CONVERTER,
     PlatformCompiledStatistics,
     _generate_max_mean_min_statistic_in_sub_period_stmt,
@@ -38,16 +38,16 @@ from homeassistant.components.recorder.statistics import (
     list_statistic_ids,
     validate_statistics,
 )
-from homeassistant.components.recorder.table_managers.statistics_meta import (
+from smarthub.components.recorder.table_managers.statistics_meta import (
     _generate_get_metadata_stmt,
 )
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.components.sensor import UNIT_CONVERTERS
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder.util import session_scope
+from smarthub.components.sensor import UNIT_CONVERTERS
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .common import (
     assert_dict_of_states_equal_without_context_and_last_changed,
@@ -75,7 +75,7 @@ def multiple_start_time_chunk_sizes(
     to call _generate_statistics_at_time_stmt_group_by multiple times.
     """
     with patch(
-        "homeassistant.components.recorder.statistics.MAX_IDS_FOR_INDEXED_GROUP_BY",
+        "smarthub.components.recorder.statistics.MAX_IDS_FOR_INDEXED_GROUP_BY",
         ids_for_start_time_chunk_sizes,
     ):
         yield
@@ -94,7 +94,7 @@ def setup_recorder(recorder_mock: Recorder) -> None:
 
 
 async def _setup_mock_domain(
-    hass: HomeAssistant,
+    hass: SmartHub,
     platform: Any | None = None,  # There's no RecorderPlatform class yet
 ) -> None:
     """Set up a mock domain."""
@@ -112,7 +112,7 @@ def test_converters_align_with_sensor() -> None:
 
 
 async def test_compile_hourly_statistics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
 ) -> None:
     """Test compiling hourly statistics."""
@@ -417,7 +417,7 @@ def mock_sensor_statistics():
         )
 
     with patch(
-        "homeassistant.components.sensor.recorder.compile_statistics",
+        "smarthub.components.sensor.recorder.compile_statistics",
         side_effect=get_fake_stats,
     ):
         yield
@@ -437,7 +437,7 @@ def mock_from_stats():
         return real_from_stats(metadata_id, stats, now_timestamp)
 
     with patch(
-        "homeassistant.components.recorder.statistics.StatisticsShortTerm.from_stats",
+        "smarthub.components.recorder.statistics.StatisticsShortTerm.from_stats",
         side_effect=from_stats,
         autospec=True,
     ):
@@ -445,7 +445,7 @@ def mock_from_stats():
 
 
 async def test_compile_periodic_statistics_exception(
-    hass: HomeAssistant, setup_recorder: None, mock_sensor_statistics, mock_from_stats
+    hass: SmartHub, setup_recorder: None, mock_sensor_statistics, mock_from_stats
 ) -> None:
     """Test exception handling when compiling periodic statistics."""
     await async_setup_component(hass, "sensor", {})
@@ -487,7 +487,7 @@ async def test_compile_periodic_statistics_exception(
 
 
 async def test_rename_entity(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, setup_recorder: None
+    hass: SmartHub, entity_registry: er.EntityRegistry, setup_recorder: None
 ) -> None:
     """Test statistics is migrated when entity_id is changed."""
     await async_setup_component(hass, "sensor", {})
@@ -564,7 +564,7 @@ async def test_rename_entity(
 
 
 async def test_statistics_during_period_set_back_compat(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
 ) -> None:
     """Test statistics_during_period can handle a list instead of a set."""
@@ -585,7 +585,7 @@ async def test_statistics_during_period_set_back_compat(
 
 
 async def test_rename_entity_collision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
@@ -692,7 +692,7 @@ async def test_rename_entity_collision(
 
 
 async def test_rename_entity_collision_states_meta_check_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
@@ -805,7 +805,7 @@ async def test_rename_entity_collision_states_meta_check_disabled(
 
 
 async def test_statistics_duplicated(
-    hass: HomeAssistant, setup_recorder: None, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, setup_recorder: None, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test statistics with same start time is not compiled."""
     await async_setup_component(hass, "sensor", {})
@@ -818,7 +818,7 @@ async def test_statistics_duplicated(
     assert "Statistics already compiled" not in caplog.text
 
     with patch(
-        "homeassistant.components.sensor.recorder.compile_statistics",
+        "smarthub.components.sensor.recorder.compile_statistics",
         return_value=statistics.PlatformCompiledStatistics([], {}),
     ) as compile_statistics:
         do_adhoc_statistics(hass, start=zero)
@@ -848,7 +848,7 @@ async def test_statistics_duplicated(
 )
 async def test_import_statistics(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     source,
@@ -1094,7 +1094,7 @@ async def test_import_statistics(
 
 
 async def test_external_statistics_errors(
-    hass: HomeAssistant, setup_recorder: None, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, setup_recorder: None, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test validation of external statistics."""
     await async_wait_recording_done(hass)
@@ -1127,7 +1127,7 @@ async def test_external_statistics_errors(
         "statistic_id": "sensor.total_energy_import",
     }
     external_statistics = {**_external_statistics}
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_add_external_statistics(hass, external_metadata, (external_statistics,))
     await async_wait_recording_done(hass)
     assert statistics_during_period(hass, zero, period="hour") == {}
@@ -1137,7 +1137,7 @@ async def test_external_statistics_errors(
     # Attempt to insert statistics for the wrong domain
     external_metadata = {**_external_metadata, "source": "other"}
     external_statistics = {**_external_statistics}
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_add_external_statistics(hass, external_metadata, (external_statistics,))
     await async_wait_recording_done(hass)
     assert statistics_during_period(hass, zero, period="hour") == {}
@@ -1150,7 +1150,7 @@ async def test_external_statistics_errors(
         **_external_statistics,
         "start": period1.replace(tzinfo=None),
     }
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_add_external_statistics(hass, external_metadata, (external_statistics,))
     await async_wait_recording_done(hass)
     assert statistics_during_period(hass, zero, period="hour") == {}
@@ -1160,7 +1160,7 @@ async def test_external_statistics_errors(
     # Attempt to insert statistics for an invalid starting time
     external_metadata = {**_external_metadata}
     external_statistics = {**_external_statistics, "start": period1.replace(minute=1)}
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_add_external_statistics(hass, external_metadata, (external_statistics,))
     await async_wait_recording_done(hass)
     assert statistics_during_period(hass, zero, period="hour") == {}
@@ -1173,7 +1173,7 @@ async def test_external_statistics_errors(
         **_external_statistics,
         "last_reset": last_reset.replace(tzinfo=None),
     }
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_add_external_statistics(hass, external_metadata, (external_statistics,))
     await async_wait_recording_done(hass)
     assert statistics_during_period(hass, zero, period="hour") == {}
@@ -1182,7 +1182,7 @@ async def test_external_statistics_errors(
 
 
 async def test_import_statistics_errors(
-    hass: HomeAssistant, setup_recorder: None, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, setup_recorder: None, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test validation of imported statistics."""
     await async_wait_recording_done(hass)
@@ -1215,7 +1215,7 @@ async def test_import_statistics_errors(
         "statistic_id": "test:total_energy_import",
     }
     external_statistics = {**_external_statistics}
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_import_statistics(hass, external_metadata, (external_statistics,))
     await async_wait_recording_done(hass)
     assert statistics_during_period(hass, zero, period="hour") == {}
@@ -1225,7 +1225,7 @@ async def test_import_statistics_errors(
     # Attempt to insert statistics for the wrong domain
     external_metadata = {**_external_metadata, "source": "sensor"}
     external_statistics = {**_external_statistics}
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_import_statistics(hass, external_metadata, (external_statistics,))
     await async_wait_recording_done(hass)
     assert statistics_during_period(hass, zero, period="hour") == {}
@@ -1238,7 +1238,7 @@ async def test_import_statistics_errors(
         **_external_statistics,
         "start": period1.replace(tzinfo=None),
     }
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_import_statistics(hass, external_metadata, (external_statistics,))
     await async_wait_recording_done(hass)
     assert statistics_during_period(hass, zero, period="hour") == {}
@@ -1248,7 +1248,7 @@ async def test_import_statistics_errors(
     # Attempt to insert statistics for an invalid starting time
     external_metadata = {**_external_metadata}
     external_statistics = {**_external_statistics, "start": period1.replace(minute=1)}
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_import_statistics(hass, external_metadata, (external_statistics,))
     await async_wait_recording_done(hass)
     assert statistics_during_period(hass, zero, period="hour") == {}
@@ -1261,7 +1261,7 @@ async def test_import_statistics_errors(
         **_external_statistics,
         "last_reset": last_reset.replace(tzinfo=None),
     }
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         async_import_statistics(hass, external_metadata, (external_statistics,))
     await async_wait_recording_done(hass)
     assert statistics_during_period(hass, zero, period="hour") == {}
@@ -1273,7 +1273,7 @@ async def test_import_statistics_errors(
 @pytest.mark.parametrize("timezone", ["America/Regina", "Europe/Vienna", "UTC"])
 @pytest.mark.freeze_time("2022-10-01 00:00:00+00:00")
 async def test_daily_statistics_sum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
     timezone,
@@ -1454,7 +1454,7 @@ async def test_daily_statistics_sum(
 @pytest.mark.parametrize("timezone", ["America/Regina", "Europe/Vienna", "UTC"])
 @pytest.mark.freeze_time("2022-10-01 00:00:00+00:00")
 async def test_multiple_daily_statistics_sum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
     timezone,
@@ -1662,7 +1662,7 @@ async def test_multiple_daily_statistics_sum(
 @pytest.mark.parametrize("timezone", ["America/Regina", "Europe/Vienna", "UTC"])
 @pytest.mark.freeze_time("2022-10-01 00:00:00+00:00")
 async def test_weekly_statistics_mean(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
     timezone,
@@ -1798,7 +1798,7 @@ async def test_weekly_statistics_mean(
 @pytest.mark.parametrize("timezone", ["America/Regina", "Europe/Vienna", "UTC"])
 @pytest.mark.freeze_time("2022-10-01 00:00:00+00:00")
 async def test_weekly_statistics_sum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
     timezone,
@@ -1979,7 +1979,7 @@ async def test_weekly_statistics_sum(
 @pytest.mark.parametrize("timezone", ["America/Regina", "Europe/Vienna", "UTC"])
 @pytest.mark.freeze_time("2021-08-01 00:00:00+00:00")
 async def test_monthly_statistics_sum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
     timezone,
@@ -2322,7 +2322,7 @@ def test_cache_key_for_generate_statistics_at_time_stmt_dependent_sub_query() ->
 @pytest.mark.parametrize("timezone", ["America/Regina", "Europe/Vienna", "UTC"])
 @pytest.mark.freeze_time("2022-10-01 00:00:00+00:00")
 async def test_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
     timezone,
@@ -2658,7 +2658,7 @@ async def test_change(
 @pytest.mark.parametrize("timezone", ["America/Regina", "Europe/Vienna", "UTC"])
 @pytest.mark.freeze_time("2022-10-01 00:00:00+00:00")
 async def test_change_multiple(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
     timezone,
@@ -3043,7 +3043,7 @@ async def test_change_multiple(
 @pytest.mark.parametrize("timezone", ["America/Regina", "Europe/Vienna", "UTC"])
 @pytest.mark.freeze_time("2022-10-01 00:00:00+00:00")
 async def test_change_with_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
     timezone,
@@ -3268,7 +3268,7 @@ async def test_change_with_none(
 
 
 async def test_recorder_platform_with_statistics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -3339,7 +3339,7 @@ async def test_recorder_platform_with_statistics(
 
 
 async def test_recorder_platform_without_statistics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -3364,7 +3364,7 @@ async def test_recorder_platform_without_statistics(
     ],
 )
 async def test_recorder_platform_with_partial_statistics_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
     supported_methods: tuple[str, ...],
@@ -3594,7 +3594,7 @@ async def test_recorder_platform_with_partial_statistics_support(
 )
 @pytest.mark.usefixtures("recorder_mock")
 async def test_get_statistics_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_read_only_user: MockUser,
     service_args: dict[str, Any],
     expected_result: dict[str, Any],
@@ -3721,7 +3721,7 @@ async def test_get_statistics_service(
 )
 @pytest.mark.usefixtures("recorder_mock")
 async def test_get_statistics_service_missing_mandatory_keys(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_args: dict[str, Any],
     missing_key: str,
 ) -> None:

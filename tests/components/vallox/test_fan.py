@@ -5,7 +5,7 @@ from unittest.mock import call
 import pytest
 from vallox_websocket_api import MetricData, MetricValue, Profile, ValloxApiException
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     ATTR_PRESET_MODE,
     DOMAIN as FAN_DOMAIN,
@@ -13,9 +13,9 @@ from homeassistant.components.fan import (
     SERVICE_SET_PRESET_MODE,
     NotValidPresetModeError,
 )
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import patch_set_fan_speed, patch_set_profile, patch_set_values
 
@@ -31,7 +31,7 @@ async def test_fan_state(
     expected_state: str,
     mock_entry: MockConfigEntry,
     setup_fetch_metric_data_mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test fan on/off state."""
 
@@ -63,7 +63,7 @@ async def test_fan_profile(
     expected_preset: str,
     mock_entry: MockConfigEntry,
     setup_fetch_metric_data_mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test fan profile."""
 
@@ -98,7 +98,7 @@ async def test_turn_on_off(
     expected_called_with: dict[str, MetricValue],
     mock_entry: MockConfigEntry,
     setup_fetch_metric_data_mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test turn on/off."""
     setup_fetch_metric_data_mock(metrics=initial_metrics)
@@ -137,7 +137,7 @@ async def test_turn_on_with_parameters(
     initial_metrics: dict[str, MetricValue],
     expected_call_args_list: list[tuple],
     mock_entry: MockConfigEntry,
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_fetch_metric_data_mock,
 ) -> None:
     """Test turn on/off."""
@@ -176,7 +176,7 @@ async def test_set_preset_mode(
     initial_profile: Profile,
     expected_call_args_list: list[tuple],
     mock_entry: MockConfigEntry,
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_fetch_metric_data_mock,
 ) -> None:
     """Test set preset mode."""
@@ -202,7 +202,7 @@ async def test_set_preset_mode(
 
 async def test_set_invalid_preset_mode(
     mock_entry: MockConfigEntry,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test set preset mode."""
     await hass.config_entries.async_setup(mock_entry.entry_id)
@@ -222,14 +222,14 @@ async def test_set_invalid_preset_mode(
 
 async def test_set_preset_mode_exception(
     mock_entry: MockConfigEntry,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test set preset mode."""
     with patch_set_profile() as set_profile:
         set_profile.side_effect = ValloxApiException("Fake exception")
         await hass.config_entries.async_setup(mock_entry.entry_id)
         await hass.async_block_till_done()
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 FAN_DOMAIN,
                 SERVICE_SET_PRESET_MODE,
@@ -258,7 +258,7 @@ async def test_set_fan_speed(
     expected_set_fan_speed_call: list[tuple],
     expected_set_values_call: list[tuple],
     mock_entry: MockConfigEntry,
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_fetch_metric_data_mock,
 ) -> None:
     """Test set fan speed percentage."""
@@ -286,7 +286,7 @@ async def test_set_fan_speed(
 
 
 async def test_set_fan_speed_exception(
-    mock_entry: MockConfigEntry, hass: HomeAssistant, setup_fetch_metric_data_mock
+    mock_entry: MockConfigEntry, hass: SmartHub, setup_fetch_metric_data_mock
 ) -> None:
     """Test set fan speed percentage."""
     setup_fetch_metric_data_mock(
@@ -297,7 +297,7 @@ async def test_set_fan_speed_exception(
         set_values.side_effect = ValloxApiException("Fake failure")
         await hass.config_entries.async_setup(mock_entry.entry_id)
         await hass.async_block_till_done()
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 FAN_DOMAIN,
                 SERVICE_SET_PERCENTAGE,

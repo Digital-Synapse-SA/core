@@ -7,12 +7,12 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from wled import Device as WLEDDevice, WLEDConnectionError, WLEDError
 
-from homeassistant.components.select import ATTR_OPTION, DOMAIN as SELECT_DOMAIN
-from homeassistant.components.wled.const import DOMAIN, SCAN_INTERVAL
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_SELECT_OPTION, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.select import ATTR_OPTION, DOMAIN as SELECT_DOMAIN
+from smarthub.components.wled.const import DOMAIN, SCAN_INTERVAL
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_SELECT_OPTION, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import async_fire_time_changed, async_load_json_object_fixture
 
@@ -53,7 +53,7 @@ pytestmark = pytest.mark.usefixtures("init_integration")
     ],
 )
 async def test_color_palette_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -88,7 +88,7 @@ async def test_color_palette_state(
 
     # Test invalid response, not becoming unavailable
     method_mock.side_effect = WLEDError
-    with pytest.raises(HomeAssistantError, match="Invalid response from WLED API"):
+    with pytest.raises(SmartHubError, match="Invalid response from WLED API"):
         await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
@@ -103,7 +103,7 @@ async def test_color_palette_state(
 
     # Test connection error, leading to becoming unavailable
     method_mock.side_effect = WLEDConnectionError
-    with pytest.raises(HomeAssistantError, match="Error communicating with WLED API"):
+    with pytest.raises(SmartHubError, match="Error communicating with WLED API"):
         await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
@@ -119,7 +119,7 @@ async def test_color_palette_state(
 
 @pytest.mark.parametrize("device_fixture", ["rgb_single_segment"])
 async def test_color_palette_dynamically_handle_segments(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_wled: MagicMock,
 ) -> None:
@@ -158,13 +158,13 @@ async def test_color_palette_dynamically_handle_segments(
     assert segment1.state == STATE_UNAVAILABLE
 
 
-async def test_preset_unavailable_without_presets(hass: HomeAssistant) -> None:
+async def test_preset_unavailable_without_presets(hass: SmartHub) -> None:
     """Test WLED preset entity is unavailable when presets are not available."""
     assert (state := hass.states.get("select.wled_rgb_light_preset"))
     assert state.state == STATE_UNAVAILABLE
 
 
-async def test_playlist_unavailable_without_playlists(hass: HomeAssistant) -> None:
+async def test_playlist_unavailable_without_playlists(hass: SmartHub) -> None:
     """Test WLED playlist entity is unavailable when playlists are not available."""
     assert (state := hass.states.get("select.wled_rgb_light_playlist"))
     assert state.state == STATE_UNAVAILABLE

@@ -13,19 +13,19 @@ from aiotankerkoenig.exceptions import (
 )
 import pytest
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.tankerkoenig.const import (
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.tankerkoenig.const import (
     CONF_STATIONS,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ID, CONF_SHOW_ON_MAP, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ID, CONF_SHOW_ON_MAP, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .const import CONFIG_DATA
 
@@ -34,7 +34,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("setup_integration")
 async def test_rate_limit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     tankerkoenig: AsyncMock,
     caplog: pytest.LogCaptureFixture,
@@ -84,7 +84,7 @@ async def test_rate_limit(
 )
 @pytest.mark.usefixtures("setup_integration")
 async def test_update_exception_logging(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     tankerkoenig: AsyncMock,
     caplog: pytest.LogCaptureFixture,
@@ -115,7 +115,7 @@ async def test_update_exception_logging(
     ],
 )
 async def test_setup_exception_logging(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     tankerkoenig: AsyncMock,
     caplog: pytest.LogCaptureFixture,
@@ -133,7 +133,7 @@ async def test_setup_exception_logging(
 
 
 async def test_automatic_registry_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     tankerkoenig: AsyncMock,
     device_registry: dr.DeviceRegistry,
@@ -199,7 +199,7 @@ async def test_automatic_registry_cleanup(
 
 
 async def test_many_stations_warning(
-    hass: HomeAssistant, tankerkoenig: AsyncMock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, tankerkoenig: AsyncMock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the warning about morethan 10 selected stations."""
     mock_config = MockConfigEntry(

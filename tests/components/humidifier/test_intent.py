@@ -2,9 +2,9 @@
 
 import pytest
 
-from homeassistant.components import conversation
-from homeassistant.components.homeassistant.exposed_entities import async_expose_entity
-from homeassistant.components.humidifier import (
+from smarthub.components import conversation
+from smarthub.components.smarthub.exposed_entities import async_expose_entity
+from smarthub.components.humidifier import (
     ATTR_AVAILABLE_MODES,
     ATTR_HUMIDITY,
     DOMAIN,
@@ -12,7 +12,7 @@ from homeassistant.components.humidifier import (
     SERVICE_SET_MODE,
     intent,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_MODE,
     ATTR_SUPPORTED_FEATURES,
@@ -20,8 +20,8 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.intent import (
+from smarthub.core import SmartHub
+from smarthub.helpers.intent import (
     IntentHandleError,
     IntentResponseType,
     InvalidSlotInfo,
@@ -29,14 +29,14 @@ from homeassistant.helpers.intent import (
     MatchFailedReason,
     async_handle,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from tests.common import async_mock_service
 
 
-async def test_intent_set_humidity(hass: HomeAssistant) -> None:
+async def test_intent_set_humidity(hass: SmartHub) -> None:
     """Test the set humidity intent."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set(
         "humidifier.bedroom_humidifier", STATE_ON, {ATTR_HUMIDITY: 40}
     )
@@ -64,9 +64,9 @@ async def test_intent_set_humidity(hass: HomeAssistant) -> None:
     assert call.data.get(ATTR_HUMIDITY) == 50
 
 
-async def test_intent_set_humidity_and_turn_on(hass: HomeAssistant) -> None:
+async def test_intent_set_humidity_and_turn_on(hass: SmartHub) -> None:
     """Test the set humidity intent for turned off humidifier."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set(
         "humidifier.bedroom_humidifier", STATE_OFF, {ATTR_HUMIDITY: 40}
     )
@@ -101,9 +101,9 @@ async def test_intent_set_humidity_and_turn_on(hass: HomeAssistant) -> None:
     assert call.data.get(ATTR_HUMIDITY) == 50
 
 
-async def test_intent_set_mode(hass: HomeAssistant) -> None:
+async def test_intent_set_mode(hass: SmartHub) -> None:
     """Test the set mode intent."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set(
         "humidifier.bedroom_humidifier",
         STATE_ON,
@@ -141,9 +141,9 @@ async def test_intent_set_mode(hass: HomeAssistant) -> None:
     assert call.data.get(ATTR_MODE) == "away"
 
 
-async def test_intent_set_mode_and_turn_on(hass: HomeAssistant) -> None:
+async def test_intent_set_mode_and_turn_on(hass: SmartHub) -> None:
     """Test the set mode intent."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set(
         "humidifier.bedroom_humidifier",
         STATE_OFF,
@@ -185,9 +185,9 @@ async def test_intent_set_mode_and_turn_on(hass: HomeAssistant) -> None:
     assert call.data.get(ATTR_MODE) == "away"
 
 
-async def test_intent_set_mode_tests_feature(hass: HomeAssistant) -> None:
+async def test_intent_set_mode_tests_feature(hass: SmartHub) -> None:
     """Test the set mode intent where modes are not supported."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set(
         "humidifier.bedroom_humidifier", STATE_ON, {ATTR_HUMIDITY: 40}
     )
@@ -208,10 +208,10 @@ async def test_intent_set_mode_tests_feature(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("available_modes", [["home", "away"], None])
 async def test_intent_set_unknown_mode(
-    hass: HomeAssistant, available_modes: list[str] | None
+    hass: SmartHub, available_modes: list[str] | None
 ) -> None:
     """Test the set mode intent for unsupported mode."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set(
         "humidifier.bedroom_humidifier",
         STATE_ON,
@@ -237,9 +237,9 @@ async def test_intent_set_unknown_mode(
     assert len(mode_calls) == 0
 
 
-async def test_intent_errors(hass: HomeAssistant) -> None:
+async def test_intent_errors(hass: SmartHub) -> None:
     """Test the error conditions for set humidity and set mode intents."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     entity_id = "humidifier.bedroom_humidifier"
     hass.states.async_set(
         entity_id,

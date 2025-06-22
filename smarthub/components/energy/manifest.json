@@ -1,0 +1,10 @@
+{
+  "domain": "energy",
+  "name": "Energy",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["websocket_api", "history", "recorder"],
+  "documentation": "https://www.smart-hub.io/integrations/energy",
+  "integration_type": "system",
+  "iot_class": "calculated",
+  "quality_scale": "internal"
+}

@@ -13,8 +13,8 @@ from crownstone_cloud.exceptions import (
 import pytest
 from serial.tools.list_ports_common import ListPortInfo
 
-from homeassistant.components import usb
-from homeassistant.components.crownstone.const import (
+from smarthub.components import usb
+from smarthub.components.crownstone.const import (
     CONF_USB_MANUAL_PATH,
     CONF_USB_PATH,
     CONF_USB_SPHERE,
@@ -24,9 +24,9 @@ from homeassistant.components.crownstone.const import (
     DONT_USE_USB,
     MANUAL_PATH,
 )
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -37,7 +37,7 @@ type MockFixture = Generator[MagicMock | AsyncMock]
 def crownstone_setup() -> MockFixture:
     """Mock Crownstone entry setup."""
     with patch(
-        "homeassistant.components.crownstone.async_setup_entry", return_value=True
+        "smarthub.components.crownstone.async_setup_entry", return_value=True
     ) as setup_mock:
         yield setup_mock
 
@@ -66,7 +66,7 @@ def usb_comports_none_types() -> MockFixture:
 def usb_path() -> MockFixture:
     """Mock usb serial path."""
     with patch(
-        "homeassistant.components.usb.get_serial_by_id",
+        "smarthub.components.usb.get_serial_by_id",
         return_value="/dev/serial/by-id/crownstone-usb",
     ) as usb_path_mock:
         yield usb_path_mock
@@ -146,15 +146,15 @@ def create_mocked_entry_options_conf(usb_path: str | None, usb_sphere: str | Non
     return mock_options
 
 
-async def start_config_flow(hass: HomeAssistant, mocked_cloud: MagicMock):
+async def start_config_flow(hass: SmartHub, mocked_cloud: MagicMock):
     """Patch Crownstone Cloud and start the flow."""
     mocked_login_input = {
-        CONF_EMAIL: "example@homeassistant.com",
-        CONF_PASSWORD: "homeassistantisawesome",
+        CONF_EMAIL: "example@smarthub.com",
+        CONF_PASSWORD: "smarthubisawesome",
     }
 
     with patch(
-        "homeassistant.components.crownstone.config_flow.CrownstoneCloud",
+        "smarthub.components.crownstone.config_flow.CrownstoneCloud",
         return_value=mocked_cloud,
     ):
         return await hass.config_entries.flow.async_init(
@@ -163,12 +163,12 @@ async def start_config_flow(hass: HomeAssistant, mocked_cloud: MagicMock):
 
 
 async def start_options_flow(
-    hass: HomeAssistant, entry: MockConfigEntry, mocked_manager: MagicMock
+    hass: SmartHub, entry: MockConfigEntry, mocked_manager: MagicMock
 ):
     """Patch CrownstoneEntryManager and start the flow."""
     # set up integration
     with patch(
-        "homeassistant.components.crownstone.CrownstoneEntryManager",
+        "smarthub.components.crownstone.CrownstoneEntryManager",
         return_value=mocked_manager,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -178,7 +178,7 @@ async def start_options_flow(
 
 
 async def test_no_user_input(
-    crownstone_setup: MockFixture, hass: HomeAssistant
+    crownstone_setup: MockFixture, hass: SmartHub
 ) -> None:
     """Test the flow done in the correct way."""
     # test if a form is returned if no input is provided
@@ -192,13 +192,13 @@ async def test_no_user_input(
 
 
 async def test_abort_if_configured(
-    crownstone_setup: MockFixture, hass: HomeAssistant
+    crownstone_setup: MockFixture, hass: SmartHub
 ) -> None:
     """Test flow with correct login input and abort if sphere already configured."""
     # create mock entry conf
     configured_entry_data = create_mocked_entry_data_conf(
-        email="example@homeassistant.com",
-        password="homeassistantisawesome",
+        email="example@smarthub.com",
+        password="smarthubisawesome",
     )
     configured_entry_options = create_mocked_entry_options_conf(
         usb_path="/dev/serial/by-id/crownstone-usb",
@@ -222,7 +222,7 @@ async def test_abort_if_configured(
 
 
 async def test_authentication_errors(
-    crownstone_setup: MockFixture, hass: HomeAssistant
+    crownstone_setup: MockFixture, hass: SmartHub
 ) -> None:
     """Test flow with wrong auth errors."""
     cloud = get_mocked_crownstone_cloud()
@@ -249,7 +249,7 @@ async def test_authentication_errors(
 
 
 async def test_unknown_error(
-    crownstone_setup: MockFixture, hass: HomeAssistant
+    crownstone_setup: MockFixture, hass: SmartHub
 ) -> None:
     """Test flow with unknown error."""
     cloud = get_mocked_crownstone_cloud()
@@ -264,12 +264,12 @@ async def test_unknown_error(
 
 
 async def test_successful_login_no_usb(
-    crownstone_setup: MockFixture, hass: HomeAssistant
+    crownstone_setup: MockFixture, hass: SmartHub
 ) -> None:
     """Test a successful login without configuring a USB."""
     entry_data_without_usb = create_mocked_entry_data_conf(
-        email="example@homeassistant.com",
-        password="homeassistantisawesome",
+        email="example@smarthub.com",
+        password="smarthubisawesome",
     )
     entry_options_without_usb = create_mocked_entry_options_conf(
         usb_path=None,
@@ -295,12 +295,12 @@ async def test_successful_login_with_usb(
     crownstone_setup: MockFixture,
     pyserial_comports_none_types: MockFixture,
     usb_path: MockFixture,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test flow with correct login and usb configuration."""
     entry_data_with_usb = create_mocked_entry_data_conf(
-        email="example@homeassistant.com",
-        password="homeassistantisawesome",
+        email="example@smarthub.com",
+        password="smarthubisawesome",
     )
     entry_options_with_usb = create_mocked_entry_options_conf(
         usb_path="/dev/serial/by-id/crownstone-usb",
@@ -347,12 +347,12 @@ async def test_successful_login_with_usb(
 
 
 async def test_successful_login_with_manual_usb_path(
-    crownstone_setup: MockFixture, pyserial_comports: MockFixture, hass: HomeAssistant
+    crownstone_setup: MockFixture, pyserial_comports: MockFixture, hass: SmartHub
 ) -> None:
     """Test flow with correct login and usb configuration."""
     entry_data_with_manual_usb = create_mocked_entry_data_conf(
-        email="example@homeassistant.com",
-        password="homeassistantisawesome",
+        email="example@smarthub.com",
+        password="smarthubisawesome",
     )
     entry_options_with_manual_usb = create_mocked_entry_options_conf(
         usb_path="/dev/crownstone-usb",
@@ -391,12 +391,12 @@ async def test_successful_login_with_manual_usb_path(
 
 
 async def test_options_flow_setup_usb(
-    pyserial_comports: MockFixture, usb_path: MockFixture, hass: HomeAssistant
+    pyserial_comports: MockFixture, usb_path: MockFixture, hass: SmartHub
 ) -> None:
     """Test options flow init."""
     configured_entry_data = create_mocked_entry_data_conf(
-        email="example@homeassistant.com",
-        password="homeassistantisawesome",
+        email="example@smarthub.com",
+        password="smarthubisawesome",
     )
     configured_entry_options = create_mocked_entry_options_conf(
         usb_path=None,
@@ -469,11 +469,11 @@ async def test_options_flow_setup_usb(
     )
 
 
-async def test_options_flow_remove_usb(hass: HomeAssistant) -> None:
+async def test_options_flow_remove_usb(hass: SmartHub) -> None:
     """Test selecting to set up an USB dongle."""
     configured_entry_data = create_mocked_entry_data_conf(
-        email="example@homeassistant.com",
-        password="homeassistantisawesome",
+        email="example@smarthub.com",
+        password="smarthubisawesome",
     )
     configured_entry_options = create_mocked_entry_options_conf(
         usb_path="/dev/serial/by-id/crownstone-usb",
@@ -521,12 +521,12 @@ async def test_options_flow_remove_usb(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow_manual_usb_path(
-    pyserial_comports: MockFixture, hass: HomeAssistant
+    pyserial_comports: MockFixture, hass: SmartHub
 ) -> None:
     """Test flow with correct login and usb configuration."""
     configured_entry_data = create_mocked_entry_data_conf(
-        email="example@homeassistant.com",
-        password="homeassistantisawesome",
+        email="example@smarthub.com",
+        password="smarthubisawesome",
     )
     configured_entry_options = create_mocked_entry_options_conf(
         usb_path=None,
@@ -581,11 +581,11 @@ async def test_options_flow_manual_usb_path(
     )
 
 
-async def test_options_flow_change_usb_sphere(hass: HomeAssistant) -> None:
+async def test_options_flow_change_usb_sphere(hass: SmartHub) -> None:
     """Test changing the usb sphere in the options."""
     configured_entry_data = create_mocked_entry_data_conf(
-        email="example@homeassistant.com",
-        password="homeassistantisawesome",
+        email="example@smarthub.com",
+        password="smarthubisawesome",
     )
     configured_entry_options = create_mocked_entry_options_conf(
         usb_path="/dev/serial/by-id/crownstone-usb",

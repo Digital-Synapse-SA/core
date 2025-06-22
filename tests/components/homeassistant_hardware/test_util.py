@@ -6,16 +6,16 @@ import pytest
 from universal_silabs_flasher.common import Version as FlasherVersion
 from universal_silabs_flasher.const import ApplicationType as FlasherApplicationType
 
-from homeassistant.components.hassio import (
+from smarthub.components.hassio import (
     AddonError,
     AddonInfo,
     AddonManager,
     AddonState,
 )
-from homeassistant.components.homeassistant_hardware.helpers import (
+from smarthub.components.smarthub_hardware.helpers import (
     async_register_firmware_info_provider,
 )
-from homeassistant.components.homeassistant_hardware.util import (
+from smarthub.components.smarthub_hardware.util import (
     ApplicationType,
     FirmwareInfo,
     OwningAddon,
@@ -25,9 +25,9 @@ from homeassistant.components.homeassistant_hardware.util import (
     probe_silabs_firmware_info,
     probe_silabs_firmware_type,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -60,10 +60,10 @@ ZHA_CONFIG_ENTRY2 = MockConfigEntry(
 )
 
 
-async def test_guess_firmware_info_unknown(hass: HomeAssistant) -> None:
+async def test_guess_firmware_info_unknown(hass: SmartHub) -> None:
     """Test guessing the firmware type."""
 
-    await async_setup_component(hass, "homeassistant_hardware", {})
+    await async_setup_component(hass, "smarthub_hardware", {})
 
     assert (await guess_firmware_info(hass, "/dev/missing")) == FirmwareInfo(
         device="/dev/missing",
@@ -74,10 +74,10 @@ async def test_guess_firmware_info_unknown(hass: HomeAssistant) -> None:
     )
 
 
-async def test_guess_firmware_info_integrations(hass: HomeAssistant) -> None:
+async def test_guess_firmware_info_integrations(hass: SmartHub) -> None:
     """Test guessing the firmware via OTBR and ZHA."""
 
-    await async_setup_component(hass, "homeassistant_hardware", {})
+    await async_setup_component(hass, "smarthub_hardware", {})
 
     # One instance of ZHA and two OTBRs
     zha = MockConfigEntry(domain="zha", unique_id="some_unique_id_1")
@@ -127,7 +127,7 @@ async def test_guess_firmware_info_integrations(hass: HomeAssistant) -> None:
     async_register_firmware_info_provider(hass, "zha", mock_zha_hardware_info)
 
     async def mock_otbr_async_get_firmware_info(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> FirmwareInfo | None:
         return {
             otbr1.entry_id: otbr_firmware_info1,
@@ -158,14 +158,14 @@ async def test_guess_firmware_info_integrations(hass: HomeAssistant) -> None:
     ) == otbr_firmware_info1
 
 
-async def test_owning_addon(hass: HomeAssistant) -> None:
+async def test_owning_addon(hass: SmartHub) -> None:
     """Test `OwningAddon`."""
 
     owning_addon = OwningAddon(slug="some-addon-slug")
 
     # Explicitly running
     with patch(
-        "homeassistant.components.homeassistant_hardware.util.WaitingAddonManager"
+        "smarthub.components.smarthub_hardware.util.WaitingAddonManager"
     ) as mock_manager:
         mock_manager.return_value.async_get_addon_info = AsyncMock(
             return_value=AddonInfo(
@@ -181,7 +181,7 @@ async def test_owning_addon(hass: HomeAssistant) -> None:
 
     # Explicitly not running
     with patch(
-        "homeassistant.components.homeassistant_hardware.util.WaitingAddonManager"
+        "smarthub.components.smarthub_hardware.util.WaitingAddonManager"
     ) as mock_manager:
         mock_manager.return_value.async_get_addon_info = AsyncMock(
             return_value=AddonInfo(
@@ -197,7 +197,7 @@ async def test_owning_addon(hass: HomeAssistant) -> None:
 
     # Failed to get status
     with patch(
-        "homeassistant.components.homeassistant_hardware.util.WaitingAddonManager"
+        "smarthub.components.smarthub_hardware.util.WaitingAddonManager"
     ) as mock_manager:
         mock_manager.return_value.async_get_addon_info = AsyncMock(
             side_effect=AddonError()
@@ -205,7 +205,7 @@ async def test_owning_addon(hass: HomeAssistant) -> None:
         assert (await owning_addon.is_running(hass)) is False
 
 
-async def test_owning_addon_temporarily_stop_info_error(hass: HomeAssistant) -> None:
+async def test_owning_addon_temporarily_stop_info_error(hass: SmartHub) -> None:
     """Test `OwningAddon` temporarily stopping with an info error."""
 
     owning_addon = OwningAddon(slug="some-addon-slug")
@@ -213,7 +213,7 @@ async def test_owning_addon_temporarily_stop_info_error(hass: HomeAssistant) -> 
     mock_manager.async_get_addon_info.side_effect = AddonError()
 
     with patch(
-        "homeassistant.components.homeassistant_hardware.util.WaitingAddonManager",
+        "smarthub.components.smarthub_hardware.util.WaitingAddonManager",
         return_value=mock_manager,
     ):
         async with owning_addon.temporarily_stop(hass):
@@ -226,7 +226,7 @@ async def test_owning_addon_temporarily_stop_info_error(hass: HomeAssistant) -> 
     assert len(mock_manager.async_start_addon_waiting.mock_calls) == 0
 
 
-async def test_owning_addon_temporarily_stop_not_running(hass: HomeAssistant) -> None:
+async def test_owning_addon_temporarily_stop_not_running(hass: SmartHub) -> None:
     """Test `OwningAddon` temporarily stopping when the addon is not running."""
 
     owning_addon = OwningAddon(slug="some-addon-slug")
@@ -242,7 +242,7 @@ async def test_owning_addon_temporarily_stop_not_running(hass: HomeAssistant) ->
     )
 
     with patch(
-        "homeassistant.components.homeassistant_hardware.util.WaitingAddonManager",
+        "smarthub.components.smarthub_hardware.util.WaitingAddonManager",
         return_value=mock_manager,
     ):
         async with owning_addon.temporarily_stop(hass):
@@ -255,7 +255,7 @@ async def test_owning_addon_temporarily_stop_not_running(hass: HomeAssistant) ->
     assert len(mock_manager.async_start_addon_waiting.mock_calls) == 0
 
 
-async def test_owning_addon_temporarily_stop(hass: HomeAssistant) -> None:
+async def test_owning_addon_temporarily_stop(hass: SmartHub) -> None:
     """Test `OwningAddon` temporarily stopping when the addon is running."""
 
     owning_addon = OwningAddon(slug="some-addon-slug")
@@ -277,7 +277,7 @@ async def test_owning_addon_temporarily_stop(hass: HomeAssistant) -> None:
     # The error is propagated but it doesn't affect restarting the addon
     with (
         patch(
-            "homeassistant.components.homeassistant_hardware.util.WaitingAddonManager",
+            "smarthub.components.smarthub_hardware.util.WaitingAddonManager",
             return_value=mock_manager,
         ),
         pytest.raises(RuntimeError),
@@ -292,7 +292,7 @@ async def test_owning_addon_temporarily_stop(hass: HomeAssistant) -> None:
     assert len(mock_manager.async_start_addon_waiting.mock_calls) == 1
 
 
-async def test_owning_integration(hass: HomeAssistant) -> None:
+async def test_owning_integration(hass: SmartHub) -> None:
     """Test `OwningIntegration`."""
     config_entry = MockConfigEntry(domain="mock_domain", unique_id="some_unique_id")
     config_entry.add_to_hass(hass)
@@ -313,7 +313,7 @@ async def test_owning_integration(hass: HomeAssistant) -> None:
 
 
 async def test_owning_integration_temporarily_stop_missing_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test temporarily stopping the integration when the config entry doesn't exist."""
     missing_integration = OwningIntegration(config_entry_id="missing_entry_id")
@@ -331,7 +331,7 @@ async def test_owning_integration_temporarily_stop_missing_entry(
 
 
 async def test_owning_integration_temporarily_stop_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test temporarily stopping the integration when the config entry is not loaded."""
     entry = MockConfigEntry(domain="test_domain")
@@ -352,7 +352,7 @@ async def test_owning_integration_temporarily_stop_not_loaded(
     assert len(mock_setup.mock_calls) == 0
 
 
-async def test_owning_integration_temporarily_stop_loaded(hass: HomeAssistant) -> None:
+async def test_owning_integration_temporarily_stop_loaded(hass: SmartHub) -> None:
     """Test temporarily stopping the integration when the config entry is loaded."""
     entry = MockConfigEntry(domain="test_domain")
     entry.add_to_hass(hass)
@@ -373,7 +373,7 @@ async def test_owning_integration_temporarily_stop_loaded(hass: HomeAssistant) -
     mock_setup.assert_called_once_with(entry.entry_id)
 
 
-async def test_firmware_info(hass: HomeAssistant) -> None:
+async def test_firmware_info(hass: SmartHub) -> None:
     """Test `FirmwareInfo`."""
 
     owner1 = AsyncMock()
@@ -409,7 +409,7 @@ async def test_firmware_info(hass: HomeAssistant) -> None:
     assert (await firmware_info2.is_running(hass)) is False
 
 
-async def test_get_otbr_addon_firmware_info_failure(hass: HomeAssistant) -> None:
+async def test_get_otbr_addon_firmware_info_failure(hass: SmartHub) -> None:
     """Test getting OTBR addon firmware info failure due to bad API call."""
 
     otbr_addon_manager = AsyncMock(spec_set=AddonManager)
@@ -419,7 +419,7 @@ async def test_get_otbr_addon_firmware_info_failure(hass: HomeAssistant) -> None
 
 
 async def test_get_otbr_addon_firmware_info_failure_bad_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test getting OTBR addon firmware info failure due to bad addon options."""
 
@@ -492,7 +492,7 @@ async def test_probe_silabs_firmware_info(
     mock_flasher.probe_app_type = AsyncMock(side_effect=probe_app_type)
 
     with patch(
-        "homeassistant.components.homeassistant_hardware.util.Flasher",
+        "smarthub.components.smarthub_hardware.util.Flasher",
         return_value=mock_flasher,
     ):
         result = await probe_silabs_firmware_info("/dev/ttyUSB0")
@@ -520,7 +520,7 @@ async def test_probe_silabs_firmware_type(
 ) -> None:
     """Test getting the firmware type from the probe result."""
     with patch(
-        "homeassistant.components.homeassistant_hardware.util.probe_silabs_firmware_info",
+        "smarthub.components.smarthub_hardware.util.probe_silabs_firmware_info",
         autospec=True,
         return_value=probe_result,
     ):

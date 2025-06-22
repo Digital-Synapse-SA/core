@@ -4,23 +4,23 @@ from unittest.mock import patch
 
 from switchbot_api import Device
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.switchbot_cloud import SwitchBotAPI
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.switchbot_cloud import SwitchBotAPI
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import configure_integration
 
 
 async def test_relay_switch(
-    hass: HomeAssistant, mock_list_devices, mock_get_status
+    hass: SmartHub, mock_list_devices, mock_get_status
 ) -> None:
     """Test turn on and turn off."""
     mock_list_devices.return_value = [
@@ -55,7 +55,7 @@ async def test_relay_switch(
 
 
 async def test_switchmode_bot(
-    hass: HomeAssistant, mock_list_devices, mock_get_status
+    hass: SmartHub, mock_list_devices, mock_get_status
 ) -> None:
     """Test turn on and turn off."""
     mock_list_devices.return_value = [
@@ -90,7 +90,7 @@ async def test_switchmode_bot(
 
 
 async def test_pressmode_bot_no_switch_entity(
-    hass: HomeAssistant, mock_list_devices, mock_get_status
+    hass: SmartHub, mock_list_devices, mock_get_status
 ) -> None:
     """Test a pressMode bot isn't added as a switch."""
     mock_list_devices.return_value = [

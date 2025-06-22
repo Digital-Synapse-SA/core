@@ -5,10 +5,10 @@ from datetime import timedelta
 from freezegun.api import FrozenDateTimeFactory
 import requests_mock
 
-from homeassistant.components.vesync.const import DOMAIN, UPDATE_INTERVAL
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.vesync.const import DOMAIN, UPDATE_INTERVAL
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from .common import (
     mock_air_purifier_400s_update_response,
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_entity_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     requests_mock: requests_mock.Mocker,
 ) -> None:

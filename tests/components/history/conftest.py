@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant.components import history
-from homeassistant.components.recorder import Recorder
-from homeassistant.const import CONF_DOMAINS, CONF_ENTITIES, CONF_EXCLUDE, CONF_INCLUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import history
+from smarthub.components.recorder import Recorder
+from smarthub.const import CONF_DOMAINS, CONF_ENTITIES, CONF_EXCLUDE, CONF_INCLUDE
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import RecorderInstanceContextManager
 
@@ -19,8 +19,8 @@ async def mock_recorder_before_hass(
 
 
 @pytest.fixture
-async def hass_history(hass: HomeAssistant, recorder_mock: Recorder) -> None:
-    """Home Assistant fixture with history."""
+async def hass_history(hass: SmartHub, recorder_mock: Recorder) -> None:
+    """SmartHub fixture with history."""
     config = history.CONFIG_SCHEMA(
         {
             history.DOMAIN: {

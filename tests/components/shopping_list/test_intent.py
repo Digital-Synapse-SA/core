@@ -1,10 +1,10 @@
 """Test Shopping List intents."""
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import intent
+from smarthub.core import SmartHub
+from smarthub.helpers import intent
 
 
-async def test_complete_item_intent(hass: HomeAssistant, sl_setup) -> None:
+async def test_complete_item_intent(hass: SmartHub, sl_setup) -> None:
     """Test complete item."""
     await intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "soda"}}
@@ -41,7 +41,7 @@ async def test_complete_item_intent(hass: HomeAssistant, sl_setup) -> None:
     assert hass.data["shopping_list"].items[2]["complete"]
 
 
-async def test_complete_item_intent_not_found(hass: HomeAssistant, sl_setup) -> None:
+async def test_complete_item_intent_not_found(hass: SmartHub, sl_setup) -> None:
     """Test completing a missing item."""
     response = await intent.async_handle(
         hass, "test", "HassShoppingListCompleteItem", {"item": {"value": "beer"}}
@@ -50,7 +50,7 @@ async def test_complete_item_intent_not_found(hass: HomeAssistant, sl_setup) -> 
     assert response.speech_slots.get("completed_items") == []
 
 
-async def test_recent_items_intent(hass: HomeAssistant, sl_setup) -> None:
+async def test_recent_items_intent(hass: SmartHub, sl_setup) -> None:
     """Test recent items."""
     await intent.async_handle(
         hass, "test", "HassShoppingListAddItem", {"item": {"value": "beer"}}
@@ -70,7 +70,7 @@ async def test_recent_items_intent(hass: HomeAssistant, sl_setup) -> None:
     )
 
 
-async def test_recent_items_intent_no_items(hass: HomeAssistant, sl_setup) -> None:
+async def test_recent_items_intent_no_items(hass: SmartHub, sl_setup) -> None:
     """Test recent items."""
     response = await intent.async_handle(hass, "test", "HassShoppingListLastItems")
 

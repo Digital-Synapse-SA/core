@@ -5,9 +5,9 @@ import datetime
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.bmw_connected_drive.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.bmw_connected_drive.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_mocked_integration
 
@@ -22,7 +22,7 @@ from tests.typing import ClientSessionGenerator
 @pytest.mark.usefixtures("bmw_fixture")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -41,7 +41,7 @@ async def test_config_entry_diagnostics(
 @pytest.mark.usefixtures("bmw_fixture")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_device_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,
@@ -66,7 +66,7 @@ async def test_device_diagnostics(
 @pytest.mark.usefixtures("bmw_fixture")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_device_diagnostics_vehicle_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,

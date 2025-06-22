@@ -6,17 +6,17 @@ from unittest.mock import Mock, patch
 import pytest
 import requests_mock
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
     DOMAIN as MP_DOMAIN,
     SERVICE_PLAY_MEDIA,
     MediaType,
 )
-from homeassistant.components.plex.const import CONF_SERVER_IDENTIFIER, PLEX_URI_SCHEME
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.plex.const import CONF_SERVER_IDENTIFIER, PLEX_URI_SCHEME
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .const import DEFAULT_DATA, PLEX_DIRECT_URL
 
@@ -46,7 +46,7 @@ class MockPlexLibrarySection:
 
 
 async def test_media_player_playback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_plex_server,
     requests_mock: requests_mock.Mocker,
     playqueue_created,
@@ -71,7 +71,7 @@ async def test_media_player_playback(
             return_value=None,
             __qualname__="search",
         ),
-        pytest.raises(HomeAssistantError) as excinfo,
+        pytest.raises(SmartHubError) as excinfo,
     ):
         await hass.services.async_call(
             MP_DOMAIN,
@@ -198,7 +198,7 @@ async def test_media_player_playback(
     playmedia_mock.reset()
     movies = [movie2, movie3]
     with (
-        pytest.raises(HomeAssistantError) as excinfo,
+        pytest.raises(SmartHubError) as excinfo,
         patch(
             "plexapi.library.LibrarySection.search",
             return_value=movies,
@@ -227,7 +227,7 @@ async def test_media_player_playback(
             __qualname__="search",
         ),
         patch(
-            "homeassistant.components.plex.server.PlexServer.create_playqueue"
+            "smarthub.components.plex.server.PlexServer.create_playqueue"
         ) as mock_create_playqueue,
     ):
         await hass.services.async_call(

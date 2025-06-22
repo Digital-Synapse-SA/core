@@ -10,14 +10,14 @@ from pysnooz.commands import SnoozCommandResult, SnoozCommandResultStatus
 from pysnooz.testing import MockSnoozDevice
 import pytest
 
-from homeassistant.components import fan
-from homeassistant.components.snooz.const import (
+from smarthub.components import fan
+from smarthub.components.snooz.const import (
     ATTR_DURATION,
     DOMAIN,
     SERVICE_TRANSITION_OFF,
     SERVICE_TRANSITION_ON,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ASSUMED_STATE,
     ATTR_ENTITY_ID,
     STATE_OFF,
@@ -26,16 +26,16 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import SnoozFixture, create_mock_snooz, create_mock_snooz_config_entry
 
 from tests.components.bluetooth import generate_ble_device
 
 
-async def test_turn_on(hass: HomeAssistant, snooz_fan_entity_id: str) -> None:
+async def test_turn_on(hass: SmartHub, snooz_fan_entity_id: str) -> None:
     """Test turning on the device."""
     await hass.services.async_call(
         fan.DOMAIN,
@@ -49,7 +49,7 @@ async def test_turn_on(hass: HomeAssistant, snooz_fan_entity_id: str) -> None:
     assert ATTR_ASSUMED_STATE not in state.attributes
 
 
-async def test_transition_on(hass: HomeAssistant, snooz_fan_entity_id: str) -> None:
+async def test_transition_on(hass: SmartHub, snooz_fan_entity_id: str) -> None:
     """Test transitioning on the device."""
     await hass.services.async_call(
         DOMAIN,
@@ -65,7 +65,7 @@ async def test_transition_on(hass: HomeAssistant, snooz_fan_entity_id: str) -> N
 
 @pytest.mark.parametrize("percentage", [1, 22, 50, 99, 100])
 async def test_turn_on_with_percentage(
-    hass: HomeAssistant, snooz_fan_entity_id: str, percentage: int
+    hass: SmartHub, snooz_fan_entity_id: str, percentage: int
 ) -> None:
     """Test turning on the device with a percentage."""
     await hass.services.async_call(
@@ -83,7 +83,7 @@ async def test_turn_on_with_percentage(
 
 @pytest.mark.parametrize("percentage", [1, 22, 50, 99, 100])
 async def test_set_percentage(
-    hass: HomeAssistant, snooz_fan_entity_id: str, percentage: int
+    hass: SmartHub, snooz_fan_entity_id: str, percentage: int
 ) -> None:
     """Test setting the fan percentage."""
     await hass.services.async_call(
@@ -99,7 +99,7 @@ async def test_set_percentage(
 
 
 async def test_set_0_percentage_turns_off(
-    hass: HomeAssistant, snooz_fan_entity_id: str
+    hass: SmartHub, snooz_fan_entity_id: str
 ) -> None:
     """Test turning off the device by setting the percentage/volume to 0."""
     await hass.services.async_call(
@@ -123,7 +123,7 @@ async def test_set_0_percentage_turns_off(
     assert ATTR_ASSUMED_STATE not in state.attributes
 
 
-async def test_turn_off(hass: HomeAssistant, snooz_fan_entity_id: str) -> None:
+async def test_turn_off(hass: SmartHub, snooz_fan_entity_id: str) -> None:
     """Test turning off the device."""
     await hass.services.async_call(
         fan.DOMAIN,
@@ -137,7 +137,7 @@ async def test_turn_off(hass: HomeAssistant, snooz_fan_entity_id: str) -> None:
     assert ATTR_ASSUMED_STATE not in state.attributes
 
 
-async def test_transition_off(hass: HomeAssistant, snooz_fan_entity_id: str) -> None:
+async def test_transition_off(hass: SmartHub, snooz_fan_entity_id: str) -> None:
     """Test transitioning off the device."""
     await hass.services.async_call(
         DOMAIN,
@@ -152,7 +152,7 @@ async def test_transition_off(hass: HomeAssistant, snooz_fan_entity_id: str) -> 
 
 
 async def test_push_events(
-    hass: HomeAssistant, mock_connected_snooz: SnoozFixture, snooz_fan_entity_id: str
+    hass: SmartHub, mock_connected_snooz: SnoozFixture, snooz_fan_entity_id: str
 ) -> None:
     """Test state update events from snooz device."""
     mock_connected_snooz.device.trigger_state(SnoozDeviceState(False, 64))
@@ -179,7 +179,7 @@ async def test_push_events(
 
 
 async def test_restore_state(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests restoring entity state."""
     device = await create_mock_snooz(connected=False, initial_state=UnknownSnoozState)
@@ -203,9 +203,9 @@ async def test_restore_state(
 
     # reload entry
     with (
-        patch("homeassistant.components.snooz.SnoozDevice", return_value=device),
+        patch("smarthub.components.snooz.SnoozDevice", return_value=device),
         patch(
-            "homeassistant.components.snooz.async_ble_device_from_address",
+            "smarthub.components.snooz.async_ble_device_from_address",
             return_value=generate_ble_device(device.address, device.name),
         ),
     ):
@@ -219,7 +219,7 @@ async def test_restore_state(
 
 
 async def test_restore_unknown_state(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests restoring entity state that was unknown."""
     device = await create_mock_snooz(connected=False, initial_state=UnknownSnoozState)
@@ -235,9 +235,9 @@ async def test_restore_unknown_state(
 
     # reload entry
     with (
-        patch("homeassistant.components.snooz.SnoozDevice", return_value=device),
+        patch("smarthub.components.snooz.SnoozDevice", return_value=device),
         patch(
-            "homeassistant.components.snooz.async_ble_device_from_address",
+            "smarthub.components.snooz.async_ble_device_from_address",
             return_value=generate_ble_device(device.address, device.name),
         ),
     ):
@@ -249,7 +249,7 @@ async def test_restore_unknown_state(
 
 
 async def test_command_results(
-    hass: HomeAssistant, mock_connected_snooz: SnoozFixture, snooz_fan_entity_id: str
+    hass: SmartHub, mock_connected_snooz: SnoozFixture, snooz_fan_entity_id: str
 ) -> None:
     """Test device command results."""
     mock_execute = Mock(spec=mock_connected_snooz.device.async_execute_command)
@@ -293,7 +293,7 @@ async def test_command_results(
         SnoozCommandResultStatus.UNEXPECTED_ERROR, timedelta()
     )
 
-    with pytest.raises(HomeAssistantError) as failure:
+    with pytest.raises(SmartHubError) as failure:
         await hass.services.async_call(
             fan.DOMAIN,
             fan.SERVICE_TURN_ON,
@@ -306,7 +306,7 @@ async def test_command_results(
 
 @pytest.fixture(name="snooz_fan_entity_id")
 async def fixture_snooz_fan_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connected_snooz: SnoozFixture,
     entity_registry: er.EntityRegistry,
 ) -> str:
@@ -316,7 +316,7 @@ async def fixture_snooz_fan_entity_id(
 
 
 def get_fan_entity_id(
-    hass: HomeAssistant, device: MockSnoozDevice, entity_registry: er.EntityRegistry
+    hass: SmartHub, device: MockSnoozDevice, entity_registry: er.EntityRegistry
 ) -> str:
     """Get the entity ID for a mock device."""
 

@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.event import async_track_entity_registry_updated_event
-from homeassistant.helpers.helper_integration import async_handle_source_entity_changes
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import Event, SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.event import async_track_entity_registry_updated_event
+from smarthub.helpers.helper_integration import async_handle_source_entity_changes
 
 from tests.common import (
     MockConfigEntry,
@@ -24,7 +24,7 @@ SOURCE_DOMAIN = "test"
 
 
 @pytest.fixture
-def source_config_entry(hass: HomeAssistant) -> er.RegistryEntry:
+def source_config_entry(hass: SmartHub) -> er.RegistryEntry:
     """Fixture to create a source config entry."""
     source_config_entry = MockConfigEntry()
     source_config_entry.add_to_hass(hass)
@@ -62,7 +62,7 @@ def source_entity_entry(
 
 @pytest.fixture
 def helper_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     source_entity_entry: er.RegistryEntry,
     use_entity_registry_id: bool,
 ) -> MockConfigEntry:
@@ -145,7 +145,7 @@ def source_entity_removed() -> AsyncMock:
 
 @pytest.fixture
 def mock_helper_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     helper_config_entry: MockConfigEntry,
     source_entity_entry: er.RegistryEntry,
@@ -156,7 +156,7 @@ def mock_helper_integration(
 ) -> None:
     """Mock the helper integration."""
 
-    async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    async def async_setup_entry(hass: SmartHub, entry: ConfigEntry) -> bool:
         """Mock setup entry."""
         async_handle_source_entity_changes(
             hass,
@@ -180,7 +180,7 @@ def mock_helper_integration(
     mock_platform(hass, f"{HELPER_DOMAIN}.config_flow", None)
 
 
-def track_entity_registry_actions(hass: HomeAssistant, entity_id: str) -> list[str]:
+def track_entity_registry_actions(hass: SmartHub, entity_id: str) -> list[str]:
     """Track entity registry actions for an entity."""
     events = []
 
@@ -196,7 +196,7 @@ def track_entity_registry_actions(hass: HomeAssistant, entity_id: str) -> list[s
 @pytest.mark.parametrize("use_entity_registry_id", [True, False])
 @pytest.mark.usefixtures("mock_helper_flow", "mock_helper_integration")
 async def test_async_handle_source_entity_changes_source_entity_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     helper_config_entry: MockConfigEntry,
@@ -260,7 +260,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed(
 @pytest.mark.parametrize("use_entity_registry_id", [True, False])
 @pytest.mark.usefixtures("mock_helper_flow", "mock_helper_integration")
 async def test_async_handle_source_entity_changes_source_entity_removed_from_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     helper_config_entry: MockConfigEntry,
@@ -310,7 +310,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed_from_dev
 @pytest.mark.parametrize("use_entity_registry_id", [True, False])
 @pytest.mark.usefixtures("mock_helper_flow", "mock_helper_integration")
 async def test_async_handle_source_entity_changes_source_entity_moved_other_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     helper_config_entry: MockConfigEntry,
@@ -376,7 +376,7 @@ async def test_async_handle_source_entity_changes_source_entity_moved_other_devi
 )
 @pytest.mark.usefixtures("mock_helper_flow", "mock_helper_integration")
 async def test_async_handle_source_entity_new_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     helper_config_entry: MockConfigEntry,

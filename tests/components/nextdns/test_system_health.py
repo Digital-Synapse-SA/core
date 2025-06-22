@@ -5,16 +5,16 @@ import asyncio
 from aiohttp import ClientError
 from nextdns.const import API_ENDPOINT
 
-from homeassistant.components.nextdns.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.nextdns.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import get_system_health_info
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_nextdns_system_health(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test NextDNS system health."""
     aioclient_mock.get(API_ENDPOINT, text="")
@@ -32,7 +32,7 @@ async def test_nextdns_system_health(
 
 
 async def test_nextdns_system_health_fail(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test NextDNS system health."""
     aioclient_mock.get(API_ENDPOINT, exc=ClientError)

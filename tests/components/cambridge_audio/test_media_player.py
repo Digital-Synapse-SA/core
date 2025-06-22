@@ -10,7 +10,7 @@ from aiostreammagic import (
 )
 import pytest
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_MEDIA_ARTIST,
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
@@ -23,7 +23,7 @@ from homeassistant.components.media_player import (
     MediaPlayerEntityFeature,
     RepeatMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     SERVICE_MEDIA_NEXT_TRACK,
@@ -47,8 +47,8 @@ from homeassistant.const import (
     STATE_PLAYING,
     STATE_STANDBY,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from . import mock_state_update, setup_integration
 from .const import ENTITY_ID
@@ -57,7 +57,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_entity_supported_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -131,7 +131,7 @@ async def test_entity_supported_features(
 
 
 async def test_entity_supported_features_with_control_bus(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -168,7 +168,7 @@ async def test_entity_supported_features_with_control_bus(
     ],
 )
 async def test_entity_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     power_state: bool,
@@ -187,7 +187,7 @@ async def test_entity_state(
 
 
 async def test_media_play_pause_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -223,7 +223,7 @@ async def test_media_play_pause_stop(
 
 
 async def test_media_next_previous_track(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -242,7 +242,7 @@ async def test_media_next_previous_track(
 
 
 async def test_shuffle_repeat_set(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -290,7 +290,7 @@ async def test_shuffle_repeat_set(
 
 
 async def test_shuffle_repeat_get(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -320,7 +320,7 @@ async def test_shuffle_repeat_get(
 
 
 async def test_power_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -339,7 +339,7 @@ async def test_power_service(
 
 
 async def test_media_seek(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -360,7 +360,7 @@ async def test_media_seek(
 
 
 async def test_media_volume(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -397,7 +397,7 @@ async def test_media_volume(
 
 
 async def test_play_media_preset_item_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -445,7 +445,7 @@ async def test_play_media_preset_item_id(
 
 
 async def test_play_media_airable_radio_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -469,7 +469,7 @@ async def test_play_media_airable_radio_id(
 
 
 async def test_play_media_internet_radio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -493,7 +493,7 @@ async def test_play_media_internet_radio(
 
 
 async def test_play_media_unknown_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stream_magic_client: AsyncMock,
 ) -> None:
@@ -501,7 +501,7 @@ async def test_play_media_unknown_type(
     await setup_integration(hass, mock_config_entry)
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Unsupported media type for Cambridge Audio device: unsupported_content_type",
     ):
         await hass.services.async_call(
@@ -528,7 +528,7 @@ async def test_play_media_unknown_type(
     ],
 )
 async def test_media_artist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     source_id: str,

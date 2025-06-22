@@ -8,26 +8,26 @@ from zwave_js_server.client import Client
 from zwave_js_server.const import CommandClass
 from zwave_js_server.model.node import Node
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.zwave_js import DOMAIN, device_action
-from homeassistant.components.zwave_js.helpers import get_device_id
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.zwave_js import DOMAIN, device_action
+from smarthub.components.zwave_js.helpers import get_device_id
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     config_validation as cv,
     device_registry as dr,
     entity_registry as er,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from tests.common import async_get_device_automations
 
 
 async def test_get_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     lock_schlage_be469: Node,
     integration: ConfigEntry,
@@ -116,7 +116,7 @@ async def test_get_actions(
 
 
 async def test_get_actions_meter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     aeon_smart_switch_6: Node,
     integration: ConfigEntry,
@@ -136,7 +136,7 @@ async def test_get_actions_meter(
 
 
 async def test_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     climate_radio_thermostat_ct100_plus: Node,
     integration: ConfigEntry,
@@ -265,7 +265,7 @@ async def test_actions(
         assert args[1] == 1
 
     with patch(
-        "homeassistant.components.zwave_js.services.async_set_config_parameter"
+        "smarthub.components.zwave_js.services.async_set_config_parameter"
     ) as mock_call:
         hass.bus.async_fire("test_event_set_config_parameter")
         await hass.async_block_till_done()
@@ -277,7 +277,7 @@ async def test_actions(
         assert args[2] == 1
 
     with patch(
-        "homeassistant.components.zwave_js.services.async_set_config_parameter"
+        "smarthub.components.zwave_js.services.async_set_config_parameter"
     ) as mock_call:
         hass.bus.async_fire("test_event_set_config_parameter_no_endpoint")
         await hass.async_block_till_done()
@@ -290,7 +290,7 @@ async def test_actions(
 
 
 async def test_actions_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     climate_radio_thermostat_ct100_plus: Node,
     integration: ConfigEntry,
@@ -348,7 +348,7 @@ async def test_actions_legacy(
 
 
 async def test_actions_multiple_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     climate_radio_thermostat_ct100_plus: Node,
     integration: ConfigEntry,
@@ -398,7 +398,7 @@ async def test_actions_multiple_calls(
 
 
 async def test_lock_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     lock_schlage_be469: Node,
     integration: ConfigEntry,
@@ -451,7 +451,7 @@ async def test_lock_actions(
         },
     )
 
-    with patch("homeassistant.components.zwave_js.lock.clear_usercode") as mock_call:
+    with patch("smarthub.components.zwave_js.lock.clear_usercode") as mock_call:
         hass.bus.async_fire("test_event_clear_lock_usercode")
         await hass.async_block_till_done()
         mock_call.assert_called_once()
@@ -460,7 +460,7 @@ async def test_lock_actions(
         assert args[0].node_id == node.node_id
         assert args[1] == 1
 
-    with patch("homeassistant.components.zwave_js.lock.set_usercode") as mock_call:
+    with patch("smarthub.components.zwave_js.lock.set_usercode") as mock_call:
         hass.bus.async_fire("test_event_set_lock_usercode")
         await hass.async_block_till_done()
         mock_call.assert_called_once()
@@ -472,7 +472,7 @@ async def test_lock_actions(
 
 
 async def test_reset_meter_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     aeon_smart_switch_6: Node,
     integration: ConfigEntry,
@@ -523,7 +523,7 @@ async def test_reset_meter_action(
 
 
 async def test_get_action_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     climate_radio_thermostat_ct100_plus: Node,
     integration: ConfigEntry,
@@ -693,7 +693,7 @@ async def test_get_action_capabilities(
 
 
 async def test_get_action_capabilities_lock_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     lock_schlage_be469: Node,
     integration: ConfigEntry,
@@ -744,7 +744,7 @@ async def test_get_action_capabilities_lock_triggers(
 
 
 async def test_get_action_capabilities_meter_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     aeon_smart_switch_6: Node,
     integration: ConfigEntry,
@@ -775,7 +775,7 @@ async def test_get_action_capabilities_meter_triggers(
 
 
 async def test_failure_scenarios(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     hank_binary_switch: Node,
     integration: ConfigEntry,
@@ -784,7 +784,7 @@ async def test_failure_scenarios(
     """Test failure scenarios."""
     device = dr.async_entries_for_config_entry(device_registry, integration.entry_id)[0]
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await device_action.async_call_action_from_config(
             hass, {"type": "failed.test", "device_id": device.id}, {}, None
         )
@@ -798,7 +798,7 @@ async def test_failure_scenarios(
 
 
 async def test_unavailable_entity_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Client,
     lock_schlage_be469: Node,
     integration: ConfigEntry,

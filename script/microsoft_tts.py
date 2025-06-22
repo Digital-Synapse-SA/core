@@ -16,7 +16,7 @@ tree = html.fromstring(req.content)
 supported_languages_raw = tree.xpath(XPATH_QUERY)
 supported_languages = {s.lower() for s in supported_languages_raw}
 
-Path("homeassistant/generated/microsoft_tts.py").write_text(
+Path("smarthub/generated/microsoft_tts.py").write_text(
     format_python_namespace(
         {
             "SUPPORTED_LANGUAGES": supported_languages,

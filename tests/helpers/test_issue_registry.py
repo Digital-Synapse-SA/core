@@ -5,13 +5,13 @@ from typing import Any
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
 
 from tests.common import async_capture_events, flush_store
 
 
-async def test_load_save_issues(hass: HomeAssistant) -> None:
+async def test_load_save_issues(hass: SmartHub) -> None:
     """Make sure that we can load/save data correctly."""
     issues = [
         {
@@ -213,7 +213,7 @@ async def test_load_save_issues(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("load_registries", [False])
 async def test_load_save_issues_read_only(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Make sure that we don't save data when opened in read-only mode."""
     hass_storage[ir.STORAGE_KEY] = {
@@ -284,7 +284,7 @@ async def test_load_save_issues_read_only(
 
 @pytest.mark.parametrize("load_registries", [False])
 async def test_loading_issues_from_storage(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test loading stored issues on start."""
     hass_storage[ir.STORAGE_KEY] = {
@@ -332,7 +332,7 @@ async def test_loading_issues_from_storage(
 
 
 @pytest.mark.parametrize("load_registries", [False])
-async def test_migration_1_1(hass: HomeAssistant, hass_storage: dict[str, Any]) -> None:
+async def test_migration_1_1(hass: SmartHub, hass_storage: dict[str, Any]) -> None:
     """Test migration from version 1.1."""
     hass_storage[ir.STORAGE_KEY] = {
         "version": 1,
@@ -362,7 +362,7 @@ async def test_migration_1_1(hass: HomeAssistant, hass_storage: dict[str, Any]) 
 
 
 async def test_get_or_create_thread_safety(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test call async_get_or_create_from a thread."""
     with pytest.raises(
@@ -383,7 +383,7 @@ async def test_get_or_create_thread_safety(
 
 
 async def test_async_delete_issue_thread_safety(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test call async_delete_issue from a thread."""
     ir.async_create_issue(
@@ -408,7 +408,7 @@ async def test_async_delete_issue_thread_safety(
 
 
 async def test_async_ignore_issue_thread_safety(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test call async_ignore_issue from a thread."""
     ir.async_create_issue(

@@ -13,10 +13,10 @@ from aiounifi.models.message import MessageKey
 import orjson
 import pytest
 
-from homeassistant.components.unifi import STORAGE_KEY, STORAGE_VERSION
-from homeassistant.components.unifi.const import CONF_SITE_ID, DOMAIN
-from homeassistant.components.unifi.hub.websocket import RETRY_TIMER
-from homeassistant.const import (
+from smarthub.components.unifi import STORAGE_KEY, STORAGE_VERSION
+from smarthub.components.unifi.const import CONF_SITE_ID, DOMAIN
+from smarthub.components.unifi.hub.websocket import RETRY_TIMER
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
@@ -24,9 +24,9 @@ from homeassistant.const import (
     CONF_VERIFY_SSL,
     CONTENT_TYPE_JSON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -70,14 +70,14 @@ class WebsocketMessageMock(Protocol):
 def fixture_discovery():
     """No real network traffic allowed."""
     with patch(
-        "homeassistant.components.unifi.config_flow._async_discover_unifi",
+        "smarthub.components.unifi.config_flow._async_discover_unifi",
         return_value=None,
     ) as mock:
         yield mock
 
 
 @pytest.fixture(name="mock_device_registry")
-def fixture_device_registry(hass: HomeAssistant, device_registry: dr.DeviceRegistry):
+def fixture_device_registry(hass: SmartHub, device_registry: dr.DeviceRegistry):
     """Mock device registry."""
     config_entry = MockConfigEntry(domain="something_else")
     config_entry.add_to_hass(hass)
@@ -106,7 +106,7 @@ def fixture_device_registry(hass: HomeAssistant, device_registry: dr.DeviceRegis
 
 @pytest.fixture(name="config_entry")
 def fixture_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_data: MappingProxyType[str, Any],
     config_entry_options: MappingProxyType[str, Any],
 ) -> MockConfigEntry:
@@ -325,7 +325,7 @@ def fixture_default_requests(
 
 @pytest.fixture(name="config_entry_factory")
 async def fixture_config_entry_factory(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_requests: Callable[[str, str], None],
 ) -> ConfigEntryFactoryType:
@@ -358,7 +358,7 @@ class WebsocketStateManager(asyncio.Event):
     """
 
     def __init__(
-        self, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+        self, hass: SmartHub, aioclient_mock: AiohttpClientMocker
     ) -> None:
         """Store hass object and initialize asyncio.Event."""
         self.hass = hass
@@ -404,7 +404,7 @@ def fixture_aiounifi_websocket_method() -> Generator[AsyncMock]:
 
 @pytest.fixture(autouse=True, name="mock_websocket_state")
 def fixture_aiounifi_websocket_state(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, _mock_websocket: AsyncMock
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, _mock_websocket: AsyncMock
 ) -> WebsocketStateManager:
     """Provide a state manager for UniFi websocket."""
     websocket_state_manager = WebsocketStateManager(hass, aioclient_mock)

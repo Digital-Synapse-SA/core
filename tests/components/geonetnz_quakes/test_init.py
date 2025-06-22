@@ -2,10 +2,10 @@
 
 from unittest.mock import patch
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
-async def test_component_unload_config_entry(hass: HomeAssistant, config_entry) -> None:
+async def test_component_unload_config_entry(hass: SmartHub, config_entry) -> None:
     """Test that loading and unloading of a config entry works."""
     config_entry.add_to_hass(hass)
     with patch(

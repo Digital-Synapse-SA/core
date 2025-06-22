@@ -13,14 +13,14 @@ from pypck.lcn_defs import MotorPositioningMode, MotorReverseTime, MotorStateMod
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
     DOMAIN as DOMAIN_COVER,
     CoverState,
 )
-from homeassistant.components.lcn.helpers import get_device_connection
-from homeassistant.const import (
+from smarthub.components.lcn.helpers import get_device_connection
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
@@ -29,8 +29,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MockConfigEntry, MockModuleConnection, init_integration
 
@@ -43,19 +43,19 @@ COVER_RELAYS_MODULE = "cover.testmodule_cover_relays_module"
 
 
 async def test_setup_lcn_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the setup of cover."""
-    with patch("homeassistant.components.lcn.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.lcn.PLATFORMS", [Platform.COVER]):
         await init_integration(hass, entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_outputs_open(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_outputs_open(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the outputs cover opens."""
     await init_integration(hass, entry)
 
@@ -103,7 +103,7 @@ async def test_outputs_open(hass: HomeAssistant, entry: MockConfigEntry) -> None
         assert state.state == CoverState.OPENING
 
 
-async def test_outputs_close(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_outputs_close(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the outputs cover closes."""
     await init_integration(hass, entry)
 
@@ -151,7 +151,7 @@ async def test_outputs_close(hass: HomeAssistant, entry: MockConfigEntry) -> Non
         assert state.state == CoverState.CLOSING
 
 
-async def test_outputs_stop(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_outputs_stop(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the outputs cover stops."""
     await init_integration(hass, entry)
 
@@ -195,7 +195,7 @@ async def test_outputs_stop(hass: HomeAssistant, entry: MockConfigEntry) -> None
         assert state.state not in (CoverState.CLOSING, CoverState.OPENING)
 
 
-async def test_relays_open(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_relays_open(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the relays cover opens."""
     await init_integration(hass, entry)
 
@@ -243,7 +243,7 @@ async def test_relays_open(hass: HomeAssistant, entry: MockConfigEntry) -> None:
         assert state.state == CoverState.OPENING
 
 
-async def test_relays_close(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_relays_close(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the relays cover closes."""
     await init_integration(hass, entry)
 
@@ -291,7 +291,7 @@ async def test_relays_close(hass: HomeAssistant, entry: MockConfigEntry) -> None
         assert state.state == CoverState.CLOSING
 
 
-async def test_relays_stop(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_relays_stop(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the relays cover stops."""
     await init_integration(hass, entry)
 
@@ -347,7 +347,7 @@ async def test_relays_stop(hass: HomeAssistant, entry: MockConfigEntry) -> None:
     ],
 )
 async def test_relays_set_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
     entity_id: str,
     motor: int,
@@ -399,7 +399,7 @@ async def test_relays_set_position(
 
 
 async def test_pushed_outputs_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the outputs cover changes its state on status received."""
     await init_integration(hass, entry)
@@ -439,7 +439,7 @@ async def test_pushed_outputs_status_change(
 
 
 async def test_pushed_relays_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the relays cover changes its state on status received."""
     await init_integration(hass, entry)
@@ -503,7 +503,7 @@ async def test_pushed_relays_status_change(
     assert state.attributes[ATTR_CURRENT_POSITION] == 75
 
 
-async def test_unload_config_entry(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_unload_config_entry(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the cover is removed when the config entry is unloaded."""
     await init_integration(hass, entry)
 

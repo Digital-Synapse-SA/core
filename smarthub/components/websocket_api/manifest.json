@@ -1,0 +1,9 @@
+{
+  "domain": "websocket_api",
+  "name": "SmartHub WebSocket API",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["http"],
+  "documentation": "https://www.smart-hub.io/integrations/websocket_api",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

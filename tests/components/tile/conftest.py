@@ -8,8 +8,8 @@ import pytest
 from pytile.api import API
 from pytile.tile import Tile
 
-from homeassistant.components.tile.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.components.tile.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
 
 from .const import TEST_PASSWORD, TEST_USERNAME
 
@@ -73,9 +73,9 @@ def mock_pytile(tile: AsyncMock) -> Generator[None]:
     client.async_get_tiles = AsyncMock(return_value={"19264d2dffdbca32": tile})
     with (
         patch(
-            "homeassistant.components.tile.config_flow.async_login", return_value=client
+            "smarthub.components.tile.config_flow.async_login", return_value=client
         ),
-        patch("homeassistant.components.tile.async_login", return_value=client),
+        patch("smarthub.components.tile.async_login", return_value=client),
     ):
         yield
 
@@ -84,6 +84,6 @@ def mock_pytile(tile: AsyncMock) -> Generator[None]:
 def mock_setup_entry():
     """Mock async_setup_entry."""
     with patch(
-        "homeassistant.components.tile.async_setup_entry", return_value=True
+        "smarthub.components.tile.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry

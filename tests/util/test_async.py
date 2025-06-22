@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.util import async_ as hasync
+from smarthub.core import SmartHub
+from smarthub.util import async_ as hasync
 
 from tests.common import extract_stack_to_frame
 
@@ -61,7 +61,7 @@ async def test_gather_with_limited_concurrency() -> None:
     assert results == [2, 2, -1, -1]
 
 
-async def test_shutdown_run_callback_threadsafe(hass: HomeAssistant) -> None:
+async def test_shutdown_run_callback_threadsafe(hass: SmartHub) -> None:
     """Test we can shutdown run_callback_threadsafe."""
     hasync.shutdown_run_callback_threadsafe(hass.loop)
     callback = MagicMock()
@@ -70,7 +70,7 @@ async def test_shutdown_run_callback_threadsafe(hass: HomeAssistant) -> None:
         hasync.run_callback_threadsafe(hass.loop, callback)
 
 
-async def test_run_callback_threadsafe(hass: HomeAssistant) -> None:
+async def test_run_callback_threadsafe(hass: SmartHub) -> None:
     """Test run_callback_threadsafe runs code in the event loop."""
     it_ran = False
 
@@ -88,7 +88,7 @@ async def test_run_callback_threadsafe(hass: HomeAssistant) -> None:
     assert it_ran is True
 
 
-async def test_callback_is_always_scheduled(hass: HomeAssistant) -> None:
+async def test_callback_is_always_scheduled(hass: SmartHub) -> None:
     """Test run_callback_threadsafe always calls call_soon_threadsafe before checking for shutdown."""
     # We have to check the shutdown state AFTER the callback is scheduled otherwise
     # the function could continue on and the caller call `future.result()` after
@@ -107,7 +107,7 @@ async def test_callback_is_always_scheduled(hass: HomeAssistant) -> None:
     mock_call_soon_threadsafe.assert_called_once()
 
 
-async def test_create_eager_task_312(hass: HomeAssistant) -> None:
+async def test_create_eager_task_312(hass: SmartHub) -> None:
     """Test create_eager_task schedules a task eagerly in the event loop.
 
     For Python 3.12+, the task is scheduled eagerly in the event loop.
@@ -131,7 +131,7 @@ async def test_create_eager_task_312(hass: HomeAssistant) -> None:
     await task2
 
 
-async def test_create_eager_task_from_thread(hass: HomeAssistant) -> None:
+async def test_create_eager_task_from_thread(hass: SmartHub) -> None:
     """Test we report trying to create an eager task from a thread."""
 
     coro = asyncio.sleep(0)
@@ -152,7 +152,7 @@ async def test_create_eager_task_from_thread(hass: HomeAssistant) -> None:
 
 
 async def test_create_eager_task_from_thread_in_integration(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we report trying to create an eager task from a thread."""
 
@@ -164,12 +164,12 @@ async def test_create_eager_task_from_thread_in_integration(
     frames = extract_stack_to_frame(
         [
             Mock(
-                filename="/home/paulus/homeassistant/core.py",
+                filename="/home/paulus/smarthub/core.py",
                 lineno="23",
                 line="do_something()",
             ),
             Mock(
-                filename="/home/paulus/homeassistant/components/hue/light.py",
+                filename="/home/paulus/smarthub/components/hue/light.py",
                 lineno="23",
                 line="self.light.is_on",
             ),
@@ -183,19 +183,19 @@ async def test_create_eager_task_from_thread_in_integration(
     with (
         pytest.raises(RuntimeError, match="no running event loop"),
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value="self.light.is_on",
         ),
         patch(
-            "homeassistant.util.loop._get_line_from_cache",
+            "smarthub.util.loop._get_line_from_cache",
             return_value="mock_line",
         ),
         patch(
-            "homeassistant.util.loop.get_current_frame",
+            "smarthub.util.loop.get_current_frame",
             return_value=frames,
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=frames,
         ),
     ):
@@ -203,7 +203,7 @@ async def test_create_eager_task_from_thread_in_integration(
 
     assert (
         "Detected that integration 'hue' attempted to create an asyncio task "
-        "from a thread at homeassistant/components/hue/light.py, line 23: "
+        "from a thread at smarthub/components/hue/light.py, line 23: "
         "self.light.is_on"
     ) in caplog.text
 
@@ -211,7 +211,7 @@ async def test_create_eager_task_from_thread_in_integration(
     await coro
 
 
-async def test_get_scheduled_timer_handles(hass: HomeAssistant) -> None:
+async def test_get_scheduled_timer_handles(hass: SmartHub) -> None:
     """Test get_scheduled_timer_handles returns all scheduled timer handles."""
     loop = hass.loop
     timer_handle = loop.call_later(10, lambda: None)

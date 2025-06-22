@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.konnected import config_flow, panel
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.setup import async_setup_component
-from homeassistant.util import utcnow
+from smarthub.components.konnected import config_flow, panel
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.setup import async_setup_component
+from smarthub.util import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -45,7 +45,7 @@ async def mock_panel_fixture():
         yield konn_client
 
 
-async def test_create_and_setup(hass: HomeAssistant, mock_panel) -> None:
+async def test_create_and_setup(hass: SmartHub, mock_panel) -> None:
     """Test that we create a Konnected Panel and save the data."""
     device_config = config_flow.CONFIG_ENTRY_SCHEMA(
         {
@@ -219,7 +219,7 @@ async def test_create_and_setup(hass: HomeAssistant, mock_panel) -> None:
     }
 
 
-async def test_create_and_setup_pro(hass: HomeAssistant, mock_panel) -> None:
+async def test_create_and_setup_pro(hass: SmartHub, mock_panel) -> None:
     """Test that we create a Konnected Pro Panel and save the data."""
     device_config = config_flow.CONFIG_ENTRY_SCHEMA(
         {
@@ -415,7 +415,7 @@ async def test_create_and_setup_pro(hass: HomeAssistant, mock_panel) -> None:
     }
 
 
-async def test_default_options(hass: HomeAssistant, mock_panel) -> None:
+async def test_default_options(hass: SmartHub, mock_panel) -> None:
     """Test that we create a Konnected Panel and save the data."""
     device_config = config_flow.CONFIG_ENTRY_SCHEMA(
         {
@@ -592,7 +592,7 @@ async def test_default_options(hass: HomeAssistant, mock_panel) -> None:
     }
 
 
-async def test_connect_retry(hass: HomeAssistant, mock_panel) -> None:
+async def test_connect_retry(hass: SmartHub, mock_panel) -> None:
     """Test that we create a Konnected Panel and save the data."""
     device_config = config_flow.CONFIG_ENTRY_SCHEMA(
         {

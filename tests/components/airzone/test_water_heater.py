@@ -12,7 +12,7 @@ from aioairzone.const import (
 from aioairzone.exceptions import AirzoneError
 import pytest
 
-from homeassistant.components.water_heater import (
+from smarthub.components.water_heater import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_MAX_TEMP,
     ATTR_MIN_TEMP,
@@ -23,20 +23,20 @@ from homeassistant.components.water_heater import (
     STATE_ECO,
     STATE_PERFORMANCE,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .util import async_init_integration
 
 
-async def test_airzone_create_water_heater(hass: HomeAssistant) -> None:
+async def test_airzone_create_water_heater(hass: SmartHub) -> None:
     """Test creation of water heater."""
 
     await async_init_integration(hass)
@@ -49,7 +49,7 @@ async def test_airzone_create_water_heater(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_TEMPERATURE] == 45
 
 
-async def test_airzone_water_heater_turn_on_off(hass: HomeAssistant) -> None:
+async def test_airzone_water_heater_turn_on_off(hass: SmartHub) -> None:
     """Test turning on/off."""
 
     await async_init_integration(hass)
@@ -61,7 +61,7 @@ async def test_airzone_water_heater_turn_on_off(hass: HomeAssistant) -> None:
         }
     }
     with patch(
-        "homeassistant.components.airzone.AirzoneLocalApi.put_hvac",
+        "smarthub.components.airzone.AirzoneLocalApi.put_hvac",
         return_value=HVAC_MOCK,
     ):
         await hass.services.async_call(
@@ -83,7 +83,7 @@ async def test_airzone_water_heater_turn_on_off(hass: HomeAssistant) -> None:
         }
     }
     with patch(
-        "homeassistant.components.airzone.AirzoneLocalApi.put_hvac",
+        "smarthub.components.airzone.AirzoneLocalApi.put_hvac",
         return_value=HVAC_MOCK,
     ):
         await hass.services.async_call(
@@ -99,7 +99,7 @@ async def test_airzone_water_heater_turn_on_off(hass: HomeAssistant) -> None:
     assert state.state == STATE_ECO
 
 
-async def test_airzone_water_heater_set_operation(hass: HomeAssistant) -> None:
+async def test_airzone_water_heater_set_operation(hass: SmartHub) -> None:
     """Test setting the Operation mode."""
 
     await async_init_integration(hass)
@@ -111,7 +111,7 @@ async def test_airzone_water_heater_set_operation(hass: HomeAssistant) -> None:
         }
     }
     with patch(
-        "homeassistant.components.airzone.AirzoneLocalApi.put_hvac",
+        "smarthub.components.airzone.AirzoneLocalApi.put_hvac",
         return_value=HVAC_MOCK_1,
     ):
         await hass.services.async_call(
@@ -135,7 +135,7 @@ async def test_airzone_water_heater_set_operation(hass: HomeAssistant) -> None:
         }
     }
     with patch(
-        "homeassistant.components.airzone.AirzoneLocalApi.put_hvac",
+        "smarthub.components.airzone.AirzoneLocalApi.put_hvac",
         return_value=HVAC_MOCK_2,
     ):
         await hass.services.async_call(
@@ -159,7 +159,7 @@ async def test_airzone_water_heater_set_operation(hass: HomeAssistant) -> None:
         }
     }
     with patch(
-        "homeassistant.components.airzone.AirzoneLocalApi.put_hvac",
+        "smarthub.components.airzone.AirzoneLocalApi.put_hvac",
         return_value=HVAC_MOCK_3,
     ):
         await hass.services.async_call(
@@ -176,7 +176,7 @@ async def test_airzone_water_heater_set_operation(hass: HomeAssistant) -> None:
     assert state.state == STATE_ECO
 
 
-async def test_airzone_water_heater_set_temp(hass: HomeAssistant) -> None:
+async def test_airzone_water_heater_set_temp(hass: SmartHub) -> None:
     """Test setting the target temperature."""
 
     HVAC_MOCK = {
@@ -189,7 +189,7 @@ async def test_airzone_water_heater_set_temp(hass: HomeAssistant) -> None:
     await async_init_integration(hass)
 
     with patch(
-        "homeassistant.components.airzone.AirzoneLocalApi.put_hvac",
+        "smarthub.components.airzone.AirzoneLocalApi.put_hvac",
         return_value=HVAC_MOCK,
     ):
         await hass.services.async_call(
@@ -206,17 +206,17 @@ async def test_airzone_water_heater_set_temp(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_TEMPERATURE] == 35
 
 
-async def test_airzone_water_heater_set_temp_error(hass: HomeAssistant) -> None:
+async def test_airzone_water_heater_set_temp_error(hass: SmartHub) -> None:
     """Test error when setting the target temperature."""
 
     await async_init_integration(hass)
 
     with (
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.put_hvac",
+            "smarthub.components.airzone.AirzoneLocalApi.put_hvac",
             side_effect=AirzoneError,
         ),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             WATER_HEATER_DOMAIN,

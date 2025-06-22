@@ -4,12 +4,12 @@ from kasa import Feature
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.tplink.binary_sensor import BINARY_SENSOR_DESCRIPTIONS
-from homeassistant.components.tplink.const import DOMAIN
-from homeassistant.components.tplink.entity import EXCLUDED_FEATURES
-from homeassistant.const import CONF_HOST, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.tplink.binary_sensor import BINARY_SENSOR_DESCRIPTIONS
+from smarthub.components.tplink.const import DOMAIN
+from smarthub.components.tplink.entity import EXCLUDED_FEATURES
+from smarthub.const import CONF_HOST, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import (
     _mocked_device,
@@ -38,7 +38,7 @@ def mocked_feature_binary_sensor() -> Feature:
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -61,7 +61,7 @@ async def test_states(
 
 
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mocked_feature_binary_sensor: Feature,
 ) -> None:
@@ -85,7 +85,7 @@ async def test_binary_sensor(
 
 
 async def test_binary_sensor_children(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mocked_feature_binary_sensor: Feature,

@@ -15,13 +15,13 @@ from aiohomeconnect.model.error import HomeConnectApiError
 from aiohomeconnect.model.event import ArrayOfEvents, EventType
 import pytest
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.home_connect.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.home_connect.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -34,7 +34,7 @@ def platforms() -> list[str]:
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_paired_depaired_devices_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -95,7 +95,7 @@ async def test_paired_depaired_devices_flow(
     indirect=["appliance"],
 )
 async def test_connected_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -170,7 +170,7 @@ async def test_connected_devices(
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_button_entity_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -233,7 +233,7 @@ async def test_button_entity_availability(
     ],
 )
 async def test_button_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -260,7 +260,7 @@ async def test_button_functionality(
 
 
 async def test_command_button_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -285,7 +285,7 @@ async def test_command_button_exception(
     assert entity
     assert entity.state != STATE_UNAVAILABLE
 
-    with pytest.raises(HomeAssistantError, match=r"Error.*executing.*command"):
+    with pytest.raises(SmartHubError, match=r"Error.*executing.*command"):
         await hass.services.async_call(
             BUTTON_DOMAIN,
             SERVICE_PRESS,
@@ -295,7 +295,7 @@ async def test_command_button_exception(
 
 
 async def test_stop_program_button_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -310,7 +310,7 @@ async def test_stop_program_button_exception(
     assert entity
     assert entity.state != STATE_UNAVAILABLE
 
-    with pytest.raises(HomeAssistantError, match=r"Error.*stop.*program"):
+    with pytest.raises(SmartHubError, match=r"Error.*stop.*program"):
         await hass.services.async_call(
             BUTTON_DOMAIN,
             SERVICE_PRESS,

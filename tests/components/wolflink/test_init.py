@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 from httpx import RequestError
 
-from homeassistant.components.wolflink.const import DEVICE_ID, DOMAIN, MANUFACTURER
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.wolflink.const import DEVICE_ID, DOMAIN, MANUFACTURER
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .const import CONFIG
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_unique_id_migration(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test already configured while creating entry."""
     config_entry = MockConfigEntry(
@@ -41,7 +41,7 @@ async def test_unique_id_migration(
 
     with (
         patch(
-            "homeassistant.components.wolflink.fetch_parameters",
+            "smarthub.components.wolflink.fetch_parameters",
             side_effect=RequestError("Unable to fetch parameters"),
         ),
     ):

@@ -3,18 +3,18 @@
 from datetime import timedelta
 import time
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
 )
-from homeassistant.components.govee_ble.const import DOMAIN
-from homeassistant.components.sensor import ATTR_STATE_CLASS
-from homeassistant.const import (
+from smarthub.components.govee_ble.const import DOMAIN
+from smarthub.components.sensor import ATTR_STATE_CLASS
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import (
     GVH5075_SERVICE_INFO,
@@ -32,7 +32,7 @@ from tests.components.bluetooth import (
 )
 
 
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test setting up creates the sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -59,7 +59,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_gvh5178_error(hass: HomeAssistant) -> None:
+async def test_gvh5178_error(hass: SmartHub) -> None:
     """Test H5178 Remote in error marks state as unavailable."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -82,7 +82,7 @@ async def test_gvh5178_error(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_gvh5178_multi_sensor(hass: HomeAssistant) -> None:
+async def test_gvh5178_multi_sensor(hass: SmartHub) -> None:
     """Test H5178 with a primary and remote sensor.
 
     The gateway sensor is responsible for broadcasting the state for
@@ -163,7 +163,7 @@ async def test_gvh5178_multi_sensor(hass: HomeAssistant) -> None:
     assert primary_temp_sensor.state == STATE_UNAVAILABLE
 
 
-async def test_gvh5106(hass: HomeAssistant) -> None:
+async def test_gvh5106(hass: SmartHub) -> None:
     """Test setting up creates the sensors for a device with PM25."""
     entry = MockConfigEntry(
         domain=DOMAIN,

@@ -5,10 +5,10 @@ from datetime import timedelta
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN, HVACMode
-from homeassistant.components.gree.const import UPDATE_INTERVAL
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.climate import DOMAIN as CLIMATE_DOMAIN, HVACMode
+from smarthub.components.gree.const import UPDATE_INTERVAL
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .common import async_setup_gree, build_device_mock
 
@@ -25,7 +25,7 @@ def mock_now():
 
 
 async def test_discovery_after_setup(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, discovery, device, mock_now
+    hass: SmartHub, freezer: FrozenDateTimeFactory, discovery, device, mock_now
 ) -> None:
     """Test gree devices don't change after multiple discoveries."""
     mock_device_1 = build_device_mock(
@@ -72,7 +72,7 @@ async def test_discovery_after_setup(
 
 
 async def test_coordinator_updates(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, discovery, device
+    hass: SmartHub, freezer: FrozenDateTimeFactory, discovery, device
 ) -> None:
     """Test gree devices update their state."""
     await async_setup_gree(hass)

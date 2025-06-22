@@ -9,12 +9,12 @@ from airgradient import (
     ConfigurationControl,
 )
 
-from homeassistant.components.airgradient.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.airgradient.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -50,7 +50,7 @@ ZEROCONF_DISCOVERY = ZeroconfServiceInfo(
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_new_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -80,7 +80,7 @@ async def test_full_flow(
 
 
 async def test_flow_with_registered_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -102,7 +102,7 @@ async def test_flow_with_registered_device(
 
 
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -139,7 +139,7 @@ async def test_flow_errors(
 
 
 async def test_flow_old_firmware_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -165,7 +165,7 @@ async def test_flow_old_firmware_version(
 
 
 async def test_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -192,7 +192,7 @@ async def test_duplicate(
 
 
 async def test_zeroconf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_new_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -223,7 +223,7 @@ async def test_zeroconf_flow(
 
 
 async def test_zeroconf_flow_cloud_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -244,7 +244,7 @@ async def test_zeroconf_flow_cloud_device(
     mock_cloud_airgradient_client.set_configuration_control.assert_not_called()
 
 
-async def test_zeroconf_flow_abort_old_firmware(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow_abort_old_firmware(hass: SmartHub) -> None:
     """Test zeroconf flow aborts with old firmware."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -256,7 +256,7 @@ async def test_zeroconf_flow_abort_old_firmware(hass: HomeAssistant) -> None:
 
 
 async def test_zeroconf_flow_abort_duplicate(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test zeroconf flow aborts with duplicate."""
     mock_config_entry.add_to_hass(hass)
@@ -270,7 +270,7 @@ async def test_zeroconf_flow_abort_duplicate(
 
 
 async def test_user_flow_works_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_new_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -299,7 +299,7 @@ async def test_user_flow_works_discovery(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_new_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -325,7 +325,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_new_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -365,7 +365,7 @@ async def test_reconfigure_flow_errors(
 
 
 async def test_reconfigure_flow_unique_id_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_new_airgradient_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

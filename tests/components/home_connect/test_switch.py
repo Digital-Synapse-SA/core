@@ -26,15 +26,15 @@ from aiohomeconnect.model.program import ProgramDefinitionOption
 from aiohomeconnect.model.setting import SettingConstraints
 import pytest
 
-from homeassistant.components.home_connect.const import (
+from smarthub.components.home_connect.const import (
     BSH_POWER_OFF,
     BSH_POWER_ON,
     BSH_POWER_STANDBY,
     DOMAIN,
 )
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -43,9 +43,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -58,7 +58,7 @@ def platforms() -> list[str]:
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_paired_depaired_devices_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -122,7 +122,7 @@ async def test_paired_depaired_devices_flow(
     indirect=["appliance"],
 )
 async def test_connected_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -181,7 +181,7 @@ async def test_connected_devices(
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.parametrize("appliance", ["Dishwasher"], indirect=True)
 async def test_switch_entity_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -261,7 +261,7 @@ async def test_switch_entity_availability(
     indirect=["appliance"],
 )
 async def test_switch_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -321,7 +321,7 @@ async def test_switch_functionality(
     ],
 )
 async def test_switch_exception_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -357,7 +357,7 @@ async def test_switch_exception_handling(
     with pytest.raises(HomeConnectError):
         await getattr(client_with_exception, mock_attr)()
 
-    with pytest.raises(HomeAssistantError, match=exception_match):
+    with pytest.raises(SmartHubError, match=exception_match):
         await hass.services.async_call(
             SWITCH_DOMAIN, service, {ATTR_ENTITY_ID: entity_id}, blocking=True
         )
@@ -383,7 +383,7 @@ async def test_switch_exception_handling(
     indirect=["appliance"],
 )
 async def test_ent_desc_switch_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -428,7 +428,7 @@ async def test_ent_desc_switch_functionality(
     indirect=["appliance"],
 )
 async def test_ent_desc_switch_exception_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -455,7 +455,7 @@ async def test_ent_desc_switch_exception_handling(
     # Assert that an exception is called.
     with pytest.raises(HomeConnectError):
         await client_with_exception.set_setting()
-    with pytest.raises(HomeAssistantError, match=exception_match):
+    with pytest.raises(SmartHubError, match=exception_match):
         await hass.services.async_call(
             SWITCH_DOMAIN, service, {ATTR_ENTITY_ID: entity_id}, blocking=True
         )
@@ -508,7 +508,7 @@ async def test_ent_desc_switch_exception_handling(
     indirect=["appliance"],
 )
 async def test_power_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -555,7 +555,7 @@ async def test_power_switch(
     ],
 )
 async def test_power_switch_fetch_off_state_from_current_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -603,7 +603,7 @@ async def test_power_switch_fetch_off_state_from_current_value(
     ],
 )
 async def test_power_switch_service_validation_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -641,7 +641,7 @@ async def test_power_switch_service_validation_errors(
     assert await integration_setup(client)
     assert config_entry.state is ConfigEntryState.LOADED
 
-    with pytest.raises(HomeAssistantError, match=exception_match):
+    with pytest.raises(SmartHubError, match=exception_match):
         await hass.services.async_call(
             SWITCH_DOMAIN, service, {ATTR_ENTITY_ID: entity_id}, blocking=True
         )
@@ -678,7 +678,7 @@ async def test_power_switch_service_validation_errors(
     indirect=["appliance"],
 )
 async def test_options_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],

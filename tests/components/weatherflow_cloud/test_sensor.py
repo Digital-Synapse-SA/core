@@ -7,10 +7,10 @@ from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 from weatherflow4py.models.rest.observation import ObservationStationREST
 
-from homeassistant.components.weatherflow_cloud import DOMAIN
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.weatherflow_cloud import DOMAIN
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -23,7 +23,7 @@ from tests.common import (
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -31,7 +31,7 @@ async def test_all_entities(
 ) -> None:
     """Test all entities."""
     with patch(
-        "homeassistant.components.weatherflow_cloud.PLATFORMS", [Platform.SENSOR]
+        "smarthub.components.weatherflow_cloud.PLATFORMS", [Platform.SENSOR]
     ):
         await setup_integration(hass, mock_config_entry)
 
@@ -39,7 +39,7 @@ async def test_all_entities(
 
 
 async def test_all_entities_with_lightning_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     mock_api: AsyncMock,
@@ -52,7 +52,7 @@ async def test_all_entities_with_lightning_error(
     )
 
     with patch(
-        "homeassistant.components.weatherflow_cloud.PLATFORMS", [Platform.SENSOR]
+        "smarthub.components.weatherflow_cloud.PLATFORMS", [Platform.SENSOR]
     ):
         await setup_integration(hass, mock_config_entry)
 

@@ -8,8 +8,8 @@ from freezegun.api import FrozenDateTimeFactory
 from holidays import HALF_DAY, OPTIONAL
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.workday.const import (
+from smarthub import config_entries
+from smarthub.components.workday.const import (
     CONF_ADD_HOLIDAYS,
     CONF_CATEGORY,
     CONF_EXCLUDES,
@@ -21,16 +21,16 @@ from homeassistant.components.workday.const import (
     DEFAULT_WORKDAYS,
     DOMAIN,
 )
-from homeassistant.const import CONF_COUNTRY, CONF_LANGUAGE, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.util.dt import UTC
+from smarthub.const import CONF_COUNTRY, CONF_LANGUAGE, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.util.dt import UTC
 
 from . import init_integration
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the forms."""
 
     result = await hass.config_entries.flow.async_init(
@@ -74,7 +74,7 @@ async def test_form(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form_province_no_alias(hass: HomeAssistant) -> None:
+async def test_form_province_no_alias(hass: SmartHub) -> None:
     """Test we get the forms."""
 
     result = await hass.config_entries.flow.async_init(
@@ -116,7 +116,7 @@ async def test_form_province_no_alias(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form_no_country(hass: HomeAssistant) -> None:
+async def test_form_no_country(hass: SmartHub) -> None:
     """Test we get the forms correctly without a country."""
 
     result = await hass.config_entries.flow.async_init(
@@ -156,7 +156,7 @@ async def test_form_no_country(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form_no_subdivision(hass: HomeAssistant) -> None:
+async def test_form_no_subdivision(hass: SmartHub) -> None:
     """Test we get the forms correctly without subdivision."""
 
     result = await hass.config_entries.flow.async_init(
@@ -199,7 +199,7 @@ async def test_form_no_subdivision(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_options_form(hass: HomeAssistant) -> None:
+async def test_options_form(hass: SmartHub) -> None:
     """Test we get the form in options."""
 
     entry = await init_integration(
@@ -246,7 +246,7 @@ async def test_options_form(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form_incorrect_dates(hass: HomeAssistant) -> None:
+async def test_form_incorrect_dates(hass: SmartHub) -> None:
     """Test errors in setup entry."""
 
     result = await hass.config_entries.flow.async_init(
@@ -319,7 +319,7 @@ async def test_form_incorrect_dates(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_options_form_incorrect_dates(hass: HomeAssistant) -> None:
+async def test_options_form_incorrect_dates(hass: SmartHub) -> None:
     """Test errors in options."""
 
     entry = await init_integration(
@@ -396,7 +396,7 @@ async def test_options_form_incorrect_dates(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_options_form_abort_duplicate(hass: HomeAssistant) -> None:
+async def test_options_form_abort_duplicate(hass: SmartHub) -> None:
     """Test errors in options for duplicates."""
 
     await init_integration(
@@ -450,7 +450,7 @@ async def test_options_form_abort_duplicate(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form_incorrect_date_range(hass: HomeAssistant) -> None:
+async def test_form_incorrect_date_range(hass: SmartHub) -> None:
     """Test errors in setup entry."""
 
     result = await hass.config_entries.flow.async_init(
@@ -523,7 +523,7 @@ async def test_form_incorrect_date_range(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_options_form_incorrect_date_ranges(hass: HomeAssistant) -> None:
+async def test_options_form_incorrect_date_ranges(hass: SmartHub) -> None:
     """Test errors in options."""
 
     entry = await init_integration(
@@ -607,7 +607,7 @@ async def test_options_form_incorrect_date_ranges(hass: HomeAssistant) -> None:
     ],
 )
 async def test_language(
-    hass: HomeAssistant, language: str, holiday: str, freezer: FrozenDateTimeFactory
+    hass: SmartHub, language: str, holiday: str, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test we get the forms."""
     freezer.move_to(datetime(2023, 12, 25, 12, tzinfo=UTC))  # Monday
@@ -656,7 +656,7 @@ async def test_language(
     assert state.state == "on"
 
 
-async def test_form_with_categories(hass: HomeAssistant) -> None:
+async def test_form_with_categories(hass: SmartHub) -> None:
     """Test optional categories."""
 
     result = await hass.config_entries.flow.async_init(
@@ -701,7 +701,7 @@ async def test_form_with_categories(hass: HomeAssistant) -> None:
     }
 
 
-async def test_options_form_removes_subdiv(hass: HomeAssistant) -> None:
+async def test_options_form_removes_subdiv(hass: SmartHub) -> None:
     """Test we get the form in options when removing a configured subdivision."""
 
     entry = await init_integration(

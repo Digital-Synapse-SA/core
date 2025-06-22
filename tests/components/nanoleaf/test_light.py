@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import ATTR_EFFECT_LIST, DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import (
+from smarthub.components.light import ATTR_EFFECT_LIST, DOMAIN as LIGHT_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -21,14 +21,14 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_nanoleaf: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.nanoleaf.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.nanoleaf.PLATFORMS", [Platform.LIGHT]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
@@ -36,7 +36,7 @@ async def test_entities(
 
 @pytest.mark.parametrize("service", [SERVICE_TURN_ON, SERVICE_TURN_OFF])
 async def test_turning_on_or_off_writes_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nanoleaf: AsyncMock,
     mock_config_entry: MockConfigEntry,
     service: str,

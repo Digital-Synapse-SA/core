@@ -7,10 +7,10 @@ from unittest.mock import AsyncMock, PropertyMock, patch
 import blebox_uniapi
 import pytest
 
-from homeassistant.components.blebox.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.blebox.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 from tests.components.light.conftest import mock_light_profiles  # noqa: F401
@@ -79,7 +79,7 @@ def feature_fixture(request: pytest.FixtureRequest) -> Any:
 
 
 async def async_setup_entities(
-    hass: HomeAssistant, entity_ids: list[str]
+    hass: SmartHub, entity_ids: list[str]
 ) -> list[er.RegistryEntry]:
     """Return configured entries with the given entity ids."""
 
@@ -93,7 +93,7 @@ async def async_setup_entities(
     return [entity_registry.async_get(entity_id) for entity_id in entity_ids]
 
 
-async def async_setup_entity(hass: HomeAssistant, entity_id: str) -> er.RegistryEntry:
+async def async_setup_entity(hass: SmartHub, entity_id: str) -> er.RegistryEntry:
     """Return a configured entry with the given entity_id."""
 
     return (await async_setup_entities(hass, [entity_id]))[0]

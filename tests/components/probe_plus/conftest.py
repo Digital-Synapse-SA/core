@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pyprobeplus.parser import ParserBase, ProbePlusData
 import pytest
 
-from homeassistant.components.probe_plus.const import DOMAIN
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
+from smarthub.components.probe_plus.const import DOMAIN
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -17,13 +17,13 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.probe_plus.async_setup_entry", return_value=True
+        "smarthub.components.probe_plus.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Return the default mocked config entry."""
     return MockConfigEntry(
         title="FM210 aa:bb:cc:dd:ee:ff",
@@ -40,7 +40,7 @@ def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 def mock_probe_plus() -> MagicMock:
     """Mock the Probe Plus device."""
     with patch(
-        "homeassistant.components.probe_plus.coordinator.ProbePlusDevice",
+        "smarthub.components.probe_plus.coordinator.ProbePlusDevice",
         autospec=True,
     ) as mock_device:
         device = mock_device.return_value

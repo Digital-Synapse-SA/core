@@ -2,7 +2,7 @@
 
 import json
 
-from homeassistant.util import slugify
+from smarthub.util import slugify
 from script.hassfest.manifest import SUPPORTED_IOT_CLASSES
 
 from .const import COMPONENT_DIR
@@ -95,7 +95,7 @@ def gather_new_integration(determine_auth: bool) -> Info:
 
 Valid values are {", ".join(SUPPORTED_IOT_CLASSES)}
 
-More info @ https://developers.home-assistant.io/docs/creating_integration_manifest#iot-class
+More info @ https://developers.smart-hub.io/docs/creating_integration_manifest#iot-class
 """
             ),
             "validators": [
@@ -111,7 +111,7 @@ More info @ https://developers.home-assistant.io/docs/creating_integration_manif
         fields.update(
             {
                 "authentication": {
-                    "prompt": "Does Home Assistant need the user to authenticate to control the device/service? (yes/no)",
+                    "prompt": "Does SmartHub need the user to authenticate to control the device/service? (yes/no)",
                     "default": "yes",
                     **YES_NO,
                 },

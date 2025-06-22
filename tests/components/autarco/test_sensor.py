@@ -7,10 +7,10 @@ from autarco import AutarcoConnectionError
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -18,21 +18,21 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 
 async def test_all_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_autarco_client: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the Autarco sensors."""
-    with patch("homeassistant.components.autarco.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.autarco.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_autarco_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

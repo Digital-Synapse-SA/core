@@ -19,18 +19,18 @@ import zigpy.device
 from zigpy.exceptions import NetworkNotFormed
 import zigpy.types
 
-from homeassistant import config_entries
-from homeassistant.components.hassio import AddonError, AddonState
-from homeassistant.components.zha import config_flow, radio_manager
-from homeassistant.components.zha.const import (
+from smarthub import config_entries
+from smarthub.components.hassio import AddonError, AddonState
+from smarthub.components.zha import config_flow, radio_manager
+from smarthub.components.zha.const import (
     CONF_BAUDRATE,
     CONF_FLOW_CONTROL,
     CONF_RADIO_TYPE,
     DOMAIN,
     EZSP_OVERWRITE_EUI64,
 )
-from homeassistant.components.zha.radio_manager import ProbeResult
-from homeassistant.config_entries import (
+from smarthub.components.zha.radio_manager import ProbeResult
+from smarthub.config_entries import (
     SOURCE_SSDP,
     SOURCE_USB,
     SOURCE_USER,
@@ -38,16 +38,16 @@ from homeassistant.config_entries import (
     ConfigEntryState,
     ConfigFlowResult,
 )
-from homeassistant.const import CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.const import CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_MANUFACTURER_URL,
     ATTR_UPNP_SERIAL,
     SsdpServiceInfo,
 )
-from homeassistant.helpers.service_info.usb import UsbServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.helpers.service_info.usb import UsbServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -60,7 +60,7 @@ PROBE_FUNCTION_PATH = "zigbee.application.ControllerApplication.probe"
 @pytest.fixture(autouse=True)
 def disable_platform_only():
     """Disable platforms to speed up tests."""
-    with patch("homeassistant.components.zha.PLATFORMS", []):
+    with patch("smarthub.components.zha.PLATFORMS", []):
         yield
 
 
@@ -69,11 +69,11 @@ def mock_multipan_platform():
     """Mock the multipan platform."""
     with (
         patch(
-            "homeassistant.components.zha.silabs_multiprotocol.async_get_channel",
+            "smarthub.components.zha.silabs_multiprotocol.async_get_channel",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.zha.silabs_multiprotocol.async_using_multipan",
+            "smarthub.components.zha.silabs_multiprotocol.async_using_multipan",
             return_value=False,
         ),
     ):
@@ -246,7 +246,7 @@ def com_port(device="/dev/ttyUSB1234") -> ListPortInfo:
         ),
     ],
 )
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
 @patch(f"bellows.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
 async def test_zeroconf_discovery(
@@ -254,7 +254,7 @@ async def test_zeroconf_discovery(
     unique_id: str,
     radio_type: RadioType,
     service_info: ZeroconfServiceInfo,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test zeroconf flow -- radio detected."""
     result_init = await hass.config_entries.flow.async_init(
@@ -289,10 +289,10 @@ async def test_zeroconf_discovery(
     }
 
 
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 @patch(f"zigpy_zigate.{PROBE_FUNCTION_PATH}")
 async def test_legacy_zeroconf_discovery_zigate(
-    setup_entry_mock, hass: HomeAssistant
+    setup_entry_mock, hass: SmartHub
 ) -> None:
     """Test zeroconf flow -- zigate radio detected."""
     service_info = ZeroconfServiceInfo(
@@ -342,7 +342,7 @@ async def test_legacy_zeroconf_discovery_zigate(
     }
 
 
-async def test_zeroconf_discovery_bad_payload(hass: HomeAssistant) -> None:
+async def test_zeroconf_discovery_bad_payload(hass: SmartHub) -> None:
     """Test zeroconf flow with a bad payload."""
     service_info = ZeroconfServiceInfo(
         ip_address=ip_address("192.168.1.200"),
@@ -360,9 +360,9 @@ async def test_zeroconf_discovery_bad_payload(hass: HomeAssistant) -> None:
     assert result["reason"] == "invalid_zeroconf_data"
 
 
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
-async def test_legacy_zeroconf_discovery_ip_change_ignored(hass: HomeAssistant) -> None:
+async def test_legacy_zeroconf_discovery_ip_change_ignored(hass: SmartHub) -> None:
     """Test zeroconf flow that was ignored gets updated."""
 
     entry = MockConfigEntry(
@@ -399,7 +399,7 @@ async def test_legacy_zeroconf_discovery_ip_change_ignored(hass: HomeAssistant) 
 
 
 async def test_legacy_zeroconf_discovery_confirm_final_abort_if_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test discovery aborts if ZHA was set up after the confirmation dialog is shown."""
     service_info = ZeroconfServiceInfo(
@@ -418,7 +418,7 @@ async def test_legacy_zeroconf_discovery_confirm_final_abort_if_entries(
 
     # ZHA was somehow set up while we were in the config flow
     with patch(
-        "homeassistant.config_entries.ConfigFlow._async_current_entries",
+        "smarthub.config_entries.ConfigFlow._async_current_entries",
         return_value=[MagicMock()],
     ):
         # Confirm discovery
@@ -432,7 +432,7 @@ async def test_legacy_zeroconf_discovery_confirm_final_abort_if_entries(
 
 
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
-async def test_discovery_via_usb(hass: HomeAssistant) -> None:
+async def test_discovery_via_usb(hass: SmartHub) -> None:
     """Test usb flow -- radio detected."""
     discovery_info = UsbServiceInfo(
         device="/dev/ttyZIGBEE",
@@ -458,7 +458,7 @@ async def test_discovery_via_usb(hass: HomeAssistant) -> None:
     assert result2["type"] is FlowResultType.MENU
     assert result2["step_id"] == "choose_formation_strategy"
 
-    with patch("homeassistant.components.zha.async_setup_entry", return_value=True):
+    with patch("smarthub.components.zha.async_setup_entry", return_value=True):
         result3 = await hass.config_entries.flow.async_configure(
             result2["flow_id"],
             user_input={"next_step_id": config_flow.FORMATION_REUSE_SETTINGS},
@@ -478,7 +478,7 @@ async def test_discovery_via_usb(hass: HomeAssistant) -> None:
 
 
 @patch(f"zigpy_zigate.{PROBE_FUNCTION_PATH}", return_value=True)
-async def test_zigate_discovery_via_usb(probe_mock, hass: HomeAssistant) -> None:
+async def test_zigate_discovery_via_usb(probe_mock, hass: SmartHub) -> None:
     """Test zigate usb flow -- radio detected."""
     discovery_info = UsbServiceInfo(
         device="/dev/ttyZIGBEE",
@@ -508,7 +508,7 @@ async def test_zigate_discovery_via_usb(probe_mock, hass: HomeAssistant) -> None
     assert result3["type"] is FlowResultType.MENU
     assert result3["step_id"] == "choose_formation_strategy"
 
-    with patch("homeassistant.components.zha.async_setup_entry", return_value=True):
+    with patch("smarthub.components.zha.async_setup_entry", return_value=True):
         result4 = await hass.config_entries.flow.async_configure(
             result3["flow_id"],
             user_input={"next_step_id": config_flow.FORMATION_REUSE_SETTINGS},
@@ -528,10 +528,10 @@ async def test_zigate_discovery_via_usb(probe_mock, hass: HomeAssistant) -> None
 
 
 @patch(
-    "homeassistant.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
+    "smarthub.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
     AsyncMock(return_value=ProbeResult.PROBING_FAILED),
 )
-async def test_discovery_via_usb_no_radio(hass: HomeAssistant) -> None:
+async def test_discovery_via_usb_no_radio(hass: SmartHub) -> None:
     """Test usb flow -- no radio detected."""
     discovery_info = UsbServiceInfo(
         device="/dev/null",
@@ -548,7 +548,7 @@ async def test_discovery_via_usb_no_radio(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "confirm"
 
-    with patch("homeassistant.components.zha.async_setup_entry", return_value=True):
+    with patch("smarthub.components.zha.async_setup_entry", return_value=True):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"], user_input={}
         )
@@ -559,7 +559,7 @@ async def test_discovery_via_usb_no_radio(hass: HomeAssistant) -> None:
 
 
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
-async def test_discovery_via_usb_already_setup(hass: HomeAssistant) -> None:
+async def test_discovery_via_usb_already_setup(hass: SmartHub) -> None:
     """Test usb flow -- already setup."""
 
     MockConfigEntry(
@@ -583,8 +583,8 @@ async def test_discovery_via_usb_already_setup(hass: HomeAssistant) -> None:
     assert result["reason"] == "single_instance_allowed"
 
 
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
-async def test_discovery_via_usb_path_does_not_change(hass: HomeAssistant) -> None:
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
+async def test_discovery_via_usb_path_does_not_change(hass: SmartHub) -> None:
     """Test usb flow already set up and the path does not change."""
 
     entry = MockConfigEntry(
@@ -623,7 +623,7 @@ async def test_discovery_via_usb_path_does_not_change(hass: HomeAssistant) -> No
 
 
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
-async def test_discovery_via_usb_deconz_already_discovered(hass: HomeAssistant) -> None:
+async def test_discovery_via_usb_deconz_already_discovered(hass: SmartHub) -> None:
     """Test usb flow -- deconz discovered."""
     result = await hass.config_entries.flow.async_init(
         "deconz",
@@ -657,7 +657,7 @@ async def test_discovery_via_usb_deconz_already_discovered(hass: HomeAssistant) 
 
 
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
-async def test_discovery_via_usb_deconz_already_setup(hass: HomeAssistant) -> None:
+async def test_discovery_via_usb_deconz_already_setup(hass: SmartHub) -> None:
     """Test usb flow -- deconz setup."""
     MockConfigEntry(domain="deconz", data={}).add_to_hass(hass)
     await hass.async_block_till_done()
@@ -679,7 +679,7 @@ async def test_discovery_via_usb_deconz_already_setup(hass: HomeAssistant) -> No
 
 
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
-async def test_discovery_via_usb_deconz_ignored(hass: HomeAssistant) -> None:
+async def test_discovery_via_usb_deconz_ignored(hass: SmartHub) -> None:
     """Test usb flow -- deconz ignored."""
     MockConfigEntry(
         domain="deconz", source=config_entries.SOURCE_IGNORE, data={}
@@ -703,7 +703,7 @@ async def test_discovery_via_usb_deconz_ignored(hass: HomeAssistant) -> None:
 
 
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
-async def test_discovery_via_usb_zha_ignored_updates(hass: HomeAssistant) -> None:
+async def test_discovery_via_usb_zha_ignored_updates(hass: SmartHub) -> None:
     """Test usb flow that was ignored gets updated."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -733,9 +733,9 @@ async def test_discovery_via_usb_zha_ignored_updates(hass: HomeAssistant) -> Non
     }
 
 
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
-async def test_legacy_zeroconf_discovery_already_setup(hass: HomeAssistant) -> None:
+async def test_legacy_zeroconf_discovery_already_setup(hass: SmartHub) -> None:
     """Test zeroconf flow -- radio detected."""
     service_info = ZeroconfServiceInfo(
         ip_address=ip_address("192.168.1.200"),
@@ -761,11 +761,11 @@ async def test_legacy_zeroconf_discovery_already_setup(hass: HomeAssistant) -> N
 
 
 @patch(
-    "homeassistant.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
+    "smarthub.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
     mock_detect_radio_type(radio_type=RadioType.deconz),
 )
 @patch("serial.tools.list_ports.comports", MagicMock(return_value=[com_port()]))
-async def test_user_flow(hass: HomeAssistant) -> None:
+async def test_user_flow(hass: SmartHub) -> None:
     """Test user flow -- radio detected."""
 
     port = com_port()
@@ -781,7 +781,7 @@ async def test_user_flow(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.MENU
     assert result["step_id"] == "choose_formation_strategy"
 
-    with patch("homeassistant.components.zha.async_setup_entry", return_value=True):
+    with patch("smarthub.components.zha.async_setup_entry", return_value=True):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input={"next_step_id": config_flow.FORMATION_REUSE_SETTINGS},
@@ -801,11 +801,11 @@ async def test_user_flow(hass: HomeAssistant) -> None:
 
 
 @patch(
-    "homeassistant.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
+    "smarthub.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
     AsyncMock(return_value=ProbeResult.PROBING_FAILED),
 )
 @patch("serial.tools.list_ports.comports", MagicMock(return_value=[com_port()]))
-async def test_user_flow_not_detected(hass: HomeAssistant) -> None:
+async def test_user_flow_not_detected(hass: SmartHub) -> None:
     """Test user flow, radio not detected."""
 
     port = com_port()
@@ -826,7 +826,7 @@ async def test_user_flow_not_detected(hass: HomeAssistant) -> None:
 
 
 @patch("serial.tools.list_ports.comports", MagicMock(return_value=[com_port()]))
-async def test_user_flow_show_form(hass: HomeAssistant) -> None:
+async def test_user_flow_show_form(hass: SmartHub) -> None:
     """Test user step form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -839,7 +839,7 @@ async def test_user_flow_show_form(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("addon_not_installed")
 @patch("serial.tools.list_ports.comports", MagicMock(return_value=[]))
-async def test_user_flow_show_manual(hass: HomeAssistant) -> None:
+async def test_user_flow_show_manual(hass: SmartHub) -> None:
     """Test user flow manual entry when no comport detected."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -850,7 +850,7 @@ async def test_user_flow_show_manual(hass: HomeAssistant) -> None:
     assert result["step_id"] == "manual_pick_radio_type"
 
 
-async def test_user_flow_manual(hass: HomeAssistant) -> None:
+async def test_user_flow_manual(hass: SmartHub) -> None:
     """Test user flow manual entry."""
 
     result = await hass.config_entries.flow.async_init(
@@ -863,7 +863,7 @@ async def test_user_flow_manual(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("radio_type", RadioType.list())
-async def test_pick_radio_flow(hass: HomeAssistant, radio_type) -> None:
+async def test_pick_radio_flow(hass: SmartHub, radio_type) -> None:
     """Test radio picker."""
 
     result = await hass.config_entries.flow.async_init(
@@ -875,7 +875,7 @@ async def test_pick_radio_flow(hass: HomeAssistant, radio_type) -> None:
     assert result["step_id"] == "manual_port_config"
 
 
-async def test_user_flow_existing_config_entry(hass: HomeAssistant) -> None:
+async def test_user_flow_existing_config_entry(hass: SmartHub) -> None:
     """Test if config entry already exists."""
     MockConfigEntry(
         domain=DOMAIN, data={CONF_DEVICE: {CONF_DEVICE_PATH: "/dev/ttyUSB1"}}
@@ -893,7 +893,7 @@ async def test_user_flow_existing_config_entry(hass: HomeAssistant) -> None:
 @patch(f"zigpy_zigate.{PROBE_FUNCTION_PATH}", return_value=False)
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", return_value=True)
 async def test_detect_radio_type_success(
-    znp_probe, zigate_probe, deconz_probe, bellows_probe, hass: HomeAssistant
+    znp_probe, zigate_probe, deconz_probe, bellows_probe, hass: SmartHub
 ) -> None:
     """Test detect radios successfully."""
 
@@ -922,7 +922,7 @@ async def test_detect_radio_type_success(
 @patch(f"zigpy_zigate.{PROBE_FUNCTION_PATH}", return_value=False)
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", return_value=False)
 async def test_detect_radio_type_success_with_settings(
-    znp_probe, zigate_probe, deconz_probe, bellows_probe, hass: HomeAssistant
+    znp_probe, zigate_probe, deconz_probe, bellows_probe, hass: SmartHub
 ) -> None:
     """Test detect radios successfully but probing returns new settings."""
 
@@ -945,7 +945,7 @@ async def test_detect_radio_type_success_with_settings(
 
 
 @patch(f"bellows.{PROBE_FUNCTION_PATH}", return_value=False)
-async def test_user_port_config_fail(probe_mock, hass: HomeAssistant) -> None:
+async def test_user_port_config_fail(probe_mock, hass: SmartHub) -> None:
     """Test port config flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -964,9 +964,9 @@ async def test_user_port_config_fail(probe_mock, hass: HomeAssistant) -> None:
     assert probe_mock.await_count == 1
 
 
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 @patch(f"bellows.{PROBE_FUNCTION_PATH}", return_value=True)
-async def test_user_port_config(probe_mock, hass: HomeAssistant) -> None:
+async def test_user_port_config(probe_mock, hass: SmartHub) -> None:
     """Test port config."""
 
     result = await hass.config_entries.flow.async_init(
@@ -998,8 +998,8 @@ async def test_user_port_config(probe_mock, hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("onboarded", [True, False])
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
-async def test_hardware(onboarded, hass: HomeAssistant) -> None:
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
+async def test_hardware(onboarded, hass: SmartHub) -> None:
     """Test hardware flow."""
     data = {
         "name": "Yellow",
@@ -1011,7 +1011,7 @@ async def test_hardware(onboarded, hass: HomeAssistant) -> None:
         },
     }
     with patch(
-        "homeassistant.components.onboarding.async_is_onboarded", return_value=onboarded
+        "smarthub.components.onboarding.async_is_onboarded", return_value=onboarded
     ):
         result1 = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_HARDWARE}, data=data
@@ -1050,7 +1050,7 @@ async def test_hardware(onboarded, hass: HomeAssistant) -> None:
     }
 
 
-async def test_hardware_already_setup(hass: HomeAssistant) -> None:
+async def test_hardware_already_setup(hass: SmartHub) -> None:
     """Test hardware flow -- already setup."""
 
     MockConfigEntry(
@@ -1077,7 +1077,7 @@ async def test_hardware_already_setup(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     "data", [None, {}, {"radio_type": "best_radio"}, {"radio_type": "efr32"}]
 )
-async def test_hardware_invalid_data(hass: HomeAssistant, data) -> None:
+async def test_hardware_invalid_data(hass: SmartHub, data) -> None:
     """Test onboarding flow -- invalid data."""
 
     result = await hass.config_entries.flow.async_init(
@@ -1111,7 +1111,7 @@ def test_prevent_overwrite_ezsp_ieee() -> None:
 
 @pytest.fixture
 def pick_radio(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> Generator[RadioPicker]:
     """Fixture for the first step of the config flow (where a radio is picked)."""
 
@@ -1120,7 +1120,7 @@ def pick_radio(
         port_select = f"{port}, s/n: {port.serial_number} - {port.manufacturer}"
 
         with patch(
-            "homeassistant.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
+            "smarthub.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
             mock_detect_radio_type(radio_type=radio_type),
         ):
             result = await hass.config_entries.flow.async_init(
@@ -1137,14 +1137,14 @@ def pick_radio(
         return result, port
 
     p1 = patch("serial.tools.list_ports.comports", MagicMock(return_value=[com_port()]))
-    p2 = patch("homeassistant.components.zha.async_setup_entry")
+    p2 = patch("smarthub.components.zha.async_setup_entry")
 
     with p1, p2:
         yield wrapper
 
 
 async def test_strategy_no_network_settings(
-    pick_radio: RadioPicker, mock_app: AsyncMock, hass: HomeAssistant
+    pick_radio: RadioPicker, mock_app: AsyncMock, hass: SmartHub
 ) -> None:
     """Test formation strategy when no network settings are present."""
     mock_app.load_network_info = MagicMock(side_effect=NetworkNotFormed())
@@ -1157,7 +1157,7 @@ async def test_strategy_no_network_settings(
 
 
 async def test_formation_strategy_form_new_network(
-    pick_radio: RadioPicker, mock_app: AsyncMock, hass: HomeAssistant
+    pick_radio: RadioPicker, mock_app: AsyncMock, hass: SmartHub
 ) -> None:
     """Test forming a new network."""
     result, port = await pick_radio(RadioType.ezsp)
@@ -1175,7 +1175,7 @@ async def test_formation_strategy_form_new_network(
 
 
 async def test_formation_strategy_form_initial_network(
-    pick_radio: RadioPicker, mock_app: AsyncMock, hass: HomeAssistant
+    pick_radio: RadioPicker, mock_app: AsyncMock, hass: SmartHub
 ) -> None:
     """Test forming a new network, with no previous settings on the radio."""
     mock_app.load_network_info = AsyncMock(side_effect=NetworkNotFormed())
@@ -1194,9 +1194,9 @@ async def test_formation_strategy_form_initial_network(
 
 
 @patch(f"zigpy_znp.{PROBE_FUNCTION_PATH}", AsyncMock(return_value=True))
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 async def test_onboarding_auto_formation_new_hardware(
-    mock_app: AsyncMock, hass: HomeAssistant
+    mock_app: AsyncMock, hass: SmartHub
 ) -> None:
     """Test auto network formation with new hardware during onboarding."""
     mock_app.load_network_info = AsyncMock(side_effect=NetworkNotFormed())
@@ -1211,7 +1211,7 @@ async def test_onboarding_auto_formation_new_hardware(
     )
 
     with patch(
-        "homeassistant.components.onboarding.async_is_onboarded", return_value=False
+        "smarthub.components.onboarding.async_is_onboarded", return_value=False
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": SOURCE_USB}, data=discovery_info
@@ -1231,7 +1231,7 @@ async def test_onboarding_auto_formation_new_hardware(
 
 
 async def test_formation_strategy_reuse_settings(
-    pick_radio: RadioPicker, mock_app: AsyncMock, hass: HomeAssistant
+    pick_radio: RadioPicker, mock_app: AsyncMock, hass: SmartHub
 ) -> None:
     """Test reusing existing network settings."""
     result, port = await pick_radio(RadioType.ezsp)
@@ -1248,7 +1248,7 @@ async def test_formation_strategy_reuse_settings(
     assert result2["type"] is FlowResultType.CREATE_ENTRY
 
 
-@patch("homeassistant.components.zha.config_flow.process_uploaded_file")
+@patch("smarthub.components.zha.config_flow.process_uploaded_file")
 def test_parse_uploaded_backup(process_mock) -> None:
     """Test parsing uploaded backup files."""
     backup = zigpy.backups.NetworkBackup()
@@ -1262,12 +1262,12 @@ def test_parse_uploaded_backup(process_mock) -> None:
     assert backup == parsed_backup
 
 
-@patch("homeassistant.components.zha.radio_manager._allow_overwrite_ezsp_ieee")
+@patch("smarthub.components.zha.radio_manager._allow_overwrite_ezsp_ieee")
 async def test_formation_strategy_restore_manual_backup_non_ezsp(
     allow_overwrite_ieee_mock,
     pick_radio: RadioPicker,
     mock_app: AsyncMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test restoring a manual backup on non-EZSP coordinators."""
     result, port = await pick_radio(RadioType.znp)
@@ -1282,7 +1282,7 @@ async def test_formation_strategy_restore_manual_backup_non_ezsp(
     assert result2["step_id"] == "upload_manual_backup"
 
     with patch(
-        "homeassistant.components.zha.config_flow.ZhaConfigFlowHandler._parse_uploaded_backup",
+        "smarthub.components.zha.config_flow.ZhaConfigFlowHandler._parse_uploaded_backup",
         return_value=zigpy.backups.NetworkBackup(),
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -1297,13 +1297,13 @@ async def test_formation_strategy_restore_manual_backup_non_ezsp(
     assert result3["data"][CONF_RADIO_TYPE] == "znp"
 
 
-@patch("homeassistant.components.zha.radio_manager._allow_overwrite_ezsp_ieee")
+@patch("smarthub.components.zha.radio_manager._allow_overwrite_ezsp_ieee")
 async def test_formation_strategy_restore_manual_backup_overwrite_ieee_ezsp(
     allow_overwrite_ieee_mock,
     pick_radio: RadioPicker,
     mock_app: AsyncMock,
     backup,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test restoring a manual backup on EZSP coordinators (overwrite IEEE)."""
     result, port = await pick_radio(RadioType.ezsp)
@@ -1318,7 +1318,7 @@ async def test_formation_strategy_restore_manual_backup_overwrite_ieee_ezsp(
     assert result2["step_id"] == "upload_manual_backup"
 
     with patch(
-        "homeassistant.components.zha.config_flow.ZhaConfigFlowHandler._parse_uploaded_backup",
+        "smarthub.components.zha.config_flow.ZhaConfigFlowHandler._parse_uploaded_backup",
         return_value=backup,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -1341,12 +1341,12 @@ async def test_formation_strategy_restore_manual_backup_overwrite_ieee_ezsp(
     assert result4["data"][CONF_RADIO_TYPE] == "ezsp"
 
 
-@patch("homeassistant.components.zha.radio_manager._allow_overwrite_ezsp_ieee")
+@patch("smarthub.components.zha.radio_manager._allow_overwrite_ezsp_ieee")
 async def test_formation_strategy_restore_manual_backup_ezsp(
     allow_overwrite_ieee_mock,
     pick_radio: RadioPicker,
     mock_app: AsyncMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test restoring a manual backup on EZSP coordinators (don't overwrite IEEE)."""
     result, port = await pick_radio(RadioType.ezsp)
@@ -1363,7 +1363,7 @@ async def test_formation_strategy_restore_manual_backup_ezsp(
     backup = zigpy.backups.NetworkBackup()
 
     with patch(
-        "homeassistant.components.zha.config_flow.ZhaConfigFlowHandler._parse_uploaded_backup",
+        "smarthub.components.zha.config_flow.ZhaConfigFlowHandler._parse_uploaded_backup",
         return_value=backup,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -1387,7 +1387,7 @@ async def test_formation_strategy_restore_manual_backup_ezsp(
 
 
 async def test_formation_strategy_restore_manual_backup_invalid_upload(
-    pick_radio: RadioPicker, mock_app: AsyncMock, hass: HomeAssistant
+    pick_radio: RadioPicker, mock_app: AsyncMock, hass: SmartHub
 ) -> None:
     """Test restoring a manual backup but an invalid file is uploaded."""
     result, port = await pick_radio(RadioType.ezsp)
@@ -1402,7 +1402,7 @@ async def test_formation_strategy_restore_manual_backup_invalid_upload(
     assert result2["step_id"] == "upload_manual_backup"
 
     with patch(
-        "homeassistant.components.zha.config_flow.ZhaConfigFlowHandler._parse_uploaded_backup",
+        "smarthub.components.zha.config_flow.ZhaConfigFlowHandler._parse_uploaded_backup",
         side_effect=ValueError("Invalid backup JSON"),
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -1434,12 +1434,12 @@ def test_format_backup_choice() -> None:
 
 
 @patch(
-    "homeassistant.components.zha.config_flow._format_backup_choice",
+    "smarthub.components.zha.config_flow._format_backup_choice",
     lambda s, **kwargs: "choice:" + repr(s),
 )
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 async def test_formation_strategy_restore_automatic_backup_ezsp(
-    pick_radio: RadioPicker, mock_app: AsyncMock, make_backup, hass: HomeAssistant
+    pick_radio: RadioPicker, mock_app: AsyncMock, make_backup, hass: SmartHub
 ) -> None:
     """Test restoring an automatic backup (EZSP radio)."""
     mock_app.backups.backups = [
@@ -1482,17 +1482,17 @@ async def test_formation_strategy_restore_automatic_backup_ezsp(
 
 
 @patch(
-    "homeassistant.components.zha.config_flow._format_backup_choice",
+    "smarthub.components.zha.config_flow._format_backup_choice",
     lambda s, **kwargs: "choice:" + repr(s),
 )
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 @pytest.mark.parametrize("is_advanced", [True, False])
 async def test_formation_strategy_restore_automatic_backup_non_ezsp(
     is_advanced,
     pick_radio: RadioPicker,
     mock_app: AsyncMock,
     make_backup,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test restoring an automatic backup (non-EZSP radio)."""
     mock_app.backups.backups = [
@@ -1506,7 +1506,7 @@ async def test_formation_strategy_restore_automatic_backup_non_ezsp(
     result, port = await pick_radio(RadioType.znp)
 
     with patch(
-        "homeassistant.config_entries.ConfigFlow.show_advanced_options",
+        "smarthub.config_entries.ConfigFlow.show_advanced_options",
         new_callable=PropertyMock(return_value=is_advanced),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -1543,13 +1543,13 @@ async def test_formation_strategy_restore_automatic_backup_non_ezsp(
     assert result3["data"][CONF_RADIO_TYPE] == "znp"
 
 
-@patch("homeassistant.components.zha.radio_manager._allow_overwrite_ezsp_ieee")
+@patch("smarthub.components.zha.radio_manager._allow_overwrite_ezsp_ieee")
 async def test_ezsp_restore_without_settings_change_ieee(
     allow_overwrite_ieee_mock,
     pick_radio: RadioPicker,
     mock_app: AsyncMock,
     backup,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a manual backup on EZSP coordinators without settings (no IEEE write)."""
     # Fail to load settings
@@ -1577,7 +1577,7 @@ async def test_ezsp_restore_without_settings_change_ieee(
     assert result2["step_id"] == "upload_manual_backup"
 
     with patch(
-        "homeassistant.components.zha.config_flow.ZhaConfigFlowHandler._parse_uploaded_backup",
+        "smarthub.components.zha.config_flow.ZhaConfigFlowHandler._parse_uploaded_backup",
         return_value=backup,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -1606,9 +1606,9 @@ async def test_ezsp_restore_without_settings_change_ieee(
         ]
     ),
 )
-@patch("homeassistant.components.zha.async_setup_entry", return_value=True)
+@patch("smarthub.components.zha.async_setup_entry", return_value=True)
 async def test_options_flow_defaults(
-    async_setup_entry, async_unload_effect, hass: HomeAssistant
+    async_setup_entry, async_unload_effect, hass: SmartHub
 ) -> None:
     """Test options flow defaults match radio defaults."""
 
@@ -1635,7 +1635,7 @@ async def test_options_flow_defaults(
 
     # ZHA gets unloaded
     with patch(
-        "homeassistant.config_entries.ConfigEntries.async_unload",
+        "smarthub.config_entries.ConfigEntries.async_unload",
         side_effect=[async_unload_effect],
     ) as mock_async_unload:
         result1 = await hass.config_entries.options.async_configure(
@@ -1728,8 +1728,8 @@ async def test_options_flow_defaults(
         ]
     ),
 )
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
-async def test_options_flow_defaults_socket(hass: HomeAssistant) -> None:
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
+async def test_options_flow_defaults_socket(hass: SmartHub) -> None:
     """Test options flow defaults work even for serial ports that can't be listed."""
 
     entry = MockConfigEntry(
@@ -1753,7 +1753,7 @@ async def test_options_flow_defaults_socket(hass: HomeAssistant) -> None:
 
     # ZHA gets unloaded
     with patch(
-        "homeassistant.config_entries.ConfigEntries.async_unload", return_value=True
+        "smarthub.config_entries.ConfigEntries.async_unload", return_value=True
     ):
         result1 = await hass.config_entries.options.async_configure(
             flow["flow_id"], user_input={}
@@ -1795,9 +1795,9 @@ async def test_options_flow_defaults_socket(hass: HomeAssistant) -> None:
 
 
 @patch("serial.tools.list_ports.comports", MagicMock(return_value=[com_port()]))
-@patch("homeassistant.components.zha.async_setup_entry", return_value=True)
+@patch("smarthub.components.zha.async_setup_entry", return_value=True)
 async def test_options_flow_restarts_running_zha_if_cancelled(
-    async_setup_entry, hass: HomeAssistant
+    async_setup_entry, hass: SmartHub
 ) -> None:
     """Test options flow restarts a previously-running ZHA if it's cancelled."""
 
@@ -1822,7 +1822,7 @@ async def test_options_flow_restarts_running_zha_if_cancelled(
 
     # ZHA gets unloaded
     with patch(
-        "homeassistant.config_entries.ConfigEntries.async_unload", return_value=True
+        "smarthub.config_entries.ConfigEntries.async_unload", return_value=True
     ):
         result1 = await hass.config_entries.options.async_configure(
             flow["flow_id"], user_input={}
@@ -1850,9 +1850,9 @@ async def test_options_flow_restarts_running_zha_if_cancelled(
 
 
 @patch("serial.tools.list_ports.comports", MagicMock(return_value=[com_port()]))
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 async def test_options_flow_migration_reset_old_adapter(
-    hass: HomeAssistant, mock_app
+    hass: SmartHub, mock_app
 ) -> None:
     """Test options flow for migrating from an old radio."""
 
@@ -1877,7 +1877,7 @@ async def test_options_flow_migration_reset_old_adapter(
 
     # ZHA gets unloaded
     with patch(
-        "homeassistant.config_entries.ConfigEntries.async_unload", return_value=True
+        "smarthub.config_entries.ConfigEntries.async_unload", return_value=True
     ):
         result1 = await hass.config_entries.options.async_configure(
             flow["flow_id"], user_input={}
@@ -1922,7 +1922,7 @@ async def test_options_flow_migration_reset_old_adapter(
     ],
 )
 async def test_config_flow_port_yellow_port_name(
-    hass: HomeAssistant, device: str
+    hass: SmartHub, device: str
 ) -> None:
     """Test config flow serial port name for Yellow Zigbee radio."""
     port = com_port(device=device)
@@ -1931,7 +1931,7 @@ async def test_config_flow_port_yellow_port_name(
     port.description = None
 
     with (
-        patch("homeassistant.components.zha.config_flow.yellow_hardware.async_info"),
+        patch("smarthub.components.zha.config_flow.yellow_hardware.async_info"),
         patch("serial.tools.list_ports.comports", MagicMock(return_value=[port])),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1945,11 +1945,11 @@ async def test_config_flow_port_yellow_port_name(
     )
 
 
-async def test_config_flow_ports_no_hassio(hass: HomeAssistant) -> None:
+async def test_config_flow_ports_no_hassio(hass: SmartHub) -> None:
     """Test config flow serial port name when this is not a hassio install."""
 
     with (
-        patch("homeassistant.components.zha.config_flow.is_hassio", return_value=False),
+        patch("smarthub.components.zha.config_flow.is_hassio", return_value=False),
         patch("serial.tools.list_ports.comports", MagicMock(return_value=[])),
     ):
         ports = await config_flow.list_serial_ports(hass)
@@ -1957,13 +1957,13 @@ async def test_config_flow_ports_no_hassio(hass: HomeAssistant) -> None:
     assert ports == []
 
 
-async def test_config_flow_port_multiprotocol_port_name(hass: HomeAssistant) -> None:
+async def test_config_flow_port_multiprotocol_port_name(hass: SmartHub) -> None:
     """Test config flow serial port name for multiprotocol add-on."""
 
     with (
-        patch("homeassistant.components.zha.config_flow.is_hassio", return_value=True),
+        patch("smarthub.components.zha.config_flow.is_hassio", return_value=True),
         patch(
-            "homeassistant.components.hassio.addon_manager.AddonManager.async_get_addon_info"
+            "smarthub.components.hassio.addon_manager.AddonManager.async_get_addon_info"
         ) as async_get_addon_info,
         patch("serial.tools.list_ports.comports", MagicMock(return_value=[])),
     ):
@@ -1977,13 +1977,13 @@ async def test_config_flow_port_multiprotocol_port_name(hass: HomeAssistant) -> 
     assert ports[0].device == "socket://core-silabs-multiprotocol:9999"
 
 
-async def test_config_flow_port_no_multiprotocol(hass: HomeAssistant) -> None:
+async def test_config_flow_port_no_multiprotocol(hass: SmartHub) -> None:
     """Test config flow serial port listing when addon info fails to load."""
 
     with (
-        patch("homeassistant.components.zha.config_flow.is_hassio", return_value=True),
+        patch("smarthub.components.zha.config_flow.is_hassio", return_value=True),
         patch(
-            "homeassistant.components.hassio.addon_manager.AddonManager.async_get_addon_info",
+            "smarthub.components.hassio.addon_manager.AddonManager.async_get_addon_info",
             side_effect=AddonError,
         ),
         patch("serial.tools.list_ports.comports", MagicMock(return_value=[])),
@@ -1994,11 +1994,11 @@ async def test_config_flow_port_no_multiprotocol(hass: HomeAssistant) -> None:
 
 
 @patch("serial.tools.list_ports.comports", MagicMock(return_value=[com_port()]))
-async def test_probe_wrong_firmware_installed(hass: HomeAssistant) -> None:
+async def test_probe_wrong_firmware_installed(hass: SmartHub) -> None:
     """Test auto-probing failing because the wrong firmware is installed."""
 
     with patch(
-        "homeassistant.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
+        "smarthub.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
         return_value=ProbeResult.WRONG_FIRMWARE_INSTALLED,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -2015,16 +2015,16 @@ async def test_probe_wrong_firmware_installed(hass: HomeAssistant) -> None:
     assert result["reason"] == "wrong_firmware_installed"
 
 
-async def test_discovery_wrong_firmware_installed(hass: HomeAssistant) -> None:
+async def test_discovery_wrong_firmware_installed(hass: SmartHub) -> None:
     """Test auto-probing failing because the wrong firmware is installed."""
 
     with (
         patch(
-            "homeassistant.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
+            "smarthub.components.zha.radio_manager.ZhaRadioManager.detect_radio_type",
             return_value=ProbeResult.WRONG_FIRMWARE_INSTALLED,
         ),
         patch(
-            "homeassistant.components.onboarding.async_is_onboarded", return_value=False
+            "smarthub.components.onboarding.async_is_onboarded", return_value=False
         ),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -2047,7 +2047,7 @@ async def test_discovery_wrong_firmware_installed(hass: HomeAssistant) -> None:
     ],
 )
 async def test_migration_ti_cc_to_znp(
-    old_type: str, new_type: str, hass: HomeAssistant, config_entry: MockConfigEntry
+    old_type: str, new_type: str, hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test zigpy-cc to zigpy-znp config migration."""
     config_entry.add_to_hass(hass)
@@ -2055,7 +2055,7 @@ async def test_migration_ti_cc_to_znp(
         config_entry, data={**config_entry.data, CONF_RADIO_TYPE: old_type}, version=2
     )
 
-    with patch("homeassistant.components.zha.async_setup_entry", return_value=True):
+    with patch("smarthub.components.zha.async_setup_entry", return_value=True):
         await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()
 

@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.utility_meter.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub import config_entries
+from smarthub.components.utility_meter.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, get_schema_suggested_value
 
 
 @pytest.mark.parametrize("platform", ["sensor"])
-async def test_config_flow(hass: HomeAssistant, platform) -> None:
+async def test_config_flow(hass: SmartHub, platform) -> None:
     """Test the config flow."""
     input_sensor_entity_id = "sensor.input"
 
@@ -25,7 +25,7 @@ async def test_config_flow(hass: HomeAssistant, platform) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.utility_meter.async_setup_entry",
+        "smarthub.components.utility_meter.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -72,7 +72,7 @@ async def test_config_flow(hass: HomeAssistant, platform) -> None:
     assert config_entry.title == "Electricity meter"
 
 
-async def test_tariffs(hass: HomeAssistant) -> None:
+async def test_tariffs(hass: SmartHub) -> None:
     """Test tariffs."""
     input_sensor_entity_id = "sensor.input"
 
@@ -146,7 +146,7 @@ async def test_tariffs(hass: HomeAssistant) -> None:
     assert result["errors"]["base"] == "tariffs_not_unique"
 
 
-async def test_non_periodically_resetting(hass: HomeAssistant) -> None:
+async def test_non_periodically_resetting(hass: SmartHub) -> None:
     """Test periodically resetting."""
     input_sensor_entity_id = "sensor.input"
 
@@ -199,7 +199,7 @@ async def test_non_periodically_resetting(hass: HomeAssistant) -> None:
     }
 
 
-async def test_always_available(hass: HomeAssistant) -> None:
+async def test_always_available(hass: SmartHub) -> None:
     """Test sensor always available."""
     input_sensor_entity_id = "sensor.input"
 
@@ -253,7 +253,7 @@ async def test_always_available(hass: HomeAssistant) -> None:
     }
 
 
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test reconfiguring."""
     input_sensor1_entity_id = "sensor.input1"
     input_sensor2_entity_id = "sensor.input2"
@@ -324,7 +324,7 @@ async def test_options(hass: HomeAssistant) -> None:
 
 
 async def test_change_device_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

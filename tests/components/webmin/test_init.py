@@ -1,13 +1,13 @@
 """Tests for the Webmin integration."""
 
-from homeassistant.components.webmin.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.webmin.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .conftest import async_init_integration
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test successful unload of entry."""
 
     entry = await async_init_integration(hass)
@@ -21,7 +21,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
     assert not hass.data.get(DOMAIN)
 
 
-async def test_entry_without_mac_address(hass: HomeAssistant) -> None:
+async def test_entry_without_mac_address(hass: SmartHub) -> None:
     """Test an entry without MAC address."""
 
     entry = await async_init_integration(hass, False)

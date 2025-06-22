@@ -5,21 +5,21 @@ from typing import Any
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.environment_canada.const import (
+from smarthub.components.environment_canada.const import (
     DOMAIN,
     SERVICE_ENVIRONMENT_CANADA_FORECASTS,
 )
-from homeassistant.components.weather import (
+from smarthub.components.weather import (
     DOMAIN as WEATHER_DOMAIN,
     SERVICE_GET_FORECASTS,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import init_integration
 
 
 async def test_forecast_daily(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, ec_data: dict[str, Any]
+    hass: SmartHub, snapshot: SnapshotAssertion, ec_data: dict[str, Any]
 ) -> None:
     """Test basic forecast."""
 
@@ -43,7 +43,7 @@ async def test_forecast_daily(
 
 
 async def test_forecast_daily_with_some_previous_days_data(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, ec_data: dict[str, Any]
+    hass: SmartHub, snapshot: SnapshotAssertion, ec_data: dict[str, Any]
 ) -> None:
     """Test forecast with half day at start."""
 
@@ -63,7 +63,7 @@ async def test_forecast_daily_with_some_previous_days_data(
 
 
 async def test_get_environment_canada_raw_forecast_data(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, ec_data: dict[str, Any]
+    hass: SmartHub, snapshot: SnapshotAssertion, ec_data: dict[str, Any]
 ) -> None:
     """Test forecast with half day at start."""
 

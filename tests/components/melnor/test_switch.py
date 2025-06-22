@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from homeassistant.components.switch import SwitchDeviceClass
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.components.switch import SwitchDeviceClass
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from .conftest import (
     mock_config_entry,
@@ -14,7 +14,7 @@ from .conftest import (
 )
 
 
-async def test_manual_watering_switch_metadata(hass: HomeAssistant) -> None:
+async def test_manual_watering_switch_metadata(hass: SmartHub) -> None:
     """Test the manual watering switch."""
 
     entry = mock_config_entry(hass)
@@ -33,7 +33,7 @@ async def test_manual_watering_switch_metadata(hass: HomeAssistant) -> None:
         assert switch.attributes["device_class"] == SwitchDeviceClass.SWITCH
 
 
-async def test_manual_watering_switch_on_off(hass: HomeAssistant) -> None:
+async def test_manual_watering_switch_on_off(hass: SmartHub) -> None:
     """Test the manual watering switch."""
 
     entry = mock_config_entry(hass)
@@ -80,7 +80,7 @@ async def test_manual_watering_switch_on_off(hass: HomeAssistant) -> None:
         assert device.zone1.is_watering is False
 
 
-async def test_schedule_enabled_switch_on_off(hass: HomeAssistant) -> None:
+async def test_schedule_enabled_switch_on_off(hass: SmartHub) -> None:
     """Test the schedule enabled switch."""
 
     entry = mock_config_entry(hass)

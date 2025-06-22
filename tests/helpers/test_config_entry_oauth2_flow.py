@@ -10,10 +10,10 @@ from unittest.mock import AsyncMock, patch
 import aiohttp
 import pytest
 
-from homeassistant import config_entries, data_entry_flow, setup
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.helpers.network import NoURLAvailableError
+from smarthub import config_entries, data_entry_flow, setup
+from smarthub.core import SmartHub
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.helpers.network import NoURLAvailableError
 
 from tests.common import MockConfigEntry, MockModule, mock_integration, mock_platform
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -36,7 +36,7 @@ MOCK_SECRET_TOKEN_URLSAFE = (
 
 @pytest.fixture
 async def local_impl(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> config_entry_oauth2_flow.LocalOAuth2Implementation:
     """Local implementation."""
     assert await setup.async_setup_component(hass, "auth", {})
@@ -47,12 +47,12 @@ async def local_impl(
 
 @pytest.fixture
 async def local_impl_pkce(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> AsyncGenerator[config_entry_oauth2_flow.LocalOAuth2ImplementationWithPkce]:
     """Local implementation."""
     assert await setup.async_setup_component(hass, "auth", {})
     with patch(
-        "homeassistant.helpers.config_entry_oauth2_flow.secrets.token_urlsafe",
+        "smarthub.helpers.config_entry_oauth2_flow.secrets.token_urlsafe",
         return_value=MOCK_SECRET_TOKEN_URLSAFE
         + "bbbbbb",  # Add some characters that should be removed by the logic.
     ):
@@ -63,7 +63,7 @@ async def local_impl_pkce(
 
 @pytest.fixture
 def flow_handler(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> Generator[type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler]]:
     """Return a registered config flow."""
 
@@ -138,7 +138,7 @@ def test_inherit_enforces_domain_set() -> None:
 
 
 async def test_abort_if_no_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
 ) -> None:
     """Check flow abort when no implementations."""
@@ -150,14 +150,14 @@ async def test_abort_if_no_implementation(
 
 
 async def test_missing_credentials_for_domain(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
 ) -> None:
     """Check flow abort for integration supporting application credentials."""
     flow = flow_handler()
     flow.hass = hass
 
-    with patch("homeassistant.loader.APPLICATION_CREDENTIALS", [TEST_DOMAIN]):
+    with patch("smarthub.loader.APPLICATION_CREDENTIALS", [TEST_DOMAIN]):
         result = await flow.async_step_user()
     assert result["type"] == data_entry_flow.FlowResultType.ABORT
     assert result["reason"] == "missing_credentials"
@@ -165,7 +165,7 @@ async def test_missing_credentials_for_domain(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_abort_if_authorization_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
 ) -> None:
@@ -176,7 +176,7 @@ async def test_abort_if_authorization_timeout(
     flow.hass = hass
 
     with patch(
-        "homeassistant.helpers.config_entry_oauth2_flow.asyncio.timeout",
+        "smarthub.helpers.config_entry_oauth2_flow.asyncio.timeout",
         side_effect=TimeoutError,
     ):
         result = await flow.async_step_user()
@@ -187,7 +187,7 @@ async def test_abort_if_authorization_timeout(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_abort_if_no_url_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
 ) -> None:
@@ -209,7 +209,7 @@ async def test_abort_if_no_url_available(
 @pytest.mark.parametrize("expires_in_dict", [{}, {"expires_in": "badnumber"}])
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_abort_if_oauth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     hass_client_no_auth: ClientSessionGenerator,
@@ -272,7 +272,7 @@ async def test_abort_if_oauth_error(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_abort_if_oauth_rejected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     hass_client_no_auth: ClientSessionGenerator,
@@ -326,7 +326,7 @@ async def test_abort_if_oauth_rejected(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_abort_on_oauth_timeout_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     hass_client_no_auth: ClientSessionGenerator,
@@ -371,7 +371,7 @@ async def test_abort_on_oauth_timeout_error(
     assert resp.headers["content-type"] == "text/html; charset=utf-8"
 
     with patch(
-        "homeassistant.helpers.config_entry_oauth2_flow.asyncio.timeout",
+        "smarthub.helpers.config_entry_oauth2_flow.asyncio.timeout",
         side_effect=TimeoutError,
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
@@ -381,7 +381,7 @@ async def test_abort_on_oauth_timeout_error(
 
 
 async def test_step_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
 ) -> None:
@@ -410,7 +410,7 @@ async def test_step_discovery(
 
 
 async def test_abort_discovered_multiple(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
 ) -> None:
@@ -479,7 +479,7 @@ async def test_abort_discovered_multiple(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_abort_if_oauth_token_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     hass_client_no_auth: ClientSessionGenerator,
@@ -543,7 +543,7 @@ async def test_abort_if_oauth_token_error(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_abort_if_oauth_token_closing_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     hass_client_no_auth: ClientSessionGenerator,
@@ -603,7 +603,7 @@ async def test_abort_if_oauth_token_closing_error(
 
 
 async def test_abort_discovered_existing_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
 ) -> None:
@@ -633,12 +633,12 @@ async def test_abort_discovered_existing_entries(
     ("additional_components", "expected_redirect_uri"),
     [
         ([], "https://example.com/auth/external/callback"),
-        (["my"], "https://my.home-assistant.io/redirect/oauth"),
+        (["my"], "https://my.smart-hub.io/redirect/oauth"),
     ],
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     hass_client_no_auth: ClientSessionGenerator,
@@ -719,7 +719,7 @@ async def test_full_flow(
 
 
 async def test_local_refresh_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -755,7 +755,7 @@ async def test_local_refresh_token(
 
 
 async def test_oauth_session(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     aioclient_mock: AiohttpClientMocker,
@@ -805,7 +805,7 @@ async def test_oauth_session(
 
 
 async def test_oauth_session_with_clock_slightly_out_of_sync(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     aioclient_mock: AiohttpClientMocker,
@@ -855,7 +855,7 @@ async def test_oauth_session_with_clock_slightly_out_of_sync(
 
 
 async def test_oauth_session_no_token_refresh_needed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     aioclient_mock: AiohttpClientMocker,
@@ -899,7 +899,7 @@ async def test_oauth_session_no_token_refresh_needed(
     assert round(config_entry.data["token"]["expires_at"] - now) == 500
 
 
-async def test_implementation_provider(hass: HomeAssistant, local_impl) -> None:
+async def test_implementation_provider(hass: SmartHub, local_impl) -> None:
     """Test providing an implementation provider."""
     assert (
         await config_entry_oauth2_flow.async_get_implementations(hass, TEST_DOMAIN)
@@ -919,7 +919,7 @@ async def test_implementation_provider(hass: HomeAssistant, local_impl) -> None:
     provider_source = []
 
     async def async_provide_implementation(
-        hass: HomeAssistant, domain: str
+        hass: SmartHub, domain: str
     ) -> list[config_entry_oauth2_flow.AbstractOAuth2Implementation]:
         """Mock implementation provider."""
         return provider_source
@@ -958,7 +958,7 @@ async def test_implementation_provider(hass: HomeAssistant, local_impl) -> None:
 
 
 async def test_oauth_session_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl: config_entry_oauth2_flow.LocalOAuth2Implementation,
     aioclient_mock: AiohttpClientMocker,
@@ -1001,7 +1001,7 @@ async def test_oauth2_without_secret_init(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_abort_oauth_with_pkce_rejected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl_pkce: config_entry_oauth2_flow.LocalOAuth2ImplementationWithPkce,
     hass_client_no_auth: ClientSessionGenerator,
@@ -1049,7 +1049,7 @@ async def test_abort_oauth_with_pkce_rejected(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_oauth_with_pkce_adds_code_verifier_to_token_resolve(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_handler: type[config_entry_oauth2_flow.AbstractOAuth2FlowHandler],
     local_impl_pkce: config_entry_oauth2_flow.LocalOAuth2ImplementationWithPkce,
     hass_client_no_auth: ClientSessionGenerator,

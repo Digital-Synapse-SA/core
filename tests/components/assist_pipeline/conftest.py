@@ -9,24 +9,24 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components import stt, tts, wake_word
-from homeassistant.components.assist_pipeline import DOMAIN, select as assist_select
-from homeassistant.components.assist_pipeline.const import (
+from smarthub.components import stt, tts, wake_word
+from smarthub.components.assist_pipeline import DOMAIN, select as assist_select
+from smarthub.components.assist_pipeline.const import (
     BYTES_PER_CHUNK,
     SAMPLE_CHANNELS,
     SAMPLE_RATE,
     SAMPLE_WIDTH,
 )
-from homeassistant.components.assist_pipeline.pipeline import (
+from smarthub.components.assist_pipeline.pipeline import (
     PipelineData,
     PipelineStorageCollection,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import chat_session, device_registry as dr
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import chat_session, device_registry as dr
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -193,7 +193,7 @@ class MockFlow(ConfigFlow):
 
 
 @pytest.fixture
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, "test.config_flow")
 
@@ -203,7 +203,7 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
 
 @pytest.fixture
 async def init_supporting_components(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stt_provider: MockSTTProvider,
     mock_stt_provider_entity: MockSTTProviderEntity,
     mock_tts_provider: MockTTSProvider,
@@ -215,7 +215,7 @@ async def init_supporting_components(
     """Initialize relevant components with empty configs."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -224,7 +224,7 @@ async def init_supporting_components(
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Unload up test config entry."""
         await hass.config_entries.async_unload_platforms(
@@ -233,7 +233,7 @@ async def init_supporting_components(
         return True
 
     async def async_setup_entry_stt_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -241,7 +241,7 @@ async def init_supporting_components(
         async_add_entities([mock_stt_provider_entity])
 
     async def async_setup_entry_tts_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -249,7 +249,7 @@ async def init_supporting_components(
         async_add_entities([mock_tts_entity])
 
     async def async_setup_entry_wake_word_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -291,7 +291,7 @@ async def init_supporting_components(
     )
     mock_platform(hass, "test.config_flow")
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, tts.DOMAIN, {"tts": {"platform": "test"}})
     assert await async_setup_component(hass, stt.DOMAIN, {"stt": {"platform": "test"}})
     assert await async_setup_component(hass, "media_source", {})
@@ -303,7 +303,7 @@ async def init_supporting_components(
 
 
 @pytest.fixture
-async def init_components(hass: HomeAssistant, init_supporting_components):
+async def init_components(hass: SmartHub, init_supporting_components):
     """Initialize relevant components with empty configs."""
 
     assert await async_setup_component(hass, "assist_pipeline", {})
@@ -311,7 +311,7 @@ async def init_components(hass: HomeAssistant, init_supporting_components):
 
 @pytest.fixture
 async def assist_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, init_components
+    hass: SmartHub, device_registry: dr.DeviceRegistry, init_components
 ) -> dr.DeviceEntry:
     """Create an assist device."""
     config_entry = MockConfigEntry(domain="test_assist_device")
@@ -324,7 +324,7 @@ async def assist_device(
     )
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -333,7 +333,7 @@ async def assist_device(
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Unload up test config entry."""
         await hass.config_entries.async_unload_platforms(
@@ -342,7 +342,7 @@ async def assist_device(
         return True
 
     async def async_setup_entry_select_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -384,7 +384,7 @@ async def assist_device(
 
 
 @pytest.fixture
-def pipeline_data(hass: HomeAssistant, init_components) -> PipelineData:
+def pipeline_data(hass: SmartHub, init_components) -> PipelineData:
     """Return pipeline data."""
     return hass.data[DOMAIN]
 
@@ -401,11 +401,11 @@ def make_10ms_chunk(header: bytes) -> bytes:
 
 
 @pytest.fixture
-def mock_chat_session(hass: HomeAssistant) -> Generator[chat_session.ChatSession]:
+def mock_chat_session(hass: SmartHub) -> Generator[chat_session.ChatSession]:
     """Mock the ulid of chat sessions."""
     # pylint: disable-next=contextmanager-generator-missing-cleanup
     with (
-        patch("homeassistant.helpers.chat_session.ulid_now", return_value="mock-ulid"),
+        patch("smarthub.helpers.chat_session.ulid_now", return_value="mock-ulid"),
         chat_session.async_get_chat_session(hass) as session,
     ):
         yield session

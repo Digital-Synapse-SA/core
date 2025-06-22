@@ -1,13 +1,13 @@
-"""Test Home Assistant location util methods."""
+"""Test SmartHub location util methods."""
 
 from unittest.mock import Mock, patch
 
 import aiohttp
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.util import location as location_util
+from smarthub.core import SmartHub
+from smarthub.helpers.aiohttp_client import async_get_clientsession
+from smarthub.util import location as location_util
 
 from tests.common import load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -29,7 +29,7 @@ DISTANCE_MILES = 3632.78
 
 
 @pytest.fixture
-async def session(hass: HomeAssistant) -> aiohttp.ClientSession:
+async def session(hass: SmartHub) -> aiohttp.ClientSession:
     """Return aioclient session."""
     return async_get_clientsession(hass)
 
@@ -79,10 +79,10 @@ def test_get_miles() -> None:
 async def test_detect_location_info_whoami(
     aioclient_mock: AiohttpClientMocker, session: aiohttp.ClientSession
 ) -> None:
-    """Test detect location info using services.home-assistant.io/whoami."""
+    """Test detect location info using services.smart-hub.io/whoami."""
     aioclient_mock.get(location_util.WHOAMI_URL, text=load_fixture("whoami.json"))
 
-    with patch("homeassistant.util.location.HA_VERSION", "1.0"):
+    with patch("smarthub.util.location.HA_VERSION", "1.0"):
         info = await location_util.async_detect_location_info(session, _test_real=True)
 
     assert str(aioclient_mock.mock_calls[-1][1]) == location_util.WHOAMI_URL
@@ -105,7 +105,7 @@ async def test_dev_url(
 ) -> None:
     """Test usage of dev URL."""
     aioclient_mock.get(location_util.WHOAMI_URL_DEV, text=load_fixture("whoami.json"))
-    with patch("homeassistant.util.location.HA_VERSION", "1.0.dev0"):
+    with patch("smarthub.util.location.HA_VERSION", "1.0.dev0"):
         info = await location_util.async_detect_location_info(session, _test_real=True)
 
     assert str(aioclient_mock.mock_calls[-1][1]) == location_util.WHOAMI_URL_DEV

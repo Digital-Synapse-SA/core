@@ -4,22 +4,22 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.frontend import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.frontend import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockUser
 from tests.typing import WebSocketGenerator
 
 
 @pytest.fixture(autouse=True)
-async def setup_frontend(hass: HomeAssistant) -> None:
+async def setup_frontend(hass: SmartHub) -> None:
     """Fixture to setup the frontend."""
     await async_setup_component(hass, "frontend", {})
 
 
 async def test_get_user_data_empty(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get_user_data command."""
     client = await hass_ws_client(hass)
@@ -34,7 +34,7 @@ async def test_get_user_data_empty(
 
 
 async def test_get_user_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_admin_user: MockUser,
     hass_storage: dict[str, Any],
@@ -89,7 +89,7 @@ async def test_get_user_data(
     ],
 )
 async def test_set_user_data_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     subscriptions: list[tuple[int, dict[str, str], Any]],
     events: list[tuple[int, Any]],
@@ -205,7 +205,7 @@ async def test_set_user_data_empty(
     ],
 )
 async def test_set_user_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
     hass_admin_user: MockUser,

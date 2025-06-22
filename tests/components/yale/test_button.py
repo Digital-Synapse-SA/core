@@ -1,13 +1,13 @@
 """The button tests for the yale platform."""
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .mocks import _create_yale_api_with_devices, _mock_lock_from_fixture
 
 
-async def test_wake_lock(hass: HomeAssistant) -> None:
+async def test_wake_lock(hass: SmartHub) -> None:
     """Test creation of a lock and wake it."""
     lock_one = await _mock_lock_from_fixture(
         hass, "get_lock.online_with_doorsense.json"

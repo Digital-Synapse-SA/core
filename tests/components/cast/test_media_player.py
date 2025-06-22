@@ -15,33 +15,33 @@ from pychromecast.const import CAST_TYPE_CHROMECAST, CAST_TYPE_GROUP
 import pytest
 import yarl
 
-from homeassistant.components import media_player, tts
-from homeassistant.components.cast import media_player as cast
-from homeassistant.components.cast.const import (
+from smarthub.components import media_player, tts
+from smarthub.components.cast import media_player as cast
+from smarthub.components.cast.const import (
     DOMAIN,
     SIGNAL_HASS_CAST_SHOW_VIEW,
-    HomeAssistantControllerData,
+    SmartHubControllerData,
 )
-from homeassistant.components.cast.media_player import ChromecastInfo
-from homeassistant.components.media_player import (
+from smarthub.components.cast.media_player import ChromecastInfo
+from smarthub.components.media_player import (
     BrowseMedia,
     MediaClass,
     MediaPlayerEntityFeature,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CAST_APP_ID_HOMEASSISTANT_LOVELACE,
     EVENT_HOMEASSISTANT_STOP,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er, network
-from homeassistant.helpers.dispatcher import (
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er, network
+from smarthub.helpers.dispatcher import (
     async_dispatcher_connect,
     async_dispatcher_send,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -116,14 +116,14 @@ def get_fake_zconf(host="192.168.178.42", port=8009):
 
 
 async def async_setup_cast(
-    hass: HomeAssistant, config: dict[str, Any] | None = None
+    hass: SmartHub, config: dict[str, Any] | None = None
 ) -> MagicMock:
     """Set up the cast platform."""
     if config is None:
         config = {}
     data = {"ignore_cec": [], "known_hosts": [], "uuid": [], **config}
     with patch(
-        "homeassistant.helpers.entity_platform.EntityPlatform._async_schedule_add_entities_for_entry"
+        "smarthub.helpers.entity_platform.EntityPlatform._async_schedule_add_entities_for_entry"
     ) as add_entities:
         entry = MockConfigEntry(data=data, domain="cast")
         entry.add_to_hass(hass)
@@ -134,7 +134,7 @@ async def async_setup_cast(
 
 
 async def async_setup_cast_internal_discovery(
-    hass: HomeAssistant, config: dict[str, Any] | None = None
+    hass: SmartHub, config: dict[str, Any] | None = None
 ) -> tuple[
     Callable[
         [
@@ -151,7 +151,7 @@ async def async_setup_cast_internal_discovery(
     browser = MagicMock(devices={}, zc={})
 
     with patch(
-        "homeassistant.components.cast.discovery.pychromecast.discovery.CastBrowser",
+        "smarthub.components.cast.discovery.pychromecast.discovery.CastBrowser",
         return_value=browser,
     ) as cast_browser:
         add_entities = await async_setup_cast(hass, config)
@@ -203,7 +203,7 @@ async def async_setup_cast_internal_discovery(
     return discover_chromecast, remove_chromecast, add_entities
 
 
-async def async_setup_media_player_cast(hass: HomeAssistant, info: ChromecastInfo):
+async def async_setup_media_player_cast(hass: SmartHub, info: ChromecastInfo):
     """Set up a cast config entry."""
     browser = MagicMock(devices={}, zc={})
     chromecast = get_fake_chromecast(info)
@@ -211,15 +211,15 @@ async def async_setup_media_player_cast(hass: HomeAssistant, info: ChromecastInf
 
     with (
         patch(
-            "homeassistant.components.cast.discovery.pychromecast.get_chromecast_from_cast_info",
+            "smarthub.components.cast.discovery.pychromecast.get_chromecast_from_cast_info",
             return_value=chromecast,
         ) as get_chromecast,
         patch(
-            "homeassistant.components.cast.discovery.pychromecast.discovery.CastBrowser",
+            "smarthub.components.cast.discovery.pychromecast.discovery.CastBrowser",
             return_value=browser,
         ) as cast_browser,
         patch(
-            "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+            "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
             return_value=zconf,
         ),
     ):
@@ -285,7 +285,7 @@ def get_status_callbacks(chromecast_mock, mz_mock=None):
 
 
 async def test_start_discovery_called_once(
-    hass: HomeAssistant, castbrowser_mock
+    hass: SmartHub, castbrowser_mock
 ) -> None:
     """Test pychromecast.start_discovery called exactly once."""
     await async_setup_cast(hass)
@@ -298,7 +298,7 @@ async def test_start_discovery_called_once(
 
 
 async def test_internal_discovery_callback_fill_out_group_fail(
-    hass: HomeAssistant, get_multizone_status_mock
+    hass: SmartHub, get_multizone_status_mock
 ) -> None:
     """Test internal discovery automatically filling out information."""
     discover_cast, _, _ = await async_setup_cast_internal_discovery(hass)
@@ -323,7 +323,7 @@ async def test_internal_discovery_callback_fill_out_group_fail(
     get_multizone_status_mock.return_value = None
 
     with patch(
-        "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+        "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
         return_value=zconf,
     ):
         signal = MagicMock()
@@ -339,7 +339,7 @@ async def test_internal_discovery_callback_fill_out_group_fail(
 
 
 async def test_internal_discovery_callback_fill_out_group(
-    hass: HomeAssistant, get_multizone_status_mock
+    hass: SmartHub, get_multizone_status_mock
 ) -> None:
     """Test internal discovery automatically filling out information."""
     discover_cast, _, _ = await async_setup_cast_internal_discovery(hass)
@@ -364,7 +364,7 @@ async def test_internal_discovery_callback_fill_out_group(
     get_multizone_status_mock.return_value = None
 
     with patch(
-        "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+        "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
         return_value=zconf,
     ):
         signal = MagicMock()
@@ -380,7 +380,7 @@ async def test_internal_discovery_callback_fill_out_group(
 
 
 async def test_internal_discovery_callback_fill_out_cast_type_manufacturer(
-    hass: HomeAssistant, get_cast_type_mock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, get_cast_type_mock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test internal discovery automatically filling out information."""
     discover_cast, _, _ = await async_setup_cast_internal_discovery(hass)
@@ -433,7 +433,7 @@ async def test_internal_discovery_callback_fill_out_cast_type_manufacturer(
     get_cast_type_mock.return_value = full_info.cast_info
 
     with patch(
-        "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+        "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
         return_value=zconf,
     ):
         signal = MagicMock()
@@ -468,7 +468,7 @@ async def test_internal_discovery_callback_fill_out_cast_type_manufacturer(
 
 
 async def test_stop_discovery_called_on_stop(
-    hass: HomeAssistant, castbrowser_mock
+    hass: SmartHub, castbrowser_mock
 ) -> None:
     """Test pychromecast.stop_discovery called on shutdown."""
     # start_discovery should be called with empty config
@@ -483,14 +483,14 @@ async def test_stop_discovery_called_on_stop(
     assert castbrowser_mock.return_value.stop_discovery.call_count == 1
 
 
-async def test_create_cast_device_without_uuid(hass: HomeAssistant) -> None:
+async def test_create_cast_device_without_uuid(hass: SmartHub) -> None:
     """Test create a cast device with no UUId does not create an entity."""
     info = get_fake_chromecast_info(uuid=None)
     cast_device = cast._async_create_cast_device(hass, info)
     assert cast_device is None
 
 
-async def test_create_cast_device_with_uuid(hass: HomeAssistant) -> None:
+async def test_create_cast_device_with_uuid(hass: SmartHub) -> None:
     """Test create cast devices with UUID creates entities."""
     added_casts = hass.data[cast.ADDED_CAST_DEVICES_KEY] = set()
     info = get_fake_chromecast_info()
@@ -504,7 +504,7 @@ async def test_create_cast_device_with_uuid(hass: HomeAssistant) -> None:
     assert cast_device is None
 
 
-async def test_manual_cast_chromecasts_uuid(hass: HomeAssistant) -> None:
+async def test_manual_cast_chromecasts_uuid(hass: SmartHub) -> None:
     """Test only wanted casts are added for manual configuration."""
     cast_1 = get_fake_chromecast_info(host="host_1", uuid=FakeUUID)
     cast_2 = get_fake_chromecast_info(host="host_2", uuid=FakeUUID2)
@@ -516,7 +516,7 @@ async def test_manual_cast_chromecasts_uuid(hass: HomeAssistant) -> None:
         hass, config={"uuid": str(FakeUUID)}
     )
     with patch(
-        "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+        "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
         return_value=zconf_2,
     ):
         discover_cast(
@@ -528,7 +528,7 @@ async def test_manual_cast_chromecasts_uuid(hass: HomeAssistant) -> None:
     assert add_dev1.call_count == 0
 
     with patch(
-        "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+        "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
         return_value=zconf_1,
     ):
         discover_cast(
@@ -540,7 +540,7 @@ async def test_manual_cast_chromecasts_uuid(hass: HomeAssistant) -> None:
     assert add_dev1.call_count == 1
 
 
-async def test_auto_cast_chromecasts(hass: HomeAssistant) -> None:
+async def test_auto_cast_chromecasts(hass: SmartHub) -> None:
     """Test all discovered casts are added for default configuration."""
     cast_1 = get_fake_chromecast_info(host="some_host")
     cast_2 = get_fake_chromecast_info(host="other_host", uuid=FakeUUID2)
@@ -550,7 +550,7 @@ async def test_auto_cast_chromecasts(hass: HomeAssistant) -> None:
     # Manual configuration of media player with host "configured_host"
     discover_cast, _, add_dev1 = await async_setup_cast_internal_discovery(hass)
     with patch(
-        "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+        "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
         return_value=zconf_1,
     ):
         discover_cast(
@@ -562,7 +562,7 @@ async def test_auto_cast_chromecasts(hass: HomeAssistant) -> None:
     assert add_dev1.call_count == 1
 
     with patch(
-        "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+        "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
         return_value=zconf_2,
     ):
         discover_cast(
@@ -575,7 +575,7 @@ async def test_auto_cast_chromecasts(hass: HomeAssistant) -> None:
 
 
 async def test_discover_dynamic_group(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_multizone_status_mock,
     get_chromecast_mock,
@@ -608,7 +608,7 @@ async def test_discover_dynamic_group(
     # Discover cast service
     with (
         patch(
-            "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+            "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
             return_value=zconf_1,
         ),
         patch.object(
@@ -637,7 +637,7 @@ async def test_discover_dynamic_group(
     # Discover other dynamic group cast service
     with (
         patch(
-            "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+            "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
             return_value=zconf_2,
         ),
         patch.object(
@@ -666,7 +666,7 @@ async def test_discover_dynamic_group(
     # Get update for cast service
     with (
         patch(
-            "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+            "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
             return_value=zconf_1,
         ),
         patch.object(
@@ -693,7 +693,7 @@ async def test_discover_dynamic_group(
     assert "Disconnecting from chromecast" not in caplog.text
 
     with patch(
-        "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+        "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
         return_value=zconf_1,
     ):
         remove_cast(
@@ -706,7 +706,7 @@ async def test_discover_dynamic_group(
     assert "Disconnecting from chromecast" in caplog.text
 
 
-async def test_update_cast_chromecasts(hass: HomeAssistant) -> None:
+async def test_update_cast_chromecasts(hass: SmartHub) -> None:
     """Test discovery of same UUID twice only adds one cast."""
     cast_1 = get_fake_chromecast_info(host="old_host")
     cast_2 = get_fake_chromecast_info(host="new_host")
@@ -717,7 +717,7 @@ async def test_update_cast_chromecasts(hass: HomeAssistant) -> None:
     discover_cast, _, add_dev1 = await async_setup_cast_internal_discovery(hass)
 
     with patch(
-        "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+        "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
         return_value=zconf_1,
     ):
         discover_cast(
@@ -729,7 +729,7 @@ async def test_update_cast_chromecasts(hass: HomeAssistant) -> None:
     assert add_dev1.call_count == 1
 
     with patch(
-        "homeassistant.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
+        "smarthub.components.cast.discovery.ChromeCastZeroconf.get_zeroconf",
         return_value=zconf_2,
     ):
         discover_cast(
@@ -741,7 +741,7 @@ async def test_update_cast_chromecasts(hass: HomeAssistant) -> None:
     assert add_dev1.call_count == 1
 
 
-async def test_entity_availability(hass: HomeAssistant) -> None:
+async def test_entity_availability(hass: SmartHub) -> None:
     """Test handling of connection status."""
     entity_id = "media_player.speaker"
     info = get_fake_chromecast_info()
@@ -791,7 +791,7 @@ async def test_entity_availability(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize(("port", "entry_type"), [(8009, None), (12345, None)])
 async def test_device_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -843,7 +843,7 @@ async def test_device_registry(
 
 
 async def test_entity_cast_status(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test handling of cast status."""
     entity_id = "media_player.speaker"
@@ -972,7 +972,7 @@ async def test_entity_cast_status(
     ],
 )
 async def test_supported_features(
-    hass: HomeAssistant, cast_type, supported_features, supported_features_no_media
+    hass: SmartHub, cast_type, supported_features, supported_features_no_media
 ) -> None:
     """Test supported features."""
     entity_id = "media_player.speaker"
@@ -1004,7 +1004,7 @@ async def test_supported_features(
 
 
 async def test_entity_browse_media(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can browse media."""
     await async_setup_component(hass, "media_source", {"media_source": {}})
@@ -1063,7 +1063,7 @@ async def test_entity_browse_media(
     [pychromecast.const.CAST_TYPE_AUDIO, pychromecast.const.CAST_TYPE_GROUP],
 )
 async def test_entity_browse_media_audio_only(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, cast_type
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, cast_type
 ) -> None:
     """Test we can browse media."""
     await async_setup_component(hass, "media_source", {"media_source": {}})
@@ -1118,7 +1118,7 @@ async def test_entity_browse_media_audio_only(
 
 
 async def test_entity_play_media(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, quick_play_mock
+    hass: SmartHub, entity_registry: er.EntityRegistry, quick_play_mock
 ) -> None:
     """Test playing media."""
     entity_id = "media_player.speaker"
@@ -1167,7 +1167,7 @@ async def test_entity_play_media(
 
 
 async def test_entity_play_media_cast(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, quick_play_mock
+    hass: SmartHub, entity_registry: er.EntityRegistry, quick_play_mock
 ) -> None:
     """Test playing media with cast special features."""
     entity_id = "media_player.speaker"
@@ -1212,7 +1212,7 @@ async def test_entity_play_media_cast(
 
 
 async def test_entity_play_media_cast_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
     quick_play_mock,
@@ -1260,7 +1260,7 @@ async def test_entity_play_media_cast_invalid(
     assert "App unknown not supported" in caplog.text
 
 
-async def test_entity_play_media_sign_URL(hass: HomeAssistant, quick_play_mock) -> None:
+async def test_entity_play_media_sign_URL(hass: SmartHub, quick_play_mock) -> None:
     """Test playing media."""
     entity_id = "media_player.speaker"
 
@@ -1340,7 +1340,7 @@ async def test_entity_play_media_sign_URL(hass: HomeAssistant, quick_play_mock) 
     ],
 )
 async def test_entity_play_media_playlist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     quick_play_mock,
     url,
@@ -1384,7 +1384,7 @@ async def test_entity_play_media_playlist(
     ],
 )
 async def test_entity_media_content_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     cast_type,
     default_content_type,
@@ -1442,7 +1442,7 @@ async def test_entity_media_content_type(
 
 
 async def test_entity_control(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, quick_play_mock
+    hass: SmartHub, entity_registry: er.EntityRegistry, quick_play_mock
 ) -> None:
     """Test various device and media controls."""
     entity_id = "media_player.speaker"
@@ -1492,7 +1492,7 @@ async def test_entity_control(
         chromecast,
         "default_media_receiver",
         {
-            "media_id": "https://www.home-assistant.io/images/cast/splash.png",
+            "media_id": "https://www.smart-hub.io/images/cast/splash.png",
             "media_type": "image/png",
         },
     )
@@ -1519,17 +1519,17 @@ async def test_entity_control(
     chromecast.media_controller.pause.assert_called_once_with()
 
     # Media previous
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_media_previous_track(hass, entity_id)
     chromecast.media_controller.queue_prev.assert_not_called()
 
     # Media next
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_media_next_track(hass, entity_id)
     chromecast.media_controller.queue_next.assert_not_called()
 
     # Media seek
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_media_seek(hass, 123, entity_id)
     chromecast.media_controller.seek.assert_not_called()
 
@@ -1574,7 +1574,7 @@ async def test_entity_control(
     [(pychromecast.APP_YOUTUBE, "idle"), ("Netflix", "playing")],
 )
 async def test_entity_media_states(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, app_id, state_no_media
+    hass: SmartHub, entity_registry: er.EntityRegistry, app_id, state_no_media
 ) -> None:
     """Test various entity media states."""
     entity_id = "media_player.speaker"
@@ -1656,7 +1656,7 @@ async def test_entity_media_states(
 
 
 async def test_entity_media_states_lovelace_app(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test various entity media states when the lovelace app is active."""
     entity_id = "media_player.speaker"
@@ -1730,7 +1730,7 @@ async def test_entity_media_states_lovelace_app(
 
 
 async def test_group_media_states(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mz_mock
+    hass: SmartHub, entity_registry: er.EntityRegistry, mz_mock
 ) -> None:
     """Test media states are read from group if entity has no state."""
     entity_id = "media_player.speaker"
@@ -1790,7 +1790,7 @@ async def test_group_media_states(
 
 
 async def test_group_media_states_early(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mz_mock
+    hass: SmartHub, entity_registry: er.EntityRegistry, mz_mock
 ) -> None:
     """Test media states are read from group if entity has no state.
 
@@ -1846,7 +1846,7 @@ async def test_group_media_states_early(
 
 
 async def test_group_media_control(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mz_mock, quick_play_mock
+    hass: SmartHub, entity_registry: er.EntityRegistry, mz_mock, quick_play_mock
 ) -> None:
     """Test media controls are handled by group if entity has no state."""
     entity_id = "media_player.speaker"
@@ -1915,7 +1915,7 @@ async def test_group_media_control(
 
 @pytest.mark.usefixtures("mock_tts_cache_dir")
 async def test_failed_cast_on_idle(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test no warning when unless player went idle with reason "ERROR"."""
     info = get_fake_chromecast_info()
@@ -1946,10 +1946,10 @@ async def test_failed_cast_on_idle(
 
 @pytest.mark.usefixtures("mock_tts_cache_dir")
 async def test_failed_cast_other_url(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test warning when casting from internal_url fails."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     with assert_setup_component(1, tts.DOMAIN):
         assert await async_setup_component(
             hass,
@@ -1971,10 +1971,10 @@ async def test_failed_cast_other_url(
 
 @pytest.mark.usefixtures("mock_tts_cache_dir")
 async def test_failed_cast_internal_url(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test warning when casting from internal_url fails."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await async_process_ha_core_config(
         hass,
         {"internal_url": "http://example.local:8123"},
@@ -2001,10 +2001,10 @@ async def test_failed_cast_internal_url(
 
 @pytest.mark.usefixtures("mock_tts_cache_dir")
 async def test_failed_cast_external_url(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test warning when casting from external_url fails."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await async_process_ha_core_config(
         hass,
         {"external_url": "http://example.com:8123"},
@@ -2031,7 +2031,7 @@ async def test_failed_cast_external_url(
     )
 
 
-async def test_disconnect_on_stop(hass: HomeAssistant) -> None:
+async def test_disconnect_on_stop(hass: SmartHub) -> None:
     """Test cast device disconnects socket on stop."""
     info = get_fake_chromecast_info()
 
@@ -2042,7 +2042,7 @@ async def test_disconnect_on_stop(hass: HomeAssistant) -> None:
     assert chromecast.disconnect.call_count == 1
 
 
-async def test_entry_setup_no_config(hass: HomeAssistant) -> None:
+async def test_entry_setup_no_config(hass: SmartHub) -> None:
     """Test deprecated empty yaml config.."""
     await async_setup_component(hass, "cast", {})
     await hass.async_block_till_done()
@@ -2052,7 +2052,7 @@ async def test_entry_setup_no_config(hass: HomeAssistant) -> None:
 
 @pytest.mark.no_fail_on_log_exception
 async def test_invalid_cast_platform(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can play media through a cast platform."""
     cast_platform_mock = Mock()
@@ -2071,7 +2071,7 @@ async def test_invalid_cast_platform(
 
 
 async def test_cast_platform_play_media(
-    hass: HomeAssistant, quick_play_mock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, quick_play_mock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can play media through a cast platform."""
     entity_id = "media_player.speaker"
@@ -2150,7 +2150,7 @@ async def test_cast_platform_play_media(
 
 
 async def test_cast_platform_browse_media(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can play media through a cast platform."""
     cast_platform_mock = Mock(
@@ -2161,7 +2161,7 @@ async def test_cast_platform_browse_media(
                     media_class=MediaClass.APP,
                     media_content_id="",
                     media_content_type="spotify",
-                    thumbnail="https://brands.home-assistant.io/_/spotify/logo.png",
+                    thumbnail="https://brands.smart-hub.io/_/spotify/logo.png",
                     can_play=False,
                     can_expand=True,
                 )
@@ -2213,7 +2213,7 @@ async def test_cast_platform_browse_media(
         "can_play": False,
         "can_expand": True,
         "can_search": False,
-        "thumbnail": "https://brands.home-assistant.io/_/spotify/logo.png",
+        "thumbnail": "https://brands.smart-hub.io/_/spotify/logo.png",
         "children_media_class": None,
     }
     assert expected_child in response["result"]["children"]
@@ -2247,7 +2247,7 @@ async def test_cast_platform_browse_media(
 
 
 async def test_cast_platform_play_media_local_media(
-    hass: HomeAssistant, quick_play_mock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, quick_play_mock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we process data when playing local media."""
     entity_id = "media_player.speaker"
@@ -2314,8 +2314,8 @@ async def test_cast_platform_play_media_local_media(
     )
 
 
-async def test_ha_cast(hass: HomeAssistant, ha_controller_mock) -> None:
-    """Test Home Assistant cast."""
+async def test_ha_cast(hass: SmartHub, ha_controller_mock) -> None:
+    """Test SmartHub cast."""
     entity_id = "media_player.speaker"
 
     info = get_fake_chromecast_info()
@@ -2326,7 +2326,7 @@ async def test_ha_cast(hass: HomeAssistant, ha_controller_mock) -> None:
     ha_controller_mock.return_value = ha_controller
 
     # Test show view signal for other entity is ignored
-    controller_data = HomeAssistantControllerData(
+    controller_data = SmartHubControllerData(
         hass_url="url",
         hass_uuid="12341234",
         client_id="client_id_1234",
@@ -2344,7 +2344,7 @@ async def test_ha_cast(hass: HomeAssistant, ha_controller_mock) -> None:
     ha_controller_mock.assert_not_called()
 
     # Test show view signal is handled
-    controller_data = HomeAssistantControllerData(
+    controller_data = SmartHubControllerData(
         hass_url="url",
         hass_uuid="12341234",
         client_id="client_id_1234",

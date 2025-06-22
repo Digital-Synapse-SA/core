@@ -10,12 +10,12 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 import voluptuous as vol
 
-from homeassistant.components import conversation, ollama
-from homeassistant.components.conversation import trace
-from homeassistant.const import ATTR_SUPPORTED_FEATURES, CONF_LLM_HASS_API, MATCH_ALL
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import intent, llm
+from smarthub.components import conversation, ollama
+from smarthub.components.conversation import trace
+from smarthub.const import ATTR_SUPPORTED_FEATURES, CONF_LLM_HASS_API, MATCH_ALL
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import intent, llm
 
 from tests.common import MockConfigEntry
 
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry
 @pytest.fixture(autouse=True)
 def mock_ulid_tools():
     """Mock generated ULIDs for tool calls."""
-    with patch("homeassistant.helpers.llm.ulid_now", return_value="mock-tool-call"):
+    with patch("smarthub.helpers.llm.ulid_now", return_value="mock-tool-call"):
         yield
 
 
@@ -37,7 +37,7 @@ async def stream_generator(response: dict | list[dict]) -> AsyncGenerator[dict]:
 
 @pytest.mark.parametrize("agent_id", [None, "conversation.mock_title"])
 async def test_chat(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
     agent_id: str,
@@ -94,7 +94,7 @@ async def test_chat(
 
 
 async def test_chat_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -141,7 +141,7 @@ async def test_chat_stream(
 
 
 async def test_template_variables(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that template variables work."""
     context = Context(user_id="12345")
@@ -166,7 +166,7 @@ async def test_template_variables(
                 {"message": {"role": "assistant", "content": "test response"}}
             ),
         ) as mock_chat,
-        patch("homeassistant.auth.AuthManager.async_get_user", return_value=mock_user),
+        patch("smarthub.auth.AuthManager.async_get_user", return_value=mock_user),
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
@@ -204,10 +204,10 @@ async def test_template_variables(
         ),
     ],
 )
-@patch("homeassistant.components.ollama.conversation.llm.AssistAPI._async_get_tools")
+@patch("smarthub.components.ollama.conversation.llm.AssistAPI._async_get_tools")
 async def test_function_call(
     mock_get_tools,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
     tool_args: dict[str, Any],
@@ -291,10 +291,10 @@ async def test_function_call(
     )
 
 
-@patch("homeassistant.components.ollama.conversation.llm.AssistAPI._async_get_tools")
+@patch("smarthub.components.ollama.conversation.llm.AssistAPI._async_get_tools")
 async def test_function_exception(
     mock_get_tools,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -308,7 +308,7 @@ async def test_function_exception(
     mock_tool.parameters = vol.Schema(
         {vol.Optional("param1", description="Test parameters"): str}
     )
-    mock_tool.async_call.side_effect = HomeAssistantError("Test tool exception")
+    mock_tool.async_call.side_effect = SmartHubError("Test tool exception")
 
     mock_get_tools.return_value = [mock_tool]
 
@@ -376,7 +376,7 @@ async def test_function_exception(
 
 
 async def test_unknown_hass_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     mock_init_component,
@@ -403,7 +403,7 @@ async def test_unknown_hass_api(
 
 
 async def test_message_history_trimming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
     freezer: FrozenDateTimeFactory,
@@ -505,7 +505,7 @@ async def test_message_history_trimming(
 
 
 async def test_message_history_unlimited(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_init_component
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_init_component
 ) -> None:
     """Test that message history is not trimmed when max_history = 0."""
     conversation_id = "1234"
@@ -543,7 +543,7 @@ async def test_message_history_unlimited(
 
 
 async def test_error_handling(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_init_component
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_init_component
 ) -> None:
     """Test error handling during converse."""
     with patch(
@@ -560,7 +560,7 @@ async def test_error_handling(
 
 
 async def test_template_error(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that template error handling works."""
     hass.config_entries.async_update_entry(
@@ -583,7 +583,7 @@ async def test_template_error(
 
 
 async def test_conversation_agent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -599,7 +599,7 @@ async def test_conversation_agent(
 
 
 async def test_conversation_agent_with_assist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -625,7 +625,7 @@ async def test_conversation_agent_with_assist(
     ],
 )
 async def test_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
     expected_options: dict[str, Any],
@@ -656,7 +656,7 @@ async def test_options(
     ids=["no_think", "think"],
 )
 async def test_reasoning_filter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
     think: bool,

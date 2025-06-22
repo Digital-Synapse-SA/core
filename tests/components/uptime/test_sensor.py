@@ -4,9 +4,9 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.uptime.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.uptime.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 @pytest.mark.usefixtures("init_integration")
 @pytest.mark.freeze_time("2022-03-01 00:00:00+00:00")
 async def test_uptime_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,

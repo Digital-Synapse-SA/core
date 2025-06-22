@@ -5,13 +5,13 @@ from unittest.mock import Mock, patch
 
 from aiohttp.test_utils import TestClient
 
-from homeassistant.auth.providers.homeassistant import InvalidAuth
+from smarthub.auth.providers.smarthub import InvalidAuth
 
 
 async def test_auth_success(hassio_client_supervisor: TestClient) -> None:
     """Test no auth needed for ."""
     with patch(
-        "homeassistant.auth.providers.homeassistant."
+        "smarthub.auth.providers.smarthub."
         "HassAuthProvider.async_validate_login",
     ) as mock_login:
         resp = await hassio_client_supervisor.post(
@@ -27,7 +27,7 @@ async def test_auth_success(hassio_client_supervisor: TestClient) -> None:
 async def test_auth_fails_no_supervisor(hassio_client: TestClient) -> None:
     """Test if only supervisor can access."""
     with patch(
-        "homeassistant.auth.providers.homeassistant."
+        "smarthub.auth.providers.smarthub."
         "HassAuthProvider.async_validate_login",
     ) as mock_login:
         resp = await hassio_client.post(
@@ -43,7 +43,7 @@ async def test_auth_fails_no_supervisor(hassio_client: TestClient) -> None:
 async def test_auth_fails_no_auth(hassio_noauth_client: TestClient) -> None:
     """Test if only supervisor can access."""
     with patch(
-        "homeassistant.auth.providers.homeassistant."
+        "smarthub.auth.providers.smarthub."
         "HassAuthProvider.async_validate_login",
     ) as mock_login:
         resp = await hassio_noauth_client.post(
@@ -59,7 +59,7 @@ async def test_auth_fails_no_auth(hassio_noauth_client: TestClient) -> None:
 async def test_login_error(hassio_client_supervisor: TestClient) -> None:
     """Test no auth needed for error."""
     with patch(
-        "homeassistant.auth.providers.homeassistant."
+        "smarthub.auth.providers.smarthub."
         "HassAuthProvider.async_validate_login",
         Mock(side_effect=InvalidAuth()),
     ) as mock_login:
@@ -76,7 +76,7 @@ async def test_login_error(hassio_client_supervisor: TestClient) -> None:
 async def test_login_no_data(hassio_client_supervisor: TestClient) -> None:
     """Test auth with no data -> error."""
     with patch(
-        "homeassistant.auth.providers.homeassistant."
+        "smarthub.auth.providers.smarthub."
         "HassAuthProvider.async_validate_login",
         Mock(side_effect=InvalidAuth()),
     ) as mock_login:
@@ -90,7 +90,7 @@ async def test_login_no_data(hassio_client_supervisor: TestClient) -> None:
 async def test_login_no_username(hassio_client_supervisor: TestClient) -> None:
     """Test auth with no username in data -> error."""
     with patch(
-        "homeassistant.auth.providers.homeassistant."
+        "smarthub.auth.providers.smarthub."
         "HassAuthProvider.async_validate_login",
         Mock(side_effect=InvalidAuth()),
     ) as mock_login:
@@ -106,7 +106,7 @@ async def test_login_no_username(hassio_client_supervisor: TestClient) -> None:
 async def test_login_success_extra(hassio_client_supervisor: TestClient) -> None:
     """Test auth with extra data."""
     with patch(
-        "homeassistant.auth.providers.homeassistant."
+        "smarthub.auth.providers.smarthub."
         "HassAuthProvider.async_validate_login",
     ) as mock_login:
         resp = await hassio_client_supervisor.post(
@@ -127,7 +127,7 @@ async def test_login_success_extra(hassio_client_supervisor: TestClient) -> None
 async def test_password_success(hassio_client_supervisor: TestClient) -> None:
     """Test no auth needed for ."""
     with patch(
-        "homeassistant.auth.providers.homeassistant."
+        "smarthub.auth.providers.smarthub."
         "HassAuthProvider.async_change_password",
     ) as mock_change:
         resp = await hassio_client_supervisor.post(

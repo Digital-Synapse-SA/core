@@ -4,14 +4,14 @@ from unittest.mock import MagicMock, patch
 
 from easyenergy import EasyEnergyConnectionError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_easyenergy: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_easyenergy: MagicMock
 ) -> None:
     """Test the easyEnergy configuration entry loading/unloading."""
     mock_config_entry.add_to_hass(hass)
@@ -27,12 +27,12 @@ async def test_load_unload_config_entry(
 
 
 @patch(
-    "homeassistant.components.easyenergy.coordinator.EasyEnergy._request",
+    "smarthub.components.easyenergy.coordinator.EasyEnergy._request",
     side_effect=EasyEnergyConnectionError,
 )
 async def test_config_flow_entry_not_ready(
     mock_request: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the easyEnergy configuration entry not ready."""

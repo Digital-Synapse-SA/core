@@ -7,11 +7,11 @@ from unittest.mock import Mock, call, patch
 
 import pytest
 
-from homeassistant import loader
-from homeassistant.const import EVENT_CORE_CONFIG_UPDATE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import translation
-from homeassistant.setup import async_setup_component
+from smarthub import loader
+from smarthub.const import EVENT_CORE_CONFIG_UPDATE
+from smarthub.core import SmartHub
+from smarthub.helpers import translation
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(autouse=True)
@@ -41,7 +41,7 @@ def test_recursive_flatten() -> None:
 
 
 def test_load_translations_files_by_language(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the load translation files function."""
     # Test one valid and one invalid file
@@ -140,7 +140,7 @@ def test_load_translations_files_by_language(
 )
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_load_translations_files_invalid_localized_placeholders(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     language: str,
     expected_translation: dict,
@@ -164,7 +164,7 @@ async def test_load_translations_files_invalid_localized_placeholders(
 
 
 @pytest.mark.usefixtures("enable_custom_integrations")
-async def test_get_translations(hass: HomeAssistant, mock_config_flows) -> None:
+async def test_get_translations(hass: SmartHub, mock_config_flows) -> None:
     """Test the get translations helper."""
     translations = await translation.async_get_translations(hass, "en", "entity")
     assert translations == {}
@@ -237,7 +237,7 @@ async def test_get_translations(hass: HomeAssistant, mock_config_flows) -> None:
 
 
 async def test_get_translations_loads_config_flows(
-    hass: HomeAssistant, mock_config_flows
+    hass: SmartHub, mock_config_flows
 ) -> None:
     """Test the get translations helper loads config flow translations."""
     mock_config_flows["integration"].append("component1")
@@ -246,11 +246,11 @@ async def test_get_translations_loads_config_flows(
 
     with (
         patch(
-            "homeassistant.helpers.translation._load_translations_files_by_language",
+            "smarthub.helpers.translation._load_translations_files_by_language",
             return_value={"en": {"component1": {"title": "world"}}},
         ),
         patch(
-            "homeassistant.helpers.translation.async_get_integrations",
+            "smarthub.helpers.translation.async_get_integrations",
             return_value={"component1": integration},
         ),
     ):
@@ -275,11 +275,11 @@ async def test_get_translations_loads_config_flows(
 
     with (
         patch(
-            "homeassistant.helpers.translation._load_translations_files_by_language",
+            "smarthub.helpers.translation._load_translations_files_by_language",
             return_value={"en": {"component2": {"title": "world"}}},
         ),
         patch(
-            "homeassistant.helpers.translation.async_get_integrations",
+            "smarthub.helpers.translation.async_get_integrations",
             return_value={"component2": integration},
         ),
     ):
@@ -306,7 +306,7 @@ async def test_get_translations_loads_config_flows(
     assert "component2" not in hass.config.components
 
 
-async def test_get_translations_while_loading_components(hass: HomeAssistant) -> None:
+async def test_get_translations_while_loading_components(hass: SmartHub) -> None:
     """Test the get translations helper loads config flow translations."""
     integration = Mock(file_path=pathlib.Path(__file__))
     integration.name = "Component 1"
@@ -325,11 +325,11 @@ async def test_get_translations_while_loading_components(hass: HomeAssistant) ->
 
     with (
         patch(
-            "homeassistant.helpers.translation._load_translations_files_by_language",
+            "smarthub.helpers.translation._load_translations_files_by_language",
             mock_load_translation_files,
         ),
         patch(
-            "homeassistant.helpers.translation.async_get_integrations",
+            "smarthub.helpers.translation.async_get_integrations",
             return_value={"component1": integration},
         ),
     ):
@@ -344,7 +344,7 @@ async def test_get_translations_while_loading_components(hass: HomeAssistant) ->
     assert load_count == 1
 
 
-async def test_get_translation_categories(hass: HomeAssistant) -> None:
+async def test_get_translation_categories(hass: SmartHub) -> None:
     """Test the get translations helper loads config flow translations."""
     with patch.object(translation, "async_get_config_flows", return_value={"light"}):
         translations = await translation.async_get_translations(
@@ -359,7 +359,7 @@ async def test_get_translation_categories(hass: HomeAssistant) -> None:
 
 
 async def test_translation_merging_loaded_together(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we merge translations of two integrations when they are loaded at the same time."""
     hass.config.components.add("hue")
@@ -378,7 +378,7 @@ async def test_translation_merging_loaded_together(
 
 
 async def test_ensure_translations_still_load_if_one_integration_fails(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that if one integration fails to load we can still get translations."""
     hass.config.components.add("sensor")
@@ -387,7 +387,7 @@ async def test_ensure_translations_still_load_if_one_integration_fails(
     sensor_integration = await loader.async_get_integration(hass, "sensor")
 
     with patch(
-        "homeassistant.helpers.translation.async_get_integrations",
+        "smarthub.helpers.translation.async_get_integrations",
         return_value={
             "sensor": sensor_integration,
             "broken": Exception("unhandled failure"),
@@ -409,14 +409,14 @@ async def test_ensure_translations_still_load_if_one_integration_fails(
 
 
 async def test_load_translations_all_integrations_broken(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Ensure we do not try to load translations again if the integration is broken."""
     hass.config.components.add("broken")
     hass.config.components.add("broken2")
 
     with patch(
-        "homeassistant.helpers.translation.async_get_integrations",
+        "smarthub.helpers.translation.async_get_integrations",
         return_value={
             "broken2": Exception("unhandled failure"),
             "broken": Exception("unhandled failure"),
@@ -439,14 +439,14 @@ async def test_load_translations_all_integrations_broken(
     assert "Failed to load integration for translation" not in caplog.text
 
 
-async def test_caching(hass: HomeAssistant) -> None:
+async def test_caching(hass: SmartHub) -> None:
     """Test we cache data."""
     hass.config.components.add("sensor")
     hass.config.components.add("light")
 
     # Patch with same method so we can count invocations
     with patch(
-        "homeassistant.helpers.translation.build_resources",
+        "smarthub.helpers.translation.build_resources",
         side_effect=translation.build_resources,
     ) as mock_build_resources:
         load1 = await translation.async_get_translations(hass, "en", "entity_component")
@@ -483,7 +483,7 @@ async def test_caching(hass: HomeAssistant) -> None:
 
     # Patch with same method so we can count invocations
     with patch(
-        "homeassistant.helpers.translation.build_resources",
+        "smarthub.helpers.translation.build_resources",
         side_effect=translation.build_resources,
     ) as mock_build:
         load_sensor_only = await translation.async_get_translations(
@@ -509,7 +509,7 @@ async def test_caching(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_custom_integrations")
-async def test_custom_component_translations(hass: HomeAssistant) -> None:
+async def test_custom_component_translations(hass: SmartHub) -> None:
     """Test getting translation from custom components."""
     hass.config.components.add("test_embedded")
     hass.config.components.add("test_package")
@@ -517,7 +517,7 @@ async def test_custom_component_translations(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_custom_integrations")
-async def test_get_cached_translations(hass: HomeAssistant, mock_config_flows) -> None:
+async def test_get_cached_translations(hass: SmartHub, mock_config_flows) -> None:
     """Test the get cached translations helper."""
     translations = await translation.async_get_translations(hass, "en", "entity")
     assert translations == {}
@@ -577,13 +577,13 @@ async def test_get_cached_translations(hass: HomeAssistant, mock_config_flows) -
     }
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test the setup load listeners helper."""
     translation.async_setup(hass)
 
     # Should not be called if the language is the current language
     with patch(
-        "homeassistant.helpers.translation._TranslationCache.async_load",
+        "smarthub.helpers.translation._TranslationCache.async_load",
     ) as mock:
         hass.bus.async_fire(EVENT_CORE_CONFIG_UPDATE, {"language": "en"})
         await hass.async_block_till_done()
@@ -591,21 +591,21 @@ async def test_setup(hass: HomeAssistant) -> None:
 
     # Should be called if the language is different
     with patch(
-        "homeassistant.helpers.translation._TranslationCache.async_load",
+        "smarthub.helpers.translation._TranslationCache.async_load",
     ) as mock:
         hass.bus.async_fire(EVENT_CORE_CONFIG_UPDATE, {"language": "es"})
         await hass.async_block_till_done()
         mock.assert_called_once_with("es", set())
 
     with patch(
-        "homeassistant.helpers.translation._TranslationCache.async_load",
+        "smarthub.helpers.translation._TranslationCache.async_load",
     ) as mock:
         hass.bus.async_fire(EVENT_CORE_CONFIG_UPDATE, {})
         await hass.async_block_till_done()
         mock.assert_not_called()
 
 
-async def test_translate_state(hass: HomeAssistant) -> None:
+async def test_translate_state(hass: SmartHub) -> None:
     """Test the state translation helper."""
     result = translation.async_translate_state(
         hass, "unavailable", "binary_sensor", "platform", "translation_key", None
@@ -618,7 +618,7 @@ async def test_translate_state(hass: HomeAssistant) -> None:
     assert result == "unknown"
 
     with patch(
-        "homeassistant.helpers.translation.async_get_cached_translations",
+        "smarthub.helpers.translation.async_get_cached_translations",
         return_value={
             "component.platform.entity.binary_sensor.translation_key.state.on": "TRANSLATED"
         },
@@ -630,7 +630,7 @@ async def test_translate_state(hass: HomeAssistant) -> None:
         assert result == "TRANSLATED"
 
     with patch(
-        "homeassistant.helpers.translation.async_get_cached_translations",
+        "smarthub.helpers.translation.async_get_cached_translations",
         return_value={
             "component.binary_sensor.entity_component.device_class.state.on": "TRANSLATED"
         },
@@ -642,7 +642,7 @@ async def test_translate_state(hass: HomeAssistant) -> None:
         assert result == "TRANSLATED"
 
     with patch(
-        "homeassistant.helpers.translation.async_get_cached_translations",
+        "smarthub.helpers.translation.async_get_cached_translations",
         return_value={
             "component.binary_sensor.entity_component._.state.on": "TRANSLATED"
         },
@@ -654,7 +654,7 @@ async def test_translate_state(hass: HomeAssistant) -> None:
         assert result == "TRANSLATED"
 
     with patch(
-        "homeassistant.helpers.translation.async_get_cached_translations",
+        "smarthub.helpers.translation.async_get_cached_translations",
         return_value={},
     ) as mock:
         result = translation.async_translate_state(
@@ -668,7 +668,7 @@ async def test_translate_state(hass: HomeAssistant) -> None:
         assert result == "on"
 
     with patch(
-        "homeassistant.helpers.translation.async_get_cached_translations",
+        "smarthub.helpers.translation.async_get_cached_translations",
         return_value={},
     ) as mock:
         result = translation.async_translate_state(
@@ -684,7 +684,7 @@ async def test_translate_state(hass: HomeAssistant) -> None:
 
 
 async def test_get_translations_still_has_title_without_translations_files(
-    hass: HomeAssistant, mock_config_flows
+    hass: SmartHub, mock_config_flows
 ) -> None:
     """Test the title still gets added in if there are no translation files."""
     mock_config_flows["integration"].append("component1")
@@ -693,11 +693,11 @@ async def test_get_translations_still_has_title_without_translations_files(
 
     with (
         patch(
-            "homeassistant.helpers.translation._load_translations_files_by_language",
+            "smarthub.helpers.translation._load_translations_files_by_language",
             return_value={},
         ),
         patch(
-            "homeassistant.helpers.translation.async_get_integrations",
+            "smarthub.helpers.translation.async_get_integrations",
             return_value={"component1": integration},
         ),
     ):

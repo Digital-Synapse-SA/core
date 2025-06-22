@@ -7,15 +7,15 @@ from syrupy.assertion import SnapshotAssertion
 from tesla_fleet_api.const import EnergyExportMode, EnergyOperationMode
 from teslemetry_stream.const import Signal
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.components.teslemetry.select import LOW
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.teslemetry.select import LOW
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, reload_platform, setup_platform
 from .const import COMMAND_OK, VEHICLE_DATA_ALT
@@ -23,7 +23,7 @@ from .const import COMMAND_OK, VEHICLE_DATA_ALT
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_legacy: AsyncMock,
@@ -34,7 +34,7 @@ async def test_select(
     assert_entities(hass, entry.entry_id, entity_registry, snapshot)
 
 
-async def test_select_services(hass: HomeAssistant, mock_vehicle_data) -> None:
+async def test_select_services(hass: SmartHub, mock_vehicle_data) -> None:
     """Tests that the select services work."""
     mock_vehicle_data.return_value = VEHICLE_DATA_ALT
     await setup_platform(hass, [Platform.SELECT])
@@ -104,7 +104,7 @@ async def test_select_services(hass: HomeAssistant, mock_vehicle_data) -> None:
 
 
 async def test_select_invalid_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -126,7 +126,7 @@ async def test_select_invalid_data(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select_streaming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_vehicle_data: AsyncMock,
     mock_add_listener: AsyncMock,

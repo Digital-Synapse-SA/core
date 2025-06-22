@@ -5,8 +5,8 @@ from http import HTTPStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.typing import ClientSessionGenerator
 
@@ -15,7 +15,7 @@ pytestmark = pytest.mark.usefixtures("init_integration")
 
 @pytest.mark.freeze_time("2022-01-05 00:00:00+00:00")
 async def test_waste_pickup_calendar(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

@@ -4,12 +4,12 @@ from kasa import Device, Feature, Module
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.tplink.const import DOMAIN
-from homeassistant.components.tplink.entity import EXCLUDED_FEATURES
-from homeassistant.components.tplink.sensor import SENSOR_DESCRIPTIONS
-from homeassistant.const import CONF_HOST, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.tplink.const import DOMAIN
+from smarthub.components.tplink.entity import EXCLUDED_FEATURES
+from smarthub.components.tplink.sensor import SENSOR_DESCRIPTIONS
+from smarthub.const import CONF_HOST, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import (
     _mocked_device,
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -47,7 +47,7 @@ async def test_states(
         assert hass.states.get(f"sensor.my_device_{excluded}") is None
 
 
-async def test_color_light_with_an_emeter(hass: HomeAssistant) -> None:
+async def test_color_light_with_an_emeter(hass: SmartHub) -> None:
     """Test a light with an emeter."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -87,7 +87,7 @@ async def test_color_light_with_an_emeter(hass: HomeAssistant) -> None:
         assert hass.states.get(sensor_entity_id) is None
 
 
-async def test_plug_with_an_emeter(hass: HomeAssistant) -> None:
+async def test_plug_with_an_emeter(hass: SmartHub) -> None:
     """Test a plug with an emeter."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -119,7 +119,7 @@ async def test_plug_with_an_emeter(hass: HomeAssistant) -> None:
         assert hass.states.get(sensor_entity_id).state == str(value)
 
 
-async def test_color_light_no_emeter(hass: HomeAssistant) -> None:
+async def test_color_light_no_emeter(hass: SmartHub) -> None:
     """Test a light without an emeter."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -148,7 +148,7 @@ async def test_color_light_no_emeter(hass: HomeAssistant) -> None:
 
 
 async def test_sensor_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a sensor unique ids."""
     already_migrated_config_entry = MockConfigEntry(
@@ -179,7 +179,7 @@ async def test_sensor_unique_id(
 
 
 async def test_undefined_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -210,7 +210,7 @@ async def test_undefined_sensor(
 
 
 async def test_sensor_children_on_parent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -258,7 +258,7 @@ async def test_sensor_children_on_parent(
 
 
 async def test_sensor_children_on_child(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -307,7 +307,7 @@ async def test_sensor_children_on_child(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_datetime_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a timestamp sensor."""
     already_migrated_config_entry = MockConfigEntry(

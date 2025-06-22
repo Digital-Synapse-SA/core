@@ -1,8 +1,8 @@
 """Test Met weather entity."""
 
-from homeassistant import config_entries
-from homeassistant.components.met import DOMAIN
-from homeassistant.components.weather import (
+from smarthub import config_entries
+from smarthub.components.met import DOMAIN
+from smarthub.components.weather import (
     ATTR_CONDITION_CLOUDY,
     ATTR_WEATHER_DEW_POINT,
     ATTR_WEATHER_HUMIDITY,
@@ -13,14 +13,14 @@ from homeassistant.components.weather import (
     ATTR_WEATHER_WIND_SPEED,
     DOMAIN as WEATHER_DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
 
 async def test_new_config_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_weather
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_weather
 ) -> None:
     """Test the expected entities are created."""
     await hass.config_entries.flow.async_init("met", context={"source": "onboarding"})
@@ -32,7 +32,7 @@ async def test_new_config_entry(
 
 
 async def test_legacy_config_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_weather
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_weather
 ) -> None:
     """Test the expected entities are created."""
     entity_registry.async_get_or_create(
@@ -48,7 +48,7 @@ async def test_legacy_config_entry(
     assert len(er.async_entries_for_config_entry(entity_registry, entry.entry_id)) == 1
 
 
-async def test_weather(hass: HomeAssistant, mock_weather) -> None:
+async def test_weather(hass: SmartHub, mock_weather) -> None:
     """Test states of the weather."""
 
     await init_integration(hass)
@@ -67,7 +67,7 @@ async def test_weather(hass: HomeAssistant, mock_weather) -> None:
     assert state.attributes[ATTR_WEATHER_UV_INDEX] == 1.1
 
 
-async def test_tracking_home(hass: HomeAssistant, mock_weather) -> None:
+async def test_tracking_home(hass: SmartHub, mock_weather) -> None:
     """Test we track home."""
     await hass.config_entries.flow.async_init("met", context={"source": "onboarding"})
     await hass.async_block_till_done()
@@ -91,7 +91,7 @@ async def test_tracking_home(hass: HomeAssistant, mock_weather) -> None:
     assert len(hass.states.async_entity_ids("weather")) == 0
 
 
-async def test_not_tracking_home(hass: HomeAssistant, mock_weather) -> None:
+async def test_not_tracking_home(hass: SmartHub, mock_weather) -> None:
     """Test when we not track home."""
 
     await hass.config_entries.flow.async_init(
@@ -116,7 +116,7 @@ async def test_not_tracking_home(hass: HomeAssistant, mock_weather) -> None:
 
 
 async def test_remove_hourly_entity(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_weather
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_weather
 ) -> None:
     """Test removing the hourly entity."""
 

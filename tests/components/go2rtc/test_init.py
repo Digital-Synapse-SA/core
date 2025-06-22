@@ -20,7 +20,7 @@ from go2rtc_client.ws import (
 import pytest
 from webrtc_models import RTCIceCandidateInit
 
-from homeassistant.components.camera import (
+from smarthub.components.camera import (
     StreamType,
     WebRTCAnswer as HAWebRTCAnswer,
     WebRTCCandidate as HAWebRTCCandidate,
@@ -29,20 +29,20 @@ from homeassistant.components.camera import (
     WebRTCSendMessage,
     async_get_image,
 )
-from homeassistant.components.default_config import DOMAIN as DEFAULT_CONFIG_DOMAIN
-from homeassistant.components.go2rtc import HomeAssistant, WebRTCProvider
-from homeassistant.components.go2rtc.const import (
+from smarthub.components.default_config import DOMAIN as DEFAULT_CONFIG_DOMAIN
+from smarthub.components.go2rtc import SmartHub, WebRTCProvider
+from smarthub.components.go2rtc.const import (
     CONF_DEBUG_UI,
     DEBUG_UI_URL_MESSAGE,
     DOMAIN,
     RECOMMENDED_VERSION,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_URL
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_URL
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.typing import ConfigType
+from smarthub.setup import async_setup_component
 
 from . import MockCamera
 
@@ -61,7 +61,7 @@ def has_go2rtc_entry_fixture() -> bool:
 
 
 @pytest.fixture
-def mock_go2rtc_entry(hass: HomeAssistant, has_go2rtc_entry: bool) -> None:
+def mock_go2rtc_entry(hass: SmartHub, has_go2rtc_entry: bool) -> None:
     """Mock a go2rtc onfig entry."""
     if not has_go2rtc_entry:
         return
@@ -70,7 +70,7 @@ def mock_go2rtc_entry(hass: HomeAssistant, has_go2rtc_entry: bool) -> None:
 
 
 async def _test_setup_and_signaling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     rest_client: AsyncMock,
     ws_client: Mock,
@@ -197,7 +197,7 @@ async def _test_setup_and_signaling(
 )
 @pytest.mark.parametrize("has_go2rtc_entry", [True, False])
 async def test_setup_go_binary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     rest_client: AsyncMock,
     ws_client: Mock,
@@ -240,7 +240,7 @@ async def test_setup_go_binary(
 )
 @pytest.mark.parametrize("has_go2rtc_entry", [True, False])
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     rest_client: AsyncMock,
     ws_client: Mock,
@@ -348,7 +348,7 @@ async def test_on_candidate(
     # Session doesn't exist
     await camera.async_on_webrtc_candidate(session_id, RTCIceCandidateInit("candidate"))
     assert (
-        "homeassistant.components.go2rtc",
+        "smarthub.components.go2rtc",
         logging.DEBUG,
         f"Unknown session {session_id}. Ignoring candidate",
     ) in caplog.record_tuples
@@ -431,7 +431,7 @@ ERR_URL_REQUIRED = "Go2rtc URL required in non-docker installs"
     "mock_get_binary", "mock_go2rtc_entry", "mock_is_docker_env", "server"
 )
 async def test_non_user_setup_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: ConfigType,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -464,7 +464,7 @@ async def test_non_user_setup_with_error(
     "mock_get_binary", "mock_go2rtc_entry", "mock_is_docker_env", "server"
 )
 async def test_setup_with_setup_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: ConfigType,
     caplog: pytest.LogCaptureFixture,
     has_go2rtc_entry: bool,
@@ -489,7 +489,7 @@ async def test_setup_with_setup_error(
     "mock_get_binary", "mock_go2rtc_entry", "mock_is_docker_env", "server"
 )
 async def test_setup_with_setup_entry_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: ConfigType,
     caplog: pytest.LogCaptureFixture,
     expected_log_message: str,
@@ -519,7 +519,7 @@ async def test_setup_with_setup_entry_error(
     "mock_get_binary", "mock_go2rtc_entry", "mock_is_docker_env", "server"
 )
 async def test_setup_with_retryable_setup_entry_error_custom_server(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     rest_client: AsyncMock,
     config: ConfigType,
@@ -554,7 +554,7 @@ async def test_setup_with_retryable_setup_entry_error_custom_server(
     "mock_get_binary", "mock_go2rtc_entry", "mock_is_docker_env", "server"
 )
 async def test_setup_with_retryable_setup_entry_error_default_server(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     rest_client: AsyncMock,
     has_go2rtc_entry: bool,
@@ -592,7 +592,7 @@ async def test_setup_with_retryable_setup_entry_error_default_server(
     "mock_get_binary", "mock_go2rtc_entry", "mock_is_docker_env", "server"
 )
 async def test_setup_with_version_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     rest_client: AsyncMock,
     config: ConfigType,
@@ -610,7 +610,7 @@ async def test_setup_with_version_error(
     assert expected_log_message in caplog.text
 
 
-async def test_config_entry_remove(hass: HomeAssistant) -> None:
+async def test_config_entry_remove(hass: SmartHub) -> None:
     """Test config entry removed when neither default_config nor go2rtc is in config."""
     config_entry = MockConfigEntry(domain=DOMAIN)
     config_entry.add_to_hass(hass)
@@ -622,7 +622,7 @@ async def test_config_entry_remove(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize("config", [{DOMAIN: {CONF_URL: "http://localhost:1984"}}])
 @pytest.mark.usefixtures("server")
 async def test_setup_with_recommended_version_repair(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     rest_client: AsyncMock,
     config: ConfigType,
@@ -648,7 +648,7 @@ async def test_setup_with_recommended_version_repair(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_async_get_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_test_integration: MockCamera,
     rest_client: AsyncMock,
 ) -> None:
@@ -667,6 +667,6 @@ async def test_async_get_image(
     camera.set_stream_source("invalid://not_supported")
 
     with pytest.raises(
-        HomeAssistantError, match="Stream source is not supported by go2rtc"
+        SmartHubError, match="Stream source is not supported by go2rtc"
     ):
         await async_get_image(hass, camera.entity_id)

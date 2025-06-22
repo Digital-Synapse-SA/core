@@ -5,9 +5,9 @@ from unittest.mock import Mock
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN, LockState
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_LOCK, SERVICE_UNLOCK
-from homeassistant.core import HomeAssistant
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN, LockState
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_LOCK, SERVICE_UNLOCK
+from smarthub.core import SmartHub
 
 from . import MockSchlageConfigEntry
 
@@ -15,7 +15,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_lock_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockSchlageConfigEntry,
     mock_schlage: Mock,
     mock_lock: Mock,
@@ -39,7 +39,7 @@ async def test_lock_attributes(
 
 
 async def test_lock_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lock: Mock,
     mock_added_config_entry: MockSchlageConfigEntry,
 ) -> None:
@@ -66,7 +66,7 @@ async def test_lock_services(
 
 
 async def test_changed_by(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lock: Mock,
     mock_added_config_entry: MockSchlageConfigEntry,
     freezer: FrozenDateTimeFactory,

@@ -7,16 +7,16 @@ from matter_server.client.models.node import MatterNode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import snapshot_matter_entities
 
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -26,7 +26,7 @@ async def test_buttons(
 
 @pytest.mark.parametrize("node_fixture", ["eve_energy_plug"])
 async def test_identify_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -53,7 +53,7 @@ async def test_identify_button(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_dishwasher"])
 async def test_operational_state_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

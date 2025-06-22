@@ -1,6 +1,6 @@
 {
   "home_assistant": {
-    "installation_type": "Home Assistant Container",
+    "installation_type": "SmartHub Container",
     "version": "2024.7.4",
     "dev": false,
     "hassio": false,
@@ -38,10 +38,10 @@
   "integration_manifest": {
     "domain": "zwave_js",
     "name": "Z-Wave",
-    "codeowners": ["home-assistant/z-wave"],
+    "codeowners": ["smart-hub/z-wave"],
     "config_flow": true,
     "dependencies": ["http", "repairs", "usb", "websocket_api"],
-    "documentation": "https://www.home-assistant.io/integrations/zwave_js",
+    "documentation": "https://www.smart-hub.io/integrations/zwave_js",
     "integration_type": "hub",
     "iot_class": "local_push",
     "loggers": ["zwave_js_server"],

@@ -6,15 +6,15 @@ from aiohttp.client_exceptions import ClientConnectionError
 import aiosomecomfort
 import pytest
 
-from homeassistant.components.honeywell.const import (
+from smarthub.components.honeywell.const import (
     CONF_COOL_AWAY_TEMPERATURE,
     CONF_HEAT_AWAY_TEMPERATURE,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import init_integration
 
@@ -23,8 +23,8 @@ from tests.common import MockConfigEntry
 MIGRATE_OPTIONS_KEYS = {CONF_COOL_AWAY_TEMPERATURE, CONF_HEAT_AWAY_TEMPERATURE}
 
 
-@patch("homeassistant.components.honeywell.UPDATE_LOOP_SLEEP_TIME", 0)
-async def test_setup_entry(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+@patch("smarthub.components.honeywell.UPDATE_LOOP_SLEEP_TIME", 0)
+async def test_setup_entry(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Initialize the config entry."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -35,9 +35,9 @@ async def test_setup_entry(hass: HomeAssistant, config_entry: MockConfigEntry) -
     )  # 1 climate entity; 2 sensor entities
 
 
-@patch("homeassistant.components.honeywell.UPDATE_LOOP_SLEEP_TIME", 0)
+@patch("smarthub.components.honeywell.UPDATE_LOOP_SLEEP_TIME", 0)
 async def test_setup_multiple_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry, config_entry2: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry, config_entry2: MockConfigEntry
 ) -> None:
     """Initialize the config entry."""
     config_entry.add_to_hass(hass)
@@ -52,7 +52,7 @@ async def test_setup_multiple_entry(
 
 
 async def test_setup_multiple_thermostats(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     location: MagicMock,
     another_device: MagicMock,
@@ -69,7 +69,7 @@ async def test_setup_multiple_thermostats(
 
 
 async def test_setup_multiple_thermostats_with_same_deviceid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     config_entry: MockConfigEntry,
     device: MagicMock,
@@ -90,7 +90,7 @@ async def test_setup_multiple_thermostats_with_same_deviceid(
     assert "Platform honeywell does not generate unique IDs" not in caplog.text
 
 
-async def test_away_temps_migration(hass: HomeAssistant) -> None:
+async def test_away_temps_migration(hass: SmartHub) -> None:
     """Test away temps migrate to config options."""
     legacy_config = MockConfigEntry(
         domain=DOMAIN,
@@ -113,7 +113,7 @@ async def test_away_temps_migration(hass: HomeAssistant) -> None:
 
 
 async def test_login_error(
-    hass: HomeAssistant, client: MagicMock, config_entry: MagicMock
+    hass: SmartHub, client: MagicMock, config_entry: MagicMock
 ) -> None:
     """Test login errors from API."""
     client.login.side_effect = aiosomecomfort.AuthError
@@ -131,7 +131,7 @@ async def test_login_error(
     ],
 )
 async def test_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MagicMock,
     the_error: Exception,
@@ -143,7 +143,7 @@ async def test_connection_error(
 
 
 async def test_no_devices(
-    hass: HomeAssistant, client: MagicMock, config_entry: MagicMock
+    hass: SmartHub, client: MagicMock, config_entry: MagicMock
 ) -> None:
     """Test no devices from API."""
     client.locations_by_id = {}
@@ -152,7 +152,7 @@ async def test_no_devices(
 
 
 async def test_remove_stale_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
     location: MagicMock,

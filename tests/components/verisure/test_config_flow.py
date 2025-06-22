@@ -7,23 +7,23 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from verisure import Error as VerisureError, LoginError as VerisureLoginError
 
-from homeassistant import config_entries
-from homeassistant.components.verisure.const import (
+from smarthub import config_entries
+from smarthub.components.verisure.const import (
     CONF_GIID,
     CONF_LOCK_CODE_DIGITS,
     DEFAULT_LOCK_CODE_DIGITS,
     DOMAIN,
 )
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_user_flow_single_installation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_verisure_config_flow: MagicMock,
 ) -> None:
@@ -62,7 +62,7 @@ async def test_full_user_flow_single_installation(
 
 
 async def test_full_user_flow_multiple_installations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_verisure_config_flow: MagicMock,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_full_user_flow_multiple_installations(
 
 
 async def test_full_user_flow_single_installation_with_mfa(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_verisure_config_flow: MagicMock,
 ) -> None:
@@ -162,7 +162,7 @@ async def test_full_user_flow_single_installation_with_mfa(
 
 
 async def test_full_user_flow_multiple_installations_with_mfa(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_verisure_config_flow: MagicMock,
 ) -> None:
@@ -231,7 +231,7 @@ async def test_full_user_flow_multiple_installations_with_mfa(
     ],
 )
 async def test_verisure_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_verisure_config_flow: MagicMock,
     side_effect: Exception,
@@ -329,7 +329,7 @@ async def test_verisure_errors(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_dhcp(hass: HomeAssistant) -> None:
+async def test_dhcp(hass: SmartHub) -> None:
     """Test that DHCP discovery works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -344,7 +344,7 @@ async def test_dhcp(hass: HomeAssistant) -> None:
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_verisure_config_flow: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -379,7 +379,7 @@ async def test_reauth_flow(
 
 
 async def test_reauth_flow_with_mfa(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_verisure_config_flow: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -440,7 +440,7 @@ async def test_reauth_flow_with_mfa(
     ],
 )
 async def test_reauth_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_verisure_config_flow: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -537,13 +537,13 @@ async def test_reauth_flow_errors(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test options config flow."""
     entry = MockConfigEntry(domain=DOMAIN, unique_id="12345", data={}, version=2)
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.verisure.async_setup_entry",
+        "smarthub.components.verisure.async_setup_entry",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)

@@ -3,13 +3,13 @@
 from aiowebostv import WebOsTvPairError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.webostv.const import CONF_SOURCES, DOMAIN, LIVE_TV_APP_ID
-from homeassistant.config_entries import SOURCE_SSDP
-from homeassistant.const import CONF_CLIENT_SECRET, CONF_HOST, CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub import config_entries
+from smarthub.components.webostv.const import CONF_SOURCES, DOMAIN, LIVE_TV_APP_ID
+from smarthub.config_entries import SOURCE_SSDP
+from smarthub.const import CONF_CLIENT_SECRET, CONF_HOST, CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_UDN,
     SsdpServiceInfo,
@@ -41,7 +41,7 @@ MOCK_DISCOVERY_INFO = SsdpServiceInfo(
 )
 
 
-async def test_form(hass: HomeAssistant, client) -> None:
+async def test_form(hass: SmartHub, client) -> None:
     """Test successful user flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -81,7 +81,7 @@ async def test_form(hass: HomeAssistant, client) -> None:
     ],
 )
 async def test_options_flow_live_tv_in_apps(
-    hass: HomeAssistant, client, apps, inputs
+    hass: SmartHub, client, apps, inputs
 ) -> None:
     """Test options config flow Live TV found in apps."""
     client.tv_state.apps = apps
@@ -111,7 +111,7 @@ async def test_options_flow_live_tv_in_apps(
     ],
 )
 async def test_options_flow_errors(
-    hass: HomeAssistant, client, side_effect, error
+    hass: SmartHub, client, side_effect, error
 ) -> None:
     """Test options config flow errors."""
     entry = await setup_webostv(hass)
@@ -142,7 +142,7 @@ async def test_options_flow_errors(
     assert result3["data"][CONF_SOURCES] == ["Input01", "Input02"]
 
 
-async def test_form_cannot_connect(hass: HomeAssistant, client) -> None:
+async def test_form_cannot_connect(hass: SmartHub, client) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -168,7 +168,7 @@ async def test_form_cannot_connect(hass: HomeAssistant, client) -> None:
     assert result["title"] == TV_NAME
 
 
-async def test_form_pairexception(hass: HomeAssistant, client) -> None:
+async def test_form_pairexception(hass: SmartHub, client) -> None:
     """Test pairing exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -194,7 +194,7 @@ async def test_form_pairexception(hass: HomeAssistant, client) -> None:
     assert result["title"] == TV_NAME
 
 
-async def test_entry_already_configured(hass: HomeAssistant, client) -> None:
+async def test_entry_already_configured(hass: SmartHub, client) -> None:
     """Test entry already configured."""
     await setup_webostv(hass)
 
@@ -208,7 +208,7 @@ async def test_entry_already_configured(hass: HomeAssistant, client) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_form_ssdp(hass: HomeAssistant, client) -> None:
+async def test_form_ssdp(hass: SmartHub, client) -> None:
     """Test that the ssdp confirmation form is served."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={CONF_SOURCE: SOURCE_SSDP}, data=MOCK_DISCOVERY_INFO
@@ -228,7 +228,7 @@ async def test_form_ssdp(hass: HomeAssistant, client) -> None:
     assert config_entry.unique_id == FAKE_UUID
 
 
-async def test_ssdp_in_progress(hass: HomeAssistant, client) -> None:
+async def test_ssdp_in_progress(hass: SmartHub, client) -> None:
     """Test abort if ssdp paring is already in progress."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -250,7 +250,7 @@ async def test_ssdp_in_progress(hass: HomeAssistant, client) -> None:
     assert result["reason"] == "already_in_progress"
 
 
-async def test_form_abort_uuid_configured(hass: HomeAssistant, client) -> None:
+async def test_form_abort_uuid_configured(hass: SmartHub, client) -> None:
     """Test abort if uuid is already configured, verify host update."""
     entry = await setup_webostv(hass, MOCK_DISCOVERY_INFO.upnp[ATTR_UPNP_UDN][5:])
     assert entry.unique_id == MOCK_DISCOVERY_INFO.upnp[ATTR_UPNP_UDN][5:]
@@ -287,7 +287,7 @@ async def test_form_abort_uuid_configured(hass: HomeAssistant, client) -> None:
     assert entry.data[CONF_HOST] == "new_host"
 
 
-async def test_reauth_successful(hass: HomeAssistant, client) -> None:
+async def test_reauth_successful(hass: SmartHub, client) -> None:
     """Test that the reauthorization is successful."""
     entry = await setup_webostv(hass)
 
@@ -317,7 +317,7 @@ async def test_reauth_successful(hass: HomeAssistant, client) -> None:
         (ConnectionResetError, "cannot_connect"),
     ],
 )
-async def test_reauth_errors(hass: HomeAssistant, client, side_effect, error) -> None:
+async def test_reauth_errors(hass: SmartHub, client, side_effect, error) -> None:
     """Test reauthorization errors."""
     entry = await setup_webostv(hass)
 
@@ -346,7 +346,7 @@ async def test_reauth_errors(hass: HomeAssistant, client, side_effect, error) ->
     assert result["reason"] == "reauth_successful"
 
 
-async def test_reconfigure_successful(hass: HomeAssistant, client) -> None:
+async def test_reconfigure_successful(hass: SmartHub, client) -> None:
     """Test that the reconfigure is successful."""
     entry = await setup_webostv(hass)
 
@@ -373,7 +373,7 @@ async def test_reconfigure_successful(hass: HomeAssistant, client) -> None:
     ],
 )
 async def test_reconfigure_errors(
-    hass: HomeAssistant, client, side_effect, error
+    hass: SmartHub, client, side_effect, error
 ) -> None:
     """Test reconfigure errors."""
     entry = await setup_webostv(hass)
@@ -402,7 +402,7 @@ async def test_reconfigure_errors(
     assert result["reason"] == "reconfigure_successful"
 
 
-async def test_reconfigure_wrong_device(hass: HomeAssistant, client) -> None:
+async def test_reconfigure_wrong_device(hass: SmartHub, client) -> None:
     """Test abort if reconfigure host is wrong webOS TV device."""
     entry = await setup_webostv(hass)
 

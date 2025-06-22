@@ -9,7 +9,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
     DOMAIN as CLIMATE_DOMAIN,
@@ -19,14 +19,14 @@ from homeassistant.components.climate import (
     SERVICE_TURN_OFF,
     HVACMode,
 )
-from homeassistant.components.comelit.const import (
+from smarthub.components.comelit.const import (
     PRESET_MODE_AUTO,
     PRESET_MODE_MANUAL,
     SCAN_INTERVAL,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -36,14 +36,14 @@ ENTITY_ID = "climate.climate0"
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.comelit.BRIDGE_PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.comelit.BRIDGE_PLATFORMS", [Platform.CLIMATE]):
         await setup_integration(hass, mock_serial_bridge_config_entry)
 
     await snapshot_platform(
@@ -87,7 +87,7 @@ async def test_all_entities(
     ],
 )
 async def test_climate_data_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
@@ -127,7 +127,7 @@ async def test_climate_data_update(
 
 
 async def test_climate_data_update_bad_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
@@ -164,7 +164,7 @@ async def test_climate_data_update_bad_data(
 
 
 async def test_climate_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -191,7 +191,7 @@ async def test_climate_set_temperature(
 
 
 async def test_climate_set_temperature_when_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -229,7 +229,7 @@ async def test_climate_set_temperature_when_off(
 
 
 async def test_climate_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -254,7 +254,7 @@ async def test_climate_hvac_mode(
 
 
 async def test_climate_hvac_mode_when_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -290,7 +290,7 @@ async def test_climate_hvac_mode_when_off(
 
 
 async def test_climate_preset_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -318,7 +318,7 @@ async def test_climate_preset_mode(
 
 
 async def test_climate_preset_mode_when_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -355,7 +355,7 @@ async def test_climate_preset_mode_when_off(
 
 
 async def test_climate_remove_stale(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:

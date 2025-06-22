@@ -8,12 +8,12 @@ from unittest.mock import Mock
 from pyfritzhome import LoginError
 from requests.exceptions import ConnectionError, HTTPError
 
-from homeassistant.components.fritzbox.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_DEVICES
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components.fritzbox.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_DEVICES
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import FritzDeviceCoverMock, FritzDeviceSwitchMock, FritzEntityBaseMock
 from .const import MOCK_CONFIG
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_coordinator_update_after_reboot(
-    hass: HomeAssistant, fritz: Mock
+    hass: SmartHub, fritz: Mock
 ) -> None:
     """Test coordinator after reboot."""
     entry = MockConfigEntry(
@@ -42,7 +42,7 @@ async def test_coordinator_update_after_reboot(
 
 
 async def test_coordinator_update_after_password_change(
-    hass: HomeAssistant, fritz: Mock
+    hass: SmartHub, fritz: Mock
 ) -> None:
     """Test coordinator after password change."""
     entry = MockConfigEntry(
@@ -62,7 +62,7 @@ async def test_coordinator_update_after_password_change(
 
 
 async def test_coordinator_update_when_unreachable(
-    hass: HomeAssistant, fritz: Mock
+    hass: SmartHub, fritz: Mock
 ) -> None:
     """Test coordinator after reboot."""
     entry = MockConfigEntry(
@@ -78,7 +78,7 @@ async def test_coordinator_update_when_unreachable(
 
 
 async def test_coordinator_automatic_registry_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fritz: Mock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,

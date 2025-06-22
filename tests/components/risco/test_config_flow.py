@@ -5,15 +5,15 @@ from unittest.mock import PropertyMock, patch
 import pytest
 import voluptuous as vol
 
-from homeassistant import config_entries
-from homeassistant.components.risco.config_flow import (
+from smarthub import config_entries
+from smarthub.components.risco.config_flow import (
     CannotConnectError,
     UnauthorizedError,
 )
-from homeassistant.components.risco.const import CONF_COMMUNICATION_DELAY, DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.risco.const import CONF_COMMUNICATION_DELAY, DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -56,7 +56,7 @@ TEST_ADVANCED_OPTIONS = {
 }
 
 
-async def test_cloud_form(hass: HomeAssistant) -> None:
+async def test_cloud_form(hass: SmartHub) -> None:
     """Test we get the cloud form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -72,18 +72,18 @@ async def test_cloud_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.risco.config_flow.RiscoCloud.login",
+            "smarthub.components.risco.config_flow.RiscoCloud.login",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.risco.config_flow.RiscoCloud.site_name",
+            "smarthub.components.risco.config_flow.RiscoCloud.site_name",
             new_callable=PropertyMock(return_value=TEST_SITE_NAME),
         ),
         patch(
-            "homeassistant.components.risco.config_flow.RiscoCloud.close"
+            "smarthub.components.risco.config_flow.RiscoCloud.close"
         ) as mock_close,
         patch(
-            "homeassistant.components.risco.async_setup_entry",
+            "smarthub.components.risco.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -107,7 +107,7 @@ async def test_cloud_form(hass: HomeAssistant) -> None:
         (Exception, "unknown"),
     ],
 )
-async def test_cloud_error(hass: HomeAssistant, login_with_error, error) -> None:
+async def test_cloud_error(hass: SmartHub, login_with_error, error) -> None:
     """Test we handle config flow errors."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -117,7 +117,7 @@ async def test_cloud_error(hass: HomeAssistant, login_with_error, error) -> None
     )
 
     with patch(
-        "homeassistant.components.risco.config_flow.RiscoCloud.close"
+        "smarthub.components.risco.config_flow.RiscoCloud.close"
     ) as mock_close:
         result3 = await hass.config_entries.flow.async_configure(
             result2["flow_id"], TEST_CLOUD_DATA
@@ -128,7 +128,7 @@ async def test_cloud_error(hass: HomeAssistant, login_with_error, error) -> None
     assert result3["errors"] == {"base": error}
 
 
-async def test_form_cloud_already_exists(hass: HomeAssistant) -> None:
+async def test_form_cloud_already_exists(hass: SmartHub) -> None:
     """Test that a flow with an existing username aborts."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -155,7 +155,7 @@ async def test_form_cloud_already_exists(hass: HomeAssistant) -> None:
 
 
 async def test_form_reauth(
-    hass: HomeAssistant, cloud_config_entry: MockConfigEntry
+    hass: SmartHub, cloud_config_entry: MockConfigEntry
 ) -> None:
     """Test reauthenticate."""
 
@@ -165,18 +165,18 @@ async def test_form_reauth(
 
     with (
         patch(
-            "homeassistant.components.risco.config_flow.RiscoCloud.login",
+            "smarthub.components.risco.config_flow.RiscoCloud.login",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.risco.config_flow.RiscoCloud.site_name",
+            "smarthub.components.risco.config_flow.RiscoCloud.site_name",
             new_callable=PropertyMock(return_value=TEST_SITE_NAME),
         ),
         patch(
-            "homeassistant.components.risco.config_flow.RiscoCloud.close",
+            "smarthub.components.risco.config_flow.RiscoCloud.close",
         ),
         patch(
-            "homeassistant.components.risco.async_setup_entry",
+            "smarthub.components.risco.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -192,7 +192,7 @@ async def test_form_reauth(
 
 
 async def test_form_reauth_with_new_username(
-    hass: HomeAssistant, cloud_config_entry: MockConfigEntry
+    hass: SmartHub, cloud_config_entry: MockConfigEntry
 ) -> None:
     """Test reauthenticate with new username."""
 
@@ -202,18 +202,18 @@ async def test_form_reauth_with_new_username(
 
     with (
         patch(
-            "homeassistant.components.risco.config_flow.RiscoCloud.login",
+            "smarthub.components.risco.config_flow.RiscoCloud.login",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.risco.config_flow.RiscoCloud.site_name",
+            "smarthub.components.risco.config_flow.RiscoCloud.site_name",
             new_callable=PropertyMock(return_value=TEST_SITE_NAME),
         ),
         patch(
-            "homeassistant.components.risco.config_flow.RiscoCloud.close",
+            "smarthub.components.risco.config_flow.RiscoCloud.close",
         ),
         patch(
-            "homeassistant.components.risco.async_setup_entry",
+            "smarthub.components.risco.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -229,7 +229,7 @@ async def test_form_reauth_with_new_username(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_local_form(hass: HomeAssistant) -> None:
+async def test_local_form(hass: SmartHub) -> None:
     """Test we get the local form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -245,18 +245,18 @@ async def test_local_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.risco.config_flow.RiscoLocal.connect",
+            "smarthub.components.risco.config_flow.RiscoLocal.connect",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.risco.config_flow.RiscoLocal.id",
+            "smarthub.components.risco.config_flow.RiscoLocal.id",
             new_callable=PropertyMock(return_value=TEST_SITE_NAME),
         ),
         patch(
-            "homeassistant.components.risco.config_flow.RiscoLocal.disconnect"
+            "smarthub.components.risco.config_flow.RiscoLocal.disconnect"
         ) as mock_close,
         patch(
-            "homeassistant.components.risco.async_setup_entry",
+            "smarthub.components.risco.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -285,7 +285,7 @@ async def test_local_form(hass: HomeAssistant) -> None:
         (Exception, "unknown"),
     ],
 )
-async def test_local_error(hass: HomeAssistant, connect_with_error, error) -> None:
+async def test_local_error(hass: SmartHub, connect_with_error, error) -> None:
     """Test we handle config flow errors."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -302,7 +302,7 @@ async def test_local_error(hass: HomeAssistant, connect_with_error, error) -> No
     assert result3["errors"] == {"base": error}
 
 
-async def test_form_local_already_exists(hass: HomeAssistant) -> None:
+async def test_form_local_already_exists(hass: SmartHub) -> None:
     """Test that a flow with an existing host aborts."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -322,15 +322,15 @@ async def test_form_local_already_exists(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.risco.config_flow.RiscoLocal.connect",
+            "smarthub.components.risco.config_flow.RiscoLocal.connect",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.risco.config_flow.RiscoLocal.id",
+            "smarthub.components.risco.config_flow.RiscoLocal.id",
             new_callable=PropertyMock(return_value=TEST_SITE_NAME),
         ),
         patch(
-            "homeassistant.components.risco.config_flow.RiscoLocal.disconnect",
+            "smarthub.components.risco.config_flow.RiscoLocal.disconnect",
         ),
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -341,7 +341,7 @@ async def test_form_local_already_exists(hass: HomeAssistant) -> None:
     assert result3["reason"] == "already_configured"
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test options flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -371,7 +371,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "ha_to_risco"
 
-    with patch("homeassistant.components.risco.async_setup_entry", return_value=True):
+    with patch("smarthub.components.risco.async_setup_entry", return_value=True):
         result = await hass.config_entries.options.async_configure(
             result["flow_id"],
             user_input=TEST_HA_TO_RISCO,
@@ -385,7 +385,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_advanced_options_flow(hass: HomeAssistant) -> None:
+async def test_advanced_options_flow(hass: SmartHub) -> None:
     """Test options flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -417,7 +417,7 @@ async def test_advanced_options_flow(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "ha_to_risco"
 
-    with patch("homeassistant.components.risco.async_setup_entry", return_value=True):
+    with patch("smarthub.components.risco.async_setup_entry", return_value=True):
         result = await hass.config_entries.options.async_configure(
             result["flow_id"],
             user_input=TEST_HA_TO_RISCO,
@@ -432,7 +432,7 @@ async def test_advanced_options_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_ha_to_risco_schema(hass: HomeAssistant) -> None:
+async def test_ha_to_risco_schema(hass: SmartHub) -> None:
     """Test that the schema for the ha-to-risco mapping step is generated properly."""
     entry = MockConfigEntry(
         domain=DOMAIN,

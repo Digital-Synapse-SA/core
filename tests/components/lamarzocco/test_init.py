@@ -8,10 +8,10 @@ from pylamarzocco.models import WebSocketDetails
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.lamarzocco.config_flow import CONF_MACHINE
-from homeassistant.components.lamarzocco.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.lamarzocco.config_flow import CONF_MACHINE
+from smarthub.components.lamarzocco.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     CONF_ADDRESS,
     CONF_HOST,
     CONF_MAC,
@@ -20,8 +20,8 @@ from homeassistant.const import (
     CONF_TOKEN,
     EVENT_HOMEASSISTANT_STOP,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
@@ -33,7 +33,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test loading and unloading the integration."""
@@ -48,7 +48,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_lamarzocco: MagicMock,
 ) -> None:
@@ -70,7 +70,7 @@ async def test_config_entry_not_ready(
     ],
 )
 async def test_get_settings_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_cloud_client: MagicMock,
     side_effect: Exception,
@@ -86,7 +86,7 @@ async def test_get_settings_errors(
 
 
 async def test_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_lamarzocco: MagicMock,
 ) -> None:
@@ -111,7 +111,7 @@ async def test_invalid_auth(
 
 
 async def test_v1_migration_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
 ) -> None:
     """Test v1 -> v2 Migration."""
@@ -130,7 +130,7 @@ async def test_v1_migration_fails(
 
 
 async def test_v2_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
 ) -> None:
     """Test v2 -> v3 Migration."""
@@ -160,7 +160,7 @@ async def test_v2_migration(
 
 
 async def test_migration_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_cloud_client: MagicMock,
     mock_lamarzocco: MagicMock,
@@ -185,7 +185,7 @@ async def test_migration_errors(
 
 
 async def test_config_flow_entry_migration_downgrade(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that config entry fails setup if the version is from the future."""
     entry = MockConfigEntry(domain=DOMAIN, version=4)
@@ -195,7 +195,7 @@ async def test_config_flow_entry_migration_downgrade(
 
 
 async def test_bluetooth_is_set_from_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_lamarzocco: MagicMock,
     mock_cloud_client: MagicMock,
@@ -208,11 +208,11 @@ async def test_bluetooth_is_set_from_discovery(
     mock_cloud_client.get_thing_settings.return_value.ble_auth_token = "token"
     with (
         patch(
-            "homeassistant.components.lamarzocco.async_discovered_service_info",
+            "smarthub.components.lamarzocco.async_discovered_service_info",
             return_value=[service_info],
         ) as discovery,
         patch(
-            "homeassistant.components.lamarzocco.LaMarzoccoMachine"
+            "smarthub.components.lamarzocco.LaMarzoccoMachine"
         ) as mock_machine_class,
     ):
         mock_machine_class.return_value = mock_lamarzocco
@@ -227,7 +227,7 @@ async def test_bluetooth_is_set_from_discovery(
 
 
 async def test_websocket_closed_on_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_lamarzocco: MagicMock,
 ) -> None:
@@ -253,7 +253,7 @@ async def test_websocket_closed_on_unload(
     ("version", "issue_exists"), [("v3.5-rc6", True), ("v5.0.9", False)]
 )
 async def test_gateway_version_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_cloud_client: MagicMock,
     version: str,
@@ -272,7 +272,7 @@ async def test_gateway_version_issue(
 
 
 async def test_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,

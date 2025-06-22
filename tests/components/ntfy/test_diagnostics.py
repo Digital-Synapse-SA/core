@@ -3,9 +3,9 @@
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ntfy.const import DOMAIN
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
+from smarthub.components.ntfy.const import DOMAIN
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -32,7 +32,7 @@ async def test_diagnostics(
 
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_diagnostics_redacted_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:

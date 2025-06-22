@@ -10,17 +10,17 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant import setup
-from homeassistant.components.command_line.binary_sensor import CommandBinarySensor
-from homeassistant.components.command_line.const import DOMAIN
-from homeassistant.components.homeassistant import (
+from smarthub import setup
+from smarthub.components.command_line.binary_sensor import CommandBinarySensor
+from smarthub.components.command_line.const import DOMAIN
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import mock_asyncio_subprocess_run
 
@@ -46,7 +46,7 @@ from tests.common import async_fire_time_changed
     ],
 )
 async def test_setup_integration_yaml(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test sensor setup."""
 
@@ -56,7 +56,7 @@ async def test_setup_integration_yaml(
     assert entity_state.name == "Test"
 
 
-async def test_setup_platform_yaml(hass: HomeAssistant) -> None:
+async def test_setup_platform_yaml(hass: SmartHub) -> None:
     """Test setting up the platform with platform yaml."""
     await setup.async_setup_component(
         hass,
@@ -95,7 +95,7 @@ async def test_setup_platform_yaml(hass: HomeAssistant) -> None:
         }
     ],
 )
-async def test_template(hass: HomeAssistant, load_yaml_integration: None) -> None:
+async def test_template(hass: SmartHub, load_yaml_integration: None) -> None:
     """Test setting the state with a template."""
 
     entity_state = hass.states.get("binary_sensor.test")
@@ -129,7 +129,7 @@ async def test_template(hass: HomeAssistant, load_yaml_integration: None) -> Non
         }
     ],
 )
-async def test_sensor_off(hass: HomeAssistant, load_yaml_integration: None) -> None:
+async def test_sensor_off(hass: SmartHub, load_yaml_integration: None) -> None:
     """Test setting the state with a template."""
 
     entity_state = hass.states.get("binary_sensor.test")
@@ -165,7 +165,7 @@ async def test_sensor_off(hass: HomeAssistant, load_yaml_integration: None) -> N
     ],
 )
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, load_yaml_integration: None
+    hass: SmartHub, entity_registry: er.EntityRegistry, load_yaml_integration: None
 ) -> None:
     """Test unique_id option and if it only creates one binary sensor per id."""
 
@@ -195,7 +195,7 @@ async def test_unique_id(
     ],
 )
 async def test_return_code(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, get_config: dict[str, Any]
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, get_config: dict[str, Any]
 ) -> None:
     """Test setting the state with a template."""
     await setup.async_setup_component(
@@ -208,7 +208,7 @@ async def test_return_code(
 
 
 async def test_updating_to_often(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test handling updating when command already running."""
 
@@ -226,7 +226,7 @@ async def test_updating_to_often(
             await wait_till_event.wait()
 
     with patch(
-        "homeassistant.components.command_line.binary_sensor.CommandBinarySensor",
+        "smarthub.components.command_line.binary_sensor.CommandBinarySensor",
         side_effect=MockCommandBinarySensor,
     ):
         await setup.async_setup_component(
@@ -272,9 +272,9 @@ async def test_updating_to_often(
 
 
 async def test_updating_manually(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """Test handling manual updating using homeassistant udate_entity service."""
+    """Test handling manual updating using smarthub udate_entity service."""
     await setup.async_setup_component(hass, HA_DOMAIN, {})
     called = []
 
@@ -286,7 +286,7 @@ async def test_updating_manually(
             called.append(1)
 
     with patch(
-        "homeassistant.components.command_line.binary_sensor.CommandBinarySensor",
+        "smarthub.components.command_line.binary_sensor.CommandBinarySensor",
         side_effect=MockCommandBinarySensor,
     ):
         await setup.async_setup_component(
@@ -342,7 +342,7 @@ async def test_updating_manually(
     ],
 )
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_yaml_integration: None,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -402,7 +402,7 @@ async def test_availability(
     ],
 )
 async def test_availability_blocks_value_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_yaml_integration: None,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,

@@ -8,28 +8,28 @@ from typing import Any
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.energy import data
-from homeassistant.components.recorder.core import Recorder
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.components.sensor import (
+from smarthub.components.energy import data
+from smarthub.components.recorder.core import Recorder
+from smarthub.components.recorder.util import session_scope
+from smarthub.components.sensor import (
     ATTR_LAST_RESET,
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.components.sensor.recorder import compile_statistics
-from homeassistant.const import (
+from smarthub.components.sensor.recorder import compile_statistics
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     STATE_UNKNOWN,
     UnitOfEnergy,
     UnitOfVolume,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from tests.components.recorder.common import async_wait_recording_done
 from tests.typing import WebSocketGenerator
@@ -40,10 +40,10 @@ TEST_TIME_ADVANCE_INTERVAL = timedelta(milliseconds=10)
 @pytest.fixture
 async def setup_integration(
     recorder_mock: Recorder,
-) -> Callable[[HomeAssistant], Coroutine[Any, Any, None]]:
+) -> Callable[[SmartHub], Coroutine[Any, Any, None]]:
     """Set up the integration."""
 
-    async def setup_integration(hass: HomeAssistant) -> None:
+    async def setup_integration(hass: SmartHub) -> None:
         assert await async_setup_component(hass, "energy", {})
         await hass.async_block_till_done()
 
@@ -66,7 +66,7 @@ def get_statistics_for_entity(statistics_results, entity_id):
 
 
 async def test_cost_sensor_no_states(
-    setup_integration, hass: HomeAssistant, hass_storage: dict[str, Any]
+    setup_integration, hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test sensors are created."""
     energy_data = data.EnergyManager.default_preferences()
@@ -96,7 +96,7 @@ async def test_cost_sensor_no_states(
 
 async def test_cost_sensor_attributes(
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -151,7 +151,7 @@ async def test_cost_sensor_attributes(
 async def test_cost_sensor_price_entity_total_increasing(
     frozen_time,
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
@@ -363,7 +363,7 @@ async def test_cost_sensor_price_entity_total_increasing(
 async def test_cost_sensor_price_entity_total(
     frozen_time,
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
@@ -578,7 +578,7 @@ async def test_cost_sensor_price_entity_total(
 async def test_cost_sensor_price_entity_total_no_reset(
     frozen_time,
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
@@ -756,7 +756,7 @@ async def test_cost_sensor_price_entity_total_no_reset(
 )
 async def test_cost_sensor_handle_energy_units(
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     energy_unit,
     factor,
@@ -823,7 +823,7 @@ async def test_cost_sensor_handle_energy_units(
 )
 async def test_cost_sensor_handle_price_units(
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     price_unit,
     factor,
@@ -886,7 +886,7 @@ async def test_cost_sensor_handle_price_units(
 
 async def test_cost_sensor_handle_late_price_sensor(
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ) -> None:
     """Test energy cost where the price sensor is not immediately available."""
@@ -997,7 +997,7 @@ async def test_cost_sensor_handle_late_price_sensor(
     [UnitOfVolume.CUBIC_FEET, UnitOfVolume.CUBIC_METERS, UnitOfVolume.LITERS],
 )
 async def test_cost_sensor_handle_gas(
-    setup_integration, hass: HomeAssistant, hass_storage: dict[str, Any], unit
+    setup_integration, hass: SmartHub, hass_storage: dict[str, Any], unit
 ) -> None:
     """Test gas cost price from sensor entity."""
     energy_attributes = {
@@ -1044,7 +1044,7 @@ async def test_cost_sensor_handle_gas(
 
 
 async def test_cost_sensor_handle_gas_kwh(
-    setup_integration, hass: HomeAssistant, hass_storage: dict[str, Any]
+    setup_integration, hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test gas cost price from sensor entity."""
     energy_attributes = {
@@ -1101,7 +1101,7 @@ async def test_cost_sensor_handle_gas_kwh(
 )
 async def test_cost_sensor_handle_water(
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     unit_system,
     usage_unit,
@@ -1155,7 +1155,7 @@ async def test_cost_sensor_handle_water(
 @pytest.mark.parametrize("state_class", [None])
 async def test_cost_sensor_wrong_state_class(
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     caplog: pytest.LogCaptureFixture,
     state_class,
@@ -1217,7 +1217,7 @@ async def test_cost_sensor_wrong_state_class(
 @pytest.mark.parametrize("state_class", [SensorStateClass.MEASUREMENT])
 async def test_cost_sensor_state_class_measurement_no_reset(
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     caplog: pytest.LogCaptureFixture,
     state_class,
@@ -1274,7 +1274,7 @@ async def test_cost_sensor_state_class_measurement_no_reset(
 
 async def test_inherit_source_unique_id(
     setup_integration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_storage: dict[str, Any],
 ) -> None:

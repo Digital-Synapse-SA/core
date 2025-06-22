@@ -7,19 +7,19 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant import loader
-from homeassistant.const import EVENT_COMPONENT_LOADED
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.integration_platform import (
+from smarthub import loader
+from smarthub.const import EVENT_COMPONENT_LOADED
+from smarthub.core import SmartHub, callback
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.integration_platform import (
     async_process_integration_platforms,
 )
-from homeassistant.setup import ATTR_COMPONENT
+from smarthub.setup import ATTR_COMPONENT
 
 from tests.common import mock_platform
 
 
-async def test_process_integration_platforms_with_wait(hass: HomeAssistant) -> None:
+async def test_process_integration_platforms_with_wait(hass: SmartHub) -> None:
     """Test processing integrations."""
     loaded_platform = Mock()
     mock_platform(hass, "loaded.platform_to_check", loaded_platform)
@@ -31,7 +31,7 @@ async def test_process_integration_platforms_with_wait(hass: HomeAssistant) -> N
     processed = []
 
     async def _process_platform(
-        hass: HomeAssistant, domain: str, platform: Any
+        hass: SmartHub, domain: str, platform: Any
     ) -> None:
         """Process platform."""
         processed.append((domain, platform))
@@ -59,7 +59,7 @@ async def test_process_integration_platforms_with_wait(hass: HomeAssistant) -> N
     assert len(processed) == 2
 
 
-async def test_process_integration_platforms(hass: HomeAssistant) -> None:
+async def test_process_integration_platforms(hass: SmartHub) -> None:
     """Test processing integrations."""
     loaded_platform = Mock()
     mock_platform(hass, "loaded.platform_to_check", loaded_platform)
@@ -71,7 +71,7 @@ async def test_process_integration_platforms(hass: HomeAssistant) -> None:
     processed = []
 
     async def _process_platform(
-        hass: HomeAssistant, domain: str, platform: Any
+        hass: SmartHub, domain: str, platform: Any
     ) -> None:
         """Process platform."""
         processed.append((domain, platform))
@@ -100,7 +100,7 @@ async def test_process_integration_platforms(hass: HomeAssistant) -> None:
 
 
 async def test_process_integration_platforms_import_fails(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test processing integrations when one fails to import."""
     loaded_platform = Mock()
@@ -113,7 +113,7 @@ async def test_process_integration_platforms_import_fails(
     processed = []
 
     async def _process_platform(
-        hass: HomeAssistant, domain: str, platform: Any
+        hass: SmartHub, domain: str, platform: Any
     ) -> None:
         """Process platform."""
         processed.append((domain, platform))
@@ -145,7 +145,7 @@ async def test_process_integration_platforms_import_fails(
 
 
 async def test_process_integration_platforms_import_fails_after_registered(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test processing integrations when one fails to import."""
     loaded_platform = Mock()
@@ -158,7 +158,7 @@ async def test_process_integration_platforms_import_fails_after_registered(
     processed = []
 
     async def _process_platform(
-        hass: HomeAssistant, domain: str, platform: Any
+        hass: SmartHub, domain: str, platform: Any
     ) -> None:
         """Process platform."""
         processed.append((domain, platform))
@@ -186,17 +186,17 @@ async def test_process_integration_platforms_import_fails_after_registered(
 
 @callback
 def _process_platform_callback(
-    hass: HomeAssistant, domain: str, platform: ModuleType
+    hass: SmartHub, domain: str, platform: ModuleType
 ) -> None:
     """Process platform."""
-    raise HomeAssistantError("Non-compliant platform")
+    raise SmartHubError("Non-compliant platform")
 
 
 async def _process_platform_coro(
-    hass: HomeAssistant, domain: str, platform: ModuleType
+    hass: SmartHub, domain: str, platform: ModuleType
 ) -> None:
     """Process platform."""
-    raise HomeAssistantError("Non-compliant platform")
+    raise SmartHubError("Non-compliant platform")
 
 
 @pytest.mark.no_fail_on_log_exception
@@ -204,7 +204,7 @@ async def _process_platform_coro(
     "process_platform", [_process_platform_callback, _process_platform_coro]
 )
 async def test_process_integration_platforms_non_compliant(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, process_platform: Callable
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, process_platform: Callable
 ) -> None:
     """Test processing integrations using with a non-compliant platform."""
     loaded_platform = Mock()
@@ -240,7 +240,7 @@ async def test_process_integration_platforms_non_compliant(
 
 
 async def test_broken_integration(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test handling an integration with a broken or missing manifest."""
     Mock()
@@ -252,7 +252,7 @@ async def test_broken_integration(
     processed = []
 
     async def _process_platform(
-        hass: HomeAssistant, domain: str, platform: Any
+        hass: SmartHub, domain: str, platform: Any
     ) -> None:
         """Process platform."""
         processed.append((domain, platform))
@@ -268,7 +268,7 @@ async def test_broken_integration(
 
 
 async def test_process_integration_platforms_no_integrations(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test processing integrations when no integrations are loaded."""
     event_platform = Mock()
@@ -277,7 +277,7 @@ async def test_process_integration_platforms_no_integrations(
     processed = []
 
     async def _process_platform(
-        hass: HomeAssistant, domain: str, platform: Any
+        hass: SmartHub, domain: str, platform: Any
     ) -> None:
         """Process platform."""
         processed.append((domain, platform))

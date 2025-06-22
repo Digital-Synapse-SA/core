@@ -6,13 +6,13 @@ from unittest.mock import PropertyMock, patch
 import pytest
 from soco.exceptions import NotSupportedException
 
-from homeassistant.components.sensor import SCAN_INTERVAL
-from homeassistant.components.sonos.binary_sensor import ATTR_BATTERY_POWER_SOURCE
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.sensor import SCAN_INTERVAL
+from smarthub.components.sonos.binary_sensor import ATTR_BATTERY_POWER_SOURCE
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .conftest import SonosMockEvent
 
@@ -20,7 +20,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_entity_registry_unsupported(
-    hass: HomeAssistant, async_setup_sonos, soco, entity_registry: er.EntityRegistry
+    hass: SmartHub, async_setup_sonos, soco, entity_registry: er.EntityRegistry
 ) -> None:
     """Test sonos device without battery registered in the device registry."""
     soco.get_battery_info.side_effect = NotSupportedException
@@ -34,7 +34,7 @@ async def test_entity_registry_unsupported(
 
 
 async def test_entity_registry_supported(
-    hass: HomeAssistant, async_autosetup_sonos, soco, entity_registry: er.EntityRegistry
+    hass: SmartHub, async_autosetup_sonos, soco, entity_registry: er.EntityRegistry
 ) -> None:
     """Test sonos device with battery registered in the device registry."""
     await hass.async_block_till_done(wait_background_tasks=True)
@@ -45,7 +45,7 @@ async def test_entity_registry_supported(
 
 
 async def test_battery_attributes(
-    hass: HomeAssistant, async_autosetup_sonos, soco, entity_registry: er.EntityRegistry
+    hass: SmartHub, async_autosetup_sonos, soco, entity_registry: er.EntityRegistry
 ) -> None:
     """Test sonos device with battery state."""
     battery = entity_registry.entities["sensor.zone_a_battery"]
@@ -62,7 +62,7 @@ async def test_battery_attributes(
 
 
 async def test_battery_on_s1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_sonos,
     soco,
     device_properties_event,
@@ -95,7 +95,7 @@ async def test_battery_on_s1(
 
 
 async def test_device_payload_without_battery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_sonos,
     soco,
     device_properties_event,
@@ -120,7 +120,7 @@ async def test_device_payload_without_battery(
 
 
 async def test_device_payload_without_battery_and_ignored_keys(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_sonos,
     soco,
     device_properties_event,
@@ -145,7 +145,7 @@ async def test_device_payload_without_battery_and_ignored_keys(
 
 
 async def test_audio_input_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_autosetup_sonos,
     soco,
     tv_event,
@@ -189,7 +189,7 @@ async def test_audio_input_sensor(
 
 
 async def test_microphone_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_autosetup_sonos,
     soco,
     device_properties_event,
@@ -212,7 +212,7 @@ async def test_microphone_binary_sensor(
 
 
 async def test_favorites_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_autosetup_sonos,
     soco,
     fire_zgs_event,
@@ -247,7 +247,7 @@ async def test_favorites_sensor(
         soco, service, {"favorites_update_id": "2", "container_update_i_ds": "FV:2,2"}
     )
     with patch(
-        "homeassistant.components.sonos.favorites.SonosFavorites.update_cache",
+        "smarthub.components.sonos.favorites.SonosFavorites.update_cache",
         return_value=True,
     ):
         subscription.callback(event=favorites_updated_event)

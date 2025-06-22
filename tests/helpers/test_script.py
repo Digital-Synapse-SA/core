@@ -15,25 +15,25 @@ import pytest
 import voluptuous as vol
 
 # Otherwise can't test just this file (import order issue)
-from homeassistant import config_entries, exceptions
-from homeassistant.components import scene
-from homeassistant.const import (
+from smarthub import config_entries, exceptions
+from smarthub.components import scene
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_DEVICE_ID,
     CONF_DOMAIN,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import (
+from smarthub.core import (
     Context,
     CoreState,
-    HomeAssistant,
+    SmartHub,
     ServiceCall,
     ServiceResponse,
     SupportsResponse,
     callback,
 )
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     config_validation as cv,
     device_registry as dr,
     entity_registry as er,
@@ -41,10 +41,10 @@ from homeassistant.helpers import (
     template,
     trace,
 )
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.helpers.typing import UNDEFINED
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.helpers.dispatcher import async_dispatcher_connect
+from smarthub.helpers.typing import UNDEFINED
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -140,7 +140,7 @@ def async_watch_for_action(script_obj, message):
 
 
 async def test_firing_event_basic(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the firing of events."""
     event = "test_event"
@@ -179,7 +179,7 @@ async def test_firing_event_basic(
     )
 
 
-async def test_firing_event_template(hass: HomeAssistant) -> None:
+async def test_firing_event_template(hass: SmartHub) -> None:
     """Test the firing of events."""
     event = "test_event"
     context = Context()
@@ -241,7 +241,7 @@ async def test_firing_event_template(hass: HomeAssistant) -> None:
 
 
 async def test_calling_service_basic(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the calling of a service."""
     context = Context()
@@ -280,7 +280,7 @@ async def test_calling_service_basic(
     )
 
 
-async def test_calling_service_template(hass: HomeAssistant) -> None:
+async def test_calling_service_template(hass: SmartHub) -> None:
     """Test the calling of a service."""
     context = Context()
     calls = async_mock_service(hass, "test", "script")
@@ -334,7 +334,7 @@ async def test_calling_service_template(hass: HomeAssistant) -> None:
 
 
 async def test_calling_service_response_data(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the calling of a service with response data."""
     context = Context()
@@ -421,7 +421,7 @@ async def test_calling_service_response_data(
     ],
 )
 async def test_service_response_data_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supports_response: SupportsResponse,
     params: dict[str, str],
     expected_error: str,
@@ -452,7 +452,7 @@ async def test_service_response_data_errors(
         await script_obj.async_run(context=context)
 
 
-async def test_calling_service_response_data_in_scopes(hass: HomeAssistant) -> None:
+async def test_calling_service_response_data_in_scopes(hass: SmartHub) -> None:
     """Test response variable is still set after scopes end."""
     expected_var = {"data": "value-12345"}
 
@@ -514,7 +514,7 @@ async def test_calling_service_response_data_in_scopes(hass: HomeAssistant) -> N
     assert_action_trace(expected_trace)
 
 
-async def test_data_template_with_templated_key(hass: HomeAssistant) -> None:
+async def test_data_template_with_templated_key(hass: SmartHub) -> None:
     """Test the calling of a service with a data_template with a templated key."""
     context = Context()
     calls = async_mock_service(hass, "test", "script")
@@ -553,7 +553,7 @@ async def test_data_template_with_templated_key(hass: HomeAssistant) -> None:
     )
 
 
-async def test_multiple_runs_no_wait(hass: HomeAssistant) -> None:
+async def test_multiple_runs_no_wait(hass: SmartHub) -> None:
     """Test multiple runs with no wait in script."""
     logger = logging.getLogger("TEST")
     calls = []
@@ -627,7 +627,7 @@ async def test_multiple_runs_no_wait(hass: HomeAssistant) -> None:
 
 
 async def test_activating_scene(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the activation of a scene."""
     context = Context()
@@ -653,7 +653,7 @@ async def test_activating_scene(
 
 
 @pytest.mark.parametrize("count", [1, 3])
-async def test_stop_no_wait(hass: HomeAssistant, count) -> None:
+async def test_stop_no_wait(hass: SmartHub, count) -> None:
     """Test stopping script."""
     service_started_sem = asyncio.Semaphore(0)
     finish_service_event = asyncio.Event()
@@ -703,7 +703,7 @@ async def test_stop_no_wait(hass: HomeAssistant, count) -> None:
     assert len(events) == 0
 
 
-async def test_delay_basic(hass: HomeAssistant) -> None:
+async def test_delay_basic(hass: SmartHub) -> None:
     """Test the delay."""
     delay_alias = "delay step"
     sequence = cv.SCRIPT_SCHEMA({"delay": {"seconds": 5}, "alias": delay_alias})
@@ -733,7 +733,7 @@ async def test_delay_basic(hass: HomeAssistant) -> None:
     )
 
 
-async def test_empty_delay(hass: HomeAssistant) -> None:
+async def test_empty_delay(hass: SmartHub) -> None:
     """Test an empty delay."""
     delay_alias = "delay step"
     sequence = cv.SCRIPT_SCHEMA({"delay": {"seconds": 0}, "alias": delay_alias})
@@ -758,7 +758,7 @@ async def test_empty_delay(hass: HomeAssistant) -> None:
     )
 
 
-async def test_multiple_runs_delay(hass: HomeAssistant) -> None:
+async def test_multiple_runs_delay(hass: SmartHub) -> None:
     """Test multiple runs with delay in script."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -801,7 +801,7 @@ async def test_multiple_runs_delay(hass: HomeAssistant) -> None:
         assert events[-1].data["value"] == 2
 
 
-async def test_delay_template_ok(hass: HomeAssistant) -> None:
+async def test_delay_template_ok(hass: SmartHub) -> None:
     """Test the delay as a template."""
     sequence = cv.SCRIPT_SCHEMA({"delay": "00:00:{{ 5 }}"})
     script_obj = script.Script(hass, sequence, "Test Name", "test_domain")
@@ -829,7 +829,7 @@ async def test_delay_template_ok(hass: HomeAssistant) -> None:
 
 
 async def test_delay_template_invalid(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the delay as a template that fails."""
     event = "test_event"
@@ -869,7 +869,7 @@ async def test_delay_template_invalid(
     )
 
 
-async def test_delay_template_complex_ok(hass: HomeAssistant) -> None:
+async def test_delay_template_complex_ok(hass: SmartHub) -> None:
     """Test the delay with a working complex template."""
     sequence = cv.SCRIPT_SCHEMA({"delay": {"seconds": "{{ 5 }}"}})
     script_obj = script.Script(hass, sequence, "Test Name", "test_domain")
@@ -896,7 +896,7 @@ async def test_delay_template_complex_ok(hass: HomeAssistant) -> None:
 
 
 async def test_delay_template_complex_invalid(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the delay with a complex template that fails."""
     event = "test_event"
@@ -932,7 +932,7 @@ async def test_delay_template_complex_invalid(
     )
 
 
-async def test_cancel_delay(hass: HomeAssistant) -> None:
+async def test_cancel_delay(hass: SmartHub) -> None:
     """Test the cancelling while the delay is present."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -971,7 +971,7 @@ async def test_cancel_delay(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("action_type", ["template", "trigger"])
-async def test_wait_basic(hass: HomeAssistant, action_type) -> None:
+async def test_wait_basic(hass: SmartHub, action_type) -> None:
     """Test wait actions."""
     wait_alias = "wait step"
     action = {"alias": wait_alias}
@@ -1034,7 +1034,7 @@ async def test_wait_basic(hass: HomeAssistant, action_type) -> None:
     )
 
 
-async def test_wait_for_trigger_variables(hass: HomeAssistant) -> None:
+async def test_wait_for_trigger_variables(hass: SmartHub) -> None:
     """Test variables are passed to wait_for_trigger action."""
     context = Context()
     wait_alias = "wait step"
@@ -1073,7 +1073,7 @@ async def test_wait_for_trigger_variables(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("action_type", ["template", "trigger"])
-async def test_wait_basic_times_out(hass: HomeAssistant, action_type) -> None:
+async def test_wait_basic_times_out(hass: SmartHub, action_type) -> None:
     """Test wait actions times out when the action does not happen."""
     wait_alias = "wait step"
     action = {"alias": wait_alias}
@@ -1125,7 +1125,7 @@ async def test_wait_basic_times_out(hass: HomeAssistant, action_type) -> None:
 
 
 @pytest.mark.parametrize("action_type", ["template", "trigger"])
-async def test_multiple_runs_wait(hass: HomeAssistant, action_type) -> None:
+async def test_multiple_runs_wait(hass: SmartHub, action_type) -> None:
     """Test multiple runs with wait in script."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -1182,7 +1182,7 @@ async def test_multiple_runs_wait(hass: HomeAssistant, action_type) -> None:
 
 
 @pytest.mark.parametrize("action_type", ["template", "trigger"])
-async def test_cancel_wait(hass: HomeAssistant, action_type) -> None:
+async def test_cancel_wait(hass: SmartHub, action_type) -> None:
     """Test the cancelling while wait is present."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -1242,7 +1242,7 @@ async def test_cancel_wait(hass: HomeAssistant, action_type) -> None:
     )
 
 
-async def test_wait_template_not_schedule(hass: HomeAssistant) -> None:
+async def test_wait_template_not_schedule(hass: SmartHub) -> None:
     """Test the wait template with correct condition."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -1281,7 +1281,7 @@ async def test_wait_template_not_schedule(hass: HomeAssistant) -> None:
 )
 @pytest.mark.parametrize("action_type", ["template", "trigger"])
 async def test_wait_timeout(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, timeout_param, action_type
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, timeout_param, action_type
 ) -> None:
     """Test the wait timeout option."""
     event = "test_event"
@@ -1348,7 +1348,7 @@ async def test_wait_timeout(
     "timeout_param", [0, "{{ 0 }}", {"minutes": 0}, {"minutes": "{{ 0 }}"}]
 )
 async def test_wait_trigger_with_zero_timeout(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, timeout_param: int | str
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, timeout_param: int | str
 ) -> None:
     """Test the wait trigger with zero timeout option."""
     event = "test_event"
@@ -1396,7 +1396,7 @@ async def test_wait_trigger_with_zero_timeout(
     "timeout_param", [0, "{{ 0 }}", {"minutes": 0}, {"minutes": "{{ 0 }}"}]
 )
 async def test_wait_trigger_matches_with_zero_timeout(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, timeout_param: int | str
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, timeout_param: int | str
 ) -> None:
     """Test the wait trigger that matches with zero timeout option."""
     event = "test_event"
@@ -1444,7 +1444,7 @@ async def test_wait_trigger_matches_with_zero_timeout(
     "timeout_param", [0, "{{ 0 }}", {"minutes": 0}, {"minutes": "{{ 0 }}"}]
 )
 async def test_wait_template_with_zero_timeout(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, timeout_param: int | str
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, timeout_param: int | str
 ) -> None:
     """Test the wait template with zero timeout option."""
     event = "test_event"
@@ -1485,7 +1485,7 @@ async def test_wait_template_with_zero_timeout(
     "timeout_param", [0, "{{ 0 }}", {"minutes": 0}, {"minutes": "{{ 0 }}"}]
 )
 async def test_wait_template_matches_with_zero_timeout(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, timeout_param: int | str
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, timeout_param: int | str
 ) -> None:
     """Test the wait template that matches with zero timeout option."""
     event = "test_event"
@@ -1527,7 +1527,7 @@ async def test_wait_template_matches_with_zero_timeout(
 )
 @pytest.mark.parametrize("action_type", ["template", "trigger"])
 async def test_wait_continue_on_timeout(
-    hass: HomeAssistant, continue_on_timeout, n_events, action_type
+    hass: SmartHub, continue_on_timeout, n_events, action_type
 ) -> None:
     """Test the wait continue_on_timeout option."""
     event = "test_event"
@@ -1585,7 +1585,7 @@ async def test_wait_continue_on_timeout(
     assert_action_trace(expected_trace, expected_script_execution)
 
 
-async def test_wait_template_variables_in(hass: HomeAssistant) -> None:
+async def test_wait_template_variables_in(hass: SmartHub) -> None:
     """Test the wait template with input variables."""
     sequence = cv.SCRIPT_SCHEMA({"wait_template": "{{ is_state(data, 'off') }}"})
     script_obj = script.Script(hass, sequence, "Test Name", "test_domain")
@@ -1623,7 +1623,7 @@ async def test_wait_template_variables_in(hass: HomeAssistant) -> None:
     )
 
 
-async def test_wait_template_with_utcnow(hass: HomeAssistant) -> None:
+async def test_wait_template_with_utcnow(hass: SmartHub) -> None:
     """Test the wait template with utcnow."""
     sequence = cv.SCRIPT_SCHEMA({"wait_template": "{{ utcnow().hour == 12 }}"})
     script_obj = script.Script(hass, sequence, "Test Name", "test_domain")
@@ -1659,7 +1659,7 @@ async def test_wait_template_with_utcnow(hass: HomeAssistant) -> None:
     )
 
 
-async def test_wait_template_with_utcnow_no_match(hass: HomeAssistant) -> None:
+async def test_wait_template_with_utcnow_no_match(hass: SmartHub) -> None:
     """Test the wait template with utcnow that does not match."""
     sequence = cv.SCRIPT_SCHEMA({"wait_template": "{{ utcnow().hour == 12 }}"})
     script_obj = script.Script(hass, sequence, "Test Name", "test_domain")
@@ -1700,7 +1700,7 @@ async def test_wait_template_with_utcnow_no_match(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("mode", ["no_timeout", "timeout_finish", "timeout_not_finish"])
 @pytest.mark.parametrize("action_type", ["template", "trigger"])
-async def test_wait_variables_out(hass: HomeAssistant, mode, action_type) -> None:
+async def test_wait_variables_out(hass: SmartHub, mode, action_type) -> None:
     """Test the wait output variable."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -1768,7 +1768,7 @@ async def test_wait_variables_out(hass: HomeAssistant, mode, action_type) -> Non
             assert float(remaining) == 0.0
 
 
-async def test_wait_in_sequence(hass: HomeAssistant) -> None:
+async def test_wait_in_sequence(hass: SmartHub) -> None:
     """Test wait variable is still set after sequence ends."""
     sequence = cv.SCRIPT_SCHEMA(
         [
@@ -1809,7 +1809,7 @@ async def test_wait_in_sequence(hass: HomeAssistant) -> None:
     assert_action_trace(expected_trace)
 
 
-async def test_wait_in_parallel(hass: HomeAssistant) -> None:
+async def test_wait_in_parallel(hass: SmartHub) -> None:
     """Test wait variable is not set after parallel ends."""
     sequence = cv.SCRIPT_SCHEMA(
         {
@@ -1853,7 +1853,7 @@ async def test_wait_in_parallel(hass: HomeAssistant) -> None:
 
 
 async def test_wait_for_trigger_bad(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test bad wait_for_trigger."""
     sequence = cv.SCRIPT_SCHEMA(
@@ -1871,7 +1871,7 @@ async def test_wait_for_trigger_bad(
         return None
 
     with mock.patch(
-        "homeassistant.components.homeassistant.triggers.state.async_attach_trigger",
+        "smarthub.components.smarthub.triggers.state.async_attach_trigger",
         wraps=async_attach_trigger_mock,
     ):
         hass.async_create_task(script_obj.async_run())
@@ -1896,7 +1896,7 @@ async def test_wait_for_trigger_bad(
 
 
 async def test_wait_for_trigger_generated_exception(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test bad wait_for_trigger."""
     sequence = cv.SCRIPT_SCHEMA(
@@ -1914,7 +1914,7 @@ async def test_wait_for_trigger_generated_exception(
         raise ValueError("something bad")
 
     with mock.patch(
-        "homeassistant.components.homeassistant.triggers.state.async_attach_trigger",
+        "smarthub.components.smarthub.triggers.state.async_attach_trigger",
         wraps=async_attach_trigger_mock,
     ):
         hass.async_create_task(script_obj.async_run())
@@ -1941,7 +1941,7 @@ async def test_wait_for_trigger_generated_exception(
 
 
 async def test_condition_warning(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test warning on condition."""
     event = "test_event"
@@ -1989,7 +1989,7 @@ async def test_condition_warning(
 
 
 async def test_condition_basic(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if we can use conditions in a script."""
     event = "test_event"
@@ -2046,7 +2046,7 @@ async def test_condition_basic(
 
 
 async def test_condition_subscript(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test failing conditions in a subscript don't stop the parent script."""
     event = "test_event"
@@ -2097,7 +2097,7 @@ async def test_condition_subscript(
 
 
 async def test_and_default_condition(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that a list of conditions evaluates as AND."""
     alias = "condition step"
@@ -2135,7 +2135,7 @@ async def test_and_default_condition(
 
 
 async def test_shorthand_template_condition(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if we can use shorthand template conditions in a script."""
     event = "test_event"
@@ -2191,7 +2191,7 @@ async def test_shorthand_template_condition(
 
 
 async def test_condition_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2267,8 +2267,8 @@ async def test_condition_validation(
     )
 
 
-@patch("homeassistant.helpers.script.condition.async_from_config")
-async def test_condition_created_once(async_from_config, hass: HomeAssistant) -> None:
+@patch("smarthub.helpers.script.condition.async_from_config")
+async def test_condition_created_once(async_from_config, hass: SmartHub) -> None:
     """Test that the conditions do not get created multiple times."""
     sequence = cv.SCRIPT_SCHEMA(
         {
@@ -2292,7 +2292,7 @@ async def test_condition_created_once(async_from_config, hass: HomeAssistant) ->
     assert len(script_obj._config_cache) == 1
 
 
-async def test_condition_all_cached(hass: HomeAssistant) -> None:
+async def test_condition_all_cached(hass: SmartHub) -> None:
     """Test that multiple conditions get cached."""
     sequence = cv.SCRIPT_SCHEMA(
         [
@@ -2317,7 +2317,7 @@ async def test_condition_all_cached(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("count", [3, script.ACTION_TRACE_NODE_MAX_LEN * 2])
 async def test_repeat_count(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, count
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, count
 ) -> None:
     """Test repeat action w/ count option."""
     event = "test_event"
@@ -2382,7 +2382,7 @@ async def test_repeat_count(
 
 
 async def test_repeat_count_0(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test repeat action w/ count option."""
     event = "test_event"
@@ -2422,7 +2422,7 @@ async def test_repeat_count_0(
 
 
 async def test_repeat_for_each(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test repeat action using for each."""
     events = async_capture_events(hass, "test_event")
@@ -2520,7 +2520,7 @@ async def test_repeat_for_each(
     )
 
 
-async def test_repeat_for_each_template(hass: HomeAssistant) -> None:
+async def test_repeat_for_each_template(hass: SmartHub) -> None:
     """Test repeat action using for each template."""
     events = async_capture_events(hass, "test_event")
     sequence = cv.SCRIPT_SCHEMA(
@@ -2581,7 +2581,7 @@ async def test_repeat_for_each_template(hass: HomeAssistant) -> None:
     )
 
 
-async def test_repeat_for_each_non_list_template(hass: HomeAssistant) -> None:
+async def test_repeat_for_each_non_list_template(hass: SmartHub) -> None:
     """Test repeat action using for each with a template not resulting in a list."""
     events = async_capture_events(hass, "test_event")
     sequence = cv.SCRIPT_SCHEMA(
@@ -2611,7 +2611,7 @@ async def test_repeat_for_each_non_list_template(hass: HomeAssistant) -> None:
 
 
 async def test_repeat_for_each_invalid_template(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test repeat action using for each with an invalid template."""
     events = async_capture_events(hass, "test_event")
@@ -2647,7 +2647,7 @@ async def test_repeat_for_each_invalid_template(
 
 @pytest.mark.parametrize("condition", ["while", "until"])
 async def test_repeat_condition_warning(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, condition
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, condition
 ) -> None:
     """Test warning on repeat conditions."""
     event = "test_event"
@@ -2715,7 +2715,7 @@ async def test_repeat_condition_warning(
 @pytest.mark.parametrize("condition", ["while", "until"])
 @pytest.mark.parametrize("direct_template", [False, True])
 async def test_repeat_conditional(
-    hass: HomeAssistant, condition, direct_template
+    hass: SmartHub, condition, direct_template
 ) -> None:
     """Test repeat action w/ while option."""
     event = "test_event"
@@ -2789,7 +2789,7 @@ async def test_repeat_conditional(
 
 
 async def test_repeat_until_condition_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2852,7 +2852,7 @@ async def test_repeat_until_condition_validation(
 
 
 async def test_repeat_while_condition_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2915,7 +2915,7 @@ async def test_repeat_while_condition_validation(
 
 
 @pytest.mark.parametrize("condition", ["while", "until"])
-async def test_repeat_var_in_condition(hass: HomeAssistant, condition) -> None:
+async def test_repeat_var_in_condition(hass: SmartHub, condition) -> None:
     """Test repeat action w/ while option."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -3002,7 +3002,7 @@ async def test_repeat_var_in_condition(hass: HomeAssistant, condition) -> None:
     ],
 )
 async def test_repeat_nested(
-    hass: HomeAssistant, variables, first_last, inside_x
+    hass: SmartHub, variables, first_last, inside_x
 ) -> None:
     """Test nested repeats."""
     event = "test_event"
@@ -3143,7 +3143,7 @@ async def test_repeat_nested(
     ("condition", "check"), [("while", "above"), ("until", "below")]
 )
 async def test_repeat_limits(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, condition: str, check: str
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, condition: str, check: str
 ) -> None:
     """Test limits on repeats prevent the system from hanging."""
     event = "test_event"
@@ -3192,7 +3192,7 @@ async def test_repeat_limits(
 
 
 async def test_choose_warning(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test warning on choose."""
     event = "test_event"
@@ -3246,7 +3246,7 @@ async def test_choose_warning(
     ("var", "result"), [(1, "first"), (2, "second"), (3, "default")]
 )
 async def test_choose(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, var, result
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, var, result
 ) -> None:
     """Test choose action."""
     event = "test_event"
@@ -3338,7 +3338,7 @@ async def test_choose(
 
 
 async def test_choose_condition_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -3431,7 +3431,7 @@ async def test_choose_condition_validation(
     ],
 )
 async def test_multiple_runs_repeat_choose(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, action
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, action
 ) -> None:
     """Test parallel runs with repeat & choose actions & max_runs > default."""
     max_runs = script.DEFAULT_MAX + 1
@@ -3457,7 +3457,7 @@ async def test_multiple_runs_repeat_choose(
 
 
 async def test_if_warning(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test warning on if."""
     event = "test_event"
@@ -3497,7 +3497,7 @@ async def test_if_warning(
     ("var", "if_result", "choice"), [(1, True, "then"), (2, False, "else")]
 )
 async def test_if(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     var: int,
     if_result: bool,
@@ -3546,7 +3546,7 @@ async def test_if(
 
 
 async def test_if_disabled(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if action with a disabled condition."""
     sequence = cv.SCRIPT_SCHEMA(
@@ -3585,7 +3585,7 @@ async def test_if_disabled(
 
 
 async def test_if_condition_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -3662,7 +3662,7 @@ async def test_if_condition_validation(
     )
 
 
-async def test_sequence(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_sequence(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test sequence action."""
     events = async_capture_events(hass, "test_event")
 
@@ -3759,7 +3759,7 @@ async def test_sequence(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -
     assert_action_trace(expected_trace)
 
 
-async def test_parallel(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_parallel(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test parallel action."""
     events = async_capture_events(hass, "test_event")
     hass.states.async_set("switch.trigger", "off")
@@ -3877,7 +3877,7 @@ async def test_parallel(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -
 
 
 async def test_parallel_loop(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test parallel loops do not affect each other."""
     events_loop1 = async_capture_events(hass, "loop1")
@@ -4018,10 +4018,10 @@ async def test_parallel_loop(
 
 
 async def test_parallel_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test parallel action failure handling."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     events = async_capture_events(hass, "test_event")
     sequence = cv.SCRIPT_SCHEMA(
         {
@@ -4057,7 +4057,7 @@ async def test_parallel_error(
     assert_action_trace(expected_trace, expected_script_execution="error")
 
 
-async def test_last_triggered(hass: HomeAssistant) -> None:
+async def test_last_triggered(hass: SmartHub) -> None:
     """Test the last_triggered."""
     event = "test_event"
     sequence = cv.SCRIPT_SCHEMA({"event": event})
@@ -4066,16 +4066,16 @@ async def test_last_triggered(hass: HomeAssistant) -> None:
     assert script_obj.last_triggered is None
 
     time = dt_util.utcnow()
-    with mock.patch("homeassistant.helpers.script.utcnow", return_value=time):
+    with mock.patch("smarthub.helpers.script.utcnow", return_value=time):
         await script_obj.async_run(context=Context())
         await hass.async_block_till_done()
 
     assert script_obj.last_triggered == time
 
 
-async def test_propagate_error_service_not_found(hass: HomeAssistant) -> None:
+async def test_propagate_error_service_not_found(hass: SmartHub) -> None:
     """Test that a script aborts when a service is not found."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     event = "test_event"
     events = async_capture_events(hass, event)
     sequence = cv.SCRIPT_SCHEMA([{"action": "test.script"}, {"event": event}])
@@ -4106,7 +4106,7 @@ async def test_propagate_error_service_not_found(hass: HomeAssistant) -> None:
     assert_action_trace(expected_trace, expected_script_execution="error")
 
 
-async def test_propagate_error_invalid_service_data(hass: HomeAssistant) -> None:
+async def test_propagate_error_invalid_service_data(hass: SmartHub) -> None:
     """Test that a script aborts when we send invalid service data."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -4142,7 +4142,7 @@ async def test_propagate_error_invalid_service_data(hass: HomeAssistant) -> None
     assert_action_trace(expected_trace, expected_script_execution="error")
 
 
-async def test_propagate_error_service_exception(hass: HomeAssistant) -> None:
+async def test_propagate_error_service_exception(hass: SmartHub) -> None:
     """Test that a script aborts when a service throws an exception."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -4182,7 +4182,7 @@ async def test_propagate_error_service_exception(hass: HomeAssistant) -> None:
     assert_action_trace(expected_trace, expected_script_execution="error")
 
 
-async def test_referenced_labels(hass: HomeAssistant) -> None:
+async def test_referenced_labels(hass: SmartHub) -> None:
     """Test referenced labels."""
     script_obj = script.Script(
         hass,
@@ -4295,7 +4295,7 @@ async def test_referenced_labels(hass: HomeAssistant) -> None:
     assert script_obj.referenced_labels is script_obj.referenced_labels
 
 
-async def test_referenced_floors(hass: HomeAssistant) -> None:
+async def test_referenced_floors(hass: SmartHub) -> None:
     """Test referenced floors."""
     script_obj = script.Script(
         hass,
@@ -4405,7 +4405,7 @@ async def test_referenced_floors(hass: HomeAssistant) -> None:
     assert script_obj.referenced_floors is script_obj.referenced_floors
 
 
-async def test_referenced_areas(hass: HomeAssistant) -> None:
+async def test_referenced_areas(hass: SmartHub) -> None:
     """Test referenced areas."""
     script_obj = script.Script(
         hass,
@@ -4516,7 +4516,7 @@ async def test_referenced_areas(hass: HomeAssistant) -> None:
     assert script_obj.referenced_areas is script_obj.referenced_areas
 
 
-async def test_referenced_entities(hass: HomeAssistant) -> None:
+async def test_referenced_entities(hass: SmartHub) -> None:
     """Test referenced entities."""
     script_obj = script.Script(
         hass,
@@ -4646,7 +4646,7 @@ async def test_referenced_entities(hass: HomeAssistant) -> None:
     assert script_obj.referenced_entities is script_obj.referenced_entities
 
 
-async def test_referenced_devices(hass: HomeAssistant) -> None:
+async def test_referenced_devices(hass: SmartHub) -> None:
     """Test referenced entities."""
     script_obj = script.Script(
         hass,
@@ -4778,7 +4778,7 @@ def does_not_raise():
 
 
 async def test_script_mode_single(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test overlapping runs with max_runs = 1."""
     event = "test_event"
@@ -4825,7 +4825,7 @@ async def test_script_mode_single(
     ("script_mode", "max_runs"), [("single", 1), ("parallel", 2), ("queued", 2)]
 )
 async def test_max_exceeded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     max_exceeded,
     script_mode,
@@ -4887,7 +4887,7 @@ async def test_max_exceeded(
     [("restart", ["Restarting"], [2]), ("parallel", [], [2, 2])],
 )
 async def test_script_mode_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     script_mode,
     messages,
@@ -4958,7 +4958,7 @@ async def test_script_mode_2(
             assert events[idx].data["value"] == value
 
 
-async def test_script_mode_queued(hass: HomeAssistant) -> None:
+async def test_script_mode_queued(hass: SmartHub) -> None:
     """Test overlapping runs with script_mode = 'queued' & max_runs > 1."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -5055,7 +5055,7 @@ async def test_script_mode_queued(hass: HomeAssistant) -> None:
         assert events[3].data["value"] == 2
 
 
-async def test_script_mode_queued_cancel(hass: HomeAssistant) -> None:
+async def test_script_mode_queued_cancel(hass: SmartHub) -> None:
     """Test canceling with a queued run."""
     script_obj = script.Script(
         hass,
@@ -5097,7 +5097,7 @@ async def test_script_mode_queued_cancel(hass: HomeAssistant) -> None:
         raise
 
 
-async def test_script_mode_queued_stop(hass: HomeAssistant) -> None:
+async def test_script_mode_queued_stop(hass: SmartHub) -> None:
     """Test stopping with a queued run."""
     script_obj = script.Script(
         hass,
@@ -5129,7 +5129,7 @@ async def test_script_mode_queued_stop(hass: HomeAssistant) -> None:
 
 
 async def test_script_logging(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test script logging."""
     script_obj = script.Script(hass, [], "Script with % Name", "test_domain")
@@ -5139,7 +5139,7 @@ async def test_script_logging(
 
 
 async def test_shutdown_at(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test stopping scripts at shutdown."""
     delay_alias = "delay step"
@@ -5157,7 +5157,7 @@ async def test_shutdown_at(
         await script_obj.async_stop()
         raise
     else:
-        hass.bus.async_fire("homeassistant_stop")
+        hass.bus.async_fire("smarthub_stop")
         await hass.async_block_till_done()
 
         assert not script_obj.is_running
@@ -5171,7 +5171,7 @@ async def test_shutdown_at(
 
 @pytest.mark.parametrize("wait_for_stop_scripts_after_shutdown", [True])
 async def test_shutdown_after(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test stopping scripts at shutdown."""
     delay_alias = "delay step"
@@ -5180,7 +5180,7 @@ async def test_shutdown_after(
     delay_started_flag = async_watch_for_action(script_obj, delay_alias)
 
     hass.set_state(CoreState.stopping)
-    hass.bus.async_fire("homeassistant_stop")
+    hass.bus.async_fire("smarthub_stop")
     await hass.async_block_till_done()
 
     try:
@@ -5210,7 +5210,7 @@ async def test_shutdown_after(
 
 @pytest.mark.parametrize("wait_for_stop_scripts_after_shutdown", [True])
 async def test_start_script_after_shutdown(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test starting scripts after shutdown is blocked."""
     delay_alias = "delay step"
@@ -5219,7 +5219,7 @@ async def test_start_script_after_shutdown(
 
     # Trigger 1st stage script shutdown
     hass.set_state(CoreState.stopping)
-    hass.bus.async_fire("homeassistant_stop")
+    hass.bus.async_fire("smarthub_stop")
     await hass.async_block_till_done()
     # Trigger 2nd stage script shutdown
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=60))
@@ -5228,11 +5228,11 @@ async def test_start_script_after_shutdown(
     # Attempt to spawn additional script run
     await script_obj.async_run(context=Context())
     assert not script_obj.is_running
-    assert "Home Assistant is shutting down, starting script blocked" in caplog.text
+    assert "SmartHub is shutting down, starting script blocked" in caplog.text
 
 
 async def test_update_logger(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test updating logger."""
     sequence = cv.SCRIPT_SCHEMA({"event": "test_event"})
@@ -5253,7 +5253,7 @@ async def test_update_logger(
 
 
 async def test_started_action(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the callback of started_action."""
     event = "test_event"
@@ -5274,7 +5274,7 @@ async def test_started_action(
 
 
 async def test_set_variable(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setting variables in scripts."""
     sequence = cv.SCRIPT_SCHEMA(
@@ -5344,7 +5344,7 @@ async def test_set_variable(
 
 
 async def test_set_redefines_variable(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setting variables based on their current value."""
     sequence = cv.SCRIPT_SCHEMA(
@@ -5399,7 +5399,7 @@ async def test_set_redefines_variable(
 
 
 async def test_validate_action_config(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Validate action config."""
 
@@ -5495,7 +5495,7 @@ async def test_validate_action_config(
     # Verify we raise if we don't know the action type
     with (
         patch(
-            "homeassistant.helpers.config_validation.determine_script_action",
+            "smarthub.helpers.config_validation.determine_script_action",
             return_value="non-existing",
         ),
         pytest.raises(ValueError),
@@ -5525,7 +5525,7 @@ async def test_validate_action_config(
             assert isinstance(device_action["message"], template.Template)
 
 
-async def test_embedded_wait_for_trigger_in_automation(hass: HomeAssistant) -> None:
+async def test_embedded_wait_for_trigger_in_automation(hass: SmartHub) -> None:
     """Test an embedded wait for trigger."""
     assert await async_setup_component(
         hass,
@@ -5584,7 +5584,7 @@ async def test_embedded_wait_for_trigger_in_automation(hass: HomeAssistant) -> N
     assert len(mock_calls) == 1
 
 
-async def test_breakpoints_1(hass: HomeAssistant) -> None:
+async def test_breakpoints_1(hass: SmartHub) -> None:
     """Test setting a breakpoint halts execution, and execution can be resumed."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -5679,7 +5679,7 @@ async def test_breakpoints_1(hass: HomeAssistant) -> None:
     assert events[-1].data["value"] == 7
 
 
-async def test_breakpoints_2(hass: HomeAssistant) -> None:
+async def test_breakpoints_2(hass: SmartHub) -> None:
     """Test setting a breakpoint halts execution, and execution can be aborted."""
     event = "test_event"
     events = async_capture_events(hass, event)
@@ -5746,11 +5746,11 @@ async def test_breakpoints_2(hass: HomeAssistant) -> None:
     assert len(events) == 1
 
 
-async def test_platform_async_validate_action_config(hass: HomeAssistant) -> None:
+async def test_platform_async_validate_action_config(hass: SmartHub) -> None:
     """Test platform.async_validate_action_config will be called if it exists."""
     config = {CONF_DEVICE_ID: "test", CONF_DOMAIN: "test"}
     with patch(
-        "homeassistant.components.device_automation.action.async_validate_action_config",
+        "smarthub.components.device_automation.action.async_validate_action_config",
         return_value=AsyncMock(),
     ) as device_automation_validate_action_mock:
         await script.async_validate_action_config(hass, config)
@@ -5758,7 +5758,7 @@ async def test_platform_async_validate_action_config(hass: HomeAssistant) -> Non
 
 
 async def test_stop_action(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if automation stops on calling the stop action."""
     event = "test_event"
@@ -5800,7 +5800,7 @@ async def test_stop_action(
     ],
 )
 async def test_stop_action_subscript(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     error,
     error_dict,
@@ -5858,7 +5858,7 @@ async def test_stop_action_subscript(
     ("script_mode", "max_runs"), [("single", 1), ("parallel", 2), ("queued", 2)]
 )
 async def test_stop_action_response_variables(
-    hass: HomeAssistant,
+    hass: SmartHub,
     var: int,
     response: str,
     script_mode,
@@ -5900,7 +5900,7 @@ async def test_stop_action_response_variables(
     [(1, True, "then", "If: Then"), (2, False, "else", "If: Else")],
 )
 async def test_stop_action_nested_response_variables(
-    hass: HomeAssistant,
+    hass: SmartHub,
     var: int,
     if_result: bool,
     choice: str,
@@ -5950,7 +5950,7 @@ async def test_stop_action_nested_response_variables(
 
 
 async def test_stop_action_with_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if automation fails on calling the error action."""
     event = "test_event"
@@ -5991,14 +5991,14 @@ async def test_stop_action_with_error(
     )
 
 
-async def test_continue_on_error(hass: HomeAssistant) -> None:
+async def test_continue_on_error(hass: SmartHub) -> None:
     """Test if automation continue when a step fails."""
     events = async_capture_events(hass, "test_event")
 
     @callback
     def broken_service(service: ServiceCall) -> None:
         """Break this service with an error."""
-        raise HomeAssistantError("It is not working!")
+        raise SmartHubError("It is not working!")
 
     hass.services.async_register("broken", "service", broken_service)
 
@@ -6019,7 +6019,7 @@ async def test_continue_on_error(hass: HomeAssistant) -> None:
     )
     script_obj = script.Script(hass, sequence, "Test Name", "test_domain")
 
-    with pytest.raises(exceptions.HomeAssistantError, match="It is not working!"):
+    with pytest.raises(exceptions.SmartHubError, match="It is not working!"):
         await script_obj.async_run(context=Context())
 
     assert len(events) == 2
@@ -6060,7 +6060,7 @@ async def test_continue_on_error(hass: HomeAssistant) -> None:
     )
 
 
-async def test_continue_on_error_with_stop(hass: HomeAssistant) -> None:
+async def test_continue_on_error_with_stop(hass: SmartHub) -> None:
     """Test continue on error doesn't work with explicit an stop."""
     sequence = cv.SCRIPT_SCHEMA(
         [
@@ -6082,9 +6082,9 @@ async def test_continue_on_error_with_stop(hass: HomeAssistant) -> None:
     )
 
 
-async def test_continue_on_error_automation_issue(hass: HomeAssistant) -> None:
+async def test_continue_on_error_automation_issue(hass: SmartHub) -> None:
     """Test continue on error doesn't block action automation errors."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     sequence = cv.SCRIPT_SCHEMA(
         [
             {
@@ -6119,9 +6119,9 @@ async def test_continue_on_error_automation_issue(hass: HomeAssistant) -> None:
     )
 
 
-async def test_continue_on_error_unknown_error(hass: HomeAssistant) -> None:
+async def test_continue_on_error_unknown_error(hass: SmartHub) -> None:
     """Test continue on error doesn't block unknown errors from e.g., libraries."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     class MyLibraryError(Exception):
         """My custom library error."""
@@ -6169,7 +6169,7 @@ async def test_continue_on_error_unknown_error(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("enabled_value", [False, "{{ 1 == 9 }}"])
 async def test_disabled_actions(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, enabled_value: bool | str
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, enabled_value: bool | str
 ) -> None:
     """Test disabled action steps."""
     events = async_capture_events(hass, "test_event")
@@ -6177,7 +6177,7 @@ async def test_disabled_actions(
     @callback
     def broken_service(service: ServiceCall) -> None:
         """Break this service with an error."""
-        raise HomeAssistantError("This service should not be called")
+        raise SmartHubError("This service should not be called")
 
     hass.services.async_register("broken", "service", broken_service)
 
@@ -6215,9 +6215,9 @@ async def test_disabled_actions(
     )
 
 
-async def test_enabled_error_non_limited_template(hass: HomeAssistant) -> None:
+async def test_enabled_error_non_limited_template(hass: SmartHub) -> None:
     """Test that a script aborts when an action enabled uses non-limited template."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     event = "test_event"
     events = async_capture_events(hass, event)
     sequence = cv.SCRIPT_SCHEMA(
@@ -6247,7 +6247,7 @@ async def test_enabled_error_non_limited_template(hass: HomeAssistant) -> None:
 
 
 async def test_condition_and_shorthand(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if we can use the shorthand and conditions in a script."""
     events = async_capture_events(hass, "test_event")
@@ -6288,7 +6288,7 @@ async def test_condition_and_shorthand(
 
 
 async def test_condition_or_shorthand(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if we can use the shorthand or conditions in a script."""
     events = async_capture_events(hass, "test_event")
@@ -6329,7 +6329,7 @@ async def test_condition_or_shorthand(
 
 
 async def test_condition_not_shorthand(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if we can use the shorthand not conditions in a script."""
     events = async_capture_events(hass, "test_event")
@@ -6370,7 +6370,7 @@ async def test_condition_not_shorthand(
 
 
 async def test_conversation_response(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setting conversation response."""
     sequence = cv.SCRIPT_SCHEMA([{"set_conversation_response": "Testing 123"}])
@@ -6387,7 +6387,7 @@ async def test_conversation_response(
 
 
 async def test_conversation_response_template(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test a templated conversation response."""
     sequence = cv.SCRIPT_SCHEMA(
@@ -6410,7 +6410,7 @@ async def test_conversation_response_template(
 
 
 async def test_conversation_response_not_set(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test not setting conversation response."""
     sequence = cv.SCRIPT_SCHEMA([])
@@ -6423,7 +6423,7 @@ async def test_conversation_response_not_set(
 
 
 async def test_conversation_response_unset(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test clearing conversation response."""
     sequence = cv.SCRIPT_SCHEMA(
@@ -6450,7 +6450,7 @@ async def test_conversation_response_unset(
     [(1, True, "then", "If: Then"), (2, False, "else", "If: Else")],
 )
 async def test_conversation_response_subscript_if(
-    hass: HomeAssistant,
+    hass: SmartHub,
     var: int,
     if_result: bool,
     choice: str,
@@ -6495,7 +6495,7 @@ async def test_conversation_response_subscript_if(
     ("var", "if_result", "choice"), [(1, True, "then"), (2, False, "else")]
 )
 async def test_conversation_response_not_set_subscript_if(
-    hass: HomeAssistant,
+    hass: SmartHub,
     var: int,
     if_result: bool,
     choice: str,
@@ -6535,7 +6535,7 @@ async def test_conversation_response_not_set_subscript_if(
 
 
 async def test_stopping_run_before_starting(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test stopping a script run before its started."""
     sequence = cv.SCRIPT_SCHEMA(
@@ -6552,7 +6552,7 @@ async def test_stopping_run_before_starting(
 
 
 async def test_disallowed_recursion(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test a queued mode script disallowed recursion."""
     context = Context()
@@ -6621,7 +6621,7 @@ async def test_disallowed_recursion(
 
 
 async def test_calling_service_backwards_compatible(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the calling of a service with the service instead of the action key."""
     context = Context()
@@ -6661,7 +6661,7 @@ async def test_calling_service_backwards_compatible(
 
 
 async def test_enabled_sequence_in_parallel(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test to ensure sequence inside parallel follows enabled tag."""
     event = "test_event"

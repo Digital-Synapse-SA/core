@@ -4,14 +4,14 @@ from datetime import timedelta
 
 import pytest
 
-from homeassistant.components import lifx
-from homeassistant.components.lifx.const import DOMAIN
-from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, CONF_HOST, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import lifx
+from smarthub.components.lifx.const import DOMAIN
+from smarthub.components.select import DOMAIN as SELECT_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, CONF_HOST, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -29,7 +29,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_theme_select(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test selecting a theme."""
     config_entry = MockConfigEntry(
@@ -69,7 +69,7 @@ async def test_theme_select(
 
 
 async def test_infrared_brightness(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test getting and setting infrared brightness."""
 
@@ -102,7 +102,7 @@ async def test_infrared_brightness(
 
 
 @pytest.mark.usefixtures("mock_discovery")
-async def test_set_infrared_brightness_25_percent(hass: HomeAssistant) -> None:
+async def test_set_infrared_brightness_25_percent(hass: SmartHub) -> None:
     """Test getting and setting infrared brightness."""
 
     config_entry = MockConfigEntry(
@@ -144,7 +144,7 @@ async def test_set_infrared_brightness_25_percent(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_discovery")
-async def test_set_infrared_brightness_50_percent(hass: HomeAssistant) -> None:
+async def test_set_infrared_brightness_50_percent(hass: SmartHub) -> None:
     """Test getting and setting infrared brightness."""
 
     config_entry = MockConfigEntry(
@@ -186,7 +186,7 @@ async def test_set_infrared_brightness_50_percent(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_discovery")
-async def test_set_infrared_brightness_100_percent(hass: HomeAssistant) -> None:
+async def test_set_infrared_brightness_100_percent(hass: SmartHub) -> None:
     """Test getting and setting infrared brightness."""
 
     config_entry = MockConfigEntry(
@@ -228,7 +228,7 @@ async def test_set_infrared_brightness_100_percent(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_discovery")
-async def test_disable_infrared(hass: HomeAssistant) -> None:
+async def test_disable_infrared(hass: SmartHub) -> None:
     """Test getting and setting infrared brightness."""
 
     config_entry = MockConfigEntry(
@@ -270,7 +270,7 @@ async def test_disable_infrared(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_discovery")
-async def test_invalid_infrared_brightness(hass: HomeAssistant) -> None:
+async def test_invalid_infrared_brightness(hass: SmartHub) -> None:
     """Test getting and setting infrared brightness."""
 
     config_entry = MockConfigEntry(

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import voluptuous as vol
 
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_CONDITION,
     CONF_DEVICE_ID,
@@ -14,13 +14,13 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import (
+from smarthub.core import SmartHub, callback
+from smarthub.helpers import (
     condition,
     config_validation as cv,
     entity_registry as er,
 )
-from homeassistant.helpers.typing import ConfigType, TemplateVarsType
+from smarthub.helpers.typing import ConfigType, TemplateVarsType
 
 from . import DOMAIN
 
@@ -36,7 +36,7 @@ CONDITION_SCHEMA = cv.DEVICE_CONDITION_BASE_SCHEMA.extend(
 
 
 async def async_get_conditions(
-    hass: HomeAssistant, device_id: str
+    hass: SmartHub, device_id: str
 ) -> list[dict[str, str]]:
     """List device conditions for NEW_NAME devices."""
     registry = er.async_get(hass)
@@ -63,7 +63,7 @@ async def async_get_conditions(
 
 @callback
 def async_condition_from_config(
-    hass: HomeAssistant, config: ConfigType
+    hass: SmartHub, config: ConfigType
 ) -> condition.ConditionCheckerType:
     """Create a function to test a device condition."""
     if config[CONF_TYPE] == "is_on":
@@ -72,7 +72,7 @@ def async_condition_from_config(
         state = STATE_OFF
 
     @callback
-    def test_is_state(hass: HomeAssistant, variables: TemplateVarsType) -> bool:
+    def test_is_state(hass: SmartHub, variables: TemplateVarsType) -> bool:
         """Test if an entity is a certain state."""
         return condition.state(hass, config[ATTR_ENTITY_ID], state)
 

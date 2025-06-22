@@ -7,11 +7,11 @@ from pydeconz.models.sensor.ancillary_control import AncillaryControlPanel
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_CONTROL_PANEL_DOMAIN,
     AlarmControlPanelState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_CODE,
     ATTR_ENTITY_ID,
     SERVICE_ALARM_ARM_AWAY,
@@ -20,8 +20,8 @@ from homeassistant.const import (
     SERVICE_ALARM_DISARM,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType, WebsocketDataType
 
@@ -94,7 +94,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
     ],
 )
 async def test_alarm_control_panel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     aioclient_mock: AiohttpClientMocker,
     config_entry_factory: ConfigEntryFactoryType,
@@ -104,7 +104,7 @@ async def test_alarm_control_panel(
 ) -> None:
     """Test successful creation of alarm control panel entities."""
     with patch(
-        "homeassistant.components.deconz.PLATFORMS", [Platform.ALARM_CONTROL_PANEL]
+        "smarthub.components.deconz.PLATFORMS", [Platform.ALARM_CONTROL_PANEL]
     ):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)

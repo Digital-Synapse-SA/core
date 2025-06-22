@@ -7,12 +7,12 @@ from pynecil import CharSetting, CommunicationError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 async def button_only() -> AsyncGenerator[None]:
     """Enable only the button platform."""
     with patch(
-        "homeassistant.components.iron_os.PLATFORMS",
+        "smarthub.components.iron_os.PLATFORMS",
         [Platform.BUTTON],
     ):
         yield
@@ -31,7 +31,7 @@ async def button_only() -> AsyncGenerator[None]:
     "entity_registry_enabled_by_default", "mock_pynecil", "ble_device"
 )
 async def test_button_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -55,7 +55,7 @@ async def test_button_platform(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "ble_device")
 async def test_button_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pynecil: AsyncMock,
     entity_id: str,
@@ -80,7 +80,7 @@ async def test_button_press(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "ble_device")
 async def test_button_press_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pynecil: AsyncMock,
 ) -> None:

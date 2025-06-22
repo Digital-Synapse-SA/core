@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pykoplenti import ApiClient, ExtendedApiClient, SettingsData
 import pytest
 
-from homeassistant.components.kostal_plenticore.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceInfo
+from smarthub.components.kostal_plenticore.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import DeviceInfo
 
 from tests.common import MockConfigEntry
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 def mock_apiclient() -> Generator[ApiClient]:
     """Return a mocked ApiClient class."""
     with patch(
-        "homeassistant.components.kostal_plenticore.coordinator.ExtendedApiClient",
+        "smarthub.components.kostal_plenticore.coordinator.ExtendedApiClient",
         autospec=True,
     ) as mock_api_class:
         apiclient = MagicMock(spec=ExtendedApiClient)
@@ -28,7 +28,7 @@ def mock_apiclient() -> Generator[ApiClient]:
 
 
 async def test_plenticore_async_setup_g1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_apiclient: ApiClient,
 ) -> None:
@@ -80,7 +80,7 @@ async def test_plenticore_async_setup_g1(
 
 
 async def test_plenticore_async_setup_g2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_apiclient: ApiClient,
 ) -> None:

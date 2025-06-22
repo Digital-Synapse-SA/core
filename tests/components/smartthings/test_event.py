@@ -8,10 +8,10 @@ from pysmartthings.models import HealthStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.event import ATTR_EVENT_TYPES
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.event import ATTR_EVENT_TYPES
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import (
     setup_integration,
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -38,7 +38,7 @@ async def test_all_entities(
 
 @pytest.mark.parametrize("device_fixture", ["heatit_zpushwall"])
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -70,7 +70,7 @@ async def test_state_update(
 
 @pytest.mark.parametrize("device_fixture", ["heatit_zpushwall"])
 async def test_supported_button_values_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -107,7 +107,7 @@ async def test_supported_button_values_update(
 
 @pytest.mark.parametrize("device_fixture", ["heatit_zpushwall"])
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -138,7 +138,7 @@ async def test_availability(
 
 @pytest.mark.parametrize("device_fixture", ["heatit_zpushwall"])
 async def test_availability_at_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unavailable_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

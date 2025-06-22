@@ -6,18 +6,18 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.apcupsd.coordinator import REQUEST_REFRESH_COOLDOWN
-from homeassistant.const import (
+from smarthub.components.apcupsd.coordinator import REQUEST_REFRESH_COOLDOWN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import slugify
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import slugify
+from smarthub.util.dt import utcnow
 
 from . import MOCK_MINIMAL_STATUS, MOCK_STATUS, async_init_integration
 
@@ -26,17 +26,17 @@ from tests.common import async_fire_time_changed, snapshot_platform
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test states of sensor."""
-    with patch("homeassistant.components.apcupsd.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.apcupsd.PLATFORMS", [Platform.SENSOR]):
         config_entry = await async_init_integration(hass, status=MOCK_STATUS)
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
 
-async def test_state_update(hass: HomeAssistant) -> None:
+async def test_state_update(hass: SmartHub) -> None:
     """Ensure the sensor state changes after updating the data."""
     await async_init_integration(hass)
 
@@ -58,8 +58,8 @@ async def test_state_update(hass: HomeAssistant) -> None:
         assert state.state == "15.0"
 
 
-async def test_manual_update_entity(hass: HomeAssistant) -> None:
-    """Test manual update entity via service homeassistant/update_entity."""
+async def test_manual_update_entity(hass: SmartHub) -> None:
+    """Test manual update entity via service smarthub/update_entity."""
     await async_init_integration(hass)
 
     device_slug = slugify(MOCK_STATUS["UPSNAME"])
@@ -70,7 +70,7 @@ async def test_manual_update_entity(hass: HomeAssistant) -> None:
     assert state.state == "14.0"
 
     # Setup HASS for calling the update_entity service.
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     with patch("aioapcaccess.request_status") as mock_request_status:
         mock_request_status.return_value = MOCK_STATUS | {
@@ -82,7 +82,7 @@ async def test_manual_update_entity(hass: HomeAssistant) -> None:
         future = utcnow() + timedelta(seconds=REQUEST_REFRESH_COOLDOWN)
         async_fire_time_changed(hass, future)
         await hass.services.async_call(
-            "homeassistant",
+            "smarthub",
             "update_entity",
             {
                 ATTR_ENTITY_ID: [
@@ -103,8 +103,8 @@ async def test_manual_update_entity(hass: HomeAssistant) -> None:
         assert state.state == "15.0"
 
 
-async def test_multiple_manual_update_entity(hass: HomeAssistant) -> None:
-    """Test multiple simultaneous manual update entity via service homeassistant/update_entity.
+async def test_multiple_manual_update_entity(hass: SmartHub) -> None:
+    """Test multiple simultaneous manual update entity via service smarthub/update_entity.
 
     We should only do network call once for the multiple simultaneous update entity services.
     """
@@ -112,7 +112,7 @@ async def test_multiple_manual_update_entity(hass: HomeAssistant) -> None:
 
     device_slug = slugify(MOCK_STATUS["UPSNAME"])
     # Setup HASS for calling the update_entity service.
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     with patch(
         "aioapcaccess.request_status", return_value=MOCK_STATUS
@@ -121,7 +121,7 @@ async def test_multiple_manual_update_entity(hass: HomeAssistant) -> None:
         future = utcnow() + timedelta(seconds=REQUEST_REFRESH_COOLDOWN)
         async_fire_time_changed(hass, future)
         await hass.services.async_call(
-            "homeassistant",
+            "smarthub",
             "update_entity",
             {
                 ATTR_ENTITY_ID: [
@@ -134,7 +134,7 @@ async def test_multiple_manual_update_entity(hass: HomeAssistant) -> None:
         assert mock_request_status.call_count == 1
 
 
-async def test_sensor_unknown(hass: HomeAssistant) -> None:
+async def test_sensor_unknown(hass: SmartHub) -> None:
     """Test if our integration can properly mark certain sensors as unknown when it becomes so."""
     await async_init_integration(hass, status=MOCK_MINIMAL_STATUS)
 

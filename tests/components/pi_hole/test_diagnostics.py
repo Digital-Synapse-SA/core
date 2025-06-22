@@ -3,8 +3,8 @@
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components import pi_hole
-from homeassistant.core import HomeAssistant
+from smarthub.components import pi_hole
+from smarthub.core import SmartHub
 
 from . import CONFIG_DATA_DEFAULTS, _create_mocked_hole, _patch_init_hole
 
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:

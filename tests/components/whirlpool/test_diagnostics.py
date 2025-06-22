@@ -3,7 +3,7 @@
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import init_integration
 
@@ -14,7 +14,7 @@ YAML_CONFIG = {"username": "test-user", "password": "test-password"}
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:

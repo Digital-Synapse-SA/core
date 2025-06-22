@@ -6,18 +6,18 @@ from unittest.mock import AsyncMock, MagicMock
 from elgato import ElgatoConnectionError
 import pytest
 
-from homeassistant.components.elgato.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_MAC, CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.elgato.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_MAC, CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_user_flow_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_elgato: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -49,7 +49,7 @@ async def test_full_user_flow_implementation(
 
 
 async def test_full_zeroconf_flow_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_elgato: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -97,7 +97,7 @@ async def test_full_zeroconf_flow_implementation(
 
 
 async def test_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_elgato: MagicMock,
 ) -> None:
     """Test we show user form on Elgato Key Light connection error."""
@@ -133,7 +133,7 @@ async def test_connection_error(
 
 
 async def test_zeroconf_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_elgato: MagicMock,
 ) -> None:
     """Test we abort zeroconf flow on Elgato Key Light connection error."""
@@ -158,7 +158,7 @@ async def test_zeroconf_connection_error(
 
 @pytest.mark.usefixtures("mock_elgato")
 async def test_user_device_exists_abort(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we abort zeroconf flow if Elgato Key Light device already configured."""
     mock_config_entry.add_to_hass(hass)
@@ -174,7 +174,7 @@ async def test_user_device_exists_abort(
 
 @pytest.mark.usefixtures("mock_elgato")
 async def test_zeroconf_device_exists_abort(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we abort zeroconf flow if Elgato Key Light device already configured."""
     mock_config_entry.add_to_hass(hass)
@@ -221,7 +221,7 @@ async def test_zeroconf_device_exists_abort(
 
 
 async def test_zeroconf_during_onboarding(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_elgato: MagicMock,
     mock_setup_entry: AsyncMock,
     mock_onboarding: MagicMock,

@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.derivative.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import selector
+from smarthub import config_entries
+from smarthub.components.derivative.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import selector
 
 from tests.common import MockConfigEntry, get_schema_suggested_value
 
 
 @pytest.mark.parametrize("platform", ["sensor"])
-async def test_config_flow(hass: HomeAssistant, platform) -> None:
+async def test_config_flow(hass: SmartHub, platform) -> None:
     """Test the config flow."""
     input_sensor_entity_id = "sensor.input"
 
@@ -25,7 +25,7 @@ async def test_config_flow(hass: HomeAssistant, platform) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.derivative.async_setup_entry",
+        "smarthub.components.derivative.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -65,7 +65,7 @@ async def test_config_flow(hass: HomeAssistant, platform) -> None:
 
 
 @pytest.mark.parametrize("platform", ["sensor"])
-async def test_options(hass: HomeAssistant, platform) -> None:
+async def test_options(hass: SmartHub, platform) -> None:
     """Test reconfiguring."""
     # Setup the config entry
     config_entry = MockConfigEntry(

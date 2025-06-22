@@ -1,15 +1,15 @@
-"""Test the Home Assistant SkyConnect constants."""
+"""Test the SmartHub SkyConnect constants."""
 
 import pytest
 
-from homeassistant.components.homeassistant_sky_connect.const import HardwareVariant
+from smarthub.components.smarthub_sky_connect.const import HardwareVariant
 
 
 @pytest.mark.parametrize(
     ("usb_product_name", "expected_variant"),
     [
         ("SkyConnect v1.0", HardwareVariant.SKYCONNECT),
-        ("Home Assistant Connect ZBT-1", HardwareVariant.CONNECT_ZBT1),
+        ("SmartHub Connect ZBT-1", HardwareVariant.CONNECT_ZBT1),
     ],
 )
 def test_hardware_variant(

@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock, patch
 from aiohttp.client_exceptions import ClientError
 import pytest
 
-from homeassistant.components.twitch.const import DOMAIN, OAUTH2_TOKEN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.twitch.const import DOMAIN, OAUTH2_TOKEN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -18,7 +18,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_setup_success(
-    hass: HomeAssistant, config_entry: MockConfigEntry, twitch_mock: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, twitch_mock: AsyncMock
 ) -> None:
     """Test successful setup and unload."""
     await setup_integration(hass, config_entry)
@@ -35,7 +35,7 @@ async def test_setup_success(
 
 @pytest.mark.parametrize("expires_at", [time.time() - 3600], ids=["expired"])
 async def test_expired_token_refresh_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,
     twitch_mock: AsyncMock,
@@ -79,7 +79,7 @@ async def test_expired_token_refresh_success(
     ids=["failure_requires_reauth", "transient_failure"],
 )
 async def test_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     status: http.HTTPStatus,
     expected_state: ConfigEntryState,
@@ -104,12 +104,12 @@ async def test_expired_token_refresh_failure(
 
 
 async def test_expired_token_refresh_client_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, twitch_mock: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, twitch_mock: AsyncMock
 ) -> None:
     """Test failure while refreshing token with a client error."""
 
     with patch(
-        "homeassistant.components.twitch.OAuth2Session.async_ensure_token_valid",
+        "smarthub.components.twitch.OAuth2Session.async_ensure_token_valid",
         side_effect=ClientError,
     ):
         config_entry.add_to_hass(hass)

@@ -11,7 +11,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from ttls.client import TwinklyError
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_EFFECT,
     ATTR_RGB_COLOR,
@@ -19,8 +19,8 @@ from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     LightEntityFeature,
 )
-from homeassistant.components.twinkly import DOMAIN
-from homeassistant.const import (
+from smarthub.components.twinkly import DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     SERVICE_TURN_OFF,
@@ -29,8 +29,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import setup_integration
 from .const import TEST_MAC
@@ -40,20 +40,20 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 @pytest.mark.usefixtures("mock_twinkly_client")
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the created entities."""
-    with patch("homeassistant.components.twinkly.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.twinkly.PLATFORMS", [Platform.LIGHT]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
 ) -> None:
@@ -75,7 +75,7 @@ async def test_turn_on_off(
 
 
 async def test_turn_on_with_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
 ) -> None:
@@ -96,7 +96,7 @@ async def test_turn_on_with_brightness(
 
 
 async def test_brightness_to_zero(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
 ) -> None:
@@ -115,7 +115,7 @@ async def test_brightness_to_zero(
 
 
 async def test_turn_on_with_color_rgbw(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
 ) -> None:
@@ -146,7 +146,7 @@ async def test_turn_on_with_color_rgbw(
 
 
 async def test_turn_on_with_color_rgb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
 ) -> None:
@@ -174,7 +174,7 @@ async def test_turn_on_with_color_rgb(
 
 
 async def test_turn_on_with_effect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
 ) -> None:
@@ -209,7 +209,7 @@ async def test_turn_on_with_effect(
     ],
 )
 async def test_turn_on_with_missing_effect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
     data: dict[str, Any],
@@ -239,7 +239,7 @@ async def test_turn_on_with_missing_effect(
 
 
 async def test_turn_on_with_color_rgbw_and_missing_effect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
 ) -> None:
@@ -264,7 +264,7 @@ async def test_turn_on_with_color_rgbw_and_missing_effect(
 
 
 async def test_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
 ) -> None:
@@ -281,7 +281,7 @@ async def test_turn_off(
 
 
 async def test_no_current_movie(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -303,7 +303,7 @@ async def test_no_current_movie(
 
 
 async def test_update_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,

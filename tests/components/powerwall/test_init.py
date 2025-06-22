@@ -7,22 +7,22 @@ from unittest.mock import MagicMock, patch
 from aiohttp import CookieJar
 from tesla_powerwall import AccessDeniedError, LoginResponse
 
-from homeassistant.components.powerwall.const import (
+from smarthub.components.powerwall.const import (
     AUTH_COOKIE_KEY,
     CONFIG_ENTRY_COOKIE,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_IP_ADDRESS, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.util.dt import utcnow
 
 from .mocks import MOCK_GATEWAY_DIN, _mock_powerwall_with_fixtures
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_update_data_reauthenticate_on_access_denied(hass: HomeAssistant) -> None:
+async def test_update_data_reauthenticate_on_access_denied(hass: SmartHub) -> None:
     """Test if _update_data of PowerwallDataManager reauthenticates on AccessDeniedError."""
 
     mock_powerwall = await _mock_powerwall_with_fixtures(hass)
@@ -52,11 +52,11 @@ async def test_update_data_reauthenticate_on_access_denied(hass: HomeAssistant) 
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -84,7 +84,7 @@ async def test_update_data_reauthenticate_on_access_denied(hass: HomeAssistant) 
         assert reauth_flow["context"]["source"] == "reauth"
 
 
-async def test_init_uses_cookie_if_present(hass: HomeAssistant) -> None:
+async def test_init_uses_cookie_if_present(hass: SmartHub) -> None:
     """Tests if the init will use the auth cookie if present.
 
     If the cookie is present, the login step will be skipped and info will be fetched directly (see _login_and_fetch_base_info).
@@ -102,11 +102,11 @@ async def test_init_uses_cookie_if_present(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -116,7 +116,7 @@ async def test_init_uses_cookie_if_present(hass: HomeAssistant) -> None:
         assert mock_powerwall.get_gateway_din.called
 
 
-async def test_init_uses_password_if_no_cookies(hass: HomeAssistant) -> None:
+async def test_init_uses_password_if_no_cookies(hass: SmartHub) -> None:
     """Tests if the init will use the password if no auth cookie present."""
     mock_powerwall = await _mock_powerwall_with_fixtures(hass)
 
@@ -130,11 +130,11 @@ async def test_init_uses_password_if_no_cookies(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -144,7 +144,7 @@ async def test_init_uses_password_if_no_cookies(hass: HomeAssistant) -> None:
         assert mock_powerwall.get_charge.called
 
 
-async def test_init_saves_the_cookie(hass: HomeAssistant) -> None:
+async def test_init_saves_the_cookie(hass: SmartHub) -> None:
     """Tests that the cookie is properly saved."""
     mock_powerwall = await _mock_powerwall_with_fixtures(hass)
     mock_jar = MagicMock(CookieJar)
@@ -160,13 +160,13 @@ async def test_init_saves_the_cookie(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
-        patch("homeassistant.components.powerwall.CookieJar", return_value=mock_jar),
+        patch("smarthub.components.powerwall.CookieJar", return_value=mock_jar),
     ):
         auth_cookie = Morsel()
         auth_cookie.set(AUTH_COOKIE_KEY, "somecookie", "somecookie")
@@ -178,7 +178,7 @@ async def test_init_saves_the_cookie(hass: HomeAssistant) -> None:
         assert config_entry.data[CONFIG_ENTRY_COOKIE] == "somecookie"
 
 
-async def test_retry_ignores_cookie(hass: HomeAssistant) -> None:
+async def test_retry_ignores_cookie(hass: SmartHub) -> None:
     """Tests that retrying uses the password instead."""
     mock_powerwall = await _mock_powerwall_with_fixtures(hass)
 
@@ -193,11 +193,11 @@ async def test_retry_ignores_cookie(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -218,7 +218,7 @@ async def test_retry_ignores_cookie(hass: HomeAssistant) -> None:
         assert mock_powerwall.get_charge.call_count == 2
 
 
-async def test_reauth_ignores_and_clears_cookie(hass: HomeAssistant) -> None:
+async def test_reauth_ignores_and_clears_cookie(hass: SmartHub) -> None:
     """Tests that the reauth flow uses password and clears the cookie."""
     mock_powerwall = await _mock_powerwall_with_fixtures(hass)
 
@@ -233,11 +233,11 @@ async def test_reauth_ignores_and_clears_cookie(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -273,7 +273,7 @@ async def test_reauth_ignores_and_clears_cookie(hass: HomeAssistant) -> None:
         assert config_entry.data[CONFIG_ENTRY_COOKIE] is None
 
 
-async def test_init_retries_with_password(hass: HomeAssistant) -> None:
+async def test_init_retries_with_password(hass: SmartHub) -> None:
     """Tests that the init retries with password if cookie fails."""
     mock_powerwall = await _mock_powerwall_with_fixtures(hass)
 
@@ -288,11 +288,11 @@ async def test_init_retries_with_password(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         mock_powerwall.get_gateway_din.side_effect = [

@@ -1,4 +1,4 @@
-"""Test the Home Assistant fyta binary sensor module."""
+"""Test the SmartHub fyta binary sensor module."""
 
 from datetime import timedelta
 from unittest.mock import AsyncMock
@@ -9,10 +9,10 @@ from fyta_cli.fyta_models import Plant
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fyta.const import DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.fyta.const import DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_platform
 
@@ -26,7 +26,7 @@ from tests.common import (
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_fyta_connector: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -46,7 +46,7 @@ async def test_all_entities(
     ],
 )
 async def test_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     mock_fyta_connector: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -67,7 +67,7 @@ async def test_connection_error(
 
 
 async def test_add_remove_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fyta_connector: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

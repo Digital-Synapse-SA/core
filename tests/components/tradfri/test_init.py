@@ -5,11 +5,11 @@ from unittest.mock import MagicMock
 from pytradfri.const import ATTR_FIRMWARE_VERSION, ATTR_GATEWAY_ID
 from pytradfri.gateway import Gateway
 
-from homeassistant.components import tradfri
-from homeassistant.components.tradfri.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components import tradfri
+from smarthub.components.tradfri.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import GATEWAY_ID, GATEWAY_ID1, GATEWAY_ID2
 from .common import CommandStore
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry, async_load_json_object_fixture
 
 
 async def test_entry_setup_unload(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, mock_api_factory: MagicMock
+    hass: SmartHub, device_registry: dr.DeviceRegistry, mock_api_factory: MagicMock
 ) -> None:
     """Test config entry setup and unload."""
     config_entry = MockConfigEntry(
@@ -54,7 +54,7 @@ async def test_entry_setup_unload(
 
 
 async def test_remove_stale_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test remove stale device registry entries."""
@@ -101,7 +101,7 @@ async def test_remove_stale_devices(
 
 
 async def test_migrate_config_entry_and_identifiers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     command_store: CommandStore,
 ) -> None:

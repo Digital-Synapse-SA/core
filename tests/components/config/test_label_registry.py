@@ -5,16 +5,16 @@ from datetime import datetime
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.config import label_registry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import label_registry as lr
+from smarthub.components.config import label_registry
+from smarthub.core import SmartHub
+from smarthub.helpers import label_registry as lr
 
 from tests.typing import MockHAClientWebSocket, WebSocketGenerator
 
 
 @pytest.fixture(name="client")
 async def client_fixture(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> MockHAClientWebSocket:
     """Fixture that can interact with the config manager API."""
     label_registry.async_setup(hass)

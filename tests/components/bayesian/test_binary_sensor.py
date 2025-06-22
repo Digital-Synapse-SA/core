@@ -6,13 +6,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components.bayesian import DOMAIN, binary_sensor as bayesian
-from homeassistant.components.homeassistant import (
+from smarthub import config as hass_config
+from smarthub.components.bayesian import DOMAIN, binary_sensor as bayesian
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_RELOAD,
     STATE_OFF,
@@ -20,15 +20,15 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import Context, HomeAssistant, callback
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.event import async_track_state_change_event
-from homeassistant.setup import async_setup_component
+from smarthub.core import Context, SmartHub, callback
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.event import async_track_state_change_event
+from smarthub.setup import async_setup_component
 
 from tests.common import get_fixture_path
 
 
-async def test_load_values_when_added_to_hass(hass: HomeAssistant) -> None:
+async def test_load_values_when_added_to_hass(hass: SmartHub) -> None:
     """Test that sensor initializes with observations of relevant entities."""
 
     config = {
@@ -64,7 +64,7 @@ async def test_load_values_when_added_to_hass(hass: HomeAssistant) -> None:
 
 
 async def test_unknown_state_does_not_influence_probability(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that an unknown state does not change the output probability."""
     prior = 0.2
@@ -99,7 +99,7 @@ async def test_unknown_state_does_not_influence_probability(
 
 
 async def test_sensor_numeric_state(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test sensor on numeric state platform observations."""
     config = {
@@ -199,7 +199,7 @@ async def test_sensor_numeric_state(
     assert len(issue_registry.issues) == 0
 
 
-async def test_sensor_state(hass: HomeAssistant) -> None:
+async def test_sensor_state(hass: SmartHub) -> None:
     """Test sensor on state platform observations."""
     prior = 0.2
     config = {
@@ -272,7 +272,7 @@ async def test_sensor_state(hass: HomeAssistant) -> None:
     assert state.state == "off"
 
 
-async def test_sensor_value_template(hass: HomeAssistant) -> None:
+async def test_sensor_value_template(hass: SmartHub) -> None:
     """Test sensor on template platform observations."""
     config = {
         "binary_sensor": {
@@ -325,7 +325,7 @@ async def test_sensor_value_template(hass: HomeAssistant) -> None:
     assert state.state == "off"
 
 
-async def test_mixed_states(hass: HomeAssistant) -> None:
+async def test_mixed_states(hass: SmartHub) -> None:
     """Test sensor on probability threshold limits."""
     config = {
         "binary_sensor": {
@@ -394,7 +394,7 @@ async def test_mixed_states(hass: HomeAssistant) -> None:
     # P(A) = 0.91139240, P(B|A) = (1-0.1) , P(B|notA) = (1-0.6), result = 0.95857988
 
 
-async def test_threshold(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
+async def test_threshold(hass: SmartHub, issue_registry: ir.IssueRegistry) -> None:
     """Test sensor on probability threshold limits."""
     config = {
         "binary_sensor": {
@@ -427,7 +427,7 @@ async def test_threshold(hass: HomeAssistant, issue_registry: ir.IssueRegistry) 
     assert len(issue_registry.issues) == 0
 
 
-async def test_multiple_observations(hass: HomeAssistant) -> None:
+async def test_multiple_observations(hass: SmartHub) -> None:
     """Test sensor with multiple observations of same entity.
 
     these entries should be labelled as 'state' and negative observations ignored - as the outcome is not known to be binary.
@@ -504,7 +504,7 @@ async def test_multiple_observations(hass: HomeAssistant) -> None:
 
 
 async def test_multiple_numeric_observations(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test sensor on numeric state platform observations with more than one range.
 
@@ -699,7 +699,7 @@ async def test_multiple_numeric_observations(
 
 
 async def test_mirrored_observations(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test whether mirrored entries are detected and appropriate issues are created."""
 
@@ -789,7 +789,7 @@ async def test_mirrored_observations(
 
 
 async def test_missing_prob_given_false(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test whether missing prob_given_false are detected and appropriate issues are created."""
 
@@ -835,7 +835,7 @@ async def test_missing_prob_given_false(
 
 
 async def test_bad_multi_numeric(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -897,7 +897,7 @@ async def test_bad_multi_numeric(
 
 
 async def test_inverted_numeric(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -929,7 +929,7 @@ async def test_inverted_numeric(
 
 
 async def test_no_value_numeric(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -955,7 +955,7 @@ async def test_no_value_numeric(
     assert "at least one of 'above' or 'below' must be specified" in caplog.text
 
 
-async def test_probability_updates(hass: HomeAssistant) -> None:
+async def test_probability_updates(hass: SmartHub) -> None:
     """Test probability update function."""
     prob_given_true = [0.3, 0.6, 0.8]
     prob_given_false = [0.7, 0.4, 0.2]
@@ -976,7 +976,7 @@ async def test_probability_updates(hass: HomeAssistant) -> None:
     assert round(abs(0.9130434782608695 - prior), 7) == 0
 
 
-async def test_observed_entities(hass: HomeAssistant) -> None:
+async def test_observed_entities(hass: SmartHub) -> None:
     """Test sensor on observed entities."""
     config = {
         "binary_sensor": {
@@ -1036,7 +1036,7 @@ async def test_observed_entities(hass: HomeAssistant) -> None:
     ]
 
 
-async def test_state_attributes_are_serializable(hass: HomeAssistant) -> None:
+async def test_state_attributes_are_serializable(hass: SmartHub) -> None:
     """Test sensor on observed entities."""
     config = {
         "binary_sensor": {
@@ -1100,7 +1100,7 @@ async def test_state_attributes_are_serializable(hass: HomeAssistant) -> None:
 
 
 async def test_template_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test sensor with template error."""
     config = {
@@ -1129,7 +1129,7 @@ async def test_template_error(
     assert "xyz" in caplog.text
 
 
-async def test_update_request_with_template(hass: HomeAssistant) -> None:
+async def test_update_request_with_template(hass: SmartHub) -> None:
     """Test sensor on template platform observations that gets an update request."""
     config = {
         "binary_sensor": {
@@ -1165,7 +1165,7 @@ async def test_update_request_with_template(hass: HomeAssistant) -> None:
     assert hass.states.get("binary_sensor.test_binary").state == "off"
 
 
-async def test_update_request_without_template(hass: HomeAssistant) -> None:
+async def test_update_request_without_template(hass: SmartHub) -> None:
     """Test sensor on template platform observations that gets an update request."""
     config = {
         "binary_sensor": {
@@ -1205,7 +1205,7 @@ async def test_update_request_without_template(hass: HomeAssistant) -> None:
     assert hass.states.get("binary_sensor.test_binary").state == "off"
 
 
-async def test_monitored_sensor_goes_away(hass: HomeAssistant) -> None:
+async def test_monitored_sensor_goes_away(hass: SmartHub) -> None:
     """Test sensor on template platform observations that goes away."""
     config = {
         "binary_sensor": {
@@ -1246,7 +1246,7 @@ async def test_monitored_sensor_goes_away(hass: HomeAssistant) -> None:
     assert hass.states.get("binary_sensor.test_binary").state == "off"
 
 
-async def test_reload(hass: HomeAssistant) -> None:
+async def test_reload(hass: SmartHub) -> None:
     """Verify we can reload bayesian sensors."""
 
     config = {
@@ -1291,7 +1291,7 @@ async def test_reload(hass: HomeAssistant) -> None:
     assert hass.states.get("binary_sensor.test2")
 
 
-async def test_template_triggers(hass: HomeAssistant) -> None:
+async def test_template_triggers(hass: SmartHub) -> None:
     """Test sensor with template triggers."""
     hass.states.async_set("input_boolean.test", STATE_OFF)
     config = {
@@ -1332,7 +1332,7 @@ async def test_template_triggers(hass: HomeAssistant) -> None:
     assert events[0].context == context
 
 
-async def test_state_triggers(hass: HomeAssistant) -> None:
+async def test_state_triggers(hass: SmartHub) -> None:
     """Test sensor with state triggers."""
     hass.states.async_set("sensor.test_monitored", STATE_OFF)
 

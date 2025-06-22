@@ -7,18 +7,18 @@ from unittest.mock import MagicMock, call
 
 from mysensors.sensor import Sensor
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_RGB_COLOR,
     ATTR_RGBW_COLOR,
     DOMAIN as LIGHT_DOMAIN,
 )
-from homeassistant.const import ATTR_BATTERY_LEVEL
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_BATTERY_LEVEL
+from smarthub.core import SmartHub
 
 
 async def test_dimmer_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     dimmer_node: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,
@@ -99,7 +99,7 @@ async def test_dimmer_node(
 
 
 async def test_rgb_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     rgb_node: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,
@@ -210,7 +210,7 @@ async def test_rgb_node(
 
 
 async def test_rgbw_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     rgbw_node: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,

@@ -4,18 +4,18 @@ from unittest.mock import Mock, patch
 
 from pyvesync import VeSync
 
-from homeassistant.components.vesync import SERVICE_UPDATE_DEVS, async_setup_entry
-from homeassistant.components.vesync.const import DOMAIN, VS_DEVICES, VS_MANAGER
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.vesync import SERVICE_UPDATE_DEVS, async_setup_entry
+from smarthub.components.vesync.const import DOMAIN, VS_DEVICES, VS_MANAGER
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_async_setup_entry__not_login(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     manager: VeSync,
 ) -> None:
@@ -32,7 +32,7 @@ async def test_async_setup_entry__not_login(
 
 
 async def test_async_setup_entry__no_devices(
-    hass: HomeAssistant, config_entry: ConfigEntry, manager: VeSync
+    hass: SmartHub, config_entry: ConfigEntry, manager: VeSync
 ) -> None:
     """Test setup connects to vesync and creates empty config when no devices."""
     with patch.object(hass.config_entries, "async_forward_entry_setups") as setups_mock:
@@ -58,7 +58,7 @@ async def test_async_setup_entry__no_devices(
 
 
 async def test_async_setup_entry__loads_fans(
-    hass: HomeAssistant, config_entry: ConfigEntry, manager: VeSync, fan
+    hass: SmartHub, config_entry: ConfigEntry, manager: VeSync, fan
 ) -> None:
     """Test setup connects to vesync and loads fan."""
     fans = [fan]
@@ -89,7 +89,7 @@ async def test_async_setup_entry__loads_fans(
 
 
 async def test_async_new_device_discovery(
-    hass: HomeAssistant, config_entry: ConfigEntry, manager: VeSync, fan, humidifier
+    hass: SmartHub, config_entry: ConfigEntry, manager: VeSync, fan, humidifier
 ) -> None:
     """Test new device discovery."""
 
@@ -101,7 +101,7 @@ async def test_async_new_device_discovery(
 
     # Mock discovery of new fan which would get added to VS_DEVICES.
     with patch(
-        "homeassistant.components.vesync.async_generate_device_list",
+        "smarthub.components.vesync.async_generate_device_list",
         return_value=[fan],
     ):
         await hass.services.async_call(DOMAIN, SERVICE_UPDATE_DEVS, {}, blocking=True)
@@ -113,7 +113,7 @@ async def test_async_new_device_discovery(
     # Mock discovery of new humidifier which would invoke discovery in all platforms.
     # The mocked humidifier needs to have all properties populated for correct processing.
     with patch(
-        "homeassistant.components.vesync.async_generate_device_list",
+        "smarthub.components.vesync.async_generate_device_list",
         return_value=[humidifier],
     ):
         await hass.services.async_call(DOMAIN, SERVICE_UPDATE_DEVS, {}, blocking=True)
@@ -124,7 +124,7 @@ async def test_async_new_device_discovery(
 
 
 async def test_migrate_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     switch_old_id_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:

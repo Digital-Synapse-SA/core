@@ -5,14 +5,14 @@ from unittest.mock import MagicMock, patch
 
 from yalexs.authenticator_common import AuthenticationState
 
-from homeassistant.components.august.const import DOMAIN
-from homeassistant.components.august.gateway import AugustGateway
-from homeassistant.core import HomeAssistant
+from smarthub.components.august.const import DOMAIN
+from smarthub.components.august.gateway import AugustGateway
+from smarthub.core import SmartHub
 
 from .mocks import _mock_august_authentication, _mock_get_config
 
 
-async def test_refresh_access_token(hass: HomeAssistant) -> None:
+async def test_refresh_access_token(hass: SmartHub) -> None:
     """Test token refreshes."""
     await _patched_refresh_access_token(hass, "new_token", 5678)
 
@@ -22,7 +22,7 @@ async def test_refresh_access_token(hass: HomeAssistant) -> None:
 @patch("yalexs.manager.gateway.AuthenticatorAsync.should_refresh")
 @patch("yalexs.manager.gateway.AuthenticatorAsync.async_refresh_access_token")
 async def _patched_refresh_access_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     new_token: str,
     new_token_expire_time: int,
     refresh_access_token_mock,

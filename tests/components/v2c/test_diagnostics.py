@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
 
 from . import init_integration
 
@@ -15,7 +15,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: ConfigEntry,
     mock_v2c_client: AsyncMock,
     hass_client: ClientSessionGenerator,

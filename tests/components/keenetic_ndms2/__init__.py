@@ -1,14 +1,14 @@
 """Tests for the Keenetic NDMS2 component."""
 
-from homeassistant.components.keenetic_ndms2 import const
-from homeassistant.const import (
+from smarthub.components.keenetic_ndms2 import const
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_SCAN_INTERVAL,
     CONF_USERNAME,
 )
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_UDN,
     SsdpServiceInfo,

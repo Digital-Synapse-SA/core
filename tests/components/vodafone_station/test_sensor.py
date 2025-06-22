@@ -8,10 +8,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.vodafone_station.const import LINE_TYPES, SCAN_INTERVAL
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.vodafone_station.const import LINE_TYPES, SCAN_INTERVAL
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -27,7 +27,7 @@ async def test_all_entities(
 ) -> None:
     """Test all entities."""
     with patch(
-        "homeassistant.components.vodafone_station.PLATFORMS", [Platform.SENSOR]
+        "smarthub.components.vodafone_station.PLATFORMS", [Platform.SENSOR]
     ):
         await setup_integration(hass, mock_config_entry)
 
@@ -43,7 +43,7 @@ async def test_all_entities(
     ],
 )
 async def test_active_connection_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -72,7 +72,7 @@ async def test_active_connection_type(
 
 @pytest.mark.freeze_time("2023-12-02T13:00:00+00:00")
 async def test_uptime(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -106,7 +106,7 @@ async def test_uptime(
     ],
 )
 async def test_coordinator_client_connector_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,

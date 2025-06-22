@@ -2,27 +2,27 @@
 
 from freezegun import freeze_time
 
-from homeassistant.components import geo_location
-from homeassistant.components.demo.geo_location import (
+from smarthub.components import geo_location
+from smarthub.components.demo.geo_location import (
     DEFAULT_UPDATE_INTERVAL,
     NUMBER_OF_DEMO_DEVICES,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_LATITUDE,
     ATTR_LONGITUDE,
     ATTR_UNIT_OF_MEASUREMENT,
     UnitOfLength,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import assert_setup_component, async_fire_time_changed
 
 CONFIG = {geo_location.DOMAIN: [{"platform": "demo"}]}
 
 
-async def test_setup_platform(hass: HomeAssistant, disable_platforms) -> None:
+async def test_setup_platform(hass: SmartHub, disable_platforms) -> None:
     """Test setup of demo platform via configuration."""
     utcnow = dt_util.utcnow()
     # Patching 'utcnow' to gain more control over the timed update.

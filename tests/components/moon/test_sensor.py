@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.moon.sensor import (
+from smarthub.components.moon.sensor import (
     STATE_FIRST_QUARTER,
     STATE_FULL_MOON,
     STATE_LAST_QUARTER,
@@ -16,10 +16,10 @@ from homeassistant.components.moon.sensor import (
     STATE_WAXING_CRESCENT,
     STATE_WAXING_GIBBOUS,
 )
-from homeassistant.components.sensor import ATTR_OPTIONS, SensorDeviceClass
-from homeassistant.const import ATTR_DEVICE_CLASS, ATTR_FRIENDLY_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.sensor import ATTR_OPTIONS, SensorDeviceClass
+from smarthub.const import ATTR_DEVICE_CLASS, ATTR_FRIENDLY_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -38,7 +38,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_moon_day(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
@@ -49,7 +49,7 @@ async def test_moon_day(
     mock_config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.moon.sensor.moon.phase", return_value=moon_value
+        "smarthub.components.moon.sensor.moon.phase", return_value=moon_value
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()

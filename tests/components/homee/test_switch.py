@@ -7,18 +7,18 @@ from syrupy.assertion import SnapshotAssertion
 from websockets import frames
 from websockets.exceptions import ConnectionClosed
 
-from homeassistant.components.homee.const import DOMAIN
-from homeassistant.components.switch import (
+from smarthub.components.homee.const import DOMAIN
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_ON,
     SwitchDeviceClass,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import build_mock_node, setup_integration
 
@@ -26,7 +26,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_switch_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -44,7 +44,7 @@ async def test_switch_state(
 
 
 async def test_switch_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_switch_turn_on(
 
 
 async def test_switch_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -85,7 +85,7 @@ async def test_switch_turn_off(
 
 
 async def test_switch_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_switch_device_class(
 
 
 async def test_switch_no_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -122,7 +122,7 @@ async def test_switch_no_name(
 
 
 async def test_switch_device_class_no_outlet(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -139,7 +139,7 @@ async def test_switch_device_class_no_outlet(
 
 
 async def test_send_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -151,7 +151,7 @@ async def test_send_error(
     mock_homee.set_value.side_effect = ConnectionClosed(
         rcvd=frames.Close(1002, "Protocol Error"), sent=None
     )
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -164,7 +164,7 @@ async def test_send_error(
 
 
 async def test_switch_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -173,7 +173,7 @@ async def test_switch_snapshot(
     """Test the multisensor snapshot."""
     mock_homee.nodes = [build_mock_node("switches.json")]
     mock_homee.get_node_by_id.return_value = mock_homee.nodes[0]
-    with patch("homeassistant.components.homee.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.homee.PLATFORMS", [Platform.SWITCH]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

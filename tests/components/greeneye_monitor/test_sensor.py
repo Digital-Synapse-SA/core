@@ -2,13 +2,13 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.greeneye_monitor.sensor import (
+from smarthub.components.greeneye_monitor.sensor import (
     DATA_PULSES,
     DATA_WATT_SECONDS,
 )
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     MULTI_MONITOR_CONFIG,
@@ -24,7 +24,7 @@ from .conftest import assert_sensor_state
 
 
 async def test_sensor_does_not_exist_before_monitor_connected(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, monitors: AsyncMock
+    hass: SmartHub, entity_registry: er.EntityRegistry, monitors: AsyncMock
 ) -> None:
     """Test that a sensor does not exist before its monitor is connected."""
     # The sensor base class handles connecting the monitor, so we test this with a single voltage sensor for ease
@@ -36,7 +36,7 @@ async def test_sensor_does_not_exist_before_monitor_connected(
 
 
 async def test_sensors_created_when_monitor_connected(
-    hass: HomeAssistant, monitors: AsyncMock
+    hass: SmartHub, monitors: AsyncMock
 ) -> None:
     """Test that sensors get created when the monitor first connects."""
     # The sensor base class handles updating the state on connection, so we test this with a single voltage sensor for ease
@@ -51,7 +51,7 @@ async def test_sensors_created_when_monitor_connected(
 
 
 async def test_sensors_created_during_setup_if_monitor_already_connected(
-    hass: HomeAssistant, monitors: AsyncMock
+    hass: SmartHub, monitors: AsyncMock
 ) -> None:
     """Test that sensors get created during setup if the monitor happens to connect really quickly."""
     # The sensor base class handles updating the state on connection, so we test this with a single voltage sensor for ease
@@ -65,7 +65,7 @@ async def test_sensors_created_during_setup_if_monitor_already_connected(
 
 
 async def test_disable_sensor_after_monitor_connected(
-    hass: HomeAssistant, monitors: AsyncMock
+    hass: SmartHub, monitors: AsyncMock
 ) -> None:
     """Test that a sensor disabled after its monitor connected stops listening for sensor changes."""
     # The sensor base class handles connecting the monitor, so we test this with a single voltage sensor for ease
@@ -80,7 +80,7 @@ async def test_disable_sensor_after_monitor_connected(
 
 
 async def test_updates_state_when_sensor_pushes(
-    hass: HomeAssistant, monitors: AsyncMock
+    hass: SmartHub, monitors: AsyncMock
 ) -> None:
     """Test that a sensor entity updates its state when the underlying sensor pushes an update."""
     # The sensor base class handles triggering state updates, so we test this with a single voltage sensor for ease
@@ -96,7 +96,7 @@ async def test_updates_state_when_sensor_pushes(
 
 
 async def test_power_sensor_initially_unknown(
-    hass: HomeAssistant, monitors: AsyncMock
+    hass: SmartHub, monitors: AsyncMock
 ) -> None:
     """Test that the power sensor can handle its initial state being unknown (since the GEM API needs at least two packets to arrive before it can compute watts)."""
     await setup_greeneye_monitor_component_with_config(
@@ -113,7 +113,7 @@ async def test_power_sensor_initially_unknown(
     )
 
 
-async def test_power_sensor(hass: HomeAssistant, monitors: AsyncMock) -> None:
+async def test_power_sensor(hass: SmartHub, monitors: AsyncMock) -> None:
     """Test that a power sensor reports its values correctly, including handling net metering."""
     await setup_greeneye_monitor_component_with_config(
         hass, SINGLE_MONITOR_CONFIG_POWER_SENSORS
@@ -130,7 +130,7 @@ async def test_power_sensor(hass: HomeAssistant, monitors: AsyncMock) -> None:
 
 
 async def test_pulse_counter_initially_unknown(
-    hass: HomeAssistant, monitors: AsyncMock
+    hass: SmartHub, monitors: AsyncMock
 ) -> None:
     """Test that the pulse counter sensor can handle its initial state being unknown (since the GEM API needs at least two packets to arrive before it can compute pulses per time)."""
     await setup_greeneye_monitor_component_with_config(
@@ -152,7 +152,7 @@ async def test_pulse_counter_initially_unknown(
     assert_sensor_state(hass, "sensor.pulse_3", STATE_UNKNOWN, {DATA_PULSES: 1000})
 
 
-async def test_pulse_counter(hass: HomeAssistant, monitors: AsyncMock) -> None:
+async def test_pulse_counter(hass: SmartHub, monitors: AsyncMock) -> None:
     """Test that a pulse counter sensor reports its values properly, including calculating different units."""
     await setup_greeneye_monitor_component_with_config(
         hass, SINGLE_MONITOR_CONFIG_PULSE_COUNTERS
@@ -167,7 +167,7 @@ async def test_pulse_counter(hass: HomeAssistant, monitors: AsyncMock) -> None:
     assert_sensor_state(hass, "sensor.pulse_3", "18000.0", {DATA_PULSES: 1000})
 
 
-async def test_temperature_sensor(hass: HomeAssistant, monitors: AsyncMock) -> None:
+async def test_temperature_sensor(hass: SmartHub, monitors: AsyncMock) -> None:
     """Test that a temperature sensor reports its values properly, including proper handling of when its native unit is different from that configured in hass."""
     await setup_greeneye_monitor_component_with_config(
         hass, SINGLE_MONITOR_CONFIG_TEMPERATURE_SENSORS
@@ -178,7 +178,7 @@ async def test_temperature_sensor(hass: HomeAssistant, monitors: AsyncMock) -> N
     assert_sensor_state(hass, "sensor.temp_a", "0.0")
 
 
-async def test_voltage_sensor(hass: HomeAssistant, monitors: AsyncMock) -> None:
+async def test_voltage_sensor(hass: SmartHub, monitors: AsyncMock) -> None:
     """Test that a voltage sensor reports its values properly."""
     await setup_greeneye_monitor_component_with_config(
         hass, SINGLE_MONITOR_CONFIG_VOLTAGE_SENSORS
@@ -187,7 +187,7 @@ async def test_voltage_sensor(hass: HomeAssistant, monitors: AsyncMock) -> None:
     assert_sensor_state(hass, "sensor.voltage_1", "120.0")
 
 
-async def test_multi_monitor_sensors(hass: HomeAssistant, monitors: AsyncMock) -> None:
+async def test_multi_monitor_sensors(hass: SmartHub, monitors: AsyncMock) -> None:
     """Test that sensors still work when multiple monitors are registered."""
     await setup_greeneye_monitor_component_with_config(hass, MULTI_MONITOR_CONFIG)
     await connect_monitor(hass, monitors, 1)
@@ -198,7 +198,7 @@ async def test_multi_monitor_sensors(hass: HomeAssistant, monitors: AsyncMock) -
     assert_sensor_state(hass, "sensor.unit_3_temp_1", "32.0")
 
 
-async def disable_entity(hass: HomeAssistant, entity_id: str) -> None:
+async def disable_entity(hass: SmartHub, entity_id: str) -> None:
     """Disable the given entity."""
     entity_registry = er.async_get(hass)
     entity_registry.async_update_entity(

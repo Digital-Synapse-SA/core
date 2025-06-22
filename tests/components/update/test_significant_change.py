@@ -1,6 +1,6 @@
 """Test the update significant change platform."""
 
-from homeassistant.components.update.const import (
+from smarthub.components.update.const import (
     ATTR_IN_PROGRESS,
     ATTR_INSTALLED_VERSION,
     ATTR_LATEST_VERSION,
@@ -9,14 +9,14 @@ from homeassistant.components.update.const import (
     ATTR_SKIPPED_VERSION,
     ATTR_TITLE,
 )
-from homeassistant.components.update.significant_change import (
+from smarthub.components.update.significant_change import (
     async_check_significant_change,
 )
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 
-async def test_significant_change(hass: HomeAssistant) -> None:
+async def test_significant_change(hass: SmartHub) -> None:
     """Detect update significant changes."""
     assert async_check_significant_change(hass, STATE_ON, {}, STATE_OFF, {})
     assert async_check_significant_change(hass, STATE_OFF, {}, STATE_ON, {})

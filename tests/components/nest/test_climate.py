@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock
 import aiohttp
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_HUMIDITY,
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
@@ -33,13 +33,13 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_SUPPORTED_FEATURES,
     ATTR_TEMPERATURE,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from .common import (
     DEVICE_COMMAND,
@@ -71,7 +71,7 @@ def device_traits() -> dict[str, Any]:
 
 @pytest.fixture
 async def create_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     subscriber: AsyncMock,
 ) -> CreateEvent:
     """Fixture to send a pub/sub event."""
@@ -94,14 +94,14 @@ async def create_event(
     return create_event
 
 
-async def test_no_devices(hass: HomeAssistant, setup_platform: PlatformSetup) -> None:
+async def test_no_devices(hass: SmartHub, setup_platform: PlatformSetup) -> None:
     """Test no devices returned by the api."""
     await setup_platform()
     assert len(hass.states.async_all()) == 0
 
 
 async def test_climate_devices(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test no eligible climate devices returned by the api."""
     create_device.create({"sdm.devices.traits.CameraImage": {}})
@@ -110,7 +110,7 @@ async def test_climate_devices(
 
 
 async def test_thermostat_off(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test a thermostat that is not running."""
     create_device.create(
@@ -153,7 +153,7 @@ async def test_thermostat_off(
 
 
 async def test_thermostat_heat(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test a thermostat that is heating."""
     create_device.create(
@@ -199,7 +199,7 @@ async def test_thermostat_heat(
 
 
 async def test_thermostat_cool(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test a thermostat that is cooling."""
     create_device.create(
@@ -241,7 +241,7 @@ async def test_thermostat_cool(
 
 
 async def test_thermostat_heatcool(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test a thermostat that is cooling in heatcool mode."""
     create_device.create(
@@ -284,7 +284,7 @@ async def test_thermostat_heatcool(
 
 
 async def test_thermostat_eco_off(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test a thermostat cooling with eco off."""
     create_device.create(
@@ -333,7 +333,7 @@ async def test_thermostat_eco_off(
 
 
 async def test_thermostat_eco_on(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test a thermostat in eco mode."""
     create_device.create(
@@ -382,7 +382,7 @@ async def test_thermostat_eco_on(
 
 
 async def test_thermostat_eco_heat_only(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test a thermostat in eco mode that only supports heat."""
     create_device.create(
@@ -426,7 +426,7 @@ async def test_thermostat_eco_heat_only(
 
 
 async def test_thermostat_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -497,7 +497,7 @@ async def test_thermostat_set_hvac_mode(
 
 
 async def test_thermostat_invalid_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -528,7 +528,7 @@ async def test_thermostat_invalid_hvac_mode(
 
 
 async def test_thermostat_set_eco_preset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -631,7 +631,7 @@ async def test_thermostat_set_eco_preset(
 
 
 async def test_thermostat_set_cool(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -668,7 +668,7 @@ async def test_thermostat_set_cool(
 
 
 async def test_thermostat_set_heat(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -705,7 +705,7 @@ async def test_thermostat_set_heat(
 
 
 async def test_thermostat_set_temperature_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -789,7 +789,7 @@ async def test_thermostat_set_temperature_hvac_mode(
     ],
 )
 async def test_thermostat_set_temperature_range_too_close(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -833,7 +833,7 @@ async def test_thermostat_set_temperature_range_too_close(
 
 
 async def test_thermostat_set_heat_cool(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -873,7 +873,7 @@ async def test_thermostat_set_heat_cool(
 
 
 async def test_thermostat_fan_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
 ) -> None:
@@ -924,7 +924,7 @@ async def test_thermostat_fan_off(
 
 
 async def test_thermostat_fan_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
 ) -> None:
@@ -977,7 +977,7 @@ async def test_thermostat_fan_on(
 
 
 async def test_thermostat_cool_with_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
 ) -> None:
@@ -1022,7 +1022,7 @@ async def test_thermostat_cool_with_fan(
 
 
 async def test_thermostat_set_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -1086,7 +1086,7 @@ async def test_thermostat_set_fan(
 
 
 async def test_thermostat_set_fan_when_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -1129,7 +1129,7 @@ async def test_thermostat_set_fan_when_off(
 
 
 async def test_thermostat_fan_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
 ) -> None:
@@ -1183,7 +1183,7 @@ async def test_thermostat_fan_empty(
 
 
 async def test_thermostat_invalid_fan_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
 ) -> None:
@@ -1230,7 +1230,7 @@ async def test_thermostat_invalid_fan_mode(
 
 
 async def test_thermostat_target_temp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
     create_event: CreateEvent,
@@ -1286,7 +1286,7 @@ async def test_thermostat_target_temp(
 
 
 async def test_thermostat_missing_mode_traits(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
 ) -> None:
@@ -1323,7 +1323,7 @@ async def test_thermostat_missing_mode_traits(
 
 
 async def test_thermostat_missing_temperature_trait(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
 ) -> None:
@@ -1359,7 +1359,7 @@ async def test_thermostat_missing_temperature_trait(
     assert ATTR_FAN_MODE not in thermostat.attributes
     assert ATTR_FAN_MODES not in thermostat.attributes
 
-    with pytest.raises(HomeAssistantError) as e_info:
+    with pytest.raises(SmartHubError) as e_info:
         await common.async_set_temperature(hass, temperature=24.0)
     await hass.async_block_till_done()
     assert "temperature" in str(e_info)
@@ -1369,7 +1369,7 @@ async def test_thermostat_missing_temperature_trait(
 
 
 async def test_thermostat_unexpected_hvac_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
 ) -> None:
@@ -1402,7 +1402,7 @@ async def test_thermostat_unexpected_hvac_status(
 
 
 async def test_thermostat_missing_set_point(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
 ) -> None:
@@ -1440,7 +1440,7 @@ async def test_thermostat_missing_set_point(
 
 
 async def test_thermostat_unexepected_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
 ) -> None:
@@ -1478,7 +1478,7 @@ async def test_thermostat_unexepected_hvac_mode(
 
 
 async def test_thermostat_invalid_set_preset_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -1517,7 +1517,7 @@ async def test_thermostat_invalid_set_preset_mode(
 
 
 async def test_thermostat_hvac_mode_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     create_device: CreateDevice,
@@ -1554,28 +1554,28 @@ async def test_thermostat_hvac_mode_failure(
     assert thermostat.attributes[ATTR_HVAC_ACTION] == HVACAction.IDLE
 
     auth.responses = [aiohttp.web.Response(status=HTTPStatus.BAD_REQUEST)]
-    with pytest.raises(HomeAssistantError) as e_info:
+    with pytest.raises(SmartHubError) as e_info:
         await common.async_set_hvac_mode(hass, HVACMode.HEAT)
     assert "HVAC mode" in str(e_info)
     assert "climate.my_thermostat" in str(e_info)
     assert HVACMode.HEAT in str(e_info)
 
     auth.responses = [aiohttp.web.Response(status=HTTPStatus.BAD_REQUEST)]
-    with pytest.raises(HomeAssistantError) as e_info:
+    with pytest.raises(SmartHubError) as e_info:
         await common.async_set_temperature(hass, temperature=25.0)
     assert "temperature" in str(e_info)
     assert "climate.my_thermostat" in str(e_info)
     assert "25.0" in str(e_info)
 
     auth.responses = [aiohttp.web.Response(status=HTTPStatus.BAD_REQUEST)]
-    with pytest.raises(HomeAssistantError) as e_info:
+    with pytest.raises(SmartHubError) as e_info:
         await common.async_set_fan_mode(hass, FAN_ON)
     assert "fan mode" in str(e_info)
     assert "climate.my_thermostat" in str(e_info)
     assert FAN_ON in str(e_info)
 
     auth.responses = [aiohttp.web.Response(status=HTTPStatus.BAD_REQUEST)]
-    with pytest.raises(HomeAssistantError) as e_info:
+    with pytest.raises(SmartHubError) as e_info:
         await common.async_set_preset_mode(hass, PRESET_ECO)
     assert "preset mode" in str(e_info)
     assert "climate.my_thermostat" in str(e_info)
@@ -1583,7 +1583,7 @@ async def test_thermostat_hvac_mode_failure(
 
 
 async def test_thermostat_available(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test a thermostat that is available."""
     create_device.create(
@@ -1613,7 +1613,7 @@ async def test_thermostat_available(
 
 
 async def test_thermostat_unavailable(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test a thermostat that is unavailable."""
     create_device.create(

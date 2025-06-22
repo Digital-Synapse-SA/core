@@ -4,13 +4,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.energy import async_get_manager, validate
-from homeassistant.components.energy.data import EnergyManager
-from homeassistant.components.recorder import Recorder
-from homeassistant.const import UnitOfEnergy
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.json import JSON_DUMP
-from homeassistant.setup import async_setup_component
+from smarthub.components.energy import async_get_manager, validate
+from smarthub.components.energy.data import EnergyManager
+from smarthub.components.recorder import Recorder
+from smarthub.const import UnitOfEnergy
+from smarthub.core import SmartHub
+from smarthub.helpers.json import JSON_DUMP
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def mock_is_entity_recorded():
     mocks = {}
 
     with patch(
-        "homeassistant.components.recorder.is_entity_recorded",
+        "smarthub.components.recorder.is_entity_recorded",
         side_effect=lambda hass, entity_id: mocks.get(entity_id, True),
     ):
         yield mocks
@@ -41,7 +41,7 @@ def mock_get_metadata():
         return result
 
     with patch(
-        "homeassistant.components.recorder.statistics.get_metadata",
+        "smarthub.components.recorder.statistics.get_metadata",
         wraps=_get_metadata,
     ):
         yield mocks
@@ -49,7 +49,7 @@ def mock_get_metadata():
 
 @pytest.fixture(autouse=True)
 async def mock_energy_manager(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> EnergyManager:
     """Set up energy."""
     assert await async_setup_component(hass, "energy", {"energy": {}})
@@ -58,7 +58,7 @@ async def mock_energy_manager(
     return manager
 
 
-async def test_validation_empty_config(hass: HomeAssistant) -> None:
+async def test_validation_empty_config(hass: SmartHub) -> None:
     """Test validating an empty config."""
     assert (await validate.async_validate(hass)).as_dict() == {
         "energy_sources": [],
@@ -79,7 +79,7 @@ async def test_validation_empty_config(hass: HomeAssistant) -> None:
     ],
 )
 async def test_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_energy_manager,
     mock_get_metadata,
     state_class,
@@ -119,7 +119,7 @@ async def test_validation(
 
 
 async def test_validation_device_consumption_entity_missing(
-    hass: HomeAssistant, mock_energy_manager
+    hass: SmartHub, mock_energy_manager
 ) -> None:
     """Test validating missing entity for device."""
     await mock_energy_manager.async_update(
@@ -145,7 +145,7 @@ async def test_validation_device_consumption_entity_missing(
 
 
 async def test_validation_device_consumption_stat_missing(
-    hass: HomeAssistant, mock_energy_manager
+    hass: SmartHub, mock_energy_manager
 ) -> None:
     """Test validating missing statistic for device with non entity stats."""
     await mock_energy_manager.async_update(
@@ -166,7 +166,7 @@ async def test_validation_device_consumption_stat_missing(
 
 
 async def test_validation_device_consumption_entity_unavailable(
-    hass: HomeAssistant, mock_energy_manager, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_get_metadata
 ) -> None:
     """Test validating missing stat for device."""
     await mock_energy_manager.async_update(
@@ -189,7 +189,7 @@ async def test_validation_device_consumption_entity_unavailable(
 
 
 async def test_validation_device_consumption_entity_non_numeric(
-    hass: HomeAssistant, mock_energy_manager, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_get_metadata
 ) -> None:
     """Test validating missing stat for device."""
     await mock_energy_manager.async_update(
@@ -212,7 +212,7 @@ async def test_validation_device_consumption_entity_non_numeric(
 
 
 async def test_validation_device_consumption_entity_unexpected_unit(
-    hass: HomeAssistant, mock_energy_manager, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_get_metadata
 ) -> None:
     """Test validating missing stat for device."""
     await mock_energy_manager.async_update(
@@ -245,7 +245,7 @@ async def test_validation_device_consumption_entity_unexpected_unit(
 
 
 async def test_validation_device_consumption_recorder_not_tracked(
-    hass: HomeAssistant, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
 ) -> None:
     """Test validating device based on untracked entity."""
     mock_is_entity_recorded["sensor.not_recorded"] = False
@@ -268,7 +268,7 @@ async def test_validation_device_consumption_recorder_not_tracked(
 
 
 async def test_validation_device_consumption_no_last_reset(
-    hass: HomeAssistant, mock_energy_manager, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_get_metadata
 ) -> None:
     """Test validating device based on untracked entity."""
     await mock_energy_manager.async_update(
@@ -299,7 +299,7 @@ async def test_validation_device_consumption_no_last_reset(
 
 
 async def test_validation_solar(
-    hass: HomeAssistant, mock_energy_manager, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_get_metadata
 ) -> None:
     """Test validating missing stat for device."""
     await mock_energy_manager.async_update(
@@ -336,7 +336,7 @@ async def test_validation_solar(
 
 
 async def test_validation_battery(
-    hass: HomeAssistant, mock_energy_manager, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_get_metadata
 ) -> None:
     """Test validating missing stat for device."""
     await mock_energy_manager.async_update(
@@ -389,7 +389,7 @@ async def test_validation_battery(
 
 
 async def test_validation_grid(
-    hass: HomeAssistant, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
 ) -> None:
     """Test validating grid with sensors for energy and cost/compensation."""
     mock_is_entity_recorded["sensor.grid_cost_1"] = False
@@ -484,7 +484,7 @@ async def test_validation_grid(
 
 
 async def test_validation_grid_external_cost_compensation(
-    hass: HomeAssistant, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
 ) -> None:
     """Test validating grid with non entity stats for energy and cost/compensation."""
     mock_get_metadata["external:grid_cost_1"] = None
@@ -557,7 +557,7 @@ async def test_validation_grid_external_cost_compensation(
 
 
 async def test_validation_grid_price_not_exist(
-    hass: HomeAssistant, mock_energy_manager, mock_get_metadata, mock_is_entity_recorded
+    hass: SmartHub, mock_energy_manager, mock_get_metadata, mock_is_entity_recorded
 ) -> None:
     """Test validating grid with errors.
 
@@ -632,7 +632,7 @@ async def test_validation_grid_price_not_exist(
 
 
 async def test_validation_grid_auto_cost_entity_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_energy_manager,
     mock_get_metadata,
     mock_is_entity_recorded,
@@ -718,7 +718,7 @@ async def test_validation_grid_auto_cost_entity_errors(
     ],
 )
 async def test_validation_grid_price_errors(
-    hass: HomeAssistant, mock_energy_manager, mock_get_metadata, state, unit, expected
+    hass: SmartHub, mock_energy_manager, mock_get_metadata, state, unit, expected
 ) -> None:
     """Test validating grid with price data that gives errors."""
     hass.states.async_set(
@@ -763,7 +763,7 @@ async def test_validation_grid_price_errors(
 
 
 async def test_validation_gas(
-    hass: HomeAssistant, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
 ) -> None:
     """Test validating gas with sensors for energy and cost/compensation."""
     mock_is_entity_recorded["sensor.gas_cost_1"] = False
@@ -896,7 +896,7 @@ async def test_validation_gas(
 
 
 async def test_validation_gas_no_costs_tracking(
-    hass: HomeAssistant, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
 ) -> None:
     """Test validating gas with sensors without cost tracking."""
     await mock_energy_manager.async_update(
@@ -929,7 +929,7 @@ async def test_validation_gas_no_costs_tracking(
 
 
 async def test_validation_grid_no_costs_tracking(
-    hass: HomeAssistant, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
 ) -> None:
     """Test validating grid with sensors for energy without cost tracking."""
     await mock_energy_manager.async_update(
@@ -975,7 +975,7 @@ async def test_validation_grid_no_costs_tracking(
 
 
 async def test_validation_water(
-    hass: HomeAssistant, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
 ) -> None:
     """Test validating water with sensors for energy and cost/compensation."""
     mock_is_entity_recorded["sensor.water_cost_1"] = False
@@ -1103,7 +1103,7 @@ async def test_validation_water(
 
 
 async def test_validation_water_no_costs_tracking(
-    hass: HomeAssistant, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
+    hass: SmartHub, mock_energy_manager, mock_is_entity_recorded, mock_get_metadata
 ) -> None:
     """Test validating water with sensors without cost tracking."""
     await mock_energy_manager.async_update(

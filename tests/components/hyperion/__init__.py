@@ -8,12 +8,12 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from hyperion import const
 
-from homeassistant.components.hyperion import get_hyperion_unique_id
-from homeassistant.components.hyperion.const import CONF_PRIORITY, DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.hyperion import get_hyperion_unique_id
+from smarthub.components.hyperion.const import CONF_PRIORITY, DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -121,7 +121,7 @@ def create_mock_client() -> Mock:
 
 
 def add_test_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     data: dict[str, Any] | None = None,
     options: dict[str, Any] | None = None,
 ) -> MockConfigEntry:
@@ -143,7 +143,7 @@ def add_test_config_entry(
 
 
 async def setup_test_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry | None = None,
     hyperion_client: Mock | None = None,
     options: dict[str, Any] | None = None,
@@ -156,7 +156,7 @@ async def setup_test_config_entry(
     hyperion_client.instances = [TEST_INSTANCE_1]
 
     with patch(
-        "homeassistant.components.hyperion.client.HyperionClient",
+        "smarthub.components.hyperion.client.HyperionClient",
         return_value=hyperion_client,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -174,7 +174,7 @@ def call_registered_callback(
 
 
 def register_test_entity(
-    hass: HomeAssistant, domain: str, type_name: str, entity_id: str
+    hass: SmartHub, domain: str, type_name: str, entity_id: str
 ) -> None:
     """Register a test entity."""
     unique_id = get_hyperion_unique_id(TEST_SYSINFO_ID, TEST_INSTANCE, type_name)

@@ -8,8 +8,8 @@ from unittest.mock import patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import media_player
-from homeassistant.components.media_player import (
+from smarthub.components import media_player
+from smarthub.components.media_player import (
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
     ATTR_MEDIA_FILTER_CLASSES,
@@ -22,14 +22,14 @@ from homeassistant.components.media_player import (
     SearchMedia,
     SearchMediaQuery,
 )
-from homeassistant.components.media_player.const import (
+from smarthub.components.media_player.const import (
     SERVICE_BROWSE_MEDIA,
     SERVICE_SEARCH_MEDIA,
 )
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockEntityPlatform,
@@ -41,9 +41,9 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant):
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub):
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
 def _create_tuples(enum: type[Enum], constant_prefix: str) -> list[tuple[Enum, str]]:
@@ -131,7 +131,7 @@ def test_deprecated_constants_const(
         "grouping",
     ],
 )
-def test_support_properties(hass: HomeAssistant, property_suffix: str) -> None:
+def test_support_properties(hass: SmartHub, property_suffix: str) -> None:
     """Test support_*** properties explicitly."""
 
     all_features = media_player.MediaPlayerEntityFeature(653887)
@@ -163,7 +163,7 @@ def test_support_properties(hass: HomeAssistant, property_suffix: str) -> None:
 
 
 async def test_get_image_http(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test get image via http command."""
     await async_setup_component(
@@ -177,7 +177,7 @@ async def test_get_image_http(
     client = await hass_client_no_auth()
 
     with patch(
-        "homeassistant.components.media_player.MediaPlayerEntity.async_get_media_image",
+        "smarthub.components.media_player.MediaPlayerEntity.async_get_media_image",
         return_value=(b"image", "image/jpeg"),
     ):
         resp = await client.get(state.attributes["entity_picture"])
@@ -187,11 +187,11 @@ async def test_get_image_http(
 
 
 async def test_get_image_http_remote(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test get image url via http command."""
     with patch(
-        "homeassistant.components.media_player.MediaPlayerEntity."
+        "smarthub.components.media_player.MediaPlayerEntity."
         "media_image_remotely_accessible",
         return_value=True,
     ):
@@ -206,7 +206,7 @@ async def test_get_image_http_remote(
         client = await hass_client_no_auth()
 
         with patch(
-            "homeassistant.components.media_player.MediaPlayerEntity."
+            "smarthub.components.media_player.MediaPlayerEntity."
             "async_get_media_image",
             return_value=(b"image", "image/jpeg"),
         ):
@@ -217,7 +217,7 @@ async def test_get_image_http_remote(
 
 
 async def test_get_image_http_log_credentials_redacted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
@@ -225,7 +225,7 @@ async def test_get_image_http_log_credentials_redacted(
     """Test credentials are redacted when logging url when fetching image."""
     url = "http://vi:pass@example.com/default.jpg"
     with patch(
-        "homeassistant.components.demo.media_player.DemoYoutubePlayer.media_image_url",
+        "smarthub.components.demo.media_player.DemoYoutubePlayer.media_image_url",
         url,
     ):
         await async_setup_component(
@@ -251,7 +251,7 @@ async def test_get_image_http_log_credentials_redacted(
 
 
 async def test_get_async_get_browse_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -270,7 +270,7 @@ async def test_get_async_get_browse_image(
     client = await hass_client_no_auth()
 
     with patch(
-        "homeassistant.components.media_player.MediaPlayerEntity."
+        "smarthub.components.media_player.MediaPlayerEntity."
         "async_get_browse_image",
         return_value=(b"image", "image/jpeg"),
     ):
@@ -282,7 +282,7 @@ async def test_get_async_get_browse_image(
 
 
 async def test_media_browse(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test browsing media."""
     await async_setup_component(
@@ -293,7 +293,7 @@ async def test_media_browse(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.components.demo.media_player.DemoBrowsePlayer.async_browse_media",
+        "smarthub.components.demo.media_player.DemoBrowsePlayer.async_browse_media",
         return_value=BrowseMedia(
             media_class=MediaClass.DIRECTORY,
             media_content_id="mock-id",
@@ -334,7 +334,7 @@ async def test_media_browse(
     assert mock_browse_media.mock_calls[0][1] == ("album", "abcd")
 
     with patch(
-        "homeassistant.components.demo.media_player.DemoBrowsePlayer.async_browse_media",
+        "smarthub.components.demo.media_player.DemoBrowsePlayer.async_browse_media",
         return_value={"bla": "yo"},
     ):
         await client.send_json(
@@ -353,7 +353,7 @@ async def test_media_browse(
     assert msg["result"] == {"bla": "yo"}
 
 
-async def test_media_browse_service(hass: HomeAssistant) -> None:
+async def test_media_browse_service(hass: SmartHub) -> None:
     """Test browsing media using service call."""
     await async_setup_component(
         hass, "media_player", {"media_player": {"platform": "demo"}}
@@ -361,7 +361,7 @@ async def test_media_browse_service(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.demo.media_player.DemoBrowsePlayer.async_browse_media",
+        "smarthub.components.demo.media_player.DemoBrowsePlayer.async_browse_media",
         return_value=BrowseMedia(
             media_class=MediaClass.DIRECTORY,
             media_content_id="mock-id",
@@ -423,7 +423,7 @@ async def test_media_browse_service(hass: HomeAssistant) -> None:
 
 
 async def test_media_search(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test browsing media."""
     await async_setup_component(
@@ -434,7 +434,7 @@ async def test_media_search(
     client = await hass_ws_client(hass)
 
     with patch(
-        "homeassistant.components.demo.media_player.DemoSearchPlayer.async_search_media",
+        "smarthub.components.demo.media_player.DemoSearchPlayer.async_search_media",
         return_value=SearchMedia(
             result=[
                 BrowseMedia(
@@ -488,7 +488,7 @@ async def test_media_search(
     )
 
 
-async def test_media_search_service(hass: HomeAssistant) -> None:
+async def test_media_search_service(hass: SmartHub) -> None:
     """Test browsing media."""
     await async_setup_component(
         hass, "media_player", {"media_player": {"platform": "demo"}}
@@ -507,7 +507,7 @@ async def test_media_search_service(hass: HomeAssistant) -> None:
     ]
 
     with patch(
-        "homeassistant.components.demo.media_player.DemoSearchPlayer.async_search_media",
+        "smarthub.components.demo.media_player.DemoSearchPlayer.async_search_media",
         return_value=SearchMedia(result=expected),
     ) as mock_search_media:
         result = await hass.services.async_call(
@@ -535,7 +535,7 @@ async def test_media_search_service(hass: HomeAssistant) -> None:
     )
 
 
-async def test_group_members_available_when_off(hass: HomeAssistant) -> None:
+async def test_group_members_available_when_off(hass: SmartHub) -> None:
     """Test that group_members are still available when media_player is off."""
     await async_setup_component(
         hass, "media_player", {"media_player": {"platform": "demo"}}
@@ -565,7 +565,7 @@ async def test_group_members_available_when_off(hass: HomeAssistant) -> None:
         ("replace", MediaPlayerEnqueue.REPLACE),
     ],
 )
-async def test_enqueue_rewrite(hass: HomeAssistant, input, expected) -> None:
+async def test_enqueue_rewrite(hass: SmartHub, input, expected) -> None:
     """Test that group_members are still available when media_player is off."""
     await async_setup_component(
         hass, "media_player", {"media_player": {"platform": "demo"}}
@@ -574,7 +574,7 @@ async def test_enqueue_rewrite(hass: HomeAssistant, input, expected) -> None:
 
     # Fake group support for DemoYoutubePlayer
     with patch(
-        "homeassistant.components.demo.media_player.DemoYoutubePlayer.play_media",
+        "smarthub.components.demo.media_player.DemoYoutubePlayer.play_media",
     ) as mock_play_media:
         await hass.services.async_call(
             "media_player",
@@ -592,7 +592,7 @@ async def test_enqueue_rewrite(hass: HomeAssistant, input, expected) -> None:
     assert mock_play_media.mock_calls[0][2]["enqueue"] == expected
 
 
-async def test_enqueue_alert_exclusive(hass: HomeAssistant) -> None:
+async def test_enqueue_alert_exclusive(hass: SmartHub) -> None:
     """Test that alert and enqueue cannot be used together."""
     await async_setup_component(
         hass, "media_player", {"media_player": {"platform": "demo"}}
@@ -624,7 +624,7 @@ async def test_enqueue_alert_exclusive(hass: HomeAssistant) -> None:
     ],
 )
 async def test_get_async_get_browse_image_quoting(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     media_content_id: str,
@@ -648,7 +648,7 @@ async def test_get_async_get_browse_image_quoting(
     client = await hass_client_no_auth()
 
     with patch(
-        "homeassistant.components.media_player.MediaPlayerEntity."
+        "smarthub.components.media_player.MediaPlayerEntity."
         "async_get_browse_image",
     ) as mock_browse_image:
         url = player.get_browse_image_url("album", media_content_id)

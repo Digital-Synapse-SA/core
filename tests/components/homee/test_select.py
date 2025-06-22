@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_FIRST,
     SERVICE_SELECT_LAST,
@@ -13,10 +13,10 @@ from homeassistant.components.select import (
     SERVICE_SELECT_OPTION,
     SERVICE_SELECT_PREVIOUS,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from . import build_mock_node, setup_integration
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def setup_select(
-    hass: HomeAssistant, mock_homee: MagicMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_homee: MagicMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Setups the integration for select tests."""
     mock_homee.nodes = [build_mock_node("selects.json")]
@@ -49,7 +49,7 @@ async def setup_select(
     ],
 )
 async def test_select_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     service: str,
@@ -73,7 +73,7 @@ async def test_select_services(
 
 
 async def test_select_option_service_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -93,14 +93,14 @@ async def test_select_option_service_error(
 
 
 async def test_select_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the select entity snapshot."""
-    with patch("homeassistant.components.homee.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.homee.PLATFORMS", [Platform.SELECT]):
         await setup_select(hass, mock_homee, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

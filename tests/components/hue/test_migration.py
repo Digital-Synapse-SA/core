@@ -2,15 +2,15 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.components import hue
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util.json import JsonArrayType
+from smarthub.components import hue
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util.json import JsonArrayType
 
 from tests.common import MockConfigEntry
 
 
-async def test_migrate_api_key(hass: HomeAssistant) -> None:
+async def test_migrate_api_key(hass: SmartHub) -> None:
     """Test if username gets migrated to api_key."""
     config_entry = MockConfigEntry(
         domain=hue.DOMAIN,
@@ -26,7 +26,7 @@ async def test_migrate_api_key(hass: HomeAssistant) -> None:
     }
 
 
-async def test_auto_switchover(hass: HomeAssistant) -> None:
+async def test_auto_switchover(hass: SmartHub) -> None:
     """Test if config entry from v1 automatically switches to v2."""
     config_entry = MockConfigEntry(
         domain=hue.DOMAIN,
@@ -49,7 +49,7 @@ async def test_auto_switchover(hass: HomeAssistant) -> None:
 
 
 async def test_light_entity_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mock_bridge_v2: Mock,
@@ -78,7 +78,7 @@ async def test_light_entity_migration(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.hue.migration.HueBridgeV2",
+        "smarthub.components.hue.migration.HueBridgeV2",
         return_value=mock_bridge_v2.api,
     ):
         await hue.migration.handle_v2_migration(hass, config_entry)
@@ -96,7 +96,7 @@ async def test_light_entity_migration(
 
 
 async def test_sensor_entity_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mock_bridge_v2: Mock,
@@ -137,7 +137,7 @@ async def test_sensor_entity_migration(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.hue.migration.HueBridgeV2",
+        "smarthub.components.hue.migration.HueBridgeV2",
         return_value=mock_bridge_v2.api,
     ):
         await hue.migration.handle_v2_migration(hass, config_entry)
@@ -158,7 +158,7 @@ async def test_sensor_entity_migration(
 
 
 async def test_group_entity_migration_with_v1_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_bridge_v2: Mock,
     mock_config_entry_v2: MockConfigEntry,
@@ -182,7 +182,7 @@ async def test_group_entity_migration_with_v1_id(
     await mock_bridge_v2.api.load_test_data(v2_resources_test_data)
     await hass.async_block_till_done()
     with patch(
-        "homeassistant.components.hue.migration.HueBridgeV2",
+        "smarthub.components.hue.migration.HueBridgeV2",
         return_value=mock_bridge_v2.api,
     ):
         await hue.migration.handle_v2_migration(hass, config_entry)
@@ -194,7 +194,7 @@ async def test_group_entity_migration_with_v1_id(
 
 
 async def test_group_entity_migration_with_v2_group_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_bridge_v2: Mock,
     mock_config_entry_v2: MockConfigEntry,
@@ -218,7 +218,7 @@ async def test_group_entity_migration_with_v2_group_id(
     await mock_bridge_v2.api.load_test_data(v2_resources_test_data)
     await hass.async_block_till_done()
     with patch(
-        "homeassistant.components.hue.migration.HueBridgeV2",
+        "smarthub.components.hue.migration.HueBridgeV2",
         return_value=mock_bridge_v2.api,
     ):
         await hue.migration.handle_v2_migration(hass, config_entry)

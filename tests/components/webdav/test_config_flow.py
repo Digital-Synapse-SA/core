@@ -5,18 +5,18 @@ from unittest.mock import AsyncMock
 from aiowebdav2.exceptions import MethodNotSupportedError, UnauthorizedError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.webdav.const import CONF_BACKUP_PATH, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME, CONF_VERIFY_SSL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.webdav.const import CONF_BACKUP_PATH, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME, CONF_VERIFY_SSL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form(hass: HomeAssistant, webdav_client: AsyncMock) -> None:
+async def test_form(hass: SmartHub, webdav_client: AsyncMock) -> None:
     """Test we get the form and create a entry on success."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -49,7 +49,7 @@ async def test_form(hass: HomeAssistant, webdav_client: AsyncMock) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form_fail(hass: HomeAssistant, webdav_client: AsyncMock) -> None:
+async def test_form_fail(hass: SmartHub, webdav_client: AsyncMock) -> None:
     """Test to handle exceptions."""
     webdav_client.check.return_value = False
     result = await hass.config_entries.flow.async_init(
@@ -91,7 +91,7 @@ async def test_form_fail(hass: HomeAssistant, webdav_client: AsyncMock) -> None:
     ],
 )
 async def test_form_unauthorized(
-    hass: HomeAssistant,
+    hass: SmartHub,
     webdav_client: AsyncMock,
     exception: Exception,
     expected_error: str,
@@ -129,7 +129,7 @@ async def test_form_unauthorized(
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, webdav_client: AsyncMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, webdav_client: AsyncMock
 ) -> None:
     """Test we get the form and create a entry on success."""
     mock_config_entry.add_to_hass(hass)

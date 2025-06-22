@@ -8,18 +8,18 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.mealie import DOMAIN
-from homeassistant.components.todo import (
+from smarthub.components.mealie import DOMAIN
+from smarthub.components.todo import (
     ATTR_ITEM,
     ATTR_RENAME,
     ATTR_STATUS,
     DOMAIN as TODO_DOMAIN,
     TodoServices,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -33,14 +33,14 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test todo entities."""
-    with patch("homeassistant.components.mealie.PLATFORMS", [Platform.TODO]):
+    with patch("smarthub.components.mealie.PLATFORMS", [Platform.TODO]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
@@ -59,7 +59,7 @@ async def test_entities(
     ],
 )
 async def test_todo_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     service: str,
@@ -81,7 +81,7 @@ async def test_todo_actions(
 
 
 async def test_add_todo_list_item_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -91,7 +91,7 @@ async def test_add_todo_list_item_error(
     mock_mealie_client.add_shopping_item.side_effect = MealieError
 
     with pytest.raises(
-        HomeAssistantError, match="An error occurred adding an item to Supermarket"
+        SmartHubError, match="An error occurred adding an item to Supermarket"
     ):
         await hass.services.async_call(
             TODO_DOMAIN,
@@ -103,7 +103,7 @@ async def test_add_todo_list_item_error(
 
 
 async def test_update_todo_list_item_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -113,7 +113,7 @@ async def test_update_todo_list_item_error(
     mock_mealie_client.update_shopping_item.side_effect = MealieError
 
     with pytest.raises(
-        HomeAssistantError, match="An error occurred updating an item in Supermarket"
+        SmartHubError, match="An error occurred updating an item in Supermarket"
     ):
         await hass.services.async_call(
             TODO_DOMAIN,
@@ -125,7 +125,7 @@ async def test_update_todo_list_item_error(
 
 
 async def test_update_non_existent_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -145,7 +145,7 @@ async def test_update_non_existent_item(
 
 
 async def test_delete_todo_list_item_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -156,7 +156,7 @@ async def test_delete_todo_list_item_error(
     mock_mealie_client.delete_shopping_item.side_effect = MealieError
 
     with pytest.raises(
-        HomeAssistantError, match="An error occurred deleting an item in Supermarket"
+        SmartHubError, match="An error occurred deleting an item in Supermarket"
     ):
         await hass.services.async_call(
             TODO_DOMAIN,
@@ -168,7 +168,7 @@ async def test_delete_todo_list_item_error(
 
 
 async def test_moving_todo_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
@@ -250,7 +250,7 @@ async def test_moving_todo_item(
 
 
 async def test_not_moving_todo_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
@@ -277,7 +277,7 @@ async def test_not_moving_todo_item(
 
 
 async def test_moving_todo_item_invalid_uid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
@@ -305,7 +305,7 @@ async def test_moving_todo_item_invalid_uid(
 
 
 async def test_moving_todo_item_invalid_previous_uid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
@@ -334,7 +334,7 @@ async def test_moving_todo_item_invalid_previous_uid(
 
 
 async def test_runtime_management(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

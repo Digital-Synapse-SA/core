@@ -6,9 +6,9 @@ from greeclimate.exceptions import DeviceTimeoutError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.gree.const import DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.gree.const import DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TOGGLE,
     SERVICE_TURN_OFF,
@@ -16,9 +16,9 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -29,7 +29,7 @@ ENTITY_ID_FRESH_AIR = f"{SWITCH_DOMAIN}.fake_device_1_fresh_air"
 ENTITY_ID_XTRA_FAN = f"{SWITCH_DOMAIN}.fake_device_1_xtra_fan"
 
 
-async def async_setup_gree(hass: HomeAssistant) -> MockConfigEntry:
+async def async_setup_gree(hass: SmartHub) -> MockConfigEntry:
     """Set up the gree switch platform."""
     entry = MockConfigEntry(domain=DOMAIN)
     entry.add_to_hass(hass)
@@ -38,9 +38,9 @@ async def async_setup_gree(hass: HomeAssistant) -> MockConfigEntry:
     return entry
 
 
-@patch("homeassistant.components.gree.PLATFORMS", [SWITCH_DOMAIN])
+@patch("smarthub.components.gree.PLATFORMS", [SWITCH_DOMAIN])
 async def test_registry_settings(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -62,7 +62,7 @@ async def test_registry_settings(
     ],
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_send_switch_on(hass: HomeAssistant, entity: str) -> None:
+async def test_send_switch_on(hass: SmartHub, entity: str) -> None:
     """Test for sending power on command to the device."""
     await async_setup_gree(hass)
 
@@ -90,7 +90,7 @@ async def test_send_switch_on(hass: HomeAssistant, entity: str) -> None:
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_send_switch_on_device_timeout(
-    hass: HomeAssistant, device, entity: str
+    hass: SmartHub, device, entity: str
 ) -> None:
     """Test for sending power on command to the device with a device timeout."""
     device().push_state_update.side_effect = DeviceTimeoutError
@@ -120,7 +120,7 @@ async def test_send_switch_on_device_timeout(
     ],
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_send_switch_off(hass: HomeAssistant, entity: str) -> None:
+async def test_send_switch_off(hass: SmartHub, entity: str) -> None:
     """Test for sending power on command to the device."""
     await async_setup_gree(hass)
 
@@ -147,7 +147,7 @@ async def test_send_switch_off(hass: HomeAssistant, entity: str) -> None:
     ],
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_send_switch_toggle(hass: HomeAssistant, entity: str) -> None:
+async def test_send_switch_toggle(hass: SmartHub, entity: str) -> None:
     """Test for sending power on command to the device."""
     await async_setup_gree(hass)
 
@@ -190,7 +190,7 @@ async def test_send_switch_toggle(hass: HomeAssistant, entity: str) -> None:
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entity_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:

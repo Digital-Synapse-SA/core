@@ -13,7 +13,7 @@ import zigpy.types
 import zigpy.zcl.clusters
 from zigpy.zcl.clusters.hvac import Thermostat
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
     ATTR_FAN_MODES,
@@ -35,19 +35,19 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha.helpers import (
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from .common import find_entity_id, send_attributes_report
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
@@ -132,7 +132,7 @@ ZCL_ATTR_PLUG = {
 def climate_platform_only():
     """Only set up the climate and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.BUTTON,
             Platform.CLIMATE,
@@ -147,7 +147,7 @@ def climate_platform_only():
 
 
 @pytest.fixture
-def device_climate_mock(hass: HomeAssistant, setup_zha, zigpy_device_mock):
+def device_climate_mock(hass: SmartHub, setup_zha, zigpy_device_mock):
     """Test regular thermostat device."""
 
     async def _dev(clusters, plug=None, manuf=None, quirk=None):
@@ -206,7 +206,7 @@ def test_sequence_mappings() -> None:
             assert Thermostat.SystemMode(HVAC_MODE_2_SYSTEM[hvac_mode]) is not None
 
 
-async def test_climate_local_temperature(hass: HomeAssistant, device_climate) -> None:
+async def test_climate_local_temperature(hass: SmartHub, device_climate) -> None:
     """Test local temperature."""
 
     thrm_cluster = device_climate.device.device.endpoints[1].thermostat
@@ -221,7 +221,7 @@ async def test_climate_local_temperature(hass: HomeAssistant, device_climate) ->
 
 
 async def test_climate_hvac_action_running_state(
-    hass: HomeAssistant, device_climate_sinope
+    hass: SmartHub, device_climate_sinope
 ) -> None:
     """Test hvac action via running state."""
 
@@ -286,7 +286,7 @@ async def test_climate_hvac_action_running_state(
 
 
 async def test_climate_hvac_action_pi_demand(
-    hass: HomeAssistant, device_climate
+    hass: SmartHub, device_climate
 ) -> None:
     """Test hvac action based on pi_heating/cooling_demand attrs."""
 
@@ -335,7 +335,7 @@ async def test_climate_hvac_action_pi_demand(
     ],
 )
 async def test_hvac_mode(
-    hass: HomeAssistant, device_climate, sys_mode, hvac_mode
+    hass: SmartHub, device_climate, sys_mode, hvac_mode
 ) -> None:
     """Test HVAC mode."""
 
@@ -373,7 +373,7 @@ async def test_hvac_mode(
     ],
 )
 async def test_hvac_modes(
-    hass: HomeAssistant, device_climate_mock, seq_of_op, modes
+    hass: SmartHub, device_climate_mock, seq_of_op, modes
 ) -> None:
     """Test HVAC modes from sequence of operations."""
 
@@ -395,7 +395,7 @@ async def test_hvac_modes(
     ],
 )
 async def test_target_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_climate_mock,
     sys_mode: Thermostat.SystemMode,
     preset: Literal[PRESET_AWAY] | None,
@@ -437,7 +437,7 @@ async def test_target_temperature(
     ],
 )
 async def test_target_temperature_high(
-    hass: HomeAssistant, device_climate_mock, preset, unoccupied, target_temp
+    hass: SmartHub, device_climate_mock, preset, unoccupied, target_temp
 ) -> None:
     """Test target temperature high property."""
 
@@ -473,7 +473,7 @@ async def test_target_temperature_high(
     ],
 )
 async def test_target_temperature_low(
-    hass: HomeAssistant, device_climate_mock, preset, unoccupied, target_temp
+    hass: SmartHub, device_climate_mock, preset, unoccupied, target_temp
 ) -> None:
     """Test target temperature low property."""
 
@@ -512,7 +512,7 @@ async def test_target_temperature_low(
     ],
 )
 async def test_set_hvac_mode(
-    hass: HomeAssistant, device_climate, hvac_mode, sys_mode
+    hass: SmartHub, device_climate, hvac_mode, sys_mode
 ) -> None:
     """Test setting hvac mode."""
 
@@ -563,7 +563,7 @@ async def test_set_hvac_mode(
     }
 
 
-async def test_set_temperature_hvac_mode(hass: HomeAssistant, device_climate) -> None:
+async def test_set_temperature_hvac_mode(hass: SmartHub, device_climate) -> None:
     """Test setting HVAC mode in temperature service call."""
 
     entity_id = find_entity_id(Platform.CLIMATE, device_climate, hass)
@@ -592,7 +592,7 @@ async def test_set_temperature_hvac_mode(hass: HomeAssistant, device_climate) ->
 
 
 async def test_set_temperature_heat_cool(
-    hass: HomeAssistant, device_climate_mock
+    hass: SmartHub, device_climate_mock
 ) -> None:
     """Test setting temperature service call in heating/cooling HVAC mode."""
 
@@ -679,7 +679,7 @@ async def test_set_temperature_heat_cool(
     }
 
 
-async def test_set_temperature_heat(hass: HomeAssistant, device_climate_mock) -> None:
+async def test_set_temperature_heat(hass: SmartHub, device_climate_mock) -> None:
     """Test setting temperature service call in heating HVAC mode."""
 
     device_climate = await device_climate_mock(
@@ -758,7 +758,7 @@ async def test_set_temperature_heat(hass: HomeAssistant, device_climate_mock) ->
     }
 
 
-async def test_set_temperature_cool(hass: HomeAssistant, device_climate_mock) -> None:
+async def test_set_temperature_cool(hass: SmartHub, device_climate_mock) -> None:
     """Test setting temperature service call in cooling HVAC mode."""
 
     device_climate = await device_climate_mock(
@@ -838,7 +838,7 @@ async def test_set_temperature_cool(hass: HomeAssistant, device_climate_mock) ->
 
 
 async def test_set_temperature_wrong_mode(
-    hass: HomeAssistant, device_climate_mock
+    hass: SmartHub, device_climate_mock
 ) -> None:
     """Test setting temperature service call for wrong HVAC mode."""
 
@@ -878,7 +878,7 @@ async def test_set_temperature_wrong_mode(
     assert thrm_cluster.write_attributes.await_count == 0
 
 
-async def test_fan_mode(hass: HomeAssistant, device_climate_fan) -> None:
+async def test_fan_mode(hass: SmartHub, device_climate_fan) -> None:
     """Test fan mode."""
 
     entity_id = find_entity_id(Platform.CLIMATE, device_climate_fan, hass)
@@ -908,7 +908,7 @@ async def test_fan_mode(hass: HomeAssistant, device_climate_fan) -> None:
 
 
 async def test_set_fan_mode_not_supported(
-    hass: HomeAssistant, device_climate_fan
+    hass: SmartHub, device_climate_fan
 ) -> None:
     """Test fan setting unsupported mode."""
 
@@ -925,7 +925,7 @@ async def test_set_fan_mode_not_supported(
     assert fan_cluster.write_attributes.await_count == 0
 
 
-async def test_set_fan_mode(hass: HomeAssistant, device_climate_fan) -> None:
+async def test_set_fan_mode(hass: SmartHub, device_climate_fan) -> None:
     """Test fan mode setting."""
 
     entity_id = find_entity_id(Platform.CLIMATE, device_climate_fan, hass)

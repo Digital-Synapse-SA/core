@@ -2,16 +2,16 @@
 
 import pytest
 
-from homeassistant.components.ccm15.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.ccm15.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("ccm15_device")
-async def test_load_unload(hass: HomeAssistant) -> None:
+async def test_load_unload(hass: SmartHub) -> None:
     """Test options flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,

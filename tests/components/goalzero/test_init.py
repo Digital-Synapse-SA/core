@@ -5,12 +5,12 @@ from unittest.mock import patch
 
 from goalzero import exceptions
 
-from homeassistant.components.goalzero.const import DEFAULT_NAME, DOMAIN, MANUFACTURER
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.util import dt as dt_util
+from smarthub.components.goalzero.const import DEFAULT_NAME, DOMAIN, MANUFACTURER
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.util import dt as dt_util
 
 from . import CONF_DATA, async_init_integration, create_entry
 
@@ -19,7 +19,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_setup_config_and_unload(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test Goal Zero setup and unload."""
     entry = await async_init_integration(hass, aioclient_mock)
@@ -36,7 +36,7 @@ async def test_setup_config_and_unload(
 
 
 async def test_setup_config_entry_incorrectly_formatted_mac(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the mac address formatting is corrected."""
     entry = await async_init_integration(hass, aioclient_mock, skip_setup=True)
@@ -53,11 +53,11 @@ async def test_setup_config_entry_incorrectly_formatted_mac(
     assert entry.unique_id == "aa:bb:cc:dd:ee:ff"
 
 
-async def test_async_setup_entry_not_ready(hass: HomeAssistant) -> None:
+async def test_async_setup_entry_not_ready(hass: SmartHub) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     entry = create_entry(hass)
     with patch(
-        "homeassistant.components.goalzero.Yeti.init_connect",
+        "smarthub.components.goalzero.Yeti.init_connect",
         side_effect=exceptions.ConnectError,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -65,14 +65,14 @@ async def test_async_setup_entry_not_ready(hass: HomeAssistant) -> None:
 
 
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test data update failure."""
     await async_init_integration(hass, aioclient_mock)
     assert hass.states.get(f"switch.{DEFAULT_NAME}_ac_port_status").state == STATE_ON
     with patch(
-        "homeassistant.components.goalzero.Yeti.get_state",
+        "smarthub.components.goalzero.Yeti.get_state",
         side_effect=exceptions.ConnectError,
     ) as updater:
         next_update = dt_util.utcnow() + timedelta(seconds=30)
@@ -84,7 +84,7 @@ async def test_update_failed(
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:

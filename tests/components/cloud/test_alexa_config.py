@@ -5,29 +5,29 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.alexa import errors
-from homeassistant.components.cloud import ALEXA_SCHEMA, alexa_config
-from homeassistant.components.cloud.const import (
+from smarthub.components.alexa import errors
+from smarthub.components.cloud import ALEXA_SCHEMA, alexa_config
+from smarthub.components.cloud.const import (
     DATA_CLOUD,
     PREF_ALEXA_DEFAULT_EXPOSE,
     PREF_ALEXA_ENTITY_CONFIGS,
     PREF_SHOULD_EXPOSE,
 )
-from homeassistant.components.cloud.prefs import CloudPreferences
-from homeassistant.components.homeassistant.exposed_entities import (
+from smarthub.components.cloud.prefs import CloudPreferences
+from smarthub.components.smarthub.exposed_entities import (
     DATA_EXPOSED_ENTITIES,
     async_expose_entity,
     async_get_entity_settings,
 )
-from homeassistant.const import (
+from smarthub.const import (
     EVENT_HOMEASSISTANT_START,
     EVENT_HOMEASSISTANT_STARTED,
     EntityCategory,
 )
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.setup import async_setup_component
+from smarthub.core import CoreState, SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.aiohttp_client import async_get_clientsession
+from smarthub.setup import async_setup_component
 
 from tests.common import async_fire_time_changed
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -39,25 +39,25 @@ def cloud_stub() -> Mock:
     return Mock(is_logged_in=True, subscription_expired=False)
 
 
-def expose_new(hass: HomeAssistant, expose_new: bool) -> None:
+def expose_new(hass: SmartHub, expose_new: bool) -> None:
     """Enable exposing new entities to Alexa."""
     exposed_entities = hass.data[DATA_EXPOSED_ENTITIES]
     exposed_entities.async_set_expose_new_entities("cloud.alexa", expose_new)
 
 
-def expose_entity(hass: HomeAssistant, entity_id: str, should_expose: bool) -> None:
+def expose_entity(hass: SmartHub, entity_id: str, should_expose: bool) -> None:
     """Expose an entity to Alexa."""
     async_expose_entity(hass, "cloud.alexa", entity_id, should_expose)
 
 
 async def test_alexa_config_expose_entity_prefs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     cloud_stub: Mock,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test Alexa config should expose using prefs."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     entity_entry1 = entity_registry.async_get_or_create(
         "light",
         "test",
@@ -136,10 +136,10 @@ async def test_alexa_config_expose_entity_prefs(
 
 
 async def test_alexa_config_report_state(
-    hass: HomeAssistant, cloud_prefs: CloudPreferences, cloud_stub: Mock
+    hass: SmartHub, cloud_prefs: CloudPreferences, cloud_stub: Mock
 ) -> None:
     """Test Alexa config should expose using prefs."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     await cloud_prefs.async_update(
         alexa_report_state=False,
@@ -171,12 +171,12 @@ async def test_alexa_config_report_state(
 
 
 async def test_alexa_config_invalidate_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test Alexa config should expose using prefs."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     aioclient_mock.post(
         "https://example/alexa/access_token",
@@ -222,7 +222,7 @@ async def test_alexa_config_invalidate_token(
     ],
 )
 async def test_alexa_config_fail_refresh_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     aioclient_mock: AiohttpClientMocker,
     entity_registry: er.EntityRegistry,
@@ -230,7 +230,7 @@ async def test_alexa_config_fail_refresh_token(
     expected_exception: type[Exception],
 ) -> None:
     """Test Alexa config failing to refresh token."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     # Enable exposing new entities to Alexa
     expose_new(hass, True)
     # Register a fan entity
@@ -337,9 +337,9 @@ def patch_sync_helper():
         return True
 
     with (
-        patch("homeassistant.components.cloud.alexa_config.SYNC_DELAY", 0),
+        patch("smarthub.components.cloud.alexa_config.SYNC_DELAY", 0),
         patch(
-            "homeassistant.components.cloud.alexa_config.CloudAlexaConfig._sync_helper",
+            "smarthub.components.cloud.alexa_config.CloudAlexaConfig._sync_helper",
             side_effect=sync_helper,
         ),
     ):
@@ -347,13 +347,13 @@ def patch_sync_helper():
 
 
 async def test_alexa_update_expose_trigger_sync(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     cloud_prefs: CloudPreferences,
     cloud_stub: Mock,
 ) -> None:
     """Test Alexa config responds to updating exposed entities."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     # Enable exposing new entities to Alexa
     expose_new(hass, True)
     # Register entities
@@ -425,7 +425,7 @@ async def test_alexa_update_expose_trigger_sync(
 
 @pytest.mark.usefixtures("mock_cloud_login")
 async def test_alexa_entity_registry_sync(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     cloud_prefs: CloudPreferences,
 ) -> None:
@@ -483,10 +483,10 @@ async def test_alexa_entity_registry_sync(
 
 
 async def test_alexa_update_report_state(
-    hass: HomeAssistant, cloud_prefs: CloudPreferences, cloud_stub: Mock
+    hass: SmartHub, cloud_prefs: CloudPreferences, cloud_stub: Mock
 ) -> None:
     """Test Alexa config responds to reporting state."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     await cloud_prefs.async_update(
         alexa_report_state=False,
     )
@@ -498,10 +498,10 @@ async def test_alexa_update_report_state(
 
     with (
         patch(
-            "homeassistant.components.cloud.alexa_config.CloudAlexaConfig.async_sync_entities",
+            "smarthub.components.cloud.alexa_config.CloudAlexaConfig.async_sync_entities",
         ) as mock_sync,
         patch(
-            "homeassistant.components.cloud.alexa_config.CloudAlexaConfig.async_enable_proactive_mode",
+            "smarthub.components.cloud.alexa_config.CloudAlexaConfig.async_enable_proactive_mode",
         ),
     ):
         await cloud_prefs.async_update(alexa_report_state=True)
@@ -512,7 +512,7 @@ async def test_alexa_update_report_state(
 
 @pytest.mark.usefixtures("mock_expired_cloud_login")
 def test_enabled_requires_valid_sub(
-    hass: HomeAssistant, cloud_prefs: CloudPreferences
+    hass: SmartHub, cloud_prefs: CloudPreferences
 ) -> None:
     """Test that alexa config enabled requires a valid Cloud sub."""
     assert cloud_prefs.alexa_enabled
@@ -527,10 +527,10 @@ def test_enabled_requires_valid_sub(
 
 
 async def test_alexa_handle_logout(
-    hass: HomeAssistant, cloud_prefs: CloudPreferences, cloud_stub: Mock
+    hass: SmartHub, cloud_prefs: CloudPreferences, cloud_stub: Mock
 ) -> None:
     """Test Alexa config responds to logging out."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     aconf = alexa_config.CloudAlexaConfig(
         hass, ALEXA_SCHEMA({}), "mock-user-id", cloud_prefs, cloud_stub
     )
@@ -538,7 +538,7 @@ async def test_alexa_handle_logout(
     await aconf.async_initialize()
 
     with patch(
-        "homeassistant.components.alexa.config.async_enable_proactive_mode",
+        "smarthub.components.alexa.config.async_enable_proactive_mode",
         return_value=Mock(),
     ) as mock_enable:
         await aconf.async_enable_proactive_mode()
@@ -568,7 +568,7 @@ async def test_alexa_handle_logout(
 
 @pytest.mark.parametrize("alexa_settings_version", [1, 2])
 async def test_alexa_config_migrate_expose_entity_prefs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     cloud_stub: Mock,
     entity_registry: er.EntityRegistry,
@@ -577,7 +577,7 @@ async def test_alexa_config_migrate_expose_entity_prefs(
     """Test migrating Alexa entity config."""
     hass.set_state(CoreState.starting)
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set("light.state_only", "on")
     entity_exposed = entity_registry.async_get_or_create(
         "light",
@@ -668,14 +668,14 @@ async def test_alexa_config_migrate_expose_entity_prefs(
 
 
 async def test_alexa_config_migrate_expose_entity_prefs_v2_no_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test migrating Alexa entity config from v2 to v3 when no entity is exposed."""
     hass.set_state(CoreState.starting)
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set("light.state_only", "on")
     entity_migrated = entity_registry.async_get_or_create(
         "light",
@@ -715,14 +715,14 @@ async def test_alexa_config_migrate_expose_entity_prefs_v2_no_exposed(
 
 
 async def test_alexa_config_migrate_expose_entity_prefs_v2_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test migrating Alexa entity config from v2 to v3 when an entity is exposed."""
     hass.set_state(CoreState.starting)
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set("light.state_only", "on")
     entity_migrated = entity_registry.async_get_or_create(
         "light",
@@ -762,7 +762,7 @@ async def test_alexa_config_migrate_expose_entity_prefs_v2_exposed(
 
 
 async def test_alexa_config_migrate_expose_entity_prefs_default_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     cloud_stub: Mock,
     entity_registry: er.EntityRegistry,
@@ -770,7 +770,7 @@ async def test_alexa_config_migrate_expose_entity_prefs_default_none(
     """Test migrating Alexa entity config."""
     hass.set_state(CoreState.starting)
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     entity_default = entity_registry.async_get_or_create(
         "light",
         "test",
@@ -800,7 +800,7 @@ async def test_alexa_config_migrate_expose_entity_prefs_default_none(
 
 
 async def test_alexa_config_migrate_expose_entity_prefs_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_prefs: CloudPreferences,
     cloud_stub: Mock,
     entity_registry: er.EntityRegistry,
@@ -808,7 +808,7 @@ async def test_alexa_config_migrate_expose_entity_prefs_default(
     """Test migrating Alexa entity config."""
     hass.set_state(CoreState.starting)
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     binary_sensor_supported = entity_registry.async_get_or_create(
         "binary_sensor",

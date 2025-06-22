@@ -12,23 +12,23 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from sqlalchemy.exc import SQLAlchemyError
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.components.sql.const import CONF_QUERY, DOMAIN
-from homeassistant.components.sql.sensor import _generate_lambda_stmt
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.recorder import Recorder
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.components.sql.const import CONF_QUERY, DOMAIN
+from smarthub.components.sql.sensor import _generate_lambda_stmt
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_ICON,
     CONF_UNIQUE_ID,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     UnitOfInformation,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.entity_platform import async_get_platforms
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.entity_platform import async_get_platforms
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     YAML_CONFIG,
@@ -44,7 +44,7 @@ from . import (
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_query_basic(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_query_basic(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test the SQL sensor."""
     config = {
         "db_url": "sqlite://",
@@ -60,7 +60,7 @@ async def test_query_basic(recorder_mock: Recorder, hass: HomeAssistant) -> None
     assert state.attributes["value"] == 5
 
 
-async def test_query_cte(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_query_cte(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test the SQL sensor with CTE."""
     config = {
         "db_url": "sqlite://",
@@ -77,7 +77,7 @@ async def test_query_cte(recorder_mock: Recorder, hass: HomeAssistant) -> None:
 
 
 async def test_query_value_template(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test the SQL sensor."""
     config = {
@@ -94,7 +94,7 @@ async def test_query_value_template(
 
 
 async def test_query_value_template_invalid(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test the SQL sensor."""
     config = {
@@ -110,7 +110,7 @@ async def test_query_value_template_invalid(
     assert state.state == "5.01"
 
 
-async def test_query_limit(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_query_limit(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test the SQL sensor with a query containing 'LIMIT' in lowercase."""
     config = {
         "db_url": "sqlite://",
@@ -126,7 +126,7 @@ async def test_query_limit(recorder_mock: Recorder, hass: HomeAssistant) -> None
 
 
 async def test_query_no_value(
-    recorder_mock: Recorder, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    recorder_mock: Recorder, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the SQL sensor with a query that returns no value."""
     config = {
@@ -146,7 +146,7 @@ async def test_query_no_value(
 
 async def test_query_on_disk_sqlite_no_result(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     tmp_path: Path,
 ) -> None:
@@ -182,20 +182,20 @@ async def test_query_on_disk_sqlite_no_result(
     ("url", "expected_patterns", "not_expected_patterns"),
     [
         (
-            "sqlite://homeassistant:hunter2@homeassistant.local",
-            ["sqlite://****:****@homeassistant.local"],
-            ["sqlite://homeassistant:hunter2@homeassistant.local"],
+            "sqlite://smarthub:hunter2@smarthub.local",
+            ["sqlite://****:****@smarthub.local"],
+            ["sqlite://smarthub:hunter2@smarthub.local"],
         ),
         (
-            "sqlite://homeassistant.local",
-            ["sqlite://homeassistant.local"],
+            "sqlite://smarthub.local",
+            ["sqlite://smarthub.local"],
             [],
         ),
     ],
 )
 async def test_invalid_url_setup(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     url: str,
     expected_patterns: str,
@@ -219,7 +219,7 @@ async def test_invalid_url_setup(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.sql.sensor.sqlalchemy.create_engine",
+        "smarthub.components.sql.sensor.sqlalchemy.create_engine",
         side_effect=SQLAlchemyError(url),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -233,7 +233,7 @@ async def test_invalid_url_setup(
 
 async def test_invalid_url_on_update(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test invalid db url with redacted credentials on retry."""
@@ -249,10 +249,10 @@ async def test_invalid_url_on_update(
 
         def execute(self, query: Any) -> None:
             """Execute the query."""
-            raise SQLAlchemyError("sqlite://homeassistant:hunter2@homeassistant.local")
+            raise SQLAlchemyError("sqlite://smarthub:hunter2@smarthub.local")
 
     with patch(
-        "homeassistant.components.sql.sensor.scoped_session",
+        "smarthub.components.sql.sensor.scoped_session",
         return_value=MockSession,
     ):
         await init_integration(hass, config)
@@ -262,10 +262,10 @@ async def test_invalid_url_on_update(
         )
         await hass.async_block_till_done(wait_background_tasks=True)
 
-    assert "sqlite://****:****@homeassistant.local" in caplog.text
+    assert "sqlite://****:****@smarthub.local" in caplog.text
 
 
-async def test_query_from_yaml(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_query_from_yaml(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test the SQL sensor from yaml config."""
 
     assert await async_setup_component(hass, DOMAIN, YAML_CONFIG)
@@ -276,7 +276,7 @@ async def test_query_from_yaml(recorder_mock: Recorder, hass: HomeAssistant) -> 
 
 
 async def test_templates_with_yaml(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test the SQL sensor from yaml config with templates."""
 
@@ -337,7 +337,7 @@ async def test_templates_with_yaml(
 
 
 async def test_config_from_old_yaml(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test the SQL sensor from old yaml config does not create any entity."""
     config = {
@@ -364,20 +364,20 @@ async def test_config_from_old_yaml(
     ("url", "expected_patterns", "not_expected_patterns"),
     [
         (
-            "sqlite://homeassistant:hunter2@homeassistant.local",
-            ["sqlite://****:****@homeassistant.local"],
-            ["sqlite://homeassistant:hunter2@homeassistant.local"],
+            "sqlite://smarthub:hunter2@smarthub.local",
+            ["sqlite://****:****@smarthub.local"],
+            ["sqlite://smarthub:hunter2@smarthub.local"],
         ),
         (
-            "sqlite://homeassistant.local",
-            ["sqlite://homeassistant.local"],
+            "sqlite://smarthub.local",
+            ["sqlite://smarthub.local"],
             [],
         ),
     ],
 )
 async def test_invalid_url_setup_from_yaml(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     url: str,
     expected_patterns: str,
@@ -394,7 +394,7 @@ async def test_invalid_url_setup_from_yaml(
     }
 
     with patch(
-        "homeassistant.components.sql.sensor.sqlalchemy.create_engine",
+        "smarthub.components.sql.sensor.sqlalchemy.create_engine",
         side_effect=SQLAlchemyError(url),
     ):
         assert await async_setup_component(hass, DOMAIN, config)
@@ -407,7 +407,7 @@ async def test_invalid_url_setup_from_yaml(
 
 
 async def test_attributes_from_yaml_setup(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test attributes from yaml config."""
 
@@ -423,7 +423,7 @@ async def test_attributes_from_yaml_setup(
 
 
 async def test_binary_data_from_yaml_setup(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test binary data from yaml config."""
 
@@ -436,7 +436,7 @@ async def test_binary_data_from_yaml_setup(
 
 async def test_issue_when_using_old_query(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -467,7 +467,7 @@ async def test_issue_when_using_old_query(
 )
 async def test_issue_when_using_old_query_without_unique_id(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     yaml_config: dict[str, Any],
     issue_registry: ir.IssueRegistry,
@@ -490,12 +490,12 @@ async def test_issue_when_using_old_query_without_unique_id(
 
 
 async def test_no_issue_when_view_has_the_text_entity_id_in_it(
-    recorder_mock: Recorder, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    recorder_mock: Recorder, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we do not trigger the full table scan issue for a custom view."""
 
     with patch(
-        "homeassistant.components.sql.sensor.scoped_session",
+        "smarthub.components.sql.sensor.scoped_session",
     ):
         await init_integration(
             hass, YAML_CONFIG_WITH_VIEW_THAT_CONTAINS_ENTITY_ID["sql"]
@@ -513,7 +513,7 @@ async def test_no_issue_when_view_has_the_text_entity_id_in_it(
 
 
 async def test_multiple_sensors_using_same_db(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test multiple sensors using the same db."""
     config = {
@@ -544,7 +544,7 @@ async def test_multiple_sensors_using_same_db(
 
 
 async def test_engine_is_disposed_at_stop(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test we dispose of the engine at stop."""
     config = {
@@ -566,7 +566,7 @@ async def test_engine_is_disposed_at_stop(
 
 
 async def test_attributes_from_entry_config(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test attributes from entry config."""
 
@@ -611,7 +611,7 @@ async def test_attributes_from_entry_config(
 
 async def test_query_recover_from_rollback(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -654,7 +654,7 @@ async def test_query_recover_from_rollback(
     assert state.attributes.get("value") == 5
 
 
-async def test_setup_without_recorder(hass: HomeAssistant) -> None:
+async def test_setup_without_recorder(hass: SmartHub) -> None:
     """Test the SQL sensor without recorder."""
 
     assert await async_setup_component(hass, DOMAIN, YAML_CONFIG)
@@ -665,7 +665,7 @@ async def test_setup_without_recorder(hass: HomeAssistant) -> None:
 
 
 async def test_availability_blocks_value_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test availability blocks value_template from rendering."""

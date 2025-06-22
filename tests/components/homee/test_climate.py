@@ -6,7 +6,7 @@ from pyHomee.const import AttributeType
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_ACTION,
     ATTR_HVAC_MODE,
     ATTR_HVAC_MODES,
@@ -26,10 +26,10 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.homee.const import PRESET_MANUAL
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.homee.const import PRESET_MANUAL
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import build_mock_node, setup_integration
 
@@ -37,7 +37,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def setup_mock_climate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     file: str,
@@ -83,7 +83,7 @@ async def setup_mock_climate(
     ],
 )
 async def test_climate_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     file: str,
@@ -100,7 +100,7 @@ async def test_climate_features(
 
 
 async def test_climate_preset_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
 ) -> None:
@@ -128,7 +128,7 @@ async def test_climate_preset_modes(
     ],
 )
 async def test_hvac_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     attribute_type: AttributeType,
@@ -160,7 +160,7 @@ async def test_hvac_action(
     ],
 )
 async def test_current_preset_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     preset_mode_int: int,
@@ -186,7 +186,7 @@ async def test_current_preset_mode(
     ],
 )
 async def test_current_preset_mode_alternate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     preset_mode_int: int,
@@ -254,7 +254,7 @@ async def test_current_preset_mode_alternate(
     ],
 )
 async def test_climate_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     service: str,
@@ -312,7 +312,7 @@ async def test_climate_services(
     ],
 )
 async def test_climate_services_alternate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     service: str,
@@ -335,7 +335,7 @@ async def test_climate_services_alternate(
 
 
 async def test_climate_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -349,7 +349,7 @@ async def test_climate_snapshot(
         build_mock_node("thermostat_with_preset.json"),
         build_mock_node("thermostat_with_alternate_preset.json"),
     ]
-    with patch("homeassistant.components.homee.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.homee.PLATFORMS", [Platform.CLIMATE]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

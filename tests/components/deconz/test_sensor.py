@@ -7,13 +7,13 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.deconz.const import CONF_ALLOW_CLIP_SENSOR
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.deconz.const import CONF_ALLOW_CLIP_SENSOR
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .conftest import ConfigEntryFactoryType, WebsocketDataType
 
@@ -643,7 +643,7 @@ TEST_DATA = [
 @pytest.mark.parametrize(("sensor_payload", "expected"), TEST_DATA)
 @pytest.mark.parametrize("config_entry_options", [{CONF_ALLOW_CLIP_SENSOR: True}])
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     sensor_ws_data: WebsocketDataType,
@@ -651,7 +651,7 @@ async def test_sensors(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test successful creation of sensor entities."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.SENSOR]):
         config_entry = await config_entry_factory()
 
     # Enable in entity registry
@@ -689,7 +689,7 @@ async def test_sensors(
 )
 @pytest.mark.parametrize("config_entry_options", [{CONF_ALLOW_CLIP_SENSOR: False}])
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_not_allow_clip_sensor(hass: HomeAssistant) -> None:
+async def test_not_allow_clip_sensor(hass: SmartHub) -> None:
     """Test that CLIP sensors are not allowed."""
     assert len(hass.states.async_all()) == 0
 
@@ -729,13 +729,13 @@ async def test_not_allow_clip_sensor(hass: HomeAssistant) -> None:
 )
 @pytest.mark.parametrize("config_entry_options", [{CONF_ALLOW_CLIP_SENSOR: True}])
 async def test_allow_clip_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that CLIP sensors can be allowed."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.SENSOR]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -764,7 +764,7 @@ async def test_allow_clip_sensors(
 
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_add_new_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sensor_ws_data: WebsocketDataType,
 ) -> None:
     """Test that adding a new sensor works."""
@@ -797,7 +797,7 @@ BAD_SENSOR_DATA = [
 
 @pytest.mark.parametrize(("sensor_type", "sensor_property"), BAD_SENSOR_DATA)
 async def test_dont_add_sensor_if_state_is_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_factory: ConfigEntryFactoryType,
     sensor_payload: dict[str, Any],
     sensor_type: str,
@@ -841,7 +841,7 @@ async def test_dont_add_sensor_if_state_is_none(
     ],
 )
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_air_quality_sensor_without_ppb(hass: HomeAssistant) -> None:
+async def test_air_quality_sensor_without_ppb(hass: SmartHub) -> None:
     """Test sensor with scaled data is not created if state is None."""
     assert len(hass.states.async_all()) == 1
 
@@ -869,7 +869,7 @@ async def test_air_quality_sensor_without_ppb(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_add_battery_later(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sensor_ws_data: WebsocketDataType,
 ) -> None:
     """Test that a battery sensor can be created later on.
@@ -889,7 +889,7 @@ async def test_add_battery_later(
 
 @pytest.mark.parametrize("model_id", ["0x8030", "0x8031", "0x8034", "0x8035"])
 async def test_special_danfoss_battery_creation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_factory: ConfigEntryFactoryType,
     sensor_payload: dict[str, Any],
     model_id: str,
@@ -1034,6 +1034,6 @@ async def test_special_danfoss_battery_creation(
     [{"type": "not supported", "name": "name", "state": {}, "config": {}}],
 )
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_unsupported_sensor(hass: HomeAssistant) -> None:
+async def test_unsupported_sensor(hass: SmartHub) -> None:
     """Test that unsupported sensors doesn't break anything."""
     assert len(hass.states.async_all()) == 0

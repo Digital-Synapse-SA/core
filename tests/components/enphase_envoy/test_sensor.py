@@ -9,13 +9,13 @@ from pyenphase.const import PHASENAMES
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.enphase_envoy.const import Platform
-from homeassistant.components.enphase_envoy.coordinator import SCAN_INTERVAL
-from homeassistant.const import STATE_UNKNOWN, UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_conversion import TemperatureConverter
+from smarthub.components.enphase_envoy.const import Platform
+from smarthub.components.enphase_envoy.coordinator import SCAN_INTERVAL
+from smarthub.const import STATE_UNKNOWN, UnitOfTemperature
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_conversion import TemperatureConverter
 
 from . import setup_integration
 
@@ -37,14 +37,14 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test sensor platform entities against snapshot."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -72,12 +72,12 @@ PRODUCTION_NAMES: tuple[str, ...] = (
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_production_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test production entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -111,12 +111,12 @@ PRODUCTION_PHASE_NAMES: list[str] = [
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_production_phase_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test production phase entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -162,12 +162,12 @@ CONSUMPTION_NAMES: tuple[str, ...] = (
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_consumption_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test consumption entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -206,12 +206,12 @@ NET_CONSUMPTION_NAMES: tuple[str, ...] = (
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_net_consumption_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test net consumption entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -244,12 +244,12 @@ CONSUMPTION_PHASE_NAMES: list[str] = [
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_consumption_phase_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test consumption phase entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -289,12 +289,12 @@ NET_CONSUMPTION_PHASE_NAMES: list[str] = [
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_net_consumption_phase_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test consumption phase entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -330,12 +330,12 @@ CT_PRODUCTION_NAMES_STR = ("metering_status_production_ct",)
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_production_ct_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
 ) -> None:
     """Test production CT phase entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -381,12 +381,12 @@ CT_PRODUCTION_NAMES_STR_PHASE = [
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_production_ct_phase_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test production ct phase entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -445,12 +445,12 @@ CT_CONSUMPTION_NAMES_STR: tuple[str, ...] = ("metering_status_net_consumption_ct
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_consumption_ct_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test consumption CT phase entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -503,12 +503,12 @@ CT_CONSUMPTION_NAMES_STR_PHASE = [
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_consumption_ct_phase_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test consumption ct phase entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -573,12 +573,12 @@ CT_STORAGE_NAMES_STR = ("metering_status_storage_ct",)
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_storage_ct_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test storage phase entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -627,12 +627,12 @@ CT_STORAGE_NAMES_STR_PHASE = [
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_storage_ct_phase_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test storage ct phase entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -686,13 +686,13 @@ async def test_sensor_storage_ct_phase_data(
     indirect=["mock_envoy"],
 )
 async def test_sensor_all_phase_entities_disabled_by_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all phase entities are disabled by integration."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -720,13 +720,13 @@ async def test_sensor_all_phase_entities_disabled_by_integration(
     indirect=["mock_envoy"],
 )
 async def test_sensor_storage_phase_disabled_by_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     mock_envoy: AsyncMock,
 ) -> None:
     """Test all storage CT phase entities are disabled by integration."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -753,12 +753,12 @@ async def test_sensor_storage_phase_disabled_by_integration(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_inverter_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test enphase_envoy inverter entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     entity_base = f"{Platform.SENSOR}.inverter"
@@ -785,13 +785,13 @@ async def test_sensor_inverter_data(
     indirect=["mock_envoy"],
 )
 async def test_sensor_inverter_disabled_by_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test enphase_envoy inverter disabled by integration entities."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     INVERTER_BASE = f"{Platform.SENSOR}.inverter"
@@ -812,12 +812,12 @@ async def test_sensor_inverter_disabled_by_integration(
     indirect=["mock_envoy"],
 )
 async def test_sensor_encharge_aggregate_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test enphase_envoy encharge aggregate entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -844,12 +844,12 @@ async def test_sensor_encharge_aggregate_data(
     indirect=["mock_envoy"],
 )
 async def test_sensor_encharge_enpower_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test enphase_envoy encharge enpower entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.data.enpower.serial_number
@@ -883,12 +883,12 @@ async def test_sensor_encharge_enpower_data(
     indirect=["mock_envoy"],
 )
 async def test_sensor_encharge_power_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
 ) -> None:
     """Test enphase_envoy encharge_power entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     ENTITY_BASE = f"{Platform.SENSOR}.encharge"
@@ -951,12 +951,12 @@ ACB_POWER_STR_NAMES: tuple[str, ...] = ("battery_state",)
     indirect=["mock_envoy"],
 )
 async def test_sensor_acb_power_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
 ) -> None:
     """Test enphase_envoy acb battery power entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -998,12 +998,12 @@ AGGREGATED_ACB_BATTERY_NAMES: tuple[str, ...] = ("available_acb_battery_energy",
     indirect=["mock_envoy"],
 )
 async def test_sensor_aggegated_battery_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
 ) -> None:
     """Test enphase_envoy aggregated batteries entities values."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     sn = mock_envoy.serial_number
@@ -1053,14 +1053,14 @@ def integration_disabled_entities(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_missing_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test enphase_envoy sensor platform midding data handling."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     ENTITY_BASE = f"{Platform.SENSOR}.envoy_{mock_envoy.serial_number}"
@@ -1115,7 +1115,7 @@ async def test_sensor_missing_data(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_fw_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
     entity_registry: er.EntityRegistry,
@@ -1123,8 +1123,8 @@ async def test_fw_update(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test enphase_envoy sensor update over fw update."""
-    logging.getLogger("homeassistant.components.enphase_envoy").setLevel(logging.DEBUG)
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    logging.getLogger("smarthub.components.enphase_envoy").setLevel(logging.DEBUG)
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     # force HA to detect changed data by changing raw

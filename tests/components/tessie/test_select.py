@@ -7,24 +7,24 @@ from syrupy.assertion import SnapshotAssertion
 from tesla_fleet_api.const import EnergyExportMode, EnergyOperationMode
 from tesla_fleet_api.exceptions import UnsupportedVehicle
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.components.tessie.const import (
+from smarthub.components.tessie.const import (
     TessieSeatCoolerOptions,
     TessieSeatHeaterOptions,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_OPTION, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_OPTION, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .common import ERROR_UNKNOWN, TEST_RESPONSE, assert_entities, setup_platform
 
 
 async def test_select(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
+    hass: SmartHub, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests that the select entities are correct."""
 
@@ -35,7 +35,7 @@ async def test_select(
     # Test changing select
     entity_id = "select.test_seat_heater_left"
     with patch(
-        "homeassistant.components.tessie.select.set_seat_heat",
+        "smarthub.components.tessie.select.set_seat_heat",
         return_value=TEST_RESPONSE,
     ) as mock_set:
         await hass.services.async_call(
@@ -87,7 +87,7 @@ async def test_select(
     # Test changing select
     entity_id = "select.test_seat_cooler_left"
     with patch(
-        "homeassistant.components.tessie.select.set_seat_cool",
+        "smarthub.components.tessie.select.set_seat_cool",
         return_value=TEST_RESPONSE,
     ) as mock_set:
         await hass.services.async_call(
@@ -101,7 +101,7 @@ async def test_select(
     assert mock_set.call_args[1]["level"] == 1
 
 
-async def test_errors(hass: HomeAssistant) -> None:
+async def test_errors(hass: SmartHub) -> None:
     """Tests unknown error is handled."""
 
     await setup_platform(hass, [Platform.SELECT])
@@ -109,10 +109,10 @@ async def test_errors(hass: HomeAssistant) -> None:
     # Test changing vehicle select with unknown error
     with (
         patch(
-            "homeassistant.components.tessie.select.set_seat_heat",
+            "smarthub.components.tessie.select.set_seat_heat",
             side_effect=ERROR_UNKNOWN,
         ) as mock_set,
-        pytest.raises(HomeAssistantError) as error,
+        pytest.raises(SmartHubError) as error,
     ):
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -132,7 +132,7 @@ async def test_errors(hass: HomeAssistant) -> None:
             "tesla_fleet_api.tessie.EnergySite.operation",
             side_effect=UnsupportedVehicle,
         ) as mock_set,
-        pytest.raises(HomeAssistantError) as error,
+        pytest.raises(SmartHubError) as error,
     ):
         await hass.services.async_call(
             SELECT_DOMAIN,

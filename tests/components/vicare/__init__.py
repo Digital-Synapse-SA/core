@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from typing import Final
 
-from homeassistant.components.vicare.const import CONF_HEATING_TYPE
-from homeassistant.const import CONF_CLIENT_ID, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.vicare.const import CONF_HEATING_TYPE
+from smarthub.const import CONF_CLIENT_ID, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
-MODULE = "homeassistant.components.vicare"
+MODULE = "smarthub.components.vicare"
 
 ENTRY_CONFIG: Final[dict[str, str]] = {
     CONF_USERNAME: "foo@bar.com",
@@ -22,7 +22,7 @@ ENTRY_CONFIG: Final[dict[str, str]] = {
 MOCK_MAC = "B874241B7B9"
 
 
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
 

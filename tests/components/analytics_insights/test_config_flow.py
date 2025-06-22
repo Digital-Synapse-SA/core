@@ -4,17 +4,17 @@ from typing import Any
 from unittest.mock import AsyncMock
 
 import pytest
-from python_homeassistant_analytics import HomeassistantAnalyticsConnectionError
+from python_smarthub_analytics import HomeassistantAnalyticsConnectionError
 
-from homeassistant.components.analytics_insights.const import (
+from smarthub.components.analytics_insights.const import (
     CONF_TRACKED_ADDONS,
     CONF_TRACKED_CUSTOM_INTEGRATIONS,
     CONF_TRACKED_INTEGRATIONS,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 
@@ -59,7 +59,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_analytics_client: AsyncMock,
     user_input: dict[str, Any],
@@ -78,7 +78,7 @@ async def test_form(
     await hass.async_block_till_done()
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["title"] == "Home Assistant Analytics Insights"
+    assert result["title"] == "SmartHub Analytics Insights"
     assert result["data"] == {}
     assert result["options"] == expected_options
     assert len(mock_setup_entry.mock_calls) == 1
@@ -96,7 +96,7 @@ async def test_form(
     ],
 )
 async def test_submitting_empty_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_analytics_client: AsyncMock,
     user_input: dict[str, Any],
@@ -127,7 +127,7 @@ async def test_submitting_empty_form(
     await hass.async_block_till_done()
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["title"] == "Home Assistant Analytics Insights"
+    assert result["title"] == "SmartHub Analytics Insights"
     assert result["data"] == {}
     assert result["options"] == {
         CONF_TRACKED_ADDONS: ["core_samba"],
@@ -145,7 +145,7 @@ async def test_submitting_empty_form(
     ],
 )
 async def test_form_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_analytics_client: AsyncMock,
     exception: Exception,
     reason: str,
@@ -162,7 +162,7 @@ async def test_form_cannot_connect(
 
 
 async def test_form_already_configured(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle cannot connect error."""
     entry = MockConfigEntry(
@@ -231,7 +231,7 @@ async def test_form_already_configured(
     ],
 )
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_analytics_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     user_input: dict[str, Any],
@@ -268,7 +268,7 @@ async def test_options_flow(
     ],
 )
 async def test_submitting_empty_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_analytics_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     user_input: dict[str, Any],
@@ -308,7 +308,7 @@ async def test_submitting_empty_options_flow(
 
 
 async def test_options_flow_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_analytics_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

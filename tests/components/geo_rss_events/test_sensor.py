@@ -5,17 +5,17 @@ from unittest.mock import MagicMock, patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components import sensor
-from homeassistant.components.geo_rss_events import sensor as geo_rss_events
-from homeassistant.const import (
+from smarthub.components import sensor
+from smarthub.components.geo_rss_events import sensor as geo_rss_events
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
     ATTR_UNIT_OF_MEASUREMENT,
     EVENT_HOMEASSISTANT_START,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import assert_setup_component, async_fire_time_changed
 
@@ -38,9 +38,9 @@ VALID_CONFIG = {
 
 @pytest.fixture
 def mock_feed():
-    """Pytest fixture for homeassistant.components.geo_rss_events.sensor.GenericFeed."""
+    """Pytest fixture for smarthub.components.geo_rss_events.sensor.GenericFeed."""
     with patch(
-        "homeassistant.components.geo_rss_events.sensor.GenericFeed"
+        "smarthub.components.geo_rss_events.sensor.GenericFeed"
     ) as mock_feed:
         yield mock_feed
 
@@ -59,7 +59,7 @@ def _generate_mock_feed_entry(
 
 
 async def test_setup(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, mock_feed
+    hass: SmartHub, freezer: FrozenDateTimeFactory, mock_feed
 ) -> None:
     """Test the general setup of the platform."""
     # Set up some mock feed entries for this test.
@@ -122,7 +122,7 @@ async def test_setup(
         }
 
 
-async def test_setup_with_categories(hass: HomeAssistant, mock_feed) -> None:
+async def test_setup_with_categories(hass: SmartHub, mock_feed) -> None:
     """Test the general setup of the platform."""
     # Set up some mock feed entries for this test.
     mock_entry_1 = _generate_mock_feed_entry(

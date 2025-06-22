@@ -6,9 +6,9 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 from nextdns import InvalidApiKeyError
 
-from homeassistant.components.nextdns.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.nextdns.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import init_integration
 
@@ -16,7 +16,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test authentication error when polling data."""
@@ -27,35 +27,35 @@ async def test_auth_error(
     freezer.tick(timedelta(minutes=10))
     with (
         patch(
-            "homeassistant.components.nextdns.NextDns.get_profiles",
+            "smarthub.components.nextdns.NextDns.get_profiles",
             side_effect=InvalidApiKeyError,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_status",
+            "smarthub.components.nextdns.NextDns.get_analytics_status",
             side_effect=InvalidApiKeyError,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_encryption",
+            "smarthub.components.nextdns.NextDns.get_analytics_encryption",
             side_effect=InvalidApiKeyError,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_dnssec",
+            "smarthub.components.nextdns.NextDns.get_analytics_dnssec",
             side_effect=InvalidApiKeyError,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_ip_versions",
+            "smarthub.components.nextdns.NextDns.get_analytics_ip_versions",
             side_effect=InvalidApiKeyError,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_protocols",
+            "smarthub.components.nextdns.NextDns.get_analytics_protocols",
             side_effect=InvalidApiKeyError,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_settings",
+            "smarthub.components.nextdns.NextDns.get_settings",
             side_effect=InvalidApiKeyError,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.connection_status",
+            "smarthub.components.nextdns.NextDns.connection_status",
             side_effect=InvalidApiKeyError,
         ),
     ):

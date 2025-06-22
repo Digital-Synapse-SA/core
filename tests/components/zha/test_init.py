@@ -10,23 +10,23 @@ from zigpy.application import ControllerApplication
 from zigpy.config import CONF_DEVICE, CONF_DEVICE_PATH
 from zigpy.exceptions import TransientConnectionError
 
-from homeassistant.components.zha.const import (
+from smarthub.components.zha.const import (
     CONF_BAUDRATE,
     CONF_FLOW_CONTROL,
     CONF_RADIO_TYPE,
     CONF_USB_PATH,
     DOMAIN,
 )
-from homeassistant.components.zha.helpers import get_zha_data, get_zha_gateway
-from homeassistant.const import (
+from smarthub.components.zha.helpers import get_zha_data, get_zha_gateway
+from smarthub.const import (
     EVENT_HOMEASSISTANT_STOP,
     MAJOR_VERSION,
     MINOR_VERSION,
     Platform,
 )
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.helpers.event import async_call_later
-from homeassistant.setup import async_setup_component
+from smarthub.core import CoreState, SmartHub
+from smarthub.helpers.event import async_call_later
+from smarthub.setup import async_setup_component
 
 from .test_light import LIGHT_ON_OFF
 
@@ -39,12 +39,12 @@ DATA_PORT_PATH = "/dev/serial/by-id/FTDI_USB__-__Serial_Cable_12345678-if00-port
 @pytest.fixture(autouse=True)
 def disable_platform_only():
     """Disable platforms to speed up tests."""
-    with patch("homeassistant.components.zha.PLATFORMS", []):
+    with patch("smarthub.components.zha.PLATFORMS", []):
         yield
 
 
 @pytest.fixture
-def config_entry_v1(hass: HomeAssistant):
+def config_entry_v1(hass: SmartHub):
     """Config entry version 1 fixture."""
     return MockConfigEntry(
         domain=DOMAIN,
@@ -54,9 +54,9 @@ def config_entry_v1(hass: HomeAssistant):
 
 
 @pytest.mark.parametrize("config", [{}, {DOMAIN: {}}])
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 async def test_migration_from_v1_no_baudrate(
-    hass: HomeAssistant, config_entry_v1, config
+    hass: SmartHub, config_entry_v1, config
 ) -> None:
     """Test migration of config entry from v1."""
     config_entry_v1.add_to_hass(hass)
@@ -69,9 +69,9 @@ async def test_migration_from_v1_no_baudrate(
     assert config_entry_v1.version == 4
 
 
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 async def test_migration_from_v1_with_baudrate(
-    hass: HomeAssistant, config_entry_v1
+    hass: SmartHub, config_entry_v1
 ) -> None:
     """Test migration of config entry from v1 with baudrate in config."""
     config_entry_v1.add_to_hass(hass)
@@ -86,9 +86,9 @@ async def test_migration_from_v1_with_baudrate(
     assert config_entry_v1.version == 4
 
 
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 async def test_migration_from_v1_wrong_baudrate(
-    hass: HomeAssistant, config_entry_v1
+    hass: SmartHub, config_entry_v1
 ) -> None:
     """Test migration of config entry from v1 with wrong baudrate."""
     config_entry_v1.add_to_hass(hass)
@@ -114,11 +114,11 @@ async def test_migration_from_v1_wrong_baudrate(
         {CONF_RADIO_TYPE: "ezsp", CONF_USB_PATH: "str"},
     ],
 )
-async def test_config_depreciation(hass: HomeAssistant, zha_config) -> None:
+async def test_config_depreciation(hass: SmartHub, zha_config) -> None:
     """Test config option depreciation."""
 
     with patch(
-        "homeassistant.components.zha.async_setup", return_value=True
+        "smarthub.components.zha.async_setup", return_value=True
     ) as setup_mock:
         assert await async_setup_component(hass, DOMAIN, {DOMAIN: zha_config})
         assert setup_mock.call_count == 1
@@ -141,10 +141,10 @@ async def test_config_depreciation(hass: HomeAssistant, zha_config) -> None:
     ],
 )
 @patch(
-    "homeassistant.components.zha.websocket_api.async_load_api", Mock(return_value=True)
+    "smarthub.components.zha.websocket_api.async_load_api", Mock(return_value=True)
 )
 async def test_setup_with_v3_cleaning_uri(
-    hass: HomeAssistant,
+    hass: SmartHub,
     path: str,
     cleaned_path: str,
     mock_zigpy_connect: ControllerApplication,
@@ -189,14 +189,14 @@ async def test_setup_with_v3_cleaning_uri(
         ("deconz", 115200, None, 115200, None),
     ],
 )
-@patch("homeassistant.components.zha.async_setup_entry", AsyncMock(return_value=True))
+@patch("smarthub.components.zha.async_setup_entry", AsyncMock(return_value=True))
 async def test_migration_baudrate_and_flow_control(
     radio_type: str,
     old_baudrate: int,
     old_flow_control: typing.Literal["hardware", "software", None],
     new_baudrate: int,
     new_flow_control: typing.Literal["hardware", "software", None],
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test baudrate and flow control migration."""
@@ -225,11 +225,11 @@ async def test_migration_baudrate_and_flow_control(
 
 
 @patch(
-    "homeassistant.components.zha.PLATFORMS",
+    "smarthub.components.zha.PLATFORMS",
     [Platform.LIGHT, Platform.BUTTON, Platform.SENSOR, Platform.SELECT],
 )
 async def test_zha_retry_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     zigpy_device_mock,
     mock_zigpy_connect: ControllerApplication,
@@ -251,7 +251,7 @@ async def test_zha_retry_unique_ids(
         side_effect=[TransientConnectionError(), None],
     ) as mock_connect:
         with patch(
-            "homeassistant.config_entries.async_call_later",
+            "smarthub.config_entries.async_call_later",
             lambda hass, delay, action: async_call_later(hass, 0.01, action),
         ):
             await hass.config_entries.async_setup(config_entry.entry_id)
@@ -269,7 +269,7 @@ async def test_zha_retry_unique_ids(
 
 
 async def test_shutdown_on_ha_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_zigpy_connect: ControllerApplication,
 ) -> None:
@@ -292,7 +292,7 @@ async def test_shutdown_on_ha_stop(
 
 
 async def test_timezone_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_zigpy_connect: ControllerApplication,
 ) -> None:

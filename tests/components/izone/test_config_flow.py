@@ -6,11 +6,11 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.izone.const import DISPATCH_CONTROLLER_DISCOVERED, IZONE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.dispatcher import async_dispatcher_send
+from smarthub import config_entries
+from smarthub.components.izone.const import DISPATCH_CONTROLLER_DISCOVERED, IZONE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.dispatcher import async_dispatcher_send
 
 
 @pytest.fixture
@@ -22,7 +22,7 @@ def mock_disco() -> Mock:
     return disco
 
 
-def _mock_start_discovery(hass: HomeAssistant, mock_disco: Mock) -> Callable[..., Mock]:
+def _mock_start_discovery(hass: SmartHub, mock_disco: Mock) -> Callable[..., Mock]:
     def do_disovered(*args: Any) -> Mock:
         async_dispatcher_send(hass, DISPATCH_CONTROLLER_DISCOVERED, True)
         return mock_disco
@@ -30,15 +30,15 @@ def _mock_start_discovery(hass: HomeAssistant, mock_disco: Mock) -> Callable[...
     return do_disovered
 
 
-async def test_not_found(hass: HomeAssistant, mock_disco: Mock) -> None:
+async def test_not_found(hass: SmartHub, mock_disco: Mock) -> None:
     """Test not finding iZone controller."""
 
     with (
         patch(
-            "homeassistant.components.izone.config_flow.async_start_discovery_service"
+            "smarthub.components.izone.config_flow.async_start_discovery_service"
         ) as start_disco,
         patch(
-            "homeassistant.components.izone.config_flow.async_stop_discovery_service",
+            "smarthub.components.izone.config_flow.async_stop_discovery_service",
             return_value=None,
         ) as stop_disco,
     ):
@@ -58,20 +58,20 @@ async def test_not_found(hass: HomeAssistant, mock_disco: Mock) -> None:
     stop_disco.assert_called_once()
 
 
-async def test_found(hass: HomeAssistant, mock_disco: Mock) -> None:
+async def test_found(hass: SmartHub, mock_disco: Mock) -> None:
     """Test not finding iZone controller."""
     mock_disco.pi_disco.controllers["blah"] = object()
 
     with (
         patch(
-            "homeassistant.components.izone.climate.async_setup_entry",
+            "smarthub.components.izone.climate.async_setup_entry",
             return_value=True,
         ) as mock_setup,
         patch(
-            "homeassistant.components.izone.config_flow.async_start_discovery_service"
+            "smarthub.components.izone.config_flow.async_start_discovery_service"
         ) as start_disco,
         patch(
-            "homeassistant.components.izone.async_start_discovery_service",
+            "smarthub.components.izone.async_start_discovery_service",
             return_value=None,
         ),
     ):

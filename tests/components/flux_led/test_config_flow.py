@@ -6,9 +6,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.flux_led.config_flow import FluxLedConfigFlow
-from homeassistant.components.flux_led.const import (
+from smarthub import config_entries
+from smarthub.components.flux_led.config_flow import FluxLedConfigFlow
+from smarthub.components.flux_led.const import (
     CONF_CUSTOM_EFFECT_COLORS,
     CONF_CUSTOM_EFFECT_SPEED_PCT,
     CONF_CUSTOM_EFFECT_TRANSITION,
@@ -23,10 +23,10 @@ from homeassistant.components.flux_led.const import (
     TRANSITION_JUMP,
     TRANSITION_STROBE,
 )
-from homeassistant.const import CONF_DEVICE, CONF_HOST, CONF_MODEL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.const import CONF_DEVICE, CONF_HOST, CONF_MODEL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -49,7 +49,7 @@ from tests.common import MockConfigEntry
 MAC_ADDRESS_DIFFERENT = "ff:bb:ff:dd:ee:ff"
 
 
-async def test_discovery(hass: HomeAssistant) -> None:
+async def test_discovery(hass: SmartHub) -> None:
     """Test setting up discovery."""
     with _patch_discovery(), _patch_wifibulb():
         result = await hass.config_entries.flow.async_init(
@@ -124,7 +124,7 @@ async def test_discovery(hass: HomeAssistant) -> None:
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_discovery_legacy(hass: HomeAssistant) -> None:
+async def test_discovery_legacy(hass: SmartHub) -> None:
     """Test setting up discovery with a legacy device."""
     with _patch_discovery(device=FLUX_DISCOVERY_PARTIAL), _patch_wifibulb():
         result = await hass.config_entries.flow.async_init(
@@ -199,7 +199,7 @@ async def test_discovery_legacy(hass: HomeAssistant) -> None:
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_discovery_with_existing_device_present(hass: HomeAssistant) -> None:
+async def test_discovery_with_existing_device_present(hass: SmartHub) -> None:
     """Test setting up discovery."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.2"}, unique_id="dd:dd:dd:dd:dd:dd"
@@ -283,7 +283,7 @@ async def test_discovery_with_existing_device_present(hass: HomeAssistant) -> No
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_discovery_no_device(hass: HomeAssistant) -> None:
+async def test_discovery_no_device(hass: SmartHub) -> None:
     """Test discovery without device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -297,7 +297,7 @@ async def test_discovery_no_device(hass: HomeAssistant) -> None:
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_manual_working_discovery(hass: HomeAssistant) -> None:
+async def test_manual_working_discovery(hass: SmartHub) -> None:
     """Test manually setup."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -356,7 +356,7 @@ async def test_manual_working_discovery(hass: HomeAssistant) -> None:
     assert result2["reason"] == "already_configured"
 
 
-async def test_user_flow_can_replace_ignored(hass: HomeAssistant) -> None:
+async def test_user_flow_can_replace_ignored(hass: SmartHub) -> None:
     """Test a user flow can replace an ignored entry."""
     ignored_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -410,7 +410,7 @@ async def test_user_flow_can_replace_ignored(hass: HomeAssistant) -> None:
     }
 
 
-async def test_manual_no_discovery_data(hass: HomeAssistant) -> None:
+async def test_manual_no_discovery_data(hass: SmartHub) -> None:
     """Test manually setup without discovery data."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -438,7 +438,7 @@ async def test_manual_no_discovery_data(hass: HomeAssistant) -> None:
     }
 
 
-async def test_discovered_by_discovery_and_dhcp(hass: HomeAssistant) -> None:
+async def test_discovered_by_discovery_and_dhcp(hass: SmartHub) -> None:
     """Test we get the form with discovery and abort for dhcp source when we get both."""
 
     with _patch_discovery(), _patch_wifibulb():
@@ -493,7 +493,7 @@ async def test_discovered_by_discovery_and_dhcp(hass: HomeAssistant) -> None:
     assert result3["reason"] == "already_in_progress"
 
 
-async def test_discovered_by_discovery(hass: HomeAssistant) -> None:
+async def test_discovered_by_discovery(hass: SmartHub) -> None:
     """Test we can setup when discovered from discovery."""
 
     with _patch_discovery(), _patch_wifibulb():
@@ -534,7 +534,7 @@ async def test_discovered_by_discovery(hass: HomeAssistant) -> None:
     assert mock_async_setup_entry.called
 
 
-async def test_discovered_by_dhcp_udp_responds(hass: HomeAssistant) -> None:
+async def test_discovered_by_dhcp_udp_responds(hass: SmartHub) -> None:
     """Test we can setup when discovered from dhcp but with udp response."""
 
     with _patch_discovery(), _patch_wifibulb():
@@ -573,7 +573,7 @@ async def test_discovered_by_dhcp_udp_responds(hass: HomeAssistant) -> None:
     assert mock_async_setup_entry.called
 
 
-async def test_discovered_by_dhcp_no_udp_response(hass: HomeAssistant) -> None:
+async def test_discovered_by_dhcp_no_udp_response(hass: SmartHub) -> None:
     """Test we can setup when discovered from dhcp but no udp response."""
 
     with _patch_discovery(no_device=True), _patch_wifibulb():
@@ -607,7 +607,7 @@ async def test_discovered_by_dhcp_no_udp_response(hass: HomeAssistant) -> None:
 
 
 async def test_discovered_by_dhcp_partial_udp_response_fallback_tcp(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we can setup when discovered from dhcp but part of the udp response is missing."""
 
@@ -643,7 +643,7 @@ async def test_discovered_by_dhcp_partial_udp_response_fallback_tcp(
 
 
 async def test_discovered_by_dhcp_no_udp_response_or_tcp_response(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we can setup when discovered from dhcp but no udp response or tcp response."""
 
@@ -665,7 +665,7 @@ async def test_discovered_by_dhcp_no_udp_response_or_tcp_response(
     ],
 )
 async def test_discovered_by_dhcp_or_discovery_adds_missing_unique_id(
-    hass: HomeAssistant, source, data
+    hass: SmartHub, source, data
 ) -> None:
     """Test we can setup when discovered from dhcp or discovery."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={CONF_HOST: IP_ADDRESS})
@@ -684,7 +684,7 @@ async def test_discovered_by_dhcp_or_discovery_adds_missing_unique_id(
 
 
 async def test_mac_address_off_by_one_updated_via_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the mac address is updated when its off by one from integration discovery."""
     config_entry = MockConfigEntry(
@@ -707,7 +707,7 @@ async def test_mac_address_off_by_one_updated_via_discovery(
 
 
 async def test_mac_address_off_by_one_not_updated_from_dhcp(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the mac address is NOT updated when its off by one from dhcp discovery."""
     config_entry = MockConfigEntry(
@@ -735,7 +735,7 @@ async def test_mac_address_off_by_one_not_updated_from_dhcp(
     ],
 )
 async def test_discovered_by_dhcp_or_discovery_mac_address_mismatch_host_already_configured(
-    hass: HomeAssistant, source, data
+    hass: SmartHub, source, data
 ) -> None:
     """Test we abort if the host is already configured but the mac does not match."""
     config_entry = MockConfigEntry(
@@ -755,7 +755,7 @@ async def test_discovered_by_dhcp_or_discovery_mac_address_mismatch_host_already
     assert config_entry.unique_id == MAC_ADDRESS_DIFFERENT
 
 
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test options flow."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -801,7 +801,7 @@ async def test_options(hass: HomeAssistant) -> None:
         (config_entries.SOURCE_INTEGRATION_DISCOVERY, FLUX_DISCOVERY),
     ],
 )
-async def test_discovered_can_be_ignored(hass: HomeAssistant, source, data) -> None:
+async def test_discovered_can_be_ignored(hass: SmartHub, source, data) -> None:
     """Test we abort if the mac was already ignored."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

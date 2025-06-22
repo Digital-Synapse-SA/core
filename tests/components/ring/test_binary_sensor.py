@@ -8,15 +8,15 @@ import pytest
 from ring_doorbell import Ring
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.ring.binary_sensor import RingEvent
-from homeassistant.components.ring.const import DOMAIN
-from homeassistant.components.ring.coordinator import RingEventListener
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.ring.binary_sensor import RingEvent
+from smarthub.components.ring.const import DOMAIN
+from smarthub.components.ring.coordinator import RingEventListener
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from .common import (
     MockConfigEntry,
@@ -36,7 +36,7 @@ from tests.common import async_fire_time_changed, snapshot_platform
 
 @pytest.fixture
 def create_deprecated_binary_sensor_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ):
@@ -63,7 +63,7 @@ def create_deprecated_binary_sensor_entities(
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -101,7 +101,7 @@ async def test_states(
     ],
 )
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: ConfigEntry,
     mock_ring_client: Ring,
     mock_ring_event_listener_class: RingEventListener,
@@ -126,7 +126,7 @@ async def test_binary_sensor(
         suggested_object_id=f"{device_name}_{alert_kind}",
         config_entry=mock_config_entry,
     )
-    with patch("homeassistant.components.ring.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.ring.PLATFORMS", [Platform.BINARY_SENSOR]):
         assert await async_setup_component(hass, DOMAIN, {})
 
     on_event_cb = mock_ring_event_listener_class.return_value.add_notification_callback.call_args.args[
@@ -180,7 +180,7 @@ async def test_binary_sensor(
 
 
 async def test_binary_sensor_not_exists_with_deprecation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: ConfigEntry,
     mock_ring_client: Ring,
     entity_registry: er.EntityRegistry,
@@ -191,7 +191,7 @@ async def test_binary_sensor_not_exists_with_deprecation(
     entity_id = "binary_sensor.front_door_motion"
 
     assert not hass.states.get(entity_id)
-    with patch("homeassistant.components.ring.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.ring.PLATFORMS", [Platform.BINARY_SENSOR]):
         assert await async_setup_component(hass, DOMAIN, {})
 
     assert not entity_registry.async_get(entity_id)
@@ -210,7 +210,7 @@ async def test_binary_sensor_not_exists_with_deprecation(
     ],
 )
 async def test_binary_sensor_exists_with_deprecation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: ConfigEntry,
     mock_ring_client: Ring,
     entity_registry: er.EntityRegistry,
@@ -238,7 +238,7 @@ async def test_binary_sensor_exists_with_deprecation(
     )
     assert entity.entity_id == entity_id
     assert not hass.states.get(entity_id)
-    with patch("homeassistant.components.ring.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.ring.PLATFORMS", [Platform.BINARY_SENSOR]):
         assert await async_setup_component(hass, DOMAIN, {})
 
     entity = entity_registry.async_get(entity_id)

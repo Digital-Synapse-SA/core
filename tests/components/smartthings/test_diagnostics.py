@@ -6,9 +6,9 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.smartthings.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.smartthings.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 
@@ -22,7 +22,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     devices: AsyncMock,
     mock_smartthings: AsyncMock,
@@ -44,7 +44,7 @@ async def test_config_entry_diagnostics(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_device_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     devices: AsyncMock,
@@ -70,7 +70,7 @@ async def test_device_diagnostics(
 
     mock_smartthings.get_raw_device_status.reset_mock()
 
-    with patch("homeassistant.components.smartthings.diagnostics.EVENT_WAIT_TIME", 0.1):
+    with patch("smarthub.components.smartthings.diagnostics.EVENT_WAIT_TIME", 0.1):
         diag = await get_diagnostics_for_device(
             hass, hass_client, mock_config_entry, device
         )

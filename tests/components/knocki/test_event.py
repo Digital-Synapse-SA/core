@@ -7,10 +7,10 @@ from knocki import Event, EventType, Trigger, TriggerDetails
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.knocki.const import DOMAIN
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.knocki.const import DOMAIN
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -22,7 +22,7 @@ from tests.common import (
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -36,7 +36,7 @@ async def test_entities(
 
 @pytest.mark.freeze_time("2022-01-01T12:00:00Z")
 async def test_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -81,7 +81,7 @@ async def test_subscription(
 
 
 async def test_adding_runtime_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -104,7 +104,7 @@ async def test_adding_runtime_entities(
 
 
 async def test_removing_runtime_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

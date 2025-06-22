@@ -6,10 +6,10 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from total_connect_client.exceptions import FailedToBypassZone
 
-from homeassistant.components.button import DOMAIN as BUTTON, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_platform
 
@@ -21,7 +21,7 @@ PANEL_BYPASS_ID = "button.test_bypass_all"
 
 
 async def test_entity_registry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test the button is registered in entity registry."""
     entry = await setup_platform(hass, BUTTON)
@@ -40,7 +40,7 @@ async def test_entity_registry(
     ],
 )
 async def test_bypass_button(
-    hass: HomeAssistant, entity_id: str, tcc_request: str
+    hass: SmartHub, entity_id: str, tcc_request: str
 ) -> None:
     """Test pushing a bypass button."""
     responses = [FailedToBypassZone, None]
@@ -66,7 +66,7 @@ async def test_bypass_button(
         assert mock_request.call_count == 2
 
 
-async def test_clear_button(hass: HomeAssistant) -> None:
+async def test_clear_button(hass: SmartHub) -> None:
     """Test pushing the clear bypass button."""
     data = {ATTR_ENTITY_ID: PANEL_CLEAR_ID}
     await setup_platform(hass, BUTTON)

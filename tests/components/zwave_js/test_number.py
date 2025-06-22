@@ -5,10 +5,10 @@ from unittest.mock import patch
 import pytest
 from zwave_js_server.event import Event
 
-from homeassistant.const import STATE_UNKNOWN, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_UNKNOWN, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -17,7 +17,7 @@ VOLUME_NUMBER_ENTITY = "number.indoor_siren_6_default_volume_2"
 
 
 async def test_number(
-    hass: HomeAssistant, client, aeotec_radiator_thermostat, integration
+    hass: SmartHub, client, aeotec_radiator_thermostat, integration
 ) -> None:
     """Test the number entity."""
     node = aeotec_radiator_thermostat
@@ -76,14 +76,14 @@ def mock_client_fixture():
     """Mock no target_value."""
 
     with patch(
-        "homeassistant.components.zwave_js.number.ZwaveNumberEntity.get_zwave_value",
+        "smarthub.components.zwave_js.number.ZwaveNumberEntity.get_zwave_value",
         return_value=None,
     ):
         yield
 
 
 async def test_number_no_target_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     no_target_value,
     aeotec_radiator_thermostat,
@@ -91,7 +91,7 @@ async def test_number_no_target_value(
 ) -> None:
     """Test the number entity with no target value."""
     # Test turn on setting value fails
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "number",
             "set_value",
@@ -101,7 +101,7 @@ async def test_number_no_target_value(
 
 
 async def test_number_writeable(
-    hass: HomeAssistant, client, aeotec_radiator_thermostat
+    hass: SmartHub, client, aeotec_radiator_thermostat
 ) -> None:
     """Test the number entity where current value is writeable."""
     aeotec_radiator_thermostat.values["4-38-0-currentValue"].metadata.data[
@@ -138,7 +138,7 @@ async def test_number_writeable(
 
 
 async def test_volume_number(
-    hass: HomeAssistant, client, aeotec_zw164_siren, integration
+    hass: SmartHub, client, aeotec_zw164_siren, integration
 ) -> None:
     """Test the volume number entity."""
     node = aeotec_zw164_siren
@@ -219,7 +219,7 @@ async def test_volume_number(
 
 
 async def test_config_parameter_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     climate_adc_t3000,
     integration,

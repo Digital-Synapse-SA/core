@@ -6,14 +6,14 @@ from http import HTTPStatus
 from doorbirdpy import DoorBirdScheduleEntry
 import pytest
 
-from homeassistant.components.doorbird.const import CONF_EVENTS
-from homeassistant.core import HomeAssistant
+from smarthub.components.doorbird.const import CONF_EVENTS
+from smarthub.core import SmartHub
 
 from .conftest import DoorbirdMockerType
 
 
 async def test_no_configured_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     doorbird_mocker: DoorbirdMockerType,
 ) -> None:
     """Test a doorbird with no events configured."""

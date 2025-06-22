@@ -8,14 +8,14 @@ from astroid import nodes
 from pylint.checkers import BaseChecker
 from pylint.lint import PyLinter
 
-_MODULE_REGEX: re.Pattern[str] = re.compile(r"^homeassistant\.components\.\w+(\.\w+)?$")
+_MODULE_REGEX: re.Pattern[str] = re.compile(r"^smarthub\.components\.\w+(\.\w+)?$")
 
 
 def _get_module_platform(module_name: str) -> str | None:
     """Return the platform for the module name."""
     if not (module_match := _MODULE_REGEX.match(module_name)):
-        # Ensure `homeassistant.components.<component>`
-        # Or `homeassistant.components.<component>.<platform>`
+        # Ensure `smarthub.components.<component>`
+        # Or `smarthub.components.<component>.<platform>`
         return None
 
     platform = module_match.groups()[0]

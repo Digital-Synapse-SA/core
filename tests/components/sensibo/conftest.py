@@ -10,9 +10,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pysensibo import SensiboClient, SensiboData
 import pytest
 
-from homeassistant.components.sensibo.const import DOMAIN, PLATFORMS
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.components.sensibo.const import DOMAIN, PLATFORMS
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from . import ENTRY_CONFIG
 
@@ -24,7 +24,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.sensibo.async_setup_entry", return_value=True
+        "smarthub.components.sensibo.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -37,7 +37,7 @@ async def patch_platform_constant() -> list[Platform]:
 
 @pytest.fixture
 async def load_int(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: SensiboClient,
     load_platforms: list[Platform],
 ) -> MockConfigEntry:
@@ -52,7 +52,7 @@ async def load_int(
 
     config_entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.sensibo.PLATFORMS", load_platforms):
+    with patch("smarthub.components.sensibo.PLATFORMS", load_platforms):
         await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()
 
@@ -61,17 +61,17 @@ async def load_int(
 
 @pytest.fixture(name="mock_client")
 async def get_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_data: tuple[SensiboData, dict[str, Any], dict[str, Any]],
 ) -> AsyncGenerator[MagicMock]:
     """Mock SensiboClient."""
 
     with (
         patch(
-            "homeassistant.components.sensibo.coordinator.SensiboClient",
+            "smarthub.components.sensibo.coordinator.SensiboClient",
             autospec=True,
         ) as mock_client,
-        patch("homeassistant.components.sensibo.util.SensiboClient", new=mock_client),
+        patch("smarthub.components.sensibo.util.SensiboClient", new=mock_client),
     ):
         client = mock_client.return_value
         client.async_get_devices_data.return_value = get_data[0]
@@ -82,7 +82,7 @@ async def get_client(
 
 @pytest.fixture(name="get_data")
 async def get_data_from_library(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     load_json: tuple[dict[str, Any], dict[str, Any]],
 ) -> AsyncGenerator[tuple[SensiboData, dict[str, Any], dict[str, Any]]]:

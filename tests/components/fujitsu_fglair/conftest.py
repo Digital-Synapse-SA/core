@@ -7,13 +7,13 @@ from ayla_iot_unofficial import AylaApi
 from ayla_iot_unofficial.fujitsu_hvac import FanSpeed, FujitsuHVAC, OpMode, SwingMode
 import pytest
 
-from homeassistant.components.fujitsu_fglair.const import (
+from smarthub.components.fujitsu_fglair.const import (
     CONF_REGION,
     DOMAIN,
     REGION_DEFAULT,
 )
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME, Platform
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -44,7 +44,7 @@ def platforms() -> list[Platform]:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.fujitsu_fglair.async_setup_entry", return_value=True
+        "smarthub.components.fujitsu_fglair.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -56,10 +56,10 @@ def mock_ayla_api(mock_devices: list[AsyncMock]) -> Generator[AsyncMock]:
 
     with (
         patch(
-            "homeassistant.components.fujitsu_fglair.new_ayla_api", return_value=my_mock
+            "smarthub.components.fujitsu_fglair.new_ayla_api", return_value=my_mock
         ),
         patch(
-            "homeassistant.components.fujitsu_fglair.config_flow.new_ayla_api",
+            "smarthub.components.fujitsu_fglair.config_flow.new_ayla_api",
             return_value=my_mock,
         ),
     ):
@@ -87,7 +87,7 @@ def mock_config_entry(request: pytest.FixtureRequest) -> MockConfigEntry:
 
 @pytest.fixture(name="integration_setup")
 async def mock_integration_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     platforms: list[Platform],
     mock_config_entry: MockConfigEntry,
 ) -> Callable[[], Awaitable[bool]]:
@@ -95,7 +95,7 @@ async def mock_integration_setup(
     mock_config_entry.add_to_hass(hass)
 
     async def run() -> bool:
-        with patch("homeassistant.components.fujitsu_fglair.PLATFORMS", platforms):
+        with patch("smarthub.components.fujitsu_fglair.PLATFORMS", platforms):
             result = await hass.config_entries.async_setup(mock_config_entry.entry_id)
             await hass.async_block_till_done()
         return result

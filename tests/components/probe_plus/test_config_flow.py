@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.probe_plus.const import DOMAIN
-from homeassistant.config_entries import SOURCE_BLUETOOTH, SOURCE_USER
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.components.probe_plus.const import DOMAIN
+from smarthub.config_entries import SOURCE_BLUETOOTH, SOURCE_USER
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -29,14 +29,14 @@ service_info = BluetoothServiceInfo(
 def mock_discovered_service_info() -> Generator[AsyncMock]:
     """Override getting Bluetooth service info."""
     with patch(
-        "homeassistant.components.probe_plus.config_flow.async_discovered_service_info",
+        "smarthub.components.probe_plus.config_flow.async_discovered_service_info",
         return_value=[service_info],
     ) as mock_discovered_service_info:
         yield mock_discovered_service_info
 
 
 async def test_user_config_flow_creates_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_discovered_service_info: AsyncMock,
 ) -> None:
@@ -61,7 +61,7 @@ async def test_user_config_flow_creates_entry(
 
 
 async def test_user_flow_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovered_service_info: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
@@ -78,7 +78,7 @@ async def test_user_flow_already_configured(
 
 
 async def test_bluetooth_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_discovered_service_info: AsyncMock,
 ) -> None:
@@ -103,7 +103,7 @@ async def test_bluetooth_discovery(
 
 
 async def test_already_configured_bluetooth_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Ensure configure device is not discovered again."""
@@ -119,7 +119,7 @@ async def test_already_configured_bluetooth_discovery(
 
 
 async def test_no_bluetooth_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_discovered_service_info: AsyncMock,
 ) -> None:

@@ -4,13 +4,13 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from airtouch4pyapi.airtouch import AirTouch, AirTouchAc, AirTouchGroup, AirTouchStatus
 
-from homeassistant import config_entries
-from homeassistant.components.airtouch4.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.airtouch4.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -27,11 +27,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.airtouch4.config_flow.AirTouch",
+            "smarthub.components.airtouch4.config_flow.AirTouch",
             return_value=mock_airtouch,
         ),
         patch(
-            "homeassistant.components.airtouch4.async_setup_entry",
+            "smarthub.components.airtouch4.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -48,7 +48,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_timeout(hass: HomeAssistant) -> None:
+async def test_form_timeout(hass: SmartHub) -> None:
     """Test we handle a connection timeout."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -57,7 +57,7 @@ async def test_form_timeout(hass: HomeAssistant) -> None:
     mock_airtouch.UpdateInfo = AsyncMock()
     mock_airtouch.status = AirTouchStatus.CONNECTION_INTERRUPTED
     with patch(
-        "homeassistant.components.airtouch4.config_flow.AirTouch",
+        "smarthub.components.airtouch4.config_flow.AirTouch",
         return_value=mock_airtouch,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -67,7 +67,7 @@ async def test_form_timeout(hass: HomeAssistant) -> None:
         assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_library_error_message(hass: HomeAssistant) -> None:
+async def test_form_library_error_message(hass: SmartHub) -> None:
     """Test we handle an unknown error message from the library."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -76,7 +76,7 @@ async def test_form_library_error_message(hass: HomeAssistant) -> None:
     mock_airtouch.UpdateInfo = AsyncMock()
     mock_airtouch.status = AirTouchStatus.ERROR
     with patch(
-        "homeassistant.components.airtouch4.config_flow.AirTouch",
+        "smarthub.components.airtouch4.config_flow.AirTouch",
         return_value=mock_airtouch,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -86,7 +86,7 @@ async def test_form_library_error_message(hass: HomeAssistant) -> None:
         assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_connection_refused(hass: HomeAssistant) -> None:
+async def test_form_connection_refused(hass: SmartHub) -> None:
     """Test we handle a connection error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -95,7 +95,7 @@ async def test_form_connection_refused(hass: HomeAssistant) -> None:
     mock_airtouch.UpdateInfo = AsyncMock()
     mock_airtouch.status = AirTouchStatus.NOT_CONNECTED
     with patch(
-        "homeassistant.components.airtouch4.config_flow.AirTouch",
+        "smarthub.components.airtouch4.config_flow.AirTouch",
         return_value=mock_airtouch,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -105,7 +105,7 @@ async def test_form_connection_refused(hass: HomeAssistant) -> None:
         assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_no_units(hass: HomeAssistant) -> None:
+async def test_form_no_units(hass: SmartHub) -> None:
     """Test we handle no units found."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -118,7 +118,7 @@ async def test_form_no_units(hass: HomeAssistant) -> None:
     mock_airtouch.GetGroups = Mock(return_value=[])
 
     with patch(
-        "homeassistant.components.airtouch4.config_flow.AirTouch",
+        "smarthub.components.airtouch4.config_flow.AirTouch",
         return_value=mock_airtouch,
     ):
         result2 = await hass.config_entries.flow.async_configure(

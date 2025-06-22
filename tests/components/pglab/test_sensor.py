@@ -6,7 +6,7 @@ from freezegun import freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .test_common import get_device_discovery_payload, send_discovery_message
 
@@ -24,7 +24,7 @@ from tests.typing import MqttMockHAClient
     ],
 )
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mqtt_mock: MqttMockHAClient,
     setup_pglab,

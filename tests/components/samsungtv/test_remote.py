@@ -5,16 +5,16 @@ from unittest.mock import Mock, patch
 import pytest
 from samsungtvws.encrypted.remote import SamsungTVEncryptedCommand
 
-from homeassistant.components.remote import (
+from smarthub.components.remote import (
     ATTR_COMMAND,
     DOMAIN as REMOTE_DOMAIN,
     SERVICE_SEND_COMMAND,
 )
-from homeassistant.components.samsungtv.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.samsungtv.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_samsungtv_entry
 from .const import ENTRYDATA_ENCRYPTED_WEBSOCKET, ENTRYDATA_LEGACY, ENTRYDATA_WEBSOCKET
@@ -25,7 +25,7 @@ ENTITY_ID = f"{REMOTE_DOMAIN}.mock_title"
 
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test setup with basic config."""
     await setup_samsungtv_entry(hass, ENTRYDATA_ENCRYPTED_WEBSOCKET)
     assert hass.states.get(ENTITY_ID)
@@ -33,7 +33,7 @@ async def test_setup(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test unique id."""
     await setup_samsungtv_entry(hass, ENTRYDATA_ENCRYPTED_WEBSOCKET)
@@ -44,7 +44,7 @@ async def test_unique_id(
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
 async def test_main_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     remote_encrypted_websocket: Mock,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_main_services(
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
 async def test_send_command_service(
-    hass: HomeAssistant, remote_encrypted_websocket: Mock
+    hass: SmartHub, remote_encrypted_websocket: Mock
 ) -> None:
     """Test the send command."""
     await setup_samsungtv_entry(hass, ENTRYDATA_ENCRYPTED_WEBSOCKET)
@@ -103,7 +103,7 @@ async def test_send_command_service(
 
 
 @pytest.mark.usefixtures("remote_websocket", "rest_api")
-async def test_turn_on_wol(hass: HomeAssistant) -> None:
+async def test_turn_on_wol(hass: SmartHub) -> None:
     """Test turn on."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -114,7 +114,7 @@ async def test_turn_on_wol(hass: HomeAssistant) -> None:
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
     with patch(
-        "homeassistant.components.samsungtv.entity.send_magic_packet"
+        "smarthub.components.samsungtv.entity.send_magic_packet"
     ) as mock_send_magic_packet:
         await hass.services.async_call(
             REMOTE_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: ENTITY_ID}, True
@@ -123,10 +123,10 @@ async def test_turn_on_wol(hass: HomeAssistant) -> None:
     assert mock_send_magic_packet.called
 
 
-async def test_turn_on_without_turnon(hass: HomeAssistant, remote_legacy: Mock) -> None:
+async def test_turn_on_without_turnon(hass: SmartHub, remote_legacy: Mock) -> None:
     """Test turn on."""
     await setup_samsungtv_entry(hass, ENTRYDATA_LEGACY)
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             REMOTE_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: ENTITY_ID}, True
         )

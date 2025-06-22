@@ -6,9 +6,9 @@ from freezegun import freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_mocked_integration
 
@@ -19,7 +19,7 @@ from tests.common import snapshot_platform
 @pytest.mark.usefixtures("bmw_fixture")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entity_state_attrs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -27,7 +27,7 @@ async def test_entity_state_attrs(
 
     # Setup component
     with patch(
-        "homeassistant.components.bmw_connected_drive.PLATFORMS",
+        "smarthub.components.bmw_connected_drive.PLATFORMS",
         [Platform.BINARY_SENSOR],
     ):
         mock_config_entry = await setup_mocked_integration(hass)

@@ -1,6 +1,6 @@
 """Tests for binary sensors."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .conftest import (
     EntityAndExpectedValues,
@@ -10,7 +10,7 @@ from .conftest import (
 )
 
 
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test all binary sensors."""
 
     entity_and_expected_values = [

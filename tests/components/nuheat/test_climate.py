@@ -3,10 +3,10 @@
 from datetime import timedelta
 from unittest.mock import patch
 
-from homeassistant.components.nuheat.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.nuheat.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .mocks import (
     MOCK_CONFIG_ENTRY,
@@ -20,13 +20,13 @@ from .mocks import (
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_climate_thermostat_run(hass: HomeAssistant) -> None:
+async def test_climate_thermostat_run(hass: SmartHub) -> None:
     """Test a thermostat with the schedule running."""
     mock_thermostat = _get_mock_thermostat_run()
     mock_nuheat = _get_mock_nuheat(get_thermostat=mock_thermostat)
 
     with patch(
-        "homeassistant.components.nuheat.nuheat.NuHeat",
+        "smarthub.components.nuheat.nuheat.NuHeat",
         return_value=mock_nuheat,
     ):
         config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG_ENTRY)
@@ -54,14 +54,14 @@ async def test_climate_thermostat_run(hass: HomeAssistant) -> None:
 
 
 async def test_climate_thermostat_schedule_hold_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a thermostat with the schedule hold that is offline."""
     mock_thermostat = _get_mock_thermostat_schedule_hold_unavailable()
     mock_nuheat = _get_mock_nuheat(get_thermostat=mock_thermostat)
 
     with patch(
-        "homeassistant.components.nuheat.nuheat.NuHeat",
+        "smarthub.components.nuheat.nuheat.NuHeat",
         return_value=mock_nuheat,
     ):
         config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG_ENTRY)
@@ -85,13 +85,13 @@ async def test_climate_thermostat_schedule_hold_unavailable(
     assert all(item in state.attributes.items() for item in expected_attributes.items())
 
 
-async def test_climate_thermostat_schedule_hold_available(hass: HomeAssistant) -> None:
+async def test_climate_thermostat_schedule_hold_available(hass: SmartHub) -> None:
     """Test a thermostat with the schedule hold that is online."""
     mock_thermostat = _get_mock_thermostat_schedule_hold_available()
     mock_nuheat = _get_mock_nuheat(get_thermostat=mock_thermostat)
 
     with patch(
-        "homeassistant.components.nuheat.nuheat.NuHeat",
+        "smarthub.components.nuheat.nuheat.NuHeat",
         return_value=mock_nuheat,
     ):
         config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG_ENTRY)
@@ -119,13 +119,13 @@ async def test_climate_thermostat_schedule_hold_available(hass: HomeAssistant) -
     assert all(item in state.attributes.items() for item in expected_attributes.items())
 
 
-async def test_climate_thermostat_schedule_temporary_hold(hass: HomeAssistant) -> None:
+async def test_climate_thermostat_schedule_temporary_hold(hass: SmartHub) -> None:
     """Test a thermostat with the temporary schedule hold that is online."""
     mock_thermostat = _get_mock_thermostat_schedule_temporary_hold()
     mock_nuheat = _get_mock_nuheat(get_thermostat=mock_thermostat)
 
     with patch(
-        "homeassistant.components.nuheat.nuheat.NuHeat",
+        "smarthub.components.nuheat.nuheat.NuHeat",
         return_value=mock_nuheat,
     ):
         config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG_ENTRY)

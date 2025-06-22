@@ -9,21 +9,21 @@ from psutil._common import sdiskpart, sdiskusage, shwtemp, snetio, snicaddr
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.systemmonitor.const import DOMAIN
-from homeassistant.components.systemmonitor.coordinator import VirtualMemory
-from homeassistant.components.systemmonitor.sensor import get_cpu_icon
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.systemmonitor.const import DOMAIN
+from smarthub.components.systemmonitor.coordinator import VirtualMemory
+from smarthub.components.systemmonitor.sensor import get_cpu_icon
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     entity_registry: er.EntityRegistry,
@@ -70,7 +70,7 @@ async def test_sensor(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_process_sensor_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     entity_registry: er.EntityRegistry,
@@ -102,7 +102,7 @@ async def test_process_sensor_not_loaded(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_not_loading_veth_networks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: ConfigEntry,
 ) -> None:
     """Test the sensor."""
@@ -117,7 +117,7 @@ async def test_sensor_not_loading_veth_networks(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_icon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     mock_config_entry: MockConfigEntry,
@@ -135,7 +135,7 @@ async def test_sensor_icon(
 
 
 async def test_sensor_updating(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     freezer: FrozenDateTimeFactory,
@@ -193,7 +193,7 @@ async def test_sensor_updating(
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_network_sensors(
     freezer: FrozenDateTimeFactory,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: ConfigEntry,
     mock_psutil: Mock,
 ) -> None:
@@ -268,7 +268,7 @@ async def test_sensor_network_sensors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_missing_cpu_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     mock_config_entry: MockConfigEntry,
@@ -292,7 +292,7 @@ async def test_missing_cpu_temperature(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_processor_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     mock_config_entry: MockConfigEntry,
@@ -342,7 +342,7 @@ async def test_processor_temperature(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_exception_handling_disk_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_added_config_entry: ConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -401,7 +401,7 @@ async def test_exception_handling_disk_sensor(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_cpu_percentage_is_zero_returns_unknown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_added_config_entry: ConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -434,7 +434,7 @@ async def test_cpu_percentage_is_zero_returns_unknown(
 
 
 async def test_remove_obsolete_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_added_config_entry: ConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -508,7 +508,7 @@ async def test_remove_obsolete_entities(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_no_duplicate_disk_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     caplog: pytest.LogCaptureFixture,

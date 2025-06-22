@@ -8,24 +8,24 @@ from yalexs.authenticator_common import AuthenticationState
 from yalexs.const import Brand
 from yalexs.exceptions import AugustApiAIOHTTPError
 
-from homeassistant.components.august.const import DOMAIN
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN, LockState
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.august.const import DOMAIN
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN, LockState
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_LOCK,
     SERVICE_OPEN,
     SERVICE_UNLOCK,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from .mocks import (
     _create_august_with_devices,
@@ -42,7 +42,7 @@ from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
-async def test_august_api_is_failing(hass: HomeAssistant) -> None:
+async def test_august_api_is_failing(hass: SmartHub) -> None:
     """Config entry state is SETUP_RETRY when august api is failing."""
 
     config_entry = MockConfigEntry(
@@ -62,7 +62,7 @@ async def test_august_api_is_failing(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_august_is_offline(hass: HomeAssistant) -> None:
+async def test_august_is_offline(hass: SmartHub) -> None:
     """Config entry state is SETUP_RETRY when august is offline."""
 
     config_entry = MockConfigEntry(
@@ -82,7 +82,7 @@ async def test_august_is_offline(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_august_late_auth_failure(hass: HomeAssistant) -> None:
+async def test_august_late_auth_failure(hass: SmartHub) -> None:
     """Test we can detect a late auth failure."""
     aiohttp_client_response_exception = ClientResponseError(None, None, status=401)
     config_entry = MockConfigEntry(
@@ -108,7 +108,7 @@ async def test_august_late_auth_failure(hass: HomeAssistant) -> None:
     assert flows[0]["step_id"] == "reauth_validate"
 
 
-async def test_unlock_throws_august_api_http_error(hass: HomeAssistant) -> None:
+async def test_unlock_throws_august_api_http_error(hass: SmartHub) -> None:
     """Test unlock throws correct error on http error."""
     mocked_lock_detail = await _mock_operative_august_lock_detail(hass)
     aiohttp_client_response_exception = ClientResponseError(None, None, status=400)
@@ -129,7 +129,7 @@ async def test_unlock_throws_august_api_http_error(hass: HomeAssistant) -> None:
     data = {ATTR_ENTITY_ID: "lock.a6697750d607098bae8d6baa11ef8063_name"}
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=(
             "A6697750D607098BAE8D6BAA11EF8063 Name: This should bubble up as its user"
             " consumable"
@@ -138,7 +138,7 @@ async def test_unlock_throws_august_api_http_error(hass: HomeAssistant) -> None:
         await hass.services.async_call(LOCK_DOMAIN, SERVICE_UNLOCK, data, blocking=True)
 
 
-async def test_lock_throws_august_api_http_error(hass: HomeAssistant) -> None:
+async def test_lock_throws_august_api_http_error(hass: SmartHub) -> None:
     """Test lock throws correct error on http error."""
     mocked_lock_detail = await _mock_operative_august_lock_detail(hass)
     aiohttp_client_response_exception = ClientResponseError(None, None, status=400)
@@ -158,7 +158,7 @@ async def test_lock_throws_august_api_http_error(hass: HomeAssistant) -> None:
     )
     data = {ATTR_ENTITY_ID: "lock.a6697750d607098bae8d6baa11ef8063_name"}
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=(
             "A6697750D607098BAE8D6BAA11EF8063 Name: This should bubble up as its user"
             " consumable"
@@ -168,17 +168,17 @@ async def test_lock_throws_august_api_http_error(hass: HomeAssistant) -> None:
 
 
 async def test_open_throws_hass_service_not_supported_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test open throws correct error on entity does not support this service error."""
     mocked_lock_detail = await _mock_operative_august_lock_detail(hass)
     await _create_august_with_devices(hass, [mocked_lock_detail])
     data = {ATTR_ENTITY_ID: "lock.a6697750d607098bae8d6baa11ef8063_name"}
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(LOCK_DOMAIN, SERVICE_OPEN, data, blocking=True)
 
 
-async def test_inoperative_locks_are_filtered_out(hass: HomeAssistant) -> None:
+async def test_inoperative_locks_are_filtered_out(hass: SmartHub) -> None:
     """Ensure inoperative locks do not get setup."""
     august_operative_lock = await _mock_operative_august_lock_detail(hass)
     august_inoperative_lock = await _mock_inoperative_august_lock_detail(hass)
@@ -194,7 +194,7 @@ async def test_inoperative_locks_are_filtered_out(hass: HomeAssistant) -> None:
     assert lock_a6697750d607098bae8d6baa11ef8063_name.state == LockState.LOCKED
 
 
-async def test_lock_has_doorsense(hass: HomeAssistant) -> None:
+async def test_lock_has_doorsense(hass: SmartHub) -> None:
     """Check to see if a lock has doorsense."""
     doorsenselock = await _mock_doorsense_enabled_august_lock_detail(hass)
     nodoorsenselock = await _mock_doorsense_missing_august_lock_detail(hass)
@@ -210,7 +210,7 @@ async def test_lock_has_doorsense(hass: HomeAssistant) -> None:
     assert binary_sensor_missing_doorsense_id_name_open is None
 
 
-async def test_auth_fails(hass: HomeAssistant) -> None:
+async def test_auth_fails(hass: SmartHub) -> None:
     """Config entry state is SETUP_ERROR when auth fails."""
 
     config_entry = MockConfigEntry(
@@ -235,7 +235,7 @@ async def test_auth_fails(hass: HomeAssistant) -> None:
     assert flows[0]["step_id"] == "reauth_validate"
 
 
-async def test_bad_password(hass: HomeAssistant) -> None:
+async def test_bad_password(hass: SmartHub) -> None:
     """Config entry state is SETUP_ERROR when the password has been changed."""
 
     config_entry = MockConfigEntry(
@@ -262,7 +262,7 @@ async def test_bad_password(hass: HomeAssistant) -> None:
     assert flows[0]["step_id"] == "reauth_validate"
 
 
-async def test_http_failure(hass: HomeAssistant) -> None:
+async def test_http_failure(hass: SmartHub) -> None:
     """Config entry state is SETUP_RETRY when august is offline."""
 
     config_entry = MockConfigEntry(
@@ -285,7 +285,7 @@ async def test_http_failure(hass: HomeAssistant) -> None:
     assert hass.config_entries.flow.async_progress() == []
 
 
-async def test_unknown_auth_state(hass: HomeAssistant) -> None:
+async def test_unknown_auth_state(hass: SmartHub) -> None:
     """Config entry state is SETUP_ERROR when august is in an unknown auth state."""
 
     config_entry = MockConfigEntry(
@@ -310,7 +310,7 @@ async def test_unknown_auth_state(hass: HomeAssistant) -> None:
     assert flows[0]["step_id"] == "reauth_validate"
 
 
-async def test_requires_validation_state(hass: HomeAssistant) -> None:
+async def test_requires_validation_state(hass: SmartHub) -> None:
     """Config entry state is SETUP_ERROR when august requires validation."""
 
     config_entry = MockConfigEntry(
@@ -336,7 +336,7 @@ async def test_requires_validation_state(hass: HomeAssistant) -> None:
     assert hass.config_entries.flow.async_progress()[0]["context"]["source"] == "reauth"
 
 
-async def test_unknown_auth_http_401(hass: HomeAssistant) -> None:
+async def test_unknown_auth_http_401(hass: SmartHub) -> None:
     """Config entry state is SETUP_ERROR when august gets an http."""
 
     config_entry = MockConfigEntry(
@@ -361,7 +361,7 @@ async def test_unknown_auth_http_401(hass: HomeAssistant) -> None:
     assert flows[0]["step_id"] == "reauth_validate"
 
 
-async def test_load_unload(hass: HomeAssistant) -> None:
+async def test_load_unload(hass: SmartHub) -> None:
     """Config entry can be unloaded."""
 
     august_operative_lock = await _mock_operative_august_lock_detail(hass)
@@ -378,7 +378,7 @@ async def test_load_unload(hass: HomeAssistant) -> None:
 
 
 async def test_load_triggers_ble_discovery(
-    hass: HomeAssistant, mock_discovery: Mock
+    hass: SmartHub, mock_discovery: Mock
 ) -> None:
     """Test that loading a lock that supports offline ble operation passes the keys to yalexe_ble."""
 
@@ -402,7 +402,7 @@ async def test_load_triggers_ble_discovery(
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -426,7 +426,7 @@ async def test_device_remove_devices(
     assert response["success"]
 
 
-async def test_brand_migration_issue(hass: HomeAssistant) -> None:
+async def test_brand_migration_issue(hass: SmartHub) -> None:
     """Test creating and removing the brand migration issue."""
     august_operative_lock = await _mock_operative_august_lock_detail(hass)
     config_entry = await _create_august_with_devices(
@@ -440,7 +440,7 @@ async def test_brand_migration_issue(hass: HomeAssistant) -> None:
     assert issue_entry
     assert issue_entry.severity == ir.IssueSeverity.CRITICAL
     assert issue_entry.translation_placeholders == {
-        "migrate_url": "https://my.home-assistant.io/redirect/config_flow_start?domain=yale"
+        "migrate_url": "https://my.smart-hub.io/redirect/config_flow_start?domain=yale"
     }
 
     await hass.config_entries.async_remove(config_entry.entry_id)

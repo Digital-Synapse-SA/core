@@ -4,11 +4,11 @@ from unittest.mock import MagicMock
 
 import pycfdns
 
-from homeassistant.components.cloudflare.const import CONF_RECORDS, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_TOKEN, CONF_SOURCE, CONF_ZONE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.cloudflare.const import CONF_RECORDS, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_TOKEN, CONF_SOURCE, CONF_ZONE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     ENTRY_CONFIG,
@@ -21,7 +21,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_user_form(hass: HomeAssistant, cfupdate_flow: MagicMock) -> None:
+async def test_user_form(hass: SmartHub, cfupdate_flow: MagicMock) -> None:
     """Test we get the user initiated form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -73,7 +73,7 @@ async def test_user_form(hass: HomeAssistant, cfupdate_flow: MagicMock) -> None:
 
 
 async def test_user_form_cannot_connect(
-    hass: HomeAssistant, cfupdate_flow: MagicMock
+    hass: SmartHub, cfupdate_flow: MagicMock
 ) -> None:
     """Test we handle cannot connect error."""
     instance = cfupdate_flow.return_value
@@ -93,7 +93,7 @@ async def test_user_form_cannot_connect(
 
 
 async def test_user_form_invalid_auth(
-    hass: HomeAssistant, cfupdate_flow: MagicMock
+    hass: SmartHub, cfupdate_flow: MagicMock
 ) -> None:
     """Test we handle invalid auth error."""
     instance = cfupdate_flow.return_value
@@ -113,7 +113,7 @@ async def test_user_form_invalid_auth(
 
 
 async def test_user_form_unexpected_exception(
-    hass: HomeAssistant, cfupdate_flow: MagicMock
+    hass: SmartHub, cfupdate_flow: MagicMock
 ) -> None:
     """Test we handle unexpected exception."""
     instance = cfupdate_flow.return_value
@@ -132,7 +132,7 @@ async def test_user_form_unexpected_exception(
     assert result["errors"] == {"base": "unknown"}
 
 
-async def test_user_form_single_instance_allowed(hass: HomeAssistant) -> None:
+async def test_user_form_single_instance_allowed(hass: SmartHub) -> None:
     """Test that configuring more than one instance is rejected."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRY_CONFIG)
     entry.add_to_hass(hass)
@@ -146,7 +146,7 @@ async def test_user_form_single_instance_allowed(hass: HomeAssistant) -> None:
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_reauth_flow(hass: HomeAssistant, cfupdate_flow: MagicMock) -> None:
+async def test_reauth_flow(hass: SmartHub, cfupdate_flow: MagicMock) -> None:
     """Test the reauthentication configuration flow."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRY_CONFIG)
     entry.add_to_hass(hass)

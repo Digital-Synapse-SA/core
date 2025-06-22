@@ -7,15 +7,15 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType, WebsocketDataType
 
@@ -76,7 +76,7 @@ TEST_DATA = [
 
 @pytest.mark.parametrize(("sensor_payload", "expected"), TEST_DATA)
 async def test_number_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     sensor_ws_data: WebsocketDataType,
@@ -85,7 +85,7 @@ async def test_number_entities(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test successful creation of number entities."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.NUMBER]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 

@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant import setup
-from homeassistant.components.google_drive.application_credentials import (
+from smarthub import setup
+from smarthub.components.google_drive.application_credentials import (
     async_get_description_placeholders,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 @pytest.mark.parametrize(
@@ -14,11 +14,11 @@ from homeassistant.core import HomeAssistant
     [
         ([], "https://example.com", "https://example.com/auth/external/callback"),
         ([], None, "https://YOUR_DOMAIN:PORT/auth/external/callback"),
-        (["my"], "https://example.com", "https://my.home-assistant.io/redirect/oauth"),
+        (["my"], "https://example.com", "https://my.smart-hub.io/redirect/oauth"),
     ],
 )
 async def test_description_placeholders(
-    hass: HomeAssistant,
+    hass: SmartHub,
     additional_components: list[str],
     external_url: str | None,
     expected_redirect_uri: str,
@@ -30,7 +30,7 @@ async def test_description_placeholders(
     placeholders = await async_get_description_placeholders(hass)
     assert placeholders == {
         "oauth_consent_url": "https://console.cloud.google.com/apis/credentials/consent",
-        "more_info_url": "https://www.home-assistant.io/integrations/google_drive/",
+        "more_info_url": "https://www.smart-hub.io/integrations/google_drive/",
         "oauth_creds_url": "https://console.cloud.google.com/apis/credentials",
         "redirect_url": expected_redirect_uri,
     }

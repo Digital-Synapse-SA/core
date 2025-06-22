@@ -3,14 +3,14 @@
 import pytest
 from Tami4EdgeAPI import exceptions
 
-from homeassistant import config_entries
-from homeassistant.components.tami4.const import CONF_PHONE, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.tami4.const import CONF_PHONE, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def test_step_user_valid_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry,
     mock_request_otp,
     mock__get_devices_metadata,
@@ -34,7 +34,7 @@ async def test_step_user_valid_number(
 
 
 async def test_step_user_invalid_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry,
     mock_request_otp,
     mock__get_devices_metadata,
@@ -63,7 +63,7 @@ async def test_step_user_invalid_number(
     indirect=["mock_request_otp"],
 )
 async def test_step_user_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry,
     mock_request_otp,
     mock__get_devices_metadata,
@@ -88,7 +88,7 @@ async def test_step_user_exception(
 
 
 async def test_step_otp_valid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry,
     mock_request_otp,
     mock_submit_otp,
@@ -126,7 +126,7 @@ async def test_step_otp_valid(
     "mock_submit_otp",
     "mock__get_devices_metadata_no_name",
 )
-async def test_step_otp_valid_device_no_name(hass: HomeAssistant) -> None:
+async def test_step_otp_valid_device_no_name(hass: SmartHub) -> None:
     """Test user step with valid phone number."""
 
     result = await hass.config_entries.flow.async_init(
@@ -163,7 +163,7 @@ async def test_step_otp_valid_device_no_name(hass: HomeAssistant) -> None:
     indirect=["mock_submit_otp"],
 )
 async def test_step_otp_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry,
     mock_request_otp,
     mock_submit_otp,

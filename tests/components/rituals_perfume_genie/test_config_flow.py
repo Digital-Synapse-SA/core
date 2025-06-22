@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from aiohttp import ClientResponseError
 from pyrituals import AuthenticationException
 
-from homeassistant import config_entries
-from homeassistant.components.rituals_perfume_genie.const import ACCOUNT_HASH, DOMAIN
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.rituals_perfume_genie.const import ACCOUNT_HASH, DOMAIN
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 TEST_EMAIL = "rituals@example.com"
 VALID_PASSWORD = "passw0rd"
@@ -25,7 +25,7 @@ def _mock_account(*_):
     return account
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -35,11 +35,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.rituals_perfume_genie.config_flow.Account",
+            "smarthub.components.rituals_perfume_genie.config_flow.Account",
             side_effect=_mock_account,
         ),
         patch(
-            "homeassistant.components.rituals_perfume_genie.async_setup_entry",
+            "smarthub.components.rituals_perfume_genie.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -58,14 +58,14 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.rituals_perfume_genie.config_flow.Account.authenticate",
+        "smarthub.components.rituals_perfume_genie.config_flow.Account.authenticate",
         side_effect=AuthenticationException,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -80,14 +80,14 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_auth_exception(hass: HomeAssistant) -> None:
+async def test_form_auth_exception(hass: SmartHub) -> None:
     """Test we handle auth exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.rituals_perfume_genie.config_flow.Account.authenticate",
+        "smarthub.components.rituals_perfume_genie.config_flow.Account.authenticate",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -102,14 +102,14 @@ async def test_form_auth_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.rituals_perfume_genie.config_flow.Account.authenticate",
+        "smarthub.components.rituals_perfume_genie.config_flow.Account.authenticate",
         side_effect=ClientResponseError(
             None, None, status=HTTPStatus.INTERNAL_SERVER_ERROR
         ),

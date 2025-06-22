@@ -2,9 +2,9 @@
 
 from unittest.mock import PropertyMock, patch
 
-from homeassistant.components.atag import DOMAIN
-from homeassistant.components.atag.climate import PRESET_MAP
-from homeassistant.components.climate import (
+from smarthub.components.atag import DOMAIN
+from smarthub.components.atag.climate import PRESET_MAP
+from smarthub.components.climate import (
     ATTR_HVAC_ACTION,
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
@@ -16,16 +16,16 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.homeassistant import DOMAIN as HA_DOMAIN
-from homeassistant.const import (
+from smarthub.components.smarthub import DOMAIN as HA_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import UID, init_integration
 
@@ -35,7 +35,7 @@ CLIMATE_ID = f"{Platform.CLIMATE}.{DOMAIN}"
 
 
 async def test_climate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -49,7 +49,7 @@ async def test_climate(
 
 
 async def test_setting_climate(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setting the climate device."""
     await init_integration(hass, aioclient_mock)
@@ -85,7 +85,7 @@ async def test_setting_climate(
 
 
 async def test_incorrect_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test incorrect values are handled correctly."""
@@ -98,7 +98,7 @@ async def test_incorrect_modes(
 
 
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test data is not destroyed on update failure."""

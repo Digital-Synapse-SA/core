@@ -7,12 +7,12 @@ from pyenphase.exceptions import EnvoyError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.enphase_envoy.const import (
+from smarthub.components.enphase_envoy.const import (
     DOMAIN,
     OPTION_DIAGNOSTICS_INCLUDE_FIXTURES,
 )
-from homeassistant.components.enphase_envoy.coordinator import MAC_VERIFICATION_DELAY
-from homeassistant.core import HomeAssistant
+from smarthub.components.enphase_envoy.coordinator import MAC_VERIFICATION_DELAY
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -39,7 +39,7 @@ def limit_diagnostic_attrs(prop, path) -> bool:
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
     mock_envoy: AsyncMock,
@@ -53,7 +53,7 @@ async def test_entry_diagnostics(
 
 
 @pytest.fixture(name="config_entry_options")
-def config_entry_options_fixture(hass: HomeAssistant, config: dict[str, str]):
+def config_entry_options_fixture(hass: SmartHub, config: dict[str, str]):
     """Define a config entry fixture."""
     return MockConfigEntry(
         domain=DOMAIN,
@@ -66,7 +66,7 @@ def config_entry_options_fixture(hass: HomeAssistant, config: dict[str, str]):
 
 
 async def test_entry_diagnostics_with_fixtures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry_options: MockConfigEntry,
     mock_envoy: AsyncMock,
@@ -80,7 +80,7 @@ async def test_entry_diagnostics_with_fixtures(
 
 
 async def test_entry_diagnostics_with_fixtures_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry_options: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -95,7 +95,7 @@ async def test_entry_diagnostics_with_fixtures_with_error(
 
 
 async def test_entry_diagnostics_with_interface_information(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

@@ -2,9 +2,9 @@
 
 import pytest
 
-from homeassistant.components.doorbird.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.doorbird.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import mock_not_found_exception, mock_unauthorized_exception
 from .conftest import DoorbirdMockerType
@@ -20,7 +20,7 @@ async def test_basic_setup(
 
 
 async def test_auth_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     doorbird_mocker: DoorbirdMockerType,
 ) -> None:
     """Test basic setup with an auth failure."""
@@ -67,7 +67,7 @@ async def test_http_schedule_api_missing(
 
 
 async def test_events_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     doorbird_mocker: DoorbirdMockerType,
 ) -> None:
     """Test basic setup."""
@@ -87,7 +87,7 @@ async def test_events_changed(
     assert len(api.change_favorite.mock_calls) == 1
     favorite_type, title, url = api.change_favorite.mock_calls[0][1]
     assert favorite_type == "http"
-    assert title == "Home Assistant (mydoorbird_xyz)"
+    assert title == "SmartHub (mydoorbird_xyz)"
     assert url == (
         f"http://10.10.10.10:8123/api/doorbird/mydoorbird_xyz?token={entry.entry_id}"
     )

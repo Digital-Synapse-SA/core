@@ -8,16 +8,16 @@ from renault_api.gigya.exceptions import InvalidCredentialsException
 from renault_api.kamereon import schemas
 from renault_api.renault_account import RenaultAccount
 
-from homeassistant import config_entries
-from homeassistant.components.renault.const import (
+from smarthub import config_entries
+from smarthub.components.renault.const import (
     CONF_KAMEREON_ACCOUNT_ID,
     CONF_LOCALE,
     DOMAIN,
 )
-from homeassistant.const import CONF_NAME, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import aiohttp_client
+from smarthub.const import CONF_NAME, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import aiohttp_client
 
 from tests.common import MockConfigEntry, async_load_fixture, get_schema_suggested_value
 
@@ -36,7 +36,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
     ],
 )
 async def test_config_flow_single_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     exception: Exception | type[Exception],
     error: str,
@@ -112,7 +112,7 @@ async def test_config_flow_single_account(
 
 
 async def test_config_flow_no_account(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -145,7 +145,7 @@ async def test_config_flow_no_account(
 
 
 async def test_config_flow_multiple_accounts(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test what happens if multiple Kamereon accounts are available."""
     result = await hass.config_entries.flow.async_init(
@@ -202,7 +202,7 @@ async def test_config_flow_multiple_accounts(
 
 @pytest.mark.usefixtures("config_entry")
 async def test_config_flow_duplicate(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test abort if unique_id configured."""
     assert len(hass.config_entries.async_entries(DOMAIN)) == 1
@@ -241,7 +241,7 @@ async def test_config_flow_duplicate(
     assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_reauth(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_reauth(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test the start of the config flow."""
     assert len(hass.config_entries.async_entries(DOMAIN)) == 1
 
@@ -286,7 +286,7 @@ async def test_reauth(hass: HomeAssistant, config_entry: MockConfigEntry) -> Non
 
 
 async def test_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -341,7 +341,7 @@ async def test_reconfigure(
 
 
 async def test_reconfigure_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:

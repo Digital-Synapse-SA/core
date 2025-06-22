@@ -2,11 +2,11 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.dunehd.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.dunehd.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -16,7 +16,7 @@ CONFIG_IP = {CONF_HOST: "10.10.10.12"}
 DUNEHD_STATE = {"protocol_version": "4", "player_state": "navigator"}
 
 
-async def test_user_invalid_host(hass: HomeAssistant) -> None:
+async def test_user_invalid_host(hass: SmartHub) -> None:
     """Test that errors are shown when the host is invalid."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data={CONF_HOST: "invalid/host"}
@@ -25,7 +25,7 @@ async def test_user_invalid_host(hass: HomeAssistant) -> None:
     assert result["errors"] == {CONF_HOST: "invalid_host"}
 
 
-async def test_user_very_long_host(hass: HomeAssistant) -> None:
+async def test_user_very_long_host(hass: SmartHub) -> None:
     """Test that errors are shown when the host is longer than 253 chars."""
     long_host = (
         "very_long_host_very_long_host_very_long_host_very_long_host_very_long_"
@@ -40,7 +40,7 @@ async def test_user_very_long_host(hass: HomeAssistant) -> None:
     assert result["errors"] == {CONF_HOST: "invalid_host"}
 
 
-async def test_user_cannot_connect(hass: HomeAssistant) -> None:
+async def test_user_cannot_connect(hass: SmartHub) -> None:
     """Test that errors are shown when cannot connect to the host."""
     with patch("pdunehd.DuneHDPlayer.update_state", return_value={}):
         result = await hass.config_entries.flow.async_init(
@@ -50,7 +50,7 @@ async def test_user_cannot_connect(hass: HomeAssistant) -> None:
         assert result["errors"] == {CONF_HOST: "cannot_connect"}
 
 
-async def test_duplicate_error(hass: HomeAssistant) -> None:
+async def test_duplicate_error(hass: SmartHub) -> None:
     """Test that errors are shown when duplicates are added."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -67,10 +67,10 @@ async def test_duplicate_error(hass: HomeAssistant) -> None:
         assert result["errors"] == {CONF_HOST: "already_configured"}
 
 
-async def test_create_entry(hass: HomeAssistant) -> None:
+async def test_create_entry(hass: SmartHub) -> None:
     """Test that the user step works."""
     with (
-        patch("homeassistant.components.dunehd.async_setup_entry"),
+        patch("smarthub.components.dunehd.async_setup_entry"),
         patch("pdunehd.DuneHDPlayer.update_state", return_value=DUNEHD_STATE),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -82,10 +82,10 @@ async def test_create_entry(hass: HomeAssistant) -> None:
         assert result["data"] == {CONF_HOST: "dunehd-host"}
 
 
-async def test_create_entry_with_ipv6_address(hass: HomeAssistant) -> None:
+async def test_create_entry_with_ipv6_address(hass: SmartHub) -> None:
     """Test that the user step works with device IPv6 address.."""
     with (
-        patch("homeassistant.components.dunehd.async_setup_entry"),
+        patch("smarthub.components.dunehd.async_setup_entry"),
         patch("pdunehd.DuneHDPlayer.update_state", return_value=DUNEHD_STATE),
     ):
         result = await hass.config_entries.flow.async_init(

@@ -7,18 +7,18 @@ from typing import Any
 
 from freezegun import freeze_time
 
-from homeassistant.components.derivative.const import DOMAIN
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
-from homeassistant.const import UnitOfPower, UnitOfTime
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.derivative.const import DOMAIN
+from smarthub.components.sensor import ATTR_STATE_CLASS, SensorStateClass
+from smarthub.const import UnitOfPower, UnitOfTime
+from smarthub.core import SmartHub, State
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 
 
-async def test_state(hass: HomeAssistant) -> None:
+async def test_state(hass: SmartHub) -> None:
     """Test derivative sensor state."""
     config = {
         "sensor": {
@@ -51,7 +51,7 @@ async def test_state(hass: HomeAssistant) -> None:
     assert state.attributes.get("unit_of_measurement") == "kW"
 
 
-async def test_no_change(hass: HomeAssistant) -> None:
+async def test_no_change(hass: SmartHub) -> None:
     """Test derivative sensor state updated when source sensor doesn't change."""
     config = {
         "sensor": {
@@ -95,7 +95,7 @@ async def test_no_change(hass: HomeAssistant) -> None:
 
 
 async def _setup_sensor(
-    hass: HomeAssistant, config: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any]
 ) -> tuple[dict[str, Any], str]:
     default_config = {
         "platform": "derivative",
@@ -115,7 +115,7 @@ async def _setup_sensor(
 
 
 async def setup_tests(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     times: list[int],
     values: list[float],
@@ -140,7 +140,7 @@ async def setup_tests(
     return state
 
 
-async def test_dataSet1(hass: HomeAssistant) -> None:
+async def test_dataSet1(hass: SmartHub) -> None:
     """Test derivative sensor state."""
     await setup_tests(
         hass,
@@ -151,7 +151,7 @@ async def test_dataSet1(hass: HomeAssistant) -> None:
     )
 
 
-async def test_dataSet2(hass: HomeAssistant) -> None:
+async def test_dataSet2(hass: SmartHub) -> None:
     """Test derivative sensor state."""
     await setup_tests(
         hass,
@@ -162,7 +162,7 @@ async def test_dataSet2(hass: HomeAssistant) -> None:
     )
 
 
-async def test_dataSet3(hass: HomeAssistant) -> None:
+async def test_dataSet3(hass: SmartHub) -> None:
     """Test derivative sensor state."""
     state = await setup_tests(
         hass,
@@ -175,7 +175,7 @@ async def test_dataSet3(hass: HomeAssistant) -> None:
     assert state.attributes.get("unit_of_measurement") == f"/{UnitOfTime.SECONDS}"
 
 
-async def test_dataSet4(hass: HomeAssistant) -> None:
+async def test_dataSet4(hass: SmartHub) -> None:
     """Test derivative sensor state."""
     await setup_tests(
         hass,
@@ -186,7 +186,7 @@ async def test_dataSet4(hass: HomeAssistant) -> None:
     )
 
 
-async def test_dataSet5(hass: HomeAssistant) -> None:
+async def test_dataSet5(hass: SmartHub) -> None:
     """Test derivative sensor state."""
     await setup_tests(
         hass,
@@ -197,12 +197,12 @@ async def test_dataSet5(hass: HomeAssistant) -> None:
     )
 
 
-async def test_dataSet6(hass: HomeAssistant) -> None:
+async def test_dataSet6(hass: SmartHub) -> None:
     """Test derivative sensor state."""
     await setup_tests(hass, {}, times=[0, 60], values=[0, 1 / 60], expected_state=1)
 
 
-async def test_data_moving_average_with_zeroes(hass: HomeAssistant) -> None:
+async def test_data_moving_average_with_zeroes(hass: SmartHub) -> None:
     """Test that zeroes are properly handled within the time window."""
     # We simulate the following situation:
     # The temperature rises 1 °C per minute for 10 minutes long. Then, it
@@ -249,7 +249,7 @@ async def test_data_moving_average_with_zeroes(hass: HomeAssistant) -> None:
             last_derivative = derivative
 
 
-async def test_data_moving_average_for_discrete_sensor(hass: HomeAssistant) -> None:
+async def test_data_moving_average_for_discrete_sensor(hass: SmartHub) -> None:
     """Test derivative sensor state."""
     # We simulate the following situation:
     # The temperature rises 1 °C per minute for 30 minutes long.
@@ -289,7 +289,7 @@ async def test_data_moving_average_for_discrete_sensor(hass: HomeAssistant) -> N
                 assert abs(1 - derivative) <= 0.1 + 1e-6
 
 
-async def test_data_moving_average_for_irregular_times(hass: HomeAssistant) -> None:
+async def test_data_moving_average_for_irregular_times(hass: SmartHub) -> None:
     """Test derivative sensor state."""
     # We simulate the following situation:
     # The temperature rises 1 °C per minute for 30 minutes long.
@@ -333,7 +333,7 @@ async def test_data_moving_average_for_irregular_times(hass: HomeAssistant) -> N
                 assert abs(0.1 - derivative) <= 0.01 + 1e-6
 
 
-async def test_double_signal_after_delay(hass: HomeAssistant) -> None:
+async def test_double_signal_after_delay(hass: SmartHub) -> None:
     """Test derivative sensor state."""
     # The old algorithm would produce extreme values if, after a delay longer than the time window
     # there would be two signals, a large spike would be produced. Check explicitly for this situation
@@ -371,7 +371,7 @@ async def test_double_signal_after_delay(hass: HomeAssistant) -> None:
             previous = derivative
 
 
-async def test_prefix(hass: HomeAssistant) -> None:
+async def test_prefix(hass: SmartHub) -> None:
     """Test derivative sensor state using a power source."""
     config = {
         "sensor": {
@@ -411,7 +411,7 @@ async def test_prefix(hass: HomeAssistant) -> None:
     assert state.attributes.get("unit_of_measurement") == f"kW/{UnitOfTime.HOURS}"
 
 
-async def test_suffix(hass: HomeAssistant) -> None:
+async def test_suffix(hass: SmartHub) -> None:
     """Test derivative sensor state using a network counter source."""
     config = {
         "sensor": {
@@ -443,7 +443,7 @@ async def test_suffix(hass: HomeAssistant) -> None:
     assert round(float(state.state), config["sensor"]["round"]) == 0.0
 
 
-async def test_total_increasing_reset(hass: HomeAssistant) -> None:
+async def test_total_increasing_reset(hass: SmartHub) -> None:
     """Test derivative sensor state with total_increasing sensor input where it should ignore the reset value."""
     times = [0, 20, 30, 35, 40, 50, 60]
     values = [0, 10, 30, 40, 0, 10, 40]
@@ -478,7 +478,7 @@ async def test_total_increasing_reset(hass: HomeAssistant) -> None:
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:

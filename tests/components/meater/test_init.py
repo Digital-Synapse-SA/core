@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.meater.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.meater.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 from .const import PROBE_ID
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_meater_client: AsyncMock,
     mock_config_entry: MockConfigEntry,

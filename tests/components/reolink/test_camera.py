@@ -5,15 +5,15 @@ from unittest.mock import MagicMock, patch
 import pytest
 from reolink_aio.exceptions import ReolinkError
 
-from homeassistant.components.camera import (
+from smarthub.components.camera import (
     CameraState,
     async_get_image,
     async_get_stream_source,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import TEST_DUO_MODEL, TEST_NVR_NAME
 
@@ -22,13 +22,13 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
 ) -> None:
     """Test camera entity with fluent."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.CAMERA]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.CAMERA]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -41,7 +41,7 @@ async def test_camera(
     assert (await async_get_image(hass, entity_id)).content == b"image"
 
     reolink_host.get_snapshot.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await async_get_image(hass, entity_id)
 
     # check getting the stream source
@@ -50,7 +50,7 @@ async def test_camera(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_camera_no_stream_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
 ) -> None:
@@ -58,7 +58,7 @@ async def test_camera_no_stream_source(
     reolink_host.model = TEST_DUO_MODEL
     reolink_host.get_stream_source.return_value = None
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.CAMERA]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.CAMERA]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED

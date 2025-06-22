@@ -8,18 +8,18 @@ from hdate.holidays import HolidayDatabase
 from hdate.parasha import Parasha
 import pytest
 
-from homeassistant.components.jewish_calendar.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.jewish_calendar.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 @pytest.mark.parametrize("language", ["en", "he"])
-async def test_min_config(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_min_config(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test minimum jewish calendar configuration."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -159,7 +159,7 @@ TEST_PARAMS = [
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "setup_at_time")
 async def test_jewish_calendar_sensor(
-    hass: HomeAssistant, results: dict[str, Any], sensor: str
+    hass: SmartHub, results: dict[str, Any], sensor: str
 ) -> None:
     """Test Jewish calendar sensor output."""
     result = results["state"]
@@ -491,7 +491,7 @@ SHABBAT_PARAMS = [
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "setup_at_time")
 async def test_shabbat_times_sensor(
-    hass: HomeAssistant, results: dict[str, Any], language: str
+    hass: SmartHub, results: dict[str, Any], language: str
 ) -> None:
     """Test sensor output for upcoming shabbat/yomtov times."""
     for sensor_type, result_value in results.items():
@@ -521,7 +521,7 @@ async def test_shabbat_times_sensor(
     indirect=True,
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "setup_at_time")
-async def test_omer_sensor(hass: HomeAssistant, results: str) -> None:
+async def test_omer_sensor(hass: SmartHub, results: str) -> None:
     """Test Omer Count sensor output."""
     assert hass.states.get("sensor.jewish_calendar_day_of_the_omer").state == results
 
@@ -538,7 +538,7 @@ async def test_omer_sensor(hass: HomeAssistant, results: str) -> None:
     indirect=True,
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "setup_at_time")
-async def test_dafyomi_sensor(hass: HomeAssistant, results: str) -> None:
+async def test_dafyomi_sensor(hass: SmartHub, results: str) -> None:
     """Test Daf Yomi sensor output."""
     assert hass.states.get("sensor.jewish_calendar_daf_yomi").state == results
 
@@ -559,7 +559,7 @@ async def test_dafyomi_sensor(hass: HomeAssistant, results: str) -> None:
 )
 @pytest.mark.usefixtures("setup_at_time")
 async def test_sensor_does_not_update_on_time_change(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, results: dict[str, Any]
+    hass: SmartHub, freezer: FrozenDateTimeFactory, results: dict[str, Any]
 ) -> None:
     """Test that the Jewish calendar sensor does not update after time advances (regression test for update bug)."""
     sensor_id = "sensor.jewish_calendar_date"
@@ -572,7 +572,7 @@ async def test_sensor_does_not_update_on_time_change(
 
 
 async def test_no_discovery_info(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup without discovery info."""
     assert SENSOR_DOMAIN not in hass.config.components

@@ -5,10 +5,10 @@ from datetime import timedelta
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.tessie.coordinator import TESSIE_SYNC_INTERVAL
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.tessie.coordinator import TESSIE_SYNC_INTERVAL
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_platform
 
@@ -18,7 +18,7 @@ WAIT = timedelta(seconds=TESSIE_SYNC_INTERVAL)
 
 
 async def test_media_player(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,

@@ -60,9 +60,9 @@ from aioairzone.const import (
     DEFAULT_SYSTEM_ID,
 )
 
-from homeassistant.components.airzone.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_ID, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.airzone.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_ID, CONF_PORT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -370,9 +370,9 @@ HVAC_WEBSERVER_MOCK = {
 
 
 async def async_init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> MockConfigEntry:
-    """Set up the Airzone integration in Home Assistant."""
+    """Set up the Airzone integration in SmartHub."""
 
     config_entry = MockConfigEntry(
         minor_version=2,
@@ -385,23 +385,23 @@ async def async_init_integration(
 
     with (
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_dhw",
+            "smarthub.components.airzone.AirzoneLocalApi.get_dhw",
             return_value=HVAC_DHW_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_hvac",
+            "smarthub.components.airzone.AirzoneLocalApi.get_hvac",
             return_value=HVAC_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_hvac_systems",
+            "smarthub.components.airzone.AirzoneLocalApi.get_hvac_systems",
             return_value=HVAC_SYSTEMS_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_version",
+            "smarthub.components.airzone.AirzoneLocalApi.get_version",
             return_value=HVAC_VERSION_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_webserver",
+            "smarthub.components.airzone.AirzoneLocalApi.get_webserver",
             return_value=HVAC_WEBSERVER_MOCK,
         ),
     ):

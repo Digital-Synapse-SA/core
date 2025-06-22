@@ -1,19 +1,19 @@
 """Tests for the Mazda Connected Services integration."""
 
-from homeassistant.components.mazda import DOMAIN
-from homeassistant.config_entries import (
+from smarthub.components.mazda import DOMAIN
+from smarthub.config_entries import (
     SOURCE_IGNORE,
     ConfigEntryDisabler,
     ConfigEntryState,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
 
 from tests.common import MockConfigEntry
 
 
 async def test_mazda_repair_issue(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test the Mazda configuration entry loading/unloading handles the repair."""
     config_entry_1 = MockConfigEntry(

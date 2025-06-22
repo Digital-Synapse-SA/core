@@ -7,17 +7,17 @@ from unittest.mock import patch
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant import config_entries
-from homeassistant.components.version.const import (
+from smarthub import config_entries
+from smarthub.components.version.const import (
     DEFAULT_CONFIGURATION,
     DEFAULT_NAME_CURRENT,
     DOMAIN,
     UPDATE_COORDINATOR_UPDATE_INTERVAL,
     VERSION_SOURCE_LOCAL,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_NAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -39,7 +39,7 @@ TEST_DEFAULT_IMPORT_CONFIG: Final = {
 
 
 async def mock_get_version_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     version: str = MOCK_VERSION,
     side_effect: Exception | None = None,
@@ -56,7 +56,7 @@ async def mock_get_version_update(
 
 
 async def setup_version_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_data: dict[str, Any] | None = None,
 ) -> MockConfigEntry:
     """Set up the Version integration."""

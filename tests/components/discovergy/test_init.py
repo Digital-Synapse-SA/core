@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock
 from pydiscovergy.error import DiscovergyClientError, HTTPError, InvalidLogin
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("discovergy")
 async def test_config_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test for setup success."""
@@ -32,7 +32,7 @@ async def test_config_setup(
     ],
 )
 async def test_config_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     discovergy: AsyncMock,
     error: Exception,
@@ -49,7 +49,7 @@ async def test_config_not_ready(
 
 @pytest.mark.usefixtures("setup_integration")
 async def test_reload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test config entry reload."""

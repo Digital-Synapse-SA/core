@@ -2,19 +2,19 @@
 
 from pytest_unordered import unordered
 
-from homeassistant.components.sensor.const import (
+from smarthub.components.sensor.const import (
     DOMAIN,
     NON_NUMERIC_DEVICE_CLASSES,
     SensorDeviceClass,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import WebSocketGenerator
 
 
 async def test_device_class_units(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can get supported units."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -82,7 +82,7 @@ async def test_device_class_units(
 
 
 async def test_numeric_device_classes(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can get numeric device classes."""
     numeric_device_classes = set(SensorDeviceClass) - NON_NUMERIC_DEVICE_CLASSES

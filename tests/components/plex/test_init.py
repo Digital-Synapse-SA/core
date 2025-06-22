@@ -10,22 +10,22 @@ import plexapi
 import requests
 import requests_mock
 
-from homeassistant.components.plex import const
-from homeassistant.components.plex.models import (
+from smarthub.components.plex import const
+from smarthub.components.plex.models import (
     LIVE_TV_SECTION,
     TRANSIENT_SECTION,
     UNKNOWN_SECTION,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     CONF_TOKEN,
     CONF_URL,
     CONF_VERIFY_SSL,
     STATE_IDLE,
     STATE_PLAYING,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .const import DEFAULT_DATA, DEFAULT_OPTIONS, PLEX_DIRECT_URL
 from .helpers import trigger_plex_update, wait_for_debouncer
@@ -34,7 +34,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_set_config_entry_unique_id(
-    hass: HomeAssistant, entry, mock_plex_server
+    hass: SmartHub, entry, mock_plex_server
 ) -> None:
     """Test updating missing unique_id from config entry."""
     assert len(hass.config_entries.async_entries(const.DOMAIN)) == 1
@@ -46,10 +46,10 @@ async def test_set_config_entry_unique_id(
     )
 
 
-async def test_setup_config_entry_with_error(hass: HomeAssistant, entry) -> None:
+async def test_setup_config_entry_with_error(hass: SmartHub, entry) -> None:
     """Test setup component from config entry with errors."""
     with patch(
-        "homeassistant.components.plex.PlexServer.connect",
+        "smarthub.components.plex.PlexServer.connect",
         side_effect=requests.exceptions.ConnectionError,
     ):
         entry.add_to_hass(hass)
@@ -60,7 +60,7 @@ async def test_setup_config_entry_with_error(hass: HomeAssistant, entry) -> None
     assert entry.state is ConfigEntryState.SETUP_RETRY
 
     with patch(
-        "homeassistant.components.plex.PlexServer.connect",
+        "smarthub.components.plex.PlexServer.connect",
         side_effect=plexapi.exceptions.BadRequest,
     ):
         next_update = dt_util.utcnow() + timedelta(seconds=30)
@@ -72,7 +72,7 @@ async def test_setup_config_entry_with_error(hass: HomeAssistant, entry) -> None
 
 
 async def test_setup_with_insecure_config_entry(
-    hass: HomeAssistant, entry, setup_plex_server
+    hass: SmartHub, entry, setup_plex_server
 ) -> None:
     """Test setup component with config."""
     INSECURE_DATA = copy.deepcopy(DEFAULT_DATA)
@@ -87,7 +87,7 @@ async def test_setup_with_insecure_config_entry(
 
 
 async def test_unload_config_entry(
-    hass: HomeAssistant, entry, mock_plex_server
+    hass: SmartHub, entry, mock_plex_server
 ) -> None:
     """Test unloading a config entry."""
     config_entries = hass.config_entries.async_entries(const.DOMAIN)
@@ -106,7 +106,7 @@ async def test_unload_config_entry(
 
 
 async def test_setup_with_photo_session(
-    hass: HomeAssistant, entry, setup_plex_server
+    hass: SmartHub, entry, setup_plex_server
 ) -> None:
     """Test setup component with config."""
     await setup_plex_server(session_type="photo")
@@ -127,7 +127,7 @@ async def test_setup_with_photo_session(
 
 
 async def test_setup_with_live_tv_session(
-    hass: HomeAssistant, entry, setup_plex_server
+    hass: SmartHub, entry, setup_plex_server
 ) -> None:
     """Test setup component with a Live TV session."""
     await setup_plex_server(session_type="live_tv")
@@ -149,7 +149,7 @@ async def test_setup_with_live_tv_session(
 
 
 async def test_setup_with_transient_session(
-    hass: HomeAssistant, entry, setup_plex_server
+    hass: SmartHub, entry, setup_plex_server
 ) -> None:
     """Test setup component with a transient session."""
     await setup_plex_server(session_type="transient")
@@ -171,7 +171,7 @@ async def test_setup_with_transient_session(
 
 
 async def test_setup_with_unknown_session(
-    hass: HomeAssistant, entry, setup_plex_server
+    hass: SmartHub, entry, setup_plex_server
 ) -> None:
     """Test setup component with an unknown session."""
     await setup_plex_server(session_type="unknown")
@@ -193,7 +193,7 @@ async def test_setup_with_unknown_session(
 
 
 async def test_setup_when_certificate_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock: requests_mock.Mocker,
     empty_library,
     empty_payload,
@@ -270,7 +270,7 @@ async def test_setup_when_certificate_changed(
     assert old_entry.data[const.PLEX_SERVER_CONFIG][CONF_URL] == new_url
 
 
-async def test_tokenless_server(hass: HomeAssistant, entry, setup_plex_server) -> None:
+async def test_tokenless_server(hass: SmartHub, entry, setup_plex_server) -> None:
     """Test setup with a server with token auth disabled."""
     TOKENLESS_DATA = copy.deepcopy(DEFAULT_DATA)
     TOKENLESS_DATA[const.PLEX_SERVER_CONFIG].pop(CONF_TOKEN, None)
@@ -282,7 +282,7 @@ async def test_tokenless_server(hass: HomeAssistant, entry, setup_plex_server) -
 
 
 async def test_bad_token_with_tokenless_server(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry,
     mock_websocket,
     setup_plex_server,
@@ -302,10 +302,10 @@ async def test_bad_token_with_tokenless_server(
     await hass.async_block_till_done()
 
 
-async def test_scan_clients_schedule(hass: HomeAssistant, setup_plex_server) -> None:
+async def test_scan_clients_schedule(hass: SmartHub, setup_plex_server) -> None:
     """Test scan_clients scheduled update."""
     with patch(
-        "homeassistant.components.plex.server.PlexServer._async_update_platforms"
+        "smarthub.components.plex.server.PlexServer._async_update_platforms"
     ) as mock_scan_clients:
         await setup_plex_server()
         mock_scan_clients.reset_mock()
@@ -320,7 +320,7 @@ async def test_scan_clients_schedule(hass: HomeAssistant, setup_plex_server) -> 
 
 
 async def test_setup_with_limited_credentials(
-    hass: HomeAssistant, entry, setup_plex_server
+    hass: SmartHub, entry, setup_plex_server
 ) -> None:
     """Test setup with a user with limited permissions."""
     with patch(
@@ -342,7 +342,7 @@ async def test_setup_with_limited_credentials(
 
 
 async def test_trigger_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
     mock_plex_server,
     mock_websocket,
@@ -371,7 +371,7 @@ async def test_trigger_reauth(
 
 
 async def test_setup_with_deauthorized_token(
-    hass: HomeAssistant, entry, setup_plex_server
+    hass: SmartHub, entry, setup_plex_server
 ) -> None:
     """Test setup with a deauthorized token."""
     with patch(

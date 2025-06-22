@@ -6,7 +6,7 @@ from collections.abc import AsyncIterable, Callable, Coroutine
 from pathlib import Path
 from typing import Any
 
-from homeassistant.components.stt import (
+from smarthub.components.stt import (
     AudioBitRates,
     AudioChannels,
     AudioCodecs,
@@ -18,10 +18,10 @@ from homeassistant.components.stt import (
     SpeechResultState,
     SpeechToTextEntity,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_platform import AddEntitiesCallback
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
 
 from tests.common import MockPlatform, mock_platform
 
@@ -106,12 +106,12 @@ class MockSTTPlatform(MockPlatform):
     def __init__(
         self,
         async_get_engine: Callable[
-            [HomeAssistant, ConfigType, DiscoveryInfoType | None],
+            [SmartHub, ConfigType, DiscoveryInfoType | None],
             Coroutine[Any, Any, Provider | None],
         ]
         | None = None,
         get_engine: Callable[
-            [HomeAssistant, ConfigType, DiscoveryInfoType | None], Provider | None
+            [SmartHub, ConfigType, DiscoveryInfoType | None], Provider | None
         ]
         | None = None,
     ) -> None:
@@ -124,16 +124,16 @@ class MockSTTPlatform(MockPlatform):
 
 
 def mock_stt_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     integration: str = "stt",
     async_get_engine: Callable[
-        [HomeAssistant, ConfigType, DiscoveryInfoType | None],
+        [SmartHub, ConfigType, DiscoveryInfoType | None],
         Coroutine[Any, Any, Provider | None],
     ]
     | None = None,
     get_engine: Callable[
-        [HomeAssistant, ConfigType, DiscoveryInfoType | None], Provider | None
+        [SmartHub, ConfigType, DiscoveryInfoType | None], Provider | None
     ]
     | None = None,
 ):
@@ -145,11 +145,11 @@ def mock_stt_platform(
 
 
 def mock_stt_entity_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     integration: str,
     async_setup_entry: Callable[
-        [HomeAssistant, ConfigEntry, AddEntitiesCallback],
+        [SmartHub, ConfigEntry, AddEntitiesCallback],
         Coroutine[Any, Any, None],
     ]
     | None = None,

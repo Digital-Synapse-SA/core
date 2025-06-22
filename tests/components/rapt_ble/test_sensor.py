@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from homeassistant.components.rapt_ble.const import DOMAIN
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
-from homeassistant.const import (
+from smarthub.components.rapt_ble.const import DOMAIN
+from smarthub.components.sensor import ATTR_STATE_CLASS, SensorStateClass
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import COMPLETE_SERVICE_INFO, RAPT_MAC
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 from tests.components.bluetooth import inject_bluetooth_service_info
 
 
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test setting up creates the sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,

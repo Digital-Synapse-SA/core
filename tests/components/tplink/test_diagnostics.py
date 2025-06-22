@@ -5,8 +5,8 @@ import json
 from kasa import Device
 import pytest
 
-from homeassistant.components.tplink.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.tplink.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import _mocked_device, initialize_config_entry_for_device
 
@@ -33,7 +33,7 @@ from tests.typing import ClientSessionGenerator
     ],
 )
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mocked_dev: Device,
     fixture_file: str,

@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, patch
 import pytest
 import requests_mock
 
-from homeassistant.components.plex.const import DOMAIN, PLEX_SERVER_CONFIG, SERVERS
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
+from smarthub.components.plex.const import DOMAIN, PLEX_SERVER_CONFIG, SERVERS
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
 
 from .const import DEFAULT_DATA, DEFAULT_OPTIONS, PLEX_DIRECT_URL
 from .helpers import websocket_connected
@@ -26,7 +26,7 @@ def plex_server_url(entry):
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.plex.async_setup_entry", return_value=True
+        "smarthub.components.plex.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -431,7 +431,7 @@ async def mock_config_entry():
 @pytest.fixture
 def mock_websocket():
     """Mock the PlexWebsocket class."""
-    with patch("homeassistant.components.plex.PlexWebsocket", autospec=True) as ws:
+    with patch("smarthub.components.plex.PlexWebsocket", autospec=True) as ws:
         yield ws
 
 
@@ -547,7 +547,7 @@ def mock_plex_calls(
 
 @pytest.fixture
 def setup_plex_server(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry,
     livetv_sessions,
     mock_websocket,
@@ -592,7 +592,7 @@ def setup_plex_server(
             requests_mock.get(f"{url}/clients", text=empty_payload)
 
         with patch(
-            "homeassistant.components.plex.GDM",
+            "smarthub.components.plex.GDM",
             return_value=MockGDM(disabled=disable_gdm),
         ):
             config_entry.add_to_hass(hass)

@@ -6,15 +6,15 @@ from inflection import underscore
 from mozart_api.models import ButtonEvent
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.bang_olufsen.const import (
+from smarthub.components.bang_olufsen.const import (
     DEVICE_BUTTON_EVENTS,
     DEVICE_BUTTONS,
     EVENT_TRANSLATION_MAP,
 )
-from homeassistant.components.event import ATTR_EVENT_TYPE, ATTR_EVENT_TYPES
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.components.event import ATTR_EVENT_TYPE, ATTR_EVENT_TYPES
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from .const import TEST_BUTTON_EVENT_ENTITY_ID
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_button_event_creation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     entity_registry: EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -50,7 +50,7 @@ async def test_button_event_creation(
 
 
 async def test_button_event_creation_beoconnect_core(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_core: MockConfigEntry,
     mock_mozart_client: AsyncMock,
     entity_registry: EntityRegistry,
@@ -71,7 +71,7 @@ async def test_button_event_creation_beoconnect_core(
 
 
 async def test_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_config_entry: MockConfigEntry,
     mock_mozart_client: AsyncMock,

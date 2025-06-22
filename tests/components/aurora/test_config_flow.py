@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock
 from aiohttp import ClientError
 import pytest
 
-from homeassistant.components.aurora.const import CONF_THRESHOLD, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.aurora.const import CONF_THRESHOLD, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 
@@ -22,7 +22,7 @@ DATA = {
 
 
 async def test_full_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_aurora_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_aurora_client: AsyncMock
 ) -> None:
     """Test full flow."""
 
@@ -49,7 +49,7 @@ async def test_full_flow(
     ],
 )
 async def test_form_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_aurora_client: AsyncMock,
     side_effect: Exception,
@@ -78,7 +78,7 @@ async def test_form_errors(
 
 
 async def test_option_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_aurora_client: AsyncMock,
     mock_config_entry: MockConfigEntry,

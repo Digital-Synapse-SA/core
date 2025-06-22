@@ -12,7 +12,7 @@ from bleak.backends.scanner import AdvertisementData, BLEDevice
 from bluetooth_adapters import DEFAULT_ADDRESS
 from habluetooth import BaseHaScanner, get_manager
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     DOMAIN,
     MONOTONIC_TIME,
     SOURCE_LOCAL,
@@ -21,9 +21,9 @@ from homeassistant.components.bluetooth import (
     BluetoothServiceInfoBleak,
     async_get_advertisement_callback,
 )
-from homeassistant.components.bluetooth.manager import HomeAssistantBluetoothManager
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.bluetooth.manager import SmartHubBluetoothManager
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -68,7 +68,7 @@ def patch_bluetooth_time(mock_time: float) -> None:
     """Patch the bluetooth time."""
     with (
         patch(
-            "homeassistant.components.bluetooth.MONOTONIC_TIME", return_value=mock_time
+            "smarthub.components.bluetooth.MONOTONIC_TIME", return_value=mock_time
         ),
         patch("habluetooth.base_scanner.monotonic_time_coarse", return_value=mock_time),
         patch("habluetooth.manager.monotonic_time_coarse", return_value=mock_time),
@@ -107,21 +107,21 @@ def generate_ble_device(
     return BLEDevice(**new)
 
 
-def _get_manager() -> HomeAssistantBluetoothManager:
+def _get_manager() -> SmartHubBluetoothManager:
     """Return the bluetooth manager."""
-    manager: HomeAssistantBluetoothManager = get_manager()
+    manager: SmartHubBluetoothManager = get_manager()
     return manager
 
 
 def inject_advertisement(
-    hass: HomeAssistant, device: BLEDevice, adv: AdvertisementData
+    hass: SmartHub, device: BLEDevice, adv: AdvertisementData
 ) -> None:
     """Inject an advertisement into the manager."""
     return inject_advertisement_with_source(hass, device, adv, SOURCE_LOCAL)
 
 
 def inject_advertisement_with_source(
-    hass: HomeAssistant, device: BLEDevice, adv: AdvertisementData, source: str
+    hass: SmartHub, device: BLEDevice, adv: AdvertisementData, source: str
 ) -> None:
     """Inject an advertisement into the manager from a specific source."""
     inject_advertisement_with_time_and_source(
@@ -130,7 +130,7 @@ def inject_advertisement_with_source(
 
 
 def inject_advertisement_with_time_and_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: BLEDevice,
     adv: AdvertisementData,
     time: float,
@@ -143,7 +143,7 @@ def inject_advertisement_with_time_and_source(
 
 
 def inject_advertisement_with_time_and_source_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: BLEDevice,
     adv: AdvertisementData,
     time: float,
@@ -170,7 +170,7 @@ def inject_advertisement_with_time_and_source_connectable(
 
 
 def inject_bluetooth_service_info_bleak(
-    hass: HomeAssistant, info: BluetoothServiceInfoBleak
+    hass: SmartHub, info: BluetoothServiceInfoBleak
 ) -> None:
     """Inject an advertisement into the manager with connectable status."""
     advertisement_data = generate_advertisement_data(
@@ -196,7 +196,7 @@ def inject_bluetooth_service_info_bleak(
 
 
 def inject_bluetooth_service_info(
-    hass: HomeAssistant, info: BluetoothServiceInfo
+    hass: SmartHub, info: BluetoothServiceInfo
 ) -> None:
     """Inject a BluetoothServiceInfo into the manager."""
     advertisement_data = generate_advertisement_data(  # type: ignore[no-untyped-call]
@@ -256,18 +256,18 @@ def patch_discovered_devices(mock_discovered: list[BLEDevice]) -> None:
     manager._connectable_history = original_connectable_history
 
 
-async def async_setup_with_default_adapter(hass: HomeAssistant) -> MockConfigEntry:
+async def async_setup_with_default_adapter(hass: SmartHub) -> MockConfigEntry:
     """Set up the Bluetooth integration with a default adapter."""
     return await _async_setup_with_adapter(hass, DEFAULT_ADDRESS)
 
 
-async def async_setup_with_one_adapter(hass: HomeAssistant) -> MockConfigEntry:
+async def async_setup_with_one_adapter(hass: SmartHub) -> MockConfigEntry:
     """Set up the Bluetooth integration with one adapter."""
     return await _async_setup_with_adapter(hass, "00:00:00:00:00:01")
 
 
 async def _async_setup_with_adapter(
-    hass: HomeAssistant, address: str
+    hass: SmartHub, address: str
 ) -> MockConfigEntry:
     """Set up the Bluetooth integration with any adapter."""
     entry = MockConfigEntry(domain="bluetooth", unique_id=address)

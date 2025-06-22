@@ -4,11 +4,11 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from homeassistant.components.image_processing import DOMAIN as IP_DOMAIN
-from homeassistant.components.microsoft_face import DOMAIN as MF_DOMAIN, FACE_API_URL
-from homeassistant.const import ATTR_ENTITY_PICTURE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.setup import async_setup_component
+from smarthub.components.image_processing import DOMAIN as IP_DOMAIN
+from smarthub.components.microsoft_face import DOMAIN as MF_DOMAIN, FACE_API_URL
+from smarthub.const import ATTR_ENTITY_PICTURE, STATE_UNKNOWN
+from smarthub.core import SmartHub, callback
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component, async_load_fixture
 from tests.components.image_processing import common
@@ -16,16 +16,16 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant):
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub):
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
 @pytest.fixture
 def store_mock():
     """Mock update store."""
     with patch(
-        "homeassistant.components.microsoft_face.MicrosoftFace.update_store",
+        "smarthub.components.microsoft_face.MicrosoftFace.update_store",
         return_value=None,
     ) as mock_update_store:
         yield mock_update_store
@@ -35,7 +35,7 @@ def store_mock():
 def poll_mock():
     """Disable polling."""
     with patch(
-        "homeassistant.components.microsoft_face_identify.image_processing."
+        "smarthub.components.microsoft_face_identify.image_processing."
         "MicrosoftFaceIdentifyEntity.should_poll",
         new_callable=PropertyMock(return_value=False),
     ):
@@ -55,7 +55,7 @@ CONFIG = {
 ENDPOINT_URL = f"https://westus.{FACE_API_URL}"
 
 
-async def test_setup_platform(hass: HomeAssistant, store_mock) -> None:
+async def test_setup_platform(hass: SmartHub, store_mock) -> None:
     """Set up platform with one entity."""
     config = {
         IP_DOMAIN: {
@@ -74,7 +74,7 @@ async def test_setup_platform(hass: HomeAssistant, store_mock) -> None:
     assert hass.states.get("image_processing.microsoftface_demo_camera")
 
 
-async def test_setup_platform_name(hass: HomeAssistant, store_mock) -> None:
+async def test_setup_platform_name(hass: SmartHub, store_mock) -> None:
     """Set up platform with one entity and set name."""
     config = {
         IP_DOMAIN: {
@@ -94,7 +94,7 @@ async def test_setup_platform_name(hass: HomeAssistant, store_mock) -> None:
 
 
 async def test_ms_identify_process_image(
-    hass: HomeAssistant, poll_mock, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, poll_mock, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set up and scan a picture and test plates from event."""
     aioclient_mock.get(

@@ -5,11 +5,11 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
-from homeassistant.components.risco import CannotConnectError, UnauthorizedError
-from homeassistant.components.risco.coordinator import LAST_EVENT_TIMESTAMP_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.risco import CannotConnectError, UnauthorizedError
+from smarthub.components.risco.coordinator import LAST_EVENT_TIMESTAMP_KEY
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
@@ -110,11 +110,11 @@ CATEGORIES_TO_EVENTS = {
 def _no_zones_and_partitions():
     with (
         patch(
-            "homeassistant.components.risco.RiscoLocal.zones",
+            "smarthub.components.risco.RiscoLocal.zones",
             new_callable=PropertyMock(return_value=[]),
         ),
         patch(
-            "homeassistant.components.risco.RiscoLocal.partitions",
+            "smarthub.components.risco.RiscoLocal.partitions",
             new_callable=PropertyMock(return_value=[]),
         ),
     ):
@@ -123,7 +123,7 @@ def _no_zones_and_partitions():
 
 @pytest.mark.parametrize("exception", [CannotConnectError, UnauthorizedError])
 async def test_error_on_login(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     login_with_error,
     cloud_config_entry,
@@ -136,7 +136,7 @@ async def test_error_on_login(
         assert not entity_registry.async_is_registered(entity_id)
 
 
-def _check_state(hass: HomeAssistant, category: str, entity_id: str) -> None:
+def _check_state(hass: SmartHub, category: str, entity_id: str) -> None:
     event_index = CATEGORIES_TO_EVENTS[category]
     event = TEST_EVENTS[event_index]
     state = hass.states.get(entity_id)
@@ -160,7 +160,7 @@ def _check_state(hass: HomeAssistant, category: str, entity_id: str) -> None:
 
 
 @pytest.fixture
-async def _set_utc_time_zone(hass: HomeAssistant) -> None:
+async def _set_utc_time_zone(hass: SmartHub) -> None:
     await hass.config.async_set_time_zone("UTC")
 
 
@@ -168,7 +168,7 @@ async def _set_utc_time_zone(hass: HomeAssistant) -> None:
 def save_mock():
     """Create a mock for async_save."""
     with patch(
-        "homeassistant.components.risco.coordinator.Store.async_save",
+        "smarthub.components.risco.coordinator.Store.async_save",
     ) as save_mock:
         yield save_mock
 
@@ -176,7 +176,7 @@ def save_mock():
 @pytest.mark.parametrize("events", [TEST_EVENTS])
 @pytest.mark.usefixtures("two_zone_cloud", "_set_utc_time_zone")
 async def test_cloud_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     save_mock,
     setup_risco_cloud,
@@ -191,10 +191,10 @@ async def test_cloud_setup(
 
     with (
         patch(
-            "homeassistant.components.risco.RiscoCloud.get_events", return_value=[]
+            "smarthub.components.risco.RiscoCloud.get_events", return_value=[]
         ) as events_mock,
         patch(
-            "homeassistant.components.risco.coordinator.Store.async_load",
+            "smarthub.components.risco.coordinator.Store.async_load",
             return_value={LAST_EVENT_TIMESTAMP_KEY: TEST_EVENTS[0].time},
         ),
     ):

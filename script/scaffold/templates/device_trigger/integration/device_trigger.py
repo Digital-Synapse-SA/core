@@ -6,9 +6,9 @@ from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.components.device_automation import DEVICE_TRIGGER_BASE_SCHEMA
-from homeassistant.components.homeassistant.triggers import state as state_trigger
-from homeassistant.const import (
+from smarthub.components.device_automation import DEVICE_TRIGGER_BASE_SCHEMA
+from smarthub.components.smarthub.triggers import state as state_trigger
+from smarthub.const import (
     CONF_DEVICE_ID,
     CONF_DOMAIN,
     CONF_ENTITY_ID,
@@ -17,10 +17,10 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant
-from homeassistant.helpers import config_validation as cv, entity_registry as er
-from homeassistant.helpers.trigger import TriggerActionType, TriggerInfo
-from homeassistant.helpers.typing import ConfigType
+from smarthub.core import CALLBACK_TYPE, SmartHub
+from smarthub.helpers import config_validation as cv, entity_registry as er
+from smarthub.helpers.trigger import TriggerActionType, TriggerInfo
+from smarthub.helpers.typing import ConfigType
 
 from . import DOMAIN
 
@@ -36,7 +36,7 @@ TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
 
 
 async def async_get_triggers(
-    hass: HomeAssistant, device_id: str
+    hass: SmartHub, device_id: str
 ) -> list[dict[str, Any]]:
     """List device triggers for NEW_NAME devices."""
     registry = er.async_get(hass)
@@ -69,7 +69,7 @@ async def async_get_triggers(
 
 
 async def async_attach_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: ConfigType,
     action: TriggerActionType,
     trigger_info: TriggerInfo,

@@ -2,14 +2,14 @@
 
 from datetime import timedelta
 
-from homeassistant.components.smarttub.const import SCAN_INTERVAL
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.smarttub.const import SCAN_INTERVAL
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
 
-async def trigger_update(hass: HomeAssistant) -> None:
+async def trigger_update(hass: SmartHub) -> None:
     """Trigger a polling update by moving time forward."""
     new_time = dt_util.utcnow() + timedelta(seconds=SCAN_INTERVAL + 1)
     async_fire_time_changed(hass, new_time)

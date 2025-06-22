@@ -22,32 +22,32 @@ from aiohasupervisor.models import (
 import pytest
 import voluptuous as vol
 
-from homeassistant import components, loader
-from homeassistant.components import repairs
-from homeassistant.config_entries import (
+from smarthub import components, loader
+from smarthub.components import repairs
+from smarthub.config_entries import (
     DISCOVERY_SOURCES,
     ConfigEntriesFlowManager,
     FlowResult,
     OptionsFlowManager,
 )
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import Context, HomeAssistant, ServiceRegistry, ServiceResponse
-from homeassistant.data_entry_flow import (
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import Context, SmartHub, ServiceRegistry, ServiceResponse
+from smarthub.data_entry_flow import (
     FlowContext,
     FlowHandler,
     FlowManager,
     FlowResultType,
     section,
 )
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.translation import async_get_translations
-from homeassistant.util import yaml as yaml_util
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.translation import async_get_translations
+from smarthub.util import yaml as yaml_util
 
 from tests.common import QualityScaleStatus, get_quality_scale
 
 if TYPE_CHECKING:
-    from homeassistant.components.hassio import AddonManager
+    from smarthub.components.hassio import AddonManager
 
     from .conversation import MockAgent
     from .device_tracker.common import MockScanner
@@ -63,7 +63,7 @@ RE_REQUEST_DOMAIN = re.compile(r".*tests\/components\/([^/]+)\/.*")
 def patch_zeroconf_multiple_catcher() -> Generator[None]:
     """If installed, patch zeroconf wrapper that detects if multiple instances are used."""
     with patch(
-        "homeassistant.components.zeroconf.install_multiple_zeroconf_catcher",
+        "smarthub.components.zeroconf.install_multiple_zeroconf_catcher",
         side_effect=lambda zc: None,
     ):
         yield
@@ -73,7 +73,7 @@ def patch_zeroconf_multiple_catcher() -> Generator[None]:
 def prevent_io() -> Generator[None]:
     """Fixture to prevent certain I/O from happening."""
     with patch(
-        "homeassistant.components.http.ban.load_yaml_config_file",
+        "smarthub.components.http.ban.load_yaml_config_file",
     ):
         yield
 
@@ -83,11 +83,11 @@ def entity_registry_enabled_by_default() -> Generator[None]:
     """Test fixture that ensures all entities are enabled in the registry."""
     with (
         patch(
-            "homeassistant.helpers.entity.Entity.entity_registry_enabled_default",
+            "smarthub.helpers.entity.Entity.entity_registry_enabled_default",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.device_tracker.config_entry.ScannerEntity.entity_registry_enabled_default",
+            "smarthub.components.device_tracker.config_entry.ScannerEntity.entity_registry_enabled_default",
             return_value=True,
         ),
     ):
@@ -158,7 +158,7 @@ def tts_mutagen_mock_fixture() -> Generator[MagicMock]:
 
 
 @pytest.fixture(name="mock_conversation_agent")
-def mock_conversation_agent_fixture(hass: HomeAssistant) -> MockAgent:
+def mock_conversation_agent_fixture(hass: SmartHub) -> MockAgent:
     """Mock a conversation agent."""
     from .conversation.common import (  # noqa: PLC0415
         mock_conversation_agent_fixture_helper,
@@ -171,7 +171,7 @@ def mock_conversation_agent_fixture(hass: HomeAssistant) -> MockAgent:
 def prevent_ffmpeg_subprocess() -> Generator[None]:
     """If installed, prevent ffmpeg from creating a subprocess."""
     with patch(
-        "homeassistant.components.ffmpeg.FFVersion.get_version", return_value="6.0"
+        "smarthub.components.ffmpeg.FFVersion.get_version", return_value="6.0"
     ):
         yield
 
@@ -213,7 +213,7 @@ def mock_legacy_device_scanner() -> MockScanner:
 
 
 @pytest.fixture
-def mock_legacy_device_tracker_setup() -> Callable[[HomeAssistant, MockScanner], None]:
+def mock_legacy_device_tracker_setup() -> Callable[[SmartHub, MockScanner], None]:
     """Return setup callable for legacy device tracker setup."""
     from .device_tracker.common import mock_legacy_device_tracker_setup  # noqa: PLC0415
 
@@ -222,7 +222,7 @@ def mock_legacy_device_tracker_setup() -> Callable[[HomeAssistant, MockScanner],
 
 @pytest.fixture(name="addon_manager")
 def addon_manager_fixture(
-    hass: HomeAssistant, supervisor_client: AsyncMock
+    hass: SmartHub, supervisor_client: AsyncMock
 ) -> AddonManager:
     """Return an AddonManager instance."""
     from .hassio.common import mock_addon_manager  # noqa: PLC0415
@@ -518,7 +518,7 @@ def supervisor_client() -> Generator[AsyncMock]:
     supervisor_client = AsyncMock()
     supervisor_client.addons = AsyncMock()
     supervisor_client.discovery = AsyncMock()
-    supervisor_client.homeassistant = AsyncMock()
+    supervisor_client.smarthub = AsyncMock()
     supervisor_client.host = AsyncMock()
     supervisor_client.jobs = AsyncMock()
     supervisor_client.mounts.info.return_value = mounts_info_mock
@@ -527,39 +527,39 @@ def supervisor_client() -> Generator[AsyncMock]:
     supervisor_client.supervisor = AsyncMock()
     with (
         patch(
-            "homeassistant.components.hassio.get_supervisor_client",
+            "smarthub.components.hassio.get_supervisor_client",
             return_value=supervisor_client,
         ),
         patch(
-            "homeassistant.components.hassio.handler.get_supervisor_client",
+            "smarthub.components.hassio.handler.get_supervisor_client",
             return_value=supervisor_client,
         ),
         patch(
-            "homeassistant.components.hassio.addon_manager.get_supervisor_client",
+            "smarthub.components.hassio.addon_manager.get_supervisor_client",
             return_value=supervisor_client,
         ),
         patch(
-            "homeassistant.components.hassio.backup.get_supervisor_client",
+            "smarthub.components.hassio.backup.get_supervisor_client",
             return_value=supervisor_client,
         ),
         patch(
-            "homeassistant.components.hassio.discovery.get_supervisor_client",
+            "smarthub.components.hassio.discovery.get_supervisor_client",
             return_value=supervisor_client,
         ),
         patch(
-            "homeassistant.components.hassio.coordinator.get_supervisor_client",
+            "smarthub.components.hassio.coordinator.get_supervisor_client",
             return_value=supervisor_client,
         ),
         patch(
-            "homeassistant.components.hassio.issues.get_supervisor_client",
+            "smarthub.components.hassio.issues.get_supervisor_client",
             return_value=supervisor_client,
         ),
         patch(
-            "homeassistant.components.hassio.repairs.get_supervisor_client",
+            "smarthub.components.hassio.repairs.get_supervisor_client",
             return_value=supervisor_client,
         ),
         patch(
-            "homeassistant.components.hassio.update_helper.get_supervisor_client",
+            "smarthub.components.hassio.update_helper.get_supervisor_client",
             return_value=supervisor_client,
         ),
     ):
@@ -587,7 +587,7 @@ def _validate_translation_placeholders(
 
 
 async def _validate_translation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     translation_errors: dict[str, str],
     ignore_translations_for_mock_domains: set[str],
     category: str,
@@ -646,7 +646,7 @@ async def _validate_translation(
 
     translation_errors[full_key] = (
         f"Translation not found for {component}: `{category}.{key}`. "
-        f"Please add to homeassistant/components/{component}/strings.json"
+        f"Please add to smarthub/components/{component}/strings.json"
     )
 
 
@@ -676,7 +676,7 @@ def _get_integration_quality_scale(integration: str) -> dict[str, Any]:
     """Get the quality scale for an integration."""
     try:
         return yaml_util.load_yaml_dict(
-            f"homeassistant/components/{integration}/quality_scale.yaml"
+            f"smarthub/components/{integration}/quality_scale.yaml"
         ).get("rules", {})
     except FileNotFoundError:
         return {}
@@ -692,7 +692,7 @@ def _get_integration_quality_scale_rule(integration: str, rule: str) -> str:
 
 
 async def _check_step_or_section_translations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     translation_errors: dict[str, str],
     category: str,
     integration: str,
@@ -864,8 +864,8 @@ def _get_request_quality_scale(
 
 
 async def _check_exception_translation(
-    hass: HomeAssistant,
-    exception: HomeAssistantError,
+    hass: SmartHub,
+    exception: SmartHubError,
     translation_errors: dict[str, str],
     request: pytest.FixtureRequest,
     ignore_translations_for_mock_domains: set[str],
@@ -965,7 +965,7 @@ async def check_translations(
                 target,
                 return_response,
             )
-        except HomeAssistantError as err:
+        except SmartHubError as err:
             translation_coros.add(
                 _check_exception_translation(
                     self._hass,
@@ -980,15 +980,15 @@ async def check_translations(
     # Use override functions
     with (
         patch(
-            "homeassistant.data_entry_flow.FlowManager._async_handle_step",
+            "smarthub.data_entry_flow.FlowManager._async_handle_step",
             _flow_manager_async_handle_step,
         ),
         patch(
-            "homeassistant.helpers.issue_registry.IssueRegistry.async_get_or_create",
+            "smarthub.helpers.issue_registry.IssueRegistry.async_get_or_create",
             _issue_registry_async_create_issue,
         ),
         patch(
-            "homeassistant.core.ServiceRegistry.async_call",
+            "smarthub.core.ServiceRegistry.async_call",
             _service_registry_async_call,
         ),
     ):

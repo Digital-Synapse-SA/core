@@ -12,18 +12,18 @@ from synology_dsm.exceptions import (
     SynologyDSMRequestException,
 )
 
-from homeassistant.components.backup import (
+from smarthub.components.backup import (
     DOMAIN as BACKUP_DOMAIN,
     AddonInfo,
     AgentBackup,
     Folder,
 )
-from homeassistant.components.synology_dsm.const import (
+from smarthub.components.synology_dsm.const import (
     CONF_BACKUP_PATH,
     CONF_BACKUP_SHARE,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
@@ -31,10 +31,10 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.backup import async_initialize_backup
-from homeassistant.setup import async_setup_component
-from homeassistant.util.aiohttp import MockStreamReader, MockStreamReaderChunked
+from smarthub.core import SmartHub
+from smarthub.helpers.backup import async_initialize_backup
+from smarthub.setup import async_setup_component
+from smarthub.util.aiohttp import MockStreamReader, MockStreamReaderChunked
 
 from .common import mock_dsm_information
 from .consts import HOST, MACS, PASSWORD, PORT, USE_SSL, USERNAME
@@ -50,8 +50,8 @@ async def _mock_download_file(path: str, filename: str) -> MockStreamReader:
         return MockStreamReader(
             b'{"addons":[],"backup_id":"abcd12ef","date":"2025-01-09T20:14:35.457323+01:00",'
             b'"database_included":true,"extra_metadata":{"instance_id":"36b3b7e984da43fc89f7bafb2645fa36",'
-            b'"with_automatic_settings":true},"folders":[],"homeassistant_included":true,'
-            b'"homeassistant_version":"2025.2.0.dev0","name":"Automatic backup 2025.2.0.dev0","protected":true,"size":13916160}'
+            b'"with_automatic_settings":true},"folders":[],"smarthub_included":true,'
+            b'"smarthub_version":"2025.2.0.dev0","name":"Automatic backup 2025.2.0.dev0","protected":true,"size":13916160}'
         )
     if filename == f"{BASE_FILENAME}.tar":
         return MockStreamReaderChunked(b"backup data")
@@ -65,8 +65,8 @@ async def _mock_download_file_meta_ok_tar_missing(
         return MockStreamReader(
             b'{"addons":[],"backup_id":"abcd12ef","date":"2025-01-09T20:14:35.457323+01:00",'
             b'"database_included":true,"extra_metadata":{"instance_id":"36b3b7e984da43fc89f7bafb2645fa36",'
-            b'"with_automatic_settings":true},"folders":[],"homeassistant_included":true,'
-            b'"homeassistant_version":"2025.2.0.dev0","name":"Automatic backup 2025.2.0.dev0","protected":true,"size":13916160}'
+            b'"with_automatic_settings":true},"folders":[],"smarthub_included":true,'
+            b'"smarthub_version":"2025.2.0.dev0","name":"Automatic backup 2025.2.0.dev0","protected":true,"size":13916160}'
         )
     if filename == f"{BASE_FILENAME}.tar":
         raise SynologyDSMAPIErrorException("api", "900", [{"code": 408}])
@@ -84,7 +84,7 @@ async def _mock_download_file_meta_defect(path: str, filename: str) -> MockStrea
 @pytest.fixture
 def mock_dsm_with_filestation():
     """Mock a successful service with filestation support."""
-    with patch("homeassistant.components.synology_dsm.common.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.common.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 
@@ -137,7 +137,7 @@ def mock_dsm_with_filestation():
 def mock_dsm_without_filestation():
     """Mock a successful service with filestation support."""
 
-    with patch("homeassistant.components.synology_dsm.common.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.common.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 
@@ -158,17 +158,17 @@ def mock_dsm_without_filestation():
 
 @pytest.fixture
 async def setup_dsm_with_filestation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dsm_with_filestation: MagicMock,
 ):
     """Mock setup of synology dsm config entry and backup integration."""
     async_initialize_backup(hass)
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=mock_dsm_with_filestation,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,
@@ -195,7 +195,7 @@ async def setup_dsm_with_filestation(
 
 
 async def test_agents_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_with_filestation: MagicMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -215,11 +215,11 @@ async def test_agents_info(
 
 
 async def test_agents_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test backup agent with no loaded config entry."""
-    with patch("homeassistant.components.backup.is_hassio", return_value=False):
+    with patch("smarthub.components.backup.is_hassio", return_value=False):
         async_initialize_backup(hass)
         assert await async_setup_component(hass, BACKUP_DOMAIN, {BACKUP_DOMAIN: {}})
         assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -238,7 +238,7 @@ async def test_agents_not_loaded(
 
 
 async def test_agents_on_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_with_filestation: MagicMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -276,7 +276,7 @@ async def test_agents_on_unload(
 
 
 async def test_agents_on_changed_update_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_with_filestation: MagicMock,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
@@ -320,7 +320,7 @@ async def test_agents_on_changed_update_success(
 
 
 async def test_agents_list_backups(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_with_filestation: MagicMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -349,8 +349,8 @@ async def test_agents_list_backups(
             "failed_agent_ids": [],
             "failed_folders": [],
             "folders": [],
-            "homeassistant_included": True,
-            "homeassistant_version": "2025.2.0.dev0",
+            "smarthub_included": True,
+            "smarthub_version": "2025.2.0.dev0",
             "name": "Automatic backup 2025.2.0.dev0",
             "with_automatic_settings": None,
         }
@@ -358,7 +358,7 @@ async def test_agents_list_backups(
 
 
 async def test_agents_list_backups_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_with_filestation: MagicMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -388,7 +388,7 @@ async def test_agents_list_backups_error(
 
 
 async def test_agents_list_backups_disabled_filestation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dsm_without_filestation: MagicMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -422,8 +422,8 @@ async def test_agents_list_backups_disabled_filestation(
                 "failed_agent_ids": [],
                 "failed_folders": [],
                 "folders": [],
-                "homeassistant_included": True,
-                "homeassistant_version": "2025.2.0.dev0",
+                "smarthub_included": True,
+                "smarthub_version": "2025.2.0.dev0",
                 "name": "Automatic backup 2025.2.0.dev0",
                 "with_automatic_settings": None,
             },
@@ -436,7 +436,7 @@ async def test_agents_list_backups_disabled_filestation(
     ids=["found", "not_found"],
 )
 async def test_agents_get_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_dsm_with_filestation: MagicMock,
     backup_id: str,
@@ -453,7 +453,7 @@ async def test_agents_get_backup(
 
 
 async def test_agents_get_backup_not_existing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_dsm_with_filestation: MagicMock,
 ) -> None:
@@ -473,7 +473,7 @@ async def test_agents_get_backup_not_existing(
 
 
 async def test_agents_get_backup_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_dsm_with_filestation: MagicMock,
 ) -> None:
@@ -498,7 +498,7 @@ async def test_agents_get_backup_error(
 
 
 async def test_agents_get_backup_defect_meta(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_dsm_with_filestation: MagicMock,
 ) -> None:
@@ -516,7 +516,7 @@ async def test_agents_get_backup_defect_meta(
 
 
 async def test_agents_download(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup_dsm_with_filestation: MagicMock,
 ) -> None:
@@ -532,7 +532,7 @@ async def test_agents_download(
 
 
 async def test_agents_download_not_existing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup_dsm_with_filestation: MagicMock,
 ) -> None:
@@ -552,7 +552,7 @@ async def test_agents_download_not_existing(
 
 
 async def test_agents_upload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
     setup_dsm_with_filestation: MagicMock,
@@ -567,8 +567,8 @@ async def test_agents_upload(
         date="1970-01-01T00:00:00.000Z",
         extra_metadata={},
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=True,
         size=0,
@@ -577,10 +577,10 @@ async def test_agents_upload(
 
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -603,7 +603,7 @@ async def test_agents_upload(
 
 
 async def test_agents_upload_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
     setup_dsm_with_filestation: MagicMock,
@@ -618,8 +618,8 @@ async def test_agents_upload_error(
         date="1970-01-01T00:00:00.000Z",
         extra_metadata={},
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=True,
         size=0,
@@ -629,10 +629,10 @@ async def test_agents_upload_error(
     # fail to upload the tar file
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -658,10 +658,10 @@ async def test_agents_upload_error(
     # fail to upload the meta json file
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -690,7 +690,7 @@ async def test_agents_upload_error(
 
 
 async def test_agents_delete(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_dsm_with_filestation: MagicMock,
 ) -> None:
@@ -717,7 +717,7 @@ async def test_agents_delete(
 
 
 async def test_agents_delete_not_existing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_dsm_with_filestation: MagicMock,
 ) -> None:
@@ -766,7 +766,7 @@ async def test_agents_delete_not_existing(
     ],
 )
 async def test_agents_delete_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     setup_dsm_with_filestation: MagicMock,

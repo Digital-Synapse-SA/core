@@ -8,9 +8,9 @@ from pyiskra.exceptions import (
 )
 import pytest
 
-from homeassistant.components.iskra import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.iskra import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_ADDRESS,
     CONF_HOST,
     CONF_PASSWORD,
@@ -18,8 +18,8 @@ from homeassistant.const import (
     CONF_PROTOCOL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import (
     HOST,
@@ -36,7 +36,7 @@ from tests.common import MockConfigEntry
 
 
 # Test step_user with Rest API protocol
-async def test_user_rest_no_auth(hass: HomeAssistant, mock_pyiskra_rest) -> None:
+async def test_user_rest_no_auth(hass: SmartHub, mock_pyiskra_rest) -> None:
     """Test the user flow with Rest API protocol."""
 
     result = await hass.config_entries.flow.async_init(
@@ -61,7 +61,7 @@ async def test_user_rest_no_auth(hass: HomeAssistant, mock_pyiskra_rest) -> None
     assert result["data"] == {CONF_HOST: HOST, CONF_PROTOCOL: "rest_api"}
 
 
-async def test_user_rest_auth(hass: HomeAssistant, mock_pyiskra_rest) -> None:
+async def test_user_rest_auth(hass: SmartHub, mock_pyiskra_rest) -> None:
     """Test the user flow with Rest API protocol and authentication required."""
     mock_pyiskra_rest.side_effect = NotAuthorised
 
@@ -111,7 +111,7 @@ async def test_user_rest_auth(hass: HomeAssistant, mock_pyiskra_rest) -> None:
     }
 
 
-async def test_user_modbus(hass: HomeAssistant, mock_pyiskra_modbus) -> None:
+async def test_user_modbus(hass: SmartHub, mock_pyiskra_modbus) -> None:
     """Test the user flow with Modbus TCP protocol."""
 
     result = await hass.config_entries.flow.async_init(
@@ -153,7 +153,7 @@ async def test_user_modbus(hass: HomeAssistant, mock_pyiskra_modbus) -> None:
 
 
 async def test_modbus_abort_if_already_setup(
-    hass: HomeAssistant, mock_pyiskra_modbus
+    hass: SmartHub, mock_pyiskra_modbus
 ) -> None:
     """Test we abort if Iskra is already setup."""
 
@@ -179,7 +179,7 @@ async def test_modbus_abort_if_already_setup(
 
 
 async def test_rest_api_abort_if_already_setup(
-    hass: HomeAssistant, mock_pyiskra_rest
+    hass: SmartHub, mock_pyiskra_rest
 ) -> None:
     """Test we abort if Iskra is already setup."""
 
@@ -204,7 +204,7 @@ async def test_rest_api_abort_if_already_setup(
     ],
 )
 async def test_modbus_device_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pyiskra_modbus,
     s_effect,
     reason,
@@ -266,7 +266,7 @@ async def test_modbus_device_error(
     ],
 )
 async def test_rest_device_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pyiskra_rest,
     s_effect,
     reason,

@@ -1,13 +1,13 @@
 """Test DROP select entities."""
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     ATTR_OPTIONS,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .common import (
     TEST_DATA_HUB,
@@ -20,7 +20,7 @@ from tests.common import async_fire_mqtt_message
 from tests.typing import MqttMockHAClient
 
 
-async def test_selects_hub(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_selects_hub(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test DROP binary sensors for hubs."""
     entry = config_entry_hub()
     entry.add_to_hass(hass)

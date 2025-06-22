@@ -8,9 +8,9 @@ from miio.integrations.fan.dmaker.fan_miot import FanStatusMiot
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.xiaomi_miio import MODEL_TO_CLASS_MAP
-from homeassistant.components.xiaomi_miio.const import CONF_FLOW_TYPE, DOMAIN
-from homeassistant.const import (
+from smarthub.components.xiaomi_miio import MODEL_TO_CLASS_MAP
+from smarthub.components.xiaomi_miio.const import CONF_FLOW_TYPE, DOMAIN
+from smarthub.const import (
     CONF_DEVICE,
     CONF_HOST,
     CONF_MAC,
@@ -18,8 +18,8 @@ from homeassistant.const import (
     CONF_TOKEN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import TEST_MAC
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 _MODEL_INFORMATION = {
     "dmaker.fan.p5": {
-        "patch_class": "homeassistant.components.xiaomi_miio.FanP5",
+        "patch_class": "smarthub.components.xiaomi_miio.FanP5",
         "mock_status": FanStatusP5(
             {
                 "roll_angle": 60,
@@ -43,7 +43,7 @@ _MODEL_INFORMATION = {
         ),
     },
     "dmaker.fan.p18": {
-        "patch_class": "homeassistant.components.xiaomi_miio.FanMiot",
+        "patch_class": "smarthub.components.xiaomi_miio.FanMiot",
         "mock_status": FanStatusMiot(
             {
                 "swing_mode_angle": 90,
@@ -81,7 +81,7 @@ def setup_device(model_code: str) -> Generator[MagicMock]:
 
     with (
         patch(
-            "homeassistant.components.xiaomi_miio.get_platforms",
+            "smarthub.components.xiaomi_miio.get_platforms",
             return_value=[Platform.FAN],
         ),
         patch(model_information["patch_class"]) as mock_fan_cls,
@@ -95,7 +95,7 @@ def setup_device(model_code: str) -> Generator[MagicMock]:
 
 
 async def setup_component(
-    hass: HomeAssistant, model_code: str, entry_title: str
+    hass: SmartHub, model_code: str, entry_title: str
 ) -> MockConfigEntry:
     """Set up fan component."""
     config_entry = MockConfigEntry(
@@ -119,7 +119,7 @@ async def setup_component(
 
 
 async def test_fan_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     model_code: str,
     snapshot: SnapshotAssertion,

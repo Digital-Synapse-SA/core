@@ -1,7 +1,7 @@
 """Tests for Airly."""
 
-from homeassistant.components.airly.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.airly.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -17,9 +17,9 @@ HEADERS = {
 
 
 async def init_integration(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> MockConfigEntry:
-    """Set up the Airly integration in Home Assistant."""
+    """Set up the Airly integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Home",

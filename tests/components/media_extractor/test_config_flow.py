@@ -1,14 +1,14 @@
 """Tests for the Media extractor config flow."""
 
-from homeassistant.components.media_extractor.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.media_extractor.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_full_user_flow(hass: HomeAssistant, mock_setup_entry) -> None:
+async def test_full_user_flow(hass: SmartHub, mock_setup_entry) -> None:
     """Test the full user configuration flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -29,7 +29,7 @@ async def test_full_user_flow(hass: HomeAssistant, mock_setup_entry) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_single_instance_allowed(hass: HomeAssistant) -> None:
+async def test_single_instance_allowed(hass: SmartHub) -> None:
     """Test we abort if already setup."""
     mock_config_entry = MockConfigEntry(domain=DOMAIN)
 

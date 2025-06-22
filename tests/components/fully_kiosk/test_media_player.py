@@ -4,21 +4,21 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from homeassistant.components import media_player
-from homeassistant.components.fully_kiosk.const import DOMAIN, MEDIA_SUPPORT_FULLYKIOSK
-from homeassistant.components.media_source import DOMAIN as MS_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import media_player
+from smarthub.components.fully_kiosk.const import DOMAIN, MEDIA_SUPPORT_FULLYKIOSK
+from smarthub.components.media_source import DOMAIN as MS_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
 async def test_media_player(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mock_fully_kiosk: MagicMock,
@@ -46,7 +46,7 @@ async def test_media_player(
     assert len(mock_fully_kiosk.playSound.mock_calls) == 1
 
     with patch(
-        "homeassistant.components.media_source.async_resolve_media",
+        "smarthub.components.media_source.async_resolve_media",
         return_value=Mock(url="http://example.com/test.mp3"),
     ):
         await hass.services.async_call(
@@ -102,7 +102,7 @@ async def test_media_player(
 
 @pytest.mark.parametrize("media_content_type", ["video", "video/mp4"])
 async def test_media_player_video(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,
     media_content_type: str,
@@ -135,12 +135,12 @@ async def test_media_player_video(
 
 
 async def test_media_player_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
     """Test Fully Kiosk media player for unsupported media."""
-    with pytest.raises(HomeAssistantError) as error:
+    with pytest.raises(SmartHubError) as error:
         await hass.services.async_call(
             media_player.DOMAIN,
             "play_media",
@@ -155,7 +155,7 @@ async def test_media_player_unsupported(
 
 
 async def test_browse_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,

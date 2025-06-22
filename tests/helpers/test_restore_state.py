@@ -6,14 +6,14 @@ import logging
 from typing import Any
 from unittest.mock import Mock, patch
 
-from homeassistant.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import CoreState, HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.entity_component import EntityComponent
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.reload import async_get_platform_without_config_entry
-from homeassistant.helpers.restore_state import (
+from smarthub.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP
+from smarthub.core import CoreState, SmartHub, State
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.entity import Entity
+from smarthub.helpers.entity_component import EntityComponent
+from smarthub.helpers.entity_platform import AddEntitiesCallback
+from smarthub.helpers.reload import async_get_platform_without_config_entry
+from smarthub.helpers.restore_state import (
     DATA_RESTORE_STATE,
     STORAGE_KEY,
     RestoreEntity,
@@ -22,8 +22,8 @@ from homeassistant.helpers.restore_state import (
     async_get,
     async_load,
 )
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from homeassistant.util import dt as dt_util
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockEntityPlatform,
@@ -40,7 +40,7 @@ DOMAIN = "test_domain"
 PLATFORM = "test_platform"
 
 
-async def test_caching_data(hass: HomeAssistant) -> None:
+async def test_caching_data(hass: SmartHub) -> None:
     """Test that we cache data."""
     now = dt_util.utcnow()
     stored_states = [
@@ -58,10 +58,10 @@ async def test_caching_data(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.helpers.restore_state.Store.async_load",
-            side_effect=HomeAssistantError,
+            "smarthub.helpers.restore_state.Store.async_load",
+            side_effect=SmartHubError,
         ),
-        patch("homeassistant.helpers.restore_state.Store.async_save"),
+        patch("smarthub.helpers.restore_state.Store.async_save"),
     ):
         # Failure to load should not be treated as fatal
         await async_load(hass)
@@ -71,7 +71,7 @@ async def test_caching_data(hass: HomeAssistant) -> None:
 
     # Mock that only b1 is present this run
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         await async_load(hass)
         await hass.async_block_till_done()
@@ -92,7 +92,7 @@ async def test_caching_data(hass: HomeAssistant) -> None:
     assert mock_write_data.called
 
 
-async def test_periodic_write(hass: HomeAssistant) -> None:
+async def test_periodic_write(hass: SmartHub) -> None:
     """Test that we write periodiclly but not after stop."""
     data = async_get(hass)
     await hass.async_block_till_done()
@@ -100,7 +100,7 @@ async def test_periodic_write(hass: HomeAssistant) -> None:
 
     # Emulate a fresh load
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         hass.data.pop(DATA_RESTORE_STATE)
         await async_load(hass)
@@ -116,7 +116,7 @@ async def test_periodic_write(hass: HomeAssistant) -> None:
     assert mock_write_data.called
 
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=15))
         await hass.async_block_till_done()
@@ -124,7 +124,7 @@ async def test_periodic_write(hass: HomeAssistant) -> None:
     assert mock_write_data.called
 
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
         await hass.async_block_till_done()
@@ -132,7 +132,7 @@ async def test_periodic_write(hass: HomeAssistant) -> None:
     assert mock_write_data.called
 
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=30))
         await hass.async_block_till_done()
@@ -140,7 +140,7 @@ async def test_periodic_write(hass: HomeAssistant) -> None:
     assert not mock_write_data.called
 
 
-async def test_save_persistent_states(hass: HomeAssistant) -> None:
+async def test_save_persistent_states(hass: SmartHub) -> None:
     """Test that we cancel the currently running job, save the data, and verify the perdiodic job continues."""
     data = async_get(hass)
     await hass.async_block_till_done()
@@ -148,7 +148,7 @@ async def test_save_persistent_states(hass: HomeAssistant) -> None:
 
     # Emulate a fresh load
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         hass.data.pop(DATA_RESTORE_STATE)
         await async_load(hass)
@@ -165,7 +165,7 @@ async def test_save_persistent_states(hass: HomeAssistant) -> None:
     assert mock_write_data.called
 
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=10))
         await hass.async_block_till_done()
@@ -174,7 +174,7 @@ async def test_save_persistent_states(hass: HomeAssistant) -> None:
     assert not mock_write_data.called
 
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         await RestoreStateData.async_save_persistent_states(hass)
         await hass.async_block_till_done()
@@ -182,7 +182,7 @@ async def test_save_persistent_states(hass: HomeAssistant) -> None:
     assert mock_write_data.called
 
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=20))
         await hass.async_block_till_done()
@@ -190,7 +190,7 @@ async def test_save_persistent_states(hass: HomeAssistant) -> None:
     assert mock_write_data.called
 
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
         await hass.async_block_till_done()
@@ -198,7 +198,7 @@ async def test_save_persistent_states(hass: HomeAssistant) -> None:
     assert mock_write_data.called
 
 
-async def test_hass_starting(hass: HomeAssistant) -> None:
+async def test_hass_starting(hass: SmartHub) -> None:
     """Test that we cache data."""
     hass.set_state(CoreState.starting)
 
@@ -229,7 +229,7 @@ async def test_hass_starting(hass: HomeAssistant) -> None:
 
     # Mock that only b1 is present this run
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         state = await entity.async_get_last_state()
         await hass.async_block_till_done()
@@ -244,7 +244,7 @@ async def test_hass_starting(hass: HomeAssistant) -> None:
 
     # Finish hass startup
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         hass.bus.async_fire(EVENT_HOMEASSISTANT_START)
         await hass.async_block_till_done()
@@ -253,7 +253,7 @@ async def test_hass_starting(hass: HomeAssistant) -> None:
     assert mock_write_data.called
 
 
-async def test_dump_data(hass: HomeAssistant) -> None:
+async def test_dump_data(hass: SmartHub) -> None:
     """Test that we cache data."""
     states = [
         State("input_boolean.b0", "on"),
@@ -292,7 +292,7 @@ async def test_dump_data(hass: HomeAssistant) -> None:
         hass.states.async_set(state.entity_id, state.state, state.attributes)
 
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         await data.async_dump_states()
 
@@ -326,7 +326,7 @@ async def test_dump_data(hass: HomeAssistant) -> None:
         hass.states.async_set(state.entity_id, state.state, state.attributes)
 
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save"
+        "smarthub.helpers.restore_state.Store.async_save"
     ) as mock_write_data:
         await data.async_dump_states()
 
@@ -342,7 +342,7 @@ async def test_dump_data(hass: HomeAssistant) -> None:
     assert state1["state"]["state"] == "off"
 
 
-async def test_dump_error(hass: HomeAssistant) -> None:
+async def test_dump_error(hass: SmartHub) -> None:
     """Test that we cache data."""
     states = [
         State("input_boolean.b0", "on"),
@@ -367,30 +367,30 @@ async def test_dump_error(hass: HomeAssistant) -> None:
         hass.states.async_set(state.entity_id, state.state, state.attributes)
 
     with patch(
-        "homeassistant.helpers.restore_state.Store.async_save",
-        side_effect=HomeAssistantError,
+        "smarthub.helpers.restore_state.Store.async_save",
+        side_effect=SmartHubError,
     ) as mock_write_data:
         await data.async_dump_states()
 
     assert mock_write_data.called
 
 
-async def test_load_error(hass: HomeAssistant) -> None:
+async def test_load_error(hass: SmartHub) -> None:
     """Test that we cache data."""
     entity = RestoreEntity()
     entity.hass = hass
     entity.entity_id = "input_boolean.b1"
 
     with patch(
-        "homeassistant.helpers.storage.Store.async_load",
-        side_effect=HomeAssistantError,
+        "smarthub.helpers.storage.Store.async_load",
+        side_effect=SmartHubError,
     ):
         state = await entity.async_get_last_state()
 
     assert state is None
 
 
-async def test_state_saved_on_remove(hass: HomeAssistant) -> None:
+async def test_state_saved_on_remove(hass: SmartHub) -> None:
     """Test that we save entity state on removal."""
     platform = MockEntityPlatform(hass, domain="input_boolean")
     entity = RestoreEntity()
@@ -418,7 +418,7 @@ async def test_state_saved_on_remove(hass: HomeAssistant) -> None:
 
 
 async def test_restoring_invalid_entity_id(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test restoring invalid entity IDs."""
     entity = RestoreEntity()
@@ -451,7 +451,7 @@ async def test_restoring_invalid_entity_id(
 
 
 async def test_restore_entity_end_to_end(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test restoring an entity end-to-end."""
     component_setup = Mock(return_value=True)
@@ -483,7 +483,7 @@ async def test_restore_entity_end_to_end(
             self._state = (await self.async_get_last_state()).state
 
     async def async_setup_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         async_add_entities: AddEntitiesCallback,
         discovery_info: DiscoveryInfoType | None = None,

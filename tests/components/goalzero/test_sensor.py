@@ -2,13 +2,13 @@
 
 import pytest
 
-from homeassistant.components.goalzero.const import DEFAULT_NAME
-from homeassistant.components.sensor import (
+from smarthub.components.goalzero.const import DEFAULT_NAME
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
@@ -20,7 +20,7 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfTime,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import async_init_integration
 
@@ -29,7 +29,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we get sensor data."""
     await async_init_integration(hass, aioclient_mock)

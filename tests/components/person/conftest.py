@@ -5,11 +5,11 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import person
-from homeassistant.components.person import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import collection
-from homeassistant.setup import async_setup_component
+from smarthub.components import person
+from smarthub.components.person import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import collection
+from smarthub.setup import async_setup_component
 
 from tests.common import MockUser
 
@@ -18,7 +18,7 @@ DEVICE_TRACKER_2 = "device_tracker.test_tracker_2"
 
 
 @pytest.fixture
-def storage_collection(hass: HomeAssistant) -> person.PersonStorageCollection:
+def storage_collection(hass: SmartHub) -> person.PersonStorageCollection:
     """Return an empty storage collection."""
     id_manager = collection.IDManager()
     return person.PersonStorageCollection(
@@ -32,7 +32,7 @@ def storage_collection(hass: HomeAssistant) -> person.PersonStorageCollection:
 
 @pytest.fixture
 async def storage_setup(
-    hass: HomeAssistant, hass_storage: dict[str, Any], hass_admin_user: MockUser
+    hass: SmartHub, hass_storage: dict[str, Any], hass_admin_user: MockUser
 ) -> None:
     """Storage setup."""
     hass_storage[DOMAIN] = {

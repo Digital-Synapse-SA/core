@@ -15,32 +15,32 @@ from aioshelly.exceptions import (
 )
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.shelly import MacAddressMismatchError, config_flow
-from homeassistant.components.shelly.const import (
+from smarthub import config_entries
+from smarthub.components.shelly import MacAddressMismatchError, config_flow
+from smarthub.components.shelly.const import (
     CONF_BLE_SCANNER_MODE,
     CONF_GEN,
     CONF_SLEEP_PERIOD,
     DOMAIN,
     BLEScannerMode,
 )
-from homeassistant.components.shelly.coordinator import ENTRY_RELOAD_COOLDOWN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.shelly.coordinator import ENTRY_RELOAD_COOLDOWN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_HOST,
     CONF_MODEL,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import (
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import init_integration
 
@@ -76,7 +76,7 @@ DISCOVERY_INFO_WITH_MAC = ZeroconfServiceInfo(
     ],
 )
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     model: str,
     port: int,
@@ -94,7 +94,7 @@ async def test_form(
 
     with (
         patch(
-            "homeassistant.components.shelly.config_flow.get_info",
+            "smarthub.components.shelly.config_flow.get_info",
             return_value={
                 "mac": "test-mac",
                 "type": MODEL_1,
@@ -123,14 +123,14 @@ async def test_form(
 
 
 async def test_user_flow_overrides_existing_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     mock_setup_entry: AsyncMock,
     mock_setup: AsyncMock,
 ) -> None:
     """Test setting up from the user flow when the devices is already discovered."""
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={
             "mac": "AABBCCDDEEFF",
             "model": MODEL_PLUS_2PM,
@@ -182,7 +182,7 @@ async def test_user_flow_overrides_existing_discovery(
 
 
 async def test_form_gen1_custom_port(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     mock_setup_entry: AsyncMock,
     mock_setup: AsyncMock,
@@ -196,7 +196,7 @@ async def test_form_gen1_custom_port(
 
     with (
         patch(
-            "homeassistant.components.shelly.config_flow.get_info",
+            "smarthub.components.shelly.config_flow.get_info",
             return_value={"mac": "test-mac", "type": MODEL_1, "gen": 1},
         ),
         patch(
@@ -213,7 +213,7 @@ async def test_form_gen1_custom_port(
     assert result["errors"]["base"] == "custom_port_not_supported"
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "gen": 1},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -259,7 +259,7 @@ async def test_form_gen1_custom_port(
     ],
 )
 async def test_form_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     model: str,
     user_input: dict[str, str],
@@ -277,7 +277,7 @@ async def test_form_auth(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "auth": True, "gen": gen},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -316,7 +316,7 @@ async def test_form_auth(
     ],
 )
 async def test_form_errors_get_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     mock_setup: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -328,7 +328,7 @@ async def test_form_errors_get_info(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
-    with patch("homeassistant.components.shelly.config_flow.get_info", side_effect=exc):
+    with patch("smarthub.components.shelly.config_flow.get_info", side_effect=exc):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {CONF_HOST: "1.1.1.1"},
@@ -338,7 +338,7 @@ async def test_form_errors_get_info(
     assert result["errors"] == {"base": base_error}
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "gen": 1},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -361,7 +361,7 @@ async def test_form_errors_get_info(
 
 
 async def test_form_missing_model_key(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test we handle missing Shelly model key."""
     result = await hass.config_entries.flow.async_init(
@@ -369,7 +369,7 @@ async def test_form_missing_model_key(
     )
     monkeypatch.setattr(mock_rpc_device, "shelly", {"gen": 2})
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "auth": False, "gen": "2"},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -382,7 +382,7 @@ async def test_form_missing_model_key(
 
 
 async def test_form_missing_model_key_auth_enabled(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test we handle missing Shelly model key when auth enabled."""
     result = await hass.config_entries.flow.async_init(
@@ -392,7 +392,7 @@ async def test_form_missing_model_key_auth_enabled(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "auth": True, "gen": 2},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -412,14 +412,14 @@ async def test_form_missing_model_key_auth_enabled(
 
 
 async def test_form_missing_model_key_zeroconf(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test we handle missing Shelly model key via zeroconf."""
     monkeypatch.setattr(mock_rpc_device, "shelly", {"gen": 2})
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "auth": False, "gen": 2},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -441,7 +441,7 @@ async def test_form_missing_model_key_zeroconf(
     ],
 )
 async def test_form_errors_test_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     mock_setup_entry: AsyncMock,
     mock_setup: AsyncMock,
@@ -455,7 +455,7 @@ async def test_form_errors_test_connection(
 
     with (
         patch(
-            "homeassistant.components.shelly.config_flow.get_info",
+            "smarthub.components.shelly.config_flow.get_info",
             return_value={"mac": "test-mac", "auth": False},
         ),
         patch(
@@ -471,7 +471,7 @@ async def test_form_errors_test_connection(
     assert result["errors"] == {"base": base_error}
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "auth": False},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -493,7 +493,7 @@ async def test_form_errors_test_connection(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_already_configured(hass: HomeAssistant) -> None:
+async def test_form_already_configured(hass: SmartHub) -> None:
     """Test we get the form."""
 
     entry = MockConfigEntry(
@@ -506,7 +506,7 @@ async def test_form_already_configured(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -522,7 +522,7 @@ async def test_form_already_configured(hass: HomeAssistant) -> None:
 
 
 async def test_user_setup_ignored_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     mock_setup_entry: AsyncMock,
     mock_setup: AsyncMock,
@@ -542,7 +542,7 @@ async def test_user_setup_ignored_device(
     )
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -568,7 +568,7 @@ async def test_user_setup_ignored_device(
     ],
 )
 async def test_form_auth_errors_test_connection_gen1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     mock_setup: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -581,7 +581,7 @@ async def test_form_auth_errors_test_connection_gen1(
     )
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "auth": True},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -601,7 +601,7 @@ async def test_form_auth_errors_test_connection_gen1(
     assert result["errors"] == {"base": base_error}
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "auth": True},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -635,7 +635,7 @@ async def test_form_auth_errors_test_connection_gen1(
     ],
 )
 async def test_form_auth_errors_test_connection_gen2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     mock_setup: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -648,7 +648,7 @@ async def test_form_auth_errors_test_connection_gen2(
     )
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "auth": True, "gen": 2},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -667,7 +667,7 @@ async def test_form_auth_errors_test_connection_gen2(
     assert result["errors"] == {"base": base_error}
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "auth": True, "gen": 2},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -712,7 +712,7 @@ async def test_form_auth_errors_test_connection_gen2(
     ],
 )
 async def test_zeroconf(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     model: str,
     get_info: dict[str, Any],
@@ -724,7 +724,7 @@ async def test_zeroconf(
     """Test we get the form."""
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info", return_value=get_info
+        "smarthub.components.shelly.config_flow.get_info", return_value=get_info
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -759,7 +759,7 @@ async def test_zeroconf(
 
 
 async def test_zeroconf_sleeping_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     mock_setup_entry: AsyncMock,
@@ -772,7 +772,7 @@ async def test_zeroconf_sleeping_device(
         {"period": 10, "unit": "m"},
     )
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={
             "mac": "test-mac",
             "type": MODEL_1,
@@ -811,11 +811,11 @@ async def test_zeroconf_sleeping_device(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_zeroconf_sleeping_device_error(hass: HomeAssistant) -> None:
+async def test_zeroconf_sleeping_device_error(hass: SmartHub) -> None:
     """Test sleeping device configuration via zeroconf with error."""
     with (
         patch(
-            "homeassistant.components.shelly.config_flow.get_info",
+            "smarthub.components.shelly.config_flow.get_info",
             return_value={
                 "mac": "test-mac",
                 "type": MODEL_1,
@@ -839,7 +839,7 @@ async def test_zeroconf_sleeping_device_error(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow_abort_setup_retry(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test ble options abort if device is in setup retry."""
     monkeypatch.setattr(
@@ -856,7 +856,7 @@ async def test_options_flow_abort_setup_retry(
 
 
 async def test_options_flow_abort_no_scripts_support(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test ble options abort if device does not support scripts."""
     monkeypatch.setattr(
@@ -871,7 +871,7 @@ async def test_options_flow_abort_no_scripts_support(
 
 
 async def test_options_flow_abort_zigbee_enabled(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test ble options abort if Zigbee is enabled for the device."""
     monkeypatch.setattr(mock_rpc_device, "zigbee_enabled", True)
@@ -883,7 +883,7 @@ async def test_options_flow_abort_zigbee_enabled(
     assert result["reason"] == "zigbee_enabled"
 
 
-async def test_zeroconf_already_configured(hass: HomeAssistant) -> None:
+async def test_zeroconf_already_configured(hass: SmartHub) -> None:
     """Test we get the form."""
 
     entry = MockConfigEntry(
@@ -892,7 +892,7 @@ async def test_zeroconf_already_configured(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -908,7 +908,7 @@ async def test_zeroconf_already_configured(hass: HomeAssistant) -> None:
     assert entry.data[CONF_HOST] == "1.1.1.1"
 
 
-async def test_zeroconf_ignored(hass: HomeAssistant) -> None:
+async def test_zeroconf_ignored(hass: SmartHub) -> None:
     """Test zeroconf when the device was previously ignored."""
 
     entry = MockConfigEntry(
@@ -920,7 +920,7 @@ async def test_zeroconf_ignored(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -933,7 +933,7 @@ async def test_zeroconf_ignored(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_zeroconf_with_wifi_ap_ip(hass: HomeAssistant) -> None:
+async def test_zeroconf_with_wifi_ap_ip(hass: SmartHub) -> None:
     """Test we ignore the Wi-FI AP IP."""
 
     entry = MockConfigEntry(
@@ -942,7 +942,7 @@ async def test_zeroconf_with_wifi_ap_ip(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -960,10 +960,10 @@ async def test_zeroconf_with_wifi_ap_ip(hass: HomeAssistant) -> None:
     assert entry.data[CONF_HOST] == "2.2.2.2"
 
 
-async def test_zeroconf_cannot_connect(hass: HomeAssistant) -> None:
+async def test_zeroconf_cannot_connect(hass: SmartHub) -> None:
     """Test we get the form."""
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         side_effect=DeviceConnectionError,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -977,7 +977,7 @@ async def test_zeroconf_cannot_connect(hass: HomeAssistant) -> None:
 
 
 async def test_zeroconf_require_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     mock_setup_entry: AsyncMock,
     mock_setup: AsyncMock,
@@ -985,7 +985,7 @@ async def test_zeroconf_require_auth(
     """Test zeroconf if auth is required."""
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "auth": True},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1026,7 +1026,7 @@ async def test_zeroconf_require_auth(
     ],
 )
 async def test_reauth_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     user_input: dict[str, str],
     mock_block_device: Mock,
@@ -1045,7 +1045,7 @@ async def test_reauth_successful(
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "auth": True, "gen": gen},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -1073,7 +1073,7 @@ async def test_reauth_successful(
     ],
 )
 async def test_reauth_unsuccessful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     user_input: dict[str, str],
     exc: Exception,
@@ -1092,7 +1092,7 @@ async def test_reauth_unsuccessful(
 
     with (
         patch(
-            "homeassistant.components.shelly.config_flow.get_info",
+            "smarthub.components.shelly.config_flow.get_info",
             return_value={
                 "mac": "test-mac",
                 "type": MODEL_1,
@@ -1114,7 +1114,7 @@ async def test_reauth_unsuccessful(
     assert result["reason"] == abort_reason
 
 
-async def test_reauth_get_info_error(hass: HomeAssistant) -> None:
+async def test_reauth_get_info_error(hass: SmartHub) -> None:
     """Test reauthentication flow failed with error in get_info()."""
     entry = MockConfigEntry(
         domain="shelly", unique_id="test-mac", data={CONF_HOST: "0.0.0.0", CONF_GEN: 2}
@@ -1125,7 +1125,7 @@ async def test_reauth_get_info_error(hass: HomeAssistant) -> None:
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         side_effect=DeviceConnectionError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -1138,7 +1138,7 @@ async def test_reauth_get_info_error(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow_disabled_gen_1(
-    hass: HomeAssistant, mock_block_device: Mock, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, mock_block_device: Mock, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test options are disabled for gen1 devices."""
     await async_setup_component(hass, "config", {})
@@ -1159,7 +1159,7 @@ async def test_options_flow_disabled_gen_1(
 
 
 async def test_options_flow_enabled_gen_2(
-    hass: HomeAssistant, mock_rpc_device: Mock, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, mock_rpc_device: Mock, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test options are enabled for gen2 devices."""
     await async_setup_component(hass, "config", {})
@@ -1180,7 +1180,7 @@ async def test_options_flow_enabled_gen_2(
 
 
 async def test_options_flow_disabled_sleepy_gen_2(
-    hass: HomeAssistant, mock_rpc_device: Mock, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, mock_rpc_device: Mock, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test options are disabled for sleepy gen2 devices."""
     await async_setup_component(hass, "config", {})
@@ -1200,7 +1200,7 @@ async def test_options_flow_disabled_sleepy_gen_2(
     await hass.config_entries.async_unload(entry.entry_id)
 
 
-async def test_options_flow_ble(hass: HomeAssistant, mock_rpc_device: Mock) -> None:
+async def test_options_flow_ble(hass: SmartHub, mock_rpc_device: Mock) -> None:
     """Test setting ble options for gen2 devices."""
     entry = await init_integration(hass, 2)
     result = await hass.config_entries.options.async_init(entry.entry_id)
@@ -1252,7 +1252,7 @@ async def test_options_flow_ble(hass: HomeAssistant, mock_rpc_device: Mock) -> N
 
 
 async def test_zeroconf_already_configured_triggers_refresh_mac_in_name(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test zeroconf discovery triggers refresh when the mac is in the device name."""
     entry = MockConfigEntry(
@@ -1271,7 +1271,7 @@ async def test_zeroconf_already_configured_triggers_refresh_mac_in_name(
     assert len(mock_rpc_device.initialize.mock_calls) == 1
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1293,7 +1293,7 @@ async def test_zeroconf_already_configured_triggers_refresh_mac_in_name(
 
 
 async def test_zeroconf_already_configured_triggers_refresh(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test zeroconf discovery triggers refresh when the mac is obtained via get_info."""
     entry = MockConfigEntry(
@@ -1312,7 +1312,7 @@ async def test_zeroconf_already_configured_triggers_refresh(
     assert len(mock_rpc_device.initialize.mock_calls) == 1
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "AABBCCDDEEFF", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1334,7 +1334,7 @@ async def test_zeroconf_already_configured_triggers_refresh(
 
 
 async def test_zeroconf_sleeping_device_not_triggers_refresh(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
@@ -1363,7 +1363,7 @@ async def test_zeroconf_sleeping_device_not_triggers_refresh(
     assert len(mock_rpc_device.initialize.mock_calls) == 1
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "AABBCCDDEEFF", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1386,7 +1386,7 @@ async def test_zeroconf_sleeping_device_not_triggers_refresh(
 
 
 async def test_zeroconf_sleeping_device_attempts_configure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
@@ -1418,7 +1418,7 @@ async def test_zeroconf_sleeping_device_attempts_configure(
     assert len(mock_rpc_device.initialize.mock_calls) == 1
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "AABBCCDDEEFF", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1449,7 +1449,7 @@ async def test_zeroconf_sleeping_device_attempts_configure(
 
 
 async def test_zeroconf_sleeping_device_attempts_configure_ws_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
@@ -1484,7 +1484,7 @@ async def test_zeroconf_sleeping_device_attempts_configure_ws_disabled(
     assert len(mock_rpc_device.initialize.mock_calls) == 1
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "AABBCCDDEEFF", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1515,7 +1515,7 @@ async def test_zeroconf_sleeping_device_attempts_configure_ws_disabled(
 
 
 async def test_zeroconf_sleeping_device_attempts_configure_no_url_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
@@ -1550,7 +1550,7 @@ async def test_zeroconf_sleeping_device_attempts_configure_no_url_available(
     assert len(mock_rpc_device.initialize.mock_calls) == 1
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "AABBCCDDEEFF", "type": MODEL_1, "auth": False},
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1580,7 +1580,7 @@ async def test_zeroconf_sleeping_device_attempts_configure_no_url_available(
 
 
 async def test_sleeping_device_gen2_with_new_firmware(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test sleeping device Gen2 with firmware 1.0.0 or later."""
     monkeypatch.setitem(mock_rpc_device.status["sys"], "wakeup_period", 666)
@@ -1592,12 +1592,12 @@ async def test_sleeping_device_gen2_with_new_firmware(
 
     with (
         patch(
-            "homeassistant.components.shelly.config_flow.get_info",
+            "smarthub.components.shelly.config_flow.get_info",
             return_value={"mac": "test-mac", "gen": 2},
         ),
-        patch("homeassistant.components.shelly.async_setup", return_value=True),
+        patch("smarthub.components.shelly.async_setup", return_value=True),
         patch(
-            "homeassistant.components.shelly.async_setup_entry",
+            "smarthub.components.shelly.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -1618,7 +1618,7 @@ async def test_sleeping_device_gen2_with_new_firmware(
 
 @pytest.mark.parametrize(CONF_GEN, [1, 2, 3])
 async def test_reconfigure_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     mock_block_device: Mock,
     mock_rpc_device: Mock,
@@ -1637,7 +1637,7 @@ async def test_reconfigure_successful(
     assert result["step_id"] == "reconfigure"
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "auth": False, "gen": gen},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -1652,7 +1652,7 @@ async def test_reconfigure_successful(
 
 @pytest.mark.parametrize("gen", [1, 2, 3])
 async def test_reconfigure_unsuccessful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     mock_block_device: Mock,
     mock_rpc_device: Mock,
@@ -1671,7 +1671,7 @@ async def test_reconfigure_unsuccessful(
     assert result["step_id"] == "reconfigure"
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={
             "mac": "another-mac",
             "type": MODEL_1,
@@ -1696,7 +1696,7 @@ async def test_reconfigure_unsuccessful(
     ],
 )
 async def test_reconfigure_with_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exc: Exception,
     base_error: str,
     mock_rpc_device: Mock,
@@ -1712,7 +1712,7 @@ async def test_reconfigure_with_exception(
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "reconfigure"
 
-    with patch("homeassistant.components.shelly.config_flow.get_info", side_effect=exc):
+    with patch("smarthub.components.shelly.config_flow.get_info", side_effect=exc):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input={CONF_HOST: "10.10.10.10", CONF_PORT: 99},
@@ -1721,7 +1721,7 @@ async def test_reconfigure_with_exception(
     assert result["errors"] == {"base": base_error}
 
     with patch(
-        "homeassistant.components.shelly.config_flow.get_info",
+        "smarthub.components.shelly.config_flow.get_info",
         return_value={"mac": "test-mac", "type": MODEL_1, "auth": False, "gen": 2},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -1734,7 +1734,7 @@ async def test_reconfigure_with_exception(
     assert entry.data == {CONF_HOST: "10.10.10.10", CONF_PORT: 99, CONF_GEN: 2}
 
 
-async def test_zeroconf_rejects_ipv6(hass: HomeAssistant) -> None:
+async def test_zeroconf_rejects_ipv6(hass: SmartHub) -> None:
     """Test zeroconf discovery rejects ipv6."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,

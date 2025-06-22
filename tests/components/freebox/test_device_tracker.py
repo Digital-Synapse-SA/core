@@ -4,9 +4,9 @@ from unittest.mock import Mock
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
-from homeassistant.components.freebox import SCAN_INTERVAL
-from homeassistant.core import HomeAssistant
+from smarthub.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
+from smarthub.components.freebox import SCAN_INTERVAL
+from smarthub.core import SmartHub
 
 from .common import setup_platform
 
@@ -14,7 +14,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_router_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     router: Mock,
 ) -> None:
@@ -32,7 +32,7 @@ async def test_router_mode(
 
 
 async def test_bridge_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     router_bridge_mode: Mock,
 ) -> None:

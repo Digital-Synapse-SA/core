@@ -4,15 +4,15 @@ from datetime import datetime
 
 import pytest
 
-from homeassistant.components.here_travel_time.config_flow import DEFAULT_OPTIONS
-from homeassistant.components.here_travel_time.const import (
+from smarthub.components.here_travel_time.config_flow import DEFAULT_OPTIONS
+from smarthub.components.here_travel_time.const import (
     CONF_ARRIVAL_TIME,
     CONF_DEPARTURE_TIME,
     CONF_ROUTE_MODE,
     DOMAIN,
     ROUTE_MODE_FASTEST,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .const import DEFAULT_CONFIG
 
@@ -37,7 +37,7 @@ from tests.common import MockConfigEntry
         },
     ],
 )
-async def test_unload_entry(hass: HomeAssistant, options) -> None:
+async def test_unload_entry(hass: SmartHub, options) -> None:
     """Test that unloading an entry works."""
     entry = MockConfigEntry(
         domain=DOMAIN,

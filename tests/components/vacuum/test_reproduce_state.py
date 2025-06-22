@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.vacuum import (
+from smarthub.components.vacuum import (
     ATTR_FAN_SPEED,
     SERVICE_PAUSE,
     SERVICE_RETURN_TO_BASE,
@@ -11,9 +11,9 @@ from homeassistant.components.vacuum import (
     SERVICE_STOP,
     VacuumActivity,
 )
-from homeassistant.const import SERVICE_TURN_OFF, SERVICE_TURN_ON, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.state import async_reproduce_state
+from smarthub.const import SERVICE_TURN_OFF, SERVICE_TURN_ON, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub, State
+from smarthub.helpers.state import async_reproduce_state
 
 from tests.common import async_mock_service
 
@@ -22,7 +22,7 @@ FAN_SPEED_HIGH = "high"
 
 
 async def test_reproducing_states(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reproducing Vacuum states."""
     hass.states.async_set("vacuum.entity_off", STATE_OFF, {})

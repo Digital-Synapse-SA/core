@@ -5,16 +5,16 @@ from freezegun.api import FrozenDateTimeFactory
 from iottycloud.verbs import RESULT, STATUS, STATUS_OFF, STATUS_ON
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.iotty.const import DOMAIN
-from homeassistant.components.iotty.coordinator import UPDATE_INTERVAL
-from homeassistant.components.switch import (
+from smarthub.components.iotty.const import DOMAIN
+from smarthub.components.iotty.coordinator import UPDATE_INTERVAL
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     config_entry_oauth2_flow,
     device_registry as dr,
     entity_registry as er,
@@ -30,7 +30,7 @@ async def check_command_ok(
     initial_status: str,
     final_status: str,
     command: str,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_status,
@@ -66,7 +66,7 @@ async def check_command_ok(
 
 
 async def test_turn_on_light_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twolightswitches,
@@ -91,7 +91,7 @@ async def test_turn_on_light_ok(
 
 
 async def test_turn_on_outlet_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_two_outlets,
@@ -116,7 +116,7 @@ async def test_turn_on_outlet_ok(
 
 
 async def test_turn_off_light_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twolightswitches,
@@ -141,7 +141,7 @@ async def test_turn_off_light_ok(
 
 
 async def test_turn_off_outlet_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_two_outlets,
@@ -166,7 +166,7 @@ async def test_turn_off_outlet_ok(
 
 
 async def test_setup_entry_ok_nodevices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_status_filled,
@@ -188,7 +188,7 @@ async def test_setup_entry_ok_nodevices(
 
 
 async def test_devices_creaction_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
@@ -224,7 +224,7 @@ async def test_devices_creaction_ok(
 
 
 async def test_devices_deletion_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twolightswitches,
@@ -258,7 +258,7 @@ async def test_devices_deletion_ok(
 
 
 async def test_devices_insertion_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twolightswitches,
@@ -292,7 +292,7 @@ async def test_devices_insertion_ok(
 
 
 async def test_outlet_insertion_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_two_outlets,
@@ -326,7 +326,7 @@ async def test_outlet_insertion_ok(
 
 
 async def test_api_not_ok_entities_stay_the_same_as_before(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twolightswitches,
@@ -361,7 +361,7 @@ async def test_api_not_ok_entities_stay_the_same_as_before(
 
 
 async def test_api_throws_response_entities_stay_the_same_as_before(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twolightswitches,

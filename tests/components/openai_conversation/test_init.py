@@ -14,10 +14,10 @@ from openai.types.images_response import ImagesResponse
 from openai.types.responses import Response, ResponseOutputMessage, ResponseOutputText
 import pytest
 
-from homeassistant.components.openai_conversation import CONF_FILENAMES
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.setup import async_setup_component
+from smarthub.components.openai_conversation import CONF_FILENAMES
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -65,7 +65,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_generate_image_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
     service_data,
@@ -108,7 +108,7 @@ async def test_generate_image_service(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_image_service_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test generate image service handles errors."""
@@ -123,7 +123,7 @@ async def test_generate_image_service_error(
                 message="Reason",
             ),
         ),
-        pytest.raises(HomeAssistantError, match="Error generating image: Reason"),
+        pytest.raises(SmartHubError, match="Error generating image: Reason"),
     ):
         await hass.services.async_call(
             "openai_conversation",
@@ -150,7 +150,7 @@ async def test_generate_image_service_error(
                 ],
             ),
         ),
-        pytest.raises(HomeAssistantError, match="No image returned"),
+        pytest.raises(SmartHubError, match="No image returned"),
     ):
         await hass.services.async_call(
             "openai_conversation",
@@ -166,7 +166,7 @@ async def test_generate_image_service_error(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_content_service_with_image_not_allowed_path(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test generate content service with an image in a not allowed path."""
@@ -174,7 +174,7 @@ async def test_generate_content_service_with_image_not_allowed_path(
         patch("pathlib.Path.exists", return_value=True),
         patch.object(hass.config, "is_allowed_path", return_value=False),
         pytest.raises(
-            HomeAssistantError,
+            SmartHubError,
             match=(
                 "Cannot read `doorbell_snapshot.jpg`, no access to path; "
                 "`allowlist_external_dirs` may need to be adjusted in "
@@ -203,7 +203,7 @@ async def test_generate_content_service_with_image_not_allowed_path(
     ],
 )
 async def test_invalid_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
     service_name: str,
@@ -254,7 +254,7 @@ async def test_invalid_config_entry(
     ],
 )
 async def test_init_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
     side_effect,
@@ -363,7 +363,7 @@ async def test_init_error(
     ],
 )
 async def test_generate_content_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
     service_data,
@@ -469,7 +469,7 @@ async def test_generate_content_service(
     ],
 )
 async def test_generate_content_service_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
     service_data,
@@ -495,7 +495,7 @@ async def test_generate_content_service_invalid(
             hass.config, "is_allowed_path", side_effect=is_allowed_side_effect
         ),
     ):
-        with pytest.raises(HomeAssistantError, match=error):
+        with pytest.raises(SmartHubError, match=error):
             await hass.services.async_call(
                 "openai_conversation",
                 "generate_content",
@@ -509,7 +509,7 @@ async def test_generate_content_service_invalid(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_content_service_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test generate content service handles errors."""
@@ -524,7 +524,7 @@ async def test_generate_content_service_error(
                 message="Reason",
             ),
         ),
-        pytest.raises(HomeAssistantError, match="Error generating content: Reason"),
+        pytest.raises(SmartHubError, match="Error generating content: Reason"),
     ):
         await hass.services.async_call(
             "openai_conversation",

@@ -5,17 +5,17 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.homee.const import (
+from smarthub.components.homee.const import (
     DOMAIN,
     OPEN_CLOSE_MAP,
     OPEN_CLOSE_MAP_REVERSED,
     WINDOW_MAP,
     WINDOW_MAP_REVERSED,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
 
 from . import async_update_attribute_value, build_mock_node, setup_integration
 from .conftest import HOMEE_ID
@@ -29,7 +29,7 @@ def enable_all_entities(entity_registry_enabled_by_default: None) -> None:
 
 
 async def setup_sensor(
-    hass: HomeAssistant, mock_homee: MagicMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_homee: MagicMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Setups the integration for sensor tests."""
     mock_homee.nodes = [build_mock_node("sensors.json")]
@@ -38,7 +38,7 @@ async def setup_sensor(
 
 
 async def test_up_down_values(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_up_down_values(
 
 
 async def test_window_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -103,7 +103,7 @@ async def test_window_position(
     ],
 )
 async def test_sensor_deprecation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     issue_registry: ir.IssueRegistry,
@@ -124,7 +124,7 @@ async def test_sensor_deprecation(
     )
 
     with patch(
-        "homeassistant.components.homee.sensor.entity_used_in", return_value=True
+        "smarthub.components.homee.sensor.entity_used_in", return_value=True
     ):
         await setup_sensor(hass, mock_homee, mock_config_entry)
 
@@ -139,7 +139,7 @@ async def test_sensor_deprecation(
 
 
 async def test_sensor_deprecation_unused_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     issue_registry: ir.IssueRegistry,
@@ -169,7 +169,7 @@ async def test_sensor_deprecation_unused_entity(
 
 
 async def test_sensor_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -178,7 +178,7 @@ async def test_sensor_snapshot(
     """Test the multisensor snapshot."""
     mock_homee.nodes = [build_mock_node("sensors.json")]
     mock_homee.get_node_by_id.return_value = mock_homee.nodes[0]
-    with patch("homeassistant.components.homee.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.homee.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

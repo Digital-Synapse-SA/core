@@ -3,7 +3,7 @@
 import pytest
 from vallox_websocket_api import Profile
 
-from homeassistant.components.vallox import (
+from smarthub.components.vallox import (
     ATTR_DURATION,
     ATTR_PROFILE,
     ATTR_PROFILE_FAN_SPEED,
@@ -13,8 +13,8 @@ from homeassistant.components.vallox import (
     SERVICE_SET_PROFILE_FAN_SPEED_BOOST,
     SERVICE_SET_PROFILE_FAN_SPEED_HOME,
 )
-from homeassistant.components.vallox.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.vallox.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .conftest import patch_set_fan_speed, patch_set_profile
 
@@ -30,7 +30,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_create_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry: MockConfigEntry,
     service: str,
     profile: Profile,
@@ -69,7 +69,7 @@ async def test_create_service(
     ],
 )
 async def test_set_profile_service(
-    hass: HomeAssistant, mock_entry: MockConfigEntry, profile: str, duration: int | None
+    hass: SmartHub, mock_entry: MockConfigEntry, profile: str, duration: int | None
 ) -> None:
     """Test service for setting profile and duration."""
     # Act

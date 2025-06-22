@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
 
-@patch("homeassistant.components.sabnzbd.PLATFORMS", [Platform.BINARY_SENSOR])
+@patch("smarthub.components.sabnzbd.PLATFORMS", [Platform.BINARY_SENSOR])
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

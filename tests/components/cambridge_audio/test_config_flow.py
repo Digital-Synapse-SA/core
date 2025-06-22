@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock
 
 from aiostreammagic import StreamMagicError
 
-from homeassistant.components.cambridge_audio.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF, ConfigFlowResult
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.cambridge_audio.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF, ConfigFlowResult
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -32,7 +32,7 @@ ZEROCONF_DISCOVERY = ZeroconfServiceInfo(
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -57,7 +57,7 @@ async def test_full_flow(
 
 
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -89,7 +89,7 @@ async def test_flow_errors(
 
 
 async def test_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -114,7 +114,7 @@ async def test_duplicate(
 
 
 async def test_zeroconf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -140,7 +140,7 @@ async def test_zeroconf_flow(
 
 
 async def test_zeroconf_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -177,7 +177,7 @@ async def test_zeroconf_flow_errors(
 
 
 async def test_zeroconf_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -195,7 +195,7 @@ async def test_zeroconf_duplicate(
 
 
 async def _start_reconfigure_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> ConfigFlowResult:
     """Initialize a reconfigure flow."""
     mock_config_entry.add_to_hass(hass)
@@ -212,7 +212,7 @@ async def _start_reconfigure_flow(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -232,7 +232,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_unique_id_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

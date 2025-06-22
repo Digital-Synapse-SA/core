@@ -2,7 +2,7 @@
 
 import json
 
-from homeassistant.components.google_assistant.data_redaction import async_redact_msg
+from smarthub.components.google_assistant.data_redaction import async_redact_msg
 
 from tests.common import load_fixture
 

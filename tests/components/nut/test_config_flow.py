@@ -5,10 +5,10 @@ from unittest.mock import patch
 
 from aionut import NUTError, NUTLoginError
 
-from homeassistant import config_entries
-from homeassistant.components.nut.config_flow import PASSWORD_NOT_CHANGED
-from homeassistant.components.nut.const import DOMAIN
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components.nut.config_flow import PASSWORD_NOT_CHANGED
+from smarthub.components.nut.const import DOMAIN
+from smarthub.const import (
     CONF_ALIAS,
     CONF_HOST,
     CONF_NAME,
@@ -17,9 +17,9 @@ from homeassistant.const import (
     CONF_RESOURCES,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .util import _get_mock_nutclient, async_init_integration
 
@@ -33,7 +33,7 @@ VALID_CONFIG = {
 }
 
 
-async def test_form_zeroconf(hass: HomeAssistant) -> None:
+async def test_form_zeroconf(hass: SmartHub) -> None:
     """Test we can setup from zeroconf."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -58,11 +58,11 @@ async def test_form_zeroconf(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -84,7 +84,7 @@ async def test_form_zeroconf(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_user_one_alias(hass: HomeAssistant) -> None:
+async def test_form_user_one_alias(hass: SmartHub) -> None:
     """Test we can configure a device with one alias."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -98,11 +98,11 @@ async def test_form_user_one_alias(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -128,7 +128,7 @@ async def test_form_user_one_alias(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_user_multiple_aliases(hass: HomeAssistant) -> None:
+async def test_form_user_multiple_aliases(hass: SmartHub) -> None:
     """Test we can configure device with multiple aliases."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -148,7 +148,7 @@ async def test_form_user_multiple_aliases(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -166,11 +166,11 @@ async def test_form_user_multiple_aliases(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -192,7 +192,7 @@ async def test_form_user_multiple_aliases(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 2
 
 
-async def test_form_user_one_alias_with_ignored_entry(hass: HomeAssistant) -> None:
+async def test_form_user_one_alias_with_ignored_entry(hass: SmartHub) -> None:
     """Test we can setup a new one when there is an ignored one."""
     ignored_entry = MockConfigEntry(
         domain=DOMAIN, data={}, source=config_entries.SOURCE_IGNORE
@@ -211,11 +211,11 @@ async def test_form_user_one_alias_with_ignored_entry(hass: HomeAssistant) -> No
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -241,7 +241,7 @@ async def test_form_user_one_alias_with_ignored_entry(hass: HomeAssistant) -> No
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_no_aliases_found(hass: HomeAssistant) -> None:
+async def test_form_no_aliases_found(hass: SmartHub) -> None:
     """Test we abort when the NUT server has no aliases."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -250,7 +250,7 @@ async def test_form_no_aliases_found(hass: HomeAssistant) -> None:
     mock_pynut = _get_mock_nutclient()
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -267,7 +267,7 @@ async def test_form_no_aliases_found(hass: HomeAssistant) -> None:
     assert result2["reason"] == "no_ups_found"
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -275,11 +275,11 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_ups",
+            "smarthub.components.nut.AIONUTClient.list_ups",
             side_effect=NUTError("no route to host"),
         ),
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_vars",
+            "smarthub.components.nut.AIONUTClient.list_vars",
             side_effect=NUTError("no route to host"),
         ),
     ):
@@ -299,11 +299,11 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_ups",
+            "smarthub.components.nut.AIONUTClient.list_ups",
             return_value={"ups1"},
         ),
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_vars",
+            "smarthub.components.nut.AIONUTClient.list_vars",
             side_effect=Exception,
         ),
     ):
@@ -325,11 +325,11 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     )
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -355,7 +355,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_auth_failures(hass: HomeAssistant) -> None:
+async def test_auth_failures(hass: SmartHub) -> None:
     """Test authentication failures."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -363,11 +363,11 @@ async def test_auth_failures(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_ups",
+            "smarthub.components.nut.AIONUTClient.list_ups",
             side_effect=NUTLoginError,
         ),
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_vars",
+            "smarthub.components.nut.AIONUTClient.list_vars",
             side_effect=NUTLoginError,
         ),
     ):
@@ -389,11 +389,11 @@ async def test_auth_failures(hass: HomeAssistant) -> None:
     )
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -419,7 +419,7 @@ async def test_auth_failures(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_reauth(hass: HomeAssistant) -> None:
+async def test_reauth(hass: SmartHub) -> None:
     """Test reauth flow."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -438,11 +438,11 @@ async def test_reauth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_ups",
+            "smarthub.components.nut.AIONUTClient.list_ups",
             side_effect=NUTLoginError,
         ),
         patch(
-            "homeassistant.components.nut.AIONUTClient.list_vars",
+            "smarthub.components.nut.AIONUTClient.list_vars",
             side_effect=NUTLoginError,
         ),
     ):
@@ -462,11 +462,11 @@ async def test_reauth(hass: HomeAssistant) -> None:
     )
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -484,7 +484,7 @@ async def test_reauth(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
+async def test_abort_if_already_setup(hass: SmartHub) -> None:
     """Test we abort if component is already setup."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -506,7 +506,7 @@ async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -521,7 +521,7 @@ async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
         assert result2["reason"] == "already_configured"
 
 
-async def test_abort_duplicate_unique_ids(hass: HomeAssistant) -> None:
+async def test_abort_duplicate_unique_ids(hass: SmartHub) -> None:
     """Test we abort if unique_id is already setup."""
 
     list_vars = {
@@ -542,7 +542,7 @@ async def test_abort_duplicate_unique_ids(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -558,7 +558,7 @@ async def test_abort_duplicate_unique_ids(hass: HomeAssistant) -> None:
         assert result2["reason"] == "already_configured"
 
 
-async def test_abort_multiple_aliases_duplicate_unique_ids(hass: HomeAssistant) -> None:
+async def test_abort_multiple_aliases_duplicate_unique_ids(hass: SmartHub) -> None:
     """Test we abort on multiple aliases if unique_id is already setup."""
 
     list_vars = {
@@ -578,7 +578,7 @@ async def test_abort_multiple_aliases_duplicate_unique_ids(hass: HomeAssistant) 
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -601,11 +601,11 @@ async def test_abort_multiple_aliases_duplicate_unique_ids(hass: HomeAssistant) 
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -619,7 +619,7 @@ async def test_abort_multiple_aliases_duplicate_unique_ids(hass: HomeAssistant) 
         assert result3["reason"] == "already_configured"
 
 
-async def test_abort_if_already_setup_alias(hass: HomeAssistant) -> None:
+async def test_abort_if_already_setup_alias(hass: SmartHub) -> None:
     """Test we abort if component is already setup with same alias."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -642,7 +642,7 @@ async def test_abort_if_already_setup_alias(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -657,7 +657,7 @@ async def test_abort_if_already_setup_alias(hass: HomeAssistant) -> None:
     assert result2["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -669,7 +669,7 @@ async def test_abort_if_already_setup_alias(hass: HomeAssistant) -> None:
         assert result3["reason"] == "already_configured"
 
 
-async def test_reconfigure_one_alias_successful(hass: HomeAssistant) -> None:
+async def test_reconfigure_one_alias_successful(hass: SmartHub) -> None:
     """Test reconfigure one alias successful."""
     entry = await async_init_integration(
         hass,
@@ -692,7 +692,7 @@ async def test_reconfigure_one_alias_successful(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -714,7 +714,7 @@ async def test_reconfigure_one_alias_successful(hass: HomeAssistant) -> None:
         assert entry.data[CONF_PASSWORD] == "test-new-password"
 
 
-async def test_reconfigure_one_alias_nochange(hass: HomeAssistant) -> None:
+async def test_reconfigure_one_alias_nochange(hass: SmartHub) -> None:
     """Test reconfigure one alias when there is no change."""
     entry = await async_init_integration(
         hass,
@@ -737,7 +737,7 @@ async def test_reconfigure_one_alias_nochange(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -759,7 +759,7 @@ async def test_reconfigure_one_alias_nochange(hass: HomeAssistant) -> None:
         assert entry.data[CONF_PASSWORD] == "test-password"
 
 
-async def test_reconfigure_one_alias_password_nochange(hass: HomeAssistant) -> None:
+async def test_reconfigure_one_alias_password_nochange(hass: SmartHub) -> None:
     """Test reconfigure one alias when there is no password change."""
     entry = await async_init_integration(
         hass,
@@ -782,7 +782,7 @@ async def test_reconfigure_one_alias_password_nochange(hass: HomeAssistant) -> N
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -804,7 +804,7 @@ async def test_reconfigure_one_alias_password_nochange(hass: HomeAssistant) -> N
         assert entry.data[CONF_PASSWORD] == "test-password"
 
 
-async def test_reconfigure_one_alias_already_configured(hass: HomeAssistant) -> None:
+async def test_reconfigure_one_alias_already_configured(hass: SmartHub) -> None:
     """Test reconfigure when config changed to an existing host/port/alias."""
     entry = await async_init_integration(
         hass,
@@ -837,7 +837,7 @@ async def test_reconfigure_one_alias_already_configured(hass: HomeAssistant) -> 
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -864,7 +864,7 @@ async def test_reconfigure_one_alias_already_configured(hass: HomeAssistant) -> 
         assert entry2.data[CONF_PASSWORD] == "test-password"
 
 
-async def test_reconfigure_one_alias_unique_id_change(hass: HomeAssistant) -> None:
+async def test_reconfigure_one_alias_unique_id_change(hass: SmartHub) -> None:
     """Test reconfigure when the unique ID is changed."""
     entry = await async_init_integration(
         hass,
@@ -895,7 +895,7 @@ async def test_reconfigure_one_alias_unique_id_change(hass: HomeAssistant) -> No
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -912,7 +912,7 @@ async def test_reconfigure_one_alias_unique_id_change(hass: HomeAssistant) -> No
         assert result2["reason"] == "unique_id_mismatch"
 
 
-async def test_reconfigure_one_alias_duplicate_unique_ids(hass: HomeAssistant) -> None:
+async def test_reconfigure_one_alias_duplicate_unique_ids(hass: SmartHub) -> None:
     """Test reconfigure that results in a duplicate unique ID."""
 
     list_vars = {
@@ -956,7 +956,7 @@ async def test_reconfigure_one_alias_duplicate_unique_ids(hass: HomeAssistant) -
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -973,7 +973,7 @@ async def test_reconfigure_one_alias_duplicate_unique_ids(hass: HomeAssistant) -
         assert result2["reason"] == "unique_id_mismatch"
 
 
-async def test_reconfigure_multiple_aliases_successful(hass: HomeAssistant) -> None:
+async def test_reconfigure_multiple_aliases_successful(hass: SmartHub) -> None:
     """Test reconfigure with multiple aliases is successful."""
     entry = await async_init_integration(
         hass,
@@ -999,7 +999,7 @@ async def test_reconfigure_multiple_aliases_successful(hass: HomeAssistant) -> N
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -1017,11 +1017,11 @@ async def test_reconfigure_multiple_aliases_successful(hass: HomeAssistant) -> N
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -1041,7 +1041,7 @@ async def test_reconfigure_multiple_aliases_successful(hass: HomeAssistant) -> N
         assert entry.data[CONF_ALIAS] == "ups2"
 
 
-async def test_reconfigure_multiple_aliases_nochange(hass: HomeAssistant) -> None:
+async def test_reconfigure_multiple_aliases_nochange(hass: SmartHub) -> None:
     """Test reconfigure with multiple aliases and no change."""
     entry = await async_init_integration(
         hass,
@@ -1067,7 +1067,7 @@ async def test_reconfigure_multiple_aliases_nochange(hass: HomeAssistant) -> Non
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -1085,11 +1085,11 @@ async def test_reconfigure_multiple_aliases_nochange(hass: HomeAssistant) -> Non
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -1110,7 +1110,7 @@ async def test_reconfigure_multiple_aliases_nochange(hass: HomeAssistant) -> Non
 
 
 async def test_reconfigure_multiple_aliases_password_nochange(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test reconfigure with multiple aliases when no password change."""
     entry = await async_init_integration(
@@ -1137,7 +1137,7 @@ async def test_reconfigure_multiple_aliases_password_nochange(
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -1155,11 +1155,11 @@ async def test_reconfigure_multiple_aliases_password_nochange(
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -1180,7 +1180,7 @@ async def test_reconfigure_multiple_aliases_password_nochange(
 
 
 async def test_reconfigure_multiple_aliases_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test reconfigure multi aliases changed to existing host/port/alias."""
     entry = await async_init_integration(
@@ -1224,7 +1224,7 @@ async def test_reconfigure_multiple_aliases_already_configured(
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -1242,11 +1242,11 @@ async def test_reconfigure_multiple_aliases_already_configured(
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -1273,7 +1273,7 @@ async def test_reconfigure_multiple_aliases_already_configured(
 
 
 async def test_reconfigure_multiple_aliases_unique_id_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test reconfigure with multiple aliases and the unique ID is changed."""
     entry = await async_init_integration(
@@ -1305,7 +1305,7 @@ async def test_reconfigure_multiple_aliases_unique_id_change(
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -1323,11 +1323,11 @@ async def test_reconfigure_multiple_aliases_unique_id_change(
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -1342,7 +1342,7 @@ async def test_reconfigure_multiple_aliases_unique_id_change(
 
 
 async def test_reconfigure_multiple_aliases_duplicate_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test reconfigure multi aliases that results in duplicate unique ID."""
 
@@ -1392,7 +1392,7 @@ async def test_reconfigure_multiple_aliases_duplicate_unique_ids(
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -1410,11 +1410,11 @@ async def test_reconfigure_multiple_aliases_duplicate_unique_ids(
 
     with (
         patch(
-            "homeassistant.components.nut.AIONUTClient",
+            "smarthub.components.nut.AIONUTClient",
             return_value=mock_pynut,
         ),
         patch(
-            "homeassistant.components.nut.async_setup_entry",
+            "smarthub.components.nut.async_setup_entry",
             return_value=True,
         ),
     ):

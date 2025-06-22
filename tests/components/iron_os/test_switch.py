@@ -9,17 +9,17 @@ from pynecil import CharSetting, CommunicationError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TOGGLE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
@@ -28,7 +28,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 async def switch_only() -> AsyncGenerator[None]:
     """Enable only the switch platform."""
     with patch(
-        "homeassistant.components.iron_os.PLATFORMS",
+        "smarthub.components.iron_os.PLATFORMS",
         [Platform.SWITCH],
     ):
         yield
@@ -38,7 +38,7 @@ async def switch_only() -> AsyncGenerator[None]:
     "entity_registry_enabled_by_default", "mock_pynecil", "ble_device"
 )
 async def test_switch_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -79,7 +79,7 @@ async def test_switch_platform(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "ble_device")
 async def test_turn_on_off_toggle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pynecil: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -118,7 +118,7 @@ async def test_turn_on_off_toggle(
     "entity_registry_enabled_by_default", "ble_device", "mock_pynecil"
 )
 async def test_turn_on_off_toggle_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pynecil: AsyncMock,
     service: str,

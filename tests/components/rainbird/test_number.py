@@ -4,13 +4,13 @@ from http import HTTPStatus
 
 import pytest
 
-from homeassistant.components import number
-from homeassistant.components.rainbird import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components import number
+from smarthub.components.rainbird import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .conftest import (
     ACK_ECHO,
@@ -34,7 +34,7 @@ def platforms() -> list[str]:
 
 @pytest.fixture(autouse=True)
 async def setup_config_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> list[Platform]:
     """Fixture to setup the config entry."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -46,7 +46,7 @@ async def setup_config_entry(
     [(RAIN_DELAY, "16"), (RAIN_DELAY_OFF, "0")],
 )
 async def test_number_values(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_state: str,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -70,7 +70,7 @@ async def test_number_values(
 
 
 async def test_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     aioclient_mock: AiohttpClientMocker,
     responses: list[str],
@@ -112,7 +112,7 @@ async def test_set_value(
     ],
 )
 async def test_set_value_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     responses: list[str],
     status: HTTPStatus,
@@ -123,7 +123,7 @@ async def test_set_value_error(
     aioclient_mock.mock_calls.clear()
     responses.append(mock_response_error(status=status))
 
-    with pytest.raises(HomeAssistantError, match=expected_msg):
+    with pytest.raises(SmartHubError, match=expected_msg):
         await hass.services.async_call(
             number.DOMAIN,
             number.SERVICE_SET_VALUE,
@@ -144,7 +144,7 @@ async def test_set_value_error(
     ],
 )
 async def test_no_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     responses: list[AiohttpClientMockResponse],
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,

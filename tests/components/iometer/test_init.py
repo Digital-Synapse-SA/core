@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.iometer.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.iometer.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_platform
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_new_firmware_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_iometer_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,

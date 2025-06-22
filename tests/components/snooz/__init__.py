@@ -9,10 +9,10 @@ from pysnooz.commands import SnoozCommandData
 from pysnooz.device import DisconnectionReason, SnoozConnectionStatus
 from pysnooz.testing import MockSnoozDevice as ParentMockSnoozDevice
 
-from homeassistant.components.snooz.const import DOMAIN
-from homeassistant.const import CONF_ADDRESS, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.components.snooz.const import DOMAIN
+from smarthub.const import CONF_ADDRESS, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
 
 from tests.common import MockConfigEntry
 from tests.components.bluetooth import generate_ble_device
@@ -114,14 +114,14 @@ async def create_mock_snooz(
 
 
 async def create_mock_snooz_config_entry(
-    hass: HomeAssistant, device: MockSnoozDevice
+    hass: SmartHub, device: MockSnoozDevice
 ) -> MockConfigEntry:
     """Create a mock config entry."""
 
     with (
-        patch("homeassistant.components.snooz.SnoozDevice", return_value=device),
+        patch("smarthub.components.snooz.SnoozDevice", return_value=device),
         patch(
-            "homeassistant.components.snooz.async_ble_device_from_address",
+            "smarthub.components.snooz.async_ble_device_from_address",
             return_value=generate_ble_device(device.address, device.name),
         ),
     ):

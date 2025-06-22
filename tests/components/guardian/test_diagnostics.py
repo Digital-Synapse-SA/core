@@ -1,8 +1,8 @@
 """Test Guardian diagnostics."""
 
-from homeassistant.components.diagnostics import REDACTED
-from homeassistant.components.guardian import GuardianData
-from homeassistant.core import HomeAssistant
+from smarthub.components.diagnostics import REDACTED
+from smarthub.components.guardian import GuardianData
+from smarthub.core import SmartHub
 
 from tests.common import ANY, MockConfigEntry
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -10,7 +10,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
     setup_guardian: None,  # relies on config_entry fixture

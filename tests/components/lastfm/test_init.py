@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from homeassistant.components.lastfm.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.lastfm.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import MockUser
 from .conftest import ComponentSetup
@@ -12,7 +12,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
     default_user: MockUser,

@@ -6,18 +6,18 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from wled import WLEDConnectionError
 
-from homeassistant.components.wled.const import CONF_KEEP_MAIN_LIGHT, DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_MAC, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.wled.const import CONF_KEEP_MAIN_LIGHT, DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_MAC, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_wled")
-async def test_full_user_flow_implementation(hass: HomeAssistant) -> None:
+async def test_full_user_flow_implementation(hass: SmartHub) -> None:
     """Test the full manual user flow from start to finish."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -38,7 +38,7 @@ async def test_full_user_flow_implementation(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_wled")
-async def test_full_zeroconf_flow_implementation(hass: HomeAssistant) -> None:
+async def test_full_zeroconf_flow_implementation(hass: SmartHub) -> None:
     """Test the full manual user flow from start to finish."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -79,7 +79,7 @@ async def test_full_zeroconf_flow_implementation(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_wled")
 async def test_zeroconf_during_onboarding(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_onboarding: MagicMock,
 ) -> None:
@@ -109,7 +109,7 @@ async def test_zeroconf_during_onboarding(
     assert len(mock_onboarding.mock_calls) == 1
 
 
-async def test_connection_error(hass: HomeAssistant, mock_wled: MagicMock) -> None:
+async def test_connection_error(hass: SmartHub, mock_wled: MagicMock) -> None:
     """Test we show user form on WLED connection error."""
     mock_wled.update.side_effect = WLEDConnectionError
     result = await hass.config_entries.flow.async_init(
@@ -124,7 +124,7 @@ async def test_connection_error(hass: HomeAssistant, mock_wled: MagicMock) -> No
 
 
 async def test_zeroconf_connection_error(
-    hass: HomeAssistant, mock_wled: MagicMock
+    hass: SmartHub, mock_wled: MagicMock
 ) -> None:
     """Test we abort zeroconf flow on WLED connection error."""
     mock_wled.update.side_effect = WLEDConnectionError
@@ -149,7 +149,7 @@ async def test_zeroconf_connection_error(
 
 @pytest.mark.usefixtures("mock_wled")
 async def test_user_device_exists_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_wled: MagicMock,
 ) -> None:
@@ -167,7 +167,7 @@ async def test_user_device_exists_abort(
 
 @pytest.mark.usefixtures("mock_wled")
 async def test_zeroconf_without_mac_device_exists_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort zeroconf flow if WLED device already configured."""
@@ -191,7 +191,7 @@ async def test_zeroconf_without_mac_device_exists_abort(
 
 
 async def test_zeroconf_with_mac_device_exists_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_wled: MagicMock,
 ) -> None:
@@ -216,7 +216,7 @@ async def test_zeroconf_with_mac_device_exists_abort(
 
 
 async def test_options_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test options config flow."""
     mock_config_entry.add_to_hass(hass)

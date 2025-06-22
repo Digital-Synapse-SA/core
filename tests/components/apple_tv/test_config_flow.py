@@ -8,17 +8,17 @@ from pyatv import exceptions
 from pyatv.const import PairingRequirement, Protocol
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.apple_tv import CONF_ADDRESS, config_flow
-from homeassistant.components.apple_tv.const import (
+from smarthub import config_entries
+from smarthub.components.apple_tv import CONF_ADDRESS, config_flow
+from smarthub.components.apple_tv.const import (
     CONF_IDENTIFIERS,
     CONF_START_OFF,
     DOMAIN,
 )
-from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.const import CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .common import airplay_service, create_conf, mrp_service, raop_service
 
@@ -62,7 +62,7 @@ def use_mocked_zeroconf(mock_async_zeroconf: MagicMock) -> None:
 def mock_setup_entry() -> Generator[Mock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.apple_tv.async_setup_entry", return_value=True
+        "smarthub.components.apple_tv.async_setup_entry", return_value=True
     ) as setup_entry:
         yield setup_entry
 
@@ -71,7 +71,7 @@ def mock_setup_entry() -> Generator[Mock]:
 
 
 @pytest.mark.usefixtures("mrp_device")
-async def test_user_input_device_not_found(hass: HomeAssistant) -> None:
+async def test_user_input_device_not_found(hass: SmartHub) -> None:
     """Test when user specifies a non-existing device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -89,7 +89,7 @@ async def test_user_input_device_not_found(hass: HomeAssistant) -> None:
 
 
 async def test_user_input_unexpected_error(
-    hass: HomeAssistant, mock_scan: AsyncMock
+    hass: SmartHub, mock_scan: AsyncMock
 ) -> None:
     """Test that unexpected error yields an error message."""
     result = await hass.config_entries.flow.async_init(
@@ -107,7 +107,7 @@ async def test_user_input_unexpected_error(
 
 
 @pytest.mark.usefixtures("full_device", "pairing")
-async def test_user_adds_full_device(hass: HomeAssistant) -> None:
+async def test_user_adds_full_device(hass: SmartHub) -> None:
     """Test adding device with all services."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -156,7 +156,7 @@ async def test_user_adds_full_device(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("dmap_device", "dmap_pin", "pairing")
-async def test_user_adds_dmap_device(hass: HomeAssistant) -> None:
+async def test_user_adds_dmap_device(hass: SmartHub) -> None:
     """Test adding device with only DMAP service."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -190,7 +190,7 @@ async def test_user_adds_dmap_device(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("dmap_device", "dmap_pin")
 async def test_user_adds_dmap_device_failed(
-    hass: HomeAssistant, pairing: AsyncMock
+    hass: SmartHub, pairing: AsyncMock
 ) -> None:
     """Test adding DMAP device where remote device did not attempt to pair."""
     pairing.always_fail = True
@@ -212,7 +212,7 @@ async def test_user_adds_dmap_device_failed(
 
 
 @pytest.mark.usefixtures("dmap_device_with_credentials", "mock_scan")
-async def test_user_adds_device_with_ip_filter(hass: HomeAssistant) -> None:
+async def test_user_adds_device_with_ip_filter(hass: SmartHub) -> None:
     """Test add device filtering by IP."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -231,7 +231,7 @@ async def test_user_adds_device_with_ip_filter(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("pairing_requirement", [(PairingRequirement.NotNeeded)])
 @pytest.mark.usefixtures("dmap_with_requirement", "pairing_mock")
-async def test_user_pair_no_interaction(hass: HomeAssistant) -> None:
+async def test_user_pair_no_interaction(hass: SmartHub) -> None:
     """Test pairing service without user interaction."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -255,7 +255,7 @@ async def test_user_pair_no_interaction(hass: HomeAssistant) -> None:
 
 
 async def test_user_adds_device_by_ip_uses_unicast_scan(
-    hass: HomeAssistant, mock_scan: AsyncMock
+    hass: SmartHub, mock_scan: AsyncMock
 ) -> None:
     """Test add device by IP-address, verify unicast scan is used."""
     result = await hass.config_entries.flow.async_init(
@@ -271,7 +271,7 @@ async def test_user_adds_device_by_ip_uses_unicast_scan(
 
 
 @pytest.mark.usefixtures("mrp_device")
-async def test_user_adds_existing_device(hass: HomeAssistant) -> None:
+async def test_user_adds_existing_device(hass: SmartHub) -> None:
     """Test that it is not possible to add existing device."""
     MockConfigEntry(domain="apple_tv", unique_id="mrpid").add_to_hass(hass)
 
@@ -289,7 +289,7 @@ async def test_user_adds_existing_device(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mrp_device")
 async def test_user_connection_failed(
-    hass: HomeAssistant, pairing_mock: AsyncMock
+    hass: SmartHub, pairing_mock: AsyncMock
 ) -> None:
     """Test error message when connection to device fails."""
     pairing_mock.begin.side_effect = exceptions.ConnectionFailedError
@@ -318,7 +318,7 @@ async def test_user_connection_failed(
 
 @pytest.mark.usefixtures("mrp_device")
 async def test_user_start_pair_error_failed(
-    hass: HomeAssistant, pairing_mock: AsyncMock
+    hass: SmartHub, pairing_mock: AsyncMock
 ) -> None:
     """Test initiating pairing fails."""
     pairing_mock.begin.side_effect = exceptions.PairingError
@@ -341,7 +341,7 @@ async def test_user_start_pair_error_failed(
 
 
 @pytest.mark.usefixtures("airplay_device_with_password", "pairing_mock")
-async def test_user_pair_service_with_password(hass: HomeAssistant) -> None:
+async def test_user_pair_service_with_password(hass: SmartHub) -> None:
     """Test pairing with service requiring a password (not supported)."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -369,7 +369,7 @@ async def test_user_pair_service_with_password(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("pairing_requirement", [(PairingRequirement.Disabled)])
 @pytest.mark.usefixtures("dmap_with_requirement", "pairing_mock")
-async def test_user_pair_disabled_service(hass: HomeAssistant) -> None:
+async def test_user_pair_disabled_service(hass: SmartHub) -> None:
     """Test pairing with disabled service (is ignored with message)."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -397,7 +397,7 @@ async def test_user_pair_disabled_service(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("pairing_requirement", [(PairingRequirement.Unsupported)])
 @pytest.mark.usefixtures("dmap_with_requirement", "pairing_mock")
-async def test_user_pair_ignore_unsupported(hass: HomeAssistant) -> None:
+async def test_user_pair_ignore_unsupported(hass: SmartHub) -> None:
     """Test pairing with disabled service (is ignored silently)."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -418,7 +418,7 @@ async def test_user_pair_ignore_unsupported(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mrp_device")
 async def test_user_pair_invalid_pin(
-    hass: HomeAssistant, pairing_mock: AsyncMock
+    hass: SmartHub, pairing_mock: AsyncMock
 ) -> None:
     """Test pairing with invalid pin."""
     pairing_mock.finish.side_effect = exceptions.PairingError
@@ -447,7 +447,7 @@ async def test_user_pair_invalid_pin(
 
 @pytest.mark.usefixtures("mrp_device")
 async def test_user_pair_unexpected_error(
-    hass: HomeAssistant, pairing_mock: AsyncMock
+    hass: SmartHub, pairing_mock: AsyncMock
 ) -> None:
     """Test unexpected error when entering PIN code."""
 
@@ -476,7 +476,7 @@ async def test_user_pair_unexpected_error(
 
 @pytest.mark.usefixtures("mrp_device")
 async def test_user_pair_backoff_error(
-    hass: HomeAssistant, pairing_mock: AsyncMock
+    hass: SmartHub, pairing_mock: AsyncMock
 ) -> None:
     """Test that backoff error is displayed in case device requests it."""
     pairing_mock.begin.side_effect = exceptions.BackOffError
@@ -500,7 +500,7 @@ async def test_user_pair_backoff_error(
 
 @pytest.mark.usefixtures("mrp_device")
 async def test_user_pair_begin_unexpected_error(
-    hass: HomeAssistant, pairing_mock: AsyncMock
+    hass: SmartHub, pairing_mock: AsyncMock
 ) -> None:
     """Test unexpected error during start of pairing."""
     pairing_mock.begin.side_effect = Exception
@@ -523,7 +523,7 @@ async def test_user_pair_begin_unexpected_error(
 
 
 @pytest.mark.usefixtures("airplay_with_disabled_mrp", "pairing")
-async def test_ignores_disabled_service(hass: HomeAssistant) -> None:
+async def test_ignores_disabled_service(hass: SmartHub) -> None:
     """Test adding device with only DMAP service."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -561,7 +561,7 @@ async def test_ignores_disabled_service(hass: HomeAssistant) -> None:
 # Zeroconf
 
 
-async def test_zeroconf_unsupported_service_aborts(hass: HomeAssistant) -> None:
+async def test_zeroconf_unsupported_service_aborts(hass: SmartHub) -> None:
     """Test discovering unsupported zeroconf service."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -581,7 +581,7 @@ async def test_zeroconf_unsupported_service_aborts(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mrp_device", "pairing")
-async def test_zeroconf_add_mrp_device(hass: HomeAssistant) -> None:
+async def test_zeroconf_add_mrp_device(hass: SmartHub) -> None:
     """Test add MRP device discovered by zeroconf."""
     unrelated_result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -637,7 +637,7 @@ async def test_zeroconf_add_mrp_device(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("dmap_device", "dmap_pin", "pairing")
-async def test_zeroconf_add_dmap_device(hass: HomeAssistant) -> None:
+async def test_zeroconf_add_dmap_device(hass: SmartHub) -> None:
     """Test add DMAP device discovered by zeroconf."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_ZEROCONF}, data=DMAP_SERVICE
@@ -665,7 +665,7 @@ async def test_zeroconf_add_dmap_device(hass: HomeAssistant) -> None:
     }
 
 
-async def test_zeroconf_ip_change(hass: HomeAssistant, mock_scan: AsyncMock) -> None:
+async def test_zeroconf_ip_change(hass: SmartHub, mock_scan: AsyncMock) -> None:
     """Test that the config entry gets updated when the ip changes and reloads."""
     entry = MockConfigEntry(
         domain="apple_tv", unique_id="mrpid", data={CONF_ADDRESS: "127.0.0.2"}
@@ -682,7 +682,7 @@ async def test_zeroconf_ip_change(hass: HomeAssistant, mock_scan: AsyncMock) -> 
     ]
 
     with patch(
-        "homeassistant.components.apple_tv.async_setup_entry", return_value=True
+        "smarthub.components.apple_tv.async_setup_entry", return_value=True
     ) as mock_async_setup:
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -699,7 +699,7 @@ async def test_zeroconf_ip_change(hass: HomeAssistant, mock_scan: AsyncMock) -> 
 
 
 async def test_zeroconf_ip_change_after_ip_conflict_with_ignored_entry(
-    hass: HomeAssistant, mock_scan: AsyncMock
+    hass: SmartHub, mock_scan: AsyncMock
 ) -> None:
     """Test that the config entry gets updated when the ip changes and reloads."""
     entry = MockConfigEntry(
@@ -720,7 +720,7 @@ async def test_zeroconf_ip_change_after_ip_conflict_with_ignored_entry(
     ]
 
     with patch(
-        "homeassistant.components.apple_tv.async_setup_entry", return_value=True
+        "smarthub.components.apple_tv.async_setup_entry", return_value=True
     ) as mock_async_setup:
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -737,7 +737,7 @@ async def test_zeroconf_ip_change_after_ip_conflict_with_ignored_entry(
 
 
 async def test_zeroconf_ip_change_via_secondary_identifier(
-    hass: HomeAssistant, mock_scan: AsyncMock
+    hass: SmartHub, mock_scan: AsyncMock
 ) -> None:
     """Test that the config entry gets updated when the ip changes and reloads.
 
@@ -761,7 +761,7 @@ async def test_zeroconf_ip_change_via_secondary_identifier(
     ]
 
     with patch(
-        "homeassistant.components.apple_tv.async_setup_entry", return_value=True
+        "smarthub.components.apple_tv.async_setup_entry", return_value=True
     ) as mock_async_setup:
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -779,7 +779,7 @@ async def test_zeroconf_ip_change_via_secondary_identifier(
 
 
 async def test_zeroconf_updates_identifiers_for_ignored_entries(
-    hass: HomeAssistant, mock_scan: AsyncMock
+    hass: SmartHub, mock_scan: AsyncMock
 ) -> None:
     """Test that an ignored config entry gets updated when the ip changes.
 
@@ -804,7 +804,7 @@ async def test_zeroconf_updates_identifiers_for_ignored_entries(
     ]
 
     with patch(
-        "homeassistant.components.apple_tv.async_setup_entry", return_value=True
+        "smarthub.components.apple_tv.async_setup_entry", return_value=True
     ) as mock_async_setup:
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -824,7 +824,7 @@ async def test_zeroconf_updates_identifiers_for_ignored_entries(
 
 
 @pytest.mark.usefixtures("dmap_device")
-async def test_zeroconf_add_existing_aborts(hass: HomeAssistant) -> None:
+async def test_zeroconf_add_existing_aborts(hass: SmartHub) -> None:
     """Test start new zeroconf flow while existing flow is active aborts."""
     await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_ZEROCONF}, data=DMAP_SERVICE
@@ -838,7 +838,7 @@ async def test_zeroconf_add_existing_aborts(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_scan")
-async def test_zeroconf_add_but_device_not_found(hass: HomeAssistant) -> None:
+async def test_zeroconf_add_but_device_not_found(hass: SmartHub) -> None:
     """Test add device which is not found with another scan."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_ZEROCONF}, data=DMAP_SERVICE
@@ -848,7 +848,7 @@ async def test_zeroconf_add_but_device_not_found(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("dmap_device")
-async def test_zeroconf_add_existing_device(hass: HomeAssistant) -> None:
+async def test_zeroconf_add_existing_device(hass: SmartHub) -> None:
     """Test add already existing device from zeroconf."""
     MockConfigEntry(domain="apple_tv", unique_id="dmapid").add_to_hass(hass)
 
@@ -860,7 +860,7 @@ async def test_zeroconf_add_existing_device(hass: HomeAssistant) -> None:
 
 
 async def test_zeroconf_unexpected_error(
-    hass: HomeAssistant, mock_scan: AsyncMock
+    hass: SmartHub, mock_scan: AsyncMock
 ) -> None:
     """Test unexpected error aborts in zeroconf."""
     mock_scan.side_effect = Exception
@@ -873,7 +873,7 @@ async def test_zeroconf_unexpected_error(
 
 
 async def test_zeroconf_abort_if_other_in_progress(
-    hass: HomeAssistant, mock_scan: AsyncMock
+    hass: SmartHub, mock_scan: AsyncMock
 ) -> None:
     """Test discovering unsupported zeroconf service."""
     mock_scan.result = [
@@ -922,7 +922,7 @@ async def test_zeroconf_abort_if_other_in_progress(
 
 @pytest.mark.usefixtures("pairing", "mock_zeroconf")
 async def test_zeroconf_missing_device_during_protocol_resolve(
-    hass: HomeAssistant, mock_scan: AsyncMock
+    hass: SmartHub, mock_scan: AsyncMock
 ) -> None:
     """Test discovery after service been added to existing flow with missing device."""
     mock_scan.result = [
@@ -981,7 +981,7 @@ async def test_zeroconf_missing_device_during_protocol_resolve(
 
 @pytest.mark.usefixtures("pairing", "mock_zeroconf")
 async def test_zeroconf_additional_protocol_resolve_failure(
-    hass: HomeAssistant, mock_scan: AsyncMock
+    hass: SmartHub, mock_scan: AsyncMock
 ) -> None:
     """Test discovery with missing service."""
     mock_scan.result = [
@@ -1042,7 +1042,7 @@ async def test_zeroconf_additional_protocol_resolve_failure(
 
 @pytest.mark.usefixtures("pairing", "mock_zeroconf")
 async def test_zeroconf_pair_additionally_found_protocols(
-    hass: HomeAssistant, mock_scan: AsyncMock
+    hass: SmartHub, mock_scan: AsyncMock
 ) -> None:
     """Test discovered protocols are merged to original flow."""
     mock_scan.result = [
@@ -1144,7 +1144,7 @@ async def test_zeroconf_pair_additionally_found_protocols(
 
 
 @pytest.mark.usefixtures("pairing", "mock_zeroconf")
-async def test_zeroconf_mismatch(hass: HomeAssistant, mock_scan: AsyncMock) -> None:
+async def test_zeroconf_mismatch(hass: SmartHub, mock_scan: AsyncMock) -> None:
     """Test the technically possible case where a protocol has no service.
 
     This could happen in case of mDNS issues.
@@ -1184,7 +1184,7 @@ async def test_zeroconf_mismatch(hass: HomeAssistant, mock_scan: AsyncMock) -> N
 
 @pytest.mark.usefixtures("mrp_device", "pairing")
 async def test_reconfigure_update_credentials(
-    hass: HomeAssistant, mock_setup_entry: Mock
+    hass: SmartHub, mock_setup_entry: Mock
 ) -> None:
     """Test that reconfigure flow updates config entry."""
     config_entry = MockConfigEntry(
@@ -1224,7 +1224,7 @@ async def test_reconfigure_update_credentials(
 # Options
 
 
-async def test_option_start_off(hass: HomeAssistant) -> None:
+async def test_option_start_off(hass: SmartHub) -> None:
     """Test start off-option flag."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, unique_id="dmapid", options={"start_off": False}
@@ -1242,7 +1242,7 @@ async def test_option_start_off(hass: HomeAssistant) -> None:
     assert config_entry.options[CONF_START_OFF]
 
 
-async def test_zeroconf_rejects_ipv6(hass: HomeAssistant) -> None:
+async def test_zeroconf_rejects_ipv6(hass: SmartHub) -> None:
     """Test zeroconf discovery rejects ipv6."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,

@@ -3,9 +3,9 @@
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.homekit_controller.const import KNOWN_DEVICES
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.homekit_controller.const import KNOWN_DEVICES
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .common import setup_accessories_from_file, setup_test_accessories
 
@@ -17,7 +17,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -33,7 +33,7 @@ async def test_config_entry(
 
 
 async def test_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,

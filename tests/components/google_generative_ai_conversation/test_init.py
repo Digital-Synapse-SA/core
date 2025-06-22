@@ -7,9 +7,9 @@ import pytest
 from requests.exceptions import Timeout
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import API_ERROR_500, CLIENT_ERROR_API_KEY_INVALID
 
@@ -18,12 +18,12 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_content_service_without_images(
-    hass: HomeAssistant, snapshot: SnapshotAssertion
+    hass: SmartHub, snapshot: SnapshotAssertion
 ) -> None:
     """Test generate content service."""
     stubbed_generated_content = (
         "I'm thrilled to welcome you all to the release "
-        "party for the latest version of Home Assistant!"
+        "party for the latest version of SmartHub!"
     )
 
     with patch(
@@ -37,7 +37,7 @@ async def test_generate_content_service_without_images(
         response = await hass.services.async_call(
             "google_generative_ai_conversation",
             "generate_content",
-            {"prompt": "Write an opening speech for a Home Assistant release party"},
+            {"prompt": "Write an opening speech for a SmartHub release party"},
             blocking=True,
             return_response=True,
         )
@@ -50,7 +50,7 @@ async def test_generate_content_service_without_images(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_content_service_with_image(
-    hass: HomeAssistant, snapshot: SnapshotAssertion
+    hass: SmartHub, snapshot: SnapshotAssertion
 ) -> None:
     """Test generate content service."""
     stubbed_generated_content = (
@@ -94,7 +94,7 @@ async def test_generate_content_service_with_image(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_content_file_processing_succeeds(
-    hass: HomeAssistant, snapshot: SnapshotAssertion
+    hass: SmartHub, snapshot: SnapshotAssertion
 ) -> None:
     """Test generate content service."""
     stubbed_generated_content = (
@@ -148,7 +148,7 @@ async def test_generate_content_file_processing_succeeds(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_content_file_processing_fails(
-    hass: HomeAssistant, snapshot: SnapshotAssertion
+    hass: SmartHub, snapshot: SnapshotAssertion
 ) -> None:
     """Test generate content service."""
     stubbed_generated_content = (
@@ -187,7 +187,7 @@ async def test_generate_content_file_processing_fails(
             ],
         ),
         pytest.raises(
-            HomeAssistantError,
+            SmartHubError,
             match="File `context.txt` processing failed, reason: File processing failed",
         ),
     ):
@@ -205,7 +205,7 @@ async def test_generate_content_file_processing_fails(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_content_service_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test generate content service handles errors."""
@@ -215,7 +215,7 @@ async def test_generate_content_service_error(
             side_effect=API_ERROR_500,
         ),
         pytest.raises(
-            HomeAssistantError,
+            SmartHubError,
             match="Error generating content: 500 internal-error. {'message': 'Internal Server Error', 'status': 'internal-error'}",
         ),
     ):
@@ -230,7 +230,7 @@ async def test_generate_content_service_error(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_content_response_has_empty_parts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test generate content service handles response with empty parts."""
@@ -242,7 +242,7 @@ async def test_generate_content_response_has_empty_parts(
                 candidates=[Mock(content=Mock(parts=[]))],
             ),
         ),
-        pytest.raises(HomeAssistantError, match="Unknown error generating content"),
+        pytest.raises(SmartHubError, match="Unknown error generating content"),
     ):
         await hass.services.async_call(
             "google_generative_ai_conversation",
@@ -255,14 +255,14 @@ async def test_generate_content_response_has_empty_parts(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_content_service_with_image_not_allowed_path(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test generate content service with an image in a not allowed path."""
     with (
         patch("pathlib.Path.exists", return_value=True),
         patch.object(hass.config, "is_allowed_path", return_value=False),
         pytest.raises(
-            HomeAssistantError,
+            SmartHubError,
             match=(
                 "Cannot read `doorbell_snapshot.jpg`, no access to path; "
                 "`allowlist_external_dirs` may need to be adjusted in "
@@ -284,7 +284,7 @@ async def test_generate_content_service_with_image_not_allowed_path(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_generate_content_service_with_image_not_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test generate content service with an image that does not exist."""
     with (
@@ -292,7 +292,7 @@ async def test_generate_content_service_with_image_not_exists(
         patch.object(hass.config, "is_allowed_path", return_value=True),
         patch("pathlib.Path.exists", return_value=False),
         pytest.raises(
-            HomeAssistantError, match="`doorbell_snapshot.jpg` does not exist"
+            SmartHubError, match="`doorbell_snapshot.jpg` does not exist"
         ),
     ):
         await hass.services.async_call(
@@ -328,7 +328,7 @@ async def test_generate_content_service_with_image_not_exists(
     ],
 )
 async def test_config_entry_error(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, side_effect, state, reauth
+    hass: SmartHub, mock_config_entry: MockConfigEntry, side_effect, state, reauth
 ) -> None:
     """Test different configuration entry errors."""
     mock_client = AsyncMock()
@@ -342,7 +342,7 @@ async def test_config_entry_error(
 
 @pytest.mark.usefixtures("mock_init_component")
 async def test_load_entry_with_unloaded_entries(
-    hass: HomeAssistant, snapshot: SnapshotAssertion
+    hass: SmartHub, snapshot: SnapshotAssertion
 ) -> None:
     """Test loading an entry with unloaded entries."""
     config_entries = hass.config_entries.async_entries(
@@ -364,7 +364,7 @@ async def test_load_entry_with_unloaded_entries(
 
     stubbed_generated_content = (
         "I'm thrilled to welcome you all to the release "
-        "party for the latest version of Home Assistant!"
+        "party for the latest version of SmartHub!"
     )
 
     with patch(
@@ -378,7 +378,7 @@ async def test_load_entry_with_unloaded_entries(
         response = await hass.services.async_call(
             "google_generative_ai_conversation",
             "generate_content",
-            {"prompt": "Write an opening speech for a Home Assistant release party"},
+            {"prompt": "Write an opening speech for a SmartHub release party"},
             blocking=True,
             return_response=True,
         )

@@ -8,13 +8,13 @@ import pytest
 from requests.exceptions import HTTPError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.fritzbox.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_DEVICES, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.fritzbox.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_DEVICES, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import FritzDeviceBinarySensorMock, set_devices, setup_config_entry
 from .const import CONF_FAKE_NAME, MOCK_CONFIG
@@ -26,14 +26,14 @@ ENTITY_ID = f"{BINARY_SENSOR_DOMAIN}.{CONF_FAKE_NAME}"
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     fritz: Mock,
 ) -> None:
     """Test setup of platform."""
     device = FritzDeviceBinarySensorMock()
-    with patch("homeassistant.components.fritzbox.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.fritzbox.PLATFORMS", [Platform.BINARY_SENSOR]):
         entry = await setup_config_entry(
             hass, MOCK_CONFIG[DOMAIN][CONF_DEVICES][0], ENTITY_ID, device, fritz
         )
@@ -42,7 +42,7 @@ async def test_setup(
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_is_off(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_is_off(hass: SmartHub, fritz: Mock) -> None:
     """Test state of platform."""
     device = FritzDeviceBinarySensorMock()
     device.present = False
@@ -63,7 +63,7 @@ async def test_is_off(hass: HomeAssistant, fritz: Mock) -> None:
     assert state.state == STATE_UNAVAILABLE
 
 
-async def test_update(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_update(hass: SmartHub, fritz: Mock) -> None:
     """Test update without error."""
     device = FritzDeviceBinarySensorMock()
     await setup_config_entry(
@@ -81,7 +81,7 @@ async def test_update(hass: HomeAssistant, fritz: Mock) -> None:
     assert fritz().login.call_count == 1
 
 
-async def test_update_error(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_update_error(hass: SmartHub, fritz: Mock) -> None:
     """Test update with error."""
     device = FritzDeviceBinarySensorMock()
     device.update.side_effect = [mock.DEFAULT, HTTPError("Boom")]
@@ -100,7 +100,7 @@ async def test_update_error(hass: HomeAssistant, fritz: Mock) -> None:
     assert fritz().login.call_count == 1
 
 
-async def test_discover_new_device(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_discover_new_device(hass: SmartHub, fritz: Mock) -> None:
     """Test adding new discovered devices during runtime."""
     device = FritzDeviceBinarySensorMock()
     await setup_config_entry(

@@ -9,10 +9,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.rehlko.coordinator import SCAN_INTERVAL_MINUTES
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.rehlko.coordinator import SCAN_INTERVAL_MINUTES
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
@@ -20,13 +20,13 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 @pytest.fixture(name="platform_sensor", autouse=True)
 async def platform_sensor_fixture():
     """Patch Rehlko to only load Sensor platform."""
-    with patch("homeassistant.components.rehlko.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.rehlko.PLATFORMS", [Platform.SENSOR]):
         yield
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     rehlko_config_entry: MockConfigEntry,
@@ -39,7 +39,7 @@ async def test_sensors(
 
 
 async def test_sensor_availability_device_disconnect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     generator: dict[str, Any],
     mock_rehlko: AsyncMock,
     load_rehlko_config_entry: None,
@@ -63,7 +63,7 @@ async def test_sensor_availability_device_disconnect(
 
 
 async def test_sensor_availability_poll_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rehlko: AsyncMock,
     load_rehlko_config_entry: None,
     freezer: FrozenDateTimeFactory,

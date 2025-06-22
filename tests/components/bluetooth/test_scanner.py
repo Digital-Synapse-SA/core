@@ -11,16 +11,16 @@ from bleak.backends.scanner import AdvertisementDataCallback
 from dbus_fast import InvalidMessageError
 import pytest
 
-from homeassistant.components import bluetooth
-from homeassistant.components.bluetooth.const import (
+from smarthub.components import bluetooth
+from smarthub.components.bluetooth.const import (
     SCANNER_WATCHDOG_INTERVAL,
     SCANNER_WATCHDOG_TIMEOUT,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STARTED, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STARTED, EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     async_setup_with_one_adapter,
@@ -46,7 +46,7 @@ NEED_RESET_ERRORS = [
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
 async def test_config_entry_can_be_reloaded_when_stop_raises(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can reload if stopping the scanner raises."""
     entry = hass.config_entries.async_entries(bluetooth.DOMAIN)[0]
@@ -65,7 +65,7 @@ async def test_config_entry_can_be_reloaded_when_stop_raises(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_dbus_socket_missing_in_container(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle dbus being missing in the container."""
 
@@ -89,7 +89,7 @@ async def test_dbus_socket_missing_in_container(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_dbus_socket_missing(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle dbus being missing."""
 
@@ -113,7 +113,7 @@ async def test_dbus_socket_missing(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_dbus_broken_pipe_in_container(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle dbus broken pipe in the container."""
 
@@ -138,7 +138,7 @@ async def test_dbus_broken_pipe_in_container(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_dbus_broken_pipe(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle dbus broken pipe."""
 
@@ -163,7 +163,7 @@ async def test_dbus_broken_pipe(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_invalid_dbus_message(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle invalid dbus message."""
 
@@ -183,7 +183,7 @@ async def test_invalid_dbus_message(
 
 @pytest.mark.parametrize("error", NEED_RESET_ERRORS)
 @pytest.mark.usefixtures("one_adapter")
-async def test_adapter_needs_reset_at_start(hass: HomeAssistant, error: str) -> None:
+async def test_adapter_needs_reset_at_start(hass: SmartHub, error: str) -> None:
     """Test we cycle the adapter when it needs a restart."""
 
     with (
@@ -207,7 +207,7 @@ async def test_adapter_needs_reset_at_start(hass: HomeAssistant, error: str) -> 
 
 
 @pytest.mark.usefixtures("one_adapter")
-async def test_recovery_from_dbus_restart(hass: HomeAssistant) -> None:
+async def test_recovery_from_dbus_restart(hass: SmartHub) -> None:
     """Test we can recover when DBus gets restarted out from under us."""
 
     called_start = 0
@@ -288,7 +288,7 @@ async def test_recovery_from_dbus_restart(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("one_adapter")
-async def test_adapter_recovery(hass: HomeAssistant) -> None:
+async def test_adapter_recovery(hass: SmartHub) -> None:
     """Test we can recover when the adapter stops responding."""
 
     called_start = 0
@@ -373,7 +373,7 @@ async def test_adapter_recovery(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("one_adapter")
-async def test_adapter_scanner_fails_to_start_first_time(hass: HomeAssistant) -> None:
+async def test_adapter_scanner_fails_to_start_first_time(hass: SmartHub) -> None:
     """Test we can recover when the adapter stops responding and the first recovery fails."""
 
     called_start = 0
@@ -482,12 +482,12 @@ async def test_adapter_scanner_fails_to_start_first_time(hass: HomeAssistant) ->
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_adapter_fails_to_start_and_takes_a_bit_to_init(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can recover the adapter at startup and we wait for Dbus to init."""
     assert await async_setup_component(hass, "logger", {})
     async with async_call_logger_set_level(
-        "homeassistant.components.bluetooth", "DEBUG", hass=hass, caplog=caplog
+        "smarthub.components.bluetooth", "DEBUG", hass=hass, caplog=caplog
     ):
         called_start = 0
         called_stop = 0
@@ -551,7 +551,7 @@ async def test_adapter_fails_to_start_and_takes_a_bit_to_init(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_restart_takes_longer_than_watchdog_time(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we do not try to recover the adapter again if the restart is still in progress."""
 
@@ -621,7 +621,7 @@ async def test_restart_takes_longer_than_watchdog_time(
 @pytest.mark.skipif("platform.system() != 'Darwin'")
 @pytest.mark.usefixtures("macos_adapter")
 async def test_setup_and_stop_macos(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test we enable use_bdaddr on MacOS."""
     entry = MockConfigEntry(

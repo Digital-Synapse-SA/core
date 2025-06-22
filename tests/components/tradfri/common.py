@@ -9,8 +9,8 @@ from pytradfri.const import ATTR_ID
 from pytradfri.device import Device
 from pytradfri.gateway import Gateway
 
-from homeassistant.components import tradfri
-from homeassistant.core import HomeAssistant
+from smarthub.components import tradfri
+from smarthub.core import SmartHub
 
 from . import GATEWAY_ID
 
@@ -46,7 +46,7 @@ class CommandStore:
 
     async def trigger_observe_callback(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         device: Device,
         new_device_state: dict[str, Any] | None = None,
     ) -> None:
@@ -79,7 +79,7 @@ class CommandStore:
         await hass.async_block_till_done()
 
 
-async def setup_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def setup_integration(hass: SmartHub) -> MockConfigEntry:
     """Load the Tradfri integration with a mock gateway."""
     entry = MockConfigEntry(
         domain=tradfri.DOMAIN,

@@ -10,28 +10,28 @@ from aiohttp import web
 from hass_nabucasa.client import RemoteActivationNotAllowed
 import pytest
 
-from homeassistant.components import webhook
-from homeassistant.components.cloud import DOMAIN
-from homeassistant.components.cloud.client import (
+from smarthub.components import webhook
+from smarthub.components.cloud import DOMAIN
+from smarthub.components.cloud.client import (
     VALID_REPAIR_TRANSLATION_KEYS,
     CloudClient,
 )
-from homeassistant.components.cloud.const import (
+from smarthub.components.cloud.const import (
     DATA_CLOUD,
     PREF_ALEXA_REPORT_STATE,
     PREF_ENABLE_ALEXA,
     PREF_ENABLE_GOOGLE,
 )
-from homeassistant.components.cloud.prefs import CloudPreferences
-from homeassistant.components.homeassistant.exposed_entities import (
+from smarthub.components.cloud.prefs import CloudPreferences
+from smarthub.components.smarthub.exposed_entities import (
     DATA_EXPOSED_ENTITIES,
     async_expose_entity,
 )
-from homeassistant.const import CONTENT_TYPE_JSON, __version__ as HA_VERSION
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.const import CONTENT_TYPE_JSON, __version__ as HA_VERSION
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er, issue_registry as ir
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import mock_cloud, mock_cloud_prefs
 
@@ -45,7 +45,7 @@ def mock_cloud_inst() -> MagicMock:
     return MagicMock(subscription_expired=False)
 
 
-async def test_handler_alexa(hass: HomeAssistant) -> None:
+async def test_handler_alexa(hass: SmartHub) -> None:
     """Test handler Alexa."""
     hass.states.async_set("switch.test", "on", {"friendly_name": "Test switch"})
     hass.states.async_set("switch.test2", "on", {"friendly_name": "Test switch 2"})
@@ -78,14 +78,14 @@ async def test_handler_alexa(hass: HomeAssistant) -> None:
     assert len(endpoints) == 1
     device = endpoints[0]
 
-    assert device["description"] == "Config description via Home Assistant"
+    assert device["description"] == "Config description via SmartHub"
     assert device["friendlyName"] == "Config name"
     assert device["displayCategories"] == ["LIGHT"]
-    assert device["manufacturerName"] == "Home Assistant"
+    assert device["manufacturerName"] == "SmartHub"
 
 
 async def test_handler_alexa_disabled(
-    hass: HomeAssistant, mock_cloud_fixture: CloudPreferences
+    hass: SmartHub, mock_cloud_fixture: CloudPreferences
 ) -> None:
     """Test handler Alexa when user has disabled it."""
     mock_cloud_fixture._prefs[PREF_ENABLE_ALEXA] = False
@@ -100,7 +100,7 @@ async def test_handler_alexa_disabled(
     assert resp["event"]["payload"]["type"] == "BRIDGE_UNREACHABLE"
 
 
-async def test_handler_google_actions(hass: HomeAssistant) -> None:
+async def test_handler_google_actions(hass: SmartHub) -> None:
     """Test handler Google Actions."""
     hass.states.async_set("switch.test", "on", {"friendly_name": "Test switch"})
     hass.states.async_set("switch.test2", "on", {"friendly_name": "Test switch 2"})
@@ -159,7 +159,7 @@ async def test_handler_google_actions(hass: HomeAssistant) -> None:
     ],
 )
 async def test_handler_google_actions_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_fixture: CloudPreferences,
     intent: str,
     response_payload: dict[str, Any],
@@ -185,7 +185,7 @@ async def test_handler_google_actions_disabled(
 
 
 async def test_handler_ice_servers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     set_cloud_prefs: Callable[[dict[str, Any]], Coroutine[Any, Any, None]],
 ) -> None:
@@ -209,7 +209,7 @@ async def test_handler_ice_servers(
 
 
 async def test_handler_ice_servers_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     set_cloud_prefs: Callable[[dict[str, Any]], Coroutine[Any, Any, None]],
 ) -> None:
@@ -238,7 +238,7 @@ async def test_handler_ice_servers_disabled(
 
 
 async def test_webhook_msg(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test webhook msg."""
     with patch("hass_nabucasa.Cloud.initialize"):
@@ -263,7 +263,7 @@ async def test_webhook_msg(
     received = []
 
     async def handler(
-        hass: HomeAssistant, webhook_id: str, request: web.Request
+        hass: SmartHub, webhook_id: str, request: web.Request
     ) -> web.Response:
         """Handle a webhook."""
         received.append(request)
@@ -318,7 +318,7 @@ async def test_webhook_msg(
 
 @pytest.mark.usefixtures("mock_cloud_setup", "mock_cloud_login")
 async def test_google_config_expose_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test Google config exposing entity method uses latest config."""
@@ -345,7 +345,7 @@ async def test_google_config_expose_entity(
 
 @pytest.mark.usefixtures("mock_cloud_setup", "mock_cloud_login")
 async def test_google_config_should_2fa(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test Google config disabling 2FA method uses latest config."""
@@ -368,7 +368,7 @@ async def test_google_config_should_2fa(
     assert not gconf.should_2fa(state)
 
 
-async def test_set_username(hass: HomeAssistant) -> None:
+async def test_set_username(hass: SmartHub) -> None:
     """Test we set username during login."""
     prefs = MagicMock(
         alexa_enabled=False,
@@ -384,7 +384,7 @@ async def test_set_username(hass: HomeAssistant) -> None:
 
 
 async def test_login_recovers_bad_internet(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test Alexa can recover bad auth."""
     prefs = Mock(
@@ -407,7 +407,7 @@ async def test_login_recovers_bad_internet(
     assert len(client._alexa_config.async_enable_proactive_mode.mock_calls) == 2
 
 
-async def test_system_msg(hass: HomeAssistant) -> None:
+async def test_system_msg(hass: SmartHub) -> None:
     """Test system msg."""
     with patch("hass_nabucasa.Cloud.initialize"):
         setup = await async_setup_component(hass, "cloud", {"cloud": {}})
@@ -426,7 +426,7 @@ async def test_system_msg(hass: HomeAssistant) -> None:
     assert cloud.client.relayer_region == "xx-earth-616"
 
 
-async def test_cloud_connection_info(hass: HomeAssistant) -> None:
+async def test_cloud_connection_info(hass: SmartHub) -> None:
     """Test connection info msg."""
     with (
         patch("hass_nabucasa.Cloud.initialize"),
@@ -533,7 +533,7 @@ async def test_async_delete_repair_issue(
     assert issue is None
 
 
-async def test_disconnected(hass: HomeAssistant) -> None:
+async def test_disconnected(hass: SmartHub) -> None:
     """Test cleanup when disconnected from the cloud."""
     prefs = MagicMock(
         alexa_enabled=False,
@@ -550,7 +550,7 @@ async def test_disconnected(hass: HomeAssistant) -> None:
 
 
 async def test_logged_out(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
 ) -> None:
     """Test cleanup when logged out from the cloud."""
@@ -581,7 +581,7 @@ async def test_logged_out(
     alexa_config_mock.async_deinitialize.assert_called_once_with()
 
 
-async def test_remote_enable(hass: HomeAssistant) -> None:
+async def test_remote_enable(hass: SmartHub) -> None:
     """Test enabling remote UI."""
     prefs = MagicMock(async_update=AsyncMock(return_value=None))
     client = CloudClient(hass, prefs, None, {}, {})
@@ -591,7 +591,7 @@ async def test_remote_enable(hass: HomeAssistant) -> None:
     prefs.async_update.assert_called_once_with(remote_enabled=True)
 
 
-async def test_remote_enable_not_allowed(hass: HomeAssistant) -> None:
+async def test_remote_enable_not_allowed(hass: SmartHub) -> None:
     """Test enabling remote UI."""
     prefs = MagicMock(
         async_update=AsyncMock(return_value=None),

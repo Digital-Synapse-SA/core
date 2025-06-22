@@ -15,7 +15,7 @@ from aioshelly.exceptions import (
 from aioshelly.rpc_device.utils import bluetooth_mac_from_primary_mac
 import pytest
 
-from homeassistant.components.shelly.const import (
+from smarthub.components.shelly.const import (
     BLE_SCANNER_FIRMWARE_UNSUPPORTED_ISSUE_ID,
     BLE_SCANNER_MIN_FIRMWARE,
     BLOCK_EXPECTED_SLEEP_PERIOD,
@@ -27,25 +27,25 @@ from homeassistant.components.shelly.const import (
     MODELS_WITH_WRONG_SLEEP_PERIOD,
     BLEScannerMode,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     CONF_HOST,
     CONF_MODEL,
     CONF_PORT,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.device_registry import DeviceRegistry, format_mac
-from homeassistant.helpers.entity_registry import EntityRegistry
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.device_registry import DeviceRegistry, format_mac
+from smarthub.helpers.entity_registry import EntityRegistry
+from smarthub.setup import async_setup_component
 
 from . import MOCK_MAC, init_integration, mutate_rpc_device_status
 
 
 async def test_custom_coap_port(
-    hass: HomeAssistant, mock_block_device: Mock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_block_device: Mock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test custom coap port."""
     assert await async_setup_component(
@@ -60,20 +60,20 @@ async def test_custom_coap_port(
 
 
 async def test_ip_address_with_only_default_interface(
-    hass: HomeAssistant, mock_block_device: Mock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_block_device: Mock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test more local ip addresses with only the default interface.."""
     with (
         patch(
-            "homeassistant.components.network.async_only_default_interface_enabled",
+            "smarthub.components.network.async_only_default_interface_enabled",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.network.async_get_enabled_source_ips",
+            "smarthub.components.network.async_get_enabled_source_ips",
             return_value=[IPv4Address("192.168.1.10"), IPv4Address("10.10.10.10")],
         ),
         patch(
-            "homeassistant.components.shelly.utils.COAP",
+            "smarthub.components.shelly.utils.COAP",
             autospec=COAP,
         ) as mock_coap_init,
     ):
@@ -89,20 +89,20 @@ async def test_ip_address_with_only_default_interface(
 
 
 async def test_ip_address_without_only_default_interface(
-    hass: HomeAssistant, mock_block_device: Mock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_block_device: Mock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test more local ip addresses without only the default interface.."""
     with (
         patch(
-            "homeassistant.components.network.async_only_default_interface_enabled",
+            "smarthub.components.network.async_only_default_interface_enabled",
             return_value=False,
         ),
         patch(
-            "homeassistant.components.network.async_get_enabled_source_ips",
+            "smarthub.components.network.async_get_enabled_source_ips",
             return_value=[IPv4Address("192.168.1.10"), IPv4Address("10.10.10.10")],
         ),
         patch(
-            "homeassistant.components.shelly.utils.COAP",
+            "smarthub.components.shelly.utils.COAP",
             autospec=COAP,
         ) as mock_coap_init,
     ):
@@ -118,7 +118,7 @@ async def test_ip_address_without_only_default_interface(
 
 @pytest.mark.parametrize("gen", [1, 2, 3])
 async def test_shared_device_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     mock_block_device: Mock,
     mock_rpc_device: Mock,
@@ -131,7 +131,7 @@ async def test_shared_device_mac(
 
 
 async def test_setup_entry_not_shelly(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test not Shelly entry."""
     await init_integration(hass, 1, data={})
@@ -140,7 +140,7 @@ async def test_setup_entry_not_shelly(
 
 @pytest.mark.parametrize("gen", [1, 2, 3])
 async def test_device_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     mock_block_device: Mock,
     mock_rpc_device: Mock,
@@ -160,7 +160,7 @@ async def test_device_connection_error(
 
 @pytest.mark.parametrize("gen", [1, 2, 3])
 async def test_device_unsupported_firmware(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     mock_block_device: Mock,
     mock_rpc_device: Mock,
@@ -181,7 +181,7 @@ async def test_device_unsupported_firmware(
 
 @pytest.mark.parametrize("gen", [1, 2, 3])
 async def test_mac_mismatch_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     mock_block_device: Mock,
     mock_rpc_device: Mock,
@@ -201,7 +201,7 @@ async def test_mac_mismatch_error(
 
 @pytest.mark.parametrize("gen", [1, 2, 3])
 async def test_device_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     mock_block_device: Mock,
     mock_rpc_device: Mock,
@@ -232,7 +232,7 @@ async def test_device_auth_error(
 
 @pytest.mark.parametrize(("entry_sleep", "device_sleep"), [(None, 0), (3600, 3600)])
 async def test_sleeping_block_device_online(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_sleep: int | None,
     device_sleep: int,
     mock_block_device: Mock,
@@ -260,7 +260,7 @@ async def test_sleeping_block_device_online(
 
 @pytest.mark.parametrize(("entry_sleep", "device_sleep"), [(None, 0), (1000, 1000)])
 async def test_sleeping_rpc_device_online(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_sleep: int | None,
     device_sleep: int,
     mock_rpc_device: Mock,
@@ -281,7 +281,7 @@ async def test_sleeping_rpc_device_online(
 
 
 async def test_sleeping_rpc_device_online_new_firmware(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
@@ -300,7 +300,7 @@ async def test_sleeping_rpc_device_online_new_firmware(
 
 
 async def test_sleeping_rpc_device_online_during_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_sleepy_rpc_device: Mock,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -315,7 +315,7 @@ async def test_sleeping_rpc_device_online_during_setup(
 
 
 async def test_sleeping_rpc_device_offline_during_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
@@ -351,7 +351,7 @@ async def test_sleeping_rpc_device_offline_during_setup(
     ],
 )
 async def test_entry_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     entity_id: str,
     mock_block_device: Mock,
@@ -383,7 +383,7 @@ async def test_entry_unload(
     ],
 )
 async def test_entry_unload_device_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gen: int,
     entity_id: str,
     mock_block_device: Mock,
@@ -402,14 +402,14 @@ async def test_entry_unload_device_not_ready(
 
 
 async def test_entry_unload_not_connected(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test entry unload when not connected."""
     monkeypatch.delitem(mock_rpc_device.status, "cover:0")
     monkeypatch.setitem(mock_rpc_device.status["sys"], "relay_in_thermostat", False)
 
     with patch(
-        "homeassistant.components.shelly.coordinator.async_stop_scanner"
+        "smarthub.components.shelly.coordinator.async_stop_scanner"
     ) as mock_stop_scanner:
         assert (
             entry := await init_integration(
@@ -432,14 +432,14 @@ async def test_entry_unload_not_connected(
 
 
 async def test_entry_unload_not_connected_but_we_think_we_are(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test entry unload when not connected but we think we are still connected."""
     monkeypatch.delitem(mock_rpc_device.status, "cover:0")
     monkeypatch.setitem(mock_rpc_device.status["sys"], "relay_in_thermostat", False)
 
     with patch(
-        "homeassistant.components.shelly.coordinator.async_stop_scanner",
+        "smarthub.components.shelly.coordinator.async_stop_scanner",
         side_effect=DeviceConnectionError,
     ) as mock_stop_scanner:
         assert (
@@ -463,11 +463,11 @@ async def test_entry_unload_not_connected_but_we_think_we_are(
 
 
 async def test_no_attempt_to_stop_scanner_with_sleepy_devices(
-    hass: HomeAssistant, mock_rpc_device: Mock
+    hass: SmartHub, mock_rpc_device: Mock
 ) -> None:
     """Test we do not try to stop the scanner if its disabled with a sleepy device."""
     with patch(
-        "homeassistant.components.shelly.coordinator.async_stop_scanner",
+        "smarthub.components.shelly.coordinator.async_stop_scanner",
     ) as mock_stop_scanner:
         entry = await init_integration(hass, 2, sleep_period=7200)
         assert entry.state is ConfigEntryState.LOADED
@@ -478,7 +478,7 @@ async def test_no_attempt_to_stop_scanner_with_sleepy_devices(
         assert not mock_stop_scanner.call_count
 
 
-async def test_entry_missing_gen(hass: HomeAssistant, mock_block_device: Mock) -> None:
+async def test_entry_missing_gen(hass: SmartHub, mock_block_device: Mock) -> None:
     """Test successful Gen1 device init when gen is missing in entry data."""
     entry = await init_integration(hass, None)
 
@@ -489,7 +489,7 @@ async def test_entry_missing_gen(hass: HomeAssistant, mock_block_device: Mock) -
     assert state.state == STATE_ON
 
 
-async def test_entry_missing_port(hass: HomeAssistant) -> None:
+async def test_entry_missing_port(hass: SmartHub) -> None:
     """Test successful Gen2 device init when port is missing in entry data."""
     data = {
         CONF_HOST: "192.168.1.37",
@@ -499,9 +499,9 @@ async def test_entry_missing_port(hass: HomeAssistant) -> None:
     }
     entry = await init_integration(hass, 2, data=data, skip_setup=True)
     with (
-        patch("homeassistant.components.shelly.RpcDevice.initialize"),
+        patch("smarthub.components.shelly.RpcDevice.initialize"),
         patch(
-            "homeassistant.components.shelly.RpcDevice.create", return_value=Mock()
+            "smarthub.components.shelly.RpcDevice.create", return_value=Mock()
         ) as rpc_device_mock,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -512,7 +512,7 @@ async def test_entry_missing_port(hass: HomeAssistant) -> None:
         )
 
 
-async def test_rpc_entry_custom_port(hass: HomeAssistant) -> None:
+async def test_rpc_entry_custom_port(hass: SmartHub) -> None:
     """Test successful Gen2 device init using custom port."""
     data = {
         CONF_HOST: "192.168.1.37",
@@ -523,9 +523,9 @@ async def test_rpc_entry_custom_port(hass: HomeAssistant) -> None:
     }
     entry = await init_integration(hass, 2, data=data, skip_setup=True)
     with (
-        patch("homeassistant.components.shelly.RpcDevice.initialize"),
+        patch("smarthub.components.shelly.RpcDevice.initialize"),
         patch(
-            "homeassistant.components.shelly.RpcDevice.create", return_value=Mock()
+            "smarthub.components.shelly.RpcDevice.create", return_value=Mock()
         ) as rpc_device_mock,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -538,7 +538,7 @@ async def test_rpc_entry_custom_port(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize(("model"), MODELS_WITH_WRONG_SLEEP_PERIOD)
 async def test_sleeping_block_device_wrong_sleep_period(
-    hass: HomeAssistant, mock_block_device: Mock, model: str
+    hass: SmartHub, mock_block_device: Mock, model: str
 ) -> None:
     """Test sleeping block device with wrong sleep period."""
     entry = await init_integration(
@@ -551,7 +551,7 @@ async def test_sleeping_block_device_wrong_sleep_period(
 
 
 async def test_bluetooth_cleanup_on_remove_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
 ) -> None:
     """Test bluetooth is cleaned up on entry removal."""
@@ -562,7 +562,7 @@ async def test_bluetooth_cleanup_on_remove_entry(
     await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
 
-    with patch("homeassistant.components.shelly.async_remove_scanner") as remove_mock:
+    with patch("smarthub.components.shelly.async_remove_scanner") as remove_mock:
         await hass.config_entries.async_remove(entry.entry_id)
         await hass.async_block_till_done()
 
@@ -572,7 +572,7 @@ async def test_bluetooth_cleanup_on_remove_entry(
 
 
 async def test_device_script_getcode_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -586,7 +586,7 @@ async def test_device_script_getcode_error(
 
 
 async def test_ble_scanner_unsupported_firmware_fixed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     issue_registry: ir.IssueRegistry,
@@ -610,7 +610,7 @@ async def test_ble_scanner_unsupported_firmware_fixed(
 
 
 async def test_blu_trv_stale_device_removal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,

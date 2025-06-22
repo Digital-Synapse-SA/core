@@ -5,17 +5,17 @@ from datetime import datetime, timedelta
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components import sun
-from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import sun
+from smarthub.const import EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_setting_rising(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:

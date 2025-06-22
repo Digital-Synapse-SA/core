@@ -5,12 +5,12 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.group import DOMAIN, async_setup_entry
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import entity_registry as er
+from smarthub import config_entries
+from smarthub.components.group import DOMAIN, async_setup_entry
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, get_schema_suggested_value
 from tests.typing import WebSocketGenerator
@@ -61,7 +61,7 @@ from tests.typing import WebSocketGenerator
     ],
 )
 async def test_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     group_type,
     group_state,
     member_state,
@@ -89,7 +89,7 @@ async def test_config_flow(
     assert result["step_id"] == group_type
 
     with patch(
-        "homeassistant.components.group.async_setup_entry", wraps=async_setup_entry
+        "smarthub.components.group.async_setup_entry", wraps=async_setup_entry
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -149,7 +149,7 @@ async def test_config_flow(
     ],
 )
 async def test_config_flow_hides_members(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     group_type,
     extra_input,
@@ -223,7 +223,7 @@ async def test_config_flow_hides_members(
     ],
 )
 async def test_options(
-    hass: HomeAssistant, group_type, member_state, extra_options, options_options
+    hass: SmartHub, group_type, member_state, extra_options, options_options
 ) -> None:
     """Test reconfiguring."""
     members1 = [f"{group_type}.one", f"{group_type}.two"]
@@ -325,7 +325,7 @@ async def test_options(
     ],
 )
 async def test_all_options(
-    hass: HomeAssistant, group_type, extra_options, extra_options_after, advanced
+    hass: SmartHub, group_type, extra_options, extra_options_after, advanced
 ) -> None:
     """Test reconfiguring."""
     members1 = [f"{group_type}.one", f"{group_type}.two"]
@@ -405,7 +405,7 @@ async def test_all_options(
     ],
 )
 async def test_options_flow_hides_members(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     group_type,
     extra_input,
@@ -504,7 +504,7 @@ SENSOR_ATTRS = [{"icon": "mdi:calculator"}, {"max_entity_id": "sensor.input_two"
     ],
 )
 async def test_config_flow_preview(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     domain: str,
     extra_user_input: dict[str, Any],
@@ -622,7 +622,7 @@ async def test_config_flow_preview(
     ],
 )
 async def test_option_flow_preview(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     domain: str,
     extra_config_flow_data: dict[str, Any],
@@ -684,7 +684,7 @@ async def test_option_flow_preview(
 
 
 async def test_option_flow_sensor_preview_config_entry_removed(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the option flow preview where the config entry is removed."""
     client = await hass_ws_client(hass)

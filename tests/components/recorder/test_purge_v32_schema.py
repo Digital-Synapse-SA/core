@@ -12,19 +12,19 @@ from sqlalchemy import text, update
 from sqlalchemy.exc import DatabaseError, OperationalError
 from sqlalchemy.orm.session import Session
 
-from homeassistant.components.recorder import DOMAIN, Recorder, migration
-from homeassistant.components.recorder.const import SupportedDialect
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.components.recorder.purge import purge_old_data
-from homeassistant.components.recorder.services import (
+from smarthub.components.recorder import DOMAIN, Recorder, migration
+from smarthub.components.recorder.const import SupportedDialect
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.components.recorder.purge import purge_old_data
+from smarthub.components.recorder.services import (
     SERVICE_PURGE,
     SERVICE_PURGE_ENTITIES,
 )
-from homeassistant.components.recorder.tasks import PurgeTask
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.const import EVENT_STATE_CHANGED
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder.tasks import PurgeTask
+from smarthub.components.recorder.util import session_scope
+from smarthub.const import EVENT_STATE_CHANGED
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .common import (
     async_attach_db_engine,
@@ -54,7 +54,7 @@ async def mock_recorder_before_hass(
 
 
 @pytest.fixture(autouse=True)
-def db_schema_32(hass: HomeAssistant) -> Generator[None]:
+def db_schema_32(hass: SmartHub) -> Generator[None]:
     """Fixture to initialize the db with the old schema 32."""
     with old_db_schema(hass, "32"):
         yield
@@ -64,7 +64,7 @@ def db_schema_32(hass: HomeAssistant) -> Generator[None]:
 def mock_use_sqlite(request: pytest.FixtureRequest) -> Generator[None]:
     """Pytest fixture to switch purge method."""
     with patch(
-        "homeassistant.components.recorder.core.Recorder.dialect_name",
+        "smarthub.components.recorder.core.Recorder.dialect_name",
         return_value=SupportedDialect.SQLITE
         if request.param
         else SupportedDialect.MYSQL,
@@ -72,7 +72,7 @@ def mock_use_sqlite(request: pytest.FixtureRequest) -> Generator[None]:
         yield
 
 
-async def test_purge_old_states(hass: HomeAssistant, recorder_mock: Recorder) -> None:
+async def test_purge_old_states(hass: SmartHub, recorder_mock: Recorder) -> None:
     """Test deleting old states."""
     await async_attach_db_engine(hass)
 
@@ -173,7 +173,7 @@ async def test_purge_old_states(hass: HomeAssistant, recorder_mock: Recorder) ->
 @pytest.mark.skip_on_db_engine(["mysql", "postgresql"])
 @pytest.mark.usefixtures("recorder_mock", "skip_by_db_engine")
 async def test_purge_old_states_encouters_database_corruption(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test database image image is malformed while deleting old states.
 
@@ -190,10 +190,10 @@ async def test_purge_old_states_encouters_database_corruption(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.move_away_broken_database"
+            "smarthub.components.recorder.core.move_away_broken_database"
         ) as move_away,
         patch(
-            "homeassistant.components.recorder.purge.purge_old_data",
+            "smarthub.components.recorder.purge.purge_old_data",
             side_effect=sqlite3_exception,
         ),
     ):
@@ -210,7 +210,7 @@ async def test_purge_old_states_encouters_database_corruption(
 
 
 async def test_purge_old_states_encounters_temporary_mysql_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -224,9 +224,9 @@ async def test_purge_old_states_encounters_temporary_mysql_error(
     mysql_exception.orig = Exception(1205, "retryable")
 
     with (
-        patch("homeassistant.components.recorder.util.time.sleep") as sleep_mock,
+        patch("smarthub.components.recorder.util.time.sleep") as sleep_mock,
         patch(
-            "homeassistant.components.recorder.purge._purge_old_recorder_runs",
+            "smarthub.components.recorder.purge._purge_old_recorder_runs",
             side_effect=[mysql_exception, None],
         ),
         patch.object(recorder_mock.engine.dialect, "name", "mysql"),
@@ -242,7 +242,7 @@ async def test_purge_old_states_encounters_temporary_mysql_error(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_purge_old_states_encounters_operational_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test error on operational errors that are not mysql does not retry."""
@@ -254,7 +254,7 @@ async def test_purge_old_states_encounters_operational_error(
     exception = OperationalError("statement", {}, [])
 
     with patch(
-        "homeassistant.components.recorder.purge._purge_old_recorder_runs",
+        "smarthub.components.recorder.purge._purge_old_recorder_runs",
         side_effect=exception,
     ):
         await hass.services.async_call(DOMAIN, SERVICE_PURGE, {"keep_days": 0})
@@ -266,7 +266,7 @@ async def test_purge_old_states_encounters_operational_error(
     assert "Error executing purge" in caplog.text
 
 
-async def test_purge_old_events(hass: HomeAssistant, recorder_mock: Recorder) -> None:
+async def test_purge_old_events(hass: SmartHub, recorder_mock: Recorder) -> None:
     """Test deleting old events."""
     await async_attach_db_engine(hass)
 
@@ -308,7 +308,7 @@ async def test_purge_old_events(hass: HomeAssistant, recorder_mock: Recorder) ->
 
 
 async def test_purge_old_recorder_runs(
-    hass: HomeAssistant, recorder_mock: Recorder
+    hass: SmartHub, recorder_mock: Recorder
 ) -> None:
     """Test deleting old recorder runs keeps current run."""
     await async_attach_db_engine(hass)
@@ -347,7 +347,7 @@ async def test_purge_old_recorder_runs(
 
 
 async def test_purge_old_statistics_runs(
-    hass: HomeAssistant, recorder_mock: Recorder
+    hass: SmartHub, recorder_mock: Recorder
 ) -> None:
     """Test deleting old statistics runs keeps the latest run."""
     await async_attach_db_engine(hass)
@@ -376,7 +376,7 @@ async def test_purge_old_statistics_runs(
 @pytest.mark.parametrize("use_sqlite", [True, False], indirect=True)
 @pytest.mark.usefixtures("recorder_mock")
 async def test_purge_method(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     use_sqlite: bool,
 ) -> None:
@@ -494,10 +494,10 @@ async def test_purge_method(
 
 @pytest.mark.parametrize("use_sqlite", [True, False], indirect=True)
 @pytest.mark.usefixtures("recorder_mock")
-async def test_purge_edge_case(hass: HomeAssistant, use_sqlite: bool) -> None:
+async def test_purge_edge_case(hass: SmartHub, use_sqlite: bool) -> None:
     """Test states and events are purged even if they occurred shortly before purge_before."""
 
-    async def _add_db_entries(hass: HomeAssistant, timestamp: datetime) -> None:
+    async def _add_db_entries(hass: SmartHub, timestamp: datetime) -> None:
         with session_scope(hass=hass) as session:
             session.add(
                 Events(
@@ -558,10 +558,10 @@ async def test_purge_edge_case(hass: HomeAssistant, use_sqlite: bool) -> None:
         assert events.count() == 0
 
 
-async def test_purge_cutoff_date(hass: HomeAssistant, recorder_mock: Recorder) -> None:
+async def test_purge_cutoff_date(hass: SmartHub, recorder_mock: Recorder) -> None:
     """Test states and events are purged only if they occurred before "now() - keep_days"."""
 
-    async def _add_db_entries(hass: HomeAssistant, cutoff: datetime, rows: int) -> None:
+    async def _add_db_entries(hass: SmartHub, cutoff: datetime, rows: int) -> None:
         timestamp_keep = cutoff
         timestamp_purge = cutoff - timedelta(microseconds=1)
 
@@ -707,7 +707,7 @@ async def test_purge_cutoff_date(hass: HomeAssistant, recorder_mock: Recorder) -
         assert state_attributes.count() == 0
 
 
-async def _add_test_states(hass: HomeAssistant):
+async def _add_test_states(hass: SmartHub):
     """Add multiple states to the db for testing."""
     utcnow = dt_util.utcnow()
     five_days_ago = utcnow - timedelta(days=5)
@@ -739,7 +739,7 @@ async def _add_test_states(hass: HomeAssistant):
             await set_state("test.recorder2", state, attributes=attributes)
 
 
-async def _add_test_events(hass: HomeAssistant, iterations: int = 1):
+async def _add_test_events(hass: SmartHub, iterations: int = 1):
     """Add a few events for testing."""
     utcnow = dt_util.utcnow()
     five_days_ago = utcnow - timedelta(days=5)
@@ -772,7 +772,7 @@ async def _add_test_events(hass: HomeAssistant, iterations: int = 1):
                 )
 
 
-async def _add_events_with_event_data(hass: HomeAssistant, iterations: int = 1):
+async def _add_events_with_event_data(hass: SmartHub, iterations: int = 1):
     """Add a few events with linked event_data for testing."""
     utcnow = dt_util.utcnow()
     five_days_ago = utcnow - timedelta(days=5)
@@ -810,7 +810,7 @@ async def _add_events_with_event_data(hass: HomeAssistant, iterations: int = 1):
                 )
 
 
-async def _add_test_statistics(hass: HomeAssistant):
+async def _add_test_statistics(hass: SmartHub):
     """Add multiple statistics to the db for testing."""
     utcnow = dt_util.utcnow()
     five_days_ago = utcnow - timedelta(days=5)
@@ -839,7 +839,7 @@ async def _add_test_statistics(hass: HomeAssistant):
             )
 
 
-async def _add_test_recorder_runs(hass: HomeAssistant):
+async def _add_test_recorder_runs(hass: SmartHub):
     """Add a few recorder_runs for testing."""
     utcnow = dt_util.utcnow()
     five_days_ago = utcnow - timedelta(days=5)
@@ -866,7 +866,7 @@ async def _add_test_recorder_runs(hass: HomeAssistant):
             )
 
 
-async def _add_test_statistics_runs(hass: HomeAssistant):
+async def _add_test_statistics_runs(hass: SmartHub):
     """Add a few recorder_runs for testing."""
     utcnow = dt_util.utcnow()
     five_days_ago = utcnow - timedelta(days=5)
@@ -949,7 +949,7 @@ def _add_state_and_state_changed_event(
 
 
 async def test_purge_many_old_events(
-    hass: HomeAssistant, recorder_mock: Recorder
+    hass: SmartHub, recorder_mock: Recorder
 ) -> None:
     """Test deleting old events."""
     await async_attach_db_engine(hass)
@@ -1011,7 +1011,7 @@ async def test_purge_many_old_events(
 
 
 async def test_purge_can_mix_legacy_and_new_format(
-    hass: HomeAssistant, recorder_mock: Recorder
+    hass: SmartHub, recorder_mock: Recorder
 ) -> None:
     """Test purging with legacy and new events."""
     await async_attach_db_engine(hass)
@@ -1157,7 +1157,7 @@ async def test_purge_can_mix_legacy_and_new_format(
 @pytest.mark.skip_on_db_engine(["mysql", "postgresql"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_purge_can_mix_legacy_and_new_format_with_detached_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     recorder_db_url: str,
 ) -> None:
@@ -1337,7 +1337,7 @@ async def test_purge_can_mix_legacy_and_new_format_with_detached_state(
 
 
 async def test_purge_entities_keep_days(
-    hass: HomeAssistant, recorder_mock: Recorder
+    hass: SmartHub, recorder_mock: Recorder
 ) -> None:
     """Test purging states with an entity filter and keep_days."""
     await async_attach_db_engine(hass)

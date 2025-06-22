@@ -2,15 +2,15 @@
 
 from unittest.mock import AsyncMock, patch
 
-from homeassistant import config_entries
-from homeassistant.components.NEW_DOMAIN.config_flow import CannotConnect, InvalidAuth
-from homeassistant.components.NEW_DOMAIN.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.NEW_DOMAIN.config_flow import CannotConnect, InvalidAuth
+from smarthub.components.NEW_DOMAIN.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -19,7 +19,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.NEW_DOMAIN.config_flow.PlaceholderHub.authenticate",
+        "smarthub.components.NEW_DOMAIN.config_flow.PlaceholderHub.authenticate",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -43,7 +43,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
@@ -51,7 +51,7 @@ async def test_form_invalid_auth(
     )
 
     with patch(
-        "homeassistant.components.NEW_DOMAIN.config_flow.PlaceholderHub.authenticate",
+        "smarthub.components.NEW_DOMAIN.config_flow.PlaceholderHub.authenticate",
         side_effect=InvalidAuth,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -70,7 +70,7 @@ async def test_form_invalid_auth(
     # FlowResultType.CREATE_ENTRY or FlowResultType.ABORT so
     # we can show the config flow is able to recover from an error.
     with patch(
-        "homeassistant.components.NEW_DOMAIN.config_flow.PlaceholderHub.authenticate",
+        "smarthub.components.NEW_DOMAIN.config_flow.PlaceholderHub.authenticate",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -94,7 +94,7 @@ async def test_form_invalid_auth(
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
@@ -102,7 +102,7 @@ async def test_form_cannot_connect(
     )
 
     with patch(
-        "homeassistant.components.NEW_DOMAIN.config_flow.PlaceholderHub.authenticate",
+        "smarthub.components.NEW_DOMAIN.config_flow.PlaceholderHub.authenticate",
         side_effect=CannotConnect,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -122,7 +122,7 @@ async def test_form_cannot_connect(
     # we can show the config flow is able to recover from an error.
 
     with patch(
-        "homeassistant.components.NEW_DOMAIN.config_flow.PlaceholderHub.authenticate",
+        "smarthub.components.NEW_DOMAIN.config_flow.PlaceholderHub.authenticate",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(

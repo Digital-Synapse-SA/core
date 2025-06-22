@@ -12,12 +12,12 @@ from aiohasupervisor.models import Discovery
 from matter_server.client.exceptions import CannotConnect, InvalidServerVersion
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.matter.const import ADDON_SLUG, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.matter.const import ADDON_SLUG, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -63,7 +63,7 @@ ZEROCONF_INFO_UDP = ZeroconfServiceInfo(
 def setup_entry_fixture() -> Generator[AsyncMock]:
     """Mock entry setup."""
     with patch(
-        "homeassistant.components.matter.async_setup_entry", return_value=True
+        "smarthub.components.matter.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -72,7 +72,7 @@ def setup_entry_fixture() -> Generator[AsyncMock]:
 def unload_entry_fixture() -> Generator[AsyncMock]:
     """Mock entry unload."""
     with patch(
-        "homeassistant.components.matter.async_unload_entry", return_value=True
+        "smarthub.components.matter.async_unload_entry", return_value=True
     ) as mock_unload_entry:
         yield mock_unload_entry
 
@@ -81,7 +81,7 @@ def unload_entry_fixture() -> Generator[AsyncMock]:
 def client_connect_fixture() -> Generator[AsyncMock]:
     """Mock server version."""
     with patch(
-        "homeassistant.components.matter.config_flow.MatterClient.connect"
+        "smarthub.components.matter.config_flow.MatterClient.connect"
     ) as client_connect:
         yield client_connect
 
@@ -90,7 +90,7 @@ def client_connect_fixture() -> Generator[AsyncMock]:
 def supervisor_fixture() -> Generator[MagicMock]:
     """Mock Supervisor."""
     with patch(
-        "homeassistant.components.matter.config_flow.is_hassio", return_value=True
+        "smarthub.components.matter.config_flow.is_hassio", return_value=True
     ) as is_hassio:
         yield is_hassio
 
@@ -104,23 +104,23 @@ def mock_get_addon_discovery_info(get_addon_discovery_info: AsyncMock) -> None:
 def addon_setup_time_fixture() -> Generator[int]:
     """Mock add-on setup sleep time."""
     with patch(
-        "homeassistant.components.matter.config_flow.ADDON_SETUP_TIMEOUT", new=0
+        "smarthub.components.matter.config_flow.ADDON_SETUP_TIMEOUT", new=0
     ) as addon_setup_time:
         yield addon_setup_time
 
 
 @pytest.fixture(name="not_onboarded")
 def mock_onboarded_fixture() -> Generator[MagicMock]:
-    """Mock that Home Assistant is not yet onboarded."""
+    """Mock that SmartHub is not yet onboarded."""
     with patch(
-        "homeassistant.components.matter.config_flow.async_is_onboarded",
+        "smarthub.components.matter.config_flow.async_is_onboarded",
         return_value=False,
     ) as mock_onboarded:
         yield mock_onboarded
 
 
 async def test_manual_create_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_connect: AsyncMock,
     setup_entry: AsyncMock,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_manual_create_entry(
     ],
 )
 async def test_manual_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_connect: AsyncMock,
     error: str,
     side_effect: Exception,
@@ -183,7 +183,7 @@ async def test_manual_errors(
 
 
 async def test_manual_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_connect: AsyncMock,
     setup_entry: AsyncMock,
 ) -> None:
@@ -220,7 +220,7 @@ async def test_manual_already_configured(
 
 @pytest.mark.parametrize("zeroconf_info", [ZEROCONF_INFO_TCP, ZEROCONF_INFO_UDP])
 async def test_zeroconf_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_connect: AsyncMock,
     setup_entry: AsyncMock,
     zeroconf_info: ZeroconfServiceInfo,
@@ -256,7 +256,7 @@ async def test_zeroconf_discovery(
 
 @pytest.mark.parametrize("zeroconf_info", [ZEROCONF_INFO_TCP, ZEROCONF_INFO_UDP])
 async def test_zeroconf_discovery_not_onboarded_not_supervisor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_connect: AsyncMock,
     setup_entry: AsyncMock,
     not_onboarded: MagicMock,
@@ -306,7 +306,7 @@ async def test_zeroconf_discovery_not_onboarded_not_supervisor(
     ],
 )
 async def test_zeroconf_not_onboarded_already_discovered(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_info: AsyncMock,
     addon_running: AsyncMock,
@@ -356,7 +356,7 @@ async def test_zeroconf_not_onboarded_already_discovered(
     ],
 )
 async def test_zeroconf_not_onboarded_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_info: AsyncMock,
     addon_running: AsyncMock,
@@ -400,7 +400,7 @@ async def test_zeroconf_not_onboarded_running(
     ],
 )
 async def test_zeroconf_not_onboarded_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_info: AsyncMock,
     addon_installed: AsyncMock,
@@ -446,7 +446,7 @@ async def test_zeroconf_not_onboarded_installed(
     ],
 )
 async def test_zeroconf_not_onboarded_not_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_info: AsyncMock,
     addon_store_info: AsyncMock,
@@ -495,7 +495,7 @@ async def test_zeroconf_not_onboarded_not_installed(
     ],
 )
 async def test_supervisor_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_running: AsyncMock,
     addon_info: AsyncMock,
@@ -546,7 +546,7 @@ async def test_supervisor_discovery(
     ],
 )
 async def test_supervisor_discovery_addon_info_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_running: AsyncMock,
     addon_info: AsyncMock,
@@ -590,7 +590,7 @@ async def test_supervisor_discovery_addon_info_failed(
     ],
 )
 async def test_clean_supervisor_discovery_on_user_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_running: AsyncMock,
     addon_info: AsyncMock,
@@ -648,7 +648,7 @@ async def test_clean_supervisor_discovery_on_user_create(
 
 
 async def test_abort_supervisor_discovery_with_existing_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_running: AsyncMock,
     addon_info: AsyncMock,
@@ -678,7 +678,7 @@ async def test_abort_supervisor_discovery_with_existing_entry(
 
 
 async def test_abort_supervisor_discovery_with_existing_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_installed: AsyncMock,
     addon_info: AsyncMock,
@@ -708,7 +708,7 @@ async def test_abort_supervisor_discovery_with_existing_flow(
 
 
 async def test_abort_supervisor_discovery_for_other_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_installed: AsyncMock,
     addon_info: AsyncMock,
@@ -735,7 +735,7 @@ async def test_abort_supervisor_discovery_for_other_addon(
 
 
 async def test_supervisor_discovery_addon_not_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_installed: AsyncMock,
     addon_info: AsyncMock,
@@ -782,7 +782,7 @@ async def test_supervisor_discovery_addon_not_running(
 
 
 async def test_supervisor_discovery_addon_not_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_not_installed: AsyncMock,
     install_addon: AsyncMock,
@@ -840,7 +840,7 @@ async def test_supervisor_discovery_addon_not_installed(
 
 
 async def test_not_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     client_connect: AsyncMock,
     setup_entry: AsyncMock,
@@ -893,7 +893,7 @@ async def test_not_addon(
     ],
 )
 async def test_addon_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_running: AsyncMock,
     addon_info: AsyncMock,
@@ -996,7 +996,7 @@ async def test_addon_running(
     ],
 )
 async def test_addon_running_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_running: AsyncMock,
     addon_info: AsyncMock,
@@ -1103,7 +1103,7 @@ async def test_addon_running_failures(
     ],
 )
 async def test_addon_running_failures_zeroconf(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_running: AsyncMock,
     addon_info: AsyncMock,
@@ -1150,7 +1150,7 @@ async def test_addon_running_failures_zeroconf(
     ],
 )
 async def test_addon_running_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_running: AsyncMock,
     addon_info: AsyncMock,
@@ -1200,7 +1200,7 @@ async def test_addon_running_already_configured(
     ],
 )
 async def test_addon_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_installed: AsyncMock,
     addon_info: AsyncMock,
@@ -1285,7 +1285,7 @@ async def test_addon_installed(
     ],
 )
 async def test_addon_installed_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_installed: AsyncMock,
     addon_info: AsyncMock,
@@ -1374,7 +1374,7 @@ async def test_addon_installed_failures(
     ],
 )
 async def test_addon_installed_failures_zeroconf(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_installed: AsyncMock,
     addon_info: AsyncMock,
@@ -1419,7 +1419,7 @@ async def test_addon_installed_failures_zeroconf(
     ],
 )
 async def test_addon_installed_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_installed: AsyncMock,
     addon_info: AsyncMock,
@@ -1477,7 +1477,7 @@ async def test_addon_installed_already_configured(
     ],
 )
 async def test_addon_not_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_not_installed: AsyncMock,
     install_addon: AsyncMock,
@@ -1527,7 +1527,7 @@ async def test_addon_not_installed(
 
 
 async def test_addon_not_installed_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_not_installed: AsyncMock,
     addon_info: AsyncMock,
@@ -1562,7 +1562,7 @@ async def test_addon_not_installed_failures(
 
 @pytest.mark.parametrize("zeroconf_info", [ZEROCONF_INFO_TCP, ZEROCONF_INFO_UDP])
 async def test_addon_not_installed_failures_zeroconf(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_not_installed: AsyncMock,
     addon_info: AsyncMock,
@@ -1598,7 +1598,7 @@ async def test_addon_not_installed_failures_zeroconf(
     ],
 )
 async def test_addon_not_installed_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor: MagicMock,
     addon_not_installed: AsyncMock,
     addon_info: AsyncMock,

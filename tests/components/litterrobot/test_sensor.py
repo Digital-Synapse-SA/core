@@ -4,10 +4,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.litterrobot.sensor import icon_for_gauge_level
-from homeassistant.components.sensor import DOMAIN as PLATFORM_DOMAIN, SensorDeviceClass
-from homeassistant.const import PERCENTAGE, STATE_UNKNOWN, UnitOfMass
-from homeassistant.core import HomeAssistant
+from smarthub.components.litterrobot.sensor import icon_for_gauge_level
+from smarthub.components.sensor import DOMAIN as PLATFORM_DOMAIN, SensorDeviceClass
+from smarthub.const import PERCENTAGE, STATE_UNKNOWN, UnitOfMass
+from smarthub.core import SmartHub
 
 from .conftest import setup_integration
 
@@ -17,7 +17,7 @@ SLEEP_START_TIME_ENTITY_ID = "sensor.test_sleep_mode_start_time"
 
 
 async def test_waste_drawer_sensor(
-    hass: HomeAssistant, mock_account: MagicMock
+    hass: SmartHub, mock_account: MagicMock
 ) -> None:
     """Tests the waste drawer sensor entity was set up."""
     await setup_integration(hass, mock_account, PLATFORM_DOMAIN)
@@ -29,7 +29,7 @@ async def test_waste_drawer_sensor(
 
 
 async def test_sleep_time_sensor_with_sleep_disabled(
-    hass: HomeAssistant, mock_account_with_sleep_disabled_robot: MagicMock
+    hass: SmartHub, mock_account_with_sleep_disabled_robot: MagicMock
 ) -> None:
     """Tests the sleep mode start time sensor where sleep mode is disabled."""
     await setup_integration(
@@ -71,7 +71,7 @@ async def test_gauge_icon() -> None:
 
 @pytest.mark.freeze_time("2022-09-18 23:00:44+00:00")
 async def test_litter_robot_sensor(
-    hass: HomeAssistant, mock_account_with_litterrobot_4: MagicMock
+    hass: SmartHub, mock_account_with_litterrobot_4: MagicMock
 ) -> None:
     """Tests Litter-Robot sensors."""
     await setup_integration(hass, mock_account_with_litterrobot_4, PLATFORM_DOMAIN)
@@ -97,7 +97,7 @@ async def test_litter_robot_sensor(
 
 
 async def test_feeder_robot_sensor(
-    hass: HomeAssistant, mock_account_with_feederrobot: MagicMock
+    hass: SmartHub, mock_account_with_feederrobot: MagicMock
 ) -> None:
     """Tests Feeder-Robot sensors."""
     await setup_integration(hass, mock_account_with_feederrobot, PLATFORM_DOMAIN)
@@ -107,7 +107,7 @@ async def test_feeder_robot_sensor(
 
 
 async def test_pet_weight_sensor(
-    hass: HomeAssistant, mock_account_with_pet: MagicMock
+    hass: SmartHub, mock_account_with_pet: MagicMock
 ) -> None:
     """Tests pet weight sensors."""
     await setup_integration(hass, mock_account_with_pet, PLATFORM_DOMAIN)
@@ -117,7 +117,7 @@ async def test_pet_weight_sensor(
 
 
 async def test_litterhopper_sensor(
-    hass: HomeAssistant, mock_account_with_litterhopper: MagicMock
+    hass: SmartHub, mock_account_with_litterhopper: MagicMock
 ) -> None:
     """Tests LitterHopper sensors."""
     await setup_integration(hass, mock_account_with_litterhopper, PLATFORM_DOMAIN)

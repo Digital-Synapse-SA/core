@@ -2,14 +2,14 @@
 
 from homematicip.base.channel_event import ChannelEvent
 
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .helper import HomeFactory, get_and_check_entity_basics
 
 
 async def test_door_bell_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     default_mock_hap_factory: HomeFactory,
 ) -> None:
     """Test of door bell event of HmIP-DSD-PCB."""
@@ -38,7 +38,7 @@ async def test_door_bell_event(
 
 
 async def test_door_bell_event_wrong_event_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     default_mock_hap_factory: HomeFactory,
 ) -> None:
     """Test of door bell event of HmIP-DSD-PCB."""

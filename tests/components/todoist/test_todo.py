@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 import pytest
 from todoist_api_python.models import Due, Task
 
-from homeassistant.components.todo import (
+from smarthub.components.todo import (
     ATTR_DESCRIPTION,
     ATTR_DUE_DATE,
     ATTR_DUE_DATETIME,
@@ -16,9 +16,9 @@ from homeassistant.components.todo import (
     DOMAIN as TODO_DOMAIN,
     TodoServices,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_component import async_update_entity
 
 from .conftest import PROJECT_ID, make_api_task
 
@@ -32,7 +32,7 @@ def platforms() -> list[Platform]:
 
 
 @pytest.fixture(autouse=True)
-async def set_time_zone(hass: HomeAssistant) -> None:
+async def set_time_zone(hass: SmartHub) -> None:
     """Set the time zone for the tests that keesp UTC-6 all year round."""
     await hass.config.async_set_time_zone("America/Regina")
 
@@ -72,7 +72,7 @@ async def set_time_zone(hass: HomeAssistant) -> None:
     ],
 )
 async def test_todo_item_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     expected_state: str,
 ) -> None:
@@ -162,7 +162,7 @@ async def test_todo_item_state(
     ids=["summary", "due_date", "due_datetime", "description"],
 )
 async def test_add_todo_list_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     api: AsyncMock,
     item_data: dict[str, Any],
@@ -212,7 +212,7 @@ async def test_add_todo_list_item(
     ("tasks"), [[make_api_task(id="task-id-1", content="Soda", is_completed=False)]]
 )
 async def test_update_todo_item_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     api: AsyncMock,
 ) -> None:
@@ -460,7 +460,7 @@ async def test_update_todo_item_status(
     ],
 )
 async def test_update_todo_items(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     api: AsyncMock,
     update_data: dict[str, Any],
@@ -512,7 +512,7 @@ async def test_update_todo_items(
     ],
 )
 async def test_remove_todo_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     api: AsyncMock,
 ) -> None:
@@ -548,7 +548,7 @@ async def test_remove_todo_item(
     ("tasks"), [[make_api_task(id="task-id-1", content="Cheese", is_completed=False)]]
 )
 async def test_subscribe(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     api: AsyncMock,
     hass_ws_client: WebSocketGenerator,

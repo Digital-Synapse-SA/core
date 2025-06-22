@@ -5,15 +5,15 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries, setup
-from homeassistant.components.application_credentials import (
+from smarthub import config_entries, setup
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.xbox.const import DOMAIN, OAUTH2_AUTHORIZE, OAUTH2_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.components.xbox.const import DOMAIN, OAUTH2_AUTHORIZE, OAUTH2_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -23,7 +23,7 @@ CLIENT_ID = "1234"
 CLIENT_SECRET = "5678"
 
 
-async def test_abort_if_existing_entry(hass: HomeAssistant) -> None:
+async def test_abort_if_existing_entry(hass: SmartHub) -> None:
     """Check flow abort when an entry already exist."""
     MockConfigEntry(domain=DOMAIN).add_to_hass(hass)
 
@@ -36,7 +36,7 @@ async def test_abort_if_existing_entry(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -81,7 +81,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.xbox.async_setup_entry", return_value=True
+        "smarthub.components.xbox.async_setup_entry", return_value=True
     ) as mock_setup:
         await hass.config_entries.flow.async_configure(result["flow_id"])
 

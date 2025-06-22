@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_HUMIDITY,
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
@@ -34,16 +34,16 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.unit_system import METRIC_SYSTEM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.unit_system import METRIC_SYSTEM
 
 ENTITY_CLIMATE = "climate.hvac"
 ENTITY_ECOBEE = "climate.ecobee"
@@ -54,14 +54,14 @@ ENTITY_HEATPUMP = "climate.heatpump"
 def climate_only() -> Generator[None]:
     """Enable only the climate platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.CLIMATE],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_demo_climate(hass: HomeAssistant, climate_only: None) -> None:
+async def setup_demo_climate(hass: SmartHub, climate_only: None) -> None:
     """Initialize setup demo climate."""
     hass.config.units = METRIC_SYSTEM
     assert await async_setup_component(
@@ -70,7 +70,7 @@ async def setup_demo_climate(hass: HomeAssistant, climate_only: None) -> None:
     await hass.async_block_till_done()
 
 
-def test_setup_params(hass: HomeAssistant) -> None:
+def test_setup_params(hass: SmartHub) -> None:
     """Test the initial parameters."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.state == HVACMode.COOL
@@ -90,7 +90,7 @@ def test_setup_params(hass: HomeAssistant) -> None:
     ]
 
 
-def test_default_setup_params(hass: HomeAssistant) -> None:
+def test_default_setup_params(hass: SmartHub) -> None:
     """Test the setup with default parameters."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.attributes.get(ATTR_MIN_TEMP) == 7
@@ -99,7 +99,7 @@ def test_default_setup_params(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_MAX_HUMIDITY) == 99
 
 
-async def test_set_only_target_temp_bad_attr(hass: HomeAssistant) -> None:
+async def test_set_only_target_temp_bad_attr(hass: SmartHub) -> None:
     """Test setting the target temperature without required attribute."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.attributes.get(ATTR_TEMPERATURE) == 21
@@ -116,7 +116,7 @@ async def test_set_only_target_temp_bad_attr(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_TEMPERATURE) == 21
 
 
-async def test_set_only_target_temp(hass: HomeAssistant) -> None:
+async def test_set_only_target_temp(hass: SmartHub) -> None:
     """Test the setting of the target temperature."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.attributes.get(ATTR_TEMPERATURE) == 21
@@ -132,7 +132,7 @@ async def test_set_only_target_temp(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_TEMPERATURE) == 30.0
 
 
-async def test_set_only_target_temp_with_convert(hass: HomeAssistant) -> None:
+async def test_set_only_target_temp_with_convert(hass: SmartHub) -> None:
     """Test the setting of the target temperature."""
     state = hass.states.get(ENTITY_HEATPUMP)
     assert state.attributes.get(ATTR_TEMPERATURE) == 20
@@ -148,7 +148,7 @@ async def test_set_only_target_temp_with_convert(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_TEMPERATURE) == 21.0
 
 
-async def test_set_target_temp_range(hass: HomeAssistant) -> None:
+async def test_set_target_temp_range(hass: SmartHub) -> None:
     """Test the setting of the target temperature with range."""
     state = hass.states.get(ENTITY_ECOBEE)
     assert state.attributes.get(ATTR_TEMPERATURE) is None
@@ -172,7 +172,7 @@ async def test_set_target_temp_range(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_TARGET_TEMP_HIGH) == 25.0
 
 
-async def test_set_target_temp_range_bad_attr(hass: HomeAssistant) -> None:
+async def test_set_target_temp_range_bad_attr(hass: SmartHub) -> None:
     """Test setting the target temperature range without attribute."""
     state = hass.states.get(ENTITY_ECOBEE)
     assert state.attributes.get(ATTR_TEMPERATURE) is None
@@ -197,7 +197,7 @@ async def test_set_target_temp_range_bad_attr(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_TARGET_TEMP_HIGH) == 24.0
 
 
-async def test_set_temp_with_hvac_mode(hass: HomeAssistant) -> None:
+async def test_set_temp_with_hvac_mode(hass: SmartHub) -> None:
     """Test the setting of the hvac_mode in set_temperature."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.attributes.get(ATTR_TEMPERATURE) == 21
@@ -219,7 +219,7 @@ async def test_set_temp_with_hvac_mode(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_TEMPERATURE) == 23
 
 
-async def test_set_target_humidity_bad_attr(hass: HomeAssistant) -> None:
+async def test_set_target_humidity_bad_attr(hass: SmartHub) -> None:
     """Test setting the target humidity without required attribute."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.attributes.get(ATTR_HUMIDITY) == 67.4
@@ -236,7 +236,7 @@ async def test_set_target_humidity_bad_attr(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_HUMIDITY) == 67.4
 
 
-async def test_set_target_humidity(hass: HomeAssistant) -> None:
+async def test_set_target_humidity(hass: SmartHub) -> None:
     """Test the setting of the target humidity."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.attributes.get(ATTR_HUMIDITY) == 67.4
@@ -252,7 +252,7 @@ async def test_set_target_humidity(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_HUMIDITY) == 64.0
 
 
-async def test_set_fan_mode_bad_attr(hass: HomeAssistant) -> None:
+async def test_set_fan_mode_bad_attr(hass: SmartHub) -> None:
     """Test setting fan mode without required attribute."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.attributes.get(ATTR_FAN_MODE) == "on_high"
@@ -269,7 +269,7 @@ async def test_set_fan_mode_bad_attr(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_FAN_MODE) == "on_high"
 
 
-async def test_set_fan_mode(hass: HomeAssistant) -> None:
+async def test_set_fan_mode(hass: SmartHub) -> None:
     """Test setting of new fan mode."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.attributes.get(ATTR_FAN_MODE) == "on_high"
@@ -285,7 +285,7 @@ async def test_set_fan_mode(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_FAN_MODE) == "on_low"
 
 
-async def test_set_swing_mode_bad_attr(hass: HomeAssistant) -> None:
+async def test_set_swing_mode_bad_attr(hass: SmartHub) -> None:
     """Test setting swing mode without required attribute."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.attributes.get(ATTR_SWING_MODE) == "off"
@@ -302,7 +302,7 @@ async def test_set_swing_mode_bad_attr(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_SWING_MODE) == "off"
 
 
-async def test_set_swing(hass: HomeAssistant) -> None:
+async def test_set_swing(hass: SmartHub) -> None:
     """Test setting of new swing mode."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.attributes.get(ATTR_SWING_MODE) == "off"
@@ -318,7 +318,7 @@ async def test_set_swing(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_SWING_MODE) == "auto"
 
 
-async def test_set_hvac_bad_attr_and_state(hass: HomeAssistant) -> None:
+async def test_set_hvac_bad_attr_and_state(hass: SmartHub) -> None:
     """Test setting hvac mode without required attribute.
 
     Also check the state.
@@ -340,7 +340,7 @@ async def test_set_hvac_bad_attr_and_state(hass: HomeAssistant) -> None:
     assert state.state == HVACMode.COOL
 
 
-async def test_set_hvac(hass: HomeAssistant) -> None:
+async def test_set_hvac(hass: SmartHub) -> None:
     """Test setting of new hvac mode."""
     state = hass.states.get(ENTITY_CLIMATE)
     assert state.state == HVACMode.COOL
@@ -356,7 +356,7 @@ async def test_set_hvac(hass: HomeAssistant) -> None:
     assert state.state == HVACMode.HEAT
 
 
-async def test_set_hold_mode_away(hass: HomeAssistant) -> None:
+async def test_set_hold_mode_away(hass: SmartHub) -> None:
     """Test setting the hold mode away."""
     await hass.services.async_call(
         CLIMATE_DOMAIN,
@@ -369,7 +369,7 @@ async def test_set_hold_mode_away(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_PRESET_MODE) == PRESET_AWAY
 
 
-async def test_set_hold_mode_eco(hass: HomeAssistant) -> None:
+async def test_set_hold_mode_eco(hass: SmartHub) -> None:
     """Test setting the hold mode eco."""
     await hass.services.async_call(
         CLIMATE_DOMAIN,
@@ -382,7 +382,7 @@ async def test_set_hold_mode_eco(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_PRESET_MODE) == PRESET_ECO
 
 
-async def test_turn_on(hass: HomeAssistant) -> None:
+async def test_turn_on(hass: SmartHub) -> None:
     """Test turn on device."""
     await hass.services.async_call(
         CLIMATE_DOMAIN,
@@ -401,7 +401,7 @@ async def test_turn_on(hass: HomeAssistant) -> None:
     assert state.state == HVACMode.HEAT
 
 
-async def test_turn_off(hass: HomeAssistant) -> None:
+async def test_turn_off(hass: SmartHub) -> None:
     """Test turn on device."""
     await hass.services.async_call(
         CLIMATE_DOMAIN,

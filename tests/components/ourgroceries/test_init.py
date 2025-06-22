@@ -4,16 +4,16 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.ourgroceries import ClientError, InvalidLoginException
-from homeassistant.components.ourgroceries.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.ourgroceries import ClientError, InvalidLoginException
+from smarthub.components.ourgroceries.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ourgroceries_config_entry: MockConfigEntry | None,
 ) -> None:
@@ -42,7 +42,7 @@ def login_with_error(exception, ourgroceries: AsyncMock):
     ],
 )
 async def test_init_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     login_with_error,
     setup_integration: None,
     status: ConfigEntryState,

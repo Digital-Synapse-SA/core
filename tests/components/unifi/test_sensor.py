@@ -12,12 +12,12 @@ from freezegun.api import FrozenDateTimeFactory, freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     DOMAIN as SENSOR_DOMAIN,
     SCAN_INTERVAL,
     SensorDeviceClass,
 )
-from homeassistant.components.unifi.const import (
+from smarthub.components.unifi.const import (
     CONF_ALLOW_BANDWIDTH_SENSORS,
     CONF_ALLOW_UPTIME_SENSORS,
     CONF_DETECTION_TIME,
@@ -26,18 +26,18 @@ from homeassistant.components.unifi.const import (
     DEFAULT_DETECTION_TIME,
     DEVICE_STATES,
 )
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import (
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     EntityCategory,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_registry import RegistryEntryDisabler
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_registry import RegistryEntryDisabler
+from smarthub.util import dt as dt_util
 
 from .conftest import (
     ConfigEntryFactoryType,
@@ -435,13 +435,13 @@ PDU_OUTLETS_UPDATE_DATA = [
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.freeze_time("2021-01-01 01:01:00")
 async def test_entity_and_device_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Validate entity and device data."""
-    with patch("homeassistant.components.unifi.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.unifi.PLATFORMS", [Platform.SENSOR]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -451,7 +451,7 @@ async def test_entity_and_device_data(
     [{CONF_ALLOW_BANDWIDTH_SENSORS: True, CONF_ALLOW_UPTIME_SENSORS: True}],
 )
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_no_clients(hass: HomeAssistant) -> None:
+async def test_no_clients(hass: SmartHub) -> None:
     """Test the update_clients function when no clients are found."""
     assert len(hass.states.async_entity_ids(SENSOR_DOMAIN)) == 0
 
@@ -469,7 +469,7 @@ async def test_no_clients(hass: HomeAssistant) -> None:
 )
 @pytest.mark.parametrize("client_payload", [[WIRED_CLIENT, WIRELESS_CLIENT]])
 async def test_bandwidth_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message: WebsocketMessageMock,
     config_entry_options: MappingProxyType[str, Any],
     config_entry_setup: MockConfigEntry,
@@ -550,7 +550,7 @@ async def test_bandwidth_sensors(
 @pytest.mark.usefixtures("config_entry_setup")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_remove_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message: WebsocketMessageMock,
     client_payload: list[dict[str, Any]],
 ) -> None:
@@ -579,7 +579,7 @@ async def test_remove_sensors(
 @pytest.mark.parametrize("device_payload", [[DEVICE_1]])
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_poe_port_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_websocket_message: WebsocketMessageMock,
     mock_websocket_state: WebsocketStateManager,
@@ -652,7 +652,7 @@ async def test_poe_port_switches(
 
 @pytest.mark.parametrize("wlan_payload", [[WLAN]])
 async def test_wlan_client_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_factory: ConfigEntryFactoryType,
     mock_websocket_message: WebsocketMessageMock,
     mock_websocket_state: WebsocketStateManager,
@@ -783,7 +783,7 @@ async def test_wlan_client_sensors(
 @pytest.mark.parametrize("device_payload", [[PDU_DEVICE_1]])
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_outlet_power_readings(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message: WebsocketMessageMock,
     device_payload: list[dict[str, Any]],
     entity_id: str,
@@ -836,7 +836,7 @@ async def test_outlet_power_readings(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_device_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message: WebsocketMessageMock,
     device_payload: list[dict[str, Any]],
 ) -> None:
@@ -880,7 +880,7 @@ async def test_device_temperature(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_device_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_websocket_message: WebsocketMessageMock,
     device_payload: list[dict[str, Any]],
@@ -915,7 +915,7 @@ async def test_device_state(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_device_system_stats(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message: WebsocketMessageMock,
     device_payload: list[dict[str, Any]],
 ) -> None:
@@ -999,7 +999,7 @@ async def test_device_system_stats(
     ],
 )
 async def test_bandwidth_port_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_setup: MockConfigEntry,
     config_entry_options: MappingProxyType[str, Any],
@@ -1099,7 +1099,7 @@ async def test_bandwidth_port_sensors(
     ],
 )
 async def test_device_client_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_websocket_message: WebsocketMessageMock,
@@ -1179,7 +1179,7 @@ async def test_device_client_sensors(
 
 
 async def _test_uptime_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_websocket_message: WebsocketMessageMock,
     config_entry_factory: ConfigEntryFactoryType,
@@ -1203,7 +1203,7 @@ async def _test_uptime_entity(
 
     payload["uptime"] = event_uptime
     now = datetime(2021, 1, 1, 1, 4, 0, tzinfo=dt_util.UTC)
-    with patch("homeassistant.util.dt.now", return_value=now):
+    with patch("smarthub.util.dt.now", return_value=now):
         mock_websocket_message(message=message_key, data=payload)
         await hass.async_block_till_done()
 
@@ -1214,7 +1214,7 @@ async def _test_uptime_entity(
 
     payload["uptime"] = small_variation_uptime
     now = datetime(2021, 1, 1, 1, 8, 15, tzinfo=dt_util.UTC)
-    with patch("homeassistant.util.dt.now", return_value=now):
+    with patch("smarthub.util.dt.now", return_value=now):
         mock_websocket_message(message=message_key, data=payload)
 
     assert hass.states.get(entity_id).state == "2021-01-01T01:00:00+00:00"
@@ -1224,7 +1224,7 @@ async def _test_uptime_entity(
 
     payload["uptime"] = new_uptime
     now = datetime(2021, 2, 1, 1, 1, 0, tzinfo=dt_util.UTC)
-    with patch("homeassistant.util.dt.now", return_value=now):
+    with patch("smarthub.util.dt.now", return_value=now):
         mock_websocket_message(message=message_key, data=payload)
         await hass.async_block_till_done()
 
@@ -1246,7 +1246,7 @@ async def _test_uptime_entity(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_client_uptime(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry_options: MappingProxyType[str, Any],
     config_entry_factory: ConfigEntryFactoryType,
@@ -1291,7 +1291,7 @@ async def test_client_uptime(
 
 @pytest.mark.parametrize("device_payload", [[DEVICE_1]])
 async def test_device_uptime(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
     config_entry_factory: ConfigEntryFactoryType,
@@ -1388,7 +1388,7 @@ async def test_device_uptime(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_wan_monitor_latency(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_websocket_message: WebsocketMessageMock,
     device_payload: list[dict[str, Any]],
@@ -1483,7 +1483,7 @@ async def test_wan_monitor_latency(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_wan_monitor_latency_with_no_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Verify that wan latency sensors is not created if there is no data."""
@@ -1517,7 +1517,7 @@ async def test_wan_monitor_latency_with_no_entries(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_wan_monitor_latency_with_no_uptime(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Verify that wan latency sensors is not created if there is no data."""
@@ -1569,7 +1569,7 @@ async def test_wan_monitor_latency_with_no_uptime(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_device_temperatures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_websocket_message,
     device_payload: list[dict[str, Any]],
@@ -1636,7 +1636,7 @@ async def test_device_temperatures(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_device_with_no_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Verify that device temperature sensors is not created if there is no data."""
@@ -1676,7 +1676,7 @@ async def test_device_with_no_temperature(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_device_with_no_matching_temperatures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Verify that device temperature sensors is not created if there is no matching data."""
@@ -1735,7 +1735,7 @@ async def test_device_with_no_matching_temperatures(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_device_uplink(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_websocket_message,
     device_payload: list[dict[str, Any]],

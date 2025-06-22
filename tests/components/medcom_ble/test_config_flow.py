@@ -5,11 +5,11 @@ from unittest.mock import patch
 from bleak import BleakError
 from medcom_ble import MedcomBleDevice
 
-from homeassistant import config_entries
-from homeassistant.components.medcom_ble.const import DOMAIN
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.medcom_ble.const import DOMAIN
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     MEDCOM_DEVICE_INFO,
@@ -23,7 +23,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_bluetooth_discovery(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -57,7 +57,7 @@ async def test_bluetooth_discovery(hass: HomeAssistant) -> None:
         assert result["result"].unique_id == "a0:d9:5a:57:0b:00"
 
 
-async def test_bluetooth_discovery_already_setup(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery_already_setup(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device when already setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -73,10 +73,10 @@ async def test_bluetooth_discovery_already_setup(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_user_setup(hass: HomeAssistant) -> None:
+async def test_user_setup(hass: SmartHub) -> None:
     """Test the user initiated form."""
     with patch(
-        "homeassistant.components.medcom_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.medcom_ble.config_flow.async_discovered_service_info",
         return_value=[MEDCOM_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -104,7 +104,7 @@ async def test_user_setup(hass: HomeAssistant) -> None:
             )
         ),
         patch(
-            "homeassistant.components.medcom_ble.async_setup_entry",
+            "smarthub.components.medcom_ble.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -118,10 +118,10 @@ async def test_user_setup(hass: HomeAssistant) -> None:
     assert result["result"].unique_id == "a0:d9:5a:57:0b:00"
 
 
-async def test_user_setup_no_device(hass: HomeAssistant) -> None:
+async def test_user_setup_no_device(hass: SmartHub) -> None:
     """Test the user initiated form without any device detected."""
     with patch(
-        "homeassistant.components.medcom_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.medcom_ble.config_flow.async_discovered_service_info",
         return_value=[],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -131,7 +131,7 @@ async def test_user_setup_no_device(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_user_setup_existing_and_unknown_device(hass: HomeAssistant) -> None:
+async def test_user_setup_existing_and_unknown_device(hass: SmartHub) -> None:
     """Test the user initiated form with existing devices and unknown ones."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -139,7 +139,7 @@ async def test_user_setup_existing_and_unknown_device(hass: HomeAssistant) -> No
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.medcom_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.medcom_ble.config_flow.async_discovered_service_info",
         return_value=[UNKNOWN_SERVICE_INFO, MEDCOM_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -158,10 +158,10 @@ async def test_user_setup_existing_and_unknown_device(hass: HomeAssistant) -> No
         assert result["reason"] == "cannot_connect"
 
 
-async def test_user_setup_unknown_device(hass: HomeAssistant) -> None:
+async def test_user_setup_unknown_device(hass: SmartHub) -> None:
     """Test the user initiated form with only unknown devices."""
     with patch(
-        "homeassistant.components.medcom_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.medcom_ble.config_flow.async_discovered_service_info",
         return_value=[UNKNOWN_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -171,10 +171,10 @@ async def test_user_setup_unknown_device(hass: HomeAssistant) -> None:
         assert result["reason"] == "no_devices_found"
 
 
-async def test_user_setup_unknown_error(hass: HomeAssistant) -> None:
+async def test_user_setup_unknown_error(hass: SmartHub) -> None:
     """Test the user initiated form with an unknown error."""
     with patch(
-        "homeassistant.components.medcom_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.medcom_ble.config_flow.async_discovered_service_info",
         return_value=[MEDCOM_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -197,10 +197,10 @@ async def test_user_setup_unknown_error(hass: HomeAssistant) -> None:
     assert result["reason"] == "unknown"
 
 
-async def test_user_setup_unable_to_connect(hass: HomeAssistant) -> None:
+async def test_user_setup_unable_to_connect(hass: SmartHub) -> None:
     """Test the user initiated form with a device that's failing connection."""
     with patch(
-        "homeassistant.components.medcom_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.medcom_ble.config_flow.async_discovered_service_info",
         return_value=[MEDCOM_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(

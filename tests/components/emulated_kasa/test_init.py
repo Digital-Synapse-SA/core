@@ -5,21 +5,21 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components import emulated_kasa
-from homeassistant.components.emulated_kasa.const import (
+from smarthub.components import emulated_kasa
+from smarthub.components.emulated_kasa.const import (
     CONF_POWER,
     CONF_POWER_ENTITY,
     DOMAIN,
 )
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     DOMAIN as FAN_DOMAIN,
     SERVICE_SET_PERCENTAGE,
 )
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_ENTITIES,
     CONF_NAME,
@@ -27,8 +27,8 @@ from homeassistant.const import (
     SERVICE_TURN_ON,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 ENTITY_SWITCH = "switch.ac"
 ENTITY_SWITCH_NAME = "A/C"
@@ -136,9 +136,9 @@ CONFIG_SENSOR = {
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant):
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub):
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
 def nested_value(ndict, *keys):
@@ -151,7 +151,7 @@ def nested_value(ndict, *keys):
     return nested_value(ndict[key], *keys[1:])
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test that devices are reported correctly."""
     with patch(
         "sense_energy.SenseLink",
@@ -160,7 +160,7 @@ async def test_setup(hass: HomeAssistant) -> None:
         assert await async_setup_component(hass, DOMAIN, CONFIG) is True
 
 
-async def test_float(hass: HomeAssistant) -> None:
+async def test_float(hass: SmartHub) -> None:
     """Test a configuration using a simple float."""
     config = CONFIG_SWITCH[DOMAIN][CONF_ENTITIES]
     assert await async_setup_component(
@@ -203,7 +203,7 @@ async def test_float(hass: HomeAssistant) -> None:
     assert math.isclose(power, 0)
 
 
-async def test_switch_power(hass: HomeAssistant) -> None:
+async def test_switch_power(hass: SmartHub) -> None:
     """Test a configuration using a simple float."""
     config = CONFIG_SWITCH_NO_POWER[DOMAIN][CONF_ENTITIES]
     assert await async_setup_component(
@@ -236,7 +236,7 @@ async def test_switch_power(hass: HomeAssistant) -> None:
     assert math.isclose(power, 0)
 
 
-async def test_template(hass: HomeAssistant) -> None:
+async def test_template(hass: SmartHub) -> None:
     """Test a configuration using a complex template."""
     config = CONFIG_FAN[DOMAIN][CONF_ENTITIES]
     assert await async_setup_component(
@@ -295,7 +295,7 @@ async def test_template(hass: HomeAssistant) -> None:
     assert math.isclose(power, 0)
 
 
-async def test_sensor(hass: HomeAssistant) -> None:
+async def test_sensor(hass: SmartHub) -> None:
     """Test a configuration using a sensor in a template."""
     config = CONFIG_LIGHT[DOMAIN][CONF_ENTITIES]
     assert await async_setup_component(
@@ -352,7 +352,7 @@ async def test_sensor(hass: HomeAssistant) -> None:
     assert math.isclose(power, 0)
 
 
-async def test_sensor_state(hass: HomeAssistant) -> None:
+async def test_sensor_state(hass: SmartHub) -> None:
     """Test a configuration using a sensor in a template."""
     config = CONFIG_SENSOR[DOMAIN][CONF_ENTITIES]
     assert await async_setup_component(
@@ -399,7 +399,7 @@ async def test_sensor_state(hass: HomeAssistant) -> None:
     assert math.isclose(power, 0)
 
 
-async def test_multiple_devices(hass: HomeAssistant) -> None:
+async def test_multiple_devices(hass: SmartHub) -> None:
     """Test that devices are reported correctly."""
     config = CONFIG[DOMAIN][CONF_ENTITIES]
     assert await async_setup_component(

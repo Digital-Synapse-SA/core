@@ -10,10 +10,10 @@ from pyownet.protocol import OwnetError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.onewire.onewirehub import _DEVICE_SCAN_INTERVAL
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.onewire.onewirehub import _DEVICE_SCAN_INTERVAL
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_owproxy_mock_devices
 from .const import ATTR_INJECT_READS, MOCK_OWPROXY_DEVICES
@@ -24,13 +24,13 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.onewire._PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.onewire._PLATFORMS", [Platform.SENSOR]):
         yield
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     owproxy: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -46,7 +46,7 @@ async def test_sensors(
 @pytest.mark.parametrize("device_id", ["12.111111111111"])
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors_delayed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     owproxy: MagicMock,
     device_id: str,
@@ -72,7 +72,7 @@ async def test_sensors_delayed(
 
 @pytest.mark.parametrize("device_id", ["12.111111111111"])
 async def test_tai8570_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     owproxy: MagicMock,
     device_id: str,

@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock
 from pysuez.exception import PySuezError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.suez_water.const import CONF_COUNTER_ID, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.recorder import Recorder
+from smarthub.components.suez_water.const import CONF_COUNTER_ID, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import MOCK_DATA
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_form(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, suez_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, suez_client: AsyncMock
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -40,7 +40,7 @@ async def test_form(
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, suez_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, suez_client: AsyncMock
 ) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
@@ -71,7 +71,7 @@ async def test_form_invalid_auth(
 
 
 async def test_form_already_configured(
-    hass: HomeAssistant, recorder_mock: Recorder, suez_client: AsyncMock
+    hass: SmartHub, recorder_mock: Recorder, suez_client: AsyncMock
 ) -> None:
     """Test we abort when entry is already configured."""
 
@@ -99,7 +99,7 @@ async def test_form_already_configured(
     ("exception", "error"), [(PySuezError, "cannot_connect"), (Exception, "unknown")]
 )
 async def test_form_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     exception: Exception,
     suez_client: AsyncMock,
@@ -133,7 +133,7 @@ async def test_form_error(
 
 
 async def test_form_auto_counter(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, suez_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, suez_client: AsyncMock
 ) -> None:
     """Test form set counter if not set by user."""
     result = await hass.config_entries.flow.async_init(

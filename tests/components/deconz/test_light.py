@@ -7,8 +7,8 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.deconz.const import CONF_ALLOW_DECONZ_GROUPS
-from homeassistant.components.light import (
+from smarthub.components.deconz.const import CONF_ALLOW_DECONZ_GROUPS
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
@@ -27,15 +27,15 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntityFeature,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     STATE_OFF,
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType, WebsocketDataType
 
@@ -284,13 +284,13 @@ from tests.test_util.aiohttp import AiohttpClientMocker
     ],
 )
 async def test_lights(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that different light entities are created with expected values."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.LIGHT]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -329,7 +329,7 @@ async def test_lights(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_light_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     light_ws_data: WebsocketDataType,
 ) -> None:
     """Verify light can change state on websocket event."""
@@ -477,7 +477,7 @@ async def test_light_state_change(
     ],
 )
 async def test_light_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     config_entry_factory: ConfigEntryFactoryType,
     light_payload: dict[str, Any],
@@ -559,7 +559,7 @@ async def test_light_service_calls(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_ikea_default_transition_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
 ) -> None:
     """Verify that service calls to IKEA lights always extend with transition tinme 0 if absent."""
@@ -625,7 +625,7 @@ async def test_ikea_default_transition_time(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_lidl_christmas_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
 ) -> None:
     """Test that lights or groups entities are created."""
@@ -663,7 +663,7 @@ async def test_lidl_christmas_light(
     ],
 )
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_configuration_tool(hass: HomeAssistant) -> None:
+async def test_configuration_tool(hass: SmartHub) -> None:
     """Verify that configuration tool is not created."""
     assert len(hass.states.async_all()) == 0
 
@@ -716,7 +716,7 @@ async def test_configuration_tool(hass: HomeAssistant) -> None:
     ],
 )
 async def test_groups(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     group_payload: dict[str, Any],
@@ -747,7 +747,7 @@ async def test_groups(
         },
     }
 
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.LIGHT]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -851,7 +851,7 @@ async def test_groups(
     ],
 )
 async def test_group_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_factory: ConfigEntryFactoryType,
     group_payload: dict[str, Any],
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
@@ -903,7 +903,7 @@ async def test_group_service_calls(
     ],
 )
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_empty_group(hass: HomeAssistant) -> None:
+async def test_empty_group(hass: SmartHub) -> None:
     """Verify that a group without a list of lights is not created."""
     assert len(hass.states.async_all()) == 0
     assert not hass.states.get("light.empty_group")
@@ -949,7 +949,7 @@ async def test_empty_group(hass: HomeAssistant) -> None:
 )
 @pytest.mark.parametrize("config_entry_options", [{CONF_ALLOW_DECONZ_GROUPS: False}])
 async def test_disable_light_groups(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_setup: MockConfigEntry,
 ) -> None:
     """Test disallowing light groups work."""
@@ -1061,7 +1061,7 @@ async def test_disable_light_groups(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_non_color_light_reports_color(
-    hass: HomeAssistant,
+    hass: SmartHub,
     light_ws_data: WebsocketDataType,
 ) -> None:
     """Verify hs_color does not crash when a group gets updated with a bad color value.
@@ -1153,7 +1153,7 @@ async def test_non_color_light_reports_color(
     ],
 )
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_verify_group_supported_features(hass: HomeAssistant) -> None:
+async def test_verify_group_supported_features(hass: SmartHub) -> None:
     """Test that group supported features reflect what included lights support."""
     assert len(hass.states.async_all()) == 4
 
@@ -1270,7 +1270,7 @@ async def test_verify_group_supported_features(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_verify_group_color_mode_fallback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_data: WebsocketDataType,
 ) -> None:
     """Test that group supported features reflect what included lights support."""

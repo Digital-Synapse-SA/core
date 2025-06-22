@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
 
 from .common import MockBinarySensor
 

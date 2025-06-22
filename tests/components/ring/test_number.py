@@ -5,14 +5,14 @@ from unittest.mock import Mock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import MockConfigEntry, async_check_entity_translations, setup_platform
 
@@ -30,7 +30,7 @@ from tests.common import snapshot_platform
     ],
 )
 async def test_entity_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_ring_client: Mock,
     entity_id: str,
@@ -44,7 +44,7 @@ async def test_entity_registry(
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -71,7 +71,7 @@ async def test_states(
     ],
 )
 async def test_volume_can_be_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     entity_id: str,
     new_value: str,

@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -21,7 +21,7 @@ async def test_binary_sensor_entitity(
     expected_state: str,
     mock_entry: MockConfigEntry,
     setup_fetch_metric_data_mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test binary sensor with metrics."""
 

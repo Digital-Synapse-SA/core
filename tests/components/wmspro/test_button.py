@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from . import setup_config_entry
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_button_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_configuration_prod_awning_dimmer: AsyncMock,
@@ -34,7 +34,7 @@ async def test_button_update(
 
 
 async def test_button_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_configuration_prod_awning_dimmer: AsyncMock,

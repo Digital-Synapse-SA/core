@@ -1,18 +1,18 @@
 """Tests for AndroidTV integration initialization."""
 
-from homeassistant.components.androidtv.const import (
+from smarthub.components.androidtv.const import (
     CONF_SCREENCAP,
     CONF_SCREENCAP_INTERVAL,
 )
-from homeassistant.components.media_player import DOMAIN as MP_DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.media_player import DOMAIN as MP_DOMAIN
+from smarthub.core import SmartHub
 
 from . import patchers
 from .common import CONFIG_ANDROID_DEFAULT, SHELL_RESPONSE_OFF, setup_mock_entry
 
 
 async def test_migrate_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test migration to new version."""
     patch_key, _, mock_config_entry = setup_mock_entry(

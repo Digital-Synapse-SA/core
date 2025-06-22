@@ -14,15 +14,15 @@ from aiohttp.client_exceptions import ClientError
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.google import DOMAIN
-from homeassistant.components.google.calendar import SERVICE_CREATE_EVENT
-from homeassistant.components.google.const import CONF_CALENDAR_ACCESS
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_FRIENDLY_NAME, STATE_OFF
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError, ServiceNotSupported
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import UTC, utcnow
+from smarthub.components.google import DOMAIN
+from smarthub.components.google.calendar import SERVICE_CREATE_EVENT
+from smarthub.components.google.const import CONF_CALENDAR_ACCESS
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_FRIENDLY_NAME, STATE_OFF
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError, ServiceNotSupported
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import UTC, utcnow
 
 from .conftest import (
     CALENDAR_ID,
@@ -75,7 +75,7 @@ def assert_state(actual: State | None, expected: State | None) -> None:
     ids=("google.create_event", "calendar.create_event"),
 )
 def add_event_call_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     request: pytest.FixtureRequest,
 ) -> Callable[[dict[str, Any]], Awaitable[None]]:
     """Fixture for calling the add or create event service."""
@@ -99,7 +99,7 @@ def add_event_call_service(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
 ) -> None:
     """Test load and unload of a ConfigEntry."""
@@ -118,7 +118,7 @@ async def test_unload_entry(
     "token_scopes", ["https://www.googleapis.com/auth/calendar.readonly"]
 )
 async def test_existing_token_missing_scope(
-    hass: HomeAssistant,
+    hass: SmartHub,
     token_scopes: list[str],
     component_setup: ComponentSetup,
     config_entry: MockConfigEntry,
@@ -137,7 +137,7 @@ async def test_existing_token_missing_scope(
 
 @pytest.mark.parametrize("config_entry_options", [{CONF_CALENDAR_ACCESS: "read_only"}])
 async def test_config_entry_scope_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     token_scopes: list[str],
     component_setup: ComponentSetup,
     config_entry: MockConfigEntry,
@@ -154,7 +154,7 @@ async def test_config_entry_scope_reauth(
 
 @pytest.mark.parametrize("calendars_config", [[{"cal_id": "invalid-schema"}]])
 async def test_calendar_yaml_missing_required_fields(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     calendars_config: list[dict[str, Any]],
     mock_calendars_yaml: None,
@@ -168,7 +168,7 @@ async def test_calendar_yaml_missing_required_fields(
 
 @pytest.mark.parametrize("calendars_config", [[{"missing-cal_id": "invalid-schema"}]])
 async def test_invalid_calendar_yaml(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     calendars_config: list[dict[str, Any]],
     mock_calendars_yaml: None,
@@ -181,7 +181,7 @@ async def test_invalid_calendar_yaml(
 
 
 async def test_calendar_yaml_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     test_api_calendar: dict[str, Any],
@@ -191,7 +191,7 @@ async def test_calendar_yaml_error(
     mock_calendars_list({"items": [test_api_calendar]})
     mock_events_list({})
 
-    with patch("homeassistant.components.google.open", side_effect=FileNotFoundError()):
+    with patch("smarthub.components.google.open", side_effect=FileNotFoundError()):
         assert await component_setup()
 
     assert not hass.states.get(TEST_YAML_ENTITY)
@@ -200,7 +200,7 @@ async def test_calendar_yaml_error(
 
 @pytest.mark.parametrize("calendars_config", [None])
 async def test_empty_calendar_yaml(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     calendars_config: list[dict[str, Any]],
     mock_calendars_yaml: None,
@@ -219,7 +219,7 @@ async def test_empty_calendar_yaml(
 
 
 async def test_init_calendar(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     test_api_calendar: dict[str, Any],
@@ -241,7 +241,7 @@ async def test_init_calendar(
 
 
 async def test_multiple_config_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     config_entry: MockConfigEntry,
     mock_calendars_list: ApiResult,
@@ -400,7 +400,7 @@ async def test_multiple_config_entries(
     ],
 )
 async def test_add_event_invalid_params(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     test_api_calendar: dict[str, Any],
@@ -437,7 +437,7 @@ async def test_add_event_invalid_params(
     ids=["in_days", "in_weeks"],
 )
 async def test_add_event_date_in_x(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     mock_insert_event: Callable[..., None],
@@ -475,7 +475,7 @@ async def test_add_event_date_in_x(
 
 
 async def test_add_event_date(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     test_api_calendar: dict[str, Any],
@@ -515,7 +515,7 @@ async def test_add_event_date(
 
 
 async def test_add_event_date_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     mock_insert_event: Callable[..., None],
@@ -578,7 +578,7 @@ async def test_add_event_date_time(
     ],
 )
 async def test_unsupported_create_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_calendars_yaml: Mock,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
@@ -588,7 +588,7 @@ async def test_unsupported_create_event(
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test create event service call is unsupported for virtual calendars."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     mock_calendars_list({"items": [test_api_calendar]})
     mock_events_list({})
     assert await component_setup()
@@ -618,7 +618,7 @@ async def test_unsupported_create_event(
 
 
 async def test_add_event_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     test_api_calendar: dict[str, Any],
@@ -637,14 +637,14 @@ async def test_add_event_failure(
         exc=ClientError(),
     )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await add_event_call_service(
             {"start_date": "2022-05-01", "end_date": "2022-05-02"}
         )
 
 
 async def test_add_event_location(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     test_api_calendar: dict[str, Any],
@@ -694,7 +694,7 @@ async def test_add_event_location(
     ids=["max_timestamp", "timestamp_naive"],
 )
 async def test_invalid_token_expiry_in_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -725,7 +725,7 @@ async def test_invalid_token_expiry_in_config_entry(
 
 @pytest.mark.parametrize("config_entry_token_expiry", [EXPIRED_TOKEN_TIMESTAMP])
 async def test_expired_token_refresh_internal_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -748,7 +748,7 @@ async def test_expired_token_refresh_internal_error(
     [EXPIRED_TOKEN_TIMESTAMP],
 )
 async def test_expired_token_requires_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -787,7 +787,7 @@ async def test_expired_token_requires_reauth(
     ids=["has_yaml", "no_yaml"],
 )
 async def test_calendar_yaml_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_yaml: Mock,
     mock_calendars_list: ApiResult,
@@ -815,7 +815,7 @@ async def test_calendar_yaml_update(
 
 
 async def test_update_will_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     test_api_calendar: dict[str, Any],
@@ -830,7 +830,7 @@ async def test_update_will_reload(
     assert config_entry.options == {}  # read_write is default
 
     with patch(
-        "homeassistant.config_entries.ConfigEntries.async_reload",
+        "smarthub.config_entries.ConfigEntries.async_reload",
         return_value=None,
     ) as mock_reload:
         # No-op does not reload
@@ -861,7 +861,7 @@ async def test_update_will_reload(
 
 @pytest.mark.parametrize("config_entry_unique_id", [None])
 async def test_assign_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     test_api_calendar: dict[str, Any],
@@ -899,7 +899,7 @@ async def test_assign_unique_id(
     ],
 )
 async def test_assign_unique_id_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_list: ApiResult,
     test_api_calendar: dict[str, Any],
@@ -929,7 +929,7 @@ async def test_assign_unique_id_failure(
 
 
 async def test_remove_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_calendars_list: ApiResult,
     component_setup: ComponentSetup,
     test_api_calendar: dict[str, Any],

@@ -6,10 +6,10 @@ from google_nest_sdm.exceptions import SubscriberException
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.nest.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.nest.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import CreateDevice, PlatformSetup
 
@@ -64,7 +64,7 @@ def platforms() -> list[str]:
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -84,7 +84,7 @@ async def test_entry_diagnostics(
 
 
 async def test_device_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     create_device: CreateDevice,
@@ -107,14 +107,14 @@ async def test_device_diagnostics(
 
 
 async def test_setup_susbcriber_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     setup_base_platform: PlatformSetup,
 ) -> None:
     """Test configuration error."""
     with patch(
-        "homeassistant.components.nest.api.GoogleNestSubscriber.start_async",
+        "smarthub.components.nest.api.GoogleNestSubscriber.start_async",
         side_effect=SubscriberException(),
     ):
         await setup_base_platform()
@@ -125,7 +125,7 @@ async def test_setup_susbcriber_failure(
 
 
 async def test_camera_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,

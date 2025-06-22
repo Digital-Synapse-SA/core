@@ -9,19 +9,19 @@ from aiohue.v1 import HueBridgeV1
 from aiohue.v2 import HueBridgeV2
 import pytest
 
-from homeassistant.components.hue import bridge
-from homeassistant.components.hue.const import (
+from smarthub.components.hue import bridge
+from smarthub.components.hue.const import (
     CONF_ALLOW_HUE_GROUPS,
     CONF_ALLOW_UNREACHABLE,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from smarthub.core import SmartHub
+from smarthub.exceptions import ConfigEntryNotReady
 
 from tests.common import MockConfigEntry
 
 
-async def test_bridge_setup_v1(hass: HomeAssistant, mock_api_v1: Mock) -> None:
+async def test_bridge_setup_v1(hass: SmartHub, mock_api_v1: Mock) -> None:
     """Test a successful setup for V1 bridge."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -45,7 +45,7 @@ async def test_bridge_setup_v1(hass: HomeAssistant, mock_api_v1: Mock) -> None:
     assert forward_entries == {"light", "binary_sensor", "sensor"}
 
 
-async def test_bridge_setup_v2(hass: HomeAssistant, mock_api_v2: Mock) -> None:
+async def test_bridge_setup_v2(hass: SmartHub, mock_api_v2: Mock) -> None:
     """Test a successful setup for V2 bridge."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -74,7 +74,7 @@ async def test_bridge_setup_v2(hass: HomeAssistant, mock_api_v2: Mock) -> None:
     }
 
 
-async def test_bridge_setup_invalid_api_key(hass: HomeAssistant) -> None:
+async def test_bridge_setup_invalid_api_key(hass: SmartHub) -> None:
     """Test we start config flow if username is no longer whitelisted."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -93,7 +93,7 @@ async def test_bridge_setup_invalid_api_key(hass: HomeAssistant) -> None:
     assert mock_init.mock_calls[0][2]["data"] == {"host": "1.2.3.4"}
 
 
-async def test_bridge_setup_timeout(hass: HomeAssistant) -> None:
+async def test_bridge_setup_timeout(hass: SmartHub) -> None:
     """Test we retry to connect if we cannot connect."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -114,7 +114,7 @@ async def test_bridge_setup_timeout(hass: HomeAssistant) -> None:
 
 
 async def test_reset_unloads_entry_if_setup(
-    hass: HomeAssistant, mock_api_v1: Mock
+    hass: SmartHub, mock_api_v1: Mock
 ) -> None:
     """Test calling reset while the entry has been setup."""
     config_entry = MockConfigEntry(
@@ -145,7 +145,7 @@ async def test_reset_unloads_entry_if_setup(
     assert len(hass.services.async_services()) == 0
 
 
-async def test_handle_unauthorized(hass: HomeAssistant, mock_api_v1: Mock) -> None:
+async def test_handle_unauthorized(hass: SmartHub, mock_api_v1: Mock) -> None:
     """Test handling an unauthorized error on update."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

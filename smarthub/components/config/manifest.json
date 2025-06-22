@@ -1,0 +1,9 @@
+{
+  "domain": "config",
+  "name": "Configuration",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["http"],
+  "documentation": "https://www.smart-hub.io/integrations/config",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

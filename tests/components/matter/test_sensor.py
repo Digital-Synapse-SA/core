@@ -6,9 +6,9 @@ from matter_server.client.models.node import MatterNode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import EntityCategory, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import EntityCategory, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -19,7 +19,7 @@ from .common import (
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "matter_devices")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -29,7 +29,7 @@ async def test_sensors(
 
 @pytest.mark.parametrize("node_fixture", ["flow_sensor"])
 async def test_sensor_null_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_sensor_null_value(
 
 @pytest.mark.parametrize("node_fixture", ["flow_sensor"])
 async def test_flow_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -67,7 +67,7 @@ async def test_flow_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["humidity_sensor"])
 async def test_humidity_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -86,7 +86,7 @@ async def test_humidity_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["light_sensor"])
 async def test_light_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_light_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["temperature_sensor"])
 async def test_temperature_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -124,7 +124,7 @@ async def test_temperature_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["eve_contact_sensor"])
 async def test_battery_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     matter_client: MagicMock,
     matter_node: MatterNode,
@@ -150,7 +150,7 @@ async def test_battery_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["eve_contact_sensor"])
 async def test_battery_sensor_voltage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     matter_client: MagicMock,
     matter_node: MatterNode,
@@ -176,7 +176,7 @@ async def test_battery_sensor_voltage(
 
 @pytest.mark.parametrize("node_fixture", ["smoke_detector"])
 async def test_battery_sensor_description(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     matter_client: MagicMock,
     matter_node: MatterNode,
@@ -202,7 +202,7 @@ async def test_battery_sensor_description(
 
 @pytest.mark.parametrize("node_fixture", ["eve_thermo"])
 async def test_eve_thermo_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -234,7 +234,7 @@ async def test_eve_thermo_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["pressure_sensor"])
 async def test_pressure_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -253,7 +253,7 @@ async def test_pressure_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["eve_weather_sensor"])
 async def test_eve_weather_sensor_custom_cluster(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -272,7 +272,7 @@ async def test_eve_weather_sensor_custom_cluster(
 
 @pytest.mark.parametrize("node_fixture", ["air_quality_sensor"])
 async def test_air_quality_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -328,7 +328,7 @@ async def test_air_quality_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_dishwasher"])
 async def test_operational_state_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -355,7 +355,7 @@ async def test_operational_state_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["yandex_smart_socket"])
 async def test_draft_electrical_measurement_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -383,7 +383,7 @@ async def test_draft_electrical_measurement_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_laundrywasher"])
 async def test_list_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -403,7 +403,7 @@ async def test_list_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_evse_charging"])
 async def test_evse_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -471,7 +471,7 @@ async def test_evse_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_water_heater"])
 async def test_water_heater(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -527,7 +527,7 @@ async def test_water_heater(
 
 @pytest.mark.parametrize("node_fixture", ["pump"])
 async def test_pump(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

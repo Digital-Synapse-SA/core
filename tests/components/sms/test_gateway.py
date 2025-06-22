@@ -2,8 +2,8 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.sms.gateway import Gateway
-from homeassistant.core import HomeAssistant
+from smarthub.components.sms.gateway import Gateway
+from smarthub.core import SmartHub
 
 from .const import (
     NEXT_SMS_MULTIPLE_1,
@@ -14,7 +14,7 @@ from .const import (
 )
 
 
-async def test_get_and_delete_all_sms_single_message(hass: HomeAssistant) -> None:
+async def test_get_and_delete_all_sms_single_message(hass: SmartHub) -> None:
     """Test that a single message produces a list of entries containing the single message."""
 
     # Mock the Gammu state_machine
@@ -33,7 +33,7 @@ async def test_get_and_delete_all_sms_single_message(hass: HomeAssistant) -> Non
     assert response[0][0]["Text"] == "Short message"
 
 
-async def test_get_and_delete_all_sms_two_part_message(hass: HomeAssistant) -> None:
+async def test_get_and_delete_all_sms_two_part_message(hass: SmartHub) -> None:
     """Test that a two-part message produces a list of entries containing one combined message."""
 
     state_machine = MagicMock()

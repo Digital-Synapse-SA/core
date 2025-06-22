@@ -4,8 +4,8 @@
 from habluetooth.advertisement_tracker import ADVERTISING_TIMES_NEEDED
 import pytest
 
-from homeassistant.components.bluetooth import async_set_fallback_availability_interval
-from homeassistant.core import HomeAssistant
+from smarthub.components.bluetooth import async_set_fallback_availability_interval
+from smarthub.core import SmartHub
 
 from . import (
     MAC_RPA_VALID_1,
@@ -16,7 +16,7 @@ from . import (
 
 
 @pytest.mark.usefixtures("enable_bluetooth", "entity_registry_enabled_by_default")
-async def test_sensor_unavailable(hass: HomeAssistant) -> None:
+async def test_sensor_unavailable(hass: SmartHub) -> None:
     """Test sensors are unavailable."""
     await async_mock_config_entry(hass)
 
@@ -26,7 +26,7 @@ async def test_sensor_unavailable(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth", "entity_registry_enabled_by_default")
-async def test_sensors_already_home(hass: HomeAssistant) -> None:
+async def test_sensors_already_home(hass: SmartHub) -> None:
     """Test sensors get value when we start at home."""
     await async_inject_broadcast(hass, MAC_RPA_VALID_1)
     await async_mock_config_entry(hass)
@@ -37,7 +37,7 @@ async def test_sensors_already_home(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth", "entity_registry_enabled_by_default")
-async def test_sensors_come_home(hass: HomeAssistant) -> None:
+async def test_sensors_come_home(hass: SmartHub) -> None:
     """Test sensors get value when we receive a broadcast."""
     await async_mock_config_entry(hass)
     await async_inject_broadcast(hass, MAC_RPA_VALID_1)
@@ -48,7 +48,7 @@ async def test_sensors_come_home(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth", "entity_registry_enabled_by_default")
-async def test_estimated_broadcast_interval(hass: HomeAssistant) -> None:
+async def test_estimated_broadcast_interval(hass: SmartHub) -> None:
     """Test sensors get value when we receive a broadcast."""
     await async_mock_config_entry(hass)
     await async_inject_broadcast(hass, MAC_RPA_VALID_1)

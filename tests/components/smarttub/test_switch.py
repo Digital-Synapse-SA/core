@@ -2,8 +2,8 @@
 
 import pytest
 
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 
 @pytest.mark.parametrize(
@@ -15,7 +15,7 @@ from homeassistant.core import HomeAssistant
     ],
 )
 async def test_pumps(
-    spa, setup_entry, hass: HomeAssistant, pump_id, pump_state, entity_suffix
+    spa, setup_entry, hass: SmartHub, pump_id, pump_state, entity_suffix
 ) -> None:
     """Test pump entities."""
 

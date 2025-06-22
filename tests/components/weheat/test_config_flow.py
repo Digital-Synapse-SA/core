@@ -4,17 +4,17 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.weheat.const import (
+from smarthub.components.weheat.const import (
     DOMAIN,
     ENTRY_TITLE,
     OAUTH2_AUTHORIZE,
     OAUTH2_TOKEN,
 )
-from homeassistant.config_entries import SOURCE_USER, ConfigFlowResult
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_SOURCE, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.config_entries import SOURCE_USER, ConfigFlowResult
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_SOURCE, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .const import (
     CLIENT_ID,
@@ -33,7 +33,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry,
@@ -47,7 +47,7 @@ async def test_full_flow(
 
     with (
         patch(
-            "homeassistant.components.weheat.config_flow.async_get_user_id_from_token",
+            "smarthub.components.weheat.config_flow.async_get_user_id_from_token",
             return_value=USER_UUID_1,
         ) as mock_weheat,
     ):
@@ -67,7 +67,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_duplicate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry,
@@ -89,7 +89,7 @@ async def test_duplicate_unique_id(
 
     with (
         patch(
-            "homeassistant.components.weheat.config_flow.async_get_user_id_from_token",
+            "smarthub.components.weheat.config_flow.async_get_user_id_from_token",
             return_value=USER_UUID_1,
         ),
     ):
@@ -106,7 +106,7 @@ async def test_duplicate_unique_id(
     [(USER_UUID_1, "reauth_successful"), (USER_UUID_2, "wrong_account")],
 )
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_user_id: AsyncMock,
@@ -146,7 +146,7 @@ async def test_reauth(
 
 
 async def handle_oauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     result: ConfigFlowResult,

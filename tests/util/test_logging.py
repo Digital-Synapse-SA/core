@@ -1,4 +1,4 @@
-"""Test Home Assistant logging util methods."""
+"""Test SmartHub logging util methods."""
 
 import asyncio
 from functools import partial
@@ -9,13 +9,13 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.core import (
-    HomeAssistant,
+from smarthub.core import (
+    SmartHub,
     callback,
     is_callback,
     is_callback_check_partial,
 )
-from homeassistant.util import logging as logging_util
+from smarthub.util import logging as logging_util
 
 
 async def empty_log_queue() -> None:
@@ -26,10 +26,10 @@ async def empty_log_queue() -> None:
 
 
 async def test_logging_with_queue_handler() -> None:
-    """Test logging with HomeAssistantQueueHandler."""
+    """Test logging with SmartHubQueueHandler."""
 
     simple_queue = queue.SimpleQueue()
-    handler = logging_util.HomeAssistantQueueHandler(simple_queue)
+    handler = logging_util.SmartHubQueueHandler(simple_queue)
 
     log_record = logging.makeLogRecord({"msg": "Test Log Record"})
 
@@ -66,13 +66,13 @@ async def test_logging_with_queue_handler() -> None:
     assert simple_queue.empty()
 
 
-async def test_migrate_log_handler(hass: HomeAssistant) -> None:
+async def test_migrate_log_handler(hass: SmartHub) -> None:
     """Test migrating log handlers."""
 
     logging_util.async_activate_log_queue_handler(hass)
 
     assert len(logging.root.handlers) == 1
-    assert isinstance(logging.root.handlers[0], logging_util.HomeAssistantQueueHandler)
+    assert isinstance(logging.root.handlers[0], logging_util.SmartHubQueueHandler)
 
     # Test that the close hook shuts down the queue handler's thread
     listener_thread = logging.root.handlers[0].listener._thread
@@ -83,7 +83,7 @@ async def test_migrate_log_handler(hass: HomeAssistant) -> None:
 
 @pytest.mark.no_fail_on_log_exception
 async def test_async_create_catching_coro(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test exception logging of wrapped coroutine."""
 
@@ -159,9 +159,9 @@ async def test_catch_log_exception_catches_and_logs() -> None:
     assert saved_args == [("failure sync passed",)]
 
 
-@patch("homeassistant.util.logging.HomeAssistantQueueListener.MAX_LOGS_COUNT", 5)
+@patch("smarthub.util.logging.SmartHubQueueListener.MAX_LOGS_COUNT", 5)
 @patch(
-    "homeassistant.util.logging.HomeAssistantQueueListener.EXCLUDED_LOG_COUNT_MODULES",
+    "smarthub.util.logging.SmartHubQueueListener.EXCLUDED_LOG_COUNT_MODULES",
     ["excluded"],
 )
 @pytest.mark.parametrize(
@@ -174,7 +174,7 @@ async def test_catch_log_exception_catches_and_logs() -> None:
     [(4, 0, 0, 0), (5, 1, 1, 0), (11, 1, 5, 1), (20, 1, 20, 1)],
 )
 async def test_noisy_loggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     logger1_count: int,
     logger1_expected_notices: int,
@@ -194,7 +194,7 @@ async def test_noisy_loggers(
     for _ in range(logger2_count):
         logger2.info("This is another log")
 
-    for _ in range(logging_util.HomeAssistantQueueListener.MAX_LOGS_COUNT + 1):
+    for _ in range(logging_util.SmartHubQueueListener.MAX_LOGS_COUNT + 1):
         logger_excluded.info("This log should not trigger a warning")
 
     await empty_log_queue()
@@ -221,9 +221,9 @@ async def test_noisy_loggers(
     logging.root.handlers[0].close()
 
 
-@patch("homeassistant.util.logging.HomeAssistantQueueListener.MAX_LOGS_COUNT", 1)
+@patch("smarthub.util.logging.SmartHubQueueListener.MAX_LOGS_COUNT", 1)
 async def test_noisy_loggers_ignores_self(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that the noisy loggers warning does not trigger a warning for its own module."""
 
@@ -243,9 +243,9 @@ async def test_noisy_loggers_ignores_self(
     logging.root.handlers[0].close()
 
 
-@patch("homeassistant.util.logging.HomeAssistantQueueListener.MAX_LOGS_COUNT", 5)
+@patch("smarthub.util.logging.SmartHubQueueListener.MAX_LOGS_COUNT", 5)
 async def test_noisy_loggers_ignores_lower_than_info(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that noisy loggers all logged as warnings, except for levels lower than INFO."""
 
@@ -272,9 +272,9 @@ async def test_noisy_loggers_ignores_lower_than_info(
     logging.root.handlers[0].close()
 
 
-@patch("homeassistant.util.logging.HomeAssistantQueueListener.MAX_LOGS_COUNT", 3)
+@patch("smarthub.util.logging.SmartHubQueueListener.MAX_LOGS_COUNT", 3)
 async def test_noisy_loggers_counters_reset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -286,12 +286,12 @@ async def test_noisy_loggers_counters_reset(
     expected_warning = "Module noisy_module is logging too frequently"
 
     # Do multiple iterations to ensure the reset is periodic
-    for _ in range(logging_util.HomeAssistantQueueListener.MAX_LOGS_COUNT * 2):
+    for _ in range(logging_util.SmartHubQueueListener.MAX_LOGS_COUNT * 2):
         logger.info("This is log 0")
         await empty_log_queue()
 
         freezer.tick(
-            logging_util.HomeAssistantQueueListener.LOG_COUNTS_RESET_INTERVAL + 1
+            logging_util.SmartHubQueueListener.LOG_COUNTS_RESET_INTERVAL + 1
         )
 
         logger.info("This is log 1")

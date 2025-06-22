@@ -1,4 +1,4 @@
-"""Test Home Assistant remote methods and classes."""
+"""Test SmartHub remote methods and classes."""
 
 import datetime
 from functools import partial
@@ -12,9 +12,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.core import Event, HomeAssistant, State
-from homeassistant.helpers import json as json_helper
-from homeassistant.helpers.json import (
+from smarthub.core import Event, SmartHub, State
+from smarthub.helpers import json as json_helper
+from smarthub.helpers.json import (
     ExtendedJSONEncoder,
     JSONEncoder as DefaultHASSJSONEncoder,
     find_paths_unserializable_data,
@@ -25,9 +25,9 @@ from homeassistant.helpers.json import (
     json_fragment,
     save_json,
 )
-from homeassistant.util import dt as dt_util
-from homeassistant.util.color import RGBColor
-from homeassistant.util.json import (
+from smarthub.util import dt as dt_util
+from smarthub.util.color import RGBColor
+from smarthub.util.json import (
     JSON_DECODE_EXCEPTIONS,
     JSON_ENCODE_EXCEPTIONS,
     SerializationError,
@@ -42,7 +42,7 @@ TEST_JSON_B = {"a": "one", "B": 2}
 
 
 @pytest.mark.parametrize("encoder", [DefaultHASSJSONEncoder, ExtendedJSONEncoder])
-def test_json_encoder(hass: HomeAssistant, encoder: type[json.JSONEncoder]) -> None:
+def test_json_encoder(hass: SmartHub, encoder: type[json.JSONEncoder]) -> None:
     """Test the JSON encoders."""
     ha_json_enc = encoder()
     state = State("test.test", "hello")
@@ -60,7 +60,7 @@ def test_json_encoder(hass: HomeAssistant, encoder: type[json.JSONEncoder]) -> N
     assert json_round_trip(default) == json_round_trip(state.as_dict())
 
 
-def test_json_encoder_raises(hass: HomeAssistant) -> None:
+def test_json_encoder_raises(hass: SmartHub) -> None:
     """Test the JSON encoder raises on unsupported types."""
     ha_json_enc = DefaultHASSJSONEncoder()
 
@@ -69,7 +69,7 @@ def test_json_encoder_raises(hass: HomeAssistant) -> None:
         ha_json_enc.default(1)
 
 
-def test_extended_json_encoder(hass: HomeAssistant) -> None:
+def test_extended_json_encoder(hass: SmartHub) -> None:
     """Test the extended JSON encoder."""
     ha_json_enc = ExtendedJSONEncoder()
     # Test serializing a timedelta
@@ -282,12 +282,12 @@ def test_default_encoder_is_passed(tmp_path: Path) -> None:
     """Test we use orjson if they pass in the default encoder."""
     fname = tmp_path / "test6.json"
     with patch(
-        "homeassistant.helpers.json.orjson.dumps", return_value=b"{}"
+        "smarthub.helpers.json.orjson.dumps", return_value=b"{}"
     ) as mock_orjson_dumps:
         save_json(fname, {"any": 1}, encoder=DefaultHASSJSONEncoder)
     assert len(mock_orjson_dumps.mock_calls) == 1
     # Patch json.dumps to make sure we are using the orjson path
-    with patch("homeassistant.helpers.json.json.dumps", side_effect=Exception):
+    with patch("smarthub.helpers.json.json.dumps", side_effect=Exception):
         save_json(fname, {"any": {1}}, encoder=DefaultHASSJSONEncoder)
     data = load_json(fname)
     assert data == {"any": [1]}
@@ -360,7 +360,7 @@ def test_deprecated_json_loads(caplog: pytest.LogCaptureFixture) -> None:
     json_helper.json_loads("{}")
     assert (
         "json_loads is a deprecated function which will be removed in "
-        "HA Core 2025.8. Use homeassistant.util.json.json_loads instead"
+        "HA Core 2025.8. Use smarthub.util.json.json_loads instead"
     ) in caplog.text
 
 
@@ -369,12 +369,12 @@ def test_deprecated_json_loads(caplog: pytest.LogCaptureFixture) -> None:
     [
         (
             "JSON_DECODE_EXCEPTIONS",
-            "homeassistant.util.json.JSON_DECODE_EXCEPTIONS",
+            "smarthub.util.json.JSON_DECODE_EXCEPTIONS",
             JSON_DECODE_EXCEPTIONS,
         ),
         (
             "JSON_ENCODE_EXCEPTIONS",
-            "homeassistant.util.json.JSON_ENCODE_EXCEPTIONS",
+            "smarthub.util.json.JSON_ENCODE_EXCEPTIONS",
             JSON_ENCODE_EXCEPTIONS,
         ),
     ],

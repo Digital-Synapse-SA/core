@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.twinkly import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_ID, CONF_MODEL, CONF_NAME
+from smarthub.components.twinkly import DOMAIN
+from smarthub.const import CONF_HOST, CONF_ID, CONF_MODEL, CONF_NAME
 
 from .const import TEST_MAC, TEST_MODEL, TEST_NAME
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry, load_json_object_fixture
 
 @pytest.fixture
 def mock_config_entry() -> MockConfigEntry:
-    """Create Twinkly entry in Home Assistant."""
+    """Create Twinkly entry in SmartHub."""
     return MockConfigEntry(
         domain=DOMAIN,
         title="Twinkly",
@@ -36,11 +36,11 @@ def mock_twinkly_client() -> Generator[AsyncMock]:
     """Mock the Twinkly client."""
     with (
         patch(
-            "homeassistant.components.twinkly.Twinkly",
+            "smarthub.components.twinkly.Twinkly",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.twinkly.config_flow.Twinkly",
+            "smarthub.components.twinkly.config_flow.Twinkly",
             new=mock_client,
         ),
     ):
@@ -67,5 +67,5 @@ def mock_twinkly_client() -> Generator[AsyncMock]:
 @pytest.fixture
 def mock_setup_entry() -> Generator[None]:
     """Mock setting up a config entry."""
-    with patch("homeassistant.components.twinkly.async_setup_entry", return_value=True):
+    with patch("smarthub.components.twinkly.async_setup_entry", return_value=True):
         yield

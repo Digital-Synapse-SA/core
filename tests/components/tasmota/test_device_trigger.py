@@ -8,14 +8,14 @@ from hatasmota.switch import TasmotaSwitchTriggerConfig
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.tasmota import _LOGGER
-from homeassistant.components.tasmota.const import DEFAULT_PREFIX, DOMAIN
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.trigger import async_initialize_triggers
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.tasmota import _LOGGER
+from smarthub.components.tasmota.const import DEFAULT_PREFIX, DOMAIN
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.trigger import async_initialize_triggers
+from smarthub.setup import async_setup_component
 
 from .test_common import DEFAULT_CONFIG, remove_device
 
@@ -29,7 +29,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 async def test_get_triggers_btn(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -75,7 +75,7 @@ async def test_get_triggers_btn(
 
 
 async def test_get_triggers_swc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -109,7 +109,7 @@ async def test_get_triggers_swc(
 
 
 async def test_get_unknown_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -157,7 +157,7 @@ async def test_get_unknown_triggers(
 
 
 async def test_get_non_existing_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -182,7 +182,7 @@ async def test_get_non_existing_triggers(
 
 @pytest.mark.no_fail_on_log_exception
 async def test_discover_bad_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -268,7 +268,7 @@ async def test_discover_bad_triggers(
 
 
 async def test_update_remove_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -344,7 +344,7 @@ async def test_update_remove_triggers(
 
 
 async def test_if_fires_on_mqtt_message_btn(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mqtt_mock: MqttMockHAClient,
@@ -419,7 +419,7 @@ async def test_if_fires_on_mqtt_message_btn(
 
 
 async def test_if_fires_on_mqtt_message_swc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mqtt_mock: MqttMockHAClient,
@@ -517,7 +517,7 @@ async def test_if_fires_on_mqtt_message_swc(
 
 
 async def test_if_fires_on_mqtt_message_late_discover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mqtt_mock: MqttMockHAClient,
@@ -600,7 +600,7 @@ async def test_if_fires_on_mqtt_message_late_discover(
 
 
 async def test_if_fires_on_mqtt_message_after_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mqtt_mock: MqttMockHAClient,
@@ -686,7 +686,7 @@ async def test_if_fires_on_mqtt_message_after_update(
 
 
 async def test_no_resubscribe_same_topic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -737,7 +737,7 @@ async def test_no_resubscribe_same_topic(
 
 
 async def test_not_fires_on_mqtt_message_after_remove_by_mqtt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mqtt_mock: MqttMockHAClient,
@@ -812,7 +812,7 @@ async def test_not_fires_on_mqtt_message_after_remove_by_mqtt(
 
 
 async def test_not_fires_on_mqtt_message_after_remove_from_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
@@ -877,7 +877,7 @@ async def test_not_fires_on_mqtt_message_after_remove_from_registry(
 
 
 async def test_attach_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -941,7 +941,7 @@ async def test_attach_remove(
 
 
 async def test_attach_remove_late(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -1017,7 +1017,7 @@ async def test_attach_remove_late(
 
 
 async def test_attach_remove_late2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -1078,7 +1078,7 @@ async def test_attach_remove_late2(
 
 
 async def test_attach_remove_unknown1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -1120,7 +1120,7 @@ async def test_attach_remove_unknown1(
 
 
 async def test_attach_unknown_remove_device_from_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
@@ -1173,7 +1173,7 @@ async def test_attach_unknown_remove_device_from_registry(
 
 
 async def test_attach_remove_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,

@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock
 from pyituran.exceptions import IturanApiError, IturanAuthError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_ituran: AsyncMock,
 ) -> None:
@@ -31,7 +31,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_ituran: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -47,7 +47,7 @@ async def test_device(
 
 
 async def test_remove_stale_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_ituran: AsyncMock,
     device_registry: dr.DeviceRegistry,
@@ -71,7 +71,7 @@ async def test_remove_stale_devices(
 
 
 async def test_recover_from_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_ituran: AsyncMock,
     device_registry: dr.DeviceRegistry,

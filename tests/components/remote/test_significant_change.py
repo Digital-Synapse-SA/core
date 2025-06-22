@@ -1,7 +1,7 @@
 """Test the Remote significant change platform."""
 
-from homeassistant.components.remote import ATTR_ACTIVITY_LIST, ATTR_CURRENT_ACTIVITY
-from homeassistant.components.remote.significant_change import (
+from smarthub.components.remote import ATTR_ACTIVITY_LIST, ATTR_CURRENT_ACTIVITY
+from smarthub.components.remote.significant_change import (
     async_check_significant_change,
 )
 

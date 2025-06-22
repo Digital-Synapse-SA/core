@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.blueprint import BLUEPRINT_SCHEMA, errors, models
-from homeassistant.core import HomeAssistant
-from homeassistant.util.yaml import Input
+from smarthub.components.blueprint import BLUEPRINT_SCHEMA, errors, models
+from smarthub.core import SmartHub
+from smarthub.util.yaml import Input
 
 
 @pytest.fixture
@@ -18,7 +18,7 @@ def blueprint_1() -> models.Blueprint:
             "blueprint": {
                 "name": "Hello",
                 "domain": "automation",
-                "source_url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml",
+                "source_url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml",
                 "input": {"test-input": {"name": "Name", "description": "Description"}},
             },
             "example": Input("test-input"),
@@ -34,7 +34,7 @@ def blueprint_2(request: pytest.FixtureRequest) -> models.Blueprint:
         "blueprint": {
             "name": "Hello",
             "domain": "automation",
-            "source_url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml",
+            "source_url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml",
             "input": {
                 "test-input": {"name": "Name", "description": "Description"},
                 "test-input-default": {"default": "test"},
@@ -62,7 +62,7 @@ def blueprint_2(request: pytest.FixtureRequest) -> models.Blueprint:
 
 
 @pytest.fixture
-def domain_bps(hass: HomeAssistant) -> models.DomainBlueprints:
+def domain_bps(hass: SmartHub) -> models.DomainBlueprints:
     """Domain blueprints fixture."""
     return models.DomainBlueprints(
         hass,
@@ -105,7 +105,7 @@ def test_blueprint_properties(blueprint_1: models.Blueprint) -> None:
     assert blueprint_1.metadata == {
         "name": "Hello",
         "domain": "automation",
-        "source_url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml",
+        "source_url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml",
         "input": {"test-input": {"name": "Name", "description": "Description"}},
     }
     assert blueprint_1.domain == "automation"
@@ -151,11 +151,11 @@ def test_blueprint_validate() -> None:
             "blueprint": {
                 "name": "Hello",
                 "domain": "automation",
-                "homeassistant": {"min_version": "100000.0.0"},
+                "smarthub": {"min_version": "100000.0.0"},
             },
         },
         schema=BLUEPRINT_SCHEMA,
-    ).validate() == ["Requires at least Home Assistant 100000.0.0"]
+    ).validate() == ["Requires at least SmartHub 100000.0.0"]
 
 
 def test_blueprint_inputs(blueprint_2: models.Blueprint) -> None:
@@ -227,20 +227,20 @@ def test_blueprint_inputs_override_default(blueprint_2: models.Blueprint) -> Non
 
 
 async def test_domain_blueprints_get_blueprint_errors(
-    hass: HomeAssistant, domain_bps: models.DomainBlueprints
+    hass: SmartHub, domain_bps: models.DomainBlueprints
 ) -> None:
     """Test domain blueprints."""
     assert hass.data["blueprint"]["automation"] is domain_bps
 
     with (
         pytest.raises(errors.FailedToLoad),
-        patch("homeassistant.util.yaml.load_yaml", side_effect=FileNotFoundError),
+        patch("smarthub.util.yaml.load_yaml", side_effect=FileNotFoundError),
     ):
         await domain_bps.async_get_blueprint("non-existing-path")
 
     with (
         patch(
-            "homeassistant.util.yaml.load_yaml", return_value={"blueprint": "invalid"}
+            "smarthub.util.yaml.load_yaml", return_value={"blueprint": "invalid"}
         ),
         pytest.raises(errors.FailedToLoad),
     ):

@@ -10,7 +10,7 @@ from aioesphomeapi import (
     APIClient,
 )
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     ATTR_CODE,
     DOMAIN as ALARM_CONTROL_PANEL_DOMAIN,
     SERVICE_ALARM_ARM_AWAY,
@@ -22,15 +22,15 @@ from homeassistant.components.alarm_control_panel import (
     SERVICE_ALARM_TRIGGER,
     AlarmControlPanelState,
 )
-from homeassistant.components.esphome.alarm_control_panel import EspHomeACPFeatures
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.esphome.alarm_control_panel import EspHomeACPFeatures
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .conftest import MockGenericDeviceEntryType
 
 
 async def test_generic_alarm_control_panel_requires_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -163,7 +163,7 @@ async def test_generic_alarm_control_panel_requires_code(
 
 
 async def test_generic_alarm_control_panel_no_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -209,7 +209,7 @@ async def test_generic_alarm_control_panel_no_code(
 
 
 async def test_generic_alarm_control_panel_missing_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:

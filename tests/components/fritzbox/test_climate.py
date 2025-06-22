@@ -8,7 +8,7 @@ import pytest
 from requests.exceptions import HTTPError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_HVAC_MODE,
     ATTR_HVAC_MODES,
@@ -25,23 +25,23 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.components.fritzbox.climate import (
+from smarthub.components.fritzbox.climate import (
     OFF_API_TEMPERATURE,
     ON_API_TEMPERATURE,
     PRESET_HOLIDAY,
     PRESET_SUMMER,
 )
-from homeassistant.components.fritzbox.const import (
+from smarthub.components.fritzbox.const import (
     ATTR_STATE_HOLIDAY_MODE,
     ATTR_STATE_SUMMER_MODE,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, CONF_DEVICES, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, CONF_DEVICES, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import (
     FritzDeviceClimateMock,
@@ -57,14 +57,14 @@ ENTITY_ID = f"{CLIMATE_DOMAIN}.{CONF_FAKE_NAME}"
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     fritz: Mock,
 ) -> None:
     """Test setup of platform."""
     device = FritzDeviceClimateMock()
-    with patch("homeassistant.components.fritzbox.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.fritzbox.PLATFORMS", [Platform.CLIMATE]):
         entry = await setup_config_entry(
             hass, MOCK_CONFIG[DOMAIN][CONF_DEVICES][0], ENTITY_ID, device, fritz
         )
@@ -72,7 +72,7 @@ async def test_setup(
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_hkr_wo_temperature_sensor(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_hkr_wo_temperature_sensor(hass: SmartHub, fritz: Mock) -> None:
     """Test hkr without exposing dedicated temperature sensor data block."""
     device = FritzDeviceClimateWithoutTempSensorMock()
     await setup_config_entry(
@@ -84,7 +84,7 @@ async def test_hkr_wo_temperature_sensor(hass: HomeAssistant, fritz: Mock) -> No
     assert state.attributes[ATTR_CURRENT_TEMPERATURE] == 18.0
 
 
-async def test_target_temperature_on(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_target_temperature_on(hass: SmartHub, fritz: Mock) -> None:
     """Test turn device on."""
     device = FritzDeviceClimateMock()
     device.target_temperature = 127.0
@@ -97,7 +97,7 @@ async def test_target_temperature_on(hass: HomeAssistant, fritz: Mock) -> None:
     assert state.attributes[ATTR_TEMPERATURE] is None
 
 
-async def test_target_temperature_off(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_target_temperature_off(hass: SmartHub, fritz: Mock) -> None:
     """Test turn device on."""
     device = FritzDeviceClimateMock()
     device.target_temperature = 126.5
@@ -110,7 +110,7 @@ async def test_target_temperature_off(hass: HomeAssistant, fritz: Mock) -> None:
     assert state.attributes[ATTR_TEMPERATURE] is None
 
 
-async def test_update(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_update(hass: SmartHub, fritz: Mock) -> None:
     """Test update without error."""
     device = FritzDeviceClimateMock()
     await setup_config_entry(
@@ -138,7 +138,7 @@ async def test_update(hass: HomeAssistant, fritz: Mock) -> None:
     assert state.attributes[ATTR_TEMPERATURE] == 20
 
 
-async def test_automatic_offset(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_automatic_offset(hass: SmartHub, fritz: Mock) -> None:
     """Test when automatic offset is configured on fritz!box device."""
     device = FritzDeviceClimateMock()
     device.temperature = 18
@@ -156,7 +156,7 @@ async def test_automatic_offset(hass: HomeAssistant, fritz: Mock) -> None:
     assert state.attributes[ATTR_TEMPERATURE] == 20
 
 
-async def test_update_error(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_update_error(hass: SmartHub, fritz: Mock) -> None:
     """Test update with error."""
     device = FritzDeviceClimateMock()
     fritz().update_devices.side_effect = HTTPError("Boom")
@@ -203,7 +203,7 @@ async def test_update_error(hass: HomeAssistant, fritz: Mock) -> None:
     ],
 )
 async def test_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fritz: Mock,
     service_data: dict,
     expected_set_target_temperature_call_args: list[_Call],
@@ -280,7 +280,7 @@ async def test_set_temperature(
     ],
 )
 async def test_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fritz: Mock,
     service_data: dict,
     target_temperature: float,
@@ -332,7 +332,7 @@ async def test_set_hvac_mode(
     ],
 )
 async def test_set_preset_mode_comfort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fritz: Mock,
     comfort_temperature: int,
     expected_call_args: list[_Call],
@@ -365,7 +365,7 @@ async def test_set_preset_mode_comfort(
     ],
 )
 async def test_set_preset_mode_eco(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fritz: Mock,
     eco_temperature: int,
     expected_call_args: list[_Call],
@@ -390,7 +390,7 @@ async def test_set_preset_mode_eco(
 
 
 async def test_set_preset_mode_boost(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fritz: Mock,
 ) -> None:
     """Test setting preset mode."""
@@ -411,7 +411,7 @@ async def test_set_preset_mode_boost(
     assert device.set_hkr_state.call_args_list == [call("on", True)]
 
 
-async def test_preset_mode_update(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_preset_mode_update(hass: SmartHub, fritz: Mock) -> None:
     """Test preset mode."""
     device = FritzDeviceClimateMock()
     device.comfort_temperature = 23
@@ -458,7 +458,7 @@ async def test_preset_mode_update(hass: HomeAssistant, fritz: Mock) -> None:
     assert state.attributes[ATTR_PRESET_MODE] == PRESET_BOOST
 
 
-async def test_discover_new_device(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_discover_new_device(hass: SmartHub, fritz: Mock) -> None:
     """Test adding new discovered devices during runtime."""
     device = FritzDeviceClimateMock()
     await setup_config_entry(
@@ -492,7 +492,7 @@ async def test_discover_new_device(hass: HomeAssistant, fritz: Mock) -> None:
     ],
 )
 async def test_set_temperature_lock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fritz: Mock,
     service_data: dict,
 ) -> None:
@@ -505,7 +505,7 @@ async def test_set_temperature_lock(
     )
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Can't change settings while manual access for telephone, app, or user interface is disabled on the device",
     ):
         await hass.services.async_call(
@@ -538,7 +538,7 @@ async def test_set_temperature_lock(
     ],
 )
 async def test_set_hvac_mode_lock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fritz: Mock,
     service_data: dict,
     target_temperature: float,
@@ -563,7 +563,7 @@ async def test_set_hvac_mode_lock(
     )
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Can't change settings while manual access for telephone, app, or user interface is disabled on the device",
     ):
         await hass.services.async_call(
@@ -575,7 +575,7 @@ async def test_set_hvac_mode_lock(
 
 
 async def test_holidy_summer_mode(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, fritz: Mock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, fritz: Mock
 ) -> None:
     """Test holiday and summer mode."""
     device = FritzDeviceClimateMock()
@@ -614,7 +614,7 @@ async def test_holidy_summer_mode(
     assert state.attributes[ATTR_PRESET_MODES] == [PRESET_HOLIDAY]
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Can't change settings while holiday or summer mode is active on the device",
     ):
         await hass.services.async_call(
@@ -624,7 +624,7 @@ async def test_holidy_summer_mode(
             blocking=True,
         )
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Can't change settings while holiday or summer mode is active on the device",
     ):
         await hass.services.async_call(
@@ -650,7 +650,7 @@ async def test_holidy_summer_mode(
     assert state.attributes[ATTR_PRESET_MODES] == [PRESET_SUMMER]
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Can't change settings while holiday or summer mode is active on the device",
     ):
         await hass.services.async_call(
@@ -660,7 +660,7 @@ async def test_holidy_summer_mode(
             blocking=True,
         )
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Can't change settings while holiday or summer mode is active on the device",
     ):
         await hass.services.async_call(

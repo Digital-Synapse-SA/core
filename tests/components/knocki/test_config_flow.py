@@ -5,13 +5,13 @@ from unittest.mock import AsyncMock
 from knocki import KnockiConnectionError, KnockiInvalidAuthError
 import pytest
 
-from homeassistant.components.knocki.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.knocki.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import setup_integration
 
@@ -25,7 +25,7 @@ DHCP_DISCOVERY = DhcpServiceInfo(
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -55,7 +55,7 @@ async def test_full_flow(
 
 
 async def test_duplcate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_knocki_client: AsyncMock,
 ) -> None:
@@ -89,7 +89,7 @@ async def test_duplcate_entry(
     ],
 )
 async def test_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     field: str,
@@ -124,7 +124,7 @@ async def test_exceptions(
 
 
 async def test_dhcp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -148,7 +148,7 @@ async def test_dhcp(
 
 
 async def test_dhcp_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -172,7 +172,7 @@ async def test_dhcp_mac(
 
 
 async def test_dhcp_already_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_knocki_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

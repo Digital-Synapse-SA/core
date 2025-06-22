@@ -6,18 +6,18 @@ from unittest.mock import create_autospec, patch
 
 import pywemo
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.wemo import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.wemo import (
     CONF_DISCOVERY,
     CONF_STATIC,
     WemoDiscovery,
     async_wemo_dispatcher_connect,
 )
-from homeassistant.components.wemo.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.wemo.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import entity_test_helpers
 from .conftest import (
@@ -31,18 +31,18 @@ from .conftest import (
 from tests.common import async_fire_time_changed
 
 
-async def test_config_no_config(hass: HomeAssistant) -> None:
+async def test_config_no_config(hass: SmartHub) -> None:
     """Component setup succeeds when there are no config entry for the domain."""
     assert await async_setup_component(hass, DOMAIN, {})
 
 
-async def test_config_no_static(hass: HomeAssistant) -> None:
+async def test_config_no_static(hass: SmartHub) -> None:
     """Component setup succeeds when there are no static config entries."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {CONF_DISCOVERY: False}})
 
 
 async def test_static_duplicate_static_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, pywemo_device
+    hass: SmartHub, entity_registry: er.EntityRegistry, pywemo_device
 ) -> None:
     """Duplicate static entries are merged into a single entity."""
     static_config_entry = f"{MOCK_HOST}:{MOCK_PORT}"
@@ -65,7 +65,7 @@ async def test_static_duplicate_static_entry(
 
 
 async def test_static_config_with_port(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, pywemo_device
+    hass: SmartHub, entity_registry: er.EntityRegistry, pywemo_device
 ) -> None:
     """Static device with host and port is added and removed."""
     assert await async_setup_component(
@@ -84,7 +84,7 @@ async def test_static_config_with_port(
 
 
 async def test_static_config_without_port(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, pywemo_device
+    hass: SmartHub, entity_registry: er.EntityRegistry, pywemo_device
 ) -> None:
     """Static device with host and no port is added and removed."""
     assert await async_setup_component(
@@ -103,7 +103,7 @@ async def test_static_config_without_port(
 
 
 async def test_reload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     pywemo_device: pywemo.WeMoDevice,
     pywemo_registry: pywemo.SubscriptionRegistry,
@@ -150,7 +150,7 @@ async def test_reload_config_entry(
     assert ids == (entry_id, entity_id)
 
 
-async def test_static_config_with_invalid_host(hass: HomeAssistant) -> None:
+async def test_static_config_with_invalid_host(hass: SmartHub) -> None:
     """Component setup fails if a static host is invalid."""
     setup_success = await async_setup_component(
         hass,
@@ -166,7 +166,7 @@ async def test_static_config_with_invalid_host(hass: HomeAssistant) -> None:
 
 
 async def test_static_with_upnp_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     pywemo_device: pywemo.WeMoDevice,
 ) -> None:
@@ -189,7 +189,7 @@ async def test_static_with_upnp_failure(
 
 
 async def test_discovery(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, pywemo_registry
+    hass: SmartHub, entity_registry: er.EntityRegistry, pywemo_registry
 ) -> None:
     """Verify that discovery dispatches devices to the platform for setup."""
 
@@ -219,10 +219,10 @@ async def test_discovery(
     with (
         patch("pywemo.discover_devices", return_value=pywemo_devices) as mock_discovery,
         patch(
-            "homeassistant.components.wemo.WemoDiscovery.discover_statics"
+            "smarthub.components.wemo.WemoDiscovery.discover_statics"
         ) as mock_discover_statics,
         patch(
-            "homeassistant.components.wemo.binary_sensor.async_wemo_dispatcher_connect",
+            "smarthub.components.wemo.binary_sensor.async_wemo_dispatcher_connect",
             side_effect=async_connect,
         ),
     ):

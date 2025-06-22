@@ -2,13 +2,13 @@
 
 import pytest
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import patch_set_values
 
@@ -41,7 +41,7 @@ async def test_temperature_number_entities(
     metric_key: str,
     value: float,
     mock_entry: MockConfigEntry,
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_fetch_metric_data_mock,
 ) -> None:
     """Test temperature entities."""
@@ -66,7 +66,7 @@ async def test_temperature_number_entity_set(
     metric_key: str,
     value: float,
     mock_entry: MockConfigEntry,
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_fetch_metric_data_mock,
 ) -> None:
     """Test temperature set."""

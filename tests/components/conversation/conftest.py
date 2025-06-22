@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import conversation
-from homeassistant.components.shopping_list import intent as sl_intent
-from homeassistant.const import MATCH_ALL
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import conversation
+from smarthub.components.shopping_list import intent as sl_intent
+from smarthub.const import MATCH_ALL
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import MockAgent
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-def mock_agent_support_all(hass: HomeAssistant) -> MockAgent:
+def mock_agent_support_all(hass: SmartHub) -> MockAgent:
     """Mock agent that supports all languages."""
     entry = MockConfigEntry(entry_id="mock-entry-support-all")
     entry.add_to_hass(hass)
@@ -29,14 +29,14 @@ def mock_agent_support_all(hass: HomeAssistant) -> MockAgent:
 def mock_shopping_list_io():
     """Stub out the persistence."""
     with (
-        patch("homeassistant.components.shopping_list.ShoppingData.save"),
-        patch("homeassistant.components.shopping_list.ShoppingData.async_load"),
+        patch("smarthub.components.shopping_list.ShoppingData.save"),
+        patch("smarthub.components.shopping_list.ShoppingData.async_load"),
     ):
         yield
 
 
 @pytest.fixture
-async def sl_setup(hass: HomeAssistant):
+async def sl_setup(hass: SmartHub):
     """Set up the shopping list."""
 
     entry = MockConfigEntry(domain="shopping_list")
@@ -48,7 +48,7 @@ async def sl_setup(hass: HomeAssistant):
 
 
 @pytest.fixture
-async def init_components(hass: HomeAssistant):
+async def init_components(hass: SmartHub):
     """Initialize relevant components with empty configs."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})

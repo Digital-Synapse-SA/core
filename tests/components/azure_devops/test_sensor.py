@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import (
     DEVOPS_BUILD_MISSING_DATA,
@@ -33,7 +33,7 @@ SENSOR_KEYS = [
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
@@ -54,7 +54,7 @@ async def test_sensors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors_missing_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
@@ -75,7 +75,7 @@ async def test_sensors_missing_data(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors_missing_project_definition(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: AsyncMock,

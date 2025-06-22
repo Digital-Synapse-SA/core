@@ -13,19 +13,19 @@ from freezegun.api import FrozenDateTimeFactory
 import jinja2
 import pytest
 
-from homeassistant import core as ha
-from homeassistant.const import MATCH_ALL
-from homeassistant.core import (
+from smarthub import core as ha
+from smarthub.const import MATCH_ALL
+from smarthub.core import (
     Event,
     EventStateChangedData,
     EventStateReportedData,
-    HomeAssistant,
+    SmartHub,
     callback,
 )
-from homeassistant.exceptions import TemplateError
-from homeassistant.helpers.device_registry import EVENT_DEVICE_REGISTRY_UPDATED
-from homeassistant.helpers.entity_registry import EVENT_ENTITY_REGISTRY_UPDATED
-from homeassistant.helpers.event import (
+from smarthub.exceptions import TemplateError
+from smarthub.helpers.device_registry import EVENT_DEVICE_REGISTRY_UPDATED
+from smarthub.helpers.entity_registry import EVENT_ENTITY_REGISTRY_UPDATED
+from smarthub.helpers.event import (
     TrackStates,
     TrackTemplate,
     TrackTemplateResult,
@@ -51,16 +51,16 @@ from homeassistant.helpers.event import (
     async_track_utc_time_change,
     track_point_in_utc_time,
 )
-from homeassistant.helpers.template import Template, result_as_boolean
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.helpers.template import Template, result_as_boolean
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed, async_fire_time_changed_exact
 
 DEFAULT_TIME_ZONE = dt_util.get_default_time_zone()
 
 
-async def test_track_point_in_time(hass: HomeAssistant) -> None:
+async def test_track_point_in_time(hass: SmartHub) -> None:
     """Test track point in time."""
     before_birthday = datetime(1985, 7, 9, 12, 0, 0, tzinfo=dt_util.UTC)
     birthday_paulus = datetime(1986, 7, 9, 12, 0, 0, tzinfo=dt_util.UTC)
@@ -112,7 +112,7 @@ async def test_track_point_in_time(hass: HomeAssistant) -> None:
     assert len(runs) == 2
 
 
-async def test_track_point_in_time_drift_rearm(hass: HomeAssistant) -> None:
+async def test_track_point_in_time_drift_rearm(hass: SmartHub) -> None:
     """Test tasks with the time rolling backwards."""
     specific_runs = []
 
@@ -145,7 +145,7 @@ async def test_track_point_in_time_drift_rearm(hass: HomeAssistant) -> None:
     assert len(specific_runs) == 1
 
 
-async def test_track_state_change_from_to_state_match(hass: HomeAssistant) -> None:
+async def test_track_state_change_from_to_state_match(hass: SmartHub) -> None:
     """Test track_state_change with from and to state matchers."""
     from_and_to_state_runs = []
     only_from_runs = []
@@ -229,7 +229,7 @@ async def test_track_state_change_from_to_state_match(hass: HomeAssistant) -> No
     assert len(no_to_from_specified_runs) == 4
 
 
-async def test_track_state_change(hass: HomeAssistant) -> None:
+async def test_track_state_change(hass: SmartHub) -> None:
     """Test track_state_change."""
     # 2 lists to track how often our callbacks get called
     specific_runs = []
@@ -309,7 +309,7 @@ async def test_track_state_change(hass: HomeAssistant) -> None:
     assert len(wildercard_runs) == 6
 
 
-async def test_async_track_state_change_filtered(hass: HomeAssistant) -> None:
+async def test_async_track_state_change_filtered(hass: SmartHub) -> None:
     """Test async_track_state_change_filtered."""
     single_entity_id_tracker = []
     multiple_entity_id_tracker = []
@@ -445,7 +445,7 @@ async def test_async_track_state_change_filtered(hass: HomeAssistant) -> None:
     track_throws.async_remove()
 
 
-async def test_async_track_state_change_event(hass: HomeAssistant) -> None:
+async def test_async_track_state_change_event(hass: SmartHub) -> None:
     """Test async_track_state_change_event."""
     single_entity_id_tracker = []
     multiple_entity_id_tracker = []
@@ -539,7 +539,7 @@ async def test_async_track_state_change_event(hass: HomeAssistant) -> None:
 
 
 async def test_async_track_state_change_event_with_empty_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test async_track_state_change_event passing an empty list of entities."""
     unsub_single = async_track_state_change_event(
@@ -553,7 +553,7 @@ async def test_async_track_state_change_event_with_empty_list(
     unsub_single()
 
 
-async def test_async_track_state_added_domain(hass: HomeAssistant) -> None:
+async def test_async_track_state_added_domain(hass: SmartHub) -> None:
     """Test async_track_state_added_domain."""
     single_entity_id_tracker = []
     multiple_entity_id_tracker = []
@@ -638,7 +638,7 @@ async def test_async_track_state_added_domain(hass: HomeAssistant) -> None:
 
 
 async def test_async_track_state_added_domain_with_empty_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test async_track_state_added_domain passing an empty list of domains."""
     unsub_single = async_track_state_added_domain(
@@ -653,7 +653,7 @@ async def test_async_track_state_added_domain_with_empty_list(
 
 
 async def test_async_track_state_removed_domain_with_empty_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test async_track_state_removed_domain passing an empty list of domains."""
     unsub_single = async_track_state_removed_domain(
@@ -667,7 +667,7 @@ async def test_async_track_state_removed_domain_with_empty_list(
     unsub_single()
 
 
-async def test_async_track_state_removed_domain(hass: HomeAssistant) -> None:
+async def test_async_track_state_removed_domain(hass: SmartHub) -> None:
     """Test async_track_state_removed_domain."""
     single_entity_id_tracker = []
     multiple_entity_id_tracker = []
@@ -751,7 +751,7 @@ async def test_async_track_state_removed_domain(hass: HomeAssistant) -> None:
     unsub_throws()
 
 
-async def test_async_track_state_removed_domain_match_all(hass: HomeAssistant) -> None:
+async def test_async_track_state_removed_domain_match_all(hass: SmartHub) -> None:
     """Test async_track_state_removed_domain with a match_all."""
     single_entity_id_tracker = []
     match_all_entity_id_tracker = []
@@ -795,7 +795,7 @@ async def test_async_track_state_removed_domain_match_all(hass: HomeAssistant) -
     assert len(match_all_entity_id_tracker) == 2
 
 
-async def test_track_template(hass: HomeAssistant) -> None:
+async def test_track_template(hass: SmartHub) -> None:
     """Test tracking template."""
     specific_runs = []
     wildcard_runs = []
@@ -881,7 +881,7 @@ async def test_track_template(hass: HomeAssistant) -> None:
 
 
 async def test_track_template_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test tracking template with error."""
     template_error = Template("{{ (states.switch | lunch) > 0 }}", hass)
@@ -914,7 +914,7 @@ async def test_track_template_error(
 
 
 async def test_track_template_error_can_recover(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test tracking template with error."""
     hass.states.async_set("switch.data_system", "cow", {"opmode": 0})
@@ -943,7 +943,7 @@ async def test_track_template_error_can_recover(
 
 
 async def test_track_template_time_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -973,7 +973,7 @@ async def test_track_template_time_change(
     unsub()
 
 
-async def test_track_template_result(hass: HomeAssistant) -> None:
+async def test_track_template_result(hass: SmartHub) -> None:
     """Test tracking template."""
     specific_runs = []
     wildcard_runs = []
@@ -1068,7 +1068,7 @@ async def test_track_template_result(hass: HomeAssistant) -> None:
     assert len(wildercard_runs) == 4
 
 
-async def test_track_template_result_none(hass: HomeAssistant) -> None:
+async def test_track_template_result_none(hass: SmartHub) -> None:
     """Test tracking template."""
     specific_runs = []
     wildcard_runs = []
@@ -1144,7 +1144,7 @@ async def test_track_template_result_none(hass: HomeAssistant) -> None:
     assert wildercard_runs == [(None, 5), (5, 10)]
 
 
-async def test_track_template_result_super_template(hass: HomeAssistant) -> None:
+async def test_track_template_result_super_template(hass: SmartHub) -> None:
     """Test tracking template with super template listening to same entity."""
     specific_runs = []
     specific_runs_availability = []
@@ -1298,7 +1298,7 @@ async def test_track_template_result_super_template(hass: HomeAssistant) -> None
 
 
 async def test_track_template_result_super_template_initially_false(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test tracking template with super template listening to same entity."""
     specific_runs = []
@@ -1467,7 +1467,7 @@ async def test_track_template_result_super_template_initially_false(
     ],
 )
 async def test_track_template_result_super_template_2(
-    hass: HomeAssistant, availability_template: str
+    hass: SmartHub, availability_template: str
 ) -> None:
     """Test tracking template with super template listening to different entities."""
     specific_runs = []
@@ -1619,7 +1619,7 @@ async def test_track_template_result_super_template_2(
     ],
 )
 async def test_track_template_result_super_template_2_initially_false(
-    hass: HomeAssistant, availability_template: str
+    hass: SmartHub, availability_template: str
 ) -> None:
     """Test tracking template with super template listening to different entities."""
     specific_runs = []
@@ -1757,7 +1757,7 @@ async def test_track_template_result_super_template_2_initially_false(
     info3.async_remove()
 
 
-async def test_track_template_result_complex(hass: HomeAssistant) -> None:
+async def test_track_template_result_complex(hass: SmartHub) -> None:
     """Test tracking template."""
     specific_runs = []
     template_complex_str = """
@@ -1916,7 +1916,7 @@ async def test_track_template_result_complex(hass: HomeAssistant) -> None:
     }
 
 
-async def test_track_template_result_with_wildcard(hass: HomeAssistant) -> None:
+async def test_track_template_result_with_wildcard(hass: SmartHub) -> None:
     """Test tracking template with a wildcard."""
     specific_runs = []
     template_complex_str = r"""
@@ -1960,7 +1960,7 @@ async def test_track_template_result_with_wildcard(hass: HomeAssistant) -> None:
     assert "cover.office_skylight=open" in specific_runs[0]
 
 
-async def test_track_template_result_with_group(hass: HomeAssistant) -> None:
+async def test_track_template_result_with_group(hass: SmartHub) -> None:
     """Test tracking template with a group."""
     hass.states.async_set("sensor.power_1", 0)
     hass.states.async_set("sensor.power_2", 200.2)
@@ -2021,7 +2021,7 @@ async def test_track_template_result_with_group(hass: HomeAssistant) -> None:
     assert specific_runs[1] == 100.1 + 200.2 + 0
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         return_value={
             "group": {
                 "power_sensors": "sensor.power_1,sensor.power_2,sensor.power_3,sensor.power_4",
@@ -2036,7 +2036,7 @@ async def test_track_template_result_with_group(hass: HomeAssistant) -> None:
     assert specific_runs[-1] == 100.1 + 200.2 + 0 + 800.8
 
 
-async def test_track_template_result_and_conditional(hass: HomeAssistant) -> None:
+async def test_track_template_result_and_conditional(hass: SmartHub) -> None:
     """Test tracking template with an and conditional."""
     specific_runs = []
     hass.states.async_set("light.a", "off")
@@ -2103,7 +2103,7 @@ async def test_track_template_result_and_conditional(hass: HomeAssistant) -> Non
 
 
 async def test_track_template_result_and_conditional_upper_case(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test tracking template with an and conditional with an upper case template."""
     specific_runs = []
@@ -2170,7 +2170,7 @@ async def test_track_template_result_and_conditional_upper_case(
     assert specific_runs[2] == "on"
 
 
-async def test_track_template_result_iterator(hass: HomeAssistant) -> None:
+async def test_track_template_result_iterator(hass: SmartHub) -> None:
     """Test tracking template."""
     iterator_runs = []
 
@@ -2253,7 +2253,7 @@ async def test_track_template_result_iterator(hass: HomeAssistant) -> None:
 
 
 async def test_track_template_result_errors(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test tracking template with errors in the template."""
     template_syntax_error = Template("{{states.switch", hass)
@@ -2344,7 +2344,7 @@ async def test_track_template_result_errors(
 
 
 async def test_track_template_result_transient_errors(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test tracking template with transient errors in the template."""
     hass.states.async_set("sensor.error", "unknown")
@@ -2396,7 +2396,7 @@ async def test_track_template_result_transient_errors(
     assert "ValueError" not in repr(info)
 
 
-async def test_static_string(hass: HomeAssistant) -> None:
+async def test_static_string(hass: SmartHub) -> None:
     """Test a static string."""
     template_refresh = Template("{{ 'static' }}", hass)
 
@@ -2419,7 +2419,7 @@ async def test_static_string(hass: HomeAssistant) -> None:
     assert refresh_runs == ["static"]
 
 
-async def test_track_template_rate_limit(hass: HomeAssistant) -> None:
+async def test_track_template_rate_limit(hass: SmartHub) -> None:
     """Test template rate limit."""
     template_refresh = Template("{{ states | count }}", hass)
 
@@ -2452,7 +2452,7 @@ async def test_track_template_rate_limit(hass: HomeAssistant) -> None:
     assert refresh_runs == [0, 1]
     next_time = dt_util.utcnow() + timedelta(seconds=0.125)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -2465,7 +2465,7 @@ async def test_track_template_rate_limit(hass: HomeAssistant) -> None:
     assert refresh_runs == [0, 1, 2]
     next_time = dt_util.utcnow() + timedelta(seconds=0.125 * 2)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -2477,7 +2477,7 @@ async def test_track_template_rate_limit(hass: HomeAssistant) -> None:
     info.async_remove()
 
 
-async def test_track_template_rate_limit_super(hass: HomeAssistant) -> None:
+async def test_track_template_rate_limit_super(hass: SmartHub) -> None:
     """Test template rate limit with super template."""
     template_availability = Template(
         "{{ states('sensor.one') != 'unavailable' }}", hass
@@ -2525,7 +2525,7 @@ async def test_track_template_rate_limit_super(hass: HomeAssistant) -> None:
     assert refresh_runs == [0, 1]
     next_time = dt_util.utcnow() + timedelta(seconds=0.125)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -2542,7 +2542,7 @@ async def test_track_template_rate_limit_super(hass: HomeAssistant) -> None:
     assert refresh_runs == [0, 1, 4]
     next_time = dt_util.utcnow() + timedelta(seconds=0.125 * 2)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -2554,7 +2554,7 @@ async def test_track_template_rate_limit_super(hass: HomeAssistant) -> None:
     info.async_remove()
 
 
-async def test_track_template_rate_limit_super_2(hass: HomeAssistant) -> None:
+async def test_track_template_rate_limit_super_2(hass: SmartHub) -> None:
     """Test template rate limit with rate limited super template."""
     # Somewhat forced example of a rate limited template
     template_availability = Template("{{ states | count % 2 == 1 }}", hass)
@@ -2598,7 +2598,7 @@ async def test_track_template_rate_limit_super_2(hass: HomeAssistant) -> None:
     assert refresh_runs == [1]
     next_time = dt_util.utcnow() + timedelta(seconds=0.125)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -2614,7 +2614,7 @@ async def test_track_template_rate_limit_super_2(hass: HomeAssistant) -> None:
     assert refresh_runs == [1]
     next_time = dt_util.utcnow() + timedelta(seconds=0.125 * 2)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -2626,7 +2626,7 @@ async def test_track_template_rate_limit_super_2(hass: HomeAssistant) -> None:
     info.async_remove()
 
 
-async def test_track_template_rate_limit_super_3(hass: HomeAssistant) -> None:
+async def test_track_template_rate_limit_super_3(hass: SmartHub) -> None:
     """Test template with rate limited super template."""
     # Somewhat forced example of a rate limited template
     template_availability = Template("{{ states | count % 2 == 1 }}", hass)
@@ -2671,7 +2671,7 @@ async def test_track_template_rate_limit_super_3(hass: HomeAssistant) -> None:
     assert refresh_runs == [1, 2]
     next_time = dt_util.utcnow() + timedelta(seconds=0.125)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -2688,7 +2688,7 @@ async def test_track_template_rate_limit_super_3(hass: HomeAssistant) -> None:
     assert refresh_runs == [1, 2]
     next_time = dt_util.utcnow() + timedelta(seconds=0.125 * 2)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -2703,7 +2703,7 @@ async def test_track_template_rate_limit_super_3(hass: HomeAssistant) -> None:
     info.async_remove()
 
 
-async def test_track_template_rate_limit_suppress_listener(hass: HomeAssistant) -> None:
+async def test_track_template_rate_limit_suppress_listener(hass: SmartHub) -> None:
     """Test template rate limit will suppress the listener during the rate limit."""
     template_refresh = Template("{{ states | count }}", hass)
 
@@ -2750,7 +2750,7 @@ async def test_track_template_rate_limit_suppress_listener(hass: HomeAssistant) 
     assert refresh_runs == [0, 1]
     next_time = dt_util.utcnow() + timedelta(seconds=0.125)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -2777,7 +2777,7 @@ async def test_track_template_rate_limit_suppress_listener(hass: HomeAssistant) 
     }
     next_time = dt_util.utcnow() + timedelta(seconds=0.125 * 2)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -2803,7 +2803,7 @@ async def test_track_template_rate_limit_suppress_listener(hass: HomeAssistant) 
     info.async_remove()
 
 
-async def test_track_template_rate_limit_five(hass: HomeAssistant) -> None:
+async def test_track_template_rate_limit_five(hass: SmartHub) -> None:
     """Test template rate limit of 5 seconds."""
     template_refresh = Template("{{ states | count }}", hass)
 
@@ -2841,7 +2841,7 @@ async def test_track_template_rate_limit_five(hass: HomeAssistant) -> None:
     info.async_remove()
 
 
-async def test_track_template_has_default_rate_limit(hass: HomeAssistant) -> None:
+async def test_track_template_has_default_rate_limit(hass: SmartHub) -> None:
     """Test template has a rate limit by default."""
     hass.states.async_set("sensor.zero", "any")
     template_refresh = Template("{{ states | list | count }}", hass)
@@ -2881,7 +2881,7 @@ async def test_track_template_has_default_rate_limit(hass: HomeAssistant) -> Non
 
 
 async def test_track_template_unavailable_states_has_default_rate_limit(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test template watching for unavailable states has a rate limit by default."""
     hass.states.async_set("sensor.zero", "unknown")
@@ -2927,7 +2927,7 @@ async def test_track_template_unavailable_states_has_default_rate_limit(
 
 
 async def test_specifically_referenced_entity_is_not_rate_limited(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test template rate limit of 5 seconds."""
     hass.states.async_set("sensor.one", "none")
@@ -2971,7 +2971,7 @@ async def test_specifically_referenced_entity_is_not_rate_limited(
 
 
 async def test_track_two_templates_with_different_rate_limits(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test two templates with different rate limits."""
     template_one = Template("{{ (states | count) + 0 }}", hass)
@@ -3018,7 +3018,7 @@ async def test_track_two_templates_with_different_rate_limits(
     assert refresh_runs[template_five] == [0, 1]
     next_time = dt_util.utcnow() + timedelta(seconds=0.125 * 1)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -3040,7 +3040,7 @@ async def test_track_two_templates_with_different_rate_limits(
     info.async_remove()
 
 
-async def test_string(hass: HomeAssistant) -> None:
+async def test_string(hass: SmartHub) -> None:
     """Test a string."""
     template_refresh = Template("no_template", hass)
 
@@ -3063,7 +3063,7 @@ async def test_string(hass: HomeAssistant) -> None:
     assert refresh_runs == ["no_template"]
 
 
-async def test_track_template_result_refresh_cancel(hass: HomeAssistant) -> None:
+async def test_track_template_result_refresh_cancel(hass: SmartHub) -> None:
     """Test cancelling and refreshing result."""
     template_refresh = Template("{{states.switch.test.state == 'on' and now() }}", hass)
 
@@ -3121,7 +3121,7 @@ async def test_track_template_result_refresh_cancel(hass: HomeAssistant) -> None
 
 
 async def test_async_track_template_result_multiple_templates(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test tracking multiple templates."""
 
@@ -3185,7 +3185,7 @@ async def test_async_track_template_result_multiple_templates(
 
 
 async def test_async_track_template_result_multiple_templates_mixing_domain(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test tracking multiple templates when tracking entities and an entire domain."""
 
@@ -3260,7 +3260,7 @@ async def test_async_track_template_result_multiple_templates_mixing_domain(
     ]
 
 
-async def test_track_template_with_time(hass: HomeAssistant) -> None:
+async def test_track_template_with_time(hass: SmartHub) -> None:
     """Test tracking template with time."""
 
     hass.states.async_set("switch.test", "on")
@@ -3294,7 +3294,7 @@ async def test_track_template_with_time(hass: HomeAssistant) -> None:
     info.async_remove()
 
 
-async def test_track_template_with_time_default(hass: HomeAssistant) -> None:
+async def test_track_template_with_time_default(hass: SmartHub) -> None:
     """Test tracking template with time."""
 
     specific_runs = []
@@ -3334,7 +3334,7 @@ async def test_track_template_with_time_default(hass: HomeAssistant) -> None:
 
 
 async def test_track_template_with_time_that_leaves_scope(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test tracking template with time."""
     now = dt_util.utcnow()
@@ -3415,7 +3415,7 @@ async def test_track_template_with_time_that_leaves_scope(
 
 
 async def test_async_track_template_result_multiple_templates_mixing_listeners(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test tracking multiple templates with mixing listener types."""
 
@@ -3487,7 +3487,7 @@ async def test_async_track_template_result_multiple_templates_mixing_listeners(
     info.async_remove()
 
 
-async def test_track_same_state_simple_no_trigger(hass: HomeAssistant) -> None:
+async def test_track_same_state_simple_no_trigger(hass: SmartHub) -> None:
     """Test track_same_change with no trigger."""
     callback_runs = []
     period = timedelta(minutes=1)
@@ -3521,7 +3521,7 @@ async def test_track_same_state_simple_no_trigger(hass: HomeAssistant) -> None:
     assert len(callback_runs) == 0
 
 
-async def test_track_same_state_simple_trigger_check_funct(hass: HomeAssistant) -> None:
+async def test_track_same_state_simple_trigger_check_funct(hass: SmartHub) -> None:
     """Test track_same_change with trigger and check funct."""
     callback_runs = []
     check_func = []
@@ -3559,7 +3559,7 @@ async def test_track_same_state_simple_trigger_check_funct(hass: HomeAssistant) 
     assert len(callback_runs) == 1
 
 
-async def test_track_time_interval(hass: HomeAssistant) -> None:
+async def test_track_time_interval(hass: SmartHub) -> None:
     """Test tracking time interval."""
     specific_runs = []
 
@@ -3590,7 +3590,7 @@ async def test_track_time_interval(hass: HomeAssistant) -> None:
     assert len(specific_runs) == 2
 
 
-async def test_track_time_interval_name(hass: HomeAssistant) -> None:
+async def test_track_time_interval_name(hass: SmartHub) -> None:
     """Test tracking time interval name.
 
     This test is to ensure that when a name is passed to async_track_time_interval,
@@ -3613,7 +3613,7 @@ async def test_track_time_interval_name(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_track_sunrise(hass: HomeAssistant) -> None:
+async def test_track_sunrise(hass: SmartHub) -> None:
     """Test track the sunrise."""
     latitude = 32.87336
     longitude = 117.22743
@@ -3680,7 +3680,7 @@ async def test_track_sunrise(hass: HomeAssistant) -> None:
         assert len(offset_runs) == 1
 
 
-async def test_track_sunrise_update_location(hass: HomeAssistant) -> None:
+async def test_track_sunrise_update_location(hass: SmartHub) -> None:
     """Test track the sunrise."""
     # Setup sun component
     hass.config.latitude = 32.87336
@@ -3750,7 +3750,7 @@ async def test_track_sunrise_update_location(hass: HomeAssistant) -> None:
     unsub()
 
 
-async def test_track_sunset(hass: HomeAssistant) -> None:
+async def test_track_sunset(hass: SmartHub) -> None:
     """Test track the sunset."""
     latitude = 32.87336
     longitude = 117.22743
@@ -3816,7 +3816,7 @@ async def test_track_sunset(hass: HomeAssistant) -> None:
 
 
 async def test_async_track_time_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test tracking time change."""
@@ -3889,7 +3889,7 @@ async def test_async_track_time_change(
 
 
 async def test_periodic_task_minute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test periodic tasks per minute."""
@@ -3938,7 +3938,7 @@ async def test_periodic_task_minute(
 
 
 async def test_periodic_task_hour(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test periodic tasks per hour."""
@@ -3999,7 +3999,7 @@ async def test_periodic_task_hour(
     assert len(specific_runs) == 3
 
 
-async def test_periodic_task_wrong_input(hass: HomeAssistant) -> None:
+async def test_periodic_task_wrong_input(hass: SmartHub) -> None:
     """Test periodic tasks with wrong input."""
     specific_runs = []
 
@@ -4021,7 +4021,7 @@ async def test_periodic_task_wrong_input(hass: HomeAssistant) -> None:
 
 
 async def test_periodic_task_clock_rollback(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test periodic tasks with the time rolling backwards."""
     specific_runs = []
@@ -4089,7 +4089,7 @@ async def test_periodic_task_clock_rollback(
 
 
 async def test_periodic_task_duplicate_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test periodic tasks not triggering on duplicate time."""
@@ -4135,7 +4135,7 @@ async def test_periodic_task_duplicate_time(
 # DST starts early morning March 28th 2021
 @pytest.mark.freeze_time("2021-03-28 01:28:00+01:00")
 async def test_periodic_task_entering_dst(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test periodic task behavior when entering dst."""
     await hass.config.async_set_time_zone("Europe/Vienna")
@@ -4184,7 +4184,7 @@ async def test_periodic_task_entering_dst(
 # DST starts early morning March 28th 2021
 @pytest.mark.freeze_time("2021-03-28 01:59:59+01:00")
 async def test_periodic_task_entering_dst_2(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test periodic task behavior when entering dst.
 
@@ -4238,7 +4238,7 @@ async def test_periodic_task_entering_dst_2(
 # DST ends early morning October 31st 2021
 @pytest.mark.freeze_time("2021-10-31 02:28:00+02:00")
 async def test_periodic_task_leaving_dst(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test periodic task behavior when leaving dst."""
     await hass.config.async_set_time_zone("Europe/Vienna")
@@ -4315,7 +4315,7 @@ async def test_periodic_task_leaving_dst(
 # DST ends early morning October 31st 2021
 @pytest.mark.freeze_time("2021-10-31 02:28:00+02:00")
 async def test_periodic_task_leaving_dst_2(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test periodic task behavior when leaving dst."""
     await hass.config.async_set_time_zone("Europe/Vienna")
@@ -4380,7 +4380,7 @@ async def test_periodic_task_leaving_dst_2(
     unsub()
 
 
-async def test_call_later(hass: HomeAssistant) -> None:
+async def test_call_later(hass: SmartHub) -> None:
     """Test calling an action later."""
     future = asyncio.get_running_loop().create_future()
     delay = 5
@@ -4400,7 +4400,7 @@ async def test_call_later(hass: HomeAssistant) -> None:
         assert await future, "callback was called but the delay was wrong"
 
 
-async def test_async_call_later(hass: HomeAssistant) -> None:
+async def test_async_call_later(hass: SmartHub) -> None:
     """Test calling an action later."""
     future = asyncio.get_running_loop().create_future()
     delay = 5
@@ -4422,7 +4422,7 @@ async def test_async_call_later(hass: HomeAssistant) -> None:
     remove()
 
 
-async def test_async_call_later_timedelta(hass: HomeAssistant) -> None:
+async def test_async_call_later_timedelta(hass: SmartHub) -> None:
     """Test calling an action later with a timedelta."""
     future = asyncio.get_running_loop().create_future()
     delay = 5
@@ -4444,7 +4444,7 @@ async def test_async_call_later_timedelta(hass: HomeAssistant) -> None:
     remove()
 
 
-async def test_async_call_later_cancel(hass: HomeAssistant) -> None:
+async def test_async_call_later_cancel(hass: SmartHub) -> None:
     """Test canceling a call_later action."""
     future = asyncio.get_running_loop().create_future()
     delay = 0.25
@@ -4470,7 +4470,7 @@ async def test_async_call_later_cancel(hass: HomeAssistant) -> None:
 
 
 async def test_track_state_change_event_chain_multple_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that adding a new state tracker inside a tracker does not fire right away."""
     tracker_called = []
@@ -4524,7 +4524,7 @@ async def test_track_state_change_event_chain_multple_entity(
 
 
 async def test_track_state_change_event_chain_single_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that adding a new state tracker inside a tracker does not fire right away."""
     tracker_called = []
@@ -4574,7 +4574,7 @@ async def test_track_state_change_event_chain_single_entity(
     assert len(chained_tracker_unsub) == 2
 
 
-async def test_track_point_in_utc_time_cancel(hass: HomeAssistant) -> None:
+async def test_track_point_in_utc_time_cancel(hass: SmartHub) -> None:
     """Test cancel of async track point in time."""
 
     times = []
@@ -4606,7 +4606,7 @@ async def test_track_point_in_utc_time_cancel(hass: HomeAssistant) -> None:
     assert times[0].tzinfo == dt_util.UTC
 
 
-async def test_async_track_point_in_time_cancel(hass: HomeAssistant) -> None:
+async def test_async_track_point_in_time_cancel(hass: SmartHub) -> None:
     """Test cancel of async track point in time."""
 
     times = []
@@ -4635,7 +4635,7 @@ async def test_async_track_point_in_time_cancel(hass: HomeAssistant) -> None:
 
 
 async def test_async_track_point_in_time_cancel_in_job(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test cancel of async track point in time during job execution."""
 
@@ -4668,7 +4668,7 @@ async def test_async_track_point_in_time_cancel_in_job(
     assert len(times) == 1
 
 
-async def test_async_track_entity_registry_updated_event(hass: HomeAssistant) -> None:
+async def test_async_track_entity_registry_updated_event(hass: SmartHub) -> None:
     """Test tracking entity registry updates for an entity_id."""
 
     entity_id = "switch.puppy_feeder"
@@ -4740,7 +4740,7 @@ async def test_async_track_entity_registry_updated_event(hass: HomeAssistant) ->
 
 
 async def test_async_track_entity_registry_updated_event_with_a_callback_that_throws(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test tracking entity registry updates for an entity_id when one callback throws."""
 
@@ -4773,7 +4773,7 @@ async def test_async_track_entity_registry_updated_event_with_a_callback_that_th
 
 
 async def test_async_track_entity_registry_updated_event_with_empty_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test async_track_entity_registry_updated_event passing an empty list of entities."""
     unsub_single = async_track_entity_registry_updated_event(
@@ -4787,7 +4787,7 @@ async def test_async_track_entity_registry_updated_event_with_empty_list(
     unsub_single()
 
 
-async def test_async_track_device_registry_updated_event(hass: HomeAssistant) -> None:
+async def test_async_track_device_registry_updated_event(hass: SmartHub) -> None:
     """Test tracking device registry updates for an device_id."""
 
     device_id = "b92c0f06fbc911edacc9eea8ae14f866"
@@ -4845,7 +4845,7 @@ async def test_async_track_device_registry_updated_event(hass: HomeAssistant) ->
 
 
 async def test_async_track_device_registry_updated_event_with_empty_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test async_track_device_registry_updated_event passing an empty list of devices."""
     unsub_single = async_track_device_registry_updated_event(
@@ -4860,7 +4860,7 @@ async def test_async_track_device_registry_updated_event_with_empty_list(
 
 
 async def test_async_track_device_registry_updated_event_with_a_callback_that_throws(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test tracking device registry updates for an device when one callback throws."""
 
@@ -4891,7 +4891,7 @@ async def test_async_track_device_registry_updated_event_with_a_callback_that_th
 
 
 async def test_track_state_change_deprecated(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test track_state_change is deprecated."""
     async_track_state_change(
@@ -4901,12 +4901,12 @@ async def test_track_state_change_deprecated(
     assert (
         "Detected code that calls `async_track_state_change` instead "
         "of `async_track_state_change_event` which is deprecated and "
-        "will be removed in Home Assistant 2025.5. Please report this issue"
+        "will be removed in SmartHub 2025.5. Please report this issue"
     ) in caplog.text
 
 
 async def test_track_point_in_time_repr(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test track point in time."""
 
@@ -4923,7 +4923,7 @@ async def test_track_point_in_time_repr(
     await hass.async_block_till_done(wait_background_tasks=True)
 
 
-async def test_async_track_state_report_event(hass: HomeAssistant) -> None:
+async def test_async_track_state_report_event(hass: SmartHub) -> None:
     """Test async_track_state_report_event."""
     tracker_called: list[ha.State] = []
 
@@ -4947,12 +4947,12 @@ async def test_async_track_state_report_event(hass: HomeAssistant) -> None:
 
 
 async def test_async_track_template_no_hass_deprecated(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test async_track_template with a template without hass is deprecated."""
     message = (
         "Detected code that calls async_track_template_result with template without "
-        "hass. This will stop working in Home Assistant 2025.10, please "
+        "hass. This will stop working in SmartHub 2025.10, please "
         "report this issue"
     )
 
@@ -4966,12 +4966,12 @@ async def test_async_track_template_no_hass_deprecated(
 
 
 async def test_async_track_template_result_no_hass_deprecated(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test async_track_template_result with a template without hass is deprecated."""
     message = (
         "Detected code that calls async_track_template_result with template without "
-        "hass. This will stop working in Home Assistant 2025.10, please "
+        "hass. This will stop working in SmartHub 2025.10, please "
         "report this issue"
     )
 

@@ -2,23 +2,23 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 from . import init_integration
 
 
 async def test_download_switch(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, nzbget_api: MagicMock
+    hass: SmartHub, entity_registry: er.EntityRegistry, nzbget_api: MagicMock
 ) -> None:
     """Test the creation and values of the download switch."""
     instance = nzbget_api.return_value
@@ -47,7 +47,7 @@ async def test_download_switch(
 
 
 async def test_download_switch_services(
-    hass: HomeAssistant, nzbget_api: MagicMock
+    hass: SmartHub, nzbget_api: MagicMock
 ) -> None:
     """Test download switch services."""
     instance = nzbget_api.return_value

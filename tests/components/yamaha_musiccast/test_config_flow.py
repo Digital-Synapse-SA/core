@@ -6,13 +6,13 @@ from unittest.mock import patch
 from aiomusiccast import MusicCastConnectionException
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.yamaha_musiccast.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub import config_entries
+from smarthub.components.yamaha_musiccast.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_MODEL_NAME,
     ATTR_UPNP_SERIAL,
     SsdpServiceInfo,
@@ -25,14 +25,14 @@ from tests.common import MockConfigEntry
 def silent_ssdp_scanner() -> Generator[None]:
     """Start SSDP component and get Scanner, prevent actual SSDP traffic."""
     with (
-        patch("homeassistant.components.ssdp.Scanner._async_start_ssdp_listeners"),
-        patch("homeassistant.components.ssdp.Scanner._async_stop_ssdp_listeners"),
-        patch("homeassistant.components.ssdp.Scanner.async_scan"),
+        patch("smarthub.components.ssdp.Scanner._async_start_ssdp_listeners"),
+        patch("smarthub.components.ssdp.Scanner._async_stop_ssdp_listeners"),
+        patch("smarthub.components.ssdp.Scanner.async_scan"),
         patch(
-            "homeassistant.components.ssdp.Server._async_start_upnp_servers",
+            "smarthub.components.ssdp.Server._async_start_upnp_servers",
         ),
         patch(
-            "homeassistant.components.ssdp.Server._async_stop_upnp_servers",
+            "smarthub.components.ssdp.Server._async_stop_upnp_servers",
         ),
     ):
         yield
@@ -42,7 +42,7 @@ def silent_ssdp_scanner() -> Generator[None]:
 def mock_setup_entry():
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.yamaha_musiccast.async_setup_entry", return_value=True
+        "smarthub.components.yamaha_musiccast.async_setup_entry", return_value=True
     ):
         yield
 
@@ -105,7 +105,7 @@ def mock_ssdp_no_yamaha():
 def mock_valid_discovery_information():
     """Mock that the ssdp scanner returns a useful upnp description."""
     with patch(
-        "homeassistant.components.ssdp.async_get_discovery_info_by_st",
+        "smarthub.components.ssdp.async_get_discovery_info_by_st",
         return_value=[
             SsdpServiceInfo(
                 ssdp_usn="mock_usn",
@@ -125,7 +125,7 @@ def mock_valid_discovery_information():
 def mock_empty_discovery_information():
     """Mock that the ssdp scanner returns no upnp description."""
     with patch(
-        "homeassistant.components.ssdp.async_get_discovery_info_by_st", return_value=[]
+        "smarthub.components.ssdp.async_get_discovery_info_by_st", return_value=[]
     ):
         yield
 
@@ -134,7 +134,7 @@ def mock_empty_discovery_information():
 
 
 async def test_user_input_device_not_found(
-    hass: HomeAssistant, mock_get_device_info_mc_exception
+    hass: SmartHub, mock_get_device_info_mc_exception
 ) -> None:
     """Test when user specifies a non-existing device."""
     result = await hass.config_entries.flow.async_init(
@@ -152,7 +152,7 @@ async def test_user_input_device_not_found(
 
 
 async def test_user_input_non_yamaha_device_found(
-    hass: HomeAssistant, mock_get_device_info_invalid
+    hass: SmartHub, mock_get_device_info_invalid
 ) -> None:
     """Test when user specifies an existing device, which does not provide the musiccast API."""
     result = await hass.config_entries.flow.async_init(
@@ -170,7 +170,7 @@ async def test_user_input_non_yamaha_device_found(
 
 
 async def test_user_input_device_already_existing(
-    hass: HomeAssistant, mock_get_device_info_valid
+    hass: SmartHub, mock_get_device_info_valid
 ) -> None:
     """Test when user specifies an existing device."""
     mock_entry = MockConfigEntry(
@@ -194,7 +194,7 @@ async def test_user_input_device_already_existing(
 
 
 async def test_user_input_unknown_error(
-    hass: HomeAssistant, mock_get_device_info_exception
+    hass: SmartHub, mock_get_device_info_exception
 ) -> None:
     """Test when user specifies an existing device, which does not provide the musiccast API."""
     result = await hass.config_entries.flow.async_init(
@@ -212,7 +212,7 @@ async def test_user_input_unknown_error(
 
 
 async def test_user_input_device_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_device_info_valid,
     mock_valid_discovery_information,
 ) -> None:
@@ -237,7 +237,7 @@ async def test_user_input_device_found(
 
 
 async def test_user_input_device_found_no_ssdp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_device_info_valid,
     mock_empty_discovery_information,
 ) -> None:
@@ -264,7 +264,7 @@ async def test_user_input_device_found_no_ssdp(
 # SSDP Flows
 
 
-async def test_ssdp_discovery_failed(hass: HomeAssistant, mock_ssdp_no_yamaha) -> None:
+async def test_ssdp_discovery_failed(hass: SmartHub, mock_ssdp_no_yamaha) -> None:
     """Test when an SSDP discovered device is not a musiccast device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -285,7 +285,7 @@ async def test_ssdp_discovery_failed(hass: HomeAssistant, mock_ssdp_no_yamaha) -
 
 
 async def test_ssdp_discovery_successful_add_device(
-    hass: HomeAssistant, mock_ssdp_yamaha
+    hass: SmartHub, mock_ssdp_yamaha
 ) -> None:
     """Test when the SSDP discovered device is a musiccast device and the user confirms it."""
     result = await hass.config_entries.flow.async_init(
@@ -321,7 +321,7 @@ async def test_ssdp_discovery_successful_add_device(
 
 
 async def test_ssdp_discovery_existing_device_update(
-    hass: HomeAssistant, mock_ssdp_yamaha
+    hass: SmartHub, mock_ssdp_yamaha
 ) -> None:
     """Test when the SSDP discovered device is a musiccast device, but it already exists with another IP."""
     mock_entry = MockConfigEntry(

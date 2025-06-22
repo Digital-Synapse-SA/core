@@ -1,0 +1,9 @@
+{
+  "domain": "search",
+  "name": "Search",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["websocket_api"],
+  "documentation": "https://www.smart-hub.io/integrations/search",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

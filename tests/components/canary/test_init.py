@@ -2,14 +2,14 @@
 
 from requests import ConnectTimeout
 
-from homeassistant.components.canary.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.canary.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import init_integration
 
 
-async def test_unload_entry(hass: HomeAssistant, canary) -> None:
+async def test_unload_entry(hass: SmartHub, canary) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass)
 
@@ -24,7 +24,7 @@ async def test_unload_entry(hass: HomeAssistant, canary) -> None:
     assert not hass.data.get(DOMAIN)
 
 
-async def test_async_setup_raises_entry_not_ready(hass: HomeAssistant, canary) -> None:
+async def test_async_setup_raises_entry_not_ready(hass: SmartHub, canary) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     canary.side_effect = ConnectTimeout()
 

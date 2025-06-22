@@ -5,14 +5,14 @@ from unittest.mock import patch
 import librouteros
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.mikrotik.const import (
+from smarthub import config_entries
+from smarthub.components.mikrotik.const import (
     CONF_ARP_PING,
     CONF_DETECTION_TIME,
     CONF_FORCE_DHCP,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_HOST,
     CONF_NAME,
     CONF_PASSWORD,
@@ -20,8 +20,8 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -71,7 +71,7 @@ def mock_api_connection_error():
         yield
 
 
-async def test_flow_works(hass: HomeAssistant, api) -> None:
+async def test_flow_works(hass: SmartHub, api) -> None:
     """Test config flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -92,7 +92,7 @@ async def test_flow_works(hass: HomeAssistant, api) -> None:
     assert result["data"][CONF_PORT] == 8278
 
 
-async def test_options(hass: HomeAssistant, api) -> None:
+async def test_options(hass: SmartHub, api) -> None:
     """Test updating options."""
     entry = MockConfigEntry(domain=DOMAIN, data=DEMO_CONFIG_ENTRY)
     entry.add_to_hass(hass)
@@ -122,7 +122,7 @@ async def test_options(hass: HomeAssistant, api) -> None:
     }
 
 
-async def test_host_already_configured(hass: HomeAssistant, auth_error) -> None:
+async def test_host_already_configured(hass: SmartHub, auth_error) -> None:
     """Test host already configured."""
 
     entry = MockConfigEntry(domain=DOMAIN, data=DEMO_CONFIG_ENTRY)
@@ -138,7 +138,7 @@ async def test_host_already_configured(hass: HomeAssistant, auth_error) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_connection_error(hass: HomeAssistant, conn_error) -> None:
+async def test_connection_error(hass: SmartHub, conn_error) -> None:
     """Test error when connection is unsuccessful."""
 
     result = await hass.config_entries.flow.async_init(
@@ -151,7 +151,7 @@ async def test_connection_error(hass: HomeAssistant, conn_error) -> None:
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_wrong_credentials(hass: HomeAssistant, auth_error) -> None:
+async def test_wrong_credentials(hass: SmartHub, auth_error) -> None:
     """Test error when credentials are wrong."""
 
     result = await hass.config_entries.flow.async_init(
@@ -168,7 +168,7 @@ async def test_wrong_credentials(hass: HomeAssistant, auth_error) -> None:
     }
 
 
-async def test_reauth_success(hass: HomeAssistant, api) -> None:
+async def test_reauth_success(hass: SmartHub, api) -> None:
     """Test we can reauth."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -196,7 +196,7 @@ async def test_reauth_success(hass: HomeAssistant, api) -> None:
     assert result2["reason"] == "reauth_successful"
 
 
-async def test_reauth_failed(hass: HomeAssistant, auth_error) -> None:
+async def test_reauth_failed(hass: SmartHub, auth_error) -> None:
     """Test reauth fails due to wrong password."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -222,7 +222,7 @@ async def test_reauth_failed(hass: HomeAssistant, auth_error) -> None:
     }
 
 
-async def test_reauth_failed_conn_error(hass: HomeAssistant, conn_error) -> None:
+async def test_reauth_failed_conn_error(hass: SmartHub, conn_error) -> None:
     """Test reauth failed due to connection error."""
     entry = MockConfigEntry(
         domain=DOMAIN,

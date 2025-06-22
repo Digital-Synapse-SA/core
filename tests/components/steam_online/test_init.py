@@ -2,15 +2,15 @@
 
 import steam
 
-from homeassistant.components.steam_online.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.steam_online.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import create_entry, patch_interface
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test unload."""
     entry = create_entry(hass)
     with patch_interface():
@@ -26,7 +26,7 @@ async def test_setup(hass: HomeAssistant) -> None:
     assert not hass.data.get(DOMAIN)
 
 
-async def test_async_setup_entry_auth_failed(hass: HomeAssistant) -> None:
+async def test_async_setup_entry_auth_failed(hass: SmartHub) -> None:
     """Test that it throws ConfigEntryAuthFailed when authentication fails."""
     entry = create_entry(hass)
     with patch_interface() as interface:
@@ -38,7 +38,7 @@ async def test_async_setup_entry_auth_failed(hass: HomeAssistant) -> None:
 
 
 async def test_device_info(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test device info."""
     entry = create_entry(hass)

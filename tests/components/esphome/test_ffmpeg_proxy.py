@@ -13,10 +13,10 @@ from aiohttp import client_exceptions
 import mutagen
 import pytest
 
-from homeassistant.components import esphome
-from homeassistant.components.esphome.ffmpeg_proxy import async_create_proxy_url
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import esphome
+from smarthub.components.esphome.ffmpeg_proxy import async_create_proxy_url
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -44,7 +44,7 @@ def _write_silence(filename: str, length: int) -> None:
         wav_file.writeframes(bytes(16000 * 2 * length))  # length s
 
 
-async def test_async_create_proxy_url(hass: HomeAssistant) -> None:
+async def test_async_create_proxy_url(hass: SmartHub) -> None:
     """Test that async_create_proxy_url returns the correct format."""
     assert await async_setup_component(hass, "esphome", {})
 
@@ -55,7 +55,7 @@ async def test_async_create_proxy_url(hass: HomeAssistant) -> None:
     proxy_url = f"/api/esphome/ffmpeg_proxy/{device_id}/{convert_id}.{media_format}"
 
     with patch(
-        "homeassistant.components.esphome.ffmpeg_proxy.secrets.token_urlsafe",
+        "smarthub.components.esphome.ffmpeg_proxy.secrets.token_urlsafe",
         return_value=convert_id,
     ):
         assert (
@@ -65,7 +65,7 @@ async def test_async_create_proxy_url(hass: HomeAssistant) -> None:
 
 
 async def test_proxy_view(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     wav_file: str,
 ) -> None:
@@ -85,7 +85,7 @@ async def test_proxy_view(
 
     # Allow the URL
     with patch(
-        "homeassistant.components.esphome.ffmpeg_proxy.secrets.token_urlsafe",
+        "smarthub.components.esphome.ffmpeg_proxy.secrets.token_urlsafe",
         return_value=convert_id,
     ):
         assert (
@@ -117,7 +117,7 @@ async def test_proxy_view(
 
 
 async def test_ffmpeg_file_doesnt_exist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test ffmpeg conversion with a file that doesn't exist."""
@@ -138,7 +138,7 @@ async def test_ffmpeg_file_doesnt_exist(
 
 
 async def test_lingering_process(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     wav_file: str,
 ) -> None:
@@ -198,7 +198,7 @@ async def test_lingering_process(
 
 @pytest.mark.parametrize("wav_file_length", [10])
 async def test_request_same_url_multiple_times(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     wav_file: str,
 ) -> None:
@@ -242,7 +242,7 @@ async def test_request_same_url_multiple_times(
 
 
 async def test_max_conversions_per_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test that each device has a maximum number of conversions (currently 2)."""
@@ -290,10 +290,10 @@ async def test_max_conversions_per_device(
 
 
 async def test_abort_on_shutdown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
-    """Test we abort on Home Assistant shutdown."""
+    """Test we abort on SmartHub shutdown."""
     device_id = "1234"
 
     await async_setup_component(hass, esphome.DOMAIN, {esphome.DOMAIN: {}})
@@ -327,7 +327,7 @@ async def test_abort_on_shutdown(
         initial_mp3_data = await req.content.read(4)
         assert initial_mp3_data == b"RIFF"
 
-        # Shut down Home Assistant
+        # Shut down SmartHub
         await hass.async_stop()
 
         with pytest.raises(client_exceptions.ClientPayloadError):

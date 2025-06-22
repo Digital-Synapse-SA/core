@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.airvisual_pro.const import DOMAIN
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.json import JsonObjectType
+from smarthub.components.airvisual_pro.const import DOMAIN
+from smarthub.const import CONF_IP_ADDRESS, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.json import JsonObjectType
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -19,14 +19,14 @@ from tests.common import MockConfigEntry, load_json_object_fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.airvisual_pro.async_setup_entry", return_value=True
+        "smarthub.components.airvisual_pro.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any]
 ) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
@@ -80,16 +80,16 @@ def pro_fixture(
 
 @pytest.fixture(name="setup_airvisual_pro")
 async def setup_airvisual_pro_fixture(
-    hass: HomeAssistant, config, pro
+    hass: SmartHub, config, pro
 ) -> AsyncGenerator[None]:
     """Define a fixture to set up AirVisual Pro."""
     with (
         patch(
-            "homeassistant.components.airvisual_pro.config_flow.NodeSamba",
+            "smarthub.components.airvisual_pro.config_flow.NodeSamba",
             return_value=pro,
         ),
-        patch("homeassistant.components.airvisual_pro.NodeSamba", return_value=pro),
-        patch("homeassistant.components.airvisual_pro.PLATFORMS", []),
+        patch("smarthub.components.airvisual_pro.NodeSamba", return_value=pro),
+        patch("smarthub.components.airvisual_pro.PLATFORMS", []),
     ):
         assert await async_setup_component(hass, DOMAIN, config)
         await hass.async_block_till_done()

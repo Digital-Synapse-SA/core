@@ -8,7 +8,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_GROUP_MEMBERS,
     ATTR_MEDIA_ANNOUNCE,
     ATTR_MEDIA_CONTENT_ID,
@@ -32,7 +32,7 @@ from homeassistant.components.media_player import (
     MediaType,
     RepeatMode,
 )
-from homeassistant.components.squeezebox.const import (
+from smarthub.components.squeezebox.const import (
     ATTR_ANNOUNCE_TIMEOUT,
     ATTR_ANNOUNCE_VOLUME,
     DISCOVERY_INTERVAL,
@@ -40,12 +40,12 @@ from homeassistant.components.squeezebox.const import (
     PLAYER_UPDATE_INTERVAL,
     SENSOR_UPDATE_INTERVAL,
 )
-from homeassistant.components.squeezebox.media_player import (
+from smarthub.components.squeezebox.media_player import (
     ATTR_PARAMETERS,
     SERVICE_CALL_METHOD,
     SERVICE_CALL_QUERY,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_COMMAND,
     ATTR_ENTITY_ID,
     SERVICE_MEDIA_NEXT_TRACK,
@@ -66,11 +66,11 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
+from smarthub.util.dt import utcnow
 
 from .conftest import (
     FAKE_VALID_ITEM_ID,
@@ -83,7 +83,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 
 async def test_device_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: DeviceRegistry,
     configured_player: MagicMock,
     snapshot: SnapshotAssertion,
@@ -95,7 +95,7 @@ async def test_device_registry(
 
 
 async def test_entity_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     configured_player: MagicMock,
     snapshot: SnapshotAssertion,
@@ -106,7 +106,7 @@ async def test_entity_registry(
 
 
 async def test_squeezebox_new_player_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     lms: MagicMock,
     player_factory: MagicMock,
@@ -133,7 +133,7 @@ async def test_squeezebox_new_player_discovery(
 
 
 async def test_squeezebox_player_rediscovery(
-    hass: HomeAssistant, configured_player: MagicMock, freezer: FrozenDateTimeFactory
+    hass: SmartHub, configured_player: MagicMock, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test rediscovery of a squeezebox player."""
 
@@ -159,7 +159,7 @@ async def test_squeezebox_player_rediscovery(
 
 
 async def test_squeezebox_turn_on(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test turn on service call."""
     await hass.services.async_call(
@@ -172,7 +172,7 @@ async def test_squeezebox_turn_on(
 
 
 async def test_squeezebox_turn_off(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test turn off service call."""
     await hass.services.async_call(
@@ -185,7 +185,7 @@ async def test_squeezebox_turn_off(
 
 
 async def test_squeezebox_state(
-    hass: HomeAssistant, configured_player: MagicMock, freezer: FrozenDateTimeFactory
+    hass: SmartHub, configured_player: MagicMock, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test determining the MediaPlayerState."""
 
@@ -216,7 +216,7 @@ async def test_squeezebox_state(
 
 
 async def test_squeezebox_volume_up(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test volume up service call."""
     configured_player.volume = 50
@@ -232,7 +232,7 @@ async def test_squeezebox_volume_up(
 
 
 async def test_squeezebox_volume_down(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test volume down service call."""
     configured_player.volume = 50
@@ -248,7 +248,7 @@ async def test_squeezebox_volume_down(
 
 
 async def test_squeezebox_volume_set(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test volume set service call."""
     await hass.services.async_call(
@@ -261,7 +261,7 @@ async def test_squeezebox_volume_set(
 
 
 async def test_squeezebox_volume_property(
-    hass: HomeAssistant, configured_player: MagicMock, freezer: FrozenDateTimeFactory
+    hass: SmartHub, configured_player: MagicMock, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test volume property."""
 
@@ -285,7 +285,7 @@ async def test_squeezebox_volume_property(
 
 
 async def test_squeezebox_mute(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test mute service call."""
     await hass.services.async_call(
@@ -298,7 +298,7 @@ async def test_squeezebox_mute(
 
 
 async def test_squeezebox_unmute(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test unmute service call."""
     await hass.services.async_call(
@@ -311,7 +311,7 @@ async def test_squeezebox_unmute(
 
 
 async def test_squeezebox_mute_property(
-    hass: HomeAssistant, configured_player: MagicMock, freezer: FrozenDateTimeFactory
+    hass: SmartHub, configured_player: MagicMock, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test the mute property."""
 
@@ -335,7 +335,7 @@ async def test_squeezebox_mute_property(
 
 
 async def test_squeezebox_repeat_mode(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test set repeat mode service call."""
     await hass.services.async_call(
@@ -373,7 +373,7 @@ async def test_squeezebox_repeat_mode(
 
 
 async def test_squeezebox_repeat_mode_property(
-    hass: HomeAssistant, configured_player: MagicMock, freezer: FrozenDateTimeFactory
+    hass: SmartHub, configured_player: MagicMock, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test the repeat mode property."""
     configured_player.repeat = "playlist"
@@ -405,7 +405,7 @@ async def test_squeezebox_repeat_mode_property(
 
 
 async def test_squeezebox_shuffle(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test set shuffle service call."""
     await hass.services.async_call(
@@ -436,7 +436,7 @@ async def test_squeezebox_shuffle(
 
 
 async def test_squeezebox_shuffle_property(
-    hass: HomeAssistant, configured_player: MagicMock, freezer: FrozenDateTimeFactory
+    hass: SmartHub, configured_player: MagicMock, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test the shuffle property."""
 
@@ -460,7 +460,7 @@ async def test_squeezebox_shuffle_property(
 
 
 async def test_squeezebox_play(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test play service call."""
     await hass.services.async_call(
@@ -473,7 +473,7 @@ async def test_squeezebox_play(
 
 
 async def test_squeezebox_play_media_with_announce(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test play service call with announce."""
     await hass.services.async_call(
@@ -497,7 +497,7 @@ async def test_squeezebox_play_media_with_announce(
     ["0.2", 0.2],
 )
 async def test_squeezebox_play_media_with_announce_volume(
-    hass: HomeAssistant, configured_player: MagicMock, announce_volume: str | int
+    hass: SmartHub, configured_player: MagicMock, announce_volume: str | int
 ) -> None:
     """Test play service call with announce."""
     await hass.services.async_call(
@@ -520,7 +520,7 @@ async def test_squeezebox_play_media_with_announce_volume(
 
 @pytest.mark.parametrize("announce_volume", ["1.1", 1.1, "text", "-1", -1, 0, "0"])
 async def test_squeezebox_play_media_with_announce_volume_invalid(
-    hass: HomeAssistant, configured_player: MagicMock, announce_volume: str | int
+    hass: SmartHub, configured_player: MagicMock, announce_volume: str | int
 ) -> None:
     """Test play service call with announce and volume zero."""
     with pytest.raises(ServiceValidationError):
@@ -540,7 +540,7 @@ async def test_squeezebox_play_media_with_announce_volume_invalid(
 
 @pytest.mark.parametrize("announce_timeout", ["-1", "text", -1, 0, "0"])
 async def test_squeezebox_play_media_with_announce_timeout_invalid(
-    hass: HomeAssistant, configured_player: MagicMock, announce_timeout: str | int
+    hass: SmartHub, configured_player: MagicMock, announce_timeout: str | int
 ) -> None:
     """Test play service call with announce and invalid timeout."""
     with pytest.raises(ServiceValidationError):
@@ -560,7 +560,7 @@ async def test_squeezebox_play_media_with_announce_timeout_invalid(
 
 @pytest.mark.parametrize("announce_timeout", ["100", 100])
 async def test_squeezebox_play_media_with_announce_timeout(
-    hass: HomeAssistant, configured_player: MagicMock, announce_timeout: str | int
+    hass: SmartHub, configured_player: MagicMock, announce_timeout: str | int
 ) -> None:
     """Test play service call with announce."""
     await hass.services.async_call(
@@ -582,7 +582,7 @@ async def test_squeezebox_play_media_with_announce_timeout(
 
 
 async def test_squeezebox_play_pause(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test play/pause service call."""
     await hass.services.async_call(
@@ -595,7 +595,7 @@ async def test_squeezebox_play_pause(
 
 
 async def test_squeezebox_pause(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test pause service call."""
     await hass.services.async_call(
@@ -608,7 +608,7 @@ async def test_squeezebox_pause(
 
 
 async def test_squeezebox_seek(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test seek service call."""
     await hass.services.async_call(
@@ -634,7 +634,7 @@ async def test_squeezebox_seek(
 
 
 async def test_squeezebox_stop(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test stop service call."""
     await hass.services.async_call(
@@ -647,7 +647,7 @@ async def test_squeezebox_stop(
 
 
 async def test_squeezebox_load_playlist(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test load a playlist."""
     # load a playlist by number
@@ -695,7 +695,7 @@ async def test_squeezebox_load_playlist(
 
 
 async def test_squeezebox_enqueue(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test the various enqueue service calls."""
 
@@ -740,7 +740,7 @@ async def test_squeezebox_enqueue(
 
 
 async def test_squeezebox_skip_tracks(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test track skipping service calls."""
     await hass.services.async_call(
@@ -771,7 +771,7 @@ async def test_squeezebox_skip_tracks(
 
 
 async def test_squeezebox_call_query(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test query service call."""
     await hass.services.async_call(
@@ -790,7 +790,7 @@ async def test_squeezebox_call_query(
 
 
 async def test_squeezebox_call_method(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test method call service call."""
     await hass.services.async_call(
@@ -809,7 +809,7 @@ async def test_squeezebox_call_method(
 
 
 async def test_squeezebox_invalid_state(
-    hass: HomeAssistant, configured_player: MagicMock, freezer: FrozenDateTimeFactory
+    hass: SmartHub, configured_player: MagicMock, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test handling an unexpected state from pysqueezebox."""
     configured_player.mode = "invalid"
@@ -820,7 +820,7 @@ async def test_squeezebox_invalid_state(
 
 
 async def test_squeezebox_server_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     lms: MagicMock,
     lms_factory: MagicMock,
     config_entry: MockConfigEntry,
@@ -835,11 +835,11 @@ async def test_squeezebox_server_discovery(
 
     with (
         patch(
-            "homeassistant.components.squeezebox.Server",
+            "smarthub.components.squeezebox.Server",
             return_value=lms,
         ),
         patch(
-            "homeassistant.components.squeezebox.media_player.async_discover",
+            "smarthub.components.squeezebox.media_player.async_discover",
             mock_async_discover,
         ),
     ):
@@ -848,7 +848,7 @@ async def test_squeezebox_server_discovery(
         # how do we check that a config flow started?
 
 
-async def test_squeezebox_join(hass: HomeAssistant, configured_players: list) -> None:
+async def test_squeezebox_join(hass: SmartHub, configured_players: list) -> None:
     """Test joining a squeezebox player."""
 
     # join a valid player
@@ -879,7 +879,7 @@ async def test_squeezebox_join(hass: HomeAssistant, configured_players: list) ->
 
 
 async def test_squeezebox_unjoin(
-    hass: HomeAssistant, configured_player: MagicMock
+    hass: SmartHub, configured_player: MagicMock
 ) -> None:
     """Test unjoining a squeezebox player."""
     await hass.services.async_call(
@@ -892,7 +892,7 @@ async def test_squeezebox_unjoin(
 
 
 async def test_squeezebox_media_content_properties(
-    hass: HomeAssistant,
+    hass: SmartHub,
     configured_player: MagicMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -944,7 +944,7 @@ async def test_squeezebox_media_content_properties(
 
 
 async def test_squeezebox_media_position_property(
-    hass: HomeAssistant, configured_player: MagicMock, freezer: FrozenDateTimeFactory
+    hass: SmartHub, configured_player: MagicMock, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test media_position property."""
     configured_player.time = 100

@@ -7,14 +7,14 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import fan
-from homeassistant.components.fan import ATTR_PRESET_MODES
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.const import ATTR_FRIENDLY_NAME, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import fan
+from smarthub.components.fan import ATTR_PRESET_MODES
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.const import ATTR_FRIENDLY_NAME, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 from tests.components.recorder.common import async_wait_recording_done
@@ -24,16 +24,16 @@ from tests.components.recorder.common import async_wait_recording_done
 async def fan_only() -> None:
     """Enable only the fan platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.FAN],
     ):
         yield
 
 
-async def test_exclude_attributes(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_exclude_attributes(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test fan registered attributes to be excluded."""
     now = dt_util.utcnow()
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await async_setup_component(hass, fan.DOMAIN, {fan.DOMAIN: {"platform": "demo"}})
     await hass.async_block_till_done()
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=5))

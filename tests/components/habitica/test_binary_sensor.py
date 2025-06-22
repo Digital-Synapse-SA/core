@@ -7,11 +7,11 @@ from habiticalib import HabiticaUserResponse
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.habitica.const import ASSETS_URL, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.habitica.const import ASSETS_URL, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_load_fixture, snapshot_platform
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry, async_load_fixture, snapshot_platform
 def binary_sensor_only() -> Generator[None]:
     """Enable only the binarty sensor platform."""
     with patch(
-        "homeassistant.components.habitica.PLATFORMS",
+        "smarthub.components.habitica.PLATFORMS",
         [Platform.BINARY_SENSOR],
     ):
         yield
@@ -28,7 +28,7 @@ def binary_sensor_only() -> Generator[None]:
 
 @pytest.mark.usefixtures("habitica")
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -52,7 +52,7 @@ async def test_binary_sensors(
     ],
 )
 async def test_pending_quest_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     fixture: str,

@@ -6,10 +6,10 @@ from mastodon.Mastodon import MastodonAPIError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.notify import DOMAIN as NOTIFY_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.notify import DOMAIN as NOTIFY_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_notify(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_mastodon_client: AsyncMock,
@@ -42,7 +42,7 @@ async def test_notify(
 
 
 async def test_notify_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -53,7 +53,7 @@ async def test_notify_failed(
 
     mock_mastodon_client.status_post.side_effect = MastodonAPIError
 
-    with pytest.raises(HomeAssistantError, match="Unable to send message"):
+    with pytest.raises(SmartHubError, match="Unable to send message"):
         await hass.services.async_call(
             NOTIFY_DOMAIN,
             "trwnh_mastodon_social",

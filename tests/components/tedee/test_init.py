@@ -13,12 +13,12 @@ from aiotedee.exception import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.tedee.const import CONF_LOCAL_ACCESS_TOKEN, DOMAIN
-from homeassistant.components.webhook import async_generate_url
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_WEBHOOK_ID, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.tedee.const import CONF_LOCAL_ACCESS_TOKEN, DOMAIN
+from smarthub.components.webhook import async_generate_url
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_WEBHOOK_ID, EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 from .conftest import WEBHOOK_ID
@@ -28,7 +28,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tedee: MagicMock,
 ) -> None:
@@ -47,7 +47,7 @@ async def test_load_unload_config_entry(
     "side_effect", [TedeeClientException(""), TedeeAuthException("")]
 )
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tedee: MagicMock,
     side_effect: Exception,
@@ -62,7 +62,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_cleanup_on_shutdown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tedee: MagicMock,
 ) -> None:
@@ -77,7 +77,7 @@ async def test_cleanup_on_shutdown(
 
 
 async def test_webhook_cleanup_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tedee: MagicMock,
     caplog: pytest.LogCaptureFixture,
@@ -96,7 +96,7 @@ async def test_webhook_cleanup_errors(
 
 
 async def test_webhook_registration_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tedee: MagicMock,
     caplog: pytest.LogCaptureFixture,
@@ -112,7 +112,7 @@ async def test_webhook_registration_errors(
 
 
 async def test_webhook_registration_cleanup_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tedee: MagicMock,
     caplog: pytest.LogCaptureFixture,
@@ -128,7 +128,7 @@ async def test_webhook_registration_cleanup_errors(
 
 
 async def test_lock_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tedee: MagicMock,
     device_registry: dr.DeviceRegistry,
@@ -143,7 +143,7 @@ async def test_lock_device(
 
 
 async def test_bridge_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tedee: MagicMock,
     device_registry: dr.DeviceRegistry,
@@ -184,7 +184,7 @@ async def test_bridge_device(
     ],
 )
 async def test_webhook_post(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tedee: MagicMock,
     hass_client_no_auth: ClientSessionGenerator,
@@ -207,7 +207,7 @@ async def test_webhook_post(
     assert resp.status == expected_code
 
 
-async def test_config_flow_entry_migrate_2_1(hass: HomeAssistant) -> None:
+async def test_config_flow_entry_migrate_2_1(hass: SmartHub) -> None:
     """Test that config entry fails setup if the version is from the future."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -220,7 +220,7 @@ async def test_config_flow_entry_migrate_2_1(hass: HomeAssistant) -> None:
 
 
 async def test_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
 ) -> None:
     """Test migration of the config entry."""
@@ -238,7 +238,7 @@ async def test_migration(
     )
 
     with patch(
-        "homeassistant.components.tedee.webhook_generate_id",
+        "smarthub.components.tedee.webhook_generate_id",
         return_value=WEBHOOK_ID,
     ):
         await setup_integration(hass, mock_config_entry)

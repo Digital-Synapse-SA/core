@@ -1,12 +1,12 @@
 """Tests for the quantum_gateway component."""
 
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
-async def setup_platform(hass: HomeAssistant) -> None:
+async def setup_platform(hass: SmartHub) -> None:
     """Set up the quantum_gateway integration."""
     result = await async_setup_component(
         hass,

@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 from aiohttp.hdrs import X_FORWARDED_FOR, X_FORWARDED_HOST, X_FORWARDED_PROTO
 import pytest
 
-from homeassistant.components.hassio.const import X_AUTH_TOKEN
+from smarthub.components.hassio.const import X_AUTH_TOKEN
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 

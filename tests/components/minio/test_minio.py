@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 
-from homeassistant.components.minio import (
+from smarthub.components.minio import (
     CONF_ACCESS_KEY,
     CONF_HOST,
     CONF_LISTEN,
@@ -17,8 +17,8 @@ from homeassistant.components.minio import (
     DOMAIN,
     QueueListener,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, callback
+from smarthub.setup import async_setup_component
 
 from .common import TEST_EVENT
 
@@ -26,7 +26,7 @@ from .common import TEST_EVENT
 @pytest.fixture(name="minio_client")
 def minio_client_fixture():
     """Patch Minio client."""
-    with patch("homeassistant.components.minio.minio_helper.Minio") as minio_mock:
+    with patch("smarthub.components.minio.minio_helper.Minio") as minio_mock:
         minio_client_mock = minio_mock.return_value
 
         yield minio_client_mock
@@ -35,7 +35,7 @@ def minio_client_fixture():
 @pytest.fixture(name="minio_client_event")
 def minio_client_event_fixture():
     """Patch helper function for minio notification stream."""
-    with patch("homeassistant.components.minio.minio_helper.Minio") as minio_mock:
+    with patch("smarthub.components.minio.minio_helper.Minio") as minio_mock:
         minio_client_mock = minio_mock.return_value
 
         response_mock = MagicMock()
@@ -54,7 +54,7 @@ def minio_client_event_fixture():
 
 
 async def test_minio_services(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, minio_client
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, minio_client
 ) -> None:
     """Test Minio services."""
     hass.config.allowlist_external_dirs = {"/test"}
@@ -107,7 +107,7 @@ async def test_minio_services(
 
 
 async def test_minio_listen(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, minio_client_event
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, minio_client_event
 ) -> None:
     """Test minio listen on notifications."""
     minio_client_event.presigned_get_object.return_value = "http://url"
@@ -155,7 +155,7 @@ async def test_minio_listen(
 
 
 async def test_queue_listener() -> None:
-    """Tests QueueListener firing events on Home Assistant event bus."""
+    """Tests QueueListener firing events on SmartHub event bus."""
     hass = MagicMock()
 
     queue_listener = QueueListener(hass)

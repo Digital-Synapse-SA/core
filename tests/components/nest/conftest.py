@@ -17,14 +17,14 @@ from google_nest_sdm.streaming_manager import StreamingManager
 import pytest
 from yarl import URL
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     async_import_client_credential,
 )
-from homeassistant.components.nest import DOMAIN
-from homeassistant.components.nest.const import API_URL, CONF_SUBSCRIBER_ID, SDM_SCOPES
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.nest import DOMAIN
+from smarthub.components.nest.const import API_URL, CONF_SUBSCRIBER_ID, SDM_SCOPES
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import (
     DEVICE_ID,
@@ -145,10 +145,10 @@ async def auth(
 
 
 @pytest.fixture(autouse=True, name="media_path")
-def cleanup_media_storage(hass: HomeAssistant) -> Generator[str]:
+def cleanup_media_storage(hass: SmartHub) -> Generator[str]:
     """Test cleanup, remove any media storage persisted during the test."""
     tmp_path = str(uuid.uuid4())
-    with patch("homeassistant.components.nest.media_source.MEDIA_PATH", new=tmp_path):
+    with patch("smarthub.components.nest.media_source.MEDIA_PATH", new=tmp_path):
         full_path = hass.config.path(tmp_path)
         yield full_path
         shutil.rmtree(full_path, ignore_errors=True)
@@ -182,7 +182,7 @@ def mock_subscriber() -> YieldFixture[AsyncMock]:
     """Fixture for injecting errors into the subscriber."""
     mock_subscriber = AsyncMock(GoogleNestSubscriber)
     with patch(
-        "homeassistant.components.nest.api.GoogleNestSubscriber",
+        "smarthub.components.nest.api.GoogleNestSubscriber",
         return_value=mock_subscriber,
     ):
         yield mock_subscriber
@@ -287,7 +287,7 @@ def config_entry(
 
 
 @pytest.fixture(autouse=True)
-async def credential(hass: HomeAssistant, nest_test_config: NestTestConfig) -> None:
+async def credential(hass: SmartHub, nest_test_config: NestTestConfig) -> None:
     """Fixture that provides the ClientCredential for the test if any."""
     if not nest_test_config.credential:
         return
@@ -299,14 +299,14 @@ async def credential(hass: HomeAssistant, nest_test_config: NestTestConfig) -> N
 
 @pytest.fixture
 async def setup_base_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     platforms: list[str],
     config_entry: MockConfigEntry | None,
     auth: FakeAuth,
 ) -> YieldFixture[PlatformSetup]:
     """Fixture to setup the integration platform."""
     config_entry.add_to_hass(hass)
-    with patch("homeassistant.components.nest.PLATFORMS", platforms):
+    with patch("smarthub.components.nest.PLATFORMS", platforms):
 
         async def _setup_func() -> bool:
             await hass.config_entries.async_setup(config_entry.entry_id)

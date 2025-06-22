@@ -9,10 +9,10 @@ from pybalboa.enums import OffLowHighState, UnknownState
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fan import ATTR_PERCENTAGE
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.fan import ATTR_PERCENTAGE
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import client_update, init_integration
 
@@ -42,19 +42,19 @@ def mock_pump(client: MagicMock):
 
 
 async def test_fan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test spa fans."""
-    with patch("homeassistant.components.balboa.PLATFORMS", [Platform.FAN]):
+    with patch("smarthub.components.balboa.PLATFORMS", [Platform.FAN]):
         entry = await init_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_pump(hass: HomeAssistant, client: MagicMock, mock_pump) -> None:
+async def test_pump(hass: SmartHub, client: MagicMock, mock_pump) -> None:
     """Test spa pump."""
     await init_integration(hass)
 
@@ -90,7 +90,7 @@ async def test_pump(hass: HomeAssistant, client: MagicMock, mock_pump) -> None:
 
 
 async def test_pump_unknown_state(
-    hass: HomeAssistant, client: MagicMock, mock_pump
+    hass: SmartHub, client: MagicMock, mock_pump
 ) -> None:
     """Tests spa pump with unknown state."""
     await init_integration(hass)

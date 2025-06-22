@@ -3,12 +3,12 @@
 import datetime
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.components.wiz.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_FRIENDLY_NAME, CONF_HOST, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components.wiz.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_FRIENDLY_NAME, CONF_HOST, EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from . import (
     FAKE_IP,
@@ -23,7 +23,7 @@ from . import (
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_setup_retry(hass: HomeAssistant) -> None:
+async def test_setup_retry(hass: SmartHub) -> None:
     """Test setup is retried on error."""
     bulb = _mocked_wizlight(None, None, FAKE_SOCKET)
     bulb.getMac = AsyncMock(side_effect=OSError)
@@ -38,7 +38,7 @@ async def test_setup_retry(hass: HomeAssistant) -> None:
     assert entry.state is ConfigEntryState.LOADED
 
 
-async def test_cleanup_on_shutdown(hass: HomeAssistant) -> None:
+async def test_cleanup_on_shutdown(hass: SmartHub) -> None:
     """Test the socket is cleaned up on shutdown."""
     bulb = _mocked_wizlight(None, None, FAKE_SOCKET)
     _, entry = await async_setup_integration(hass, wizlight=bulb)
@@ -48,7 +48,7 @@ async def test_cleanup_on_shutdown(hass: HomeAssistant) -> None:
     bulb.async_close.assert_called_once()
 
 
-async def test_cleanup_on_failed_first_update(hass: HomeAssistant) -> None:
+async def test_cleanup_on_failed_first_update(hass: SmartHub) -> None:
     """Test the socket is cleaned up on failed first update."""
     bulb = _mocked_wizlight(None, None, FAKE_SOCKET)
     bulb.updateState = AsyncMock(side_effect=OSError)
@@ -59,7 +59,7 @@ async def test_cleanup_on_failed_first_update(hass: HomeAssistant) -> None:
     )
     entry.add_to_hass(hass)
     with (
-        patch("homeassistant.components.wiz.discovery.find_wizlights", return_value=[]),
+        patch("smarthub.components.wiz.discovery.find_wizlights", return_value=[]),
         _patch_wizlight(device=bulb),
     ):
         await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -68,7 +68,7 @@ async def test_cleanup_on_failed_first_update(hass: HomeAssistant) -> None:
     bulb.async_close.assert_called_once()
 
 
-async def test_wrong_device_now_has_our_ip(hass: HomeAssistant) -> None:
+async def test_wrong_device_now_has_our_ip(hass: SmartHub) -> None:
     """Test setup is retried when the wrong device is found."""
     bulb = _mocked_wizlight(None, None, FAKE_SOCKET)
     bulb.mac = "dddddddddddd"
@@ -77,7 +77,7 @@ async def test_wrong_device_now_has_our_ip(hass: HomeAssistant) -> None:
     await hass.async_block_till_done(wait_background_tasks=True)
 
 
-async def test_reload_on_title_change(hass: HomeAssistant) -> None:
+async def test_reload_on_title_change(hass: SmartHub) -> None:
     """Test the integration gets reloaded when the title is updated."""
     bulb = _mocked_wizlight(None, None, FAKE_SOCKET)
     _, entry = await async_setup_integration(hass, wizlight=bulb)

@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.todoist.const import DOMAIN
-from homeassistant.const import CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.todoist.const import DOMAIN
+from smarthub.const import CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import TOKEN
 
@@ -22,13 +22,13 @@ async def patch_api(
 ) -> None:
     """Mock setup of the todoist integration."""
     with patch(
-        "homeassistant.components.todoist.config_flow.TodoistAPIAsync", return_value=api
+        "smarthub.components.todoist.config_flow.TodoistAPIAsync", return_value=api
     ):
         yield
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
 ) -> None:
     """Test we get the form."""
@@ -55,7 +55,7 @@ async def test_form(
 
 
 @pytest.mark.parametrize("todoist_api_status", [HTTPStatus.UNAUTHORIZED])
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -73,7 +73,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("todoist_api_status", [HTTPStatus.INTERNAL_SERVER_ERROR])
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -91,7 +91,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("todoist_api_status", [HTTPStatus.UNAUTHORIZED])
-async def test_unknown_error(hass: HomeAssistant, api: AsyncMock) -> None:
+async def test_unknown_error(hass: SmartHub, api: AsyncMock) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -110,7 +110,7 @@ async def test_unknown_error(hass: HomeAssistant, api: AsyncMock) -> None:
     assert result2.get("errors") == {"base": "unknown"}
 
 
-async def test_already_configured(hass: HomeAssistant, setup_integration: None) -> None:
+async def test_already_configured(hass: SmartHub, setup_integration: None) -> None:
     """Test that only a single instance can be configured."""
 
     entries = hass.config_entries.async_entries(DOMAIN)

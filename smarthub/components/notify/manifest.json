@@ -1,0 +1,9 @@
+{
+  "domain": "notify",
+  "name": "Notifications",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["repairs"],
+  "documentation": "https://www.smart-hub.io/integrations/notify",
+  "integration_type": "entity",
+  "quality_scale": "internal"
+}

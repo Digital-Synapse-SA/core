@@ -4,19 +4,19 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from homeassistant.components import lifx
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import (
+from smarthub.components import lifx
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_HOST,
     SIGNAL_STRENGTH_DECIBELS,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -33,7 +33,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_rssi_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test LIFX RSSI sensor entity."""
 
@@ -89,7 +89,7 @@ async def test_rssi_sensor(
 
 
 async def test_rssi_sensor_old_firmware(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test LIFX RSSI sensor entity."""
 

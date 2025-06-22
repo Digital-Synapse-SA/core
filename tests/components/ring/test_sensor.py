@@ -8,13 +8,13 @@ import pytest
 from ring_doorbell import Ring
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ring.const import DOMAIN, SCAN_INTERVAL
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.ring.const import DOMAIN, SCAN_INTERVAL
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import MockConfigEntry, async_check_entity_translations, setup_platform
 from .device_mocks import (
@@ -30,7 +30,7 @@ from tests.common import async_fire_time_changed, snapshot_platform
 
 @pytest.fixture
 def create_deprecated_and_disabled_sensor_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ):
@@ -72,7 +72,7 @@ def create_deprecated_and_disabled_sensor_entities(
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -108,7 +108,7 @@ async def test_states(
     ],
 )
 async def test_health_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     freezer: FrozenDateTimeFactory,
     entity_registry: er.EntityRegistry,
@@ -173,7 +173,7 @@ async def test_health_sensor(
     ],
 )
 async def test_history_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Ring,
     mock_config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -197,7 +197,7 @@ async def test_history_sensor(
         suggested_object_id=f"{device_name}_{sensor_name}",
         config_entry=mock_config_entry,
     )
-    with patch("homeassistant.components.ring.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.ring.PLATFORMS", [Platform.SENSOR]):
         assert await async_setup_component(hass, DOMAIN, {})
 
     entity_id = f"sensor.{device_name}_{sensor_name}"
@@ -214,7 +214,7 @@ async def test_history_sensor(
 
 
 async def test_only_chime_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     mock_ring_devices,
     freezer: FrozenDateTimeFactory,

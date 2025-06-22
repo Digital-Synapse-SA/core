@@ -8,15 +8,15 @@ from pypck.lcn_defs import Var, VarValue
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import automation, script
-from homeassistant.components.automation import automations_with_entity
-from homeassistant.components.lcn import DOMAIN
-from homeassistant.components.lcn.helpers import get_device_connection
-from homeassistant.components.script import scripts_with_entity
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation, script
+from smarthub.components.automation import automations_with_entity
+from smarthub.components.lcn import DOMAIN
+from smarthub.components.lcn.helpers import get_device_connection
+from smarthub.components.script import scripts_with_entity
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import entity_registry as er, issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from .conftest import MockConfigEntry, init_integration
 
@@ -28,20 +28,20 @@ BINARY_SENSOR_KEYLOCK = "binary_sensor.testmodule_sensor_keylock"
 
 
 async def test_setup_lcn_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the setup of binary sensor."""
-    with patch("homeassistant.components.lcn.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.lcn.PLATFORMS", [Platform.BINARY_SENSOR]):
         await init_integration(hass, entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
 async def test_pushed_lock_setpoint_status_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
 ) -> None:
     """Test the lock setpoint sensor changes its state on status received."""
@@ -70,7 +70,7 @@ async def test_pushed_lock_setpoint_status_change(
 
 
 async def test_pushed_binsensor_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the binary port sensor changes its state on status received."""
     await init_integration(hass, entry)
@@ -100,7 +100,7 @@ async def test_pushed_binsensor_status_change(
 
 
 async def test_pushed_keylock_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the keylock sensor changes its state on status received."""
     await init_integration(hass, entry)
@@ -129,7 +129,7 @@ async def test_pushed_keylock_status_change(
     assert state.state == STATE_ON
 
 
-async def test_unload_config_entry(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_unload_config_entry(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the binary sensor is removed when the config entry is unloaded."""
     await init_integration(hass, entry)
 
@@ -147,7 +147,7 @@ async def test_unload_config_entry(hass: HomeAssistant, entry: MockConfigEntry) 
     ],
 )
 async def test_create_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     issue_registry: ir.IssueRegistry,
     entry: MockConfigEntry,

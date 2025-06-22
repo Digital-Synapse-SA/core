@@ -4,9 +4,9 @@ from http import HTTPStatus
 
 import requests_mock
 
-from homeassistant.components.notify import DOMAIN as NOTIFY_DOMAIN
-from homeassistant.components.pushbullet.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.notify import DOMAIN as NOTIFY_DOMAIN
+from smarthub.components.pushbullet.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import MOCK_CONFIG
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_pushbullet_push_default(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test pushbullet push to default target."""
     requests_mock.register_uri(
@@ -42,7 +42,7 @@ async def test_pushbullet_push_default(
 
 
 async def test_pushbullet_push_device(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test pushbullet push to default target."""
     requests_mock.register_uri(
@@ -77,7 +77,7 @@ async def test_pushbullet_push_device(
 
 
 async def test_pushbullet_push_devices(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test pushbullet push to default target."""
     requests_mock.register_uri(
@@ -119,7 +119,7 @@ async def test_pushbullet_push_devices(
 
 
 async def test_pushbullet_push_email(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test pushbullet push to default target."""
     requests_mock.register_uri(
@@ -154,7 +154,7 @@ async def test_pushbullet_push_email(
 
 
 async def test_pushbullet_push_mixed(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test pushbullet push to default target."""
     requests_mock.register_uri(

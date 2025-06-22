@@ -4,11 +4,11 @@ from unittest.mock import AsyncMock, patch
 
 from pytautulli import exceptions
 
-from homeassistant.components.tautulli.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_SOURCE, CONF_URL, CONF_VERIFY_SSL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.tautulli.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_SOURCE, CONF_URL, CONF_VERIFY_SSL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import CONF_DATA, NAME, patch_config_flow_tautulli, setup_integration
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
-async def test_flow_user(hass: HomeAssistant) -> None:
+async def test_flow_user(hass: SmartHub) -> None:
     """Test user initiated flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={CONF_SOURCE: SOURCE_USER}
@@ -37,7 +37,7 @@ async def test_flow_user(hass: HomeAssistant) -> None:
     assert result2["data"] == CONF_DATA
 
 
-async def test_flow_user_cannot_connect(hass: HomeAssistant) -> None:
+async def test_flow_user_cannot_connect(hass: SmartHub) -> None:
     """Test user initialized flow with unreachable server."""
     with patch_config_flow_tautulli(AsyncMock()) as tautullimock:
         tautullimock.side_effect = exceptions.PyTautulliConnectionException
@@ -60,7 +60,7 @@ async def test_flow_user_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["data"] == CONF_DATA
 
 
-async def test_flow_user_invalid_auth(hass: HomeAssistant) -> None:
+async def test_flow_user_invalid_auth(hass: SmartHub) -> None:
     """Test user initialized flow with invalid authentication."""
     with patch_config_flow_tautulli(AsyncMock()) as tautullimock:
         tautullimock.side_effect = exceptions.PyTautulliAuthenticationException
@@ -83,7 +83,7 @@ async def test_flow_user_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["data"] == CONF_DATA
 
 
-async def test_flow_user_unknown_error(hass: HomeAssistant) -> None:
+async def test_flow_user_unknown_error(hass: SmartHub) -> None:
     """Test user initialized flow with unreachable server."""
     with patch_config_flow_tautulli(AsyncMock()) as tautullimock:
         tautullimock.side_effect = exceptions.PyTautulliException
@@ -106,7 +106,7 @@ async def test_flow_user_unknown_error(hass: HomeAssistant) -> None:
     assert result2["data"] == CONF_DATA
 
 
-async def test_flow_user_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_user_already_configured(hass: SmartHub) -> None:
     """Test user step already configured."""
     entry = MockConfigEntry(domain=DOMAIN, data=CONF_DATA)
     entry.add_to_hass(hass)
@@ -121,7 +121,7 @@ async def test_flow_user_already_configured(hass: HomeAssistant) -> None:
         assert result["reason"] == "already_configured"
 
 
-async def test_flow_user_multiple_entries_allowed(hass: HomeAssistant) -> None:
+async def test_flow_user_multiple_entries_allowed(hass: SmartHub) -> None:
     """Test user step can configure multiple entries."""
     entry = MockConfigEntry(domain=DOMAIN, data=CONF_DATA)
     entry.add_to_hass(hass)
@@ -151,10 +151,10 @@ async def test_flow_user_multiple_entries_allowed(hass: HomeAssistant) -> None:
 
 
 async def test_flow_reauth(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test reauth flow."""
-    with patch("homeassistant.components.tautulli.PLATFORMS", []):
+    with patch("smarthub.components.tautulli.PLATFORMS", []):
         entry = await setup_integration(hass, aioclient_mock)
     result = await entry.start_reauth_flow(hass)
     assert result["type"] is FlowResultType.FORM
@@ -165,7 +165,7 @@ async def test_flow_reauth(
     CONF_DATA[CONF_API_KEY] = "efgh"
     with (
         patch_config_flow_tautulli(AsyncMock()),
-        patch("homeassistant.components.tautulli.async_setup_entry") as mock_entry,
+        patch("smarthub.components.tautulli.async_setup_entry") as mock_entry,
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -180,10 +180,10 @@ async def test_flow_reauth(
 
 
 async def test_flow_reauth_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test reauth flow with invalid authentication."""
-    with patch("homeassistant.components.tautulli.PLATFORMS", []):
+    with patch("smarthub.components.tautulli.PLATFORMS", []):
         entry = await setup_integration(hass, aioclient_mock)
     result = await entry.start_reauth_flow(hass)
     with patch_config_flow_tautulli(AsyncMock()) as tautullimock:

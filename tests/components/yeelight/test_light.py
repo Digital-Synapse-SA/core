@@ -21,7 +21,7 @@ from yeelight import (
 from yeelight.flow import Action, Flow
 from yeelight.main import _MODEL_SPECS
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_BRIGHTNESS_PCT,
     ATTR_COLOR_TEMP_KELVIN,
@@ -37,7 +37,7 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntityFeature,
 )
-from homeassistant.components.yeelight.const import (
+from smarthub.components.yeelight.const import (
     ATTR_COUNT,
     ATTR_MODE_MUSIC,
     ATTR_TRANSITIONS,
@@ -57,7 +57,7 @@ from homeassistant.components.yeelight.const import (
     YEELIGHT_SLEEP_TRANSACTION,
     YEELIGHT_TEMPERATURE_TRANSACTION,
 )
-from homeassistant.components.yeelight.light import (
+from smarthub.components.yeelight.light import (
     ATTR_KELVIN,
     ATTR_MINUTES,
     ATTR_MODE,
@@ -88,7 +88,7 @@ from homeassistant.components.yeelight.light import (
     YEELIGHT_MONO_EFFECT_LIST,
     YEELIGHT_TEMP_ONLY_EFFECT_LIST,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_HOST,
     CONF_NAME,
@@ -96,12 +96,12 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.color import (
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.color import (
     color_hs_to_RGB,
     color_hs_to_xy,
     color_RGB_to_hs,
@@ -138,9 +138,9 @@ SUPPORT_YEELIGHT = (
 )
 
 
-async def test_services(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_services(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test Yeelight services."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data={
@@ -170,7 +170,7 @@ async def test_services(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -
         method,
         payload=None,
         domain=DOMAIN,
-        failure_side_effect=HomeAssistantError,
+        failure_side_effect=SmartHubError,
     ):
         err_count = len([x for x in caplog.records if x.levelno == logging.ERROR])
 
@@ -488,7 +488,7 @@ async def test_services(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -
     mocked_bulb.last_properties["power"] = "off"
     mocked_bulb.available = True
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: ENTITY_LIGHT},
         blocking=True,
@@ -497,7 +497,7 @@ async def test_services(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -
 
     mocked_bulb.async_turn_on = AsyncMock()
     mocked_bulb.async_set_brightness = AsyncMock(side_effect=BulbException)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "light",
             SERVICE_TURN_ON,
@@ -507,7 +507,7 @@ async def test_services(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -
     assert hass.states.get(ENTITY_LIGHT).state == STATE_OFF
 
     mocked_bulb.async_set_brightness = AsyncMock(side_effect=TimeoutError)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "light",
             SERVICE_TURN_ON,
@@ -517,7 +517,7 @@ async def test_services(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -
     assert hass.states.get(ENTITY_LIGHT).state == STATE_OFF
 
     mocked_bulb.async_set_brightness = AsyncMock(side_effect=socket.error)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "light",
             SERVICE_TURN_ON,
@@ -528,10 +528,10 @@ async def test_services(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -
 
 
 async def test_update_errors(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test update errors."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data={
@@ -558,7 +558,7 @@ async def test_update_errors(
     # Timeout usually means the bulb is overloaded with commands
     # but will still respond eventually.
     mocked_bulb.async_turn_off = AsyncMock(side_effect=TimeoutError)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "light",
             SERVICE_TURN_OFF,
@@ -571,7 +571,7 @@ async def test_update_errors(
     # or lost wifi, then came back online and forced the existing
     # connection closed with a TCP RST
     mocked_bulb.async_turn_off = AsyncMock(side_effect=socket.error)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "light",
             SERVICE_TURN_OFF,
@@ -581,7 +581,7 @@ async def test_update_errors(
     assert hass.states.get(ENTITY_LIGHT).state == STATE_UNAVAILABLE
 
 
-async def test_state_already_set_avoid_ratelimit(hass: HomeAssistant) -> None:
+async def test_state_already_set_avoid_ratelimit(hass: SmartHub) -> None:
     """Ensure we suppress state changes that will increase the rate limit when there is no change."""
     mocked_bulb = _mocked_bulb()
     properties = {**PROPERTIES}
@@ -776,7 +776,7 @@ async def test_state_already_set_avoid_ratelimit(hass: HomeAssistant) -> None:
 
 
 async def test_device_types(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -1362,7 +1362,7 @@ async def test_device_types(
     )
 
 
-async def test_effects(hass: HomeAssistant) -> None:
+async def test_effects(hass: SmartHub) -> None:
     """Test effects."""
     assert await async_setup_component(
         hass,
@@ -1537,7 +1537,7 @@ async def test_effects(hass: HomeAssistant) -> None:
     await _async_test_effect("not_existed", called=False)
 
 
-async def test_ambilight_with_nightlight_disabled(hass: HomeAssistant) -> None:
+async def test_ambilight_with_nightlight_disabled(hass: SmartHub) -> None:
     """Test that main light on ambilights with the nightlight disabled shows the correct brightness."""
     mocked_bulb = _mocked_bulb()
     properties = {**PROPERTIES}
@@ -1572,7 +1572,7 @@ async def test_ambilight_with_nightlight_disabled(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_BRIGHTNESS] == 128
 
 
-async def test_state_fails_to_update_triggers_update(hass: HomeAssistant) -> None:
+async def test_state_fails_to_update_triggers_update(hass: SmartHub) -> None:
     """Ensure we call async_get_properties if the turn on/off fails to update the state."""
     mocked_bulb = _mocked_bulb()
     properties = {**PROPERTIES}

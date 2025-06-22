@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.mcp_server.const import DOMAIN
-from homeassistant.const import CONF_LLM_HASS_API
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import llm
+from smarthub.components.mcp_server.const import DOMAIN
+from smarthub.const import CONF_LLM_HASS_API
+from smarthub.core import SmartHub
+from smarthub.helpers import llm
 
 from tests.common import MockConfigEntry
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.mcp_server.async_setup_entry", return_value=True
+        "smarthub.components.mcp_server.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -29,7 +29,7 @@ def llm_hass_api_fixture() -> str:
 
 
 @pytest.fixture(name="config_entry")
-def mock_config_entry(hass: HomeAssistant, llm_hass_api: str) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub, llm_hass_api: str) -> MockConfigEntry:
     """Fixture to load the integration."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

@@ -10,27 +10,27 @@ from dynalite_devices_lib.dynalite_devices import (
     DynaliteNotification,
 )
 
-from homeassistant.components import dynalite
-from homeassistant.components.dynalite.const import (
+from smarthub.components import dynalite
+from smarthub.components.dynalite.const import (
     ATTR_AREA,
     ATTR_HOST,
     ATTR_PACKET,
     ATTR_PRESET,
 )
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.helpers.dispatcher import async_dispatcher_connect
 
 from tests.common import MockConfigEntry
 
 
-async def test_update_device(hass: HomeAssistant) -> None:
+async def test_update_device(hass: SmartHub) -> None:
     """Test that update works."""
     host = "1.2.3.4"
     entry = MockConfigEntry(domain=dynalite.DOMAIN, data={CONF_HOST: host})
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.dynalite.bridge.DynaliteDevices"
+        "smarthub.components.dynalite.bridge.DynaliteDevices"
     ) as mock_dyn_dev:
         mock_dyn_dev().async_setup = AsyncMock(return_value=True)
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -54,13 +54,13 @@ async def test_update_device(hass: HomeAssistant) -> None:
     specific_func.assert_called_once()
 
 
-async def test_add_devices_then_register(hass: HomeAssistant) -> None:
+async def test_add_devices_then_register(hass: SmartHub) -> None:
     """Test that add_devices work."""
     host = "1.2.3.4"
     entry = MockConfigEntry(domain=dynalite.DOMAIN, data={CONF_HOST: host})
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.dynalite.bridge.DynaliteDevices"
+        "smarthub.components.dynalite.bridge.DynaliteDevices"
     ) as mock_dyn_dev:
         mock_dyn_dev().async_setup = AsyncMock(return_value=True)
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -89,13 +89,13 @@ async def test_add_devices_then_register(hass: HomeAssistant) -> None:
     assert hass.states.get("switch.name3")
 
 
-async def test_register_then_add_devices(hass: HomeAssistant) -> None:
+async def test_register_then_add_devices(hass: SmartHub) -> None:
     """Test that add_devices work after register_add_entities."""
     host = "1.2.3.4"
     entry = MockConfigEntry(domain=dynalite.DOMAIN, data={CONF_HOST: host})
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.dynalite.bridge.DynaliteDevices"
+        "smarthub.components.dynalite.bridge.DynaliteDevices"
     ) as mock_dyn_dev:
         mock_dyn_dev().async_setup = AsyncMock(return_value=True)
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -118,13 +118,13 @@ async def test_register_then_add_devices(hass: HomeAssistant) -> None:
     assert hass.states.get("switch.name2")
 
 
-async def test_notifications(hass: HomeAssistant) -> None:
+async def test_notifications(hass: SmartHub) -> None:
     """Test that update works."""
     host = "1.2.3.4"
     entry = MockConfigEntry(domain=dynalite.DOMAIN, data={CONF_HOST: host})
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.dynalite.bridge.DynaliteDevices"
+        "smarthub.components.dynalite.bridge.DynaliteDevices"
     ) as mock_dyn_dev:
         mock_dyn_dev().async_setup = AsyncMock(return_value=True)
         assert await hass.config_entries.async_setup(entry.entry_id)

@@ -16,14 +16,14 @@ from amberelectric.models.spike_status import SpikeStatus
 from dateutil import parser
 import pytest
 
-from homeassistant.components.amberelectric.const import CONF_SITE_ID, CONF_SITE_NAME
-from homeassistant.components.amberelectric.coordinator import (
+from smarthub.components.amberelectric.const import CONF_SITE_ID, CONF_SITE_NAME
+from smarthub.components.amberelectric.coordinator import (
     AmberUpdateCoordinator,
     normalize_descriptor,
 )
-from homeassistant.const import CONF_API_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import UpdateFailed
+from smarthub.const import CONF_API_TOKEN
+from smarthub.core import SmartHub
+from smarthub.helpers.update_coordinator import UpdateFailed
 
 from .helpers import (
     CONTROLLED_LOAD_CHANNEL,
@@ -110,7 +110,7 @@ def test_normalize_descriptor() -> None:
     assert normalize_descriptor(PriceDescriptor.SPIKE) == "spike"
 
 
-async def test_fetch_general_site(hass: HomeAssistant, current_price_api: Mock) -> None:
+async def test_fetch_general_site(hass: SmartHub, current_price_api: Mock) -> None:
     """Test fetching a site with only a general channel."""
 
     current_price_api.get_current_prices.return_value = GENERAL_CHANNEL
@@ -140,7 +140,7 @@ async def test_fetch_general_site(hass: HomeAssistant, current_price_api: Mock) 
 
 
 async def test_fetch_no_general_site(
-    hass: HomeAssistant, current_price_api: Mock
+    hass: SmartHub, current_price_api: Mock
 ) -> None:
     """Test fetching a site with no general channel."""
 
@@ -156,7 +156,7 @@ async def test_fetch_no_general_site(
     )
 
 
-async def test_fetch_api_error(hass: HomeAssistant, current_price_api: Mock) -> None:
+async def test_fetch_api_error(hass: SmartHub, current_price_api: Mock) -> None:
     """Test that the old values are maintained if a second call fails."""
 
     current_price_api.get_current_prices.return_value = GENERAL_CHANNEL
@@ -204,7 +204,7 @@ async def test_fetch_api_error(hass: HomeAssistant, current_price_api: Mock) -> 
 
 
 async def test_fetch_general_and_controlled_load_site(
-    hass: HomeAssistant, current_price_api: Mock
+    hass: SmartHub, current_price_api: Mock
 ) -> None:
     """Test fetching a site with a general and controlled load channel."""
 
@@ -244,7 +244,7 @@ async def test_fetch_general_and_controlled_load_site(
 
 
 async def test_fetch_general_and_feed_in_site(
-    hass: HomeAssistant, current_price_api: Mock
+    hass: SmartHub, current_price_api: Mock
 ) -> None:
     """Test fetching a site with a general and feed_in channel."""
 
@@ -281,7 +281,7 @@ async def test_fetch_general_and_feed_in_site(
 
 
 async def test_fetch_potential_spike(
-    hass: HomeAssistant, current_price_api: Mock
+    hass: SmartHub, current_price_api: Mock
 ) -> None:
     """Test fetching a site with only a general channel."""
 
@@ -299,7 +299,7 @@ async def test_fetch_potential_spike(
     assert result["grid"]["price_spike"] == "potential"
 
 
-async def test_fetch_spike(hass: HomeAssistant, current_price_api: Mock) -> None:
+async def test_fetch_spike(hass: SmartHub, current_price_api: Mock) -> None:
     """Test fetching a site with only a general channel."""
 
     general_channel: list[Interval] = [

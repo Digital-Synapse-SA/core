@@ -4,21 +4,21 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.somfy_mylink.const import (
+from smarthub import config_entries
+from smarthub.components.somfy_mylink.const import (
     CONF_REVERSED_TARGET_IDS,
     CONF_SYSTEM_ID,
     DOMAIN,
 )
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from tests.common import MockConfigEntry
 
 
-async def test_form_user(hass: HomeAssistant) -> None:
+async def test_form_user(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -29,11 +29,11 @@ async def test_form_user(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
+            "smarthub.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
             return_value={"any": "data"},
         ),
         patch(
-            "homeassistant.components.somfy_mylink.async_setup_entry",
+            "smarthub.components.somfy_mylink.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -57,7 +57,7 @@ async def test_form_user(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_user_already_configured(hass: HomeAssistant) -> None:
+async def test_form_user_already_configured(hass: SmartHub) -> None:
     """Test we abort if already configured."""
 
     config_entry = MockConfigEntry(
@@ -73,11 +73,11 @@ async def test_form_user_already_configured(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
+            "smarthub.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
             return_value={"any": "data"},
         ),
         patch(
-            "homeassistant.components.somfy_mylink.async_setup_entry",
+            "smarthub.components.somfy_mylink.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -95,14 +95,14 @@ async def test_form_user_already_configured(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
+        "smarthub.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
         return_value={
             "jsonrpc": "2.0",
             "error": {"code": -32652, "message": "Invalid auth"},
@@ -122,14 +122,14 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
+        "smarthub.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
         side_effect=TimeoutError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -145,14 +145,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_unknown_error(hass: HomeAssistant) -> None:
+async def test_form_unknown_error(hass: SmartHub) -> None:
     """Test we handle broad exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
+        "smarthub.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
         side_effect=ValueError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -168,7 +168,7 @@ async def test_form_unknown_error(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_options_not_loaded(hass: HomeAssistant) -> None:
+async def test_options_not_loaded(hass: SmartHub) -> None:
     """Test options will not display until loaded."""
 
     config_entry = MockConfigEntry(
@@ -178,7 +178,7 @@ async def test_options_not_loaded(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.somfy_mylink.SomfyMyLinkSynergy.status_info",
+        "smarthub.components.somfy_mylink.SomfyMyLinkSynergy.status_info",
         return_value={"result": []},
     ):
         result = await hass.config_entries.options.async_init(config_entry.entry_id)
@@ -187,7 +187,7 @@ async def test_options_not_loaded(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("reversed", [True, False])
-async def test_options_with_targets(hass: HomeAssistant, reversed) -> None:
+async def test_options_with_targets(hass: SmartHub, reversed) -> None:
     """Test we can configure reverse for a target."""
 
     config_entry = MockConfigEntry(
@@ -197,7 +197,7 @@ async def test_options_with_targets(hass: HomeAssistant, reversed) -> None:
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.somfy_mylink.SomfyMyLinkSynergy.status_info",
+        "smarthub.components.somfy_mylink.SomfyMyLinkSynergy.status_info",
         return_value={
             "result": [
                 {
@@ -241,7 +241,7 @@ async def test_options_with_targets(hass: HomeAssistant, reversed) -> None:
         await hass.async_block_till_done()
 
 
-async def test_form_user_already_configured_from_dhcp(hass: HomeAssistant) -> None:
+async def test_form_user_already_configured_from_dhcp(hass: SmartHub) -> None:
     """Test we abort if already configured from dhcp."""
 
     config_entry = MockConfigEntry(
@@ -252,11 +252,11 @@ async def test_form_user_already_configured_from_dhcp(hass: HomeAssistant) -> No
 
     with (
         patch(
-            "homeassistant.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
+            "smarthub.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
             return_value={"any": "data"},
         ),
         patch(
-            "homeassistant.components.somfy_mylink.async_setup_entry",
+            "smarthub.components.somfy_mylink.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -276,7 +276,7 @@ async def test_form_user_already_configured_from_dhcp(hass: HomeAssistant) -> No
     assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_already_configured_with_ignored(hass: HomeAssistant) -> None:
+async def test_already_configured_with_ignored(hass: SmartHub) -> None:
     """Test ignored entries do not break checking for existing entries."""
 
     config_entry = MockConfigEntry(
@@ -296,7 +296,7 @@ async def test_already_configured_with_ignored(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
 
 
-async def test_dhcp_discovery(hass: HomeAssistant) -> None:
+async def test_dhcp_discovery(hass: SmartHub) -> None:
     """Test we can process the discovery from dhcp."""
 
     result = await hass.config_entries.flow.async_init(
@@ -313,11 +313,11 @@ async def test_dhcp_discovery(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
+            "smarthub.components.somfy_mylink.config_flow.SomfyMyLinkSynergy.status_info",
             return_value={"any": "data"},
         ),
         patch(
-            "homeassistant.components.somfy_mylink.async_setup_entry",
+            "smarthub.components.somfy_mylink.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):

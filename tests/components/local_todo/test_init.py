@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .conftest import TEST_ENTITY
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload(
-    hass: HomeAssistant, setup_integration: None, config_entry: MockConfigEntry
+    hass: SmartHub, setup_integration: None, config_entry: MockConfigEntry
 ) -> None:
     """Test loading and unloading a config entry."""
 
@@ -33,11 +33,11 @@ async def test_load_unload(
 
 
 async def test_remove_config_entry(
-    hass: HomeAssistant, setup_integration: None, config_entry: MockConfigEntry
+    hass: SmartHub, setup_integration: None, config_entry: MockConfigEntry
 ) -> None:
     """Test removing a config entry."""
 
-    with patch("homeassistant.components.local_todo.Path.unlink") as unlink_mock:
+    with patch("smarthub.components.local_todo.Path.unlink") as unlink_mock:
         assert await hass.config_entries.async_remove(config_entry.entry_id)
         await hass.async_block_till_done()
         unlink_mock.assert_called_once()
@@ -50,7 +50,7 @@ async def test_remove_config_entry(
     ],
 )
 async def test_load_failure(
-    hass: HomeAssistant, setup_integration: None, config_entry: MockConfigEntry
+    hass: SmartHub, setup_integration: None, config_entry: MockConfigEntry
 ) -> None:
     """Test failures loading the todo store."""
 

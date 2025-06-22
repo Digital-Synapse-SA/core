@@ -6,13 +6,13 @@ from unittest.mock import patch
 import pytest
 from voluptuous import Invalid
 
-from homeassistant import config_entries
-from homeassistant.components.random import async_setup_entry
-from homeassistant.components.random.const import DOMAIN
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import UnitOfEnergy, UnitOfPower
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.random import async_setup_entry
+from smarthub.components.random.const import DOMAIN
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import UnitOfEnergy, UnitOfPower
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -50,7 +50,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_type: str,
     extra_input: dict[str, Any],
     extra_options: dict[str, Any],
@@ -71,7 +71,7 @@ async def test_config_flow(
     assert result["step_id"] == entity_type
 
     with patch(
-        "homeassistant.components.random.async_setup_entry", wraps=async_setup_entry
+        "smarthub.components.random.async_setup_entry", wraps=async_setup_entry
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -101,7 +101,7 @@ async def test_config_flow(
     ],
 )
 async def test_wrong_uom(
-    hass: HomeAssistant, device_class: SensorDeviceClass, unit_of_measurement: str
+    hass: SmartHub, device_class: SensorDeviceClass, unit_of_measurement: str
 ) -> None:
     """Test entering a wrong unit of measurement."""
 
@@ -154,7 +154,7 @@ async def test_wrong_uom(
     ],
 )
 async def test_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_type: str,
     extra_options,
     options_options,

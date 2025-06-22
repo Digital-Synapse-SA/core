@@ -2,9 +2,9 @@
 
 from freezegun import freeze_time
 
-from homeassistant.components.ai_task import async_generate_text
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.ai_task import async_generate_text
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .conftest import TEST_ENTITY_ID, MockAITaskEntity
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 @freeze_time("2025-06-08 16:28:13")
 async def test_state_generate_text(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: None,
     mock_config_entry: MockConfigEntry,
     mock_ai_task_entity: MockAITaskEntity,

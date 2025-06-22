@@ -1,4 +1,4 @@
-"""Test the Home Assistant Hardware silabs multiprotocol addon manager."""
+"""Test the SmartHub Hardware silabs multiprotocol addon manager."""
 
 from __future__ import annotations
 
@@ -10,15 +10,15 @@ from aiohasupervisor import SupervisorError
 from aiohasupervisor.models import AddonsOptions
 import pytest
 
-from homeassistant.components.hassio import AddonError, AddonInfo, AddonState, HassIO
-from homeassistant.components.homeassistant_hardware import silabs_multiprotocol_addon
-from homeassistant.components.zha import DOMAIN as ZHA_DOMAIN
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import EVENT_COMPONENT_LOADED
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import ATTR_COMPONENT
+from smarthub.components.hassio import AddonError, AddonInfo, AddonState, HassIO
+from smarthub.components.smarthub_hardware import silabs_multiprotocol_addon
+from smarthub.components.zha import DOMAIN as ZHA_DOMAIN
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import EVENT_COMPONENT_LOADED
+from smarthub.core import SmartHub, callback
+from smarthub.data_entry_flow import FlowResult, FlowResultType
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import ATTR_COMPONENT
 
 from tests.common import (
     MockConfigEntry,
@@ -101,7 +101,7 @@ class FakeOptionsFlow(silabs_multiprotocol_addon.OptionsFlowHandler):
 
 @pytest.fixture(autouse=True)
 def config_flow_handler(
-    hass: HomeAssistant, current_request_with_host: None
+    hass: SmartHub, current_request_with_host: None
 ) -> Generator[None]:
     """Fixture for a test config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
@@ -113,13 +113,13 @@ def config_flow_handler(
 def options_flow_poll_addon_state() -> Generator[None]:
     """Fixture for patching options flow addon state polling."""
     with patch(
-        "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.WaitingAddonManager.async_wait_until_addon_state"
+        "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.WaitingAddonManager.async_wait_until_addon_state"
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-def hassio_integration(hass: HomeAssistant) -> Generator[None]:
+def hassio_integration(hass: SmartHub) -> Generator[None]:
     """Fixture to mock the `hassio` integration."""
     mock_component(hass, "hassio")
     hass.data["hassio"] = Mock(spec_set=HassIO)
@@ -137,23 +137,23 @@ class MockMultiprotocolPlatform(MockPlatform):
         self.change_channel_calls = []
 
     async def async_change_channel(
-        self, hass: HomeAssistant, channel: int, delay: float
+        self, hass: SmartHub, channel: int, delay: float
     ) -> None:
         """Set the channel to be used."""
         self.change_channel_calls.append((channel, delay))
 
-    async def async_get_channel(self, hass: HomeAssistant) -> int | None:
+    async def async_get_channel(self, hass: SmartHub) -> int | None:
         """Return the channel."""
         return self.channel
 
-    async def async_using_multipan(self, hass: HomeAssistant) -> bool:
+    async def async_using_multipan(self, hass: SmartHub) -> bool:
         """Return if the multiprotocol device is used."""
         return self.using_multipan
 
 
 @pytest.fixture
 def mock_multiprotocol_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> Generator[FakeConfigFlow]:
     """Fixture for a test silabs multiprotocol platform."""
     hass.config.components.add(TEST_DOMAIN)
@@ -174,13 +174,13 @@ def get_suggested(schema, key):
 
 
 @patch(
-    "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.ADDON_STATE_POLL_INTERVAL",
+    "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.ADDON_STATE_POLL_INTERVAL",
     0,
 )
 @pytest.mark.usefixtures(
     "addon_store_info", "addon_info", "install_addon", "uninstall_addon"
 )
-async def test_uninstall_addon_waiting(hass: HomeAssistant) -> None:
+async def test_uninstall_addon_waiting(hass: SmartHub) -> None:
     """Test the synchronous addon uninstall helper."""
 
     multipan_manager = await silabs_multiprotocol_addon.get_multiprotocol_addon_manager(
@@ -213,7 +213,7 @@ async def test_uninstall_addon_waiting(hass: HomeAssistant) -> None:
 
 
 async def test_option_flow_install_multi_pan_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_store_info,
     addon_info,
     install_addon,
@@ -272,7 +272,7 @@ async def test_option_flow_install_multi_pan_addon(
 
 
 async def test_option_flow_install_multi_pan_addon_zha(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_store_info,
     addon_info,
     install_addon,
@@ -328,7 +328,7 @@ async def test_option_flow_install_multi_pan_addon_zha(
     )
     assert multipan_manager._channel is None
     with patch(
-        "homeassistant.components.zha.silabs_multiprotocol.async_get_channel",
+        "smarthub.components.zha.silabs_multiprotocol.async_get_channel",
         return_value=11,
     ):
         result = await hass.config_entries.options.async_configure(result["flow_id"])
@@ -366,7 +366,7 @@ async def test_option_flow_install_multi_pan_addon_zha(
 
 
 async def test_option_flow_install_multi_pan_addon_zha_other_radio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_store_info,
     addon_info,
     install_addon,
@@ -452,7 +452,7 @@ async def test_option_flow_install_multi_pan_addon_zha_other_radio(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_option_flow_non_hassio(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test installing the multi pan addon on a Core installation, without hassio."""
     # Setup the config entry
@@ -465,7 +465,7 @@ async def test_option_flow_non_hassio(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.is_hassio",
+        "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.is_hassio",
         return_value=False,
     ):
         result = await hass.config_entries.options.async_init(config_entry.entry_id)
@@ -475,7 +475,7 @@ async def test_option_flow_non_hassio(
 
 
 async def test_option_flow_addon_installed_other_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_store_info,
     addon_installed,
 ) -> None:
@@ -502,7 +502,7 @@ async def test_option_flow_addon_installed_other_device(
     ("configured_channel", "suggested_channel"), [(None, "15"), (11, "11")]
 )
 async def test_option_flow_addon_installed_same_device_reconfigure_unexpected_users(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     addon_installed,
@@ -562,7 +562,7 @@ async def test_option_flow_addon_installed_same_device_reconfigure_unexpected_us
     ("configured_channel", "suggested_channel"), [(None, "15"), (11, "11")]
 )
 async def test_option_flow_addon_installed_same_device_reconfigure_expected_users(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     addon_installed,
@@ -629,7 +629,7 @@ async def test_option_flow_addon_installed_same_device_reconfigure_expected_user
 
 
 async def test_option_flow_addon_installed_same_device_uninstall(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     addon_installed,
@@ -722,7 +722,7 @@ async def test_option_flow_addon_installed_same_device_uninstall(
 
 
 async def test_option_flow_addon_installed_same_device_do_not_uninstall_multi_pan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     addon_installed,
@@ -765,7 +765,7 @@ async def test_option_flow_addon_installed_same_device_do_not_uninstall_multi_pa
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_option_flow_flasher_already_running_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     addon_installed,
@@ -812,7 +812,7 @@ async def test_option_flow_flasher_already_running_failure(
 
 
 async def test_option_flow_addon_installed_same_device_flasher_already_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     addon_installed,
@@ -877,7 +877,7 @@ async def test_option_flow_addon_installed_same_device_flasher_already_installed
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_option_flow_flasher_install_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     addon_installed,
@@ -944,7 +944,7 @@ async def test_option_flow_flasher_install_failure(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_option_flow_flasher_addon_flash_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     addon_installed,
@@ -1007,12 +1007,12 @@ async def test_option_flow_flasher_addon_flash_failure(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 @patch(
-    "homeassistant.components.zha.radio_manager.ZhaMultiPANMigrationHelper.async_initiate_migration",
+    "smarthub.components.zha.radio_manager.ZhaMultiPANMigrationHelper.async_initiate_migration",
     side_effect=Exception("Boom!"),
 )
 async def test_option_flow_uninstall_migration_initiate_failure(
     mock_initiate_migration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     addon_installed,
@@ -1069,12 +1069,12 @@ async def test_option_flow_uninstall_migration_initiate_failure(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 @patch(
-    "homeassistant.components.zha.radio_manager.ZhaMultiPANMigrationHelper.async_finish_migration",
+    "smarthub.components.zha.radio_manager.ZhaMultiPANMigrationHelper.async_finish_migration",
     side_effect=Exception("Boom!"),
 )
 async def test_option_flow_uninstall_migration_finish_failure(
     mock_finish_migration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     addon_installed,
@@ -1141,7 +1141,7 @@ async def test_option_flow_uninstall_migration_finish_failure(
 
 
 async def test_option_flow_do_not_install_multi_pan_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
 ) -> None:
@@ -1171,7 +1171,7 @@ async def test_option_flow_do_not_install_multi_pan_addon(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_option_flow_install_multi_pan_addon_install_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_store_info,
     addon_info,
     install_addon,
@@ -1215,7 +1215,7 @@ async def test_option_flow_install_multi_pan_addon_install_fails(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_option_flow_install_multi_pan_addon_start_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_store_info,
     addon_info,
     install_addon,
@@ -1277,7 +1277,7 @@ async def test_option_flow_install_multi_pan_addon_start_fails(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_option_flow_install_multi_pan_addon_set_options_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_store_info,
     addon_info,
     install_addon,
@@ -1321,7 +1321,7 @@ async def test_option_flow_install_multi_pan_addon_set_options_fails(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_option_flow_addon_info_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_store_info,
     addon_info,
 ) -> None:
@@ -1345,12 +1345,12 @@ async def test_option_flow_addon_info_fails(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 @patch(
-    "homeassistant.components.zha.radio_manager.ZhaMultiPANMigrationHelper.async_initiate_migration",
+    "smarthub.components.zha.radio_manager.ZhaMultiPANMigrationHelper.async_initiate_migration",
     side_effect=Exception("Boom!"),
 )
 async def test_option_flow_install_multi_pan_addon_zha_migration_fails_step_1(
     mock_initiate_migration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_store_info,
     addon_info,
     install_addon,
@@ -1401,12 +1401,12 @@ async def test_option_flow_install_multi_pan_addon_zha_migration_fails_step_1(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 @patch(
-    "homeassistant.components.zha.radio_manager.ZhaMultiPANMigrationHelper.async_finish_migration",
+    "smarthub.components.zha.radio_manager.ZhaMultiPANMigrationHelper.async_finish_migration",
     side_effect=Exception("Boom!"),
 )
 async def test_option_flow_install_multi_pan_addon_zha_migration_fails_step_2(
     mock_finish_migration,
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_store_info,
     addon_info,
     install_addon,
@@ -1499,7 +1499,7 @@ def test_is_multiprotocol_url() -> None:
     ],
 )
 async def test_import_channel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     initial_multipan_channel: int | None,
     platform_using_multipan: bool,
     platform_channel: int | None,
@@ -1536,7 +1536,7 @@ async def test_import_channel(
     ],
 )
 async def test_change_channel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_multiprotocol_platform: MockMultiprotocolPlatform,
     platform_using_multipan: bool,
     expected_calls: list[int],
@@ -1551,7 +1551,7 @@ async def test_change_channel(
     assert mock_multiprotocol_platform.change_channel_calls == expected_calls
 
 
-async def test_load_preferences(hass: HomeAssistant) -> None:
+async def test_load_preferences(hass: SmartHub) -> None:
     """Make sure that we can load/save data correctly."""
     multipan_manager = await silabs_multiprotocol_addon.get_multiprotocol_addon_manager(
         hass
@@ -1581,7 +1581,7 @@ async def test_load_preferences(hass: HomeAssistant) -> None:
     ],
 )
 async def test_active_plaforms(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multipan_platforms: dict[str, bool],
     active_platforms: list[str],
 ) -> None:
@@ -1605,16 +1605,16 @@ async def test_active_plaforms(
     assert await multipan_manager.async_active_platforms() == active_platforms
 
 
-async def test_check_multi_pan_addon_no_hassio(hass: HomeAssistant) -> None:
+async def test_check_multi_pan_addon_no_hassio(hass: SmartHub) -> None:
     """Test `check_multi_pan_addon` without hassio."""
 
     with (
         patch(
-            "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.is_hassio",
+            "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.is_hassio",
             return_value=False,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.get_multiprotocol_addon_manager",
+            "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.get_multiprotocol_addon_manager",
             autospec=True,
         ) as mock_get_addon_manager,
     ):
@@ -1623,21 +1623,21 @@ async def test_check_multi_pan_addon_no_hassio(hass: HomeAssistant) -> None:
 
 
 async def test_check_multi_pan_addon_info_error(
-    hass: HomeAssistant, addon_store_info
+    hass: SmartHub, addon_store_info
 ) -> None:
     """Test `check_multi_pan_addon` where the addon info cannot be read."""
 
     addon_store_info.side_effect = SupervisorError("Boom")
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await silabs_multiprotocol_addon.check_multi_pan_addon(hass)
 
 
-async def test_check_multi_pan_addon_bad_state(hass: HomeAssistant) -> None:
+async def test_check_multi_pan_addon_bad_state(hass: SmartHub) -> None:
     """Test `check_multi_pan_addon` where the addon is in an unexpected state."""
 
     with patch(
-        "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.get_multiprotocol_addon_manager",
+        "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.get_multiprotocol_addon_manager",
         return_value=Mock(
             spec_set=silabs_multiprotocol_addon.MultiprotocolAddonManager
         ),
@@ -1652,14 +1652,14 @@ async def test_check_multi_pan_addon_bad_state(hass: HomeAssistant) -> None:
             version="1.0.0",
         )
 
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await silabs_multiprotocol_addon.check_multi_pan_addon(hass)
 
         manager.async_start_addon.assert_not_called()
 
 
 async def test_check_multi_pan_addon_auto_start(
-    hass: HomeAssistant, addon_info, addon_store_info, start_addon
+    hass: SmartHub, addon_info, addon_store_info, start_addon
 ) -> None:
     """Test `check_multi_pan_addon` auto starting the addon."""
 
@@ -1668,14 +1668,14 @@ async def test_check_multi_pan_addon_auto_start(
     addon_store_info.return_value.available = True
 
     # An error is raised even if we auto-start
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await silabs_multiprotocol_addon.check_multi_pan_addon(hass)
 
     start_addon.assert_called_once_with("core_silabs_multiprotocol")
 
 
 async def test_check_multi_pan_addon(
-    hass: HomeAssistant, addon_info, addon_store_info, start_addon
+    hass: SmartHub, addon_info, addon_store_info, start_addon
 ) -> None:
     """Test `check_multi_pan_addon`."""
 
@@ -1687,11 +1687,11 @@ async def test_check_multi_pan_addon(
     start_addon.assert_not_called()
 
 
-async def test_multi_pan_addon_using_device_no_hassio(hass: HomeAssistant) -> None:
+async def test_multi_pan_addon_using_device_no_hassio(hass: SmartHub) -> None:
     """Test `multi_pan_addon_using_device` without hassio."""
 
     with patch(
-        "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.is_hassio",
+        "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.is_hassio",
         return_value=False,
     ):
         assert (
@@ -1703,7 +1703,7 @@ async def test_multi_pan_addon_using_device_no_hassio(hass: HomeAssistant) -> No
 
 
 async def test_multi_pan_addon_using_device_not_running(
-    hass: HomeAssistant, addon_info, addon_store_info
+    hass: SmartHub, addon_info, addon_store_info
 ) -> None:
     """Test `multi_pan_addon_using_device` when the addon isn't running."""
 
@@ -1724,7 +1724,7 @@ async def test_multi_pan_addon_using_device_not_running(
     [("/dev/ttyAMA2", False), ("/dev/ttyAMA1", True)],
 )
 async def test_multi_pan_addon_using_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info,
     addon_store_info,
     options_device: str,

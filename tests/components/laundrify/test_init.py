@@ -2,10 +2,10 @@
 
 from laundrify_aio import exceptions
 
-from homeassistant.components.laundrify.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ACCESS_TOKEN
-from homeassistant.core import HomeAssistant
+from smarthub.components.laundrify.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_ACCESS_TOKEN
+from smarthub.core import SmartHub
 
 from .const import VALID_ACCESS_TOKEN
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_setup_entry_api_unauthorized(
-    hass: HomeAssistant,
+    hass: SmartHub,
     laundrify_api_mock,
     laundrify_config_entry: MockConfigEntry,
 ) -> None:
@@ -27,7 +27,7 @@ async def test_setup_entry_api_unauthorized(
 
 
 async def test_setup_entry_api_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     laundrify_api_mock,
     laundrify_config_entry: MockConfigEntry,
 ) -> None:
@@ -41,7 +41,7 @@ async def test_setup_entry_api_cannot_connect(
 
 
 async def test_setup_entry_successful(
-    hass: HomeAssistant, laundrify_config_entry: MockConfigEntry
+    hass: SmartHub, laundrify_config_entry: MockConfigEntry
 ) -> None:
     """Test entry can be setup successfully."""
     assert len(hass.config_entries.async_entries(DOMAIN)) == 1
@@ -49,7 +49,7 @@ async def test_setup_entry_successful(
 
 
 async def test_setup_entry_unload(
-    hass: HomeAssistant, laundrify_config_entry: MockConfigEntry
+    hass: SmartHub, laundrify_config_entry: MockConfigEntry
 ) -> None:
     """Test unloading the laundrify entry."""
     await hass.config_entries.async_unload(laundrify_config_entry.entry_id)
@@ -58,7 +58,7 @@ async def test_setup_entry_unload(
     assert laundrify_config_entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_migrate_entry_minor_version_1_2(hass: HomeAssistant) -> None:
+async def test_migrate_entry_minor_version_1_2(hass: SmartHub) -> None:
     """Test migrating a 1.1 config entry to 1.2."""
     entry = MockConfigEntry(
         domain=DOMAIN,

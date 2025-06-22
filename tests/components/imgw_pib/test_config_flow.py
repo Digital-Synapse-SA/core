@@ -6,14 +6,14 @@ from aiohttp import ClientError
 from imgw_pib.exceptions import ApiError
 import pytest
 
-from homeassistant.components.imgw_pib.const import CONF_STATION_ID, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.imgw_pib.const import CONF_STATION_ID, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def test_create_entry(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_imgw_pib_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_imgw_pib_client: AsyncMock
 ) -> None:
     """Test that the user step works."""
     result = await hass.config_entries.flow.async_init(
@@ -37,7 +37,7 @@ async def test_create_entry(
 
 @pytest.mark.parametrize("exc", [ApiError("API Error"), ClientError, TimeoutError])
 async def test_form_no_station_list(
-    hass: HomeAssistant, exc: Exception, mock_imgw_pib_client: AsyncMock
+    hass: SmartHub, exc: Exception, mock_imgw_pib_client: AsyncMock
 ) -> None:
     """Test aborting the flow when we cannot get the list of hydrological stations."""
     mock_imgw_pib_client.update_hydrological_stations.side_effect = exc
@@ -58,7 +58,7 @@ async def test_form_no_station_list(
     ],
 )
 async def test_form_with_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exc: Exception,
     base_error: str,
     mock_setup_entry: AsyncMock,

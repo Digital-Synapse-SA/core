@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, Mock, patch
 from pyfibaro.fibaro_device import SceneEvent
 import pytest
 
-from homeassistant.components.fibaro import CONF_IMPORT_PLUGINS, DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.fibaro import CONF_IMPORT_PLUGINS, DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -25,7 +25,7 @@ TEST_MODEL = "HC3"
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.fibaro.async_setup_entry", return_value=True
+        "smarthub.components.fibaro.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -330,7 +330,7 @@ def mock_button_device() -> Mock:
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Return the default mocked config entry."""
     mock_config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -358,7 +358,7 @@ def mock_fibaro_client() -> Generator[Mock]:
     info_mock.mac_address = "00:22:4d:b7:13:24"
 
     with patch(
-        "homeassistant.components.fibaro.FibaroClient", autospec=True
+        "smarthub.components.fibaro.FibaroClient", autospec=True
     ) as fibaro_client_mock:
         client = fibaro_client_mock.return_value
         client.connect_with_credentials.return_value = info_mock
@@ -373,7 +373,7 @@ def mock_fibaro_client() -> Generator[Mock]:
 
 
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Set up the fibaro integration for testing."""
     assert await hass.config_entries.async_setup(mock_config_entry.entry_id)

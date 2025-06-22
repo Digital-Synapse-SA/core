@@ -5,8 +5,8 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import conversation
-from homeassistant.components.climate import (
+from smarthub.components import conversation
+from smarthub.components.climate import (
     ATTR_TEMPERATURE,
     DOMAIN,
     ClimateEntity,
@@ -14,17 +14,17 @@ from homeassistant.components.climate import (
     HVACMode,
     intent as climate_intent,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import Platform, UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import Platform, UnitOfTemperature
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     area_registry as ar,
     entity_registry as er,
     floor_registry as fr,
     intent,
 )
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.setup import async_setup_component
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -43,7 +43,7 @@ class MockFlow(ConfigFlow):
 
 
 @pytest.fixture(autouse=True)
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -52,11 +52,11 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
 
 
 @pytest.fixture(autouse=True)
-def mock_setup_integration(hass: HomeAssistant) -> None:
+def mock_setup_integration(hass: SmartHub) -> None:
     """Fixture to set up a mock integration."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -65,7 +65,7 @@ def mock_setup_integration(hass: HomeAssistant) -> None:
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
     ) -> bool:
         await hass.config_entries.async_unload_platforms(config_entry, [Platform.TODO])
@@ -83,13 +83,13 @@ def mock_setup_integration(hass: HomeAssistant) -> None:
 
 
 async def create_mock_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entities: list[ClimateEntity],
 ) -> MockConfigEntry:
     """Create a todo platform with the specified entities."""
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -133,13 +133,13 @@ class MockClimateEntityNoSetTemperature(ClimateEntity):
 
 
 async def test_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
     floor_registry: fr.FloorRegistry,
 ) -> None:
     """Test HassClimateSetTemperature intent."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     await climate_intent.async_setup_intents(hass)
 
     climate_1 = MockClimateEntity()
@@ -314,10 +314,10 @@ async def test_set_temperature(
 
 
 async def test_set_temperature_no_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test HassClimateSetTemperature intent with no climate entities."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     await climate_intent.async_setup_intents(hass)
 
     await create_mock_platform(hass, [])
@@ -333,9 +333,9 @@ async def test_set_temperature_no_entities(
     assert err.value.result.no_match_reason == intent.MatchFailedReason.DOMAIN
 
 
-async def test_set_temperature_not_supported(hass: HomeAssistant) -> None:
+async def test_set_temperature_not_supported(hass: SmartHub) -> None:
     """Test HassClimateSetTemperature intent when climate entity doesn't support required feature."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     await climate_intent.async_setup_intents(hass)
 
     climate_1 = MockClimateEntityNoSetTemperature()

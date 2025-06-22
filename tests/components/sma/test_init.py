@@ -2,9 +2,9 @@
 
 from collections.abc import AsyncGenerator
 
-from homeassistant.components.sma.const import DOMAIN
-from homeassistant.config_entries import SOURCE_IMPORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.sma.const import DOMAIN
+from smarthub.config_entries import SOURCE_IMPORT
+from smarthub.core import SmartHub
 
 from . import MOCK_DEVICE, MOCK_USER_INPUT
 
@@ -12,7 +12,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_migrate_entry_minor_version_1_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_sma_client: AsyncGenerator,
 ) -> None:

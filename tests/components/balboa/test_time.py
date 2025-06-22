@@ -8,14 +8,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.time import (
+from smarthub.components.time import (
     ATTR_TIME,
     DOMAIN as TIME_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -25,13 +25,13 @@ ENTITY_TIME = "time.fakespa_"
 
 
 async def test_times(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test spa times."""
-    with patch("homeassistant.components.balboa.PLATFORMS", [Platform.TIME]):
+    with patch("smarthub.components.balboa.PLATFORMS", [Platform.TIME]):
         entry = await init_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
@@ -47,7 +47,7 @@ async def test_times(
     ],
 )
 async def test_time(
-    hass: HomeAssistant, client: MagicMock, filter_cycle: int, period: str, value: str
+    hass: SmartHub, client: MagicMock, filter_cycle: int, period: str, value: str
 ) -> None:
     """Test spa filter cycle time."""
     await init_integration(hass)

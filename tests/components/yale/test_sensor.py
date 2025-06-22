@@ -4,15 +4,15 @@ from typing import Any
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import core as ha
-from homeassistant.const import (
+from smarthub import core as ha
+from smarthub.const import (
     ATTR_ENTITY_PICTURE,
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import CoreState, SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .mocks import (
     _create_yale_with_devices,
@@ -25,7 +25,7 @@ from .mocks import (
 from tests.common import mock_restore_cache_with_extra_data
 
 
-async def test_create_doorbell(hass: HomeAssistant) -> None:
+async def test_create_doorbell(hass: SmartHub) -> None:
     """Test creation of a doorbell."""
     doorbell_one = await _mock_doorbell_from_fixture(hass, "get_doorbell.json")
     await _create_yale_with_devices(hass, [doorbell_one])
@@ -36,7 +36,7 @@ async def test_create_doorbell(hass: HomeAssistant) -> None:
 
 
 async def test_create_doorbell_offline(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test creation of a doorbell that is offline."""
     doorbell_one = await _mock_doorbell_from_fixture(hass, "get_doorbell.offline.json")
@@ -51,7 +51,7 @@ async def test_create_doorbell_offline(
     assert entry.unique_id == "tmt100_device_battery"
 
 
-async def test_create_doorbell_hardwired(hass: HomeAssistant) -> None:
+async def test_create_doorbell_hardwired(hass: SmartHub) -> None:
     """Test creation of a doorbell that is hardwired without a battery."""
     doorbell_one = await _mock_doorbell_from_fixture(
         hass, "get_doorbell.nobattery.json"
@@ -63,7 +63,7 @@ async def test_create_doorbell_hardwired(hass: HomeAssistant) -> None:
 
 
 async def test_create_lock_with_linked_keypad(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test creation of a lock with a linked keypad that both have a battery."""
     lock_one = await _mock_lock_from_fixture(hass, "get_lock.doorsense_init.json")
@@ -90,7 +90,7 @@ async def test_create_lock_with_linked_keypad(
 
 
 async def test_create_lock_with_low_battery_linked_keypad(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test creation of a lock with a linked keypad that both have a battery."""
     lock_one = await _mock_lock_from_fixture(hass, "get_lock.low_keypad_battery.json")
@@ -129,7 +129,7 @@ async def test_create_lock_with_low_battery_linked_keypad(
 
 
 async def test_lock_operator_bluetooth(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test operation of a lock with doorsense and bridge."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
@@ -155,7 +155,7 @@ async def test_lock_operator_bluetooth(
 
 
 async def test_lock_operator_keypad(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test operation of a lock with doorsense and bridge."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
@@ -176,7 +176,7 @@ async def test_lock_operator_keypad(
 
 
 async def test_lock_operator_remote(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test operation of a lock with doorsense and bridge."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
@@ -195,7 +195,7 @@ async def test_lock_operator_remote(
 
 
 async def test_lock_operator_manual(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test operation of a lock with doorsense and bridge."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
@@ -215,7 +215,7 @@ async def test_lock_operator_manual(
 
 
 async def test_lock_operator_autorelock(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test operation of a lock with doorsense and bridge."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
@@ -236,7 +236,7 @@ async def test_lock_operator_autorelock(
 
 
 async def test_unlock_operator_manual(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test operation of a lock manually."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
@@ -257,7 +257,7 @@ async def test_unlock_operator_manual(
 
 
 async def test_unlock_operator_tag(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test operation of a lock with a tag."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
@@ -278,7 +278,7 @@ async def test_unlock_operator_tag(
 
 
 async def test_restored_state(
-    hass: HomeAssistant, hass_storage: dict[str, Any], snapshot: SnapshotAssertion
+    hass: SmartHub, hass_storage: dict[str, Any], snapshot: SnapshotAssertion
 ) -> None:
     """Test restored state."""
 

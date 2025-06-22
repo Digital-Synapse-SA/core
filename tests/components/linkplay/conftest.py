@@ -10,9 +10,9 @@ from aiohttp import ClientSession
 from linkplay.bridge import LinkPlayBridge, LinkPlayDevice
 import pytest
 
-from homeassistant.components.linkplay.const import DOMAIN
-from homeassistant.const import CONF_HOST, EVENT_HOMEASSISTANT_CLOSE
-from homeassistant.core import HomeAssistant
+from smarthub.components.linkplay.const import DOMAIN
+from smarthub.const import CONF_HOST, EVENT_HOMEASSISTANT_CLOSE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 from tests.conftest import AiohttpClientMocker
@@ -29,11 +29,11 @@ def mock_linkplay_factory_bridge() -> Generator[AsyncMock]:
 
     with (
         patch(
-            "homeassistant.components.linkplay.config_flow.async_get_client_session",
+            "smarthub.components.linkplay.config_flow.async_get_client_session",
             return_value=AsyncMock(spec=ClientSession),
         ),
         patch(
-            "homeassistant.components.linkplay.config_flow.linkplay_factory_httpapi_bridge",
+            "smarthub.components.linkplay.config_flow.linkplay_factory_httpapi_bridge",
         ) as conf_factory,
     ):
         bridge = AsyncMock(spec=LinkPlayBridge)
@@ -49,7 +49,7 @@ def mock_linkplay_factory_bridge() -> Generator[AsyncMock]:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.linkplay.async_setup_entry",
+        "smarthub.components.linkplay.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -89,7 +89,7 @@ def mock_lp_aiohttp_client() -> Iterator[AiohttpClientMocker]:
     """Context manager to mock aiohttp client."""
     mocker = AiohttpClientMocker()
 
-    def create_session(hass: HomeAssistant, *args: Any, **kwargs: Any) -> ClientSession:
+    def create_session(hass: SmartHub, *args: Any, **kwargs: Any) -> ClientSession:
         session = mocker.create_session(hass.loop)
 
         async def close_session(event):
@@ -101,7 +101,7 @@ def mock_lp_aiohttp_client() -> Iterator[AiohttpClientMocker]:
         return session
 
     with mock.patch(
-        "homeassistant.components.linkplay.async_get_client_session",
+        "smarthub.components.linkplay.async_get_client_session",
         side_effect=create_session,
     ):
         yield mocker

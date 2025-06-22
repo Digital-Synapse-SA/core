@@ -3,12 +3,12 @@
 import pytest
 from ttn_client import TTNAuthError
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 @pytest.mark.parametrize(("exception_class"), [TTNAuthError, Exception])
 async def test_init_exceptions(
-    hass: HomeAssistant, mock_ttnclient, exception_class, mock_config_entry
+    hass: SmartHub, mock_ttnclient, exception_class, mock_config_entry
 ) -> None:
     """Test TTN Exceptions."""
 

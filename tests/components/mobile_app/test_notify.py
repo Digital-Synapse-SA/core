@@ -5,10 +5,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.mobile_app.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components.mobile_app.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, MockUser
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -17,10 +17,10 @@ from tests.typing import WebSocketGenerator
 
 @pytest.fixture
 async def setup_push_receiver(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, hass_admin_user: MockUser
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, hass_admin_user: MockUser
 ) -> None:
     """Fixture that sets up a mocked push receiver."""
-    push_url = "https://mobile-push.home-assistant.dev/push"
+    push_url = "https://mobile-push.smart-hub.dev/push"
 
     now = datetime.now() + timedelta(hours=24)
     iso_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -43,12 +43,12 @@ async def setup_push_receiver(
     entry = MockConfigEntry(
         data={
             "app_data": {"push_token": "PUSH_TOKEN", "push_url": push_url},
-            "app_id": "io.homeassistant.mobile_app",
+            "app_id": "io.smarthub.mobile_app",
             "app_name": "mobile_app tests",
             "app_version": "1.0",
             "device_id": "4d5e6f",
             "device_name": "Test",
-            "manufacturer": "Home Assistant",
+            "manufacturer": "SmartHub",
             "model": "mobile_app",
             "os_name": "Linux",
             "os_version": "5.0.6",
@@ -70,12 +70,12 @@ async def setup_push_receiver(
     loaded_late_entry = MockConfigEntry(
         data={
             "app_data": {"push_token": "PUSH_TOKEN2", "push_url": f"{push_url}2"},
-            "app_id": "io.homeassistant.mobile_app",
+            "app_id": "io.smarthub.mobile_app",
             "app_name": "mobile_app tests",
             "app_version": "1.0",
             "device_id": "4d5e6f2",
             "device_name": "Loaded Late",
-            "manufacturer": "Home Assistant",
+            "manufacturer": "SmartHub",
             "model": "mobile_app",
             "os_name": "Linux",
             "os_version": "5.0.6",
@@ -111,18 +111,18 @@ async def setup_push_receiver(
 
 @pytest.fixture
 async def setup_websocket_channel_only_push(
-    hass: HomeAssistant, hass_admin_user: MockUser
+    hass: SmartHub, hass_admin_user: MockUser
 ) -> None:
     """Set up local push."""
     entry = MockConfigEntry(
         data={
             "app_data": {"push_websocket_channel": True},
-            "app_id": "io.homeassistant.mobile_app",
+            "app_id": "io.smarthub.mobile_app",
             "app_name": "mobile_app tests",
             "app_version": "1.0",
             "device_id": "websocket-push-device-id",
             "device_name": "Websocket Push Name",
-            "manufacturer": "Home Assistant",
+            "manufacturer": "SmartHub",
             "model": "mobile_app",
             "os_name": "Linux",
             "os_version": "5.0.6",
@@ -144,7 +144,7 @@ async def setup_websocket_channel_only_push(
 
 
 async def test_notify_works(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, setup_push_receiver
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, setup_push_receiver
 ) -> None:
     """Test notify works."""
     assert hass.services.has_service("notify", "mobile_app_test") is True
@@ -159,13 +159,13 @@ async def test_notify_works(
 
     assert call_json["push_token"] == "PUSH_TOKEN"
     assert call_json["message"] == "Hello world"
-    assert call_json["registration_info"]["app_id"] == "io.homeassistant.mobile_app"
+    assert call_json["registration_info"]["app_id"] == "io.smarthub.mobile_app"
     assert call_json["registration_info"]["app_version"] == "1.0"
     assert call_json["registration_info"]["webhook_id"] == "mock-webhook_id"
 
 
 async def test_notify_ws_works(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     setup_push_receiver,
     hass_ws_client: WebSocketGenerator,
@@ -255,7 +255,7 @@ async def test_notify_ws_works(
 
 
 async def test_notify_ws_confirming_works(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     setup_push_receiver,
     hass_ws_client: WebSocketGenerator,
@@ -344,7 +344,7 @@ async def test_notify_ws_confirming_works(
 
 
 async def test_notify_ws_not_confirming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     setup_push_receiver,
     hass_ws_client: WebSocketGenerator,
@@ -369,7 +369,7 @@ async def test_notify_ws_not_confirming(
     )
 
     with patch(
-        "homeassistant.components.mobile_app.push_notification.PUSH_CONFIRM_TIMEOUT", 0
+        "smarthub.components.mobile_app.push_notification.PUSH_CONFIRM_TIMEOUT", 0
     ):
         await hass.services.async_call(
             "notify", "mobile_app_test", {"message": "Hello world 2"}, blocking=True
@@ -389,12 +389,12 @@ async def test_notify_ws_not_confirming(
 
 
 async def test_local_push_only(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_websocket_channel_only_push,
 ) -> None:
     """Test a local only push registration."""
-    with pytest.raises(HomeAssistantError) as e_info:
+    with pytest.raises(SmartHubError) as e_info:
         await hass.services.async_call(
             "notify",
             "mobile_app_websocket_push_name",

@@ -7,8 +7,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.filter.const import (
+from smarthub import config_entries
+from smarthub.components.filter.const import (
     CONF_FILTER_LOWER_BOUND,
     CONF_FILTER_NAME,
     CONF_FILTER_PRECISION,
@@ -30,10 +30,10 @@ from homeassistant.components.filter.const import (
     FILTER_NAME_TIME_THROTTLE,
     TIME_SMA_LAST,
 )
-from homeassistant.components.recorder import Recorder
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.recorder import Recorder
+from smarthub.const import CONF_ENTITY_ID, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -113,7 +113,7 @@ from tests.common import MockConfigEntry
 )
 async def test_form(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     entry_config: dict[str, Any],
     options: dict[str, Any],
@@ -155,7 +155,7 @@ async def test_form(
 
 
 async def test_options_flow(
-    recorder_mock: Recorder, hass: HomeAssistant, loaded_entry: MockConfigEntry
+    recorder_mock: Recorder, hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test options flow."""
 
@@ -194,7 +194,7 @@ async def test_options_flow(
 
 
 async def test_entry_already_exist(
-    recorder_mock: Recorder, hass: HomeAssistant, loaded_entry: MockConfigEntry
+    recorder_mock: Recorder, hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test abort when entry already exist."""
 

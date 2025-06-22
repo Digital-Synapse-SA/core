@@ -20,8 +20,8 @@ from aioesphomeapi import (
 )
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.esphome.const import (
+from smarthub import config_entries
+from smarthub.components.esphome.const import (
     CONF_ALLOW_SERVICE_CALLS,
     CONF_BLUETOOTH_MAC_ADDRESS,
     CONF_DEVICE_NAME,
@@ -30,24 +30,24 @@ from homeassistant.components.esphome.const import (
     STABLE_BLE_URL_VERSION,
     STABLE_BLE_VERSION_STR,
 )
-from homeassistant.components.esphome.manager import DEVICE_CONFLICT_ISSUE_FORMAT
-from homeassistant.components.tag import DOMAIN as TAG_DOMAIN
-from homeassistant.const import (
+from smarthub.components.esphome.manager import DEVICE_CONFLICT_ISSUE_FORMAT
+from smarthub.components.tag import DOMAIN as TAG_DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
     EVENT_HOMEASSISTANT_CLOSE,
 )
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
 )
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.setup import async_setup_component
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.setup import async_setup_component
 
 from .conftest import MockESPHomeDeviceType, MockGenericDeviceEntryType
 
@@ -60,7 +60,7 @@ from tests.common import (
 
 
 async def test_esphome_device_subscribe_logs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     caplog: pytest.LogCaptureFixture,
@@ -85,7 +85,7 @@ async def test_esphome_device_subscribe_logs(
     await hass.async_block_till_done()
 
     async with async_call_logger_set_level(
-        "homeassistant.components.esphome", "DEBUG", hass=hass, caplog=caplog
+        "smarthub.components.esphome", "DEBUG", hass=hass, caplog=caplog
     ):
         assert device.current_log_level == LogLevel.LOG_LEVEL_VERY_VERBOSE
 
@@ -117,21 +117,21 @@ async def test_esphome_device_subscribe_logs(
         assert "test_debug_log_message" in caplog.text
 
     async with async_call_logger_set_level(
-        "homeassistant.components.esphome", "WARNING", hass=hass, caplog=caplog
+        "smarthub.components.esphome", "WARNING", hass=hass, caplog=caplog
     ):
         assert device.current_log_level == LogLevel.LOG_LEVEL_WARN
     async with async_call_logger_set_level(
-        "homeassistant.components.esphome", "ERROR", hass=hass, caplog=caplog
+        "smarthub.components.esphome", "ERROR", hass=hass, caplog=caplog
     ):
         assert device.current_log_level == LogLevel.LOG_LEVEL_ERROR
     async with async_call_logger_set_level(
-        "homeassistant.components.esphome", "INFO", hass=hass, caplog=caplog
+        "smarthub.components.esphome", "INFO", hass=hass, caplog=caplog
     ):
         assert device.current_log_level == LogLevel.LOG_LEVEL_CONFIG
 
 
 async def test_esphome_device_service_calls_not_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     caplog: pytest.LogCaptureFixture,
@@ -158,13 +158,13 @@ async def test_esphome_device_service_calls_not_allowed(
     assert issue is not None
     assert (
         "If you trust this device and want to allow access "
-        "for it to make Home Assistant service calls, you can "
+        "for it to make SmartHub service calls, you can "
         "enable this functionality in the options flow"
     ) in caplog.text
 
 
 async def test_esphome_device_service_calls_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -316,7 +316,7 @@ async def test_esphome_device_service_calls_allowed(
 
 
 async def test_esphome_device_with_old_bluetooth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     issue_registry: ir.IssueRegistry,
@@ -337,7 +337,7 @@ async def test_esphome_device_with_old_bluetooth(
 
 
 async def test_esphome_device_with_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     issue_registry: ir.IssueRegistry,
@@ -370,7 +370,7 @@ async def test_esphome_device_with_password(
 
 
 async def test_esphome_device_with_current_bluetooth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     issue_registry: ir.IssueRegistry,
@@ -396,7 +396,7 @@ async def test_esphome_device_with_current_bluetooth(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_unique_id_updated_to_mac(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test we update config entry unique ID to MAC address."""
     entry = MockConfigEntry(
@@ -427,7 +427,7 @@ async def test_unique_id_updated_to_mac(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_add_missing_bluetooth_mac_address(
-    hass: HomeAssistant, mock_client
+    hass: SmartHub, mock_client
 ) -> None:
     """Test bluetooth mac is added if its missing."""
     entry = MockConfigEntry(
@@ -460,7 +460,7 @@ async def test_add_missing_bluetooth_mac_address(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_unique_id_not_updated_if_name_same_and_already_mac(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test we never update the entry unique ID event if the name is the same."""
     entry = MockConfigEntry(
@@ -495,7 +495,7 @@ async def test_unique_id_not_updated_if_name_same_and_already_mac(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_unique_id_updated_if_name_unset_and_already_mac(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test we never update config entry unique ID even if the name is unset."""
     entry = MockConfigEntry(
@@ -525,7 +525,7 @@ async def test_unique_id_updated_if_name_unset_and_already_mac(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_unique_id_not_updated_if_name_different_and_already_mac(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test we do not update config entry unique ID if the name is different."""
     entry = MockConfigEntry(
@@ -562,7 +562,7 @@ async def test_unique_id_not_updated_if_name_different_and_already_mac(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_name_updated_only_if_mac_matches(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test we update config entry name only if the mac matches."""
     entry = MockConfigEntry(
@@ -597,7 +597,7 @@ async def test_name_updated_only_if_mac_matches(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_name_updated_only_if_mac_was_unset(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test we update config entry name if the old unique id was not a mac."""
     entry = MockConfigEntry(
@@ -632,7 +632,7 @@ async def test_name_updated_only_if_mac_was_unset(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_connection_aborted_wrong_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     caplog: pytest.LogCaptureFixture,
     issue_registry: ir.IssueRegistry,
@@ -709,7 +709,7 @@ async def test_connection_aborted_wrong_device(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_connection_aborted_wrong_device_same_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     caplog: pytest.LogCaptureFixture,
     issue_registry: ir.IssueRegistry,
@@ -783,7 +783,7 @@ async def test_connection_aborted_wrong_device_same_name(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_failure_during_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -817,7 +817,7 @@ async def test_failure_during_connect(
 
 async def test_state_subscription(
     mock_client: APIClient,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
     """Test ESPHome subscribes to state changes."""
@@ -874,7 +874,7 @@ async def test_state_subscription(
 
 async def test_state_request(
     mock_client: APIClient,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
     """Test ESPHome requests state change."""
@@ -896,7 +896,7 @@ async def test_state_request(
 
 async def test_debug_logging(
     mock_client: APIClient,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_generic_device_entry: MockGenericDeviceEntryType,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -906,19 +906,19 @@ async def test_debug_logging(
         mock_client=mock_client,
     )
     async with async_call_logger_set_level(
-        "homeassistant.components.esphome", "DEBUG", hass=hass, caplog=caplog
+        "smarthub.components.esphome", "DEBUG", hass=hass, caplog=caplog
     ):
         mock_client.set_debug.assert_has_calls([call(True)])
         mock_client.reset_mock()
 
     async with async_call_logger_set_level(
-        "homeassistant.components.esphome", "WARNING", hass=hass, caplog=caplog
+        "smarthub.components.esphome", "WARNING", hass=hass, caplog=caplog
     ):
         mock_client.set_debug.assert_has_calls([call(False)])
 
 
 async def test_esphome_device_with_dash_in_name_user_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -981,7 +981,7 @@ async def test_esphome_device_with_dash_in_name_user_services(
 
 
 async def test_esphome_user_services_ignores_invalid_arg_types(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1037,7 +1037,7 @@ async def test_esphome_user_services_ignores_invalid_arg_types(
 
 
 async def test_esphome_user_service_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1058,7 +1058,7 @@ async def test_esphome_user_service_fails(
     assert hass.services.has_service(DOMAIN, "with_dash_simple_service")
 
     mock_client.execute_service = Mock(side_effect=APIConnectionError("fail"))
-    with pytest.raises(HomeAssistantError) as exc:
+    with pytest.raises(SmartHubError) as exc:
         await hass.services.async_call(
             DOMAIN, "with_dash_simple_service", {"arg1": True}, blocking=True
         )
@@ -1089,7 +1089,7 @@ async def test_esphome_user_service_fails(
 
 
 async def test_esphome_user_services_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1161,7 +1161,7 @@ async def test_esphome_user_services_changes(
 
 
 async def test_esphome_device_with_suggested_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -1180,7 +1180,7 @@ async def test_esphome_device_with_suggested_area(
 
 
 async def test_esphome_device_with_project(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -1201,7 +1201,7 @@ async def test_esphome_device_with_project(
 
 
 async def test_esphome_device_with_manufacturer(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -1220,7 +1220,7 @@ async def test_esphome_device_with_manufacturer(
 
 
 async def test_esphome_device_with_web_server(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -1239,7 +1239,7 @@ async def test_esphome_device_with_web_server(
 
 
 async def test_esphome_device_with_ipv6_web_server(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -1269,7 +1269,7 @@ async def test_esphome_device_with_ipv6_web_server(
 
 
 async def test_esphome_device_with_compilation_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -1288,7 +1288,7 @@ async def test_esphome_device_with_compilation_time(
 
 
 async def test_disconnects_at_close_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1316,7 +1316,7 @@ async def test_disconnects_at_close_event(
     ],
 )
 async def test_start_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     error: Exception,
@@ -1338,7 +1338,7 @@ async def test_start_reauth(
 
 
 async def test_no_reauth_wrong_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     caplog: pytest.LogCaptureFixture,
@@ -1368,7 +1368,7 @@ async def test_no_reauth_wrong_mac(
 
 
 async def test_entry_missing_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1390,7 +1390,7 @@ async def test_entry_missing_unique_id(
 
 
 async def test_entry_missing_bluetooth_mac_address(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1416,7 +1416,7 @@ async def test_entry_missing_bluetooth_mac_address(
 
 
 async def test_device_adds_friendly_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     caplog: pytest.LogCaptureFixture,
@@ -1456,7 +1456,7 @@ async def test_device_adds_friendly_name(
 
 
 async def test_assist_in_progress_issue_deleted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     entity_registry: er.EntityRegistry,
     issue_registry: ir.IssueRegistry,

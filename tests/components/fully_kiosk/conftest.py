@@ -8,15 +8,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from homeassistant.components.fully_kiosk.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.fully_kiosk.const import DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
     CONF_SSL,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -42,7 +42,7 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.fully_kiosk.async_setup_entry", return_value=True
+        "smarthub.components.fully_kiosk.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
@@ -51,7 +51,7 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 def mock_fully_kiosk_config_flow() -> Generator[MagicMock]:
     """Return a mocked Fully Kiosk client for the config flow."""
     with patch(
-        "homeassistant.components.fully_kiosk.config_flow.FullyKiosk",
+        "smarthub.components.fully_kiosk.config_flow.FullyKiosk",
         autospec=True,
     ) as client_mock:
         client = client_mock.return_value
@@ -67,7 +67,7 @@ def mock_fully_kiosk_config_flow() -> Generator[MagicMock]:
 def mock_fully_kiosk() -> Generator[MagicMock]:
     """Return a mocked Fully Kiosk client."""
     with patch(
-        "homeassistant.components.fully_kiosk.coordinator.FullyKiosk",
+        "smarthub.components.fully_kiosk.coordinator.FullyKiosk",
         autospec=True,
     ) as client_mock:
         client = client_mock.return_value
@@ -82,7 +82,7 @@ def mock_fully_kiosk() -> Generator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_fully_kiosk: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_fully_kiosk: MagicMock
 ) -> MockConfigEntry:
     """Set up the Fully Kiosk Browser integration for testing."""
     mock_config_entry.add_to_hass(hass)

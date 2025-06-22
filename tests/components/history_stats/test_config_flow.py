@@ -4,24 +4,24 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock
 
-from homeassistant import config_entries
-from homeassistant.components.history_stats.const import (
+from smarthub import config_entries
+from smarthub.components.history_stats.const import (
     CONF_DURATION,
     CONF_END,
     CONF_START,
     DEFAULT_NAME,
     DOMAIN,
 )
-from homeassistant.components.recorder import Recorder
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_STATE, CONF_TYPE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.recorder import Recorder
+from smarthub.const import CONF_ENTITY_ID, CONF_NAME, CONF_STATE, CONF_TYPE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_form(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form."""
 
@@ -65,7 +65,7 @@ async def test_form(
 
 
 async def test_options_flow(
-    recorder_mock: Recorder, hass: HomeAssistant, loaded_entry: MockConfigEntry
+    recorder_mock: Recorder, hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test options flow."""
 
@@ -103,7 +103,7 @@ async def test_options_flow(
 
 
 async def test_validation_options(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test validation."""
 
@@ -161,7 +161,7 @@ async def test_validation_options(
 
 
 async def test_entry_already_exist(
-    recorder_mock: Recorder, hass: HomeAssistant, loaded_entry: MockConfigEntry
+    recorder_mock: Recorder, hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test abort when entry already exist."""
 

@@ -5,21 +5,21 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.folder_watcher.const import (
+from smarthub import config_entries
+from smarthub.components.folder_watcher.const import (
     CONF_FOLDER,
     CONF_PATTERNS,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_form(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_form(hass: SmartHub, tmp_path: Path) -> None:
     """Test we get the form."""
     path = tmp_path.as_posix()
     hass.config.allowlist_external_dirs = {path}
@@ -39,7 +39,7 @@ async def test_form(hass: HomeAssistant, tmp_path: Path) -> None:
     assert result["options"] == {CONF_FOLDER: path, CONF_PATTERNS: ["*"]}
 
 
-async def test_form_not_allowed_path(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_form_not_allowed_path(hass: SmartHub, tmp_path: Path) -> None:
     """Test we handle not allowed path."""
     path = tmp_path.as_posix()
     result = await hass.config_entries.flow.async_init(
@@ -67,7 +67,7 @@ async def test_form_not_allowed_path(hass: HomeAssistant, tmp_path: Path) -> Non
     assert result["options"] == {CONF_FOLDER: path, CONF_PATTERNS: ["*"]}
 
 
-async def test_form_not_directory(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_form_not_directory(hass: SmartHub, tmp_path: Path) -> None:
     """Test we handle not a directory."""
     path = tmp_path.as_posix()
     result = await hass.config_entries.flow.async_init(
@@ -95,7 +95,7 @@ async def test_form_not_directory(hass: HomeAssistant, tmp_path: Path) -> None:
     assert result["options"] == {CONF_FOLDER: path, CONF_PATTERNS: ["*"]}
 
 
-async def test_form_not_readable_dir(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_form_not_readable_dir(hass: SmartHub, tmp_path: Path) -> None:
     """Test we handle not able to read directory."""
     path = tmp_path.as_posix()
     result = await hass.config_entries.flow.async_init(
@@ -125,7 +125,7 @@ async def test_form_not_readable_dir(hass: HomeAssistant, tmp_path: Path) -> Non
     assert result["options"] == {CONF_FOLDER: path, CONF_PATTERNS: ["*"]}
 
 
-async def test_form_already_configured(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_form_already_configured(hass: SmartHub, tmp_path: Path) -> None:
     """Test we abort when entry is already configured."""
     path = tmp_path.as_posix()
     hass.config.allowlist_external_dirs = {path}

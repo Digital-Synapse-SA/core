@@ -1,12 +1,12 @@
 """Tests for the Suez Water integration."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def setup_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Init suez water integration."""
     mock_config_entry.add_to_hass(hass)

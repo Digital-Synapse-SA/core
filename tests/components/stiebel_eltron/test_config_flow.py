@@ -4,17 +4,17 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.stiebel_eltron.const import DOMAIN
-from homeassistant.config_entries import SOURCE_IMPORT, SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.stiebel_eltron.const import DOMAIN
+from smarthub.config_entries import SOURCE_IMPORT, SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_NAME, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_stiebel_eltron_client")
-async def test_full_flow(hass: HomeAssistant) -> None:
+async def test_full_flow(hass: SmartHub) -> None:
     """Test the full flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -39,7 +39,7 @@ async def test_full_flow(hass: HomeAssistant) -> None:
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stiebel_eltron_client: MagicMock,
 ) -> None:
     """Test we handle cannot connect error."""
@@ -74,7 +74,7 @@ async def test_form_cannot_connect(
 
 
 async def test_form_unknown_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stiebel_eltron_client: MagicMock,
 ) -> None:
     """Test we handle cannot connect error."""
@@ -109,7 +109,7 @@ async def test_form_unknown_exception(
 
 
 async def test_already_configured(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we handle already configured."""
     mock_config_entry.add_to_hass(hass)
@@ -130,7 +130,7 @@ async def test_already_configured(
 
 
 @pytest.mark.usefixtures("mock_stiebel_eltron_client")
-async def test_import(hass: HomeAssistant) -> None:
+async def test_import(hass: SmartHub) -> None:
     """Test import step."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -150,7 +150,7 @@ async def test_import(hass: HomeAssistant) -> None:
 
 
 async def test_import_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stiebel_eltron_client: MagicMock,
 ) -> None:
     """Test we handle cannot connect error."""
@@ -170,7 +170,7 @@ async def test_import_cannot_connect(
 
 
 async def test_import_unknown_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stiebel_eltron_client: MagicMock,
 ) -> None:
     """Test we handle cannot connect error."""
@@ -191,7 +191,7 @@ async def test_import_unknown_exception(
 
 
 async def test_import_already_configured(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we handle already configured."""
     mock_config_entry.add_to_hass(hass)

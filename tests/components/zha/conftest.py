@@ -26,9 +26,9 @@ from zigpy.zcl.clusters.general import Basic, Groups
 from zigpy.zcl.foundation import Status
 import zigpy.zdo.types as zdo_t
 
-from homeassistant.components.zha import const as zha_const
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.zha import const as zha_const
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import patch_cluster as common_patch_cluster
 
@@ -238,7 +238,7 @@ def mock_zigpy_connect(
 
 @pytest.fixture
 def setup_zha(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_zigpy_connect: ControllerApplication,
 ):
@@ -277,7 +277,7 @@ def cluster_handler():
 @pytest.fixture(autouse=True)
 def speed_up_radio_mgr():
     """Speed up the radio manager connection time by removing delays."""
-    with patch("homeassistant.components.zha.radio_manager.CONNECT_DELAY_S", 0.00001):
+    with patch("smarthub.components.zha.radio_manager.CONNECT_DELAY_S", 0.00001):
         yield
 
 

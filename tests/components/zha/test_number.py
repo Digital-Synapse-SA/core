@@ -7,16 +7,16 @@ from zigpy.profiles import zha
 from zigpy.zcl.clusters import general
 import zigpy.zcl.foundation as zcl_f
 
-from homeassistant.components.number import DOMAIN as NUMBER_DOMAIN
-from homeassistant.components.zha.helpers import (
+from smarthub.components.number import DOMAIN as NUMBER_DOMAIN
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import find_entity_id, send_attributes_report, update_attribute_cache
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
@@ -26,7 +26,7 @@ from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
 def number_platform_only():
     """Only set up the number and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.BUTTON,
             Platform.DEVICE_TRACKER,
@@ -39,7 +39,7 @@ def number_platform_only():
         yield
 
 
-async def test_number(hass: HomeAssistant, setup_zha, zigpy_device_mock) -> None:
+async def test_number(hass: SmartHub, setup_zha, zigpy_device_mock) -> None:
     """Test ZHA number platform."""
 
     await setup_zha()
@@ -123,11 +123,11 @@ async def test_number(hass: HomeAssistant, setup_zha, zigpy_device_mock) -> None
     # update device value with failed attribute report
     cluster.PLUGGED_ATTR_READS["present_value"] = 40.0
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await hass.async_block_till_done()
 
     await hass.services.async_call(
-        "homeassistant", "update_entity", {"entity_id": entity_id}, blocking=True
+        "smarthub", "update_entity", {"entity_id": entity_id}, blocking=True
     )
     assert hass.states.get(entity_id).state == "40.0"
     assert "present_value" in cluster.read_attributes.call_args[0][0]

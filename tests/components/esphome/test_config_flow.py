@@ -17,9 +17,9 @@ from aioesphomeapi import (
 import aiohttp
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.esphome import dashboard
-from homeassistant.components.esphome.const import (
+from smarthub import config_entries
+from smarthub.components.esphome import dashboard
+from smarthub.components.esphome.const import (
     CONF_ALLOW_SERVICE_CALLS,
     CONF_DEVICE_NAME,
     CONF_NOISE_PSK,
@@ -27,14 +27,14 @@ from homeassistant.components.esphome.const import (
     DEFAULT_NEW_CONFIG_ALLOW_ALLOW_SERVICE_CALLS,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_IGNORE, ConfigFlowResult
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
-from homeassistant.helpers.service_info.mqtt import MqttServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.config_entries import SOURCE_IGNORE, ConfigFlowResult
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.helpers.service_info.mqtt import MqttServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from . import VALID_NOISE_PSK
 from .conftest import MockGenericDeviceEntryType
@@ -48,11 +48,11 @@ WRONG_NOISE_PSK = "GP+ciK+nVfTQ/gcz6uOdS+oKEdJgesU+jeu8Ssj2how="
 @pytest.fixture(autouse=False)
 def mock_setup_entry():
     """Mock setting up a config entry."""
-    with patch("homeassistant.components.esphome.async_setup_entry", return_value=True):
+    with patch("smarthub.components.esphome.async_setup_entry", return_value=True):
         yield
 
 
-def get_flow_context(hass: HomeAssistant, result: ConfigFlowResult) -> dict[str, Any]:
+def get_flow_context(hass: SmartHub, result: ConfigFlowResult) -> dict[str, Any]:
     """Get the flow context from the result of async_init or async_configure."""
     flow = next(
         flow
@@ -65,7 +65,7 @@ def get_flow_context(hass: HomeAssistant, result: ConfigFlowResult) -> dict[str,
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_user_connection_works(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test we can finish a config flow."""
     result = await hass.config_entries.flow.async_init(
@@ -105,7 +105,7 @@ async def test_user_connection_works(
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_user_connection_updates_host(hass: HomeAssistant) -> None:
+async def test_user_connection_updates_host(hass: SmartHub) -> None:
     """Test setup up the same name updates the host."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -137,7 +137,7 @@ async def test_user_connection_updates_host(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_user_sets_unique_id(hass: HomeAssistant) -> None:
+async def test_user_sets_unique_id(hass: SmartHub) -> None:
     """Test that the user flow sets the unique id."""
     service_info = ZeroconfServiceInfo(
         ip_address=ip_address("192.168.43.183"),
@@ -196,11 +196,11 @@ async def test_user_sets_unique_id(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
-async def test_user_resolve_error(hass: HomeAssistant, mock_client: APIClient) -> None:
+async def test_user_resolve_error(hass: SmartHub, mock_client: APIClient) -> None:
     """Test user step with IP resolve error."""
 
     with patch(
-        "homeassistant.components.esphome.config_flow.APIConnectionError",
+        "smarthub.components.esphome.config_flow.APIConnectionError",
         new_callable=lambda: ResolveAPIError,
     ) as exc:
         mock_client.device_info.side_effect = exc
@@ -238,7 +238,7 @@ async def test_user_resolve_error(hass: HomeAssistant, mock_client: APIClient) -
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_user_causes_zeroconf_to_abort(hass: HomeAssistant) -> None:
+async def test_user_causes_zeroconf_to_abort(hass: SmartHub) -> None:
     """Test that the user flow sets the unique id and aborts the zeroconf flow."""
     service_info = ZeroconfServiceInfo(
         ip_address=ip_address("192.168.43.183"),
@@ -288,7 +288,7 @@ async def test_user_causes_zeroconf_to_abort(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_user_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
 ) -> None:
     """Test user step with connection error."""
@@ -329,7 +329,7 @@ async def test_user_connection_error(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_user_with_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
 ) -> None:
     """Test user step with password."""
@@ -362,7 +362,7 @@ async def test_user_with_password(
 
 @pytest.mark.usefixtures("mock_zeroconf")
 async def test_user_invalid_password(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test user step with invalid password."""
     mock_client.device_info.return_value = DeviceInfo(uses_password=True, name="test")
@@ -407,7 +407,7 @@ async def test_user_invalid_password(
 
 @pytest.mark.usefixtures("mock_dashboard", "mock_setup_entry", "mock_zeroconf")
 async def test_user_dashboard_has_wrong_key(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
 ) -> None:
     """Test user step with key from dashboard that is incorrect."""
@@ -422,7 +422,7 @@ async def test_user_dashboard_has_wrong_key(
     ]
 
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
         return_value=WRONG_NOISE_PSK,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -453,7 +453,7 @@ async def test_user_dashboard_has_wrong_key(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_user_discovers_name_and_gets_key_from_dashboard(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_dashboard: dict[str, Any],
 ) -> None:
@@ -477,7 +477,7 @@ async def test_user_discovers_name_and_gets_key_from_dashboard(
     await dashboard.async_get_dashboard(hass).async_refresh()
 
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
         return_value=VALID_NOISE_PSK,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -504,7 +504,7 @@ async def test_user_discovers_name_and_gets_key_from_dashboard(
 )
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_user_discovers_name_and_gets_key_from_dashboard_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     dashboard_exception: Exception,
     mock_client: APIClient,
     mock_dashboard: dict[str, Any],
@@ -529,7 +529,7 @@ async def test_user_discovers_name_and_gets_key_from_dashboard_fails(
     await dashboard.async_get_dashboard(hass).async_refresh()
 
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
         side_effect=dashboard_exception,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -560,7 +560,7 @@ async def test_user_discovers_name_and_gets_key_from_dashboard_fails(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_user_discovers_name_and_dashboard_is_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_dashboard: dict[str, Any],
 ) -> None:
@@ -583,7 +583,7 @@ async def test_user_discovers_name_and_dashboard_is_unavailable(
     )
 
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_devices",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_devices",
         side_effect=TimeoutError,
     ):
         await dashboard.async_get_dashboard(hass).async_refresh()
@@ -615,7 +615,7 @@ async def test_user_discovers_name_and_dashboard_is_unavailable(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_login_connection_error(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test user step with connection error on login attempt."""
     mock_client.device_info.return_value = DeviceInfo(uses_password=True, name="test")
@@ -659,7 +659,7 @@ async def test_login_connection_error(
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_initiation(hass: HomeAssistant) -> None:
+async def test_discovery_initiation(hass: SmartHub) -> None:
     """Test discovery importing works."""
     service_info = ZeroconfServiceInfo(
         ip_address=ip_address("192.168.43.183"),
@@ -696,7 +696,7 @@ async def test_discovery_initiation(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_no_mac(hass: HomeAssistant) -> None:
+async def test_discovery_no_mac(hass: SmartHub) -> None:
     """Test discovery aborted if old ESPHome without mac in zeroconf."""
     service_info = ZeroconfServiceInfo(
         ip_address=ip_address("192.168.43.183"),
@@ -715,7 +715,7 @@ async def test_discovery_no_mac(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_already_configured(hass: HomeAssistant) -> None:
+async def test_discovery_already_configured(hass: SmartHub) -> None:
     """Test discovery aborts if already configured via hostname."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -748,7 +748,7 @@ async def test_discovery_already_configured(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_ignored(hass: HomeAssistant) -> None:
+async def test_discovery_ignored(hass: SmartHub) -> None:
     """Test discovery does not probe and ignored entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -777,7 +777,7 @@ async def test_discovery_ignored(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_duplicate_data(hass: HomeAssistant) -> None:
+async def test_discovery_duplicate_data(hass: SmartHub) -> None:
     """Test discovery aborts if same mDNS packet arrives."""
     service_info = ZeroconfServiceInfo(
         ip_address=ip_address("192.168.43.183"),
@@ -804,7 +804,7 @@ async def test_discovery_duplicate_data(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_updates_unique_id(hass: HomeAssistant) -> None:
+async def test_discovery_updates_unique_id(hass: SmartHub) -> None:
     """Test a duplicate discovery host aborts and updates existing entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -841,7 +841,7 @@ async def test_discovery_updates_unique_id(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
 async def test_discovery_abort_without_update_same_host_port(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test discovery aborts without update when hsot and port are the same."""
     entry = MockConfigEntry(
@@ -870,7 +870,7 @@ async def test_discovery_abort_without_update_same_host_port(
 
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
-async def test_user_requires_psk(hass: HomeAssistant, mock_client: APIClient) -> None:
+async def test_user_requires_psk(hass: SmartHub, mock_client: APIClient) -> None:
     """Test user step with requiring encryption key."""
     mock_client.device_info.side_effect = RequiresEncryptionAPIError
 
@@ -914,7 +914,7 @@ async def test_user_requires_psk(hass: HomeAssistant, mock_client: APIClient) ->
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_encryption_key_valid_psk(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test encryption key step with valid key."""
 
@@ -950,7 +950,7 @@ async def test_encryption_key_valid_psk(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_encryption_key_invalid_psk(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test encryption key step with invalid key."""
 
@@ -995,7 +995,7 @@ async def test_encryption_key_invalid_psk(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_reauth_confirm_valid(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reauth initiation with valid PSK."""
     entry = MockConfigEntry(
@@ -1026,7 +1026,7 @@ async def test_reauth_confirm_valid(
 
 @pytest.mark.usefixtures("mock_zeroconf", "mock_setup_entry")
 async def test_reauth_attempt_to_change_mac_aborts(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reauth initiation with valid PSK attempting to change mac.
 
@@ -1068,7 +1068,7 @@ async def test_reauth_attempt_to_change_mac_aborts(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_reauth_fixed_via_dashboard(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_dashboard: dict[str, Any],
 ) -> None:
@@ -1100,7 +1100,7 @@ async def test_reauth_fixed_via_dashboard(
     await dashboard.async_get_dashboard(hass).async_refresh()
 
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
         return_value=VALID_NOISE_PSK,
     ) as mock_get_encryption_key:
         result = await entry.start_reauth_flow(hass)
@@ -1114,7 +1114,7 @@ async def test_reauth_fixed_via_dashboard(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_reauth_fixed_via_dashboard_add_encryption_remove_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_dashboard: dict[str, Any],
     mock_config_entry: MockConfigEntry,
@@ -1135,7 +1135,7 @@ async def test_reauth_fixed_via_dashboard_add_encryption_remove_password(
     await dashboard.async_get_dashboard(hass).async_refresh()
 
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
         return_value=VALID_NOISE_PSK,
     ) as mock_get_encryption_key:
         result = await mock_config_entry.start_reauth_flow(hass)
@@ -1150,7 +1150,7 @@ async def test_reauth_fixed_via_dashboard_add_encryption_remove_password(
 
 @pytest.mark.usefixtures("mock_dashboard", "mock_setup_entry", "mock_zeroconf")
 async def test_reauth_fixed_via_remove_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -1168,7 +1168,7 @@ async def test_reauth_fixed_via_remove_password(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_reauth_fixed_via_dashboard_at_confirm(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_dashboard: dict[str, Any],
 ) -> None:
@@ -1208,7 +1208,7 @@ async def test_reauth_fixed_via_dashboard_at_confirm(
     await dashboard.async_get_dashboard(hass).async_refresh()
 
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
         return_value=VALID_NOISE_PSK,
     ) as mock_get_encryption_key:
         # We just fetch the form
@@ -1223,7 +1223,7 @@ async def test_reauth_fixed_via_dashboard_at_confirm(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_reauth_confirm_invalid(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reauth initiation with invalid PSK."""
     entry = MockConfigEntry(
@@ -1264,7 +1264,7 @@ async def test_reauth_confirm_invalid(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_reauth_confirm_invalid_with_unique_id(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reauth initiation with invalid PSK."""
     entry = MockConfigEntry(
@@ -1304,7 +1304,7 @@ async def test_reauth_confirm_invalid_with_unique_id(
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_reauth_encryption_key_removed(hass: HomeAssistant) -> None:
+async def test_reauth_encryption_key_removed(hass: SmartHub) -> None:
     """Test reauth when the encryption key was removed."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1336,7 +1336,7 @@ async def test_reauth_encryption_key_removed(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_discovery_dhcp_updates_host(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test dhcp discovery updates host and aborts."""
     entry = MockConfigEntry(
@@ -1371,7 +1371,7 @@ async def test_discovery_dhcp_updates_host(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_discovery_dhcp_does_not_update_host_wrong_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
 ) -> None:
     """Test dhcp discovery does not update the host if the mac is wrong."""
@@ -1408,7 +1408,7 @@ async def test_discovery_dhcp_does_not_update_host_wrong_mac(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_discovery_dhcp_does_not_update_host_wrong_mac_bad_key(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test dhcp discovery does not update the host if the mac is wrong."""
     entry = MockConfigEntry(
@@ -1443,7 +1443,7 @@ async def test_discovery_dhcp_does_not_update_host_wrong_mac_bad_key(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_discovery_dhcp_does_not_update_host_missing_mac_bad_key(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test dhcp discovery does not update the host if the mac is missing."""
     entry = MockConfigEntry(
@@ -1478,7 +1478,7 @@ async def test_discovery_dhcp_does_not_update_host_missing_mac_bad_key(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_discovery_dhcp_no_changes(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test dhcp discovery updates host and aborts."""
     entry = MockConfigEntry(
@@ -1505,7 +1505,7 @@ async def test_discovery_dhcp_no_changes(
 
 
 @pytest.mark.usefixtures("mock_dashboard")
-async def test_discovery_hassio(hass: HomeAssistant) -> None:
+async def test_discovery_hassio(hass: SmartHub) -> None:
     """Test dashboard discovery."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -1531,7 +1531,7 @@ async def test_discovery_hassio(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_zeroconf_encryption_key_via_dashboard(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_dashboard: dict[str, Any],
 ) -> None:
@@ -1574,7 +1574,7 @@ async def test_zeroconf_encryption_key_via_dashboard(
     ]
 
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
         return_value=VALID_NOISE_PSK,
     ) as mock_get_encryption_key:
         result = await hass.config_entries.flow.async_configure(
@@ -1597,7 +1597,7 @@ async def test_zeroconf_encryption_key_via_dashboard(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_zeroconf_encryption_key_via_dashboard_with_api_encryption_prop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_dashboard: dict[str, Any],
 ) -> None:
@@ -1640,7 +1640,7 @@ async def test_zeroconf_encryption_key_via_dashboard_with_api_encryption_prop(
     ]
 
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
         return_value=VALID_NOISE_PSK,
     ) as mock_get_encryption_key:
         result = await hass.config_entries.flow.async_configure(
@@ -1663,7 +1663,7 @@ async def test_zeroconf_encryption_key_via_dashboard_with_api_encryption_prop(
 
 @pytest.mark.usefixtures("mock_dashboard", "mock_setup_entry", "mock_zeroconf")
 async def test_zeroconf_no_encryption_key_via_dashboard(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
 ) -> None:
     """Test encryption key not retrieved from dashboard."""
@@ -1715,7 +1715,7 @@ async def test_zeroconf_no_encryption_key_via_dashboard(
 
 
 async def test_option_flow_allow_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -1740,7 +1740,7 @@ async def test_option_flow_allow_service_calls(
         CONF_SUBSCRIBE_LOGS: False,
     }
     with patch(
-        "homeassistant.components.esphome.async_setup_entry", return_value=True
+        "smarthub.components.esphome.async_setup_entry", return_value=True
     ) as mock_reload:
         result = await hass.config_entries.options.async_configure(
             result["flow_id"],
@@ -1757,7 +1757,7 @@ async def test_option_flow_allow_service_calls(
 
 
 async def test_option_flow_subscribe_logs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -1776,7 +1776,7 @@ async def test_option_flow_subscribe_logs(
     }
 
     with patch(
-        "homeassistant.components.esphome.async_setup_entry", return_value=True
+        "smarthub.components.esphome.async_setup_entry", return_value=True
     ) as mock_reload:
         result = await hass.config_entries.options.async_configure(
             result["flow_id"],
@@ -1794,7 +1794,7 @@ async def test_option_flow_subscribe_logs(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_user_discovers_name_no_dashboard(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
 ) -> None:
     """Test user step can discover the name and the there is not dashboard."""
@@ -1835,7 +1835,7 @@ async def test_user_discovers_name_no_dashboard(
 
 
 async def mqtt_discovery_test_abort(
-    hass: HomeAssistant, payload: str, reason: str
+    hass: SmartHub, payload: str, reason: str
 ) -> None:
     """Test discovery aborted."""
     service_info = MqttServiceInfo(
@@ -1854,25 +1854,25 @@ async def mqtt_discovery_test_abort(
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_mqtt_no_mac(hass: HomeAssistant) -> None:
+async def test_discovery_mqtt_no_mac(hass: SmartHub) -> None:
     """Test discovery aborted if mac is missing in MQTT payload."""
     await mqtt_discovery_test_abort(hass, "{}", "mqtt_missing_mac")
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_mqtt_empty_payload(hass: HomeAssistant) -> None:
+async def test_discovery_mqtt_empty_payload(hass: SmartHub) -> None:
     """Test discovery aborted if MQTT payload is empty."""
     await mqtt_discovery_test_abort(hass, "", "mqtt_missing_payload")
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_mqtt_no_api(hass: HomeAssistant) -> None:
+async def test_discovery_mqtt_no_api(hass: SmartHub) -> None:
     """Test discovery aborted if api/port is missing in MQTT payload."""
     await mqtt_discovery_test_abort(hass, '{"mac":"abcdef123456"}', "mqtt_missing_api")
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_mqtt_no_ip(hass: HomeAssistant) -> None:
+async def test_discovery_mqtt_no_ip(hass: SmartHub) -> None:
     """Test discovery aborted if ip is missing in MQTT payload."""
     await mqtt_discovery_test_abort(
         hass, '{"mac":"abcdef123456","port":6053}', "mqtt_missing_ip"
@@ -1880,7 +1880,7 @@ async def test_discovery_mqtt_no_ip(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_client", "mock_setup_entry", "mock_zeroconf")
-async def test_discovery_mqtt_initiation(hass: HomeAssistant) -> None:
+async def test_discovery_mqtt_initiation(hass: SmartHub) -> None:
     """Test discovery importing works."""
     service_info = MqttServiceInfo(
         topic="esphome/discover/test",
@@ -1909,7 +1909,7 @@ async def test_discovery_mqtt_initiation(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_user_flow_name_conflict_migrate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
 ) -> None:
     """Test handle migration on name conflict."""
@@ -1959,7 +1959,7 @@ async def test_user_flow_name_conflict_migrate(
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_zeroconf")
 async def test_user_flow_name_conflict_overwrite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
 ) -> None:
     """Test handle overwrite on name conflict."""
@@ -2003,7 +2003,7 @@ async def test_user_flow_name_conflict_overwrite(
 
 @pytest.mark.usefixtures("mock_zeroconf", "mock_setup_entry")
 async def test_reconfig_success_with_same_ip_new_name(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reconfig initiation with same ip and new name."""
     entry = MockConfigEntry(
@@ -2035,7 +2035,7 @@ async def test_reconfig_success_with_same_ip_new_name(
 
 @pytest.mark.usefixtures("mock_zeroconf", "mock_setup_entry")
 async def test_reconfig_success_with_new_ip_new_name(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reconfig initiation with new ip and new name."""
     entry = MockConfigEntry(
@@ -2067,7 +2067,7 @@ async def test_reconfig_success_with_new_ip_new_name(
 
 @pytest.mark.usefixtures("mock_zeroconf", "mock_setup_entry")
 async def test_reconfig_success_with_new_ip_same_name(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reconfig initiation with new ip and same name."""
     entry = MockConfigEntry(
@@ -2101,7 +2101,7 @@ async def test_reconfig_success_with_new_ip_same_name(
 
 @pytest.mark.usefixtures("mock_zeroconf", "mock_setup_entry")
 async def test_reconfig_success_noise_psk_changes(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reconfig initiation with new ip and new noise psk."""
     entry = MockConfigEntry(
@@ -2149,7 +2149,7 @@ async def test_reconfig_success_noise_psk_changes(
 
 @pytest.mark.usefixtures("mock_zeroconf", "mock_setup_entry")
 async def test_reconfig_name_conflict_with_existing_entry(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reconfig with a name conflict with an existing entry."""
     entry = MockConfigEntry(
@@ -2196,7 +2196,7 @@ async def test_reconfig_name_conflict_with_existing_entry(
 
 @pytest.mark.usefixtures("mock_zeroconf", "mock_setup_entry")
 async def test_reconfig_attempt_to_change_mac_aborts(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reconfig initiation with valid PSK attempting to change mac."""
     entry = MockConfigEntry(
@@ -2234,7 +2234,7 @@ async def test_reconfig_attempt_to_change_mac_aborts(
 
 @pytest.mark.usefixtures("mock_zeroconf", "mock_setup_entry")
 async def test_reconfig_mac_used_by_other_entry(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reconfig when there is another entry for the mac."""
     entry = MockConfigEntry(
@@ -2279,7 +2279,7 @@ async def test_reconfig_mac_used_by_other_entry(
 
 @pytest.mark.usefixtures("mock_zeroconf", "mock_setup_entry")
 async def test_reconfig_name_conflict_migrate(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reconfig initiation when device has been replaced."""
     entry = MockConfigEntry(
@@ -2324,7 +2324,7 @@ async def test_reconfig_name_conflict_migrate(
 
 @pytest.mark.usefixtures("mock_zeroconf", "mock_setup_entry")
 async def test_reconfig_name_conflict_overwrite(
-    hass: HomeAssistant, mock_client: APIClient
+    hass: SmartHub, mock_client: APIClient
 ) -> None:
     """Test reconfig initiation when device has been replaced."""
     entry = MockConfigEntry(

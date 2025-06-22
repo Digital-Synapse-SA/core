@@ -6,11 +6,11 @@ from unittest.mock import patch
 from aioesphomeapi import APIClient, DeviceInfo, InvalidAuthAPIError
 import pytest
 
-from homeassistant.components.esphome import CONF_NOISE_PSK, DOMAIN, dashboard
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub.components.esphome import CONF_NOISE_PSK, DOMAIN, dashboard
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from . import VALID_NOISE_PSK
 from .common import MockDashboardRefresh
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("init_integration", "mock_dashboard")
 async def test_dashboard_storage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ) -> None:
     """Test dashboard storage."""
@@ -35,7 +35,7 @@ async def test_dashboard_storage(
 
 
 async def test_restore_dashboard_storage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ) -> None:
     """Restore dashboard url and slug from storage."""
@@ -54,7 +54,7 @@ async def test_restore_dashboard_storage(
 
 
 async def test_restore_dashboard_storage_end_to_end(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ) -> None:
     """Restore dashboard url and slug from storage."""
@@ -66,10 +66,10 @@ async def test_restore_dashboard_storage_end_to_end(
     }
     with (
         patch(
-            "homeassistant.components.esphome.dashboard.is_hassio", return_value=False
+            "smarthub.components.esphome.dashboard.is_hassio", return_value=False
         ),
         patch(
-            "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI"
+            "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI"
         ) as mock_dashboard_api,
     ):
         await async_setup_component(hass, DOMAIN, {})
@@ -79,7 +79,7 @@ async def test_restore_dashboard_storage_end_to_end(
 
 @pytest.mark.usefixtures("hassio_stubs")
 async def test_restore_dashboard_storage_skipped_if_addon_uninstalled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -92,13 +92,13 @@ async def test_restore_dashboard_storage_skipped_if_addon_uninstalled(
     }
     with (
         patch(
-            "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI"
+            "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI"
         ) as mock_dashboard_api,
         patch(
-            "homeassistant.components.esphome.dashboard.is_hassio", return_value=True
+            "smarthub.components.esphome.dashboard.is_hassio", return_value=True
         ),
         patch(
-            "homeassistant.components.hassio.get_addons_info",
+            "smarthub.components.hassio.get_addons_info",
             return_value={},
         ),
     ):
@@ -109,12 +109,12 @@ async def test_restore_dashboard_storage_skipped_if_addon_uninstalled(
 
 
 async def test_setup_dashboard_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ) -> None:
     """Test that nothing is stored on failed dashboard setup when there was no dashboard before."""
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_devices",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_devices",
         side_effect=TimeoutError,
     ) as mock_get_devices:
         await async_setup_component(hass, DOMAIN, {})
@@ -128,13 +128,13 @@ async def test_setup_dashboard_fails(
 
 
 async def test_setup_dashboard_fails_when_already_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     hass_storage: dict[str, Any],
 ) -> None:
     """Test failed dashboard setup still reloads entries if one existed before."""
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_devices"
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_devices"
     ) as mock_get_devices:
         await dashboard.async_set_dashboard_info(
             hass, "test-slug", "working-host", 6052
@@ -149,11 +149,11 @@ async def test_setup_dashboard_fails_when_already_setup(
 
     with (
         patch(
-            "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_devices",
+            "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_devices",
             side_effect=TimeoutError,
         ) as mock_get_devices,
         patch(
-            "homeassistant.components.esphome.async_setup_entry", return_value=True
+            "smarthub.components.esphome.async_setup_entry", return_value=True
         ) as mock_setup,
     ):
         await dashboard.async_set_dashboard_info(hass, "test-slug", "test-host", 6052)
@@ -168,26 +168,26 @@ async def test_setup_dashboard_fails_when_already_setup(
 
 @pytest.mark.usefixtures("mock_dashboard")
 async def test_new_info_reload_config_entries(
-    hass: HomeAssistant, init_integration: MockConfigEntry
+    hass: SmartHub, init_integration: MockConfigEntry
 ) -> None:
     """Test config entries are reloaded when new info is set."""
     assert init_integration.state is ConfigEntryState.LOADED
 
-    with patch("homeassistant.components.esphome.async_setup_entry") as mock_setup:
+    with patch("smarthub.components.esphome.async_setup_entry") as mock_setup:
         await dashboard.async_set_dashboard_info(hass, "test-slug", "test-host", 6052)
 
     assert len(mock_setup.mock_calls) == 1
     assert mock_setup.mock_calls[0][1][1] == init_integration
 
     # Test it's a no-op when the same info is set
-    with patch("homeassistant.components.esphome.async_setup_entry") as mock_setup:
+    with patch("smarthub.components.esphome.async_setup_entry") as mock_setup:
         await dashboard.async_set_dashboard_info(hass, "test-slug", "test-host", 6052)
 
     assert len(mock_setup.mock_calls) == 0
 
 
 async def test_new_dashboard_fix_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_config_entry: MockConfigEntry,
     mock_dashboard: dict[str, Any],
@@ -199,7 +199,7 @@ async def test_new_dashboard_fix_reauth(
     )
 
     with patch(
-        "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
+        "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
         return_value=VALID_NOISE_PSK,
     ) as mock_get_encryption_key:
         result = await mock_config_entry.start_reauth_flow(hass)
@@ -218,11 +218,11 @@ async def test_new_dashboard_fix_reauth(
 
     with (
         patch(
-            "homeassistant.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
+            "smarthub.components.esphome.coordinator.ESPHomeDashboardAPI.get_encryption_key",
             return_value=VALID_NOISE_PSK,
         ) as mock_get_encryption_key,
         patch(
-            "homeassistant.components.esphome.async_setup_entry", return_value=True
+            "smarthub.components.esphome.async_setup_entry", return_value=True
         ) as mock_setup,
     ):
         await dashboard.async_set_dashboard_info(hass, "test-slug", "test-host", 6052)
@@ -234,7 +234,7 @@ async def test_new_dashboard_fix_reauth(
 
 
 async def test_dashboard_supports_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dashboard: dict[str, Any],
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -273,7 +273,7 @@ async def test_dashboard_supports_update(
 
 
 async def test_dashboard_unsupported_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dashboard: dict[str, Any],
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,

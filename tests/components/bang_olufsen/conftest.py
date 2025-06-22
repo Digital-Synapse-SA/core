@@ -28,8 +28,8 @@ from mozart_api.models import (
 )
 import pytest
 
-from homeassistant.components.bang_olufsen.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.bang_olufsen.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .const import (
     TEST_DATA_CREATE_ENTRY,
@@ -78,7 +78,7 @@ def mock_config_entry_core() -> MockConfigEntry:
 
 @pytest.fixture(name="integration")
 async def integration_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mozart_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -94,10 +94,10 @@ def mock_mozart_client() -> Generator[AsyncMock]:
     """Mock MozartClient."""
     with (
         patch(
-            "homeassistant.components.bang_olufsen.MozartClient", autospec=True
+            "smarthub.components.bang_olufsen.MozartClient", autospec=True
         ) as mock_client,
         patch(
-            "homeassistant.components.bang_olufsen.config_flow.MozartClient",
+            "smarthub.components.bang_olufsen.config_flow.MozartClient",
             new=mock_client,
         ),
     ):
@@ -364,6 +364,6 @@ def mock_mozart_client() -> Generator[AsyncMock]:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock successful setup entry."""
     with patch(
-        "homeassistant.components.bang_olufsen.async_setup_entry", return_value=True
+        "smarthub.components.bang_olufsen.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry

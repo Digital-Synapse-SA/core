@@ -2,14 +2,14 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.epson.const import CONF_CONNECTION_TYPE, DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components.epson.const import CONF_CONNECTION_TYPE, DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_migrate_entry(hass: HomeAssistant) -> None:
+async def test_migrate_entry(hass: SmartHub) -> None:
     """Test successful migration of entry data from version 1 to 1.2."""
 
     mock_entry = MockConfigEntry(
@@ -25,7 +25,7 @@ async def test_migrate_entry(hass: HomeAssistant) -> None:
     mock_entry.add_to_hass(hass)
 
     # Create entity entry to migrate to new unique ID
-    with patch("homeassistant.components.epson.Projector.get_power"):
+    with patch("smarthub.components.epson.Projector.get_power"):
         await hass.config_entries.async_setup(mock_entry.entry_id)
         await hass.async_block_till_done()
 

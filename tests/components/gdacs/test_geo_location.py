@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 
-from homeassistant.components.gdacs.const import DEFAULT_SCAN_INTERVAL
-from homeassistant.components.gdacs.geo_location import (
+from smarthub.components.gdacs.const import DEFAULT_SCAN_INTERVAL
+from smarthub.components.gdacs.geo_location import (
     ATTR_ALERT_LEVEL,
     ATTR_COUNTRY,
     ATTR_DESCRIPTION,
@@ -19,8 +19,8 @@ from homeassistant.components.gdacs.geo_location import (
     ATTR_TO_DATE,
     ATTR_VULNERABILITY,
 )
-from homeassistant.components.geo_location import ATTR_SOURCE
-from homeassistant.const import (
+from smarthub.components.geo_location import ATTR_SOURCE
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
@@ -31,10 +31,10 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_START,
     UnitOfLength,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from . import _generate_mock_feed_entry
 
@@ -44,7 +44,7 @@ CONFIG = {CONF_RADIUS: 200}
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -211,7 +211,7 @@ async def test_setup(
 
 
 async def test_setup_imperial(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test the setup of the integration using imperial unit system."""
     hass.config.units = US_CUSTOMARY_SYSTEM

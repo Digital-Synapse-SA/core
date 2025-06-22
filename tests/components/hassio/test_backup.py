@@ -35,7 +35,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.backup import (
+from smarthub.components.backup import (
     DOMAIN as BACKUP_DOMAIN,
     AddonInfo,
     AgentBackup,
@@ -45,12 +45,12 @@ from homeassistant.components.backup import (
     Folder,
     store as backup_store,
 )
-from homeassistant.components.hassio import DOMAIN
-from homeassistant.components.hassio.backup import RESTORE_JOB_ID_ENV
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.backup import async_initialize_backup
-from homeassistant.setup import async_setup_component
+from smarthub.components.hassio import DOMAIN
+from smarthub.components.hassio.backup import RESTORE_JOB_ID_ENV
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.backup import async_initialize_backup
+from smarthub.setup import async_setup_component
 
 from .test_init import MOCK_ENVIRON
 
@@ -62,7 +62,7 @@ TEST_BACKUP = supervisor_backups.Backup(
     content=supervisor_backups.BackupContent(
         addons=["ssl"],
         folders=[supervisor_backups.Folder.SHARE],
-        homeassistant=True,
+        smarthub=True,
     ),
     date=datetime.fromisoformat("1970-01-01T00:00:00Z"),
     location_attributes={
@@ -87,8 +87,8 @@ TEST_BACKUP_DETAILS = supervisor_backups.BackupComplete(
     date=TEST_BACKUP.date,
     extra=None,
     folders=[supervisor_backups.Folder.SHARE],
-    homeassistant_exclude_database=False,
-    homeassistant="2024.12.0",
+    smarthub_exclude_database=False,
+    smarthub="2024.12.0",
     location_attributes=TEST_BACKUP.location_attributes,
     name=TEST_BACKUP.name,
     repositories=[],
@@ -102,7 +102,7 @@ TEST_BACKUP_2 = supervisor_backups.Backup(
     content=supervisor_backups.BackupContent(
         addons=["ssl"],
         folders=[supervisor_backups.Folder.SHARE],
-        homeassistant=False,
+        smarthub=False,
     ),
     date=datetime.fromisoformat("1970-01-01T00:00:00Z"),
     location_attributes={
@@ -127,8 +127,8 @@ TEST_BACKUP_DETAILS_2 = supervisor_backups.BackupComplete(
     date=TEST_BACKUP_2.date,
     extra=None,
     folders=[supervisor_backups.Folder.SHARE],
-    homeassistant_exclude_database=False,
-    homeassistant=None,
+    smarthub_exclude_database=False,
+    smarthub=None,
     location_attributes=TEST_BACKUP_2.location_attributes,
     name=TEST_BACKUP_2.name,
     repositories=[],
@@ -142,7 +142,7 @@ TEST_BACKUP_3 = supervisor_backups.Backup(
     content=supervisor_backups.BackupContent(
         addons=["ssl"],
         folders=[supervisor_backups.Folder.SHARE],
-        homeassistant=True,
+        smarthub=True,
     ),
     date=datetime.fromisoformat("1970-01-01T00:00:00Z"),
     location_attributes={
@@ -167,8 +167,8 @@ TEST_BACKUP_DETAILS_3 = supervisor_backups.BackupComplete(
     date=TEST_BACKUP_3.date,
     extra=None,
     folders=[supervisor_backups.Folder.SHARE],
-    homeassistant_exclude_database=False,
-    homeassistant=None,
+    smarthub_exclude_database=False,
+    smarthub=None,
     location_attributes=TEST_BACKUP_3.location_attributes,
     name=TEST_BACKUP_3.name,
     repositories=[],
@@ -183,7 +183,7 @@ TEST_BACKUP_4 = supervisor_backups.Backup(
     content=supervisor_backups.BackupContent(
         addons=["ssl"],
         folders=[supervisor_backups.Folder.SHARE],
-        homeassistant=True,
+        smarthub=True,
     ),
     date=datetime.fromisoformat("1970-01-01T00:00:00Z"),
     location_attributes={
@@ -208,8 +208,8 @@ TEST_BACKUP_DETAILS_4 = supervisor_backups.BackupComplete(
     date=TEST_BACKUP_4.date,
     extra=None,
     folders=[supervisor_backups.Folder.SHARE],
-    homeassistant_exclude_database=True,
-    homeassistant="2024.12.0",
+    smarthub_exclude_database=True,
+    smarthub="2024.12.0",
     location_attributes=TEST_BACKUP_4.location_attributes,
     name=TEST_BACKUP_4.name,
     repositories=[],
@@ -223,7 +223,7 @@ TEST_BACKUP_5 = supervisor_backups.Backup(
     content=supervisor_backups.BackupContent(
         addons=["ssl"],
         folders=[supervisor_backups.Folder.SHARE],
-        homeassistant=True,
+        smarthub=True,
     ),
     date=datetime.fromisoformat("1970-01-01T00:00:00Z"),
     location_attributes={
@@ -248,8 +248,8 @@ TEST_BACKUP_DETAILS_5 = supervisor_backups.BackupComplete(
     date=TEST_BACKUP_5.date,
     extra=None,
     folders=[supervisor_backups.Folder.SHARE],
-    homeassistant_exclude_database=False,
-    homeassistant="2024.12.0",
+    smarthub_exclude_database=False,
+    smarthub="2024.12.0",
     location_attributes=TEST_BACKUP_5.location_attributes,
     name=TEST_BACKUP_5.name,
     repositories=[],
@@ -311,19 +311,19 @@ def fixture_supervisor_environ() -> Generator[None]:
 
 @pytest.fixture(autouse=True)
 async def hassio_enabled(
-    hass: HomeAssistant, supervisor_client: AsyncMock
+    hass: SmartHub, supervisor_client: AsyncMock
 ) -> AsyncGenerator[None]:
     """Enable hassio."""
     with (
-        patch("homeassistant.components.backup.is_hassio", return_value=True),
-        patch("homeassistant.components.backup.backup.is_hassio", return_value=True),
+        patch("smarthub.components.backup.is_hassio", return_value=True),
+        patch("smarthub.components.backup.backup.is_hassio", return_value=True),
     ):
         yield
 
 
 @pytest.fixture
 async def setup_backup_integration(
-    hass: HomeAssistant, hassio_enabled: None, supervisor_client: AsyncMock
+    hass: SmartHub, hassio_enabled: None, supervisor_client: AsyncMock
 ) -> None:
     """Set up Backup integration."""
     async_initialize_backup(hass)
@@ -398,7 +398,7 @@ def mock_backup_agent(
 
 
 async def _setup_backup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     *,
     domain: str,
     platform: BackupAgentPlatformProtocol,
@@ -456,7 +456,7 @@ async def _setup_backup_platform(
     ],
 )
 async def test_agent_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     mounts: MountsInfo,
@@ -501,8 +501,8 @@ async def test_agent_info(
                 "failed_agent_ids": [],
                 "failed_folders": [],
                 "folders": ["share"],
-                "homeassistant_included": True,
-                "homeassistant_version": "2024.12.0",
+                "smarthub_included": True,
+                "smarthub_version": "2024.12.0",
                 "name": "Test",
                 "with_automatic_settings": None,
             },
@@ -523,8 +523,8 @@ async def test_agent_info(
                 "failed_agent_ids": [],
                 "failed_folders": [],
                 "folders": ["share"],
-                "homeassistant_included": False,
-                "homeassistant_version": None,
+                "smarthub_included": False,
+                "smarthub_version": None,
                 "name": "Test",
                 "with_automatic_settings": None,
             },
@@ -532,7 +532,7 @@ async def test_agent_info(
     ],
 )
 async def test_agent_list_backups(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     backup: supervisor_backups.Backup,
@@ -553,7 +553,7 @@ async def test_agent_list_backups(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_agent_download(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -588,7 +588,7 @@ async def test_agent_download(
 )
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_agent_download_unavailable_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     supervisor_client: AsyncMock,
     agent_id: str,
@@ -606,7 +606,7 @@ async def test_agent_download_unavailable_backup(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_agent_upload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -628,7 +628,7 @@ async def test_agent_upload(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_agent_get_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -661,8 +661,8 @@ async def test_agent_get_backup(
             "failed_agent_ids": [],
             "failed_folders": [],
             "folders": ["share"],
-            "homeassistant_included": True,
-            "homeassistant_version": "2024.12.0",
+            "smarthub_included": True,
+            "smarthub_version": "2024.12.0",
             "name": "Test",
             "with_automatic_settings": None,
         },
@@ -691,7 +691,7 @@ async def test_agent_get_backup(
     ],
 )
 async def test_agent_get_backup_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     backup_info_side_effect: Exception,
@@ -716,7 +716,7 @@ async def test_agent_get_backup_with_error(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_agent_delete_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -763,7 +763,7 @@ async def test_agent_delete_backup(
     ],
 )
 async def test_agent_delete_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     remove_side_effect: Exception,
@@ -834,7 +834,7 @@ async def test_agent_delete_with_error(
     ],
 )
 async def test_agents_notify_on_mount_added_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     event_data: dict[str, Any],
@@ -864,8 +864,8 @@ DEFAULT_BACKUP_OPTIONS = supervisor_backups.PartialBackupOptions(
     },
     filename=PurePath("Test_2025-01-30_05.42_12345678.tar"),
     folders={supervisor_backups.Folder("ssl")},
-    homeassistant_exclude_database=False,
-    homeassistant=True,
+    smarthub_exclude_database=False,
+    smarthub=True,
     location=[LOCATION_LOCAL_STORAGE],
     name="Test",
     password=None,
@@ -890,7 +890,7 @@ DEFAULT_BACKUP_OPTIONS = supervisor_backups.PartialBackupOptions(
         ),
         (
             {"include_database": False},
-            replace(DEFAULT_BACKUP_OPTIONS, homeassistant_exclude_database=True),
+            replace(DEFAULT_BACKUP_OPTIONS, smarthub_exclude_database=True),
         ),
         (
             {"include_folders": ["media", "share"]},
@@ -907,19 +907,19 @@ DEFAULT_BACKUP_OPTIONS = supervisor_backups.PartialBackupOptions(
             {
                 "include_folders": ["media"],
                 "include_database": False,
-                "include_homeassistant": False,
+                "include_smarthub": False,
             },
             replace(
                 DEFAULT_BACKUP_OPTIONS,
                 folders={supervisor_backups.Folder("media")},
-                homeassistant=False,
-                homeassistant_exclude_database=True,
+                smarthub=False,
+                smarthub_exclude_database=True,
             ),
         ),
     ],
 )
 async def test_reader_writer_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     supervisor_client: AsyncMock,
@@ -1001,7 +1001,7 @@ async def test_reader_writer_create(
     [[Mock(slug="core_ssh", version="0.0.0"), SupervisorError("Boom")]],
 )
 async def test_reader_writer_create_addon_folder_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     supervisor_client: AsyncMock,
@@ -1120,7 +1120,7 @@ async def test_reader_writer_create_addon_folder_error(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_reader_writer_create_report_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     supervisor_client: AsyncMock,
@@ -1227,7 +1227,7 @@ async def test_reader_writer_create_report_progress(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_reader_writer_create_job_done(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     supervisor_client: AsyncMock,
@@ -1429,7 +1429,7 @@ async def test_reader_writer_create_job_done(
     ],
 )
 async def test_reader_writer_create_per_agent_encryption(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     supervisor_client: AsyncMock,
@@ -1577,7 +1577,7 @@ async def test_reader_writer_create_per_agent_encryption(
     ],
 )
 async def test_reader_writer_create_partial_backup_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     side_effect: Exception,
@@ -1655,7 +1655,7 @@ async def test_reader_writer_create_partial_backup_error(
 )
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_reader_writer_create_missing_reference_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     supervisor_event: dict[str, Any],
@@ -1719,7 +1719,7 @@ async def test_reader_writer_create_missing_reference_error(
     [("download_backup", 1, 1), ("remove_backup", 1, 1)],
 )
 async def test_reader_writer_create_download_remove_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     exception: Exception,
@@ -1809,7 +1809,7 @@ async def test_reader_writer_create_download_remove_error(
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 @pytest.mark.parametrize("exception", [SupervisorError("Boom!"), Exception("Boom!")])
 async def test_reader_writer_create_info_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     exception: Exception,
@@ -1885,7 +1885,7 @@ async def test_reader_writer_create_info_error(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_reader_writer_create_remote_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     supervisor_client: AsyncMock,
@@ -1972,14 +1972,14 @@ async def test_reader_writer_create_remote_backup(
     ("extra_generate_options", "expected_error"),
     [
         (
-            {"include_homeassistant": False},
+            {"include_smarthub": False},
             {
                 "code": "home_assistant_error",
-                "message": "Cannot create a backup with database but without Home Assistant",
+                "message": "Cannot create a backup with database but without SmartHub",
             },
         ),
         (
-            {"include_homeassistant": False, "include_database": False},
+            {"include_smarthub": False, "include_database": False},
             {
                 "code": "unknown_error",
                 "message": "Unknown error",
@@ -1988,7 +1988,7 @@ async def test_reader_writer_create_remote_backup(
     ],
 )
 async def test_reader_writer_create_wrong_parameters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     extra_generate_options: dict[str, Any],
@@ -2039,7 +2039,7 @@ async def test_reader_writer_create_wrong_parameters(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_agent_receive_remote_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -2088,7 +2088,7 @@ async def test_agent_receive_remote_backup(
 )
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_reader_writer_restore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     get_job_result: supervisor_jobs.Job,
@@ -2126,7 +2126,7 @@ async def test_reader_writer_restore(
             addons=None,
             background=True,
             folders=None,
-            homeassistant=True,
+            smarthub=True,
             location=LOCATION_LOCAL_STORAGE,
             password=None,
         ),
@@ -2155,7 +2155,7 @@ async def test_reader_writer_restore(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_reader_writer_restore_remote_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -2174,8 +2174,8 @@ async def test_reader_writer_restore_remote_backup(
         date="1970-01-01T00:00:00.000Z",
         extra_metadata={},
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=False,
         size=0,
@@ -2219,7 +2219,7 @@ async def test_reader_writer_restore_remote_backup(
             addons=None,
             background=True,
             folders=None,
-            homeassistant=True,
+            smarthub=True,
             location=LOCATION_CLOUD_BACKUP,
             password=None,
         ),
@@ -2252,7 +2252,7 @@ async def test_reader_writer_restore_remote_backup(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_reader_writer_restore_report_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -2288,7 +2288,7 @@ async def test_reader_writer_restore_report_progress(
             addons=None,
             background=True,
             folders=None,
-            homeassistant=True,
+            smarthub=True,
             location=LOCATION_LOCAL_STORAGE,
             password=None,
         ),
@@ -2374,7 +2374,7 @@ async def test_reader_writer_restore_report_progress(
 )
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_reader_writer_restore_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     supervisor_error: Exception,
@@ -2410,7 +2410,7 @@ async def test_reader_writer_restore_error(
             addons=None,
             background=True,
             folders=None,
-            homeassistant=True,
+            smarthub=True,
             location=LOCATION_LOCAL_STORAGE,
             password=None,
         ),
@@ -2433,7 +2433,7 @@ async def test_reader_writer_restore_error(
 
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_reader_writer_restore_late_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -2467,7 +2467,7 @@ async def test_reader_writer_restore_late_error(
             addons=None,
             background=True,
             folders=None,
-            homeassistant=True,
+            smarthub=True,
             location=LOCATION_LOCAL_STORAGE,
             password=None,
         ),
@@ -2534,20 +2534,20 @@ async def test_reader_writer_restore_late_error(
         (
             TEST_BACKUP,
             TEST_BACKUP_DETAILS,
-            {"restore_homeassistant": False},
-            "Cannot restore database without Home Assistant",
+            {"restore_smarthub": False},
+            "Cannot restore database without SmartHub",
         ),
         (
             TEST_BACKUP_4,
             TEST_BACKUP_DETAILS_4,
-            {"restore_homeassistant": True, "restore_database": True},
+            {"restore_smarthub": True, "restore_database": True},
             "Restore database must match backup",
         ),
     ],
 )
 @pytest.mark.usefixtures("hassio_client", "setup_backup_integration")
 async def test_reader_writer_restore_wrong_parameters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     backup: supervisor_backups.Backup,
@@ -2600,7 +2600,7 @@ async def test_reader_writer_restore_wrong_parameters(
 )
 @pytest.mark.usefixtures("hassio_client")
 async def test_restore_progress_after_restart(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     get_job_result: supervisor_jobs.Job,
@@ -2626,7 +2626,7 @@ async def test_restore_progress_after_restart(
 
 @pytest.mark.usefixtures("hassio_client")
 async def test_restore_progress_after_restart_report_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -2709,7 +2709,7 @@ async def test_restore_progress_after_restart_report_progress(
 
 @pytest.mark.usefixtures("hassio_client")
 async def test_restore_progress_after_restart_unknown_job(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -2803,7 +2803,7 @@ async def test_restore_progress_after_restart_unknown_job(
 )
 @pytest.mark.usefixtures("hassio_client")
 async def test_config_load_config_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,

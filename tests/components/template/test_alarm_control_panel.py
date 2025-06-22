@@ -5,12 +5,12 @@ from typing import Any
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import template
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components import template
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_DOMAIN,
     AlarmControlPanelState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DOMAIN,
     ATTR_ENTITY_ID,
     ATTR_SERVICE_DATA,
@@ -19,9 +19,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import Event, HomeAssistant, State, callback
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import Event, SmartHub, State, callback
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import ConfigurationStyle
 
@@ -33,7 +33,7 @@ TEST_STATE_ENTITY_ID = "alarm_control_panel.test"
 
 
 @pytest.fixture
-def call_service_events(hass: HomeAssistant) -> list[Event]:
+def call_service_events(hass: SmartHub) -> list[Event]:
     """Track service call events for alarm_control_panel.test."""
     events: list[Event] = []
     entity_id = "alarm_control_panel.test"
@@ -112,7 +112,7 @@ TEMPLATE_ALARM_CONFIG = {
 
 
 async def async_setup_legacy_format(
-    hass: HomeAssistant, count: int, panel_config: dict[str, Any]
+    hass: SmartHub, count: int, panel_config: dict[str, Any]
 ) -> None:
     """Do setup of alarm control panel integration via legacy format."""
     config = {"alarm_control_panel": {"platform": "template", "panels": panel_config}}
@@ -129,7 +129,7 @@ async def async_setup_legacy_format(
 
 
 async def async_setup_modern_format(
-    hass: HomeAssistant, count: int, panel_config: dict[str, Any]
+    hass: SmartHub, count: int, panel_config: dict[str, Any]
 ) -> None:
     """Do setup of alarm control panel integration via modern format."""
     config = {"template": {"alarm_control_panel": panel_config}}
@@ -148,7 +148,7 @@ async def async_setup_modern_format(
 
 @pytest.fixture
 async def setup_panel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     panel_config: dict[str, Any],
@@ -161,7 +161,7 @@ async def setup_panel(
 
 
 async def async_setup_state_panel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -192,7 +192,7 @@ async def async_setup_state_panel(
 
 @pytest.fixture
 async def setup_state_panel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -203,7 +203,7 @@ async def setup_state_panel(
 
 @pytest.fixture
 async def setup_base_panel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str | None,
@@ -232,7 +232,7 @@ async def setup_base_panel(
 
 @pytest.fixture
 async def setup_single_attribute_state_panel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -273,7 +273,7 @@ async def setup_single_attribute_state_panel(
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_panel")
-async def test_template_state_text(hass: HomeAssistant) -> None:
+async def test_template_state_text(hass: SmartHub) -> None:
     """Test the state text of a template."""
 
     for set_state in (
@@ -320,7 +320,7 @@ async def test_template_state_text(hass: HomeAssistant) -> None:
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_panel")
-async def test_state_template_states(hass: HomeAssistant, expected: str) -> None:
+async def test_state_template_states(hass: SmartHub, expected: str) -> None:
     """Test the state template."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.state == expected
@@ -344,7 +344,7 @@ async def test_state_template_states(hass: HomeAssistant, expected: str) -> None
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_panel")
 async def test_icon_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test icon template."""
     state = hass.states.get(TEST_ENTITY_ID)
@@ -375,7 +375,7 @@ async def test_icon_template(
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_panel")
 async def test_picture_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test icon template."""
     state = hass.states.get(TEST_ENTITY_ID)
@@ -389,7 +389,7 @@ async def test_picture_template(
 
 
 async def test_setup_config_entry(
-    hass: HomeAssistant, snapshot: SnapshotAssertion
+    hass: SmartHub, snapshot: SnapshotAssertion
 ) -> None:
     """Test the config flow."""
     value_template = "{{ states('alarm_control_panel.one') }}"
@@ -431,7 +431,7 @@ async def test_setup_config_entry(
     "panel_config", [OPTIMISTIC_TEMPLATE_ALARM_CONFIG, EMPTY_ACTIONS]
 )
 @pytest.mark.usefixtures("setup_base_panel")
-async def test_optimistic_states(hass: HomeAssistant) -> None:
+async def test_optimistic_states(hass: SmartHub) -> None:
     """Test the optimistic state."""
 
     state = hass.states.get(TEST_ENTITY_ID)
@@ -478,7 +478,7 @@ async def test_optimistic_states(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("setup_base_panel")
 async def test_template_syntax_error(
-    hass: HomeAssistant, msg, caplog_setup_text
+    hass: SmartHub, msg, caplog_setup_text
 ) -> None:
     """Test templating syntax error."""
     assert len(hass.states.async_all("alarm_control_panel")) == 0
@@ -522,7 +522,7 @@ async def test_template_syntax_error(
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_legacy_template_syntax_error(
-    hass: HomeAssistant, msg, caplog_setup_text
+    hass: SmartHub, msg, caplog_setup_text
 ) -> None:
     """Test templating syntax error."""
     assert len(hass.states.async_all("alarm_control_panel")) == 0
@@ -541,7 +541,7 @@ async def test_legacy_template_syntax_error(
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_panel")
-async def test_name(hass: HomeAssistant, test_entity_id: str) -> None:
+async def test_name(hass: SmartHub, test_entity_id: str) -> None:
     """Test the accessibility of the name attribute."""
     state = hass.states.get(test_entity_id)
     assert state is not None
@@ -568,7 +568,7 @@ async def test_name(hass: HomeAssistant, test_entity_id: str) -> None:
 )
 @pytest.mark.usefixtures("setup_state_panel")
 async def test_actions(
-    hass: HomeAssistant, service, call_service_events: list[Event]
+    hass: SmartHub, service, call_service_events: list[Event]
 ) -> None:
     """Test alarm actions."""
     await hass.services.async_call(
@@ -618,13 +618,13 @@ async def test_actions(
     ],
 )
 @pytest.mark.usefixtures("setup_panel")
-async def test_unique_id(hass: HomeAssistant) -> None:
+async def test_unique_id(hass: SmartHub) -> None:
     """Test unique_id option only creates one alarm control panel per id."""
     assert len(hass.states.async_all()) == 1
 
 
 async def test_nested_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a template unique_id propagates to alarm_control_panel unique_ids."""
     with assert_setup_component(1, template.DOMAIN):
@@ -703,7 +703,7 @@ async def test_nested_unique_id(
     ],
 )
 @pytest.mark.usefixtures("setup_base_panel")
-async def test_code_config(hass: HomeAssistant, code_format, code_arm_required) -> None:
+async def test_code_config(hass: SmartHub, code_format, code_arm_required) -> None:
     """Test configuration options related to alarm code."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.attributes.get("code_format") == code_format
@@ -752,7 +752,7 @@ async def test_code_config(hass: HomeAssistant, code_format, code_arm_required) 
     ],
 )
 async def test_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     state_template: str,
     style: ConfigurationStyle,
@@ -774,7 +774,7 @@ async def test_restore_state(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

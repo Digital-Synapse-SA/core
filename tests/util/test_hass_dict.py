@@ -1,6 +1,6 @@
 """Test HassDict and custom HassKey types."""
 
-from homeassistant.util.hass_dict import HassDict, HassEntryKey, HassKey
+from smarthub.util.hass_dict import HassDict, HassEntryKey, HassKey
 
 
 def test_key_comparison() -> None:

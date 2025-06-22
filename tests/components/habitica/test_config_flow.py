@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.habitica.const import (
+from smarthub.components.habitica.const import (
     CONF_API_USER,
     DEFAULT_URL,
     DOMAIN,
@@ -13,8 +13,8 @@ from homeassistant.components.habitica.const import (
     SECTION_REAUTH_API_KEY,
     SECTION_REAUTH_LOGIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_API_KEY,
     CONF_NAME,
     CONF_PASSWORD,
@@ -22,8 +22,8 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import ERROR_BAD_REQUEST, ERROR_NOT_AUTHORIZED
 
@@ -65,7 +65,7 @@ USER_INPUT_RECONFIGURE = {
 
 
 @pytest.mark.usefixtures("habitica")
-async def test_form_login(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form_login(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the login form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -113,7 +113,7 @@ async def test_form_login(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> N
     ],
 )
 async def test_form_login_errors(
-    hass: HomeAssistant, habitica: AsyncMock, raise_error, text_error
+    hass: SmartHub, habitica: AsyncMock, raise_error, text_error
 ) -> None:
     """Test we handle invalid credentials error."""
 
@@ -159,7 +159,7 @@ async def test_form_login_errors(
 
 @pytest.mark.usefixtures("habitica")
 async def test_form_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort form login when entry is already configured."""
@@ -188,7 +188,7 @@ async def test_form_already_configured(
 
 
 @pytest.mark.usefixtures("habitica")
-async def test_form_advanced(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form_advanced(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -236,7 +236,7 @@ async def test_form_advanced(hass: HomeAssistant, mock_setup_entry: AsyncMock) -
     ],
 )
 async def test_form_advanced_errors(
-    hass: HomeAssistant, habitica: AsyncMock, raise_error, text_error
+    hass: SmartHub, habitica: AsyncMock, raise_error, text_error
 ) -> None:
     """Test we handle invalid credentials error."""
 
@@ -283,7 +283,7 @@ async def test_form_advanced_errors(
 
 @pytest.mark.usefixtures("habitica")
 async def test_form_advanced_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort user data set when entry is already configured."""
@@ -321,7 +321,7 @@ async def test_form_advanced_already_configured(
 )
 @pytest.mark.usefixtures("habitica")
 async def test_flow_reauth(
-    hass: HomeAssistant, config_entry: MockConfigEntry, user_input: dict[str, Any]
+    hass: SmartHub, config_entry: MockConfigEntry, user_input: dict[str, Any]
 ) -> None:
     """Test reauth flow."""
     config_entry.add_to_hass(hass)
@@ -385,7 +385,7 @@ async def test_flow_reauth(
     ],
 )
 async def test_flow_reauth_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     habitica: AsyncMock,
     config_entry: MockConfigEntry,
     raise_error: Exception,
@@ -427,7 +427,7 @@ async def test_flow_reauth_errors(
 
 
 @pytest.mark.usefixtures("habitica")
-async def test_flow_reauth_unique_id_mismatch(hass: HomeAssistant) -> None:
+async def test_flow_reauth_unique_id_mismatch(hass: SmartHub) -> None:
     """Test reauth flow."""
 
     config_entry = MockConfigEntry(
@@ -461,7 +461,7 @@ async def test_flow_reauth_unique_id_mismatch(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("habitica")
 async def test_flow_reconfigure(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test reconfigure flow."""
     config_entry.add_to_hass(hass)
@@ -494,7 +494,7 @@ async def test_flow_reconfigure(
     ],
 )
 async def test_flow_reconfigure_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     habitica: AsyncMock,
     config_entry: MockConfigEntry,
     raise_error: Exception,

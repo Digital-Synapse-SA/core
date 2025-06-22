@@ -14,14 +14,14 @@ from smart_meter_texas.const import (
     OD_READ_ENDPOINT,
 )
 
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.smart_meter_texas.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.smart_meter_texas.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -36,7 +36,7 @@ def load_smt_fixture(name):
 
 
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
     **kwargs: Any,
@@ -48,7 +48,7 @@ async def setup_integration(
 
 
 async def refresh_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -103,7 +103,7 @@ def mock_connection(
 
 
 @pytest.fixture(name="config_entry")
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Return a mock config entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

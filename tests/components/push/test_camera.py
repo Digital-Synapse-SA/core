@@ -4,17 +4,17 @@ from datetime import timedelta
 from http import HTTPStatus
 import io
 
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 from tests.typing import ClientSessionGenerator
 
 
 async def test_bad_posting(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test that posting to wrong api endpoint fails."""
     await async_process_ha_core_config(
@@ -47,7 +47,7 @@ async def test_bad_posting(
 
 
 async def test_posting_url(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test that posting to api endpoint works."""
     await async_process_ha_core_config(

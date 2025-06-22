@@ -1,4 +1,4 @@
-homeassistant:
+smarthub:
   packages:
     should_be_a_dict:
       - platform: template

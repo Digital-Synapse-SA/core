@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.water_heater import (
+from smarthub.components.water_heater import (
     ATTR_AWAY_MODE,
     ATTR_OPERATION_MODE,
     ATTR_TEMPERATURE,
@@ -12,15 +12,15 @@ from homeassistant.components.water_heater import (
     STATE_ECO,
     STATE_GAS,
 )
-from homeassistant.const import SERVICE_TURN_OFF, SERVICE_TURN_ON, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.state import async_reproduce_state
+from smarthub.const import SERVICE_TURN_OFF, SERVICE_TURN_ON, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub, State
+from smarthub.helpers.state import async_reproduce_state
 
 from tests.common import async_mock_service
 
 
 async def test_reproducing_states(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reproducing Water heater states."""
     hass.states.async_set("water_heater.entity_off", STATE_OFF, {})

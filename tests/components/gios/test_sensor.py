@@ -8,12 +8,12 @@ from unittest.mock import patch
 from gios import ApiError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.gios.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as PLATFORM
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components.gios.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as PLATFORM
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import init_integration
 
@@ -21,16 +21,16 @@ from tests.common import async_fire_time_changed, async_load_fixture, snapshot_p
 
 
 async def test_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test states of the sensor."""
-    with patch("homeassistant.components.gios.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.gios.PLATFORMS", [Platform.SENSOR]):
         entry = await init_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_availability(hass: HomeAssistant) -> None:
+async def test_availability(hass: SmartHub) -> None:
     """Ensure that we mark the entities unavailable correctly when service causes an error."""
     indexes = json.loads(await async_load_fixture(hass, "indexes.json", DOMAIN))
     sensors = json.loads(await async_load_fixture(hass, "sensors.json", DOMAIN))
@@ -51,7 +51,7 @@ async def test_availability(hass: HomeAssistant) -> None:
 
     future = utcnow() + timedelta(minutes=60)
     with patch(
-        "homeassistant.components.gios.coordinator.Gios._get_all_sensors",
+        "smarthub.components.gios.coordinator.Gios._get_all_sensors",
         side_effect=ApiError("Unexpected error"),
     ):
         async_fire_time_changed(hass, future)
@@ -74,11 +74,11 @@ async def test_availability(hass: HomeAssistant) -> None:
     future = utcnow() + timedelta(minutes=120)
     with (
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_all_sensors",
+            "smarthub.components.gios.coordinator.Gios._get_all_sensors",
             return_value=incomplete_sensors,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_indexes",
+            "smarthub.components.gios.coordinator.Gios._get_indexes",
             return_value={},
         ),
     ):
@@ -103,11 +103,11 @@ async def test_availability(hass: HomeAssistant) -> None:
     future = utcnow() + timedelta(minutes=180)
     with (
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_all_sensors",
+            "smarthub.components.gios.coordinator.Gios._get_all_sensors",
             return_value=sensors,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_indexes",
+            "smarthub.components.gios.coordinator.Gios._get_indexes",
             return_value=indexes,
         ),
     ):
@@ -127,7 +127,7 @@ async def test_availability(hass: HomeAssistant) -> None:
     assert state.state == "good"
 
 
-async def test_invalid_indexes(hass: HomeAssistant) -> None:
+async def test_invalid_indexes(hass: SmartHub) -> None:
     """Test states of the sensor when API returns invalid indexes."""
     await init_integration(hass, invalid_indexes=True)
 
@@ -156,7 +156,7 @@ async def test_invalid_indexes(hass: HomeAssistant) -> None:
 
 
 async def test_unique_id_migration(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test states of the unique_id migration."""
     entity_registry.async_get_or_create(

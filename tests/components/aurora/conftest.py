@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.aurora.const import CONF_THRESHOLD, DOMAIN
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.components.aurora.const import CONF_THRESHOLD, DOMAIN
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE
 
 from tests.common import MockConfigEntry
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.aurora.async_setup_entry",
+        "smarthub.components.aurora.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -26,11 +26,11 @@ def mock_aurora_client() -> Generator[AsyncMock]:
     """Mock a Homeassistant Analytics client."""
     with (
         patch(
-            "homeassistant.components.aurora.coordinator.AuroraForecast",
+            "smarthub.components.aurora.coordinator.AuroraForecast",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.aurora.config_flow.AuroraForecast",
+            "smarthub.components.aurora.config_flow.AuroraForecast",
             new=mock_client,
         ),
     ):

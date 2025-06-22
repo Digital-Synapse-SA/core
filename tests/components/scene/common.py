@@ -4,14 +4,14 @@ All containing methods are legacy helpers that should not be used by new
 components. Instead call the service directly.
 """
 
-from homeassistant.components.scene import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, ENTITY_MATCH_ALL, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.loader import bind_hass
+from smarthub.components.scene import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, ENTITY_MATCH_ALL, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.loader import bind_hass
 
 
 @bind_hass
-def activate(hass: HomeAssistant, entity_id: str = ENTITY_MATCH_ALL) -> None:
+def activate(hass: SmartHub, entity_id: str = ENTITY_MATCH_ALL) -> None:
     """Activate a scene."""
     data = {}
 

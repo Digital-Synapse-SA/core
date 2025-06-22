@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.sensor import ATTR_OPTIONS, SensorDeviceClass
-from homeassistant.components.zodiac.const import (
+from smarthub.components.sensor import ATTR_OPTIONS, SensorDeviceClass
+from smarthub.components.zodiac.const import (
     ATTR_ELEMENT,
     ATTR_MODALITY,
     DOMAIN,
@@ -19,11 +19,11 @@ from homeassistant.components.zodiac.const import (
     SIGN_SCORPIO,
     SIGN_TAURUS,
 )
-from homeassistant.const import ATTR_DEVICE_CLASS
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_DEVICE_CLASS
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 
@@ -41,7 +41,7 @@ DAY3 = datetime(2020, 4, 21, tzinfo=dt_util.UTC)
     ],
 )
 async def test_zodiac_day(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     now: datetime,
     sign: str,
@@ -54,7 +54,7 @@ async def test_zodiac_day(
         domain=DOMAIN,
     ).add_to_hass(hass)
 
-    with patch("homeassistant.components.zodiac.sensor.utcnow", return_value=now):
+    with patch("smarthub.components.zodiac.sensor.utcnow", return_value=now):
         assert await async_setup_component(hass, DOMAIN, {})
         await hass.async_block_till_done()
 

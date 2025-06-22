@@ -7,11 +7,11 @@ from pynecil import CommunicationError, UpdateException
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.update import ATTR_INSTALLED_VERSION
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.update import ATTR_INSTALLED_VERSION
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_ON, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, mock_restore_cache, snapshot_platform
 from tests.typing import WebSocketGenerator
@@ -21,7 +21,7 @@ from tests.typing import WebSocketGenerator
 async def update_only() -> AsyncGenerator[None]:
     """Enable only the update platform."""
     with patch(
-        "homeassistant.components.iron_os.PLATFORMS",
+        "smarthub.components.iron_os.PLATFORMS",
         [Platform.UPDATE],
     ):
         yield
@@ -29,7 +29,7 @@ async def update_only() -> AsyncGenerator[None]:
 
 @pytest.mark.usefixtures("mock_pynecil", "ble_device", "mock_ironosupdate")
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -59,7 +59,7 @@ async def test_update(
 
 @pytest.mark.usefixtures("ble_device", "mock_pynecil")
 async def test_update_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_ironosupdate: AsyncMock,
 ) -> None:
@@ -80,7 +80,7 @@ async def test_update_unavailable(
 
 @pytest.mark.usefixtures("ble_device")
 async def test_update_restore_last_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pynecil: AsyncMock,
 ) -> None:

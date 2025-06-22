@@ -7,13 +7,13 @@ from bleak.exc import BleakError
 from improv_ble_client import Error, State, errors as improv_ble_errors
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.bluetooth import BluetoothChange
-from homeassistant.components.improv_ble.const import DOMAIN
-from homeassistant.config_entries import SOURCE_IGNORE
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
+from smarthub import config_entries
+from smarthub.components.bluetooth import BluetoothChange
+from smarthub.components.improv_ble.const import DOMAIN
+from smarthub.config_entries import SOURCE_IGNORE
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResult, FlowResultType
 
 from . import (
     BAD_IMPROV_BLE_DISCOVERY_INFO,
@@ -24,7 +24,7 @@ from . import (
 
 from tests.common import MockConfigEntry
 
-IMPROV_BLE = "homeassistant.components.improv_ble"
+IMPROV_BLE = "smarthub.components.improv_ble"
 
 
 @pytest.mark.parametrize(
@@ -35,7 +35,7 @@ IMPROV_BLE = "homeassistant.components.improv_ble"
     ],
 )
 async def test_user_step_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     url: str | None,
     abort_reason: str | None,
     placeholders: dict[str, str] | None,
@@ -57,7 +57,7 @@ async def test_user_step_success(
     )
 
 
-async def test_user_step_success_authorize(hass: HomeAssistant) -> None:
+async def test_user_step_success_authorize(hass: SmartHub) -> None:
     """Test user step success path."""
     with patch(
         f"{IMPROV_BLE}.config_flow.bluetooth.async_discovered_service_info",
@@ -75,7 +75,7 @@ async def test_user_step_success_authorize(hass: HomeAssistant) -> None:
     )
 
 
-async def test_user_step_no_devices_found(hass: HomeAssistant) -> None:
+async def test_user_step_no_devices_found(hass: SmartHub) -> None:
     """Test user step with no devices found."""
     with patch(
         f"{IMPROV_BLE}.config_flow.bluetooth.async_discovered_service_info",
@@ -92,7 +92,7 @@ async def test_user_step_no_devices_found(hass: HomeAssistant) -> None:
 
 
 async def test_async_step_user_takes_precedence_over_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test manual setup takes precedence over discovery."""
     result = await hass.config_entries.flow.async_init(
@@ -121,7 +121,7 @@ async def test_async_step_user_takes_precedence_over_discovery(
     assert not hass.config_entries.flow.async_progress(DOMAIN)
 
 
-async def test_user_setup_removes_ignored_entry(hass: HomeAssistant) -> None:
+async def test_user_setup_removes_ignored_entry(hass: SmartHub) -> None:
     """Test the user initiated form can replace an ignored device."""
     ignored_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -147,7 +147,7 @@ async def test_user_setup_removes_ignored_entry(hass: HomeAssistant) -> None:
     assert not hass.config_entries.async_entries(DOMAIN)
 
 
-async def test_bluetooth_step_provisioned_device(hass: HomeAssistant) -> None:
+async def test_bluetooth_step_provisioned_device(hass: SmartHub) -> None:
     """Test bluetooth step when device is already provisioned."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -158,7 +158,7 @@ async def test_bluetooth_step_provisioned_device(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_provisioned"
 
 
-async def test_bluetooth_step_provisioned_device_2(hass: HomeAssistant) -> None:
+async def test_bluetooth_step_provisioned_device_2(hass: SmartHub) -> None:
     """Test bluetooth step when device changes to provisioned."""
     with patch(
         f"{IMPROV_BLE}.config_flow.bluetooth.async_register_callback",
@@ -179,7 +179,7 @@ async def test_bluetooth_step_provisioned_device_2(hass: HomeAssistant) -> None:
     assert len(hass.config_entries.flow.async_progress_by_handler("improv_ble")) == 0
 
 
-async def test_bluetooth_step_success(hass: HomeAssistant) -> None:
+async def test_bluetooth_step_success(hass: SmartHub) -> None:
     """Test bluetooth step success path."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -195,7 +195,7 @@ async def test_bluetooth_step_success(hass: HomeAssistant) -> None:
     )
 
 
-async def test_bluetooth_step_success_identify(hass: HomeAssistant) -> None:
+async def test_bluetooth_step_success_identify(hass: SmartHub) -> None:
     """Test bluetooth step success path."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -212,7 +212,7 @@ async def test_bluetooth_step_success_identify(hass: HomeAssistant) -> None:
 
 
 async def _test_common_success_with_identify(
-    hass: HomeAssistant, result: FlowResult, address: str
+    hass: SmartHub, result: FlowResult, address: str
 ) -> None:
     """Test bluetooth and user flow success paths."""
     with patch(
@@ -252,7 +252,7 @@ async def _test_common_success_with_identify(
 
 
 async def _test_common_success_wo_identify(
-    hass: HomeAssistant,
+    hass: SmartHub,
     result: FlowResult,
     address: str,
     url: str | None = None,
@@ -275,7 +275,7 @@ async def _test_common_success_wo_identify(
 
 
 async def _test_common_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     result: FlowResult,
     url: str | None = None,
     abort_reason: str = "provision_successful",
@@ -310,7 +310,7 @@ async def _test_common_success(
 
 
 async def _test_common_success_wo_identify_w_authorize(
-    hass: HomeAssistant, result: FlowResult, address: str
+    hass: SmartHub, result: FlowResult, address: str
 ) -> None:
     """Test bluetooth and user flow success paths."""
     with patch(
@@ -328,7 +328,7 @@ async def _test_common_success_wo_identify_w_authorize(
 
 
 async def _test_common_success_w_authorize(
-    hass: HomeAssistant, result: FlowResult
+    hass: SmartHub, result: FlowResult
 ) -> None:
     """Test bluetooth and user flow success paths."""
 
@@ -381,7 +381,7 @@ async def _test_common_success_w_authorize(
     mock_provision.assert_awaited_once_with("MyWIFI", "secret", None)
 
 
-async def test_bluetooth_step_already_in_progress(hass: HomeAssistant) -> None:
+async def test_bluetooth_step_already_in_progress(hass: SmartHub) -> None:
     """Test we can't start a flow for the same device twice."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -408,7 +408,7 @@ async def test_bluetooth_step_already_in_progress(hass: HomeAssistant) -> None:
         (improv_ble_errors.CharacteristicMissingError, "characteristic_missing"),
     ],
 )
-async def test_can_identify_fails(hass: HomeAssistant, exc, error) -> None:
+async def test_can_identify_fails(hass: SmartHub, exc, error) -> None:
     """Test bluetooth flow with error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -443,7 +443,7 @@ async def test_can_identify_fails(hass: HomeAssistant, exc, error) -> None:
         (improv_ble_errors.CharacteristicMissingError, "characteristic_missing"),
     ],
 )
-async def test_identify_fails(hass: HomeAssistant, exc, error) -> None:
+async def test_identify_fails(hass: SmartHub, exc, error) -> None:
     """Test bluetooth flow with error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -486,7 +486,7 @@ async def test_identify_fails(hass: HomeAssistant, exc, error) -> None:
         (improv_ble_errors.CharacteristicMissingError, "characteristic_missing"),
     ],
 )
-async def test_need_authorization_fails(hass: HomeAssistant, exc, error) -> None:
+async def test_need_authorization_fails(hass: SmartHub, exc, error) -> None:
     """Test bluetooth flow with error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -530,7 +530,7 @@ async def test_need_authorization_fails(hass: HomeAssistant, exc, error) -> None
         (improv_ble_errors.CharacteristicMissingError, "characteristic_missing"),
     ],
 )
-async def test_authorize_fails(hass: HomeAssistant, exc, error) -> None:
+async def test_authorize_fails(hass: SmartHub, exc, error) -> None:
     """Test bluetooth flow with error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -573,7 +573,7 @@ async def test_authorize_fails(hass: HomeAssistant, exc, error) -> None:
     assert result["reason"] == error
 
 
-async def _test_provision_error(hass: HomeAssistant, exc) -> str:
+async def _test_provision_error(hass: SmartHub, exc) -> str:
     """Test bluetooth flow with error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -629,7 +629,7 @@ async def _test_provision_error(hass: HomeAssistant, exc) -> str:
         (improv_ble_errors.ProvisioningFailed(Error.UNKNOWN_ERROR), "unknown"),
     ],
 )
-async def test_provision_fails(hass: HomeAssistant, exc, error) -> None:
+async def test_provision_fails(hass: SmartHub, exc, error) -> None:
     """Test bluetooth flow with error."""
     flow_id = await _test_provision_error(hass, exc)
 
@@ -642,7 +642,7 @@ async def test_provision_fails(hass: HomeAssistant, exc, error) -> None:
     ("exc", "error"),
     [(improv_ble_errors.ProvisioningFailed(Error.NOT_AUTHORIZED), "unknown")],
 )
-async def test_provision_not_authorized(hass: HomeAssistant, exc, error) -> None:
+async def test_provision_not_authorized(hass: SmartHub, exc, error) -> None:
     """Test bluetooth flow with error."""
 
     async def subscribe_state_updates(
@@ -671,7 +671,7 @@ async def test_provision_not_authorized(hass: HomeAssistant, exc, error) -> None
         ),
     ],
 )
-async def test_provision_retry(hass: HomeAssistant, exc, error) -> None:
+async def test_provision_retry(hass: SmartHub, exc, error) -> None:
     """Test bluetooth flow with error."""
     flow_id = await _test_provision_error(hass, exc)
 
@@ -682,7 +682,7 @@ async def test_provision_retry(hass: HomeAssistant, exc, error) -> None:
 
 
 async def test_provision_fails_invalid_data(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test bluetooth flow with error due to invalid data."""
     result = await hass.config_entries.flow.async_init(

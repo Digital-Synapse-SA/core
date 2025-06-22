@@ -4,15 +4,15 @@ from datetime import timedelta
 from unittest.mock import Mock
 from urllib.error import HTTPError, URLError
 
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_media_player_handle_URLerror(
-    hass: HomeAssistant, init_integration: MockConfigEntry, mock_remote: Mock
+    hass: SmartHub, init_integration: MockConfigEntry, mock_remote: Mock
 ) -> None:
     """Test remote handle URLError as Unavailable."""
 
@@ -30,7 +30,7 @@ async def test_media_player_handle_URLerror(
 
 
 async def test_media_player_handle_HTTPError(
-    hass: HomeAssistant, init_integration: MockConfigEntry, mock_remote: Mock
+    hass: SmartHub, init_integration: MockConfigEntry, mock_remote: Mock
 ) -> None:
     """Test remote handle HTTPError as Off."""
 

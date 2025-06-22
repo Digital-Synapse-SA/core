@@ -6,16 +6,16 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.local_file.const import DEFAULT_NAME, DOMAIN
-from homeassistant.const import CONF_FILE_PATH, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.local_file.const import DEFAULT_NAME, DOMAIN
+from smarthub.const import CONF_FILE_PATH, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form_sensor(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form_sensor(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form for sensor."""
 
     result = await hass.config_entries.flow.async_init(
@@ -28,7 +28,7 @@ async def test_form_sensor(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> 
         patch("os.path.isfile", Mock(return_value=True)),
         patch("os.access", Mock(return_value=True)),
         patch(
-            "homeassistant.components.local_file.camera.mimetypes.guess_type",
+            "smarthub.components.local_file.camera.mimetypes.guess_type",
             Mock(return_value=(None, None)),
         ),
     ):
@@ -51,7 +51,7 @@ async def test_form_sensor(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> 
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_options_flow(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
+async def test_options_flow(hass: SmartHub, loaded_entry: MockConfigEntry) -> None:
     """Test options flow."""
 
     result = await hass.config_entries.options.async_init(loaded_entry.entry_id)
@@ -63,7 +63,7 @@ async def test_options_flow(hass: HomeAssistant, loaded_entry: MockConfigEntry) 
         patch("os.path.isfile", Mock(return_value=True)),
         patch("os.access", Mock(return_value=True)),
         patch(
-            "homeassistant.components.local_file.camera.mimetypes.guess_type",
+            "smarthub.components.local_file.camera.mimetypes.guess_type",
             Mock(return_value=(None, None)),
         ),
     ):
@@ -86,7 +86,7 @@ async def test_options_flow(hass: HomeAssistant, loaded_entry: MockConfigEntry) 
 
 
 async def test_validation_options(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test validation."""
 
@@ -100,7 +100,7 @@ async def test_validation_options(
         patch("os.path.isfile", Mock(return_value=True)),
         patch("os.access", Mock(return_value=False)),
         patch(
-            "homeassistant.components.local_file.camera.mimetypes.guess_type",
+            "smarthub.components.local_file.camera.mimetypes.guess_type",
             Mock(return_value=(None, None)),
         ),
     ):
@@ -121,7 +121,7 @@ async def test_validation_options(
         patch("os.path.isfile", Mock(return_value=True)),
         patch("os.access", Mock(return_value=True)),
         patch(
-            "homeassistant.components.local_file.camera.mimetypes.guess_type",
+            "smarthub.components.local_file.camera.mimetypes.guess_type",
             Mock(return_value=(None, None)),
         ),
     ):
@@ -146,7 +146,7 @@ async def test_validation_options(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_entry_already_exist(
-    hass: HomeAssistant, loaded_entry: MockConfigEntry
+    hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test abort when entry already exist."""
 
@@ -160,7 +160,7 @@ async def test_entry_already_exist(
         patch("os.path.isfile", Mock(return_value=True)),
         patch("os.access", Mock(return_value=True)),
         patch(
-            "homeassistant.components.local_file.camera.mimetypes.guess_type",
+            "smarthub.components.local_file.camera.mimetypes.guess_type",
             Mock(return_value=(None, None)),
         ),
     ):

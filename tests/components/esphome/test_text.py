@@ -4,19 +4,19 @@ from unittest.mock import call
 
 from aioesphomeapi import APIClient, TextInfo, TextMode as ESPHomeTextMode, TextState
 
-from homeassistant.components.text import (
+from smarthub.components.text import (
     ATTR_VALUE,
     DOMAIN as TEXT_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .conftest import MockGenericDeviceEntryType
 
 
 async def test_generic_text_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -56,7 +56,7 @@ async def test_generic_text_entity(
 
 
 async def test_generic_text_entity_no_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -87,7 +87,7 @@ async def test_generic_text_entity_no_state(
 
 
 async def test_generic_text_entity_missing_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:

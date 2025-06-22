@@ -5,18 +5,18 @@ from unittest.mock import MagicMock
 from luftdaten.exceptions import LuftdatenConnectionError
 import pytest
 
-from homeassistant.components.luftdaten import DOMAIN
-from homeassistant.components.luftdaten.const import CONF_SENSOR_ID
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_SHOW_ON_MAP
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.luftdaten import DOMAIN
+from smarthub.components.luftdaten.const import CONF_SENSOR_ID
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_SHOW_ON_MAP
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_duplicate_error(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that errors are shown when duplicates are added."""
     mock_config_entry.add_to_hass(hass)
@@ -38,7 +38,7 @@ async def test_duplicate_error(
 
 
 async def test_communication_error(
-    hass: HomeAssistant, mock_luftdaten: MagicMock
+    hass: SmartHub, mock_luftdaten: MagicMock
 ) -> None:
     """Test that no sensor is added while unable to communicate with API."""
     result = await hass.config_entries.flow.async_init(
@@ -72,7 +72,7 @@ async def test_communication_error(
     }
 
 
-async def test_invalid_sensor(hass: HomeAssistant, mock_luftdaten: MagicMock) -> None:
+async def test_invalid_sensor(hass: SmartHub, mock_luftdaten: MagicMock) -> None:
     """Test that an invalid sensor throws an error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -107,7 +107,7 @@ async def test_invalid_sensor(hass: HomeAssistant, mock_luftdaten: MagicMock) ->
 
 @pytest.mark.usefixtures("mock_setup_entry", "mock_luftdaten")
 async def test_step_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that the user step works."""
     result = await hass.config_entries.flow.async_init(

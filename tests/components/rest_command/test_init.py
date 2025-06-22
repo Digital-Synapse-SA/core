@@ -7,21 +7,21 @@ from unittest.mock import patch
 import aiohttp
 import pytest
 
-from homeassistant.components.rest_command import DOMAIN
-from homeassistant.const import (
+from smarthub.components.rest_command import DOMAIN
+from smarthub.const import (
     CONTENT_TYPE_JSON,
     CONTENT_TYPE_TEXT_PLAIN,
     SERVICE_RELOAD,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import TEST_URL, ComponentSetup
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
-async def test_reload(hass: HomeAssistant, setup_component: ComponentSetup) -> None:
+async def test_reload(hass: SmartHub, setup_component: ComponentSetup) -> None:
     """Verify we can reload rest_command integration."""
     await setup_component()
 
@@ -34,7 +34,7 @@ async def test_reload(hass: HomeAssistant, setup_component: ComponentSetup) -> N
         }
     }
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value=new_config,
     ):
@@ -45,7 +45,7 @@ async def test_reload(hass: HomeAssistant, setup_component: ComponentSetup) -> N
 
 
 async def test_setup_tests(
-    hass: HomeAssistant, setup_component: ComponentSetup
+    hass: SmartHub, setup_component: ComponentSetup
 ) -> None:
     """Set up test config and test it."""
     await setup_component()
@@ -57,7 +57,7 @@ async def test_setup_tests(
 
 
 async def test_rest_command_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -66,7 +66,7 @@ async def test_rest_command_timeout(
 
     aioclient_mock.get(TEST_URL, exc=TimeoutError())
 
-    with pytest.raises(HomeAssistantError) as exc:
+    with pytest.raises(SmartHubError) as exc:
         await hass.services.async_call(DOMAIN, "get_test", {}, blocking=True)
     assert str(exc.value) == 'Timeout when calling resource "https://example.com/"'
 
@@ -74,7 +74,7 @@ async def test_rest_command_timeout(
 
 
 async def test_rest_command_aiohttp_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_rest_command_aiohttp_error(
 
     aioclient_mock.get(TEST_URL, exc=aiohttp.ClientError())
 
-    with pytest.raises(HomeAssistantError) as exc:
+    with pytest.raises(SmartHubError) as exc:
         await hass.services.async_call(DOMAIN, "get_test", {}, blocking=True)
 
     assert (
@@ -94,7 +94,7 @@ async def test_rest_command_aiohttp_error(
 
 
 async def test_rest_command_http_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -109,7 +109,7 @@ async def test_rest_command_http_error(
 
 
 async def test_rest_command_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -124,7 +124,7 @@ async def test_rest_command_auth(
 
 
 async def test_rest_command_form_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -150,7 +150,7 @@ async def test_rest_command_form_data(
     ],
 )
 async def test_rest_command_methods(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
     method: str,
@@ -166,7 +166,7 @@ async def test_rest_command_methods(
 
 
 async def test_rest_command_headers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -272,7 +272,7 @@ async def test_rest_command_headers(
 
 
 async def test_rest_command_get_response_plaintext(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -293,7 +293,7 @@ async def test_rest_command_get_response_plaintext(
 
 
 async def test_rest_command_get_response_json(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -317,7 +317,7 @@ async def test_rest_command_get_response_json(
 
 
 async def test_rest_command_get_response_malformed_json(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -335,7 +335,7 @@ async def test_rest_command_get_response_malformed_json(
     assert not response
 
     # Throws error when requesting response
-    with pytest.raises(HomeAssistantError) as exc:
+    with pytest.raises(SmartHubError) as exc:
         await hass.services.async_call(
             DOMAIN, "get_test", {}, blocking=True, return_response=True
         )
@@ -346,7 +346,7 @@ async def test_rest_command_get_response_malformed_json(
 
 
 async def test_rest_command_get_response_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -369,7 +369,7 @@ async def test_rest_command_get_response_none(
     assert not response
 
     # Throws Decode error when requesting response
-    with pytest.raises(HomeAssistantError) as exc:
+    with pytest.raises(SmartHubError) as exc:
         response = await hass.services.async_call(
             DOMAIN, "get_test", {}, blocking=True, return_response=True
         )

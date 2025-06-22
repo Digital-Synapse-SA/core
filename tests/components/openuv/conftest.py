@@ -7,14 +7,14 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.openuv import CONF_FROM_WINDOW, CONF_TO_WINDOW, DOMAIN
-from homeassistant.const import (
+from smarthub.components.openuv import CONF_FROM_WINDOW, CONF_TO_WINDOW, DOMAIN
+from smarthub.const import (
     CONF_API_KEY,
     CONF_ELEVATION,
     CONF_LATITUDE,
     CONF_LONGITUDE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -25,7 +25,7 @@ TEST_LONGITUDE = -0.3817765
 
 
 @pytest.fixture
-async def set_time_zone(hass: HomeAssistant) -> None:
+async def set_time_zone(hass: SmartHub) -> None:
     """Set the time zone for the tests."""
     # Set our timezone to CST/Regina so we can check calculations
     # This keeps UTC-6 all year round
@@ -36,7 +36,7 @@ async def set_time_zone(hass: HomeAssistant) -> None:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.openuv.async_setup_entry", return_value=True
+        "smarthub.components.openuv.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -54,7 +54,7 @@ def client_fixture(data_protection_window, data_uv_index):
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any]
 ) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
@@ -95,16 +95,16 @@ async def mock_pyopenuv_fixture(client, set_time_zone):
     """Define a fixture to patch pyopenuv."""
     with (
         patch(
-            "homeassistant.components.openuv.config_flow.Client", return_value=client
+            "smarthub.components.openuv.config_flow.Client", return_value=client
         ),
-        patch("homeassistant.components.openuv.Client", return_value=client),
+        patch("smarthub.components.openuv.Client", return_value=client),
     ):
         yield
 
 
 @pytest.fixture(name="setup_config_entry")
 async def setup_config_entry_fixture(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_pyopenuv: None
+    hass: SmartHub, config_entry: MockConfigEntry, mock_pyopenuv: None
 ) -> None:
     """Define a fixture to set up openuv."""
     assert await hass.config_entries.async_setup(config_entry.entry_id)

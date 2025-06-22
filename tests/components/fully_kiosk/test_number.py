@@ -2,18 +2,18 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components import number
-from homeassistant.components.fully_kiosk.const import DOMAIN, UPDATE_INTERVAL
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, ServiceResponse
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components import number
+from smarthub.components.fully_kiosk.const import DOMAIN, UPDATE_INTERVAL
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub, ServiceResponse
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_numbers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mock_fully_kiosk: MagicMock,
@@ -82,7 +82,7 @@ async def test_numbers(
 
 
 async def set_value(
-    hass: HomeAssistant, entity_id: str, value: float
+    hass: SmartHub, entity_id: str, value: float
 ) -> ServiceResponse:
     """Set the value of a number entity."""
     return await hass.services.async_call(

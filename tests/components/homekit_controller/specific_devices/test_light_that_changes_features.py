@@ -1,8 +1,8 @@
-"""Test for a Home Assistant bridge that changes light features at runtime."""
+"""Test for a SmartHub bridge that changes light features at runtime."""
 
-from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES, ColorMode
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.light import ATTR_SUPPORTED_COLOR_MODES, ColorMode
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from ..common import (
     device_config_changed,
@@ -12,7 +12,7 @@ from ..common import (
 
 
 async def test_light_add_feature_at_runtime(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that new features can be added at runtime."""
 

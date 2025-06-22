@@ -2,15 +2,15 @@
 
 import pytest
 
-from homeassistant.components.esphome import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.esphome import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_client", "mock_zeroconf")
-async def test_delete_entry(hass: HomeAssistant) -> None:
+async def test_delete_entry(hass: SmartHub) -> None:
     """Test we can delete an entry without error."""
     entry = MockConfigEntry(
         domain=DOMAIN,

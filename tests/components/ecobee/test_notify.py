@@ -2,11 +2,11 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.notify import (
+from smarthub.components.notify import (
     DOMAIN as NOTIFY_DOMAIN,
     SERVICE_SEND_MESSAGE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import setup_platform
 
@@ -14,7 +14,7 @@ THERMOSTAT_ID = 0
 
 
 async def test_notify_entity_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ecobee: MagicMock,
 ) -> None:
     """Test the notify entity service."""

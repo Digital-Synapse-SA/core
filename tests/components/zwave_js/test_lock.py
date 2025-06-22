@@ -11,32 +11,32 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import FailedZWaveCommand
 from zwave_js_server.model.node import Node, NodeStatus
 
-from homeassistant.components.lock import (
+from smarthub.components.lock import (
     DOMAIN as LOCK_DOMAIN,
     SERVICE_LOCK,
     SERVICE_UNLOCK,
     LockState,
 )
-from homeassistant.components.zwave_js.const import (
+from smarthub.components.zwave_js.const import (
     ATTR_LOCK_TIMEOUT,
     ATTR_OPERATION_TYPE,
     DOMAIN,
 )
-from homeassistant.components.zwave_js.helpers import ZwaveValueMatcher
-from homeassistant.components.zwave_js.lock import (
+from smarthub.components.zwave_js.helpers import ZwaveValueMatcher
+from smarthub.components.zwave_js.lock import (
     SERVICE_CLEAR_LOCK_USERCODE,
     SERVICE_SET_LOCK_CONFIGURATION,
     SERVICE_SET_LOCK_USERCODE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .common import SCHLAGE_BE469_LOCK_ENTITY, replace_value_of_zwave_value
 
 
 async def test_door_lock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     lock_schlage_be469,
     integration,
@@ -259,7 +259,7 @@ async def test_door_lock(
 
     client.async_send_command.side_effect = FailedZWaveCommand("test", 1, "test")
     # Test set usercode service error handling
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SET_LOCK_USERCODE,
@@ -272,7 +272,7 @@ async def test_door_lock(
         )
 
     # Test clear usercode service error handling
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_CLEAR_LOCK_USERCODE,
@@ -299,14 +299,14 @@ async def test_door_lock(
 
 
 async def test_only_one_lock(
-    hass: HomeAssistant, client, lock_home_connect_620, integration
+    hass: SmartHub, client, lock_home_connect_620, integration
 ) -> None:
     """Test node with both Door Lock and Lock CC values only gets one lock entity."""
     assert len(hass.states.async_entity_ids("lock")) == 1
 
 
 async def test_door_lock_no_value(
-    hass: HomeAssistant, client, lock_schlage_be469_state, integration
+    hass: SmartHub, client, lock_schlage_be469_state, integration
 ) -> None:
     """Test a lock entity with door lock command class that has no value for mode."""
     node_state = replace_value_of_zwave_value(

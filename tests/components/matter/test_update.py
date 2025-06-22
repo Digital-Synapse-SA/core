@@ -11,21 +11,21 @@ from matter_server.common.errors import UpdateCheckError, UpdateError
 from matter_server.common.models import MatterSoftwareVersion, UpdateSource
 import pytest
 
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.matter.update import SCAN_INTERVAL
-from homeassistant.components.update import (
+from smarthub.components.matter.update import SCAN_INTERVAL
+from smarthub.components.update import (
     ATTR_VERSION,
     DOMAIN as UPDATE_DOMAIN,
     SERVICE_INSTALL,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
+from smarthub.setup import async_setup_component
 
 from .common import (
     set_node_attribute,
@@ -47,7 +47,7 @@ TEST_SOFTWARE_VERSION = MatterSoftwareVersion(
     firmware_information="",
     min_applicable_software_version=0,
     max_applicable_software_version=1,
-    release_notes_url="http://home-assistant.io/non-existing-product",
+    release_notes_url="http://smart-hub.io/non-existing-product",
     update_source=UpdateSource.LOCAL,
 )
 
@@ -80,7 +80,7 @@ async def update_node_fixture(matter_client: MagicMock) -> AsyncMock:
 
 @pytest.mark.parametrize("node_fixture", ["dimmable_light"])
 async def test_update_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     check_node_update: AsyncMock,
     matter_node: MatterNode,
@@ -95,7 +95,7 @@ async def test_update_entity(
 
 @pytest.mark.parametrize("node_fixture", ["dimmable_light"])
 async def test_update_check_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     check_node_update: AsyncMock,
     matter_node: MatterNode,
@@ -116,7 +116,7 @@ async def test_update_check_service(
         firmware_information="",
         min_applicable_software_version=0,
         max_applicable_software_version=1,
-        release_notes_url="http://home-assistant.io/non-existing-product",
+        release_notes_url="http://smart-hub.io/non-existing-product",
         update_source=UpdateSource.LOCAL,
     )
 
@@ -137,13 +137,13 @@ async def test_update_check_service(
     assert state.attributes.get("latest_version") == "v2.0"
     assert (
         state.attributes.get("release_url")
-        == "http://home-assistant.io/non-existing-product"
+        == "http://smart-hub.io/non-existing-product"
     )
 
 
 @pytest.mark.parametrize("node_fixture", ["dimmable_light"])
 async def test_update_install(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     check_node_update: AsyncMock,
     matter_node: MatterNode,
@@ -163,7 +163,7 @@ async def test_update_install(
         firmware_information="",
         min_applicable_software_version=0,
         max_applicable_software_version=1,
-        release_notes_url="http://home-assistant.io/non-existing-product",
+        release_notes_url="http://smart-hub.io/non-existing-product",
         update_source=UpdateSource.LOCAL,
     )
 
@@ -179,7 +179,7 @@ async def test_update_install(
     assert state.attributes.get("latest_version") == "v2.0"
     assert (
         state.attributes.get("release_url")
-        == "http://home-assistant.io/non-existing-product"
+        == "http://smart-hub.io/non-existing-product"
     )
 
     await hass.services.async_call(
@@ -246,7 +246,7 @@ async def test_update_install(
 
 @pytest.mark.parametrize("node_fixture", ["dimmable_light"])
 async def test_update_install_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     check_node_update: AsyncMock,
     update_node: AsyncMock,
@@ -267,7 +267,7 @@ async def test_update_install_failure(
         firmware_information="",
         min_applicable_software_version=0,
         max_applicable_software_version=1,
-        release_notes_url="http://home-assistant.io/non-existing-product",
+        release_notes_url="http://smart-hub.io/non-existing-product",
         update_source=UpdateSource.LOCAL,
     )
 
@@ -283,12 +283,12 @@ async def test_update_install_failure(
     assert state.attributes.get("latest_version") == "v2.0"
     assert (
         state.attributes.get("release_url")
-        == "http://home-assistant.io/non-existing-product"
+        == "http://smart-hub.io/non-existing-product"
     )
 
     update_node.side_effect = UpdateCheckError("Error finding applicable update")
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,
@@ -301,7 +301,7 @@ async def test_update_install_failure(
 
     update_node.side_effect = UpdateError("Error updating node")
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,
@@ -315,7 +315,7 @@ async def test_update_install_failure(
 
 @pytest.mark.parametrize("node_fixture", ["dimmable_light"])
 async def test_update_state_save_and_restore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     matter_client: MagicMock,
     check_node_update: AsyncMock,
@@ -358,14 +358,14 @@ async def test_update_state_save_and_restore(
             "firmware_information": "",
             "min_applicable_software_version": 0,
             "max_applicable_software_version": 1,
-            "release_notes_url": "http://home-assistant.io/non-existing-product",
+            "release_notes_url": "http://smart-hub.io/non-existing-product",
             "update_source": "local",
         }
     }
 
 
 async def test_update_state_restore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     check_node_update: AsyncMock,
     update_node: AsyncMock,

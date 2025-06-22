@@ -4,19 +4,19 @@ from unittest.mock import call
 
 from aioesphomeapi import APIClient, DateInfo, DateState
 
-from homeassistant.components.date import (
+from smarthub.components.date import (
     ATTR_DATE,
     DOMAIN as DATE_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .conftest import MockGenericDeviceEntryType
 
 
 async def test_generic_date_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -52,7 +52,7 @@ async def test_generic_date_entity(
 
 
 async def test_generic_date_missing_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:

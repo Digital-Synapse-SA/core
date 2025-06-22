@@ -4,11 +4,11 @@ from httpx import ConnectError, Response, UnsupportedProtocol
 import pytest
 import respx
 
-from homeassistant.components.remote_calendar.const import CONF_CALENDAR_NAME, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.remote_calendar.const import CONF_CALENDAR_NAME, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 from .conftest import CALENDAR_NAME, CALENDER_URL
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 @respx.mock
-async def test_form_import_ics(hass: HomeAssistant, ics_content: str) -> None:
+async def test_form_import_ics(hass: SmartHub, ics_content: str) -> None:
     """Test we get the import form."""
     respx.get(CALENDER_URL).mock(
         return_value=Response(
@@ -46,7 +46,7 @@ async def test_form_import_ics(hass: HomeAssistant, ics_content: str) -> None:
 
 
 @respx.mock
-async def test_form_import_webcal(hass: HomeAssistant, ics_content: str) -> None:
+async def test_form_import_webcal(hass: SmartHub, ics_content: str) -> None:
     """Test we get the import form."""
     respx.get(CALENDER_URL).mock(
         return_value=Response(
@@ -83,7 +83,7 @@ async def test_form_import_webcal(hass: HomeAssistant, ics_content: str) -> None
 )
 @respx.mock
 async def test_form_inavild_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: Exception,
     ics_content: str,
 ) -> None:
@@ -142,7 +142,7 @@ async def test_form_inavild_url(
     ],
 )
 async def test_unsupported_inputs(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, url: str, log_message: str
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, url: str, log_message: str
 ) -> None:
     """Test that an unsupported inputs results in a form error."""
     result = await hass.config_entries.flow.async_init(
@@ -174,7 +174,7 @@ async def test_unsupported_inputs(
 )
 @respx.mock
 async def test_form_http_status_error(
-    hass: HomeAssistant, ics_content: str, http_status: int, error: str
+    hass: SmartHub, ics_content: str, http_status: int, error: str
 ) -> None:
     """Test we http status."""
     result = await hass.config_entries.flow.async_init(
@@ -218,7 +218,7 @@ async def test_form_http_status_error(
 
 
 @respx.mock
-async def test_no_valid_calendar(hass: HomeAssistant, ics_content: str) -> None:
+async def test_no_valid_calendar(hass: SmartHub, ics_content: str) -> None:
     """Test invalid ics content."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -263,7 +263,7 @@ async def test_no_valid_calendar(hass: HomeAssistant, ics_content: str) -> None:
 
 
 async def test_duplicate_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test two calendars cannot be added with the same name."""
@@ -289,7 +289,7 @@ async def test_duplicate_name(
 
 
 async def test_duplicate_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test two calendars cannot be added with the same url."""

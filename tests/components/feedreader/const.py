@@ -1,10 +1,10 @@
 """Constants for the tests for the feedreader component."""
 
-from homeassistant.components.feedreader.const import (
+from smarthub.components.feedreader.const import (
     CONF_MAX_ENTRIES,
     DEFAULT_MAX_ENTRIES,
 )
-from homeassistant.const import CONF_URL
+from smarthub.const import CONF_URL
 
 URL = "http://some.rss.local/rss_feed.xml"
 FEED_TITLE = "RSS Sample"

@@ -7,12 +7,12 @@ from aiohttp import ClientConnectionError, ClientResponseError
 from aiohttp.client import RequestInfo
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.tessie import PLATFORMS
-from homeassistant.components.tessie.const import DOMAIN, TessieStatus
-from homeassistant.const import CONF_ACCESS_TOKEN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.typing import UNDEFINED, UndefinedType
+from smarthub.components.tessie import PLATFORMS
+from smarthub.components.tessie.const import DOMAIN, TessieStatus
+from smarthub.const import CONF_ACCESS_TOKEN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.typing import UNDEFINED, UndefinedType
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -68,7 +68,7 @@ NO_SCOPES = ["user_data", "offline_access", "openid"]
 
 
 async def setup_platform(
-    hass: HomeAssistant, platforms: list[Platform] | UndefinedType = UNDEFINED
+    hass: SmartHub, platforms: list[Platform] | UndefinedType = UNDEFINED
 ) -> MockConfigEntry:
     """Set up the Tessie platform."""
 
@@ -79,7 +79,7 @@ async def setup_platform(
     mock_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.tessie.PLATFORMS",
+        "smarthub.components.tessie.PLATFORMS",
         PLATFORMS if platforms is UNDEFINED else platforms,
     ):
         await hass.config_entries.async_setup(mock_entry.entry_id)
@@ -89,7 +89,7 @@ async def setup_platform(
 
 
 def assert_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_id: str,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

@@ -1,22 +1,22 @@
-image: ghcr.io/home-assistant/{arch}-homeassistant
+image: ghcr.io/smart-hub/{arch}-smarthub
 build_from:
-  aarch64: ghcr.io/home-assistant/aarch64-homeassistant-base:2025.05.0
-  armhf: ghcr.io/home-assistant/armhf-homeassistant-base:2025.05.0
-  armv7: ghcr.io/home-assistant/armv7-homeassistant-base:2025.05.0
-  amd64: ghcr.io/home-assistant/amd64-homeassistant-base:2025.05.0
-  i386: ghcr.io/home-assistant/i386-homeassistant-base:2025.05.0
+  aarch64: ghcr.io/smart-hub/aarch64-smarthub-base:2025.05.0
+  armhf: ghcr.io/smart-hub/armhf-smarthub-base:2025.05.0
+  armv7: ghcr.io/smart-hub/armv7-smarthub-base:2025.05.0
+  amd64: ghcr.io/smart-hub/amd64-smarthub-base:2025.05.0
+  i386: ghcr.io/smart-hub/i386-smarthub-base:2025.05.0
 codenotary:
-  signer: notary@home-assistant.io
-  base_image: notary@home-assistant.io
+  signer: notary@smart-hub.io
+  base_image: notary@smart-hub.io
 cosign:
-  base_identity: https://github.com/home-assistant/docker/.*
-  identity: https://github.com/home-assistant/core/.*
+  base_identity: https://github.com/smart-hub/docker/.*
+  identity: https://github.com/smart-hub/core/.*
 labels:
   io.hass.type: core
-  org.opencontainers.image.title: Home Assistant
+  org.opencontainers.image.title: SmartHub
   org.opencontainers.image.description: Open-source home automation platform running on Python 3
-  org.opencontainers.image.source: https://github.com/home-assistant/core
-  org.opencontainers.image.authors: The Home Assistant Authors
-  org.opencontainers.image.url: https://www.home-assistant.io/
-  org.opencontainers.image.documentation: https://www.home-assistant.io/docs/
+  org.opencontainers.image.source: https://github.com/smart-hub/core
+  org.opencontainers.image.authors: The SmartHub Authors
+  org.opencontainers.image.url: https://www.smart-hub.io/
+  org.opencontainers.image.documentation: https://www.smart-hub.io/docs/
   org.opencontainers.image.licenses: Apache-2.0

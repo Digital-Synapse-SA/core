@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.webmin.const import DEFAULT_PORT, DOMAIN
-from homeassistant.const import (
+from smarthub.components.webmin.const import DEFAULT_PORT, DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
@@ -14,7 +14,7 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_json_object_fixture
 
@@ -32,20 +32,20 @@ TEST_USER_INPUT = {
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.webmin.async_setup_entry", return_value=True
+        "smarthub.components.webmin.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
 
 async def async_init_integration(
-    hass: HomeAssistant, with_mac_address: bool = True
+    hass: SmartHub, with_mac_address: bool = True
 ) -> MockConfigEntry:
-    """Set up the Webmin integration in Home Assistant."""
+    """Set up the Webmin integration in SmartHub."""
     entry = MockConfigEntry(domain=DOMAIN, options=TEST_USER_INPUT, title="name")
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.webmin.helpers.WebminInstance.update",
+        "smarthub.components.webmin.helpers.WebminInstance.update",
         return_value=await async_load_json_object_fixture(
             hass,
             "webmin_update.json"

@@ -1,0 +1,8 @@
+{
+  "domain": "hddtemp",
+  "name": "hddtemp",
+  "codeowners": [],
+  "documentation": "https://www.smart-hub.io/integrations/hddtemp",
+  "iot_class": "local_polling",
+  "quality_scale": "legacy"
+}

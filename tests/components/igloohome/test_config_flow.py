@@ -7,11 +7,11 @@ from aiohttp import ClientError
 from igloohome_api import AuthException
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.igloohome.const import DOMAIN
-from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.igloohome.const import DOMAIN
+from smarthub.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 
@@ -22,7 +22,7 @@ FORM_USER_INPUT = {
 
 
 async def test_form_valid_input(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: Generator[AsyncMock],
     mock_auth: Generator[AsyncMock],
 ) -> None:
@@ -49,7 +49,7 @@ async def test_form_valid_input(
     [(AuthException(), "invalid_auth"), (ClientError(), "cannot_connect")],
 )
 async def test_form_invalid_input(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_auth: Generator[AsyncMock],
     exception: Exception,
@@ -85,7 +85,7 @@ async def test_form_invalid_input(
 
 
 async def test_form_abort_on_matching_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: Generator[AsyncMock],
     mock_auth: Generator[AsyncMock],
 ) -> None:

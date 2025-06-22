@@ -10,11 +10,11 @@ import packaging.tags
 import py
 import pytest
 
-from homeassistant import core, runner
-from homeassistant.core import HomeAssistant
-from homeassistant.util import executor, thread
+from smarthub import core, runner
+from smarthub.core import SmartHub
+from smarthub.util import executor, thread
 
-# https://github.com/home-assistant/supervisor/blob/main/supervisor/docker/homeassistant.py
+# https://github.com/smart-hub/supervisor/blob/main/supervisor/docker/smarthub.py
 SUPERVISOR_HARD_TIMEOUT = 240
 
 TIMEOUT_SAFETY_MARGIN = 10
@@ -34,15 +34,15 @@ async def test_cumulative_shutdown_timeout_less_than_supervisor() -> None:
     )
 
 
-async def test_setup_and_run_hass(hass: HomeAssistant, tmpdir: py.path.local) -> None:
+async def test_setup_and_run_hass(hass: SmartHub, tmpdir: py.path.local) -> None:
     """Test we can setup and run."""
     test_dir = tmpdir.mkdir("config")
     default_config = runner.RuntimeConfig(test_dir)
 
     with (
-        patch("homeassistant.bootstrap.async_setup_hass", return_value=hass),
+        patch("smarthub.bootstrap.async_setup_hass", return_value=hass),
         patch("threading._shutdown"),
-        patch("homeassistant.core.HomeAssistant.async_run") as mock_run,
+        patch("smarthub.core.SmartHub.async_run") as mock_run,
     ):
         await runner.setup_and_run_hass(default_config)
         assert threading._shutdown == thread.deadlock_safe_shutdown
@@ -50,16 +50,16 @@ async def test_setup_and_run_hass(hass: HomeAssistant, tmpdir: py.path.local) ->
     assert mock_run.called
 
 
-def test_run(hass: HomeAssistant, tmpdir: py.path.local) -> None:
+def test_run(hass: SmartHub, tmpdir: py.path.local) -> None:
     """Test we can run."""
     test_dir = tmpdir.mkdir("config")
     default_config = runner.RuntimeConfig(test_dir)
 
     with (
         patch.object(runner, "TASK_CANCELATION_TIMEOUT", 1),
-        patch("homeassistant.bootstrap.async_setup_hass", return_value=hass),
+        patch("smarthub.bootstrap.async_setup_hass", return_value=hass),
         patch("threading._shutdown"),
-        patch("homeassistant.core.HomeAssistant.async_run") as mock_run,
+        patch("smarthub.core.SmartHub.async_run") as mock_run,
     ):
         runner.run(default_config)
 
@@ -67,7 +67,7 @@ def test_run(hass: HomeAssistant, tmpdir: py.path.local) -> None:
 
 
 def test_run_executor_shutdown_throws(
-    hass: HomeAssistant, tmpdir: py.path.local
+    hass: SmartHub, tmpdir: py.path.local
 ) -> None:
     """Test we can run and we still shutdown if the executor shutdown throws."""
     test_dir = tmpdir.mkdir("config")
@@ -76,14 +76,14 @@ def test_run_executor_shutdown_throws(
     with (
         patch.object(runner, "TASK_CANCELATION_TIMEOUT", 1),
         pytest.raises(RuntimeError),
-        patch("homeassistant.bootstrap.async_setup_hass", return_value=hass),
+        patch("smarthub.bootstrap.async_setup_hass", return_value=hass),
         patch("threading._shutdown"),
         patch(
-            "homeassistant.runner.InterruptibleThreadPoolExecutor.shutdown",
+            "smarthub.runner.InterruptibleThreadPoolExecutor.shutdown",
             side_effect=RuntimeError,
         ) as mock_shutdown,
         patch(
-            "homeassistant.core.HomeAssistant.async_run",
+            "smarthub.core.SmartHub.async_run",
         ) as mock_run,
     ):
         runner.run(default_config)
@@ -93,7 +93,7 @@ def test_run_executor_shutdown_throws(
 
 
 def test_run_does_not_block_forever_with_shielded_task(
-    hass: HomeAssistant, tmpdir: py.path.local, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, tmpdir: py.path.local, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can shutdown and not block forever."""
     test_dir = tmpdir.mkdir("config")
@@ -121,9 +121,9 @@ def test_run_does_not_block_forever_with_shielded_task(
 
     with (
         patch.object(runner, "TASK_CANCELATION_TIMEOUT", 0.1),
-        patch("homeassistant.bootstrap.async_setup_hass", return_value=hass),
+        patch("smarthub.bootstrap.async_setup_hass", return_value=hass),
         patch("threading._shutdown"),
-        patch("homeassistant.core.HomeAssistant.async_run", _async_create_tasks),
+        patch("smarthub.core.SmartHub.async_run", _async_create_tasks),
     ):
         runner.run(default_config)
 
@@ -134,7 +134,7 @@ def test_run_does_not_block_forever_with_shielded_task(
 
 
 async def test_unhandled_exception_traceback(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test an unhandled exception gets a traceback in debug mode."""
 
@@ -171,7 +171,7 @@ def test_enable_posix_spawn() -> None:
     with (
         patch.object(subprocess, "_USE_POSIX_SPAWN", False),
         patch(
-            "homeassistant.runner.packaging.tags.sys_tags",
+            "smarthub.runner.packaging.tags.sys_tags",
             side_effect=_mock_sys_tags_musl,
         ),
     ):
@@ -181,7 +181,7 @@ def test_enable_posix_spawn() -> None:
     with (
         patch.object(subprocess, "_USE_POSIX_SPAWN", False),
         patch(
-            "homeassistant.runner.packaging.tags.sys_tags",
+            "smarthub.runner.packaging.tags.sys_tags",
             side_effect=_mock_sys_tags_any,
         ),
     ):

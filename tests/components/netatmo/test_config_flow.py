@@ -6,20 +6,20 @@ from unittest.mock import patch
 from pyatmo.const import ALL_SCOPES
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.netatmo import config_flow
-from homeassistant.components.netatmo.const import (
+from smarthub import config_entries
+from smarthub.components.netatmo import config_flow
+from smarthub.components.netatmo.const import (
     CONF_NEW_AREA,
     CONF_WEATHER_AREAS,
     DOMAIN,
     OAUTH2_AUTHORIZE,
     OAUTH2_TOKEN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.helpers.service_info.zeroconf import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
@@ -33,7 +33,7 @@ from tests.typing import ClientSessionGenerator
 VALID_CONFIG = {}
 
 
-async def test_abort_if_existing_entry(hass: HomeAssistant) -> None:
+async def test_abort_if_existing_entry(hass: SmartHub) -> None:
     """Check flow abort when an entry already exist."""
     MockConfigEntry(domain=DOMAIN).add_to_hass(hass)
 
@@ -65,7 +65,7 @@ async def test_abort_if_existing_entry(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -106,7 +106,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.netatmo.async_setup_entry", return_value=True
+        "smarthub.components.netatmo.async_setup_entry", return_value=True
     ) as mock_setup:
         await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -114,7 +114,7 @@ async def test_full_flow(
     assert len(mock_setup.mock_calls) == 1
 
 
-async def test_option_flow(hass: HomeAssistant) -> None:
+async def test_option_flow(hass: SmartHub) -> None:
     """Test config flow options."""
     valid_option = {
         "lat_ne": 32.91336,
@@ -172,7 +172,7 @@ async def test_option_flow(hass: HomeAssistant) -> None:
         assert config_entry.options[CONF_WEATHER_AREAS]["Home"][k] == v
 
 
-async def test_option_flow_wrong_coordinates(hass: HomeAssistant) -> None:
+async def test_option_flow_wrong_coordinates(hass: SmartHub) -> None:
     """Test config flow options with mixed up coordinates."""
     valid_option = {
         "lat_ne": 32.1234567,
@@ -232,7 +232,7 @@ async def test_option_flow_wrong_coordinates(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -273,7 +273,7 @@ async def test_reauth(
     )
 
     with patch(
-        "homeassistant.components.netatmo.async_setup_entry", return_value=True
+        "smarthub.components.netatmo.async_setup_entry", return_value=True
     ) as mock_setup:
         await hass.config_entries.flow.async_configure(result["flow_id"])
         await hass.async_block_till_done()
@@ -316,7 +316,7 @@ async def test_reauth(
 
     # Update entry
     with patch(
-        "homeassistant.components.netatmo.async_setup_entry", return_value=True
+        "smarthub.components.netatmo.async_setup_entry", return_value=True
     ) as mock_setup:
         result3 = await hass.config_entries.flow.async_configure(result2["flow_id"])
         await hass.async_block_till_done()

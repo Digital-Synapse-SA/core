@@ -9,10 +9,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_OPTION, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.select import DOMAIN as SELECT_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, ATTR_OPTION, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -21,20 +21,20 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 @pytest.mark.usefixtures("mock_twinkly_client")
 async def test_select_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the created select entities."""
-    with patch("homeassistant.components.twinkly.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.twinkly.PLATFORMS", [Platform.SELECT]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_select_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
 ) -> None:
@@ -60,7 +60,7 @@ async def test_select_mode(
 
 
 async def test_mode_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
     freezer: FrozenDateTimeFactory,

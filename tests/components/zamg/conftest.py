@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from zamg import ZamgData as ZamgDevice
 
-from homeassistant.components.zamg.const import CONF_STATION_ID, DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.zamg.const import CONF_STATION_ID, DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -32,7 +32,7 @@ def mock_config_entry() -> MockConfigEntry:
 @pytest.fixture
 def mock_setup_entry() -> Generator[None]:
     """Mock setting up a config entry."""
-    with patch("homeassistant.components.zamg.async_setup_entry", return_value=True):
+    with patch("smarthub.components.zamg.async_setup_entry", return_value=True):
         yield
 
 
@@ -40,7 +40,7 @@ def mock_setup_entry() -> Generator[None]:
 def mock_zamg_config_flow() -> Generator[MagicMock]:
     """Return a mocked Zamg client."""
     with patch(
-        "homeassistant.components.zamg.sensor.ZamgData", autospec=True
+        "smarthub.components.zamg.sensor.ZamgData", autospec=True
     ) as zamg_mock:
         zamg = zamg_mock.return_value
         zamg.update.return_value = ZamgDevice(
@@ -55,7 +55,7 @@ def mock_zamg() -> Generator[MagicMock]:
     """Return a mocked Zamg client."""
 
     with patch(
-        "homeassistant.components.zamg.config_flow.ZamgData", autospec=True
+        "smarthub.components.zamg.config_flow.ZamgData", autospec=True
     ) as zamg_mock:
         zamg = zamg_mock.return_value
         zamg.update.return_value = {TEST_STATION_ID: {"Name": TEST_STATION_NAME}}
@@ -74,7 +74,7 @@ def mock_zamg_coordinator() -> Generator[MagicMock]:
     """Return a mocked Zamg client."""
 
     with patch(
-        "homeassistant.components.zamg.coordinator.ZamgDevice", autospec=True
+        "smarthub.components.zamg.coordinator.ZamgDevice", autospec=True
     ) as zamg_mock:
         zamg = zamg_mock.return_value
         zamg.update.return_value = {TEST_STATION_ID: {"Name": TEST_STATION_NAME}}
@@ -89,7 +89,7 @@ def mock_zamg_coordinator() -> Generator[MagicMock]:
 
 
 @pytest.fixture
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
     """Set up the Zamg integration for testing."""
     mock_config_entry.add_to_hass(hass)
 

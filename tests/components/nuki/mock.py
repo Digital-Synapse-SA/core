@@ -1,8 +1,8 @@
 """Mockup Nuki device."""
 
-from homeassistant.components.nuki.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TOKEN
-from homeassistant.core import HomeAssistant
+from smarthub.components.nuki.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT, CONF_TOKEN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -17,7 +17,7 @@ ID_HEX = "BC614E"
 MOCK_INFO = load_json_object_fixture("info.json", DOMAIN)
 
 
-async def setup_nuki_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def setup_nuki_integration(hass: SmartHub) -> MockConfigEntry:
     """Create the Nuki device."""
 
     entry = MockConfigEntry(

@@ -5,17 +5,17 @@ from unittest.mock import patch
 from pyplaato.models.device import PlaatoDeviceType
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.plaato.const import (
+from smarthub import config_entries
+from smarthub.components.plaato.const import (
     CONF_DEVICE_NAME,
     CONF_DEVICE_TYPE,
     CONF_USE_WEBHOOK,
     DOMAIN,
 )
-from homeassistant.const import CONF_SCAN_INTERVAL, CONF_TOKEN, CONF_WEBHOOK_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_SCAN_INTERVAL, CONF_TOKEN, CONF_WEBHOOK_ID
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -29,18 +29,18 @@ def mock_webhook_id():
     """Mock webhook_id."""
     with (
         patch(
-            "homeassistant.components.webhook.async_generate_id",
+            "smarthub.components.webhook.async_generate_id",
             return_value=WEBHOOK_ID,
         ),
         patch(
-            "homeassistant.components.webhook.async_generate_url",
+            "smarthub.components.webhook.async_generate_url",
             return_value="hook_id",
         ),
     ):
         yield
 
 
-async def test_show_config_form(hass: HomeAssistant) -> None:
+async def test_show_config_form(hass: SmartHub) -> None:
     """Test show configuration form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -51,7 +51,7 @@ async def test_show_config_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_show_config_form_device_type_airlock(hass: HomeAssistant) -> None:
+async def test_show_config_form_device_type_airlock(hass: SmartHub) -> None:
     """Test show configuration form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -68,7 +68,7 @@ async def test_show_config_form_device_type_airlock(hass: HomeAssistant) -> None
     assert result["data_schema"].schema.get(CONF_USE_WEBHOOK) is bool
 
 
-async def test_show_config_form_device_type_keg(hass: HomeAssistant) -> None:
+async def test_show_config_form_device_type_keg(hass: SmartHub) -> None:
     """Test show configuration form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -83,7 +83,7 @@ async def test_show_config_form_device_type_keg(hass: HomeAssistant) -> None:
 
 
 async def test_show_config_form_validate_webhook(
-    hass: HomeAssistant, webhook_id
+    hass: SmartHub, webhook_id
 ) -> None:
     """Test show configuration form."""
 
@@ -108,11 +108,11 @@ async def test_show_config_form_validate_webhook(
     assert await async_setup_component(hass, "cloud", {})
     with (
         patch(
-            "homeassistant.components.cloud.async_active_subscription",
+            "smarthub.components.cloud.async_active_subscription",
             return_value=True,
         ),
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=True),
         patch(
             "hass_nabucasa.cloudhooks.Cloudhooks.async_create",
             return_value={"cloudhook_url": "https://hooks.nabu.casa/ABCD"},
@@ -131,7 +131,7 @@ async def test_show_config_form_validate_webhook(
 
 
 async def test_show_config_form_validate_webhook_not_connected(
-    hass: HomeAssistant, webhook_id
+    hass: SmartHub, webhook_id
 ) -> None:
     """Test validating webhook when not connected aborts."""
 
@@ -156,11 +156,11 @@ async def test_show_config_form_validate_webhook_not_connected(
     assert await async_setup_component(hass, "cloud", {})
     with (
         patch(
-            "homeassistant.components.cloud.async_active_subscription",
+            "smarthub.components.cloud.async_active_subscription",
             return_value=True,
         ),
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=False),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=False),
         patch(
             "hass_nabucasa.cloudhooks.Cloudhooks.async_create",
             return_value={"cloudhook_url": "https://hooks.nabu.casa/ABCD"},
@@ -178,7 +178,7 @@ async def test_show_config_form_validate_webhook_not_connected(
     assert result["reason"] == "cloud_not_connected"
 
 
-async def test_show_config_form_validate_token(hass: HomeAssistant) -> None:
+async def test_show_config_form_validate_token(hass: SmartHub) -> None:
     """Test show configuration form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -196,7 +196,7 @@ async def test_show_config_form_validate_token(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "api_method"
 
-    with patch("homeassistant.components.plaato.async_setup_entry", return_value=True):
+    with patch("smarthub.components.plaato.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], user_input={CONF_TOKEN: "valid_token"}
         )
@@ -212,7 +212,7 @@ async def test_show_config_form_validate_token(hass: HomeAssistant) -> None:
 
 
 async def test_show_config_form_no_cloud_webhook(
-    hass: HomeAssistant, webhook_id
+    hass: SmartHub, webhook_id
 ) -> None:
     """Test show configuration form."""
 
@@ -245,7 +245,7 @@ async def test_show_config_form_no_cloud_webhook(
 
 
 async def test_show_config_form_api_method_no_auth_token(
-    hass: HomeAssistant, webhook_id
+    hass: SmartHub, webhook_id
 ) -> None:
     """Test show configuration form."""
 
@@ -300,7 +300,7 @@ async def test_show_config_form_api_method_no_auth_token(
     assert result["errors"]["base"] == "no_api_method"
 
 
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test updating options."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -311,7 +311,7 @@ async def test_options(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.plaato.async_setup_entry", return_value=True
+        "smarthub.components.plaato.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()
@@ -334,7 +334,7 @@ async def test_options(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_options_webhook(hass: HomeAssistant, webhook_id) -> None:
+async def test_options_webhook(hass: SmartHub, webhook_id) -> None:
     """Test updating options."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -345,7 +345,7 @@ async def test_options_webhook(hass: HomeAssistant, webhook_id) -> None:
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.plaato.async_setup_entry", return_value=True
+        "smarthub.components.plaato.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()

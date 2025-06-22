@@ -7,13 +7,13 @@ from unittest.mock import MagicMock
 from matter_server.client.models.node import MatterNode
 import pytest
 
-from homeassistant.components.matter.const import DOMAIN
-from homeassistant.components.matter.helpers import (
+from smarthub.components.matter.const import DOMAIN
+from smarthub.components.matter.helpers import (
     get_device_id,
     get_node_from_device_entry,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .common import setup_integration_with_node_fixture
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.parametrize("node_fixture", ["device_diagnostics"])
 async def test_get_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -33,7 +33,7 @@ async def test_get_device_id(
 
 
 async def test_get_node_from_device_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     matter_client: MagicMock,
 ) -> None:

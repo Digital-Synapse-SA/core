@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.text.const import (
+from smarthub.components.text.const import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_MODE,
@@ -10,8 +10,8 @@ from homeassistant.components.text.const import (
     DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.state import async_reproduce_state
+from smarthub.core import SmartHub, State
+from smarthub.helpers.state import async_reproduce_state
 
 from tests.common import async_mock_service
 
@@ -20,7 +20,7 @@ VALID_TEXT2 = "World"
 
 
 async def test_reproducing_states(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reproducing Text states."""
 

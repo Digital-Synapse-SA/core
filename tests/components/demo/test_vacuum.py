@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.demo.vacuum import (
+from smarthub.components.demo.vacuum import (
     DEMO_VACUUM_BASIC,
     DEMO_VACUUM_COMPLETE,
     DEMO_VACUUM_MINIMAL,
@@ -13,7 +13,7 @@ from homeassistant.components.demo.vacuum import (
     DEMO_VACUUM_NONE,
     FAN_SPEEDS,
 )
-from homeassistant.components.vacuum import (
+from smarthub.components.vacuum import (
     ATTR_BATTERY_LEVEL,
     ATTR_COMMAND,
     ATTR_FAN_SPEED,
@@ -24,16 +24,16 @@ from homeassistant.components.vacuum import (
     SERVICE_SET_FAN_SPEED,
     VacuumActivity,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     CONF_PLATFORM,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed, async_mock_service
 from tests.components.vacuum import common
@@ -49,14 +49,14 @@ ENTITY_VACUUM_NONE = f"{VACUUM_DOMAIN}.{DEMO_VACUUM_NONE}".lower()
 async def vacuum_only() -> None:
     """Enable only the datetime platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.VACUUM],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_demo_vacuum(hass: HomeAssistant, vacuum_only: None):
+async def setup_demo_vacuum(hass: SmartHub, vacuum_only: None):
     """Initialize setup demo vacuum."""
     assert await async_setup_component(
         hass, VACUUM_DOMAIN, {VACUUM_DOMAIN: {CONF_PLATFORM: "demo"}}
@@ -64,7 +64,7 @@ async def setup_demo_vacuum(hass: HomeAssistant, vacuum_only: None):
     await hass.async_block_till_done()
 
 
-async def test_supported_features(hass: HomeAssistant) -> None:
+async def test_supported_features(hass: SmartHub) -> None:
     """Test vacuum supported features."""
     state = hass.states.get(ENTITY_VACUUM_COMPLETE)
     assert state.attributes.get(ATTR_SUPPORTED_FEATURES) == 16380
@@ -102,7 +102,7 @@ async def test_supported_features(hass: HomeAssistant) -> None:
     assert state.state == VacuumActivity.DOCKED
 
 
-async def test_methods(hass: HomeAssistant) -> None:
+async def test_methods(hass: SmartHub) -> None:
     """Test if methods call the services as expected."""
     await common.async_start(hass, ENTITY_VACUUM_BASIC)
     await hass.async_block_till_done()
@@ -158,33 +158,33 @@ async def test_methods(hass: HomeAssistant) -> None:
     assert state.state == VacuumActivity.DOCKED
 
 
-async def test_unsupported_methods(hass: HomeAssistant) -> None:
+async def test_unsupported_methods(hass: SmartHub) -> None:
     """Test service calls for unsupported vacuums."""
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_stop(hass, ENTITY_VACUUM_NONE)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_locate(hass, ENTITY_VACUUM_NONE)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_return_to_base(hass, ENTITY_VACUUM_NONE)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_set_fan_speed(
             hass, FAN_SPEEDS[-1], entity_id=ENTITY_VACUUM_NONE
         )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_clean_spot(hass, ENTITY_VACUUM_NONE)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_pause(hass, ENTITY_VACUUM_NONE)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_start(hass, ENTITY_VACUUM_NONE)
 
 
-async def test_services(hass: HomeAssistant) -> None:
+async def test_services(hass: SmartHub) -> None:
     """Test vacuum services."""
     # Test send_command
     send_command_calls = async_mock_service(hass, VACUUM_DOMAIN, SERVICE_SEND_COMMAND)
@@ -215,7 +215,7 @@ async def test_services(hass: HomeAssistant) -> None:
     assert call.data[ATTR_FAN_SPEED] == FAN_SPEEDS[0]
 
 
-async def test_set_fan_speed(hass: HomeAssistant) -> None:
+async def test_set_fan_speed(hass: SmartHub) -> None:
     """Test vacuum service to set the fan speed."""
     group_vacuums = f"{ENTITY_VACUUM_COMPLETE},{ENTITY_VACUUM_MOST}"
     old_state_complete = hass.states.get(ENTITY_VACUUM_COMPLETE)
@@ -235,7 +235,7 @@ async def test_set_fan_speed(hass: HomeAssistant) -> None:
     assert new_state_most.attributes[ATTR_FAN_SPEED] == FAN_SPEEDS[0]
 
 
-async def test_send_command(hass: HomeAssistant) -> None:
+async def test_send_command(hass: SmartHub) -> None:
     """Test vacuum service to send a command."""
     group_vacuums = f"{ENTITY_VACUUM_COMPLETE}"
     old_state_complete = hass.states.get(ENTITY_VACUUM_COMPLETE)

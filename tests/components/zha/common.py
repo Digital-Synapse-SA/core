@@ -6,10 +6,10 @@ from unittest.mock import AsyncMock, Mock
 import zigpy.zcl
 import zigpy.zcl.foundation as zcl_f
 
-from homeassistant.components.zha.helpers import ZHADeviceProxy
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.zha.helpers import ZHADeviceProxy
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
@@ -91,13 +91,13 @@ def make_attribute(attrid, value, status=0):
     return attr
 
 
-def send_attribute_report(hass: HomeAssistant, cluster, attrid, value):
+def send_attribute_report(hass: SmartHub, cluster, attrid, value):
     """Send a single attribute report."""
     return send_attributes_report(hass, cluster, {attrid: value})
 
 
 async def send_attributes_report(
-    hass: HomeAssistant, cluster: zigpy.zcl.Cluster, attributes: dict
+    hass: SmartHub, cluster: zigpy.zcl.Cluster, attributes: dict
 ):
     """Cause the sensor to receive an attribute report from the network.
 
@@ -125,7 +125,7 @@ async def send_attributes_report(
 
 
 def find_entity_id(
-    domain: str, zha_device: ZHADeviceProxy, hass: HomeAssistant, qualifier=None
+    domain: str, zha_device: ZHADeviceProxy, hass: SmartHub, qualifier=None
 ) -> str | None:
     """Find the entity id under the testing.
 
@@ -144,7 +144,7 @@ def find_entity_id(
 
 
 def find_entity_ids(
-    domain: str, zha_device: ZHADeviceProxy, hass: HomeAssistant
+    domain: str, zha_device: ZHADeviceProxy, hass: SmartHub
 ) -> list[str]:
     """Find the entity ids under the testing.
 
@@ -160,7 +160,7 @@ def find_entity_ids(
     ]
 
 
-def async_find_group_entity_id(hass: HomeAssistant, domain, group):
+def async_find_group_entity_id(hass: SmartHub, domain, group):
     """Find the group entity id under test."""
     entity_id = f"{domain}.coordinator_manufacturer_coordinator_model_{group.name.lower().replace(' ', '_')}"
 
@@ -189,7 +189,7 @@ def reset_clusters(clusters):
         cluster.write_attributes.reset_mock()
 
 
-async def async_shift_time(hass: HomeAssistant):
+async def async_shift_time(hass: SmartHub):
     """Shift time to cause call later tasks to run."""
     next_update = dt_util.utcnow() + timedelta(seconds=11)
     async_fire_time_changed(hass, next_update)

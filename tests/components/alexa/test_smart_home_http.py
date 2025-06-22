@@ -8,10 +8,10 @@ from typing import Any
 from aiohttp import ClientResponse
 import pytest
 
-from homeassistant.components.alexa import DOMAIN, smart_home
-from homeassistant.const import CONTENT_TYPE_JSON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.alexa import DOMAIN, smart_home
+from smarthub.const import CONTENT_TYPE_JSON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .test_common import get_new_request
 
@@ -19,7 +19,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def do_http_discovery(
-    config: dict[str, Any], hass: HomeAssistant, hass_client: ClientSessionGenerator
+    config: dict[str, Any], hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> ClientResponse:
     """Submit a request to the Smart Home HTTP API."""
     await async_setup_component(hass, DOMAIN, config)
@@ -48,7 +48,7 @@ async def do_http_discovery(
     ],
 )
 async def test_http_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     hass_client: ClientSessionGenerator,
     config: dict[str, Any],
@@ -65,7 +65,7 @@ async def test_http_api(
 
 
 async def test_http_api_disabled(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Without `smart_home:`, the HTTP API is disabled."""
     config = {"alexa": {}}

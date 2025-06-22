@@ -1,0 +1,10 @@
+{
+  "domain": "hardware",
+  "name": "Hardware",
+  "codeowners": ["@smart-hub/core"],
+  "config_flow": false,
+  "documentation": "https://www.smart-hub.io/integrations/hardware",
+  "integration_type": "system",
+  "quality_scale": "internal",
+  "requirements": ["psutil-smart-hub==0.0.1"]
+}

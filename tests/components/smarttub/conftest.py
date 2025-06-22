@@ -6,10 +6,10 @@ from unittest.mock import create_autospec, patch
 import pytest
 import smarttub
 
-from homeassistant.components.smarttub.const import DOMAIN
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.smarttub.const import DOMAIN
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -31,7 +31,7 @@ def config_entry(config_data: dict[str, Any]) -> MockConfigEntry:
 
 
 @pytest.fixture
-async def setup_component(hass: HomeAssistant) -> None:
+async def setup_component(hass: SmartHub) -> None:
     """Set up the component."""
     assert await async_setup_component(hass, DOMAIN, {}) is True
 
@@ -155,7 +155,7 @@ def mock_api(account, spa):
     """Mock the SmartTub API."""
 
     with patch(
-        "homeassistant.components.smarttub.controller.SmartTub",
+        "smarthub.components.smarttub.controller.SmartTub",
         autospec=True,
     ) as api_class_mock:
         api_mock = api_class_mock.return_value
@@ -164,7 +164,7 @@ def mock_api(account, spa):
 
 
 @pytest.fixture
-async def setup_entry(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_entry(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Initialize the config entry."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)

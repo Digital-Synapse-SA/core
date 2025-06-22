@@ -12,16 +12,16 @@ from dsmr_parser.obis_references import (
 from dsmr_parser.objects import CosemObject, MBusObject, Telegram
 import pytest
 
-from homeassistant.components.dsmr.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.dsmr.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_migrate_gas_to_mbus(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     dsmr_connection_fixture: tuple[MagicMock, MagicMock, MagicMock],
@@ -132,7 +132,7 @@ async def test_migrate_gas_to_mbus(
 
 
 async def test_migrate_hourly_gas_to_mbus(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     dsmr_connection_fixture: tuple[MagicMock, MagicMock, MagicMock],
@@ -243,7 +243,7 @@ async def test_migrate_hourly_gas_to_mbus(
 
 
 async def test_migrate_gas_with_devid_to_mbus(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     dsmr_connection_fixture: tuple[MagicMock, MagicMock, MagicMock],
@@ -350,7 +350,7 @@ async def test_migrate_gas_with_devid_to_mbus(
 
 
 async def test_migrate_gas_to_mbus_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     dsmr_connection_fixture: tuple[MagicMock, MagicMock, MagicMock],

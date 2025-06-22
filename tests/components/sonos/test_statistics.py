@@ -1,12 +1,12 @@
 """Tests for the Sonos statistics."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_statistics_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_autosetup_sonos,
     soco,
     device_properties_event,

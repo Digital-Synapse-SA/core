@@ -7,8 +7,8 @@ from samsungtvws.exceptions import HttpApiError
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.samsungtv.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.samsungtv.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import setup_samsungtv_entry
 from .const import ENTRYDATA_ENCRYPTED_WEBSOCKET, ENTRYDATA_WEBSOCKET
@@ -20,7 +20,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("remote_websocket", "rest_api")
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_entry_diagnostics(
 
 @pytest.mark.usefixtures("remote_encrypted_websocket")
 async def test_entry_diagnostics_encrypted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     rest_api: Mock,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
@@ -52,7 +52,7 @@ async def test_entry_diagnostics_encrypted(
 
 @pytest.mark.usefixtures("remote_encrypted_websocket")
 async def test_entry_diagnostics_encrypte_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     rest_api: Mock,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,

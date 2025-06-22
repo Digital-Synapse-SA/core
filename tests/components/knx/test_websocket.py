@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.knx.const import KNX_ADDRESS, KNX_MODULE_KEY
-from homeassistant.components.knx.project import STORAGE_KEY as KNX_PROJECT_STORAGE_KEY
-from homeassistant.components.knx.schema import SwitchSchema
-from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.knx.const import KNX_ADDRESS, KNX_MODULE_KEY
+from smarthub.components.knx.project import STORAGE_KEY as KNX_PROJECT_STORAGE_KEY
+from smarthub.components.knx.schema import SwitchSchema
+from smarthub.const import CONF_NAME
+from smarthub.core import SmartHub
 
 from .conftest import FIXTURE_PROJECT_DATA, KNXTestKit
 
@@ -17,7 +17,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_knx_info_command(
-    hass: HomeAssistant, knx: KNXTestKit, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, knx: KNXTestKit, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test knx/info command."""
     await knx.setup_integration()
@@ -33,7 +33,7 @@ async def test_knx_info_command(
 
 
 async def test_knx_info_command_with_project(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
     load_knxproj: None,
@@ -55,7 +55,7 @@ async def test_knx_info_command_with_project(
 
 
 async def test_knx_project_file_process(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
@@ -79,7 +79,7 @@ async def test_knx_project_file_process(
     )
     with (
         patch(
-            "homeassistant.components.knx.project.process_uploaded_file",
+            "smarthub.components.knx.project.process_uploaded_file",
         ) as file_upload_mock,
         patch("xknxproject.XKNXProj.parse", return_value=_parse_result) as parse_mock,
     ):
@@ -95,7 +95,7 @@ async def test_knx_project_file_process(
 
 
 async def test_knx_project_file_process_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -114,7 +114,7 @@ async def test_knx_project_file_process_error(
     )
     with (
         patch(
-            "homeassistant.components.knx.project.process_uploaded_file",
+            "smarthub.components.knx.project.process_uploaded_file",
         ) as file_upload_mock,
         patch("xknxproject.XKNXProj.parse", side_effect=ValueError) as parse_mock,
     ):
@@ -127,7 +127,7 @@ async def test_knx_project_file_process_error(
 
 
 async def test_knx_project_file_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
     load_knxproj: None,
@@ -148,7 +148,7 @@ async def test_knx_project_file_remove(
 
 
 async def test_knx_get_project(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
     load_knxproj: None,
@@ -166,7 +166,7 @@ async def test_knx_get_project(
 
 
 async def test_knx_group_monitor_info_command(
-    hass: HomeAssistant, knx: KNXTestKit, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, knx: KNXTestKit, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test knx/group_monitor_info command."""
     await knx.setup_integration()
@@ -181,7 +181,7 @@ async def test_knx_group_monitor_info_command(
 
 
 async def test_knx_group_telegrams_command(
-    hass: HomeAssistant, knx: KNXTestKit, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, knx: KNXTestKit, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test knx/group_telegrams command."""
     await knx.setup_integration()
@@ -212,7 +212,7 @@ async def test_knx_group_telegrams_command(
 
 
 async def test_knx_subscribe_telegrams_command_recent_telegrams(
-    hass: HomeAssistant, knx: KNXTestKit, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, knx: KNXTestKit, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test knx/subscribe_telegrams command sending recent telegrams."""
     await knx.setup_integration(
@@ -260,7 +260,7 @@ async def test_knx_subscribe_telegrams_command_recent_telegrams(
 
 
 async def test_knx_subscribe_telegrams_command_no_project(
-    hass: HomeAssistant, knx: KNXTestKit, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, knx: KNXTestKit, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test knx/subscribe_telegrams command without project data."""
     await knx.setup_integration(
@@ -332,7 +332,7 @@ async def test_knx_subscribe_telegrams_command_no_project(
 
 
 async def test_knx_subscribe_telegrams_command_project(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
     load_knxproj: None,
@@ -399,7 +399,7 @@ async def test_knx_subscribe_telegrams_command_project(
     ],
 )
 async def test_websocket_when_config_entry_unloaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
     endpoint: str,

@@ -11,10 +11,10 @@ from gardena_bluetooth.exceptions import CharacteristicNotFound
 from gardena_bluetooth.parse import Characteristic
 import pytest
 
-from homeassistant.components.gardena_bluetooth.const import DOMAIN
-from homeassistant.components.gardena_bluetooth.coordinator import SCAN_INTERVAL
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
+from smarthub.components.gardena_bluetooth.const import DOMAIN
+from smarthub.components.gardena_bluetooth.coordinator import SCAN_INTERVAL
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
 
 from . import WATER_TIMER_SERVICE_INFO
 
@@ -33,7 +33,7 @@ def mock_entry():
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.gardena_bluetooth.async_setup_entry",
+        "smarthub.components.gardena_bluetooth.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -50,7 +50,7 @@ def mock_read_char_raw():
 
 @pytest.fixture
 async def scan_step(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> Callable[[], Coroutine[Any, Any, None]]:
     """Step system time forward."""
 
@@ -103,10 +103,10 @@ def mock_client(
 
     with (
         patch(
-            "homeassistant.components.gardena_bluetooth.config_flow.Client",
+            "smarthub.components.gardena_bluetooth.config_flow.Client",
             return_value=client,
         ),
-        patch("homeassistant.components.gardena_bluetooth.Client", return_value=client),
+        patch("smarthub.components.gardena_bluetooth.Client", return_value=client),
     ):
         yield client
 

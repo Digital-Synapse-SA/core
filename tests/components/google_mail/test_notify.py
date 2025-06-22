@@ -5,14 +5,14 @@ from unittest.mock import patch
 import pytest
 from voluptuous.error import Invalid
 
-from homeassistant.components.notify import DOMAIN as NOTIFY_DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.notify import DOMAIN as NOTIFY_DOMAIN
+from smarthub.core import SmartHub
 
 from .conftest import BUILD, ComponentSetup
 
 
 async def test_notify(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
 ) -> None:
     """Test service call draft email."""
@@ -47,7 +47,7 @@ async def test_notify(
 
 
 async def test_notify_voluptuous_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
 ) -> None:
     """Test voluptuous error thrown when drafting email."""

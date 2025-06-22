@@ -8,15 +8,15 @@ from unittest.mock import patch
 from devolo_plc_api.exceptions.device import DeviceNotFound, DevicePasswordProtected
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.devolo_home_network.const import (
+from smarthub import config_entries
+from smarthub.components.devolo_home_network.const import (
     DOMAIN,
     SERIAL_NUMBER,
     TITLE,
 )
-from homeassistant.const import CONF_BASE, CONF_IP_ADDRESS, CONF_NAME, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_BASE, CONF_IP_ADDRESS, CONF_NAME, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import configure_integration
 from .const import (
@@ -29,7 +29,7 @@ from .const import (
 from .mock import MockDevice, MockDeviceWrongPassword
 
 
-async def test_form(hass: HomeAssistant, info: dict[str, Any]) -> None:
+async def test_form(hass: SmartHub, info: dict[str, Any]) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -38,7 +38,7 @@ async def test_form(hass: HomeAssistant, info: dict[str, Any]) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.devolo_home_network.async_setup_entry",
+        "smarthub.components.devolo_home_network.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -65,14 +65,14 @@ async def test_form(hass: HomeAssistant, info: dict[str, Any]) -> None:
         (Exception, "unknown"),
     ],
 )
-async def test_form_error(hass: HomeAssistant, exception_type, expected_error) -> None:
+async def test_form_error(hass: SmartHub, exception_type, expected_error) -> None:
     """Test we handle errors."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.devolo_home_network.config_flow.validate_input",
+        "smarthub.components.devolo_home_network.config_flow.validate_input",
         side_effect=exception_type,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -85,11 +85,11 @@ async def test_form_error(hass: HomeAssistant, exception_type, expected_error) -
 
     with (
         patch(
-            "homeassistant.components.devolo_home_network.async_setup_entry",
+            "smarthub.components.devolo_home_network.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.devolo_home_network.config_flow.Device",
+            "smarthub.components.devolo_home_network.config_flow.Device",
             new=MockDevice,
         ),
     ):
@@ -102,7 +102,7 @@ async def test_form_error(hass: HomeAssistant, exception_type, expected_error) -
     assert result3["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_zeroconf(hass: HomeAssistant) -> None:
+async def test_zeroconf(hass: SmartHub) -> None:
     """Test that the zeroconf form is served."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -127,11 +127,11 @@ async def test_zeroconf(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.devolo_home_network.async_setup_entry",
+            "smarthub.components.devolo_home_network.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.devolo_home_network.config_flow.Device",
+            "smarthub.components.devolo_home_network.config_flow.Device",
             new=MockDevice,
         ),
     ):
@@ -150,7 +150,7 @@ async def test_zeroconf(hass: HomeAssistant) -> None:
     assert result2["result"].unique_id == "1234567890"
 
 
-async def test_zeroconf_wrong_auth(hass: HomeAssistant) -> None:
+async def test_zeroconf_wrong_auth(hass: SmartHub) -> None:
     """Test that the zeroconf form asks for password if authorization fails."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -175,11 +175,11 @@ async def test_zeroconf_wrong_auth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.devolo_home_network.async_setup_entry",
+            "smarthub.components.devolo_home_network.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.devolo_home_network.config_flow.Device",
+            "smarthub.components.devolo_home_network.config_flow.Device",
             new=MockDeviceWrongPassword,
         ),
     ):
@@ -194,11 +194,11 @@ async def test_zeroconf_wrong_auth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.devolo_home_network.async_setup_entry",
+            "smarthub.components.devolo_home_network.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.devolo_home_network.config_flow.Device",
+            "smarthub.components.devolo_home_network.config_flow.Device",
             new=MockDevice,
         ),
     ):
@@ -213,7 +213,7 @@ async def test_zeroconf_wrong_auth(hass: HomeAssistant) -> None:
     assert result3["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_abort_zeroconf_wrong_device(hass: HomeAssistant) -> None:
+async def test_abort_zeroconf_wrong_device(hass: SmartHub) -> None:
     """Test we abort zeroconf for wrong devices."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -225,7 +225,7 @@ async def test_abort_zeroconf_wrong_device(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("info")
-async def test_abort_if_configured(hass: HomeAssistant) -> None:
+async def test_abort_if_configured(hass: SmartHub) -> None:
     """Test we abort config flow if already configured."""
     entry = configure_integration(hass)
 
@@ -256,7 +256,7 @@ async def test_abort_if_configured(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_device")
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_form_reauth(hass: HomeAssistant) -> None:
+async def test_form_reauth(hass: SmartHub) -> None:
     """Test that the reauth confirmation form is served."""
     entry = configure_integration(hass)
     await hass.config_entries.async_setup(entry.entry_id)
@@ -267,11 +267,11 @@ async def test_form_reauth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.devolo_home_network.async_setup_entry",
+            "smarthub.components.devolo_home_network.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.devolo_home_network.config_flow.Device",
+            "smarthub.components.devolo_home_network.config_flow.Device",
             new=MockDeviceWrongPassword,
         ),
     ):
@@ -286,11 +286,11 @@ async def test_form_reauth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.devolo_home_network.async_setup_entry",
+            "smarthub.components.devolo_home_network.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.devolo_home_network.config_flow.Device",
+            "smarthub.components.devolo_home_network.config_flow.Device",
             new=MockDevice,
         ),
     ):

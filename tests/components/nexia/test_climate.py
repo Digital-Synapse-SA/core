@@ -1,12 +1,12 @@
 """The lock tests for the august platform."""
 
-from homeassistant.components.climate import HVACMode
-from homeassistant.core import HomeAssistant
+from smarthub.components.climate import HVACMode
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 
-async def test_climate_zones(hass: HomeAssistant) -> None:
+async def test_climate_zones(hass: SmartHub) -> None:
     """Test creation climate zones."""
 
     await async_init_integration(hass)

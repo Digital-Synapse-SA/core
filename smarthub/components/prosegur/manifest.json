@@ -1,0 +1,10 @@
+{
+  "domain": "prosegur",
+  "name": "Prosegur Alarm",
+  "codeowners": ["@dgomes"],
+  "config_flow": true,
+  "documentation": "https://www.smart-hub.io/integrations/prosegur",
+  "iot_class": "cloud_polling",
+  "loggers": ["pyprosegur"],
+  "requirements": ["pyprosegur==0.0.14"]
+}

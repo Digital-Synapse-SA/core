@@ -4,20 +4,20 @@ from unittest.mock import MagicMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.humidifier import (
+from smarthub.components.humidifier import (
     ATTR_HUMIDITY,
     DOMAIN as HUMIDIFIER_DOMAIN,
     SERVICE_SET_HUMIDITY,
 )
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
 
 async def test_humidifier_service_calls(
-    hass: HomeAssistant, device: MagicMock, config_entry: MagicMock
+    hass: SmartHub, device: MagicMock, config_entry: MagicMock
 ) -> None:
     """Test the setup of the climate entities when there are no additional options available."""
     device.has_humidifier = True
@@ -51,7 +51,7 @@ async def test_humidifier_service_calls(
 
 
 async def test_dehumidifier_service_calls(
-    hass: HomeAssistant, device: MagicMock, config_entry: MagicMock
+    hass: SmartHub, device: MagicMock, config_entry: MagicMock
 ) -> None:
     """Test the setup of the climate entities when there are no additional options available."""
     device.has_dehumidifier = True
@@ -85,7 +85,7 @@ async def test_dehumidifier_service_calls(
 
 
 async def test_static_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device: MagicMock,
     config_entry: MagicMock,

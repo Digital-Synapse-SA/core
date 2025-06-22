@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock
 
 from autarco import AutarcoAuthenticationError, AutarcoConnectionError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_autarco_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -31,7 +31,7 @@ async def test_load_unload_entry(
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_autarco_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -46,7 +46,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_setup_entry_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_autarco_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

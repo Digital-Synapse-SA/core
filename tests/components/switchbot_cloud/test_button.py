@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 from switchbot_api import BotCommands, Device
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.switchbot_cloud import SwitchBotAPI
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.switchbot_cloud import SwitchBotAPI
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from . import configure_integration
 
 
 async def test_pressmode_bot(
-    hass: HomeAssistant, mock_list_devices, mock_get_status
+    hass: SmartHub, mock_list_devices, mock_get_status
 ) -> None:
     """Test press."""
     mock_list_devices.return_value = [
@@ -47,7 +47,7 @@ async def test_pressmode_bot(
 
 
 async def test_switchmode_bot_no_button_entity(
-    hass: HomeAssistant, mock_list_devices, mock_get_status
+    hass: SmartHub, mock_list_devices, mock_get_status
 ) -> None:
     """Test a switchMode bot isn't added as a button."""
     mock_list_devices.return_value = [

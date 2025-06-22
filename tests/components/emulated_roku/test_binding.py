@@ -3,7 +3,7 @@
 from unittest.mock import AsyncMock, Mock, patch
 from uuid import uuid4
 
-from homeassistant.components.emulated_roku.binding import (
+from smarthub.components.emulated_roku.binding import (
     ATTR_APP_ID,
     ATTR_COMMAND_TYPE,
     ATTR_KEY,
@@ -15,10 +15,10 @@ from homeassistant.components.emulated_roku.binding import (
     ROKU_COMMAND_LAUNCH,
     EmulatedRoku,
 )
-from homeassistant.core import Event, HomeAssistant
+from smarthub.core import Event, SmartHub
 
 
-async def test_events_fired_properly(hass: HomeAssistant) -> None:
+async def test_events_fired_properly(hass: SmartHub) -> None:
     """Test that events are fired correctly."""
     random_name = uuid4().hex
     # Note that this test is accessing the internal EmulatedRoku class
@@ -48,7 +48,7 @@ async def test_events_fired_properly(hass: HomeAssistant) -> None:
             events.append(event)
 
     with patch(
-        "homeassistant.components.emulated_roku.binding.EmulatedRokuServer", instantiate
+        "smarthub.components.emulated_roku.binding.EmulatedRokuServer", instantiate
     ):
         hass.bus.async_listen(EVENT_ROKU_COMMAND, listener)
 

@@ -11,16 +11,16 @@ from pytrafikverket.exceptions import InvalidAuthentication, NoTrainAnnouncement
 from pytrafikverket.models import TrainStopModel
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntry
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from tests.common import async_fire_time_changed
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_next(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     load_int: ConfigEntry,
     get_trains_next: list[TrainStopModel],
@@ -41,11 +41,11 @@ async def test_sensor_next(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
             return_value=get_trains_next,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_stop",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_stop",
             return_value=get_train_stop,
         ),
     ):
@@ -67,7 +67,7 @@ async def test_sensor_next(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_single_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     load_int: ConfigEntry,
     get_trains_next: list[TrainStopModel],
@@ -83,7 +83,7 @@ async def test_sensor_single_stop(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_update_auth_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     load_int: ConfigEntry,
     get_trains_next: list[TrainStopModel],
@@ -95,11 +95,11 @@ async def test_sensor_update_auth_failure(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
             side_effect=InvalidAuthentication,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_stop",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_stop",
             side_effect=InvalidAuthentication,
         ),
     ):
@@ -116,7 +116,7 @@ async def test_sensor_update_auth_failure(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_update_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     load_int: ConfigEntry,
     get_trains_next: list[TrainStopModel],
@@ -128,11 +128,11 @@ async def test_sensor_update_failure(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
             side_effect=NoTrainAnnouncementFound,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_stop",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_stop",
             side_effect=NoTrainAnnouncementFound,
         ),
     ):
@@ -146,7 +146,7 @@ async def test_sensor_update_failure(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_update_failure_no_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     load_int: ConfigEntry,
     get_trains_next: list[TrainStopModel],
@@ -157,7 +157,7 @@ async def test_sensor_update_failure_no_state(
     assert state.state == "2023-05-01T11:00:00+00:00"
 
     with patch(
-        "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_stop",
+        "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_stop",
         return_value=None,
     ):
         freezer.tick(timedelta(minutes=6))

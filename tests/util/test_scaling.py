@@ -1,10 +1,10 @@
-"""Test Home Assistant scaling utils."""
+"""Test SmartHub scaling utils."""
 
 import math
 
 import pytest
 
-from homeassistant.util.percentage import (
+from smarthub.util.percentage import (
     scale_ranged_value_to_int_range,
     scale_to_ranged_value,
 )

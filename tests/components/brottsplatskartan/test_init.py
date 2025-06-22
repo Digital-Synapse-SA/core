@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from homeassistant.components.brottsplatskartan.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.brottsplatskartan.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_load_unload_entry(hass: HomeAssistant) -> None:
+async def test_load_unload_entry(hass: SmartHub) -> None:
     """Test load and unload entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -24,7 +24,7 @@ async def test_load_unload_entry(hass: HomeAssistant) -> None:
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.brottsplatskartan.sensor.BrottsplatsKartan",
+        "smarthub.components.brottsplatskartan.sensor.BrottsplatsKartan",
     ):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()

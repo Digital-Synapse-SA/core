@@ -7,11 +7,11 @@ from unittest.mock import ANY, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import backup, onboarding
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.backup import async_initialize_backup
-from homeassistant.setup import async_setup_component
+from smarthub.components import backup, onboarding
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.backup import async_initialize_backup
+from smarthub.setup import async_setup_component
 
 from tests.common import register_auth_provider
 from tests.typing import ClientSessionGenerator
@@ -26,10 +26,10 @@ def mock_onboarding_storage(hass_storage, data):
 
 
 @pytest.fixture(autouse=True)
-def auth_active(hass: HomeAssistant) -> None:
+def auth_active(hass: SmartHub) -> None:
     """Ensure auth is always active."""
     hass.loop.run_until_complete(
-        register_auth_provider(hass, {"type": "homeassistant"})
+        register_auth_provider(hass, {"type": "smarthub"})
     )
 
 
@@ -46,7 +46,7 @@ def auth_active(hass: HomeAssistant) -> None:
     ],
 )
 async def test_onboarding_view_after_done(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     method: str,
@@ -81,7 +81,7 @@ async def test_onboarding_view_after_done(
     ],
 )
 async def test_onboarding_backup_view_without_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     method: str,
@@ -102,7 +102,7 @@ async def test_onboarding_backup_view_without_backup(
 
 
 async def test_onboarding_backup_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
@@ -131,8 +131,8 @@ async def test_onboarding_backup_info(
             failed_agent_ids=[],
             failed_folders=[],
             folders=[backup.Folder.MEDIA, backup.Folder.SHARE],
-            homeassistant_included=True,
-            homeassistant_version="2024.12.0",
+            smarthub_included=True,
+            smarthub_version="2024.12.0",
             name="Test",
             with_automatic_settings=True,
         ),
@@ -152,15 +152,15 @@ async def test_onboarding_backup_info(
             failed_agent_ids=[],
             failed_folders=[],
             folders=[backup.Folder.MEDIA, backup.Folder.SHARE],
-            homeassistant_included=True,
-            homeassistant_version="2024.12.0",
+            smarthub_included=True,
+            smarthub_version="2024.12.0",
             name="Test 2",
             with_automatic_settings=None,
         ),
     }
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_get_backups",
+        "smarthub.components.backup.manager.BackupManager.async_get_backups",
         return_value=(backups, {}),
     ):
         resp = await client.get("/api/onboarding/backup/info")
@@ -180,7 +180,7 @@ async def test_onboarding_backup_info(
                 "restore_addons": None,
                 "restore_database": True,
                 "restore_folders": None,
-                "restore_homeassistant": True,
+                "restore_smarthub": True,
             },
         ),
         (
@@ -198,7 +198,7 @@ async def test_onboarding_backup_info(
                 "restore_addons": ["addon_1"],
                 "restore_database": True,
                 "restore_folders": [backup.Folder.MEDIA],
-                "restore_homeassistant": True,
+                "restore_smarthub": True,
             },
         ),
         (
@@ -216,13 +216,13 @@ async def test_onboarding_backup_info(
                 "restore_addons": ["addon_1", "addon_2"],
                 "restore_database": False,
                 "restore_folders": [backup.Folder.MEDIA, backup.Folder.SHARE],
-                "restore_homeassistant": True,
+                "restore_smarthub": True,
             },
         ),
     ],
 )
 async def test_onboarding_backup_restore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     params: dict[str, Any],
@@ -239,7 +239,7 @@ async def test_onboarding_backup_restore(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_restore_backup",
+        "smarthub.components.backup.manager.BackupManager.async_restore_backup",
     ) as mock_restore:
         resp = await client.post("/api/onboarding/backup/restore", json=params)
     assert resp.status == 200
@@ -305,10 +305,10 @@ async def test_onboarding_backup_restore(
             {"code": "incorrect_password"},
             1,
         ),
-        # Home Assistant error
+        # SmartHub error
         (
             {"backup_id": "abc123", "agent_id": "backup.local"},
-            HomeAssistantError("Boom!"),
+            SmartHubError("Boom!"),
             400,
             {"code": "restore_failed", "message": "Boom!"},
             1,
@@ -316,7 +316,7 @@ async def test_onboarding_backup_restore(
     ],
 )
 async def test_onboarding_backup_restore_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     params: dict[str, Any],
@@ -336,7 +336,7 @@ async def test_onboarding_backup_restore_error(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_restore_backup",
+        "smarthub.components.backup.manager.BackupManager.async_restore_backup",
         side_effect=restore_error,
     ) as mock_restore:
         resp = await client.post("/api/onboarding/backup/restore", json=params)
@@ -360,7 +360,7 @@ async def test_onboarding_backup_restore_error(
     ],
 )
 async def test_onboarding_backup_restore_unexpected_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
     params: dict[str, Any],
@@ -380,7 +380,7 @@ async def test_onboarding_backup_restore_unexpected_error(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_restore_backup",
+        "smarthub.components.backup.manager.BackupManager.async_restore_backup",
         side_effect=restore_error,
     ) as mock_restore:
         resp = await client.post("/api/onboarding/backup/restore", json=params)
@@ -391,7 +391,7 @@ async def test_onboarding_backup_restore_unexpected_error(
 
 
 async def test_onboarding_backup_upload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -406,7 +406,7 @@ async def test_onboarding_backup_upload(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_receive_backup",
+        "smarthub.components.backup.manager.BackupManager.async_receive_backup",
         return_value="abc123",
     ) as mock_receive:
         resp = await client.post(

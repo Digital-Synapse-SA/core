@@ -6,13 +6,13 @@ from unittest.mock import patch
 
 from uiprotect.data import Camera
 
-from homeassistant.components.automation import DOMAIN as AUTOMATION_DOMAIN
-from homeassistant.components.script import DOMAIN as SCRIPT_DOMAIN
-from homeassistant.components.unifiprotect.const import DOMAIN
-from homeassistant.const import SERVICE_RELOAD, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.automation import DOMAIN as AUTOMATION_DOMAIN
+from smarthub.components.script import DOMAIN as SCRIPT_DOMAIN
+from smarthub.components.unifiprotect.const import DOMAIN
+from smarthub.const import SERVICE_RELOAD, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .utils import MockUFPFixture, init_entry
 
@@ -21,7 +21,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_deprecated_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     hass_ws_client: WebSocketGenerator,
     doorbell: Camera,
@@ -45,7 +45,7 @@ async def test_deprecated_entity(
 
 
 async def test_deprecated_entity_no_automations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     hass_ws_client: WebSocketGenerator,
@@ -75,7 +75,7 @@ async def test_deprecated_entity_no_automations(
     assert issue is None
 
 
-async def _load_automation(hass: HomeAssistant, entity_id: str):
+async def _load_automation(hass: SmartHub, entity_id: str):
     assert await async_setup_component(
         hass,
         AUTOMATION_DOMAIN,
@@ -109,7 +109,7 @@ async def _load_automation(hass: HomeAssistant, entity_id: str):
 
 
 async def test_deprecate_entity_automation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     hass_ws_client: WebSocketGenerator,
@@ -139,7 +139,7 @@ async def test_deprecate_entity_automation(
     assert issue is not None
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={AUTOMATION_DOMAIN: []},
     ):
@@ -159,7 +159,7 @@ async def test_deprecate_entity_automation(
     assert issue is None
 
 
-async def _load_script(hass: HomeAssistant, entity_id: str):
+async def _load_script(hass: SmartHub, entity_id: str):
     assert await async_setup_component(
         hass,
         SCRIPT_DOMAIN,
@@ -177,7 +177,7 @@ async def _load_script(hass: HomeAssistant, entity_id: str):
 
 
 async def test_deprecate_entity_script(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     hass_ws_client: WebSocketGenerator,
@@ -207,7 +207,7 @@ async def test_deprecate_entity_script(
     assert issue is not None
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={SCRIPT_DOMAIN: {}},
     ):

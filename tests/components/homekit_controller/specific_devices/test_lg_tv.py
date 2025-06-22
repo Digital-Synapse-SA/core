@@ -1,11 +1,11 @@
 """Test against characteristics captured from an LG TV."""
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE_LIST,
     MediaPlayerEntityFeature,
 )
-from homeassistant.const import ATTR_SUPPORTED_FEATURES, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_SUPPORTED_FEATURES, STATE_ON
+from smarthub.core import SmartHub
 
 from ..common import (
     HUB_TEST_ACCESSORY_ID,
@@ -16,7 +16,7 @@ from ..common import (
 )
 
 
-async def test_lg_tv_setup(hass: HomeAssistant) -> None:
+async def test_lg_tv_setup(hass: SmartHub) -> None:
     """Test that a LG TV can be correctly setup in HA."""
     accessories = await setup_accessories_from_file(hass, "lg_tv.json")
     await setup_test_accessories(hass, accessories)

@@ -44,8 +44,8 @@ from . import assert_adds_messages, assert_no_messages
 @pytest.mark.parametrize(
     "path",
     [
-        "homeassistant.components.pylint_test.coordinator",
-        "homeassistant.components.pylint_test.coordinator.my_coordinator",
+        "smarthub.components.pylint_test.coordinator",
+        "smarthub.components.pylint_test.coordinator.my_coordinator",
     ],
 )
 def test_enforce_class_module_good(
@@ -66,10 +66,10 @@ def test_enforce_class_module_good(
 @pytest.mark.parametrize(
     "path",
     [
-        "homeassistant.components.sensor",
-        "homeassistant.components.sensor.entity",
-        "homeassistant.components.pylint_test.sensor",
-        "homeassistant.components.pylint_test.sensor.entity",
+        "smarthub.components.sensor",
+        "smarthub.components.sensor.entity",
+        "smarthub.components.pylint_test.sensor",
+        "smarthub.components.pylint_test.sensor.entity",
     ],
 )
 def test_enforce_class_platform_good(
@@ -102,10 +102,10 @@ def test_enforce_class_platform_good(
 @pytest.mark.parametrize(
     "path",
     [
-        "homeassistant.components.pylint_test",
-        "homeassistant.components.pylint_test.my_coordinator",
-        "homeassistant.components.pylint_test.coordinator_other",
-        "homeassistant.components.pylint_test.sensor",
+        "smarthub.components.pylint_test",
+        "smarthub.components.pylint_test.my_coordinator",
+        "smarthub.components.pylint_test.coordinator_other",
+        "smarthub.components.pylint_test.sensor",
     ],
 )
 def test_enforce_class_module_bad_simple(
@@ -162,10 +162,10 @@ def test_enforce_class_module_bad_simple(
 @pytest.mark.parametrize(
     "path",
     [
-        "homeassistant.components.pylint_test",
-        "homeassistant.components.pylint_test.my_coordinator",
-        "homeassistant.components.pylint_test.coordinator_other",
-        "homeassistant.components.pylint_test.sensor",
+        "smarthub.components.pylint_test",
+        "smarthub.components.pylint_test.my_coordinator",
+        "smarthub.components.pylint_test.coordinator_other",
+        "smarthub.components.pylint_test.sensor",
     ],
 )
 def test_enforce_class_module_bad_nested(
@@ -219,9 +219,9 @@ def test_enforce_class_module_bad_nested(
 @pytest.mark.parametrize(
     "path",
     [
-        "homeassistant.components.sensor",
-        "homeassistant.components.sensor.entity",
-        "homeassistant.components.pylint_test.entity",
+        "smarthub.components.sensor",
+        "smarthub.components.sensor.entity",
+        "smarthub.components.pylint_test.entity",
     ],
 )
 def test_enforce_entity_good(
@@ -248,9 +248,9 @@ def test_enforce_entity_good(
 @pytest.mark.parametrize(
     "path",
     [
-        "homeassistant.components.pylint_test",
-        "homeassistant.components.pylint_test.select",
-        "homeassistant.components.pylint_test.select.entity",
+        "smarthub.components.pylint_test",
+        "smarthub.components.pylint_test.select",
+        "smarthub.components.pylint_test.select.entity",
     ],
 )
 def test_enforce_entity_bad(

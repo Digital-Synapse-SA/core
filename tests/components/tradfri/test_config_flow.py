@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.tradfri import config_flow
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import (
+from smarthub import config_entries
+from smarthub.components.tradfri import config_flow
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
@@ -26,7 +26,7 @@ def mock_auth_fixture():
         yield auth
 
 
-async def test_already_paired(hass: HomeAssistant, mock_entry_setup) -> None:
+async def test_already_paired(hass: SmartHub, mock_entry_setup) -> None:
     """Test Gateway already paired."""
     with patch(
         f"{TRADFRI_PATH}.config_flow.APIFactory",
@@ -47,7 +47,7 @@ async def test_already_paired(hass: HomeAssistant, mock_entry_setup) -> None:
 
 
 async def test_user_connection_successful(
-    hass: HomeAssistant, mock_auth, mock_entry_setup
+    hass: SmartHub, mock_auth, mock_entry_setup
 ) -> None:
     """Test a successful connection."""
     mock_auth.side_effect = lambda hass, host, code: {"host": host, "gateway_id": "bla"}
@@ -70,7 +70,7 @@ async def test_user_connection_successful(
 
 
 async def test_user_connection_timeout(
-    hass: HomeAssistant, mock_auth, mock_entry_setup
+    hass: SmartHub, mock_auth, mock_entry_setup
 ) -> None:
     """Test a connection timeout."""
     mock_auth.side_effect = config_flow.AuthError("timeout")
@@ -90,7 +90,7 @@ async def test_user_connection_timeout(
 
 
 async def test_user_connection_bad_key(
-    hass: HomeAssistant, mock_auth, mock_entry_setup
+    hass: SmartHub, mock_auth, mock_entry_setup
 ) -> None:
     """Test a connection with bad key."""
     mock_auth.side_effect = config_flow.AuthError("invalid_security_code")
@@ -110,7 +110,7 @@ async def test_user_connection_bad_key(
 
 
 async def test_discovery_connection(
-    hass: HomeAssistant, mock_auth, mock_entry_setup
+    hass: SmartHub, mock_auth, mock_entry_setup
 ) -> None:
     """Test a connection via discovery."""
     mock_auth.side_effect = lambda hass, host, code: {"host": host, "gateway_id": "bla"}
@@ -143,7 +143,7 @@ async def test_discovery_connection(
     }
 
 
-async def test_discovery_duplicate_aborted(hass: HomeAssistant) -> None:
+async def test_discovery_duplicate_aborted(hass: SmartHub) -> None:
     """Test a duplicate discovery host aborts and updates existing entry."""
     entry = MockConfigEntry(
         domain="tradfri", data={"host": "some-host"}, unique_id="homekit-id"
@@ -171,7 +171,7 @@ async def test_discovery_duplicate_aborted(hass: HomeAssistant) -> None:
 
 
 async def test_duplicate_discovery(
-    hass: HomeAssistant, mock_auth, mock_entry_setup
+    hass: SmartHub, mock_auth, mock_entry_setup
 ) -> None:
     """Test a duplicate discovery in progress is ignored."""
     result = await hass.config_entries.flow.async_init(
@@ -207,7 +207,7 @@ async def test_duplicate_discovery(
     assert result2["type"] is FlowResultType.ABORT
 
 
-async def test_discovery_updates_unique_id(hass: HomeAssistant) -> None:
+async def test_discovery_updates_unique_id(hass: SmartHub) -> None:
     """Test a duplicate discovery host aborts and updates existing entry."""
     entry = MockConfigEntry(
         domain="tradfri",

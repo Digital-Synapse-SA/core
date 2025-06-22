@@ -1,10 +1,10 @@
 """Test the weather websocket API."""
 
-from homeassistant.components.weather import Forecast, WeatherEntityFeature
-from homeassistant.components.weather.const import DOMAIN
-from homeassistant.const import UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.weather import Forecast, WeatherEntityFeature
+from smarthub.components.weather.const import DOMAIN
+from smarthub.const import UnitOfTemperature
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import MockWeatherTest, create_entity
 
@@ -12,7 +12,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_device_class_units(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can get supported units."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -39,7 +39,7 @@ async def test_device_class_units(
 
 
 async def test_subscribe_forecast(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     config_flow_fixture: None,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_subscribe_forecast(
 
 
 async def test_subscribe_forecast_unknown_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test multiple forecast."""
@@ -130,7 +130,7 @@ async def test_subscribe_forecast_unknown_entity(
 
 
 async def test_subscribe_forecast_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     config_flow_fixture: None,
 ) -> None:

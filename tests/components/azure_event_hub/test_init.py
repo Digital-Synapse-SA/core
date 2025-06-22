@@ -7,13 +7,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from azure.eventhub.exceptions import EventHubError
 import pytest
 
-from homeassistant.components import azure_event_hub
-from homeassistant.components.azure_event_hub.const import CONF_SEND_INTERVAL, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components import azure_event_hub
+from smarthub.components.azure_event_hub.const import CONF_SEND_INTERVAL, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from .conftest import FilterTest
 from .const import AZURE_EVENT_HUB_PATH, BASIC_OPTIONS, CS_CONFIG_FULL, SAS_CONFIG_FULL
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 _LOGGER = logging.getLogger(__name__)
 
 
-async def test_import(hass: HomeAssistant) -> None:
+async def test_import(hass: SmartHub) -> None:
     """Test the popping of the filter and further import of the config."""
     config = {
         DOMAIN: {
@@ -43,7 +43,7 @@ async def test_import(hass: HomeAssistant) -> None:
     assert await async_setup_component(hass, DOMAIN, config)
 
 
-async def test_filter_only_config(hass: HomeAssistant) -> None:
+async def test_filter_only_config(hass: SmartHub) -> None:
     """Test the popping of the filter and further import of the config."""
     config = {
         DOMAIN: {
@@ -61,7 +61,7 @@ async def test_filter_only_config(hass: HomeAssistant) -> None:
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, entry: MockConfigEntry, mock_create_batch: MagicMock
+    hass: SmartHub, entry: MockConfigEntry, mock_create_batch: MagicMock
 ) -> None:
     """Test being able to unload an entry.
 
@@ -75,7 +75,7 @@ async def test_unload_entry(
 
 
 async def test_failed_test_connection(
-    hass: HomeAssistant, mock_get_eventhub_properties: AsyncMock
+    hass: SmartHub, mock_get_eventhub_properties: AsyncMock
 ) -> None:
     """Test being able to unload an entry."""
     entry = MockConfigEntry(
@@ -91,7 +91,7 @@ async def test_failed_test_connection(
 
 
 async def test_send_batch_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_with_one_event: MockConfigEntry,
     mock_send_batch: AsyncMock,
 ) -> None:
@@ -116,7 +116,7 @@ async def test_send_batch_error(
 
 
 async def test_late_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_with_one_event: MockConfigEntry,
     mock_create_batch: MagicMock,
 ) -> None:
@@ -135,7 +135,7 @@ async def test_late_event(
 
 
 async def test_full_batch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_with_one_event: MockConfigEntry,
     mock_create_batch: MagicMock,
 ) -> None:
@@ -218,7 +218,7 @@ async def test_full_batch(
     ids=["allowlist", "denylist", "filtered_allowlist", "filtered_denylist"],
 )
 async def test_filter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
     tests: list[FilterTest],
     mock_create_batch: MagicMock,

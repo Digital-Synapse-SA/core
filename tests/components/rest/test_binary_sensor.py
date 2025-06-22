@@ -7,13 +7,13 @@ from unittest.mock import patch
 import aiohttp
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components.binary_sensor import (
+from smarthub import config as hass_config
+from smarthub.components.binary_sensor import (
     DOMAIN as BINARY_SENSOR_DOMAIN,
     BinarySensorDeviceClass,
 )
-from homeassistant.components.rest import DOMAIN
-from homeassistant.const import (
+from smarthub.components.rest import DOMAIN
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     CONTENT_TYPE_JSON,
@@ -22,15 +22,15 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import get_fixture_path
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
-async def test_setup_missing_basic_config(hass: HomeAssistant) -> None:
+async def test_setup_missing_basic_config(hass: SmartHub) -> None:
     """Test setup with configuration missing required entries."""
     assert await async_setup_component(
         hass, BINARY_SENSOR_DOMAIN, {BINARY_SENSOR_DOMAIN: {"platform": DOMAIN}}
@@ -39,7 +39,7 @@ async def test_setup_missing_basic_config(hass: HomeAssistant) -> None:
     assert len(hass.states.async_all(BINARY_SENSOR_DOMAIN)) == 0
 
 
-async def test_setup_missing_config(hass: HomeAssistant) -> None:
+async def test_setup_missing_config(hass: SmartHub) -> None:
     """Test setup with configuration missing required entries."""
     assert await async_setup_component(
         hass,
@@ -57,7 +57,7 @@ async def test_setup_missing_config(hass: HomeAssistant) -> None:
 
 
 async def test_setup_failed_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -81,7 +81,7 @@ async def test_setup_failed_connect(
 
 
 async def test_setup_fail_on_ssl_erros(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -104,7 +104,7 @@ async def test_setup_fail_on_ssl_erros(
 
 
 async def test_setup_timeout(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup when connection timeout occurs."""
     aioclient_mock.get("http://localhost", exc=TimeoutError())
@@ -124,7 +124,7 @@ async def test_setup_timeout(
 
 
 async def test_setup_minimum(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with minimum configuration."""
     aioclient_mock.get("http://localhost", status=HTTPStatus.OK)
@@ -144,7 +144,7 @@ async def test_setup_minimum(
 
 
 async def test_setup_minimum_resource_template(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with minimum configuration (resource_template)."""
     aioclient_mock.get("http://localhost", status=HTTPStatus.OK)
@@ -163,7 +163,7 @@ async def test_setup_minimum_resource_template(
 
 
 async def test_setup_duplicate_resource_template(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with duplicate resources."""
     aioclient_mock.get("http://localhost", status=HTTPStatus.OK)
@@ -183,7 +183,7 @@ async def test_setup_duplicate_resource_template(
 
 
 async def test_setup_get(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with valid configuration."""
     aioclient_mock.get("http://localhost", status=HTTPStatus.OK, json={})
@@ -217,7 +217,7 @@ async def test_setup_get(
 
 
 async def test_setup_get_template_headers_params(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with valid configuration."""
     aioclient_mock.get("http://localhost", status=200, json={})
@@ -244,7 +244,7 @@ async def test_setup_get_template_headers_params(
             }
         },
     )
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await hass.async_block_till_done()
 
     # Verify headers and params were sent correctly by checking the mock was called
@@ -255,7 +255,7 @@ async def test_setup_get_template_headers_params(
 
 
 async def test_setup_get_digest_auth(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with valid configuration."""
     aioclient_mock.get("http://localhost", status=HTTPStatus.OK, json={})
@@ -284,7 +284,7 @@ async def test_setup_get_digest_auth(
 
 
 async def test_setup_post(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with valid configuration."""
     aioclient_mock.post("http://localhost", status=HTTPStatus.OK, json={})
@@ -313,7 +313,7 @@ async def test_setup_post(
 
 
 async def test_setup_get_off(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with valid off configuration."""
     aioclient_mock.get(
@@ -345,7 +345,7 @@ async def test_setup_get_off(
 
 
 async def test_setup_get_on(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with valid on configuration."""
     aioclient_mock.get(
@@ -377,7 +377,7 @@ async def test_setup_get_on(
 
 
 async def test_setup_get_xml(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with valid xml configuration."""
     aioclient_mock.get(
@@ -416,7 +416,7 @@ async def test_setup_get_xml(
     ],
 )
 async def test_setup_get_bad_xml(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
     content: str,
@@ -453,7 +453,7 @@ async def test_setup_get_bad_xml(
 
 
 async def test_setup_with_exception(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with exception."""
     aioclient_mock.get("http://localhost", status=HTTPStatus.OK, json={})
@@ -478,13 +478,13 @@ async def test_setup_with_exception(
     state = hass.states.get("binary_sensor.foo")
     assert state.state == STATE_OFF
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await hass.async_block_till_done()
 
     aioclient_mock.clear_requests()
     aioclient_mock.get("http://localhost", exc=aiohttp.ClientError("Request failed"))
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: ["binary_sensor.foo"]},
         blocking=True,
@@ -495,7 +495,7 @@ async def test_setup_with_exception(
     assert state.state == STATE_UNAVAILABLE
 
 
-async def test_reload(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_reload(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Verify we can reload reset sensors."""
 
     aioclient_mock.get("http://localhost", status=HTTPStatus.OK)
@@ -535,7 +535,7 @@ async def test_reload(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) 
 
 
 async def test_setup_query_params(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with query params."""
     aioclient_mock.get("http://localhost?search=something", status=HTTPStatus.OK)
@@ -556,7 +556,7 @@ async def test_setup_query_params(
 
 
 async def test_entity_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -595,7 +595,7 @@ async def test_entity_config(
 
 
 async def test_availability_in_config(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test entity configuration."""
 
@@ -620,7 +620,7 @@ async def test_availability_in_config(
 
 
 async def test_availability_blocks_value_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -647,7 +647,7 @@ async def test_availability_blocks_value_template(
         },
     )
     await hass.async_block_till_done()
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await hass.async_block_till_done()
 
     assert error not in caplog.text
@@ -659,7 +659,7 @@ async def test_availability_blocks_value_template(
     aioclient_mock.clear_requests()
     aioclient_mock.get("http://localhost", status=HTTPStatus.OK, text="50")
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: ["binary_sensor.block_template"]},
         blocking=True,

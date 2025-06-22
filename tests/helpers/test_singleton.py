@@ -5,8 +5,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import singleton
+from smarthub.core import SmartHub
+from smarthub.helpers import singleton
 
 
 @pytest.fixture
@@ -16,11 +16,11 @@ def mock_hass():
 
 
 @pytest.mark.parametrize("result", [object(), {}, []])
-async def test_singleton_async(mock_hass: HomeAssistant, result: Any) -> None:
+async def test_singleton_async(mock_hass: SmartHub, result: Any) -> None:
     """Test singleton with async function."""
 
     @singleton.singleton("test_key")
-    async def something(hass: HomeAssistant) -> Any:
+    async def something(hass: SmartHub) -> Any:
         return result
 
     result1 = await something(mock_hass)
@@ -32,11 +32,11 @@ async def test_singleton_async(mock_hass: HomeAssistant, result: Any) -> None:
 
 
 @pytest.mark.parametrize("result", [object(), {}, []])
-def test_singleton(mock_hass: HomeAssistant, result: Any) -> None:
+def test_singleton(mock_hass: SmartHub, result: Any) -> None:
     """Test singleton with function."""
 
     @singleton.singleton("test_key")
-    def something(hass: HomeAssistant) -> Any:
+    def something(hass: SmartHub) -> Any:
         return result
 
     result1 = something(mock_hass)

@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.swiss_public_transport.const import (
+from smarthub.components.swiss_public_transport.const import (
     CONF_DESTINATION,
     CONF_START,
     CONF_TIME_FIXED,
@@ -13,11 +13,11 @@ from homeassistant.components.swiss_public_transport.const import (
     CONF_VIA,
     DOMAIN,
 )
-from homeassistant.components.swiss_public_transport.helper import unique_id_from_config
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.swiss_public_transport.helper import unique_id_from_config
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -89,7 +89,7 @@ CONNECTIONS = [
     ],
 )
 async def test_migration_from(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     from_version,
     from_minor_version,
@@ -109,7 +109,7 @@ async def test_migration_from(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.swiss_public_transport.OpendataTransport",
+        "smarthub.components.swiss_public_transport.OpendataTransport",
         return_value=AsyncMock(),
     ) as mock:
         mock().connections = CONNECTIONS
@@ -141,7 +141,7 @@ async def test_migration_from(
         )
 
 
-async def test_migrate_error_from_future(hass: HomeAssistant) -> None:
+async def test_migrate_error_from_future(hass: SmartHub) -> None:
     """Test a future version isn't migrated."""
 
     mock_entry = MockConfigEntry(
@@ -155,7 +155,7 @@ async def test_migrate_error_from_future(hass: HomeAssistant) -> None:
     mock_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.swiss_public_transport.OpendataTransport",
+        "smarthub.components.swiss_public_transport.OpendataTransport",
         return_value=AsyncMock(),
     ) as mock:
         mock().connections = CONNECTIONS

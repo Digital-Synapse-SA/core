@@ -7,8 +7,8 @@ from aioswitcher.api.messages import SwitcherBaseResponse
 from aioswitcher.device import DeviceState, ShutterChildLock
 import pytest
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -16,9 +16,9 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util import slugify
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.util import slugify
 
 from . import init_integration
 from .consts import (
@@ -39,7 +39,7 @@ ENTITY_ID3_2 = f"{SWITCH_DOMAIN}.{slugify(DEVICE3.name)}_child_lock_2"
 
 @pytest.mark.parametrize("mock_bridge", [[DUMMY_WATER_HEATER_DEVICE]], indirect=True)
 async def test_switch(
-    hass: HomeAssistant, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test the switch."""
     await init_integration(hass)
@@ -62,7 +62,7 @@ async def test_switch(
 
     # Test turning on
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_device",
     ) as mock_control_device:
         await hass.services.async_call(
             SWITCH_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: entity_id}, blocking=True
@@ -75,7 +75,7 @@ async def test_switch(
 
     # Test turning off
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_device"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_device"
     ) as mock_control_device:
         await hass.services.async_call(
             SWITCH_DOMAIN, SERVICE_TURN_OFF, {ATTR_ENTITY_ID: entity_id}, blocking=True
@@ -89,7 +89,7 @@ async def test_switch(
 
 @pytest.mark.parametrize("mock_bridge", [[DUMMY_WATER_HEATER_DEVICE]], indirect=True)
 async def test_switch_ignore_previous_async_state(
-    hass: HomeAssistant, mock_bridge, mock_api
+    hass: SmartHub, mock_bridge, mock_api
 ) -> None:
     """Test switch ignores previous async state."""
     await init_integration(hass)
@@ -104,7 +104,7 @@ async def test_switch_ignore_previous_async_state(
 
     # Test turning off
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_device"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_device"
     ) as mock_control_device:
         await hass.services.async_call(
             SWITCH_DOMAIN, SERVICE_TURN_OFF, {ATTR_ENTITY_ID: entity_id}, blocking=True
@@ -128,7 +128,7 @@ async def test_switch_ignore_previous_async_state(
 
 @pytest.mark.parametrize("mock_bridge", [[DUMMY_PLUG_DEVICE]], indirect=True)
 async def test_switch_control_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge,
     mock_api,
     monkeypatch: pytest.MonkeyPatch,
@@ -150,10 +150,10 @@ async def test_switch_control_fail(
 
     # Test exception during turn on
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_device",
         side_effect=RuntimeError("fake error"),
     ) as mock_control_device:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 SWITCH_DOMAIN,
                 SERVICE_TURN_ON,
@@ -175,10 +175,10 @@ async def test_switch_control_fail(
 
     # Test error response during turn on
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_device",
         return_value=SwitcherBaseResponse(None),
     ) as mock_control_device:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 SWITCH_DOMAIN,
                 SERVICE_TURN_ON,
@@ -228,7 +228,7 @@ async def test_switch_control_fail(
 )
 @pytest.mark.parametrize("mock_bridge", [[DEVICE, DEVICE2, DEVICE3]], indirect=True)
 async def test_child_lock_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge,
     mock_api,
     monkeypatch: pytest.MonkeyPatch,
@@ -255,7 +255,7 @@ async def test_child_lock_switch(
 
     # Test turning on child lock
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_shutter_child_lock",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_shutter_child_lock",
     ) as mock_control_device:
         await hass.services.async_call(
             SWITCH_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: entity_id}, blocking=True
@@ -268,7 +268,7 @@ async def test_child_lock_switch(
 
     # Test turning off
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_shutter_child_lock"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_shutter_child_lock"
     ) as mock_control_device:
         await hass.services.async_call(
             SWITCH_DOMAIN, SERVICE_TURN_OFF, {ATTR_ENTITY_ID: entity_id}, blocking=True
@@ -282,7 +282,7 @@ async def test_child_lock_switch(
 
 @pytest.mark.parametrize("mock_bridge", [[DEVICE]], indirect=True)
 async def test_child_lock_switch_ignore_previous_async_state(
-    hass: HomeAssistant, mock_bridge, mock_api
+    hass: SmartHub, mock_bridge, mock_api
 ) -> None:
     """Test child lock switch ignores previous async state."""
     await init_integration(hass)
@@ -296,7 +296,7 @@ async def test_child_lock_switch_ignore_previous_async_state(
 
     # Test turning off
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_shutter_child_lock"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_shutter_child_lock"
     ) as mock_control_device:
         await hass.services.async_call(
             SWITCH_DOMAIN, SERVICE_TURN_OFF, {ATTR_ENTITY_ID: entity_id}, blocking=True
@@ -354,7 +354,7 @@ async def test_child_lock_switch_ignore_previous_async_state(
 )
 @pytest.mark.parametrize("mock_bridge", [[DEVICE, DEVICE2, DEVICE3]], indirect=True)
 async def test_child_lock_control_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge,
     mock_api,
     monkeypatch: pytest.MonkeyPatch,
@@ -377,10 +377,10 @@ async def test_child_lock_control_fail(
 
     # Test exception during turn on
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_shutter_child_lock",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_shutter_child_lock",
         side_effect=RuntimeError("fake error"),
     ) as mock_control_device:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 SWITCH_DOMAIN,
                 SERVICE_TURN_ON,
@@ -402,10 +402,10 @@ async def test_child_lock_control_fail(
 
     # Test error response during turn on
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_shutter_child_lock",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_shutter_child_lock",
         return_value=SwitcherBaseResponse(None),
     ) as mock_control_device:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 SWITCH_DOMAIN,
                 SERVICE_TURN_ON,

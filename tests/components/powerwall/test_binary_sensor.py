@@ -2,16 +2,16 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.powerwall.const import DOMAIN
-from homeassistant.const import CONF_IP_ADDRESS, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.powerwall.const import DOMAIN
+from smarthub.const import CONF_IP_ADDRESS, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from .mocks import _mock_powerwall_with_fixtures
 
 from tests.common import MockConfigEntry
 
 
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test creation of the binary sensors."""
 
     mock_powerwall = await _mock_powerwall_with_fixtures(hass)
@@ -20,11 +20,11 @@ async def test_sensors(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -81,7 +81,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
     assert all(item in state.attributes.items() for item in expected_attributes.items())
 
 
-async def test_sensors_with_empty_meters(hass: HomeAssistant) -> None:
+async def test_sensors_with_empty_meters(hass: SmartHub) -> None:
     """Test creation of the binary sensors with empty meters."""
 
     mock_powerwall = await _mock_powerwall_with_fixtures(hass, empty_meters=True)
@@ -90,11 +90,11 @@ async def test_sensors_with_empty_meters(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)

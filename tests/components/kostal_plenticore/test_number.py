@@ -7,17 +7,17 @@ from unittest.mock import patch
 from pykoplenti import ApiClient, SettingsData
 import pytest
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -26,7 +26,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 def mock_plenticore_client() -> Generator[ApiClient]:
     """Return a patched ExtendedApiClient."""
     with patch(
-        "homeassistant.components.kostal_plenticore.coordinator.ExtendedApiClient",
+        "smarthub.components.kostal_plenticore.coordinator.ExtendedApiClient",
         autospec=True,
     ) as plenticore_client_class:
         yield plenticore_client_class.return_value
@@ -94,7 +94,7 @@ def mock_get_setting_values(mock_plenticore_client: ApiClient) -> list:
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_setup_all_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_plenticore_client: ApiClient,
@@ -115,7 +115,7 @@ async def test_setup_all_entries(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_setup_no_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_plenticore_client: ApiClient,
@@ -149,7 +149,7 @@ async def test_setup_no_entries(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_number_has_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_plenticore_client: ApiClient,
     mock_get_setting_values: list,
@@ -174,7 +174,7 @@ async def test_number_has_value(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_number_is_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_plenticore_client: ApiClient,
     mock_get_setting_values: list,
@@ -195,7 +195,7 @@ async def test_number_is_unavailable(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_plenticore_client: ApiClient,
     mock_get_setting_values: list,

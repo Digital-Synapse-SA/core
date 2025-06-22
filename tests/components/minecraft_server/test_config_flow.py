@@ -4,12 +4,12 @@ from unittest.mock import patch
 
 from mcstatus import BedrockServer, JavaServer
 
-from homeassistant.components.minecraft_server.api import MinecraftServerType
-from homeassistant.components.minecraft_server.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_ADDRESS, CONF_TYPE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.minecraft_server.api import MinecraftServerType
+from smarthub.components.minecraft_server.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_ADDRESS, CONF_TYPE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import (
     TEST_ADDRESS,
@@ -26,7 +26,7 @@ USER_INPUT = {
 }
 
 
-async def test_full_flow_java(hass: HomeAssistant) -> None:
+async def test_full_flow_java(hass: SmartHub) -> None:
     """Test config entry in case of a successful connection to a Java Edition server."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -37,15 +37,15 @@ async def test_full_flow_java(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.lookup",
+            "smarthub.components.minecraft_server.api.BedrockServer.lookup",
             side_effect=ValueError,
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_lookup",
+            "smarthub.components.minecraft_server.api.JavaServer.async_lookup",
             return_value=JavaServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_status",
+            "smarthub.components.minecraft_server.api.JavaServer.async_status",
             return_value=TEST_JAVA_STATUS_RESPONSE,
         ),
     ):
@@ -59,7 +59,7 @@ async def test_full_flow_java(hass: HomeAssistant) -> None:
         assert result["data"][CONF_TYPE] == MinecraftServerType.JAVA_EDITION
 
 
-async def test_full_flow_bedrock(hass: HomeAssistant) -> None:
+async def test_full_flow_bedrock(hass: SmartHub) -> None:
     """Test config entry in case of a successful connection to a Bedrock Edition server."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -70,11 +70,11 @@ async def test_full_flow_bedrock(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.lookup",
+            "smarthub.components.minecraft_server.api.BedrockServer.lookup",
             return_value=BedrockServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.async_status",
+            "smarthub.components.minecraft_server.api.BedrockServer.async_status",
             return_value=TEST_BEDROCK_STATUS_RESPONSE,
         ),
     ):
@@ -89,22 +89,22 @@ async def test_full_flow_bedrock(hass: HomeAssistant) -> None:
 
 
 async def test_service_already_configured_java(
-    hass: HomeAssistant, java_mock_config_entry: MockConfigEntry
+    hass: SmartHub, java_mock_config_entry: MockConfigEntry
 ) -> None:
     """Test config flow abort if a Java Edition server is already configured."""
     java_mock_config_entry.add_to_hass(hass)
 
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.lookup",
+            "smarthub.components.minecraft_server.api.BedrockServer.lookup",
             side_effect=ValueError,
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_lookup",
+            "smarthub.components.minecraft_server.api.JavaServer.async_lookup",
             return_value=JavaServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_status",
+            "smarthub.components.minecraft_server.api.JavaServer.async_status",
             return_value=TEST_JAVA_STATUS_RESPONSE,
         ),
     ):
@@ -116,18 +116,18 @@ async def test_service_already_configured_java(
 
 
 async def test_service_already_configured_bedrock(
-    hass: HomeAssistant, bedrock_mock_config_entry: MockConfigEntry
+    hass: SmartHub, bedrock_mock_config_entry: MockConfigEntry
 ) -> None:
     """Test config flow abort if a Bedrock Edition server is already configured."""
     bedrock_mock_config_entry.add_to_hass(hass)
 
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.lookup",
+            "smarthub.components.minecraft_server.api.BedrockServer.lookup",
             return_value=BedrockServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.async_status",
+            "smarthub.components.minecraft_server.api.BedrockServer.async_status",
             return_value=TEST_BEDROCK_STATUS_RESPONSE,
         ),
     ):
@@ -138,19 +138,19 @@ async def test_service_already_configured_bedrock(
         assert result["reason"] == "already_configured"
 
 
-async def test_recovery_java(hass: HomeAssistant) -> None:
+async def test_recovery_java(hass: SmartHub) -> None:
     """Test config flow recovery with a Java Edition server (successful connection after a failed connection)."""
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.lookup",
+            "smarthub.components.minecraft_server.api.BedrockServer.lookup",
             side_effect=ValueError,
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_lookup",
+            "smarthub.components.minecraft_server.api.JavaServer.async_lookup",
             return_value=JavaServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_status",
+            "smarthub.components.minecraft_server.api.JavaServer.async_status",
             side_effect=OSError,
         ),
     ):
@@ -162,15 +162,15 @@ async def test_recovery_java(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.lookup",
+            "smarthub.components.minecraft_server.api.BedrockServer.lookup",
             side_effect=ValueError,
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_lookup",
+            "smarthub.components.minecraft_server.api.JavaServer.async_lookup",
             return_value=JavaServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_status",
+            "smarthub.components.minecraft_server.api.JavaServer.async_status",
             return_value=TEST_JAVA_STATUS_RESPONSE,
         ),
     ):
@@ -183,15 +183,15 @@ async def test_recovery_java(hass: HomeAssistant) -> None:
         assert result2["data"][CONF_TYPE] == MinecraftServerType.JAVA_EDITION
 
 
-async def test_recovery_bedrock(hass: HomeAssistant) -> None:
+async def test_recovery_bedrock(hass: SmartHub) -> None:
     """Test config flow recovery with a Bedrock Edition server (successful connection after a failed connection)."""
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.lookup",
+            "smarthub.components.minecraft_server.api.BedrockServer.lookup",
             return_value=BedrockServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.async_status",
+            "smarthub.components.minecraft_server.api.BedrockServer.async_status",
             side_effect=OSError,
         ),
     ):
@@ -203,11 +203,11 @@ async def test_recovery_bedrock(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.lookup",
+            "smarthub.components.minecraft_server.api.BedrockServer.lookup",
             return_value=BedrockServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.BedrockServer.async_status",
+            "smarthub.components.minecraft_server.api.BedrockServer.async_status",
             return_value=TEST_BEDROCK_STATUS_RESPONSE,
         ),
     ):

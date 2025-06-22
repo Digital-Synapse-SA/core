@@ -8,8 +8,8 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ccm15.const import DOMAIN
-from homeassistant.components.climate import (
+from smarthub.components.ccm15.const import DOMAIN
+from smarthub.components.climate import (
     ATTR_FAN_MODE,
     ATTR_HVAC_MODE,
     ATTR_TEMPERATURE,
@@ -21,16 +21,16 @@ from homeassistant.components.climate import (
     SERVICE_TURN_ON,
     HVACMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID, CONF_HOST, CONF_PORT, SERVICE_TURN_OFF
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, CONF_HOST, CONF_PORT, SERVICE_TURN_OFF
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 @pytest.mark.usefixtures("ccm15_device")
 async def test_climate_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -56,7 +56,7 @@ async def test_climate_state(
     assert hass.states.get("climate.midea_1") == snapshot
 
     with patch(
-        "homeassistant.components.ccm15.coordinator.CCM15Device.async_set_state"
+        "smarthub.components.ccm15.coordinator.CCM15Device.async_set_state"
     ) as mock_set_state:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -68,7 +68,7 @@ async def test_climate_state(
         mock_set_state.assert_called_once()
 
     with patch(
-        "homeassistant.components.ccm15.coordinator.CCM15Device.async_set_state"
+        "smarthub.components.ccm15.coordinator.CCM15Device.async_set_state"
     ) as mock_set_state:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -80,7 +80,7 @@ async def test_climate_state(
         mock_set_state.assert_called_once()
 
     with patch(
-        "homeassistant.components.ccm15.coordinator.CCM15Device.async_set_state"
+        "smarthub.components.ccm15.coordinator.CCM15Device.async_set_state"
     ) as mock_set_state:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -92,7 +92,7 @@ async def test_climate_state(
         mock_set_state.assert_called_once()
 
     with patch(
-        "homeassistant.components.ccm15.coordinator.CCM15Device.async_set_state"
+        "smarthub.components.ccm15.coordinator.CCM15Device.async_set_state"
     ) as mock_set_state:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -104,7 +104,7 @@ async def test_climate_state(
         mock_set_state.assert_called_once()
 
     with patch(
-        "homeassistant.components.ccm15.coordinator.CCM15Device.async_set_state"
+        "smarthub.components.ccm15.coordinator.CCM15Device.async_set_state"
     ) as mock_set_state:
         await hass.services.async_call(
             CLIMATE_DOMAIN,

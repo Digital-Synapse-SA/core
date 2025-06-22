@@ -28,18 +28,18 @@ from aiohomeconnect.model.error import (
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.home_connect.const import (
+from smarthub.components.home_connect.const import (
     BSH_DOOR_STATE_OPEN,
     BSH_EVENT_PRESENT_STATE_PRESENT,
     BSH_POWER_OFF,
     DOMAIN,
 )
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.config_entries import ConfigEntries, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntries, ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     EVENT_STATE_REPORTED,
     STATE_OFF,
@@ -47,19 +47,19 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import (
+from smarthub.core import (
     Event as HassEvent,
     EventStateReportedData,
-    HomeAssistant,
+    SmartHub,
     callback,
 )
-from homeassistant.helpers import (
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
 )
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.typing import ClientSessionGenerator
@@ -82,7 +82,7 @@ def platforms() -> list[str]:
 @pytest.mark.parametrize("platforms", [("binary_sensor",)])
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_coordinator_failure_refresh_and_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -273,7 +273,7 @@ async def test_coordinator_update_failing(
     ],
 )
 async def test_event_listener(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -340,7 +340,7 @@ async def test_event_listener(
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def tests_receive_setting_and_status_for_first_time_at_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -395,7 +395,7 @@ async def tests_receive_setting_and_status_for_first_time_at_events(
 
 
 async def test_event_listener_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -442,7 +442,7 @@ async def test_event_listener_error(
     ],
 )
 async def test_event_listener_resilience(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -510,7 +510,7 @@ async def test_event_listener_resilience(
 
 
 async def test_devices_updated_on_refresh(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -550,7 +550,7 @@ async def test_devices_updated_on_refresh(
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_paired_disconnected_devices_not_fetching(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -579,7 +579,7 @@ async def test_paired_disconnected_devices_not_fetching(
 
 
 async def test_coordinator_disabling_updates_for_appliance(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
     client: MagicMock,
@@ -671,7 +671,7 @@ async def test_coordinator_disabling_updates_for_appliance(
 
 
 async def test_coordinator_disabling_updates_for_appliance_is_gone_after_entry_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     client: MagicMock,
     config_entry: MockConfigEntry,

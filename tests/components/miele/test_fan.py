@@ -7,15 +7,15 @@ from aiohttp import ClientResponseError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     DOMAIN as FAN_DOMAIN,
     SERVICE_SET_PERCENTAGE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -27,7 +27,7 @@ ENTITY_ID = "fan.hood_fan"
 
 @pytest.mark.parametrize("load_device_file", ["fan_devices.json"])
 async def test_fan_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -40,7 +40,7 @@ async def test_fan_states(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_fan_states_api_push(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -61,7 +61,7 @@ async def test_fan_states_api_push(
     ],
 )
 async def test_fan_control(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: MockConfigEntry,
     service: str,
@@ -89,7 +89,7 @@ async def test_fan_control(
     ],
 )
 async def test_fan_set_speed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: MockConfigEntry,
     service: str,
@@ -110,7 +110,7 @@ async def test_fan_set_speed(
 
 
 async def test_fan_turn_on_w_percentage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: None,
 ) -> None:
@@ -135,7 +135,7 @@ async def test_fan_turn_on_w_percentage(
     ],
 )
 async def test_api_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: MockConfigEntry,
     service: str,
@@ -143,7 +143,7 @@ async def test_api_failure(
     """Test handling of exception from API."""
     mock_miele_client.send_action.side_effect = ClientResponseError("test", "Test")
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             TEST_PLATFORM, service, {ATTR_ENTITY_ID: ENTITY_ID}, blocking=True
         )
@@ -151,7 +151,7 @@ async def test_api_failure(
 
 
 async def test_set_percentage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: None,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_set_percentage(
     mock_miele_client.send_action.side_effect = ClientResponseError("test", "Test")
 
     with pytest.raises(
-        HomeAssistantError, match=f"Failed to set state for {ENTITY_ID}"
+        SmartHubError, match=f"Failed to set state for {ENTITY_ID}"
     ):
         await hass.services.async_call(
             TEST_PLATFORM,

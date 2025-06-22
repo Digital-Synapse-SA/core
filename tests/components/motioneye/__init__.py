@@ -7,13 +7,13 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from motioneye_client.const import DEFAULT_PORT
 
-from homeassistant.components.motioneye.const import DOMAIN
-from homeassistant.components.motioneye.entity import get_motioneye_entity_unique_id
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.motioneye.const import DOMAIN
+from smarthub.components.motioneye.entity import get_motioneye_entity_unique_id
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -155,7 +155,7 @@ def create_mock_motioneye_client() -> AsyncMock:
 
 
 def create_mock_motioneye_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     data: dict[str, Any] | None = None,
     options: dict[str, Any] | None = None,
 ) -> ConfigEntry:
@@ -172,7 +172,7 @@ def create_mock_motioneye_config_entry(
 
 
 async def setup_mock_motioneye_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry | None = None,
     client: Mock | None = None,
 ) -> ConfigEntry:
@@ -190,7 +190,7 @@ async def setup_mock_motioneye_config_entry(
     client = client or create_mock_motioneye_client()
 
     with patch(
-        "homeassistant.components.motioneye.MotionEyeClient",
+        "smarthub.components.motioneye.MotionEyeClient",
         return_value=client,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -199,7 +199,7 @@ async def setup_mock_motioneye_config_entry(
 
 
 def register_test_entity(
-    hass: HomeAssistant, platform: str, camera_id: int, type_name: str, entity_id: str
+    hass: SmartHub, platform: str, camera_id: int, type_name: str, entity_id: str
 ) -> None:
     """Register a test entity."""
 

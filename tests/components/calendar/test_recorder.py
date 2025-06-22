@@ -4,11 +4,11 @@ from datetime import timedelta
 
 import pytest
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.const import ATTR_FRIENDLY_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.const import ATTR_FRIENDLY_NAME
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.components.recorder.common import async_wait_recording_done
@@ -17,7 +17,7 @@ from tests.components.recorder.common import async_wait_recording_done
 @pytest.fixture(autouse=True)
 async def mock_setup_dependencies(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     set_time_zone: None,
     mock_setup_integration: None,
     config_entry: MockConfigEntry,
@@ -27,7 +27,7 @@ async def mock_setup_dependencies(
     await hass.async_block_till_done()
 
 
-async def test_exclude_attributes(hass: HomeAssistant) -> None:
+async def test_exclude_attributes(hass: SmartHub) -> None:
     """Test sensor attributes to be excluded."""
     now = dt_util.utcnow()
 

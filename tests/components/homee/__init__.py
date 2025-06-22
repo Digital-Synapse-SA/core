@@ -5,13 +5,13 @@ from unittest.mock import AsyncMock
 
 from pyHomee.model import HomeeAttribute, HomeeNode
 
-from homeassistant.components.homee.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.homee.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
 
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Set up the component."""
     config_entry.add_to_hass(hass)
 
@@ -53,7 +53,7 @@ def build_mock_node(file: str) -> AsyncMock:
 
 
 async def async_update_attribute_value(
-    hass: HomeAssistant, attribute: AsyncMock, value: float
+    hass: SmartHub, attribute: AsyncMock, value: float
 ) -> None:
     """Set the current_value of an attribute and notify hass."""
     attribute.current_value = value

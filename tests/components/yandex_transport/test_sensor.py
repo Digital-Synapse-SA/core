@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components import sensor
-from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import sensor
+from smarthub.const import CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import assert_setup_component, load_fixture
 
@@ -24,7 +24,7 @@ SUBURBAN_TRAIN_REPLY = json.loads(
 def mock_requester_bus():
     """Create a mock for YandexMapsRequester."""
     with patch(
-        "homeassistant.components.yandex_transport.sensor.YandexMapsRequester"
+        "smarthub.components.yandex_transport.sensor.YandexMapsRequester"
     ) as requester:
         instance = requester.return_value
         instance.set_new_session = AsyncMock()
@@ -36,7 +36,7 @@ def mock_requester_bus():
 def mock_requester_suburban_train():
     """Create a mock for YandexMapsRequester."""
     with patch(
-        "homeassistant.components.yandex_transport.sensor.YandexMapsRequester"
+        "smarthub.components.yandex_transport.sensor.YandexMapsRequester"
     ) as requester:
         instance = requester.return_value
         instance.set_new_session = AsyncMock()
@@ -78,7 +78,7 @@ SUBURBAN_RESULT_STATE = dt_util.utc_from_timestamp(1634984640).isoformat(
 
 
 async def assert_setup_sensor(
-    hass: HomeAssistant, config: dict[str, Any], count: int = 1
+    hass: SmartHub, config: dict[str, Any], count: int = 1
 ) -> None:
     """Set up the sensor and assert it's been created."""
     with assert_setup_component(count):
@@ -87,14 +87,14 @@ async def assert_setup_sensor(
 
 
 async def test_setup_platform_valid_config(
-    hass: HomeAssistant, mock_requester_bus
+    hass: SmartHub, mock_requester_bus
 ) -> None:
     """Test that sensor is set up properly with valid config."""
     await assert_setup_sensor(hass, TEST_BUS_CONFIG)
 
 
 async def test_setup_platform_invalid_config(
-    hass: HomeAssistant, mock_requester_bus
+    hass: SmartHub, mock_requester_bus
 ) -> None:
     """Check an invalid configuration."""
     await assert_setup_sensor(
@@ -102,21 +102,21 @@ async def test_setup_platform_invalid_config(
     )
 
 
-async def test_name(hass: HomeAssistant, mock_requester_bus) -> None:
+async def test_name(hass: SmartHub, mock_requester_bus) -> None:
     """Return the name if set in the configuration."""
     await assert_setup_sensor(hass, TEST_BUS_CONFIG)
     state = hass.states.get("sensor.test_name")
     assert state.name == TEST_BUS_CONFIG["sensor"][CONF_NAME]
 
 
-async def test_state(hass: HomeAssistant, mock_requester_bus) -> None:
+async def test_state(hass: SmartHub, mock_requester_bus) -> None:
     """Return the contents of _state."""
     await assert_setup_sensor(hass, TEST_BUS_CONFIG)
     state = hass.states.get("sensor.test_name")
     assert state.state == BUS_RESULT_STATE
 
 
-async def test_filtered_attributes(hass: HomeAssistant, mock_requester_bus) -> None:
+async def test_filtered_attributes(hass: SmartHub, mock_requester_bus) -> None:
     """Return the contents of attributes."""
     await assert_setup_sensor(hass, TEST_BUS_CONFIG)
     state = hass.states.get("sensor.test_name")
@@ -125,7 +125,7 @@ async def test_filtered_attributes(hass: HomeAssistant, mock_requester_bus) -> N
 
 
 async def test_suburban_trains(
-    hass: HomeAssistant, mock_requester_suburban_train
+    hass: SmartHub, mock_requester_suburban_train
 ) -> None:
     """Return the contents of _state for suburban."""
     await assert_setup_sensor(hass, TEST_SUBURBAN_CONFIG)

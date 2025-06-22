@@ -6,25 +6,25 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     BluetoothServiceInfoBleak,
     async_ble_device_from_address,
     async_last_service_info,
 )
-from homeassistant.components.bluetooth.const import UNAVAILABLE_TRACK_SECONDS
-from homeassistant.components.ibeacon.const import (
+from smarthub.components.bluetooth.const import UNAVAILABLE_TRACK_SECONDS
+from smarthub.components.ibeacon.const import (
     DOMAIN,
     UNAVAILABLE_TIMEOUT,
     UPDATE_INTERVAL,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     STATE_HOME,
     STATE_NOT_HOME,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import (
     BEACON_RANDOM_ADDRESS_SERVICE_INFO,
@@ -46,7 +46,7 @@ def mock_bluetooth(enable_bluetooth: None) -> None:
     """Auto mock bluetooth."""
 
 
-async def test_device_tracker_fixed_address(hass: HomeAssistant) -> None:
+async def test_device_tracker_fixed_address(hass: SmartHub) -> None:
     """Test creating and updating device_tracker."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -79,7 +79,7 @@ async def test_device_tracker_fixed_address(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_device_tracker_random_address(hass: HomeAssistant) -> None:
+async def test_device_tracker_random_address(hass: SmartHub) -> None:
     """Test creating and updating device_tracker."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -107,7 +107,7 @@ async def test_device_tracker_random_address(hass: HomeAssistant) -> None:
     with (
         patch_all_discovered_devices([]),
         patch(
-            "homeassistant.components.ibeacon.coordinator.MONOTONIC_TIME",
+            "smarthub.components.ibeacon.coordinator.MONOTONIC_TIME",
             return_value=start_time + UNAVAILABLE_TIMEOUT + 1,
         ),
     ):
@@ -146,7 +146,7 @@ async def test_device_tracker_random_address(hass: HomeAssistant) -> None:
 
 
 async def test_device_tracker_random_address_infrequent_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test creating and updating device_tracker with a random mac that only changes once per day."""
     entry = MockConfigEntry(
@@ -175,7 +175,7 @@ async def test_device_tracker_random_address_infrequent_changes(
     with (
         patch_all_discovered_devices([]),
         patch(
-            "homeassistant.components.ibeacon.coordinator.MONOTONIC_TIME",
+            "smarthub.components.ibeacon.coordinator.MONOTONIC_TIME",
             return_value=start_time + UNAVAILABLE_TIMEOUT + 1,
         ),
     ):
@@ -205,7 +205,7 @@ async def test_device_tracker_random_address_infrequent_changes(
     with (
         patch_all_discovered_devices([device]),
         patch(
-            "homeassistant.components.ibeacon.coordinator.MONOTONIC_TIME",
+            "smarthub.components.ibeacon.coordinator.MONOTONIC_TIME",
             return_value=start_time + UPDATE_INTERVAL.total_seconds() + 1,
         ),
     ):
@@ -247,7 +247,7 @@ async def test_device_tracker_random_address_infrequent_changes(
     with (
         patch_all_discovered_devices([device]),
         patch(
-            "homeassistant.components.ibeacon.coordinator.MONOTONIC_TIME",
+            "smarthub.components.ibeacon.coordinator.MONOTONIC_TIME",
             return_value=start_time + UNAVAILABLE_TIMEOUT + 1,
         ),
     ):

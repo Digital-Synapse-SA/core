@@ -7,15 +7,15 @@ from syrupy.assertion import SnapshotAssertion
 from tesla_fleet_api.const import EnergyExportMode, EnergyOperationMode
 from tesla_fleet_api.exceptions import VehicleOffline
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.components.tesla_fleet.select import LOW
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.tesla_fleet.select import LOW
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, setup_platform
 from .const import COMMAND_OK, VEHICLE_DATA_ALT
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     normal_config_entry: MockConfigEntry,
@@ -37,7 +37,7 @@ async def test_select(
 
 
 async def test_select_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vehicle_data: AsyncMock,
     normal_config_entry: MockConfigEntry,
 ) -> None:
@@ -50,7 +50,7 @@ async def test_select_offline(
 
 
 async def test_select_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vehicle_data: AsyncMock,
     normal_config_entry: MockConfigEntry,
 ) -> None:

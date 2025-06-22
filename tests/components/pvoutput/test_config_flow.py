@@ -4,17 +4,17 @@ from unittest.mock import AsyncMock, MagicMock
 
 from pvo import PVOutputAuthenticationError, PVOutputConnectionError
 
-from homeassistant.components.pvoutput.const import CONF_SYSTEM_ID, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.pvoutput.const import CONF_SYSTEM_ID, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pvoutput: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -46,7 +46,7 @@ async def test_full_user_flow(
 
 
 async def test_full_flow_with_authentication_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pvoutput: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -98,7 +98,7 @@ async def test_full_flow_with_authentication_error(
     assert len(mock_pvoutput.system.mock_calls) == 2
 
 
-async def test_connection_error(hass: HomeAssistant, mock_pvoutput: MagicMock) -> None:
+async def test_connection_error(hass: SmartHub, mock_pvoutput: MagicMock) -> None:
     """Test API connection error."""
     mock_pvoutput.system.side_effect = PVOutputConnectionError
 
@@ -118,7 +118,7 @@ async def test_connection_error(hass: HomeAssistant, mock_pvoutput: MagicMock) -
 
 
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_pvoutput: MagicMock,
 ) -> None:
@@ -142,7 +142,7 @@ async def test_already_configured(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_pvoutput: MagicMock,
     mock_setup_entry: AsyncMock,
@@ -172,7 +172,7 @@ async def test_reauth_flow(
 
 
 async def test_reauth_with_authentication_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_pvoutput: MagicMock,
     mock_setup_entry: AsyncMock,
@@ -221,7 +221,7 @@ async def test_reauth_with_authentication_error(
 
 
 async def test_reauth_api_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pvoutput: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

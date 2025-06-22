@@ -2,14 +2,14 @@
 
 from unittest.mock import patch
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.components.diagnostics import get_diagnostics_for_config_entry
 from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     init_integration,
     mock_install,

@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock, call, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.helpers import discovery_flow, json as json_helper
-from homeassistant.helpers.discovery_flow import DiscoveryKey
+from smarthub import config_entries
+from smarthub.const import EVENT_HOMEASSISTANT_STARTED
+from smarthub.core import CoreState, SmartHub
+from smarthub.helpers import discovery_flow, json as json_helper
+from smarthub.helpers.discovery_flow import DiscoveryKey
 
 
 @pytest.fixture
-def mock_flow_init(hass: HomeAssistant) -> Generator[AsyncMock]:
+def mock_flow_init(hass: SmartHub) -> Generator[AsyncMock]:
     """Mock hass.config_entries.flow.async_init."""
     with patch.object(
         hass.config_entries.flow, "async_init", return_value=AsyncMock()
@@ -40,7 +40,7 @@ def mock_flow_init(hass: HomeAssistant) -> Generator[AsyncMock]:
     ],
 )
 async def test_async_create_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_flow_init: AsyncMock,
     discovery_key: DiscoveryKey | None,
     context: {},
@@ -63,7 +63,7 @@ async def test_async_create_flow(
 
 
 async def test_async_create_flow_deferred_until_started(
-    hass: HomeAssistant, mock_flow_init: AsyncMock
+    hass: SmartHub, mock_flow_init: AsyncMock
 ) -> None:
     """Test flows are deferred until started."""
     hass.set_state(CoreState.stopped)
@@ -86,12 +86,12 @@ async def test_async_create_flow_deferred_until_started(
 
 
 async def test_async_create_flow_checks_existing_flows_after_startup(
-    hass: HomeAssistant, mock_flow_init: AsyncMock
+    hass: SmartHub, mock_flow_init: AsyncMock
 ) -> None:
     """Test existing flows prevent an identical ones from being after startup."""
     hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
     with patch(
-        "homeassistant.config_entries.ConfigEntriesFlowManager.async_has_matching_discovery_flow",
+        "smarthub.config_entries.ConfigEntriesFlowManager.async_has_matching_discovery_flow",
         return_value=True,
     ):
         discovery_flow.async_create_flow(
@@ -104,7 +104,7 @@ async def test_async_create_flow_checks_existing_flows_after_startup(
 
 
 async def test_async_create_flow_checks_existing_flows_before_startup(
-    hass: HomeAssistant, mock_flow_init: AsyncMock
+    hass: SmartHub, mock_flow_init: AsyncMock
 ) -> None:
     """Test existing flows prevent an identical ones from being created before startup."""
     hass.set_state(CoreState.stopped)
@@ -127,7 +127,7 @@ async def test_async_create_flow_checks_existing_flows_before_startup(
 
 
 async def test_async_create_flow_does_nothing_after_stop(
-    hass: HomeAssistant, mock_flow_init: AsyncMock
+    hass: SmartHub, mock_flow_init: AsyncMock
 ) -> None:
     """Test we no longer create flows when hass is stopping."""
     hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)

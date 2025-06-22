@@ -6,21 +6,21 @@ from unittest.mock import patch
 import pytest
 from toonapi import Agreement, ToonError
 
-from homeassistant.components.toon.const import CONF_AGREEMENT, DOMAIN
-from homeassistant.config_entries import SOURCE_IMPORT, SOURCE_USER
-from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.setup import async_setup_component
+from smarthub.components.toon.const import CONF_AGREEMENT, DOMAIN
+from smarthub.config_entries import SOURCE_IMPORT, SOURCE_USER
+from smarthub.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
 from tests.typing import ClientSessionGenerator
 
 
-async def setup_component(hass: HomeAssistant) -> None:
+async def setup_component(hass: SmartHub) -> None:
     """Set up Toon component."""
     await async_process_ha_core_config(
         hass,
@@ -35,7 +35,7 @@ async def setup_component(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_abort_if_no_configuration(hass: HomeAssistant) -> None:
+async def test_abort_if_no_configuration(hass: SmartHub) -> None:
     """Test abort if no app is configured."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -47,7 +47,7 @@ async def test_abort_if_no_configuration(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -113,7 +113,7 @@ async def test_full_flow_implementation(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_no_agreements(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -155,7 +155,7 @@ async def test_no_agreements(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_multiple_agreements(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -207,7 +207,7 @@ async def test_multiple_agreements(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_agreement_already_set_up(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -250,7 +250,7 @@ async def test_agreement_already_set_up(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_toon_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -291,7 +291,7 @@ async def test_toon_abort(
 
 
 @pytest.mark.usefixtures("current_request_with_host")
-async def test_import(hass: HomeAssistant) -> None:
+async def test_import(hass: SmartHub) -> None:
     """Test if importing step works."""
     await setup_component(hass)
 
@@ -307,7 +307,7 @@ async def test_import(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_import_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:

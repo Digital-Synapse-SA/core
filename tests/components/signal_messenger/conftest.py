@@ -6,8 +6,8 @@ from pysignalclirestapi import SignalCliRestApi
 import pytest
 from requests_mock.mocker import Mocker
 
-from homeassistant.components.signal_messenger.notify import SignalNotificationService
-from homeassistant.core import HomeAssistant
+from smarthub.components.signal_messenger.notify import SignalNotificationService
+from smarthub.core import SmartHub
 
 SIGNAL_SEND_PATH_SUFIX = "/v2/send"
 MESSAGE = "Testing Signal Messenger platform :)"
@@ -18,7 +18,7 @@ URL_ATTACHMENT = "http://127.0.0.1:8080/image.jpg"
 
 
 @pytest.fixture
-def signal_notification_service(hass: HomeAssistant) -> SignalNotificationService:
+def signal_notification_service(hass: SmartHub) -> SignalNotificationService:
     """Set up signal notification service."""
     hass.config.allowlist_external_urls.add(URL_ATTACHMENT)
     recipients = ["+435565656565"]

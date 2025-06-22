@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PRESET_MODE,
     ATTR_PRESET_MODES,
     DOMAIN,
@@ -11,9 +11,9 @@ from homeassistant.components.fan import (
     FanEntityFeature,
     NotValidPresetModeError,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import MockFan
 
@@ -51,7 +51,7 @@ def test_fanentity() -> None:
         fan.turn_off()
 
 
-async def test_async_fanentity(hass: HomeAssistant) -> None:
+async def test_async_fanentity(hass: SmartHub) -> None:
     """Test async fan entity methods."""
     fan = BaseFan()
     fan.hass = hass
@@ -100,7 +100,7 @@ def test_fanentity_attributes(attribute_name, attribute_value) -> None:
 
 
 async def test_preset_mode_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     entity_registry: er.EntityRegistry,
 ) -> None:

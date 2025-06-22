@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 from requests.exceptions import ConnectTimeout
 
-from homeassistant import config_entries
-from homeassistant.components.plum_lightpad.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.plum_lightpad.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -22,9 +22,9 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with (
-        patch("homeassistant.components.plum_lightpad.utils.Plum.loadCloudData"),
+        patch("smarthub.components.plum_lightpad.utils.Plum.loadCloudData"),
         patch(
-            "homeassistant.components.plum_lightpad.async_setup_entry",
+            "smarthub.components.plum_lightpad.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -43,14 +43,14 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.plum_lightpad.utils.Plum.loadCloudData",
+        "smarthub.components.plum_lightpad.utils.Plum.loadCloudData",
         side_effect=ConnectTimeout,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -62,7 +62,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_one_entry_per_email_allowed(hass: HomeAssistant) -> None:
+async def test_form_one_entry_per_email_allowed(hass: SmartHub) -> None:
     """Test that only one entry allowed per Plum cloud email address."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -75,9 +75,9 @@ async def test_form_one_entry_per_email_allowed(hass: HomeAssistant) -> None:
     )
 
     with (
-        patch("homeassistant.components.plum_lightpad.utils.Plum.loadCloudData"),
+        patch("smarthub.components.plum_lightpad.utils.Plum.loadCloudData"),
         patch(
-            "homeassistant.components.plum_lightpad.async_setup_entry"
+            "smarthub.components.plum_lightpad.async_setup_entry"
         ) as mock_setup_entry,
     ):
         result2 = await hass.config_entries.flow.async_configure(

@@ -11,12 +11,12 @@ import httpx
 import pytest
 import respx
 
-from homeassistant.components import image
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components import image
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from .conftest import (
     MockImageEntity,
@@ -40,7 +40,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.freeze_time("2023-04-01 00:00:00+00:00")
 async def test_state(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, mock_image_platform: None
+    hass: SmartHub, hass_client: ClientSessionGenerator, mock_image_platform: None
 ) -> None:
     """Test image state."""
     state = hass.states.get("image.test")
@@ -55,7 +55,7 @@ async def test_state(
 
 @pytest.mark.freeze_time("2023-04-01 00:00:00+00:00")
 async def test_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_image_config_entry: ConfigEntry,
 ) -> None:
@@ -72,7 +72,7 @@ async def test_config_entry(
 
 @pytest.mark.freeze_time("2023-04-01 00:00:00+00:00")
 async def test_state_attr(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test image state with entity picture from attr."""
     mock_integration(hass, MockModule(domain="test"))
@@ -95,7 +95,7 @@ async def test_state_attr(
 
 
 async def test_no_state(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test image state."""
     mock_integration(hass, MockModule(domain="test"))
@@ -116,7 +116,7 @@ async def test_no_state(
 
 
 async def test_no_valid_content_type(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test invalid content type."""
     mock_integration(hass, MockModule(domain="test"))
@@ -143,7 +143,7 @@ async def test_no_valid_content_type(
 
 
 async def test_valid_but_capitalized_content_type(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test invalid content type."""
     mock_integration(hass, MockModule(domain="test"))
@@ -169,7 +169,7 @@ async def test_valid_but_capitalized_content_type(
 
 
 async def test_fetch_image_authenticated(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, mock_image_platform: None
+    hass: SmartHub, hass_client: ClientSessionGenerator, mock_image_platform: None
 ) -> None:
     """Test fetching an image with an authenticated client."""
     client = await hass_client()
@@ -184,7 +184,7 @@ async def test_fetch_image_authenticated(
 
 
 async def test_fetch_image_fail(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, mock_image_platform: None
+    hass: SmartHub, hass_client: ClientSessionGenerator, mock_image_platform: None
 ) -> None:
     """Test fetching an image with an authenticated client."""
     client = await hass_client()
@@ -195,7 +195,7 @@ async def test_fetch_image_fail(
 
 
 async def test_fetch_image_sync(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test fetching an image with an authenticated client."""
     mock_integration(hass, MockModule(domain="test"))
@@ -214,7 +214,7 @@ async def test_fetch_image_sync(
 
 
 async def test_fetch_image_unauthenticated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mock_image_platform: None,
 ) -> None:
@@ -244,7 +244,7 @@ async def test_fetch_image_unauthenticated(
 
 @respx.mock
 async def test_fetch_image_url_success(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test fetching an image with an authenticated client."""
     respx.get("https://example.com/myimage.jpg").respond(
@@ -276,7 +276,7 @@ async def test_fetch_image_url_success(
     ],
 )
 async def test_fetch_image_url_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     side_effect: Exception,
 ) -> None:
@@ -305,7 +305,7 @@ async def test_fetch_image_url_exception(
     ],
 )
 async def test_fetch_image_url_wrong_content_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     content_type: str | None,
 ) -> None:
@@ -328,7 +328,7 @@ async def test_fetch_image_url_wrong_content_type(
 
 
 async def test_image_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -353,7 +353,7 @@ async def test_image_stream(
         return result
 
     with patch(
-        "homeassistant.components.image.async_get_still_stream",
+        "smarthub.components.image.async_get_still_stream",
         _wrap_async_get_still_stream,
     ):
         with patch.object(mock_image, "async_image", return_value=b""):
@@ -386,7 +386,7 @@ async def test_image_stream(
     await close_future
 
 
-async def test_snapshot_service(hass: HomeAssistant) -> None:
+async def test_snapshot_service(hass: SmartHub) -> None:
     """Test snapshot service."""
     mopen = mock_open()
     mock_integration(hass, MockModule(domain="test"))
@@ -397,8 +397,8 @@ async def test_snapshot_service(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     with (
-        patch("homeassistant.components.image.open", mopen, create=True),
-        patch("homeassistant.components.image.os.makedirs"),
+        patch("smarthub.components.image.open", mopen, create=True),
+        patch("smarthub.components.image.os.makedirs"),
         patch.object(hass.config, "is_allowed_path", return_value=True),
     ):
         await hass.services.async_call(
@@ -417,7 +417,7 @@ async def test_snapshot_service(hass: HomeAssistant) -> None:
         assert mock_write.mock_calls[0][1][0] == b"Test"
 
 
-async def test_snapshot_service_no_image(hass: HomeAssistant) -> None:
+async def test_snapshot_service_no_image(hass: SmartHub) -> None:
     """Test snapshot service with no image."""
     mopen = mock_open()
     mock_integration(hass, MockModule(domain="test"))
@@ -428,9 +428,9 @@ async def test_snapshot_service_no_image(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     with (
-        patch("homeassistant.components.image.open", mopen, create=True),
+        patch("smarthub.components.image.open", mopen, create=True),
         patch(
-            "homeassistant.components.image.os.makedirs",
+            "smarthub.components.image.os.makedirs",
         ),
         patch.object(hass.config, "is_allowed_path", return_value=True),
     ):
@@ -449,7 +449,7 @@ async def test_snapshot_service_no_image(hass: HomeAssistant) -> None:
         assert len(mock_write.mock_calls) == 0
 
 
-async def test_snapshot_service_not_allowed_path(hass: HomeAssistant) -> None:
+async def test_snapshot_service_not_allowed_path(hass: SmartHub) -> None:
     """Test snapshot service with a not allowed path."""
     mock_integration(hass, MockModule(domain="test"))
     mock_platform(hass, "test.image", MockImagePlatform([MockURLImageEntity(hass)]))
@@ -458,7 +458,7 @@ async def test_snapshot_service_not_allowed_path(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    with pytest.raises(HomeAssistantError, match="/test/snapshot.jpg"):
+    with pytest.raises(SmartHubError, match="/test/snapshot.jpg"):
         await hass.services.async_call(
             image.DOMAIN,
             image.SERVICE_SNAPSHOT,
@@ -470,7 +470,7 @@ async def test_snapshot_service_not_allowed_path(hass: HomeAssistant) -> None:
         )
 
 
-async def test_snapshot_service_os_error(hass: HomeAssistant) -> None:
+async def test_snapshot_service_os_error(hass: SmartHub) -> None:
     """Test snapshot service with os error."""
     mock_integration(hass, MockModule(domain="test"))
     mock_platform(hass, "test.image", MockImagePlatform([MockImageSyncEntity(hass)]))
@@ -482,7 +482,7 @@ async def test_snapshot_service_os_error(hass: HomeAssistant) -> None:
     with (
         patch.object(hass.config, "is_allowed_path", return_value=True),
         patch("os.makedirs", side_effect=OSError),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             image.DOMAIN,

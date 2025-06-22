@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
     DOMAIN as COVER_DOMAIN,
@@ -15,11 +15,11 @@ from homeassistant.components.cover import (
     SERVICE_STOP_COVER,
     CoverState,
 )
-from homeassistant.components.homeassistant import SERVICE_UPDATE_ENTITY
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.smarthub import SERVICE_UPDATE_ENTITY
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import setup_integration
 
@@ -29,7 +29,7 @@ COVER_ENTITY_ID = "cover.shutter_mock_1"
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -43,7 +43,7 @@ async def test_entities(
 
 
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -75,7 +75,7 @@ async def test_update(
 
 
 async def test_cover_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -127,7 +127,7 @@ async def test_cover_actions(
 
 
 async def test_cover_callbacks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -175,7 +175,7 @@ async def test_cover_callbacks(
 
 
 async def test_no_cover_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,

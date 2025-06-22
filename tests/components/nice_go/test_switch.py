@@ -6,14 +6,14 @@ from aiohttp import ClientError
 from nice_go import ApiError, AuthFailedError
 import pytest
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import setup_integration
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_turn_on(
-    hass: HomeAssistant, mock_nice_go: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_nice_go: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test turn on switch."""
     await setup_integration(hass, mock_config_entry, [Platform.SWITCH])
@@ -35,7 +35,7 @@ async def test_turn_on(
 
 
 async def test_turn_off(
-    hass: HomeAssistant, mock_nice_go: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_nice_go: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test turn off switch."""
     await setup_integration(hass, mock_config_entry, [Platform.SWITCH])
@@ -66,7 +66,7 @@ async def test_turn_off(
     ],
 )
 async def test_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     action: str,
@@ -81,7 +81,7 @@ async def test_error(
     mock_nice_go.vacation_mode_on.side_effect = error
     mock_nice_go.vacation_mode_off.side_effect = error
 
-    with pytest.raises(HomeAssistantError, match=expected_error):
+    with pytest.raises(SmartHubError, match=expected_error):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             action,
@@ -91,7 +91,7 @@ async def test_error(
 
 
 async def test_auth_failed_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -116,7 +116,7 @@ async def test_auth_failed_error(
     mock_nice_go.vacation_mode_on.side_effect = _on_side_effect
     mock_nice_go.vacation_mode_off.side_effect = _off_side_effect
 
-    with pytest.raises(HomeAssistantError, match="Error while turning on the switch"):
+    with pytest.raises(SmartHubError, match="Error while turning on the switch"):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -127,7 +127,7 @@ async def test_auth_failed_error(
     assert mock_nice_go.authenticate.call_count == 1
     assert mock_nice_go.vacation_mode_on.call_count == 2
 
-    with pytest.raises(HomeAssistantError, match="Error while turning off the switch"):
+    with pytest.raises(SmartHubError, match="Error while turning off the switch"):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
@@ -152,7 +152,7 @@ async def test_auth_failed_error(
 
     # One more time but with an ApiError instead of AuthFailed
 
-    with pytest.raises(HomeAssistantError, match="Error while turning on the switch"):
+    with pytest.raises(SmartHubError, match="Error while turning on the switch"):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -160,7 +160,7 @@ async def test_auth_failed_error(
             blocking=True,
         )
 
-    with pytest.raises(HomeAssistantError, match="Error while turning off the switch"):
+    with pytest.raises(SmartHubError, match="Error while turning off the switch"):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,

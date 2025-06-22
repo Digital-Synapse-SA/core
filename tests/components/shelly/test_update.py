@@ -6,13 +6,13 @@ from aioshelly.exceptions import DeviceConnectionError, InvalidAuthError, RpcCal
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.shelly.const import (
+from smarthub.components.shelly.const import (
     DOMAIN,
     GEN1_RELEASE_URL,
     GEN2_BETA_RELEASE_URL,
     GEN2_RELEASE_URL,
 )
-from homeassistant.components.update import (
+from smarthub.components.update import (
     ATTR_IN_PROGRESS,
     ATTR_INSTALLED_VERSION,
     ATTR_LATEST_VERSION,
@@ -22,18 +22,18 @@ from homeassistant.components.update import (
     SERVICE_INSTALL,
     UpdateEntityFeature,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     STATE_OFF,
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import (
     init_integration,
@@ -48,7 +48,7 @@ from tests.common import mock_restore_cache
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_block_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     entity_registry: EntityRegistry,
@@ -104,7 +104,7 @@ async def test_block_update(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_block_beta_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     entity_registry: EntityRegistry,
@@ -169,7 +169,7 @@ async def test_block_beta_update(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_block_update_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
@@ -185,7 +185,7 @@ async def test_block_update_connection_error(
     await init_integration(hass, 1)
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Device communication error occurred while triggering OTA update for Test name",
     ):
         await hass.services.async_call(
@@ -198,7 +198,7 @@ async def test_block_update_connection_error(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_block_update_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -237,7 +237,7 @@ async def test_block_update_auth_error(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_block_version_compare(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     entity_registry: EntityRegistry,
@@ -283,7 +283,7 @@ async def test_block_version_compare(
 
 
 async def test_rpc_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -394,7 +394,7 @@ async def test_rpc_update(
 
 
 async def test_rpc_sleeping_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -445,7 +445,7 @@ async def test_rpc_sleeping_update(
 
 
 async def test_rpc_restored_sleeping_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -498,7 +498,7 @@ async def test_rpc_restored_sleeping_update(
 
 
 async def test_rpc_restored_sleeping_update_no_last_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -550,7 +550,7 @@ async def test_rpc_restored_sleeping_update_no_last_state(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_rpc_beta_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
@@ -686,7 +686,7 @@ async def test_rpc_beta_update(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_rpc_update_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exc: Exception,
     error: str,
     mock_rpc_device: Mock,
@@ -708,7 +708,7 @@ async def test_rpc_update_errors(
     )
     await init_integration(hass, 2)
 
-    with pytest.raises(HomeAssistantError, match=error):
+    with pytest.raises(SmartHubError, match=error):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,
@@ -719,7 +719,7 @@ async def test_rpc_update_errors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_rpc_update_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,

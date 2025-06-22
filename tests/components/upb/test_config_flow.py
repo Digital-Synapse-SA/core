@@ -3,11 +3,11 @@
 from asyncio import TimeoutError
 from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
-from homeassistant import config_entries
-from homeassistant.components.upb.const import DOMAIN
-from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.upb.const import DOMAIN
+from smarthub.config_entries import ConfigFlowResult
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 def mocked_upb(sync_complete=True, config_ok=True):
@@ -28,18 +28,18 @@ def mocked_upb(sync_complete=True, config_ok=True):
         _add_handler if sync_complete else _dummy_add_handler
     )
     return patch(
-        "homeassistant.components.upb.config_flow.upb_lib.UpbPim", return_value=upb_mock
+        "smarthub.components.upb.config_flow.upb_lib.UpbPim", return_value=upb_mock
     )
 
 
 async def valid_tcp_flow(
-    hass: HomeAssistant, sync_complete: bool = True, config_ok: bool = True
+    hass: SmartHub, sync_complete: bool = True, config_ok: bool = True
 ) -> ConfigFlowResult:
     """Get result dict that are standard for most tests."""
 
     with (
         mocked_upb(sync_complete, config_ok),
-        patch("homeassistant.components.upb.async_setup_entry", return_value=True),
+        patch("smarthub.components.upb.async_setup_entry", return_value=True),
     ):
         flow = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -50,13 +50,13 @@ async def valid_tcp_flow(
         )
 
 
-async def test_full_upb_flow_with_serial_port(hass: HomeAssistant) -> None:
+async def test_full_upb_flow_with_serial_port(hass: SmartHub) -> None:
     """Test a full UPB config flow with serial port."""
 
     with (
         mocked_upb(),
         patch(
-            "homeassistant.components.upb.async_setup_entry", return_value=True
+            "smarthub.components.upb.async_setup_entry", return_value=True
         ) as mock_setup_entry,
     ):
         flow = await hass.config_entries.flow.async_init(
@@ -84,7 +84,7 @@ async def test_full_upb_flow_with_serial_port(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_user_with_tcp_upb(hass: HomeAssistant) -> None:
+async def test_form_user_with_tcp_upb(hass: SmartHub) -> None:
     """Test we can setup a serial upb."""
     result = await valid_tcp_flow(hass)
     assert result["type"] is FlowResultType.CREATE_ENTRY
@@ -92,11 +92,11 @@ async def test_form_user_with_tcp_upb(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
 
     with patch(
-        "homeassistant.components.upb.config_flow.asyncio.timeout",
+        "smarthub.components.upb.config_flow.asyncio.timeout",
         side_effect=TimeoutError,
     ):
         result = await valid_tcp_flow(hass, sync_complete=False)
@@ -105,14 +105,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_missing_upb_file(hass: HomeAssistant) -> None:
+async def test_form_missing_upb_file(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await valid_tcp_flow(hass, config_ok=False)
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "invalid_upb_file"}
 
 
-async def test_form_user_with_already_configured(hass: HomeAssistant) -> None:
+async def test_form_user_with_already_configured(hass: SmartHub) -> None:
     """Test we can setup a TCP upb."""
     _ = await valid_tcp_flow(hass)
     result2 = await valid_tcp_flow(hass)

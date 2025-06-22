@@ -5,9 +5,9 @@ from unittest.mock import Mock
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.freebox import SCAN_INTERVAL
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.freebox import SCAN_INTERVAL
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
 
 from .common import setup_platform
 from .const import (
@@ -20,7 +20,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_network_speed(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, router: Mock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, router: Mock
 ) -> None:
     """Test missed call sensor."""
     await setup_platform(hass, SENSOR_DOMAIN)
@@ -43,7 +43,7 @@ async def test_network_speed(
 
 
 async def test_call(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, router: Mock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, router: Mock
 ) -> None:
     """Test missed call sensor."""
     await setup_platform(hass, SENSOR_DOMAIN)
@@ -62,7 +62,7 @@ async def test_call(
 
 
 async def test_disk(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, router: Mock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, router: Mock
 ) -> None:
     """Test disk sensor."""
     await setup_platform(hass, SENSOR_DOMAIN)
@@ -93,7 +93,7 @@ async def test_disk(
 
 
 async def test_battery(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, router: Mock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, router: Mock
 ) -> None:
     """Test battery sensor."""
     await setup_platform(hass, SENSOR_DOMAIN)

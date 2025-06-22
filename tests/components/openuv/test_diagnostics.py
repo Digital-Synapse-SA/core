@@ -1,8 +1,8 @@
 """Test OpenUV diagnostics."""
 
-from homeassistant.components.diagnostics import REDACTED
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.diagnostics import REDACTED
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import ANY
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -10,13 +10,13 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry,
     hass_client: ClientSessionGenerator,
     setup_config_entry,
 ) -> None:
     """Test config entry diagnostics."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     assert await get_diagnostics_for_config_entry(hass, hass_client, config_entry) == {
         "entry": {
             "entry_id": config_entry.entry_id,

@@ -14,16 +14,16 @@ from zeroconf import (
     current_time_millis,
 )
 
-from homeassistant.components.zeroconf import DOMAIN, async_get_async_instance
-from homeassistant.core import HomeAssistant
-from homeassistant.generated import zeroconf as zc_gen
-from homeassistant.setup import async_setup_component
+from smarthub.components.zeroconf import DOMAIN, async_get_async_instance
+from smarthub.core import SmartHub
+from smarthub.generated import zeroconf as zc_gen
+from smarthub.setup import async_setup_component
 
 from tests.typing import WebSocketGenerator
 
 
 async def test_subscribe_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test zeroconf subscribe_discovery."""

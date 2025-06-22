@@ -8,11 +8,11 @@ import pytest
 from voip_utils import CallInfo
 from voip_utils.sip import get_sip_endpoint
 
-from homeassistant.components.voip import DOMAIN
-from homeassistant.components.voip.devices import VoIPDevice, VoIPDevices
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.voip import DOMAIN
+from smarthub.components.voip.devices import VoIPDevice, VoIPDevices
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.components.tts.conftest import (
@@ -21,13 +21,13 @@ from tests.components.tts.conftest import (
 
 
 @pytest.fixture(autouse=True)
-async def load_homeassistant(hass: HomeAssistant) -> None:
-    """Load the homeassistant integration."""
-    assert await async_setup_component(hass, "homeassistant", {})
+async def load_smarthub(hass: SmartHub) -> None:
+    """Load the smarthub integration."""
+    assert await async_setup_component(hass, "smarthub", {})
 
 
 @pytest.fixture
-def config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def config_entry(hass: SmartHub) -> MockConfigEntry:
     """Create a config entry."""
     entry = MockConfigEntry(domain=DOMAIN, data={})
     entry.add_to_hass(hass)
@@ -35,10 +35,10 @@ def config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 
 @pytest.fixture
-async def setup_voip(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_voip(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Set up VoIP integration."""
     with patch(
-        "homeassistant.components.voip._create_sip_server",
+        "smarthub.components.voip._create_sip_server",
         return_value=(Mock(), AsyncMock()),
     ):
         assert await async_setup_component(hass, DOMAIN, {})
@@ -47,7 +47,7 @@ async def setup_voip(hass: HomeAssistant, config_entry: MockConfigEntry) -> None
 
 
 @pytest.fixture
-async def voip_devices(hass: HomeAssistant, setup_voip: None) -> VoIPDevices:
+async def voip_devices(hass: SmartHub, setup_voip: None) -> VoIPDevices:
     """Get VoIP devices object from a configured instance."""
     return hass.data[DOMAIN].devices
 
@@ -80,7 +80,7 @@ def call_info() -> CallInfo:
 
 @pytest.fixture
 async def voip_device(
-    hass: HomeAssistant, voip_devices: VoIPDevices, call_info: CallInfo
+    hass: SmartHub, voip_devices: VoIPDevices, call_info: CallInfo
 ) -> VoIPDevice:
     """Get a VoIP device fixture."""
     device = voip_devices.async_get_or_create(call_info)

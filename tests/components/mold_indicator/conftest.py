@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.mold_indicator.const import (
+from smarthub.components.mold_indicator.const import (
     CONF_CALIBRATION_FACTOR,
     CONF_INDOOR_HUMIDITY,
     CONF_INDOOR_TEMP,
@@ -16,14 +16,14 @@ from homeassistant.components.mold_indicator.const import (
     DEFAULT_NAME,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
     PERCENTAGE,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -32,7 +32,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Automatically path mold indicator."""
     with patch(
-        "homeassistant.components.mold_indicator.async_setup_entry",
+        "smarthub.components.mold_indicator.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -56,9 +56,9 @@ async def get_config_to_integration_load() -> dict[str, Any]:
 
 @pytest.fixture(name="loaded_entry")
 async def load_integration(
-    hass: HomeAssistant, get_config: dict[str, Any]
+    hass: SmartHub, get_config: dict[str, Any]
 ) -> MockConfigEntry:
-    """Set up the Mold indicator integration in Home Assistant."""
+    """Set up the Mold indicator integration in SmartHub."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,

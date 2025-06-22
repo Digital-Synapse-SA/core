@@ -17,15 +17,15 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import config_entries
-from homeassistant.components import cloud
-from homeassistant.components.cloud import CloudNotAvailable
-from homeassistant.components.webhook import async_generate_url
-from homeassistant.components.withings.const import DOMAIN
-from homeassistant.const import CONF_WEBHOOK_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.util import dt as dt_util
+from smarthub import config_entries
+from smarthub.components import cloud
+from smarthub.components.cloud import CloudNotAvailable
+from smarthub.components.webhook import async_generate_url
+from smarthub.components.withings.const import DOMAIN
+from smarthub.const import CONF_WEBHOOK_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.util import dt as dt_util
 
 from . import call_webhook, prepare_webhook_setup, setup_integration
 from .conftest import USER_ID, WEBHOOK_ID
@@ -40,7 +40,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_data_manager_webhook_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
 ) -> None:
@@ -76,7 +76,7 @@ async def test_data_manager_webhook_subscription(
 
 
 async def test_webhook_subscription_polling_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -94,7 +94,7 @@ async def test_webhook_subscription_polling_config(
 
 
 async def test_head_request(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -112,7 +112,7 @@ async def test_head_request(
 
 
 async def test_webhooks_request_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -145,7 +145,7 @@ async def test_webhooks_request_data(
     ],
 )
 async def test_triggering_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     error: Exception,
@@ -193,7 +193,7 @@ async def test_triggering_reauth(
     ],
 )
 async def test_config_flow_upgrade(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test config flow upgrade."""
     config_entry.add_to_hass(hass)
@@ -209,7 +209,7 @@ async def test_config_flow_upgrade(
 
 
 async def test_setup_with_cloudhook(
-    hass: HomeAssistant, cloudhook_config_entry: MockConfigEntry, withings: AsyncMock
+    hass: SmartHub, cloudhook_config_entry: MockConfigEntry, withings: AsyncMock
 ) -> None:
     """Test if set up with active cloud subscription and cloud hook."""
 
@@ -217,20 +217,20 @@ async def test_setup_with_cloudhook(
     await hass.async_block_till_done()
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=True),
         patch.object(cloud, "async_active_subscription", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ) as fake_create_cloudhook,
         patch(
-            "homeassistant.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
+            "smarthub.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.cloud.async_delete_cloudhook"
+            "smarthub.components.cloud.async_delete_cloudhook"
         ) as fake_delete_cloudhook,
-        patch("homeassistant.components.withings.webhook_generate_url"),
+        patch("smarthub.components.withings.webhook_generate_url"),
     ):
         await setup_integration(hass, cloudhook_config_entry)
 
@@ -254,7 +254,7 @@ async def test_setup_with_cloudhook(
 
 
 async def test_removing_entry_with_cloud_unavailable(
-    hass: HomeAssistant, cloudhook_config_entry: MockConfigEntry, withings: AsyncMock
+    hass: SmartHub, cloudhook_config_entry: MockConfigEntry, withings: AsyncMock
 ) -> None:
     """Test handling cloud unavailable when deleting entry."""
 
@@ -262,22 +262,22 @@ async def test_removing_entry_with_cloud_unavailable(
     await hass.async_block_till_done()
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=True),
         patch.object(cloud, "async_active_subscription", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ),
         patch(
-            "homeassistant.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
+            "smarthub.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.cloud.async_delete_cloudhook",
+            "smarthub.components.cloud.async_delete_cloudhook",
             side_effect=CloudNotAvailable(),
         ),
         patch(
-            "homeassistant.components.withings.webhook_generate_url",
+            "smarthub.components.withings.webhook_generate_url",
         ),
     ):
         await setup_integration(hass, cloudhook_config_entry)
@@ -295,7 +295,7 @@ async def test_removing_entry_with_cloud_unavailable(
 
 
 async def test_setup_with_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
     webhook_config_entry: MockConfigEntry,
     withings: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -305,20 +305,20 @@ async def test_setup_with_cloud(
     await hass.async_block_till_done()
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
         patch.object(cloud, "async_is_connected", return_value=True),
         patch.object(cloud, "async_active_subscription", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ) as fake_create_cloudhook,
         patch(
-            "homeassistant.components.withings.async_get_config_entry_implementation",
+            "smarthub.components.withings.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.cloud.async_delete_cloudhook"
+            "smarthub.components.cloud.async_delete_cloudhook"
         ) as fake_delete_cloudhook,
-        patch("homeassistant.components.withings.webhook_generate_url"),
+        patch("smarthub.components.withings.webhook_generate_url"),
     ):
         await setup_integration(hass, webhook_config_entry)
         await prepare_webhook_setup(hass, freezer)
@@ -346,7 +346,7 @@ async def test_setup_with_cloud(
 
 @pytest.mark.parametrize("url", ["http://example.com", "https://example.com:444"])
 async def test_setup_no_webhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     webhook_config_entry: MockConfigEntry,
     withings: AsyncMock,
     caplog: pytest.LogCaptureFixture,
@@ -357,14 +357,14 @@ async def test_setup_no_webhook(
     hass.config.components.add("cloud")
     with (
         patch(
-            "homeassistant.helpers.network.get_url",
+            "smarthub.helpers.network.get_url",
             return_value="http://example.nabu.casa",
         ),
         patch(
-            "homeassistant.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
+            "smarthub.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.withings.webhook_generate_url"
+            "smarthub.components.withings.webhook_generate_url"
         ) as mock_async_generate_url,
     ):
         mock_async_generate_url.return_value = url
@@ -378,7 +378,7 @@ async def test_setup_no_webhook(
 
 
 async def test_cloud_disconnect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -389,21 +389,21 @@ async def test_cloud_disconnect(
     await hass.async_block_till_done()
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
         patch.object(cloud, "async_is_connected", return_value=True),
         patch.object(cloud, "async_active_subscription", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ),
         patch(
-            "homeassistant.components.withings.async_get_config_entry_implementation",
+            "smarthub.components.withings.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.cloud.async_delete_cloudhook",
+            "smarthub.components.cloud.async_delete_cloudhook",
         ),
         patch(
-            "homeassistant.components.withings.webhook_generate_url",
+            "smarthub.components.withings.webhook_generate_url",
         ),
     ):
         await setup_integration(hass, webhook_config_entry)
@@ -430,7 +430,7 @@ async def test_cloud_disconnect(
 
 
 async def test_internet_disconnect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -441,21 +441,21 @@ async def test_internet_disconnect(
     await hass.async_block_till_done()
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
         patch.object(cloud, "async_is_connected", return_value=True),
         patch.object(cloud, "async_active_subscription", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ),
         patch(
-            "homeassistant.components.withings.async_get_config_entry_implementation",
+            "smarthub.components.withings.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.cloud.async_delete_cloudhook",
+            "smarthub.components.cloud.async_delete_cloudhook",
         ),
         patch(
-            "homeassistant.components.withings.webhook_generate_url",
+            "smarthub.components.withings.webhook_generate_url",
         ),
     ):
         await setup_integration(hass, webhook_config_entry)
@@ -482,7 +482,7 @@ async def test_internet_disconnect(
 
 
 async def test_cloud_disconnect_retry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -493,23 +493,23 @@ async def test_cloud_disconnect_retry(
     await hass.async_block_till_done()
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
         patch.object(cloud, "async_is_connected", return_value=True),
         patch.object(
             cloud, "async_active_subscription", return_value=True
         ) as mock_async_active_subscription,
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ),
         patch(
-            "homeassistant.components.withings.async_get_config_entry_implementation",
+            "smarthub.components.withings.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.cloud.async_delete_cloudhook",
+            "smarthub.components.cloud.async_delete_cloudhook",
         ),
         patch(
-            "homeassistant.components.withings.webhook_generate_url",
+            "smarthub.components.withings.webhook_generate_url",
         ),
     ):
         await setup_integration(hass, webhook_config_entry)
@@ -534,7 +534,7 @@ async def test_cloud_disconnect_retry(
 
 
 async def test_internet_timeout_then_restore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -545,21 +545,21 @@ async def test_internet_timeout_then_restore(
     await hass.async_block_till_done()
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
         patch.object(cloud, "async_is_connected", return_value=True),
         patch.object(cloud, "async_active_subscription", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ),
         patch(
-            "homeassistant.components.withings.async_get_config_entry_implementation",
+            "smarthub.components.withings.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.cloud.async_delete_cloudhook",
+            "smarthub.components.cloud.async_delete_cloudhook",
         ),
         patch(
-            "homeassistant.components.withings.webhook_generate_url",
+            "smarthub.components.withings.webhook_generate_url",
         ),
     ):
         await setup_integration(hass, webhook_config_entry)
@@ -602,7 +602,7 @@ async def test_internet_timeout_then_restore(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_webhook_post(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -628,7 +628,7 @@ async def test_webhook_post(
 
 
 async def test_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

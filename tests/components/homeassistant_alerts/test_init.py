@@ -10,16 +10,16 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components.homeassistant_alerts.const import (
+from smarthub.components.smarthub_alerts.const import (
     COMPONENT_LOADED_COOLDOWN,
     DOMAIN,
     UPDATE_INTERVAL,
 )
-from homeassistant.components.repairs import DOMAIN as REPAIRS_DOMAIN
-from homeassistant.const import EVENT_COMPONENT_LOADED
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import ATTR_COMPONENT, async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.repairs import DOMAIN as REPAIRS_DOMAIN
+from smarthub.const import EVENT_COMPONENT_LOADED
+from smarthub.core import SmartHub
+from smarthub.setup import ATTR_COMPONENT, async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed, async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -29,13 +29,13 @@ from tests.typing import WebSocketGenerator
 def stub_alert(aioclient_mock: AiohttpClientMocker, alert_id) -> None:
     """Stub an alert."""
     aioclient_mock.get(
-        f"https://alerts.home-assistant.io/alerts/{alert_id}.json",
+        f"https://alerts.smart-hub.io/alerts/{alert_id}.json",
         json={"title": f"Title for {alert_id}", "content": f"Content for {alert_id}"},
     )
 
 
 @pytest.fixture(autouse=True)
-async def setup_repairs(hass: HomeAssistant) -> None:
+async def setup_repairs(hass: SmartHub) -> None:
     """Set up the repairs integration."""
     assert await async_setup_component(hass, REPAIRS_DOMAIN, {REPAIRS_DOMAIN: {}})
 
@@ -96,7 +96,7 @@ async def setup_repairs(hass: HomeAssistant) -> None:
     ],
 )
 async def test_alerts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     aioclient_mock: AiohttpClientMocker,
     ha_version: str,
@@ -107,7 +107,7 @@ async def test_alerts(
 
     aioclient_mock.clear_requests()
     aioclient_mock.get(
-        "https://alerts.home-assistant.io/alerts.json",
+        "https://alerts.smart-hub.io/alerts.json",
         text=await async_load_fixture(hass, "alerts_1.json", DOMAIN),
     )
     for alert in expected_alerts:
@@ -134,15 +134,15 @@ async def test_alerts(
 
     with (
         patch(
-            "homeassistant.components.homeassistant_alerts.coordinator.__version__",
+            "smarthub.components.smarthub_alerts.coordinator.__version__",
             ha_version,
         ),
         patch(
-            "homeassistant.components.homeassistant_alerts.coordinator.is_hassio",
+            "smarthub.components.smarthub_alerts.coordinator.is_hassio",
             return_value=supervisor_info is not None,
         ),
         patch(
-            "homeassistant.components.homeassistant_alerts.coordinator.get_supervisor_info",
+            "smarthub.components.smarthub_alerts.coordinator.get_supervisor_info",
             return_value=supervisor_info,
         ),
     ):
@@ -289,7 +289,7 @@ async def test_alerts(
     ],
 )
 async def test_alerts_refreshed_on_component_load(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     aioclient_mock: AiohttpClientMocker,
     ha_version: str,
@@ -304,7 +304,7 @@ async def test_alerts_refreshed_on_component_load(
 
     aioclient_mock.clear_requests()
     aioclient_mock.get(
-        "https://alerts.home-assistant.io/alerts.json",
+        "https://alerts.smart-hub.io/alerts.json",
         text=await async_load_fixture(hass, "alerts_1.json", DOMAIN),
     )
     for alert in initial_alerts:
@@ -317,15 +317,15 @@ async def test_alerts_refreshed_on_component_load(
 
     with (
         patch(
-            "homeassistant.components.homeassistant_alerts.coordinator.__version__",
+            "smarthub.components.smarthub_alerts.coordinator.__version__",
             ha_version,
         ),
         patch(
-            "homeassistant.components.homeassistant_alerts.coordinator.is_hassio",
+            "smarthub.components.smarthub_alerts.coordinator.is_hassio",
             return_value=supervisor_info is not None,
         ),
         patch(
-            "homeassistant.components.homeassistant_alerts.coordinator.get_supervisor_info",
+            "smarthub.components.smarthub_alerts.coordinator.get_supervisor_info",
             return_value=supervisor_info,
         ),
     ):
@@ -361,15 +361,15 @@ async def test_alerts_refreshed_on_component_load(
 
     with (
         patch(
-            "homeassistant.components.homeassistant_alerts.coordinator.__version__",
+            "smarthub.components.smarthub_alerts.coordinator.__version__",
             ha_version,
         ),
         patch(
-            "homeassistant.components.homeassistant_alerts.coordinator.is_hassio",
+            "smarthub.components.smarthub_alerts.coordinator.is_hassio",
             return_value=supervisor_info is not None,
         ),
         patch(
-            "homeassistant.components.homeassistant_alerts.coordinator.get_supervisor_info",
+            "smarthub.components.smarthub_alerts.coordinator.get_supervisor_info",
             return_value=supervisor_info,
         ),
     ):
@@ -430,7 +430,7 @@ async def test_alerts_refreshed_on_component_load(
     ],
 )
 async def test_bad_alerts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     aioclient_mock: AiohttpClientMocker,
     ha_version: str,
@@ -441,7 +441,7 @@ async def test_bad_alerts(
     fixture_content = await async_load_fixture(hass, fixture, DOMAIN)
     aioclient_mock.clear_requests()
     aioclient_mock.get(
-        "https://alerts.home-assistant.io/alerts.json",
+        "https://alerts.smart-hub.io/alerts.json",
         text=fixture_content,
     )
     for alert in json.loads(fixture_content):
@@ -456,7 +456,7 @@ async def test_bad_alerts(
         hass.config.components.add(domain)
 
     with patch(
-        "homeassistant.components.homeassistant_alerts.coordinator.__version__",
+        "smarthub.components.smarthub_alerts.coordinator.__version__",
         ha_version,
     ):
         assert await async_setup_component(hass, DOMAIN, {})
@@ -491,7 +491,7 @@ async def test_bad_alerts(
 
 
 async def test_no_alerts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -499,7 +499,7 @@ async def test_no_alerts(
 
     aioclient_mock.clear_requests()
     aioclient_mock.get(
-        "https://alerts.home-assistant.io/alerts.json",
+        "https://alerts.smart-hub.io/alerts.json",
         text="",
     )
 
@@ -579,7 +579,7 @@ async def test_no_alerts(
     ],
 )
 async def test_alerts_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     aioclient_mock: AiohttpClientMocker,
     ha_version: str,
@@ -592,7 +592,7 @@ async def test_alerts_change(
     fixture_1_content = await async_load_fixture(hass, fixture_1, DOMAIN)
     aioclient_mock.clear_requests()
     aioclient_mock.get(
-        "https://alerts.home-assistant.io/alerts.json",
+        "https://alerts.smart-hub.io/alerts.json",
         text=fixture_1_content,
     )
     for alert in json.loads(fixture_1_content):
@@ -615,7 +615,7 @@ async def test_alerts_change(
         hass.config.components.add(domain)
 
     with patch(
-        "homeassistant.components.homeassistant_alerts.coordinator.__version__",
+        "smarthub.components.smarthub_alerts.coordinator.__version__",
         ha_version,
     ):
         assert await async_setup_component(hass, DOMAIN, {})
@@ -653,7 +653,7 @@ async def test_alerts_change(
     fixture_2_content = await async_load_fixture(hass, fixture_2, DOMAIN)
     aioclient_mock.clear_requests()
     aioclient_mock.get(
-        "https://alerts.home-assistant.io/alerts.json",
+        "https://alerts.smart-hub.io/alerts.json",
         text=fixture_2_content,
     )
     for alert in json.loads(fixture_2_content):

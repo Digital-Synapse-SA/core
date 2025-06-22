@@ -1,12 +1,12 @@
 """Test the HTTP API for AI Task integration."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.typing import WebSocketGenerator
 
 
 async def test_ws_preferences(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components: None,
 ) -> None:

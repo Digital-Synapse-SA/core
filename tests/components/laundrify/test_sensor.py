@@ -9,27 +9,27 @@ from laundrify_aio import LaundrifyDevice
 from laundrify_aio.exceptions import LaundrifyDeviceException
 import pytest
 
-from homeassistant.components.laundrify.const import (
+from smarthub.components.laundrify.const import (
     DEFAULT_POLL_INTERVAL,
     DOMAIN,
     MODELS,
 )
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     STATE_UNKNOWN,
     UnitOfPower,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.util import slugify
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.util import slugify
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_laundrify_sensor_init(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_device: LaundrifyDevice,
     laundrify_config_entry: MockConfigEntry,
@@ -51,7 +51,7 @@ async def test_laundrify_sensor_init(
 
 
 async def test_laundrify_sensor_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_device: LaundrifyDevice,
     laundrify_config_entry: MockConfigEntry,
@@ -73,7 +73,7 @@ async def test_laundrify_sensor_update(
 
 
 async def test_laundrify_sensor_update_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
     mock_device: LaundrifyDevice,

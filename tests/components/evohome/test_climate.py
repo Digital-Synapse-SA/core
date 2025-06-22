@@ -11,7 +11,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
     SERVICE_SET_HVAC_MODE,
@@ -19,15 +19,15 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import setup_evohome
 from .const import TEST_INSTALLS
@@ -35,7 +35,7 @@ from .const import TEST_INSTALLS
 
 @pytest.mark.parametrize("install", [*TEST_INSTALLS, "botched"])
 async def test_setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, str],
     install: str,
     snapshot: SnapshotAssertion,
@@ -56,7 +56,7 @@ async def test_setup_platform(
 
 @pytest.mark.parametrize("install", TEST_INSTALLS)
 async def test_ctl_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ctl_id: str,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -107,13 +107,13 @@ async def test_ctl_set_hvac_mode(
 
 @pytest.mark.parametrize("install", TEST_INSTALLS)
 async def test_ctl_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ctl_id: str,
 ) -> None:
     """Test SERVICE_SET_TEMPERATURE of an evohome controller."""
 
     # Entity climate.xxx does not support this service
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             Platform.CLIMATE,
             SERVICE_SET_TEMPERATURE,
@@ -127,7 +127,7 @@ async def test_ctl_set_temperature(
 
 @pytest.mark.parametrize("install", TEST_INSTALLS)
 async def test_ctl_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ctl_id: str,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -158,7 +158,7 @@ async def test_ctl_turn_off(
 
 @pytest.mark.parametrize("install", TEST_INSTALLS)
 async def test_ctl_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ctl_id: str,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -189,7 +189,7 @@ async def test_ctl_turn_on(
 
 @pytest.mark.parametrize("install", TEST_INSTALLS)
 async def test_zone_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zone_id: str,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -236,7 +236,7 @@ async def test_zone_set_hvac_mode(
 
 @pytest.mark.parametrize("install", TEST_INSTALLS)
 async def test_zone_set_preset_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zone_id: str,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -306,7 +306,7 @@ async def test_zone_set_preset_mode(
 
 @pytest.mark.parametrize("install", TEST_INSTALLS)
 async def test_zone_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zone_id: str,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -339,7 +339,7 @@ async def test_zone_set_temperature(
 
 @pytest.mark.parametrize("install", TEST_INSTALLS)
 async def test_zone_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zone_id: str,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -371,7 +371,7 @@ async def test_zone_turn_off(
 
 @pytest.mark.parametrize("install", TEST_INSTALLS)
 async def test_zone_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zone_id: str,
 ) -> None:
     """Test SERVICE_TURN_ON of an evohome heating zone."""

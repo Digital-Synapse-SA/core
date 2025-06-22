@@ -8,20 +8,20 @@ from unittest.mock import Mock, PropertyMock, patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import sonos
-from homeassistant.components.sonos.const import (
+from smarthub import config_entries
+from smarthub.components import sonos
+from smarthub.components.sonos.const import (
     DISCOVERY_INTERVAL,
     SONOS_SPEAKER_ACTIVITY,
 )
-from homeassistant.components.sonos.exception import SonosUpdateError
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.sonos.exception import SonosUpdateError
+from smarthub.core import SmartHub, callback
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.dispatcher import async_dispatcher_connect
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .conftest import MockSoCo, SoCoMockFactory
 
@@ -29,7 +29,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_creating_entry_sets_up_media_player(
-    hass: HomeAssistant, zeroconf_payload: ZeroconfServiceInfo
+    hass: SmartHub, zeroconf_payload: ZeroconfServiceInfo
 ) -> None:
     """Test setting up Sonos loads the media player."""
 
@@ -41,7 +41,7 @@ async def test_creating_entry_sets_up_media_player(
     )
 
     with patch(
-        "homeassistant.components.sonos.media_player.async_setup_entry",
+        "smarthub.components.sonos.media_player.async_setup_entry",
     ) as mock_setup:
         result = await hass.config_entries.flow.async_init(
             sonos.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -58,10 +58,10 @@ async def test_creating_entry_sets_up_media_player(
     assert len(mock_setup.mock_calls) == 1
 
 
-async def test_configuring_sonos_creates_entry(hass: HomeAssistant) -> None:
+async def test_configuring_sonos_creates_entry(hass: SmartHub) -> None:
     """Test that specifying config will create an entry."""
     with patch(
-        "homeassistant.components.sonos.async_setup_entry",
+        "smarthub.components.sonos.async_setup_entry",
         return_value=True,
     ) as mock_setup:
         await async_setup_component(
@@ -74,10 +74,10 @@ async def test_configuring_sonos_creates_entry(hass: HomeAssistant) -> None:
     assert len(mock_setup.mock_calls) == 1
 
 
-async def test_not_configuring_sonos_not_creates_entry(hass: HomeAssistant) -> None:
+async def test_not_configuring_sonos_not_creates_entry(hass: SmartHub) -> None:
     """Test that no config will not create an entry."""
     with patch(
-        "homeassistant.components.sonos.async_setup_entry",
+        "smarthub.components.sonos.async_setup_entry",
         return_value=True,
     ) as mock_setup:
         await async_setup_component(hass, sonos.DOMAIN, {})
@@ -87,7 +87,7 @@ async def test_not_configuring_sonos_not_creates_entry(hass: HomeAssistant) -> N
 
 
 async def test_async_poll_manual_hosts_warnings(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     soco_factory: SoCoMockFactory,
     freezer: FrozenDateTimeFactory,
@@ -172,7 +172,7 @@ class _MockSoCoVisibleZones(MockSoCo):
         return self.vz_return
 
 
-async def _setup_hass(hass: HomeAssistant):
+async def _setup_hass(hass: SmartHub):
     await async_setup_component(
         hass,
         sonos.DOMAIN,
@@ -189,7 +189,7 @@ async def _setup_hass(hass: HomeAssistant):
 
 
 async def test_async_poll_manual_hosts_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
@@ -215,7 +215,7 @@ async def test_async_poll_manual_hosts_1(
 
 
 async def test_async_poll_manual_hosts_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
@@ -241,7 +241,7 @@ async def test_async_poll_manual_hosts_2(
 
 
 async def test_async_poll_manual_hosts_3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
@@ -267,7 +267,7 @@ async def test_async_poll_manual_hosts_3(
 
 
 async def test_async_poll_manual_hosts_4(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
@@ -295,7 +295,7 @@ async def test_async_poll_manual_hosts_4(
 class SpeakerActivity:
     """Unit test class to track speaker activity messages."""
 
-    def __init__(self, hass: HomeAssistant, soco: MockSoCo) -> None:
+    def __init__(self, hass: SmartHub, soco: MockSoCo) -> None:
         """Create the object from soco."""
         self.soco = soco
         self.hass = hass
@@ -316,7 +316,7 @@ class SpeakerActivity:
 
 
 async def test_async_poll_manual_hosts_5(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
@@ -331,7 +331,7 @@ async def test_async_poll_manual_hosts_5(
     soco_2.renderingControl.GetVolume = Mock()
     speaker_2_activity = SpeakerActivity(hass, soco_2)
     with patch(
-        "homeassistant.components.sonos.DISCOVERY_INTERVAL"
+        "smarthub.components.sonos.DISCOVERY_INTERVAL"
     ) as mock_discovery_interval:
         # Speed up manual discovery interval so second iteration runs sooner
         mock_discovery_interval.total_seconds = Mock(side_effect=[0.5, 60])
@@ -358,7 +358,7 @@ async def test_async_poll_manual_hosts_5(
 
 
 async def test_async_poll_manual_hosts_6(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
@@ -377,7 +377,7 @@ async def test_async_poll_manual_hosts_6(
     speaker_2_activity = SpeakerActivity(hass, soco_2)
 
     with patch(
-        "homeassistant.components.sonos.DISCOVERY_INTERVAL"
+        "smarthub.components.sonos.DISCOVERY_INTERVAL"
     ) as mock_discovery_interval:
         # Speed up manual discovery interval so second iteration runs sooner
         mock_discovery_interval.total_seconds = Mock(side_effect=[0.0, 60])
@@ -398,7 +398,7 @@ async def test_async_poll_manual_hosts_6(
 
 
 async def test_async_poll_manual_hosts_7(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -427,7 +427,7 @@ async def test_async_poll_manual_hosts_7(
 
 
 async def test_async_poll_manual_hosts_8(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -454,7 +454,7 @@ async def test_async_poll_manual_hosts_8(
     await hass.async_block_till_done(wait_background_tasks=True)
 
 
-async def _setup_hass_ipv6_address_not_supported(hass: HomeAssistant):
+async def _setup_hass_ipv6_address_not_supported(hass: SmartHub):
     await async_setup_component(
         hass,
         sonos.DOMAIN,
@@ -471,7 +471,7 @@ async def _setup_hass_ipv6_address_not_supported(hass: HomeAssistant):
 
 
 async def test_ipv6_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Tests that invalid ipv4 addresses do not generate stack dump."""

@@ -6,11 +6,11 @@ from unittest.mock import ANY, call
 
 import RFXtrx as rfxtrxmod
 
-from homeassistant.components.rfxtrx.const import EVENT_RFXTRX_EVENT
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.rfxtrx.const import EVENT_RFXTRX_EVENT
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub, callback
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .conftest import setup_rfx_test_cfg
 
@@ -20,7 +20,7 @@ SOME_PROTOCOLS = ["ac", "arc"]
 
 
 async def test_fire_event(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, rfxtrx
+    hass: SmartHub, device_registry: dr.DeviceRegistry, rfxtrx
 ) -> None:
     """Test fire event."""
     await setup_rfx_test_cfg(
@@ -78,7 +78,7 @@ async def test_fire_event(
     ]
 
 
-async def test_send(hass: HomeAssistant, rfxtrx) -> None:
+async def test_send(hass: SmartHub, rfxtrx) -> None:
     """Test configuration."""
     await setup_rfx_test_cfg(hass, device="/dev/null", devices={})
 
@@ -92,7 +92,7 @@ async def test_send(hass: HomeAssistant, rfxtrx) -> None:
 
 
 async def test_ws_device_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -127,7 +127,7 @@ async def test_ws_device_remove(
 
 
 async def test_connect(
-    rfxtrx, connect_mock, transport_mock, hass: HomeAssistant
+    rfxtrx, connect_mock, transport_mock, hass: SmartHub
 ) -> None:
     """Test that we attempt to connect to the device."""
 
@@ -140,7 +140,7 @@ async def test_connect(
 
 
 async def test_connect_network(
-    rfxtrx, connect_mock, transport_mock, hass: HomeAssistant
+    rfxtrx, connect_mock, transport_mock, hass: SmartHub
 ) -> None:
     """Test that we attempt to connect to the device."""
 
@@ -153,7 +153,7 @@ async def test_connect_network(
 
 
 async def test_connect_with_protocols(
-    rfxtrx, connect_mock, transport_mock, hass: HomeAssistant
+    rfxtrx, connect_mock, transport_mock, hass: SmartHub
 ) -> None:
     """Test that we attempt to set protocols."""
     config_entry = await setup_rfx_test_cfg(
@@ -169,7 +169,7 @@ async def test_connect_with_protocols(
 
 
 async def test_connect_timeout(
-    rfxtrx, connect_mock, transport_mock, hass: HomeAssistant
+    rfxtrx, connect_mock, transport_mock, hass: SmartHub
 ) -> None:
     """Test that we attempt to connect to the device."""
 
@@ -184,7 +184,7 @@ async def test_connect_timeout(
 
 
 async def test_connect_failed(
-    rfxtrx, connect_mock, transport_mock, hass: HomeAssistant
+    rfxtrx, connect_mock, transport_mock, hass: SmartHub
 ) -> None:
     """Test that we attempt to connect to the device."""
 
@@ -198,7 +198,7 @@ async def test_connect_failed(
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_reconnect(rfxtrx, hass: HomeAssistant) -> None:
+async def test_reconnect(rfxtrx, hass: SmartHub) -> None:
     """Test that we reconnect on connection loss."""
     config_entry = await setup_rfx_test_cfg(hass, device="/dev/ttyUSBfake")
 

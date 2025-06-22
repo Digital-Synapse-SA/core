@@ -6,9 +6,9 @@ from aiohomekit.model import Accessory
 from aiohomekit.model.characteristics import CharacteristicsTypes
 from aiohomekit.model.services import ServicesTypes
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_test_component
 
@@ -22,7 +22,7 @@ def create_motion_sensor_service(accessory: Accessory) -> None:
 
 
 async def test_motion_sensor_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit motion sensor accessory."""
     helper = await setup_test_component(
@@ -53,7 +53,7 @@ def create_contact_sensor_service(accessory: Accessory) -> None:
 
 
 async def test_contact_sensor_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit contact accessory."""
     helper = await setup_test_component(
@@ -84,7 +84,7 @@ def create_smoke_sensor_service(accessory: Accessory) -> None:
 
 
 async def test_smoke_sensor_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit contact accessory."""
     helper = await setup_test_component(
@@ -115,7 +115,7 @@ def create_carbon_monoxide_sensor_service(accessory: Accessory) -> None:
 
 
 async def test_carbon_monoxide_sensor_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit contact accessory."""
     helper = await setup_test_component(
@@ -148,7 +148,7 @@ def create_occupancy_sensor_service(accessory: Accessory) -> None:
 
 
 async def test_occupancy_sensor_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit occupancy sensor accessory."""
     helper = await setup_test_component(
@@ -179,7 +179,7 @@ def create_leak_sensor_service(accessory: Accessory) -> None:
 
 
 async def test_leak_sensor_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit leak sensor accessory."""
     helper = await setup_test_component(
@@ -202,7 +202,7 @@ async def test_leak_sensor_read_state(
 
 
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:

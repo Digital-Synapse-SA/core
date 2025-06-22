@@ -4,18 +4,18 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.stookwijzer.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.stookwijzer.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stookwijzer: MagicMock,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stookwijzer: MagicMock,
 ) -> None:
@@ -50,7 +50,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_migrate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_v1_config_entry: MockConfigEntry,
     mock_stookwijzer: MagicMock,
 ) -> None:
@@ -72,7 +72,7 @@ async def test_migrate_entry(
 
 
 async def test_entry_migration_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_v1_config_entry: MockConfigEntry,
     mock_stookwijzer: MagicMock,
     issue_registry: ir.IssueRegistry,
@@ -95,7 +95,7 @@ async def test_entry_migration_failure(
 
 @pytest.mark.usefixtures("mock_stookwijzer")
 async def test_entity_entry_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:

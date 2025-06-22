@@ -7,21 +7,21 @@ from pysmartthings.models import HealthStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.smartthings.const import MAIN
-from homeassistant.components.update import (
+from smarthub.components.smartthings.const import MAIN
+from smarthub.components.update import (
     ATTR_IN_PROGRESS,
     DOMAIN as UPDATE_DOMAIN,
     SERVICE_INSTALL,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import (
     setup_integration,
@@ -34,7 +34,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -48,7 +48,7 @@ async def test_all_entities(
 
 @pytest.mark.parametrize("device_fixture", ["contact_sensor"])
 async def test_installing_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -71,7 +71,7 @@ async def test_installing_update(
 
 @pytest.mark.parametrize("device_fixture", ["contact_sensor"])
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -100,7 +100,7 @@ async def test_state_update(
 
 @pytest.mark.parametrize("device_fixture", ["contact_sensor"])
 async def test_state_progress_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -133,7 +133,7 @@ async def test_state_progress_update(
 
 @pytest.mark.parametrize("device_fixture", ["centralite"])
 async def test_state_update_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -156,7 +156,7 @@ async def test_state_update_available(
 
 @pytest.mark.parametrize("device_fixture", ["centralite"])
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -180,7 +180,7 @@ async def test_availability(
 
 @pytest.mark.parametrize("device_fixture", ["centralite"])
 async def test_availability_at_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unavailable_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

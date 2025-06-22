@@ -5,7 +5,7 @@ from copy import deepcopy
 import pytest
 from zwave_js_server.event import Event
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
@@ -19,7 +19,7 @@ from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     LightEntityFeature,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     SERVICE_TURN_OFF,
@@ -29,8 +29,8 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     AEON_SMART_SWITCH_LIGHT_ENTITY,
@@ -51,7 +51,7 @@ def platforms() -> list[str]:
 
 
 async def test_light(
-    hass: HomeAssistant, client, bulb_6_multi_color, integration
+    hass: SmartHub, client, bulb_6_multi_color, integration
 ) -> None:
     """Test the light entity."""
     node = bulb_6_multi_color
@@ -447,7 +447,7 @@ async def test_light(
 
 
 async def test_v4_dimmer_light(
-    hass: HomeAssistant, client, eaton_rf9640_dimmer, integration
+    hass: SmartHub, client, eaton_rf9640_dimmer, integration
 ) -> None:
     """Test a light that supports MultiLevelSwitch CommandClass version 4."""
     state = hass.states.get(EATON_RF9640_ENTITY)
@@ -459,14 +459,14 @@ async def test_v4_dimmer_light(
 
 
 async def test_optional_light(
-    hass: HomeAssistant, client, aeon_smart_switch_6, integration
+    hass: SmartHub, client, aeon_smart_switch_6, integration
 ) -> None:
     """Test a device that has an additional light endpoint being identified as light."""
     state = hass.states.get(AEON_SMART_SWITCH_LIGHT_ENTITY)
     assert state.state == STATE_ON
 
 
-async def test_rgbw_light(hass: HomeAssistant, client, zen_31, integration) -> None:
+async def test_rgbw_light(hass: SmartHub, client, zen_31, integration) -> None:
     """Test the light entity."""
     state = hass.states.get(ZEN_31_ENTITY)
 
@@ -507,7 +507,7 @@ async def test_rgbw_light(hass: HomeAssistant, client, zen_31, integration) -> N
 
 
 async def test_light_none_color_value(
-    hass: HomeAssistant, light_color_null_values, integration
+    hass: SmartHub, light_color_null_values, integration
 ) -> None:
     """Test the light entity can handle None value in current color Value."""
     entity_id = "light.repeater"
@@ -520,7 +520,7 @@ async def test_light_none_color_value(
 
 
 async def test_light_on_off_color(
-    hass: HomeAssistant, client, logic_group_zdb5100, integration
+    hass: SmartHub, client, logic_group_zdb5100, integration
 ) -> None:
     """Test the light entity for RGB lights without dimming support."""
     node = logic_group_zdb5100
@@ -803,7 +803,7 @@ async def test_light_on_off_color(
 
 
 async def test_light_color_only(
-    hass: HomeAssistant, client, express_controls_ezmultipli, integration
+    hass: SmartHub, client, express_controls_ezmultipli, integration
 ) -> None:
     """Test the light entity for RGB lights with Color Switch CC only."""
     node = express_controls_ezmultipli
@@ -1141,7 +1141,7 @@ async def test_light_color_only(
 
 
 async def test_basic_cc_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client,
     ge_in_wall_dimmer_switch,

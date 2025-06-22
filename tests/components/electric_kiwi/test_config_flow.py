@@ -8,16 +8,16 @@ from unittest.mock import AsyncMock
 from electrickiwi_api.exceptions import ApiException
 import pytest
 
-from homeassistant.components.electric_kiwi.const import (
+from smarthub.components.electric_kiwi.const import (
     DOMAIN,
     OAUTH2_AUTHORIZE,
     OAUTH2_TOKEN,
     SCOPE_VALUES,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .conftest import CLIENT_ID, REDIRECT_URI
 
@@ -28,7 +28,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("current_request_with_host", "electrickiwi_api")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,
@@ -79,7 +79,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_flow_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     electrickiwi_api: AsyncMock,
@@ -133,7 +133,7 @@ async def test_flow_failure(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_existing_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     migrated_config_entry: MockConfigEntry,
@@ -177,7 +177,7 @@ async def test_existing_entry(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauthentication(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,

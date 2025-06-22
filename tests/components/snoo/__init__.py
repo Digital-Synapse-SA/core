@@ -6,18 +6,18 @@ from unittest.mock import AsyncMock
 import pytest
 from python_snoo.containers import SnooData
 
-from homeassistant.components.snoo.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.snoo.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 def create_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> ConfigEntry:
-    """Add config entry in Home Assistant."""
+    """Add config entry in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="test-username",
@@ -33,8 +33,8 @@ def create_entry(
     return entry
 
 
-async def async_init_integration(hass: HomeAssistant) -> ConfigEntry:
-    """Set up the Snoo integration in Home Assistant."""
+async def async_init_integration(hass: SmartHub) -> ConfigEntry:
+    """Set up the Snoo integration in SmartHub."""
 
     entry = create_entry(hass)
 

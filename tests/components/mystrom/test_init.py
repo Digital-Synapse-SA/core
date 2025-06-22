@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, PropertyMock, patch
 from pymystrom.exceptions import MyStromConnectionError
 import pytest
 
-from homeassistant.components.mystrom.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.mystrom.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import (
     MyStromBulbMock,
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     device_type: int,
 ) -> None:
@@ -35,11 +35,11 @@ async def init_integration(
             ),
         ),
         patch(
-            "homeassistant.components.mystrom._get_mystrom_bulb",
+            "smarthub.components.mystrom._get_mystrom_bulb",
             return_value=MyStromBulbMock("6001940376EB", get_default_bulb_state()),
         ),
         patch(
-            "homeassistant.components.mystrom._get_mystrom_switch",
+            "smarthub.components.mystrom._get_mystrom_switch",
             return_value=MyStromSwitchMock(get_default_switch_state()),
         ),
     ):
@@ -48,7 +48,7 @@ async def init_integration(
 
 
 async def test_init_switch_and_unload(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test the initialization of a myStrom switch."""
     await init_integration(hass, config_entry, 106)
@@ -79,7 +79,7 @@ async def test_init_switch_and_unload(
     ],
 )
 async def test_init_bulb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     device_type: int,
     platform: str,
@@ -94,7 +94,7 @@ async def test_init_bulb(
 
 
 async def test_init_of_unknown_bulb(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test the initialization of a unknown myStrom bulb."""
     with (
@@ -117,7 +117,7 @@ async def test_init_of_unknown_bulb(
 
 
 async def test_init_of_unknown_device(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test the initialization of a unsupported myStrom device."""
     with patch(
@@ -131,7 +131,7 @@ async def test_init_of_unknown_device(
 
 
 async def test_init_cannot_connect_because_of_device_info(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test error handling for failing get_device_info."""
     with (
@@ -149,7 +149,7 @@ async def test_init_cannot_connect_because_of_device_info(
 
 
 async def test_init_cannot_connect_because_of_get_state(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test error handling for failing get_state."""
     with (

@@ -4,16 +4,16 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.stiebel_eltron.const import CONF_HUB, DEFAULT_HUB, DOMAIN
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.stiebel_eltron.const import CONF_HUB, DEFAULT_HUB, DOMAIN
+from smarthub.const import CONF_HOST, CONF_NAME, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 
 @pytest.mark.usefixtures("mock_stiebel_eltron_client")
 async def test_async_setup_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test successful async_setup."""
@@ -43,7 +43,7 @@ async def test_async_setup_success(
 
 @pytest.mark.usefixtures("mock_stiebel_eltron_client")
 async def test_async_setup_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     mock_config_entry,
 ) -> None:
@@ -75,7 +75,7 @@ async def test_async_setup_already_configured(
 
 
 async def test_async_setup_with_non_existing_hub(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test async_setup with non-existing modbus hub."""
     config = {
@@ -101,7 +101,7 @@ async def test_async_setup_with_non_existing_hub(
 
 
 async def test_async_setup_import_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     mock_stiebel_eltron_client: AsyncMock,
 ) -> None:
@@ -140,7 +140,7 @@ async def test_async_setup_import_failure(
 
 @pytest.mark.usefixtures("mock_modbus")
 async def test_async_setup_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     mock_stiebel_eltron_client: AsyncMock,
 ) -> None:

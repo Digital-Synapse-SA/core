@@ -8,8 +8,8 @@ from opendata_transport.exceptions import (
 )
 import pytest
 
-from homeassistant.components.swiss_public_transport import config_flow
-from homeassistant.components.swiss_public_transport.const import (
+from smarthub.components.swiss_public_transport import config_flow
+from smarthub.components.swiss_public_transport.const import (
     CONF_DESTINATION,
     CONF_START,
     CONF_TIME_FIXED,
@@ -19,9 +19,9 @@ from homeassistant.components.swiss_public_transport.const import (
     CONF_VIA,
     MAX_VIA,
 )
-from homeassistant.components.swiss_public_transport.helper import unique_id_from_config
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.swiss_public_transport.helper import unique_id_from_config
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -106,7 +106,7 @@ MOCK_ADVANCED_DATA_STEP_TIME_OFFSET = {
     ],
 )
 async def test_flow_user_init_data_success(
-    hass: HomeAssistant, user_input, time_mode_input, config_title
+    hass: SmartHub, user_input, time_mode_input, config_title
 ) -> None:
     """Test success response."""
     result = await hass.config_entries.flow.async_init(
@@ -119,7 +119,7 @@ async def test_flow_user_init_data_success(
     assert result["data_schema"] == config_flow.USER_DATA_SCHEMA
 
     with patch(
-        "homeassistant.components.swiss_public_transport.config_flow.OpendataTransport.async_get_data",
+        "smarthub.components.swiss_public_transport.config_flow.OpendataTransport.async_get_data",
         autospec=True,
         return_value=True,
     ):
@@ -155,14 +155,14 @@ async def test_flow_user_init_data_success(
     ],
 )
 async def test_flow_user_init_data_error_and_recover_on_step_1(
-    hass: HomeAssistant, raise_error, text_error, user_input_error
+    hass: SmartHub, raise_error, text_error, user_input_error
 ) -> None:
     """Test errors in user step."""
     result = await hass.config_entries.flow.async_init(
         config_flow.DOMAIN, context={"source": "user"}
     )
     with patch(
-        "homeassistant.components.swiss_public_transport.config_flow.OpendataTransport.async_get_data",
+        "smarthub.components.swiss_public_transport.config_flow.OpendataTransport.async_get_data",
         autospec=True,
         side_effect=raise_error,
     ) as mock_OpendataTransport:
@@ -201,7 +201,7 @@ async def test_flow_user_init_data_error_and_recover_on_step_1(
     ],
 )
 async def test_flow_user_init_data_error_and_recover_on_step_2(
-    hass: HomeAssistant, raise_error, text_error, user_input
+    hass: SmartHub, raise_error, text_error, user_input
 ) -> None:
     """Test errors in time mode step."""
     result = await hass.config_entries.flow.async_init(
@@ -214,7 +214,7 @@ async def test_flow_user_init_data_error_and_recover_on_step_2(
     assert result["data_schema"] == config_flow.USER_DATA_SCHEMA
 
     with patch(
-        "homeassistant.components.swiss_public_transport.config_flow.OpendataTransport.async_get_data",
+        "smarthub.components.swiss_public_transport.config_flow.OpendataTransport.async_get_data",
         autospec=True,
         return_value=True,
     ):
@@ -226,7 +226,7 @@ async def test_flow_user_init_data_error_and_recover_on_step_2(
         assert result["step_id"] == "time_fixed"
 
     with patch(
-        "homeassistant.components.swiss_public_transport.config_flow.OpendataTransport.async_get_data",
+        "smarthub.components.swiss_public_transport.config_flow.OpendataTransport.async_get_data",
         autospec=True,
         side_effect=raise_error,
     ) as mock_OpendataTransport:
@@ -250,7 +250,7 @@ async def test_flow_user_init_data_error_and_recover_on_step_2(
         assert result["result"].title == "test_start test_destination at 18:03:00"
 
 
-async def test_flow_user_init_data_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_user_init_data_already_configured(hass: SmartHub) -> None:
     """Test we abort user data set when entry is already configured."""
 
     entry = MockConfigEntry(
@@ -261,7 +261,7 @@ async def test_flow_user_init_data_already_configured(hass: HomeAssistant) -> No
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.swiss_public_transport.config_flow.OpendataTransport.async_get_data",
+        "smarthub.components.swiss_public_transport.config_flow.OpendataTransport.async_get_data",
         autospec=True,
         return_value=True,
     ):

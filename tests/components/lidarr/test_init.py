@@ -1,15 +1,15 @@
 """Test Lidarr integration."""
 
-from homeassistant.components.lidarr.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.lidarr.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import ComponentSetup
 
 
 async def test_setup(
-    hass: HomeAssistant, setup_integration: ComponentSetup, connection
+    hass: SmartHub, setup_integration: ComponentSetup, connection
 ) -> None:
     """Test setup."""
     await setup_integration()
@@ -24,7 +24,7 @@ async def test_setup(
 
 
 async def test_async_setup_entry_not_ready(
-    hass: HomeAssistant, setup_integration: ComponentSetup, cannot_connect
+    hass: SmartHub, setup_integration: ComponentSetup, cannot_connect
 ) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     await setup_integration()
@@ -35,7 +35,7 @@ async def test_async_setup_entry_not_ready(
 
 
 async def test_async_setup_entry_auth_failed(
-    hass: HomeAssistant, setup_integration: ComponentSetup, invalid_auth
+    hass: SmartHub, setup_integration: ComponentSetup, invalid_auth
 ) -> None:
     """Test that it throws ConfigEntryAuthFailed when authentication fails."""
     await setup_integration()
@@ -46,7 +46,7 @@ async def test_async_setup_entry_auth_failed(
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     setup_integration: ComponentSetup,
     connection,

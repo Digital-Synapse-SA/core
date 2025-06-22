@@ -2,9 +2,9 @@
 
 from pykoplenti import SettingsData
 
-from homeassistant.components.diagnostics import REDACTED
-from homeassistant.components.kostal_plenticore.coordinator import Plenticore
-from homeassistant.core import HomeAssistant
+from smarthub.components.diagnostics import REDACTED
+from smarthub.components.kostal_plenticore.coordinator import Plenticore
+from smarthub.core import SmartHub
 
 from tests.common import ANY, MockConfigEntry
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -12,7 +12,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_plenticore: Plenticore,
     init_integration: MockConfigEntry,

@@ -7,8 +7,8 @@ from unittest.mock import AsyncMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import config_entries
-from homeassistant.components.mold_indicator.const import (
+from smarthub import config_entries
+from smarthub.components.mold_indicator.const import (
     CONF_CALIBRATION_FACTOR,
     CONF_INDOOR_HUMIDITY,
     CONF_INDOOR_TEMP,
@@ -16,16 +16,16 @@ from homeassistant.components.mold_indicator.const import (
     DEFAULT_NAME,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_NAME, CONF_UNIT_OF_MEASUREMENT, UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_NAME, CONF_UNIT_OF_MEASUREMENT, UnitOfTemperature
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
-async def test_form_sensor(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form_sensor(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form for sensor."""
 
     result = await hass.config_entries.flow.async_init(
@@ -59,7 +59,7 @@ async def test_form_sensor(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> 
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_options_flow(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
+async def test_options_flow(hass: SmartHub, loaded_entry: MockConfigEntry) -> None:
     """Test options flow."""
 
     result = await hass.config_entries.options.async_init(loaded_entry.entry_id)
@@ -97,7 +97,7 @@ async def test_options_flow(hass: HomeAssistant, loaded_entry: MockConfigEntry) 
     assert state is not None
 
 
-async def test_calibration_factor_not_zero(hass: HomeAssistant) -> None:
+async def test_calibration_factor_not_zero(hass: SmartHub) -> None:
     """Test calibration factor is not zero."""
 
     result = await hass.config_entries.flow.async_init(
@@ -144,7 +144,7 @@ async def test_calibration_factor_not_zero(hass: HomeAssistant) -> None:
 
 
 async def test_entry_already_exist(
-    hass: HomeAssistant, loaded_entry: MockConfigEntry
+    hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test abort when entry already exist."""
 
@@ -201,7 +201,7 @@ async def test_entry_already_exist(
     ids=("success", "missing_calibration_factor", "missing_humidity_entity"),
 )
 async def test_config_flow_preview_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     user_input: str,
     snapshot: SnapshotAssertion,
@@ -252,7 +252,7 @@ async def test_config_flow_preview_success(
 
 
 async def test_options_flow_preview(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -322,7 +322,7 @@ async def test_options_flow_preview(
 
 
 async def test_options_flow_sensor_preview_config_entry_removed(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the option flow preview where the config entry is removed."""
     client = await hass_ws_client(hass)

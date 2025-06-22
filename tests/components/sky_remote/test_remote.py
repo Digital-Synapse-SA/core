@@ -2,14 +2,14 @@
 
 import pytest
 
-from homeassistant.components.remote import (
+from smarthub.components.remote import (
     ATTR_COMMAND,
     DOMAIN as REMOTE_DOMAIN,
     SERVICE_SEND_COMMAND,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from . import setup_mock_entry
 
@@ -17,7 +17,7 @@ ENTITY_ID = "remote.example_com"
 
 
 async def test_send_command(
-    hass: HomeAssistant, mock_config_entry, mock_remote_control
+    hass: SmartHub, mock_config_entry, mock_remote_control
 ) -> None:
     """Test "send_command" method."""
     await setup_mock_entry(hass, mock_config_entry)
@@ -31,7 +31,7 @@ async def test_send_command(
 
 
 async def test_send_invalid_command(
-    hass: HomeAssistant, mock_config_entry, mock_remote_control
+    hass: SmartHub, mock_config_entry, mock_remote_control
 ) -> None:
     """Test "send_command" method."""
     await setup_mock_entry(hass, mock_config_entry)

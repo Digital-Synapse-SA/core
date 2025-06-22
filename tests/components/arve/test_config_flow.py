@@ -2,12 +2,12 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.arve.config_flow import ArveConnectionError
-from homeassistant.components.arve.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_CLIENT_SECRET
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.arve.config_flow import ArveConnectionError
+from smarthub.components.arve.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_CLIENT_SECRET
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import USER_INPUT, async_init_integration
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_correct_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_arve: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_arve: AsyncMock
 ) -> None:
     """Test the whole flow."""
     result = await hass.config_entries.flow.async_init(
@@ -38,7 +38,7 @@ async def test_correct_flow(
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_arve: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_arve: AsyncMock
 ) -> None:
     """Test we handle cannot connect error."""
     mock_arve.get_customer_id.side_effect = ArveConnectionError
@@ -54,7 +54,7 @@ async def test_form_cannot_connect(
 
 
 async def test_form_abort_already_configured(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test form aborts if already configured."""
     await async_init_integration(hass, mock_config_entry)

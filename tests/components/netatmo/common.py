@@ -8,12 +8,12 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.netatmo.const import DOMAIN
-from homeassistant.components.webhook import async_handle_webhook
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.aiohttp import MockRequest
+from smarthub.components.netatmo.const import DOMAIN
+from smarthub.components.webhook import async_handle_webhook
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.aiohttp import MockRequest
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMockResponse
@@ -31,7 +31,7 @@ FAKE_WEBHOOK_ACTIVATION = {
 
 
 async def snapshot_platform_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     platform: Platform,
     entity_registry: er.EntityRegistry,
@@ -54,7 +54,7 @@ async def snapshot_platform_entities(
         )
 
 
-async def fake_post_request(hass: HomeAssistant, *args: Any, **kwargs: Any):
+async def fake_post_request(hass: SmartHub, *args: Any, **kwargs: Any):
     """Return fake data."""
     if "endpoint" not in kwargs:
         return "{}"
@@ -102,7 +102,7 @@ async def fake_get_image(*args: Any, **kwargs: Any) -> bytes | str | None:
     return None
 
 
-async def simulate_webhook(hass: HomeAssistant, webhook_id: str, response) -> None:
+async def simulate_webhook(hass: SmartHub, webhook_id: str, response) -> None:
     """Simulate a webhook event."""
     request = MockRequest(
         method="POST",
@@ -117,12 +117,12 @@ async def simulate_webhook(hass: HomeAssistant, webhook_id: str, response) -> No
 def selected_platforms(platforms: list[Platform]) -> Iterator[None]:
     """Restrict loaded platforms to list given."""
     with (
-        patch("homeassistant.components.netatmo.data_handler.PLATFORMS", platforms),
+        patch("smarthub.components.netatmo.data_handler.PLATFORMS", platforms),
         patch(
-            "homeassistant.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
+            "smarthub.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.netatmo.webhook_generate_url",
+            "smarthub.components.netatmo.webhook_generate_url",
         ),
     ):
         yield

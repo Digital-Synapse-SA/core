@@ -5,14 +5,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration, update_property_listeners
 
@@ -29,14 +29,14 @@ NUMBER_ENTITIES = [
 
 @pytest.mark.usefixtures("mock_federwiege")
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the Smarla entities."""
     with (
-        patch("homeassistant.components.smarla.PLATFORMS", [Platform.NUMBER]),
+        patch("smarthub.components.smarla.PLATFORMS", [Platform.NUMBER]),
     ):
         assert await setup_integration(hass, mock_config_entry)
 
@@ -51,7 +51,7 @@ async def test_entities(
 )
 @pytest.mark.parametrize("entity_info", NUMBER_ENTITIES)
 async def test_number_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_federwiege: MagicMock,
     entity_info: dict[str, str],
@@ -79,7 +79,7 @@ async def test_number_action(
 
 @pytest.mark.parametrize("entity_info", NUMBER_ENTITIES)
 async def test_number_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_federwiege: MagicMock,
     entity_info: dict[str, str],

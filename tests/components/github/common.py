@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import json
 
-from homeassistant.components.github.const import CONF_REPOSITORIES, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.github.const import CONF_REPOSITORIES, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -16,7 +16,7 @@ TEST_REPOSITORY = "octocat/Hello-World"
 
 
 async def setup_github_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
     add_entry_to_hass: bool = True,

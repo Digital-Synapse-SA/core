@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import aiohttp
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: MagicMock,
 ) -> None:
@@ -33,7 +33,7 @@ async def test_load_unload_entry(
 
 
 async def test_auth_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: AsyncMock,
 ) -> None:
@@ -49,7 +49,7 @@ async def test_auth_failed(
 
 
 async def test_update_failed_project(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: MagicMock,
 ) -> None:
@@ -64,7 +64,7 @@ async def test_update_failed_project(
 
 
 async def test_update_failed_builds(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: MagicMock,
 ) -> None:
@@ -79,7 +79,7 @@ async def test_update_failed_builds(
 
 
 async def test_no_builds(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: MagicMock,
 ) -> None:
@@ -94,7 +94,7 @@ async def test_no_builds(
 
 
 async def test_no_work_item_types(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: MagicMock,
 ) -> None:
@@ -109,7 +109,7 @@ async def test_no_work_item_types(
 
 
 async def test_no_work_item_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: MagicMock,
 ) -> None:
@@ -124,7 +124,7 @@ async def test_no_work_item_ids(
 
 
 async def test_no_work_items(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: MagicMock,
 ) -> None:

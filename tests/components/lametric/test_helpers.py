@@ -4,15 +4,15 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.lametric.helpers import async_get_coordinator_by_device_id
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.lametric.helpers import async_get_coordinator_by_device_id
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_get_coordinator_by_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
     mock_lametric: MagicMock,

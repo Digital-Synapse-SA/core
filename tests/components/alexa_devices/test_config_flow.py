@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock
 from aioamazondevices.exceptions import CannotAuthenticate, CannotConnect
 import pytest
 
-from homeassistant.components.alexa_devices.const import CONF_LOGIN_DATA, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_CODE, CONF_COUNTRY, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.alexa_devices.const import CONF_LOGIN_DATA, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_CODE, CONF_COUNTRY, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import TEST_CODE, TEST_COUNTRY, TEST_PASSWORD, TEST_USERNAME
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_amazon_devices_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -60,7 +60,7 @@ async def test_full_flow(
     ],
 )
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_amazon_devices_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     exception: Exception,
@@ -105,7 +105,7 @@ async def test_flow_errors(
 
 
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_amazon_devices_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

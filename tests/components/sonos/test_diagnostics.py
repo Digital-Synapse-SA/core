@@ -3,9 +3,9 @@
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import paths
 
-from homeassistant.components.sonos.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceRegistry
+from smarthub.components.sonos.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import DeviceRegistry
 
 from tests.common import MockConfigEntry
 from tests.components.diagnostics import (
@@ -16,7 +16,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     async_autosetup_sonos,
     config_entry: MockConfigEntry,
@@ -37,7 +37,7 @@ async def test_diagnostics_config_entry(
 
 
 async def test_diagnostics_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: DeviceRegistry,
     async_autosetup_sonos,

@@ -16,8 +16,8 @@ from habiticalib import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.habitica.const import DOMAIN
-from homeassistant.components.todo import (
+from smarthub.components.habitica.const import DOMAIN
+from smarthub.components.todo import (
     ATTR_DESCRIPTION,
     ATTR_DUE_DATE,
     ATTR_ITEM,
@@ -26,11 +26,11 @@ from homeassistant.components.todo import (
     DOMAIN as TODO_DOMAIN,
     TodoServices,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ERROR_NOT_FOUND, ERROR_TOO_MANY_REQUESTS
 
@@ -47,7 +47,7 @@ from tests.typing import WebSocketGenerator
 def todo_only() -> Generator[None]:
     """Enable only the todo platform."""
     with patch(
-        "homeassistant.components.habitica.PLATFORMS",
+        "smarthub.components.habitica.PLATFORMS",
         [Platform.TODO],
     ):
         yield
@@ -55,7 +55,7 @@ def todo_only() -> Generator[None]:
 
 @pytest.mark.usefixtures("habitica")
 async def test_todos(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -80,7 +80,7 @@ async def test_todos(
 )
 @pytest.mark.usefixtures("habitica")
 async def test_todo_items(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_id: str,
@@ -115,7 +115,7 @@ async def test_todo_items(
     ids=["todo", "daily"],
 )
 async def test_complete_todo_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -156,7 +156,7 @@ async def test_complete_todo_item(
     ids=["todo", "daily"],
 )
 async def test_uncomplete_todo_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     entity_id: str,
@@ -200,12 +200,12 @@ async def test_uncomplete_todo_item(
         (
             ERROR_TOO_MANY_REQUESTS,
             "Rate limit exceeded, try again in 5 seconds",
-            HomeAssistantError,
+            SmartHubError,
         ),
     ],
 )
 async def test_complete_todo_item_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     uid: str,
@@ -309,7 +309,7 @@ async def test_complete_todo_item_exception(
     ids=["todo", "todo remove date", "todo remove notes", "daily"],
 )
 async def test_update_todo_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     entity_id: str,
@@ -346,12 +346,12 @@ async def test_update_todo_item(
         (
             ERROR_TOO_MANY_REQUESTS,
             "Rate limit exceeded, try again in 5 seconds",
-            HomeAssistantError,
+            SmartHubError,
         ),
     ],
 )
 async def test_update_todo_item_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     exception: Exception,
@@ -383,7 +383,7 @@ async def test_update_todo_item_exception(
 
 
 async def test_add_todo_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
 ) -> None:
@@ -428,12 +428,12 @@ async def test_add_todo_item(
         (
             ERROR_TOO_MANY_REQUESTS,
             "Rate limit exceeded, try again in 5 seconds",
-            HomeAssistantError,
+            SmartHubError,
         ),
     ],
 )
 async def test_add_todo_item_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     exception: Exception,
@@ -468,7 +468,7 @@ async def test_add_todo_item_exception(
 
 
 async def test_delete_todo_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
 ) -> None:
@@ -503,12 +503,12 @@ async def test_delete_todo_item(
         (
             ERROR_TOO_MANY_REQUESTS,
             "Rate limit exceeded, try again in 5 seconds",
-            HomeAssistantError,
+            SmartHubError,
         ),
     ],
 )
 async def test_delete_todo_item_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     exception: Exception,
@@ -540,7 +540,7 @@ async def test_delete_todo_item_exception(
 
 
 async def test_delete_completed_todo_items(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
 ) -> None:
@@ -573,12 +573,12 @@ async def test_delete_completed_todo_items(
         (
             ERROR_TOO_MANY_REQUESTS,
             "Rate limit exceeded, try again in 5 seconds",
-            HomeAssistantError,
+            SmartHubError,
         ),
     ],
 )
 async def test_delete_completed_todo_items_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     exception: Exception,
@@ -629,7 +629,7 @@ async def test_delete_completed_todo_items_exception(
     ids=["todo", "daily"],
 )
 async def test_move_todo_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     hass_ws_client: WebSocketGenerator,
@@ -716,7 +716,7 @@ async def test_move_todo_item(
     ],
 )
 async def test_move_todo_item_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     hass_ws_client: WebSocketGenerator,
@@ -777,7 +777,7 @@ async def test_move_todo_item_exception(
 )
 @pytest.mark.usefixtures("set_tz")
 async def test_next_due_date(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fixture: str,
     calculated_due_date: str | None,
     config_entry: MockConfigEntry,

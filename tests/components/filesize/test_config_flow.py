@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.filesize.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_FILE_PATH
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.filesize.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_FILE_PATH
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import TEST_FILE_NAME, TEST_FILE_NAME2, async_create_file
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_full_user_flow(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_full_user_flow(hass: SmartHub, tmp_path: Path) -> None:
     """Test the full user configuration flow."""
     test_file = str(tmp_path.joinpath(TEST_FILE_NAME))
     await async_create_file(hass, test_file)
@@ -41,7 +41,7 @@ async def test_full_user_flow(hass: HomeAssistant, tmp_path: Path) -> None:
 
 
 async def test_unique_path(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, tmp_path: Path
+    hass: SmartHub, mock_config_entry: MockConfigEntry, tmp_path: Path
 ) -> None:
     """Test we abort if already setup."""
     test_file = str(tmp_path.joinpath(TEST_FILE_NAME))
@@ -57,7 +57,7 @@ async def test_unique_path(
     assert result.get("reason") == "already_configured"
 
 
-async def test_flow_fails_on_validation(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_flow_fails_on_validation(hass: SmartHub, tmp_path: Path) -> None:
     """Test config flow errors."""
     test_file = str(tmp_path.joinpath(TEST_FILE_NAME))
     hass.config.allowlist_external_dirs = {}
@@ -81,7 +81,7 @@ async def test_flow_fails_on_validation(hass: HomeAssistant, tmp_path: Path) -> 
     await async_create_file(hass, test_file)
 
     with patch(
-        "homeassistant.components.filesize.config_flow.pathlib.Path",
+        "smarthub.components.filesize.config_flow.pathlib.Path",
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -94,7 +94,7 @@ async def test_flow_fails_on_validation(hass: HomeAssistant, tmp_path: Path) -> 
 
     hass.config.allowlist_external_dirs = {tmp_path}
     with patch(
-        "homeassistant.components.filesize.config_flow.pathlib.Path",
+        "smarthub.components.filesize.config_flow.pathlib.Path",
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -111,7 +111,7 @@ async def test_flow_fails_on_validation(hass: HomeAssistant, tmp_path: Path) -> 
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, tmp_path: Path
+    hass: SmartHub, mock_config_entry: MockConfigEntry, tmp_path: Path
 ) -> None:
     """Test a reconfigure flow."""
     test_file = str(tmp_path.joinpath(TEST_FILE_NAME2))
@@ -136,7 +136,7 @@ async def test_reconfigure_flow(
 
 
 async def test_unique_id_already_exist_in_reconfigure_flow(
-    hass: HomeAssistant, tmp_path: Path
+    hass: SmartHub, tmp_path: Path
 ) -> None:
     """Test a reconfigure flow fails when unique id already exist."""
     test_file = str(tmp_path.joinpath(TEST_FILE_NAME))
@@ -176,7 +176,7 @@ async def test_unique_id_already_exist_in_reconfigure_flow(
 
 
 async def test_reconfigure_flow_fails_on_validation(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, tmp_path: Path
+    hass: SmartHub, mock_config_entry: MockConfigEntry, tmp_path: Path
 ) -> None:
     """Test config flow errors in reconfigure."""
     test_file2 = str(tmp_path.joinpath(TEST_FILE_NAME2))
@@ -200,7 +200,7 @@ async def test_reconfigure_flow_fails_on_validation(
     await async_create_file(hass, test_file2)
 
     with patch(
-        "homeassistant.components.filesize.config_flow.pathlib.Path",
+        "smarthub.components.filesize.config_flow.pathlib.Path",
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -213,7 +213,7 @@ async def test_reconfigure_flow_fails_on_validation(
 
     hass.config.allowlist_external_dirs = {tmp_path}
     with patch(
-        "homeassistant.components.filesize.config_flow.pathlib.Path",
+        "smarthub.components.filesize.config_flow.pathlib.Path",
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],

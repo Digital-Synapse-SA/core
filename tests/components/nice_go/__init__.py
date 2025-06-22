@@ -2,20 +2,20 @@
 
 from unittest.mock import patch
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def setup_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry, platforms: list[Platform]
+    hass: SmartHub, config_entry: MockConfigEntry, platforms: list[Platform]
 ) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.nice_go.PLATFORMS",
+        "smarthub.components.nice_go.PLATFORMS",
         platforms,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

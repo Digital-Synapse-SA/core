@@ -9,18 +9,18 @@ from deebot_client.models import CleanAction, State
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ecovacs.const import DOMAIN
-from homeassistant.components.ecovacs.controller import EcovacsController
-from homeassistant.components.lawn_mower import (
+from smarthub.components.ecovacs.const import DOMAIN
+from smarthub.components.ecovacs.controller import EcovacsController
+from smarthub.components.lawn_mower import (
     DOMAIN as PLATFORM_DOMAIN,
     SERVICE_DOCK,
     SERVICE_PAUSE,
     SERVICE_START_MOWING,
     LawnMowerActivity,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .util import notify_and_wait
 
@@ -40,7 +40,7 @@ def platforms() -> Platform | list[Platform]:
     ],
 )
 async def test_lawn_mower(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -97,7 +97,7 @@ class MowerTestCase:
     ids=["5xu9h3"],
 )
 async def test_mover_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     controller: EcovacsController,
     entity_id: list[str],
     tests: list[MowerTestCase],

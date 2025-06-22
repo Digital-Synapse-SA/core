@@ -4,11 +4,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.picnic import CONF_COUNTRY_CODE, DOMAIN
-from homeassistant.components.picnic.const import SERVICE_ADD_PRODUCT_TO_CART
-from homeassistant.components.picnic.services import PicnicServiceException
-from homeassistant.const import CONF_ACCESS_TOKEN
-from homeassistant.core import HomeAssistant
+from smarthub.components.picnic import CONF_COUNTRY_CODE, DOMAIN
+from smarthub.components.picnic.const import SERVICE_ADD_PRODUCT_TO_CART
+from smarthub.components.picnic.services import PicnicServiceException
+from smarthub.const import CONF_ACCESS_TOKEN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -33,7 +33,7 @@ def create_picnic_api_client(unique_id):
     return picnic_mock
 
 
-async def create_picnic_config_entry(hass: HomeAssistant, unique_id):
+async def create_picnic_config_entry(hass: SmartHub, unique_id):
     """Create a Picnic config entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -54,7 +54,7 @@ async def create_picnic_config_entry(hass: HomeAssistant, unique_id):
 def picnic_api_client():
     """Return the default picnic api client."""
     with patch(
-        "homeassistant.components.picnic.create_picnic_client"
+        "smarthub.components.picnic.create_picnic_client"
     ) as create_picnic_client_mock:
         picnic_client_mock = create_picnic_api_client(UNIQUE_ID)
         create_picnic_client_mock.return_value = picnic_client_mock
@@ -63,13 +63,13 @@ def picnic_api_client():
 
 
 @pytest.fixture
-async def picnic_config_entry(hass: HomeAssistant):
+async def picnic_config_entry(hass: SmartHub):
     """Generate the default Picnic config entry."""
     return await create_picnic_config_entry(hass, UNIQUE_ID)
 
 
 async def test_add_product_using_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     picnic_api_client: MagicMock,
     picnic_config_entry: MockConfigEntry,
 ) -> None:
@@ -90,7 +90,7 @@ async def test_add_product_using_id(
 
 
 async def test_add_product_using_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     picnic_api_client: MagicMock,
     picnic_config_entry: MockConfigEntry,
 ) -> None:
@@ -128,7 +128,7 @@ async def test_add_product_using_name(
 
 
 async def test_add_product_using_name_no_results(
-    hass: HomeAssistant,
+    hass: SmartHub,
     picnic_api_client: MagicMock,
     picnic_config_entry: MockConfigEntry,
 ) -> None:
@@ -149,7 +149,7 @@ async def test_add_product_using_name_no_results(
 
 
 async def test_add_product_using_name_no_named_results(
-    hass: HomeAssistant,
+    hass: SmartHub,
     picnic_api_client: MagicMock,
     picnic_config_entry: MockConfigEntry,
 ) -> None:
@@ -170,13 +170,13 @@ async def test_add_product_using_name_no_named_results(
 
 
 async def test_add_product_multiple_config_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     picnic_api_client: MagicMock,
     picnic_config_entry: MockConfigEntry,
 ) -> None:
     """Test adding a product for a specific Picnic service while multiple are configured."""
     with patch(
-        "homeassistant.components.picnic.create_picnic_client"
+        "smarthub.components.picnic.create_picnic_client"
     ) as create_picnic_client_mock:
         picnic_api_client_2 = create_picnic_api_client("3fj9-9gju-236")
         create_picnic_client_mock.return_value = picnic_api_client_2
@@ -195,7 +195,7 @@ async def test_add_product_multiple_config_entries(
 
 
 async def test_add_product_device_doesnt_exist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     picnic_api_client: MagicMock,
     picnic_config_entry: MockConfigEntry,
 ) -> None:

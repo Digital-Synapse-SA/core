@@ -6,8 +6,8 @@ from kaleidescape import const as kaleidescape_const
 from kaleidescape.device import Movie
 import pytest
 
-from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
-from homeassistant.const import (
+from smarthub.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_MEDIA_NEXT_TRACK,
     SERVICE_MEDIA_PAUSE,
@@ -21,8 +21,8 @@ from homeassistant.const import (
     STATE_PAUSED,
     STATE_PLAYING,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import MOCK_SERIAL
 
@@ -31,7 +31,7 @@ FRIENDLY_NAME = f"Kaleidescape Device {MOCK_SERIAL}"
 
 
 @pytest.mark.usefixtures("mock_device", "mock_integration")
-async def test_entity(hass: HomeAssistant) -> None:
+async def test_entity(hass: SmartHub) -> None:
     """Test entity attributes."""
     entity = hass.states.get(ENTITY_ID)
     assert entity is not None
@@ -40,7 +40,7 @@ async def test_entity(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_integration")
-async def test_update_state(hass: HomeAssistant, mock_device: MagicMock) -> None:
+async def test_update_state(hass: SmartHub, mock_device: MagicMock) -> None:
     """Tests dispatched signals update player."""
     entity = hass.states.get(ENTITY_ID)
     assert entity is not None
@@ -99,7 +99,7 @@ async def test_update_state(hass: HomeAssistant, mock_device: MagicMock) -> None
 
 
 @pytest.mark.usefixtures("mock_integration")
-async def test_services(hass: HomeAssistant, mock_device: MagicMock) -> None:
+async def test_services(hass: SmartHub, mock_device: MagicMock) -> None:
     """Test service calls."""
     await hass.services.async_call(
         MEDIA_PLAYER_DOMAIN,

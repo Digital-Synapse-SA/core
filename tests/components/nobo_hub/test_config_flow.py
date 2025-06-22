@@ -2,15 +2,15 @@
 
 from unittest.mock import PropertyMock, patch
 
-from homeassistant import config_entries
-from homeassistant.components.nobo_hub.const import CONF_OVERRIDE_TYPE, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.nobo_hub.const import CONF_OVERRIDE_TYPE, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_configure_with_discover(hass: HomeAssistant) -> None:
+async def test_configure_with_discover(hass: SmartHub) -> None:
     """Test configure with discover."""
     with patch(
         "pynobo.nobo.async_discover_hubs",
@@ -41,7 +41,7 @@ async def test_configure_with_discover(hass: HomeAssistant) -> None:
             return_value={"name": "My Nobø Ecohub"},
         ),
         patch(
-            "homeassistant.components.nobo_hub.async_setup_entry",
+            "smarthub.components.nobo_hub.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -64,7 +64,7 @@ async def test_configure_with_discover(hass: HomeAssistant) -> None:
         mock_setup_entry.assert_awaited_once()
 
 
-async def test_configure_manual(hass: HomeAssistant) -> None:
+async def test_configure_manual(hass: SmartHub) -> None:
     """Test manual configuration when no hubs are discovered."""
     with patch(
         "pynobo.nobo.async_discover_hubs",
@@ -86,7 +86,7 @@ async def test_configure_manual(hass: HomeAssistant) -> None:
             return_value={"name": "My Nobø Ecohub"},
         ),
         patch(
-            "homeassistant.components.nobo_hub.async_setup_entry",
+            "smarthub.components.nobo_hub.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -110,7 +110,7 @@ async def test_configure_manual(hass: HomeAssistant) -> None:
         mock_setup_entry.assert_awaited_once()
 
 
-async def test_configure_user_selected_manual(hass: HomeAssistant) -> None:
+async def test_configure_user_selected_manual(hass: SmartHub) -> None:
     """Test configuration when user selects manual."""
     with patch(
         "pynobo.nobo.async_discover_hubs",
@@ -139,7 +139,7 @@ async def test_configure_user_selected_manual(hass: HomeAssistant) -> None:
             return_value={"name": "My Nobø Ecohub"},
         ),
         patch(
-            "homeassistant.components.nobo_hub.async_setup_entry",
+            "smarthub.components.nobo_hub.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -163,7 +163,7 @@ async def test_configure_user_selected_manual(hass: HomeAssistant) -> None:
         mock_setup_entry.assert_awaited_once()
 
 
-async def test_configure_invalid_serial_suffix(hass: HomeAssistant) -> None:
+async def test_configure_invalid_serial_suffix(hass: SmartHub) -> None:
     """Test we handle invalid serial suffix error."""
     with patch(
         "pynobo.nobo.async_discover_hubs",
@@ -188,7 +188,7 @@ async def test_configure_invalid_serial_suffix(hass: HomeAssistant) -> None:
     assert result3["errors"] == {"base": "invalid_serial"}
 
 
-async def test_configure_invalid_serial_undiscovered(hass: HomeAssistant) -> None:
+async def test_configure_invalid_serial_undiscovered(hass: SmartHub) -> None:
     """Test we handle invalid serial error."""
     with patch(
         "pynobo.nobo.async_discover_hubs",
@@ -207,7 +207,7 @@ async def test_configure_invalid_serial_undiscovered(hass: HomeAssistant) -> Non
     assert result2["errors"] == {"base": "invalid_serial"}
 
 
-async def test_configure_invalid_ip_address(hass: HomeAssistant) -> None:
+async def test_configure_invalid_ip_address(hass: SmartHub) -> None:
     """Test we handle invalid ip address error."""
     with patch(
         "pynobo.nobo.async_discover_hubs",
@@ -226,7 +226,7 @@ async def test_configure_invalid_ip_address(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_ip"}
 
 
-async def test_configure_cannot_connect(hass: HomeAssistant) -> None:
+async def test_configure_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     with patch(
         "pynobo.nobo.async_discover_hubs",
@@ -256,7 +256,7 @@ async def test_configure_cannot_connect(hass: HomeAssistant) -> None:
         mock_connect.assert_awaited_once_with("1.1.1.1", "123456789012")
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test the options flow."""
     config_entry = MockConfigEntry(
         domain="nobo_hub",
@@ -265,7 +265,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     )
     config_entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.nobo_hub.async_setup_entry", return_value=True
+        "smarthub.components.nobo_hub.async_setup_entry", return_value=True
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()

@@ -5,16 +5,16 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from homeassistant.components.samsungtv.const import DOMAIN, METHOD_LEGACY
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_METHOD
-from homeassistant.core import HomeAssistant
+from smarthub.components.samsungtv.const import DOMAIN, METHOD_LEGACY
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_METHOD
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def setup_samsungtv_entry(
-    hass: HomeAssistant, data: Mapping[str, Any]
+    hass: SmartHub, data: Mapping[str, Any]
 ) -> ConfigEntry:
     """Set up mock Samsung TV from config entry data."""
     entry = MockConfigEntry(

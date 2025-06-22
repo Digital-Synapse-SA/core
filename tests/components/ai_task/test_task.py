@@ -4,11 +4,11 @@ from freezegun import freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ai_task import AITaskEntityFeature, async_generate_text
-from homeassistant.components.conversation import async_get_chat_log
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import chat_session
+from smarthub.components.ai_task import AITaskEntityFeature, async_generate_text
+from smarthub.components.conversation import async_get_chat_log
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import chat_session
 
 from .conftest import TEST_ENTITY_ID, MockAITaskEntity
 
@@ -16,7 +16,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_run_task_preferred_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: None,
     mock_ai_task_entity: MockAITaskEntity,
     hass_ws_client: WebSocketGenerator,
@@ -85,7 +85,7 @@ async def test_run_task_preferred_entity(
 
 
 async def test_run_text_task_unknown_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: None,
 ) -> None:
     """Test running a text task with an unknown entity."""
@@ -103,7 +103,7 @@ async def test_run_text_task_unknown_entity(
 
 @freeze_time("2025-06-14 22:59:00")
 async def test_run_text_task_updates_chat_log(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: None,
     snapshot: SnapshotAssertion,
 ) -> None:

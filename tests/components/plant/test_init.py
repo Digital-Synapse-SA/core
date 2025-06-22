@@ -2,9 +2,9 @@
 
 from datetime import datetime, timedelta
 
-from homeassistant.components import plant
-from homeassistant.components.recorder import Recorder
-from homeassistant.const import (
+from smarthub.components import plant
+from smarthub.components.recorder import Recorder
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     LIGHT_LUX,
     STATE_OK,
@@ -12,8 +12,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     UnitOfConductivity,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, State
+from smarthub.setup import async_setup_component
 
 from tests.components.recorder.common import async_wait_recording_done
 
@@ -45,7 +45,7 @@ GOOD_CONFIG = {
 }
 
 
-async def test_valid_data(hass: HomeAssistant) -> None:
+async def test_valid_data(hass: SmartHub) -> None:
     """Test processing valid data."""
     sensor = plant.Plant("my plant", GOOD_CONFIG)
     sensor.entity_id = "sensor.mqtt_plant_battery"
@@ -63,7 +63,7 @@ async def test_valid_data(hass: HomeAssistant) -> None:
         assert attrib[reading] == value
 
 
-async def test_low_battery(hass: HomeAssistant) -> None:
+async def test_low_battery(hass: SmartHub) -> None:
     """Test processing with low battery data and limit set."""
     sensor = plant.Plant("other plant", GOOD_CONFIG)
     sensor.entity_id = "sensor.mqtt_plant_battery"
@@ -77,7 +77,7 @@ async def test_low_battery(hass: HomeAssistant) -> None:
     assert sensor.extra_state_attributes["problem"] == "battery low"
 
 
-async def test_initial_states(hass: HomeAssistant) -> None:
+async def test_initial_states(hass: SmartHub) -> None:
     """Test plant initialises attributes if sensor already exists."""
     hass.states.async_set(
         MOISTURE_ENTITY, 5, {ATTR_UNIT_OF_MEASUREMENT: UnitOfConductivity.MICROSIEMENS}
@@ -91,7 +91,7 @@ async def test_initial_states(hass: HomeAssistant) -> None:
     assert state.attributes[plant.READING_MOISTURE] == 5
 
 
-async def test_update_states(hass: HomeAssistant) -> None:
+async def test_update_states(hass: SmartHub) -> None:
     """Test updating the state of a sensor.
 
     Make sure that plant processes this correctly.
@@ -109,7 +109,7 @@ async def test_update_states(hass: HomeAssistant) -> None:
     assert state.attributes[plant.READING_MOISTURE] == 5
 
 
-async def test_unavailable_state(hass: HomeAssistant) -> None:
+async def test_unavailable_state(hass: SmartHub) -> None:
     """Test updating the state with unavailable.
 
     Make sure that plant processes this correctly.
@@ -129,7 +129,7 @@ async def test_unavailable_state(hass: HomeAssistant) -> None:
     assert state.attributes[plant.READING_MOISTURE] == STATE_UNAVAILABLE
 
 
-async def test_state_problem_if_unavailable(hass: HomeAssistant) -> None:
+async def test_state_problem_if_unavailable(hass: SmartHub) -> None:
     """Test updating the state with unavailable after setting it to valid value.
 
     Make sure that plant processes this correctly.
@@ -156,7 +156,7 @@ async def test_state_problem_if_unavailable(hass: HomeAssistant) -> None:
     assert state.attributes[plant.READING_MOISTURE] == STATE_UNAVAILABLE
 
 
-async def test_load_from_db(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_load_from_db(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test bootstrapping the brightness history from the database.
 
     This test can should only be executed if the loading of the history
@@ -182,7 +182,7 @@ async def test_load_from_db(recorder_mock: Recorder, hass: HomeAssistant) -> Non
     assert max_brightness == 30
 
 
-async def test_brightness_history(hass: HomeAssistant) -> None:
+async def test_brightness_history(hass: SmartHub) -> None:
     """Test the min_brightness check."""
     plant_name = "some_plant"
     assert await async_setup_component(
@@ -204,13 +204,13 @@ async def test_brightness_history(hass: HomeAssistant) -> None:
     assert state.state == STATE_OK
 
 
-def test_daily_history_no_data(hass: HomeAssistant) -> None:
+def test_daily_history_no_data(hass: SmartHub) -> None:
     """Test with empty history."""
     dh = plant.DailyHistory(3)
     assert dh.max is None
 
 
-def test_daily_history_one_day(hass: HomeAssistant) -> None:
+def test_daily_history_one_day(hass: SmartHub) -> None:
     """Test storing data for the same day."""
     dh = plant.DailyHistory(3)
     values = [-2, 10, 0, 5, 20]
@@ -221,7 +221,7 @@ def test_daily_history_one_day(hass: HomeAssistant) -> None:
         assert dh.max == max_value
 
 
-def test_daily_history_multiple_days(hass: HomeAssistant) -> None:
+def test_daily_history_multiple_days(hass: SmartHub) -> None:
     """Test storing data for different days."""
     dh = plant.DailyHistory(3)
     today = datetime.now()

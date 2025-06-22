@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock, patch
 from afsapi import ConnectionError, InvalidPinException, NotImplementedException
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.frontier_silicon.const import (
+from smarthub import config_entries
+from smarthub.components.frontier_silicon.const import (
     CONF_WEBFSAPI_URL,
     DEFAULT_PIN,
     DOMAIN,
 )
-from homeassistant.const import CONF_HOST, CONF_PIN, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import SsdpServiceInfo
+from smarthub.const import CONF_HOST, CONF_PIN, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import SsdpServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -45,7 +45,7 @@ INVALID_MOCK_DISCOVERY = SsdpServiceInfo(
     [("mock_radio_id", None), (None, NotImplementedException)],
 )
 async def test_form_default_pin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     radio_id_return_value: str | None,
     radio_id_side_effect: Exception | None,
@@ -59,7 +59,7 @@ async def test_form_default_pin(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.frontier_silicon.config_flow.AFSAPI.get_radio_id",
+        "smarthub.components.frontier_silicon.config_flow.AFSAPI.get_radio_id",
         return_value=radio_id_return_value,
         side_effect=radio_id_side_effect,
     ):
@@ -83,7 +83,7 @@ async def test_form_default_pin(
     [("mock_radio_id", None), (None, NotImplementedException)],
 )
 async def test_form_nondefault_pin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     radio_id_return_value: str | None,
     radio_id_side_effect: Exception | None,
@@ -97,7 +97,7 @@ async def test_form_nondefault_pin(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.frontier_silicon.config_flow.AFSAPI.get_friendly_name",
+        "smarthub.components.frontier_silicon.config_flow.AFSAPI.get_friendly_name",
         side_effect=InvalidPinException,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -111,7 +111,7 @@ async def test_form_nondefault_pin(
     assert result2["errors"] is None
 
     with patch(
-        "homeassistant.components.frontier_silicon.config_flow.AFSAPI.get_radio_id",
+        "smarthub.components.frontier_silicon.config_flow.AFSAPI.get_radio_id",
         return_value=radio_id_return_value,
         side_effect=radio_id_side_effect,
     ):
@@ -139,7 +139,7 @@ async def test_form_nondefault_pin(
     ],
 )
 async def test_form_nondefault_pin_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     friendly_name_error: Exception,
     result_error: str,
     mock_setup_entry: AsyncMock,
@@ -153,7 +153,7 @@ async def test_form_nondefault_pin_invalid(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.frontier_silicon.config_flow.AFSAPI.get_friendly_name",
+        "smarthub.components.frontier_silicon.config_flow.AFSAPI.get_friendly_name",
         side_effect=InvalidPinException,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -167,7 +167,7 @@ async def test_form_nondefault_pin_invalid(
     assert result2["errors"] is None
 
     with patch(
-        "homeassistant.components.frontier_silicon.config_flow.AFSAPI.get_friendly_name",
+        "smarthub.components.frontier_silicon.config_flow.AFSAPI.get_friendly_name",
         side_effect=friendly_name_error,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -203,7 +203,7 @@ async def test_form_nondefault_pin_invalid(
     ],
 )
 async def test_invalid_device_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     webfsapi_endpoint_error: Exception,
     result_error: str,
     mock_setup_entry: AsyncMock,
@@ -217,7 +217,7 @@ async def test_invalid_device_url(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.frontier_silicon.config_flow.AFSAPI.get_webfsapi_endpoint",
+        "smarthub.components.frontier_silicon.config_flow.AFSAPI.get_webfsapi_endpoint",
         side_effect=webfsapi_endpoint_error,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -250,14 +250,14 @@ async def test_invalid_device_url(
     [("mock_radio_id", None), (None, NotImplementedException)],
 )
 async def test_ssdp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MockConfigEntry,
     radio_id_return_value: str | None,
     radio_id_side_effect: Exception | None,
 ) -> None:
     """Test a device being discovered."""
     with patch(
-        "homeassistant.components.frontier_silicon.config_flow.AFSAPI.get_radio_id",
+        "smarthub.components.frontier_silicon.config_flow.AFSAPI.get_radio_id",
         return_value=radio_id_return_value,
         side_effect=radio_id_side_effect,
     ):
@@ -289,7 +289,7 @@ async def test_ssdp(
     mock_setup_entry.assert_called_once()
 
 
-async def test_ssdp_invalid_location(hass: HomeAssistant) -> None:
+async def test_ssdp_invalid_location(hass: SmartHub) -> None:
     """Test a device being discovered."""
 
     result = await hass.config_entries.flow.async_init(
@@ -303,7 +303,7 @@ async def test_ssdp_invalid_location(hass: HomeAssistant) -> None:
 
 
 async def test_ssdp_already_configured(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test an already known device being discovered."""
 
@@ -324,11 +324,11 @@ async def test_ssdp_already_configured(
     [(ValueError, "unknown"), (ConnectionError, "cannot_connect")],
 )
 async def test_ssdp_fail(
-    hass: HomeAssistant, webfsapi_endpoint_error: Exception, result_error: str
+    hass: SmartHub, webfsapi_endpoint_error: Exception, result_error: str
 ) -> None:
     """Test a device being discovered but failing to reply."""
     with patch(
-        "homeassistant.components.frontier_silicon.config_flow.AFSAPI.get_webfsapi_endpoint",
+        "smarthub.components.frontier_silicon.config_flow.AFSAPI.get_webfsapi_endpoint",
         side_effect=webfsapi_endpoint_error,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -341,11 +341,11 @@ async def test_ssdp_fail(
     assert result["reason"] == result_error
 
 
-async def test_ssdp_nondefault_pin(hass: HomeAssistant) -> None:
+async def test_ssdp_nondefault_pin(hass: SmartHub) -> None:
     """Test a device being discovered."""
 
     with patch(
-        "homeassistant.components.frontier_silicon.config_flow.AFSAPI.get_friendly_name",
+        "smarthub.components.frontier_silicon.config_flow.AFSAPI.get_friendly_name",
         side_effect=InvalidPinException,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -358,7 +358,7 @@ async def test_ssdp_nondefault_pin(hass: HomeAssistant) -> None:
     assert result["reason"] == "invalid_auth"
 
 
-async def test_reauth_flow(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_reauth_flow(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test reauth flow."""
     config_entry.add_to_hass(hass)
     assert config_entry.data[CONF_PIN] == "1234"
@@ -385,7 +385,7 @@ async def test_reauth_flow(hass: HomeAssistant, config_entry: MockConfigEntry) -
     ],
 )
 async def test_reauth_flow_friendly_name_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     reason: str,
     config_entry: MockConfigEntry,
@@ -399,7 +399,7 @@ async def test_reauth_flow_friendly_name_error(
     assert result["step_id"] == "device_config"
 
     with patch(
-        "homeassistant.components.frontier_silicon.config_flow.AFSAPI.get_friendly_name",
+        "smarthub.components.frontier_silicon.config_flow.AFSAPI.get_friendly_name",
         side_effect=exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(

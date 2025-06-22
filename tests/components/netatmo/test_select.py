@@ -5,19 +5,19 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     ATTR_OPTIONS,
     DOMAIN as SELECT_DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_WEBHOOK_ID,
     SERVICE_SELECT_OPTION,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import selected_platforms, simulate_webhook, snapshot_platform_entities
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     netatmo_auth: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -42,7 +42,7 @@ async def test_entity(
 
 
 async def test_select_schedule_thermostats(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
     netatmo_auth: AsyncMock,

@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import json
 
-from homeassistant.components.slack.const import CONF_DEFAULT_CHANNEL, DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_API_KEY, CONF_NAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.slack.const import CONF_DEFAULT_CHANNEL, DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_API_KEY, CONF_NAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -23,8 +23,8 @@ CONF_INPUT = {CONF_API_KEY: TOKEN, CONF_DEFAULT_CHANNEL: "test_channel"}
 CONF_DATA = CONF_INPUT | {CONF_NAME: TEAM_NAME}
 
 
-def create_entry(hass: HomeAssistant) -> ConfigEntry:
-    """Add config entry in Home Assistant."""
+def create_entry(hass: SmartHub) -> ConfigEntry:
+    """Add config entry in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         data=CONF_DATA,
@@ -57,12 +57,12 @@ def mock_connection(
 
 
 async def async_init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     skip_setup: bool = False,
     error: str | None = None,
 ) -> ConfigEntry:
-    """Set up the Slack integration in Home Assistant."""
+    """Set up the Slack integration in SmartHub."""
     entry = create_entry(hass)
     mock_connection(aioclient_mock, error)
 

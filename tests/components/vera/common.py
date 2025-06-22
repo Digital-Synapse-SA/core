@@ -9,14 +9,14 @@ from unittest.mock import MagicMock
 
 import pyvera as pv
 
-from homeassistant import config_entries
-from homeassistant.components.vera.const import (
+from smarthub import config_entries
+from smarthub.components.vera.const import (
     CONF_CONTROLLER,
     CONF_LEGACY_UNIQUE_ID,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -89,7 +89,7 @@ class ComponentFactory:
 
     async def configure_component(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         controller_config: ControllerConfig = None,
         controller_configs: tuple[ControllerConfig] = (),
     ) -> ComponentData:
@@ -109,7 +109,7 @@ class ComponentFactory:
         )
 
     async def _configure_component(
-        self, hass: HomeAssistant, controller_config: ControllerConfig
+        self, hass: SmartHub, controller_config: ControllerConfig
     ) -> ControllerData:
         """Configure the component with specific mock data."""
         component_config = {
@@ -148,7 +148,7 @@ class ComponentFactory:
         if controller_config.config_source == ConfigSource.FILE:
             hass_config[DOMAIN] = component_config
 
-        # Setup Home Assistant.
+        # Setup SmartHub.
         assert await async_setup_component(hass, DOMAIN, hass_config)
         await hass.async_block_till_done()
 

@@ -8,16 +8,16 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from homeassistant.components.azure_data_explorer.const import (
+from smarthub.components.azure_data_explorer.const import (
     CONF_FILTER,
     CONF_SEND_INTERVAL,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from .const import (
     AZURE_DATA_EXPLORER_PATH,
@@ -39,7 +39,7 @@ def mock_filter_schema() -> dict[str, Any]:
 
 @pytest.fixture(name="entry_managed")
 async def mock_entry_fixture_managed(
-    hass: HomeAssistant, filter_schema: dict[str, Any]
+    hass: SmartHub, filter_schema: dict[str, Any]
 ) -> MockConfigEntry:
     """Create the setup in HA."""
     entry = MockConfigEntry(
@@ -54,7 +54,7 @@ async def mock_entry_fixture_managed(
 
 @pytest.fixture(name="entry_queued")
 async def mock_entry_fixture_queued(
-    hass: HomeAssistant, filter_schema: dict[str, Any]
+    hass: SmartHub, filter_schema: dict[str, Any]
 ) -> MockConfigEntry:
     """Create the setup in HA."""
     entry = MockConfigEntry(
@@ -67,7 +67,7 @@ async def mock_entry_fixture_queued(
     return entry
 
 
-async def _entry(hass: HomeAssistant, filter_schema: dict[str, Any], entry) -> None:
+async def _entry(hass: SmartHub, filter_schema: dict[str, Any], entry) -> None:
     entry.add_to_hass(hass)
     assert await async_setup_component(
         hass, DOMAIN, {DOMAIN: {CONF_FILTER: filter_schema}}
@@ -84,7 +84,7 @@ async def _entry(hass: HomeAssistant, filter_schema: dict[str, Any], entry) -> N
 
 @pytest.fixture(name="entry_with_one_event")
 async def mock_entry_with_one_event(
-    hass: HomeAssistant, entry_managed
+    hass: SmartHub, entry_managed
 ) -> MockConfigEntry:
     """Use the entry and add a single test event to the queue."""
     assert entry_managed.state == ConfigEntryState.LOADED

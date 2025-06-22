@@ -2,35 +2,35 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.cpuspeed.const import DOMAIN
-from homeassistant.components.cpuspeed.sensor import ATTR_ARCH, ATTR_BRAND, ATTR_HZ
-from homeassistant.components.homeassistant import (
+from smarthub.components.cpuspeed.const import DOMAIN
+from smarthub.components.cpuspeed.sensor import ATTR_ARCH, ATTR_BRAND, ATTR_HZ
+from smarthub.components.smarthub import (
     DOMAIN as HOME_ASSISTANT_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_cpuinfo: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
     """Test the CPU Speed sensor."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     entry = entity_registry.async_get("sensor.cpu_speed")
     assert entry
@@ -71,7 +71,7 @@ async def test_sensor(
 
 
 async def test_sensor_partial_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cpuinfo: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

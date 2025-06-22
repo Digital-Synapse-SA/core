@@ -1,11 +1,11 @@
 """The sensor tests for the tado platform."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 
-async def test_air_con_create_sensors(hass: HomeAssistant) -> None:
+async def test_air_con_create_sensors(hass: SmartHub) -> None:
     """Test creation of aircon sensors."""
 
     await async_init_integration(hass)
@@ -23,7 +23,7 @@ async def test_air_con_create_sensors(hass: HomeAssistant) -> None:
     assert state.state == "60.9"
 
 
-async def test_home_create_sensors(hass: HomeAssistant) -> None:
+async def test_home_create_sensors(hass: SmartHub) -> None:
     """Test creation of home sensors."""
 
     await async_init_integration(hass)
@@ -38,7 +38,7 @@ async def test_home_create_sensors(hass: HomeAssistant) -> None:
     assert state.state == "fog"
 
 
-async def test_heater_create_sensors(hass: HomeAssistant) -> None:
+async def test_heater_create_sensors(hass: SmartHub) -> None:
     """Test creation of heater sensors."""
 
     await async_init_integration(hass)
@@ -53,7 +53,7 @@ async def test_heater_create_sensors(hass: HomeAssistant) -> None:
     assert state.state == "45.2"
 
 
-async def test_water_heater_create_sensors(hass: HomeAssistant) -> None:
+async def test_water_heater_create_sensors(hass: SmartHub) -> None:
     """Test creation of water heater sensors."""
 
     await async_init_integration(hass)

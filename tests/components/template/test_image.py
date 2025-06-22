@@ -10,17 +10,17 @@ import pytest
 import respx
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import setup
-from homeassistant.components.input_text import (
+from smarthub import setup
+from smarthub.components.input_text import (
     ATTR_VALUE as INPUT_TEXT_ATTR_VALUE,
     DOMAIN as INPUT_TEXT_DOMAIN,
     SERVICE_SET_VALUE as INPUT_TEXT_SERVICE_SET_VALUE,
 )
-from homeassistant.components.template import DOMAIN
-from homeassistant.const import ATTR_ENTITY_PICTURE, CONF_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.template import DOMAIN
+from smarthub.const import ATTR_ENTITY_PICTURE, CONF_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, assert_setup_component
 from tests.typing import ClientSessionGenerator
@@ -47,7 +47,7 @@ def imgbytes2_jpg():
 
 
 async def _assert_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     expected_state: str,
     expected_image: bytes | None,
@@ -79,7 +79,7 @@ async def _assert_state(
 @respx.mock
 @pytest.mark.freeze_time("2024-07-09 00:00:00+00:00")
 async def test_setup_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     imgbytes_jpg,
 ) -> None:
@@ -112,7 +112,7 @@ async def test_setup_config_entry(
 @respx.mock
 @pytest.mark.freeze_time("2023-04-01 00:00:00+00:00")
 async def test_platform_config(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, imgbytes_jpg
+    hass: SmartHub, hass_client: ClientSessionGenerator, imgbytes_jpg
 ) -> None:
     """Test configuring under the platform key does not work."""
     respx.get("http://example.com").respond(
@@ -141,7 +141,7 @@ async def test_platform_config(
 @respx.mock
 @pytest.mark.freeze_time("2023-04-01 00:00:00+00:00")
 async def test_missing_optional_config(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, imgbytes_jpg
+    hass: SmartHub, hass_client: ClientSessionGenerator, imgbytes_jpg
 ) -> None:
     """Test: missing optional template is ok."""
     respx.get("http://example.com").respond(
@@ -177,7 +177,7 @@ async def test_missing_optional_config(
 @respx.mock
 @pytest.mark.freeze_time("2023-04-01 00:00:00+00:00")
 async def test_multiple_configs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     imgbytes_jpg,
     imgbytes2_jpg,
@@ -224,7 +224,7 @@ async def test_multiple_configs(
     )
 
 
-async def test_missing_required_keys(hass: HomeAssistant) -> None:
+async def test_missing_required_keys(hass: SmartHub) -> None:
     """Test: missing required fields will fail."""
     with assert_setup_component(0, "template"):
         assert await setup.async_setup_component(
@@ -247,7 +247,7 @@ async def test_missing_required_keys(hass: HomeAssistant) -> None:
 
 
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test unique_id configuration."""
     with assert_setup_component(1, "template"):
@@ -277,7 +277,7 @@ async def test_unique_id(
 @respx.mock
 @pytest.mark.freeze_time("2023-04-01 00:00:00+00:00")
 async def test_custom_entity_picture(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, imgbytes_jpg
+    hass: SmartHub, hass_client: ClientSessionGenerator, imgbytes_jpg
 ) -> None:
     """Test custom entity picture."""
     respx.get("http://example.com").respond(
@@ -314,7 +314,7 @@ async def test_custom_entity_picture(
 
 @respx.mock
 async def test_template_error(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test handling template error."""
     respx.get("http://example.com").side_effect = httpx.TimeoutException
@@ -349,7 +349,7 @@ async def test_template_error(
 @respx.mock
 @pytest.mark.freeze_time("2023-04-01 00:00:00+00:00")
 async def test_templates_with_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     imgbytes_jpg,
     imgbytes2_jpg,
@@ -420,7 +420,7 @@ async def test_templates_with_entities(
 @respx.mock
 @pytest.mark.freeze_time("2023-04-01 00:00:00+00:00")
 async def test_trigger_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     imgbytes_jpg,
     imgbytes2_jpg,
@@ -488,7 +488,7 @@ async def test_trigger_image(
 @respx.mock
 @pytest.mark.freeze_time("2023-04-01 00:00:00+00:00")
 async def test_trigger_image_custom_entity_picture(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, imgbytes_jpg
+    hass: SmartHub, hass_client: ClientSessionGenerator, imgbytes_jpg
 ) -> None:
     """Test trigger based template image with custom entity picture."""
     respx.get("http://example.com").respond(
@@ -542,7 +542,7 @@ async def test_trigger_image_custom_entity_picture(
 
 @respx.mock
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

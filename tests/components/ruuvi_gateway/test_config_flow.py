@@ -5,11 +5,11 @@ from unittest.mock import patch
 from aioruuvigateway.excs import CannotConnect, InvalidAuth
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.ruuvi_gateway.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.ruuvi_gateway.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .consts import (
     BASE_DATA,
@@ -43,7 +43,7 @@ DHCP_DATA = {**BASE_DATA, "host": DHCP_IP}
     ],
     ids=["user", "dhcp"],
 )
-async def test_ok_setup(hass: HomeAssistant, init_data, init_context, entry) -> None:
+async def test_ok_setup(hass: SmartHub, init_data, init_context, entry) -> None:
     """Test we get the form."""
     init_result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -68,7 +68,7 @@ async def test_ok_setup(hass: HomeAssistant, init_data, init_context, entry) -> 
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     init_result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -97,7 +97,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     init_result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -126,7 +126,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_unexpected(hass: HomeAssistant) -> None:
+async def test_form_unexpected(hass: SmartHub) -> None:
     """Test we handle unexpected errors."""
     init_result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}

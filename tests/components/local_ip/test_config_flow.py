@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from homeassistant.components.local_ip.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.local_ip.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_config_flow(hass: HomeAssistant) -> None:
+async def test_config_flow(hass: SmartHub) -> None:
     """Test we can finish a config flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -25,7 +25,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     assert state
 
 
-async def test_already_setup(hass: HomeAssistant) -> None:
+async def test_already_setup(hass: SmartHub) -> None:
     """Test we abort if already setup."""
     MockConfigEntry(
         domain=DOMAIN,

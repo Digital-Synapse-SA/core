@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 from pyuptimerobot import UptimeRobotAuthenticationException
 
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.components.uptimerobot.const import COORDINATOR_UPDATE_INTERVAL
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.components.uptimerobot.const import COORDINATOR_UPDATE_INTERVAL
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .common import (
     MOCK_UPTIMEROBOT_MONITOR,
@@ -20,7 +20,7 @@ from .common import (
 from tests.common import async_fire_time_changed
 
 
-async def test_presentation(hass: HomeAssistant) -> None:
+async def test_presentation(hass: SmartHub) -> None:
     """Test the presentation of UptimeRobot sensors."""
     await setup_uptimerobot_integration(hass)
 
@@ -38,7 +38,7 @@ async def test_presentation(hass: HomeAssistant) -> None:
     ]
 
 
-async def test_unavailable_on_update_failure(hass: HomeAssistant) -> None:
+async def test_unavailable_on_update_failure(hass: SmartHub) -> None:
     """Test entity unavailable on update failure."""
     await setup_uptimerobot_integration(hass)
 

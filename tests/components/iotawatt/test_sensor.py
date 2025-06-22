@@ -5,20 +5,20 @@ from unittest.mock import MagicMock
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     UnitOfEnergy,
     UnitOfPower,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import INPUT_SENSOR, OUTPUT_SENSOR
 
@@ -26,7 +26,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_sensor_type_input(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, mock_iotawatt: MagicMock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, mock_iotawatt: MagicMock
 ) -> None:
     """Test input sensors work."""
     assert await async_setup_component(hass, "iotawatt", {})
@@ -61,7 +61,7 @@ async def test_sensor_type_input(
 
 
 async def test_sensor_type_output(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, mock_iotawatt: MagicMock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, mock_iotawatt: MagicMock
 ) -> None:
     """Tests the sensor type of Output."""
     mock_iotawatt.getSensors.return_value["sensors"]["my_watthour_sensor_key"] = (

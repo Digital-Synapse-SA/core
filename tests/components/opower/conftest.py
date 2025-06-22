@@ -2,14 +2,14 @@
 
 import pytest
 
-from homeassistant.components.opower.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.opower.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Return the default mocked config entry."""
     config_entry = MockConfigEntry(
         title="Pacific Gas & Electric (test-username)",

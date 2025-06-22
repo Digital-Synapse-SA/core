@@ -16,8 +16,8 @@ from aiohomekit.model import Accessories, AccessoriesState, Accessory
 from aiohomekit.model.services import Service
 from aiohomekit.testing import FakeController, FakePairing
 
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.homekit_controller.const import (
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.homekit_controller.const import (
     CONTROLLER,
     DEBOUNCE_COOLDOWN,
     DOMAIN,
@@ -25,14 +25,14 @@ from homeassistant.components.homekit_controller.const import (
     IDENTIFIER_ACCESSORY_ID,
     SUBSCRIBE_COOLDOWN,
 )
-from homeassistant.components.homekit_controller.utils import async_get_controller
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant, State, callback
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.homekit_controller.utils import async_get_controller
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import EntityCategory
+from smarthub.core import SmartHub, State, callback
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -112,7 +112,7 @@ class Helper:
 
     def __init__(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         entity_id: str,
         pairing: FakePairing,
         accessory: Accessory,
@@ -179,14 +179,14 @@ class Helper:
         return state
 
 
-async def time_changed(hass: HomeAssistant, seconds: int) -> None:
+async def time_changed(hass: SmartHub, seconds: int) -> None:
     """Trigger time changed."""
     next_update = dt_util.utcnow() + timedelta(seconds)
     async_fire_time_changed(hass, next_update)
     await hass.async_block_till_done()
 
 
-async def setup_accessories_from_file(hass: HomeAssistant, path: str) -> Accessories:
+async def setup_accessories_from_file(hass: SmartHub, path: str) -> Accessories:
     """Load an collection of accessory defs from JSON data."""
     accessories_fixture = await hass.async_add_executor_job(
         load_fixture, os.path.join("homekit_controller", path)
@@ -195,12 +195,12 @@ async def setup_accessories_from_file(hass: HomeAssistant, path: str) -> Accesso
     return Accessories.from_list(accessories_json)
 
 
-async def setup_platform(hass: HomeAssistant) -> FakeController:
+async def setup_platform(hass: SmartHub) -> FakeController:
     """Load the platform but with a fake Controller API."""
     config = {"discovery": {}}
 
     with mock.patch(
-        "homeassistant.components.homekit_controller.utils.Controller", FakeController
+        "smarthub.components.homekit_controller.utils.Controller", FakeController
     ):
         await async_setup_component(hass, DOMAIN, config)
 
@@ -208,7 +208,7 @@ async def setup_platform(hass: HomeAssistant) -> FakeController:
 
 
 async def setup_test_accessories(
-    hass: HomeAssistant, accessories: list[Accessory], connection: str | None = None
+    hass: SmartHub, accessories: list[Accessory], connection: str | None = None
 ) -> tuple[MockConfigEntry, AbstractPairing]:
     """Load a fake homekit device based on captured JSON profile."""
     fake_controller = await setup_platform(hass)
@@ -218,7 +218,7 @@ async def setup_test_accessories(
 
 
 async def setup_test_accessories_with_controller(
-    hass: HomeAssistant,
+    hass: SmartHub,
     accessories: list[Accessory],
     fake_controller: FakeController,
     connection: str | None = None,
@@ -253,8 +253,8 @@ async def setup_test_accessories_with_controller(
     return config_entry, pairing
 
 
-async def device_config_changed(hass: HomeAssistant, accessories: Accessories):
-    """Discover new devices added to Home Assistant at runtime."""
+async def device_config_changed(hass: SmartHub, accessories: Accessories):
+    """Discover new devices added to SmartHub at runtime."""
     # Update the accessories our FakePairing knows about
     controller = hass.data[CONTROLLER]
     pairing: AbstractPairing = controller.pairings["00:00:00:00:00:00"]
@@ -284,7 +284,7 @@ async def device_config_changed(hass: HomeAssistant, accessories: Accessories):
 
 
 async def setup_test_component(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aid: int,
     setup_accessory: Callable[[Accessory], Service | None],
     capitalize: bool = False,
@@ -309,7 +309,7 @@ async def setup_test_component(
             domain = HOMEKIT_ACCESSORY_DISPATCH[service_name]
             break
 
-    assert domain, "Cannot map test homekit services to Home Assistant domain"
+    assert domain, "Cannot map test homekit services to SmartHub domain"
 
     config_entry, pairing = await setup_test_accessories(hass, [accessory], connection)
     entity = "testdevice" if suffix is None else f"testdevice_{suffix}"
@@ -317,7 +317,7 @@ async def setup_test_component(
 
 
 async def assert_devices_and_entities_created(
-    hass: HomeAssistant, expected: DeviceTestInfo
+    hass: SmartHub, expected: DeviceTestInfo
 ):
     """Check that all expected devices and entities are loaded and enumerated as expected."""
     entity_registry = er.async_get(hass)

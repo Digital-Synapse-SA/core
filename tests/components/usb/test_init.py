@@ -9,13 +9,13 @@ from unittest.mock import MagicMock, Mock, call, patch, sentinel
 
 import pytest
 
-from homeassistant.components import usb
-from homeassistant.components.usb.models import USBDevice
-from homeassistant.const import EVENT_HOMEASSISTANT_STARTED, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.service_info.usb import UsbServiceInfo
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import usb
+from smarthub.components.usb.models import USBDevice
+from smarthub.const import EVENT_HOMEASSISTANT_STARTED, EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
+from smarthub.helpers.service_info.usb import UsbServiceInfo
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     force_usb_polling_watcher,  # noqa: F401
@@ -44,7 +44,7 @@ slae_sh_device = USBDevice(
 
 
 async def test_aiousbwatcher_discovery(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that aiousbwatcher can discover a device without raising an exception."""
     new_usb = [{"domain": "test1", "vid": "3039"}, {"domain": "test2", "vid": "0FA0"}]
@@ -71,10 +71,10 @@ async def test_aiousbwatcher_discovery(
 
     with (
         patch("sys.platform", "linux"),
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch(
-            "homeassistant.components.usb.AIOUSBWatcher", return_value=MockAIOUSBWatcher
+            "smarthub.components.usb.AIOUSBWatcher", return_value=MockAIOUSBWatcher
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -118,7 +118,7 @@ async def test_aiousbwatcher_discovery(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_polling_discovery(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that polling can discover a device without raising an exception."""
     new_usb = [{"domain": "test1", "vid": "3039"}]
@@ -146,10 +146,10 @@ async def test_polling_discovery(
     with (
         patch("sys.platform", "linux"),
         patch(
-            "homeassistant.components.usb.POLLING_MONITOR_SCAN_PERIOD",
+            "smarthub.components.usb.POLLING_MONITOR_SCAN_PERIOD",
             timedelta(seconds=0.01),
         ),
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(side_effect=scan_serial_ports) as mock_ports,
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -171,7 +171,7 @@ async def test_polling_discovery(
 
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
-async def test_removal_by_aiousbwatcher_before_started(hass: HomeAssistant) -> None:
+async def test_removal_by_aiousbwatcher_before_started(hass: SmartHub) -> None:
     """Test a device is removed by the aiousbwatcher before started."""
     new_usb = [{"domain": "test1", "vid": "3039", "pid": "3039"}]
 
@@ -187,7 +187,7 @@ async def test_removal_by_aiousbwatcher_before_started(hass: HomeAssistant) -> N
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -206,7 +206,7 @@ async def test_removal_by_aiousbwatcher_before_started(hass: HomeAssistant) -> N
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_scan(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket scan."""
     new_usb = [{"domain": "test1", "vid": "3039", "pid": "3039"}]
@@ -223,7 +223,7 @@ async def test_discovered_by_websocket_scan(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -243,7 +243,7 @@ async def test_discovered_by_websocket_scan(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_scan_limited_by_description_matcher(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket scan is limited by the description matcher."""
     new_usb = [
@@ -262,7 +262,7 @@ async def test_discovered_by_websocket_scan_limited_by_description_matcher(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -282,7 +282,7 @@ async def test_discovered_by_websocket_scan_limited_by_description_matcher(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_most_targeted_matcher_wins(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the most targeted matcher is used."""
     new_usb = [
@@ -302,7 +302,7 @@ async def test_most_targeted_matcher_wins(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -322,7 +322,7 @@ async def test_most_targeted_matcher_wins(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_scan_rejected_by_description_matcher(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket scan rejected by the description matcher."""
     new_usb = [
@@ -341,7 +341,7 @@ async def test_discovered_by_websocket_scan_rejected_by_description_matcher(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -360,7 +360,7 @@ async def test_discovered_by_websocket_scan_rejected_by_description_matcher(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_scan_limited_by_serial_number_matcher(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket scan is limited by the serial_number matcher."""
     new_usb = [
@@ -384,7 +384,7 @@ async def test_discovered_by_websocket_scan_limited_by_serial_number_matcher(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -404,7 +404,7 @@ async def test_discovered_by_websocket_scan_limited_by_serial_number_matcher(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_scan_rejected_by_serial_number_matcher(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket scan is rejected by the serial_number matcher."""
     new_usb = [
@@ -423,7 +423,7 @@ async def test_discovered_by_websocket_scan_rejected_by_serial_number_matcher(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -442,7 +442,7 @@ async def test_discovered_by_websocket_scan_rejected_by_serial_number_matcher(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_scan_limited_by_manufacturer_matcher(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket scan is limited by the manufacturer matcher."""
     new_usb = [
@@ -466,7 +466,7 @@ async def test_discovered_by_websocket_scan_limited_by_manufacturer_matcher(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -486,7 +486,7 @@ async def test_discovered_by_websocket_scan_limited_by_manufacturer_matcher(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_scan_rejected_by_manufacturer_matcher(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket scan is rejected by the manufacturer matcher."""
     new_usb = [
@@ -510,7 +510,7 @@ async def test_discovered_by_websocket_scan_rejected_by_manufacturer_matcher(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -529,7 +529,7 @@ async def test_discovered_by_websocket_scan_rejected_by_manufacturer_matcher(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_rejected_with_empty_serial_number_only(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket is rejected with empty serial number."""
     new_usb = [
@@ -548,7 +548,7 @@ async def test_discovered_by_websocket_rejected_with_empty_serial_number_only(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -567,7 +567,7 @@ async def test_discovered_by_websocket_rejected_with_empty_serial_number_only(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_scan_match_vid_only(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket scan only matching vid."""
     new_usb = [{"domain": "test1", "vid": "3039"}]
@@ -584,7 +584,7 @@ async def test_discovered_by_websocket_scan_match_vid_only(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -604,7 +604,7 @@ async def test_discovered_by_websocket_scan_match_vid_only(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_scan_match_vid_wrong_pid(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket scan only matching vid but wrong pid."""
     new_usb = [{"domain": "test1", "vid": "3039", "pid": "9999"}]
@@ -621,7 +621,7 @@ async def test_discovered_by_websocket_scan_match_vid_wrong_pid(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -640,7 +640,7 @@ async def test_discovered_by_websocket_scan_match_vid_wrong_pid(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_discovered_by_websocket_no_vid_pid(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a device is discovered from websocket scan with no vid or pid."""
     new_usb = [{"domain": "test1", "vid": "3039", "pid": "9999"}]
@@ -657,7 +657,7 @@ async def test_discovered_by_websocket_no_vid_pid(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -676,7 +676,7 @@ async def test_discovered_by_websocket_no_vid_pid(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_non_matching_discovered_by_scanner_after_started(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test a websocket scan that does not match."""
     new_usb = [{"domain": "test1", "vid": "4444", "pid": "4444"}]
@@ -693,7 +693,7 @@ async def test_non_matching_discovered_by_scanner_after_started(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -711,7 +711,7 @@ async def test_non_matching_discovered_by_scanner_after_started(
 
 
 async def test_aiousbwatcher_on_wsl_fallback_without_throwing_exception(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that aiousbwatcher on WSL failure results in fallback to scanning without raising an exception."""
     new_usb = [{"domain": "test1", "vid": "3039"}]
@@ -728,7 +728,7 @@ async def test_aiousbwatcher_on_wsl_fallback_without_throwing_exception(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -746,7 +746,7 @@ async def test_aiousbwatcher_on_wsl_fallback_without_throwing_exception(
     assert mock_config_flow.mock_calls[0][1][0] == "test1"
 
 
-async def test_discovered_by_aiousbwatcher_before_started(hass: HomeAssistant) -> None:
+async def test_discovered_by_aiousbwatcher_before_started(hass: SmartHub) -> None:
     """Test a device is discovered since aiousbwatcher is now running."""
     new_usb = [{"domain": "test1", "vid": "3039", "pid": "3039"}]
 
@@ -772,10 +772,10 @@ async def test_discovered_by_aiousbwatcher_before_started(hass: HomeAssistant) -
 
     with (
         patch("sys.platform", "linux"),
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=initial_ports),
         patch(
-            "homeassistant.components.usb.AIOUSBWatcher", return_value=MockAIOUSBWatcher
+            "smarthub.components.usb.AIOUSBWatcher", return_value=MockAIOUSBWatcher
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -881,7 +881,7 @@ def test_human_readable_device_name() -> None:
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_async_is_plugged_in(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test async_is_plugged_in."""
     new_usb = [{"domain": "test1", "vid": "3039", "pid": "3039"}]
@@ -903,7 +903,7 @@ async def test_async_is_plugged_in(
     }
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=[]),
         patch.object(hass.config_entries.flow, "async_init"),
     ):
@@ -937,14 +937,14 @@ async def test_async_is_plugged_in(
     ],
 )
 async def test_async_is_plugged_in_case_enforcement(
-    hass: HomeAssistant, matcher
+    hass: SmartHub, matcher
 ) -> None:
     """Test `async_is_plugged_in` throws an error when incorrect cases are used."""
 
     new_usb = [{"domain": "test1", "vid": "ABCD"}]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=[]),
         patch.object(hass.config_entries.flow, "async_init"),
     ):
@@ -959,13 +959,13 @@ async def test_async_is_plugged_in_case_enforcement(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_web_socket_triggers_discovery_request_callbacks(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the websocket call triggers a discovery request callback."""
     mock_callback = Mock()
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=[]),
+        patch("smarthub.components.usb.async_get_usb", return_value=[]),
         patch_scanned_serial_ports(return_value=[]),
         patch.object(hass.config_entries.flow, "async_init"),
     ):
@@ -994,14 +994,14 @@ async def test_web_socket_triggers_discovery_request_callbacks(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_initial_scan_callback(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test it's possible to register a callback when the initial scan is done."""
     mock_callback_1 = Mock()
     mock_callback_2 = Mock()
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=[]),
+        patch("smarthub.components.usb.async_get_usb", return_value=[]),
         patch_scanned_serial_ports(return_value=[]),
         patch.object(hass.config_entries.flow, "async_init"),
     ):
@@ -1030,13 +1030,13 @@ async def test_initial_scan_callback(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_cancel_initial_scan_callback(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test it's possible to cancel an initial scan callback."""
     mock_callback = Mock()
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=[]),
+        patch("smarthub.components.usb.async_get_usb", return_value=[]),
         patch_scanned_serial_ports(return_value=[]),
         patch.object(hass.config_entries.flow, "async_init"),
     ):
@@ -1056,7 +1056,7 @@ async def test_cancel_initial_scan_callback(
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
 async def test_resolve_serial_by_id(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the discovery data resolves to serial/by-id."""
     new_usb = [{"domain": "test1", "vid": "3039", "pid": "3039"}]
@@ -1073,10 +1073,10 @@ async def test_resolve_serial_by_id(
     ]
 
     with (
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=mock_ports),
         patch(
-            "homeassistant.components.usb.get_serial_by_id",
+            "smarthub.components.usb.get_serial_by_id",
             return_value="/dev/serial/by-id/bla",
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
@@ -1171,7 +1171,7 @@ async def test_resolve_serial_by_id(
     ],
 )
 async def test_cp2102n_ordering_on_macos(
-    ports: list[MagicMock], hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    ports: list[MagicMock], hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test CP2102N ordering on macOS."""
 
@@ -1181,7 +1181,7 @@ async def test_cp2102n_ordering_on_macos(
 
     with (
         patch("sys.platform", "darwin"),
-        patch("homeassistant.components.usb.async_get_usb", return_value=new_usb),
+        patch("smarthub.components.usb.async_get_usb", return_value=new_usb),
         patch_scanned_serial_ports(return_value=ports),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
     ):
@@ -1207,7 +1207,7 @@ async def test_cp2102n_ordering_on_macos(
     [
         (
             "UsbServiceInfo",
-            "homeassistant.helpers.service_info.usb.UsbServiceInfo",
+            "smarthub.helpers.service_info.usb.UsbServiceInfo",
             UsbServiceInfo,
         ),
     ],
@@ -1230,9 +1230,9 @@ def test_deprecated_constants(
 
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
-@patch("homeassistant.components.usb.REQUEST_SCAN_COOLDOWN", 0)
+@patch("smarthub.components.usb.REQUEST_SCAN_COOLDOWN", 0)
 async def test_register_port_event_callback(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the registration of a port event callback."""
 
@@ -1323,9 +1323,9 @@ async def test_register_port_event_callback(
 
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
-@patch("homeassistant.components.usb.REQUEST_SCAN_COOLDOWN", 0)
+@patch("smarthub.components.usb.REQUEST_SCAN_COOLDOWN", 0)
 async def test_register_port_event_callback_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -1369,7 +1369,7 @@ async def test_register_port_event_callback_failure(
     # Add two new ports
     with (
         patch_scanned_serial_ports(return_value=[port1, port2]),
-        caplog.at_level(logging.ERROR, logger="homeassistant.components.usb"),
+        caplog.at_level(logging.ERROR, logger="smarthub.components.usb"),
     ):
         await ws_client.send_json({"id": 1, "type": "usb/scan"})
         response = await ws_client.receive_json()

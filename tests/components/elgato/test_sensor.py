@@ -3,8 +3,8 @@
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = [
     pytest.mark.parametrize("device_fixtures", ["key-light-mini"]),
@@ -24,7 +24,7 @@ pytestmark = [
     ],
 )
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -53,7 +53,7 @@ async def test_sensors(
     ],
 )
 async def test_disabled_by_default_sensors(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, entity_id: str
+    hass: SmartHub, entity_registry: er.EntityRegistry, entity_id: str
 ) -> None:
     """Test the disabled by default Elgato sensors."""
     assert not hass.states.get(entity_id)

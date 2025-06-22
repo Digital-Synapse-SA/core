@@ -9,8 +9,8 @@ import pytest
 import respx
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .conftest import (
@@ -33,7 +33,7 @@ TESTDATA_IDS = [f.stem for f in TESTDATA_FILES]
 
 @respx.mock
 async def test_empty_calendar(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     get_events: GetEventsFn,
 ) -> None:
@@ -118,7 +118,7 @@ async def test_empty_calendar(
 @respx.mock
 async def test_api_date_time_event(
     get_events: GetEventsFn,
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     ics_content: str,
 ) -> None:
@@ -165,7 +165,7 @@ async def test_api_date_time_event(
 @respx.mock
 async def test_api_date_event(
     get_events: GetEventsFn,
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test an event with a start/end date all day event."""
@@ -215,7 +215,7 @@ async def test_api_date_event(
 @respx.mock
 async def test_active_event(
     get_events: GetEventsFn,
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test an event with a start/end date time."""
@@ -257,7 +257,7 @@ async def test_active_event(
 @respx.mock
 async def test_upcoming_event(
     get_events: GetEventsFn,
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test an event with a start/end date time."""
@@ -298,7 +298,7 @@ async def test_upcoming_event(
 @respx.mock
 async def test_recurring_event(
     get_events: GetEventsFn,
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test an event with a recurrence rule."""
@@ -362,7 +362,7 @@ async def test_recurring_event(
 )
 async def test_all_day_iter_order(
     get_events: GetEventsFn,
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     event_order: list[str],
 ) -> None:
@@ -406,7 +406,7 @@ async def test_all_day_iter_order(
 @respx.mock
 @pytest.mark.parametrize("ics_filename", TESTDATA_FILES, ids=TESTDATA_IDS)
 async def test_calendar_examples(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     get_events: GetEventsFn,
     ics_filename: pathlib.Path,

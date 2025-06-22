@@ -9,12 +9,12 @@ from unittest.mock import patch
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components.trace.const import DEFAULT_STORED_TRACES
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import Context, CoreState, HomeAssistant, callback
-from homeassistant.helpers.typing import UNDEFINED
-from homeassistant.setup import async_setup_component
-from homeassistant.util.uuid import random_uuid_hex
+from smarthub.components.trace.const import DEFAULT_STORED_TRACES
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import Context, CoreState, SmartHub, callback
+from smarthub.helpers.typing import UNDEFINED
+from smarthub.setup import async_setup_component
+from smarthub.util.uuid import random_uuid_hex
 
 from tests.common import async_load_fixture
 from tests.typing import WebSocketGenerator
@@ -39,7 +39,7 @@ def _find_traces(traces, trace_type, item_id):
 
 
 async def _setup_automation_or_script(
-    hass: HomeAssistant,
+    hass: SmartHub,
     domain: str,
     configs: list[dict[str, Any]],
     script_config: dict[str, Any] | None = None,
@@ -71,7 +71,7 @@ async def _setup_automation_or_script(
 
 
 async def _run_automation_or_script(
-    hass: HomeAssistant,
+    hass: SmartHub,
     domain: str,
     config: dict[str, Any],
     event: str,
@@ -131,7 +131,7 @@ async def _assert_contexts(client, next_id, contexts, domain=None, item_id=None)
 )
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_get_trace(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_ws_client: WebSocketGenerator,
     domain,
@@ -142,7 +142,7 @@ async def test_get_trace(
     condition_results,
 ) -> None:
     """Test tracing a script or automation."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     msg_id = 1
 
     def next_id():
@@ -435,7 +435,7 @@ async def test_get_trace(
 
 @pytest.mark.parametrize("domain", ["automation", "script"])
 async def test_restore_traces(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_ws_client: WebSocketGenerator,
     domain: str,
@@ -510,7 +510,7 @@ async def test_restore_traces(
 
 @pytest.mark.parametrize("domain", ["automation", "script"])
 async def test_get_invalid_trace(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, domain
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, domain
 ) -> None:
     """Test getting a non-existing trace."""
     assert await async_setup_component(hass, domain, {domain: {}})
@@ -534,7 +534,7 @@ async def test_get_invalid_trace(
     [("automation", None), ("automation", 10), ("script", None), ("script", 10)],
 )
 async def test_trace_overflow(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, domain, stored_traces
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, domain, stored_traces
 ) -> None:
     """Test the number of stored traces per script or automation is limited."""
     msg_id = 1
@@ -586,7 +586,7 @@ async def test_trace_overflow(
 
     # Trigger "moon" enough times to overflow the max number of stored traces
     with patch(
-        "homeassistant.components.trace.models.uuid_util.random_uuid_hex",
+        "smarthub.components.trace.models.uuid_util.random_uuid_hex",
         wraps=mock_random_uuid_hex,
     ):
         for _ in range(stored_traces or DEFAULT_STORED_TRACES):
@@ -608,7 +608,7 @@ async def test_trace_overflow(
     ("domain", "num_restored_moon_traces"), [("automation", 3), ("script", 1)]
 )
 async def test_restore_traces_overflow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_ws_client: WebSocketGenerator,
     domain: str,
@@ -666,7 +666,7 @@ async def test_restore_traces_overflow(
 
     # Trigger "moon" enough times to overflow the max number of stored traces
     with patch(
-        "homeassistant.components.trace.models.uuid_util.random_uuid_hex",
+        "smarthub.components.trace.models.uuid_util.random_uuid_hex",
         wraps=mock_random_uuid_hex,
     ):
         for _ in range(DEFAULT_STORED_TRACES - num_restored_moon_traces + 1):
@@ -690,7 +690,7 @@ async def test_restore_traces_overflow(
     [("automation", 3, "e2c97432afe9b8a42d7983588ed5e6ef"), ("script", 1, "")],
 )
 async def test_restore_traces_late_overflow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_ws_client: WebSocketGenerator,
     domain: str,
@@ -738,7 +738,7 @@ async def test_restore_traces_late_overflow(
 
     # Trigger "moon" enough times to overflow the max number of stored traces
     with patch(
-        "homeassistant.components.trace.models.uuid_util.random_uuid_hex",
+        "smarthub.components.trace.models.uuid_util.random_uuid_hex",
         wraps=mock_random_uuid_hex,
     ):
         for _ in range(DEFAULT_STORED_TRACES - num_restored_moon_traces + 1):
@@ -759,7 +759,7 @@ async def test_restore_traces_late_overflow(
 
 @pytest.mark.parametrize("domain", ["automation", "script"])
 async def test_trace_no_traces(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, domain
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, domain
 ) -> None:
     """Test the storing traces for a script or automation can be disabled."""
     msg_id = 1
@@ -819,7 +819,7 @@ async def test_trace_no_traces(
     ],
 )
 async def test_list_traces(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     domain,
     prefix,
@@ -828,7 +828,7 @@ async def test_list_traces(
     script_execution,
 ) -> None:
     """Test listing script and automation traces."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     msg_id = 1
 
     def next_id():
@@ -955,7 +955,7 @@ async def test_list_traces(
     [("automation", "action", {"trigger/0"}), ("script", "sequence", set())],
 )
 async def test_nested_traces(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     domain,
     prefix,
@@ -1019,7 +1019,7 @@ async def test_nested_traces(
     ("domain", "prefix"), [("automation", "action"), ("script", "sequence")]
 )
 async def test_breakpoints(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, domain, prefix
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, domain, prefix
 ) -> None:
     """Test script and automation breakpoints."""
     msg_id = 1
@@ -1189,7 +1189,7 @@ async def test_breakpoints(
     ("domain", "prefix"), [("automation", "action"), ("script", "sequence")]
 )
 async def test_breakpoints_2(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, domain, prefix
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, domain, prefix
 ) -> None:
     """Test execution resumes and breakpoints are removed after subscription removed."""
     msg_id = 1
@@ -1294,7 +1294,7 @@ async def test_breakpoints_2(
     ("domain", "prefix"), [("automation", "action"), ("script", "sequence")]
 )
 async def test_breakpoints_3(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, domain, prefix
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, domain, prefix
 ) -> None:
     """Test breakpoints can be cleared."""
     msg_id = 1
@@ -1446,7 +1446,7 @@ async def test_breakpoints_3(
     ],
 )
 async def test_script_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     script_mode,
     max_runs,
@@ -1515,7 +1515,7 @@ async def test_script_mode(
     [("restart", "cancelled"), ("parallel", "finished")],
 )
 async def test_script_mode_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     script_mode,
     script_execution,
@@ -1591,11 +1591,11 @@ async def test_script_mode_2(
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_trace_blueprint_automation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test trace of blueprint automation."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     msg_id = 1
 
     def next_id():

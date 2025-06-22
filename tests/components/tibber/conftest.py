@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 import pytest
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.tibber.const import DOMAIN
-from homeassistant.const import CONF_ACCESS_TOKEN
-from homeassistant.core import HomeAssistant
+from smarthub.components.recorder import Recorder
+from smarthub.components.tibber.const import DOMAIN
+from smarthub.const import CONF_ACCESS_TOKEN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-def config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def config_entry(hass: SmartHub) -> MockConfigEntry:
     """Tibber config entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -27,7 +27,7 @@ def config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 @pytest.fixture
 async def mock_tibber_setup(
-    recorder_mock: Recorder, config_entry: MockConfigEntry, hass: HomeAssistant
+    recorder_mock: Recorder, config_entry: MockConfigEntry, hass: SmartHub
 ) -> AsyncGenerator[MagicMock]:
     """Mock tibber entry setup."""
     unique_user_id = "unique_user_id"

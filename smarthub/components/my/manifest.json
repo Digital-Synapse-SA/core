@@ -1,0 +1,9 @@
+{
+  "domain": "my",
+  "name": "My SmartHub",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["frontend"],
+  "documentation": "https://www.smart-hub.io/integrations/my",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

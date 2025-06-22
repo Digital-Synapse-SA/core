@@ -3,13 +3,13 @@
 from pymodbus.exceptions import ModbusException
 import pytest
 
-from homeassistant.components.homeassistant import SERVICE_UPDATE_ENTITY
-from homeassistant.components.light import (
+from smarthub.components.smarthub import SERVICE_UPDATE_ENTITY
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP_KELVIN,
     DOMAIN as LIGHT_DOMAIN,
 )
-from homeassistant.components.modbus.const import (
+from smarthub.components.modbus.const import (
     CALL_TYPE_COIL,
     CALL_TYPE_DISCRETE,
     CALL_TYPE_REGISTER_HOLDING,
@@ -24,7 +24,7 @@ from homeassistant.components.modbus.const import (
     CONF_WRITE_TYPE,
     MODBUS_DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_ADDRESS,
     CONF_COMMAND_OFF,
@@ -40,8 +40,8 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant, State
-from homeassistant.setup import async_setup_component
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub, State
+from smarthub.setup import async_setup_component
 
 from .conftest import TEST_ENTITY_NAME, ReadResult
 
@@ -151,7 +151,7 @@ ENTITY_ID2 = f"{ENTITY_ID}_2"
         },
     ],
 )
-async def test_config_light(hass: HomeAssistant, mock_modbus) -> None:
+async def test_config_light(hass: SmartHub, mock_modbus) -> None:
     """Run configuration test for light."""
     assert LIGHT_DOMAIN in hass.config.components
 
@@ -216,7 +216,7 @@ async def test_config_light(hass: HomeAssistant, mock_modbus) -> None:
         ),
     ],
 )
-async def test_all_light(hass: HomeAssistant, mock_do_cycle, expected) -> None:
+async def test_all_light(hass: SmartHub, mock_do_cycle, expected) -> None:
     """Run test for given config."""
     assert hass.states.get(ENTITY_ID).state == expected
 
@@ -264,7 +264,7 @@ async def test_all_light(hass: HomeAssistant, mock_do_cycle, expected) -> None:
     ],
 )
 async def test_restore_state_light(
-    hass: HomeAssistant, mock_test_state, mock_modbus
+    hass: SmartHub, mock_test_state, mock_modbus
 ) -> None:
     """Test Modbus Light restore state with brightness and color_temp."""
 
@@ -305,7 +305,7 @@ async def test_restore_state_light(
     ],
 )
 async def test_light_service_turn(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_modbus,
 ) -> None:
@@ -398,7 +398,7 @@ async def test_light_service_turn(
     ],
 )
 async def test_color_temp_brightness_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_modbus_ha,
     service_data,
     expected_calls,
@@ -480,11 +480,11 @@ async def test_color_temp_brightness_light(
     ],
 )
 async def test_service_light_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_modbus_ha,
     input_output_values,
 ) -> None:
-    """Run test for service homeassistant.update_entity."""
+    """Run test for service smarthub.update_entity."""
     await hass.services.async_call(
         HOMEASSISTANT_DOMAIN,
         SERVICE_UPDATE_ENTITY,
@@ -528,7 +528,7 @@ async def test_service_light_update(
 
 
 async def test_no_discovery_info_light(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup without discovery info."""
     assert LIGHT_DOMAIN not in hass.config.components

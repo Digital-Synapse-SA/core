@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .const import TOKEN
 
@@ -16,9 +16,9 @@ def client_fixture() -> Generator[MagicMock]:
     client = MagicMock()
     with (
         patch(
-            "homeassistant.components.remember_the_milk.entity.Rtm"
+            "smarthub.components.remember_the_milk.entity.Rtm"
         ) as entity_client_class,
-        patch("homeassistant.components.remember_the_milk.Rtm") as client_class,
+        patch("smarthub.components.remember_the_milk.Rtm") as client_class,
     ):
         entity_client_class.return_value = client
         client_class.return_value = client
@@ -37,10 +37,10 @@ def client_fixture() -> Generator[MagicMock]:
 
 
 @pytest.fixture
-async def storage(hass: HomeAssistant, client) -> AsyncGenerator[MagicMock]:
+async def storage(hass: SmartHub, client) -> AsyncGenerator[MagicMock]:
     """Mock the config storage."""
     with patch(
-        "homeassistant.components.remember_the_milk.RememberTheMilkConfiguration"
+        "smarthub.components.remember_the_milk.RememberTheMilkConfiguration"
     ) as storage_class:
         storage = storage_class.return_value
         storage.get_token.return_value = TOKEN

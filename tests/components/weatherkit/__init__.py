@@ -5,15 +5,15 @@ from unittest.mock import patch
 
 from apple_weatherkit import DataSetType
 
-from homeassistant.components.weatherkit.const import (
+from smarthub.components.weatherkit.const import (
     CONF_KEY_ID,
     CONF_KEY_PEM,
     CONF_SERVICE_ID,
     CONF_TEAM_ID,
     DOMAIN,
 )
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -21,7 +21,7 @@ EXAMPLE_CONFIG_DATA = {
     CONF_LATITUDE: 35.4690101707532,
     CONF_LONGITUDE: 135.74817234593166,
     CONF_KEY_ID: "QABCDEFG123",
-    CONF_SERVICE_ID: "io.home-assistant.testing",
+    CONF_SERVICE_ID: "io.smart-hub.testing",
     CONF_TEAM_ID: "ABCD123456",
     CONF_KEY_PEM: "-----BEGIN PRIVATE KEY-----\nwhateverkey\n-----END PRIVATE KEY-----",
 }
@@ -54,11 +54,11 @@ def mock_weather_response(
 
     with (
         patch(
-            "homeassistant.components.weatherkit.WeatherKitApiClient.get_weather_data",
+            "smarthub.components.weatherkit.WeatherKitApiClient.get_weather_data",
             return_value=weather_response,
         ),
         patch(
-            "homeassistant.components.weatherkit.WeatherKitApiClient.get_availability",
+            "smarthub.components.weatherkit.WeatherKitApiClient.get_availability",
             return_value=available_data_sets,
         ),
     ):
@@ -66,9 +66,9 @@ def mock_weather_response(
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> MockConfigEntry:
-    """Set up the WeatherKit integration in Home Assistant."""
+    """Set up the WeatherKit integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Home",

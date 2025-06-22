@@ -5,11 +5,11 @@ from unittest.mock import patch
 from plexapi.exceptions import NotFound
 import requests_mock
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 async def test_plex_tv_clients(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry,
     setup_plex_server,
     requests_mock: requests_mock.Mocker,

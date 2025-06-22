@@ -8,16 +8,16 @@ from bimmer_connected.models import MyBMWAPIError, MyBMWAuthError
 from httpx import RequestError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.bmw_connected_drive.config_flow import DOMAIN
-from homeassistant.components.bmw_connected_drive.const import (
+from smarthub import config_entries
+from smarthub.components.bmw_connected_drive.config_flow import DOMAIN
+from smarthub.components.bmw_connected_drive.const import (
     CONF_CAPTCHA_TOKEN,
     CONF_READ_ONLY,
     CONF_REFRESH_TOKEN,
 )
-from homeassistant.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     BIMMER_CONNECTED_LOGIN_PATCH,
@@ -42,7 +42,7 @@ def login_sideeffect(self: MyBMWAuthentication):
     self.gcid = FIXTURE_GCID
 
 
-async def test_full_user_flow_implementation(hass: HomeAssistant) -> None:
+async def test_full_user_flow_implementation(hass: SmartHub) -> None:
     """Test registering an integration and finishing flow works."""
     with (
         patch(
@@ -51,7 +51,7 @@ async def test_full_user_flow_implementation(hass: HomeAssistant) -> None:
             autospec=True,
         ),
         patch(
-            "homeassistant.components.bmw_connected_drive.async_setup_entry",
+            "smarthub.components.bmw_connected_drive.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -88,7 +88,7 @@ async def test_full_user_flow_implementation(hass: HomeAssistant) -> None:
     ],
 )
 async def test_error_display_with_successful_login(
-    hass: HomeAssistant, side_effect: Exception, error: str
+    hass: SmartHub, side_effect: Exception, error: str
 ) -> None:
     """Test we show user form on MyBMW authentication error and are still able to succeed."""
 
@@ -113,7 +113,7 @@ async def test_error_display_with_successful_login(
             autospec=True,
         ),
         patch(
-            "homeassistant.components.bmw_connected_drive.async_setup_entry",
+            "smarthub.components.bmw_connected_drive.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -140,7 +140,7 @@ async def test_error_display_with_successful_login(
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_unique_id_existing(hass: HomeAssistant) -> None:
+async def test_unique_id_existing(hass: SmartHub) -> None:
     """Test registering an integration and when the unique id already exists."""
 
     mock_config_entry = MockConfigEntry(**FIXTURE_CONFIG_ENTRY)
@@ -164,7 +164,7 @@ async def test_unique_id_existing(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("bmw_fixture")
-async def test_captcha_flow_missing_error(hass: HomeAssistant) -> None:
+async def test_captcha_flow_missing_error(hass: SmartHub) -> None:
     """Test the external flow with captcha failing once and succeeding the second time."""
 
     result = await hass.config_entries.flow.async_init(
@@ -185,7 +185,7 @@ async def test_captcha_flow_missing_error(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "missing_captcha"}
 
 
-async def test_options_flow_implementation(hass: HomeAssistant) -> None:
+async def test_options_flow_implementation(hass: SmartHub) -> None:
     """Test config flow options."""
     with (
         patch(
@@ -193,7 +193,7 @@ async def test_options_flow_implementation(hass: HomeAssistant) -> None:
             return_value=[],
         ),
         patch(
-            "homeassistant.components.bmw_connected_drive.async_setup_entry",
+            "smarthub.components.bmw_connected_drive.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -222,7 +222,7 @@ async def test_options_flow_implementation(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 2
 
 
-async def test_reauth(hass: HomeAssistant) -> None:
+async def test_reauth(hass: SmartHub) -> None:
     """Test the reauth form."""
     with (
         patch(
@@ -231,7 +231,7 @@ async def test_reauth(hass: HomeAssistant) -> None:
             autospec=True,
         ),
         patch(
-            "homeassistant.components.bmw_connected_drive.async_setup_entry",
+            "smarthub.components.bmw_connected_drive.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -272,7 +272,7 @@ async def test_reauth(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 2
 
 
-async def test_reconfigure(hass: HomeAssistant) -> None:
+async def test_reconfigure(hass: SmartHub) -> None:
     """Test the reconfiguration form."""
     with patch(
         BIMMER_CONNECTED_LOGIN_PATCH,

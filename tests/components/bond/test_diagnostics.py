@@ -1,7 +1,7 @@
 """Test bond diagnostics."""
 
-from homeassistant.components.fan import DOMAIN as FAN_DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.fan import DOMAIN as FAN_DOMAIN
+from smarthub.core import SmartHub
 
 from .common import ceiling_fan_with_breeze, setup_platform
 
@@ -10,7 +10,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test generating diagnostics for a config entry."""
 

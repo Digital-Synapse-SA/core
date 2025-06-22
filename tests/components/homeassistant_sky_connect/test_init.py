@@ -1,15 +1,15 @@
-"""Test the Home Assistant SkyConnect integration."""
+"""Test the SmartHub SkyConnect integration."""
 
 from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.homeassistant_hardware.util import (
+from smarthub.components.smarthub_hardware.util import (
     ApplicationType,
     FirmwareInfo,
 )
-from homeassistant.components.homeassistant_sky_connect.const import (
+from smarthub.components.smarthub_sky_connect.const import (
     DESCRIPTION,
     DOMAIN,
     MANUFACTURER,
@@ -18,12 +18,12 @@ from homeassistant.components.homeassistant_sky_connect.const import (
     SERIAL_NUMBER,
     VID,
 )
-from homeassistant.components.usb import USBDevice
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.usb import USBDevice
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STARTED
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.components.usb import (
@@ -33,7 +33,7 @@ from tests.components.usb import (
 )
 
 
-async def test_config_entry_migration_v2(hass: HomeAssistant) -> None:
+async def test_config_entry_migration_v2(hass: SmartHub) -> None:
     """Test migrating config entries from v1 to v2 format."""
 
     config_entry = MockConfigEntry(
@@ -53,7 +53,7 @@ async def test_config_entry_migration_v2(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.homeassistant_sky_connect.guess_firmware_info",
+        "smarthub.components.smarthub_sky_connect.guess_firmware_info",
         return_value=FirmwareInfo(
             device="/dev/serial/by-id/usb-Nabu_Casa_SkyConnect_v1.0_9e2adbd75b8beb119fe564a0f320645d-if00-port0",
             firmware_version=None,
@@ -81,7 +81,7 @@ async def test_config_entry_migration_v2(hass: HomeAssistant) -> None:
     await hass.config_entries.async_unload(config_entry.entry_id)
 
 
-async def test_setup_fails_on_missing_usb_port(hass: HomeAssistant) -> None:
+async def test_setup_fails_on_missing_usb_port(hass: SmartHub) -> None:
     """Test setup failing when the USB port is missing."""
 
     config_entry = MockConfigEntry(
@@ -106,7 +106,7 @@ async def test_setup_fails_on_missing_usb_port(hass: HomeAssistant) -> None:
 
     # Set up the config entry
     with patch(
-        "homeassistant.components.homeassistant_sky_connect.os.path.exists"
+        "smarthub.components.smarthub_sky_connect.os.path.exists"
     ) as mock_exists:
         mock_exists.return_value = False
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -124,7 +124,7 @@ async def test_setup_fails_on_missing_usb_port(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("force_usb_polling_watcher")
-async def test_usb_device_reactivity(hass: HomeAssistant) -> None:
+async def test_usb_device_reactivity(hass: SmartHub) -> None:
     """Test setting up USB monitoring."""
     assert await async_setup_component(hass, "usb", {"usb": {}})
 
@@ -153,7 +153,7 @@ async def test_usb_device_reactivity(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.homeassistant_sky_connect.os.path.exists"
+        "smarthub.components.smarthub_sky_connect.os.path.exists"
     ) as mock_exists:
         mock_exists.return_value = False
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -197,7 +197,7 @@ async def test_usb_device_reactivity(hass: HomeAssistant) -> None:
         assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_bad_config_entry_fixing(hass: HomeAssistant) -> None:
+async def test_bad_config_entry_fixing(hass: SmartHub) -> None:
     """Test fixing/deleting config entries with bad data."""
 
     # Newly-added ZBT-1
@@ -265,7 +265,7 @@ async def test_bad_config_entry_fixing(hass: HomeAssistant) -> None:
     fixable_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.homeassistant_sky_connect.scan_serial_ports",
+        "smarthub.components.smarthub_sky_connect.scan_serial_ports",
         return_value=[
             USBDevice(
                 device="/dev/serial/by-id/usb-Nabu_Casa_SkyConnect_v1.0_4f5f3b26d59f8714a78b599690741999-if00-port0",
@@ -277,7 +277,7 @@ async def test_bad_config_entry_fixing(hass: HomeAssistant) -> None:
             )
         ],
     ):
-        await async_setup_component(hass, "homeassistant_sky_connect", {})
+        await async_setup_component(hass, "smarthub_sky_connect", {})
 
     assert hass.config_entries.async_get_entry(new_entry.entry_id) is not None
     assert hass.config_entries.async_get_entry(old_entry.entry_id) is not None

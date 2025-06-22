@@ -13,8 +13,8 @@ from influxdb_client.rest import ApiException
 import pytest
 from voluptuous import Invalid
 
-from homeassistant.components import sensor
-from homeassistant.components.influxdb.const import (
+from smarthub.components import sensor
+from smarthub.components.influxdb.const import (
     API_VERSION_2,
     DEFAULT_API_VERSION,
     DEFAULT_BUCKET,
@@ -23,16 +23,16 @@ from homeassistant.components.influxdb.const import (
     TEST_QUERY_V1,
     TEST_QUERY_V2,
 )
-from homeassistant.components.influxdb.sensor import PLATFORM_SCHEMA
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.entity_platform import PLATFORM_NOT_READY_BASE_WAIT_TIME
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.influxdb.sensor import PLATFORM_SCHEMA
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub, State
+from smarthub.helpers.entity_platform import PLATFORM_NOT_READY_BASE_WAIT_TIME
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
-INFLUXDB_PATH = "homeassistant.components.influxdb"
+INFLUXDB_PATH = "smarthub.components.influxdb"
 INFLUXDB_CLIENT_PATH = f"{INFLUXDB_PATH}.InfluxDBClient"
 INFLUXDB_SENSOR_PATH = f"{INFLUXDB_PATH}.sensor"
 
@@ -191,7 +191,7 @@ def _set_query_mock_v2(
 
 
 async def _setup(
-    hass: HomeAssistant, config_ext, queries, expected_sensors
+    hass: SmartHub, config_ext, queries, expected_sensors
 ) -> list[State]:
     """Create client and test expected sensors."""
     config = {
@@ -223,7 +223,7 @@ async def _setup(
     indirect=["mock_client"],
 )
 async def test_minimal_config(
-    hass: HomeAssistant, mock_client, config_ext, queries, set_query_mock
+    hass: SmartHub, mock_client, config_ext, queries, set_query_mock
 ) -> None:
     """Test the minimal config and defaults."""
     set_query_mock(mock_client)
@@ -295,7 +295,7 @@ async def test_minimal_config(
     indirect=["mock_client"],
 )
 async def test_full_config(
-    hass: HomeAssistant, mock_client, config_ext, queries, set_query_mock
+    hass: SmartHub, mock_client, config_ext, queries, set_query_mock
 ) -> None:
     """Test the full config."""
     set_query_mock(mock_client)
@@ -303,7 +303,7 @@ async def test_full_config(
 
 
 @pytest.mark.parametrize("config_ext", [(BASE_V1_CONFIG), (BASE_V2_CONFIG)])
-async def test_config_failure(hass: HomeAssistant, config_ext) -> None:
+async def test_config_failure(hass: SmartHub, config_ext) -> None:
     """Test an invalid config."""
     config = {"platform": DOMAIN}
     config.update(config_ext)
@@ -333,7 +333,7 @@ async def test_config_failure(hass: HomeAssistant, config_ext) -> None:
     indirect=["mock_client"],
 )
 async def test_state_matches_query_result(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client,
     config_ext,
     queries,
@@ -369,7 +369,7 @@ async def test_state_matches_query_result(
     indirect=["mock_client"],
 )
 async def test_state_matches_first_query_result_for_multiple_return(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_client,
     config_ext,
@@ -401,7 +401,7 @@ async def test_state_matches_first_query_result_for_multiple_return(
     indirect=["mock_client"],
 )
 async def test_state_for_no_results(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_client,
     config_ext,
@@ -467,7 +467,7 @@ async def test_state_for_no_results(
     indirect=["mock_client"],
 )
 async def test_error_querying_influx(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_client,
     config_ext,
@@ -526,7 +526,7 @@ async def test_error_querying_influx(
     indirect=["mock_client"],
 )
 async def test_error_rendering_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_client,
     config_ext,
@@ -607,7 +607,7 @@ async def test_error_rendering_template(
     indirect=["mock_client"],
 )
 async def test_connection_error_at_startup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_client,
     config_ext,
@@ -660,7 +660,7 @@ async def test_connection_error_at_startup(
     indirect=["mock_client"],
 )
 async def test_data_repository_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_client,
     config_ext,

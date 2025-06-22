@@ -4,10 +4,10 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.atag import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.atag import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import UID, USER_INPUT, init_integration, mock_connection
 
@@ -17,7 +17,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_show_form(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that the form is served with no input."""
     mock_connection(aioclient_mock)
@@ -30,7 +30,7 @@ async def test_show_form(
 
 
 async def test_adding_second_device(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that only one Atag configuration is allowed."""
     await init_integration(hass, aioclient_mock, unique_id=UID)
@@ -52,7 +52,7 @@ async def test_adding_second_device(
 
 
 async def test_connection_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we show user form on Atag connection error."""
     mock_connection(aioclient_mock, conn_error=True)
@@ -68,7 +68,7 @@ async def test_connection_error(
 
 
 async def test_unauthorized(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we show correct form when Unauthorized error is raised."""
     mock_connection(aioclient_mock, authorized=False)
@@ -83,7 +83,7 @@ async def test_unauthorized(
 
 
 async def test_full_flow_implementation(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test registering an integration and finishing flow works."""
     mock_connection(aioclient_mock)

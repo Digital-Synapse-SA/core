@@ -4,8 +4,8 @@ from datetime import datetime
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -88,7 +88,7 @@ grid_entity_ids = {
 
 
 async def test_sensors_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -110,7 +110,7 @@ async def test_sensors_created(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -141,7 +141,7 @@ async def test_sensors(
 
 
 async def test_timestamp_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -163,7 +163,7 @@ async def test_timestamp_sensors(
 
 
 async def test_sensor_update(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test if the sensors get updated when there is new data."""
     client, _, _ = await init_integration(

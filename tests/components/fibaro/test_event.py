@@ -2,9 +2,9 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import init_integration
 
@@ -12,7 +12,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_entity_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
@@ -25,7 +25,7 @@ async def test_entity_setup(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_button_device]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.EVENT]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.EVENT]):
         # Act
         await init_integration(hass, mock_config_entry)
         # Assert

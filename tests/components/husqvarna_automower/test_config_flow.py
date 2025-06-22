@@ -6,16 +6,16 @@ from aioautomower.const import API_BASE_URL
 from aioautomower.session import AutomowerEndpoint
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.husqvarna_automower.const import (
+from smarthub import config_entries
+from smarthub.components.husqvarna_automower.const import (
     DOMAIN,
     OAUTH2_AUTHORIZE,
     OAUTH2_TOKEN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from . import setup_integration
 from .const import CLIENT_ID, USER_ID
@@ -36,7 +36,7 @@ from tests.typing import ClientSessionGenerator
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     jwt: str,
@@ -89,7 +89,7 @@ async def test_full_flow(
     )
     with (
         patch(
-            "homeassistant.components.husqvarna_automower.async_setup_entry",
+            "smarthub.components.husqvarna_automower.async_setup_entry",
             return_value=True,
         ) as mock_setup,
     ):
@@ -101,7 +101,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_config_non_unique_profile(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mock_config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
@@ -162,7 +162,7 @@ async def test_config_non_unique_profile(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_config_entry: MockConfigEntry,
@@ -217,7 +217,7 @@ async def test_reauth(
     )
 
     with patch(
-        "homeassistant.components.husqvarna_automower.async_setup_entry",
+        "smarthub.components.husqvarna_automower.async_setup_entry",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
@@ -242,7 +242,7 @@ async def test_reauth(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_wrong_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_config_entry: MockConfigEntry,
@@ -297,7 +297,7 @@ async def test_reauth_wrong_account(
     )
 
     with patch(
-        "homeassistant.components.husqvarna_automower.async_setup_entry",
+        "smarthub.components.husqvarna_automower.async_setup_entry",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])

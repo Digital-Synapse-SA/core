@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 BASE_COMPONENT = "notify"
 
@@ -22,7 +22,7 @@ def reset_log_level():
     logger.setLevel(orig_level)
 
 
-async def test_apprise_config_load_fail01(hass: HomeAssistant) -> None:
+async def test_apprise_config_load_fail01(hass: SmartHub) -> None:
     """Test apprise configuration failures 1."""
 
     config = {
@@ -30,7 +30,7 @@ async def test_apprise_config_load_fail01(hass: HomeAssistant) -> None:
     }
 
     with patch(
-        "homeassistant.components.apprise.notify.apprise.AppriseConfig.add",
+        "smarthub.components.apprise.notify.apprise.AppriseConfig.add",
         return_value=False,
     ):
         assert await async_setup_component(hass, BASE_COMPONENT, config)
@@ -40,7 +40,7 @@ async def test_apprise_config_load_fail01(hass: HomeAssistant) -> None:
         assert not hass.services.has_service(BASE_COMPONENT, "test")
 
 
-async def test_apprise_config_load_fail02(hass: HomeAssistant) -> None:
+async def test_apprise_config_load_fail02(hass: SmartHub) -> None:
     """Test apprise configuration failures 2."""
 
     config = {
@@ -49,11 +49,11 @@ async def test_apprise_config_load_fail02(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.apprise.notify.apprise.Apprise.add",
+            "smarthub.components.apprise.notify.apprise.Apprise.add",
             return_value=False,
         ),
         patch(
-            "homeassistant.components.apprise.notify.apprise.AppriseConfig.add",
+            "smarthub.components.apprise.notify.apprise.AppriseConfig.add",
             return_value=True,
         ),
     ):
@@ -64,7 +64,7 @@ async def test_apprise_config_load_fail02(hass: HomeAssistant) -> None:
         assert not hass.services.has_service(BASE_COMPONENT, "test")
 
 
-async def test_apprise_config_load_okay(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_apprise_config_load_okay(hass: SmartHub, tmp_path: Path) -> None:
     """Test apprise configuration failures."""
 
     # Test cases where our URL is invalid
@@ -82,7 +82,7 @@ async def test_apprise_config_load_okay(hass: HomeAssistant, tmp_path: Path) -> 
     assert hass.services.has_service(BASE_COMPONENT, "test")
 
 
-async def test_apprise_url_load_fail(hass: HomeAssistant) -> None:
+async def test_apprise_url_load_fail(hass: SmartHub) -> None:
     """Test apprise url failure."""
 
     config = {
@@ -93,7 +93,7 @@ async def test_apprise_url_load_fail(hass: HomeAssistant) -> None:
         }
     }
     with patch(
-        "homeassistant.components.apprise.notify.apprise.Apprise.add",
+        "smarthub.components.apprise.notify.apprise.Apprise.add",
         return_value=False,
     ):
         assert await async_setup_component(hass, BASE_COMPONENT, config)
@@ -103,7 +103,7 @@ async def test_apprise_url_load_fail(hass: HomeAssistant) -> None:
         assert not hass.services.has_service(BASE_COMPONENT, "test")
 
 
-async def test_apprise_notification(hass: HomeAssistant) -> None:
+async def test_apprise_notification(hass: SmartHub) -> None:
     """Test apprise notification."""
 
     config = {
@@ -118,7 +118,7 @@ async def test_apprise_notification(hass: HomeAssistant) -> None:
     data = {"title": "Test Title", "message": "Test Message"}
 
     with patch(
-        "homeassistant.components.apprise.notify.apprise.Apprise"
+        "smarthub.components.apprise.notify.apprise.Apprise"
     ) as mock_apprise:
         obj = MagicMock()
         obj.add.return_value = True
@@ -141,7 +141,7 @@ async def test_apprise_notification(hass: HomeAssistant) -> None:
         )
 
 
-async def test_apprise_multiple_notification(hass: HomeAssistant) -> None:
+async def test_apprise_multiple_notification(hass: SmartHub) -> None:
     """Test apprise notification."""
 
     config = {
@@ -159,7 +159,7 @@ async def test_apprise_multiple_notification(hass: HomeAssistant) -> None:
     data = {"title": "Test Title", "message": "Test Message"}
 
     with patch(
-        "homeassistant.components.apprise.notify.apprise.Apprise"
+        "smarthub.components.apprise.notify.apprise.Apprise"
     ) as mock_apprise:
         obj = MagicMock()
         obj.add.return_value = True
@@ -183,7 +183,7 @@ async def test_apprise_multiple_notification(hass: HomeAssistant) -> None:
 
 
 async def test_apprise_notification_with_target(
-    hass: HomeAssistant, tmp_path: Path
+    hass: SmartHub, tmp_path: Path
 ) -> None:
     """Test apprise notification with a target."""
 
@@ -202,7 +202,7 @@ async def test_apprise_notification_with_target(
     data = {"title": "Test Title", "message": "Test Message", "target": ["devops"]}
 
     with patch(
-        "homeassistant.components.apprise.notify.apprise.Apprise"
+        "smarthub.components.apprise.notify.apprise.Apprise"
     ) as mock_apprise:
         apprise_obj = MagicMock()
         apprise_obj.add.return_value = True

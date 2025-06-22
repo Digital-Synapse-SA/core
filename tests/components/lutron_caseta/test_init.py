@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import lutron_caseta
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components import lutron_caseta
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import MockBridge, async_setup_integration, make_mock_entry
 
@@ -19,7 +19,7 @@ from . import MockBridge, async_setup_integration, make_mock_entry
     ],
 )
 async def test_timeout_during_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     constant: str,
     message: str,
@@ -42,7 +42,7 @@ async def test_timeout_during_setup(
 
 
 async def test_cannot_connect(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test failing to connect."""
     mock_entry = make_mock_entry()

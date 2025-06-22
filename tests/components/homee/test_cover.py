@@ -6,15 +6,15 @@ import pytest
 from websockets import frames
 from websockets.exceptions import ConnectionClosed
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_POSITION,
     ATTR_TILT_POSITION,
     DOMAIN as COVER_DOMAIN,
     CoverEntityFeature,
     CoverState,
 )
-from homeassistant.components.homee.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.homee.const import DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_CLOSE_COVER_TILT,
@@ -24,8 +24,8 @@ from homeassistant.const import (
     SERVICE_SET_COVER_TILT_POSITION,
     SERVICE_STOP_COVER,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import build_mock_node, setup_integration
 
@@ -33,7 +33,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_open_close_stop_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -67,7 +67,7 @@ async def test_open_close_stop_cover(
 
 
 async def test_open_close_reverse_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -96,7 +96,7 @@ async def test_open_close_reverse_cover(
 
 
 async def test_set_cover_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -131,7 +131,7 @@ async def test_set_cover_position(
 
 
 async def test_close_open_slats(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -166,7 +166,7 @@ async def test_close_open_slats(
 
 
 async def test_close_open_reversed_slats(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -202,7 +202,7 @@ async def test_close_open_reversed_slats(
 
 
 async def test_set_slat_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -238,7 +238,7 @@ async def test_set_slat_position(
 
 
 async def test_cover_positions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -298,7 +298,7 @@ async def test_cover_positions(
 
 
 async def test_reversed_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -326,7 +326,7 @@ async def test_reversed_cover(
 
 
 async def test_send_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -338,7 +338,7 @@ async def test_send_error(
     mock_homee.set_value.side_effect = ConnectionClosed(
         rcvd=frames.Close(1002, "Protocol Error"), sent=None
     )
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,

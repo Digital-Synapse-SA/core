@@ -8,22 +8,22 @@ from reolink_aio.api import Chime
 from reolink_aio.baichuan import Baichuan
 from reolink_aio.exceptions import ReolinkError
 
-from homeassistant.components.reolink.config_flow import DEFAULT_PROTOCOL
-from homeassistant.components.reolink.const import (
+from smarthub.components.reolink.config_flow import DEFAULT_PROTOCOL
+from smarthub.components.reolink.const import (
     CONF_BC_PORT,
     CONF_SUPPORTS_PRIVACY_MODE,
     CONF_USE_HTTPS,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_PROTOCOL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import format_mac
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import format_mac
 
 from tests.common import MockConfigEntry
 
@@ -57,7 +57,7 @@ TEST_BC_PORT = 5678
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.reolink.async_setup_entry", return_value=True
+        "smarthub.components.reolink.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -169,7 +169,7 @@ def reolink_connect_class() -> Generator[MagicMock]:
     """Mock reolink connection and return both the host_mock and host_mock_class."""
     with (
         patch(
-            "homeassistant.components.reolink.host.Host", autospec=True
+            "smarthub.components.reolink.host.Host", autospec=True
         ) as host_mock_class,
     ):
         host_mock = host_mock_class.return_value
@@ -190,7 +190,7 @@ def reolink_connect(
 def reolink_host() -> Generator[MagicMock]:
     """Mock reolink Host class."""
     with patch(
-        "homeassistant.components.reolink.host.Host", autospec=False
+        "smarthub.components.reolink.host.Host", autospec=False
     ) as host_mock_class:
         host_mock = host_mock_class.return_value
         host_mock.baichuan = MagicMock()
@@ -201,12 +201,12 @@ def reolink_host() -> Generator[MagicMock]:
 @pytest.fixture
 def reolink_platforms() -> Generator[None]:
     """Mock reolink entry setup."""
-    with patch("homeassistant.components.reolink.PLATFORMS", return_value=[]):
+    with patch("smarthub.components.reolink.PLATFORMS", return_value=[]):
         yield
 
 
 @pytest.fixture
-def config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def config_entry(hass: SmartHub) -> MockConfigEntry:
     """Add the reolink mock config entry to hass."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

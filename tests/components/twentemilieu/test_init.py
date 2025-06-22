@@ -4,15 +4,15 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_twentemilieu")
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the Twente Milieu configuration entry loading/unloading."""
@@ -29,12 +29,12 @@ async def test_load_unload_config_entry(
 
 
 @patch(
-    "homeassistant.components.twentemilieu.coordinator.TwenteMilieu.update",
+    "smarthub.components.twentemilieu.coordinator.TwenteMilieu.update",
     side_effect=RuntimeError,
 )
 async def test_config_entry_not_ready(
     mock_request: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the Twente Milieu configuration entry not ready."""

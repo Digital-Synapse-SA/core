@@ -19,17 +19,17 @@ from uiprotect.data import (
 )
 from uiprotect.data.nvr import DoorbellMessage
 
-from homeassistant.components.select import ATTR_OPTIONS
-from homeassistant.components.unifiprotect.const import DEFAULT_ATTRIBUTION
-from homeassistant.components.unifiprotect.select import (
+from smarthub.components.select import ATTR_OPTIONS
+from smarthub.components.unifiprotect.const import DEFAULT_ATTRIBUTION
+from smarthub.components.unifiprotect.select import (
     CAMERA_SELECTS,
     LIGHT_MODE_OFF,
     LIGHT_SELECTS,
     VIEWER_SELECTS,
 )
-from homeassistant.const import ATTR_ATTRIBUTION, ATTR_ENTITY_ID, ATTR_OPTION, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ATTRIBUTION, ATTR_ENTITY_ID, ATTR_OPTION, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .utils import (
     MockUFPFixture,
@@ -42,7 +42,7 @@ from .utils import (
 
 
 async def test_select_camera_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, unadopted_camera: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, unadopted_camera: Camera
 ) -> None:
     """Test removing and re-adding a camera device."""
 
@@ -56,7 +56,7 @@ async def test_select_camera_remove(
 
 
 async def test_select_light_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, light: Light
+    hass: SmartHub, ufp: MockUFPFixture, light: Light
 ) -> None:
     """Test removing and re-adding a light device."""
 
@@ -70,7 +70,7 @@ async def test_select_light_remove(
 
 
 async def test_select_viewer_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, viewer: Viewer
+    hass: SmartHub, ufp: MockUFPFixture, viewer: Viewer
 ) -> None:
     """Test removing and re-adding a light device."""
 
@@ -84,7 +84,7 @@ async def test_select_viewer_remove(
 
 
 async def test_select_setup_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     light: Light,
@@ -113,7 +113,7 @@ async def test_select_setup_light(
 
 
 async def test_select_setup_viewer(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     viewer: Viewer,
@@ -142,7 +142,7 @@ async def test_select_setup_viewer(
 
 
 async def test_select_setup_camera_all(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -176,7 +176,7 @@ async def test_select_setup_camera_all(
 
 
 async def test_select_setup_camera_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -207,7 +207,7 @@ async def test_select_setup_camera_none(
 
 
 async def test_select_update_liveview(
-    hass: HomeAssistant, ufp: MockUFPFixture, viewer: Viewer, liveview: Liveview
+    hass: SmartHub, ufp: MockUFPFixture, viewer: Viewer, liveview: Liveview
 ) -> None:
     """Test select entity update (new Liveview)."""
 
@@ -243,7 +243,7 @@ async def test_select_update_liveview(
 
 
 async def test_select_update_doorbell_settings(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test select entity update (new Doorbell Message)."""
 
@@ -289,7 +289,7 @@ async def test_select_update_doorbell_settings(
 
 
 async def test_select_update_doorbell_message(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test select entity update (change doorbell message)."""
 
@@ -323,7 +323,7 @@ async def test_select_update_doorbell_message(
 
 
 async def test_select_set_option_light_motion(
-    hass: HomeAssistant, ufp: MockUFPFixture, light: Light
+    hass: SmartHub, ufp: MockUFPFixture, light: Light
 ) -> None:
     """Test Light Mode select."""
 
@@ -348,7 +348,7 @@ async def test_select_set_option_light_motion(
 
 
 async def test_select_set_option_light_camera(
-    hass: HomeAssistant, ufp: MockUFPFixture, light: Light, camera: Camera
+    hass: SmartHub, ufp: MockUFPFixture, light: Light, camera: Camera
 ) -> None:
     """Test Paired Camera select."""
 
@@ -382,7 +382,7 @@ async def test_select_set_option_light_camera(
 
 
 async def test_select_set_option_camera_recording(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test Recording Mode select."""
 
@@ -407,7 +407,7 @@ async def test_select_set_option_camera_recording(
 
 
 async def test_select_set_option_camera_ir(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test Infrared Mode select."""
 
@@ -432,7 +432,7 @@ async def test_select_set_option_camera_ir(
 
 
 async def test_select_set_option_camera_doorbell_custom(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test Doorbell Text select (user defined message)."""
 
@@ -459,7 +459,7 @@ async def test_select_set_option_camera_doorbell_custom(
 
 
 async def test_select_set_option_camera_doorbell_unifi(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test Doorbell Text select (unifi message)."""
 
@@ -501,7 +501,7 @@ async def test_select_set_option_camera_doorbell_unifi(
 
 
 async def test_select_set_option_camera_doorbell_default(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test Doorbell Text select (default message)."""
 
@@ -529,7 +529,7 @@ async def test_select_set_option_camera_doorbell_default(
 
 
 async def test_select_set_option_viewer(
-    hass: HomeAssistant, ufp: MockUFPFixture, viewer: Viewer, liveview: Liveview
+    hass: SmartHub, ufp: MockUFPFixture, viewer: Viewer, liveview: Liveview
 ) -> None:
     """Test Liveview select."""
 

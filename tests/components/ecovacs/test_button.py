@@ -11,12 +11,12 @@ from deebot_client.events import LifeSpan
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.ecovacs.const import DOMAIN
-from homeassistant.components.ecovacs.controller import EcovacsController
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.ecovacs.const import DOMAIN
+from smarthub.components.ecovacs.controller import EcovacsController
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = [
     pytest.mark.usefixtures("init_integration"),
@@ -99,7 +99,7 @@ def platforms() -> Platform | list[Platform]:
     ids=["yna5x1", "5xu9h3", "qhe2o2"],
 )
 async def test_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -155,7 +155,7 @@ async def test_buttons(
     ],
 )
 async def test_disabled_by_default_buttons(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, entity_ids: list[str]
+    hass: SmartHub, entity_registry: er.EntityRegistry, entity_ids: list[str]
 ) -> None:
     """Test the disabled by default buttons."""
     for entity_id in entity_ids:

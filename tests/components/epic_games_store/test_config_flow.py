@@ -3,12 +3,12 @@
 from http.client import HTTPException
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.epic_games_store.config_flow import get_default_language
-from homeassistant.components.epic_games_store.const import DOMAIN
-from homeassistant.const import CONF_COUNTRY, CONF_LANGUAGE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.epic_games_store.config_flow import get_default_language
+from smarthub.components.epic_games_store.const import DOMAIN
+from smarthub.const import CONF_COUNTRY, CONF_LANGUAGE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import (
     DATA_ERROR_ATTRIBUTE_NOT_FOUND,
@@ -19,7 +19,7 @@ from .const import (
 )
 
 
-async def test_default_language(hass: HomeAssistant) -> None:
+async def test_default_language(hass: SmartHub) -> None:
     """Test we get the form."""
     hass.config.language = "fr"
     hass.config.country = "FR"
@@ -34,7 +34,7 @@ async def test_default_language(hass: HomeAssistant) -> None:
     assert get_default_language(hass) is None
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -43,7 +43,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.epic_games_store.config_flow.EpicGamesStoreAPI.get_free_games",
+        "smarthub.components.epic_games_store.config_flow.EpicGamesStoreAPI.get_free_games",
         return_value=DATA_FREE_GAMES,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -67,14 +67,14 @@ async def test_form(hass: HomeAssistant) -> None:
     }
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.epic_games_store.config_flow.EpicGamesStoreAPI.get_free_games",
+        "smarthub.components.epic_games_store.config_flow.EpicGamesStoreAPI.get_free_games",
         side_effect=HTTPException,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -89,14 +89,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_cannot_connect_wrong_param(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect_wrong_param(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.epic_games_store.config_flow.EpicGamesStoreAPI.get_free_games",
+        "smarthub.components.epic_games_store.config_flow.EpicGamesStoreAPI.get_free_games",
         return_value=DATA_ERROR_WRONG_COUNTRY,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -111,14 +111,14 @@ async def test_form_cannot_connect_wrong_param(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_service_error(hass: HomeAssistant) -> None:
+async def test_form_service_error(hass: SmartHub) -> None:
     """Test we handle service error gracefully."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.epic_games_store.config_flow.EpicGamesStoreAPI.get_free_games",
+        "smarthub.components.epic_games_store.config_flow.EpicGamesStoreAPI.get_free_games",
         return_value=DATA_ERROR_ATTRIBUTE_NOT_FOUND,
     ):
         result2 = await hass.config_entries.flow.async_configure(

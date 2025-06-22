@@ -5,13 +5,13 @@ from datetime import datetime
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.dremel_3d_printer.const import DOMAIN
-from homeassistant.components.sensor import (
+from smarthub.components.dremel_3d_printer.const import DOMAIN
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
@@ -19,16 +19,16 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfTime,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import UTC
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import UTC
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("connection", "entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
 ) -> None:

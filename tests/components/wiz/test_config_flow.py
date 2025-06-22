@@ -5,14 +5,14 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from pywizlight.exceptions import WizLightConnectionError, WizLightTimeOutError
 
-from homeassistant import config_entries
-from homeassistant.components.wiz.config_flow import CONF_DEVICE
-from homeassistant.components.wiz.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.wiz.config_flow import CONF_DEVICE
+from smarthub.components.wiz.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import (
     FAKE_DIMMABLE_BULB,
@@ -45,7 +45,7 @@ INTEGRATION_DISCOVERY = {
 }
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -56,11 +56,11 @@ async def test_form(hass: HomeAssistant) -> None:
     with (
         _patch_wizlight(),
         patch(
-            "homeassistant.components.wiz.async_setup_entry",
+            "smarthub.components.wiz.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.wiz.async_setup", return_value=True
+            "smarthub.components.wiz.async_setup", return_value=True
         ) as mock_setup,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -78,7 +78,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_flow_enters_dns_name(hass: HomeAssistant) -> None:
+async def test_user_flow_enters_dns_name(hass: SmartHub) -> None:
     """Test we reject dns names and want ips."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -98,11 +98,11 @@ async def test_user_flow_enters_dns_name(hass: HomeAssistant) -> None:
     with (
         _patch_wizlight(),
         patch(
-            "homeassistant.components.wiz.async_setup_entry",
+            "smarthub.components.wiz.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.wiz.async_setup", return_value=True
+            "smarthub.components.wiz.async_setup", return_value=True
         ) as mock_setup,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -130,7 +130,7 @@ async def test_user_flow_enters_dns_name(hass: HomeAssistant) -> None:
     ],
 )
 async def test_user_form_exceptions(
-    hass: HomeAssistant, side_effect, error_base
+    hass: SmartHub, side_effect, error_base
 ) -> None:
     """Test all user exceptions in the flow."""
     result = await hass.config_entries.flow.async_init(
@@ -138,7 +138,7 @@ async def test_user_form_exceptions(
     )
 
     with patch(
-        "homeassistant.components.wiz.wizlight.getBulbConfig",
+        "smarthub.components.wiz.wizlight.getBulbConfig",
         side_effect=side_effect,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -150,7 +150,7 @@ async def test_user_form_exceptions(
     assert result2["errors"] == {"base": error_base}
 
 
-async def test_form_updates_unique_id(hass: HomeAssistant) -> None:
+async def test_form_updates_unique_id(hass: SmartHub) -> None:
     """Test a duplicate id aborts and updates existing entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -182,11 +182,11 @@ async def test_form_updates_unique_id(hass: HomeAssistant) -> None:
     ],
 )
 async def test_discovered_by_dhcp_connection_fails(
-    hass: HomeAssistant, source, data
+    hass: SmartHub, source, data
 ) -> None:
     """Test we abort on connection failure."""
     with patch(
-        "homeassistant.components.wiz.wizlight.getBulbConfig",
+        "smarthub.components.wiz.wizlight.getBulbConfig",
         side_effect=WizLightTimeOutError,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -260,7 +260,7 @@ async def test_discovered_by_dhcp_connection_fails(
     ],
 )
 async def test_discovered_by_dhcp_or_integration_discovery(
-    hass: HomeAssistant, source, data, bulb_type, extended_white_range, name
+    hass: SmartHub, source, data, bulb_type, extended_white_range, name
 ) -> None:
     """Test we can configure when discovered from dhcp or discovery."""
     with _patch_wizlight(
@@ -279,11 +279,11 @@ async def test_discovered_by_dhcp_or_integration_discovery(
             device=None, extended_white_range=extended_white_range, bulb_type=bulb_type
         ),
         patch(
-            "homeassistant.components.wiz.async_setup_entry",
+            "smarthub.components.wiz.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.wiz.async_setup", return_value=True
+            "smarthub.components.wiz.async_setup", return_value=True
         ) as mock_setup,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -309,7 +309,7 @@ async def test_discovered_by_dhcp_or_integration_discovery(
     ],
 )
 async def test_discovered_by_dhcp_or_integration_discovery_updates_host(
-    hass: HomeAssistant, source, data
+    hass: SmartHub, source, data
 ) -> None:
     """Test dhcp or discovery updates existing host."""
     entry = MockConfigEntry(
@@ -338,7 +338,7 @@ async def test_discovered_by_dhcp_or_integration_discovery_updates_host(
     ],
 )
 async def test_discovered_by_dhcp_or_integration_discovery_avoid_waiting_for_retry(
-    hass: HomeAssistant, source, data
+    hass: SmartHub, source, data
 ) -> None:
     """Test dhcp or discovery kicks off setup when in retry."""
     bulb = _mocked_wizlight(None, None, FAKE_SOCKET)
@@ -359,7 +359,7 @@ async def test_discovered_by_dhcp_or_integration_discovery_avoid_waiting_for_ret
     assert entry.state is ConfigEntryState.LOADED
 
 
-async def test_setup_via_discovery(hass: HomeAssistant) -> None:
+async def test_setup_via_discovery(hass: SmartHub) -> None:
     """Test setting up via discovery."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -396,10 +396,10 @@ async def test_setup_via_discovery(hass: HomeAssistant) -> None:
     with (
         _patch_wizlight(),
         patch(
-            "homeassistant.components.wiz.async_setup", return_value=True
+            "smarthub.components.wiz.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.wiz.async_setup_entry", return_value=True
+            "smarthub.components.wiz.async_setup_entry", return_value=True
         ) as mock_setup_entry,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -432,7 +432,7 @@ async def test_setup_via_discovery(hass: HomeAssistant) -> None:
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_setup_via_discovery_cannot_connect(hass: HomeAssistant) -> None:
+async def test_setup_via_discovery_cannot_connect(hass: SmartHub) -> None:
     """Test setting up via discovery and we fail to connect to the discovered device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -452,7 +452,7 @@ async def test_setup_via_discovery_cannot_connect(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wiz.wizlight.getBulbConfig",
+            "smarthub.components.wiz.wizlight.getBulbConfig",
             side_effect=WizLightTimeOutError,
         ),
         _patch_discovery(),
@@ -467,7 +467,7 @@ async def test_setup_via_discovery_cannot_connect(hass: HomeAssistant) -> None:
     assert result3["reason"] == "cannot_connect"
 
 
-async def test_setup_via_discovery_exception_finds_nothing(hass: HomeAssistant) -> None:
+async def test_setup_via_discovery_exception_finds_nothing(hass: SmartHub) -> None:
     """Test we do not find anything if discovery throws."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -478,7 +478,7 @@ async def test_setup_via_discovery_exception_finds_nothing(hass: HomeAssistant) 
     assert not result["errors"]
 
     with patch(
-        "homeassistant.components.wiz.discovery.find_wizlights",
+        "smarthub.components.wiz.discovery.find_wizlights",
         side_effect=OSError,
     ):
         result2 = await hass.config_entries.flow.async_configure(result["flow_id"], {})
@@ -488,7 +488,7 @@ async def test_setup_via_discovery_exception_finds_nothing(hass: HomeAssistant) 
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_discovery_with_firmware_update(hass: HomeAssistant) -> None:
+async def test_discovery_with_firmware_update(hass: SmartHub) -> None:
     """Test we check the device again between first discovery and config entry creation."""
     with _patch_wizlight(
         device=None,
@@ -511,11 +511,11 @@ async def test_discovery_with_firmware_update(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wiz.async_setup_entry",
+            "smarthub.components.wiz.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.wiz.async_setup", return_value=True
+            "smarthub.components.wiz.async_setup", return_value=True
         ) as mock_setup,
         _patch_wizlight(
             device=None,
@@ -545,19 +545,19 @@ async def test_discovery_with_firmware_update(hass: HomeAssistant) -> None:
         (config_entries.SOURCE_INTEGRATION_DISCOVERY, INTEGRATION_DISCOVERY),
     ],
 )
-async def test_discovered_during_onboarding(hass: HomeAssistant, source, data) -> None:
+async def test_discovered_during_onboarding(hass: SmartHub, source, data) -> None:
     """Test dhcp or discovery during onboarding creates the config entry."""
     with (
         _patch_wizlight(),
         patch(
-            "homeassistant.components.wiz.async_setup_entry",
+            "smarthub.components.wiz.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.wiz.async_setup", return_value=True
+            "smarthub.components.wiz.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.onboarding.async_is_onboarded", return_value=False
+            "smarthub.components.onboarding.async_is_onboarded", return_value=False
         ),
     ):
         result = await hass.config_entries.flow.async_init(

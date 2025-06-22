@@ -7,10 +7,10 @@ from aioskybell.helpers.const import BASE_URL, USERS_ME_URL
 import orjson
 import pytest
 
-from homeassistant.components.skybell.const import DOMAIN
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from smarthub.components.skybell.const import DOMAIN
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.helpers.aiohttp_client import async_get_clientsession
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -38,23 +38,23 @@ def skybell_mock():
 
     with (
         patch(
-            "homeassistant.components.skybell.config_flow.Skybell",
+            "smarthub.components.skybell.config_flow.Skybell",
             return_value=mocked_skybell,
         ),
-        patch("homeassistant.components.skybell.Skybell", return_value=mocked_skybell),
+        patch("smarthub.components.skybell.Skybell", return_value=mocked_skybell),
     ):
         yield mocked_skybell
 
 
-def create_entry(hass: HomeAssistant) -> MockConfigEntry:
-    """Create fixture for adding config entry in Home Assistant."""
+def create_entry(hass: SmartHub) -> MockConfigEntry:
+    """Create fixture for adding config entry in SmartHub."""
     entry = MockConfigEntry(domain=DOMAIN, unique_id=USER_ID, data=CONF_DATA)
     entry.add_to_hass(hass)
     return entry
 
 
 async def set_aioclient_responses(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set AioClient responses."""
     aioclient_mock.get(
@@ -98,12 +98,12 @@ async def set_aioclient_responses(
 
 
 @pytest.fixture
-async def connection(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def connection(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Fixture for good connection responses."""
     await set_aioclient_responses(hass, aioclient_mock)
 
 
-async def create_skybell(hass: HomeAssistant) -> Skybell:
+async def create_skybell(hass: SmartHub) -> Skybell:
     """Create Skybell object."""
     skybell = Skybell(
         username=USERNAME,
@@ -115,16 +115,16 @@ async def create_skybell(hass: HomeAssistant) -> Skybell:
     return skybell
 
 
-async def mock_skybell(hass: HomeAssistant):
+async def mock_skybell(hass: SmartHub):
     """Mock Skybell object."""
     return patch(
-        "homeassistant.components.skybell.Skybell",
+        "smarthub.components.skybell.Skybell",
         return_value=await create_skybell(hass),
     )
 
 
-async def async_init_integration(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the Skybell integration in Home Assistant."""
+async def async_init_integration(hass: SmartHub) -> MockConfigEntry:
+    """Set up the Skybell integration in SmartHub."""
     config_entry = create_entry(hass)
 
     with await mock_skybell(hass), patch("aioskybell.utils.async_save_cache"):

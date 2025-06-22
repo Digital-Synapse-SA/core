@@ -4,12 +4,12 @@ from unittest.mock import patch
 
 import aiohttp
 
-from homeassistant.components.nexia.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.nexia.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .util import async_init_integration
 
@@ -17,14 +17,14 @@ from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
-async def test_setup_retry_client_os_error(hass: HomeAssistant) -> None:
+async def test_setup_retry_client_os_error(hass: SmartHub) -> None:
     """Verify we retry setup on aiohttp.ClientOSError."""
     config_entry = await async_init_integration(hass, exception=aiohttp.ClientOSError)
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -54,9 +54,9 @@ async def test_device_remove_devices(
     assert response["success"]
 
 
-async def test_migrate_entry_minor_version_1_2(hass: HomeAssistant) -> None:
+async def test_migrate_entry_minor_version_1_2(hass: SmartHub) -> None:
     """Test migrating a 1.1 config entry to 1.2."""
-    with patch("homeassistant.components.nexia.async_setup_entry", return_value=True):
+    with patch("smarthub.components.nexia.async_setup_entry", return_value=True):
         entry = MockConfigEntry(
             domain=DOMAIN,
             data={CONF_USERNAME: "mock", CONF_PASSWORD: "mock"},

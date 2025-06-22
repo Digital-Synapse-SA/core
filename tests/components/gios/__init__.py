@@ -3,8 +3,8 @@
 import json
 from unittest.mock import patch
 
-from homeassistant.components.gios.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.gios.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 
@@ -15,9 +15,9 @@ STATIONS = [
 
 
 async def init_integration(
-    hass: HomeAssistant, incomplete_data=False, invalid_indexes=False
+    hass: SmartHub, incomplete_data=False, invalid_indexes=False
 ) -> MockConfigEntry:
-    """Set up the GIOS integration in Home Assistant."""
+    """Set up the GIOS integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Home",
@@ -38,19 +38,19 @@ async def init_integration(
 
     with (
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_stations",
+            "smarthub.components.gios.coordinator.Gios._get_stations",
             return_value=STATIONS,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_station",
+            "smarthub.components.gios.coordinator.Gios._get_station",
             return_value=station,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_all_sensors",
+            "smarthub.components.gios.coordinator.Gios._get_all_sensors",
             return_value=sensors,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_indexes",
+            "smarthub.components.gios.coordinator.Gios._get_indexes",
             return_value=indexes,
         ),
     ):

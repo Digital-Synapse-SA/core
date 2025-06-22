@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.demo import DOMAIN
-from homeassistant.components.light import (
+from smarthub.components.demo import DOMAIN
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_BRIGHTNESS_PCT,
     ATTR_COLOR_TEMP_KELVIN,
@@ -19,9 +19,9 @@ from homeassistant.components.light import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 ENTITY_LIGHT = "light.bed_light"
 
@@ -30,14 +30,14 @@ ENTITY_LIGHT = "light.bed_light"
 def light_only() -> Generator[None]:
     """Enable only the light platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.LIGHT],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_comp(hass: HomeAssistant, light_only: None) -> None:
+async def setup_comp(hass: SmartHub, light_only: None) -> None:
     """Set up demo component."""
     assert await async_setup_component(
         hass, LIGHT_DOMAIN, {LIGHT_DOMAIN: {"platform": DOMAIN}}
@@ -45,7 +45,7 @@ async def setup_comp(hass: HomeAssistant, light_only: None) -> None:
     await hass.async_block_till_done()
 
 
-async def test_state_attributes(hass: HomeAssistant) -> None:
+async def test_state_attributes(hass: SmartHub) -> None:
     """Test light state attributes."""
     await hass.services.async_call(
         LIGHT_DOMAIN,
@@ -108,7 +108,7 @@ async def test_state_attributes(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_BRIGHTNESS) == 128
 
 
-async def test_turn_off(hass: HomeAssistant) -> None:
+async def test_turn_off(hass: SmartHub) -> None:
     """Test light turn off method."""
     await hass.services.async_call(
         LIGHT_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: ENTITY_LIGHT}, blocking=True
@@ -125,7 +125,7 @@ async def test_turn_off(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_turn_off_without_entity_id(hass: HomeAssistant) -> None:
+async def test_turn_off_without_entity_id(hass: SmartHub) -> None:
     """Test light turn off all lights."""
     await hass.services.async_call(
         LIGHT_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: "all"}, blocking=True

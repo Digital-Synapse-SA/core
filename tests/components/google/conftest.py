@@ -15,14 +15,14 @@ from oauth2client.client import OAuth2Credentials
 import pytest
 import yaml
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.google import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.google import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -157,14 +157,14 @@ def calendars_config(calendars_config_entity: dict[str, Any]) -> list[dict[str, 
 
 @pytest.fixture
 def mock_calendars_yaml(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calendars_config: list[dict[str, Any]],
 ) -> Generator[Mock]:
     """Fixture that prepares the google_calendars.yaml mocks."""
     mocked_open_function = mock_open(
         read_data=yaml.dump(calendars_config) if calendars_config else None
     )
-    with patch("homeassistant.components.google.open", mocked_open_function):
+    with patch("smarthub.components.google.open", mocked_open_function):
         yield mocked_open_function
 
 
@@ -339,7 +339,7 @@ def mock_insert_event(
 
 
 @pytest.fixture(autouse=True)
-async def set_time_zone(hass: HomeAssistant) -> None:
+async def set_time_zone(hass: SmartHub) -> None:
     """Set the time zone for the tests."""
     # Set our timezone to CST/Regina so we can check calculations
     # This keeps UTC-6 all year round
@@ -348,7 +348,7 @@ async def set_time_zone(hass: HomeAssistant) -> None:
 
 @pytest.fixture
 def component_setup(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> ComponentSetup:
     """Fixture for setting up the integration."""
 

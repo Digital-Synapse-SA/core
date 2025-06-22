@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock, patch
 
 from agent import AgentError
 
-from homeassistant.components.agent_dvr.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.agent_dvr.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import CONF_DATA, create_entry, init_integration
 
@@ -21,13 +21,13 @@ async def _create_mocked_agent(available: bool = True):
 
 def _patch_init_agent(mocked_agent):
     return patch(
-        "homeassistant.components.agent_dvr.Agent",
+        "smarthub.components.agent_dvr.Agent",
         return_value=mocked_agent,
     )
 
 
 async def test_setup_config_and_unload(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup and unload."""
     entry = await init_integration(hass, aioclient_mock)
@@ -41,11 +41,11 @@ async def test_setup_config_and_unload(
     assert entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_async_setup_entry_not_ready(hass: HomeAssistant) -> None:
+async def test_async_setup_entry_not_ready(hass: SmartHub) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     entry = create_entry(hass)
     with patch(
-        "homeassistant.components.agent_dvr.Agent.update",
+        "smarthub.components.agent_dvr.Agent.update",
         side_effect=AgentError,
     ):
         await hass.config_entries.async_setup(entry.entry_id)

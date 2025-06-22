@@ -9,18 +9,18 @@ import os
 from pathlib import Path
 from typing import Final
 
-from homeassistant.const import REQUIRED_PYTHON_VER
+from smarthub.const import REQUIRED_PYTHON_VER
 
 from .model import Config, Integration
 
 # Component modules which should set no_implicit_reexport = true.
 NO_IMPLICIT_REEXPORT_MODULES: set[str] = {
-    "homeassistant.components",
-    "homeassistant.components.application_credentials.*",
-    "homeassistant.components.diagnostics.*",
-    "homeassistant.components.spotify.*",
-    "homeassistant.components.stream.*",
-    "homeassistant.components.update.*",
+    "smarthub.components",
+    "smarthub.components.application_credentials.*",
+    "smarthub.components.diagnostics.*",
+    "smarthub.components.spotify.*",
+    "smarthub.components.stream.*",
+    "smarthub.components.update.*",
 }
 
 HEADER: Final = """
@@ -157,7 +157,7 @@ def _generate_and_validate_mypy_config(config: Config) -> str:
     strict_modules: list[str] = []
     strict_core_modules: list[str] = []
     for module in parsed_modules:
-        if module.startswith("homeassistant.components"):
+        if module.startswith("smarthub.components"):
             strict_modules.append(module)
         else:
             strict_core_modules.append(module)
@@ -200,9 +200,9 @@ def _generate_and_validate_mypy_config(config: Config) -> str:
         for key, value in plugin_config.items():
             mypy_config.set(plugin_name, key, value)
 
-    # By default enable no_implicit_reexport only for homeassistant.*
+    # By default enable no_implicit_reexport only for smarthub.*
     # Disable it afterwards for all components
-    components_section = "mypy-homeassistant.*"
+    components_section = "mypy-smarthub.*"
     mypy_config.add_section(components_section)
     mypy_config.set(components_section, "no_implicit_reexport", "true")
 
@@ -213,7 +213,7 @@ def _generate_and_validate_mypy_config(config: Config) -> str:
             mypy_config.set(core_section, key, "true")
 
     # By default strict checks are disabled for components.
-    components_section = "mypy-homeassistant.components.*"
+    components_section = "mypy-smarthub.components.*"
     mypy_config.add_section(components_section)
     for key in STRICT_SETTINGS:
         mypy_config.set(components_section, key, "false")

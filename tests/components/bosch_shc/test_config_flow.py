@@ -12,12 +12,12 @@ from boschshcpy.exceptions import (
 from boschshcpy.information import SHCInformation
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.bosch_shc.config_flow import write_tls_asset
-from homeassistant.components.bosch_shc.const import CONF_SHC_CERT, CONF_SHC_KEY, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.bosch_shc.config_flow import write_tls_asset
+from smarthub.components.bosch_shc.const import CONF_SHC_CERT, CONF_SHC_KEY, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -37,7 +37,7 @@ DISCOVERY_INFO = ZeroconfServiceInfo(
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_form_user(hass: HomeAssistant) -> None:
+async def test_form_user(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -82,10 +82,10 @@ async def test_form_user(hass: HomeAssistant) -> None:
             },
         ),
         patch("os.mkdir"),
-        patch("homeassistant.components.bosch_shc.config_flow.open"),
+        patch("smarthub.components.bosch_shc.config_flow.open"),
         patch("boschshcpy.session.SHCSession.authenticate") as mock_authenticate,
         patch(
-            "homeassistant.components.bosch_shc.async_setup_entry",
+            "smarthub.components.bosch_shc.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -110,7 +110,7 @@ async def test_form_user(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_form_get_info_connection_error(hass: HomeAssistant) -> None:
+async def test_form_get_info_connection_error(hass: SmartHub) -> None:
     """Test we handle connection error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -132,7 +132,7 @@ async def test_form_get_info_connection_error(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_get_info_exception(hass: HomeAssistant) -> None:
+async def test_form_get_info_exception(hass: SmartHub) -> None:
     """Test we handle exceptions."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -155,7 +155,7 @@ async def test_form_get_info_exception(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_form_pairing_error(hass: HomeAssistant) -> None:
+async def test_form_pairing_error(hass: SmartHub) -> None:
     """Test we handle pairing error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -202,7 +202,7 @@ async def test_form_pairing_error(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_form_user_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_user_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -243,7 +243,7 @@ async def test_form_user_invalid_auth(hass: HomeAssistant) -> None:
             },
         ),
         patch("os.mkdir"),
-        patch("homeassistant.components.bosch_shc.config_flow.open"),
+        patch("smarthub.components.bosch_shc.config_flow.open"),
         patch(
             "boschshcpy.session.SHCSession.authenticate",
             side_effect=SHCAuthenticationError,
@@ -261,7 +261,7 @@ async def test_form_user_invalid_auth(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_form_validate_connection_error(hass: HomeAssistant) -> None:
+async def test_form_validate_connection_error(hass: SmartHub) -> None:
     """Test we handle connection error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -302,7 +302,7 @@ async def test_form_validate_connection_error(hass: HomeAssistant) -> None:
             },
         ),
         patch("os.mkdir"),
-        patch("homeassistant.components.bosch_shc.config_flow.open"),
+        patch("smarthub.components.bosch_shc.config_flow.open"),
         patch(
             "boschshcpy.session.SHCSession.authenticate",
             side_effect=SHCConnectionError,
@@ -320,7 +320,7 @@ async def test_form_validate_connection_error(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_form_validate_session_error(hass: HomeAssistant) -> None:
+async def test_form_validate_session_error(hass: SmartHub) -> None:
     """Test we handle session error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -361,7 +361,7 @@ async def test_form_validate_session_error(hass: HomeAssistant) -> None:
             },
         ),
         patch("os.mkdir"),
-        patch("homeassistant.components.bosch_shc.config_flow.open"),
+        patch("smarthub.components.bosch_shc.config_flow.open"),
         patch(
             "boschshcpy.session.SHCSession.authenticate",
             side_effect=SHCSessionError(""),
@@ -379,7 +379,7 @@ async def test_form_validate_session_error(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_form_validate_exception(hass: HomeAssistant) -> None:
+async def test_form_validate_exception(hass: SmartHub) -> None:
     """Test we handle exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -420,7 +420,7 @@ async def test_form_validate_exception(hass: HomeAssistant) -> None:
             },
         ),
         patch("os.mkdir"),
-        patch("homeassistant.components.bosch_shc.config_flow.open"),
+        patch("smarthub.components.bosch_shc.config_flow.open"),
         patch(
             "boschshcpy.session.SHCSession.authenticate",
             side_effect=Exception,
@@ -438,7 +438,7 @@ async def test_form_validate_exception(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_form_already_configured(hass: HomeAssistant) -> None:
+async def test_form_already_configured(hass: SmartHub) -> None:
     """Test we get the form."""
 
     entry = MockConfigEntry(
@@ -479,7 +479,7 @@ async def test_form_already_configured(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_zeroconf(hass: HomeAssistant) -> None:
+async def test_zeroconf(hass: SmartHub) -> None:
     """Test we get the form."""
 
     with (
@@ -530,12 +530,12 @@ async def test_zeroconf(hass: HomeAssistant) -> None:
             },
         ),
         patch("os.mkdir"),
-        patch("homeassistant.components.bosch_shc.config_flow.open"),
+        patch("smarthub.components.bosch_shc.config_flow.open"),
         patch(
             "boschshcpy.session.SHCSession.authenticate",
         ),
         patch(
-            "homeassistant.components.bosch_shc.async_setup_entry",
+            "smarthub.components.bosch_shc.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -558,7 +558,7 @@ async def test_zeroconf(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_zeroconf_already_configured(hass: HomeAssistant) -> None:
+async def test_zeroconf_already_configured(hass: SmartHub) -> None:
     """Test we get the form."""
 
     entry = MockConfigEntry(
@@ -596,7 +596,7 @@ async def test_zeroconf_already_configured(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_zeroconf_cannot_connect(hass: HomeAssistant) -> None:
+async def test_zeroconf_cannot_connect(hass: SmartHub) -> None:
     """Test we get the form."""
     with patch(
         "boschshcpy.session.SHCSession.mdns_info", side_effect=SHCConnectionError
@@ -611,7 +611,7 @@ async def test_zeroconf_cannot_connect(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_zeroconf_not_bosch_shc(hass: HomeAssistant) -> None:
+async def test_zeroconf_not_bosch_shc(hass: SmartHub) -> None:
     """Test we filter out non-bosch_shc devices."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -631,7 +631,7 @@ async def test_zeroconf_not_bosch_shc(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_reauth(hass: HomeAssistant) -> None:
+async def test_reauth(hass: SmartHub) -> None:
     """Test we get the form."""
 
     mock_config = MockConfigEntry(
@@ -685,10 +685,10 @@ async def test_reauth(hass: HomeAssistant) -> None:
             },
         ),
         patch("os.mkdir"),
-        patch("homeassistant.components.bosch_shc.config_flow.open"),
+        patch("smarthub.components.bosch_shc.config_flow.open"),
         patch("boschshcpy.session.SHCSession.authenticate"),
         patch(
-            "homeassistant.components.bosch_shc.async_setup_entry",
+            "smarthub.components.bosch_shc.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -706,7 +706,7 @@ async def test_reauth(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_tls_assets_writer(hass: HomeAssistant) -> None:
+async def test_tls_assets_writer(hass: SmartHub) -> None:
     """Test we write tls assets to correct location."""
     unique_id = "test-mac"
     assets = {
@@ -717,7 +717,7 @@ async def test_tls_assets_writer(hass: HomeAssistant) -> None:
     with (
         patch("os.mkdir"),
         patch(
-            "homeassistant.components.bosch_shc.config_flow.open", mock_open()
+            "smarthub.components.bosch_shc.config_flow.open", mock_open()
         ) as mocked_file,
     ):
         write_tls_asset(hass, unique_id, CONF_SHC_CERT, assets["cert"])
@@ -734,7 +734,7 @@ async def test_tls_assets_writer(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_register_multiple_controllers(hass: HomeAssistant) -> None:
+async def test_register_multiple_controllers(hass: SmartHub) -> None:
     """Test register multiple controllers.
 
     Each registered controller must get its own key/certificate pair,
@@ -794,10 +794,10 @@ async def test_register_multiple_controllers(hass: HomeAssistant) -> None:
             return_value=controller_1["register"],
         ),
         patch("os.mkdir"),
-        patch("homeassistant.components.bosch_shc.config_flow.open"),
+        patch("smarthub.components.bosch_shc.config_flow.open"),
         patch("boschshcpy.session.SHCSession.authenticate"),
         patch(
-            "homeassistant.components.bosch_shc.async_setup_entry",
+            "smarthub.components.bosch_shc.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -850,10 +850,10 @@ async def test_register_multiple_controllers(hass: HomeAssistant) -> None:
             return_value=controller_2["register"],
         ),
         patch("os.mkdir"),
-        patch("homeassistant.components.bosch_shc.config_flow.open"),
+        patch("smarthub.components.bosch_shc.config_flow.open"),
         patch("boschshcpy.session.SHCSession.authenticate"),
         patch(
-            "homeassistant.components.bosch_shc.async_setup_entry",
+            "smarthub.components.bosch_shc.async_setup_entry",
             return_value=True,
         ),
     ):

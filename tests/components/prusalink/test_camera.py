@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -14,12 +14,12 @@ from tests.typing import ClientSessionGenerator
 @pytest.fixture(autouse=True)
 def setup_camera_platform_only():
     """Only setup camera platform."""
-    with patch("homeassistant.components.prusalink.PLATFORMS", [Platform.CAMERA]):
+    with patch("smarthub.components.prusalink.PLATFORMS", [Platform.CAMERA]):
         yield
 
 
 async def test_camera_no_job(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry,
     mock_api,
     hass_client: ClientSessionGenerator,
@@ -36,7 +36,7 @@ async def test_camera_no_job(
 
 
 async def test_camera_idle_job_mk3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry,
     mock_api,
     mock_job_api_idle_mk3,
@@ -54,7 +54,7 @@ async def test_camera_idle_job_mk3(
 
 
 async def test_camera_active_job(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry,
     mock_api,
     mock_job_api_printing,

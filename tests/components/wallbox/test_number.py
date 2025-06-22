@@ -3,17 +3,17 @@
 import pytest
 import requests_mock
 
-from homeassistant.components.input_number import ATTR_VALUE, SERVICE_SET_VALUE
-from homeassistant.components.number import DOMAIN as NUMBER_DOMAIN
-from homeassistant.components.wallbox import InvalidAuth
-from homeassistant.components.wallbox.const import (
+from smarthub.components.input_number import ATTR_VALUE, SERVICE_SET_VALUE
+from smarthub.components.number import DOMAIN as NUMBER_DOMAIN
+from smarthub.components.wallbox import InvalidAuth
+from smarthub.components.wallbox.const import (
     CHARGER_ENERGY_PRICE_KEY,
     CHARGER_MAX_CHARGING_CURRENT_KEY,
     CHARGER_MAX_ICP_CURRENT_KEY,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryAuthFailed
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import ConfigEntryAuthFailed
 
 from . import (
     authorisation_response,
@@ -31,7 +31,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_wallbox_number_class(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class."""
 
@@ -64,7 +64,7 @@ async def test_wallbox_number_class(
 
 
 async def test_wallbox_number_class_bidir(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class."""
 
@@ -76,7 +76,7 @@ async def test_wallbox_number_class_bidir(
 
 
 async def test_wallbox_number_energy_class(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class."""
 
@@ -107,7 +107,7 @@ async def test_wallbox_number_energy_class(
 
 
 async def test_wallbox_number_class_connection_error(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class."""
 
@@ -138,7 +138,7 @@ async def test_wallbox_number_class_connection_error(
 
 
 async def test_wallbox_number_class_energy_price_connection_error(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class."""
 
@@ -169,7 +169,7 @@ async def test_wallbox_number_class_energy_price_connection_error(
 
 
 async def test_wallbox_number_class_energy_price_auth_error(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class."""
 
@@ -200,7 +200,7 @@ async def test_wallbox_number_class_energy_price_auth_error(
 
 
 async def test_wallbox_number_class_platform_not_ready(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox lock not loaded on authentication error."""
 
@@ -212,7 +212,7 @@ async def test_wallbox_number_class_platform_not_ready(
 
 
 async def test_wallbox_number_class_icp_energy(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class."""
 
@@ -243,7 +243,7 @@ async def test_wallbox_number_class_icp_energy(
 
 
 async def test_wallbox_number_class_icp_energy_auth_error(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class."""
 
@@ -274,7 +274,7 @@ async def test_wallbox_number_class_icp_energy_auth_error(
 
 
 async def test_wallbox_number_class_icp_energy_connection_error(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class."""
 

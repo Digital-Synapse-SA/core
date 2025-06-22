@@ -2,18 +2,18 @@
 
 import pytest
 
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.components.sensor import ATTR_STATE_CLASS, SensorStateClass
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.mark.usefixtures("aioclient_mock_fixture")
-async def test_sensors(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_sensors(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test Flo by Moen sensors."""
     hass.config.units = US_CUSTOMARY_SYSTEM
     config_entry.add_to_hass(hass)
@@ -82,7 +82,7 @@ async def test_sensors(hass: HomeAssistant, config_entry: MockConfigEntry) -> No
 
 @pytest.mark.usefixtures("aioclient_mock_fixture")
 async def test_manual_update_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -91,11 +91,11 @@ async def test_manual_update_entity(
     assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     call_count = aioclient_mock.call_count
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: ["sensor.smart_water_shutoff_current_system_mode"]},
         blocking=True,

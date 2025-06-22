@@ -7,13 +7,13 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.systemmonitor.binary_sensor import get_cpu_icon
-from homeassistant.components.systemmonitor.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.systemmonitor.binary_sensor import get_cpu_icon
+from smarthub.components.systemmonitor.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MockProcess
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     entity_registry: er.EntityRegistry,
@@ -64,7 +64,7 @@ async def test_binary_sensor(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensor_icon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     mock_config_entry: MockConfigEntry,
@@ -80,7 +80,7 @@ async def test_binary_sensor_icon(
 
 
 async def test_sensor_process_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: ConfigEntry,
     mock_psutil: Mock,
     freezer: FrozenDateTimeFactory,

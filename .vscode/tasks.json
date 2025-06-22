@@ -2,9 +2,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Run Home Assistant Core",
+      "label": "Run SmartHub Core",
       "type": "shell",
-      "command": "${command:python.interpreterPath} -m homeassistant -c ./config",
+      "command": "${command:python.interpreterPath} -m smarthub -c ./config",
       "group": "test",
       "presentation": {
         "reveal": "always",
@@ -73,7 +73,7 @@
     {
       "label": "Pylint",
       "type": "shell",
-      "command": "pylint homeassistant",
+      "command": "pylint smarthub",
       "dependsOn": ["Install all Requirements"],
       "group": {
         "kind": "test",
@@ -89,7 +89,7 @@
       "label": "Code Coverage",
       "detail": "Generate code coverage report for a given integration.",
       "type": "shell",
-      "command": "${command:python.interpreterPath} -m pytest ./tests/components/${input:integrationName}/ --cov=homeassistant.components.${input:integrationName} --cov-report term-missing --durations-min=1 --durations=0 --numprocesses=auto",
+      "command": "${command:python.interpreterPath} -m pytest ./tests/components/${input:integrationName}/ --cov=smarthub.components.${input:integrationName} --cov-report term-missing --durations-min=1 --durations=0 --numprocesses=auto",
       "dependsOn": ["Compile English translations"],
       "group": {
         "kind": "test",
@@ -161,7 +161,7 @@
     },
     {
       "label": "Compile English translations",
-      "detail": "In order to test changes to translation files, the translation strings must be compiled into Home Assistant's translation directories.",
+      "detail": "In order to test changes to translation files, the translation strings must be compiled into SmartHub's translation directories.",
       "type": "shell",
       "command": "${command:python.interpreterPath} -m script.translations develop --all",
       "group": {

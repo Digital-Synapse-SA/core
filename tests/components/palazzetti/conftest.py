@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pypalazzetti.temperature import TemperatureDefinition, TemperatureDescriptionKey
 import pytest
 
-from homeassistant.components.palazzetti.const import DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components.palazzetti.const import DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.palazzetti.async_setup_entry",
+        "smarthub.components.palazzetti.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -39,11 +39,11 @@ def mock_palazzetti_client() -> Generator[AsyncMock]:
     """Return a mocked PalazzettiClient."""
     with (
         patch(
-            "homeassistant.components.palazzetti.coordinator.PalazzettiClient",
+            "smarthub.components.palazzetti.coordinator.PalazzettiClient",
             autospec=True,
         ) as client,
         patch(
-            "homeassistant.components.palazzetti.config_flow.PalazzettiClient",
+            "smarthub.components.palazzetti.config_flow.PalazzettiClient",
             new=client,
         ),
     ):
@@ -131,7 +131,7 @@ def mock_palazzetti_client() -> Generator[AsyncMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_palazzetti_client: MagicMock,
 ) -> MockConfigEntry:

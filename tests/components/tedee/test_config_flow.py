@@ -10,11 +10,11 @@ from aiotedee import (
 from aiotedee.bridge import TedeeBridge
 import pytest
 
-from homeassistant.components.tedee.const import CONF_LOCAL_ACCESS_TOKEN, DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigFlowResult
-from homeassistant.const import CONF_HOST, CONF_WEBHOOK_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.tedee.const import CONF_LOCAL_ACCESS_TOKEN, DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigFlowResult
+from smarthub.const import CONF_HOST, CONF_WEBHOOK_ID
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import WEBHOOK_ID
 
@@ -24,10 +24,10 @@ FLOW_UNIQUE_ID = "112233445566778899"
 LOCAL_ACCESS_TOKEN = "api_token"
 
 
-async def test_flow(hass: HomeAssistant, mock_tedee: MagicMock) -> None:
+async def test_flow(hass: SmartHub, mock_tedee: MagicMock) -> None:
     """Test config flow with one bridge."""
     with patch(
-        "homeassistant.components.tedee.config_flow.webhook_generate_id",
+        "smarthub.components.tedee.config_flow.webhook_generate_id",
         return_value=WEBHOOK_ID,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -53,7 +53,7 @@ async def test_flow(hass: HomeAssistant, mock_tedee: MagicMock) -> None:
 
 
 async def test_flow_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -89,7 +89,7 @@ async def test_flow_already_configured(
     ],
 )
 async def test_config_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
     side_effect: Exception,
     error: dict[str, str],
@@ -117,7 +117,7 @@ async def test_config_flow_errors(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_tedee: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_tedee: MagicMock
 ) -> None:
     """Test that the reauth flow works."""
 
@@ -136,7 +136,7 @@ async def test_reauth_flow(
 
 
 async def __do_reconfigure_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> ConfigFlowResult:
     """Initialize a reconfigure flow."""
     mock_config_entry.add_to_hass(hass)
@@ -153,7 +153,7 @@ async def __do_reconfigure_flow(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_tedee: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_tedee: MagicMock
 ) -> None:
     """Test that the reconfigure flow works."""
 
@@ -173,7 +173,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_unique_id_mismatch(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_tedee: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_tedee: MagicMock
 ) -> None:
     """Ensure reconfigure flow aborts when the bride changes."""
 

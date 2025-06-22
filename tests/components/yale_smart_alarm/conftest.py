@@ -10,10 +10,10 @@ import pytest
 from yalesmartalarmclient import YaleDoorManAPI, YaleLock, YaleSmartAlarmData
 from yalesmartalarmclient.const import YALE_STATE_ARM_FULL
 
-from homeassistant.components.yale_smart_alarm.const import DOMAIN, PLATFORMS
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.components.yale_smart_alarm.const import DOMAIN, PLATFORMS
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -33,12 +33,12 @@ async def patch_platform_constant() -> list[Platform]:
 
 @pytest.fixture
 async def load_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_client: Mock,
     load_platforms: list[Platform],
 ) -> tuple[MockConfigEntry, Mock]:
-    """Set up the Yale Smart Living integration in Home Assistant."""
-    with patch("homeassistant.components.yale_smart_alarm.PLATFORMS", load_platforms):
+    """Set up the Yale Smart Living integration in SmartHub."""
+    with patch("smarthub.components.yale_smart_alarm.PLATFORMS", load_platforms):
         config_entry = MockConfigEntry(
             title=ENTRY_CONFIG["username"],
             domain=DOMAIN,
@@ -53,7 +53,7 @@ async def load_config_entry(
 
         config_entry.add_to_hass(hass)
         with patch(
-            "homeassistant.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
+            "smarthub.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
             return_value=get_client,
         ):
             await hass.config_entries.async_setup(config_entry.entry_id)
@@ -72,7 +72,7 @@ async def mock_client(
     data = {"data": cycle["device_status"]}
 
     with patch(
-        "homeassistant.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
+        "smarthub.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
         autospec=True,
     ) as mock_client_class:
         client = mock_client_class.return_value

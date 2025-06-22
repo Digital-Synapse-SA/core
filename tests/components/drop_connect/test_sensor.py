@@ -6,9 +6,9 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     TEST_DATA_ALERT,
@@ -53,7 +53,7 @@ from tests.typing import MqttMockHAClient
 @pytest.fixture(autouse=True)
 def only_sensor_platform() -> Generator[None]:
     """Only setup the DROP sensor platform."""
-    with patch("homeassistant.components.drop_connect.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.drop_connect.PLATFORMS", [Platform.SENSOR]):
         yield
 
 
@@ -116,7 +116,7 @@ def only_sensor_platform() -> Generator[None]:
     ],
 )
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

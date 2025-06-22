@@ -6,16 +6,16 @@ from httpcore import ConnectError
 from wolf_comm.models import Device
 from wolf_comm.token_auth import InvalidAuth
 
-from homeassistant import config_entries
-from homeassistant.components.wolflink.const import (
+from smarthub import config_entries
+from smarthub.components.wolflink.const import (
     DEVICE_GATEWAY,
     DEVICE_ID,
     DEVICE_NAME,
     DOMAIN,
 )
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import CONFIG
 
@@ -29,7 +29,7 @@ INPUT_CONFIG = {
 DEVICE = Device(CONFIG[DEVICE_ID], CONFIG[DEVICE_GATEWAY], CONFIG[DEVICE_NAME])
 
 
-async def test_show_form(hass: HomeAssistant) -> None:
+async def test_show_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -39,10 +39,10 @@ async def test_show_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_device_step_form(hass: HomeAssistant) -> None:
+async def test_device_step_form(hass: SmartHub) -> None:
     """Test we get the second step of config."""
     with patch(
-        "homeassistant.components.wolflink.config_flow.WolfClient.fetch_system_list",
+        "smarthub.components.wolflink.config_flow.WolfClient.fetch_system_list",
         return_value=[DEVICE],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -53,14 +53,14 @@ async def test_device_step_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "device"
 
 
-async def test_create_entry(hass: HomeAssistant) -> None:
+async def test_create_entry(hass: SmartHub) -> None:
     """Test entity creation from device step."""
     with (
         patch(
-            "homeassistant.components.wolflink.config_flow.WolfClient.fetch_system_list",
+            "smarthub.components.wolflink.config_flow.WolfClient.fetch_system_list",
             return_value=[DEVICE],
         ),
-        patch("homeassistant.components.wolflink.async_setup_entry", return_value=True),
+        patch("smarthub.components.wolflink.async_setup_entry", return_value=True),
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}, data=INPUT_CONFIG
@@ -76,10 +76,10 @@ async def test_create_entry(hass: HomeAssistant) -> None:
     assert result_create_entry["data"] == CONFIG
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     with patch(
-        "homeassistant.components.wolflink.config_flow.WolfClient.fetch_system_list",
+        "smarthub.components.wolflink.config_flow.WolfClient.fetch_system_list",
         side_effect=InvalidAuth,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -90,10 +90,10 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     with patch(
-        "homeassistant.components.wolflink.config_flow.WolfClient.fetch_system_list",
+        "smarthub.components.wolflink.config_flow.WolfClient.fetch_system_list",
         side_effect=ConnectError,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -104,10 +104,10 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_unknown_exception(hass: HomeAssistant) -> None:
+async def test_form_unknown_exception(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     with patch(
-        "homeassistant.components.wolflink.config_flow.WolfClient.fetch_system_list",
+        "smarthub.components.wolflink.config_flow.WolfClient.fetch_system_list",
         side_effect=Exception,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -118,14 +118,14 @@ async def test_form_unknown_exception(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "unknown"}
 
 
-async def test_already_configured_error(hass: HomeAssistant) -> None:
+async def test_already_configured_error(hass: SmartHub) -> None:
     """Test already configured while creating entry."""
     with (
         patch(
-            "homeassistant.components.wolflink.config_flow.WolfClient.fetch_system_list",
+            "smarthub.components.wolflink.config_flow.WolfClient.fetch_system_list",
             return_value=[DEVICE],
         ),
-        patch("homeassistant.components.wolflink.async_setup_entry", return_value=True),
+        patch("smarthub.components.wolflink.async_setup_entry", return_value=True),
     ):
         MockConfigEntry(
             domain=DOMAIN, unique_id=str(CONFIG[DEVICE_ID]), data=CONFIG

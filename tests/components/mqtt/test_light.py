@@ -192,8 +192,8 @@ from unittest.mock import call, patch
 
 import pytest
 
-from homeassistant.components import light, mqtt
-from homeassistant.components.mqtt.light.schema_basic import (
+from smarthub.components import light, mqtt
+from smarthub.components.mqtt.light.schema_basic import (
     CONF_BRIGHTNESS_COMMAND_TOPIC,
     CONF_COLOR_TEMP_COMMAND_TOPIC,
     CONF_EFFECT_COMMAND_TOPIC,
@@ -206,9 +206,9 @@ from homeassistant.components.mqtt.light.schema_basic import (
     MQTT_LIGHT_ATTRIBUTES_BLOCKED,
     VALUE_TEMPLATE_KEYS,
 )
-from homeassistant.components.mqtt.models import PublishPayloadType
-from homeassistant.const import ATTR_ASSUMED_STATE, STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, State
+from smarthub.components.mqtt.models import PublishPayloadType
+from smarthub.const import ATTR_ASSUMED_STATE, STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import SmartHub, State
 
 from .common import (
     help_custom_config,
@@ -254,7 +254,7 @@ DEFAULT_CONFIG = {
     "hass_config", [{mqtt.DOMAIN: {light.DOMAIN: {"name": "test"}}}]
 )
 async def test_fail_setup_if_no_command_topic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -278,7 +278,7 @@ async def test_fail_setup_if_no_command_topic(
     ],
 )
 async def test_no_color_brightness_color_temp_hs_white_xy_if_no_topics(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test if there is no color and brightness if no topic."""
     await mqtt_mock_entry()
@@ -402,7 +402,7 @@ async def test_no_color_brightness_color_temp_hs_white_xy_if_no_topics(
     ],
 )
 async def test_no_min_max_kelvin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     min_kelvin: int,
     max_kelvin: int,
@@ -451,7 +451,7 @@ async def test_no_min_max_kelvin(
     ],
 )
 async def test_controlling_state_via_topic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the controlling of the state via topic."""
     color_modes = ["color_temp", "hs", "rgb", "rgbw", "rgbww", "xy"]
@@ -586,7 +586,7 @@ async def test_controlling_state_via_topic(
     ids=["mireds", "kelvin"],
 )
 async def test_controlling_color_mode_state_via_topic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     payload: str,
     kelvin: int,
@@ -637,7 +637,7 @@ async def test_controlling_color_mode_state_via_topic(
     ],
 )
 async def test_received_rgbx_values_set_state_optimistic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the state is set correctly when an rgbx update is received."""
     await mqtt_mock_entry()
@@ -818,7 +818,7 @@ async def test_received_rgbx_values_set_state_optimistic(
     ],
 )
 async def test_invalid_state_via_topic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -936,7 +936,7 @@ async def test_invalid_state_via_topic(
     ],
 )
 async def test_brightness_controlling_scale(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the brightness controlling scale."""
     await mqtt_mock_entry()
@@ -985,7 +985,7 @@ async def test_brightness_controlling_scale(
     ],
 )
 async def test_brightness_from_rgb_controlling_scale(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the brightness controlling scale."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1073,7 +1073,7 @@ async def test_brightness_from_rgb_controlling_scale(
     ],
 )
 async def test_controlling_state_via_topic_with_templates(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of the state with a template."""
     color_modes = ["color_temp", "hs", "rgb", "rgbw", "rgbww", "xy"]
@@ -1179,7 +1179,7 @@ async def test_controlling_state_via_topic_with_templates(
     ],
 )
 async def test_sending_mqtt_commands_and_optimistic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the sending of command in optimistic mode."""
     color_modes = ["color_temp", "hs", "rgb", "rgbw", "rgbww", "xy"]
@@ -1367,7 +1367,7 @@ async def test_sending_mqtt_commands_and_optimistic(
     ],
 )
 async def test_sending_mqtt_rgb_command_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the sending of RGB command with template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1410,7 +1410,7 @@ async def test_sending_mqtt_rgb_command_with_template(
     ],
 )
 async def test_sending_mqtt_rgbw_command_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the sending of RGBW command with template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1453,7 +1453,7 @@ async def test_sending_mqtt_rgbw_command_with_template(
     ],
 )
 async def test_sending_mqtt_rgbww_command_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the sending of RGBWW command with template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1517,7 +1517,7 @@ async def test_sending_mqtt_rgbww_command_with_template(
     ids=["mireds", "kelvin"],
 )
 async def test_sending_mqtt_color_temp_command_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator, payload: str
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator, payload: str
 ) -> None:
     """Test the sending of Color Temp command with template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1556,7 +1556,7 @@ async def test_sending_mqtt_color_temp_command_with_template(
     ],
 )
 async def test_on_command_first(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test on command being sent before brightness."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1597,7 +1597,7 @@ async def test_on_command_first(
     ],
 )
 async def test_on_command_last(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test on command being sent after brightness."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1640,7 +1640,7 @@ async def test_on_command_last(
     ],
 )
 async def test_on_command_brightness(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test on command being sent as only brightness."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1702,7 +1702,7 @@ async def test_on_command_brightness(
     ],
 )
 async def test_on_command_brightness_scaled(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test brightness scale."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1775,7 +1775,7 @@ async def test_on_command_brightness_scaled(
     ],
 )
 async def test_on_command_rgb(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test on command in RGB brightness mode."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1871,7 +1871,7 @@ async def test_on_command_rgb(
     ],
 )
 async def test_on_command_rgbw(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test on command in RGBW brightness mode."""
     mqtt_mock = await mqtt_mock_entry()
@@ -1967,7 +1967,7 @@ async def test_on_command_rgbw(
     ],
 )
 async def test_on_command_rgbww(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test on command in RGBWW brightness mode."""
     mqtt_mock = await mqtt_mock_entry()
@@ -2064,7 +2064,7 @@ async def test_on_command_rgbww(
     ],
 )
 async def test_on_command_rgb_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test on command in RGB brightness mode with RGB template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -2107,7 +2107,7 @@ async def test_on_command_rgb_template(
     ],
 )
 async def test_on_command_rgbw_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test on command in RGBW brightness mode with RGBW template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -2150,7 +2150,7 @@ async def test_on_command_rgbw_template(
     ],
 )
 async def test_on_command_rgbww_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test on command in RGBWW brightness mode with RGBWW template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -2204,7 +2204,7 @@ async def test_on_command_rgbww_template(
     ],
 )
 async def test_on_command_white(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test sending commands for RGB + white light."""
     color_modes = ["rgb", "white"]
@@ -2296,7 +2296,7 @@ async def test_on_command_white(
     ],
 )
 async def test_explicit_color_mode(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test explicit color mode over mqtt."""
     color_modes = ["color_temp", "hs", "rgb", "rgbw", "rgbww", "xy"]
@@ -2442,7 +2442,7 @@ async def test_explicit_color_mode(
     ],
 )
 async def test_explicit_color_mode_templated(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test templated explicit color mode over mqtt."""
     color_modes = ["color_temp", "hs"]
@@ -2537,7 +2537,7 @@ async def test_explicit_color_mode_templated(
     ],
 )
 async def test_white_state_update(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test state updates for RGB + white light."""
     color_modes = ["rgb", "white"]
@@ -2593,7 +2593,7 @@ async def test_white_state_update(
     ],
 )
 async def test_effect(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test effect."""
     mqtt_mock = await mqtt_mock_entry()
@@ -2622,7 +2622,7 @@ async def test_effect(
 
 @pytest.mark.parametrize("hass_config", [DEFAULT_CONFIG])
 async def test_availability_when_connection_lost(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability after MQTT disconnection."""
     await help_test_availability_when_connection_lost(
@@ -2632,7 +2632,7 @@ async def test_availability_when_connection_lost(
 
 @pytest.mark.parametrize("hass_config", [DEFAULT_CONFIG])
 async def test_availability_without_topic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability without defined availability topic."""
     await help_test_availability_without_topic(
@@ -2641,7 +2641,7 @@ async def test_availability_without_topic(
 
 
 async def test_default_availability_payload(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability by default payload with defined topic."""
     await help_test_default_availability_payload(
@@ -2650,7 +2650,7 @@ async def test_default_availability_payload(
 
 
 async def test_custom_availability_payload(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability by custom payload with defined topic."""
     await help_test_custom_availability_payload(
@@ -2659,7 +2659,7 @@ async def test_custom_availability_payload(
 
 
 async def test_setting_attribute_via_mqtt_json_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_attribute_via_mqtt_json_message(
@@ -2668,7 +2668,7 @@ async def test_setting_attribute_via_mqtt_json_message(
 
 
 async def test_setting_blocked_attribute_via_mqtt_json_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_blocked_attribute_via_mqtt_json_message(
@@ -2681,7 +2681,7 @@ async def test_setting_blocked_attribute_via_mqtt_json_message(
 
 
 async def test_setting_attribute_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_attribute_with_template(
@@ -2690,7 +2690,7 @@ async def test_setting_attribute_with_template(
 
 
 async def test_update_with_json_attrs_not_dict(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2701,7 +2701,7 @@ async def test_update_with_json_attrs_not_dict(
 
 
 async def test_update_with_json_attrs_bad_json(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2712,7 +2712,7 @@ async def test_update_with_json_attrs_bad_json(
 
 
 async def test_discovery_update_attr(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered MQTTAttributes."""
     await help_test_discovery_update_attr(
@@ -2744,14 +2744,14 @@ async def test_discovery_update_attr(
     ],
 )
 async def test_unique_id(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test unique id option only creates one light per unique_id."""
     await help_test_unique_id(hass, mqtt_mock_entry, light.DOMAIN)
 
 
 async def test_discovery_removal_light(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test removal of discovered light."""
     data = (
@@ -2763,13 +2763,13 @@ async def test_discovery_removal_light(
 
 
 async def test_discovery_ignores_extra_keys(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test discovery ignores extra keys that are not blocked."""
     await mqtt_mock_entry()
     # inserted `platform` key should be ignored
     data = '{ "name": "Beer",  "platform": "mqtt",  "command_topic": "test_topic"}'
-    async_fire_mqtt_message(hass, "homeassistant/light/bla/config", data)
+    async_fire_mqtt_message(hass, "smarthub/light/bla/config", data)
     await hass.async_block_till_done()
     state = hass.states.get("light.beer")
     assert state is not None
@@ -2777,7 +2777,7 @@ async def test_discovery_ignores_extra_keys(
 
 
 async def test_discovery_update_light_topic_and_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered light."""
     config1 = {
@@ -3031,7 +3031,7 @@ async def test_discovery_update_light_topic_and_template(
 
 
 async def test_discovery_update_light_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered light."""
     config1 = {
@@ -3243,7 +3243,7 @@ async def test_discovery_update_light_template(
 
 
 async def test_discovery_update_unchanged_light(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered light."""
     data1 = (
@@ -3252,7 +3252,7 @@ async def test_discovery_update_unchanged_light(
         '  "command_topic": "test_topic" }'
     )
     with patch(
-        "homeassistant.components.mqtt.light.schema_basic.MqttLight.discovery_update"
+        "smarthub.components.mqtt.light.schema_basic.MqttLight.discovery_update"
     ) as discovery_update:
         await help_test_discovery_update_unchanged(
             hass, mqtt_mock_entry, light.DOMAIN, data1, discovery_update
@@ -3261,7 +3261,7 @@ async def test_discovery_update_unchanged_light(
 
 @pytest.mark.no_fail_on_log_exception
 async def test_discovery_broken(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test handling of bad discovery message."""
     data1 = '{ "name": "Beer" }'
@@ -3274,7 +3274,7 @@ async def test_discovery_broken(
 
 
 async def test_entity_device_info_with_connection(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT light device registry integration."""
     await help_test_entity_device_info_with_connection(
@@ -3283,7 +3283,7 @@ async def test_entity_device_info_with_connection(
 
 
 async def test_entity_device_info_with_identifier(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT light device registry integration."""
     await help_test_entity_device_info_with_identifier(
@@ -3292,7 +3292,7 @@ async def test_entity_device_info_with_identifier(
 
 
 async def test_entity_device_info_update(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test device registry update."""
     await help_test_entity_device_info_update(
@@ -3301,7 +3301,7 @@ async def test_entity_device_info_update(
 
 
 async def test_entity_device_info_remove(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test device registry remove."""
     await help_test_entity_device_info_remove(
@@ -3310,7 +3310,7 @@ async def test_entity_device_info_remove(
 
 
 async def test_entity_id_update_subscriptions(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT subscriptions are managed when entity_id is updated."""
     await help_test_entity_id_update_subscriptions(
@@ -3319,7 +3319,7 @@ async def test_entity_id_update_subscriptions(
 
 
 async def test_entity_id_update_discovery_update(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT discovery update when entity_id is updated."""
     await help_test_entity_id_update_discovery_update(
@@ -3328,7 +3328,7 @@ async def test_entity_id_update_discovery_update(
 
 
 async def test_entity_debug_info_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT debug info."""
     await help_test_entity_debug_info_message(
@@ -3356,7 +3356,7 @@ async def test_entity_debug_info_message(
     ],
 )
 async def test_max_mireds(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test setting min_mireds and max_mireds."""
     await mqtt_mock_entry()
@@ -3453,7 +3453,7 @@ async def test_max_mireds(
     ],
 )
 async def test_publishing_with_custom_encoding(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
     service: str,
@@ -3489,7 +3489,7 @@ async def test_publishing_with_custom_encoding(
 
 
 async def test_reloadable(
-    hass: HomeAssistant, mqtt_client_mock: MqttMockPahoClient
+    hass: SmartHub, mqtt_client_mock: MqttMockPahoClient
 ) -> None:
     """Test reloading the MQTT platform."""
     domain = light.DOMAIN
@@ -3528,7 +3528,7 @@ async def test_reloadable(
     ],
 )
 async def test_encoding_subscribable_topics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     topic: str,
     value: str,
@@ -3569,7 +3569,7 @@ async def test_encoding_subscribable_topics(
     ],
 )
 async def test_encoding_subscribable_topics_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     topic: str,
     value: str,
@@ -3613,7 +3613,7 @@ async def test_encoding_subscribable_topics_brightness(
     ],
 )
 async def test_sending_mqtt_brightness_command_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the sending of Brightness command with template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -3657,7 +3657,7 @@ async def test_sending_mqtt_brightness_command_with_template(
     ],
 )
 async def test_sending_mqtt_effect_command_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the sending of Effect command with template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -3701,7 +3701,7 @@ async def test_sending_mqtt_effect_command_with_template(
     ],
 )
 async def test_sending_mqtt_hs_command_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the sending of HS Color command with template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -3744,7 +3744,7 @@ async def test_sending_mqtt_hs_command_with_template(
     ],
 )
 async def test_sending_mqtt_xy_command_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the sending of XY Color command with template."""
     mqtt_mock = await mqtt_mock_entry()
@@ -3773,7 +3773,7 @@ async def test_sending_mqtt_xy_command_with_template(
     ids=["platform_key", "listed"],
 )
 async def test_setup_manual_entity_from_yaml(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test setup manual configured MQTT entity."""
     await mqtt_mock_entry()
@@ -3782,7 +3782,7 @@ async def test_setup_manual_entity_from_yaml(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test unloading the config entry."""
     domain = light.DOMAIN
@@ -3837,7 +3837,7 @@ async def test_unload_entry(
     ],
 )
 async def test_skipped_async_ha_write_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     topic: str,
     payload1: str,
@@ -3868,7 +3868,7 @@ async def test_skipped_async_ha_write_state(
     ids=VALUE_TEMPLATE_KEYS,
 )
 async def test_value_template_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

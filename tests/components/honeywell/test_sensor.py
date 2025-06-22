@@ -4,14 +4,14 @@ from aiosomecomfort.device import Device
 from aiosomecomfort.location import Location
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.parametrize(("unit", "temp"), [("C", 5), ("F", -15)])
 async def test_outdoor_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     location: Location,
     device_with_outdoor_sensor: Device,
@@ -38,7 +38,7 @@ async def test_outdoor_sensor(
 
 @pytest.mark.parametrize(("unit", "temp"), [("C", 5), ("F", -15)])
 async def test_indoor_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     location: Location,
     device: Device,

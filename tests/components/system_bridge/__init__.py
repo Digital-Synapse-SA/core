@@ -15,9 +15,9 @@ from systembridgemodels.fixtures.modules.processes import FIXTURE_PROCESSES
 from systembridgemodels.fixtures.modules.system import FIXTURE_SYSTEM
 from systembridgemodels.modules import Module, ModulesData
 
-from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.const import CONF_HOST, CONF_PORT, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -80,7 +80,7 @@ FIXTURE_DATA_RESPONSE = ModulesData(
 
 
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> bool:
     """Fixture for setting up the component."""

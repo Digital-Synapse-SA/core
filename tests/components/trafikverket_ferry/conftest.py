@@ -8,10 +8,10 @@ from unittest.mock import patch
 import pytest
 from pytrafikverket.models import FerryStopModel
 
-from homeassistant.components.trafikverket_ferry.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.trafikverket_ferry.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import ENTRY_CONFIG
 
@@ -20,9 +20,9 @@ from tests.common import MockConfigEntry
 
 @pytest.fixture(name="load_int")
 async def load_integration_from_entry(
-    hass: HomeAssistant, get_ferries: list[FerryStopModel]
+    hass: SmartHub, get_ferries: list[FerryStopModel]
 ) -> MockConfigEntry:
-    """Set up the Trafikverket Ferry integration in Home Assistant."""
+    """Set up the Trafikverket Ferry integration in SmartHub."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,
@@ -34,7 +34,7 @@ async def load_integration_from_entry(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_ferry.coordinator.TrafikverketFerry.async_get_next_ferry_stops",
+        "smarthub.components.trafikverket_ferry.coordinator.TrafikverketFerry.async_get_next_ferry_stops",
         return_value=get_ferries,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

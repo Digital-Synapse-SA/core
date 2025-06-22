@@ -5,29 +5,29 @@ from unittest.mock import AsyncMock, MagicMock
 
 from androidtvremote2 import CannotConnect, ConnectionClosed, InvalidAuth
 
-from homeassistant import config_entries
-from homeassistant.components.androidtv_remote.config_flow import (
+from smarthub import config_entries
+from smarthub.components.androidtv_remote.config_flow import (
     APPS_NEW_ID,
     CONF_APP_DELETE,
     CONF_APP_ID,
 )
-from homeassistant.components.androidtv_remote.const import (
+from smarthub.components.androidtv_remote.const import (
     CONF_APP_ICON,
     CONF_APP_NAME,
     CONF_APPS,
     CONF_ENABLE_IME,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
 
 async def test_user_flow_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -83,7 +83,7 @@ async def test_user_flow_success(
 
 
 async def test_user_flow_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -125,7 +125,7 @@ async def test_user_flow_cannot_connect(
 
 
 async def test_user_flow_pairing_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -187,7 +187,7 @@ async def test_user_flow_pairing_invalid_auth(
 
 
 async def test_user_flow_pairing_connection_closed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -249,7 +249,7 @@ async def test_user_flow_pairing_connection_closed(
 
 
 async def test_user_flow_pairing_connection_closed_followed_by_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -309,7 +309,7 @@ async def test_user_flow_pairing_connection_closed_followed_by_cannot_connect(
 
 
 async def test_user_flow_already_configured_host_changed_reloads_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -370,7 +370,7 @@ async def test_user_flow_already_configured_host_changed_reloads_entry(
 
 
 async def test_user_flow_already_configured_host_not_changed_no_reload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -429,7 +429,7 @@ async def test_user_flow_already_configured_host_not_changed_no_reload_entry(
 
 
 async def test_zeroconf_flow_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -505,7 +505,7 @@ async def test_zeroconf_flow_success(
 
 
 async def test_zeroconf_flow_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -555,7 +555,7 @@ async def test_zeroconf_flow_cannot_connect(
 
 
 async def test_zeroconf_flow_pairing_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -625,7 +625,7 @@ async def test_zeroconf_flow_pairing_invalid_auth(
 
 
 async def test_zeroconf_flow_already_configured_host_changed_reloads_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -681,7 +681,7 @@ async def test_zeroconf_flow_already_configured_host_changed_reloads_entry(
 
 
 async def test_zeroconf_flow_already_configured_host_not_changed_no_reload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -734,7 +734,7 @@ async def test_zeroconf_flow_already_configured_host_not_changed_no_reload_entry
 
 
 async def test_zeroconf_flow_abort_if_mac_is_missing(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test when mac is missing in the zeroconf discovery we abort."""
     host = "1.2.3.4"
@@ -758,7 +758,7 @@ async def test_zeroconf_flow_abort_if_mac_is_missing(
 
 
 async def test_zeroconf_flow_already_configured_zeroconf_has_multiple_invalid_ip_addresses(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -811,7 +811,7 @@ async def test_zeroconf_flow_already_configured_zeroconf_has_multiple_invalid_ip
 
 
 async def test_reauth_flow_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -882,7 +882,7 @@ async def test_reauth_flow_success(
 
 
 async def test_reauth_flow_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_api: MagicMock,
@@ -935,7 +935,7 @@ async def test_reauth_flow_cannot_connect(
 
 
 async def test_options_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test options flow."""
     mock_config_entry.add_to_hass(hass)

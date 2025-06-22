@@ -14,7 +14,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import paths
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_GROUP_MEMBERS,
     ATTR_INPUT_SOURCE,
     ATTR_MEDIA_ENQUEUE,
@@ -30,8 +30,8 @@ from homeassistant.components.media_player import (
     SERVICE_UNJOIN,
     MediaPlayerEntityFeature,
 )
-from homeassistant.components.music_assistant.const import DOMAIN
-from homeassistant.components.music_assistant.media_player import (
+from smarthub.components.music_assistant.const import DOMAIN
+from smarthub.components.music_assistant.media_player import (
     ATTR_ALBUM,
     ATTR_ANNOUNCE_VOLUME,
     ATTR_ARTIST,
@@ -47,8 +47,8 @@ from homeassistant.components.music_assistant.media_player import (
     SERVICE_PLAY_MEDIA_ADVANCED,
     SERVICE_TRANSFER_QUEUE,
 )
-from homeassistant.config_entries import HomeAssistantError
-from homeassistant.const import (
+from smarthub.config_entries import SmartHubError
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_MEDIA_NEXT_TRACK,
     SERVICE_MEDIA_PAUSE,
@@ -65,8 +65,8 @@ from homeassistant.const import (
     SERVICE_VOLUME_UP,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     setup_integration_from_fixtures,
@@ -85,7 +85,7 @@ MOCK_TRACK = Track(
 
 
 async def test_media_player(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     music_assistant_client: MagicMock,
@@ -98,7 +98,7 @@ async def test_media_player(
 
 
 async def test_media_player_basic_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity basic actions (play/stop/pause etc.)."""
@@ -133,7 +133,7 @@ async def test_media_player_basic_actions(
 
 
 async def test_media_player_seek_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity seek action."""
@@ -159,7 +159,7 @@ async def test_media_player_seek_action(
 
 
 async def test_media_player_volume_set_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity volume_set action."""
@@ -184,7 +184,7 @@ async def test_media_player_volume_set_action(
 
 
 async def test_media_player_volume_mute_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity volume_mute action."""
@@ -209,7 +209,7 @@ async def test_media_player_volume_mute_action(
 
 
 async def test_media_player_turn_on_off_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity turn_on/turn_off actions."""
@@ -238,7 +238,7 @@ async def test_media_player_turn_on_off_actions(
 
 
 async def test_media_player_shuffle_set_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity shuffle_set action."""
@@ -263,7 +263,7 @@ async def test_media_player_shuffle_set_action(
 
 
 async def test_media_player_repeat_set_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity repeat_set action."""
@@ -288,7 +288,7 @@ async def test_media_player_repeat_set_action(
 
 
 async def test_media_player_join_players_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity join_players action."""
@@ -315,7 +315,7 @@ async def test_media_player_join_players_action(
     # test again with invalid source player
     music_assistant_client.send_command.reset_mock()
     with pytest.raises(
-        HomeAssistantError, match="Entity media_player.blah_blah not found"
+        SmartHubError, match="Entity media_player.blah_blah not found"
     ):
         await hass.services.async_call(
             MEDIA_PLAYER_DOMAIN,
@@ -329,7 +329,7 @@ async def test_media_player_join_players_action(
 
 
 async def test_media_player_unjoin_player_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity unjoin player action."""
@@ -353,7 +353,7 @@ async def test_media_player_unjoin_player_action(
 
 
 async def test_media_player_clear_playlist_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity clear_playlist action."""
@@ -377,7 +377,7 @@ async def test_media_player_clear_playlist_action(
 
 
 async def test_media_player_play_media_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player (advanced) play_media action."""
@@ -511,7 +511,7 @@ async def test_media_player_play_media_action(
 
 
 async def test_media_player_play_announcement_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player play_announcement action."""
@@ -542,7 +542,7 @@ async def test_media_player_play_announcement_action(
 
 
 async def test_media_player_transfer_queue_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player transfer_queu action."""
@@ -570,7 +570,7 @@ async def test_media_player_transfer_queue_action(
     )
     # test again with invalid source player
     music_assistant_client.send_command.reset_mock()
-    with pytest.raises(HomeAssistantError, match="Source player not available."):
+    with pytest.raises(SmartHubError, match="Source player not available."):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_TRANSFER_QUEUE,
@@ -601,7 +601,7 @@ async def test_media_player_transfer_queue_action(
 
 
 async def test_media_player_get_queue_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -623,7 +623,7 @@ async def test_media_player_get_queue_action(
 
 
 async def test_media_player_select_source_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test media_player entity select source action."""
@@ -648,7 +648,7 @@ async def test_media_player_select_source_action(
 
 
 async def test_media_player_supported_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> None:
     """Test if media_player entity supported features are cortrectly (re)mapped."""

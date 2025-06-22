@@ -4,19 +4,19 @@ from unittest.mock import AsyncMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     DOMAIN as CLIMATE_DOMAIN,
     SERVICE_SET_TEMPERATURE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
 
 async def test_setup_platform(
-    hass: HomeAssistant, mock_melissa, snapshot: SnapshotAssertion
+    hass: SmartHub, mock_melissa, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup_platform."""
     await setup_integration(hass)
@@ -25,7 +25,7 @@ async def test_setup_platform(
 
 
 async def test_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_melissa: AsyncMock,

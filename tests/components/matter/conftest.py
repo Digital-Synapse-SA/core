@@ -12,7 +12,7 @@ from matter_server.common.const import SCHEMA_VERSION
 from matter_server.common.models import ServerInfoMessage
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import setup_integration_with_node_fixture
 
@@ -26,7 +26,7 @@ MOCK_COMPR_FABRIC_ID = 1234
 async def matter_client_fixture() -> AsyncGenerator[MagicMock]:
     """Fixture for a Matter client."""
     with patch(
-        "homeassistant.components.matter.MatterClient", autospec=True
+        "smarthub.components.matter.MatterClient", autospec=True
     ) as client_class:
         client = client_class.return_value
 
@@ -61,7 +61,7 @@ async def matter_client_fixture() -> AsyncGenerator[MagicMock]:
 
 @pytest.fixture(name="integration")
 async def integration_fixture(
-    hass: HomeAssistant, matter_client: MagicMock
+    hass: SmartHub, matter_client: MagicMock
 ) -> MockConfigEntry:
     """Set up the Matter integration."""
     entry = MockConfigEntry(domain="matter", data={"url": "ws://localhost:5580/ws"})
@@ -131,7 +131,7 @@ async def integration_fixture(
     ]
 )
 async def matter_devices(
-    hass: HomeAssistant, matter_client: MagicMock, request: pytest.FixtureRequest
+    hass: SmartHub, matter_client: MagicMock, request: pytest.FixtureRequest
 ) -> MatterNode:
     """Fixture for a Matter device."""
     return await setup_integration_with_node_fixture(hass, request.param, matter_client)
@@ -145,7 +145,7 @@ def attributes() -> dict[str, Any]:
 
 @pytest.fixture
 async def matter_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     node_fixture: str,
     attributes: dict[str, Any],

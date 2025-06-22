@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import conversation
-from homeassistant.components.homeassistant.exposed_entities import async_expose_entity
-from homeassistant.components.todo import (
+from smarthub.components import conversation
+from smarthub.components.smarthub.exposed_entities import async_expose_entity
+from smarthub.components.todo import (
     ATTR_ITEM,
     DOMAIN,
     TodoItem,
@@ -14,11 +14,11 @@ from homeassistant.components.todo import (
     TodoListEntity,
     intent as todo_intent,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import intent
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers import intent
+from smarthub.setup import async_setup_component
 
 from . import MockTodoListEntity, create_mock_platform
 
@@ -27,18 +27,18 @@ from tests.typing import WebSocketGenerator
 
 
 @pytest.fixture(autouse=True)
-async def setup_intents(hass: HomeAssistant) -> None:
+async def setup_intents(hass: SmartHub) -> None:
     """Set up the intents."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     await todo_intent.async_setup_intents(hass)
 
 
 async def test_add_item_intent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test adding items to lists using an intent."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     await todo_intent.async_setup_intents(hass)
 
     entity1 = MockTodoListEntity()
@@ -144,7 +144,7 @@ async def test_add_item_intent(
 
 
 async def test_add_item_intent_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     test_entity: TodoListEntity,
 ) -> None:
     """Test errors with the add item intent."""
@@ -182,7 +182,7 @@ async def test_add_item_intent_errors(
 
 
 async def test_complete_item_intent(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the complete item intent."""
     entity1 = MockTodoListEntity(
@@ -217,7 +217,7 @@ async def test_complete_item_intent(
 
 
 async def test_complete_item_intent_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     test_entity: TodoListEntity,
 ) -> None:
     """Test errors with the complete item intent."""
@@ -267,7 +267,7 @@ async def test_complete_item_intent_errors(
 
 
 async def test_complete_item_intent_ha_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     test_entity: TodoListEntity,
 ) -> None:
     """Test error handling of HA errors with the complete item intent."""
@@ -278,7 +278,7 @@ async def test_complete_item_intent_ha_errors(
     # Mock the get_entity method to return None
     with (
         patch(
-            "homeassistant.helpers.entity_component.EntityComponent.get_entity",
+            "smarthub.helpers.entity_component.EntityComponent.get_entity",
             return_value=None,
         ),
         pytest.raises(intent.IntentHandleError),

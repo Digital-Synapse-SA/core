@@ -5,13 +5,13 @@ from unittest.mock import Mock
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_CONTROL_PANEL_DOMAIN,
     AlarmControlPanelEntityFeature,
     AlarmControlPanelState,
 )
-from homeassistant.components.freebox import SCAN_INTERVAL
-from homeassistant.const import (
+from smarthub.components.freebox import SCAN_INTERVAL
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_ALARM_ARM_AWAY,
     SERVICE_ALARM_ARM_HOME,
@@ -19,7 +19,7 @@ from homeassistant.const import (
     SERVICE_ALARM_TRIGGER,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import setup_platform
 from .const import DATA_HOME_ALARM_GET_VALUE, DATA_HOME_GET_NODES
@@ -28,7 +28,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_alarm_changed_from_external(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, router: Mock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, router: Mock
 ) -> None:
     """Test Freebox Home alarm which state depends on external changes."""
     data_get_home_nodes = deepcopy(DATA_HOME_GET_NODES)
@@ -73,7 +73,7 @@ async def test_alarm_changed_from_external(
     )
 
 
-async def test_alarm_changed_from_hass(hass: HomeAssistant, router: Mock) -> None:
+async def test_alarm_changed_from_hass(hass: SmartHub, router: Mock) -> None:
     """Test Freebox Home alarm which state depends on HA."""
     data_get_home_endpoint_value = deepcopy(DATA_HOME_ALARM_GET_VALUE)
 
@@ -159,7 +159,7 @@ async def test_alarm_changed_from_hass(hass: HomeAssistant, router: Mock) -> Non
     )
 
 
-async def test_alarm_undefined_fetch_status(hass: HomeAssistant, router: Mock) -> None:
+async def test_alarm_undefined_fetch_status(hass: SmartHub, router: Mock) -> None:
     """Test Freebox Home alarm which state is undefined or null."""
     data_get_home_endpoint_value = deepcopy(DATA_HOME_ALARM_GET_VALUE)
     data_get_home_endpoint_value["value"] = None

@@ -8,15 +8,15 @@ from aiohomekit.model.characteristics import CharacteristicsTypes
 from aiohomekit.model.services import Service, ServicesTypes
 from aiohomekit.testing import FakeController
 
-from homeassistant.components.homekit_controller.const import KNOWN_DEVICES
-from homeassistant.components.light import (
+from smarthub.components.homekit_controller.const import KNOWN_DEVICES
+from smarthub.components.light import (
     ATTR_COLOR_MODE,
     ATTR_SUPPORTED_COLOR_MODES,
     ColorMode,
 )
-from homeassistant.const import ATTR_SUPPORTED_FEATURES, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_SUPPORTED_FEATURES, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_test_component
 
@@ -61,7 +61,7 @@ def create_lightbulb_service_with_color_temp(accessory: Accessory) -> Service:
 
 
 async def test_switch_change_light_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a HomeKit light on and off again."""
     helper = await setup_test_component(
@@ -112,7 +112,7 @@ async def test_switch_change_light_state(
 
 
 async def test_switch_change_light_state_color_temp(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn change color_temp."""
     helper = await setup_test_component(
@@ -136,7 +136,7 @@ async def test_switch_change_light_state_color_temp(
 
 
 async def test_switch_read_light_state_dimmer(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit light accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_lightbulb_service)
@@ -173,7 +173,7 @@ async def test_switch_read_light_state_dimmer(
 
 
 async def test_switch_push_light_state_dimmer(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit light accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_lightbulb_service)
@@ -203,7 +203,7 @@ async def test_switch_push_light_state_dimmer(
 
 
 async def test_switch_read_light_state_hs(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit light accessory."""
     helper = await setup_test_component(
@@ -270,7 +270,7 @@ async def test_switch_read_light_state_hs(
 
 
 async def test_switch_push_light_state_hs(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit light accessory."""
     helper = await setup_test_component(
@@ -305,7 +305,7 @@ async def test_switch_push_light_state_hs(
 
 
 async def test_switch_read_light_state_color_temp(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the color_temp of a  light accessory."""
     helper = await setup_test_component(
@@ -337,7 +337,7 @@ async def test_switch_read_light_state_color_temp(
 
 
 async def test_switch_push_light_state_color_temp(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit light accessory."""
     helper = await setup_test_component(
@@ -362,7 +362,7 @@ async def test_switch_push_light_state_color_temp(
 
 
 async def test_light_becomes_unavailable_but_recovers(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test transition to and from unavailable state."""
     helper = await setup_test_component(
@@ -399,7 +399,7 @@ async def test_light_becomes_unavailable_but_recovers(
 
 
 async def test_light_unloaded_removed(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test entity and HKDevice are correctly unloaded and removed."""
     helper = await setup_test_component(
@@ -428,7 +428,7 @@ async def test_light_unloaded_removed(
 
 
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:
@@ -448,7 +448,7 @@ async def test_migrate_unique_id(
 
 
 async def test_only_migrate_once(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:

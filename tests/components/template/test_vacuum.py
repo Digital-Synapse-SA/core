@@ -4,19 +4,19 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import template, vacuum
-from homeassistant.components.vacuum import (
+from smarthub.components import template, vacuum
+from smarthub.components.vacuum import (
     ATTR_BATTERY_LEVEL,
     ATTR_FAN_SPEED,
     VacuumActivity,
     VacuumEntityFeature,
 )
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.setup import async_setup_component
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.setup import async_setup_component
 
 from .conftest import ConfigurationStyle
 
@@ -91,7 +91,7 @@ UNIQUE_ID_CONFIG = {"unique_id": "not-so-unique-anymore", **TEMPLATE_VACUUM_ACTI
 
 
 def _verify(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_state: str,
     expected_battery_level: int | None = None,
     expected_fan_speed: int | None = None,
@@ -105,7 +105,7 @@ def _verify(
 
 
 async def async_setup_legacy_format(
-    hass: HomeAssistant, count: int, vacuum_config: dict[str, Any]
+    hass: SmartHub, count: int, vacuum_config: dict[str, Any]
 ) -> None:
     """Do setup of vacuum integration via new format."""
     config = {"vacuum": {"platform": "template", "vacuums": vacuum_config}}
@@ -123,7 +123,7 @@ async def async_setup_legacy_format(
 
 
 async def async_setup_modern_format(
-    hass: HomeAssistant, count: int, vacuum_config: dict[str, Any]
+    hass: SmartHub, count: int, vacuum_config: dict[str, Any]
 ) -> None:
     """Do setup of vacuum integration via modern format."""
     config = {"template": {"vacuum": vacuum_config}}
@@ -142,7 +142,7 @@ async def async_setup_modern_format(
 
 @pytest.fixture
 async def setup_vacuum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     vacuum_config: dict[str, Any],
@@ -156,7 +156,7 @@ async def setup_vacuum(
 
 @pytest.fixture
 async def setup_test_vacuum_with_extra_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     vacuum_config: dict[str, Any],
@@ -175,7 +175,7 @@ async def setup_test_vacuum_with_extra_config(
 
 @pytest.fixture
 async def setup_state_vacuum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -206,7 +206,7 @@ async def setup_state_vacuum(
 
 @pytest.fixture
 async def setup_base_vacuum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str | None,
@@ -240,7 +240,7 @@ async def setup_base_vacuum(
 
 @pytest.fixture
 async def setup_single_attribute_state_vacuum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str | None,
@@ -281,7 +281,7 @@ async def setup_single_attribute_state_vacuum(
 
 @pytest.fixture
 async def setup_attributes_state_vacuum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str | None,
@@ -398,7 +398,7 @@ async def setup_attributes_state_vacuum(
     ],
 )
 @pytest.mark.usefixtures("setup_base_vacuum")
-async def test_valid_legacy_configs(hass: HomeAssistant, count, parm1, parm2) -> None:
+async def test_valid_legacy_configs(hass: SmartHub, count, parm1, parm2) -> None:
     """Test: configs."""
     assert len(hass.states.async_all("vacuum")) == count
     _verify(hass, parm1, parm2)
@@ -416,7 +416,7 @@ async def test_valid_legacy_configs(hass: HomeAssistant, count, parm1, parm2) ->
     ],
 )
 @pytest.mark.usefixtures("setup_base_vacuum")
-async def test_invalid_configs(hass: HomeAssistant, count) -> None:
+async def test_invalid_configs(hass: SmartHub, count) -> None:
     """Test: configs."""
     assert len(hass.states.async_all("vacuum")) == count
 
@@ -444,7 +444,7 @@ async def test_invalid_configs(hass: HomeAssistant, count) -> None:
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_vacuum")
 async def test_battery_level_template(
-    hass: HomeAssistant, expected: int | None
+    hass: SmartHub, expected: int | None
 ) -> None:
     """Test templates with values from other entities."""
     _verify(hass, STATE_UNKNOWN, expected)
@@ -479,7 +479,7 @@ async def test_battery_level_template(
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_vacuum")
-async def test_fan_speed_template(hass: HomeAssistant, expected: str | None) -> None:
+async def test_fan_speed_template(hass: SmartHub, expected: str | None) -> None:
     """Test templates with values from other entities."""
     _verify(hass, STATE_UNKNOWN, None, expected)
 
@@ -502,7 +502,7 @@ async def test_fan_speed_template(hass: HomeAssistant, expected: str | None) -> 
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_vacuum")
-async def test_icon_template(hass: HomeAssistant) -> None:
+async def test_icon_template(hass: SmartHub) -> None:
     """Test icon template."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.attributes.get("icon") in ("", None)
@@ -532,7 +532,7 @@ async def test_icon_template(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_vacuum")
-async def test_picture_template(hass: HomeAssistant) -> None:
+async def test_picture_template(hass: SmartHub) -> None:
     """Test picture template."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.attributes.get("entity_picture") in ("", None)
@@ -563,7 +563,7 @@ async def test_picture_template(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_vacuum")
-async def test_available_template_with_entities(hass: HomeAssistant) -> None:
+async def test_available_template_with_entities(hass: SmartHub) -> None:
     """Test availability templates with values from other entities."""
 
     # When template returns true..
@@ -601,7 +601,7 @@ async def test_available_template_with_entities(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_vacuum")
 async def test_invalid_availability_template_keeps_component_available(
-    hass: HomeAssistant, caplog_setup_text
+    hass: SmartHub, caplog_setup_text
 ) -> None:
     """Test that an invalid availability keeps the device available."""
     assert hass.states.get(TEST_ENTITY_ID) != STATE_UNAVAILABLE
@@ -622,7 +622,7 @@ async def test_invalid_availability_template_keeps_component_available(
     ],
 )
 @pytest.mark.usefixtures("setup_attributes_state_vacuum")
-async def test_attribute_templates(hass: HomeAssistant) -> None:
+async def test_attribute_templates(hass: SmartHub) -> None:
     """Test attribute_templates template."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.attributes["test_attribute"] == "It ."
@@ -649,7 +649,7 @@ async def test_attribute_templates(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("setup_attributes_state_vacuum")
 async def test_invalid_attribute_template(
-    hass: HomeAssistant, caplog_setup_text
+    hass: SmartHub, caplog_setup_text
 ) -> None:
     """Test that errors are logged if rendering template fails."""
     assert len(hass.states.async_all("vacuum")) == 1
@@ -692,7 +692,7 @@ async def test_invalid_attribute_template(
     ],
 )
 @pytest.mark.usefixtures("setup_vacuum")
-async def test_unique_id(hass: HomeAssistant) -> None:
+async def test_unique_id(hass: SmartHub) -> None:
     """Test unique_id option only creates one vacuum per id."""
     assert len(hass.states.async_all("vacuum")) == 1
 
@@ -704,35 +704,35 @@ async def test_unique_id(hass: HomeAssistant) -> None:
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_base_vacuum")
-async def test_unused_services(hass: HomeAssistant) -> None:
+async def test_unused_services(hass: SmartHub) -> None:
     """Test calling unused services raises."""
     # Pause vacuum
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_pause(hass, TEST_ENTITY_ID)
     await hass.async_block_till_done()
 
     # Stop vacuum
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_stop(hass, TEST_ENTITY_ID)
     await hass.async_block_till_done()
 
     # Return vacuum to base
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_return_to_base(hass, TEST_ENTITY_ID)
     await hass.async_block_till_done()
 
     # Spot cleaning
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_clean_spot(hass, TEST_ENTITY_ID)
     await hass.async_block_till_done()
 
     # Locate vacuum
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_locate(hass, TEST_ENTITY_ID)
     await hass.async_block_till_done()
 
     # Set fan's speed
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await common.async_set_fan_speed(hass, "medium", TEST_ENTITY_ID)
     await hass.async_block_till_done()
 
@@ -759,7 +759,7 @@ async def test_unused_services(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("setup_state_vacuum")
 async def test_state_services(
-    hass: HomeAssistant, action: str, calls: list[ServiceCall]
+    hass: SmartHub, action: str, calls: list[ServiceCall]
 ) -> None:
     """Test locate service."""
 
@@ -798,7 +798,7 @@ async def test_state_services(
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_vacuum")
-async def test_set_fan_speed(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_set_fan_speed(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test set valid fan speed."""
 
     # Set vacuum's fan speed to high
@@ -849,7 +849,7 @@ async def test_set_fan_speed(hass: HomeAssistant, calls: list[ServiceCall]) -> N
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_vacuum")
 async def test_set_invalid_fan_speed(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test set invalid fan speed when fan has valid speed."""
 
@@ -875,7 +875,7 @@ async def test_set_invalid_fan_speed(
 
 
 async def test_nested_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a template unique_id propagates to switch unique_ids."""
     with assert_setup_component(1, template.DOMAIN):
@@ -962,7 +962,7 @@ async def test_nested_unique_id(
     ],
 )
 async def test_empty_action_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supported_features: VacuumEntityFeature,
     setup_test_vacuum_with_extra_config,
 ) -> None:

@@ -5,15 +5,15 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import ATTR_DEVICE_CLASS, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import significant_change
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import ATTR_DEVICE_CLASS, STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub, State
+from smarthub.helpers import significant_change
 
 
 @pytest.fixture(name="checker")
 async def checker_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> significant_change.SignificantlyChangedChecker:
     """Checker fixture."""
     checker = await significant_change.create_checker(hass, "test")
@@ -70,7 +70,7 @@ async def test_significant_change_extra(
     assert checker.async_is_significant_change(State(ent_id, "100", attrs), extra_arg=1)
 
     def extra_significant_check(
-        hass: HomeAssistant,
+        hass: SmartHub,
         old_state: str,
         old_attrs: dict | MappingProxyType,
         old_extra_arg: Any,

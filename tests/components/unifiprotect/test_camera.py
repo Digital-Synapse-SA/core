@@ -11,7 +11,7 @@ from uiprotect.exceptions import NvrError
 from uiprotect.websocket import WebsocketState
 from webrtc_models import RTCIceCandidateInit
 
-from homeassistant.components.camera import (
+from smarthub.components.camera import (
     CameraCapabilities,
     CameraEntityFeature,
     CameraState,
@@ -22,8 +22,8 @@ from homeassistant.components.camera import (
     async_get_stream_source,
     async_register_webrtc_provider,
 )
-from homeassistant.components.camera.helper import get_camera_from_entity_id
-from homeassistant.components.unifiprotect.const import (
+from smarthub.components.camera.helper import get_camera_from_entity_id
+from smarthub.components.unifiprotect.const import (
     ATTR_BITRATE,
     ATTR_CHANNEL_ID,
     ATTR_FPS,
@@ -32,17 +32,17 @@ from homeassistant.components.unifiprotect.const import (
     DEFAULT_ATTRIBUTION,
     DOMAIN,
 )
-from homeassistant.components.unifiprotect.utils import get_camera_base_name
-from homeassistant.const import (
+from smarthub.components.unifiprotect.utils import get_camera_base_name
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, callback
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .utils import (
     Camera,
@@ -89,14 +89,14 @@ class MockWebRTCProvider(CameraWebRTCProvider):
 
 
 @pytest.fixture
-async def web_rtc_provider(hass: HomeAssistant) -> None:
+async def web_rtc_provider(hass: SmartHub) -> None:
     """Fixture to enable WebRTC provider for camera entities."""
     await async_setup_component(hass, "camera", {})
     async_register_webrtc_provider(hass, MockWebRTCProvider())
 
 
 def validate_default_camera_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     camera_obj: ProtectCamera,
     channel_id: int,
 ) -> str:
@@ -127,7 +127,7 @@ def validate_default_camera_entity(
 
 
 def validate_rtsps_camera_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     camera_obj: ProtectCamera,
     channel_id: int,
 ) -> str:
@@ -149,7 +149,7 @@ def validate_rtsps_camera_entity(
 
 
 def validate_rtsp_camera_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     camera_obj: ProtectCamera,
     channel_id: int,
 ) -> str:
@@ -171,7 +171,7 @@ def validate_rtsp_camera_entity(
 
 
 def validate_common_camera_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     channel: CameraChannel,
     entity_id: str,
     features: int = CameraEntityFeature.STREAM,
@@ -189,7 +189,7 @@ def validate_common_camera_state(
 
 
 async def validate_rtsps_camera_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     camera_obj: ProtectCamera,
     channel_id: int,
     entity_id: str,
@@ -203,7 +203,7 @@ async def validate_rtsps_camera_state(
 
 
 async def validate_rtsp_camera_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     camera_obj: ProtectCamera,
     channel_id: int,
     entity_id: str,
@@ -217,7 +217,7 @@ async def validate_rtsp_camera_state(
 
 
 async def validate_no_stream_camera_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     camera_obj: ProtectCamera,
     channel_id: int,
     entity_id: str,
@@ -231,7 +231,7 @@ async def validate_no_stream_camera_state(
 
 
 async def test_basic_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     camera_all: ProtectCamera,
     doorbell: ProtectCamera,
@@ -334,7 +334,7 @@ async def test_basic_setup(
 
 @pytest.mark.usefixtures("web_rtc_provider")
 async def test_webrtc_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     camera_all: ProtectCamera,
 ) -> None:
@@ -355,7 +355,7 @@ async def test_webrtc_support(
 
 
 async def test_adopt(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, camera: ProtectCamera
 ) -> None:
     """Test setting up camera with no camera channels."""
 
@@ -389,7 +389,7 @@ async def test_adopt(
 
 
 async def test_camera_image(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, camera: ProtectCamera
 ) -> None:
     """Test retrieving camera image."""
 
@@ -403,7 +403,7 @@ async def test_camera_image(
 
 
 async def test_package_camera_image(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: ProtectCamera
 ) -> None:
     """Test retrieving package camera image."""
 
@@ -417,7 +417,7 @@ async def test_package_camera_image(
 
 
 async def test_camera_generic_update(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, camera: ProtectCamera
 ) -> None:
     """Tests generic entity update service."""
 
@@ -425,14 +425,14 @@ async def test_camera_generic_update(
     assert_entity_counts(hass, Platform.CAMERA, 2, 1)
     entity_id = "camera.test_camera_high_resolution_channel"
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     state = hass.states.get(entity_id)
     assert state and state.state == "idle"
 
     ufp.api.update = AsyncMock(return_value=None)
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: entity_id},
         blocking=True,
@@ -443,7 +443,7 @@ async def test_camera_generic_update(
 
 
 async def test_camera_interval_update(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, camera: ProtectCamera
 ) -> None:
     """Interval updates updates camera entity."""
 
@@ -466,7 +466,7 @@ async def test_camera_interval_update(
 
 
 async def test_camera_bad_interval_update(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, camera: ProtectCamera
 ) -> None:
     """Interval updates marks camera unavailable."""
 
@@ -493,7 +493,7 @@ async def test_camera_bad_interval_update(
 
 
 async def test_camera_websocket_disconnected(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, camera: ProtectCamera
 ) -> None:
     """Test the websocket gets disconnected and reconnected."""
 
@@ -520,7 +520,7 @@ async def test_camera_websocket_disconnected(
 
 
 async def test_camera_ws_update(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, camera: ProtectCamera
 ) -> None:
     """WS update updates camera entity."""
 
@@ -555,7 +555,7 @@ async def test_camera_ws_update(
 
 
 async def test_camera_ws_update_offline(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, camera: ProtectCamera
 ) -> None:
     """WS updates marks camera unavailable."""
 
@@ -597,7 +597,7 @@ async def test_camera_ws_update_offline(
 
 
 async def test_camera_enable_motion(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, camera: ProtectCamera
 ) -> None:
     """Tests generic entity update service."""
 
@@ -619,7 +619,7 @@ async def test_camera_enable_motion(
 
 
 async def test_camera_disable_motion(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: ProtectCamera
+    hass: SmartHub, ufp: MockUFPFixture, camera: ProtectCamera
 ) -> None:
     """Tests generic entity update service."""
 

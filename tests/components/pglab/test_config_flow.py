@@ -1,19 +1,19 @@
 """Test the PG LAB Electronics config flow."""
 
-from homeassistant.components.mqtt import MQTT_CONNECTION_STATE
-from homeassistant.components.pglab.const import DOMAIN
-from homeassistant.config_entries import SOURCE_MQTT, SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.service_info.mqtt import MqttServiceInfo
+from smarthub.components.mqtt import MQTT_CONNECTION_STATE
+from smarthub.components.pglab.const import DOMAIN
+from smarthub.config_entries import SOURCE_MQTT, SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.dispatcher import async_dispatcher_send
+from smarthub.helpers.service_info.mqtt import MqttServiceInfo
 
 from tests.common import MockConfigEntry
 from tests.typing import MqttMockHAClient
 
 
 async def test_mqtt_config_single_instance(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test MQTT flow aborts when an entry already exist."""
 
@@ -28,7 +28,7 @@ async def test_mqtt_config_single_instance(
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_mqtt_setup(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_mqtt_setup(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test we can finish a config flow through MQTT with custom prefix."""
     discovery_info = MqttServiceInfo(
         topic="pglab/discovery/E-Board-DD53AC85/config",
@@ -54,7 +54,7 @@ async def test_mqtt_setup(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> N
 
 
 async def test_mqtt_abort_invalid_topic(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Check MQTT flow aborts if discovery topic is invalid."""
     discovery_info = MqttServiceInfo(
@@ -90,7 +90,7 @@ async def test_mqtt_abort_invalid_topic(
     assert result["reason"] == "invalid_discovery_info"
 
 
-async def test_user_setup(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_user_setup(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test if the user can finish a config flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -106,7 +106,7 @@ async def test_user_setup(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> N
 
 
 async def test_user_setup_mqtt_not_connected(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test that the user setup is aborted when MQTT is not connected."""
 
@@ -122,7 +122,7 @@ async def test_user_setup_mqtt_not_connected(
     assert result["reason"] == "mqtt_not_connected"
 
 
-async def test_user_setup_mqtt_not_configured(hass: HomeAssistant) -> None:
+async def test_user_setup_mqtt_not_configured(hass: SmartHub) -> None:
     """Test that the user setup is aborted when MQTT is not configured."""
 
     result = await hass.config_entries.flow.async_init(

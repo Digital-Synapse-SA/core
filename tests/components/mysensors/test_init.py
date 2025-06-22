@@ -8,19 +8,19 @@ from unittest.mock import MagicMock
 from mysensors import BaseSyncGateway
 from mysensors.sensor import Sensor
 
-from homeassistant.components.mysensors import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.mysensors import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
 async def test_load_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     door_sensor: Sensor,
     transport: MagicMock,
     integration: MockConfigEntry,
@@ -64,7 +64,7 @@ async def test_load_unload(
 
 
 async def test_remove_config_entry_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     gps_sensor: Sensor,

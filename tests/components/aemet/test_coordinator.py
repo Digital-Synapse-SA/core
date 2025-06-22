@@ -5,9 +5,9 @@ from unittest.mock import patch
 from aemet_opendata.exceptions import AemetError
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.aemet.coordinator import WEATHER_UPDATE_INTERVAL
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.aemet.coordinator import WEATHER_UPDATE_INTERVAL
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
@@ -15,7 +15,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_coordinator_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test error on coordinator update."""
@@ -25,7 +25,7 @@ async def test_coordinator_error(
     await async_init_integration(hass)
 
     with patch(
-        "homeassistant.components.aemet.AEMET.api_call",
+        "smarthub.components.aemet.AEMET.api_call",
         side_effect=AemetError,
     ):
         freezer.tick(WEATHER_UPDATE_INTERVAL)

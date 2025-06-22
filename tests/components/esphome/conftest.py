@@ -27,8 +27,8 @@ from aioesphomeapi import (
 import pytest
 from zeroconf import Zeroconf
 
-from homeassistant.components.esphome import dashboard
-from homeassistant.components.esphome.const import (
+from smarthub.components.esphome import dashboard
+from smarthub.components.esphome.const import (
     CONF_ALLOW_SERVICE_CALLS,
     CONF_BLUETOOTH_MAC_ADDRESS,
     CONF_DEVICE_NAME,
@@ -36,9 +36,9 @@ from homeassistant.components.esphome.const import (
     DEFAULT_NEW_CONFIG_ALLOW_ALLOW_SERVICE_CALLS,
     DOMAIN,
 )
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import DASHBOARD_HOST, DASHBOARD_PORT, DASHBOARD_SLUG
 
@@ -102,9 +102,9 @@ def esphome_mock_async_zeroconf(mock_async_zeroconf: MagicMock) -> None:
 
 
 @pytest.fixture(autouse=True)
-async def load_homeassistant(hass: HomeAssistant) -> None:
-    """Load the homeassistant integration."""
-    assert await async_setup_component(hass, "homeassistant", {})
+async def load_smarthub(hass: SmartHub) -> None:
+    """Load the smarthub integration."""
+    assert await async_setup_component(hass, "smarthub", {})
 
 
 @pytest.fixture(autouse=True)
@@ -113,7 +113,7 @@ def mock_tts(mock_tts_cache_dir: Path) -> None:
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Return the default mocked config entry."""
     config_entry = MockConfigEntry(
         title="ESPHome Device",
@@ -163,7 +163,7 @@ def mock_device_info() -> DeviceInfo:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> MockConfigEntry:
     """Set up the ESPHome integration for testing."""
     await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -207,17 +207,17 @@ def mock_client(mock_device_info) -> Generator[APIClient]:
 
     with (
         patch(
-            "homeassistant.components.esphome.manager.ReconnectLogic",
+            "smarthub.components.esphome.manager.ReconnectLogic",
             BaseMockReconnectLogic,
         ),
-        patch("homeassistant.components.esphome.APIClient", mock_client),
-        patch("homeassistant.components.esphome.config_flow.APIClient", mock_client),
+        patch("smarthub.components.esphome.APIClient", mock_client),
+        patch("smarthub.components.esphome.config_flow.APIClient", mock_client),
     ):
         yield mock_client
 
 
 @pytest.fixture
-async def mock_dashboard(hass: HomeAssistant) -> AsyncGenerator[dict[str, Any]]:
+async def mock_dashboard(hass: SmartHub) -> AsyncGenerator[dict[str, Any]]:
     """Mock dashboard."""
     data = {"configured": [], "importable": []}
     with patch(
@@ -408,7 +408,7 @@ class MockESPHomeDevice:
 
 
 async def _mock_generic_device_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_device_info: dict[str, Any],
     mock_list_entities_services: tuple[list[EntityInfo], list[UserService]],
@@ -549,7 +549,7 @@ async def _mock_generic_device_entry(
             self._is_stopped = True
 
     with patch(
-        "homeassistant.components.esphome.manager.ReconnectLogic", MockReconnectLogic
+        "smarthub.components.esphome.manager.ReconnectLogic", MockReconnectLogic
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         async with asyncio.timeout(2):
@@ -561,7 +561,7 @@ async def _mock_generic_device_entry(
 
 @pytest.fixture
 async def mock_voice_assistant_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
 ):
     """Set up an ESPHome entry with voice assistant."""
@@ -611,7 +611,7 @@ async def mock_voice_assistant_api_entry(mock_voice_assistant_entry) -> MockConf
 
 @pytest.fixture
 async def mock_bluetooth_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
 ) -> MockBluetoothEntryType:
     """Set up an ESPHome entry with bluetooth."""
@@ -678,7 +678,7 @@ async def mock_bluetooth_entry_with_legacy_adv(
 
 @pytest.fixture
 async def mock_generic_device_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ) -> MockGenericDeviceEntryType:
     """Set up an ESPHome entry and return the MockConfigEntry."""
@@ -707,7 +707,7 @@ async def mock_generic_device_entry(
 
 @pytest.fixture
 async def mock_esphome_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ) -> MockESPHomeDeviceType:
     """Set up an ESPHome entry and return the MockESPHomeDevice."""

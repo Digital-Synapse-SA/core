@@ -5,15 +5,15 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 
-from homeassistant.components.geo_json_events.const import (
+from smarthub.components.geo_json_events.const import (
     ATTR_EXTERNAL_ID,
     DEFAULT_UPDATE_INTERVAL,
 )
-from homeassistant.components.geo_location import (
+from smarthub.components.geo_location import (
     ATTR_SOURCE,
     DOMAIN as GEO_LOCATION_DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     ATTR_LATITUDE,
     ATTR_LONGITUDE,
@@ -24,9 +24,9 @@ from homeassistant.const import (
     CONF_URL,
     UnitOfLength,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import _generate_mock_feed_entry
 from .conftest import URL
@@ -46,7 +46,7 @@ CONFIG_LEGACY = {
 
 
 async def test_entity_lifecycle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,
 ) -> None:

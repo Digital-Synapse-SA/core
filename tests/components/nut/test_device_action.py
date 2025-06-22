@@ -6,18 +6,18 @@ from aionut import NUTError
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation, device_automation
-from homeassistant.components.device_automation import (
+from smarthub.components import automation, device_automation
+from smarthub.components.device_automation import (
     DeviceAutomationType,
     InvalidDeviceAutomationConfig,
 )
-from homeassistant.components.nut import DOMAIN
-from homeassistant.components.nut.const import INTEGRATION_SUPPORTED_COMMANDS
-from homeassistant.const import CONF_DEVICE_ID, CONF_TYPE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.nut import DOMAIN
+from smarthub.components.nut.const import INTEGRATION_SUPPORTED_COMMANDS
+from smarthub.const import CONF_DEVICE_ID, CONF_TYPE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .util import async_init_integration
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry, async_get_device_automations
 
 
 async def test_get_all_actions_for_specified_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test we get all the expected actions from a nut if user is specified."""
@@ -58,7 +58,7 @@ async def test_get_all_actions_for_specified_user(
 
 
 async def test_no_actions_for_anonymous_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test we get no actions if user is not specified."""
@@ -80,7 +80,7 @@ async def test_no_actions_for_anonymous_user(
 
 
 async def test_no_actions_device_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we get no actions for a device that cannot be found."""
     list_commands_return_value = {"beeper.enable": None}
@@ -100,7 +100,7 @@ async def test_no_actions_device_not_found(
 
 
 async def test_no_actions_device_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test we get no actions for a device that is invalid."""
@@ -124,7 +124,7 @@ async def test_no_actions_device_invalid(
 
 
 async def test_list_commands_exception(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test there are no actions if list_commands raises exception."""
     await async_init_integration(
@@ -139,7 +139,7 @@ async def test_list_commands_exception(
 
 
 async def test_unsupported_command(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test unsupported command is excluded."""
 
@@ -159,7 +159,7 @@ async def test_unsupported_command(
     assert len(actions) == 1
 
 
-async def test_action(hass: HomeAssistant, device_registry: dr.DeviceRegistry) -> None:
+async def test_action(hass: SmartHub, device_registry: dr.DeviceRegistry) -> None:
     """Test actions are executed."""
 
     list_commands_return_value = {
@@ -217,7 +217,7 @@ async def test_action(hass: HomeAssistant, device_registry: dr.DeviceRegistry) -
 
 
 async def test_run_command_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test if run command raises exception with translation."""
@@ -239,7 +239,7 @@ async def test_run_command_exception(
     )
 
     error_message = f"Error running command {command_name}, {nut_error_message}"
-    with pytest.raises(HomeAssistantError, match=error_message):
+    with pytest.raises(SmartHubError, match=error_message):
         await platform.async_call_action_from_config(
             hass,
             {
@@ -251,7 +251,7 @@ async def test_run_command_exception(
         )
 
 
-async def test_action_exception_device_not_found(hass: HomeAssistant) -> None:
+async def test_action_exception_device_not_found(hass: SmartHub) -> None:
     """Test raises exception if device not found."""
     list_commands_return_value = {"beeper.enable": None}
     await async_init_integration(
@@ -276,7 +276,7 @@ async def test_action_exception_device_not_found(hass: HomeAssistant) -> None:
 
 
 async def test_action_exception_invalid_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test raises exception if no NUT config entry found."""
@@ -305,7 +305,7 @@ async def test_action_exception_invalid_config(
 
 
 async def test_action_exception_device_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test raises exception if config entry for device is invalid."""

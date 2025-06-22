@@ -3,13 +3,13 @@
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.button import DOMAIN
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.button import DOMAIN
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.const import EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -19,7 +19,7 @@ from tests.common import (
 
 
 async def test_get_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -58,7 +58,7 @@ async def test_get_actions(
     ],
 )
 async def test_get_actions_hidden_auxiliary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hidden_by: er.RegistryEntryHider | None,
@@ -97,7 +97,7 @@ async def test_get_actions_hidden_auxiliary(
 
 
 async def test_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -144,7 +144,7 @@ async def test_action(
 
 
 async def test_action_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

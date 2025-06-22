@@ -1,0 +1,8 @@
+{
+  "domain": "yandextts",
+  "name": "Yandex TTS",
+  "codeowners": [],
+  "documentation": "https://www.smart-hub.io/integrations/yandextts",
+  "iot_class": "cloud_push",
+  "quality_scale": "legacy"
+}

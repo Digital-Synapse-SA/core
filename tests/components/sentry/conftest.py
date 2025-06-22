@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.sentry.const import DOMAIN
+from smarthub.components.sentry.const import DOMAIN
 
 from tests.common import MockConfigEntry
 

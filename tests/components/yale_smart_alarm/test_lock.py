@@ -9,17 +9,17 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from yalesmartalarmclient import UnknownError, YaleDoorManAPI, YaleSmartAlarmData
 
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN
-from homeassistant.const import (
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN
+from smarthub.const import (
     ATTR_CODE,
     ATTR_ENTITY_ID,
     SERVICE_LOCK,
     SERVICE_UNLOCK,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -29,7 +29,7 @@ from tests.common import MockConfigEntry, snapshot_platform
     [[Platform.LOCK]],
 )
 async def test_lock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_config_entry: tuple[MockConfigEntry, Mock],
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -44,7 +44,7 @@ async def test_lock(
     [[Platform.LOCK]],
 )
 async def test_lock_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_data: YaleSmartAlarmData,
     load_config_entry: tuple[MockConfigEntry, Mock],
 ) -> None:
@@ -96,7 +96,7 @@ async def test_lock_service_calls(
     [[Platform.LOCK]],
 )
 async def test_lock_service_call_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_data: YaleSmartAlarmData,
     load_config_entry: tuple[MockConfigEntry, Mock],
 ) -> None:
@@ -115,7 +115,7 @@ async def test_lock_service_call_fails(
     assert state.state == "locked"
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Could not set lock for Device1: test_side_effect",
     ):
         await hass.services.async_call(
@@ -129,7 +129,7 @@ async def test_lock_service_call_fails(
     assert state.state == "locked"
     client.auth.post_authenticated.reset_mock()
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Could not set lock for Device1: test_side_effect",
     ):
         await hass.services.async_call(
@@ -146,7 +146,7 @@ async def test_lock_service_call_fails(
     [[Platform.LOCK]],
 )
 async def test_lock_service_call_fails_with_incorrect_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_data: YaleSmartAlarmData,
     load_config_entry: tuple[MockConfigEntry, Mock],
 ) -> None:
@@ -163,7 +163,7 @@ async def test_lock_service_call_fails_with_incorrect_status(
     assert state.state == "locked"
 
     with pytest.raises(
-        HomeAssistantError, match="Could not set lock, check system ready for lock"
+        SmartHubError, match="Could not set lock, check system ready for lock"
     ):
         await hass.services.async_call(
             LOCK_DOMAIN,

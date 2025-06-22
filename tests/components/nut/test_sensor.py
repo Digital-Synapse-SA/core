@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.nut.const import DOMAIN
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import (
+from smarthub.components.nut.const import DOMAIN
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -19,8 +19,8 @@ from homeassistant.const import (
     UnitOfElectricCurrent,
     UnitOfElectricPotential,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, translation
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, translation
 
 from .util import (
     _get_mock_nutclient,
@@ -44,7 +44,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_ups_devices(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, model: str
+    hass: SmartHub, entity_registry: er.EntityRegistry, model: str
 ) -> None:
     """Test creation of device sensors."""
 
@@ -79,7 +79,7 @@ async def test_ups_devices(
     ],
 )
 async def test_ups_devices_with_unique_ids(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, model: str, unique_id: str
+    hass: SmartHub, entity_registry: er.EntityRegistry, model: str, unique_id: str
 ) -> None:
     """Test creation of device sensors with unique ids."""
 
@@ -113,7 +113,7 @@ async def test_ups_devices_with_unique_ids(
     ],
 )
 async def test_pdu_devices_with_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     model: str,
     unique_id_base: str,
@@ -161,7 +161,7 @@ async def test_pdu_devices_with_unique_ids(
     )
 
 
-async def test_state_sensors(hass: HomeAssistant) -> None:
+async def test_state_sensors(hass: SmartHub) -> None:
     """Test creation of status display sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -174,7 +174,7 @@ async def test_state_sensors(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -186,7 +186,7 @@ async def test_state_sensors(hass: HomeAssistant) -> None:
         assert state2.state == "OL"
 
 
-async def test_unknown_state_sensors(hass: HomeAssistant) -> None:
+async def test_unknown_state_sensors(hass: SmartHub) -> None:
     """Test creation of unknown status display sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -199,7 +199,7 @@ async def test_unknown_state_sensors(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -212,7 +212,7 @@ async def test_unknown_state_sensors(hass: HomeAssistant) -> None:
 
 
 async def test_stale_options(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test creation of sensors with stale options to remove."""
     config_entry = MockConfigEntry(
@@ -231,7 +231,7 @@ async def test_stale_options(
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -247,7 +247,7 @@ async def test_stale_options(
         assert state.state == "10"
 
 
-async def test_state_ambient_translation(hass: HomeAssistant) -> None:
+async def test_state_ambient_translation(hass: SmartHub) -> None:
     """Test translation of ambient state sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -260,7 +260,7 @@ async def test_state_ambient_translation(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -287,7 +287,7 @@ async def test_state_ambient_translation(hass: HomeAssistant) -> None:
     ],
 )
 async def test_pdu_devices_ambient_not_present(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     model: str,
     unique_id_base: str,
@@ -319,7 +319,7 @@ async def test_pdu_devices_ambient_not_present(
     ],
 )
 async def test_pdu_dynamic_outlets(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     model: str,
     unique_id_base: str,

@@ -9,8 +9,8 @@ from kasa import Module
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import stream
-from homeassistant.components.camera import (
+from smarthub.components import stream
+from smarthub.components.camera import (
     DOMAIN as CAMERA_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -20,11 +20,11 @@ from homeassistant.components.camera import (
     async_get_mjpeg_stream,
     get_camera_from_entity_id,
 )
-from homeassistant.components.tplink.camera import TPLinkCameraEntity
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.tplink.camera import TPLinkCameraEntity
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.const import Platform
+from smarthub.core import SmartHub, SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import _mocked_device, setup_platform_for_device, snapshot_platform
 from .const import DEVICE_ID, IP_ADDRESS3, MAC_ADDRESS3, SMALLEST_VALID_JPEG_BYTES
@@ -34,7 +34,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -66,7 +66,7 @@ async def test_states(
 
 
 async def test_camera_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -94,7 +94,7 @@ async def test_camera_unique_id(
 
 
 async def test_handle_mjpeg_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
 ) -> None:
     """Test handle_async_mjpeg_stream."""
@@ -120,7 +120,7 @@ async def test_handle_mjpeg_stream(
 
 
 async def test_handle_mjpeg_stream_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
 ) -> None:
     """Test no stream if stream_rtsp_url is None after creation."""
@@ -146,7 +146,7 @@ async def test_handle_mjpeg_stream_not_supported(
 
 
 async def test_camera_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
@@ -167,7 +167,7 @@ async def test_camera_image(
     assert state is not None
 
     with patch(
-        "homeassistant.components.ffmpeg.async_get_image",
+        "smarthub.components.ffmpeg.async_get_image",
         return_value=SMALLEST_VALID_JPEG_BYTES,
     ) as mock_get_image:
         image = await async_get_image(hass, "camera.my_camera_live_view")
@@ -193,7 +193,7 @@ async def test_camera_image(
 
     # Test image returns None
     with patch(
-        "homeassistant.components.ffmpeg.async_get_image",
+        "smarthub.components.ffmpeg.async_get_image",
         return_value=None,
     ) as mock_get_image:
         msg = f"None camera image returned for {IP_ADDRESS3}"
@@ -207,7 +207,7 @@ async def test_camera_image(
 
 
 async def test_no_camera_image_when_streaming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -227,7 +227,7 @@ async def test_no_camera_image_when_streaming(
     assert state is not None
 
     with patch(
-        "homeassistant.components.ffmpeg.async_get_image",
+        "smarthub.components.ffmpeg.async_get_image",
         return_value=SMALLEST_VALID_JPEG_BYTES,
     ) as mock_get_image:
         await async_get_image(hass, "camera.my_camera_live_view")
@@ -252,7 +252,7 @@ async def test_no_camera_image_when_streaming(
 
         mock_get_image.reset_mock()
         with patch(
-            "homeassistant.components.tplink.camera.async_aiohttp_proxy_stream",
+            "smarthub.components.tplink.camera.async_aiohttp_proxy_stream",
             new=_waiter,
         ):
             task = asyncio.create_task(_get_stream())
@@ -265,7 +265,7 @@ async def test_no_camera_image_when_streaming(
 
 
 async def test_no_concurrent_camera_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
 ) -> None:
     """Test async_get_image doesn't make concurrent requests."""
@@ -293,7 +293,7 @@ async def test_no_concurrent_camera_image(
         return SMALLEST_VALID_JPEG_BYTES
 
     with patch(
-        "homeassistant.components.ffmpeg.async_get_image",
+        "smarthub.components.ffmpeg.async_get_image",
         new=_waiter,
     ):
         tasks = asyncio.gather(
@@ -310,7 +310,7 @@ async def test_no_concurrent_camera_image(
 
 
 async def test_camera_image_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
     mock_connect: AsyncMock,
     mock_discovery: AsyncMock,
@@ -334,17 +334,17 @@ async def test_camera_image_auth_error(
 
     with (
         patch(
-            "homeassistant.components.ffmpeg.async_get_image",
+            "smarthub.components.ffmpeg.async_get_image",
             return_value=b"",
         ),
         patch(
-            "homeassistant.components.stream.async_check_stream_client_error",
+            "smarthub.components.stream.async_check_stream_client_error",
             side_effect=stream.StreamOpenClientError(
                 "Request was unauthorized",
                 error_code=stream.StreamClientError.Unauthorized,
             ),
         ),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await async_get_image(hass, "camera.my_camera_live_view")
     await hass.async_block_till_done()
@@ -357,7 +357,7 @@ async def test_camera_image_auth_error(
 
 
 async def test_camera_stream_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -393,7 +393,7 @@ async def test_camera_stream_source(
 
 
 async def test_camera_stream_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
 ) -> None:
     """Test stream attributes."""
@@ -418,7 +418,7 @@ async def test_camera_stream_attributes(
 
 
 async def test_camera_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
 ) -> None:
     """Test camera turn on and off."""

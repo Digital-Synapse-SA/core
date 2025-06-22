@@ -4,9 +4,9 @@ import json
 
 import pytest
 
-from homeassistant.components.github.const import DOMAIN, FALLBACK_UPDATE_INTERVAL
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.github.const import DOMAIN, FALLBACK_UPDATE_INTERVAL
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .common import TEST_REPOSITORY
 
@@ -19,7 +19,7 @@ TEST_SENSOR_ENTITY = "sensor.octocat_hello_world_latest_release"
 # This tests needs to be adjusted to remove lingering tasks
 @pytest.mark.parametrize("expected_lingering_tasks", [True])
 async def test_sensor_updates_with_empty_release_array(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:

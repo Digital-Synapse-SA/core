@@ -7,8 +7,8 @@ from pymiele import MieleDevices
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.miele.const import DOMAIN, PROCESS_ACTION, PROGRAM_ID
-from homeassistant.components.vacuum import (
+from smarthub.components.miele.const import DOMAIN, PROCESS_ACTION, PROGRAM_ID
+from smarthub.components.vacuum import (
     ATTR_FAN_SPEED,
     DOMAIN as VACUUM_DOMAIN,
     SERVICE_CLEAN_SPOT,
@@ -17,10 +17,10 @@ from homeassistant.components.vacuum import (
     SERVICE_START,
     SERVICE_STOP,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import get_actions_callback, get_data_callback
 
@@ -41,7 +41,7 @@ pytestmark = [
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -55,7 +55,7 @@ async def test_sensor_states(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_vacuum_states_api_push(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -88,7 +88,7 @@ async def test_vacuum_states_api_push(
     ],
 )
 async def test_vacuum_program(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: None,
     service: str,
@@ -109,7 +109,7 @@ async def test_vacuum_program(
     ("fan_speed", "expected"), [("normal", 1), ("turbo", 3), ("silent", 4)]
 )
 async def test_vacuum_fan_speed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: None,
     fan_speed: str,
@@ -136,7 +136,7 @@ async def test_vacuum_fan_speed(
     ],
 )
 async def test_api_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     setup_platform: None,
     service: str,
@@ -145,7 +145,7 @@ async def test_api_failure(
     mock_miele_client.send_action.side_effect = ClientResponseError("test", "Test")
 
     with pytest.raises(
-        HomeAssistantError, match=f"Failed to set state for {ENTITY_ID}"
+        SmartHubError, match=f"Failed to set state for {ENTITY_ID}"
     ):
         await hass.services.async_call(
             TEST_PLATFORM, service, {ATTR_ENTITY_ID: ENTITY_ID}, blocking=True

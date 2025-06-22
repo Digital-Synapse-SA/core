@@ -5,11 +5,11 @@ from unittest.mock import MagicMock, patch
 from pushover_complete import BadAPIRequestError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.pushover.const import CONF_USER_KEY, DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.pushover.const import CONF_USER_KEY, DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import MOCK_CONFIG
 
@@ -29,12 +29,12 @@ def mock_pushover():
 def pushover_setup_fixture():
     """Patch pushover setup entry."""
     with patch(
-        "homeassistant.components.pushover.async_setup_entry", return_value=True
+        "smarthub.components.pushover.async_setup_entry", return_value=True
     ):
         yield
 
 
-async def test_flow_user(hass: HomeAssistant) -> None:
+async def test_flow_user(hass: SmartHub) -> None:
     """Test user initialized flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -49,7 +49,7 @@ async def test_flow_user(hass: HomeAssistant) -> None:
     assert result["data"] == MOCK_CONFIG
 
 
-async def test_flow_user_key_api_key_exists(hass: HomeAssistant) -> None:
+async def test_flow_user_key_api_key_exists(hass: SmartHub) -> None:
     """Test user initialized flow with duplicate user key / api key pair."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -70,7 +70,7 @@ async def test_flow_user_key_api_key_exists(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_flow_name_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_name_already_configured(hass: SmartHub) -> None:
     """Test user initialized flow with duplicate server."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -96,7 +96,7 @@ async def test_flow_name_already_configured(hass: HomeAssistant) -> None:
 
 
 async def test_flow_invalid_user_key(
-    hass: HomeAssistant, mock_pushover: MagicMock
+    hass: SmartHub, mock_pushover: MagicMock
 ) -> None:
     """Test user initialized flow with wrong user key."""
 
@@ -112,7 +112,7 @@ async def test_flow_invalid_user_key(
 
 
 async def test_flow_invalid_api_key(
-    hass: HomeAssistant, mock_pushover: MagicMock
+    hass: SmartHub, mock_pushover: MagicMock
 ) -> None:
     """Test user initialized flow with wrong api key."""
 
@@ -127,7 +127,7 @@ async def test_flow_invalid_api_key(
     assert result["errors"] == {CONF_API_KEY: "invalid_api_key"}
 
 
-async def test_flow_conn_err(hass: HomeAssistant, mock_pushover: MagicMock) -> None:
+async def test_flow_conn_err(hass: SmartHub, mock_pushover: MagicMock) -> None:
     """Test user initialized flow with conn error."""
 
     mock_pushover.side_effect = BadAPIRequestError
@@ -141,7 +141,7 @@ async def test_flow_conn_err(hass: HomeAssistant, mock_pushover: MagicMock) -> N
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_reauth_success(hass: HomeAssistant) -> None:
+async def test_reauth_success(hass: SmartHub) -> None:
     """Test we can reauth."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -165,7 +165,7 @@ async def test_reauth_success(hass: HomeAssistant) -> None:
     assert result2["reason"] == "reauth_successful"
 
 
-async def test_reauth_failed(hass: HomeAssistant, mock_pushover: MagicMock) -> None:
+async def test_reauth_failed(hass: SmartHub, mock_pushover: MagicMock) -> None:
     """Test we can reauth."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -192,7 +192,7 @@ async def test_reauth_failed(hass: HomeAssistant, mock_pushover: MagicMock) -> N
     }
 
 
-async def test_reauth_with_existing_config(hass: HomeAssistant) -> None:
+async def test_reauth_with_existing_config(hass: SmartHub) -> None:
     """Test reauth fails if the api key entered exists in another entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,

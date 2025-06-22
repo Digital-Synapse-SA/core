@@ -4,20 +4,20 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components import lock
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.components.event import EventDeviceClass
-from homeassistant.components.homekit.accessories import HomeBridge
-from homeassistant.components.homekit.const import (
+from smarthub.components import lock
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.components.event import EventDeviceClass
+from smarthub.components.homekit.accessories import HomeBridge
+from smarthub.components.homekit.const import (
     ATTR_VALUE,
     CHAR_PROGRAMMABLE_SWITCH_EVENT,
     CONF_LINKED_DOORBELL_SENSOR,
     SERV_DOORBELL,
     SERV_STATELESS_PROGRAMMABLE_SWITCH,
 )
-from homeassistant.components.homekit.type_locks import Lock
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN, LockState
-from homeassistant.const import (
+from smarthub.components.homekit.type_locks import Lock
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN, LockState
+from smarthub.const import (
     ATTR_CODE,
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
@@ -26,14 +26,14 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import Event, SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_mock_service
 
 
-async def test_lock_unlock(hass: HomeAssistant, hk_driver, events: list[Event]) -> None:
+async def test_lock_unlock(hass: SmartHub, hk_driver, events: list[Event]) -> None:
     """Test if accessory and HA are updated accordingly."""
     code = "1234"
     config = {ATTR_CODE: code}
@@ -132,7 +132,7 @@ async def test_lock_unlock(hass: HomeAssistant, hk_driver, events: list[Event]) 
 
 @pytest.mark.parametrize("config", [{}, {ATTR_CODE: None}])
 async def test_no_code(
-    hass: HomeAssistant, hk_driver, config, events: list[Event]
+    hass: SmartHub, hk_driver, config, events: list[Event]
 ) -> None:
     """Test accessory if lock doesn't require a code."""
     entity_id = "lock.kitchen_door"
@@ -154,7 +154,7 @@ async def test_no_code(
     assert events[-1].data[ATTR_VALUE] is None
 
 
-async def test_lock_with_linked_doorbell_sensor(hass: HomeAssistant, hk_driver) -> None:
+async def test_lock_with_linked_doorbell_sensor(hass: SmartHub, hk_driver) -> None:
     """Test a lock with a linked doorbell sensor can update."""
     code = "1234"
     await async_setup_component(hass, lock.DOMAIN, {lock.DOMAIN: {"platform": "demo"}})
@@ -263,7 +263,7 @@ async def test_lock_with_linked_doorbell_sensor(hass: HomeAssistant, hk_driver) 
     assert char2.value is None
 
 
-async def test_lock_with_linked_doorbell_event(hass: HomeAssistant, hk_driver) -> None:
+async def test_lock_with_linked_doorbell_event(hass: SmartHub, hk_driver) -> None:
     """Test a lock with a linked doorbell event can update."""
     await async_setup_component(hass, lock.DOMAIN, {lock.DOMAIN: {"platform": "demo"}})
     await hass.async_block_till_done()
@@ -403,7 +403,7 @@ async def test_lock_with_linked_doorbell_event(hass: HomeAssistant, hk_driver) -
 
 
 async def test_lock_with_a_missing_linked_doorbell_sensor(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test a lock with a configured linked doorbell sensor that is missing."""
     await async_setup_component(hass, lock.DOMAIN, {lock.DOMAIN: {"platform": "demo"}})

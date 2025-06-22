@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.hunterdouglas_powerview.const import DOMAIN
-from homeassistant.components.scene import DOMAIN as SCENE_DOMAIN, SERVICE_TURN_ON
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.hunterdouglas_powerview.const import DOMAIN
+from smarthub.components.scene import DOMAIN as SCENE_DOMAIN, SERVICE_TURN_ON
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .const import MOCK_MAC
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 @pytest.mark.usefixtures("mock_hunterdouglas_hub")
 @pytest.mark.parametrize("api_version", [1, 2, 3])
 async def test_scenes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     api_version: int,
 ) -> None:
     """Test the scenes."""
@@ -109,7 +109,7 @@ async def test_scenes(
     )
 
     with patch(
-        "homeassistant.components.hunterdouglas_powerview.scene.PvScene.activate"
+        "smarthub.components.hunterdouglas_powerview.scene.PvScene.activate"
     ) as mock_activate:
         await hass.services.async_call(
             SCENE_DOMAIN,

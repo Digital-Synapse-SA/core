@@ -7,8 +7,8 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.energyzero.const import SCAN_INTERVAL
-from homeassistant.core import HomeAssistant
+from smarthub.components.energyzero.const import SCAN_INTERVAL
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -20,7 +20,7 @@ pytestmark = pytest.mark.freeze_time("2022-12-07 15:00:00")
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_energyzero: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -37,7 +37,7 @@ async def test_entry_diagnostics(
 
 
 async def test_diagnostics_no_gas_today(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_energyzero: MagicMock,
     init_integration: MockConfigEntry,

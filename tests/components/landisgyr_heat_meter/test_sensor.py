@@ -9,18 +9,18 @@ import serial
 from syrupy.assertion import SnapshotAssertion
 from ultraheat_api.response import HeatMeterResponse
 
-from homeassistant.components.homeassistant import DOMAIN as HA_DOMAIN
-from homeassistant.components.landisgyr_heat_meter.const import DOMAIN, POLLING_INTERVAL
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.smarthub import DOMAIN as HA_DOMAIN
+from smarthub.components.landisgyr_heat_meter.const import DOMAIN, POLLING_INTERVAL
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 API_HEAT_METER_SERVICE = (
-    "homeassistant.components.landisgyr_heat_meter.ultraheat_api.HeatMeterService"
+    "smarthub.components.landisgyr_heat_meter.ultraheat_api.HeatMeterService"
 )
 
 MOCK_RESPONSE_GJ = {
@@ -98,7 +98,7 @@ MOCK_RESPONSE_MWH = {
 @patch(API_HEAT_METER_SERVICE)
 async def test_create_sensors(
     mock_heat_meter,
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_heat_meter_response,
@@ -125,7 +125,7 @@ async def test_create_sensors(
 
 @patch(API_HEAT_METER_SERVICE)
 async def test_exception_on_polling(
-    mock_heat_meter, hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    mock_heat_meter, hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test sensor."""
     entry_data = {

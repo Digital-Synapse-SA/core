@@ -9,11 +9,11 @@ from pypjlink import MUTE_AUDIO
 from pypjlink.projector import ProjectorError
 import pytest
 
-from homeassistant.components import media_player
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import media_player
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import assert_setup_component, async_fire_time_changed
 
@@ -50,7 +50,7 @@ def mocked_projector(projector_from_address):
 
 @pytest.mark.parametrize("side_effect", [socket.timeout, OSError])
 async def test_offline_initialization(
-    projector_from_address, hass: HomeAssistant, side_effect
+    projector_from_address, hass: SmartHub, side_effect
 ) -> None:
     """Test initialization of a device that is offline."""
 
@@ -74,7 +74,7 @@ async def test_offline_initialization(
         assert state.state == "unavailable"
 
 
-async def test_initialization(projector_from_address, hass: HomeAssistant) -> None:
+async def test_initialization(projector_from_address, hass: SmartHub) -> None:
     """Test a device that is available."""
 
     with assert_setup_component(1, media_player.DOMAIN):
@@ -112,7 +112,7 @@ async def test_initialization(projector_from_address, hass: HomeAssistant) -> No
 
 @pytest.mark.parametrize("power_state", ["on", "warm-up"])
 async def test_on_state_init(
-    projector_from_address, hass: HomeAssistant, power_state
+    projector_from_address, hass: SmartHub, power_state
 ) -> None:
     """Test a device that is available."""
 
@@ -144,7 +144,7 @@ async def test_on_state_init(
         assert state.attributes["source"] == "HDMI 1"
 
 
-async def test_api_error(projector_from_address, hass: HomeAssistant) -> None:
+async def test_api_error(projector_from_address, hass: SmartHub) -> None:
     """Test invalid api responses."""
 
     with assert_setup_component(1, media_player.DOMAIN):
@@ -176,7 +176,7 @@ async def test_api_error(projector_from_address, hass: HomeAssistant) -> None:
         assert state.state == "off"
 
 
-async def test_update_unavailable(projector_from_address, hass: HomeAssistant) -> None:
+async def test_update_unavailable(projector_from_address, hass: SmartHub) -> None:
     """Test update to a device that is unavailable."""
 
     with assert_setup_component(1, media_player.DOMAIN):
@@ -214,7 +214,7 @@ async def test_update_unavailable(projector_from_address, hass: HomeAssistant) -
         assert state.state == "unavailable"
 
 
-async def test_unavailable_time(mocked_projector, hass: HomeAssistant) -> None:
+async def test_unavailable_time(mocked_projector, hass: SmartHub) -> None:
     """Test unavailable time projector error."""
 
     assert await async_setup_component(
@@ -245,7 +245,7 @@ async def test_unavailable_time(mocked_projector, hass: HomeAssistant) -> None:
     assert "is_volume_muted" not in state.attributes
 
 
-async def test_turn_off(mocked_projector, hass: HomeAssistant) -> None:
+async def test_turn_off(mocked_projector, hass: SmartHub) -> None:
     """Test turning off beamer."""
 
     assert await async_setup_component(
@@ -270,7 +270,7 @@ async def test_turn_off(mocked_projector, hass: HomeAssistant) -> None:
     mocked_projector.set_power.assert_called_with("off")
 
 
-async def test_turn_on(mocked_projector, hass: HomeAssistant) -> None:
+async def test_turn_on(mocked_projector, hass: SmartHub) -> None:
     """Test turning on beamer."""
 
     assert await async_setup_component(
@@ -295,7 +295,7 @@ async def test_turn_on(mocked_projector, hass: HomeAssistant) -> None:
     mocked_projector.set_power.assert_called_with("on")
 
 
-async def test_mute(mocked_projector, hass: HomeAssistant) -> None:
+async def test_mute(mocked_projector, hass: SmartHub) -> None:
     """Test muting beamer."""
 
     assert await async_setup_component(
@@ -320,7 +320,7 @@ async def test_mute(mocked_projector, hass: HomeAssistant) -> None:
     mocked_projector.set_mute.assert_called_with(MUTE_AUDIO, True)
 
 
-async def test_unmute(mocked_projector, hass: HomeAssistant) -> None:
+async def test_unmute(mocked_projector, hass: SmartHub) -> None:
     """Test unmuting beamer."""
 
     assert await async_setup_component(
@@ -345,7 +345,7 @@ async def test_unmute(mocked_projector, hass: HomeAssistant) -> None:
     mocked_projector.set_mute.assert_called_with(MUTE_AUDIO, False)
 
 
-async def test_select_source(mocked_projector, hass: HomeAssistant) -> None:
+async def test_select_source(mocked_projector, hass: SmartHub) -> None:
     """Test selecting source."""
 
     assert await async_setup_component(

@@ -9,11 +9,11 @@ from solarlog_cli.solarlog_exceptions import (
     SolarLogError,
 )
 
-from homeassistant.components.solarlog.const import CONF_HAS_PWD, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.solarlog.const import CONF_HAS_PWD, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import HOST
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("test_connect")
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -44,7 +44,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
 
 @pytest.mark.usefixtures("test_connect")
 async def test_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_solarlog_connector: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -79,7 +79,7 @@ async def test_user(
     ],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception1: Exception,
     error1: dict[str, str],
     exception2: Exception,
@@ -136,7 +136,7 @@ async def test_form_exceptions(
     assert result["data"][CONF_PASSWORD] == "pwd"
 
 
-async def test_abort_if_already_setup(hass: HomeAssistant, test_connect: None) -> None:
+async def test_abort_if_already_setup(hass: SmartHub, test_connect: None) -> None:
     """Test we abort if the device is already setup."""
 
     MockConfigEntry(domain=DOMAIN, data={CONF_HOST: HOST}).add_to_hass(hass)
@@ -165,7 +165,7 @@ async def test_abort_if_already_setup(hass: HomeAssistant, test_connect: None) -
     ],
 )
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_solarlog_connector: AsyncMock,
     has_password: bool,
@@ -211,7 +211,7 @@ async def test_reconfigure_flow(
     ],
 )
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     error: dict[str, str],
     mock_solarlog_connector: AsyncMock,

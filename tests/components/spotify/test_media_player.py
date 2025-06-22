@@ -14,7 +14,7 @@ from spotifyaio import (
 )
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_INPUT_SOURCE_LIST,
     ATTR_MEDIA_CONTENT_ID,
@@ -33,8 +33,8 @@ from homeassistant.components.media_player import (
     MediaType,
     RepeatMode,
 )
-from homeassistant.components.spotify import DOMAIN
-from homeassistant.const import (
+from smarthub.components.spotify import DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_ENTITY_PICTURE,
     SERVICE_MEDIA_NEXT_TRACK,
@@ -48,8 +48,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -63,7 +63,7 @@ from tests.common import (
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,
@@ -74,7 +74,7 @@ async def test_entities(
     freezer.move_to("2023-10-21")
     with (
         patch("secrets.token_hex", return_value="mock-token"),
-        patch("homeassistant.components.spotify.PLATFORMS", [Platform.MEDIA_PLAYER]),
+        patch("smarthub.components.spotify.PLATFORMS", [Platform.MEDIA_PLAYER]),
     ):
         await setup_integration(hass, mock_config_entry)
 
@@ -85,7 +85,7 @@ async def test_entities(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_podcast(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,
@@ -99,7 +99,7 @@ async def test_podcast(
     )
     with (
         patch("secrets.token_hex", return_value="mock-token"),
-        patch("homeassistant.components.spotify.PLATFORMS", [Platform.MEDIA_PLAYER]),
+        patch("smarthub.components.spotify.PLATFORMS", [Platform.MEDIA_PLAYER]),
     ):
         await setup_integration(hass, mock_config_entry)
 
@@ -110,7 +110,7 @@ async def test_podcast(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_free_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -124,7 +124,7 @@ async def test_free_account(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_restricted_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -140,7 +140,7 @@ async def test_restricted_device(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_spotify_dj_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -169,7 +169,7 @@ async def test_spotify_dj_list(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_normal_playlist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,
@@ -211,7 +211,7 @@ async def test_normal_playlist(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_fetching_playlist_does_not_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -234,7 +234,7 @@ async def test_fetching_playlist_does_not_fail(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_fetching_playlist_once(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -262,7 +262,7 @@ async def test_fetching_playlist_once(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_idle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -288,7 +288,7 @@ async def test_idle(
     ],
 )
 async def test_simple_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     service: str,
@@ -307,7 +307,7 @@ async def test_simple_actions(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_repeat_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -330,7 +330,7 @@ async def test_repeat_mode(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_shuffle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -352,7 +352,7 @@ async def test_shuffle(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_volume_level(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -372,7 +372,7 @@ async def test_volume_level(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_seek(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -400,7 +400,7 @@ async def test_seek(
     ],
 )
 async def test_play_media_in_queue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     media_type: str,
@@ -464,7 +464,7 @@ async def test_play_media_in_queue(
     ],
 )
 async def test_play_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     media_type: str,
@@ -488,7 +488,7 @@ async def test_play_media(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_add_unsupported_media_to_queue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -512,7 +512,7 @@ async def test_add_unsupported_media_to_queue(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_play_unsupported_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -534,7 +534,7 @@ async def test_play_unsupported_media(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_select_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -556,7 +556,7 @@ async def test_select_source(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_source_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -580,7 +580,7 @@ async def test_source_devices(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_paused_playback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -594,7 +594,7 @@ async def test_paused_playback(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_fallback_show_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -616,7 +616,7 @@ async def test_fallback_show_image(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_no_episode_images(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -635,7 +635,7 @@ async def test_no_episode_images(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_no_album_images(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -649,7 +649,7 @@ async def test_no_album_images(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_normal_polling_interval(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -676,7 +676,7 @@ async def test_normal_polling_interval(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_smart_polling_interval(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -723,7 +723,7 @@ async def test_smart_polling_interval(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_smart_polling_interval_handles_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -762,7 +762,7 @@ async def test_smart_polling_interval_handles_errors(
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_smart_polling_interval_handles_paused(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

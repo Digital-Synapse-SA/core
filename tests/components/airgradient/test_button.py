@@ -8,12 +8,12 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.airgradient.const import DOMAIN
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.airgradient.const import DOMAIN
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -26,21 +26,21 @@ from tests.common import (
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     airgradient_devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.airgradient.PLATFORMS", [Platform.BUTTON]):
+    with patch("smarthub.components.airgradient.PLATFORMS", [Platform.BUTTON]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_pressing_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airgradient_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -69,13 +69,13 @@ async def test_pressing_button(
 
 
 async def test_cloud_creates_no_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_airgradient_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test cloud configuration control."""
-    with patch("homeassistant.components.airgradient.PLATFORMS", [Platform.BUTTON]):
+    with patch("smarthub.components.airgradient.PLATFORMS", [Platform.BUTTON]):
         await setup_integration(hass, mock_config_entry)
 
     assert len(hass.states.async_all()) == 0
@@ -115,7 +115,7 @@ async def test_cloud_creates_no_button(
     ],
 )
 async def test_exception_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airgradient_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
@@ -124,7 +124,7 @@ async def test_exception_handling(
     """Test exception handling."""
     await setup_integration(hass, mock_config_entry)
     mock_airgradient_client.request_co2_calibration.side_effect = exception
-    with pytest.raises(HomeAssistantError, match=error_message):
+    with pytest.raises(SmartHubError, match=error_message):
         await hass.services.async_call(
             BUTTON_DOMAIN,
             SERVICE_PRESS,

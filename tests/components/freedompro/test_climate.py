@@ -5,7 +5,7 @@ from unittest.mock import ANY, patch
 
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_HVAC_MODE,
     ATTR_HVAC_MODES,
@@ -17,11 +17,11 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util.dt import utcnow
 
 from .conftest import get_states_response_for_uid
 
@@ -31,7 +31,7 @@ uid = "3WRRJR6RCZQZSND8VP0YTO3YXCSOFPKBMW8T51TU-LQ*TWMYQKL3UVED4HSIIB9GXJWJZBQCX
 
 
 async def test_climate_get_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     init_integration: MockConfigEntry,
@@ -70,7 +70,7 @@ async def test_climate_get_state(
     states_response[0]["state"]["currentTemperature"] = 20
     states_response[0]["state"]["targetTemperature"] = 21
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         async_fire_time_changed(hass, utcnow() + timedelta(hours=2))
@@ -89,7 +89,7 @@ async def test_climate_get_state(
 
 
 async def test_climate_set_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_climate_set_off(
     assert entry.unique_id == uid
 
     with patch(
-        "homeassistant.components.freedompro.climate.put_state"
+        "smarthub.components.freedompro.climate.put_state"
     ) as mock_put_state:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -121,7 +121,7 @@ async def test_climate_set_off(
 
 
 async def test_climate_set_unsupported_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -146,7 +146,7 @@ async def test_climate_set_unsupported_hvac_mode(
 
 
 async def test_climate_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -162,7 +162,7 @@ async def test_climate_set_temperature(
     assert entry.unique_id == uid
 
     with patch(
-        "homeassistant.components.freedompro.climate.put_state"
+        "smarthub.components.freedompro.climate.put_state"
     ) as mock_put_state:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -182,7 +182,7 @@ async def test_climate_set_temperature(
     states_response[0]["state"]["currentTemperature"] = 20
     states_response[0]["state"]["targetTemperature"] = 21
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         async_fire_time_changed(hass, utcnow() + timedelta(hours=2))
@@ -193,7 +193,7 @@ async def test_climate_set_temperature(
 
 
 async def test_climate_set_temperature_unsupported_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:

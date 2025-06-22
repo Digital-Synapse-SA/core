@@ -3,8 +3,8 @@
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.tado.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.tado.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_get_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     hass_client: ClientSessionGenerator,
 ) -> None:

@@ -6,11 +6,11 @@ from homewizard_energy.errors import RequestError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.homewizard.const import UPDATE_INTERVAL
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.homewizard.const import UPDATE_INTERVAL
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
@@ -313,7 +313,7 @@ pytestmark = [
     ],
 )
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -463,7 +463,7 @@ async def test_sensors(
     ],
 )
 async def test_disabled_by_default_sensors(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, entity_ids: list[str]
+    hass: SmartHub, entity_registry: er.EntityRegistry, entity_ids: list[str]
 ) -> None:
     """Test the disabled by default sensors."""
     for entity_id in entity_ids:
@@ -476,7 +476,7 @@ async def test_disabled_by_default_sensors(
 
 @pytest.mark.parametrize("exception", [RequestError])
 async def test_sensors_unreachable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     exception: Exception,
 ) -> None:
@@ -494,7 +494,7 @@ async def test_sensors_unreachable(
 
 @pytest.mark.parametrize("exception", [RequestError])
 async def test_external_sensors_unreachable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     exception: Exception,
 ) -> None:
@@ -915,7 +915,7 @@ async def test_external_sensors_unreachable(
     ],
 )
 async def test_entities_not_created_for_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_ids: list[str],
 ) -> None:
     """Ensures entities for a specific device are not created."""

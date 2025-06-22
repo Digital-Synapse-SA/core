@@ -2,16 +2,16 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.abode import DOMAIN
-from homeassistant.components.abode.const import CONF_POLLING
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.abode import DOMAIN
+from smarthub.components.abode.const import CONF_POLLING
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
-async def setup_platform(hass: HomeAssistant, platform: str) -> MockConfigEntry:
+async def setup_platform(hass: SmartHub, platform: str) -> MockConfigEntry:
     """Set up the Abode platform."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -24,7 +24,7 @@ async def setup_platform(hass: HomeAssistant, platform: str) -> MockConfigEntry:
     mock_entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.abode.PLATFORMS", [platform]),
+        patch("smarthub.components.abode.PLATFORMS", [platform]),
         patch("jaraco.abode.event_controller.sio"),
     ):
         assert await async_setup_component(hass, DOMAIN, {})

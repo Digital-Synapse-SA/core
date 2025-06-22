@@ -4,14 +4,14 @@ from unittest.mock import patch
 
 from pyoctoprintapi import WebcamSettings
 
-from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.camera import DOMAIN as CAMERA_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
 
-async def test_camera(hass: HomeAssistant, entity_registry: er.EntityRegistry) -> None:
+async def test_camera(hass: SmartHub, entity_registry: er.EntityRegistry) -> None:
     """Test the underlying camera."""
     with patch(
         "pyoctoprintapi.OctoprintClient.get_webcam_info",
@@ -32,7 +32,7 @@ async def test_camera(hass: HomeAssistant, entity_registry: er.EntityRegistry) -
 
 
 async def test_camera_disabled(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that the camera does not load if there is not one configured."""
     with patch(
@@ -53,7 +53,7 @@ async def test_camera_disabled(
 
 
 async def test_no_supported_camera(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that the camera does not load if there is not one configured."""
     with patch(

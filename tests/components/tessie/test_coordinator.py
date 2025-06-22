@@ -5,14 +5,14 @@ from datetime import timedelta
 from freezegun.api import FrozenDateTimeFactory
 from tesla_fleet_api.exceptions import Forbidden, InvalidToken
 
-from homeassistant.components.tessie import PLATFORMS
-from homeassistant.components.tessie.coordinator import (
+from smarthub.components.tessie import PLATFORMS
+from smarthub.components.tessie.coordinator import (
     TESSIE_FLEET_API_SYNC_INTERVAL,
     TESSIE_SYNC_INTERVAL,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
 
 from .common import (
     ERROR_AUTH,
@@ -28,7 +28,7 @@ WAIT = timedelta(seconds=TESSIE_SYNC_INTERVAL)
 
 
 async def test_coordinator_online(
-    hass: HomeAssistant, mock_get_state, mock_get_status, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_get_state, mock_get_status, freezer: FrozenDateTimeFactory
 ) -> None:
     """Tests that the coordinator handles online vehicles."""
 
@@ -43,7 +43,7 @@ async def test_coordinator_online(
 
 
 async def test_coordinator_asleep(
-    hass: HomeAssistant, mock_get_status, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_get_status, freezer: FrozenDateTimeFactory
 ) -> None:
     """Tests that the coordinator handles asleep vehicles."""
 
@@ -58,7 +58,7 @@ async def test_coordinator_asleep(
 
 
 async def test_coordinator_clienterror(
-    hass: HomeAssistant, mock_get_status, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_get_status, freezer: FrozenDateTimeFactory
 ) -> None:
     """Tests that the coordinator handles client errors."""
 
@@ -73,7 +73,7 @@ async def test_coordinator_clienterror(
 
 
 async def test_coordinator_auth(
-    hass: HomeAssistant, mock_get_status, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_get_status, freezer: FrozenDateTimeFactory
 ) -> None:
     """Tests that the coordinator handles auth errors."""
 
@@ -87,7 +87,7 @@ async def test_coordinator_auth(
 
 
 async def test_coordinator_connection(
-    hass: HomeAssistant, mock_get_status, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_get_status, freezer: FrozenDateTimeFactory
 ) -> None:
     """Tests that the coordinator handles connection errors."""
 
@@ -101,7 +101,7 @@ async def test_coordinator_connection(
 
 
 async def test_coordinator_live_error(
-    hass: HomeAssistant, mock_live_status, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_live_status, freezer: FrozenDateTimeFactory
 ) -> None:
     """Tests that the energy live coordinator handles fleet errors."""
 
@@ -117,7 +117,7 @@ async def test_coordinator_live_error(
 
 
 async def test_coordinator_info_error(
-    hass: HomeAssistant, mock_site_info, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_site_info, freezer: FrozenDateTimeFactory
 ) -> None:
     """Tests that the energy info coordinator handles fleet errors."""
 
@@ -135,7 +135,7 @@ async def test_coordinator_info_error(
     )
 
 
-async def test_coordinator_live_reauth(hass: HomeAssistant, mock_live_status) -> None:
+async def test_coordinator_live_reauth(hass: SmartHub, mock_live_status) -> None:
     """Tests that the energy live coordinator handles auth errors."""
 
     mock_live_status.side_effect = InvalidToken
@@ -143,7 +143,7 @@ async def test_coordinator_live_reauth(hass: HomeAssistant, mock_live_status) ->
     assert entry.state is ConfigEntryState.SETUP_ERROR
 
 
-async def test_coordinator_info_reauth(hass: HomeAssistant, mock_site_info) -> None:
+async def test_coordinator_info_reauth(hass: SmartHub, mock_site_info) -> None:
     """Tests that the energy info coordinator handles auth errors."""
 
     mock_site_info.side_effect = InvalidToken

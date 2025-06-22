@@ -6,9 +6,9 @@ from unittest.mock import ANY, MagicMock, call, patch
 from aio_geojson_nsw_rfs_incidents import NswRuralFireServiceIncidentsFeed
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components import geo_location
-from homeassistant.components.geo_location import ATTR_SOURCE
-from homeassistant.components.nsw_rural_fire_service_feed.geo_location import (
+from smarthub.components import geo_location
+from smarthub.components.geo_location import ATTR_SOURCE
+from smarthub.components.nsw_rural_fire_service_feed.geo_location import (
     ATTR_CATEGORY,
     ATTR_COUNCIL_AREA,
     ATTR_EXTERNAL_ID,
@@ -21,7 +21,7 @@ from homeassistant.components.nsw_rural_fire_service_feed.geo_location import (
     ATTR_TYPE,
     SCAN_INTERVAL,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
@@ -35,9 +35,9 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STOP,
     UnitOfLength,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import assert_setup_component, async_fire_time_changed
 
@@ -92,7 +92,7 @@ def _generate_mock_feed_entry(
     return feed_entry
 
 
-async def test_setup(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+async def test_setup(hass: SmartHub, freezer: FrozenDateTimeFactory) -> None:
     """Test the general setup of the platform."""
     # Set up some mock feed entries for this test.
     mock_entry_1 = _generate_mock_feed_entry(
@@ -226,7 +226,7 @@ async def test_setup(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> Non
             await hass.async_block_till_done()
 
 
-async def test_setup_with_custom_location(hass: HomeAssistant) -> None:
+async def test_setup_with_custom_location(hass: SmartHub) -> None:
     """Test the setup with a custom location."""
     # Set up some mock feed entries for this test.
     mock_entry_1 = _generate_mock_feed_entry("1234", "Title 1", 20.5, (-31.1, 150.1))

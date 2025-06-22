@@ -6,11 +6,11 @@ from aiohttp import ClientError
 from aioimmich.exceptions import ImmichUnauthorizedError
 import pytest
 
-from homeassistant.components.immich.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.immich.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_URL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import MOCK_CONFIG_ENTRY_DATA, MOCK_USER_DATA
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_step_user(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_immich: Mock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_immich: Mock
 ) -> None:
     """Test a user initiated config flow."""
     result = await hass.config_entries.flow.async_init(
@@ -58,7 +58,7 @@ async def test_step_user(
     ],
 )
 async def test_step_user_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_immich: Mock,
     exception: Exception,
@@ -92,7 +92,7 @@ async def test_step_user_error_handling(
 
 
 async def test_step_user_invalid_url(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_immich: Mock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_immich: Mock
 ) -> None:
     """Test a user initiated config flow with errors."""
     result = await hass.config_entries.flow.async_init(
@@ -118,7 +118,7 @@ async def test_step_user_invalid_url(
 
 
 async def test_user_already_configured(
-    hass: HomeAssistant, mock_immich: Mock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_immich: Mock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test starting a flow by user when already configured."""
     mock_config_entry.add_to_hass(hass)
@@ -138,7 +138,7 @@ async def test_user_already_configured(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_immich: Mock,
     mock_config_entry: MockConfigEntry,
@@ -180,7 +180,7 @@ async def test_reauth_flow(
     ],
 )
 async def test_reauth_flow_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_immich: Mock,
     mock_config_entry: MockConfigEntry,
@@ -221,7 +221,7 @@ async def test_reauth_flow_error_handling(
 
 
 async def test_reauth_flow_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_immich: Mock,
     mock_config_entry: MockConfigEntry,

@@ -5,14 +5,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.onvif import DOMAIN, config_flow
-from homeassistant.config_entries import SOURCE_DHCP
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.onvif import DOMAIN, config_flow
+from smarthub.config_entries import SOURCE_DHCP
+from smarthub.const import CONF_HOST, CONF_NAME, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import (
     HOST,
@@ -99,9 +99,9 @@ def setup_mock_discovery(
     mock_discovery.return_value = mock_ws_discovery
 
 
-async def test_flow_discovered_devices(hass: HomeAssistant) -> None:
+async def test_flow_discovered_devices(hass: SmartHub) -> None:
     """Test that config flow works for discovered devices."""
-    logging.getLogger("homeassistant.components.onvif").setLevel(logging.DEBUG)
+    logging.getLogger("smarthub.components.onvif").setLevel(logging.DEBUG)
 
     result = await hass.config_entries.flow.async_init(
         config_flow.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -112,12 +112,12 @@ async def test_flow_discovered_devices(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(mock_onvif_camera)
         setup_mock_discovery(mock_discovery)
@@ -145,7 +145,7 @@ async def test_flow_discovered_devices(hass: HomeAssistant) -> None:
         assert result["step_id"] == "configure"
 
         with patch(
-            "homeassistant.components.onvif.async_setup_entry", return_value=True
+            "smarthub.components.onvif.async_setup_entry", return_value=True
         ) as mock_setup_entry:
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"],
@@ -170,10 +170,10 @@ async def test_flow_discovered_devices(hass: HomeAssistant) -> None:
 
 
 async def test_flow_discovered_devices_ignore_configured_manual_input(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that config flow discovery ignores configured devices."""
-    logging.getLogger("homeassistant.components.onvif").setLevel(logging.DEBUG)
+    logging.getLogger("smarthub.components.onvif").setLevel(logging.DEBUG)
     await setup_onvif_integration(hass)
 
     result = await hass.config_entries.flow.async_init(
@@ -185,12 +185,12 @@ async def test_flow_discovered_devices_ignore_configured_manual_input(
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(mock_onvif_camera)
         setup_mock_discovery(mock_discovery, with_mac=True)
@@ -213,7 +213,7 @@ async def test_flow_discovered_devices_ignore_configured_manual_input(
         assert result["step_id"] == "configure"
 
 
-async def test_flow_discovered_no_device(hass: HomeAssistant) -> None:
+async def test_flow_discovered_no_device(hass: SmartHub) -> None:
     """Test that config flow discovery no device."""
     await setup_onvif_integration(hass)
 
@@ -226,12 +226,12 @@ async def test_flow_discovered_no_device(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(mock_onvif_camera)
         setup_mock_discovery(mock_discovery, no_devices=True)
@@ -245,9 +245,9 @@ async def test_flow_discovered_no_device(hass: HomeAssistant) -> None:
         assert result["step_id"] == "configure"
 
 
-async def test_flow_discovery_ignore_existing_and_abort(hass: HomeAssistant) -> None:
+async def test_flow_discovery_ignore_existing_and_abort(hass: SmartHub) -> None:
     """Test that config flow discovery ignores setup devices."""
-    logging.getLogger("homeassistant.components.onvif").setLevel(logging.DEBUG)
+    logging.getLogger("smarthub.components.onvif").setLevel(logging.DEBUG)
     await setup_onvif_integration(hass)
     await setup_onvif_integration(
         hass,
@@ -271,12 +271,12 @@ async def test_flow_discovery_ignore_existing_and_abort(hass: HomeAssistant) -> 
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(mock_onvif_camera)
         setup_mock_discovery(mock_discovery, with_name=True, with_mac=True)
@@ -305,9 +305,9 @@ async def test_flow_discovery_ignore_existing_and_abort(hass: HomeAssistant) -> 
         assert result["type"] is FlowResultType.ABORT
 
 
-async def test_flow_manual_entry(hass: HomeAssistant) -> None:
+async def test_flow_manual_entry(hass: SmartHub) -> None:
     """Test that config flow works for discovered devices."""
-    logging.getLogger("homeassistant.components.onvif").setLevel(logging.DEBUG)
+    logging.getLogger("smarthub.components.onvif").setLevel(logging.DEBUG)
     result = await hass.config_entries.flow.async_init(
         config_flow.DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
@@ -317,12 +317,12 @@ async def test_flow_manual_entry(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(mock_onvif_camera, two_profiles=True)
         # no discovery
@@ -338,7 +338,7 @@ async def test_flow_manual_entry(hass: HomeAssistant) -> None:
         assert result["step_id"] == "configure"
 
         with patch(
-            "homeassistant.components.onvif.async_setup_entry", return_value=True
+            "smarthub.components.onvif.async_setup_entry", return_value=True
         ) as mock_setup_entry:
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"],
@@ -365,7 +365,7 @@ async def test_flow_manual_entry(hass: HomeAssistant) -> None:
         }
 
 
-async def test_flow_manual_entry_no_profiles(hass: HomeAssistant) -> None:
+async def test_flow_manual_entry_no_profiles(hass: SmartHub) -> None:
     """Test that config flow when no profiles are returned."""
     result = await hass.config_entries.flow.async_init(
         config_flow.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -376,12 +376,12 @@ async def test_flow_manual_entry_no_profiles(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(mock_onvif_camera, no_profiles=True)
         # no discovery
@@ -407,7 +407,7 @@ async def test_flow_manual_entry_no_profiles(hass: HomeAssistant) -> None:
         assert result["reason"] == "no_h264"
 
 
-async def test_flow_manual_entry_no_mac(hass: HomeAssistant) -> None:
+async def test_flow_manual_entry_no_mac(hass: SmartHub) -> None:
     """Test that config flow when no mac address is returned."""
     result = await hass.config_entries.flow.async_init(
         config_flow.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -418,12 +418,12 @@ async def test_flow_manual_entry_no_mac(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(
             mock_onvif_camera, with_serial=False, with_interfaces=False
@@ -451,7 +451,7 @@ async def test_flow_manual_entry_no_mac(hass: HomeAssistant) -> None:
         assert result["reason"] == "no_mac"
 
 
-async def test_flow_manual_entry_fails(hass: HomeAssistant) -> None:
+async def test_flow_manual_entry_fails(hass: SmartHub) -> None:
     """Test that we get a good error when manual entry fails."""
     result = await hass.config_entries.flow.async_init(
         config_flow.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -462,12 +462,12 @@ async def test_flow_manual_entry_fails(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(
             mock_onvif_camera, two_profiles=True, profiles_transient_failure=True
@@ -485,7 +485,7 @@ async def test_flow_manual_entry_fails(hass: HomeAssistant) -> None:
         assert result["step_id"] == "configure"
 
         with patch(
-            "homeassistant.components.onvif.async_setup_entry", return_value=True
+            "smarthub.components.onvif.async_setup_entry", return_value=True
         ) as mock_setup_entry:
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"],
@@ -510,7 +510,7 @@ async def test_flow_manual_entry_fails(hass: HomeAssistant) -> None:
         )
 
         with patch(
-            "homeassistant.components.onvif.async_setup_entry", return_value=True
+            "smarthub.components.onvif.async_setup_entry", return_value=True
         ) as mock_setup_entry:
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"],
@@ -535,7 +535,7 @@ async def test_flow_manual_entry_fails(hass: HomeAssistant) -> None:
         setup_mock_onvif_camera(mock_onvif_camera, two_profiles=True)
 
         with patch(
-            "homeassistant.components.onvif.async_setup_entry", return_value=True
+            "smarthub.components.onvif.async_setup_entry", return_value=True
         ) as mock_setup_entry:
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"],
@@ -561,7 +561,7 @@ async def test_flow_manual_entry_fails(hass: HomeAssistant) -> None:
         }
 
 
-async def test_flow_manual_entry_wrong_password(hass: HomeAssistant) -> None:
+async def test_flow_manual_entry_wrong_password(hass: SmartHub) -> None:
     """Test that we get a an auth error with the wrong password."""
     result = await hass.config_entries.flow.async_init(
         config_flow.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -572,12 +572,12 @@ async def test_flow_manual_entry_wrong_password(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(mock_onvif_camera, two_profiles=True, auth_fail=True)
         # no discovery
@@ -593,7 +593,7 @@ async def test_flow_manual_entry_wrong_password(hass: HomeAssistant) -> None:
         assert result["step_id"] == "configure"
 
         with patch(
-            "homeassistant.components.onvif.async_setup_entry", return_value=True
+            "smarthub.components.onvif.async_setup_entry", return_value=True
         ) as mock_setup_entry:
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"],
@@ -616,7 +616,7 @@ async def test_flow_manual_entry_wrong_password(hass: HomeAssistant) -> None:
         setup_mock_onvif_camera(mock_onvif_camera, two_profiles=True)
 
         with patch(
-            "homeassistant.components.onvif.async_setup_entry", return_value=True
+            "smarthub.components.onvif.async_setup_entry", return_value=True
         ) as mock_setup_entry:
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"],
@@ -643,7 +643,7 @@ async def test_flow_manual_entry_wrong_password(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("option_value", [True, False])
-async def test_option_flow(hass: HomeAssistant, option_value: bool) -> None:
+async def test_option_flow(hass: SmartHub, option_value: bool) -> None:
     """Test config flow options."""
     entry, _, _ = await setup_onvif_integration(hass)
 
@@ -674,7 +674,7 @@ async def test_option_flow(hass: HomeAssistant, option_value: bool) -> None:
 
 
 async def test_discovered_by_dhcp_updates_host(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test dhcp updates existing host."""
     config_entry, _camera, device = await setup_onvif_integration(hass)
@@ -698,7 +698,7 @@ async def test_discovered_by_dhcp_updates_host(
 
 
 async def test_discovered_by_dhcp_does_nothing_if_host_is_the_same(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test dhcp update does nothing if host is the same."""
     config_entry, _camera, device = await setup_onvif_integration(hass)
@@ -722,7 +722,7 @@ async def test_discovered_by_dhcp_does_nothing_if_host_is_the_same(
 
 
 async def test_discovered_by_dhcp_does_not_update_if_already_loaded(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test dhcp does not update existing host if its already loaded."""
     config_entry, _camera, device = await setup_onvif_integration(hass)
@@ -745,7 +745,7 @@ async def test_discovered_by_dhcp_does_not_update_if_already_loaded(
 
 
 async def test_discovered_by_dhcp_does_not_update_if_no_matching_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test dhcp does not update existing host if there are no matching entries."""
     result = await hass.config_entries.flow.async_init(
@@ -765,7 +765,7 @@ def _get_schema_default(schema, key_name):
     raise KeyError(f"{key_name} not found in schema")
 
 
-async def test_form_reauth(hass: HomeAssistant) -> None:
+async def test_form_reauth(hass: SmartHub) -> None:
     """Test reauthenticate."""
     entry, _, _ = await setup_onvif_integration(hass)
 
@@ -779,11 +779,11 @@ async def test_form_reauth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
         patch(
-            "homeassistant.components.onvif.async_setup_entry",
+            "smarthub.components.onvif.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -809,11 +809,11 @@ async def test_form_reauth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
         patch(
-            "homeassistant.components.onvif.async_setup_entry",
+            "smarthub.components.onvif.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -837,7 +837,7 @@ async def test_form_reauth(hass: HomeAssistant) -> None:
 
 
 async def test_flow_manual_entry_updates_existing_user_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that the existing username and password can be updated via manual entry."""
     entry, _, _ = await setup_onvif_integration(hass)
@@ -851,12 +851,12 @@ async def test_flow_manual_entry_updates_existing_user_password(
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(mock_onvif_camera, two_profiles=True)
         # no discovery
@@ -871,7 +871,7 @@ async def test_flow_manual_entry_updates_existing_user_password(
         assert result["step_id"] == "configure"
 
         with patch(
-            "homeassistant.components.onvif.async_setup_entry", return_value=True
+            "smarthub.components.onvif.async_setup_entry", return_value=True
         ) as mock_setup_entry:
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"],
@@ -893,7 +893,7 @@ async def test_flow_manual_entry_updates_existing_user_password(
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_flow_manual_entry_wrong_port(hass: HomeAssistant) -> None:
+async def test_flow_manual_entry_wrong_port(hass: SmartHub) -> None:
     """Test that we get a useful error with the wrong port."""
     result = await hass.config_entries.flow.async_init(
         config_flow.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -904,12 +904,12 @@ async def test_flow_manual_entry_wrong_port(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.onvif.config_flow.get_device"
+            "smarthub.components.onvif.config_flow.get_device"
         ) as mock_onvif_camera,
         patch(
-            "homeassistant.components.onvif.config_flow.WSDiscovery"
+            "smarthub.components.onvif.config_flow.WSDiscovery"
         ) as mock_discovery,
-        patch("homeassistant.components.onvif.ONVIFDevice") as mock_device,
+        patch("smarthub.components.onvif.ONVIFDevice") as mock_device,
     ):
         setup_mock_onvif_camera(mock_onvif_camera, wrong_port=True)
         # no discovery
@@ -925,7 +925,7 @@ async def test_flow_manual_entry_wrong_port(hass: HomeAssistant) -> None:
         assert result["step_id"] == "configure"
 
         with patch(
-            "homeassistant.components.onvif.async_setup_entry", return_value=True
+            "smarthub.components.onvif.async_setup_entry", return_value=True
         ) as mock_setup_entry:
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"],
@@ -948,7 +948,7 @@ async def test_flow_manual_entry_wrong_port(hass: HomeAssistant) -> None:
         setup_mock_onvif_camera(mock_onvif_camera, two_profiles=True)
 
         with patch(
-            "homeassistant.components.onvif.async_setup_entry", return_value=True
+            "smarthub.components.onvif.async_setup_entry", return_value=True
         ) as mock_setup_entry:
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"],

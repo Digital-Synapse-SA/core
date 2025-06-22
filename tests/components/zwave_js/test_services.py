@@ -7,8 +7,8 @@ import voluptuous as vol
 from zwave_js_server.exceptions import FailedZWaveCommand
 from zwave_js_server.model.value import SetConfigParameterResult
 
-from homeassistant.components.group import Group
-from homeassistant.components.zwave_js.const import (
+from smarthub.components.group import Group
+from smarthub.components.zwave_js.const import (
     ATTR_BROADCAST,
     ATTR_COMMAND_CLASS,
     ATTR_CONFIG_PARAMETER,
@@ -37,16 +37,16 @@ from homeassistant.components.zwave_js.const import (
     SERVICE_SET_CONFIG_PARAMETER,
     SERVICE_SET_VALUE,
 )
-from homeassistant.components.zwave_js.helpers import get_device_id
-from homeassistant.const import ATTR_AREA_ID, ATTR_DEVICE_ID, ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub.components.zwave_js.helpers import get_device_id
+from smarthub.const import ATTR_AREA_ID, ATTR_DEVICE_ID, ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     area_registry as ar,
     device_registry as dr,
     entity_registry as er,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from .common import (
     AEON_SMART_SWITCH_LIGHT_ENTITY,
@@ -62,7 +62,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_set_config_parameter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -363,7 +363,7 @@ async def test_set_config_parameter(
     )
 
     # Test unknown endpoint throws error when None are remaining
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SET_CONFIG_PARAMETER,
@@ -499,7 +499,7 @@ async def test_set_config_parameter(
 
     # Test accepted return
     with patch(
-        "homeassistant.components.zwave_js.services.Endpoint.async_set_raw_config_parameter_value",
+        "smarthub.components.zwave_js.services.Endpoint.async_set_raw_config_parameter_value",
         return_value=cmd_result,
     ) as mock_set_raw_config_parameter_value:
         await hass.services.async_call(
@@ -530,7 +530,7 @@ async def test_set_config_parameter(
     # Test queued return
     cmd_result.status = "queued"
     with patch(
-        "homeassistant.components.zwave_js.services.Endpoint.async_set_raw_config_parameter_value",
+        "smarthub.components.zwave_js.services.Endpoint.async_set_raw_config_parameter_value",
         return_value=cmd_result,
     ) as mock_set_raw_config_parameter_value:
         await hass.services.async_call(
@@ -560,7 +560,7 @@ async def test_set_config_parameter(
 
 
 async def test_set_config_parameter_gather(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     climate_radio_thermostat_ct100_plus_different_endpoints,
@@ -569,7 +569,7 @@ async def test_set_config_parameter_gather(
     """Test the set_config_parameter service gather functionality."""
     # Test setting config parameter by property and validate that the first node
     # which triggers an error doesn't prevent the second one to be called.
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SET_CONFIG_PARAMETER,
@@ -600,7 +600,7 @@ async def test_set_config_parameter_gather(
 
 
 async def test_bulk_set_config_parameters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     client,
@@ -833,7 +833,7 @@ async def test_bulk_set_config_parameters(
 
 
 async def test_bulk_set_config_parameters_gather(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     climate_radio_thermostat_ct100_plus_different_endpoints,
@@ -842,7 +842,7 @@ async def test_bulk_set_config_parameters_gather(
     """Test the bulk_set_partial_config_parameters service gather functionality."""
     # Test bulk setting config parameter by property and validate that the first node
     # which triggers an error doesn't prevent the second one to be called.
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_BULK_SET_PARTIAL_CONFIG_PARAMETERS,
@@ -873,7 +873,7 @@ async def test_bulk_set_config_parameters_gather(
 
 
 async def test_refresh_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     integration,
@@ -970,7 +970,7 @@ async def test_refresh_value(
 
 
 async def test_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     client,
@@ -1107,7 +1107,7 @@ async def test_set_value(
         "result": {"status": 2, "message": "test"}
     }
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SET_VALUE,
@@ -1151,7 +1151,7 @@ async def test_set_value(
 
 
 async def test_set_value_string(
-    hass: HomeAssistant, client, climate_danfoss_lc_13, lock_schlage_be469, integration
+    hass: SmartHub, client, climate_danfoss_lc_13, lock_schlage_be469, integration
 ) -> None:
     """Test set_value service converts number to string when needed."""
 
@@ -1183,7 +1183,7 @@ async def test_set_value_string(
 
 
 async def test_set_value_options(
-    hass: HomeAssistant, client, aeon_smart_switch_6, integration
+    hass: SmartHub, client, aeon_smart_switch_6, integration
 ) -> None:
     """Test set_value service with options."""
     await hass.services.async_call(
@@ -1215,7 +1215,7 @@ async def test_set_value_options(
 
 
 async def test_set_value_gather(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     climate_radio_thermostat_ct100_plus_different_endpoints,
@@ -1224,7 +1224,7 @@ async def test_set_value_gather(
     """Test the set_value service gather functionality."""
     # Test setting value by property and validate that the first node
     # which triggers an error doesn't prevent the second one to be called.
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SET_VALUE,
@@ -1258,7 +1258,7 @@ async def test_set_value_gather(
 
 
 async def test_multicast_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     client,
@@ -1480,7 +1480,7 @@ async def test_multicast_set_value(
         "result": {"status": 2, "message": "test"}
     }
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_MULTICAST_SET_VALUE,
@@ -1501,7 +1501,7 @@ async def test_multicast_set_value(
 
     # Test that when we get an exception from the library we raise an exception
     client.async_send_command.side_effect = FailedZWaveCommand("test", 12, "test")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_MULTICAST_SET_VALUE,
@@ -1529,7 +1529,7 @@ async def test_multicast_set_value(
     with (
         pytest.raises(vol.MultipleInvalid),
         patch(
-            "homeassistant.components.zwave_js.helpers.async_get_node_from_device_id",
+            "smarthub.components.zwave_js.helpers.async_get_node_from_device_id",
             side_effect=(climate_danfoss_lc_13, diff_network_node),
         ),
     ):
@@ -1569,7 +1569,7 @@ async def test_multicast_set_value(
 
 
 async def test_multicast_set_value_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     bulb_6_multi_color,
     light_color_null_values,
@@ -1615,7 +1615,7 @@ async def test_multicast_set_value_options(
 
 
 async def test_multicast_set_value_string(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     lock_id_lock_as_id150,
     lock_schlage_be469,
@@ -1650,7 +1650,7 @@ async def test_multicast_set_value_string(
 
 
 async def test_ping(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     client,
@@ -1795,7 +1795,7 @@ async def test_ping(
 
     client.async_send_command.reset_mock()
     client.async_send_command.side_effect = FailedZWaveCommand("test", 1, "test")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_PING,
@@ -1807,7 +1807,7 @@ async def test_ping(
 
 
 async def test_invoke_cc_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     client,
@@ -1932,7 +1932,7 @@ async def test_invoke_cc_api(
         "test", 12, "test"
     )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_INVOKE_CC_API,
@@ -1974,7 +1974,7 @@ async def test_invoke_cc_api(
 
 
 async def test_refresh_notifications(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     client,
@@ -2039,7 +2039,7 @@ async def test_refresh_notifications(
         "test", 12, "test"
     )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_REFRESH_NOTIFICATIONS,

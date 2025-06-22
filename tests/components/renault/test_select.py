@@ -7,16 +7,16 @@ import pytest
 from renault_api.kamereon import schemas
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.renault.const import DOMAIN
-from homeassistant.components.select import (
+from smarthub.components.renault.const import DOMAIN
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .const import MOCK_VEHICLES
 
@@ -32,14 +32,14 @@ _TEST_VEHICLES = [v for v in MOCK_VEHICLES if v != "captur_fuel"]
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.renault.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.renault.PLATFORMS", [Platform.SELECT]):
         yield
 
 
 @pytest.mark.usefixtures("fixtures_with_data")
 @pytest.mark.parametrize("vehicle_type", _TEST_VEHICLES, indirect=True)
 async def test_selects(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -54,7 +54,7 @@ async def test_selects(
 @pytest.mark.usefixtures("fixtures_with_no_data")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_select_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -69,7 +69,7 @@ async def test_select_empty(
 @pytest.mark.usefixtures("fixtures_with_invalid_upstream_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_select_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -84,7 +84,7 @@ async def test_select_errors(
 @pytest.mark.usefixtures("fixtures_with_access_denied_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_select_access_denied(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -98,7 +98,7 @@ async def test_select_access_denied(
 @pytest.mark.usefixtures("fixtures_with_not_supported_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_select_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -112,7 +112,7 @@ async def test_select_not_supported(
 @pytest.mark.usefixtures("fixtures_with_data")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_select_charge_mode(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test that service invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)

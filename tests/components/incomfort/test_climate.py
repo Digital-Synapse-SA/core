@@ -5,19 +5,19 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import climate
-from homeassistant.components.incomfort.coordinator import InComfortData
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components import climate
+from smarthub.components.incomfort.coordinator import InComfortData
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MOCK_HEATER_STATUS, MOCK_HEATER_STATUS_HEATING
 
 from tests.common import snapshot_platform
 
 
-@patch("homeassistant.components.incomfort.PLATFORMS", [Platform.CLIMATE])
+@patch("smarthub.components.incomfort.PLATFORMS", [Platform.CLIMATE])
 @pytest.mark.parametrize(
     "mock_room_status",
     [
@@ -32,7 +32,7 @@ from tests.common import snapshot_platform
     ids=["modern", "legacy"],
 )
 async def test_setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -57,7 +57,7 @@ async def test_setup_platform(
     ids=["idle", "heating"],
 )
 async def test_hvac_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     mock_config_entry: ConfigEntry,
     hvac_action: climate.HVACAction,
@@ -70,7 +70,7 @@ async def test_hvac_state(
 
 
 async def test_target_temp(
-    hass: HomeAssistant, mock_incomfort: MagicMock, mock_config_entry: ConfigEntry
+    hass: SmartHub, mock_incomfort: MagicMock, mock_config_entry: ConfigEntry
 ) -> None:
     """Test changing the target temperature."""
     await hass.config_entries.async_setup(mock_config_entry.entry_id)

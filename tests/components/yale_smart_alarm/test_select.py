@@ -8,14 +8,14 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from yalesmartalarmclient import YaleSmartAlarmData
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_OPTION, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_OPTION, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry, snapshot_platform
     [[Platform.SELECT]],
 )
 async def test_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     load_config_entry: tuple[MockConfigEntry, Mock],
     get_data: YaleSmartAlarmData,

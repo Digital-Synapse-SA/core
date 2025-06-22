@@ -4,7 +4,7 @@ All containing methods are legacy helpers that should not be used by new
 components. Instead call the service directly.
 """
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     _LOGGER,
     ATTR_FAN_MODE,
     ATTR_HUMIDITY,
@@ -24,19 +24,19 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     ENTITY_MATCH_ALL,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.loader import bind_hass
+from smarthub.core import SmartHub
+from smarthub.loader import bind_hass
 
 
 async def async_set_preset_mode(
-    hass: HomeAssistant, preset_mode: str, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, preset_mode: str, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set new preset mode."""
     data = {ATTR_PRESET_MODE: preset_mode}
@@ -49,7 +49,7 @@ async def async_set_preset_mode(
 
 @bind_hass
 def set_preset_mode(
-    hass: HomeAssistant, preset_mode: str, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, preset_mode: str, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set new preset mode."""
     data = {ATTR_PRESET_MODE: preset_mode}
@@ -61,7 +61,7 @@ def set_preset_mode(
 
 
 async def async_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     temperature: float | None = None,
     entity_id: str = ENTITY_MATCH_ALL,
     target_temp_high: float | None = None,
@@ -88,7 +88,7 @@ async def async_set_temperature(
 
 @bind_hass
 def set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     temperature: float | None = None,
     entity_id: str = ENTITY_MATCH_ALL,
     target_temp_high: float | None = None,
@@ -112,7 +112,7 @@ def set_temperature(
 
 
 async def async_set_humidity(
-    hass: HomeAssistant, humidity: int, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, humidity: int, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set new target humidity."""
     data = {ATTR_HUMIDITY: humidity}
@@ -125,7 +125,7 @@ async def async_set_humidity(
 
 @bind_hass
 def set_humidity(
-    hass: HomeAssistant, humidity: int, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, humidity: int, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set new target humidity."""
     data = {ATTR_HUMIDITY: humidity}
@@ -137,7 +137,7 @@ def set_humidity(
 
 
 async def async_set_fan_mode(
-    hass: HomeAssistant, fan: str, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, fan: str, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set all or specified climate devices fan mode on."""
     data = {ATTR_FAN_MODE: fan}
@@ -150,7 +150,7 @@ async def async_set_fan_mode(
 
 @bind_hass
 def set_fan_mode(
-    hass: HomeAssistant, fan: str, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, fan: str, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set all or specified climate devices fan mode on."""
     data = {ATTR_FAN_MODE: fan}
@@ -162,7 +162,7 @@ def set_fan_mode(
 
 
 async def async_set_hvac_mode(
-    hass: HomeAssistant, hvac_mode: HVACMode, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, hvac_mode: HVACMode, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set new target operation mode."""
     data = {ATTR_HVAC_MODE: hvac_mode}
@@ -175,7 +175,7 @@ async def async_set_hvac_mode(
 
 @bind_hass
 def set_operation_mode(
-    hass: HomeAssistant, hvac_mode: HVACMode, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, hvac_mode: HVACMode, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set new target operation mode."""
     data = {ATTR_HVAC_MODE: hvac_mode}
@@ -187,7 +187,7 @@ def set_operation_mode(
 
 
 async def async_set_swing_horizontal_mode(
-    hass: HomeAssistant, swing_horizontal_mode: str, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, swing_horizontal_mode: str, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set new target swing horizontal mode."""
     data = {ATTR_SWING_HORIZONTAL_MODE: swing_horizontal_mode}
@@ -201,7 +201,7 @@ async def async_set_swing_horizontal_mode(
 
 
 async def async_set_swing_mode(
-    hass: HomeAssistant, swing_mode: str, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, swing_mode: str, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set new target swing mode."""
     data = {ATTR_SWING_MODE: swing_mode}
@@ -214,7 +214,7 @@ async def async_set_swing_mode(
 
 @bind_hass
 def set_swing_mode(
-    hass: HomeAssistant, swing_mode: str, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, swing_mode: str, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set new target swing mode."""
     data = {ATTR_SWING_MODE: swing_mode}
@@ -225,7 +225,7 @@ def set_swing_mode(
     hass.services.call(DOMAIN, SERVICE_SET_SWING_MODE, data)
 
 
-async def async_turn_on(hass: HomeAssistant, entity_id: str = ENTITY_MATCH_ALL) -> None:
+async def async_turn_on(hass: SmartHub, entity_id: str = ENTITY_MATCH_ALL) -> None:
     """Turn on device."""
     data = {}
 
@@ -236,7 +236,7 @@ async def async_turn_on(hass: HomeAssistant, entity_id: str = ENTITY_MATCH_ALL) 
 
 
 async def async_turn_off(
-    hass: HomeAssistant, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Turn off device."""
     data = {}

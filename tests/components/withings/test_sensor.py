@@ -8,10 +8,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.withings import DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.withings import DOMAIN
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import (
     load_activity_fixture,
@@ -29,14 +29,14 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 @pytest.mark.freeze_time("2023-10-21")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.withings.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.withings.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, polling_config_entry)
 
     await snapshot_platform(
@@ -45,7 +45,7 @@ async def test_all_entities(
 
 
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -64,7 +64,7 @@ async def test_update_failed(
 
 
 async def test_update_updates_incrementally(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -107,7 +107,7 @@ async def test_update_updates_incrementally(
 
 
 async def test_update_new_measurement_creates_new_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -130,7 +130,7 @@ async def test_update_new_measurement_creates_new_sensor(
 
 
 async def test_update_new_goals_creates_new_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -154,7 +154,7 @@ async def test_update_new_goals_creates_new_sensor(
 
 
 async def test_activity_sensors_unknown_next_day(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -175,7 +175,7 @@ async def test_activity_sensors_unknown_next_day(
 
 
 async def test_activity_sensors_same_result_same_day(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -196,7 +196,7 @@ async def test_activity_sensors_same_result_same_day(
 
 
 async def test_activity_sensors_created_when_existed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -217,7 +217,7 @@ async def test_activity_sensors_created_when_existed(
 
 
 async def test_activity_sensors_created_when_receive_activity_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -246,7 +246,7 @@ async def test_activity_sensors_created_when_receive_activity_data(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sleep_sensors_created_when_existed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
 ) -> None:
@@ -266,7 +266,7 @@ async def test_sleep_sensors_created_when_existed(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sleep_sensors_created_when_receive_sleep_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -293,7 +293,7 @@ async def test_sleep_sensors_created_when_receive_sleep_data(
 
 
 async def test_workout_sensors_created_when_existed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
 ) -> None:
@@ -312,7 +312,7 @@ async def test_workout_sensors_created_when_existed(
 
 
 async def test_workout_sensors_created_when_receive_workout_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -339,7 +339,7 @@ async def test_workout_sensors_created_when_receive_workout_data(
 
 
 async def test_warning_if_no_entities_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -356,7 +356,7 @@ async def test_warning_if_no_entities_created(
 
 
 async def test_device_sensors_created_when_device_data_received(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -398,7 +398,7 @@ async def test_device_sensors_created_when_device_data_received(
 
 
 async def test_device_two_config_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     second_polling_config_entry: MockConfigEntry,

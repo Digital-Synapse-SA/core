@@ -9,11 +9,11 @@ from maxcube.wallthermostat import MaxWallThermostat
 from maxcube.windowshutter import MaxWindowShutter
 import pytest
 
-from homeassistant.components.maxcube import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import now
+from smarthub.components.maxcube import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import ConfigType
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import now
 
 
 @pytest.fixture
@@ -102,7 +102,7 @@ def hass_config():
 
 @pytest.fixture
 async def cube(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_config: ConfigType,
     room,
     thermostat,
@@ -110,7 +110,7 @@ async def cube(
     windowshutter,
 ):
     """Build and setup a cube mock with a single room and some devices."""
-    with patch("homeassistant.components.maxcube.MaxCube") as mock:
+    with patch("smarthub.components.maxcube.MaxCube") as mock:
         cube = mock.return_value
         cube.rooms = [room]
         cube.devices = [thermostat, wallthermostat, windowshutter]

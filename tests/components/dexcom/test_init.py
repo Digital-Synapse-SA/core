@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 from pydexcom import AccountError, SessionError
 
-from homeassistant.components.dexcom.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.dexcom.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import CONFIG, init_integration
 
 from tests.common import MockConfigEntry
 
 
-async def test_setup_entry_account_error(hass: HomeAssistant) -> None:
+async def test_setup_entry_account_error(hass: SmartHub) -> None:
     """Test entry setup failed due to account error."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -23,7 +23,7 @@ async def test_setup_entry_account_error(hass: HomeAssistant) -> None:
         options=None,
     )
     with patch(
-        "homeassistant.components.dexcom.Dexcom",
+        "smarthub.components.dexcom.Dexcom",
         side_effect=AccountError,
     ):
         entry.add_to_hass(hass)
@@ -33,7 +33,7 @@ async def test_setup_entry_account_error(hass: HomeAssistant) -> None:
     assert result is False
 
 
-async def test_setup_entry_session_error(hass: HomeAssistant) -> None:
+async def test_setup_entry_session_error(hass: SmartHub) -> None:
     """Test entry setup failed due to session error."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -43,7 +43,7 @@ async def test_setup_entry_session_error(hass: HomeAssistant) -> None:
         options=None,
     )
     with patch(
-        "homeassistant.components.dexcom.Dexcom",
+        "smarthub.components.dexcom.Dexcom",
         side_effect=SessionError,
     ):
         entry.add_to_hass(hass)
@@ -53,7 +53,7 @@ async def test_setup_entry_session_error(hass: HomeAssistant) -> None:
     assert result is False
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass)
 

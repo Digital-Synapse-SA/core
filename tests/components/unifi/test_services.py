@@ -5,14 +5,14 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from homeassistant.components.unifi.const import CONF_SITE_ID, DOMAIN
-from homeassistant.components.unifi.services import (
+from smarthub.components.unifi.const import CONF_SITE_ID, DOMAIN
+from smarthub.components.unifi.services import (
     SERVICE_RECONNECT_CLIENT,
     SERVICE_REMOVE_CLIENTS,
 )
-from homeassistant.const import ATTR_DEVICE_ID, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.const import ATTR_DEVICE_ID, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -22,7 +22,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
     "client_payload", [[{"is_wired": False, "mac": "00:00:00:00:00:01"}]]
 )
 async def test_reconnect_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     aioclient_mock: AiohttpClientMocker,
     config_entry_setup: MockConfigEntry,
@@ -51,7 +51,7 @@ async def test_reconnect_client(
 
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_reconnect_non_existant_device(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Verify no call is made if device does not exist."""
     aioclient_mock.clear_requests()
@@ -66,7 +66,7 @@ async def test_reconnect_non_existant_device(
 
 
 async def test_reconnect_device_without_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     aioclient_mock: AiohttpClientMocker,
     config_entry_setup: MockConfigEntry,
@@ -92,7 +92,7 @@ async def test_reconnect_device_without_mac(
     "client_payload", [[{"is_wired": False, "mac": "00:00:00:00:00:01"}]]
 )
 async def test_reconnect_client_hub_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     aioclient_mock: AiohttpClientMocker,
     config_entry_setup: MockConfigEntry,
@@ -111,7 +111,7 @@ async def test_reconnect_client_hub_unavailable(
     )
 
     with patch(
-        "homeassistant.components.unifi.UnifiHub.available", new_callable=PropertyMock
+        "smarthub.components.unifi.UnifiHub.available", new_callable=PropertyMock
     ) as ws_mock:
         ws_mock.return_value = False
         await hass.services.async_call(
@@ -124,7 +124,7 @@ async def test_reconnect_client_hub_unavailable(
 
 
 async def test_reconnect_client_unknown_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     aioclient_mock: AiohttpClientMocker,
     config_entry_setup: MockConfigEntry,
@@ -149,7 +149,7 @@ async def test_reconnect_client_unknown_mac(
     "client_payload", [[{"is_wired": True, "mac": "00:00:00:00:00:01"}]]
 )
 async def test_reconnect_wired_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     aioclient_mock: AiohttpClientMocker,
     config_entry_setup: MockConfigEntry,
@@ -202,7 +202,7 @@ async def test_reconnect_wired_client(
     ],
 )
 async def test_remove_clients(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     config_entry_setup: MockConfigEntry,
 ) -> None:
@@ -236,12 +236,12 @@ async def test_remove_clients(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_remove_clients_hub_unavailable(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Verify no call is made if UniFi Network is unavailable."""
     aioclient_mock.clear_requests()
     with patch(
-        "homeassistant.components.unifi.UnifiHub.available", new_callable=PropertyMock
+        "smarthub.components.unifi.UnifiHub.available", new_callable=PropertyMock
     ) as ws_mock:
         ws_mock.return_value = False
         await hass.services.async_call(DOMAIN, SERVICE_REMOVE_CLIENTS, blocking=True)
@@ -262,7 +262,7 @@ async def test_remove_clients_hub_unavailable(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_remove_clients_no_call_on_empty_list(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Verify no call is made if no fitting client has been added to the list."""
     aioclient_mock.clear_requests()
@@ -283,7 +283,7 @@ async def test_remove_clients_no_call_on_empty_list(
     ],
 )
 async def test_services_handle_unloaded_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     device_registry: dr.DeviceRegistry,
     config_entry_setup: MockConfigEntry,

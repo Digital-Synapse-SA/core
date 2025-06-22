@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.nut.const import DOMAIN, INTEGRATION_SUPPORTED_COMMANDS
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.nut.const import DOMAIN, INTEGRATION_SUPPORTED_COMMANDS
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .util import async_init_integration
 
@@ -35,7 +35,7 @@ from tests.common import async_load_fixture
     ],
 )
 async def test_switch_ups(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, model: str
+    hass: SmartHub, entity_registry: er.EntityRegistry, model: str
 ) -> None:
     """Tests that there are no standard switches."""
 
@@ -64,7 +64,7 @@ async def test_switch_ups(
     ],
 )
 async def test_switch_pdu_dynamic_outlets(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     model: str,
     unique_id_base: str,
@@ -130,7 +130,7 @@ async def test_switch_pdu_dynamic_outlets(
 
 
 async def test_switch_pdu_dynamic_outlets_state_unknown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test switch entity with missing status is reported as unknown."""

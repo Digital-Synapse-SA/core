@@ -16,34 +16,34 @@ from aiohttp.hdrs import (
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant.components.http import StaticPathConfig
-from homeassistant.components.http.cors import setup_cors
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.http import KEY_ALLOW_CONFIGURED_CORS, HomeAssistantView
-from homeassistant.setup import async_setup_component
+from smarthub.components.http import StaticPathConfig
+from smarthub.components.http.cors import setup_cors
+from smarthub.core import SmartHub
+from smarthub.helpers.http import KEY_ALLOW_CONFIGURED_CORS, SmartHubView
+from smarthub.setup import async_setup_component
 
 from . import HTTP_HEADER_HA_AUTH
 
 from tests.typing import ClientSessionGenerator
 
-TRUSTED_ORIGIN = "https://home-assistant.io"
+TRUSTED_ORIGIN = "https://smart-hub.io"
 
 
-async def test_cors_middleware_loaded_by_default(hass: HomeAssistant) -> None:
+async def test_cors_middleware_loaded_by_default(hass: SmartHub) -> None:
     """Test accessing to server from banned IP when feature is off."""
-    with patch("homeassistant.components.http.setup_cors") as mock_setup:
+    with patch("smarthub.components.http.setup_cors") as mock_setup:
         await async_setup_component(hass, "http", {"http": {}})
 
     assert len(mock_setup.mock_calls) == 1
 
 
-async def test_cors_middleware_loaded_from_config(hass: HomeAssistant) -> None:
+async def test_cors_middleware_loaded_from_config(hass: SmartHub) -> None:
     """Test accessing to server from banned IP when feature is off."""
-    with patch("homeassistant.components.http.setup_cors") as mock_setup:
+    with patch("smarthub.components.http.setup_cors") as mock_setup:
         await async_setup_component(
             hass,
             "http",
-            {"http": {"cors_allowed_origins": ["http://home-assistant.io"]}},
+            {"http": {"cors_allowed_origins": ["http://smart-hub.io"]}},
         )
 
     assert len(mock_setup.mock_calls) == 1
@@ -107,10 +107,10 @@ async def test_cors_preflight_allowed(client) -> None:
     assert req.headers[ACCESS_CONTROL_ALLOW_HEADERS] == "X-REQUESTED-WITH"
 
 
-async def test_cors_middleware_with_cors_allowed_view(hass: HomeAssistant) -> None:
+async def test_cors_middleware_with_cors_allowed_view(hass: SmartHub) -> None:
     """Test that we can configure cors and have a cors_allowed view."""
 
-    class MyView(HomeAssistantView):
+    class MyView(SmartHubView):
         """Test view that allows CORS."""
 
         requires_auth = False
@@ -126,7 +126,7 @@ async def test_cors_middleware_with_cors_allowed_view(hass: HomeAssistant) -> No
             return "test"
 
     assert await async_setup_component(
-        hass, "http", {"http": {"cors_allowed_origins": ["http://home-assistant.io"]}}
+        hass, "http", {"http": {"cors_allowed_origins": ["http://smart-hub.io"]}}
     )
 
     hass.http.register_view(MyView("/api/test", "api:test"))
@@ -138,13 +138,13 @@ async def test_cors_middleware_with_cors_allowed_view(hass: HomeAssistant) -> No
 
 
 async def test_cors_works_with_frontend(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test CORS works with the frontend."""
     assert await async_setup_component(
         hass,
         "frontend",
-        {"http": {"cors_allowed_origins": ["http://home-assistant.io"]}},
+        {"http": {"cors_allowed_origins": ["http://smart-hub.io"]}},
     )
     client = await hass_client()
     resp = await client.get("/")
@@ -152,7 +152,7 @@ async def test_cors_works_with_frontend(
 
 
 async def test_cors_on_static_files(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that we enable CORS for static files."""
     assert await async_setup_component(

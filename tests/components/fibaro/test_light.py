@@ -2,10 +2,10 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import init_integration
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_light_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
@@ -26,7 +26,7 @@ async def test_light_setup(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_light]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.LIGHT]):
         # Act
         await init_integration(hass, mock_config_entry)
         # Assert
@@ -37,7 +37,7 @@ async def test_light_setup(
 
 
 async def test_light_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_light: Mock,
@@ -49,7 +49,7 @@ async def test_light_brightness(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_light]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.LIGHT]):
         # Act
         await init_integration(hass, mock_config_entry)
         # Assert
@@ -59,7 +59,7 @@ async def test_light_brightness(
 
 
 async def test_zigbee_light_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_zigbee_light: Mock,
@@ -71,7 +71,7 @@ async def test_zigbee_light_brightness(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_zigbee_light]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.LIGHT]):
         # Act
         await init_integration(hass, mock_config_entry)
         # Assert
@@ -81,7 +81,7 @@ async def test_zigbee_light_brightness(
 
 
 async def test_light_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_light: Mock,
@@ -92,7 +92,7 @@ async def test_light_turn_off(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_light]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.LIGHT]):
         await init_integration(hass, mock_config_entry)
         # Act
         await hass.services.async_call(

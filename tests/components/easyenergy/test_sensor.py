@@ -5,14 +5,14 @@ from unittest.mock import MagicMock
 from easyenergy import EasyEnergyNoDataError
 import pytest
 
-from homeassistant.components.easyenergy.const import DOMAIN
-from homeassistant.components.homeassistant import SERVICE_UPDATE_ENTITY
-from homeassistant.components.sensor import (
+from smarthub.components.easyenergy.const import DOMAIN
+from smarthub.components.smarthub import SERVICE_UPDATE_ENTITY
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
@@ -23,16 +23,16 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfVolume,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.freeze_time("2023-01-19 15:00:00")
 async def test_energy_usage_today(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     init_integration: MockConfigEntry,
@@ -147,7 +147,7 @@ async def test_energy_usage_today(
 
 @pytest.mark.freeze_time("2023-01-19 15:00:00")
 async def test_energy_return_today(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     init_integration: MockConfigEntry,
@@ -263,7 +263,7 @@ async def test_energy_return_today(
 
 @pytest.mark.freeze_time("2023-01-19 10:00:00")
 async def test_gas_today(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     init_integration: MockConfigEntry,
@@ -300,15 +300,15 @@ async def test_gas_today(
 
 @pytest.mark.freeze_time("2023-01-19 15:00:00")
 async def test_no_gas_today(
-    hass: HomeAssistant, mock_easyenergy: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_easyenergy: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test the easyEnergy - No gas data available."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     mock_easyenergy.gas_prices.side_effect = EasyEnergyNoDataError
 
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         SERVICE_UPDATE_ENTITY,
         {ATTR_ENTITY_ID: "sensor.easyenergy_today_gas_current_hour_price"},
         blocking=True,

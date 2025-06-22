@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
-from homeassistant.components.greeneye_monitor import (
+from smarthub.components.greeneye_monitor import (
     CONF_CHANNELS,
     CONF_COUNTED_QUANTITY,
     CONF_COUNTED_QUANTITY_PER_PULSE,
@@ -19,15 +19,15 @@ from homeassistant.components.greeneye_monitor import (
     CONF_VOLTAGE_SENSORS,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_NAME,
     CONF_PORT,
     CONF_SENSORS,
     CONF_TEMPERATURE_UNIT,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import ConfigType
+from smarthub.setup import async_setup_component
 
 SINGLE_MONITOR_SERIAL_NUMBER = 110011
 
@@ -160,7 +160,7 @@ MULTI_MONITOR_CONFIG = {
 
 
 async def setup_greeneye_monitor_component_with_config(
-    hass: HomeAssistant, config: ConfigType
+    hass: SmartHub, config: ConfigType
 ) -> bool:
     """Set up the greeneye_monitor component with the given config. Return True if successful, False otherwise."""
     result = await async_setup_component(
@@ -243,9 +243,9 @@ def mock_monitor(serial_number: int) -> MagicMock:
 
 
 async def connect_monitor(
-    hass: HomeAssistant, monitors: AsyncMock, serial_number: int
+    hass: SmartHub, monitors: AsyncMock, serial_number: int
 ) -> MagicMock:
-    """Simulate a monitor connecting to Home Assistant. Returns the mock monitor API object."""
+    """Simulate a monitor connecting to SmartHub. Returns the mock monitor API object."""
     monitor = mock_monitor(serial_number)
     monitors.add_monitor(monitor)
     await hass.async_block_till_done()

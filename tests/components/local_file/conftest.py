@@ -8,10 +8,10 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.local_file.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_FILE_PATH, CONF_NAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.local_file.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_FILE_PATH, CONF_NAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Automatically patch setup."""
     with patch(
-        "homeassistant.components.local_file.async_setup_entry",
+        "smarthub.components.local_file.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -38,9 +38,9 @@ async def get_config_to_integration_load() -> dict[str, Any]:
 
 @pytest.fixture(name="loaded_entry")
 async def load_integration(
-    hass: HomeAssistant, get_config: dict[str, Any]
+    hass: SmartHub, get_config: dict[str, Any]
 ) -> MockConfigEntry:
-    """Set up the Local file integration in Home Assistant."""
+    """Set up the Local file integration in SmartHub."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,
@@ -53,7 +53,7 @@ async def load_integration(
         patch("os.path.isfile", Mock(return_value=True)),
         patch("os.access", Mock(return_value=True)),
         patch(
-            "homeassistant.components.local_file.camera.mimetypes.guess_type",
+            "smarthub.components.local_file.camera.mimetypes.guess_type",
             Mock(return_value=(None, None)),
         ),
     ):

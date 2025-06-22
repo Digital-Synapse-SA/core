@@ -2,16 +2,16 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.iss.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_SHOW_ON_MAP
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.iss.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_SHOW_ON_MAP
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_create_entry(hass: HomeAssistant) -> None:
+async def test_create_entry(hass: SmartHub) -> None:
     """Test we can finish a config flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -21,7 +21,7 @@ async def test_create_entry(hass: HomeAssistant) -> None:
     assert result.get("type") is FlowResultType.FORM
     assert result.get("step_id") == "user"
 
-    with patch("homeassistant.components.iss.async_setup_entry", return_value=True):
+    with patch("smarthub.components.iss.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {},
@@ -31,7 +31,7 @@ async def test_create_entry(hass: HomeAssistant) -> None:
         assert result.get("result").data == {}
 
 
-async def test_integration_already_exists(hass: HomeAssistant) -> None:
+async def test_integration_already_exists(hass: SmartHub) -> None:
     """Test we only allow a single config flow."""
 
     MockConfigEntry(
@@ -47,7 +47,7 @@ async def test_integration_already_exists(hass: HomeAssistant) -> None:
     assert result.get("reason") == "single_instance_allowed"
 
 
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test options flow."""
 
     config_entry = MockConfigEntry(
@@ -57,7 +57,7 @@ async def test_options(hass: HomeAssistant) -> None:
 
     config_entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.iss.async_setup_entry", return_value=True):
+    with patch("smarthub.components.iss.async_setup_entry", return_value=True):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
 
         optionflow = await hass.config_entries.options.async_init(config_entry.entry_id)

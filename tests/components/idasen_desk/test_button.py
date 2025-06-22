@@ -2,13 +2,13 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import init_integration
 
 
 async def test_connect_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_desk_api: MagicMock,
 ) -> None:
     """Test pressing the connect button."""
@@ -21,7 +21,7 @@ async def test_connect_button(
 
 
 async def test_disconnect_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_desk_api: MagicMock,
 ) -> None:
     """Test pressing the disconnect button."""

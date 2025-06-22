@@ -7,12 +7,12 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.assist_pipeline import PipelineStage
-from homeassistant.components.assist_satellite.websocket_api import (
+from smarthub.components.assist_pipeline import PipelineStage
+from smarthub.components.assist_satellite.websocket_api import (
     CONNECTION_TEST_TIMEOUT,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
 
 from . import ENTITY_ID
 from .conftest import MockAssistSatellite
@@ -22,7 +22,7 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 async def test_intercept_wake_word(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -56,7 +56,7 @@ async def test_intercept_wake_word(
 
 
 async def test_intercept_wake_word_requires_on_device_wake_word(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -79,7 +79,7 @@ async def test_intercept_wake_word_requires_on_device_wake_word(
 
     await entity.async_accept_pipeline_from_satellite(
         object(),  # type: ignore[arg-type]
-        # Emulate wake word processing in Home Assistant
+        # Emulate wake word processing in SmartHub
         start_stage=PipelineStage.WAKE_WORD,
     )
 
@@ -94,7 +94,7 @@ async def test_intercept_wake_word_requires_on_device_wake_word(
 
 
 async def test_intercept_wake_word_requires_wake_word_phrase(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -132,7 +132,7 @@ async def test_intercept_wake_word_requires_wake_word_phrase(
 
 
 async def test_intercept_wake_word_require_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -161,7 +161,7 @@ async def test_intercept_wake_word_require_admin(
 
 
 async def test_intercept_wake_word_invalid_satellite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -186,7 +186,7 @@ async def test_intercept_wake_word_invalid_satellite(
 
 
 async def test_intercept_wake_word_twice(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -235,7 +235,7 @@ async def test_intercept_wake_word_twice(
 
 
 async def test_intercept_wake_word_unsubscribe(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -267,7 +267,7 @@ async def test_intercept_wake_word_unsubscribe(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
         ) as mock_pipeline_from_audio_stream,
     ):
         # Start a pipeline with a wake word
@@ -281,7 +281,7 @@ async def test_intercept_wake_word_unsubscribe(
 
 
 async def test_get_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -314,7 +314,7 @@ async def test_get_configuration(
 
 
 async def test_get_configuration_not_implemented(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -345,7 +345,7 @@ async def test_get_configuration_not_implemented(
 
 
 async def test_set_wake_words(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -376,7 +376,7 @@ async def test_set_wake_words(
 
 
 async def test_set_wake_words_exceed_maximum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -400,7 +400,7 @@ async def test_set_wake_words_exceed_maximum(
 
 
 async def test_set_wake_words_bad_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -424,7 +424,7 @@ async def test_set_wake_words_bad_id(
 
 
 async def test_connection_test(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -463,7 +463,7 @@ async def test_connection_test(
 
 
 async def test_connection_test_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -500,7 +500,7 @@ async def test_connection_test_timeout(
 
 
 async def test_connection_test_invalid_satellite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,
@@ -524,7 +524,7 @@ async def test_connection_test_invalid_satellite(
 
 
 async def test_connection_test_timeout_announcement_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     hass_ws_client: WebSocketGenerator,

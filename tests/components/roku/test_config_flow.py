@@ -6,16 +6,16 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from rokuecp import Device as RokuDevice, RokuConnectionError
 
-from homeassistant.components.roku.const import CONF_PLAY_MEDIA_APP_ID, DOMAIN
-from homeassistant.config_entries import (
+from smarthub.components.roku.const import CONF_PLAY_MEDIA_APP_ID, DOMAIN
+from smarthub.config_entries import (
     SOURCE_HOMEKIT,
     SOURCE_SSDP,
     SOURCE_USER,
     ConfigFlowResult,
 )
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_HOST, CONF_NAME, CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     HOMEKIT_HOST,
@@ -32,7 +32,7 @@ RECONFIGURE_HOST = "192.168.1.190"
 
 
 async def test_duplicate_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_roku_config_flow: MagicMock,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_duplicate_error(
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_roku_config_flow: MagicMock,
     mock_setup_entry: None,
 ) -> None:
@@ -93,7 +93,7 @@ async def test_form(
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant, mock_roku_config_flow: MagicMock
+    hass: SmartHub, mock_roku_config_flow: MagicMock
 ) -> None:
     """Test we handle cannot connect roku error."""
     mock_roku_config_flow.update.side_effect = RokuConnectionError
@@ -111,7 +111,7 @@ async def test_form_cannot_connect(
 
 
 async def test_form_unknown_error(
-    hass: HomeAssistant, mock_roku_config_flow: MagicMock
+    hass: SmartHub, mock_roku_config_flow: MagicMock
 ) -> None:
     """Test we handle unknown error."""
     mock_roku_config_flow.update.side_effect = Exception
@@ -130,7 +130,7 @@ async def test_form_unknown_error(
 
 
 async def test_homekit_cannot_connect(
-    hass: HomeAssistant, mock_roku_config_flow: MagicMock
+    hass: SmartHub, mock_roku_config_flow: MagicMock
 ) -> None:
     """Test we abort homekit flow on connection error."""
     mock_roku_config_flow.update.side_effect = RokuConnectionError
@@ -147,7 +147,7 @@ async def test_homekit_cannot_connect(
 
 
 async def test_homekit_unknown_error(
-    hass: HomeAssistant, mock_roku_config_flow: MagicMock
+    hass: SmartHub, mock_roku_config_flow: MagicMock
 ) -> None:
     """Test we abort homekit flow on unknown error."""
     mock_roku_config_flow.update.side_effect = Exception
@@ -165,7 +165,7 @@ async def test_homekit_unknown_error(
 
 @pytest.mark.parametrize("mock_device", ["roku/rokutv-7820x.json"], indirect=True)
 async def test_homekit_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_roku_config_flow: MagicMock,
     mock_setup_entry: None,
 ) -> None:
@@ -202,7 +202,7 @@ async def test_homekit_discovery(
 
 
 async def test_ssdp_cannot_connect(
-    hass: HomeAssistant, mock_roku_config_flow: MagicMock
+    hass: SmartHub, mock_roku_config_flow: MagicMock
 ) -> None:
     """Test we abort SSDP flow on connection error."""
     mock_roku_config_flow.update.side_effect = RokuConnectionError
@@ -219,7 +219,7 @@ async def test_ssdp_cannot_connect(
 
 
 async def test_ssdp_unknown_error(
-    hass: HomeAssistant, mock_roku_config_flow: MagicMock
+    hass: SmartHub, mock_roku_config_flow: MagicMock
 ) -> None:
     """Test we abort SSDP flow on unknown error."""
     mock_roku_config_flow.update.side_effect = Exception
@@ -236,7 +236,7 @@ async def test_ssdp_unknown_error(
 
 
 async def test_ssdp_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_roku_config_flow: MagicMock,
     mock_setup_entry: None,
 ) -> None:
@@ -264,7 +264,7 @@ async def test_ssdp_discovery(
 
 
 async def test_options_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test options config flow."""
     mock_config_entry.add_to_hass(hass)
@@ -286,7 +286,7 @@ async def test_options_flow(
 
 
 async def _start_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> ConfigFlowResult:
     """Initialize a reconfigure flow."""
@@ -304,7 +304,7 @@ async def _start_reconfigure_flow(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_roku_config_flow: MagicMock,
@@ -323,7 +323,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_unique_id_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: RokuDevice,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

@@ -11,13 +11,13 @@ from gotailwind import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.tailwind.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.tailwind.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -25,7 +25,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 @pytest.mark.usefixtures("mock_tailwind")
-async def test_user_flow(hass: HomeAssistant) -> None:
+async def test_user_flow(hass: SmartHub) -> None:
     """Test the full happy path user flow from start to finish."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -63,7 +63,7 @@ async def test_user_flow(hass: HomeAssistant) -> None:
     ],
 )
 async def test_user_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tailwind: MagicMock,
     side_effect: Exception,
     expected_error: dict[str, str],
@@ -104,7 +104,7 @@ async def test_user_flow_errors(
 
 
 async def test_user_flow_unsupported_firmware_version(
-    hass: HomeAssistant, mock_tailwind: MagicMock
+    hass: SmartHub, mock_tailwind: MagicMock
 ) -> None:
     """Test configuration flow aborts when the firmware version is not supported."""
     mock_tailwind.status.side_effect = TailwindUnsupportedFirmwareVersionError
@@ -123,7 +123,7 @@ async def test_user_flow_unsupported_firmware_version(
 
 @pytest.mark.usefixtures("mock_tailwind")
 async def test_user_flow_already_configured(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test configuration flow aborts when the device is already configured.
 
@@ -149,7 +149,7 @@ async def test_user_flow_already_configured(
 
 @pytest.mark.usefixtures("mock_tailwind")
 async def test_zeroconf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the zeroconf happy flow from start to finish."""
@@ -202,7 +202,7 @@ async def test_zeroconf_flow(
     ],
 )
 async def test_zeroconf_flow_abort_incompatible_properties(
-    hass: HomeAssistant, properties: dict[str, str], expected_reason: str
+    hass: SmartHub, properties: dict[str, str], expected_reason: str
 ) -> None:
     """Test the zeroconf aborts when it advertises incompatible data."""
     result = await hass.config_entries.flow.async_init(
@@ -232,7 +232,7 @@ async def test_zeroconf_flow_abort_incompatible_properties(
     ],
 )
 async def test_zeroconf_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tailwind: MagicMock,
     side_effect: Exception,
     expected_error: dict[str, str],
@@ -290,7 +290,7 @@ async def test_zeroconf_flow_errors(
 
 @pytest.mark.usefixtures("mock_tailwind")
 async def test_zeroconf_flow_not_discovered_again(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the zeroconf doesn't re-discover an existing device.
@@ -326,7 +326,7 @@ async def test_zeroconf_flow_not_discovered_again(
 
 @pytest.mark.usefixtures("mock_tailwind")
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the reauthentication configuration flow."""
@@ -358,7 +358,7 @@ async def test_reauth_flow(
     ],
 )
 async def test_reauth_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tailwind: MagicMock,
     side_effect: Exception,
@@ -394,7 +394,7 @@ async def test_reauth_flow_errors(
 
 
 async def test_dhcp_discovery_updates_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test DHCP discovery updates config entries."""
@@ -416,7 +416,7 @@ async def test_dhcp_discovery_updates_entry(
     assert mock_config_entry.data[CONF_HOST] == "127.0.0.1"
 
 
-async def test_dhcp_discovery_ignores_unknown(hass: HomeAssistant) -> None:
+async def test_dhcp_discovery_ignores_unknown(hass: SmartHub) -> None:
     """Test DHCP discovery is only used for updates.
 
     Anything else will just abort the flow.

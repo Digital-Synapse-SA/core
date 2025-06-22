@@ -7,7 +7,7 @@ from pysmartthings.models import HealthStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_MEDIA_REPEAT,
     ATTR_MEDIA_SHUFFLE,
@@ -17,8 +17,8 @@ from homeassistant.components.media_player import (
     SERVICE_SELECT_SOURCE,
     RepeatMode,
 )
-from homeassistant.components.smartthings.const import MAIN
-from homeassistant.const import (
+from smarthub.components.smartthings.const import MAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_MEDIA_NEXT_TRACK,
     SERVICE_MEDIA_PAUSE,
@@ -38,8 +38,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import (
     setup_integration,
@@ -52,7 +52,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -75,7 +75,7 @@ async def test_all_entities(
     ],
 )
 async def test_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     action: str,
@@ -104,7 +104,7 @@ async def test_turn_on_off(
     ],
 )
 async def test_mute_unmute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     muted: bool,
@@ -130,7 +130,7 @@ async def test_mute_unmute(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_set_volume_level(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -154,7 +154,7 @@ async def test_set_volume_level(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_volume_up(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -177,7 +177,7 @@ async def test_volume_up(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_volume_down(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -200,7 +200,7 @@ async def test_volume_down(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_media_play(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -223,7 +223,7 @@ async def test_media_play(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_media_pause(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -246,7 +246,7 @@ async def test_media_pause(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_media_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -269,7 +269,7 @@ async def test_media_stop(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_media_previous_track(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -295,7 +295,7 @@ async def test_media_previous_track(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_media_next_track(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -321,7 +321,7 @@ async def test_media_next_track(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_select_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -352,7 +352,7 @@ async def test_select_source(
     ],
 )
 async def test_media_shuffle_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     shuffle: bool,
@@ -389,7 +389,7 @@ async def test_media_shuffle_on_off(
     ],
 )
 async def test_media_repeat_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     repeat: RepeatMode,
@@ -418,7 +418,7 @@ async def test_media_repeat_mode(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -441,7 +441,7 @@ async def test_state_update(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -465,7 +465,7 @@ async def test_availability(
 
 @pytest.mark.parametrize("device_fixture", ["hw_q80r_soundbar"])
 async def test_availability_at_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unavailable_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

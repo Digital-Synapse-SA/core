@@ -5,10 +5,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.backup.const import DATA_MANAGER, DOMAIN
-from homeassistant.config_entries import SOURCE_SYSTEM, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceNotFound
+from smarthub.components.backup.const import DATA_MANAGER, DOMAIN
+from smarthub.config_entries import SOURCE_SYSTEM, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceNotFound
 
 from .common import setup_backup_integration
 
@@ -18,7 +18,7 @@ from tests.typing import WebSocketGenerator
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_setup_with_hassio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test the setup of the integration with hassio enabled."""
@@ -29,14 +29,14 @@ async def test_setup_with_hassio(
 
 @pytest.mark.parametrize("service_data", [None, {}])
 async def test_create_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_data: dict[str, Any] | None,
 ) -> None:
     """Test generate backup."""
     await setup_backup_integration(hass)
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+        "smarthub.components.backup.manager.BackupManager.async_create_backup",
     ) as generate_backup:
         await hass.services.async_call(
             DOMAIN,
@@ -51,14 +51,14 @@ async def test_create_service(
         include_all_addons=False,
         include_database=True,
         include_folders=None,
-        include_homeassistant=True,
+        include_smarthub=True,
         name=None,
         password=None,
     )
 
 
 @pytest.mark.usefixtures("supervisor_client")
-async def test_create_service_with_hassio(hass: HomeAssistant) -> None:
+async def test_create_service_with_hassio(hass: SmartHub) -> None:
     """Test action backup.create does not exist with hassio."""
     await setup_backup_integration(hass, with_hassio=True)
 
@@ -77,7 +77,7 @@ async def test_create_service_with_hassio(hass: HomeAssistant) -> None:
                 "include_all_addons": False,
                 "include_database": True,
                 "include_folders": None,
-                "include_homeassistant": True,
+                "include_smarthub": True,
                 "name": None,
                 "password": None,
                 "with_automatic_settings": True,
@@ -104,7 +104,7 @@ async def test_create_service_with_hassio(hass: HomeAssistant) -> None:
                 "include_all_addons": True,
                 "include_database": False,
                 "include_folders": ["share"],
-                "include_homeassistant": True,
+                "include_smarthub": True,
                 "name": "cool_backup",
                 "password": "hunter2",
                 "with_automatic_settings": True,
@@ -116,7 +116,7 @@ async def test_create_service_with_hassio(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize("with_hassio", [True, False])
 @pytest.mark.usefixtures("supervisor_client")
 async def test_create_automatic_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     commands: list[dict[str, Any]],
     expected_kwargs: dict[str, Any],
@@ -133,7 +133,7 @@ async def test_create_automatic_service(
         assert result["success"]
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+        "smarthub.components.backup.manager.BackupManager.async_create_backup",
     ) as generate_backup:
         await hass.services.async_call(
             DOMAIN,
@@ -146,14 +146,14 @@ async def test_create_automatic_service(
 
 
 async def test_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test setup backup config entry."""
     await setup_backup_integration(hass, with_hassio=False)
     entry = MockConfigEntry(domain=DOMAIN, source=SOURCE_SYSTEM)
     entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.backup.PLATFORMS", return_value=[]):
+    with patch("smarthub.components.backup.PLATFORMS", return_value=[]):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
     assert entry.state is ConfigEntryState.LOADED

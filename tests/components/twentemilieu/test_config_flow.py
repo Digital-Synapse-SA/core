@@ -5,18 +5,18 @@ from unittest.mock import MagicMock
 import pytest
 from twentemilieu import TwenteMilieuAddressError, TwenteMilieuConnectionError
 
-from homeassistant import config_entries
-from homeassistant.components.twentemilieu import config_flow
-from homeassistant.components.twentemilieu.const import (
+from smarthub import config_entries
+from smarthub.components.twentemilieu import config_flow
+from smarthub.components.twentemilieu.const import (
     CONF_HOUSE_LETTER,
     CONF_HOUSE_NUMBER,
     CONF_POST_CODE,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_ID
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -24,7 +24,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 @pytest.mark.usefixtures("mock_twentemilieu")
-async def test_full_user_flow(hass: HomeAssistant) -> None:
+async def test_full_user_flow(hass: SmartHub) -> None:
     """Test registering an integration and finishing flow works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -56,7 +56,7 @@ async def test_full_user_flow(hass: HomeAssistant) -> None:
 
 
 async def test_invalid_address(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_twentemilieu: MagicMock,
 ) -> None:
     """Test full user flow when the user enters an incorrect address.
@@ -107,7 +107,7 @@ async def test_invalid_address(
 
 
 async def test_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_twentemilieu: MagicMock,
 ) -> None:
     """Test we show user form on Twente Milieu connection error."""
@@ -154,7 +154,7 @@ async def test_connection_error(
 
 @pytest.mark.usefixtures("mock_twentemilieu")
 async def test_address_already_set_up(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort if address has already been set up."""

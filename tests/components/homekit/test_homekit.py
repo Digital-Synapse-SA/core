@@ -11,11 +11,11 @@ from pyhap.accessory import Accessory
 from pyhap.const import CATEGORY_CAMERA, CATEGORY_TELEVISION
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components import homekit as homekit_base, zeroconf
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.components.event import EventDeviceClass
-from homeassistant.components.homekit import (
+from smarthub import config as hass_config
+from smarthub.components import homekit as homekit_base, zeroconf
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.components.event import EventDeviceClass
+from smarthub.components.homekit import (
     MAX_DEVICES,
     STATUS_READY,
     STATUS_RUNNING,
@@ -24,8 +24,8 @@ from homeassistant.components.homekit import (
     TYPE_AIR_PURIFIER,
     HomeKit,
 )
-from homeassistant.components.homekit.accessories import HomeBridge
-from homeassistant.components.homekit.const import (
+from smarthub.components.homekit.accessories import HomeBridge
+from smarthub.components.homekit.const import (
     BRIDGE_NAME,
     BRIDGE_SERIAL_NUMBER,
     CONF_ADVERTISE_IP,
@@ -36,18 +36,18 @@ from homeassistant.components.homekit.const import (
     SERVICE_HOMEKIT_RESET_ACCESSORY,
     SERVICE_HOMEKIT_UNPAIR,
 )
-from homeassistant.components.homekit.models import HomeKitEntryData
-from homeassistant.components.homekit.type_triggers import DeviceTriggerAccessory
-from homeassistant.components.homekit.util import get_persist_fullpath_for_entry_id
-from homeassistant.components.light import (
+from smarthub.components.homekit.models import HomeKitEntryData
+from smarthub.components.homekit.type_triggers import DeviceTriggerAccessory
+from smarthub.components.homekit.util import get_persist_fullpath_for_entry_id
+from smarthub.components.light import (
     ATTR_COLOR_MODE,
     ATTR_SUPPORTED_COLOR_MODES,
     ColorMode,
 )
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.components.switch import SwitchDeviceClass
-from homeassistant.config_entries import SOURCE_IMPORT, SOURCE_ZEROCONF
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.components.switch import SwitchDeviceClass
+from smarthub.config_entries import SOURCE_IMPORT, SOURCE_ZEROCONF
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_DEVICE_ID,
     ATTR_ENTITY_ID,
@@ -62,14 +62,14 @@ from homeassistant.const import (
     EntityCategory,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     instance_id,
 )
-from homeassistant.helpers.entityfilter import (
+from smarthub.helpers.entityfilter import (
     CONF_EXCLUDE_DOMAINS,
     CONF_EXCLUDE_ENTITIES,
     CONF_EXCLUDE_ENTITY_GLOBS,
@@ -79,7 +79,7 @@ from homeassistant.helpers.entityfilter import (
     EntityFilter,
     convert_filter,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from .util import PATH_HOMEKIT, async_init_entry, async_init_integration
 
@@ -118,13 +118,13 @@ def always_patch_driver(hk_driver):
 
 @pytest.fixture(autouse=True)
 def patch_source_ip():
-    """Patch homeassistant and pyhap functions for getting local address."""
+    """Patch smarthub and pyhap functions for getting local address."""
     with patch("pyhap.util.get_local_address", return_value="10.10.10.10"):
         yield
 
 
 def _mock_homekit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
     homekit_mode: str,
     entity_filter: EntityFilter | None = None,
@@ -146,7 +146,7 @@ def _mock_homekit(
     )
 
 
-def _mock_homekit_bridge(hass: HomeAssistant, entry: MockConfigEntry) -> HomeKit:
+def _mock_homekit_bridge(hass: SmartHub, entry: MockConfigEntry) -> HomeKit:
     homekit = _mock_homekit(hass, entry, HOMEKIT_MODE_BRIDGE)
     homekit.driver = MagicMock()
     homekit.iid_storage = MagicMock()
@@ -167,7 +167,7 @@ def _mock_pyhap_bridge():
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_setup_min(hass: HomeAssistant) -> None:
+async def test_setup_min(hass: SmartHub) -> None:
     """Test async_setup with min config options."""
 
     entry = MockConfigEntry(
@@ -180,7 +180,7 @@ async def test_setup_min(hass: HomeAssistant) -> None:
     with (
         patch(f"{PATH_HOMEKIT}.HomeKit") as mock_homekit,
         patch(
-            "homeassistant.components.network.async_get_source_ip",
+            "smarthub.components.network.async_get_source_ip",
             return_value="1.2.3.4",
         ),
     ):
@@ -212,7 +212,7 @@ async def test_setup_min(hass: HomeAssistant) -> None:
 
 @patch(f"{PATH_HOMEKIT}.async_port_is_available", return_value=True)
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_removing_entry(port_mock, hass: HomeAssistant) -> None:
+async def test_removing_entry(port_mock, hass: SmartHub) -> None:
     """Test removing a config entry."""
 
     entry = MockConfigEntry(
@@ -225,7 +225,7 @@ async def test_removing_entry(port_mock, hass: HomeAssistant) -> None:
     with (
         patch(f"{PATH_HOMEKIT}.HomeKit") as mock_homekit,
         patch(
-            "homeassistant.components.network.async_get_source_ip",
+            "smarthub.components.network.async_get_source_ip",
             return_value="1.2.3.4",
         ),
     ):
@@ -259,7 +259,7 @@ async def test_removing_entry(port_mock, hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_setup(hass: HomeAssistant, hk_driver) -> None:
+async def test_homekit_setup(hass: SmartHub, hk_driver) -> None:
     """Test setup of bridge and driver."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -308,7 +308,7 @@ async def test_homekit_setup(hass: HomeAssistant, hk_driver) -> None:
 
 
 async def test_homekit_setup_ip_address(
-    hass: HomeAssistant, hk_driver, mock_async_zeroconf: MagicMock
+    hass: SmartHub, hk_driver, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test setup with given IP address."""
     entry = MockConfigEntry(
@@ -353,7 +353,7 @@ async def test_homekit_setup_ip_address(
 
 
 async def test_homekit_with_single_advertise_ips(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     mock_async_zeroconf: MagicMock,
     hass_storage: dict[str, Any],
@@ -388,7 +388,7 @@ async def test_homekit_with_single_advertise_ips(
 
 
 async def test_homekit_with_many_advertise_ips(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     mock_async_zeroconf: MagicMock,
     hass_storage: dict[str, Any],
@@ -427,7 +427,7 @@ async def test_homekit_with_many_advertise_ips(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_setup_advertise_ips(hass: HomeAssistant, hk_driver) -> None:
+async def test_homekit_setup_advertise_ips(hass: SmartHub, hk_driver) -> None:
     """Test setup with given IP address to advertise."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -472,7 +472,7 @@ async def test_homekit_setup_advertise_ips(hass: HomeAssistant, hk_driver) -> No
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_add_accessory(hass: HomeAssistant, mock_hap) -> None:
+async def test_homekit_add_accessory(hass: SmartHub, mock_hap) -> None:
     """Add accessory if config exists and get_acc returns an accessory."""
 
     entry = MockConfigEntry(
@@ -512,7 +512,7 @@ async def test_homekit_add_accessory(hass: HomeAssistant, mock_hap) -> None:
 @pytest.mark.parametrize("acc_category", [CATEGORY_TELEVISION, CATEGORY_CAMERA])
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_warn_add_accessory_bridge(
-    hass: HomeAssistant,
+    hass: SmartHub,
     acc_category,
     mock_hap,
     caplog: pytest.LogCaptureFixture,
@@ -545,7 +545,7 @@ async def test_homekit_warn_add_accessory_bridge(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_remove_accessory(hass: HomeAssistant) -> None:
+async def test_homekit_remove_accessory(hass: SmartHub) -> None:
     """Remove accessory from bridge."""
     entry = await async_init_integration(hass)
 
@@ -563,7 +563,7 @@ async def test_homekit_remove_accessory(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_entity_filter(hass: HomeAssistant) -> None:
+async def test_homekit_entity_filter(hass: SmartHub) -> None:
     """Test the entity filter."""
     entry = await async_init_integration(hass)
 
@@ -583,7 +583,7 @@ async def test_homekit_entity_filter(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_entity_glob_filter(hass: HomeAssistant) -> None:
+async def test_homekit_entity_glob_filter(hass: SmartHub) -> None:
     """Test the entity filter."""
     entry = await async_init_integration(hass)
 
@@ -609,7 +609,7 @@ async def test_homekit_entity_glob_filter(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_entity_glob_filter_with_config_entities(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the entity filter with configuration entities."""
     entry = await async_init_integration(hass)
@@ -661,7 +661,7 @@ async def test_homekit_entity_glob_filter_with_config_entities(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_entity_glob_filter_with_hidden_entities(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the entity filter with hidden entities."""
     entry = await async_init_integration(hass)
@@ -713,7 +713,7 @@ async def test_homekit_entity_glob_filter_with_hidden_entities(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -734,7 +734,7 @@ async def test_homekit_start(
         connections={connection},
         manufacturer="Any",
         name="Any",
-        model="Home Assistant HomeKit Bridge",
+        model="SmartHub HomeKit Bridge",
     )
 
     hass.states.async_set("light.demo", "on")
@@ -751,7 +751,7 @@ async def test_homekit_start(
     await hass.async_block_till_done()
     mock_add_acc.assert_any_call(state)
     mock_setup_msg.assert_called_with(
-        hass, entry.entry_id, "Mock Title (Home Assistant Bridge)", ANY, ANY
+        hass, entry.entry_id, "Mock Title (SmartHub Bridge)", ANY, ANY
     )
     assert hk_driver_start.called
     assert homekit.status == STATUS_RUNNING
@@ -800,7 +800,7 @@ async def test_homekit_start(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_start_with_a_broken_accessory(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test HomeKit start method."""
     entry = MockConfigEntry(
@@ -828,7 +828,7 @@ async def test_homekit_start_with_a_broken_accessory(
 
     await hass.async_block_till_done()
     mock_setup_msg.assert_called_with(
-        hass, entry.entry_id, "Mock Title (Home Assistant Bridge)", ANY, ANY
+        hass, entry.entry_id, "Mock Title (SmartHub Bridge)", ANY, ANY
     )
     assert hk_driver_start.called
     assert homekit.status == STATUS_RUNNING
@@ -842,7 +842,7 @@ async def test_homekit_start_with_a_broken_accessory(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_start_with_a_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     demo_cleanup,
     device_registry: dr.DeviceRegistry,
@@ -853,7 +853,7 @@ async def test_homekit_start_with_a_device(
     entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_NAME: "mock_name", CONF_PORT: 12345}
     )
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "demo", {"demo": {}})
     await hass.async_block_till_done()
 
@@ -873,7 +873,7 @@ async def test_homekit_start_with_a_device(
 
     await hass.async_block_till_done()
     mock_setup_msg.assert_called_with(
-        hass, entry.entry_id, "Mock Title (Home Assistant Bridge)", ANY, ANY
+        hass, entry.entry_id, "Mock Title (SmartHub Bridge)", ANY, ANY
     )
     assert homekit.status == STATUS_RUNNING
 
@@ -883,7 +883,7 @@ async def test_homekit_start_with_a_device(
     await homekit.async_stop()
 
 
-async def test_homekit_stop(hass: HomeAssistant) -> None:
+async def test_homekit_stop(hass: SmartHub) -> None:
     """Test HomeKit stop method."""
     entry = await async_init_integration(hass)
     homekit = _mock_homekit(hass, entry, HOMEKIT_MODE_BRIDGE)
@@ -914,7 +914,7 @@ async def test_homekit_stop(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_reset_accessories(hass: HomeAssistant, mock_hap) -> None:
+async def test_homekit_reset_accessories(hass: SmartHub, mock_hap) -> None:
     """Test resetting HomeKit accessories."""
 
     entry = MockConfigEntry(
@@ -952,7 +952,7 @@ async def test_homekit_reset_accessories(hass: HomeAssistant, mock_hap) -> None:
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_reload_accessory_can_change_class(
-    hass: HomeAssistant, mock_hap
+    hass: SmartHub, mock_hap
 ) -> None:
     """Test reloading a HomeKit Accessory in brdige mode.
 
@@ -988,7 +988,7 @@ async def test_homekit_reload_accessory_can_change_class(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_reload_accessory_in_accessory_mode(
-    hass: HomeAssistant, mock_hap
+    hass: SmartHub, mock_hap
 ) -> None:
     """Test reloading a HomeKit Accessory in accessory mode.
 
@@ -1024,7 +1024,7 @@ async def test_homekit_reload_accessory_in_accessory_mode(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_reload_accessory_same_class(
-    hass: HomeAssistant, mock_hap
+    hass: SmartHub, mock_hap
 ) -> None:
     """Test reloading a HomeKit Accessory in bridge mode.
 
@@ -1069,7 +1069,7 @@ async def test_homekit_reload_accessory_same_class(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_unpair(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test unpairing HomeKit accessories."""
 
@@ -1119,7 +1119,7 @@ async def test_homekit_unpair(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_unpair_missing_device_id(hass: HomeAssistant) -> None:
+async def test_homekit_unpair_missing_device_id(hass: SmartHub) -> None:
     """Test unpairing HomeKit accessories with invalid device id."""
 
     entry = MockConfigEntry(
@@ -1147,7 +1147,7 @@ async def test_homekit_unpair_missing_device_id(hass: HomeAssistant) -> None:
         state = homekit.driver.state
         client_1 = str(uuid1()).encode("utf-8")
         state.add_paired_client(client_1, "any", b"1")
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 DOMAIN,
                 SERVICE_HOMEKIT_UNPAIR,
@@ -1161,7 +1161,7 @@ async def test_homekit_unpair_missing_device_id(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_unpair_not_homekit_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test unpairing HomeKit accessories with a non-homekit device id."""
 
@@ -1201,7 +1201,7 @@ async def test_homekit_unpair_not_homekit_device(
         state = homekit.driver.state
         client_1 = str(uuid1()).encode("utf-8")
         state.add_paired_client(client_1, "any", b"1")
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 DOMAIN,
                 SERVICE_HOMEKIT_UNPAIR,
@@ -1214,7 +1214,7 @@ async def test_homekit_unpair_not_homekit_device(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_reset_accessories_not_supported(hass: HomeAssistant) -> None:
+async def test_homekit_reset_accessories_not_supported(hass: SmartHub) -> None:
     """Test resetting HomeKit accessories with an unsupported entity."""
 
     entry = MockConfigEntry(
@@ -1259,7 +1259,7 @@ async def test_homekit_reset_accessories_not_supported(hass: HomeAssistant) -> N
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_reset_accessories_state_missing(hass: HomeAssistant) -> None:
+async def test_homekit_reset_accessories_state_missing(hass: SmartHub) -> None:
     """Test resetting HomeKit accessories when the state goes missing."""
 
     entry = MockConfigEntry(
@@ -1302,7 +1302,7 @@ async def test_homekit_reset_accessories_state_missing(hass: HomeAssistant) -> N
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_reset_accessories_not_bridged(hass: HomeAssistant) -> None:
+async def test_homekit_reset_accessories_not_bridged(hass: SmartHub) -> None:
     """Test resetting HomeKit accessories when the state is not bridged."""
 
     entry = MockConfigEntry(
@@ -1348,7 +1348,7 @@ async def test_homekit_reset_accessories_not_bridged(hass: HomeAssistant) -> Non
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_reset_single_accessory(hass: HomeAssistant, mock_hap) -> None:
+async def test_homekit_reset_single_accessory(hass: SmartHub, mock_hap) -> None:
     """Test resetting HomeKit single accessory."""
 
     entry = MockConfigEntry(
@@ -1386,7 +1386,7 @@ async def test_homekit_reset_single_accessory(hass: HomeAssistant, mock_hap) -> 
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_reset_single_accessory_unsupported(hass: HomeAssistant) -> None:
+async def test_homekit_reset_single_accessory_unsupported(hass: SmartHub) -> None:
     """Test resetting HomeKit single accessory with an unsupported entity."""
 
     entry = MockConfigEntry(
@@ -1427,7 +1427,7 @@ async def test_homekit_reset_single_accessory_unsupported(hass: HomeAssistant) -
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_reset_single_accessory_state_missing(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test resetting HomeKit single accessory when the state goes missing."""
 
@@ -1467,7 +1467,7 @@ async def test_homekit_reset_single_accessory_state_missing(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_reset_single_accessory_no_match(hass: HomeAssistant) -> None:
+async def test_homekit_reset_single_accessory_no_match(hass: SmartHub) -> None:
     """Test resetting HomeKit single accessory when the entity id does not match."""
 
     entry = MockConfigEntry(
@@ -1507,7 +1507,7 @@ async def test_homekit_reset_single_accessory_no_match(hass: HomeAssistant) -> N
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_too_many_accessories(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -1543,7 +1543,7 @@ async def test_homekit_too_many_accessories(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_finds_linked_batteries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1622,7 +1622,7 @@ async def test_homekit_finds_linked_batteries(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_async_get_integration_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1696,7 +1696,7 @@ async def test_homekit_async_get_integration_fails(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_yaml_updates_update_config_entry_for_name(hass: HomeAssistant) -> None:
+async def test_yaml_updates_update_config_entry_for_name(hass: SmartHub) -> None:
     """Test async_setup with imported config."""
 
     entry = MockConfigEntry(
@@ -1710,7 +1710,7 @@ async def test_yaml_updates_update_config_entry_for_name(hass: HomeAssistant) ->
     with (
         patch(f"{PATH_HOMEKIT}.HomeKit") as mock_homekit,
         patch(
-            "homeassistant.components.network.async_get_source_ip",
+            "smarthub.components.network.async_get_source_ip",
             return_value="1.2.3.4",
         ),
     ):
@@ -1745,7 +1745,7 @@ async def test_yaml_updates_update_config_entry_for_name(hass: HomeAssistant) ->
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_yaml_can_link_with_default_name(hass: HomeAssistant) -> None:
+async def test_yaml_can_link_with_default_name(hass: SmartHub) -> None:
     """Test async_setup with imported config linked by default name."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1758,7 +1758,7 @@ async def test_yaml_can_link_with_default_name(hass: HomeAssistant) -> None:
     with (
         patch(f"{PATH_HOMEKIT}.HomeKit") as mock_homekit,
         patch(
-            "homeassistant.components.network.async_get_source_ip",
+            "smarthub.components.network.async_get_source_ip",
             return_value="1.2.3.4",
         ),
     ):
@@ -1778,7 +1778,7 @@ async def test_yaml_can_link_with_default_name(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_yaml_can_link_with_port(hass: HomeAssistant) -> None:
+async def test_yaml_can_link_with_port(hass: SmartHub) -> None:
     """Test async_setup with imported config linked by port."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1804,7 +1804,7 @@ async def test_yaml_can_link_with_port(hass: HomeAssistant) -> None:
     with (
         patch(f"{PATH_HOMEKIT}.HomeKit") as mock_homekit,
         patch(
-            "homeassistant.components.network.async_get_source_ip",
+            "smarthub.components.network.async_get_source_ip",
             return_value="1.2.3.4",
         ),
     ):
@@ -1831,7 +1831,7 @@ async def test_yaml_can_link_with_port(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_uses_system_zeroconf(hass: HomeAssistant, hk_driver) -> None:
+async def test_homekit_uses_system_zeroconf(hass: SmartHub, hk_driver) -> None:
     """Test HomeKit uses system zeroconf."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1861,7 +1861,7 @@ async def test_homekit_uses_system_zeroconf(hass: HomeAssistant, hk_driver) -> N
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_ignored_missing_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1908,7 +1908,7 @@ async def test_homekit_ignored_missing_devices(
     # Delete the device to make sure we fallback
     # to using the platform
     with patch(
-        "homeassistant.helpers.entity_registry.async_entries_for_device",
+        "smarthub.helpers.entity_registry.async_entries_for_device",
         return_value=[],
     ):
         device_registry.async_remove_device(device_entry.id)
@@ -1953,7 +1953,7 @@ async def test_homekit_ignored_missing_devices(
 )
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_finds_linked_motion_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -2028,7 +2028,7 @@ async def test_homekit_finds_linked_motion_sensors(
 )
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_finds_linked_doorbell_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -2097,7 +2097,7 @@ async def test_homekit_finds_linked_doorbell_sensors(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_finds_linked_humidity_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -2116,7 +2116,7 @@ async def test_homekit_finds_linked_humidity_sensors(
         config_entry_id=config_entry.entry_id,
         sw_version="0.16.1",
         model="Smart Brainy Clever Humidifier",
-        manufacturer="Home Assistant",
+        manufacturer="SmartHub",
         connections={(dr.CONNECTION_NETWORK_MAC, "12:34:56:AB:CD:EF")},
     )
 
@@ -2156,7 +2156,7 @@ async def test_homekit_finds_linked_humidity_sensors(
         ANY,
         ANY,
         {
-            "manufacturer": "Home Assistant",
+            "manufacturer": "SmartHub",
             "model": "Smart Brainy Clever Humidifier",
             "platform": "test",
             "sw_version": "0.16.1",
@@ -2167,7 +2167,7 @@ async def test_homekit_finds_linked_humidity_sensors(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_finds_linked_air_purifier_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -2186,7 +2186,7 @@ async def test_homekit_finds_linked_air_purifier_sensors(
         config_entry_id=config_entry.entry_id,
         sw_version="0.16.1",
         model="Smart Air Purifier",
-        manufacturer="Home Assistant",
+        manufacturer="SmartHub",
         connections={(dr.CONNECTION_NETWORK_MAC, "12:34:56:AB:CD:EF")},
     )
 
@@ -2256,7 +2256,7 @@ async def test_homekit_finds_linked_air_purifier_sensors(
         ANY,
         ANY,
         {
-            "manufacturer": "Home Assistant",
+            "manufacturer": "SmartHub",
             "model": "Smart Air Purifier",
             "platform": "air_purifier",
             "sw_version": "0.16.1",
@@ -2269,7 +2269,7 @@ async def test_homekit_finds_linked_air_purifier_sensors(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_reload(hass: HomeAssistant) -> None:
+async def test_reload(hass: SmartHub) -> None:
     """Test we can reload from yaml."""
 
     entry = MockConfigEntry(
@@ -2283,7 +2283,7 @@ async def test_reload(hass: HomeAssistant) -> None:
     with (
         patch(f"{PATH_HOMEKIT}.HomeKit") as mock_homekit,
         patch(
-            "homeassistant.components.network.async_get_source_ip",
+            "smarthub.components.network.async_get_source_ip",
             return_value="1.2.3.4",
         ),
     ):
@@ -2321,7 +2321,7 @@ async def test_reload(hass: HomeAssistant) -> None:
             "pyhap.accessory_driver.AccessoryDriver.async_start",
         ),
         patch(
-            "homeassistant.components.network.async_get_source_ip",
+            "smarthub.components.network.async_get_source_ip",
             return_value="1.2.3.4",
         ),
     ):
@@ -2353,7 +2353,7 @@ async def test_reload(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_start_in_accessory_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -2397,7 +2397,7 @@ async def test_homekit_start_in_accessory_mode(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_start_in_accessory_mode_unsupported_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2430,7 +2430,7 @@ async def test_homekit_start_in_accessory_mode_unsupported_entity(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_start_in_accessory_mode_missing_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2460,7 +2460,7 @@ async def test_homekit_start_in_accessory_mode_missing_entity(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_wait_for_port_to_free(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

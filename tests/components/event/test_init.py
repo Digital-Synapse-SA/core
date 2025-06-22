@@ -6,7 +6,7 @@ from typing import Any
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components.event import (
+from smarthub.components.event import (
     ATTR_EVENT_TYPE,
     ATTR_EVENT_TYPES,
     DOMAIN,
@@ -14,13 +14,13 @@ from homeassistant.components.event import (
     EventEntity,
     EventEntityDescription,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import CONF_PLATFORM, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import CONF_PLATFORM, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub, State
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .const import TEST_DOMAIN
 
@@ -97,7 +97,7 @@ async def test_event() -> None:
 
 
 @pytest.mark.usefixtures("enable_custom_integrations", "mock_event_platform")
-async def test_restore_state(hass: HomeAssistant) -> None:
+async def test_restore_state(hass: SmartHub) -> None:
     """Test we restore state integration."""
     mock_restore_cache_with_extra_data(
         hass,
@@ -140,7 +140,7 @@ async def test_restore_state(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_custom_integrations", "mock_event_platform")
-async def test_invalid_extra_restore_state(hass: HomeAssistant) -> None:
+async def test_invalid_extra_restore_state(hass: SmartHub) -> None:
     """Test we restore state integration."""
     mock_restore_cache_with_extra_data(
         hass,
@@ -172,7 +172,7 @@ async def test_invalid_extra_restore_state(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_custom_integrations", "mock_event_platform")
-async def test_no_extra_restore_state(hass: HomeAssistant) -> None:
+async def test_no_extra_restore_state(hass: SmartHub) -> None:
     """Test we restore state integration."""
     mock_restore_cache(
         hass,
@@ -204,7 +204,7 @@ async def test_no_extra_restore_state(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_custom_integrations", "mock_event_platform")
-async def test_saving_state(hass: HomeAssistant, hass_storage: dict[str, Any]) -> None:
+async def test_saving_state(hass: SmartHub, hass_storage: dict[str, Any]) -> None:
     """Test we restore state integration."""
     restore_data = {"last_event_type": "double_press", "last_event_attributes": None}
 
@@ -238,7 +238,7 @@ class MockFlow(ConfigFlow):
 
 
 @pytest.fixture
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -247,11 +247,11 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
 
 
 @pytest.mark.usefixtures("config_flow_fixture")
-async def test_name(hass: HomeAssistant) -> None:
+async def test_name(hass: SmartHub) -> None:
     """Test event name."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -297,7 +297,7 @@ async def test_name(hass: HomeAssistant) -> None:
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:

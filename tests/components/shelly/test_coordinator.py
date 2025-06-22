@@ -8,10 +8,10 @@ from aioshelly.exceptions import DeviceConnectionError, InvalidAuthError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.shelly import MacAddressMismatchError
-from homeassistant.components.shelly.const import (
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.shelly import MacAddressMismatchError
+from smarthub.components.shelly.const import (
     ATTR_CHANNEL,
     ATTR_CLICK_TYPE,
     ATTR_DEVICE,
@@ -25,10 +25,10 @@ from homeassistant.components.shelly.const import (
     UPDATE_PERIOD_MULTIPLIER,
     BLEScannerMode,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_DEVICE_ID, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import Event, HomeAssistant, State
-from homeassistant.helpers import device_registry as dr, issue_registry as ir
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_DEVICE_ID, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import Event, SmartHub, State
+from smarthub.helpers import device_registry as dr, issue_registry as ir
 
 from . import (
     MOCK_MAC,
@@ -49,7 +49,7 @@ DEVICE_BLOCK_ID = 4
 
 
 async def test_block_reload_on_cfg_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -94,7 +94,7 @@ async def test_block_reload_on_cfg_change(
 
 
 async def test_block_no_reload_on_bulb_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -144,7 +144,7 @@ async def test_block_no_reload_on_bulb_changes(
 
 
 async def test_block_polling_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -179,7 +179,7 @@ async def test_block_polling_auth_error(
 
 
 async def test_block_rest_update_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -215,7 +215,7 @@ async def test_block_rest_update_auth_error(
 
 
 async def test_block_sleeping_device_firmware_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     issue_registry: ir.IssueRegistry,
@@ -236,7 +236,7 @@ async def test_block_sleeping_device_firmware_unsupported(
 
 
 async def test_block_polling_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -265,7 +265,7 @@ async def test_block_polling_connection_error(
 
 @pytest.mark.parametrize("exc", [DeviceConnectionError, MacAddressMismatchError])
 async def test_block_rest_update_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -289,7 +289,7 @@ async def test_block_rest_update_connection_error(
 
 
 async def test_block_sleeping_device_no_periodic_updates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -320,7 +320,7 @@ async def test_block_sleeping_device_no_periodic_updates(
 
 
 async def test_block_device_push_updates_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -346,7 +346,7 @@ async def test_block_device_push_updates_failure(
 
 
 async def test_block_button_click_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_block_device: Mock,
     events: list[Event],
@@ -392,7 +392,7 @@ async def test_block_button_click_event(
 
 
 async def test_rpc_reload_on_cfg_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -440,14 +440,14 @@ async def test_rpc_reload_on_cfg_change(
 
 
 async def test_rpc_reload_with_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test RPC when InvalidAuthError is raising during config entry reload."""
     with patch(
-        "homeassistant.components.shelly.coordinator.async_stop_scanner",
+        "smarthub.components.shelly.coordinator.async_stop_scanner",
         side_effect=[None, InvalidAuthError, None],
     ):
         entry = await init_integration(hass, 2)
@@ -495,7 +495,7 @@ async def test_rpc_reload_with_invalid_auth(
 
 
 async def test_rpc_connection_error_during_unload(
-    hass: HomeAssistant, mock_rpc_device: Mock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_rpc_device: Mock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test RPC DeviceConnectionError suppressed during config entry unload."""
     entry = await init_integration(hass, 2)
@@ -503,7 +503,7 @@ async def test_rpc_connection_error_during_unload(
     assert entry.state is ConfigEntryState.LOADED
 
     with patch(
-        "homeassistant.components.shelly.coordinator.async_stop_scanner",
+        "smarthub.components.shelly.coordinator.async_stop_scanner",
         side_effect=DeviceConnectionError,
     ):
         await hass.config_entries.async_unload(entry.entry_id)
@@ -514,7 +514,7 @@ async def test_rpc_connection_error_during_unload(
 
 
 async def test_rpc_click_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_rpc_device: Mock,
     events: list[Event],
@@ -554,7 +554,7 @@ async def test_rpc_click_event(
 
 
 async def test_rpc_update_entry_sleep_period(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -587,7 +587,7 @@ async def test_rpc_update_entry_sleep_period(
 
 
 async def test_rpc_sleeping_device_no_periodic_updates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -622,7 +622,7 @@ async def test_rpc_sleeping_device_no_periodic_updates(
 
 
 async def test_rpc_sleeping_device_firmware_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     issue_registry: ir.IssueRegistry,
@@ -644,7 +644,7 @@ async def test_rpc_sleeping_device_firmware_unsupported(
 
 
 async def test_rpc_reconnect_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -683,7 +683,7 @@ async def test_rpc_reconnect_auth_error(
 
 
 async def test_rpc_polling_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -720,7 +720,7 @@ async def test_rpc_polling_auth_error(
 
 @pytest.mark.parametrize("exc", [DeviceConnectionError, MacAddressMismatchError])
 async def test_rpc_reconnect_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -748,7 +748,7 @@ async def test_rpc_reconnect_error(
 
 
 async def test_rpc_error_running_connected_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -759,7 +759,7 @@ async def test_rpc_error_running_connected_events(
     monkeypatch.delitem(mock_rpc_device.status, "cover:0")
     monkeypatch.setitem(mock_rpc_device.status["sys"], "relay_in_thermostat", False)
     with patch(
-        "homeassistant.components.shelly.coordinator.async_ensure_ble_enabled",
+        "smarthub.components.shelly.coordinator.async_ensure_ble_enabled",
         side_effect=DeviceConnectionError,
     ):
         await init_integration(
@@ -781,7 +781,7 @@ async def test_rpc_error_running_connected_events(
 
 
 async def test_rpc_polling_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -808,7 +808,7 @@ async def test_rpc_polling_connection_error(
 
 
 async def test_rpc_polling_disconnected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -829,7 +829,7 @@ async def test_rpc_polling_disconnected(
 
 
 async def test_rpc_update_entry_fw_ver(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -873,7 +873,7 @@ async def test_rpc_update_entry_fw_ver(
     ],
 )
 async def test_rpc_runs_connected_events_when_initialized(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     supports_scripts: bool,
@@ -902,7 +902,7 @@ async def test_rpc_runs_connected_events_when_initialized(
 
 
 async def test_rpc_sleeping_device_unload_ignore_ble_scanner(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -923,7 +923,7 @@ async def test_rpc_sleeping_device_unload_ignore_ble_scanner(
 
 
 async def test_block_sleeping_device_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
@@ -976,7 +976,7 @@ async def test_block_sleeping_device_connection_error(
 
 
 async def test_rpc_sleeping_device_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
@@ -1030,7 +1030,7 @@ async def test_rpc_sleeping_device_connection_error(
 
 
 async def test_rpc_sleeping_device_late_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -1056,7 +1056,7 @@ async def test_rpc_sleeping_device_late_setup(
 
 
 async def test_rpc_already_connected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_rpc_device: Mock,
     caplog: pytest.LogCaptureFixture,
@@ -1072,7 +1072,7 @@ async def test_rpc_already_connected(
 
 
 async def test_xmod_model_lookup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,

@@ -2,9 +2,9 @@
 
 import pytest
 
-from homeassistant.components.github import CONF_REPOSITORIES
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er, icon
+from smarthub.components.github import CONF_REPOSITORIES
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er, icon
 
 from .common import setup_github_integration
 
@@ -15,7 +15,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 # This tests needs to be adjusted to remove lingering tasks
 @pytest.mark.parametrize("expected_lingering_tasks", [True])
 async def test_device_registry_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
@@ -25,7 +25,7 @@ async def test_device_registry_cleanup(
     mock_config_entry.add_to_hass(hass)
     hass.config_entries.async_update_entry(
         mock_config_entry,
-        options={CONF_REPOSITORIES: ["home-assistant/core"]},
+        options={CONF_REPOSITORIES: ["smart-hub/core"]},
     )
     await setup_github_integration(
         hass, mock_config_entry, aioclient_mock, add_entry_to_hass=False
@@ -46,7 +46,7 @@ async def test_device_registry_cleanup(
     await hass.async_block_till_done()
 
     assert (
-        f"Unlinking device {devices[0].id} for untracked repository home-assistant/core from config entry {mock_config_entry.entry_id}"
+        f"Unlinking device {devices[0].id} for untracked repository smart-hub/core from config entry {mock_config_entry.entry_id}"
         in caplog.text
     )
 
@@ -61,7 +61,7 @@ async def test_device_registry_cleanup(
 # This tests needs to be adjusted to remove lingering tasks
 @pytest.mark.parametrize("expected_lingering_tasks", [True])
 async def test_subscription_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -69,14 +69,14 @@ async def test_subscription_setup(
     mock_config_entry.add_to_hass(hass)
     hass.config_entries.async_update_entry(
         mock_config_entry,
-        options={CONF_REPOSITORIES: ["home-assistant/core"]},
+        options={CONF_REPOSITORIES: ["smart-hub/core"]},
         pref_disable_polling=False,
     )
     await setup_github_integration(
         hass, mock_config_entry, aioclient_mock, add_entry_to_hass=False
     )
     assert (
-        "https://api.github.com/repos/home-assistant/core/events" in x[1]
+        "https://api.github.com/repos/smart-hub/core/events" in x[1]
         for x in aioclient_mock.mock_calls
     )
 
@@ -84,7 +84,7 @@ async def test_subscription_setup(
 # This tests needs to be adjusted to remove lingering tasks
 @pytest.mark.parametrize("expected_lingering_tasks", [True])
 async def test_subscription_setup_polling_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -92,14 +92,14 @@ async def test_subscription_setup_polling_disabled(
     mock_config_entry.add_to_hass(hass)
     hass.config_entries.async_update_entry(
         mock_config_entry,
-        options={CONF_REPOSITORIES: ["home-assistant/core"]},
+        options={CONF_REPOSITORIES: ["smart-hub/core"]},
         pref_disable_polling=True,
     )
     await setup_github_integration(
         hass, mock_config_entry, aioclient_mock, add_entry_to_hass=False
     )
     assert (
-        "https://api.github.com/repos/home-assistant/core/events" not in x[1]
+        "https://api.github.com/repos/smart-hub/core/events" not in x[1]
         for x in aioclient_mock.mock_calls
     )
 
@@ -110,7 +110,7 @@ async def test_subscription_setup_polling_disabled(
     assert await hass.config_entries.async_reload(mock_config_entry.entry_id)
     await hass.async_block_till_done()
     assert (
-        "https://api.github.com/repos/home-assistant/core/events" in x[1]
+        "https://api.github.com/repos/smart-hub/core/events" in x[1]
         for x in aioclient_mock.mock_calls
     )
 
@@ -118,7 +118,7 @@ async def test_subscription_setup_polling_disabled(
 # This tests needs to be adjusted to remove lingering tasks
 @pytest.mark.parametrize("expected_lingering_tasks", [True])
 async def test_sensor_icons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:

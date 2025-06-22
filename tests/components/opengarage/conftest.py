@@ -7,9 +7,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.opengarage.const import CONF_DEVICE_KEY, DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT, CONF_VERIFY_SSL
-from homeassistant.core import HomeAssistant
+from smarthub.components.opengarage.const import CONF_DEVICE_KEY, DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT, CONF_VERIFY_SSL
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -34,7 +34,7 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_opengarage() -> Generator[MagicMock]:
     """Return a mocked OpenGarage client."""
     with patch(
-        "homeassistant.components.opengarage.opengarage.OpenGarage",
+        "smarthub.components.opengarage.opengarage.OpenGarage",
         autospec=True,
     ) as client_mock:
         client = client_mock.return_value
@@ -49,7 +49,7 @@ def mock_opengarage() -> Generator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_opengarage: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_opengarage: MagicMock
 ) -> MockConfigEntry:
     """Set up the OpenGarage integration for testing."""
     mock_config_entry.add_to_hass(hass)

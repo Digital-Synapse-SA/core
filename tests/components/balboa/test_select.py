@@ -9,14 +9,14 @@ from pybalboa.enums import LowHighRange
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import client_update, init_integration
 
@@ -41,19 +41,19 @@ def mock_select(client: MagicMock):
 
 
 async def test_selects(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test spa climate."""
-    with patch("homeassistant.components.balboa.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.balboa.PLATFORMS", [Platform.SELECT]):
         entry = await init_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_select(hass: HomeAssistant, client: MagicMock, mock_select) -> None:
+async def test_select(hass: SmartHub, client: MagicMock, mock_select) -> None:
     """Test spa temperature range select."""
     await init_integration(hass)
 
@@ -73,7 +73,7 @@ async def test_select(hass: HomeAssistant, client: MagicMock, mock_select) -> No
 
 
 async def test_selected_option(
-    hass: HomeAssistant, client: MagicMock, mock_select
+    hass: SmartHub, client: MagicMock, mock_select
 ) -> None:
     """Test spa temperature range selected option."""
 
@@ -89,7 +89,7 @@ async def test_selected_option(
     assert state.state == LowHighRange.HIGH.name.lower()
 
 
-async def _select_option_and_wait(hass: HomeAssistant | None, entity, option):
+async def _select_option_and_wait(hass: SmartHub | None, entity, option):
     await hass.services.async_call(
         SELECT_DOMAIN,
         SERVICE_SELECT_OPTION,

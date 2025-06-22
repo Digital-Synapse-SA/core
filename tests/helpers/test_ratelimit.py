@@ -3,11 +3,11 @@
 import asyncio
 import time
 
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import ratelimit
+from smarthub.core import SmartHub, callback
+from smarthub.helpers import ratelimit
 
 
-async def test_hit(hass: HomeAssistant) -> None:
+async def test_hit(hass: SmartHub) -> None:
     """Test hitting the rate limit."""
 
     refresh_called = False
@@ -38,7 +38,7 @@ async def test_hit(hass: HomeAssistant) -> None:
     rate_limiter.async_remove()
 
 
-async def test_miss(hass: HomeAssistant) -> None:
+async def test_miss(hass: SmartHub) -> None:
     """Test missing the rate limit."""
 
     refresh_called = False
@@ -63,7 +63,7 @@ async def test_miss(hass: HomeAssistant) -> None:
     rate_limiter.async_remove()
 
 
-async def test_no_limit(hass: HomeAssistant) -> None:
+async def test_no_limit(hass: SmartHub) -> None:
     """Test async_schedule_action always return None when there is no rate limit."""
 
     refresh_called = False

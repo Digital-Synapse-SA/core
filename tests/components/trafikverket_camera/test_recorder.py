@@ -5,11 +5,11 @@ from __future__ import annotations
 import pytest
 from pytrafikverket import CameraInfoModel
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.components.recorder.common import async_wait_recording_done
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -18,7 +18,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_exclude_attributes(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     monkeypatch: pytest.MonkeyPatch,
     aioclient_mock: AiohttpClientMocker,

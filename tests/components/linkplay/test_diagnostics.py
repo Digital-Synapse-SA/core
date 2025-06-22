@@ -7,8 +7,8 @@ from linkplay.consts import API_ENDPOINT
 from linkplay.endpoint import LinkPlayApiEndpoint
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.linkplay.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.linkplay.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .conftest import HOST, mock_lp_aiohttp_client
@@ -19,7 +19,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

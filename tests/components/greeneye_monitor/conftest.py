@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from homeassistant.components.greeneye_monitor import DOMAIN
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import UnitOfElectricPotential, UnitOfPower
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.greeneye_monitor import DOMAIN
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import UnitOfElectricPotential, UnitOfPower
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import add_listeners
 
 
 def assert_sensor_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     expected_state: str,
     attributes: dict[str, Any] | None = None,
@@ -34,7 +34,7 @@ def assert_sensor_state(
 
 
 def assert_temperature_sensor_registered(
-    hass: HomeAssistant,
+    hass: SmartHub,
     serial_number: int,
     number: int,
     name: str,
@@ -45,7 +45,7 @@ def assert_temperature_sensor_registered(
 
 
 def assert_pulse_counter_registered(
-    hass: HomeAssistant,
+    hass: SmartHub,
     serial_number: int,
     number: int,
     name: str,
@@ -58,7 +58,7 @@ def assert_pulse_counter_registered(
 
 
 def assert_power_sensor_registered(
-    hass: HomeAssistant, serial_number: int, number: int, name: str
+    hass: SmartHub, serial_number: int, number: int, name: str
 ) -> None:
     """Assert that a power sensor entity was registered properly."""
     sensor = assert_sensor_registered(hass, serial_number, "current", number, name)
@@ -67,7 +67,7 @@ def assert_power_sensor_registered(
 
 
 def assert_voltage_sensor_registered(
-    hass: HomeAssistant, serial_number: int, number: int, name: str
+    hass: SmartHub, serial_number: int, number: int, name: str
 ) -> None:
     """Assert that a voltage sensor entity was registered properly."""
     sensor = assert_sensor_registered(hass, serial_number, "volts", number, name)
@@ -76,7 +76,7 @@ def assert_voltage_sensor_registered(
 
 
 def assert_sensor_registered(
-    hass: HomeAssistant,
+    hass: SmartHub,
     serial_number: int,
     sensor_type: str,
     number: int,

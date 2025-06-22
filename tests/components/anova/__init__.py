@@ -6,10 +6,10 @@ from unittest.mock import patch
 
 from anova_wifi import APCUpdate, APCUpdateBinary, APCUpdateSensor
 
-from homeassistant.components.anova.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.anova.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -25,8 +25,8 @@ ONLINE_UPDATE = APCUpdate(
 )
 
 
-def create_entry(hass: HomeAssistant, device_id: str = DEVICE_UNIQUE_ID) -> ConfigEntry:
-    """Add config entry in Home Assistant."""
+def create_entry(hass: SmartHub, device_id: str = DEVICE_UNIQUE_ID) -> ConfigEntry:
+    """Add config entry in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Anova",
@@ -43,12 +43,12 @@ def create_entry(hass: HomeAssistant, device_id: str = DEVICE_UNIQUE_ID) -> Conf
 
 
 async def async_init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     skip_setup: bool = False,
 ) -> ConfigEntry:
-    """Set up the Anova integration in Home Assistant."""
+    """Set up the Anova integration in SmartHub."""
 
-    with patch("homeassistant.components.anova.AnovaApi.authenticate"):
+    with patch("smarthub.components.anova.AnovaApi.authenticate"):
         entry = create_entry(hass)
 
         if not skip_setup:

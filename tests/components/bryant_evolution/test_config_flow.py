@@ -4,17 +4,17 @@ from unittest.mock import DEFAULT, AsyncMock, patch
 
 from evolutionhttp import BryantEvolutionLocalClient, ZoneInfo
 
-from homeassistant import config_entries
-from homeassistant.components.bryant_evolution.const import CONF_SYSTEM_ZONE, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_FILENAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.bryant_evolution.const import CONF_SYSTEM_ZONE, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_FILENAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form_success(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form_success(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -50,7 +50,7 @@ async def test_form_success(hass: HomeAssistant, mock_setup_entry: AsyncMock) ->
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_evolution_client_factory: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_form_cannot_connect(
 
 
 async def test_form_cannot_connect_bad_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_evolution_client_factory: AsyncMock,
 ) -> None:
@@ -127,7 +127,7 @@ async def test_form_cannot_connect_bad_file(
 
 
 async def test_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_evolution_entry: MockConfigEntry,
 ) -> None:

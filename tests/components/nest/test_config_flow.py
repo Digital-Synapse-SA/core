@@ -9,13 +9,13 @@ from unittest.mock import patch
 from google_nest_sdm.exceptions import AuthException
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.nest.const import DOMAIN, OAUTH2_AUTHORIZE, OAUTH2_TOKEN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.nest.const import DOMAIN, OAUTH2_AUTHORIZE, OAUTH2_TOKEN
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResult, FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .common import (
     CLIENT_ID,
@@ -51,7 +51,7 @@ def nest_test_config() -> NestTestConfig:
 def mock_rand_topic_name_fixture() -> None:
     """Set the topic name random string to a constant."""
     with patch(
-        "homeassistant.components.nest.config_flow.get_random_string",
+        "smarthub.components.nest.config_flow.get_random_string",
         return_value=RAND_SUFFIX,
     ):
         yield
@@ -67,7 +67,7 @@ class OAuthFixture:
 
     def __init__(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         hass_client_no_auth: ClientSessionGenerator,
         aioclient_mock: AiohttpClientMocker,
     ) -> None:
@@ -216,7 +216,7 @@ class OAuthFixture:
     ) -> ConfigEntry:
         """Finish the OAuth flow exchanging auth token for refresh token."""
         with patch(
-            "homeassistant.components.nest.async_setup_entry", return_value=True
+            "smarthub.components.nest.async_setup_entry", return_value=True
         ) as mock_setup:
             await self.async_configure(result, user_input)
             assert len(mock_setup.mock_calls) == 1
@@ -241,7 +241,7 @@ class OAuthFixture:
 
 @pytest.fixture
 async def oauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     current_request_with_host: None,
@@ -332,12 +332,12 @@ def setup_mock_create_topic_responses(
 ) -> None:
     """Configure the mock responses for creating a Pub/Sub topic."""
     aioclient_mock.put(
-        f"https://pubsub.googleapis.com/v1/projects/{cloud_project_id}/topics/home-assistant-{RAND_SUFFIX}",
+        f"https://pubsub.googleapis.com/v1/projects/{cloud_project_id}/topics/smart-hub-{RAND_SUFFIX}",
         json={},
         status=create_topic_status,
     )
     aioclient_mock.post(
-        f"https://pubsub.googleapis.com/v1/projects/{cloud_project_id}/topics/home-assistant-{RAND_SUFFIX}:setIamPolicy",
+        f"https://pubsub.googleapis.com/v1/projects/{cloud_project_id}/topics/smart-hub-{RAND_SUFFIX}:setIamPolicy",
         json={},
         status=create_topic_status,
     )
@@ -350,7 +350,7 @@ def setup_mock_create_subscription_responses(
 ) -> None:
     """Configure the mock responses for creating a Pub/Sub subscription."""
     aioclient_mock.put(
-        f"https://pubsub.googleapis.com/v1/projects/{cloud_project_id}/subscriptions/home-assistant-{RAND_SUFFIX}",
+        f"https://pubsub.googleapis.com/v1/projects/{cloud_project_id}/subscriptions/smart-hub-{RAND_SUFFIX}",
         json={},
         status=create_subscription_status,
     )
@@ -405,7 +405,7 @@ def mock_pubsub_api_responses(
 
 @pytest.mark.parametrize(("sdm_managed_topic"), [(True)])
 async def test_app_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
 ) -> None:
     """Check full flow."""
@@ -429,7 +429,7 @@ async def test_app_credentials(
         "auth_implementation": "imported-cred",
         "cloud_project_id": CLOUD_PROJECT_ID,
         "project_id": PROJECT_ID,
-        "subscription_name": f"projects/{CLOUD_PROJECT_ID}/subscriptions/home-assistant-{RAND_SUFFIX}",
+        "subscription_name": f"projects/{CLOUD_PROJECT_ID}/subscriptions/smart-hub-{RAND_SUFFIX}",
         "topic_name": f"projects/sdm-prod/topics/enterprise-{PROJECT_ID}",
         "token": {
             "refresh_token": "mock-refresh-token",
@@ -443,7 +443,7 @@ async def test_app_credentials(
     ("sdm_managed_topic", "device_access_project_id", "cloud_project_id"),
     [(True, "new-project-id", "new-cloud-project-id")],
 )
-async def test_config_flow_restart(hass: HomeAssistant, oauth: OAuthFixture) -> None:
+async def test_config_flow_restart(hass: SmartHub, oauth: OAuthFixture) -> None:
     """Check with auth implementation is re-initialized when aborting the flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -485,7 +485,7 @@ async def test_config_flow_restart(hass: HomeAssistant, oauth: OAuthFixture) -> 
         "auth_implementation": "imported-cred",
         "cloud_project_id": "new-cloud-project-id",
         "project_id": "new-project-id",
-        "subscription_name": "projects/new-cloud-project-id/subscriptions/home-assistant-ABCDEF",
+        "subscription_name": "projects/new-cloud-project-id/subscriptions/smart-hub-ABCDEF",
         "topic_name": "projects/sdm-prod/topics/enterprise-new-project-id",
         "token": {
             "refresh_token": "mock-refresh-token",
@@ -497,7 +497,7 @@ async def test_config_flow_restart(hass: HomeAssistant, oauth: OAuthFixture) -> 
 
 @pytest.mark.parametrize(("sdm_managed_topic"), [(True)])
 async def test_config_flow_wrong_project_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
 ) -> None:
     """Check the case where the wrong project ids are entered."""
@@ -539,7 +539,7 @@ async def test_config_flow_wrong_project_id(
         "auth_implementation": "imported-cred",
         "cloud_project_id": CLOUD_PROJECT_ID,
         "project_id": PROJECT_ID,
-        "subscription_name": "projects/cloud-id-9876/subscriptions/home-assistant-ABCDEF",
+        "subscription_name": "projects/cloud-id-9876/subscriptions/smart-hub-ABCDEF",
         "topic_name": "projects/sdm-prod/topics/enterprise-some-project-id",
         "token": {
             "refresh_token": "mock-refresh-token",
@@ -553,7 +553,7 @@ async def test_config_flow_wrong_project_id(
     ("sdm_managed_topic", "create_subscription_status"), [(True, HTTPStatus.NOT_FOUND)]
 )
 async def test_config_flow_pubsub_configuration_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
 ) -> None:
     """Check full flow fails with configuration error."""
@@ -604,7 +604,7 @@ async def test_config_flow_pubsub_configuration_error(
     [(True, HTTPStatus.INTERNAL_SERVER_ERROR)],
 )
 async def test_config_flow_pubsub_subscriber_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
 ) -> None:
     """Check full flow with a subscriber error."""
@@ -655,7 +655,7 @@ async def test_config_flow_pubsub_subscriber_error(
     [(TEST_CONFIG_APP_CREDS, True, "project-id-2")],
 )
 async def test_multiple_config_entries(
-    hass: HomeAssistant, oauth, setup_platform
+    hass: SmartHub, oauth, setup_platform
 ) -> None:
     """Verify config flow can be started when existing config entry exists."""
     await setup_platform()
@@ -683,7 +683,7 @@ async def test_multiple_config_entries(
     ("nest_test_config", "sdm_managed_topic"), [(TEST_CONFIG_APP_CREDS, True)]
 )
 async def test_duplicate_config_entries(
-    hass: HomeAssistant, oauth, setup_platform
+    hass: SmartHub, oauth, setup_platform
 ) -> None:
     """Verify that config entries must be for unique projects."""
     await setup_platform()
@@ -710,7 +710,7 @@ async def test_duplicate_config_entries(
     ("nest_test_config", "sdm_managed_topic"), [(TEST_CONFIG_APP_CREDS, True)]
 )
 async def test_reauth_multiple_config_entries(
-    hass: HomeAssistant, oauth, setup_platform, config_entry
+    hass: SmartHub, oauth, setup_platform, config_entry
 ) -> None:
     """Test Nest reauthentication with multiple existing config entries."""
     await setup_platform()
@@ -764,7 +764,7 @@ async def test_reauth_multiple_config_entries(
     [(True, HTTPStatus.UNAUTHORIZED)],
 )
 async def test_pubsub_subscription_auth_failure(
-    hass: HomeAssistant, oauth, mock_subscriber
+    hass: SmartHub, oauth, mock_subscriber
 ) -> None:
     """Check flow that creates a pub/sub subscription."""
     result = await hass.config_entries.flow.async_init(
@@ -814,7 +814,7 @@ async def test_pubsub_subscription_auth_failure(
     ("nest_test_config", "sdm_managed_topic"), [(TEST_CONFIG_APP_CREDS, True)]
 )
 async def test_pubsub_subscriber_config_entry_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
     setup_platform: PlatformSetup,
     config_entry: MockConfigEntry,
@@ -843,7 +843,7 @@ async def test_pubsub_subscriber_config_entry_reauth(
 
 @pytest.mark.parametrize(("sdm_managed_topic"), [(True)])
 async def test_config_entry_title_from_home(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
     auth: FakeAuth,
 ) -> None:
@@ -875,7 +875,7 @@ async def test_config_entry_title_from_home(
     assert entry.data.get("cloud_project_id") == CLOUD_PROJECT_ID
     assert (
         entry.data.get("subscription_name")
-        == f"projects/{CLOUD_PROJECT_ID}/subscriptions/home-assistant-{RAND_SUFFIX}"
+        == f"projects/{CLOUD_PROJECT_ID}/subscriptions/smart-hub-{RAND_SUFFIX}"
     )
     assert (
         entry.data.get("topic_name")
@@ -885,7 +885,7 @@ async def test_config_entry_title_from_home(
 
 @pytest.mark.parametrize(("sdm_managed_topic"), [(True)])
 async def test_config_entry_title_multiple_homes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
     auth: FakeAuth,
 ) -> None:
@@ -926,7 +926,7 @@ async def test_config_entry_title_multiple_homes(
 
 @pytest.mark.parametrize(("sdm_managed_topic"), [(True)])
 async def test_title_failure_fallback(
-    hass: HomeAssistant, oauth, mock_subscriber
+    hass: SmartHub, oauth, mock_subscriber
 ) -> None:
     """Test exception handling when determining the structure names."""
     result = await hass.config_entries.flow.async_init(
@@ -947,7 +947,7 @@ async def test_title_failure_fallback(
     assert entry.data.get("cloud_project_id") == CLOUD_PROJECT_ID
     assert (
         entry.data.get("subscription_name")
-        == f"projects/{CLOUD_PROJECT_ID}/subscriptions/home-assistant-{RAND_SUFFIX}"
+        == f"projects/{CLOUD_PROJECT_ID}/subscriptions/smart-hub-{RAND_SUFFIX}"
     )
     assert (
         entry.data.get("topic_name")
@@ -957,7 +957,7 @@ async def test_title_failure_fallback(
 
 @pytest.mark.parametrize(("sdm_managed_topic"), [(True)])
 async def test_structure_missing_trait(
-    hass: HomeAssistant, oauth: OAuthFixture, auth: FakeAuth
+    hass: SmartHub, oauth: OAuthFixture, auth: FakeAuth
 ) -> None:
     """Test handling the case where a structure has no name set."""
 
@@ -985,7 +985,7 @@ async def test_structure_missing_trait(
 
 @pytest.mark.parametrize("nest_test_config", [NestTestConfig()])
 async def test_dhcp_discovery(
-    hass: HomeAssistant, oauth: OAuthFixture, nest_test_config: NestTestConfig
+    hass: SmartHub, oauth: OAuthFixture, nest_test_config: NestTestConfig
 ) -> None:
     """Exercise discovery dhcp starts the config flow and kicks user to frontend creds flow."""
     result = await hass.config_entries.flow.async_init(
@@ -1011,7 +1011,7 @@ async def test_dhcp_discovery(
     [(TEST_CONFIG_APP_CREDS, True, "project-id-2")],
 )
 async def test_dhcp_discovery_already_setup(
-    hass: HomeAssistant, oauth: OAuthFixture, setup_platform
+    hass: SmartHub, oauth: OAuthFixture, setup_platform
 ) -> None:
     """Exercise discovery dhcp with existing config entry."""
     await setup_platform()
@@ -1026,7 +1026,7 @@ async def test_dhcp_discovery_already_setup(
 
 @pytest.mark.parametrize(("sdm_managed_topic"), [(True)])
 async def test_dhcp_discovery_with_creds(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
 ) -> None:
     """Exercise discovery dhcp with no config present (can't run)."""
@@ -1065,7 +1065,7 @@ async def test_dhcp_discovery_with_creds(
         "auth_implementation": "imported-cred",
         "cloud_project_id": CLOUD_PROJECT_ID,
         "project_id": PROJECT_ID,
-        "subscription_name": f"projects/{CLOUD_PROJECT_ID}/subscriptions/home-assistant-{RAND_SUFFIX}",
+        "subscription_name": f"projects/{CLOUD_PROJECT_ID}/subscriptions/smart-hub-{RAND_SUFFIX}",
         "topic_name": f"projects/sdm-prod/topics/enterprise-{PROJECT_ID}",
         "token": {
             "refresh_token": "mock-refresh-token",
@@ -1084,7 +1084,7 @@ async def test_dhcp_discovery_with_creds(
     ],
 )
 async def test_token_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
     status_code: HTTPStatus,
     error_reason: str,
@@ -1119,7 +1119,7 @@ async def test_token_error(
     ],
 )
 async def test_existing_topic_and_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
 ) -> None:
     """Test selecting existing user managed topic and subscription."""
@@ -1157,7 +1157,7 @@ async def test_existing_topic_and_subscription(
 
 
 async def test_no_eligible_topics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
 ) -> None:
     """Test the case where there are no eligible pub/sub topics and the topic is created."""
@@ -1191,8 +1191,8 @@ async def test_no_eligible_topics(
         "auth_implementation": "imported-cred",
         "cloud_project_id": CLOUD_PROJECT_ID,
         "project_id": PROJECT_ID,
-        "subscription_name": f"projects/{CLOUD_PROJECT_ID}/subscriptions/home-assistant-{RAND_SUFFIX}",
-        "topic_name": f"projects/{CLOUD_PROJECT_ID}/topics/home-assistant-{RAND_SUFFIX}",
+        "subscription_name": f"projects/{CLOUD_PROJECT_ID}/subscriptions/smart-hub-{RAND_SUFFIX}",
+        "topic_name": f"projects/{CLOUD_PROJECT_ID}/topics/smart-hub-{RAND_SUFFIX}",
         "token": {
             "refresh_token": "mock-refresh-token",
             "access_token": "mock-access-token",
@@ -1208,7 +1208,7 @@ async def test_no_eligible_topics(
     ],
 )
 async def test_list_topics_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
 ) -> None:
     """Test selecting existing user managed topic and subscription."""
@@ -1228,7 +1228,7 @@ async def test_list_topics_failure(
     [(HTTPStatus.INTERNAL_SERVER_ERROR)],
 )
 async def test_create_topic_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
     aioclient_mock: AiohttpClientMocker,
     cloud_project_id: str,
@@ -1293,8 +1293,8 @@ async def test_create_topic_failed(
         "auth_implementation": "imported-cred",
         "cloud_project_id": CLOUD_PROJECT_ID,
         "project_id": PROJECT_ID,
-        "subscription_name": f"projects/{CLOUD_PROJECT_ID}/subscriptions/home-assistant-{RAND_SUFFIX}",
-        "topic_name": f"projects/{CLOUD_PROJECT_ID}/topics/home-assistant-{RAND_SUFFIX}",
+        "subscription_name": f"projects/{CLOUD_PROJECT_ID}/subscriptions/smart-hub-{RAND_SUFFIX}",
+        "topic_name": f"projects/{CLOUD_PROJECT_ID}/topics/smart-hub-{RAND_SUFFIX}",
         "token": {
             "refresh_token": "mock-refresh-token",
             "access_token": "mock-access-token",
@@ -1310,7 +1310,7 @@ async def test_create_topic_failed(
     ],
 )
 async def test_list_subscriptions_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     oauth: OAuthFixture,
 ) -> None:
     """Test selecting existing user managed topic and subscription."""

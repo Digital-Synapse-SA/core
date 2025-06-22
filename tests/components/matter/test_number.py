@@ -9,10 +9,10 @@ from matter_server.common.helpers.util import create_attribute_path_from_attribu
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -23,7 +23,7 @@ from .common import (
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_numbers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -33,7 +33,7 @@ async def test_numbers(
 
 @pytest.mark.parametrize("node_fixture", ["dimmable_light"])
 async def test_level_control_config_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -64,7 +64,7 @@ async def test_level_control_config_entities(
 
 @pytest.mark.parametrize("node_fixture", ["eve_weather_sensor"])
 async def test_eve_weather_sensor_altitude(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -103,15 +103,15 @@ async def test_eve_weather_sensor_altitude(
 
 @pytest.mark.parametrize("node_fixture", ["dimmable_light"])
 async def test_matter_exception_on_write_attribute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
-    """Test if a MatterError gets converted to HomeAssistantError by using a dimmable_light fixture."""
+    """Test if a MatterError gets converted to SmartHubError by using a dimmable_light fixture."""
     state = hass.states.get("number.mock_dimmable_light_on_level")
     assert state
     matter_client.write_attribute.side_effect = MatterError("Boom")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "number",
             "set_value",

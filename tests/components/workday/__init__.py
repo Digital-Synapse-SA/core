@@ -1,4 +1,4 @@
-"""Tests the Home Assistant workday binary sensor."""
+"""Tests the SmartHub workday binary sensor."""
 
 from __future__ import annotations
 
@@ -6,26 +6,26 @@ from typing import Any
 
 from holidays import OPTIONAL
 
-from homeassistant.components.workday.const import (
+from smarthub.components.workday.const import (
     DEFAULT_EXCLUDES,
     DEFAULT_NAME,
     DEFAULT_OFFSET,
     DEFAULT_WORKDAYS,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     entry_id: str = "1",
     source: str = SOURCE_USER,
 ) -> MockConfigEntry:
-    """Set up the Scrape integration in Home Assistant."""
+    """Set up the Scrape integration in SmartHub."""
 
     config_entry = MockConfigEntry(
         domain=DOMAIN,

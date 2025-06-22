@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from homeassistant.components.co2signal.const import DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.co2signal.const import DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import VALID_RESPONSE
 
@@ -21,11 +21,11 @@ def mock_electricity_maps() -> Generator[MagicMock]:
 
     with (
         patch(
-            "homeassistant.components.co2signal.ElectricityMaps",
+            "smarthub.components.co2signal.ElectricityMaps",
             autospec=True,
         ) as electricity_maps,
         patch(
-            "homeassistant.components.co2signal.config_flow.ElectricityMaps",
+            "smarthub.components.co2signal.config_flow.ElectricityMaps",
             new=electricity_maps,
         ),
     ):
@@ -37,7 +37,7 @@ def mock_electricity_maps() -> Generator[MagicMock]:
 
 
 @pytest.fixture(name="config_entry")
-async def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+async def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Return a MockConfigEntry for testing."""
     return MockConfigEntry(
         domain=DOMAIN,
@@ -48,7 +48,7 @@ async def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 @pytest.fixture(name="setup_integration")
 async def mock_setup_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry, electricity_maps: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, electricity_maps: AsyncMock
 ) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)

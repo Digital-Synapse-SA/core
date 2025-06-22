@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from switchbot.devices.device import SwitchbotOperationError
 
-from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
-from homeassistant.components.fan import (
+from smarthub.components.bluetooth import BluetoothServiceInfoBleak
+from smarthub.components.fan import (
     ATTR_OSCILLATING,
     ATTR_PERCENTAGE,
     ATTR_PRESET_MODE,
@@ -16,9 +16,9 @@ from homeassistant.components.fan import (
     SERVICE_SET_PERCENTAGE,
     SERVICE_SET_PRESET_MODE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import (
     AIR_PURIFIER_PM25_SERVICE_INFO,
@@ -67,7 +67,7 @@ from tests.components.bluetooth import inject_bluetooth_service_info
     ],
 )
 async def test_circulator_fan_controlling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_factory: Callable[[str], MockConfigEntry],
     service: str,
     service_data: dict,
@@ -83,7 +83,7 @@ async def test_circulator_fan_controlling(
     mocked_instance = AsyncMock(return_value=True)
     mcoked_none_instance = AsyncMock(return_value=None)
     with patch.multiple(
-        "homeassistant.components.switchbot.fan.switchbot.SwitchbotFan",
+        "smarthub.components.switchbot.fan.switchbot.SwitchbotFan",
         get_basic_info=mcoked_none_instance,
         **{mock_method: mocked_instance},
     ):
@@ -130,7 +130,7 @@ async def test_circulator_fan_controlling(
     ],
 )
 async def test_air_purifier_controlling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_encrypted_factory: Callable[[str], MockConfigEntry],
     service_info: BluetoothServiceInfoBleak,
     sensor_type: str,
@@ -148,7 +148,7 @@ async def test_air_purifier_controlling(
     mocked_instance = AsyncMock(return_value=True)
     mcoked_none_instance = AsyncMock(return_value=None)
     with patch.multiple(
-        "homeassistant.components.switchbot.fan.switchbot.SwitchbotAirPurifier",
+        "smarthub.components.switchbot.fan.switchbot.SwitchbotAirPurifier",
         get_basic_info=mcoked_none_instance,
         update=mcoked_none_instance,
         **{mock_method: mocked_instance},
@@ -193,7 +193,7 @@ async def test_air_purifier_controlling(
     ],
 )
 async def test_exception_handling_air_purifier_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_encrypted_factory: Callable[[str], MockConfigEntry],
     service_info: BluetoothServiceInfoBleak,
     sensor_type: str,
@@ -212,7 +212,7 @@ async def test_exception_handling_air_purifier_service(
 
     mcoked_none_instance = AsyncMock(return_value=None)
     with patch.multiple(
-        "homeassistant.components.switchbot.fan.switchbot.SwitchbotAirPurifier",
+        "smarthub.components.switchbot.fan.switchbot.SwitchbotAirPurifier",
         get_basic_info=mcoked_none_instance,
         update=mcoked_none_instance,
         **{mock_method: AsyncMock(side_effect=exception)},
@@ -220,7 +220,7 @@ async def test_exception_handling_air_purifier_service(
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
-        with pytest.raises(HomeAssistantError, match=error_message):
+        with pytest.raises(SmartHubError, match=error_message):
             await hass.services.async_call(
                 FAN_DOMAIN,
                 service,

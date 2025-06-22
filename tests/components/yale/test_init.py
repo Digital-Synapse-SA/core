@@ -6,20 +6,20 @@ from aiohttp import ClientResponseError
 import pytest
 from yalexs.exceptions import InvalidAuth, YaleApiError
 
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN, LockState
-from homeassistant.components.yale.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN, LockState
+from smarthub.components.yale.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_LOCK,
     SERVICE_OPEN,
     SERVICE_UNLOCK,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .mocks import (
     _create_yale_with_devices,
@@ -33,7 +33,7 @@ from .mocks import (
 from tests.typing import WebSocketGenerator
 
 
-async def test_yale_api_is_failing(hass: HomeAssistant) -> None:
+async def test_yale_api_is_failing(hass: SmartHub) -> None:
     """Config entry state is SETUP_RETRY when yale api is failing."""
 
     config_entry, socketio = await _create_yale_with_devices(
@@ -45,7 +45,7 @@ async def test_yale_api_is_failing(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_yale_is_offline(hass: HomeAssistant) -> None:
+async def test_yale_is_offline(hass: SmartHub) -> None:
     """Config entry state is SETUP_RETRY when yale is offline."""
 
     config_entry, socketio = await _create_yale_with_devices(
@@ -55,7 +55,7 @@ async def test_yale_is_offline(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_yale_late_auth_failure(hass: HomeAssistant) -> None:
+async def test_yale_late_auth_failure(hass: SmartHub) -> None:
     """Test we can detect a late auth failure."""
     config_entry, socketio = await _create_yale_with_devices(
         hass,
@@ -70,7 +70,7 @@ async def test_yale_late_auth_failure(hass: HomeAssistant) -> None:
     assert flows[0]["step_id"] == "pick_implementation"
 
 
-async def test_unlock_throws_yale_api_http_error(hass: HomeAssistant) -> None:
+async def test_unlock_throws_yale_api_http_error(hass: SmartHub) -> None:
     """Test unlock throws correct error on http error."""
     mocked_lock_detail = await _mock_operative_yale_lock_detail(hass)
     aiohttp_client_response_exception = ClientResponseError(None, None, status=400)
@@ -90,7 +90,7 @@ async def test_unlock_throws_yale_api_http_error(hass: HomeAssistant) -> None:
     )
     data = {ATTR_ENTITY_ID: "lock.a6697750d607098bae8d6baa11ef8063_name"}
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=(
             "A6697750D607098BAE8D6BAA11EF8063 Name: This should bubble up as its user"
             " consumable"
@@ -99,7 +99,7 @@ async def test_unlock_throws_yale_api_http_error(hass: HomeAssistant) -> None:
         await hass.services.async_call(LOCK_DOMAIN, SERVICE_UNLOCK, data, blocking=True)
 
 
-async def test_lock_throws_yale_api_http_error(hass: HomeAssistant) -> None:
+async def test_lock_throws_yale_api_http_error(hass: SmartHub) -> None:
     """Test lock throws correct error on http error."""
     mocked_lock_detail = await _mock_operative_yale_lock_detail(hass)
     aiohttp_client_response_exception = ClientResponseError(None, None, status=400)
@@ -119,7 +119,7 @@ async def test_lock_throws_yale_api_http_error(hass: HomeAssistant) -> None:
     )
     data = {ATTR_ENTITY_ID: "lock.a6697750d607098bae8d6baa11ef8063_name"}
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=(
             "A6697750D607098BAE8D6BAA11EF8063 Name: This should bubble up as its user"
             " consumable"
@@ -129,17 +129,17 @@ async def test_lock_throws_yale_api_http_error(hass: HomeAssistant) -> None:
 
 
 async def test_open_throws_hass_service_not_supported_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test open throws correct error on entity does not support this service error."""
     mocked_lock_detail = await _mock_operative_yale_lock_detail(hass)
     await _create_yale_with_devices(hass, [mocked_lock_detail])
     data = {ATTR_ENTITY_ID: "lock.a6697750d607098bae8d6baa11ef8063_name"}
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(LOCK_DOMAIN, SERVICE_OPEN, data, blocking=True)
 
 
-async def test_inoperative_locks_are_filtered_out(hass: HomeAssistant) -> None:
+async def test_inoperative_locks_are_filtered_out(hass: SmartHub) -> None:
     """Ensure inoperative locks do not get setup."""
     yale_operative_lock = await _mock_operative_yale_lock_detail(hass)
     yale_inoperative_lock = await _mock_inoperative_yale_lock_detail(hass)
@@ -153,7 +153,7 @@ async def test_inoperative_locks_are_filtered_out(hass: HomeAssistant) -> None:
     assert lock_a6697750d607098bae8d6baa11ef8063_name.state == LockState.LOCKED
 
 
-async def test_lock_has_doorsense(hass: HomeAssistant) -> None:
+async def test_lock_has_doorsense(hass: SmartHub) -> None:
     """Check to see if a lock has doorsense."""
     doorsenselock = await _mock_doorsense_enabled_yale_lock_detail(hass)
     nodoorsenselock = await _mock_doorsense_missing_yale_lock_detail(hass)
@@ -169,7 +169,7 @@ async def test_lock_has_doorsense(hass: HomeAssistant) -> None:
     assert binary_sensor_missing_doorsense_id_name_open is None
 
 
-async def test_load_unload(hass: HomeAssistant) -> None:
+async def test_load_unload(hass: SmartHub) -> None:
     """Config entry can be unloaded."""
 
     yale_operative_lock = await _mock_operative_yale_lock_detail(hass)
@@ -186,7 +186,7 @@ async def test_load_unload(hass: HomeAssistant) -> None:
 
 
 async def test_load_triggers_ble_discovery(
-    hass: HomeAssistant, mock_discovery: Mock
+    hass: SmartHub, mock_discovery: Mock
 ) -> None:
     """Test that loading a lock that supports offline ble operation passes the keys to yalexe_ble."""
 
@@ -210,7 +210,7 @@ async def test_load_triggers_ble_discovery(
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,

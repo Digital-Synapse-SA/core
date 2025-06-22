@@ -4,24 +4,24 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.siren import DOMAIN as SIREN_DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.siren import DOMAIN as SIREN_DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import configure_integration
 from .mocks import HomeControlMock, HomeControlMockSiren
 
 
 async def test_siren(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup and state change of a siren device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockSiren()
     test_gateway.devices["Test"].status = 0
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -44,14 +44,14 @@ async def test_siren(
 
 
 async def test_siren_switching(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup and state change via switching of a siren device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockSiren()
     test_gateway.devices["Test"].status = 0
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -96,14 +96,14 @@ async def test_siren_switching(
 
 
 async def test_siren_change_default_tone(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test changing the default tone on message."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockSiren()
     test_gateway.devices["Test"].status = 0
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -126,12 +126,12 @@ async def test_siren_change_default_tone(
         property_set.assert_called_once_with(2)
 
 
-async def test_remove_from_hass(hass: HomeAssistant) -> None:
+async def test_remove_from_hass(hass: SmartHub) -> None:
     """Test removing entity."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockSiren()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)

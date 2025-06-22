@@ -4,13 +4,13 @@ from unittest.mock import Mock
 
 from pytest_unordered import unordered
 
-from homeassistant.components import automation, hue
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.hue.v1 import device_trigger
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation, hue
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.hue.v1 import device_trigger
+from smarthub.const import Platform
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import setup_platform
 from .test_sensor_v1 import HUE_DIMMER_REMOTE_1, HUE_TAP_REMOTE_1
@@ -21,7 +21,7 @@ REMOTES_RESPONSE = {"7": HUE_TAP_REMOTE_1, "8": HUE_DIMMER_REMOTE_1}
 
 
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_bridge_v1: Mock,
     device_registry: dr.DeviceRegistry,
@@ -94,7 +94,7 @@ async def test_get_triggers(
 
 
 async def test_if_fires_on_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge_v1: Mock,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],

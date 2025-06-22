@@ -11,7 +11,7 @@ from flexit_bacnet import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_ACTION,
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
@@ -23,11 +23,11 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.flexit_bacnet.const import PRESET_TO_VENTILATION_MODE_MAP
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_component, entity_registry as er
+from smarthub.components.flexit_bacnet.const import PRESET_TO_VENTILATION_MODE_MAP
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_component, entity_registry as er
 
 from . import setup_with_selected_platforms
 
@@ -37,7 +37,7 @@ ENTITY_ID = "climate.device_name"
 
 
 async def test_climate_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_flexit_bacnet: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -50,7 +50,7 @@ async def test_climate_entity(
 
 
 async def test_set_hvac_preset_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_flexit_bacnet: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -96,7 +96,7 @@ async def test_set_hvac_preset_mode(
     )
 
     mock_flexit_bacnet.set_ventilation_mode.side_effect = asyncio.TimeoutError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             Platform.CLIMATE,
             SERVICE_SET_PRESET_MODE,
@@ -113,7 +113,7 @@ async def test_set_hvac_preset_mode(
 
 
 async def test_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_flexit_bacnet: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -135,7 +135,7 @@ async def test_set_hvac_mode(
     )
 
     mock_flexit_bacnet.set_ventilation_mode.side_effect = asyncio.TimeoutError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             Platform.CLIMATE,
             SERVICE_SET_HVAC_MODE,
@@ -147,7 +147,7 @@ async def test_set_hvac_mode(
 
 
 async def test_hvac_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_flexit_bacnet: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -170,7 +170,7 @@ async def test_hvac_action(
 
 
 async def test_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_flexit_bacnet: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -209,7 +209,7 @@ async def test_set_temperature(
 
     # Test handling of connection errors
     mock_flexit_bacnet.set_air_temp_setpoint_away.side_effect = ConnectionError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             Platform.CLIMATE,
             SERVICE_SET_TEMPERATURE,

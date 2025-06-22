@@ -2,20 +2,20 @@
 
 import pytest
 
-from homeassistant.components.compensation.const import CONF_PRECISION, DOMAIN
-from homeassistant.components.compensation.sensor import ATTR_COEFFICIENTS
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import (
+from smarthub.components.compensation.const import CONF_PRECISION, DOMAIN
+from smarthub.components.compensation.sensor import ATTR_COEFFICIENTS
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     EVENT_HOMEASSISTANT_START,
     EVENT_STATE_CHANGED,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
-async def test_linear_state(hass: HomeAssistant) -> None:
+async def test_linear_state(hass: SmartHub) -> None:
     """Test compensation sensor state."""
     config = {
         "compensation": {
@@ -60,7 +60,7 @@ async def test_linear_state(hass: HomeAssistant) -> None:
     assert state.state == STATE_UNKNOWN
 
 
-async def test_linear_state_from_attribute(hass: HomeAssistant) -> None:
+async def test_linear_state_from_attribute(hass: SmartHub) -> None:
     """Test compensation sensor state that pulls from attribute."""
     config = {
         "compensation": {
@@ -104,7 +104,7 @@ async def test_linear_state_from_attribute(hass: HomeAssistant) -> None:
     assert state.state == STATE_UNKNOWN
 
 
-async def test_quadratic_state(hass: HomeAssistant) -> None:
+async def test_quadratic_state(hass: SmartHub) -> None:
     """Test 3 degree polynominial compensation sensor."""
     config = {
         "compensation": {
@@ -149,7 +149,7 @@ async def test_quadratic_state(hass: HomeAssistant) -> None:
 
 
 async def test_numpy_errors(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Tests bad polyfits."""
     config = {
@@ -172,7 +172,7 @@ async def test_numpy_errors(
 
 
 async def test_datapoints_greater_than_degree(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Tests 3 bad data points."""
     config = {
@@ -195,7 +195,7 @@ async def test_datapoints_greater_than_degree(
     assert "data_points must have at least 3 data_points" in caplog.text
 
 
-async def test_new_state_is_none(hass: HomeAssistant) -> None:
+async def test_new_state_is_none(hass: SmartHub) -> None:
     """Tests catch for empty new states."""
     config = {
         "compensation": {
@@ -234,7 +234,7 @@ async def test_new_state_is_none(hass: HomeAssistant) -> None:
         (True, True),
     ],
 )
-async def test_limits(hass: HomeAssistant, lower: bool, upper: bool) -> None:
+async def test_limits(hass: SmartHub, lower: bool, upper: bool) -> None:
     """Test compensation sensor state."""
     source = "sensor.test"
     config = {

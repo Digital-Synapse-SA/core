@@ -7,11 +7,11 @@ from unittest.mock import patch
 from aiohttp.client_exceptions import ClientError
 import pytest
 
-from homeassistant.components.youtube import DOMAIN
-from homeassistant.components.youtube.const import CONF_CHANNELS
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.youtube import DOMAIN
+from smarthub.components.youtube.const import CONF_CHANNELS
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import GOOGLE_TOKEN_URI, ComponentSetup
 
@@ -19,7 +19,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_setup_success(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test successful setup and unload."""
     await setup_integration()
@@ -36,7 +36,7 @@ async def test_setup_success(
 
 @pytest.mark.parametrize("expires_at", [time.time() - 3600], ids=["expired"])
 async def test_expired_token_refresh_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -79,7 +79,7 @@ async def test_expired_token_refresh_success(
     ids=["failure_requires_reauth", "transient_failure"],
 )
 async def test_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
     status: http.HTTPStatus,
@@ -101,13 +101,13 @@ async def test_expired_token_refresh_failure(
 
 
 async def test_expired_token_refresh_client_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
 ) -> None:
     """Test failure while refreshing token with a client error."""
 
     with patch(
-        "homeassistant.components.youtube.OAuth2Session.async_ensure_token_valid",
+        "smarthub.components.youtube.OAuth2Session.async_ensure_token_valid",
         side_effect=ClientError,
     ):
         await setup_integration()
@@ -118,7 +118,7 @@ async def test_expired_token_refresh_client_error(
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     setup_integration: ComponentSetup,
 ) -> None:

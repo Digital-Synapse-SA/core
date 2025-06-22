@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.guardian import CONF_UID, DOMAIN
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.json import JsonObjectType
+from smarthub.components.guardian import CONF_UID, DOMAIN
+from smarthub.const import CONF_IP_ADDRESS, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.json import JsonObjectType
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -19,14 +19,14 @@ from tests.common import MockConfigEntry, load_json_object_fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.guardian.async_setup_entry", return_value=True
+        "smarthub.components.guardian.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config: dict[str, Any], unique_id: str
+    hass: SmartHub, config: dict[str, Any], unique_id: str
 ) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
@@ -99,7 +99,7 @@ def data_wifi_status_fixture() -> JsonObjectType:
 
 @pytest.fixture(name="setup_guardian")
 async def setup_guardian_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     data_sensor_pair_dump: JsonObjectType,
     data_sensor_pair_sensor: JsonObjectType,
@@ -149,7 +149,7 @@ async def setup_guardian_fixture(
             "aioguardian.client.Client.disconnect",
         ),
         patch(
-            "homeassistant.components.guardian.PLATFORMS",
+            "smarthub.components.guardian.PLATFORMS",
             [],
         ),
     ):

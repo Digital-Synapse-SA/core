@@ -8,8 +8,8 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components import bluetooth
-from homeassistant.core import HomeAssistant
+from smarthub.components import bluetooth
+from smarthub.core import SmartHub
 
 from .common import MockDashboardRefresh
 from .conftest import MockESPHomeDevice, MockESPHomeDeviceType
@@ -21,7 +21,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     init_integration: MockConfigEntry,
     mock_dashboard: dict[str, Any],
@@ -35,7 +35,7 @@ async def test_diagnostics(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_diagnostics_with_dashboard_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_esphome_device: MockESPHomeDeviceType,
     mock_dashboard: dict[str, Any],
@@ -62,7 +62,7 @@ async def test_diagnostics_with_dashboard_data(
 
 
 async def test_diagnostics_with_bluetooth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_bluetooth_entry_with_raw_adv: MockESPHomeDevice,
 ) -> None:

@@ -6,11 +6,11 @@ from unittest.mock import create_autospec
 import pytest
 import smarttub
 
-from homeassistant.components.binary_sensor import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.components.binary_sensor import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 
-async def test_binary_sensors(spa, setup_entry, hass: HomeAssistant) -> None:
+async def test_binary_sensors(spa, setup_entry, hass: SmartHub) -> None:
     """Test simple binary sensors."""
 
     entity_id = f"binary_sensor.{spa.brand}_{spa.model}_online"
@@ -24,7 +24,7 @@ async def test_binary_sensors(spa, setup_entry, hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_reminders(spa, setup_entry, hass: HomeAssistant) -> None:
+async def test_reminders(spa, setup_entry, hass: SmartHub) -> None:
     """Test the reminder sensor."""
 
     entity_id = f"binary_sensor.{spa.brand}_{spa.model}_myfilter_reminder"
@@ -49,7 +49,7 @@ def mock_error(spa):
     return error
 
 
-async def test_error(spa, hass: HomeAssistant, config_entry, mock_error) -> None:
+async def test_error(spa, hass: SmartHub, config_entry, mock_error) -> None:
     """Test the error sensor."""
 
     spa.get_errors.return_value = [mock_error]
@@ -66,7 +66,7 @@ async def test_error(spa, hass: HomeAssistant, config_entry, mock_error) -> None
     assert state.attributes["error_code"] == 11
 
 
-async def test_snooze_reminder(spa, setup_entry, hass: HomeAssistant) -> None:
+async def test_snooze_reminder(spa, setup_entry, hass: SmartHub) -> None:
     """Test snoozing a reminder."""
 
     entity_id = f"binary_sensor.{spa.brand}_{spa.model}_myfilter_reminder"
@@ -86,7 +86,7 @@ async def test_snooze_reminder(spa, setup_entry, hass: HomeAssistant) -> None:
     reminder.snooze.assert_called_with(days)
 
 
-async def test_reset_reminder(spa, setup_entry, hass: HomeAssistant) -> None:
+async def test_reset_reminder(spa, setup_entry, hass: SmartHub) -> None:
     """Test snoozing a reminder."""
 
     entity_id = f"binary_sensor.{spa.brand}_{spa.model}_myfilter_reminder"

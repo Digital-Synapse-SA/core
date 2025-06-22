@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import Any
 from unittest.mock import patch
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.components.nina.const import (
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.components.nina.const import (
     ATTR_AFFECTED_AREAS,
     ATTR_DESCRIPTION,
     ATTR_EXPIRES,
@@ -20,10 +20,10 @@ from homeassistant.components.nina.const import (
     ATTR_WEB,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import mocked_request_function
 
@@ -49,7 +49,7 @@ ENTRY_DATA_NO_AREA: dict[str, Any] = {
 }
 
 
-async def test_sensors(hass: HomeAssistant, entity_registry: er.EntityRegistry) -> None:
+async def test_sensors(hass: SmartHub, entity_registry: er.EntityRegistry) -> None:
     """Test the creation and values of the NINA sensors."""
 
     with patch(
@@ -169,7 +169,7 @@ async def test_sensors(hass: HomeAssistant, entity_registry: er.EntityRegistry) 
 
 
 async def test_sensors_without_corona_filter(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the creation and values of the NINA sensors without the corona filter."""
 
@@ -302,7 +302,7 @@ async def test_sensors_without_corona_filter(
 
 
 async def test_sensors_with_area_filter(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the creation and values of the NINA sensors with an area filter."""
 

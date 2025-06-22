@@ -1,6 +1,6 @@
 """Enforce that the integration has strict typing enabled.
 
-https://developers.home-assistant.io/docs/core/integration-quality-scale/rules/strict-typing/
+https://developers.smart-hub.io/docs/core/integration-quality-scale/rules/strict-typing/
 """
 
 from functools import lru_cache
@@ -11,7 +11,7 @@ import re
 from script.hassfest.model import Config, Integration
 
 _STRICT_TYPING_FILE = Path(".strict-typing")
-_COMPONENT_REGEX = r"homeassistant.components.([^.]+).*"
+_COMPONENT_REGEX = r"smarthub.components.([^.]+).*"
 
 
 @lru_cache

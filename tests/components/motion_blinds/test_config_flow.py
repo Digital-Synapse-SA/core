@@ -5,13 +5,13 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.motion_blinds import const
-from homeassistant.components.motion_blinds.config_flow import DEFAULT_GATEWAY_NAME
-from homeassistant.const import CONF_API_KEY, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.motion_blinds import const
+from smarthub.components.motion_blinds.config_flow import DEFAULT_GATEWAY_NAME
+from smarthub.const import CONF_API_KEY, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -76,58 +76,58 @@ def motion_blinds_connect_fixture():
     """Mock Motionblinds connection and entry setup."""
     with (
         patch(
-            "homeassistant.components.motion_blinds.gateway.MotionGateway.GetDeviceList",
+            "smarthub.components.motion_blinds.gateway.MotionGateway.GetDeviceList",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.motion_blinds.gateway.MotionGateway.Update",
+            "smarthub.components.motion_blinds.gateway.MotionGateway.Update",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.motion_blinds.gateway.MotionGateway.Check_gateway_multicast",
+            "smarthub.components.motion_blinds.gateway.MotionGateway.Check_gateway_multicast",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.motion_blinds.gateway.MotionGateway.device_list",
+            "smarthub.components.motion_blinds.gateway.MotionGateway.device_list",
             TEST_DEVICE_LIST,
         ),
         patch(
-            "homeassistant.components.motion_blinds.gateway.MotionGateway.mac",
+            "smarthub.components.motion_blinds.gateway.MotionGateway.mac",
             TEST_MAC,
         ),
         patch(
-            "homeassistant.components.motion_blinds.config_flow.MotionDiscovery.discover",
+            "smarthub.components.motion_blinds.config_flow.MotionDiscovery.discover",
             return_value=TEST_DISCOVERY_1,
         ),
         patch(
-            "homeassistant.components.motion_blinds.config_flow.MotionGateway.GetDeviceList",
+            "smarthub.components.motion_blinds.config_flow.MotionGateway.GetDeviceList",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.motion_blinds.config_flow.MotionGateway.available",
+            "smarthub.components.motion_blinds.config_flow.MotionGateway.available",
             True,
         ),
         patch(
-            "homeassistant.components.motion_blinds.gateway.AsyncMotionMulticast.Start_listen",
+            "smarthub.components.motion_blinds.gateway.AsyncMotionMulticast.Start_listen",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.motion_blinds.gateway.AsyncMotionMulticast.Stop_listen",
+            "smarthub.components.motion_blinds.gateway.AsyncMotionMulticast.Stop_listen",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.motion_blinds.gateway.network.async_get_adapters",
+            "smarthub.components.motion_blinds.gateway.network.async_get_adapters",
             return_value=TEST_INTERFACES,
         ),
         patch(
-            "homeassistant.components.motion_blinds.async_setup_entry",
+            "smarthub.components.motion_blinds.async_setup_entry",
             return_value=True,
         ),
     ):
         yield
 
 
-async def test_config_flow_manual_host_success(hass: HomeAssistant) -> None:
+async def test_config_flow_manual_host_success(hass: SmartHub) -> None:
     """Successful flow manually initialized by the user."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -160,7 +160,7 @@ async def test_config_flow_manual_host_success(hass: HomeAssistant) -> None:
     }
 
 
-async def test_config_flow_discovery_1_success(hass: HomeAssistant) -> None:
+async def test_config_flow_discovery_1_success(hass: SmartHub) -> None:
     """Successful flow with 1 gateway discovered."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -180,7 +180,7 @@ async def test_config_flow_discovery_1_success(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.motion_blinds.gateway.AsyncMotionMulticast.Stop_listen",
+        "smarthub.components.motion_blinds.gateway.AsyncMotionMulticast.Stop_listen",
         side_effect=socket.gaierror,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -197,7 +197,7 @@ async def test_config_flow_discovery_1_success(hass: HomeAssistant) -> None:
     }
 
 
-async def test_config_flow_discovery_2_success(hass: HomeAssistant) -> None:
+async def test_config_flow_discovery_2_success(hass: SmartHub) -> None:
     """Successful flow with 2 gateway discovered."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -208,7 +208,7 @@ async def test_config_flow_discovery_2_success(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.motion_blinds.config_flow.MotionDiscovery.discover",
+        "smarthub.components.motion_blinds.config_flow.MotionDiscovery.discover",
         return_value=TEST_DISCOVERY_2,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -234,7 +234,7 @@ async def test_config_flow_discovery_2_success(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.motion_blinds.gateway.MotionGateway.Check_gateway_multicast",
+        "smarthub.components.motion_blinds.gateway.MotionGateway.Check_gateway_multicast",
         side_effect=socket.timeout,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -251,7 +251,7 @@ async def test_config_flow_discovery_2_success(hass: HomeAssistant) -> None:
     }
 
 
-async def test_config_flow_connection_error(hass: HomeAssistant) -> None:
+async def test_config_flow_connection_error(hass: SmartHub) -> None:
     """Failed flow manually initialized by the user with connection timeout."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -271,7 +271,7 @@ async def test_config_flow_connection_error(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.motion_blinds.gateway.MotionGateway.GetDeviceList",
+        "smarthub.components.motion_blinds.gateway.MotionGateway.GetDeviceList",
         side_effect=socket.timeout,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -283,7 +283,7 @@ async def test_config_flow_connection_error(hass: HomeAssistant) -> None:
     assert result["reason"] == "connection_error"
 
 
-async def test_config_flow_discovery_fail(hass: HomeAssistant) -> None:
+async def test_config_flow_discovery_fail(hass: SmartHub) -> None:
     """Failed flow with no gateways discovered."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -294,7 +294,7 @@ async def test_config_flow_discovery_fail(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.motion_blinds.config_flow.MotionDiscovery.discover",
+        "smarthub.components.motion_blinds.config_flow.MotionDiscovery.discover",
         return_value={},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -307,7 +307,7 @@ async def test_config_flow_discovery_fail(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "discovery_error"}
 
 
-async def test_config_flow_invalid_interface(hass: HomeAssistant) -> None:
+async def test_config_flow_invalid_interface(hass: SmartHub) -> None:
     """Failed flow manually initialized by the user with invalid interface."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -327,7 +327,7 @@ async def test_config_flow_invalid_interface(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.motion_blinds.gateway.AsyncMotionMulticast.Start_listen",
+        "smarthub.components.motion_blinds.gateway.AsyncMotionMulticast.Start_listen",
         side_effect=socket.gaierror,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -344,7 +344,7 @@ async def test_config_flow_invalid_interface(hass: HomeAssistant) -> None:
     }
 
 
-async def test_dhcp_flow(hass: HomeAssistant) -> None:
+async def test_dhcp_flow(hass: SmartHub) -> None:
     """Successful flow from DHCP discovery."""
     dhcp_data = DhcpServiceInfo(
         ip=TEST_HOST,
@@ -361,7 +361,7 @@ async def test_dhcp_flow(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.motion_blinds.gateway.AsyncMotionMulticast.Start_listen",
+        "smarthub.components.motion_blinds.gateway.AsyncMotionMulticast.Start_listen",
         side_effect=OSError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -378,7 +378,7 @@ async def test_dhcp_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_dhcp_flow_abort(hass: HomeAssistant) -> None:
+async def test_dhcp_flow_abort(hass: SmartHub) -> None:
     """Test that DHCP discovery aborts if not Motionblinds."""
     dhcp_data = DhcpServiceInfo(
         ip=TEST_HOST,
@@ -387,7 +387,7 @@ async def test_dhcp_flow_abort(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.motion_blinds.config_flow.MotionGateway.GetDeviceList",
+        "smarthub.components.motion_blinds.config_flow.MotionGateway.GetDeviceList",
         side_effect=socket.timeout,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -398,7 +398,7 @@ async def test_dhcp_flow_abort(hass: HomeAssistant) -> None:
     assert result["reason"] == "not_motionblinds"
 
 
-async def test_dhcp_flow_abort_invalid_response(hass: HomeAssistant) -> None:
+async def test_dhcp_flow_abort_invalid_response(hass: SmartHub) -> None:
     """Test that DHCP discovery aborts if device responded with invalid data."""
     dhcp_data = DhcpServiceInfo(
         ip=TEST_HOST,
@@ -407,7 +407,7 @@ async def test_dhcp_flow_abort_invalid_response(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.motion_blinds.config_flow.MotionGateway.available",
+        "smarthub.components.motion_blinds.config_flow.MotionGateway.available",
         False,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -418,7 +418,7 @@ async def test_dhcp_flow_abort_invalid_response(hass: HomeAssistant) -> None:
     assert result["reason"] == "not_motionblinds"
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test specifying non default settings using options flow."""
     config_entry = MockConfigEntry(
         domain=const.DOMAIN,
@@ -450,7 +450,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_change_connection_settings(hass: HomeAssistant) -> None:
+async def test_change_connection_settings(hass: SmartHub) -> None:
     """Test changing connection settings by issuing a second user config flow."""
     config_entry = MockConfigEntry(
         domain=const.DOMAIN,

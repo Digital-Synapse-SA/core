@@ -7,9 +7,9 @@ from aiovodafone import VodafoneStationDevice
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.vodafone_station.const import DOMAIN, SCAN_INTERVAL
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.vodafone_station.const import DOMAIN, SCAN_INTERVAL
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 from .const import DEVICE_1_HOST, DEVICE_1_MAC, DEVICE_2_HOST, DEVICE_2_MAC
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_coordinator_device_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,

@@ -2,11 +2,11 @@
 
 from bond_async import Action, DeviceType
 
-from homeassistant.components.bond.button import STEP_SIZE
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.bond.button import STEP_SIZE
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import patch_bond_action, patch_bond_device_state, setup_platform
 
@@ -67,7 +67,7 @@ def motorized_shade(name: str):
 
 
 async def test_entity_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Tests that the devices are registered in the entity registry."""
@@ -89,7 +89,7 @@ async def test_entity_registry(
     assert entity.unique_id == "test-hub-id_test-device-id_startdimmer"
 
 
-async def test_mutually_exclusive_actions(hass: HomeAssistant) -> None:
+async def test_mutually_exclusive_actions(hass: SmartHub) -> None:
     """Tests we do not create the button when there is a mutually exclusive action."""
     await setup_platform(
         hass,
@@ -101,7 +101,7 @@ async def test_mutually_exclusive_actions(hass: HomeAssistant) -> None:
     assert not hass.states.async_all("button")
 
 
-async def test_stop_not_created_no_other_buttons(hass: HomeAssistant) -> None:
+async def test_stop_not_created_no_other_buttons(hass: SmartHub) -> None:
     """Tests we do not create the stop button when there are no other buttons."""
     await setup_platform(
         hass,
@@ -113,7 +113,7 @@ async def test_stop_not_created_no_other_buttons(hass: HomeAssistant) -> None:
     assert not hass.states.async_all("button")
 
 
-async def test_press_button_with_argument(hass: HomeAssistant) -> None:
+async def test_press_button_with_argument(hass: SmartHub) -> None:
     """Tests we can press a button with an argument."""
     await setup_platform(
         hass,
@@ -152,7 +152,7 @@ async def test_press_button_with_argument(hass: HomeAssistant) -> None:
     )
 
 
-async def test_press_button(hass: HomeAssistant) -> None:
+async def test_press_button(hass: SmartHub) -> None:
     """Tests we can press a button."""
     await setup_platform(
         hass,
@@ -191,7 +191,7 @@ async def test_press_button(hass: HomeAssistant) -> None:
     )
 
 
-async def test_motorized_shade_actions(hass: HomeAssistant) -> None:
+async def test_motorized_shade_actions(hass: SmartHub) -> None:
     """Tests motorized shade open next and close next actions."""
     await setup_platform(
         hass,

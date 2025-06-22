@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.wiffi.const import DOMAIN
-from homeassistant.const import CONF_PORT, CONF_TIMEOUT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.wiffi.const import DOMAIN
+from smarthub.const import CONF_PORT, CONF_TIMEOUT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -31,7 +31,7 @@ def mock_dummy_tcp_server():
 
     server = Dummy()
     with patch(
-        "homeassistant.components.wiffi.config_flow.WiffiTcpServer", return_value=server
+        "smarthub.components.wiffi.config_flow.WiffiTcpServer", return_value=server
     ):
         yield server
 
@@ -49,7 +49,7 @@ def mock_addr_in_use_server():
 
     server = Dummy()
     with patch(
-        "homeassistant.components.wiffi.config_flow.WiffiTcpServer", return_value=server
+        "smarthub.components.wiffi.config_flow.WiffiTcpServer", return_value=server
     ):
         yield server
 
@@ -67,12 +67,12 @@ def mock_start_server_failed():
 
     server = Dummy()
     with patch(
-        "homeassistant.components.wiffi.config_flow.WiffiTcpServer", return_value=server
+        "smarthub.components.wiffi.config_flow.WiffiTcpServer", return_value=server
     ):
         yield server
 
 
-async def test_form(hass: HomeAssistant, dummy_tcp_server) -> None:
+async def test_form(hass: SmartHub, dummy_tcp_server) -> None:
     """Test how we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -88,7 +88,7 @@ async def test_form(hass: HomeAssistant, dummy_tcp_server) -> None:
     assert result2["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_form_addr_in_use(hass: HomeAssistant, addr_in_use) -> None:
+async def test_form_addr_in_use(hass: SmartHub, addr_in_use) -> None:
     """Test how we handle addr_in_use error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -103,7 +103,7 @@ async def test_form_addr_in_use(hass: HomeAssistant, addr_in_use) -> None:
 
 
 async def test_form_start_server_failed(
-    hass: HomeAssistant, start_server_failed
+    hass: SmartHub, start_server_failed
 ) -> None:
     """Test how we handle start_server_failed error."""
     result = await hass.config_entries.flow.async_init(
@@ -118,7 +118,7 @@ async def test_form_start_server_failed(
     assert result2["reason"] == "start_server_failed"
 
 
-async def test_option_flow(hass: HomeAssistant) -> None:
+async def test_option_flow(hass: SmartHub) -> None:
     """Test option flow."""
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG)
     entry.add_to_hass(hass)

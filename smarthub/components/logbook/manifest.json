@@ -1,0 +1,9 @@
+{
+  "domain": "logbook",
+  "name": "Logbook",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["frontend", "http", "recorder"],
+  "documentation": "https://www.smart-hub.io/integrations/logbook",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

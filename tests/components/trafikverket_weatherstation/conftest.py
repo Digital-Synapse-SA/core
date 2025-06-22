@@ -9,9 +9,9 @@ from unittest.mock import patch
 import pytest
 from pytrafikverket import WeatherStationInfoModel
 
-from homeassistant.components.trafikverket_weatherstation.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
+from smarthub.components.trafikverket_weatherstation.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
 
 from . import ENTRY_CONFIG
 
@@ -20,9 +20,9 @@ from tests.common import MockConfigEntry
 
 @pytest.fixture
 async def load_int(
-    hass: HomeAssistant, mock_response: WeatherStationInfoModel
+    hass: SmartHub, mock_response: WeatherStationInfoModel
 ) -> MockConfigEntry:
-    """Set up the Trafikverket Weatherstation integration in Home Assistant."""
+    """Set up the Trafikverket Weatherstation integration in SmartHub."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,
@@ -43,14 +43,14 @@ async def mock_weather_response(
 ) -> AsyncGenerator[None]:
     """Mock a successful response."""
     with patch(
-        "homeassistant.components.trafikverket_weatherstation.coordinator.TrafikverketWeather.async_get_weather",
+        "smarthub.components.trafikverket_weatherstation.coordinator.TrafikverketWeather.async_get_weather",
         return_value=get_data,
     ):
         yield
 
 
 @pytest.fixture(name="get_data")
-async def get_data_from_library(hass: HomeAssistant) -> WeatherStationInfoModel:
+async def get_data_from_library(hass: SmartHub) -> WeatherStationInfoModel:
     """Retrieve data from Trafikverket Weatherstation library."""
     return WeatherStationInfoModel(
         station_name="Arlanda",

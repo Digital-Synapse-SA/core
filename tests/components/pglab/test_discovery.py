@@ -2,8 +2,8 @@
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .test_common import get_device_discovery_payload, send_discovery_message
 
@@ -11,7 +11,7 @@ from tests.typing import MqttMockHAClient
 
 
 async def test_device_discover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_reg,
     entity_reg,
@@ -39,7 +39,7 @@ async def test_device_discover(
 
 
 async def test_device_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_reg,
     entity_reg,
@@ -76,7 +76,7 @@ async def test_device_update(
 
 
 async def test_device_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_reg,
     entity_reg,

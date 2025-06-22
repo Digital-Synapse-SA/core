@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.remote import (
+from smarthub.components.remote import (
     ATTR_COMMAND,
     DOMAIN as REMOTE_DOMAIN,
     SERVICE_SEND_COMMAND,
 )
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import MOCK_SERIAL
 
@@ -19,13 +19,13 @@ ENTITY_ID = f"remote.kaleidescape_device_{MOCK_SERIAL}"
 
 
 @pytest.mark.usefixtures("mock_device", "mock_integration")
-async def test_entity(hass: HomeAssistant) -> None:
+async def test_entity(hass: SmartHub) -> None:
     """Test entity attributes."""
     assert hass.states.get(ENTITY_ID)
 
 
 @pytest.mark.usefixtures("mock_integration")
-async def test_commands(hass: HomeAssistant, mock_device: MagicMock) -> None:
+async def test_commands(hass: SmartHub, mock_device: MagicMock) -> None:
     """Test service calls."""
     await hass.services.async_call(
         REMOTE_DOMAIN,
@@ -133,9 +133,9 @@ async def test_commands(hass: HomeAssistant, mock_device: MagicMock) -> None:
 
 
 @pytest.mark.usefixtures("mock_device", "mock_integration")
-async def test_unknown_command(hass: HomeAssistant) -> None:
+async def test_unknown_command(hass: SmartHub) -> None:
     """Test service calls."""
-    with pytest.raises(HomeAssistantError) as err:
+    with pytest.raises(SmartHubError) as err:
         await hass.services.async_call(
             REMOTE_DOMAIN,
             SERVICE_SEND_COMMAND,

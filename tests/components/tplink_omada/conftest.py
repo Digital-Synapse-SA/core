@@ -19,10 +19,10 @@ from tplink_omada_client.devices import (
     OmadaSwitchPortDetails,
 )
 
-from homeassistant.components.tplink_omada.config_flow import CONF_SITE
-from homeassistant.components.tplink_omada.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME, CONF_VERIFY_SSL
-from homeassistant.core import HomeAssistant
+from smarthub.components.tplink_omada.config_flow import CONF_SITE
+from smarthub.components.tplink_omada.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME, CONF_VERIFY_SSL
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 
@@ -48,13 +48,13 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.tplink_omada.async_setup_entry", return_value=True
+        "smarthub.components.tplink_omada.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
 
 @pytest.fixture
-async def mock_omada_site_client(hass: HomeAssistant) -> AsyncGenerator[AsyncMock]:
+async def mock_omada_site_client(hass: SmartHub) -> AsyncGenerator[AsyncMock]:
     """Mock Omada site client."""
     site_client = MagicMock()
 
@@ -90,7 +90,7 @@ async def mock_omada_site_client(hass: HomeAssistant) -> AsyncGenerator[AsyncMoc
 
 
 @pytest.fixture
-def mock_omada_clients_only_site_client(hass: HomeAssistant) -> Generator[AsyncMock]:
+def mock_omada_clients_only_site_client(hass: SmartHub) -> Generator[AsyncMock]:
     """Mock Omada site client containing only client connection data."""
     site_client = MagicMock()
 
@@ -108,7 +108,7 @@ def mock_omada_clients_only_site_client(hass: HomeAssistant) -> Generator[AsyncM
 
 
 async def _get_mock_known_clients(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> AsyncGenerator[OmadaNetworkClient]:
     """Mock known clients of the Omada network."""
     known_clients_data = json.loads(
@@ -122,7 +122,7 @@ async def _get_mock_known_clients(
 
 
 async def _get_mock_connected_clients(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> AsyncGenerator[OmadaConnectedClient]:
     """Mock connected clients of the Omada network."""
     connected_clients_data = json.loads(
@@ -135,7 +135,7 @@ async def _get_mock_connected_clients(
             yield OmadaWiredClient(c)
 
 
-async def _get_mock_client(hass: HomeAssistant, mac: str) -> OmadaNetworkClient:
+async def _get_mock_client(hass: SmartHub, mac: str) -> OmadaNetworkClient:
     """Mock an Omada client."""
     connected_clients_data = json.loads(
         await async_load_fixture(hass, "connected-clients.json", DOMAIN)
@@ -153,7 +153,7 @@ async def _get_mock_client(hass: HomeAssistant, mac: str) -> OmadaNetworkClient:
 def mock_omada_client(mock_omada_site_client: AsyncMock) -> Generator[MagicMock]:
     """Mock Omada client."""
     with patch(
-        "homeassistant.components.tplink_omada.create_omada_client",
+        "smarthub.components.tplink_omada.create_omada_client",
         autospec=True,
     ) as client_mock:
         client = client_mock.return_value
@@ -168,7 +168,7 @@ def mock_omada_clients_only_client(
 ) -> Generator[MagicMock]:
     """Mock Omada client."""
     with patch(
-        "homeassistant.components.tplink_omada.create_omada_client",
+        "smarthub.components.tplink_omada.create_omada_client",
         autospec=True,
     ) as client_mock:
         client = client_mock.return_value
@@ -179,7 +179,7 @@ def mock_omada_clients_only_client(
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_omada_client: MagicMock,
 ) -> MockConfigEntry:

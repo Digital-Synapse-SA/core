@@ -5,7 +5,7 @@ from unittest.mock import patch
 from yalexs.authenticator_common import ValidationResult
 from yalexs.manager.exceptions import CannotConnect, InvalidAuth, RequireValidation
 
-from homeassistant.components.august.const import (
+from smarthub.components.august.const import (
     CONF_ACCESS_TOKEN_CACHE_FILE,
     CONF_BRAND,
     CONF_INSTALL_ID,
@@ -13,15 +13,15 @@ from homeassistant.components.august.const import (
     DOMAIN,
     VERIFICATION_CODE_KEY,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_TIMEOUT, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_TIMEOUT, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -32,11 +32,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+            "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.august.async_setup_entry",
+            "smarthub.components.august.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -63,14 +63,14 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+        "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
         side_effect=InvalidAuth,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -87,14 +87,14 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_user_unexpected_exception(hass: HomeAssistant) -> None:
+async def test_user_unexpected_exception(hass: SmartHub) -> None:
     """Test we handle an unexpected exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+        "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
         side_effect=ValueError("something exploded"),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -112,14 +112,14 @@ async def test_user_unexpected_exception(hass: HomeAssistant) -> None:
     assert result2["description_placeholders"] == {"error": "something exploded"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+        "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
         side_effect=CannotConnect,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -135,7 +135,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_needs_validate(hass: HomeAssistant) -> None:
+async def test_form_needs_validate(hass: SmartHub) -> None:
     """Test we present validation when we need to validate."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -143,7 +143,7 @@ async def test_form_needs_validate(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+            "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
             side_effect=RequireValidation,
         ),
         patch(
@@ -168,7 +168,7 @@ async def test_form_needs_validate(hass: HomeAssistant) -> None:
     # Try with the WRONG verification code give us the form back again
     with (
         patch(
-            "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+            "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
             side_effect=RequireValidation,
         ),
         patch(
@@ -196,7 +196,7 @@ async def test_form_needs_validate(hass: HomeAssistant) -> None:
     # Try with the CORRECT verification code and we setup
     with (
         patch(
-            "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+            "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
             return_value=True,
         ),
         patch(
@@ -208,7 +208,7 @@ async def test_form_needs_validate(hass: HomeAssistant) -> None:
             return_value=True,
         ) as mock_send_verification_code,
         patch(
-            "homeassistant.components.august.async_setup_entry", return_value=True
+            "smarthub.components.august.async_setup_entry", return_value=True
         ) as mock_setup_entry,
     ):
         result4 = await hass.config_entries.flow.async_configure(
@@ -231,7 +231,7 @@ async def test_form_needs_validate(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_reauth(hass: HomeAssistant) -> None:
+async def test_form_reauth(hass: SmartHub) -> None:
     """Test reauthenticate."""
 
     entry = MockConfigEntry(
@@ -254,11 +254,11 @@ async def test_form_reauth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+            "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.august.async_setup_entry",
+            "smarthub.components.august.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -275,7 +275,7 @@ async def test_form_reauth(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_reauth_with_2fa(hass: HomeAssistant) -> None:
+async def test_form_reauth_with_2fa(hass: SmartHub) -> None:
     """Test reauthenticate with 2fa."""
 
     entry = MockConfigEntry(
@@ -298,7 +298,7 @@ async def test_form_reauth_with_2fa(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+            "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
             side_effect=RequireValidation,
         ),
         patch(
@@ -322,7 +322,7 @@ async def test_form_reauth_with_2fa(hass: HomeAssistant) -> None:
     # Try with the CORRECT verification code and we setup
     with (
         patch(
-            "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+            "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
             return_value=True,
         ),
         patch(
@@ -334,7 +334,7 @@ async def test_form_reauth_with_2fa(hass: HomeAssistant) -> None:
             return_value=True,
         ) as mock_send_verification_code,
         patch(
-            "homeassistant.components.august.async_setup_entry", return_value=True
+            "smarthub.components.august.async_setup_entry", return_value=True
         ) as mock_setup_entry,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -350,7 +350,7 @@ async def test_form_reauth_with_2fa(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_switching_brands(hass: HomeAssistant) -> None:
+async def test_switching_brands(hass: SmartHub) -> None:
     """Test brands can be switched by setting up again."""
 
     entry = MockConfigEntry(
@@ -374,11 +374,11 @@ async def test_switching_brands(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.august.config_flow.AugustGateway.async_authenticate",
+            "smarthub.components.august.config_flow.AugustGateway.async_authenticate",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.august.async_setup_entry",
+            "smarthub.components.august.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):

@@ -4,9 +4,9 @@ from unittest.mock import MagicMock
 
 import httpx
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import INPUT_SENSOR
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_setup_unload(
-    hass: HomeAssistant, mock_iotawatt: MagicMock, entry: MockConfigEntry
+    hass: SmartHub, mock_iotawatt: MagicMock, entry: MockConfigEntry
 ) -> None:
     """Test we can setup and unload an entry."""
     mock_iotawatt.getSensors.return_value["sensors"]["my_sensor_key"] = INPUT_SENSOR
@@ -24,7 +24,7 @@ async def test_setup_unload(
 
 
 async def test_setup_connection_failed(
-    hass: HomeAssistant, mock_iotawatt: MagicMock, entry: MockConfigEntry
+    hass: SmartHub, mock_iotawatt: MagicMock, entry: MockConfigEntry
 ) -> None:
     """Test connection error during startup."""
     mock_iotawatt.connect.side_effect = httpx.ConnectError("")
@@ -34,7 +34,7 @@ async def test_setup_connection_failed(
 
 
 async def test_setup_auth_failed(
-    hass: HomeAssistant, mock_iotawatt: MagicMock, entry: MockConfigEntry
+    hass: SmartHub, mock_iotawatt: MagicMock, entry: MockConfigEntry
 ) -> None:
     """Test auth error during startup."""
     mock_iotawatt.connect.return_value = False

@@ -1,6 +1,6 @@
 """Test version diagnostics."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import MOCK_VERSION, setup_version_integration
 
@@ -9,7 +9,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test diagnostic information."""

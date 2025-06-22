@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock
 from aiowebdav2.exceptions import WebDavError
 import pytest
 
-from homeassistant.components.webdav.const import CONF_BACKUP_PATH, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.webdav.const import CONF_BACKUP_PATH, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_migrate_wrong_path(
-    hass: HomeAssistant, webdav_client: AsyncMock
+    hass: SmartHub, webdav_client: AsyncMock
 ) -> None:
     """Test migration of wrong encoded folder path."""
     webdav_client.list_with_properties.return_value = [
@@ -51,7 +51,7 @@ async def test_migrate_wrong_path(
     ],
 )
 async def test_migrate_non_wrong_path(
-    hass: HomeAssistant,
+    hass: SmartHub,
     webdav_client: AsyncMock,
     expected_path: str,
     remote_path_check: bool,
@@ -82,7 +82,7 @@ async def test_migrate_non_wrong_path(
 
 
 async def test_migrate_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     webdav_client: AsyncMock,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

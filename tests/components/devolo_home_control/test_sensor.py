@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import configure_integration
 from .mocks import (
@@ -19,13 +19,13 @@ from .mocks import (
 
 
 async def test_brightness_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup of a brightness sensor device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockBrightness()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -37,13 +37,13 @@ async def test_brightness_sensor(
 
 
 async def test_temperature_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup of a temperature sensor device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockSensor()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -55,14 +55,14 @@ async def test_temperature_sensor(
 
 
 async def test_battery_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup and state change of a battery sensor device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockSensor()
     test_gateway.devices["Test"].battery_level = 25
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -79,13 +79,13 @@ async def test_battery_sensor(
 
 
 async def test_consumption_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test setup and state change of a consumption sensor device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockConsumption()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -113,12 +113,12 @@ async def test_consumption_sensor(
     assert hass.states.get(f"{SENSOR_DOMAIN}.test_energy").state == STATE_UNAVAILABLE
 
 
-async def test_voltage_sensor(hass: HomeAssistant) -> None:
+async def test_voltage_sensor(hass: SmartHub) -> None:
     """Test disabled setup of a voltage sensor device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockConsumption()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -128,12 +128,12 @@ async def test_voltage_sensor(hass: HomeAssistant) -> None:
     assert state is None
 
 
-async def test_sensor_change(hass: HomeAssistant) -> None:
+async def test_sensor_change(hass: SmartHub) -> None:
     """Test state change of a sensor device."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockSensor()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -154,12 +154,12 @@ async def test_sensor_change(hass: HomeAssistant) -> None:
     )
 
 
-async def test_remove_from_hass(hass: HomeAssistant) -> None:
+async def test_remove_from_hass(hass: SmartHub) -> None:
     """Test removing entity."""
     entry = configure_integration(hass)
     test_gateway = HomeControlMockSensor()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[test_gateway, HomeControlMock()],
     ):
         await hass.config_entries.async_setup(entry.entry_id)

@@ -7,12 +7,12 @@ from unittest.mock import Mock, patch
 import aiohttp
 from loqedAPI import loqed
 
-from homeassistant import config_entries
-from homeassistant.components.loqed.const import DOMAIN
-from homeassistant.const import CONF_API_TOKEN, CONF_NAME, CONF_WEBHOOK_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.loqed.const import DOMAIN
+from smarthub.const import CONF_API_TOKEN, CONF_NAME, CONF_WEBHOOK_ID
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -28,7 +28,7 @@ zeroconf_data = ZeroconfServiceInfo(
 )
 
 
-async def test_create_entry_zeroconf(hass: HomeAssistant) -> None:
+async def test_create_entry_zeroconf(hass: SmartHub) -> None:
     """Test we get can create a lock via zeroconf."""
     lock_result = json.loads(await async_load_fixture(hass, "status_ok.json", DOMAIN))
 
@@ -61,11 +61,11 @@ async def test_create_entry_zeroconf(hass: HomeAssistant) -> None:
             return_value=mock_lock,
         ),
         patch(
-            "homeassistant.components.loqed.async_setup_entry",
+            "smarthub.components.loqed.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.webhook.async_generate_id",
+            "smarthub.components.webhook.async_generate_id",
             return_value=webhook_id,
         ),
     ):
@@ -95,7 +95,7 @@ async def test_create_entry_zeroconf(hass: HomeAssistant) -> None:
 
 
 async def test_create_entry_user(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we can create a lock via manual entry."""
     result = await hass.config_entries.flow.async_init(
@@ -124,11 +124,11 @@ async def test_create_entry_user(
             return_value=mock_lock,
         ),
         patch(
-            "homeassistant.components.loqed.async_setup_entry",
+            "smarthub.components.loqed.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.webhook.async_generate_id",
+            "smarthub.components.webhook.async_generate_id",
             return_value=webhook_id,
         ),
         patch(
@@ -158,7 +158,7 @@ async def test_create_entry_user(
 
 
 async def test_cannot_connect(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
@@ -184,7 +184,7 @@ async def test_cannot_connect(
 
 
 async def test_invalid_auth_when_lock_not_found(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we handle a situation where the user enters an invalid lock name."""
     result = await hass.config_entries.flow.async_init(
@@ -214,7 +214,7 @@ async def test_invalid_auth_when_lock_not_found(
 
 
 async def test_cannot_connect_when_lock_not_reachable(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we handle a situation where the user enters an invalid lock name."""
     result = await hass.config_entries.flow.async_init(

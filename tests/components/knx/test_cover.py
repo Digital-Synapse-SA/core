@@ -4,10 +4,10 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.cover import CoverEntityFeature, CoverState
-from homeassistant.components.knx.schema import CoverSchema
-from homeassistant.const import CONF_NAME, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.components.cover import CoverEntityFeature, CoverState
+from smarthub.components.knx.schema import CoverSchema
+from smarthub.const import CONF_NAME, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
 
 from . import KnxEntityGenerator
 from .conftest import KNXTestKit
@@ -15,7 +15,7 @@ from .conftest import KNXTestKit
 from tests.common import async_capture_events
 
 
-async def test_cover_basic(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_cover_basic(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX cover basic."""
     await knx.setup_integration(
         {
@@ -85,7 +85,7 @@ async def test_cover_basic(hass: HomeAssistant, knx: KNXTestKit) -> None:
     events.pop()
 
 
-async def test_cover_tilt_absolute(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_cover_tilt_absolute(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX cover tilt."""
     await knx.setup_integration(
         {
@@ -142,7 +142,7 @@ async def test_cover_tilt_absolute(hass: HomeAssistant, knx: KNXTestKit) -> None
     await knx.assert_write("1/0/5", (0x00,))
 
 
-async def test_cover_tilt_move_short(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_cover_tilt_move_short(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX cover tilt."""
     await knx.setup_integration(
         {

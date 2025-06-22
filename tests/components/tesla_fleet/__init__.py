@@ -4,21 +4,21 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.tesla_fleet.const import CLIENT_ID, DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.tesla_fleet.const import CLIENT_ID, DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
 async def setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     platforms: list[Platform] | None = None,
 ) -> None:
@@ -28,7 +28,7 @@ async def setup_platform(
     await async_import_client_credential(
         hass,
         DOMAIN,
-        ClientCredential(CLIENT_ID, "", "Home Assistant"),
+        ClientCredential(CLIENT_ID, "", "SmartHub"),
         DOMAIN,
     )
 
@@ -37,13 +37,13 @@ async def setup_platform(
     if platforms is None:
         await hass.config_entries.async_setup(config_entry.entry_id)
     else:
-        with patch("homeassistant.components.tesla_fleet.PLATFORMS", platforms):
+        with patch("smarthub.components.tesla_fleet.PLATFORMS", platforms):
             await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
 
 def assert_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_id: str,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -60,7 +60,7 @@ def assert_entities(
 
 
 def assert_entities_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_id: str,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

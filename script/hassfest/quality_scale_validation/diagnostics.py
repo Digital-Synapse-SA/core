@@ -1,6 +1,6 @@
 """Enforce that the integration implements diagnostics.
 
-https://developers.home-assistant.io/docs/core/integration-quality-scale/rules/diagnostics/
+https://developers.smart-hub.io/docs/core/integration-quality-scale/rules/diagnostics/
 """
 
 import ast

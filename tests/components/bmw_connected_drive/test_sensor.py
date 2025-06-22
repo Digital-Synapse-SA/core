@@ -8,15 +8,15 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.bmw_connected_drive import DOMAIN
-from homeassistant.components.bmw_connected_drive.const import SCAN_INTERVALS
-from homeassistant.components.bmw_connected_drive.sensor import SENSOR_TYPES
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.translation import async_get_translations
-from homeassistant.util.unit_system import (
+from smarthub.components.bmw_connected_drive import DOMAIN
+from smarthub.components.bmw_connected_drive.const import SCAN_INTERVALS
+from smarthub.components.bmw_connected_drive.sensor import SENSOR_TYPES
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.translation import async_get_translations
+from smarthub.util.unit_system import (
     METRIC_SYSTEM as METRIC,
     US_CUSTOMARY_SYSTEM as IMPERIAL,
     UnitSystem,
@@ -31,7 +31,7 @@ from tests.common import async_fire_time_changed, snapshot_platform
 @pytest.mark.usefixtures("bmw_fixture")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entity_state_attrs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -39,7 +39,7 @@ async def test_entity_state_attrs(
 
     # Setup component
     with patch(
-        "homeassistant.components.bmw_connected_drive.PLATFORMS", [Platform.SENSOR]
+        "smarthub.components.bmw_connected_drive.PLATFORMS", [Platform.SENSOR]
     ):
         mock_config_entry = await setup_mocked_integration(hass)
 
@@ -67,7 +67,7 @@ async def test_entity_state_attrs(
     ],
 )
 async def test_unit_conversion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     unit_system: UnitSystem,
     value: str,
@@ -89,7 +89,7 @@ async def test_unit_conversion(
 
 @pytest.mark.usefixtures("bmw_fixture")
 async def test_entity_option_translations(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Ensure all enum sensor values are translated."""
 
@@ -115,7 +115,7 @@ async def test_entity_option_translations(
 
 @pytest.mark.usefixtures("bmw_fixture")
 async def test_enum_sensor_unknown(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch, freezer: FrozenDateTimeFactory
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test conversion handling of enum sensors."""
 

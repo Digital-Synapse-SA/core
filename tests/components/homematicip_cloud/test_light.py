@@ -2,7 +2,7 @@
 
 from homematicip.base.enums import OpticalSignalBehaviour, RGBColorState
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_NAME,
@@ -12,14 +12,14 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntityFeature,
 )
-from homeassistant.const import ATTR_SUPPORTED_FEATURES, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_SUPPORTED_FEATURES, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from .helper import HomeFactory, async_manipulate_test_data, get_and_check_entity_basics
 
 
 async def test_hmip_light(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipLight."""
     entity_id = "light.treppe_ch"
@@ -66,7 +66,7 @@ async def test_hmip_light(
 
 
 async def test_hmip_notification_light(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipNotificationLight."""
     entity_id = "light.alarm_status"
@@ -165,7 +165,7 @@ async def test_hmip_notification_light(
 
 
 async def test_hmip_notification_light_2(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipNotificationLight."""
     entity_id = "light.led_oben"
@@ -200,7 +200,7 @@ async def test_hmip_notification_light_2(
 
 
 async def test_hmip_notification_light_2_without_brightness_and_light(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipNotificationLight."""
     entity_id = "light.led_oben"
@@ -233,7 +233,7 @@ async def test_hmip_notification_light_2_without_brightness_and_light(
 
 
 async def test_hmip_notification_light_2_turn_off(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipNotificationLight."""
     entity_id = "light.led_oben"
@@ -260,7 +260,7 @@ async def test_hmip_notification_light_2_turn_off(
 
 
 async def test_hmip_dimmer(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipDimmer."""
     entity_id = "light.schlafzimmerlicht"
@@ -320,7 +320,7 @@ async def test_hmip_dimmer(
 
 
 async def test_hmip_light_measuring(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipLightMeasuring."""
     entity_id = "light.flur_oben"
@@ -366,7 +366,7 @@ async def test_hmip_light_measuring(
 
 
 async def test_hmip_wired_multi_dimmer(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipMultiDimmer."""
     entity_id = "light.raumlich_kuche"
@@ -426,7 +426,7 @@ async def test_hmip_wired_multi_dimmer(
 
 
 async def test_hmip_din_rail_dimmer_3_channel1(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicIP DinRailDimmer3 Channel 1."""
     entity_id = "light.3_dimmer_channel1"
@@ -485,7 +485,7 @@ async def test_hmip_din_rail_dimmer_3_channel1(
 
 
 async def test_hmip_din_rail_dimmer_3_channel2(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicIP DinRailDimmer3 Channel 2."""
     entity_id = "light.3_dimmer_channel2"
@@ -544,7 +544,7 @@ async def test_hmip_din_rail_dimmer_3_channel2(
 
 
 async def test_hmip_din_rail_dimmer_3_channel3(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicIP DinRailDimmer3 Channel 3."""
     entity_id = "light.esstisch"

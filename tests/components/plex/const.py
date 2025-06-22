@@ -1,7 +1,7 @@
 """Constants used by Plex tests."""
 
-from homeassistant.components.plex import const
-from homeassistant.const import (
+from smarthub.components.plex import const
+from smarthub.const import (
     CONF_CLIENT_ID,
     CONF_HOST,
     CONF_PORT,

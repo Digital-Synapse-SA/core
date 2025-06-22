@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, patch
 from aionotion.errors import InvalidCredentialsError, NotionError
 import pytest
 
-from homeassistant.components.notion import CONF_REFRESH_TOKEN, CONF_USER_UUID, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.notion import CONF_REFRESH_TOKEN, CONF_USER_UUID, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import TEST_PASSWORD, TEST_REFRESH_TOKEN, TEST_USER_UUID, TEST_USERNAME
 
@@ -27,7 +27,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
     ],
 )
 async def test_create_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     errors,
     get_client_with_exception,
@@ -42,7 +42,7 @@ async def test_create_entry(
 
     # Test errors that can arise when getting a Notion API client:
     with patch(
-        "homeassistant.components.notion.config_flow.async_get_client_with_credentials",
+        "smarthub.components.notion.config_flow.async_get_client_with_credentials",
         get_client_with_exception,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -72,7 +72,7 @@ async def test_create_entry(
     }
 
 
-async def test_duplicate_error(hass: HomeAssistant, config, config_entry) -> None:
+async def test_duplicate_error(hass: SmartHub, config, config_entry) -> None:
     """Test that errors are shown when duplicates are added."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=config
@@ -90,7 +90,7 @@ async def test_duplicate_error(hass: HomeAssistant, config, config_entry) -> Non
     ],
 )
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config,
     config_entry: MockConfigEntry,
     errors,
@@ -103,7 +103,7 @@ async def test_reauth(
 
     # Test errors that can arise when getting a Notion API client:
     with patch(
-        "homeassistant.components.notion.config_flow.async_get_client_with_credentials",
+        "smarthub.components.notion.config_flow.async_get_client_with_credentials",
         get_client_with_exception,
     ):
         result = await hass.config_entries.flow.async_configure(

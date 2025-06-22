@@ -6,9 +6,9 @@ from aiohomekit.model import Accessory
 from aiohomekit.model.characteristics import CharacteristicsTypes
 from aiohomekit.model.services import Service, ServicesTypes
 
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_test_component
 
@@ -143,7 +143,7 @@ def create_window_covering_service_with_full_range_tilt(accessory):
 
 
 async def test_change_window_cover_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a HomeKit alarm on and off again."""
     helper = await setup_test_component(
@@ -172,7 +172,7 @@ async def test_change_window_cover_state(
 
 
 async def test_read_window_cover_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit alarm accessory."""
     helper = await setup_test_component(
@@ -209,7 +209,7 @@ async def test_read_window_cover_state(
 
 
 async def test_read_window_cover_tilt_horizontal(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that horizontal tilt is handled correctly."""
     helper = await setup_test_component(
@@ -226,7 +226,7 @@ async def test_read_window_cover_tilt_horizontal(
 
 
 async def test_read_window_cover_tilt_horizontal_2(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that horizontal tilt is handled correctly."""
     helper = await setup_test_component(
@@ -243,7 +243,7 @@ async def test_read_window_cover_tilt_horizontal_2(
 
 
 async def test_read_window_cover_tilt_vertical(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that vertical tilt is handled correctly."""
     helper = await setup_test_component(
@@ -260,7 +260,7 @@ async def test_read_window_cover_tilt_vertical(
 
 
 async def test_read_window_cover_tilt_vertical_2(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that vertical tilt is handled correctly."""
     helper = await setup_test_component(
@@ -277,7 +277,7 @@ async def test_read_window_cover_tilt_vertical_2(
 
 
 async def test_read_window_cover_tilt_missing_tilt(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that missing tilt is handled."""
     helper = await setup_test_component(
@@ -294,7 +294,7 @@ async def test_read_window_cover_tilt_missing_tilt(
 
 
 async def test_read_window_cover_tilt_full_range(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that horizontal tilt is handled correctly."""
     helper = await setup_test_component(
@@ -311,7 +311,7 @@ async def test_read_window_cover_tilt_full_range(
 
 
 async def test_read_window_cover_tilt_no_minmax(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that horizontal tilt is handled correctly."""
     helper = await setup_test_component(
@@ -328,7 +328,7 @@ async def test_read_window_cover_tilt_no_minmax(
 
 
 async def test_write_window_cover_tilt_horizontal(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that horizontal tilt is written correctly."""
     helper = await setup_test_component(
@@ -351,7 +351,7 @@ async def test_write_window_cover_tilt_horizontal(
 
 
 async def test_write_window_cover_tilt_horizontal_2(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that horizontal tilt is written correctly."""
     helper = await setup_test_component(
@@ -374,7 +374,7 @@ async def test_write_window_cover_tilt_horizontal_2(
 
 
 async def test_write_window_cover_tilt_vertical(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that vertical tilt is written correctly."""
     helper = await setup_test_component(
@@ -397,7 +397,7 @@ async def test_write_window_cover_tilt_vertical(
 
 
 async def test_write_window_cover_tilt_vertical_2(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that vertical tilt is written correctly."""
     helper = await setup_test_component(
@@ -420,7 +420,7 @@ async def test_write_window_cover_tilt_vertical_2(
 
 
 async def test_write_window_cover_tilt_no_minmax(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that horizontal tilt is written correctly."""
     helper = await setup_test_component(
@@ -443,7 +443,7 @@ async def test_write_window_cover_tilt_no_minmax(
 
 
 async def test_window_cover_stop(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that vertical tilt is written correctly."""
     helper = await setup_test_component(
@@ -462,7 +462,7 @@ async def test_window_cover_stop(
 
 
 async def test_write_window_cover_tilt_full_range(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that full-range tilt is working correctly."""
     helper = await setup_test_component(
@@ -532,7 +532,7 @@ def create_garage_door_opener_service(accessory: Accessory) -> None:
 
 
 async def test_change_door_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn open and close a HomeKit garage door."""
     helper = await setup_test_component(
@@ -561,7 +561,7 @@ async def test_change_door_state(
 
 
 async def test_read_door_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit garage door."""
     helper = await setup_test_component(
@@ -605,7 +605,7 @@ async def test_read_door_state(
 
 
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:

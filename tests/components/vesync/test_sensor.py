@@ -4,9 +4,9 @@ import pytest
 import requests_mock
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .common import ALL_DEVICE_NAMES, ENTITY_HUMIDIFIER_HUMIDITY, mock_devices_response
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.parametrize("device_name", ALL_DEVICE_NAMES)
 async def test_sensor_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -52,7 +52,7 @@ async def test_sensor_state(
 
 
 async def test_humidity(
-    hass: HomeAssistant, humidifier_config_entry: MockConfigEntry
+    hass: SmartHub, humidifier_config_entry: MockConfigEntry
 ) -> None:
     """Test the state of humidity sensor entity."""
 

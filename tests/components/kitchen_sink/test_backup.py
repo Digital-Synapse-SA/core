@@ -6,17 +6,17 @@ from unittest.mock import ANY, patch
 
 import pytest
 
-from homeassistant.components.backup import (
+from smarthub.components.backup import (
     DOMAIN as BACKUP_DOMAIN,
     AddonInfo,
     AgentBackup,
     Folder,
 )
-from homeassistant.components.kitchen_sink import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import instance_id
-from homeassistant.helpers.backup import async_initialize_backup
-from homeassistant.setup import async_setup_component
+from smarthub.components.kitchen_sink import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import instance_id
+from smarthub.helpers.backup import async_initialize_backup
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
@@ -28,17 +28,17 @@ async def backup_only() -> AsyncGenerator[None]:
     The backup platform is not an entity platform.
     """
     with patch(
-        "homeassistant.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
+        "smarthub.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
         [],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_integration(hass: HomeAssistant) -> AsyncGenerator[None]:
+async def setup_integration(hass: SmartHub) -> AsyncGenerator[None]:
     """Set up Kitchen Sink and backup integrations."""
     async_initialize_backup(hass)
-    with patch("homeassistant.components.backup.is_hassio", return_value=False):
+    with patch("smarthub.components.backup.is_hassio", return_value=False):
         assert await async_setup_component(hass, BACKUP_DOMAIN, {BACKUP_DOMAIN: {}})
         assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
         await hass.async_block_till_done()
@@ -46,7 +46,7 @@ async def setup_integration(hass: HomeAssistant) -> AsyncGenerator[None]:
 
 
 async def test_agents_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test backup agent info."""
@@ -91,7 +91,7 @@ async def test_agents_info(
 
 
 async def test_agents_list_backups(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test agent list backups."""
@@ -113,8 +113,8 @@ async def test_agents_list_backups(
             "failed_agent_ids": [],
             "failed_folders": [],
             "folders": ["media", "share"],
-            "homeassistant_included": True,
-            "homeassistant_version": "2024.12.0",
+            "smarthub_included": True,
+            "smarthub_version": "2024.12.0",
             "name": "Kitchen sink syncer",
             "with_automatic_settings": None,
         }
@@ -122,7 +122,7 @@ async def test_agents_list_backups(
 
 
 async def test_agents_download(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test downloading a backup."""
@@ -134,7 +134,7 @@ async def test_agents_download(
 
 
 async def test_agents_upload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
@@ -154,8 +154,8 @@ async def test_agents_upload(
             "with_automatic_settings": False,
         },
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=False,
         size=0.0,
@@ -164,10 +164,10 @@ async def test_agents_upload(
     with (
         patch("pathlib.Path.open"),
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
     ):
@@ -197,15 +197,15 @@ async def test_agents_upload(
         "failed_agent_ids": [],
         "failed_folders": [],
         "folders": ["media", "share"],
-        "homeassistant_included": True,
-        "homeassistant_version": "2024.12.0",
+        "smarthub_included": True,
+        "smarthub_version": "2024.12.0",
         "name": "Test",
         "with_automatic_settings": False,
     }
 
 
 async def test_agent_delete_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

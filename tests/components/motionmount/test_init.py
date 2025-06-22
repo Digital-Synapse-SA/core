@@ -2,17 +2,17 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.motionmount import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.device_registry import format_mac
+from smarthub.components.motionmount import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.device_registry import format_mac
 
 from tests.common import MockConfigEntry
 
 
 async def test_setup_entry_with_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
@@ -33,7 +33,7 @@ async def test_setup_entry_with_mac(
 
 
 async def test_setup_entry_without_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
@@ -55,7 +55,7 @@ async def test_setup_entry_without_mac(
 
 
 async def test_setup_entry_failed_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:
@@ -69,7 +69,7 @@ async def test_setup_entry_failed_connect(
 
 
 async def test_setup_entry_wrong_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_setup_entry_wrong_device(
 
 
 async def test_setup_entry_no_pin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:
@@ -98,7 +98,7 @@ async def test_setup_entry_no_pin(
 
 
 async def test_setup_entry_wrong_pin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_pin: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:
@@ -117,7 +117,7 @@ async def test_setup_entry_wrong_pin(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:

@@ -2,8 +2,8 @@
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.youtube.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.youtube.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .conftest import ComponentSetup
 
@@ -12,7 +12,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup_integration: ComponentSetup,
     snapshot: SnapshotAssertion,

@@ -7,14 +7,14 @@ from ohme import ChargeSlot
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ohme.const import DOMAIN
-from homeassistant.components.ohme.services import (
+from smarthub.components.ohme.const import DOMAIN
+from smarthub.components.ohme.services import (
     ATTR_CONFIG_ENTRY,
     ATTR_PRICE_CAP,
     SERVICE_LIST_CHARGE_SLOTS,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from . import setup_integration
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_list_charge_slots(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
     snapshot: SnapshotAssertion,
@@ -51,7 +51,7 @@ async def test_list_charge_slots(
 
 
 async def test_set_price_cap(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
     snapshot: SnapshotAssertion,
@@ -75,7 +75,7 @@ async def test_set_price_cap(
 
 
 async def test_list_charge_slots_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
     snapshot: SnapshotAssertion,

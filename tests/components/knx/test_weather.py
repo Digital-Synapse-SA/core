@@ -1,19 +1,19 @@
 """Test KNX weather."""
 
-from homeassistant.components.knx.schema import WeatherSchema
-from homeassistant.components.weather import (
+from smarthub.components.knx.schema import WeatherSchema
+from smarthub.components.weather import (
     ATTR_CONDITION_EXCEPTIONAL,
     ATTR_CONDITION_RAINY,
     ATTR_CONDITION_SUNNY,
     ATTR_CONDITION_WINDY,
 )
-from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_NAME
+from smarthub.core import SmartHub
 
 from .conftest import KNXTestKit
 
 
-async def test_weather(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_weather(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX weather."""
 
     await knx.setup_integration(

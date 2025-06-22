@@ -6,7 +6,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from wled import Releases, WLEDError
 
-from homeassistant.components.update import (
+from smarthub.components.update import (
     ATTR_INSTALLED_VERSION,
     ATTR_LATEST_VERSION,
     ATTR_RELEASE_SUMMARY,
@@ -17,8 +17,8 @@ from homeassistant.components.update import (
     UpdateDeviceClass,
     UpdateEntityFeature,
 )
-from homeassistant.components.wled.const import RELEASES_SCAN_INTERVAL
-from homeassistant.const import (
+from smarthub.components.wled.const import RELEASES_SCAN_INTERVAL
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_ENTITY_PICTURE,
@@ -30,8 +30,8 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import async_fire_time_changed
 
@@ -39,7 +39,7 @@ pytestmark = pytest.mark.usefixtures("init_integration")
 
 
 async def test_update_available(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the firmware update available."""
     assert (state := hass.states.get("update.wled_rgb_light_firmware"))
@@ -47,7 +47,7 @@ async def test_update_available(
     assert state.state == STATE_ON
     assert (
         state.attributes[ATTR_ENTITY_PICTURE]
-        == "https://brands.home-assistant.io/_/wled/icon.png"
+        == "https://brands.smart-hub.io/_/wled/icon.png"
     )
     assert state.attributes[ATTR_INSTALLED_VERSION] == "0.14.4"
     assert state.attributes[ATTR_LATEST_VERSION] == "0.99.0"
@@ -69,7 +69,7 @@ async def test_update_available(
 
 
 async def test_update_information_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     entity_registry: er.EntityRegistry,
     mock_wled_releases: MagicMock,
@@ -107,7 +107,7 @@ async def test_update_information_available(
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.parametrize("device_fixture", ["rgb_websocket"])
 async def test_no_update_available(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test there is no update available."""
     assert (state := hass.states.get("update.wled_websocket_firmware"))
@@ -135,7 +135,7 @@ async def test_no_update_available(
 
 
 async def test_update_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_wled: MagicMock,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -155,7 +155,7 @@ async def test_update_error(
 
 
 async def test_update_stay_stable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_wled: MagicMock,
 ) -> None:
     """Test the update entity staying on stable.
@@ -181,7 +181,7 @@ async def test_update_stay_stable(
 
 @pytest.mark.parametrize("device_fixture", ["rgbw"])
 async def test_update_beta_to_stable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_wled: MagicMock,
 ) -> None:
     """Test the update entity.
@@ -207,7 +207,7 @@ async def test_update_beta_to_stable(
 
 @pytest.mark.parametrize("device_fixture", ["rgb_single_segment"])
 async def test_update_stay_beta(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_wled: MagicMock,
 ) -> None:
     """Test the update entity.

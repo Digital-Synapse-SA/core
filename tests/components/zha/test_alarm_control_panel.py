@@ -8,18 +8,18 @@ from zigpy.zcl import Cluster
 from zigpy.zcl.clusters import security
 import zigpy.zcl.foundation as zcl_f
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_DOMAIN,
     AlarmControlPanelState,
 )
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
 
 from .common import find_entity_id
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
@@ -29,7 +29,7 @@ from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
 def alarm_control_panel_platform_only():
     """Only set up the alarm_control_panel and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.ALARM_CONTROL_PANEL,
             Platform.DEVICE_TRACKER,
@@ -45,7 +45,7 @@ def alarm_control_panel_platform_only():
     new=AsyncMock(return_value=[sentinel.data, zcl_f.Status.SUCCESS]),
 )
 async def test_alarm_control_panel(
-    hass: HomeAssistant, setup_zha, zigpy_device_mock
+    hass: SmartHub, setup_zha, zigpy_device_mock
 ) -> None:
     """Test ZHA alarm control panel platform."""
 
@@ -275,7 +275,7 @@ async def test_alarm_control_panel(
     cluster.client_command.reset_mock()
 
 
-async def reset_alarm_panel(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def reset_alarm_panel(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Reset the state of the alarm panel."""
     cluster.client_command.reset_mock()
     await hass.services.async_call(

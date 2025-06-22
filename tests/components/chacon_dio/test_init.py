@@ -2,9 +2,9 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -12,7 +12,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_cover_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -30,7 +30,7 @@ async def test_cover_unload_entry(
 
 
 async def test_cover_shutdown_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

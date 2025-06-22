@@ -6,10 +6,10 @@ from aiomealie import About, MealieAuthenticationError, MealieConnectionError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.mealie.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.mealie.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -49,7 +49,7 @@ async def test_device_info(
     ],
 )
 async def test_setup_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     field: str,
@@ -73,7 +73,7 @@ async def test_setup_failure(
     ],
 )
 async def test_setup_too_old(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     version,
@@ -87,7 +87,7 @@ async def test_setup_too_old(
 
 
 async def test_setup_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -105,7 +105,7 @@ async def test_setup_invalid(
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -128,7 +128,7 @@ async def test_load_unload_entry(
     ],
 )
 async def test_mealplan_initialization_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exc: Exception,
@@ -150,7 +150,7 @@ async def test_mealplan_initialization_failure(
     ],
 )
 async def test_shoppingitems_initialization_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exc: Exception,

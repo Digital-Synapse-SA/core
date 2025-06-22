@@ -10,13 +10,13 @@ from async_upnp_client.profiles.dlna import ContentDirectoryErrorCode, DmsDevice
 from didl_lite import didl_lite
 import pytest
 
-from homeassistant.components import media_source, ssdp
-from homeassistant.components.dlna_dms.const import DLNA_SORT_CRITERIA, DOMAIN
-from homeassistant.components.dlna_dms.dms import DidlPlayMedia
-from homeassistant.components.media_player import BrowseError
-from homeassistant.components.media_source import BrowseMediaSource, Unresolvable
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.service_info.ssdp import SsdpServiceInfo
+from smarthub.components import media_source, ssdp
+from smarthub.components.dlna_dms.const import DLNA_SORT_CRITERIA, DOMAIN
+from smarthub.components.dlna_dms.dms import DidlPlayMedia
+from smarthub.components.media_player import BrowseError
+from smarthub.components.media_source import BrowseMediaSource, Unresolvable
+from smarthub.core import SmartHub
+from smarthub.helpers.service_info.ssdp import SsdpServiceInfo
 
 from .conftest import (
     MOCK_DEVICE_BASE_URL,
@@ -42,7 +42,7 @@ type BrowseResultList = list[didl_lite.DidlObject | didl_lite.Descriptor]
 
 
 async def async_resolve_media(
-    hass: HomeAssistant, media_content_id: str
+    hass: SmartHub, media_content_id: str
 ) -> DidlPlayMedia:
     """Call media_source.async_resolve_media with the test source's ID."""
     result = await media_source.async_resolve_media(
@@ -53,7 +53,7 @@ async def async_resolve_media(
 
 
 async def async_browse_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     media_content_id: str | None,
 ) -> BrowseMediaSource:
     """Call media_source.async_browse_media with the test source's ID."""
@@ -63,7 +63,7 @@ async def async_browse_media(
 
 
 async def test_catch_request_error_unavailable(
-    hass: HomeAssistant, ssdp_scanner_mock: Mock
+    hass: SmartHub, ssdp_scanner_mock: Mock
 ) -> None:
     """Test the device is checked for availability before trying requests."""
     # DmsDevice notifies of disconnect via SSDP
@@ -100,7 +100,7 @@ async def test_catch_request_error_unavailable(
         await async_browse_media(hass, "?query")
 
 
-async def test_catch_request_error(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_catch_request_error(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test errors when making requests to the device are handled."""
     dms_device_mock.async_browse_metadata.side_effect = UpnpActionError(
         error_code=ContentDirectoryErrorCode.NO_SUCH_OBJECT
@@ -128,7 +128,7 @@ async def test_catch_request_error(hass: HomeAssistant, dms_device_mock: Mock) -
 
 
 async def test_catch_upnp_connection_error(
-    hass: HomeAssistant, dms_device_mock: Mock
+    hass: SmartHub, dms_device_mock: Mock
 ) -> None:
     """Test UpnpConnectionError causes the device source to disconnect from the device."""
     # First check the source can be used
@@ -158,7 +158,7 @@ async def test_catch_upnp_connection_error(
         await async_browse_media(hass, f":{object_id}")
 
 
-async def test_resolve_media_object(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_resolve_media_object(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test the async_resolve_object method via async_resolve_media."""
     object_id: Final = "123"
     res_url: Final = "foo/bar"
@@ -238,7 +238,7 @@ async def test_resolve_media_object(hass: HomeAssistant, dms_device_mock: Mock) 
         await async_resolve_media(hass, f":{object_id}")
 
 
-async def test_resolve_media_path(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_resolve_media_path(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test the async_resolve_path method via async_resolve_media."""
     # Path resolution involves searching each component of the path, then
     # browsing the metadata of the final object found.
@@ -300,7 +300,7 @@ async def test_resolve_media_path(hass: HomeAssistant, dms_device_mock: Mock) ->
     assert result.mime_type == res_mime
 
 
-async def test_resolve_path_browsed(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_resolve_path_browsed(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test async_resolve_path: action error results in browsing."""
     path: Final = "path/to/thing"
     object_ids: Final = ["path_id", "to_id", "thing_id"]
@@ -362,7 +362,7 @@ async def test_resolve_path_browsed(hass: HomeAssistant, dms_device_mock: Mock) 
 
 
 async def test_resolve_path_browsed_nothing(
-    hass: HomeAssistant, dms_device_mock: Mock
+    hass: SmartHub, dms_device_mock: Mock
 ) -> None:
     """Test async_resolve_path: action error results in browsing, but nothing found."""
     dms_device_mock.async_search_directory.side_effect = UpnpActionError()
@@ -390,7 +390,7 @@ async def test_resolve_path_browsed_nothing(
         await async_resolve_media(hass, "thing/other")
 
 
-async def test_resolve_path_quoted(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_resolve_path_quoted(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test async_resolve_path: quotes and backslashes in the path get escaped correctly."""
     dms_device_mock.async_search_directory.side_effect = [
         DmsDevice.BrowseResult(
@@ -427,7 +427,7 @@ async def test_resolve_path_quoted(hass: HomeAssistant, dms_device_mock: Mock) -
 
 
 async def test_resolve_path_ambiguous(
-    hass: HomeAssistant, dms_device_mock: Mock
+    hass: SmartHub, dms_device_mock: Mock
 ) -> None:
     """Test async_resolve_path: ambiguous results (too many matches) gives error."""
     dms_device_mock.async_search_directory.side_effect = [
@@ -458,7 +458,7 @@ async def test_resolve_path_ambiguous(
 
 
 async def test_resolve_path_no_such_container(
-    hass: HomeAssistant, dms_device_mock: Mock
+    hass: SmartHub, dms_device_mock: Mock
 ) -> None:
     """Test async_resolve_path: Explicit check for NO_SUCH_CONTAINER."""
     dms_device_mock.async_search_directory.side_effect = UpnpActionError(
@@ -468,7 +468,7 @@ async def test_resolve_path_no_such_container(
         await async_resolve_media(hass, "thing/other")
 
 
-async def test_resolve_media_search(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_resolve_media_search(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test the async_resolve_search method via async_resolve_media."""
     res_url: Final = "foo/bar"
     res_abs_url: Final = f"{MOCK_DEVICE_BASE_URL}/{res_url}"
@@ -525,7 +525,7 @@ async def test_resolve_media_search(hass: HomeAssistant, dms_device_mock: Mock) 
         await async_resolve_media(hass, '?dc:title="thing"')
 
 
-async def test_browse_media_root(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_browse_media_root(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test async_browse_media with no identifier will browse the root of the device."""
     dms_device_mock.async_browse_metadata.return_value = didl_lite.DidlObject(
         id="0", restricted="false", title="root"
@@ -577,7 +577,7 @@ async def test_browse_media_root(hass: HomeAssistant, dms_device_mock: Mock) -> 
     )
 
 
-async def test_browse_media_object(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_browse_media_object(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test async_browse_object via async_browse_media."""
     object_id = "1234"
     child_titles = ("Item 1", "Thing", "Item 2")
@@ -624,7 +624,7 @@ async def test_browse_media_object(hass: HomeAssistant, dms_device_mock: Mock) -
 
 
 async def test_browse_object_sort_anything(
-    hass: HomeAssistant, dms_device_mock: Mock
+    hass: SmartHub, dms_device_mock: Mock
 ) -> None:
     """Test sort criteria for children where device allows anything."""
     dms_device_mock.sort_capabilities = ["*"]
@@ -645,7 +645,7 @@ async def test_browse_object_sort_anything(
 
 
 async def test_browse_object_sort_superset(
-    hass: HomeAssistant, dms_device_mock: Mock
+    hass: SmartHub, dms_device_mock: Mock
 ) -> None:
     """Test sorting where device allows superset of integration's criteria."""
     dms_device_mock.sort_capabilities = [
@@ -673,7 +673,7 @@ async def test_browse_object_sort_superset(
 
 
 async def test_browse_object_sort_subset(
-    hass: HomeAssistant, dms_device_mock: Mock
+    hass: SmartHub, dms_device_mock: Mock
 ) -> None:
     """Test sorting where device allows subset of integration's criteria."""
     dms_device_mock.sort_capabilities = [
@@ -698,7 +698,7 @@ async def test_browse_object_sort_subset(
     )
 
 
-async def test_browse_media_path(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_browse_media_path(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test async_browse_media with a path."""
     title = "folder"
     con_id = "123"
@@ -729,7 +729,7 @@ async def test_browse_media_path(hass: HomeAssistant, dms_device_mock: Mock) -> 
     )
 
 
-async def test_browse_media_search(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_browse_media_search(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test async_browse_media with a search query."""
     query = 'dc:title contains "FooBar"'
     object_details = (("111", "FooBar baz"), ("432", "Not FooBar"), ("99", "FooBar"))
@@ -760,7 +760,7 @@ async def test_browse_media_search(hass: HomeAssistant, dms_device_mock: Mock) -
 
 
 async def test_browse_search_invalid(
-    hass: HomeAssistant, dms_device_mock: Mock
+    hass: SmartHub, dms_device_mock: Mock
 ) -> None:
     """Test searching with an invalid query gives a BrowseError."""
     query = "title == FooBar"
@@ -772,7 +772,7 @@ async def test_browse_search_invalid(
 
 
 async def test_browse_search_no_results(
-    hass: HomeAssistant, dms_device_mock: Mock
+    hass: SmartHub, dms_device_mock: Mock
 ) -> None:
     """Test a search with no results does not give an error."""
     query = 'dc:title contains "FooBar"'
@@ -786,7 +786,7 @@ async def test_browse_search_no_results(
     assert not result.children
 
 
-async def test_thumbnail(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_thumbnail(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test getting thumbnails URLs for items."""
     # Use browse_search to get multiple items at once for least effort
     dms_device_mock.async_search_directory.return_value = DmsDevice.BrowseResult(
@@ -839,7 +839,7 @@ async def test_thumbnail(hass: HomeAssistant, dms_device_mock: Mock) -> None:
     assert result.children[2].thumbnail is None
 
 
-async def test_can_play(hass: HomeAssistant, dms_device_mock: Mock) -> None:
+async def test_can_play(hass: SmartHub, dms_device_mock: Mock) -> None:
     """Test determination of playability for items."""
     protocol_infos = [
         # No protocol info for resource

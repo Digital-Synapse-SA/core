@@ -8,9 +8,9 @@ import pytest
 from python_otbr_api.tlv_parser import TLVError
 from zeroconf.asyncio import AsyncServiceInfo
 
-from homeassistant.components.thread import dataset_store, discovery
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.thread import dataset_store, discovery
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import (
     DATASET_1,
@@ -62,7 +62,7 @@ DATASET_1_LARGER_TIMESTAMP = (
 )
 
 
-async def test_add_invalid_dataset(hass: HomeAssistant) -> None:
+async def test_add_invalid_dataset(hass: SmartHub) -> None:
     """Test adding an invalid dataset."""
     with pytest.raises(TLVError, match="unknown type 222"):
         await dataset_store.async_add_dataset(hass, "source", "DEADBEEF")
@@ -71,7 +71,7 @@ async def test_add_invalid_dataset(hass: HomeAssistant) -> None:
     assert len(store.datasets) == 0
 
 
-async def test_add_dataset_twice(hass: HomeAssistant) -> None:
+async def test_add_dataset_twice(hass: SmartHub) -> None:
     """Test adding dataset twice does nothing."""
     await dataset_store.async_add_dataset(hass, "source", DATASET_1)
 
@@ -84,7 +84,7 @@ async def test_add_dataset_twice(hass: HomeAssistant) -> None:
     assert list(store.datasets.values())[0].created == created
 
 
-async def test_add_dataset_reordered(hass: HomeAssistant) -> None:
+async def test_add_dataset_reordered(hass: SmartHub) -> None:
     """Test adding dataset with keys in a different order does nothing."""
     await dataset_store.async_add_dataset(hass, "source", DATASET_1)
 
@@ -97,7 +97,7 @@ async def test_add_dataset_reordered(hass: HomeAssistant) -> None:
     assert list(store.datasets.values())[0].created == created
 
 
-async def test_delete_dataset_twice(hass: HomeAssistant) -> None:
+async def test_delete_dataset_twice(hass: SmartHub) -> None:
     """Test deleting dataset twice raises."""
     await dataset_store.async_add_dataset(hass, "source", DATASET_1)
     await dataset_store.async_add_dataset(hass, "source", DATASET_2)
@@ -113,7 +113,7 @@ async def test_delete_dataset_twice(hass: HomeAssistant) -> None:
     assert len(store.datasets) == 1
 
 
-async def test_delete_preferred_dataset(hass: HomeAssistant) -> None:
+async def test_delete_preferred_dataset(hass: SmartHub) -> None:
     """Test deleting preferred dataset raises."""
     await dataset_store.async_add_dataset(hass, "source", DATASET_1)
 
@@ -121,12 +121,12 @@ async def test_delete_preferred_dataset(hass: HomeAssistant) -> None:
     dataset_id = list(store.datasets.values())[0].id
     store.preferred_dataset = dataset_id
 
-    with pytest.raises(HomeAssistantError, match="attempt to remove preferred dataset"):
+    with pytest.raises(SmartHubError, match="attempt to remove preferred dataset"):
         store.async_delete(dataset_id)
     assert len(store.datasets) == 1
 
 
-async def test_get_dataset(hass: HomeAssistant) -> None:
+async def test_get_dataset(hass: SmartHub) -> None:
     """Test get the preferred dataset."""
     assert await dataset_store.async_get_dataset(hass, "blah") is None
 
@@ -137,7 +137,7 @@ async def test_get_dataset(hass: HomeAssistant) -> None:
     assert (await dataset_store.async_get_dataset(hass, dataset_id)) == DATASET_1
 
 
-async def test_get_preferred_dataset(hass: HomeAssistant) -> None:
+async def test_get_preferred_dataset(hass: SmartHub) -> None:
     """Test get the preferred dataset."""
     assert await dataset_store.async_get_preferred_dataset(hass) is None
 
@@ -150,7 +150,7 @@ async def test_get_preferred_dataset(hass: HomeAssistant) -> None:
     assert (await dataset_store.async_get_preferred_dataset(hass)) == DATASET_1
 
 
-async def test_dataset_properties(hass: HomeAssistant) -> None:
+async def test_dataset_properties(hass: SmartHub) -> None:
     """Test dataset entry properties."""
     datasets = [
         {"source": "Google", "tlv": DATASET_1},
@@ -184,7 +184,7 @@ async def test_dataset_properties(hass: HomeAssistant) -> None:
     assert dataset == dataset_2
     assert dataset.channel == 15
     assert dataset.extended_pan_id == "1111111122222233"
-    assert dataset.network_name == "HomeAssistant!"
+    assert dataset.network_name == "SmartHub!"
     assert dataset.pan_id == "1234"
 
     dataset = store.async_get(dataset_3.id)
@@ -203,18 +203,18 @@ async def test_dataset_properties(hass: HomeAssistant) -> None:
     ("dataset", "error"),
     [
         (DATASET_1_BAD_CHANNEL, TLVError),
-        (DATASET_1_NO_EXTPANID, HomeAssistantError),
-        (DATASET_1_NO_ACTIVETIMESTAMP, HomeAssistantError),
+        (DATASET_1_NO_EXTPANID, SmartHubError),
+        (DATASET_1_NO_ACTIVETIMESTAMP, SmartHubError),
     ],
 )
-async def test_add_bad_dataset(hass: HomeAssistant, dataset, error) -> None:
+async def test_add_bad_dataset(hass: SmartHub, dataset, error) -> None:
     """Test adding a bad dataset."""
     with pytest.raises(error):
         await dataset_store.async_add_dataset(hass, "test", dataset)
 
 
 async def test_update_dataset_newer(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test updating a dataset."""
     await dataset_store.async_add_dataset(hass, "test", DATASET_1)
@@ -235,7 +235,7 @@ async def test_update_dataset_newer(
 
 
 async def test_update_dataset_older(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test updating a dataset."""
     await dataset_store.async_add_dataset(hass, "test", DATASET_1_LARGER_TIMESTAMP)
@@ -255,7 +255,7 @@ async def test_update_dataset_older(
     )
 
 
-async def test_load_datasets(hass: HomeAssistant) -> None:
+async def test_load_datasets(hass: SmartHub) -> None:
     """Make sure that we can load/save data correctly."""
 
     datasets = [
@@ -290,7 +290,7 @@ async def test_load_datasets(hass: HomeAssistant) -> None:
 
     assert store1.preferred_dataset == dataset_1_store_1.id
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         store1.async_delete(dataset_1_store_1.id)
     store1.async_delete(dataset_2_store_1.id)
 
@@ -315,7 +315,7 @@ async def test_load_datasets(hass: HomeAssistant) -> None:
 
 
 async def test_loading_datasets_from_storage(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test loading stored datasets on start."""
     hass_storage[dataset_store.STORAGE_KEY] = {
@@ -358,7 +358,7 @@ async def test_loading_datasets_from_storage(
 
 
 async def test_migrate_drop_bad_datasets(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test migrating the dataset store when the store has bad datasets."""
     hass_storage[dataset_store.STORAGE_KEY] = {
@@ -402,7 +402,7 @@ async def test_migrate_drop_bad_datasets(
 
 
 async def test_migrate_drop_bad_datasets_preferred(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test migrating the dataset store when the store has bad datasets."""
     hass_storage[dataset_store.STORAGE_KEY] = {
@@ -433,7 +433,7 @@ async def test_migrate_drop_bad_datasets_preferred(
 
 
 async def test_migrate_drop_duplicate_datasets(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test migrating the dataset store when the store has duplicated datasets."""
     hass_storage[dataset_store.STORAGE_KEY] = {
@@ -470,7 +470,7 @@ async def test_migrate_drop_duplicate_datasets(
 
 
 async def test_migrate_drop_duplicate_datasets_2(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test migrating the dataset store when the store has duplicated datasets."""
     hass_storage[dataset_store.STORAGE_KEY] = {
@@ -507,7 +507,7 @@ async def test_migrate_drop_duplicate_datasets_2(
 
 
 async def test_migrate_drop_duplicate_datasets_preferred(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test migrating the dataset store when the store has duplicated datasets."""
     hass_storage[dataset_store.STORAGE_KEY] = {
@@ -544,7 +544,7 @@ async def test_migrate_drop_duplicate_datasets_preferred(
 
 
 async def test_migrate_set_default_border_agent_id(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test migrating the dataset store adds default border agent."""
     hass_storage[dataset_store.STORAGE_KEY] = {
@@ -568,11 +568,11 @@ async def test_migrate_set_default_border_agent_id(
     assert store.datasets[store._preferred_dataset].preferred_extended_address is None
 
 
-async def test_set_preferred_border_agent_id(hass: HomeAssistant) -> None:
+async def test_set_preferred_border_agent_id(hass: SmartHub) -> None:
     """Test set the preferred border agent ID of a dataset."""
     assert await dataset_store.async_get_preferred_dataset(hass) is None
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await dataset_store.async_add_dataset(
             hass, "source", DATASET_3, preferred_border_agent_id="blah"
         )
@@ -580,7 +580,7 @@ async def test_set_preferred_border_agent_id(hass: HomeAssistant) -> None:
     store = await dataset_store.async_get_store(hass)
     assert len(store.datasets) == 0
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await dataset_store.async_add_dataset(
             hass, "source", DATASET_3, preferred_border_agent_id="bleh"
         )
@@ -590,7 +590,7 @@ async def test_set_preferred_border_agent_id(hass: HomeAssistant) -> None:
     assert len(store.datasets) == 1
     assert list(store.datasets.values())[0].preferred_border_agent_id is None
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await dataset_store.async_add_dataset(
             hass, "source", DATASET_2, preferred_border_agent_id="blah"
         )
@@ -598,7 +598,7 @@ async def test_set_preferred_border_agent_id(hass: HomeAssistant) -> None:
 
     store = await dataset_store.async_get_store(hass)
     dataset_id = list(store.datasets.values())[0].id
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await store.async_set_preferred_border_agent(dataset_id, "blah", None)
     assert list(store.datasets.values())[0].preferred_border_agent_id is None
 
@@ -606,7 +606,7 @@ async def test_set_preferred_border_agent_id(hass: HomeAssistant) -> None:
     assert len(store.datasets) == 2
     assert list(store.datasets.values())[1].preferred_border_agent_id is None
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await dataset_store.async_add_dataset(
             hass, "source", DATASET_1_LARGER_TIMESTAMP, preferred_border_agent_id="blah"
         )
@@ -614,7 +614,7 @@ async def test_set_preferred_border_agent_id(hass: HomeAssistant) -> None:
 
 
 async def test_set_preferred_border_agent_id_and_extended_address(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test set the preferred border agent ID and extended address of a dataset."""
     assert await dataset_store.async_get_preferred_dataset(hass) is None
@@ -673,7 +673,7 @@ async def test_set_preferred_border_agent_id_and_extended_address(
     assert list(store.datasets.values())[2].preferred_extended_address == "bleh"
 
 
-async def test_set_preferred_extended_address(hass: HomeAssistant) -> None:
+async def test_set_preferred_extended_address(hass: SmartHub) -> None:
     """Test set the preferred extended address of a dataset."""
     assert await dataset_store.async_get_preferred_dataset(hass) is None
 
@@ -710,7 +710,7 @@ async def test_set_preferred_extended_address(hass: HomeAssistant) -> None:
 
 
 async def test_automatically_set_preferred_dataset(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test automatically setting the first dataset as the preferred dataset."""
     add_service_listener_called = asyncio.Event()
@@ -731,7 +731,7 @@ async def test_automatically_set_preferred_dataset(
     mock_async_zeroconf.async_get_service_info = AsyncMock()
 
     with patch(
-        "homeassistant.components.thread.dataset_store.BORDER_AGENT_DISCOVERY_TIMEOUT",
+        "smarthub.components.thread.dataset_store.BORDER_AGENT_DISCOVERY_TIMEOUT",
         0.1,
     ):
         await dataset_store.async_add_dataset(
@@ -775,7 +775,7 @@ async def test_automatically_set_preferred_dataset(
 
 
 async def test_automatically_set_preferred_dataset_own_and_other_router(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test automatically setting the first dataset as the preferred dataset.
 
@@ -799,7 +799,7 @@ async def test_automatically_set_preferred_dataset_own_and_other_router(
     mock_async_zeroconf.async_get_service_info = AsyncMock()
 
     with patch(
-        "homeassistant.components.thread.dataset_store.BORDER_AGENT_DISCOVERY_TIMEOUT",
+        "smarthub.components.thread.dataset_store.BORDER_AGENT_DISCOVERY_TIMEOUT",
         0.1,
     ):
         await dataset_store.async_add_dataset(
@@ -854,7 +854,7 @@ async def test_automatically_set_preferred_dataset_own_and_other_router(
 
 
 async def test_automatically_set_preferred_dataset_other_router(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test automatically setting the first dataset as the preferred dataset.
 
@@ -878,7 +878,7 @@ async def test_automatically_set_preferred_dataset_other_router(
     mock_async_zeroconf.async_get_service_info = AsyncMock()
 
     with patch(
-        "homeassistant.components.thread.dataset_store.BORDER_AGENT_DISCOVERY_TIMEOUT",
+        "smarthub.components.thread.dataset_store.BORDER_AGENT_DISCOVERY_TIMEOUT",
         0.1,
     ):
         await dataset_store.async_add_dataset(
@@ -922,7 +922,7 @@ async def test_automatically_set_preferred_dataset_other_router(
 
 
 async def test_automatically_set_preferred_dataset_no_router(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test automatically setting the first dataset as the preferred dataset.
 
@@ -946,7 +946,7 @@ async def test_automatically_set_preferred_dataset_no_router(
     mock_async_zeroconf.async_get_service_info = AsyncMock()
 
     with patch(
-        "homeassistant.components.thread.dataset_store.BORDER_AGENT_DISCOVERY_TIMEOUT",
+        "smarthub.components.thread.dataset_store.BORDER_AGENT_DISCOVERY_TIMEOUT",
         0.1,
     ):
         await dataset_store.async_add_dataset(

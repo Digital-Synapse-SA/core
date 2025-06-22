@@ -4,7 +4,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import init_integration
 
@@ -15,7 +15,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

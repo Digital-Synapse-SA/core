@@ -6,18 +6,18 @@ from unittest import mock
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.blackbird.const import DOMAIN, SERVICE_SETALLZONES
-from homeassistant.components.blackbird.media_player import (
+from smarthub.components.blackbird.const import DOMAIN, SERVICE_SETALLZONES
+from smarthub.components.blackbird.media_player import (
     DATA_BLACKBIRD,
     PLATFORM_SCHEMA,
 )
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     MediaPlayerEntity,
     MediaPlayerEntityFeature,
 )
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockEntityPlatform
 
@@ -177,10 +177,10 @@ def mock_blackbird() -> MockBlackbird:
 
 
 @pytest.fixture
-async def setup_blackbird(hass: HomeAssistant, mock_blackbird: MockBlackbird) -> None:
+async def setup_blackbird(hass: SmartHub, mock_blackbird: MockBlackbird) -> None:
     """Set up blackbird."""
     with mock.patch(
-        "homeassistant.components.blackbird.media_player.get_blackbird",
+        "smarthub.components.blackbird.media_player.get_blackbird",
         return_value=mock_blackbird,
     ):
         await async_setup_component(
@@ -204,7 +204,7 @@ async def setup_blackbird(hass: HomeAssistant, mock_blackbird: MockBlackbird) ->
 
 @pytest.fixture
 def media_player_entity(
-    hass: HomeAssistant, setup_blackbird: None
+    hass: SmartHub, setup_blackbird: None
 ) -> MediaPlayerEntity:
     """Return the media player entity."""
     media_player = hass.data[DATA_BLACKBIRD]["/dev/ttyUSB0-3"]
@@ -215,7 +215,7 @@ def media_player_entity(
 
 
 @pytest.mark.usefixtures("setup_blackbird")
-async def test_setup_platform(hass: HomeAssistant) -> None:
+async def test_setup_platform(hass: SmartHub) -> None:
     """Test setting up platform."""
     # One service must be registered
     assert hass.services.has_service(DOMAIN, SERVICE_SETALLZONES)
@@ -224,7 +224,7 @@ async def test_setup_platform(hass: HomeAssistant) -> None:
 
 
 async def test_setallzones_service_call_with_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     media_player_entity: MediaPlayerEntity,
     mock_blackbird: MockBlackbird,
 ) -> None:
@@ -250,7 +250,7 @@ async def test_setallzones_service_call_with_entity_id(
 
 async def test_setallzones_service_call_without_entity_id(
     mock_blackbird: MockBlackbird,
-    hass: HomeAssistant,
+    hass: SmartHub,
     media_player_entity: MediaPlayerEntity,
 ) -> None:
     """Test set all zone source service call without entity id."""
@@ -271,7 +271,7 @@ async def test_setallzones_service_call_without_entity_id(
 
 
 async def test_update(
-    hass: HomeAssistant, media_player_entity: MediaPlayerEntity
+    hass: SmartHub, media_player_entity: MediaPlayerEntity
 ) -> None:
     """Test updating values from blackbird."""
 
@@ -285,7 +285,7 @@ async def test_name(media_player_entity: MediaPlayerEntity) -> None:
 
 
 async def test_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     media_player_entity: MediaPlayerEntity,
     mock_blackbird: MockBlackbird,
 ) -> None:
@@ -308,14 +308,14 @@ async def test_supported_features(media_player_entity: MediaPlayerEntity) -> Non
 
 
 async def test_source(
-    hass: HomeAssistant, media_player_entity: MediaPlayerEntity
+    hass: SmartHub, media_player_entity: MediaPlayerEntity
 ) -> None:
     """Test source property."""
     assert media_player_entity.source == "one"
 
 
 async def test_media_title(
-    hass: HomeAssistant, media_player_entity: MediaPlayerEntity
+    hass: SmartHub, media_player_entity: MediaPlayerEntity
 ) -> None:
     """Test media title property."""
     assert media_player_entity.media_title == "one"
@@ -328,7 +328,7 @@ async def test_source_list(media_player_entity: MediaPlayerEntity) -> None:
 
 
 async def test_select_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     media_player_entity: MediaPlayerEntity,
     mock_blackbird: MockBlackbird,
 ) -> None:
@@ -350,7 +350,7 @@ async def test_select_source(
 
 
 async def test_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     media_player_entity: MediaPlayerEntity,
     mock_blackbird: MockBlackbird,
 ) -> None:
@@ -366,7 +366,7 @@ async def test_turn_on(
 
 
 async def test_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     media_player_entity: MediaPlayerEntity,
     mock_blackbird: MockBlackbird,
 ) -> None:

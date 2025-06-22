@@ -4,26 +4,26 @@ from unittest.mock import PropertyMock, patch
 
 from canary.const import LOCATION_MODE_AWAY, LOCATION_MODE_HOME, LOCATION_MODE_NIGHT
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_DOMAIN,
     AlarmControlPanelState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     SERVICE_ALARM_ARM_AWAY,
     SERVICE_ALARM_ARM_HOME,
     SERVICE_ALARM_ARM_NIGHT,
     SERVICE_ALARM_DISARM,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 from . import init_integration, mock_device, mock_location, mock_mode
 
 
 async def test_alarm_control_panel(
-    hass: HomeAssistant, canary, entity_registry: er.EntityRegistry
+    hass: SmartHub, canary, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the creation and values of the alarm_control_panel for Canary."""
 
@@ -41,7 +41,7 @@ async def test_alarm_control_panel(
     instance = canary.return_value
     instance.get_locations.return_value = [mocked_location]
 
-    with patch("homeassistant.components.canary.PLATFORMS", ["alarm_control_panel"]):
+    with patch("smarthub.components.canary.PLATFORMS", ["alarm_control_panel"]):
         await init_integration(hass)
 
     entity_id = "alarm_control_panel.home"
@@ -104,7 +104,7 @@ async def test_alarm_control_panel(
     assert state.state == AlarmControlPanelState.ARMED_NIGHT
 
 
-async def test_alarm_control_panel_services(hass: HomeAssistant, canary) -> None:
+async def test_alarm_control_panel_services(hass: SmartHub, canary) -> None:
     """Test the services of the alarm_control_panel for Canary."""
 
     online_device_at_home = mock_device(20, "Dining Room", True, "Canary Pro")
@@ -120,7 +120,7 @@ async def test_alarm_control_panel_services(hass: HomeAssistant, canary) -> None
     instance = canary.return_value
     instance.get_locations.return_value = [mocked_location]
 
-    with patch("homeassistant.components.canary.PLATFORMS", ["alarm_control_panel"]):
+    with patch("smarthub.components.canary.PLATFORMS", ["alarm_control_panel"]):
         await init_integration(hass)
 
     entity_id = "alarm_control_panel.home"

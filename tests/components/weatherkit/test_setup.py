@@ -7,16 +7,16 @@ from apple_weatherkit.client import (
     WeatherKitApiClientError,
 )
 
-from homeassistant.components.weatherkit.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.weatherkit.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import EXAMPLE_CONFIG_DATA
 
 from tests.common import MockConfigEntry
 
 
-async def test_auth_error_handling(hass: HomeAssistant) -> None:
+async def test_auth_error_handling(hass: SmartHub) -> None:
     """Test that we handle authentication errors at setup properly."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -27,11 +27,11 @@ async def test_auth_error_handling(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.weatherkit.WeatherKitApiClient.get_weather_data",
+            "smarthub.components.weatherkit.WeatherKitApiClient.get_weather_data",
             side_effect=WeatherKitApiClientAuthenticationError,
         ),
         patch(
-            "homeassistant.components.weatherkit.WeatherKitApiClient.get_availability",
+            "smarthub.components.weatherkit.WeatherKitApiClient.get_availability",
             side_effect=WeatherKitApiClientAuthenticationError,
         ),
     ):
@@ -42,7 +42,7 @@ async def test_auth_error_handling(hass: HomeAssistant) -> None:
     assert setup_result is False
 
 
-async def test_client_error_handling(hass: HomeAssistant) -> None:
+async def test_client_error_handling(hass: SmartHub) -> None:
     """Test that we handle API client errors at setup properly."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -53,11 +53,11 @@ async def test_client_error_handling(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.weatherkit.WeatherKitApiClient.get_weather_data",
+            "smarthub.components.weatherkit.WeatherKitApiClient.get_weather_data",
             side_effect=WeatherKitApiClientError,
         ),
         patch(
-            "homeassistant.components.weatherkit.WeatherKitApiClient.get_availability",
+            "smarthub.components.weatherkit.WeatherKitApiClient.get_availability",
             side_effect=WeatherKitApiClientError,
         ),
     ):

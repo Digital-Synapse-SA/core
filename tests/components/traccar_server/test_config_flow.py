@@ -6,16 +6,16 @@ from unittest.mock import AsyncMock
 import pytest
 from pytraccar import TraccarException
 
-from homeassistant import config_entries
-from homeassistant.components.traccar_server.const import (
+from smarthub import config_entries
+from smarthub.components.traccar_server.const import (
     CONF_CUSTOM_ATTRIBUTES,
     CONF_EVENTS,
     CONF_MAX_ACCURACY,
     CONF_SKIP_ACCURACY_FILTER_FOR,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
@@ -23,14 +23,14 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_traccar_api_client: Generator[AsyncMock],
 ) -> None:
     """Test we get the form."""
@@ -71,7 +71,7 @@ async def test_form(
     ],
 )
 async def test_form_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: Exception,
     error: str,
     mock_traccar_api_client: Generator[AsyncMock],
@@ -122,7 +122,7 @@ async def test_form_cannot_connect(
 
 
 async def test_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_traccar_api_client: Generator[AsyncMock],
 ) -> None:
@@ -151,7 +151,7 @@ async def test_options(
 
 
 async def test_abort_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_traccar_api_client: Generator[AsyncMock],
 ) -> None:

@@ -6,13 +6,13 @@ from aiohttp import ClientError
 from blinkpy.auth import LoginError
 import pytest
 
-from homeassistant.components.blink.const import (
+from smarthub.components.blink.const import (
     DOMAIN,
     SERVICE_SAVE_VIDEO,
     SERVICE_SEND_PIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -26,7 +26,7 @@ PIN = "1234"
     [(ClientError, False), (TimeoutError, False), (None, False)],
 )
 async def test_setup_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blink_api: MagicMock,
     mock_blink_auth_api: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -45,7 +45,7 @@ async def test_setup_not_ready(
 
 
 async def test_setup_not_ready_authkey_required(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blink_api: MagicMock,
     mock_blink_auth_api: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -57,7 +57,7 @@ async def test_setup_not_ready_authkey_required(
 
     mock_config_entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.blink.config_flow.Auth.startup",
+        "smarthub.components.blink.config_flow.Auth.startup",
         side_effect=LoginError,
     ):
         assert not await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -67,7 +67,7 @@ async def test_setup_not_ready_authkey_required(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blink_api: MagicMock,
     mock_blink_auth_api: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -85,7 +85,7 @@ async def test_unload_entry(
 
 
 async def test_migrate_V0(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blink_api: MagicMock,
     mock_blink_auth_api: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -103,7 +103,7 @@ async def test_migrate_V0(
 
 @pytest.mark.parametrize(("version"), [1, 2])
 async def test_migrate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blink_api: MagicMock,
     mock_blink_auth_api: MagicMock,
     mock_config_entry: MockConfigEntry,

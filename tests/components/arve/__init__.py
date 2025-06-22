@@ -1,7 +1,7 @@
 """Tests for the Arve integration."""
 
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_CLIENT_SECRET
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_CLIENT_SECRET
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -12,7 +12,7 @@ USER_INPUT = {
 
 
 async def async_init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Set up the Arve integration for testing."""
     mock_config_entry.add_to_hass(hass)

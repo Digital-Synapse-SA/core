@@ -2,10 +2,10 @@
 
 from unittest.mock import Mock
 
-from homeassistant.components.scene import DOMAIN as SCENE_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.scene import DOMAIN as SCENE_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import init_integration
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_entity_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
@@ -35,7 +35,7 @@ async def test_entity_attributes(
 
 
 async def test_entity_attributes_without_room(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
@@ -57,7 +57,7 @@ async def test_entity_attributes_without_room(
 
 
 async def test_activate_scene(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_scene: Mock,

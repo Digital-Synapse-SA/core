@@ -5,16 +5,16 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
     CoverState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     ERROR_UNKNOWN,
@@ -26,7 +26,7 @@ from .common import (
 
 
 async def test_covers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -46,7 +46,7 @@ async def test_covers(
         # Test open windows
         if openfunc:
             with patch(
-                f"homeassistant.components.tessie.cover.{openfunc}",
+                f"smarthub.components.tessie.cover.{openfunc}",
                 return_value=TEST_RESPONSE,
             ) as mock_open:
                 await hass.services.async_call(
@@ -61,7 +61,7 @@ async def test_covers(
         # Test close windows
         if closefunc:
             with patch(
-                f"homeassistant.components.tessie.cover.{closefunc}",
+                f"smarthub.components.tessie.cover.{closefunc}",
                 return_value=TEST_RESPONSE,
             ) as mock_close:
                 await hass.services.async_call(
@@ -74,7 +74,7 @@ async def test_covers(
             assert hass.states.get(entity_id).state == CoverState.CLOSED
 
 
-async def test_errors(hass: HomeAssistant) -> None:
+async def test_errors(hass: SmartHub) -> None:
     """Tests errors are handled."""
 
     await setup_platform(hass, [Platform.COVER])
@@ -83,10 +83,10 @@ async def test_errors(hass: HomeAssistant) -> None:
     # Test setting cover open with unknown error
     with (
         patch(
-            "homeassistant.components.tessie.cover.open_unlock_charge_port",
+            "smarthub.components.tessie.cover.open_unlock_charge_port",
             side_effect=ERROR_UNKNOWN,
         ) as mock_set,
-        pytest.raises(HomeAssistantError) as error,
+        pytest.raises(SmartHubError) as error,
     ):
         await hass.services.async_call(
             COVER_DOMAIN,
@@ -100,10 +100,10 @@ async def test_errors(hass: HomeAssistant) -> None:
     # Test setting cover open with unknown error
     with (
         patch(
-            "homeassistant.components.tessie.cover.open_unlock_charge_port",
+            "smarthub.components.tessie.cover.open_unlock_charge_port",
             return_value=TEST_RESPONSE_ERROR,
         ) as mock_set,
-        pytest.raises(HomeAssistantError) as error,
+        pytest.raises(SmartHubError) as error,
     ):
         await hass.services.async_call(
             COVER_DOMAIN,

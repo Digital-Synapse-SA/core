@@ -11,10 +11,10 @@ from freezegun import freeze_time
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 from tests.typing import ClientSessionGenerator
@@ -310,19 +310,19 @@ def platforms() -> list[Platform]:
 
 @pytest.fixture(name="tz")
 def mock_tz() -> str | None:
-    """Fixture to specify the Home Assistant timezone to use during the test."""
+    """Fixture to specify the SmartHub timezone to use during the test."""
     return None
 
 
 @pytest.fixture(autouse=True)
-async def set_tz(hass: HomeAssistant, tz: str | None) -> None:
+async def set_tz(hass: SmartHub, tz: str | None) -> None:
     """Fixture to set the default TZ to the one requested."""
     if tz is not None:
         await hass.config.async_set_time_zone(tz)
 
 
 @pytest.fixture(autouse=True)
-def mock_http(hass: HomeAssistant) -> None:
+def mock_http(hass: SmartHub) -> None:
     """Mock the http component."""
     hass.http = Mock()
 
@@ -384,7 +384,7 @@ def mock_config() -> dict[str, Any]:
 
 @pytest.fixture(name="setup_platform_cb")
 async def mock_setup_platform_cb(
-    hass: HomeAssistant, config: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any]
 ) -> Callable[[], Awaitable[None]]:
     """Fixture that returns a function to setup the calendar platform."""
 
@@ -422,7 +422,7 @@ async def mock_setup_platform_cb(
     ids=("config", "no_match", "match", "custom"),
 )
 async def test_setup_component_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     expected_entities: list[str],
     setup_platform_cb: Callable[[], Awaitable[None]],
@@ -437,7 +437,7 @@ async def test_setup_component_config(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(17, 45))
 async def test_ongoing_event(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the ongoing event is returned."""
     await setup_platform_cb()
@@ -461,7 +461,7 @@ async def test_ongoing_event(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(17, 30))
 async def test_just_ended_event(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the next ongoing event is returned."""
     await setup_platform_cb()
@@ -485,7 +485,7 @@ async def test_just_ended_event(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(17, 00))
 async def test_ongoing_event_different_tz(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the ongoing event with another timezone is returned."""
     await setup_platform_cb()
@@ -509,7 +509,7 @@ async def test_ongoing_event_different_tz(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(19, 10))
 async def test_ongoing_floating_event_returned(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that floating events without timezones work."""
     await setup_platform_cb()
@@ -533,7 +533,7 @@ async def test_ongoing_floating_event_returned(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(8, 30))
 async def test_ongoing_event_with_offset(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the offset is taken into account."""
     await setup_platform_cb()
@@ -573,7 +573,7 @@ async def test_ongoing_event_with_offset(
 )
 @freeze_time(_local_datetime(12, 00))
 async def test_matching_filter(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the matching event is returned."""
     await setup_platform_cb()
@@ -613,7 +613,7 @@ async def test_matching_filter(
 )
 @freeze_time(_local_datetime(12, 00))
 async def test_matching_filter_real_regexp(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the event matching the regexp is returned."""
 
@@ -651,7 +651,7 @@ async def test_matching_filter_real_regexp(
 )
 @freeze_time(_local_datetime(20, 00))
 async def test_filter_matching_past_event(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the matching past event is not returned."""
 
@@ -683,7 +683,7 @@ async def test_filter_matching_past_event(
 )
 @freeze_time(_local_datetime(12, 00))
 async def test_no_result_with_filtering(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that nothing is returned since nothing matches."""
     await setup_platform_cb()
@@ -716,7 +716,7 @@ async def test_no_result_with_filtering(
     ],
 )
 async def test_all_day_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     target_datetime: datetime.datetime,
 ) -> None:
@@ -755,7 +755,7 @@ async def test_all_day_event(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(21, 45))
 async def test_event_rrule(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the future recurring event is returned."""
     await setup_platform_cb()
@@ -779,7 +779,7 @@ async def test_event_rrule(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(22, 15))
 async def test_event_rrule_ongoing(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the current recurring event is returned."""
     await setup_platform_cb()
@@ -803,7 +803,7 @@ async def test_event_rrule_ongoing(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(22, 45))
 async def test_event_rrule_duration(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the future recurring event is returned."""
     await setup_platform_cb()
@@ -827,7 +827,7 @@ async def test_event_rrule_duration(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(23, 15))
 async def test_event_rrule_duration_ongoing(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the ongoing recurring event is returned."""
     await setup_platform_cb()
@@ -851,7 +851,7 @@ async def test_event_rrule_duration_ongoing(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(23, 37))
 async def test_event_rrule_endless(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the endless recurring event is returned."""
     await setup_platform_cb()
@@ -890,7 +890,7 @@ async def test_event_rrule_endless(
     ],
 )
 async def test_event_rrule_all_day_early(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     target_datetime: datetime.datetime,
 ) -> None:
@@ -931,7 +931,7 @@ async def test_event_rrule_all_day_early(
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(dt_util.as_local(datetime.datetime(2015, 11, 27, 0, 15)))
 async def test_event_rrule_hourly_on_first(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the endless recurring event is returned."""
     await setup_platform_cb()
@@ -955,7 +955,7 @@ async def test_event_rrule_hourly_on_first(
 @pytest.mark.parametrize("tz", ["UTC"])
 @freeze_time(dt_util.as_local(datetime.datetime(2015, 11, 27, 11, 15)))
 async def test_event_rrule_hourly_on_last(
-    hass: HomeAssistant, setup_platform_cb: Callable[[], Awaitable[None]]
+    hass: SmartHub, setup_platform_cb: Callable[[], Awaitable[None]]
 ) -> None:
     """Test that the endless recurring event is returned."""
     await setup_platform_cb()
@@ -985,7 +985,7 @@ async def test_event_rrule_hourly_on_last(
     ],
 )
 async def test_event_rrule_hourly(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform_cb: Callable[[], Awaitable[None]],
     freezer: FrozenDateTimeFactory,
     target_datetime: datetime.datetime,
@@ -1001,7 +1001,7 @@ async def test_event_rrule_hourly(
 
 
 async def test_get_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_api_events: Callable[[str], Awaitable[dict[str, Any]]],
     setup_platform_cb: Callable[[], Awaitable[None]],
     calendars: list[Mock],
@@ -1029,7 +1029,7 @@ async def test_get_events(
     ],
 )
 async def test_get_events_custom_calendars(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_api_events: Callable[[str], Awaitable[dict[str, Any]]],
     setup_platform_cb: Callable[[], Awaitable[None]],
 ) -> None:
@@ -1062,7 +1062,7 @@ async def test_get_events_custom_calendars(
         ]
     ],
 )
-async def test_calendar_components(hass: HomeAssistant) -> None:
+async def test_calendar_components(hass: SmartHub) -> None:
     """Test that only calendars that support events are created."""
 
     assert await async_setup_component(hass, "calendar", {"calendar": CALDAV_CONFIG})
@@ -1086,7 +1086,7 @@ async def test_calendar_components(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize("tz", [UTC])
 @freeze_time(_local_datetime(17, 30))
 async def test_setup_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test a calendar entity from a config entry."""
@@ -1120,7 +1120,7 @@ async def test_setup_config_entry(
     ],
 )
 async def test_config_entry_supported_components(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test that calendars are only created for VEVENT types when using a config entry."""

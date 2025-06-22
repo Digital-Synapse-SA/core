@@ -7,15 +7,15 @@ from freezegun.api import FrozenDateTimeFactory
 from pyloadapi.exceptions import CannotConnect, InvalidAuth, ParserError
 import pytest
 
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import CONF_PATH, CONF_URL
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import CONF_PATH, CONF_URL
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_entry_setup_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: MagicMock,
 ) -> None:
@@ -38,7 +38,7 @@ async def test_entry_setup_unload(
     [CannotConnect, ParserError],
 )
 async def test_config_entry_setup_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: MagicMock,
     side_effect: Exception,
@@ -53,7 +53,7 @@ async def test_config_entry_setup_errors(
 
 
 async def test_config_entry_setup_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: MagicMock,
 ) -> None:
@@ -69,7 +69,7 @@ async def test_config_entry_setup_invalid_auth(
 
 
 async def test_coordinator_update_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -93,7 +93,7 @@ async def test_coordinator_update_invalid_auth(
 
 @pytest.mark.usefixtures("mock_pyloadapi")
 async def test_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_migrate: MockConfigEntry,
 ) -> None:
     """Test config entry migration."""

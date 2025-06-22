@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, Mock
 
 from refoss_ha.discovery import Listener
 
-from homeassistant.components.refoss.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.refoss.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -100,7 +100,7 @@ def build_base_device_mock(name="r10", ip="1.1.1.1", mac="aabbcc112233"):
     return mock
 
 
-async def async_setup_refoss(hass: HomeAssistant) -> MockConfigEntry:
+async def async_setup_refoss(hass: SmartHub) -> MockConfigEntry:
     """Set up the refoss platform."""
     entry = MockConfigEntry(domain=DOMAIN)
     await hass.config_entries.async_setup(entry.entry_id)

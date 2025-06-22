@@ -6,23 +6,23 @@ import json
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant.components import device_tracker
-from homeassistant.components.device_tracker import legacy
-from homeassistant.components.meraki.device_tracker import (
+from smarthub.components import device_tracker
+from smarthub.components.device_tracker import legacy
+from smarthub.components.meraki.device_tracker import (
     CONF_SECRET,
     CONF_VALIDATOR,
     URL,
 )
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
 
 @pytest.fixture
 async def meraki_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> TestClient:
     """Meraki mock client."""
@@ -90,7 +90,7 @@ async def test_invalid_or_missing_data(
 
 
 async def test_data_will_be_saved(
-    mock_device_tracker_conf: list[legacy.Device], hass: HomeAssistant, meraki_client
+    mock_device_tracker_conf: list[legacy.Device], hass: SmartHub, meraki_client
 ) -> None:
     """Test with valid data."""
     data = {

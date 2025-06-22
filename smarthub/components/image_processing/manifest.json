@@ -1,0 +1,9 @@
+{
+  "domain": "image_processing",
+  "name": "Image Processing",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["camera"],
+  "documentation": "https://www.smart-hub.io/integrations/image_processing",
+  "integration_type": "entity",
+  "quality_scale": "internal"
+}

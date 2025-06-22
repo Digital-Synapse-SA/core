@@ -10,26 +10,26 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import Index
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder import core, migration, statistics
-from homeassistant.components.recorder.db_schema import SCHEMA_VERSION
-from homeassistant.components.recorder.migration import MigrationTask
-from homeassistant.components.recorder.queries import get_migration_changes
-from homeassistant.components.recorder.util import (
+from smarthub.components import recorder
+from smarthub.components.recorder import core, migration, statistics
+from smarthub.components.recorder.db_schema import SCHEMA_VERSION
+from smarthub.components.recorder.migration import MigrationTask
+from smarthub.components.recorder.queries import get_migration_changes
+from smarthub.components.recorder.util import (
     execute_stmt_lambda_element,
     session_scope,
 )
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
 
 from .common import async_recorder_block_till_done, async_wait_recording_done
 
 from tests.common import async_test_home_assistant
 from tests.typing import RecorderInstanceContextManager
 
-CREATE_ENGINE_TARGET = "homeassistant.components.recorder.core.create_engine"
+CREATE_ENGINE_TARGET = "smarthub.components.recorder.core.create_engine"
 SCHEMA_MODULE_32 = "tests.components.recorder.db_schema_32"
-SCHEMA_MODULE_CURRENT = "homeassistant.components.recorder.db_schema"
+SCHEMA_MODULE_CURRENT = "smarthub.components.recorder.db_schema"
 
 
 @pytest.fixture
@@ -39,13 +39,13 @@ async def mock_recorder_before_hass(
     """Set up recorder."""
 
 
-async def _async_wait_migration_done(hass: HomeAssistant) -> None:
+async def _async_wait_migration_done(hass: SmartHub) -> None:
     """Wait for the migration to be done."""
     await recorder.get_instance(hass).async_block_till_done()
     await async_recorder_block_till_done(hass)
 
 
-def _get_migration_id(hass: HomeAssistant) -> dict[str, int]:
+def _get_migration_id(hass: SmartHub) -> dict[str, int]:
     with session_scope(hass=hass, read_only=True) as session:
         return dict(execute_stmt_lambda_element(session, get_migration_changes()))
 
@@ -172,7 +172,7 @@ def _create_engine_test(
                 # run event_id_post_migration up until
                 # schema 44 since its the first one we can
                 # be sure has the foreign key constraint was removed
-                # via https://github.com/home-assistant/core/pull/120779
+                # via https://github.com/smart-hub/core/pull/120779
                 "event_id_post_migration": (1, 1),
                 "entity_id_post_migration": (0, 0),
             },
@@ -314,7 +314,7 @@ async def test_migration_changes_prevent_trying_to_migrate_again(
 ) -> None:
     """Test that we do not try to migrate when migration_changes indicate its already migrated.
 
-    This test will start Home Assistant 3 times:
+    This test will start SmartHub 3 times:
 
     1. With schema 32 to populate the data
     2. With current schema so the migration happens
@@ -376,7 +376,7 @@ async def test_migration_changes_prevent_trying_to_migrate_again(
     # Finally verify we did not call needs_migrate_query on StatesContextIDMigration
     with (
         patch(
-            "homeassistant.components.recorder.core.Recorder.queue_task",
+            "smarthub.components.recorder.core.Recorder.queue_task",
             _queue_task,
         ),
         patch.object(

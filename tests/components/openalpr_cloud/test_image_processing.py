@@ -4,10 +4,10 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from homeassistant.components import camera, image_processing as ip
-from homeassistant.components.openalpr_cloud.image_processing import OPENALPR_API_URL
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import camera, image_processing as ip
+from smarthub.components.openalpr_cloud.image_processing import OPENALPR_API_URL
+from smarthub.core import Event, SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     assert_setup_component,
@@ -19,13 +19,13 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant) -> None:
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub) -> None:
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
 @pytest.fixture
-async def setup_openalpr_cloud(hass: HomeAssistant) -> None:
+async def setup_openalpr_cloud(hass: SmartHub) -> None:
     """Set up openalpr cloud."""
     config = {
         ip.DOMAIN: {
@@ -38,7 +38,7 @@ async def setup_openalpr_cloud(hass: HomeAssistant) -> None:
     }
 
     with patch(
-        "homeassistant.components.openalpr_cloud.image_processing."
+        "smarthub.components.openalpr_cloud.image_processing."
         "OpenAlprCloudEntity.should_poll",
         new_callable=PropertyMock(return_value=False),
     ):
@@ -47,7 +47,7 @@ async def setup_openalpr_cloud(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-async def alpr_events(hass: HomeAssistant) -> list[Event]:
+async def alpr_events(hass: SmartHub) -> list[Event]:
     """Listen for events."""
     return async_capture_events(hass, "image_processing.found_plate")
 
@@ -60,7 +60,7 @@ PARAMS = {
 }
 
 
-async def test_setup_platform(hass: HomeAssistant) -> None:
+async def test_setup_platform(hass: SmartHub) -> None:
     """Set up platform with one entity."""
     config = {
         ip.DOMAIN: {
@@ -79,7 +79,7 @@ async def test_setup_platform(hass: HomeAssistant) -> None:
     assert hass.states.get("image_processing.openalpr_demo_camera")
 
 
-async def test_setup_platform_name(hass: HomeAssistant) -> None:
+async def test_setup_platform_name(hass: SmartHub) -> None:
     """Set up platform with one entity and set name."""
     config = {
         ip.DOMAIN: {
@@ -98,7 +98,7 @@ async def test_setup_platform_name(hass: HomeAssistant) -> None:
     assert hass.states.get("image_processing.test_local")
 
 
-async def test_setup_platform_without_api_key(hass: HomeAssistant) -> None:
+async def test_setup_platform_without_api_key(hass: SmartHub) -> None:
     """Set up platform with one entity without api_key."""
     config = {
         ip.DOMAIN: {
@@ -114,7 +114,7 @@ async def test_setup_platform_without_api_key(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_setup_platform_without_region(hass: HomeAssistant) -> None:
+async def test_setup_platform_without_region(hass: SmartHub) -> None:
     """Set up platform with one entity without region."""
     config = {
         ip.DOMAIN: {
@@ -133,7 +133,7 @@ async def test_setup_platform_without_region(hass: HomeAssistant) -> None:
 async def test_openalpr_process_image(
     alpr_events,
     setup_openalpr_cloud,
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Set up and scan a picture and test plates from event."""
@@ -145,7 +145,7 @@ async def test_openalpr_process_image(
     )
 
     with patch(
-        "homeassistant.components.camera.async_get_image",
+        "smarthub.components.camera.async_get_image",
         return_value=camera.Image("image/jpeg", b"image"),
     ):
         common.async_scan(hass, entity_id="image_processing.test_local")
@@ -170,7 +170,7 @@ async def test_openalpr_process_image(
 async def test_openalpr_process_image_api_error(
     alpr_events,
     setup_openalpr_cloud,
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Set up and scan a picture and test api error."""
@@ -182,7 +182,7 @@ async def test_openalpr_process_image_api_error(
     )
 
     with patch(
-        "homeassistant.components.camera.async_get_image",
+        "smarthub.components.camera.async_get_image",
         return_value=camera.Image("image/jpeg", b"image"),
     ):
         common.async_scan(hass, entity_id="image_processing.test_local")
@@ -195,14 +195,14 @@ async def test_openalpr_process_image_api_error(
 async def test_openalpr_process_image_api_timeout(
     alpr_events,
     setup_openalpr_cloud,
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Set up and scan a picture and test api error."""
     aioclient_mock.post(OPENALPR_API_URL, params=PARAMS, exc=TimeoutError())
 
     with patch(
-        "homeassistant.components.camera.async_get_image",
+        "smarthub.components.camera.async_get_image",
         return_value=camera.Image("image/jpeg", b"image"),
     ):
         common.async_scan(hass, entity_id="image_processing.test_local")

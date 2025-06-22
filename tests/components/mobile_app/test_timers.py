@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.mobile_app import DATA_DEVICES, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import intent as intent_helper
+from smarthub.components.mobile_app import DATA_DEVICES, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import intent as intent_helper
 
 
 @pytest.mark.parametrize(
@@ -23,7 +23,7 @@ from homeassistant.helpers import intent as intent_helper
     ],
 )
 async def test_timer_events(
-    hass: HomeAssistant, push_registration, intent_args: dict, message: str
+    hass: SmartHub, push_registration, intent_args: dict, message: str
 ) -> None:
     """Test for timer events."""
     webhook_id = push_registration["webhook_id"]
@@ -41,7 +41,7 @@ async def test_timer_events(
     )
 
     with patch(
-        "homeassistant.components.mobile_app.notify.MobileAppNotificationService.async_send_message"
+        "smarthub.components.mobile_app.notify.MobileAppNotificationService.async_send_message"
     ) as mock_send_message:
         await intent_helper.async_handle(
             hass,

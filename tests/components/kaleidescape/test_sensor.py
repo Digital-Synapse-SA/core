@@ -5,9 +5,9 @@ from unittest.mock import MagicMock
 from kaleidescape import const as kaleidescape_const
 import pytest
 
-from homeassistant.const import ATTR_FRIENDLY_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_FRIENDLY_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import MOCK_SERIAL
 
@@ -17,7 +17,7 @@ FRIENDLY_NAME = f"Kaleidescape Device {MOCK_SERIAL}"
 
 @pytest.mark.usefixtures("mock_integration")
 async def test_sensors(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_device: MagicMock
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_device: MagicMock
 ) -> None:
     """Test sensors."""
     entity = hass.states.get(f"{ENTITY_ID}_media_location")

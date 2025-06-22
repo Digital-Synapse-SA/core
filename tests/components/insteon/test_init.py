@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import insteon
-from homeassistant.components.insteon.const import CONF_DEV_PATH, DOMAIN
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import insteon
+from smarthub.components.insteon.const import CONF_DEV_PATH, DOMAIN
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import MOCK_USER_INPUT_PLM
 from .mock_devices import MockDevices
@@ -26,7 +26,7 @@ async def mock_failed_connection(*args, **kwargs):
     raise ConnectionError("Connection failed")
 
 
-async def test_setup_entry(hass: HomeAssistant) -> None:
+async def test_setup_entry(hass: SmartHub) -> None:
     """Test setting up the entry."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_INPUT_PLM)
     config_entry.add_to_hass(hass)
@@ -49,7 +49,7 @@ async def test_setup_entry(hass: HomeAssistant) -> None:
 
 
 async def test_setup_entry_failed_connection(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setting up the entry with a failed connection."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_INPUT_PLM)
@@ -67,7 +67,7 @@ async def test_setup_entry_failed_connection(
         assert "Could not connect to Insteon modem" in caplog.text
 
 
-async def test_import_frontend_dev_url(hass: HomeAssistant) -> None:
+async def test_import_frontend_dev_url(hass: SmartHub) -> None:
     """Test importing a dev_url config entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data=MOCK_USER_INPUT_PLM, options={CONF_DEV_PATH: "/some/path"}

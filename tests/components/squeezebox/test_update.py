@@ -6,19 +6,19 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.squeezebox.const import (
+from smarthub.components.squeezebox.const import (
     SENSOR_UPDATE_INTERVAL,
     STATUS_UPDATE_NEWPLUGINS,
 )
-from homeassistant.components.update import (
+from smarthub.components.update import (
     ATTR_IN_PROGRESS,
     DOMAIN as UPDATE_DOMAIN,
     SERVICE_INSTALL,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.util import dt as dt_util
 
 from .conftest import FAKE_QUERY_RESPONSE
 
@@ -26,7 +26,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_update_lms(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test binary sensor states and attributes."""
@@ -34,11 +34,11 @@ async def test_update_lms(
     # Setup component
     with (
         patch(
-            "homeassistant.components.squeezebox.PLATFORMS",
+            "smarthub.components.squeezebox.PLATFORMS",
             [Platform.UPDATE],
         ),
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=copy.deepcopy(FAKE_QUERY_RESPONSE),
         ),
     ):
@@ -51,7 +51,7 @@ async def test_update_lms(
 
 
 async def test_update_plugins_install_fallback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test binary sensor states and attributes."""
@@ -60,11 +60,11 @@ async def test_update_plugins_install_fallback(
     # Setup component
     with (
         patch(
-            "homeassistant.components.squeezebox.PLATFORMS",
+            "smarthub.components.squeezebox.PLATFORMS",
             [Platform.UPDATE],
         ),
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=copy.deepcopy(FAKE_QUERY_RESPONSE),
         ),
     ):
@@ -78,11 +78,11 @@ async def test_update_plugins_install_fallback(
     polltime = 30
     with (
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=False,
         ),
         patch(
-            "homeassistant.components.squeezebox.update.POLL_AFTER_INSTALL",
+            "smarthub.components.squeezebox.update.POLL_AFTER_INSTALL",
             polltime,
         ),
     ):
@@ -101,7 +101,7 @@ async def test_update_plugins_install_fallback(
 
     with (
         patch(
-            "homeassistant.components.squeezebox.Server.async_status",
+            "smarthub.components.squeezebox.Server.async_status",
             return_value=copy.deepcopy(FAKE_QUERY_RESPONSE),
         ),
     ):
@@ -120,7 +120,7 @@ async def test_update_plugins_install_fallback(
 
 
 async def test_update_plugins_install_restart_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test binary sensor states and attributes."""
@@ -129,11 +129,11 @@ async def test_update_plugins_install_restart_fail(
     # Setup component
     with (
         patch(
-            "homeassistant.components.squeezebox.PLATFORMS",
+            "smarthub.components.squeezebox.PLATFORMS",
             [Platform.UPDATE],
         ),
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=copy.deepcopy(FAKE_QUERY_RESPONSE),
         ),
     ):
@@ -142,10 +142,10 @@ async def test_update_plugins_install_restart_fail(
 
     with (
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=True,
         ),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             UPDATE_DOMAIN,
@@ -164,7 +164,7 @@ async def test_update_plugins_install_restart_fail(
 
 
 async def test_update_plugins_install_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test binary sensor states and attributes."""
@@ -173,11 +173,11 @@ async def test_update_plugins_install_ok(
     # Setup component
     with (
         patch(
-            "homeassistant.components.squeezebox.PLATFORMS",
+            "smarthub.components.squeezebox.PLATFORMS",
             [Platform.UPDATE],
         ),
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=copy.deepcopy(FAKE_QUERY_RESPONSE),
         ),
     ):
@@ -186,7 +186,7 @@ async def test_update_plugins_install_ok(
 
     with (
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=False,
         ),
     ):
@@ -210,11 +210,11 @@ async def test_update_plugins_install_ok(
 
     with (
         patch(
-            "homeassistant.components.squeezebox.Server.async_status",
+            "smarthub.components.squeezebox.Server.async_status",
             return_value=resp,
         ),
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=copy.deepcopy(FAKE_QUERY_RESPONSE),
         ),
     ):

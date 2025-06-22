@@ -5,15 +5,15 @@ from unittest.mock import patch
 from aiosenz import AUTHORIZATION_ENDPOINT, TOKEN_ENDPOINT
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.application_credentials import (
+from smarthub import config_entries
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.senz.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.setup import async_setup_component
+from smarthub.components.senz.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.setup import async_setup_component
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 from tests.typing import ClientSessionGenerator
@@ -24,7 +24,7 @@ CLIENT_SECRET = "5678"
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -69,7 +69,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.senz.async_setup_entry", return_value=True
+        "smarthub.components.senz.async_setup_entry", return_value=True
     ) as mock_setup:
         await hass.config_entries.flow.async_configure(result["flow_id"])
 

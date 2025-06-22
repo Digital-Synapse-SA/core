@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .common import setup_integration
 
@@ -19,7 +19,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_traccar_api_client: Generator[AsyncMock],
     mock_config_entry: MockConfigEntry,
@@ -42,7 +42,7 @@ async def test_entry_diagnostics(
 
 
 async def test_device_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_traccar_api_client: Generator[AsyncMock],
     mock_config_entry: MockConfigEntry,
@@ -84,7 +84,7 @@ async def test_device_diagnostics(
 
 
 async def test_device_diagnostics_with_disabled_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_traccar_api_client: Generator[AsyncMock],
     mock_config_entry: MockConfigEntry,

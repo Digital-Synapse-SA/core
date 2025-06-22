@@ -2,16 +2,16 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import MAC, Capabilities, setup_onvif_integration
 
 
 async def test_wiper_switch(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test states of the Wiper switch."""
     _config, _camera, device = await setup_onvif_integration(hass)
@@ -26,7 +26,7 @@ async def test_wiper_switch(
     assert entry.unique_id == f"{MAC}_wiper"
 
 
-async def test_wiper_switch_no_ptz(hass: HomeAssistant) -> None:
+async def test_wiper_switch_no_ptz(hass: SmartHub) -> None:
     """Test the wiper switch does not get created if the camera does not support ptz."""
     _config, _camera, device = await setup_onvif_integration(
         hass, capabilities=Capabilities(imaging=True, ptz=False)
@@ -36,7 +36,7 @@ async def test_wiper_switch_no_ptz(hass: HomeAssistant) -> None:
     assert hass.states.get("switch.testcamera_wiper") is None
 
 
-async def test_turn_wiper_switch_on(hass: HomeAssistant) -> None:
+async def test_turn_wiper_switch_on(hass: SmartHub) -> None:
     """Test Wiper switch turn on."""
     _, _camera, device = await setup_onvif_integration(hass)
     device.async_run_aux_command = AsyncMock(return_value=True)
@@ -54,7 +54,7 @@ async def test_turn_wiper_switch_on(hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_turn_wiper_switch_off(hass: HomeAssistant) -> None:
+async def test_turn_wiper_switch_off(hass: SmartHub) -> None:
     """Test Wiper switch turn off."""
     _, _camera, device = await setup_onvif_integration(hass)
     device.async_run_aux_command = AsyncMock(return_value=True)
@@ -73,7 +73,7 @@ async def test_turn_wiper_switch_off(hass: HomeAssistant) -> None:
 
 
 async def test_autofocus_switch(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test states of the autofocus switch."""
     _config, _camera, device = await setup_onvif_integration(hass)
@@ -88,7 +88,7 @@ async def test_autofocus_switch(
     assert entry.unique_id == f"{MAC}_autofocus"
 
 
-async def test_auto_focus_switch_no_imaging(hass: HomeAssistant) -> None:
+async def test_auto_focus_switch_no_imaging(hass: SmartHub) -> None:
     """Test the autofocus switch does not get created if the camera does not support imaging."""
     _config, _camera, device = await setup_onvif_integration(
         hass, capabilities=Capabilities(imaging=False, ptz=True)
@@ -98,7 +98,7 @@ async def test_auto_focus_switch_no_imaging(hass: HomeAssistant) -> None:
     assert hass.states.get("switch.testcamera_autofocus") is None
 
 
-async def test_turn_autofocus_switch_on(hass: HomeAssistant) -> None:
+async def test_turn_autofocus_switch_on(hass: SmartHub) -> None:
     """Test autofocus switch turn on."""
     _, _camera, device = await setup_onvif_integration(hass)
     device.async_set_imaging_settings = AsyncMock(return_value=True)
@@ -116,7 +116,7 @@ async def test_turn_autofocus_switch_on(hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_turn_autofocus_switch_off(hass: HomeAssistant) -> None:
+async def test_turn_autofocus_switch_off(hass: SmartHub) -> None:
     """Test autofocus switch turn off."""
     _, _camera, device = await setup_onvif_integration(hass)
     device.async_set_imaging_settings = AsyncMock(return_value=True)
@@ -135,7 +135,7 @@ async def test_turn_autofocus_switch_off(hass: HomeAssistant) -> None:
 
 
 async def test_infrared_switch(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test states of the autofocus switch."""
     _config, _camera, device = await setup_onvif_integration(hass)
@@ -150,7 +150,7 @@ async def test_infrared_switch(
     assert entry.unique_id == f"{MAC}_ir_lamp"
 
 
-async def test_infrared_switch_no_imaging(hass: HomeAssistant) -> None:
+async def test_infrared_switch_no_imaging(hass: SmartHub) -> None:
     """Test the infrared switch does not get created if the camera does not support imaging."""
     _config, _camera, device = await setup_onvif_integration(
         hass, capabilities=Capabilities(imaging=False, ptz=False)
@@ -160,7 +160,7 @@ async def test_infrared_switch_no_imaging(hass: HomeAssistant) -> None:
     assert hass.states.get("switch.testcamera_ir_lamp") is None
 
 
-async def test_turn_infrared_switch_on(hass: HomeAssistant) -> None:
+async def test_turn_infrared_switch_on(hass: SmartHub) -> None:
     """Test infrared switch turn on."""
     _, _camera, device = await setup_onvif_integration(hass)
     device.async_set_imaging_settings = AsyncMock(return_value=True)
@@ -178,7 +178,7 @@ async def test_turn_infrared_switch_on(hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_turn_infrared_switch_off(hass: HomeAssistant) -> None:
+async def test_turn_infrared_switch_off(hass: SmartHub) -> None:
     """Test infrared switch turn off."""
     _, _camera, device = await setup_onvif_integration(hass)
     device.async_set_imaging_settings = AsyncMock(return_value=True)

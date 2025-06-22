@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock
 import pytest
 from pytrydan.exceptions import TrydanError
 
-from homeassistant.components.v2c.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.v2c.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def test_full_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_v2c_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_v2c_client: AsyncMock
 ) -> None:
     """Test we can finish a config flow."""
     result = await hass.config_entries.flow.async_init(
@@ -42,7 +42,7 @@ async def test_full_flow(
     ],
 )
 async def test_form_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     side_effect: Exception,
     error: str,

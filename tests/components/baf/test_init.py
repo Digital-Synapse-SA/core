@@ -5,11 +5,11 @@ from unittest.mock import patch
 from aiobafi6.exceptions import DeviceUUIDMismatchError
 import pytest
 
-from homeassistant.components.baf.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_IP_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.baf.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_IP_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import MOCK_UUID, MockBAFDevice
 
@@ -22,11 +22,11 @@ def _patch_device_init(side_effect=None):
     def _create_mock_baf(*args, **kwargs):
         return MockBAFDevice(side_effect)
 
-    return patch("homeassistant.components.baf.Device", _create_mock_baf)
+    return patch("smarthub.components.baf.Device", _create_mock_baf)
 
 
 async def test_config_entry_wrong_uuid(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test config entry enters setup retry when uuid mismatches."""
     mismatched_uuid = MOCK_UUID + "0"

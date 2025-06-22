@@ -1,6 +1,6 @@
 """Test different accessory types: Covers."""
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_CURRENT_TILT_POSITION,
     ATTR_POSITION,
@@ -9,7 +9,7 @@ from homeassistant.components.cover import (
     CoverEntityFeature,
     CoverState,
 )
-from homeassistant.components.homekit.const import (
+from smarthub.components.homekit.const import (
     ATTR_OBSTRUCTION_DETECTED,
     ATTR_VALUE,
     CONF_LINKED_OBSTRUCTION_SENSOR,
@@ -20,14 +20,14 @@ from homeassistant.components.homekit.const import (
     PROP_MAX_VALUE,
     PROP_MIN_VALUE,
 )
-from homeassistant.components.homekit.type_covers import (
+from smarthub.components.homekit.type_covers import (
     Door,
     GarageDoorOpener,
     Window,
     WindowCovering,
     WindowCoveringBasic,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     EVENT_HOMEASSISTANT_START,
@@ -37,14 +37,14 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import CoreState, Event, HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import CoreState, Event, SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import async_mock_service
 
 
 async def test_garage_door_open_close(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "cover.garage_door"
@@ -133,7 +133,7 @@ async def test_garage_door_open_close(
     assert events[-1].data[ATTR_VALUE] is None
 
 
-async def test_door_instantiate_set_position(hass: HomeAssistant, hk_driver) -> None:
+async def test_door_instantiate_set_position(hass: SmartHub, hk_driver) -> None:
     """Test if Door accessory is instantiated correctly and can set position."""
     entity_id = "cover.door"
 
@@ -184,7 +184,7 @@ async def test_door_instantiate_set_position(hass: HomeAssistant, hk_driver) -> 
 
 
 async def test_windowcovering_set_cover_position(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "cover.window"
@@ -296,7 +296,7 @@ async def test_windowcovering_set_cover_position(
     assert events[-1].data[ATTR_VALUE] == 75
 
 
-async def test_window_instantiate_set_position(hass: HomeAssistant, hk_driver) -> None:
+async def test_window_instantiate_set_position(hass: SmartHub, hk_driver) -> None:
     """Test if Window accessory is instantiated correctly and can set position."""
     entity_id = "cover.window"
 
@@ -347,7 +347,7 @@ async def test_window_instantiate_set_position(hass: HomeAssistant, hk_driver) -
 
 
 async def test_windowcovering_cover_set_tilt(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA update slat tilt accordingly."""
     entity_id = "cover.window"
@@ -425,7 +425,7 @@ async def test_windowcovering_cover_set_tilt(
     assert events[-1].data[ATTR_VALUE] == 75
 
 
-async def test_windowcovering_tilt_only(hass: HomeAssistant, hk_driver) -> None:
+async def test_windowcovering_tilt_only(hass: SmartHub, hk_driver) -> None:
     """Test we lock the window covering closed when its tilt only."""
     entity_id = "cover.window"
 
@@ -449,7 +449,7 @@ async def test_windowcovering_tilt_only(hass: HomeAssistant, hk_driver) -> None:
 
 
 async def test_windowcovering_open_close(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "cover.window"
@@ -532,7 +532,7 @@ async def test_windowcovering_open_close(
 
 
 async def test_windowcovering_open_close_stop(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "cover.window"
@@ -581,7 +581,7 @@ async def test_windowcovering_open_close_stop(
 
 
 async def test_windowcovering_open_close_with_position_and_stop(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "cover.stop_window"
@@ -615,7 +615,7 @@ async def test_windowcovering_open_close_with_position_and_stop(
 
 
 async def test_windowcovering_basic_restore(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, hk_driver
+    hass: SmartHub, entity_registry: er.EntityRegistry, hk_driver
 ) -> None:
     """Test setting up an entity from state in the event registry."""
     hass.set_state(CoreState.not_running)
@@ -653,7 +653,7 @@ async def test_windowcovering_basic_restore(
 
 
 async def test_windowcovering_restore(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, hk_driver
+    hass: SmartHub, entity_registry: er.EntityRegistry, hk_driver
 ) -> None:
     """Test setting up an entity from state in the event entity_registry."""
     hass.set_state(CoreState.not_running)
@@ -691,7 +691,7 @@ async def test_windowcovering_restore(
 
 
 async def test_garage_door_with_linked_obstruction_sensor(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test if accessory and HA are updated accordingly with a linked obstruction sensor."""
     linked_obstruction_sensor_entity_id = "binary_sensor.obstruction"

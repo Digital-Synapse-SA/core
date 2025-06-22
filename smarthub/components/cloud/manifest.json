@@ -1,0 +1,18 @@
+{
+  "domain": "cloud",
+  "name": "SmartHub Cloud",
+  "after_dependencies": [
+    "alexa",
+    "assist_pipeline",
+    "backup",
+    "google_assistant"
+  ],
+  "codeowners": ["@smart-hub/cloud"],
+  "dependencies": ["auth", "http", "repairs", "webhook"],
+  "documentation": "https://www.smart-hub.io/integrations/cloud",
+  "integration_type": "system",
+  "iot_class": "cloud_push",
+  "loggers": ["acme", "hass_nabucasa", "snitun"],
+  "requirements": ["hass-nabucasa==0.103.0"],
+  "single_config_entry": true
+}

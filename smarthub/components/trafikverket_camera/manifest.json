@@ -1,0 +1,10 @@
+{
+  "domain": "trafikverket_camera",
+  "name": "Trafikverket Camera",
+  "codeowners": ["@gjohansson-ST"],
+  "config_flow": true,
+  "documentation": "https://www.smart-hub.io/integrations/trafikverket_camera",
+  "iot_class": "cloud_polling",
+  "loggers": ["pytrafikverket"],
+  "requirements": ["pytrafikverket==1.1.1"]
+}

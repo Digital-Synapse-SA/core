@@ -5,7 +5,7 @@ from zwave_js_server.const import CommandClass
 from zwave_js_server.const.command_class.humidity_control import HumidityControlMode
 from zwave_js_server.event import Event
 
-from homeassistant.components.humidifier import (
+from smarthub.components.humidifier import (
     ATTR_HUMIDITY,
     ATTR_MAX_HUMIDITY,
     ATTR_MIN_HUMIDITY,
@@ -15,7 +15,7 @@ from homeassistant.components.humidifier import (
     SERVICE_SET_HUMIDITY,
     HumidifierDeviceClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
@@ -25,7 +25,7 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import DEHUMIDIFIER_ADC_T3000_ENTITY, HUMIDIFIER_ADC_T3000_ENTITY
 
@@ -37,7 +37,7 @@ def platforms() -> list[str]:
 
 
 async def test_humidifier(
-    hass: HomeAssistant, client, climate_adc_t3000, integration
+    hass: SmartHub, client, climate_adc_t3000, integration
 ) -> None:
     """Test a humidity control command class entity."""
 
@@ -437,7 +437,7 @@ async def test_humidifier(
 
 
 async def test_dehumidifier_missing_setpoint(
-    hass: HomeAssistant, client, climate_adc_t3000_missing_setpoint, integration
+    hass: SmartHub, client, climate_adc_t3000_missing_setpoint, integration
 ) -> None:
     """Test a humidity control command class entity."""
 
@@ -468,7 +468,7 @@ async def test_dehumidifier_missing_setpoint(
 
 
 async def test_humidifier_missing_mode(
-    hass: HomeAssistant, client, climate_adc_t3000_missing_mode, integration
+    hass: SmartHub, client, climate_adc_t3000_missing_mode, integration
 ) -> None:
     """Test a humidity control command class entity."""
 
@@ -527,7 +527,7 @@ async def test_humidifier_missing_mode(
 
 
 async def test_dehumidifier(
-    hass: HomeAssistant, client, climate_adc_t3000, integration
+    hass: SmartHub, client, climate_adc_t3000, integration
 ) -> None:
     """Test a humidity control command class entity."""
 

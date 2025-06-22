@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, create_autospec, patch
 from haphilipsjs import PhilipsTV
 import pytest
 
-from homeassistant.components.philips_js.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.philips_js.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import MOCK_CONFIG, MOCK_ENTITY_ID, MOCK_NAME, MOCK_SERIAL_NO, MOCK_SYSTEM
 
@@ -20,10 +20,10 @@ def mock_setup_entry() -> Generator[AsyncMock]:
     """Disable component setup."""
     with (
         patch(
-            "homeassistant.components.philips_js.async_setup_entry", return_value=True
+            "smarthub.components.philips_js.async_setup_entry", return_value=True
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.philips_js.async_unload_entry", return_value=True
+            "smarthub.components.philips_js.async_unload_entry", return_value=True
         ),
     ):
         yield mock_setup_entry
@@ -51,15 +51,15 @@ def mock_tv():
 
     with (
         patch(
-            "homeassistant.components.philips_js.config_flow.PhilipsTV", return_value=tv
+            "smarthub.components.philips_js.config_flow.PhilipsTV", return_value=tv
         ),
-        patch("homeassistant.components.philips_js.PhilipsTV", return_value=tv),
+        patch("smarthub.components.philips_js.PhilipsTV", return_value=tv),
     ):
         yield tv
 
 
 @pytest.fixture
-async def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+async def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Get standard player."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data=MOCK_CONFIG, title=MOCK_NAME, unique_id=MOCK_SERIAL_NO
@@ -69,7 +69,7 @@ async def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 
 @pytest.fixture
-async def mock_entity(hass: HomeAssistant, mock_config_entry: MockConfigEntry) -> str:
+async def mock_entity(hass: SmartHub, mock_config_entry: MockConfigEntry) -> str:
     """Get standard player."""
     assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
     await hass.async_block_till_done()

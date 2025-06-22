@@ -8,16 +8,16 @@ from deebot_client.events import CutDirectionEvent, Event, VolumeEvent
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ecovacs.const import DOMAIN
-from homeassistant.components.ecovacs.controller import EcovacsController
-from homeassistant.components.number import (
+from smarthub.components.ecovacs.const import DOMAIN
+from smarthub.components.ecovacs.controller import EcovacsController
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as PLATFORM_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .util import block_till_done
 
@@ -72,7 +72,7 @@ class NumberTestCase:
     ids=["yna5x1", "5xu9h3"],
 )
 async def test_number_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -130,7 +130,7 @@ async def test_number_entities(
     ids=["yna5x1", "5xu9h3"],
 )
 async def test_disabled_by_default_number_entities(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, entity_ids: list[str]
+    hass: SmartHub, entity_registry: er.EntityRegistry, entity_ids: list[str]
 ) -> None:
     """Test the disabled by default number entities."""
     for entity_id in entity_ids:
@@ -146,7 +146,7 @@ async def test_disabled_by_default_number_entities(
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.parametrize(("device_fixture"), ["yna5x1"])
 async def test_volume_maximum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     controller: EcovacsController,
 ) -> None:
     """Test volume maximum."""

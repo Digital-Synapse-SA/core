@@ -6,17 +6,17 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import switch_as_x
-from homeassistant.components.homeassistant import exposed_entities
-from homeassistant.components.lock import LockState
-from homeassistant.components.switch_as_x.config_flow import SwitchAsXConfigFlowHandler
-from homeassistant.components.switch_as_x.const import (
+from smarthub.components import switch_as_x
+from smarthub.components.smarthub import exposed_entities
+from smarthub.components.lock import LockState
+from smarthub.components.switch_as_x.config_flow import SwitchAsXConfigFlowHandler
+from smarthub.components.switch_as_x.const import (
     CONF_INVERT,
     CONF_TARGET_DOMAIN,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_ENTITY_ID,
     STATE_CLOSED,
     STATE_OFF,
@@ -25,10 +25,10 @@ from homeassistant.const import (
     EntityCategory,
     Platform,
 )
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.event import async_track_entity_registry_updated_event
-from homeassistant.setup import async_setup_component
+from smarthub.core import Event, SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.event import async_track_entity_registry_updated_event
+from smarthub.setup import async_setup_component
 
 from . import PLATFORMS_TO_TEST
 
@@ -53,7 +53,7 @@ def switch_entity_registry_entry(
 
 @pytest.fixture
 def switch_as_x_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     switch_entity_registry_entry: er.RegistryEntry,
     target_domain: str,
     use_entity_registry_id: bool,
@@ -81,7 +81,7 @@ def switch_as_x_config_entry(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_config_entry_unregistered_uuid(
-    hass: HomeAssistant, target_domain: str
+    hass: SmartHub, target_domain: str
 ) -> None:
     """Test light switch setup from config entry with unknown entity registry id."""
     fake_uuid = "a266a680b608c32770e6c45bfe6b8411"
@@ -120,7 +120,7 @@ async def test_config_entry_unregistered_uuid(
     ],
 )
 async def test_entity_registry_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     switch_entity_registry_entry: er.RegistryEntry,
     switch_as_x_config_entry: MockConfigEntry,
@@ -156,7 +156,7 @@ async def test_entity_registry_events(
 
     # Check changing name does not reload the config entry
     with patch(
-        "homeassistant.components.switch_as_x.async_unload_entry",
+        "smarthub.components.switch_as_x.async_unload_entry",
     ) as mock_setup_entry:
         entity_registry.async_update_entity(new_switch_entity_id, name="New name")
         await hass.async_block_till_done()
@@ -173,7 +173,7 @@ async def test_entity_registry_events(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_device_registry_config_entry_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     target_domain: str,
@@ -235,7 +235,7 @@ async def test_device_registry_config_entry_1(
     # Remove the wrapped switch's config entry from the device, this removes the
     # wrapped switch
     with patch(
-        "homeassistant.components.switch_as_x.async_unload_entry",
+        "smarthub.components.switch_as_x.async_unload_entry",
         wraps=switch_as_x.async_unload_entry,
     ) as mock_setup_entry:
         device_registry.async_update_device(
@@ -260,7 +260,7 @@ async def test_device_registry_config_entry_1(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_device_registry_config_entry_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     target_domain: str,
@@ -316,7 +316,7 @@ async def test_device_registry_config_entry_2(
 
     # Remove the wrapped switch from the device
     with patch(
-        "homeassistant.components.switch_as_x.async_unload_entry",
+        "smarthub.components.switch_as_x.async_unload_entry",
         wraps=switch_as_x.async_unload_entry,
     ) as mock_setup_entry:
         entity_registry.async_update_entity(
@@ -338,7 +338,7 @@ async def test_device_registry_config_entry_2(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_device_registry_config_entry_3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     target_domain: str,
@@ -400,7 +400,7 @@ async def test_device_registry_config_entry_3(
 
     # Move the wrapped switch to another device
     with patch(
-        "homeassistant.components.switch_as_x.async_unload_entry",
+        "smarthub.components.switch_as_x.async_unload_entry",
         wraps=switch_as_x.async_unload_entry,
     ) as mock_setup_entry:
         entity_registry.async_update_entity(
@@ -424,7 +424,7 @@ async def test_device_registry_config_entry_3(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_config_entry_entity_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, target_domain: Platform
+    hass: SmartHub, entity_registry: er.EntityRegistry, target_domain: Platform
 ) -> None:
     """Test light switch setup from config entry with entity id."""
     config_entry = MockConfigEntry(
@@ -461,7 +461,7 @@ async def test_config_entry_entity_id(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_config_entry_uuid(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, target_domain: Platform
+    hass: SmartHub, entity_registry: er.EntityRegistry, target_domain: Platform
 ) -> None:
     """Test light switch setup from config entry with entity registry id."""
     registry_entry = entity_registry.async_get_or_create(
@@ -491,7 +491,7 @@ async def test_config_entry_uuid(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
@@ -533,7 +533,7 @@ async def test_device(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_setup_and_remove_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
 ) -> None:
@@ -577,7 +577,7 @@ async def test_setup_and_remove_config_entry(
 )
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_reset_hidden_by(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
     hidden_by_before: er.RegistryEntryHider | None,
@@ -617,7 +617,7 @@ async def test_reset_hidden_by(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_entity_category_inheritance(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
 ) -> None:
@@ -655,7 +655,7 @@ async def test_entity_category_inheritance(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_entity_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
 ) -> None:
@@ -695,7 +695,7 @@ async def test_entity_options(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_entity_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
@@ -753,7 +753,7 @@ async def test_entity_name(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_custom_name_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
@@ -815,7 +815,7 @@ async def test_custom_name_1(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_custom_name_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
@@ -896,12 +896,12 @@ async def test_custom_name_2(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_import_expose_settings_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
 ) -> None:
     """Test importing assistant expose settings."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     switch_entity_entry = entity_registry.async_get_or_create(
         "switch",
@@ -952,7 +952,7 @@ async def test_import_expose_settings_1(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_import_expose_settings_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
 ) -> None:
@@ -962,7 +962,7 @@ async def test_import_expose_settings_2(
     switch_as_x config entry is setup the first time.
     """
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     switch_entity_entry = entity_registry.async_get_or_create(
         "switch",
@@ -1026,12 +1026,12 @@ async def test_import_expose_settings_2(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_restore_expose_settings(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
 ) -> None:
     """Test removing a config entry restores assistant expose settings."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     switch_entity_entry = entity_registry.async_get_or_create(
         "switch",
@@ -1082,7 +1082,7 @@ async def test_restore_expose_settings(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_migrate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
 ) -> None:
@@ -1120,7 +1120,7 @@ async def test_migrate(
 
 @pytest.mark.parametrize("target_domain", PLATFORMS_TO_TEST)
 async def test_migrate_from_future(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     target_domain: Platform,
 ) -> None:

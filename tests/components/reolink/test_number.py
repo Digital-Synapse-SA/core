@@ -6,15 +6,15 @@ import pytest
 from reolink_aio.api import Chime
 from reolink_aio.exceptions import InvalidParameterError, ReolinkError
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import TEST_NVR_NAME
 
@@ -22,14 +22,14 @@ from tests.common import MockConfigEntry
 
 
 async def test_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test number entity with volume."""
     reolink_connect.volume.return_value = 80
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.NUMBER]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -47,7 +47,7 @@ async def test_number(
     reolink_connect.set_volume.assert_called_with(0, volume=50)
 
     reolink_connect.set_volume.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -56,7 +56,7 @@ async def test_number(
         )
 
     reolink_connect.set_volume.side_effect = InvalidParameterError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -69,14 +69,14 @@ async def test_number(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_smart_ai_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test number entity with smart ai sensitivity."""
     reolink_connect.baichuan.smart_ai_sensitivity.return_value = 80
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.NUMBER]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -98,7 +98,7 @@ async def test_smart_ai_number(
     reolink_connect.baichuan.set_smart_ai.side_effect = InvalidParameterError(
         "Test error"
     )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -110,14 +110,14 @@ async def test_smart_ai_number(
 
 
 async def test_host_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test number entity with volume."""
     reolink_connect.alarm_volume = 85
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.NUMBER]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -135,7 +135,7 @@ async def test_host_number(
     reolink_connect.set_hub_audio.assert_called_with(alarm_volume=45)
 
     reolink_connect.set_hub_audio.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -144,7 +144,7 @@ async def test_host_number(
         )
 
     reolink_connect.set_hub_audio.side_effect = InvalidParameterError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -154,7 +154,7 @@ async def test_host_number(
 
 
 async def test_chime_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     test_chime: Chime,
@@ -162,7 +162,7 @@ async def test_chime_number(
     """Test number entity of a chime with chime volume."""
     test_chime.volume = 3
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.NUMBER]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -181,7 +181,7 @@ async def test_chime_number(
     test_chime.set_option.assert_called_with(volume=2)
 
     test_chime.set_option.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -190,7 +190,7 @@ async def test_chime_number(
         )
 
     test_chime.set_option.side_effect = InvalidParameterError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,

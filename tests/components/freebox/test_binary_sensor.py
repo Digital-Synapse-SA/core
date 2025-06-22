@@ -6,13 +6,13 @@ from unittest.mock import Mock
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.binary_sensor import (
+from smarthub.components.binary_sensor import (
     DOMAIN as BINARY_SENSOR_DOMAIN,
     BinarySensorDeviceClass,
 )
-from homeassistant.components.freebox import SCAN_INTERVAL
-from homeassistant.const import ATTR_DEVICE_CLASS
-from homeassistant.core import HomeAssistant
+from smarthub.components.freebox import SCAN_INTERVAL
+from smarthub.const import ATTR_DEVICE_CLASS
+from smarthub.core import SmartHub
 
 from .common import setup_platform
 from .const import DATA_HOME_PIR_GET_VALUE, DATA_STORAGE_GET_RAIDS
@@ -21,7 +21,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_raid_array_degraded(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, router: Mock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, router: Mock
 ) -> None:
     """Test raid array degraded binary sensor."""
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
@@ -48,7 +48,7 @@ async def test_raid_array_degraded(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_home(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, router: Mock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, router: Mock
 ) -> None:
     """Test home binary sensors."""
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)

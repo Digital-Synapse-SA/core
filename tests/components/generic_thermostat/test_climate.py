@@ -7,9 +7,9 @@ from freezegun import freeze_time
 import pytest
 import voluptuous as vol
 
-from homeassistant import config as hass_config, core as ha
-from homeassistant.components import input_boolean, switch
-from homeassistant.components.climate import (
+from smarthub import config as hass_config, core as ha
+from smarthub.components import input_boolean, switch
+from smarthub.components.climate import (
     ATTR_PRESET_MODE,
     DOMAIN as CLIMATE_DOMAIN,
     PRESET_ACTIVITY,
@@ -21,8 +21,8 @@ from homeassistant.components.climate import (
     PRESET_SLEEP,
     HVACMode,
 )
-from homeassistant.components.generic_thermostat.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.generic_thermostat.const import DOMAIN
+from smarthub.const import (
     ATTR_TEMPERATURE,
     SERVICE_RELOAD,
     SERVICE_TURN_OFF,
@@ -33,20 +33,20 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     UnitOfTemperature,
 )
-from homeassistant.core import (
+from smarthub.core import (
     DOMAIN as HOMEASSISTANT_DOMAIN,
     CoreState,
-    HomeAssistant,
+    SmartHub,
     ServiceCall,
     State,
     callback,
 )
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.typing import StateType
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.typing import StateType
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from tests.common import (
     MockConfigEntry,
@@ -74,7 +74,7 @@ HOT_TOLERANCE = 0.5
 TARGET_TEMP_STEP = 0.5
 
 
-async def test_setup_missing_conf(hass: HomeAssistant) -> None:
+async def test_setup_missing_conf(hass: SmartHub) -> None:
     """Test set up heat_control with missing config values."""
     config = {
         "platform": "generic_thermostat",
@@ -85,7 +85,7 @@ async def test_setup_missing_conf(hass: HomeAssistant) -> None:
         await async_setup_component(hass, "climate", {"climate": config})
 
 
-async def test_valid_conf(hass: HomeAssistant) -> None:
+async def test_valid_conf(hass: SmartHub) -> None:
     """Test set up generic_thermostat with valid config values."""
     assert await async_setup_component(
         hass,
@@ -102,15 +102,15 @@ async def test_valid_conf(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-async def setup_comp_1(hass: HomeAssistant) -> None:
+async def setup_comp_1(hass: SmartHub) -> None:
     """Initialize components."""
     hass.config.units = METRIC_SYSTEM
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     await hass.async_block_till_done()
 
 
 @pytest.mark.usefixtures("setup_comp_1")
-async def test_heater_input_boolean(hass: HomeAssistant) -> None:
+async def test_heater_input_boolean(hass: SmartHub) -> None:
     """Test heater switching input_boolean."""
     heater_switch = "input_boolean.test"
     assert await async_setup_component(
@@ -144,7 +144,7 @@ async def test_heater_input_boolean(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_comp_1")
 async def test_heater_switch(
-    hass: HomeAssistant, mock_switch_entities: list[MockSwitch]
+    hass: SmartHub, mock_switch_entities: list[MockSwitch]
 ) -> None:
     """Test heater switching test switch."""
     setup_test_component_platform(hass, switch.DOMAIN, mock_switch_entities)
@@ -181,7 +181,7 @@ async def test_heater_switch(
 
 @pytest.mark.usefixtures("setup_comp_1")
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test setting a unique ID."""
     unique_id = "some_unique_id"
@@ -207,13 +207,13 @@ async def test_unique_id(
     assert entry.unique_id == unique_id
 
 
-def _setup_sensor(hass: HomeAssistant, temp: StateType) -> None:
+def _setup_sensor(hass: SmartHub, temp: StateType) -> None:
     """Set up the test sensor."""
     hass.states.async_set(ENT_SENSOR, temp)
 
 
 @pytest.fixture
-async def setup_comp_2(hass: HomeAssistant) -> None:
+async def setup_comp_2(hass: SmartHub) -> None:
     """Initialize components."""
     hass.config.units = METRIC_SYSTEM
     assert await async_setup_component(
@@ -240,7 +240,7 @@ async def setup_comp_2(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_setup_defaults_to_unknown(hass: HomeAssistant) -> None:
+async def test_setup_defaults_to_unknown(hass: SmartHub) -> None:
     """Test the setting of defaults to unknown."""
     hass.config.units = METRIC_SYSTEM
     await async_setup_component(
@@ -262,7 +262,7 @@ async def test_setup_defaults_to_unknown(hass: HomeAssistant) -> None:
     assert hass.states.get(ENTITY).state == HVACMode.OFF
 
 
-async def test_setup_gets_current_temp_from_sensor(hass: HomeAssistant) -> None:
+async def test_setup_gets_current_temp_from_sensor(hass: SmartHub) -> None:
     """Test that current temperature is updated on entity addition."""
     hass.config.units = METRIC_SYSTEM
     _setup_sensor(hass, 18)
@@ -287,7 +287,7 @@ async def test_setup_gets_current_temp_from_sensor(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_default_setup_params(hass: HomeAssistant) -> None:
+async def test_default_setup_params(hass: SmartHub) -> None:
     """Test the setup with default parameters."""
     state = hass.states.get(ENTITY)
     assert state.attributes.get("min_temp") == 7
@@ -297,7 +297,7 @@ async def test_default_setup_params(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_get_hvac_modes(hass: HomeAssistant) -> None:
+async def test_get_hvac_modes(hass: SmartHub) -> None:
     """Test that the operation list returns the correct modes."""
     state = hass.states.get(ENTITY)
     modes = state.attributes.get("hvac_modes")
@@ -305,7 +305,7 @@ async def test_get_hvac_modes(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_target_temp(hass: HomeAssistant) -> None:
+async def test_set_target_temp(hass: SmartHub) -> None:
     """Test the setting of the target temperature."""
     await common.async_set_temperature(hass, 30)
     state = hass.states.get(ENTITY)
@@ -317,7 +317,7 @@ async def test_set_target_temp(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_target_temp_change_preset(hass: HomeAssistant) -> None:
+async def test_set_target_temp_change_preset(hass: SmartHub) -> None:
     """Test the setting of the target temperature.
 
     Verify that preset is changed.
@@ -343,7 +343,7 @@ async def test_set_target_temp_change_preset(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_away_mode(hass: HomeAssistant, preset, temp) -> None:
+async def test_set_away_mode(hass: SmartHub, preset, temp) -> None:
     """Test the setting away mode."""
     await common.async_set_temperature(hass, 23)
     await common.async_set_preset_mode(hass, preset)
@@ -365,7 +365,7 @@ async def test_set_away_mode(hass: HomeAssistant, preset, temp) -> None:
 )
 @pytest.mark.usefixtures("setup_comp_2")
 async def test_set_away_mode_and_restore_prev_temp(
-    hass: HomeAssistant, preset, temp
+    hass: SmartHub, preset, temp
 ) -> None:
     """Test the setting and removing away mode.
 
@@ -394,7 +394,7 @@ async def test_set_away_mode_and_restore_prev_temp(
 )
 @pytest.mark.usefixtures("setup_comp_2")
 async def test_set_away_mode_twice_and_restore_prev_temp(
-    hass: HomeAssistant, preset, temp
+    hass: SmartHub, preset, temp
 ) -> None:
     """Test the setting away mode twice in a row.
 
@@ -411,7 +411,7 @@ async def test_set_away_mode_twice_and_restore_prev_temp(
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_preset_mode_invalid(hass: HomeAssistant) -> None:
+async def test_set_preset_mode_invalid(hass: SmartHub) -> None:
     """Test an invalid mode raises an error and ignore case when checking modes."""
     await common.async_set_temperature(hass, 23)
     await common.async_set_preset_mode(hass, "away")
@@ -427,7 +427,7 @@ async def test_set_preset_mode_invalid(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_sensor_bad_value(hass: HomeAssistant) -> None:
+async def test_sensor_bad_value(hass: SmartHub) -> None:
     """Test sensor that have None as state."""
     state = hass.states.get(ENTITY)
     temp = state.attributes.get("current_temperature")
@@ -448,7 +448,7 @@ async def test_sensor_bad_value(hass: HomeAssistant) -> None:
     assert state.attributes.get("current_temperature") == temp
 
 
-async def test_sensor_unknown(hass: HomeAssistant) -> None:
+async def test_sensor_unknown(hass: SmartHub) -> None:
     """Test when target sensor is Unknown."""
     hass.states.async_set("sensor.unknown", STATE_UNKNOWN)
     assert await async_setup_component(
@@ -468,7 +468,7 @@ async def test_sensor_unknown(hass: HomeAssistant) -> None:
     assert state.attributes.get("current_temperature") is None
 
 
-async def test_sensor_unavailable(hass: HomeAssistant) -> None:
+async def test_sensor_unavailable(hass: SmartHub) -> None:
     """Test when target sensor is Unavailable."""
     hass.states.async_set("sensor.unavailable", STATE_UNAVAILABLE)
     assert await async_setup_component(
@@ -489,7 +489,7 @@ async def test_sensor_unavailable(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_target_temp_heater_on(hass: HomeAssistant) -> None:
+async def test_set_target_temp_heater_on(hass: SmartHub) -> None:
     """Test if target temperature turn heater on."""
     calls = _setup_switch(hass, False)
     _setup_sensor(hass, 25)
@@ -503,7 +503,7 @@ async def test_set_target_temp_heater_on(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_target_temp_heater_off(hass: HomeAssistant) -> None:
+async def test_set_target_temp_heater_off(hass: SmartHub) -> None:
     """Test if target temperature turn heater off."""
     calls = _setup_switch(hass, True)
     _setup_sensor(hass, 30)
@@ -517,7 +517,7 @@ async def test_set_target_temp_heater_off(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_temp_change_heater_on_within_tolerance(hass: HomeAssistant) -> None:
+async def test_temp_change_heater_on_within_tolerance(hass: SmartHub) -> None:
     """Test if temperature change doesn't turn on within tolerance."""
     calls = _setup_switch(hass, False)
     await common.async_set_temperature(hass, 30)
@@ -527,7 +527,7 @@ async def test_temp_change_heater_on_within_tolerance(hass: HomeAssistant) -> No
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_temp_change_heater_on_outside_tolerance(hass: HomeAssistant) -> None:
+async def test_temp_change_heater_on_outside_tolerance(hass: SmartHub) -> None:
     """Test if temperature change turn heater on outside cold tolerance."""
     calls = _setup_switch(hass, False)
     await common.async_set_temperature(hass, 30)
@@ -541,7 +541,7 @@ async def test_temp_change_heater_on_outside_tolerance(hass: HomeAssistant) -> N
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_temp_change_heater_off_within_tolerance(hass: HomeAssistant) -> None:
+async def test_temp_change_heater_off_within_tolerance(hass: SmartHub) -> None:
     """Test if temperature change doesn't turn off within tolerance."""
     calls = _setup_switch(hass, True)
     await common.async_set_temperature(hass, 30)
@@ -551,7 +551,7 @@ async def test_temp_change_heater_off_within_tolerance(hass: HomeAssistant) -> N
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_temp_change_heater_off_outside_tolerance(hass: HomeAssistant) -> None:
+async def test_temp_change_heater_off_outside_tolerance(hass: SmartHub) -> None:
     """Test if temperature change turn heater off outside hot tolerance."""
     calls = _setup_switch(hass, True)
     await common.async_set_temperature(hass, 30)
@@ -565,7 +565,7 @@ async def test_temp_change_heater_off_outside_tolerance(hass: HomeAssistant) -> 
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_running_when_hvac_mode_is_off(hass: HomeAssistant) -> None:
+async def test_running_when_hvac_mode_is_off(hass: SmartHub) -> None:
     """Test that the switch turns off when enabled is set False."""
     calls = _setup_switch(hass, True)
     await common.async_set_temperature(hass, 30)
@@ -578,7 +578,7 @@ async def test_running_when_hvac_mode_is_off(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_no_state_change_when_hvac_mode_off(hass: HomeAssistant) -> None:
+async def test_no_state_change_when_hvac_mode_off(hass: SmartHub) -> None:
     """Test that the switch doesn't turn on when enabled is False."""
     calls = _setup_switch(hass, False)
     await common.async_set_temperature(hass, 30)
@@ -589,7 +589,7 @@ async def test_no_state_change_when_hvac_mode_off(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_hvac_mode_heat(hass: HomeAssistant) -> None:
+async def test_hvac_mode_heat(hass: SmartHub) -> None:
     """Test change mode from OFF to HEAT.
 
     Switch turns on when temp below setpoint and mode changes.
@@ -607,7 +607,7 @@ async def test_hvac_mode_heat(hass: HomeAssistant) -> None:
     assert call.data["entity_id"] == ENT_SWITCH
 
 
-def _setup_switch(hass: HomeAssistant, is_on: bool) -> list[ServiceCall]:
+def _setup_switch(hass: SmartHub, is_on: bool) -> list[ServiceCall]:
     """Set up the test switch."""
     hass.states.async_set(ENT_SWITCH, STATE_ON if is_on else STATE_OFF)
     calls = []
@@ -624,7 +624,7 @@ def _setup_switch(hass: HomeAssistant, is_on: bool) -> list[ServiceCall]:
 
 
 @pytest.fixture
-async def setup_comp_3(hass: HomeAssistant) -> None:
+async def setup_comp_3(hass: SmartHub) -> None:
     """Initialize components."""
     hass.config.temperature_unit = UnitOfTemperature.CELSIUS
     assert await async_setup_component(
@@ -648,7 +648,7 @@ async def setup_comp_3(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_set_target_temp_ac_off(hass: HomeAssistant) -> None:
+async def test_set_target_temp_ac_off(hass: SmartHub) -> None:
     """Test if target temperature turn ac off."""
     calls = _setup_switch(hass, True)
     _setup_sensor(hass, 25)
@@ -662,7 +662,7 @@ async def test_set_target_temp_ac_off(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_turn_away_mode_on_cooling(hass: HomeAssistant) -> None:
+async def test_turn_away_mode_on_cooling(hass: SmartHub) -> None:
     """Test the setting away mode when cooling."""
     _setup_switch(hass, True)
     _setup_sensor(hass, 25)
@@ -674,7 +674,7 @@ async def test_turn_away_mode_on_cooling(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_hvac_mode_cool(hass: HomeAssistant) -> None:
+async def test_hvac_mode_cool(hass: SmartHub) -> None:
     """Test change mode from OFF to COOL.
 
     Switch turns on when temp below setpoint and mode changes.
@@ -693,7 +693,7 @@ async def test_hvac_mode_cool(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_set_target_temp_ac_on(hass: HomeAssistant) -> None:
+async def test_set_target_temp_ac_on(hass: SmartHub) -> None:
     """Test if target temperature turn ac on."""
     calls = _setup_switch(hass, False)
     _setup_sensor(hass, 30)
@@ -707,7 +707,7 @@ async def test_set_target_temp_ac_on(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_temp_change_ac_off_within_tolerance(hass: HomeAssistant) -> None:
+async def test_temp_change_ac_off_within_tolerance(hass: SmartHub) -> None:
     """Test if temperature change doesn't turn ac off within tolerance."""
     calls = _setup_switch(hass, True)
     await common.async_set_temperature(hass, 30)
@@ -717,7 +717,7 @@ async def test_temp_change_ac_off_within_tolerance(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_set_temp_change_ac_off_outside_tolerance(hass: HomeAssistant) -> None:
+async def test_set_temp_change_ac_off_outside_tolerance(hass: SmartHub) -> None:
     """Test if temperature change turn ac off."""
     calls = _setup_switch(hass, True)
     await common.async_set_temperature(hass, 30)
@@ -731,7 +731,7 @@ async def test_set_temp_change_ac_off_outside_tolerance(hass: HomeAssistant) -> 
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_temp_change_ac_on_within_tolerance(hass: HomeAssistant) -> None:
+async def test_temp_change_ac_on_within_tolerance(hass: SmartHub) -> None:
     """Test if temperature change doesn't turn ac on within tolerance."""
     calls = _setup_switch(hass, False)
     await common.async_set_temperature(hass, 25)
@@ -741,7 +741,7 @@ async def test_temp_change_ac_on_within_tolerance(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_temp_change_ac_on_outside_tolerance(hass: HomeAssistant) -> None:
+async def test_temp_change_ac_on_outside_tolerance(hass: SmartHub) -> None:
     """Test if temperature change turn ac on."""
     calls = _setup_switch(hass, False)
     await common.async_set_temperature(hass, 25)
@@ -755,7 +755,7 @@ async def test_temp_change_ac_on_outside_tolerance(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_running_when_operating_mode_is_off_2(hass: HomeAssistant) -> None:
+async def test_running_when_operating_mode_is_off_2(hass: SmartHub) -> None:
     """Test that the switch turns off when enabled is set False."""
     calls = _setup_switch(hass, True)
     await common.async_set_temperature(hass, 30)
@@ -768,7 +768,7 @@ async def test_running_when_operating_mode_is_off_2(hass: HomeAssistant) -> None
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_no_state_change_when_operation_mode_off_2(hass: HomeAssistant) -> None:
+async def test_no_state_change_when_operation_mode_off_2(hass: SmartHub) -> None:
     """Test that the switch doesn't turn on when enabled is False."""
     calls = _setup_switch(hass, False)
     await common.async_set_temperature(hass, 30)
@@ -779,7 +779,7 @@ async def test_no_state_change_when_operation_mode_off_2(hass: HomeAssistant) ->
 
 
 async def _setup_thermostat_with_min_cycle_duration(
-    hass: HomeAssistant, ac_mode: bool, initial_hvac_mode: HVACMode
+    hass: SmartHub, ac_mode: bool, initial_hvac_mode: HVACMode
 ):
     """Initialize components."""
     hass.config.temperature_unit = UnitOfTemperature.CELSIUS
@@ -819,7 +819,7 @@ async def _setup_thermostat_with_min_cycle_duration(
     ],
 )
 async def test_heating_cooling_switch_does_not_toggle_when_within_min_cycle_duration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ac_mode: bool,
     initial_hvac_mode: HVACMode,
     initial_switch_state: bool,
@@ -857,7 +857,7 @@ async def test_heating_cooling_switch_does_not_toggle_when_within_min_cycle_dura
     ],
 )
 async def test_heating_cooling_switch_toggles_when_outside_min_cycle_duration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ac_mode: bool,
     initial_hvac_mode: HVACMode,
     initial_switch_state: bool,
@@ -903,7 +903,7 @@ async def test_heating_cooling_switch_toggles_when_outside_min_cycle_duration(
     ],
 )
 async def test_hvac_mode_change_toggles_heating_cooling_switch_even_when_within_min_cycle_duration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ac_mode: bool,
     initial_hvac_mode: HVACMode,
     initial_switch_state: bool,
@@ -927,13 +927,13 @@ async def test_hvac_mode_change_toggles_heating_cooling_switch_even_when_within_
     await common.async_set_hvac_mode(hass, changed_hvac_mode)
     assert len(calls) == 1
     call = calls[0]
-    assert call.domain == "homeassistant"
+    assert call.domain == "smarthub"
     assert call.service == expected_triggered_service_call
     assert call.data["entity_id"] == ENT_SWITCH
 
 
 @pytest.fixture
-async def setup_comp_7(hass: HomeAssistant) -> None:
+async def setup_comp_7(hass: SmartHub) -> None:
     """Initialize components."""
     hass.config.temperature_unit = UnitOfTemperature.CELSIUS
     assert await async_setup_component(
@@ -960,7 +960,7 @@ async def setup_comp_7(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_7")
-async def test_temp_change_ac_trigger_on_long_enough_3(hass: HomeAssistant) -> None:
+async def test_temp_change_ac_trigger_on_long_enough_3(hass: SmartHub) -> None:
     """Test if turn on signal is sent at keep-alive intervals."""
     calls = _setup_switch(hass, True)
     await hass.async_block_till_done()
@@ -984,7 +984,7 @@ async def test_temp_change_ac_trigger_on_long_enough_3(hass: HomeAssistant) -> N
 
 
 @pytest.mark.usefixtures("setup_comp_7")
-async def test_temp_change_ac_trigger_off_long_enough_3(hass: HomeAssistant) -> None:
+async def test_temp_change_ac_trigger_off_long_enough_3(hass: SmartHub) -> None:
     """Test if turn on signal is sent at keep-alive intervals."""
     calls = _setup_switch(hass, False)
     await hass.async_block_till_done()
@@ -1008,7 +1008,7 @@ async def test_temp_change_ac_trigger_off_long_enough_3(hass: HomeAssistant) -> 
 
 
 @pytest.fixture
-async def setup_comp_8(hass: HomeAssistant) -> None:
+async def setup_comp_8(hass: SmartHub) -> None:
     """Initialize components."""
     hass.config.temperature_unit = UnitOfTemperature.CELSIUS
     assert await async_setup_component(
@@ -1033,7 +1033,7 @@ async def setup_comp_8(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_8")
-async def test_temp_change_heater_trigger_on_long_enough_2(hass: HomeAssistant) -> None:
+async def test_temp_change_heater_trigger_on_long_enough_2(hass: SmartHub) -> None:
     """Test if turn on signal is sent at keep-alive intervals."""
     calls = _setup_switch(hass, True)
     await hass.async_block_till_done()
@@ -1058,7 +1058,7 @@ async def test_temp_change_heater_trigger_on_long_enough_2(hass: HomeAssistant) 
 
 @pytest.mark.usefixtures("setup_comp_8")
 async def test_temp_change_heater_trigger_off_long_enough_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if turn on signal is sent at keep-alive intervals."""
     calls = _setup_switch(hass, False)
@@ -1083,7 +1083,7 @@ async def test_temp_change_heater_trigger_off_long_enough_2(
 
 
 @pytest.fixture
-async def setup_comp_9(hass: HomeAssistant) -> None:
+async def setup_comp_9(hass: SmartHub) -> None:
     """Initialize components."""
     assert await async_setup_component(
         hass,
@@ -1107,7 +1107,7 @@ async def setup_comp_9(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_9")
-async def test_precision(hass: HomeAssistant) -> None:
+async def test_precision(hass: SmartHub) -> None:
     """Test that setting precision to tenths works as intended."""
     hass.config.units = US_CUSTOMARY_SYSTEM
     await common.async_set_temperature(hass, 55.27)
@@ -1123,7 +1123,7 @@ async def test_precision(hass: HomeAssistant) -> None:
         HVACMode.COOL,
     ]
 )
-async def setup_comp_10(hass: HomeAssistant, request: pytest.FixtureRequest) -> None:
+async def setup_comp_10(hass: SmartHub, request: pytest.FixtureRequest) -> None:
     """Initialize components."""
     assert await async_setup_component(
         hass,
@@ -1145,7 +1145,7 @@ async def setup_comp_10(hass: HomeAssistant, request: pytest.FixtureRequest) -> 
 
 
 @pytest.mark.usefixtures("setup_comp_10")
-async def test_zero_tolerances(hass: HomeAssistant) -> None:
+async def test_zero_tolerances(hass: SmartHub) -> None:
     """Test that having a zero tolerance doesn't cause the switch to flip-flop."""
 
     # if the switch is off, it should remain off
@@ -1163,7 +1163,7 @@ async def test_zero_tolerances(hass: HomeAssistant) -> None:
     assert len(calls) == 1
 
 
-async def test_custom_setup_params(hass: HomeAssistant) -> None:
+async def test_custom_setup_params(hass: SmartHub) -> None:
     """Test the setup with custom parameters."""
     result = await async_setup_component(
         hass,
@@ -1191,7 +1191,7 @@ async def test_custom_setup_params(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("hvac_mode", [HVACMode.OFF, HVACMode.HEAT, HVACMode.COOL])
-async def test_restore_state(hass: HomeAssistant, hvac_mode) -> None:
+async def test_restore_state(hass: SmartHub, hvac_mode) -> None:
     """Ensure states are restored on startup."""
     mock_restore_cache(
         hass,
@@ -1226,7 +1226,7 @@ async def test_restore_state(hass: HomeAssistant, hvac_mode) -> None:
     assert state.state == hvac_mode
 
 
-async def test_no_restore_state(hass: HomeAssistant) -> None:
+async def test_no_restore_state(hass: SmartHub) -> None:
     """Ensure states are restored on startup if they exist.
 
     Allows for graceful reboot.
@@ -1263,7 +1263,7 @@ async def test_no_restore_state(hass: HomeAssistant) -> None:
     assert state.state == HVACMode.OFF
 
 
-async def test_initial_hvac_off_force_heater_off(hass: HomeAssistant) -> None:
+async def test_initial_hvac_off_force_heater_off(hass: SmartHub) -> None:
     """Ensure that restored state is coherent with real situation.
 
     'initial_hvac_mode: off' will force HVAC status, but we must be sure
@@ -1301,7 +1301,7 @@ async def test_initial_hvac_off_force_heater_off(hass: HomeAssistant) -> None:
     assert call.data["entity_id"] == ENT_SWITCH
 
 
-async def test_restore_will_turn_off_(hass: HomeAssistant) -> None:
+async def test_restore_will_turn_off_(hass: SmartHub) -> None:
     """Ensure that restored state is coherent with real situation.
 
     Thermostat status must trigger heater event if temp raises the target .
@@ -1349,7 +1349,7 @@ async def test_restore_will_turn_off_(hass: HomeAssistant) -> None:
     assert hass.states.get(heater_switch).state == STATE_ON
 
 
-async def test_restore_will_turn_off_when_loaded_second(hass: HomeAssistant) -> None:
+async def test_restore_will_turn_off_when_loaded_second(hass: SmartHub) -> None:
     """Ensure that restored state is coherent with real situation.
 
     Switch is not available until after component is loaded
@@ -1409,7 +1409,7 @@ async def test_restore_will_turn_off_when_loaded_second(hass: HomeAssistant) -> 
     assert call.data["entity_id"] == "input_boolean.test"
 
 
-async def test_restore_state_uncoherence_case(hass: HomeAssistant) -> None:
+async def test_restore_state_uncoherence_case(hass: SmartHub) -> None:
     """Test restore from a strange state.
 
     - Turn the generic thermostat off
@@ -1433,7 +1433,7 @@ async def test_restore_state_uncoherence_case(hass: HomeAssistant) -> None:
     assert state.state == HVACMode.OFF
 
 
-async def _setup_climate(hass: HomeAssistant) -> None:
+async def _setup_climate(hass: SmartHub) -> None:
     assert await async_setup_component(
         hass,
         CLIMATE_DOMAIN,
@@ -1453,7 +1453,7 @@ async def _setup_climate(hass: HomeAssistant) -> None:
 
 
 def _mock_restore_cache(
-    hass: HomeAssistant, temperature: int = 20, hvac_mode: HVACMode = HVACMode.OFF
+    hass: SmartHub, temperature: int = 20, hvac_mode: HVACMode = HVACMode.OFF
 ) -> None:
     mock_restore_cache(
         hass,
@@ -1467,7 +1467,7 @@ def _mock_restore_cache(
     )
 
 
-async def test_reload(hass: HomeAssistant) -> None:
+async def test_reload(hass: SmartHub) -> None:
     """Test we can reload."""
 
     assert await async_setup_component(
@@ -1503,7 +1503,7 @@ async def test_reload(hass: HomeAssistant) -> None:
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:

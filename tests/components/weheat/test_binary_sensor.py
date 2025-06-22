@@ -6,9 +6,9 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from weheat.abstractions.discovery import HeatPumpDiscovery
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_weheat_discover: AsyncMock,
     mock_weheat_heat_pump: AsyncMock,
@@ -25,7 +25,7 @@ async def test_binary_entities(
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.weheat.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.weheat.PLATFORMS", [Platform.BINARY_SENSOR]):
         await setup_integration(hass, mock_config_entry)
 
     await hass.async_block_till_done()
@@ -34,7 +34,7 @@ async def test_binary_entities(
 
 
 async def test_create_binary_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_weheat_discover: AsyncMock,
     mock_weheat_heat_pump: AsyncMock,
     mock_heat_pump_info: HeatPumpDiscovery.HeatPumpInfo,
@@ -43,7 +43,7 @@ async def test_create_binary_entities(
     """Test creating entities."""
     mock_weheat_discover.return_value = [mock_heat_pump_info]
 
-    with patch("homeassistant.components.weheat.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.weheat.PLATFORMS", [Platform.BINARY_SENSOR]):
         await setup_integration(hass, mock_config_entry)
 
     await hass.async_block_till_done()

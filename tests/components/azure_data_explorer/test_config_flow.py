@@ -5,14 +5,14 @@ from unittest.mock import AsyncMock, MagicMock
 from azure.kusto.data.exceptions import KustoAuthenticationError, KustoServiceError
 import pytest
 
-from homeassistant import config_entries, data_entry_flow
-from homeassistant.components.azure_data_explorer.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub import config_entries, data_entry_flow
+from smarthub.components.azure_data_explorer.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .const import BASE_CONFIG
 
 
-async def test_config_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_config_flow(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}, data=None
@@ -40,7 +40,7 @@ async def test_config_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> 
 async def test_config_flow_errors(
     test_input: Exception,
     expected: str,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_execute_query: MagicMock,
 ) -> None:
     """Test we handle connection KustoServiceError."""

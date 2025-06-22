@@ -6,21 +6,21 @@ from plexapi.exceptions import BadRequest, NotFound
 import pytest
 import requests_mock
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
     DOMAIN as MEDIA_PLAYER_DOMAIN,
     SERVICE_PLAY_MEDIA,
     MediaType,
 )
-from homeassistant.components.plex.const import DOMAIN
-from homeassistant.components.plex.errors import MediaNotFound
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.plex.const import DOMAIN
+from smarthub.components.plex.errors import MediaNotFound
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 
 async def test_media_lookups(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_plex_server,
     requests_mock: requests_mock.Mocker,
     playqueue_created,

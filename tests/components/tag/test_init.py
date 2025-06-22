@@ -8,12 +8,12 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.tag import DOMAIN, _create_entry, async_scan_tag
-from homeassistant.const import CONF_NAME, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import collection, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.tag import DOMAIN, _create_entry, async_scan_tag
+from smarthub.const import CONF_NAME, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import collection, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import TEST_DEVICE_ID, TEST_TAG_ID, TEST_TAG_ID_2, TEST_TAG_NAME, TEST_TAG_NAME_2
 
@@ -22,7 +22,7 @@ from tests.typing import WebSocketGenerator
 
 
 @pytest.fixture
-def storage_setup(hass: HomeAssistant, hass_storage: dict[str, Any]):
+def storage_setup(hass: SmartHub, hass_storage: dict[str, Any]):
     """Storage setup."""
 
     async def _storage(items=None):
@@ -54,7 +54,7 @@ def storage_setup(hass: HomeAssistant, hass_storage: dict[str, Any]):
 
 
 @pytest.fixture
-def storage_setup_1_1(hass: HomeAssistant, hass_storage: dict[str, Any]):
+def storage_setup_1_1(hass: SmartHub, hass_storage: dict[str, Any]):
     """Storage version 1.1 setup."""
 
     async def _storage(items=None):
@@ -82,7 +82,7 @@ def storage_setup_1_1(hass: HomeAssistant, hass_storage: dict[str, Any]):
 
 
 async def test_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     storage_setup_1_1,
     freezer: FrozenDateTimeFactory,
@@ -124,7 +124,7 @@ async def test_migration(
 
 
 async def test_ws_list(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, storage_setup
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, storage_setup
 ) -> None:
     """Test listing tags via WS."""
     assert await storage_setup()
@@ -141,7 +141,7 @@ async def test_ws_list(
 
 
 async def test_ws_update(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, storage_setup
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, storage_setup
 ) -> None:
     """Test listing tags via WS."""
     assert await storage_setup()
@@ -163,7 +163,7 @@ async def test_ws_update(
 
 
 async def test_tag_scanned(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     hass_storage: dict[str, Any],
@@ -228,7 +228,7 @@ def track_changes(coll: collection.ObservableCollection):
 
 
 async def test_tag_id_exists(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, storage_setup
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, storage_setup
 ) -> None:
     """Test scanning tags."""
     assert await storage_setup()
@@ -243,7 +243,7 @@ async def test_tag_id_exists(
 
 
 async def test_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     storage_setup,
@@ -277,7 +277,7 @@ async def test_entity(
 
 async def test_entity_created_and_removed(
     caplog: pytest.LogCaptureFixture,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     storage_setup,

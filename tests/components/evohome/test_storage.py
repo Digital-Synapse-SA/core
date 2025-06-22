@@ -7,9 +7,9 @@ from typing import Any, Final, NotRequired, TypedDict
 
 import pytest
 
-from homeassistant.components.evohome.const import DOMAIN, STORAGE_KEY, STORAGE_VER
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.evohome.const import DOMAIN, STORAGE_KEY, STORAGE_VER
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .conftest import setup_evohome
 from .const import ACCESS_TOKEN, REFRESH_TOKEN, SESSION_ID, USERNAME
@@ -78,7 +78,7 @@ DOMAIN_STORAGE_BASE: Final = {
 @pytest.mark.parametrize("install", ["minimal"])
 @pytest.mark.parametrize("idx", TEST_STORAGE_NULL)
 async def test_auth_tokens_null(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     config: dict[str, str],
     idx: str,
@@ -106,7 +106,7 @@ async def test_auth_tokens_null(
 @pytest.mark.parametrize("install", ["minimal"])
 @pytest.mark.parametrize("idx", TEST_STORAGE_DATA)
 async def test_auth_tokens_same(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     config: dict[str, str],
     idx: str,
@@ -131,7 +131,7 @@ async def test_auth_tokens_same(
 @pytest.mark.parametrize("install", ["minimal"])
 @pytest.mark.parametrize("idx", TEST_STORAGE_DATA)
 async def test_auth_tokens_past(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     config: dict[str, str],
     idx: str,
@@ -165,7 +165,7 @@ async def test_auth_tokens_past(
 @pytest.mark.parametrize("install", ["minimal"])
 @pytest.mark.parametrize("idx", TEST_STORAGE_DATA)
 async def test_auth_tokens_diff(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     config: dict[str, str],
     idx: str,

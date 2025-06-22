@@ -2,21 +2,21 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.cups import CONF_PRINTERS, DOMAIN
-from homeassistant.components.sensor.const import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.cups import CONF_PRINTERS, DOMAIN
+from smarthub.components.sensor.const import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import CONF_PLATFORM
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 
 async def test_repair_issue_is_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test repair issue is created."""
     with patch(
-        "homeassistant.components.cups.sensor.CupsData", autospec=True
+        "smarthub.components.cups.sensor.CupsData", autospec=True
     ) as cups_data:
         cups_data.available = True
         assert await async_setup_component(

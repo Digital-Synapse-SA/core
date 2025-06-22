@@ -10,13 +10,13 @@ from roborock.roborock_typing import RoborockCommand
 from syrupy.assertion import SnapshotAssertion
 from vacuum_map_parser_base.map_data import Point
 
-from homeassistant.components.roborock import DOMAIN
-from homeassistant.components.roborock.const import (
+from smarthub.components.roborock import DOMAIN
+from smarthub.components.roborock.const import (
     GET_MAPS_SERVICE_NAME,
     GET_VACUUM_CURRENT_POSITION_SERVICE_NAME,
     SET_VACUUM_GOTO_POSITION_SERVICE_NAME,
 )
-from homeassistant.components.vacuum import (
+from smarthub.components.vacuum import (
     SERVICE_CLEAN_SPOT,
     SERVICE_LOCATE,
     SERVICE_PAUSE,
@@ -26,11 +26,11 @@ from homeassistant.components.vacuum import (
     SERVICE_START,
     SERVICE_STOP,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .mock_data import MAP_DATA, PROP
 
@@ -50,7 +50,7 @@ def platforms() -> list[Platform]:
 
 
 async def test_registry_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     bypass_api_fixture,
@@ -89,7 +89,7 @@ async def test_registry_entries(
     ],
 )
 async def test_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
     service: str,
@@ -104,7 +104,7 @@ async def test_commands(
 
     data = {ATTR_ENTITY_ID: ENTITY_ID, **(service_params or {})}
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.send_command"
+        "smarthub.components.roborock.coordinator.RoborockLocalClientV1.send_command"
     ) as mock_send_command:
         await hass.services.async_call(
             Platform.VACUUM,
@@ -118,7 +118,7 @@ async def test_commands(
 
 
 async def test_cloud_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
 ) -> None:
@@ -129,7 +129,7 @@ async def test_cloud_command(
 
     data = {ATTR_ENTITY_ID: ENTITY_ID, "command": "get_map_v1"}
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockMqttClientV1.send_command"
+        "smarthub.components.roborock.coordinator.RoborockMqttClientV1.send_command"
     ) as mock_send_command:
         await hass.services.async_call(
             Platform.VACUUM,
@@ -151,7 +151,7 @@ async def test_cloud_command(
     ],
 )
 async def test_resume_cleaning(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     mock_roborock_entry: MockConfigEntry,
     in_cleaning_int: int,
@@ -161,7 +161,7 @@ async def test_resume_cleaning(
     prop = copy.deepcopy(PROP)
     prop.status.in_cleaning = in_cleaning_int
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
+        "smarthub.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
         return_value=prop,
     ):
         await async_setup_component(hass, DOMAIN, {})
@@ -170,7 +170,7 @@ async def test_resume_cleaning(
 
     data = {ATTR_ENTITY_ID: ENTITY_ID}
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.send_command"
+        "smarthub.components.roborock.coordinator.RoborockLocalClientV1.send_command"
     ) as mock_send_command:
         await hass.services.async_call(
             Platform.VACUUM,
@@ -183,18 +183,18 @@ async def test_resume_cleaning(
 
 
 async def test_failed_user_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
 ) -> None:
-    """Test that when a user sends an invalid command, we raise HomeAssistantError."""
+    """Test that when a user sends an invalid command, we raise SmartHubError."""
     data = {ATTR_ENTITY_ID: ENTITY_ID, "command": "fake_command"}
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.send_command",
+            "smarthub.components.roborock.coordinator.RoborockLocalClientV1.send_command",
             side_effect=RoborockException(),
         ),
-        pytest.raises(HomeAssistantError, match="Error while calling fake_command"),
+        pytest.raises(SmartHubError, match="Error while calling fake_command"),
     ):
         await hass.services.async_call(
             Platform.VACUUM,
@@ -205,7 +205,7 @@ async def test_failed_user_command(
 
 
 async def test_get_maps(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -222,7 +222,7 @@ async def test_get_maps(
 
 
 async def test_goto(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
 ) -> None:
@@ -232,7 +232,7 @@ async def test_goto(
 
     data = {ATTR_ENTITY_ID: ENTITY_ID, "x": 25500, "y": 25500}
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.send_command"
+        "smarthub.components.roborock.coordinator.RoborockLocalClientV1.send_command"
     ) as mock_send_command:
         await hass.services.async_call(
             DOMAIN,
@@ -246,7 +246,7 @@ async def test_goto(
 
 
 async def test_get_current_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -257,11 +257,11 @@ async def test_get_current_position(
     map_data.image = None
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMqttClientV1.get_map_v1",
+            "smarthub.components.roborock.coordinator.RoborockMqttClientV1.get_map_v1",
             return_value=b"",
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMapDataParser.parse",
+            "smarthub.components.roborock.coordinator.RoborockMapDataParser.parse",
             return_value=map_data,
         ),
     ):
@@ -281,18 +281,18 @@ async def test_get_current_position(
 
 
 async def test_get_current_position_no_map_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
 ) -> None:
     """Test that the service for getting the current position handles no map data error."""
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMqttClientV1.get_map_v1",
+            "smarthub.components.roborock.coordinator.RoborockMqttClientV1.get_map_v1",
             return_value=None,
         ),
         pytest.raises(
-            HomeAssistantError, match="Something went wrong creating the map"
+            SmartHubError, match="Something went wrong creating the map"
         ),
     ):
         await hass.services.async_call(
@@ -305,7 +305,7 @@ async def test_get_current_position_no_map_data(
 
 
 async def test_get_current_position_no_robot_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
 ) -> None:
@@ -314,14 +314,14 @@ async def test_get_current_position_no_robot_position(
     map_data.vacuum_position = None
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMqttClientV1.get_map_v1",
+            "smarthub.components.roborock.coordinator.RoborockMqttClientV1.get_map_v1",
             return_value=b"",
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMapDataParser.parse",
+            "smarthub.components.roborock.coordinator.RoborockMapDataParser.parse",
             return_value=map_data,
         ),
-        pytest.raises(HomeAssistantError, match="Robot position not found"),
+        pytest.raises(SmartHubError, match="Robot position not found"),
     ):
         await hass.services.async_call(
             DOMAIN,

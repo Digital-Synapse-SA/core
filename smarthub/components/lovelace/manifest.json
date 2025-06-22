@@ -1,0 +1,9 @@
+{
+  "domain": "lovelace",
+  "name": "Dashboards",
+  "codeowners": ["@smart-hub/frontend"],
+  "dependencies": ["onboarding"],
+  "documentation": "https://www.smart-hub.io/integrations/lovelace",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

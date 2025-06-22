@@ -16,9 +16,9 @@ import pytest
 from sqlalchemy.exc import DatabaseError, OperationalError, SQLAlchemyError
 from sqlalchemy.pool import QueuePool
 
-from homeassistant.components import recorder
-from homeassistant.components.lock import LockState
-from homeassistant.components.recorder import (
+from smarthub.components import recorder
+from smarthub.components.lock import LockState
+from smarthub.components.recorder import (
     CONF_AUTO_PURGE,
     CONF_AUTO_REPACK,
     CONF_COMMIT_INTERVAL,
@@ -33,13 +33,13 @@ from homeassistant.components.recorder import (
     migration,
     statistics,
 )
-from homeassistant.components.recorder.const import (
+from smarthub.components.recorder.const import (
     EVENT_RECORDER_5MIN_STATISTICS_GENERATED,
     EVENT_RECORDER_HOURLY_STATISTICS_GENERATED,
     KEEPALIVE_TIME,
     SupportedDialect,
 )
-from homeassistant.components.recorder.db_schema import (
+from smarthub.components.recorder.db_schema import (
     SCHEMA_VERSION,
     EventData,
     Events,
@@ -50,20 +50,20 @@ from homeassistant.components.recorder.db_schema import (
     StatesMeta,
     StatisticsRuns,
 )
-from homeassistant.components.recorder.models import process_timestamp
-from homeassistant.components.recorder.queries import select_event_type_ids
-from homeassistant.components.recorder.services import (
+from smarthub.components.recorder.models import process_timestamp
+from smarthub.components.recorder.queries import select_event_type_ids
+from smarthub.components.recorder.services import (
     SERVICE_DISABLE,
     SERVICE_ENABLE,
     SERVICE_PURGE,
     SERVICE_PURGE_ENTITIES,
 )
-from homeassistant.components.recorder.table_managers import (
+from smarthub.components.recorder.table_managers import (
     state_attributes as state_attributes_table_manager,
     states_meta as states_meta_table_manager,
 )
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.const import (
+from smarthub.components.recorder.util import session_scope
+from smarthub.const import (
     EVENT_COMPONENT_LOADED,
     EVENT_HOMEASSISTANT_CLOSE,
     EVENT_HOMEASSISTANT_FINAL_WRITE,
@@ -71,17 +71,17 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STOP,
     MATCH_ALL,
 )
-from homeassistant.core import Context, CoreState, Event, HomeAssistant, State, callback
-from homeassistant.helpers import (
+from smarthub.core import Context, CoreState, Event, SmartHub, State, callback
+from smarthub.helpers import (
     entity_registry as er,
     issue_registry as ir,
     recorder as recorder_helper,
 )
-from homeassistant.helpers.event import async_track_entity_registry_updated_event
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.json import json_loads
+from smarthub.helpers.event import async_track_entity_registry_updated_event
+from smarthub.helpers.typing import ConfigType
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.json import json_loads
 
 from .common import (
     async_block_recorder,
@@ -125,7 +125,7 @@ def small_cache_size() -> Generator[None]:
         yield
 
 
-def _default_recorder(hass: HomeAssistant) -> Recorder:
+def _default_recorder(hass: SmartHub) -> Recorder:
     """Return a recorder with reasonable defaults."""
     return Recorder(
         hass,
@@ -143,7 +143,7 @@ def _default_recorder(hass: HomeAssistant) -> Recorder:
 
 @pytest.mark.parametrize("persistent_database", [True])
 async def test_shutdown_before_startup_finishes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test shutdown before recorder starts is clean.
@@ -182,7 +182,7 @@ async def test_shutdown_before_startup_finishes(
 
 
 async def test_canceled_before_startup_finishes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -207,7 +207,7 @@ async def test_canceled_before_startup_finishes(
 
 
 async def test_shutdown_closes_connections(
-    hass: HomeAssistant, setup_recorder: None
+    hass: SmartHub, setup_recorder: None
 ) -> None:
     """Test shutdown closes connections."""
 
@@ -234,7 +234,7 @@ async def test_shutdown_closes_connections(
 
 
 async def test_state_gets_saved_when_set_before_start_event(
-    hass: HomeAssistant, async_setup_recorder_instance: RecorderInstanceGenerator
+    hass: SmartHub, async_setup_recorder_instance: RecorderInstanceGenerator
 ) -> None:
     """Test we can record an event when starting with not running."""
 
@@ -260,7 +260,7 @@ async def test_state_gets_saved_when_set_before_start_event(
         assert db_states[0].event_id is None
 
 
-async def test_saving_state(hass: HomeAssistant, setup_recorder: None) -> None:
+async def test_saving_state(hass: SmartHub, setup_recorder: None) -> None:
     """Test saving and restoring a state."""
     entity_id = "test.recorder"
     state = "restoring_from_db"
@@ -298,7 +298,7 @@ async def test_saving_state(hass: HomeAssistant, setup_recorder: None) -> None:
     ],
 )
 async def test_saving_state_with_nul(
-    hass: HomeAssistant,
+    hass: SmartHub,
     db_engine: str,
     recorder_dialect_name: None,
     setup_recorder: None,
@@ -334,7 +334,7 @@ async def test_saving_state_with_nul(
 
 
 async def test_saving_many_states(
-    hass: HomeAssistant, async_setup_recorder_instance: RecorderInstanceGenerator
+    hass: SmartHub, async_setup_recorder_instance: RecorderInstanceGenerator
 ) -> None:
     """Test we expire after many commits."""
     instance = await async_setup_recorder_instance(
@@ -363,7 +363,7 @@ async def test_saving_many_states(
 
 
 async def test_saving_state_with_intermixed_time_changes(
-    hass: HomeAssistant, setup_recorder: None
+    hass: SmartHub, setup_recorder: None
 ) -> None:
     """Test saving states with intermixed time changes."""
     entity_id = "test.recorder"
@@ -387,7 +387,7 @@ async def test_saving_state_with_intermixed_time_changes(
 
 
 async def test_saving_state_with_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     setup_recorder: None,
 ) -> None:
@@ -430,7 +430,7 @@ async def test_saving_state_with_exception(
 
 
 async def test_saving_state_with_sqlalchemy_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     setup_recorder: None,
 ) -> None:
@@ -473,7 +473,7 @@ async def test_saving_state_with_sqlalchemy_exception(
 
 
 async def test_force_shutdown_with_queue_of_writes_that_generate_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -507,7 +507,7 @@ async def test_force_shutdown_with_queue_of_writes_that_generate_exceptions(
     assert "Error saving events" not in caplog.text
 
 
-async def test_saving_event(hass: HomeAssistant, setup_recorder: None) -> None:
+async def test_saving_event(hass: SmartHub, setup_recorder: None) -> None:
     """Test saving and restoring an event."""
     event_type = "EVENT_TEST"
     event_data = {"test_attr": 5, "test_attr_10": "nice"}
@@ -561,7 +561,7 @@ async def test_saving_event(hass: HomeAssistant, setup_recorder: None) -> None:
 
 
 async def test_saving_state_with_commit_interval_zero(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving a state with a commit interval of zero."""
@@ -582,7 +582,7 @@ async def test_saving_state_with_commit_interval_zero(
         assert db_states[0].event_id is None
 
 
-async def _add_entities(hass: HomeAssistant, entity_ids: list[str]) -> list[State]:
+async def _add_entities(hass: SmartHub, entity_ids: list[str]) -> list[State]:
     """Add entities."""
     attributes = {"test_attr": 5, "test_attr_10": "nice"}
     for idx, entity_id in enumerate(entity_ids):
@@ -606,21 +606,21 @@ async def _add_entities(hass: HomeAssistant, entity_ids: list[str]) -> list[Stat
         return states
 
 
-def _state_with_context(hass: HomeAssistant, entity_id: str) -> State | None:
+def _state_with_context(hass: SmartHub, entity_id: str) -> State | None:
     # We don't restore context unless we need it by joining the
     # events table on the event_id for state_changed events
     return hass.states.get(entity_id)
 
 
 async def test_setup_without_migration(
-    hass: HomeAssistant, setup_recorder: None
+    hass: SmartHub, setup_recorder: None
 ) -> None:
     """Verify the schema version without a migration."""
     assert recorder.get_instance(hass).schema_version == SCHEMA_VERSION
 
 
 async def test_saving_state_include_domains(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring a state."""
@@ -631,7 +631,7 @@ async def test_saving_state_include_domains(
 
 
 async def test_saving_state_include_domains_globs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring a state."""
@@ -655,7 +655,7 @@ async def test_saving_state_include_domains_globs(
 
 
 async def test_saving_state_incl_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring a state."""
@@ -668,7 +668,7 @@ async def test_saving_state_incl_entities(
 
 
 async def test_saving_event_exclude_event_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring an event."""
@@ -676,10 +676,10 @@ async def test_saving_event_exclude_event_type(
         "exclude": {
             "event_types": [
                 "service_registered",
-                "homeassistant_start",
+                "smarthub_start",
                 "component_loaded",
                 "core_config_updated",
-                "homeassistant_started",
+                "smarthub_started",
                 "test",
             ]
         }
@@ -691,7 +691,7 @@ async def test_saving_event_exclude_event_type(
 
     await async_wait_recording_done(hass)
 
-    def _get_events(hass: HomeAssistant, event_type_list: list[str]) -> list[Event]:
+    def _get_events(hass: SmartHub, event_type_list: list[str]) -> list[Event]:
         with session_scope(hass=hass, read_only=True) as session:
             events = []
             for event, event_data, event_types in (
@@ -719,7 +719,7 @@ async def test_saving_event_exclude_event_type(
 
 
 async def test_saving_state_exclude_domains(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring a state."""
@@ -730,7 +730,7 @@ async def test_saving_state_exclude_domains(
 
 
 async def test_saving_state_exclude_domains_globs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring a state."""
@@ -745,7 +745,7 @@ async def test_saving_state_exclude_domains_globs(
 
 
 async def test_saving_state_exclude_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring a state."""
@@ -758,7 +758,7 @@ async def test_saving_state_exclude_entities(
 
 
 async def test_saving_state_exclude_domain_include_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring a state."""
@@ -774,7 +774,7 @@ async def test_saving_state_exclude_domain_include_entity(
 
 
 async def test_saving_state_exclude_domain_glob_include_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring a state."""
@@ -792,7 +792,7 @@ async def test_saving_state_exclude_domain_glob_include_entity(
 
 
 async def test_saving_state_include_domain_exclude_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring a state."""
@@ -810,7 +810,7 @@ async def test_saving_state_include_domain_exclude_entity(
 
 
 async def test_saving_state_include_domain_glob_exclude_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test saving and restoring a state."""
@@ -830,7 +830,7 @@ async def test_saving_state_include_domain_glob_exclude_entity(
 
 
 async def test_saving_state_and_removing_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
 ) -> None:
     """Test saving the state of a removed entity."""
@@ -857,7 +857,7 @@ async def test_saving_state_and_removing_entity(
 
 
 async def test_saving_state_with_oversized_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     setup_recorder: None,
 ) -> None:
@@ -892,7 +892,7 @@ async def test_saving_state_with_oversized_attributes(
 
 
 async def test_saving_event_with_oversized_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     setup_recorder: None,
 ) -> None:
@@ -924,7 +924,7 @@ async def test_saving_event_with_oversized_data(
 
 
 async def test_saving_event_invalid_context_ulid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     setup_recorder: None,
 ) -> None:
@@ -950,12 +950,12 @@ async def test_saving_event_invalid_context_ulid(
     assert json_loads(events["test_event"]) == event_data
 
 
-async def test_recorder_setup_failure(hass: HomeAssistant) -> None:
+async def test_recorder_setup_failure(hass: SmartHub) -> None:
     """Test some exceptions."""
     recorder_helper.async_initialize_recorder(hass)
     with (
         patch.object(Recorder, "_setup_connection") as setup,
-        patch("homeassistant.components.recorder.core.time.sleep"),
+        patch("smarthub.components.recorder.core.time.sleep"),
     ):
         setup.side_effect = ImportError("driver not found")
         rec = _default_recorder(hass)
@@ -970,15 +970,15 @@ async def test_recorder_setup_failure(hass: HomeAssistant) -> None:
     "function_to_patch", ["_get_current_schema_version", "_get_initial_schema_version"]
 )
 async def test_recorder_validate_schema_failure(
-    hass: HomeAssistant, function_to_patch: str
+    hass: SmartHub, function_to_patch: str
 ) -> None:
     """Test some exceptions."""
     recorder_helper.async_initialize_recorder(hass)
     with (
         patch(
-            f"homeassistant.components.recorder.migration.{function_to_patch}"
+            f"smarthub.components.recorder.migration.{function_to_patch}"
         ) as inspect_schema_version,
-        patch("homeassistant.components.recorder.core.time.sleep"),
+        patch("smarthub.components.recorder.core.time.sleep"),
     ):
         inspect_schema_version.side_effect = ImportError("driver not found")
         rec = _default_recorder(hass)
@@ -990,13 +990,13 @@ async def test_recorder_validate_schema_failure(
 
 
 async def test_recorder_setup_failure_without_event_listener(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test recorder setup failure when the event listener is not setup."""
     recorder_helper.async_initialize_recorder(hass)
     with (
         patch.object(Recorder, "_setup_connection") as setup,
-        patch("homeassistant.components.recorder.core.time.sleep"),
+        patch("smarthub.components.recorder.core.time.sleep"),
     ):
         setup.side_effect = ImportError("driver not found")
         rec = _default_recorder(hass)
@@ -1006,17 +1006,17 @@ async def test_recorder_setup_failure_without_event_listener(
     hass.stop()
 
 
-async def test_defaults_set(hass: HomeAssistant) -> None:
+async def test_defaults_set(hass: SmartHub) -> None:
     """Test the config defaults are set."""
     recorder_config = None
 
-    async def mock_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    async def mock_setup(hass: SmartHub, config: ConfigType) -> bool:
         """Mock setup."""
         nonlocal recorder_config
         recorder_config = config["recorder"]
         return True
 
-    with patch("homeassistant.components.recorder.async_setup", side_effect=mock_setup):
+    with patch("smarthub.components.recorder.async_setup", side_effect=mock_setup):
         assert await async_setup_component(hass, "history", {})
 
     assert recorder_config is not None
@@ -1025,7 +1025,7 @@ async def test_defaults_set(hass: HomeAssistant) -> None:
     assert recorder_config["purge_keep_days"] == 10
 
 
-async def run_tasks_at_time(hass: HomeAssistant, test_time: datetime) -> None:
+async def run_tasks_at_time(hass: SmartHub, test_time: datetime) -> None:
     """Advance the clock and wait for any callbacks to finish."""
     async_fire_time_changed(hass, test_time)
     await hass.async_block_till_done(wait_background_tasks=True)
@@ -1034,7 +1034,7 @@ async def run_tasks_at_time(hass: HomeAssistant, test_time: datetime) -> None:
 
 
 @pytest.mark.parametrize("enable_nightly_purge", [True])
-async def test_auto_purge(hass: HomeAssistant, setup_recorder: None) -> None:
+async def test_auto_purge(hass: SmartHub, setup_recorder: None) -> None:
     """Test periodic purge scheduling."""
     timezone = "Europe/Copenhagen"
     await hass.config.async_set_time_zone(timezone)
@@ -1052,10 +1052,10 @@ async def test_auto_purge(hass: HomeAssistant, setup_recorder: None) -> None:
 
     with (
         patch(
-            "homeassistant.components.recorder.purge.purge_old_data", return_value=True
+            "smarthub.components.recorder.purge.purge_old_data", return_value=True
         ) as purge_old_data,
         patch(
-            "homeassistant.components.recorder.tasks.periodic_db_cleanups"
+            "smarthub.components.recorder.tasks.periodic_db_cleanups"
         ) as periodic_db_cleanups,
     ):
         assert len(purge_old_data.mock_calls) == 0
@@ -1094,7 +1094,7 @@ async def test_auto_purge(hass: HomeAssistant, setup_recorder: None) -> None:
 
 @pytest.mark.parametrize("enable_nightly_purge", [True])
 async def test_auto_purge_auto_repack_on_second_sunday(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
 ) -> None:
     """Test periodic purge scheduling does a repack on the 2nd sunday."""
@@ -1114,13 +1114,13 @@ async def test_auto_purge_auto_repack_on_second_sunday(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.is_second_sunday", return_value=True
+            "smarthub.components.recorder.core.is_second_sunday", return_value=True
         ),
         patch(
-            "homeassistant.components.recorder.purge.purge_old_data", return_value=True
+            "smarthub.components.recorder.purge.purge_old_data", return_value=True
         ) as purge_old_data,
         patch(
-            "homeassistant.components.recorder.tasks.periodic_db_cleanups"
+            "smarthub.components.recorder.tasks.periodic_db_cleanups"
         ) as periodic_db_cleanups,
     ):
         assert len(purge_old_data.mock_calls) == 0
@@ -1137,7 +1137,7 @@ async def test_auto_purge_auto_repack_on_second_sunday(
 
 @pytest.mark.parametrize("enable_nightly_purge", [True])
 async def test_auto_purge_auto_repack_disabled_on_second_sunday(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test periodic purge scheduling does not auto repack on the 2nd sunday if disabled."""
@@ -1158,13 +1158,13 @@ async def test_auto_purge_auto_repack_disabled_on_second_sunday(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.is_second_sunday", return_value=True
+            "smarthub.components.recorder.core.is_second_sunday", return_value=True
         ),
         patch(
-            "homeassistant.components.recorder.purge.purge_old_data", return_value=True
+            "smarthub.components.recorder.purge.purge_old_data", return_value=True
         ) as purge_old_data,
         patch(
-            "homeassistant.components.recorder.tasks.periodic_db_cleanups"
+            "smarthub.components.recorder.tasks.periodic_db_cleanups"
         ) as periodic_db_cleanups,
     ):
         assert len(purge_old_data.mock_calls) == 0
@@ -1181,7 +1181,7 @@ async def test_auto_purge_auto_repack_disabled_on_second_sunday(
 
 @pytest.mark.parametrize("enable_nightly_purge", [True])
 async def test_auto_purge_no_auto_repack_on_not_second_sunday(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
 ) -> None:
     """Test periodic purge scheduling does not do a repack unless its the 2nd sunday."""
@@ -1201,14 +1201,14 @@ async def test_auto_purge_no_auto_repack_on_not_second_sunday(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.is_second_sunday",
+            "smarthub.components.recorder.core.is_second_sunday",
             return_value=False,
         ),
         patch(
-            "homeassistant.components.recorder.purge.purge_old_data", return_value=True
+            "smarthub.components.recorder.purge.purge_old_data", return_value=True
         ) as purge_old_data,
         patch(
-            "homeassistant.components.recorder.tasks.periodic_db_cleanups"
+            "smarthub.components.recorder.tasks.periodic_db_cleanups"
         ) as periodic_db_cleanups,
     ):
         assert len(purge_old_data.mock_calls) == 0
@@ -1225,7 +1225,7 @@ async def test_auto_purge_no_auto_repack_on_not_second_sunday(
 
 @pytest.mark.parametrize("enable_nightly_purge", [True])
 async def test_auto_purge_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test periodic db cleanup still run when auto purge is disabled."""
@@ -1245,10 +1245,10 @@ async def test_auto_purge_disabled(
 
     with (
         patch(
-            "homeassistant.components.recorder.purge.purge_old_data", return_value=True
+            "smarthub.components.recorder.purge.purge_old_data", return_value=True
         ) as purge_old_data,
         patch(
-            "homeassistant.components.recorder.tasks.periodic_db_cleanups"
+            "smarthub.components.recorder.tasks.periodic_db_cleanups"
         ) as periodic_db_cleanups,
     ):
         assert len(purge_old_data.mock_calls) == 0
@@ -1266,7 +1266,7 @@ async def test_auto_purge_disabled(
 
 @pytest.mark.parametrize("enable_statistics", [True])
 async def test_auto_statistics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -1308,7 +1308,7 @@ async def test_auto_statistics(
 
     real_compile_statistics = statistics.compile_statistics
     with patch(
-        "homeassistant.components.recorder.statistics.compile_statistics",
+        "smarthub.components.recorder.statistics.compile_statistics",
         side_effect=real_compile_statistics,
         autospec=True,
     ) as compile_statistics:
@@ -1350,12 +1350,12 @@ async def test_auto_statistics(
 
 
 async def test_statistics_runs_initiated(
-    hass: HomeAssistant, async_setup_recorder_instance: RecorderInstanceGenerator
+    hass: SmartHub, async_setup_recorder_instance: RecorderInstanceGenerator
 ) -> None:
     """Test statistics_runs is initiated when DB is created."""
     now = dt_util.utcnow()
     with patch(
-        "homeassistant.components.recorder.core.dt_util.utcnow", return_value=now
+        "smarthub.components.recorder.core.dt_util.utcnow", return_value=now
     ):
         await async_setup_recorder_instance(hass)
 
@@ -1380,7 +1380,7 @@ async def test_compile_missing_statistics(
     """Test missing statistics are compiled on startup."""
     now = dt_util.utcnow().replace(minute=0, second=0, microsecond=0)
 
-    def get_statistic_runs(hass: HomeAssistant) -> list:
+    def get_statistic_runs(hass: SmartHub) -> list:
         with session_scope(hass=hass, read_only=True) as session:
             return list(session.query(StatisticsRuns))
 
@@ -1403,7 +1403,7 @@ async def test_compile_missing_statistics(
         await async_wait_recording_done(hass)
         await hass.async_stop()
 
-    # Start Home Assistant one hour later
+    # Start SmartHub one hour later
     stats_5min = []
     stats_hourly = []
 
@@ -1447,7 +1447,7 @@ async def test_compile_missing_statistics(
         await hass.async_stop()
 
 
-async def test_saving_sets_old_state(hass: HomeAssistant, setup_recorder: None) -> None:
+async def test_saving_sets_old_state(hass: SmartHub, setup_recorder: None) -> None:
     """Test saving sets old state."""
     hass.states.async_set("test.one", "s1", {})
     hass.states.async_set("test.two", "s2", {})
@@ -1476,7 +1476,7 @@ async def test_saving_sets_old_state(hass: HomeAssistant, setup_recorder: None) 
 
 
 async def test_saving_state_with_serializable_data(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, setup_recorder: None
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, setup_recorder: None
 ) -> None:
     """Test saving data that cannot be serialized does not crash."""
     hass.bus.async_fire("bad_event", {"fail": CannotSerializeMe()})
@@ -1501,7 +1501,7 @@ async def test_saving_state_with_serializable_data(
     assert "State is not JSON serializable" in caplog.text
 
 
-async def test_has_services(hass: HomeAssistant, setup_recorder: None) -> None:
+async def test_has_services(hass: SmartHub, setup_recorder: None) -> None:
     """Test the services exist."""
     assert hass.services.has_service(DOMAIN, SERVICE_DISABLE)
     assert hass.services.has_service(DOMAIN, SERVICE_ENABLE)
@@ -1510,7 +1510,7 @@ async def test_has_services(hass: HomeAssistant, setup_recorder: None) -> None:
 
 
 async def test_service_disable_events_not_recording(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
 ) -> None:
     """Test that events are not recorded when recorder is disabled using service."""
@@ -1593,7 +1593,7 @@ async def test_service_disable_events_not_recording(
 
 
 async def test_service_disable_states_not_recording(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
 ) -> None:
     """Test that state changes are not recorded when recorder is disabled using service."""
@@ -1638,7 +1638,7 @@ async def test_service_disable_run_information_recorded(
 ) -> None:
     """Test that runs are still recorded when recorder is disabled."""
 
-    def get_recorder_runs(hass: HomeAssistant) -> list:
+    def get_recorder_runs(hass: SmartHub) -> list:
         with session_scope(hass=hass, read_only=True) as session:
             return list(session.query(RecorderRuns))
 
@@ -1690,7 +1690,7 @@ class CannotSerializeMe:
 @pytest.mark.parametrize("persistent_database", [True])
 @pytest.mark.parametrize("recorder_config", [{CONF_COMMIT_INTERVAL: 0}])
 async def test_database_corruption_while_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     recorder_db_url: str,
     caplog: pytest.LogCaptureFixture,
@@ -1760,7 +1760,7 @@ async def test_database_corruption_while_running(
 
 
 async def test_entity_id_filter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test that entity ID filtering filters string and list."""
@@ -1814,7 +1814,7 @@ async def test_entity_id_filter(
 @pytest.mark.usefixtures("skip_by_db_engine")
 @pytest.mark.parametrize("persistent_database", [True])
 async def test_database_lock_and_unlock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test writing events during lock getting written after unlocking.
@@ -1866,7 +1866,7 @@ async def test_database_lock_and_unlock(
 @pytest.mark.usefixtures("skip_by_db_engine")
 @pytest.mark.parametrize("persistent_database", [True])
 async def test_database_lock_and_overflow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     caplog: pytest.LogCaptureFixture,
     issue_registry: ir.IssueRegistry,
@@ -1931,7 +1931,7 @@ async def test_database_lock_and_overflow(
 @pytest.mark.usefixtures("skip_by_db_engine")
 @pytest.mark.parametrize("persistent_database", [True])
 async def test_database_lock_and_overflow_checks_available_memory(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     caplog: pytest.LogCaptureFixture,
     issue_registry: ir.IssueRegistry,
@@ -1955,7 +1955,7 @@ async def test_database_lock_and_overflow_checks_available_memory(
             )
 
     with patch(
-        "homeassistant.components.recorder.core.QUEUE_CHECK_INTERVAL",
+        "smarthub.components.recorder.core.QUEUE_CHECK_INTERVAL",
         timedelta(seconds=1),
     ):
         await async_setup_recorder_instance(hass, config)
@@ -2036,7 +2036,7 @@ async def test_database_lock_and_overflow_checks_available_memory(
 @pytest.mark.skip_on_db_engine(["mysql", "postgresql"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_database_lock_timeout(
-    hass: HomeAssistant, setup_recorder: None, recorder_db_url: str
+    hass: SmartHub, setup_recorder: None, recorder_db_url: str
 ) -> None:
     """Test locking database timeout when recorder stopped.
 
@@ -2065,7 +2065,7 @@ async def test_database_lock_timeout(
 
 
 async def test_database_lock_without_instance(
-    hass: HomeAssistant, setup_recorder: None
+    hass: SmartHub, setup_recorder: None
 ) -> None:
     """Test database lock doesn't fail if instance is not initialized."""
     hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
@@ -2079,7 +2079,7 @@ async def test_database_lock_without_instance(
 
 
 async def test_in_memory_database(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test connecting to an in-memory recorder is not allowed."""
     assert not await async_setup_component(
@@ -2090,7 +2090,7 @@ async def test_in_memory_database(
 
 @pytest.mark.parametrize("db_engine", ["mysql"])
 async def test_database_connection_keep_alive(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_dialect_name: None,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     caplog: pytest.LogCaptureFixture,
@@ -2112,7 +2112,7 @@ async def test_database_connection_keep_alive(
 @pytest.mark.skip_on_db_engine(["mysql", "postgresql"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_database_connection_keep_alive_disabled_on_sqlite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     caplog: pytest.LogCaptureFixture,
     recorder_db_url: str,
@@ -2134,7 +2134,7 @@ async def test_database_connection_keep_alive_disabled_on_sqlite(
 
 
 async def test_deduplication_event_data_inside_commit_interval(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, setup_recorder: None
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, setup_recorder: None
 ) -> None:
     """Test deduplication of event data inside the commit interval."""
     for _ in range(10):
@@ -2158,7 +2158,7 @@ async def test_deduplication_event_data_inside_commit_interval(
 
 async def test_deduplication_state_attributes_inside_commit_interval(
     small_cache_size: None,
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     setup_recorder: None,
 ) -> None:
@@ -2191,7 +2191,7 @@ async def test_deduplication_state_attributes_inside_commit_interval(
 
 
 async def test_async_block_till_done(
-    hass: HomeAssistant, async_setup_recorder_instance: RecorderInstanceGenerator
+    hass: SmartHub, async_setup_recorder_instance: RecorderInstanceGenerator
 ) -> None:
     """Test we can block until recordering is done."""
     instance = await async_setup_recorder_instance(hass)
@@ -2226,7 +2226,7 @@ async def test_async_block_till_done(
     ],
 )
 async def test_disable_echo(
-    hass: HomeAssistant, db_url, echo, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, db_url, echo, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test echo is disabled for non sqlite databases."""
     recorder_helper.async_initialize_recorder(hass)
@@ -2238,9 +2238,9 @@ async def test_disable_echo(
     mock_event = MockEvent()
     with (
         patch(
-            "homeassistant.components.recorder.core.create_engine"
+            "smarthub.components.recorder.core.create_engine"
         ) as create_engine_mock,
-        patch("homeassistant.components.recorder.core.sqlalchemy_event", mock_event),
+        patch("smarthub.components.recorder.core.sqlalchemy_event", mock_event),
     ):
         await async_setup_component(hass, DOMAIN, {DOMAIN: {CONF_DB_URL: db_url}})
         create_engine_mock.assert_called_once()
@@ -2285,7 +2285,7 @@ async def test_disable_echo(
     ],
 )
 async def test_mysql_missing_utf8mb4(
-    hass: HomeAssistant, config_url, expected_connect_args
+    hass: SmartHub, config_url, expected_connect_args
 ) -> None:
     """Test recorder fails to setup if charset=utf8mb4 is missing from db_url."""
     recorder_helper.async_initialize_recorder(hass)
@@ -2297,9 +2297,9 @@ async def test_mysql_missing_utf8mb4(
     mock_event = MockEvent()
     with (
         patch(
-            "homeassistant.components.recorder.core.create_engine"
+            "smarthub.components.recorder.core.create_engine"
         ) as create_engine_mock,
-        patch("homeassistant.components.recorder.core.sqlalchemy_event", mock_event),
+        patch("smarthub.components.recorder.core.sqlalchemy_event", mock_event),
     ):
         await async_setup_component(hass, DOMAIN, {DOMAIN: {CONF_DB_URL: config_url}})
         create_engine_mock.assert_called_once()
@@ -2317,7 +2317,7 @@ async def test_mysql_missing_utf8mb4(
         "mysql://user:password@SERVER_IP/DB_NAME?blah=bleh&charset=other",
     ],
 )
-async def test_connect_args_priority(hass: HomeAssistant, config_url) -> None:
+async def test_connect_args_priority(hass: SmartHub, config_url) -> None:
     """Test connect_args has priority over URL query."""
     connect_params = []
     recorder_helper.async_initialize_recorder(hass)
@@ -2386,7 +2386,7 @@ async def test_connect_args_priority(hass: HomeAssistant, config_url) -> None:
 
 
 async def test_excluding_attributes_by_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     setup_recorder: None,
 ) -> None:
@@ -2439,7 +2439,7 @@ async def test_excluding_attributes_by_integration(
 
 
 async def test_excluding_all_attributes_by_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     setup_recorder: None,
 ) -> None:
@@ -2504,7 +2504,7 @@ async def test_excluding_all_attributes_by_integration(
 
 
 async def test_lru_increases_with_many_entities(
-    small_cache_size: None, hass: HomeAssistant, setup_recorder: None
+    small_cache_size: None, hass: SmartHub, setup_recorder: None
 ) -> None:
     """Test that the recorder's internal LRU cache increases with many entities."""
     mock_entity_count = 16
@@ -2520,12 +2520,12 @@ async def test_lru_increases_with_many_entities(
 
 
 async def test_clean_shutdown_when_recorder_thread_raises_during_initialize_database(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we still shutdown cleanly when the recorder thread raises during initialize_database."""
     with (
         patch.object(migration, "initialize_database", side_effect=Exception),
-        patch("homeassistant.components.recorder.ALLOW_IN_MEMORY_DB", True),
+        patch("smarthub.components.recorder.ALLOW_IN_MEMORY_DB", True),
     ):
         if recorder.DOMAIN not in hass.data:
             recorder_helper.async_initialize_recorder(hass)
@@ -2548,12 +2548,12 @@ async def test_clean_shutdown_when_recorder_thread_raises_during_initialize_data
 
 
 async def test_clean_shutdown_when_recorder_thread_raises_during_validate_db_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we still shutdown cleanly when the recorder thread raises during validate_db_schema."""
     with (
         patch.object(migration, "validate_db_schema", side_effect=Exception),
-        patch("homeassistant.components.recorder.ALLOW_IN_MEMORY_DB", True),
+        patch("smarthub.components.recorder.ALLOW_IN_MEMORY_DB", True),
     ):
         if recorder.DOMAIN not in hass.data:
             recorder_helper.async_initialize_recorder(hass)
@@ -2583,7 +2583,7 @@ async def test_clean_shutdown_when_recorder_thread_raises_during_validate_db_sch
     ],
 )
 async def test_clean_shutdown_when_schema_migration_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     func_to_patch: str,
     expected_setup_result: bool,
     caplog: pytest.LogCaptureFixture,
@@ -2591,7 +2591,7 @@ async def test_clean_shutdown_when_schema_migration_fails(
     """Test we still shutdown cleanly when schema migration fails."""
     with (
         patch.object(migration, "_get_current_schema_version", side_effect=[None, 1]),
-        patch("homeassistant.components.recorder.ALLOW_IN_MEMORY_DB", True),
+        patch("smarthub.components.recorder.ALLOW_IN_MEMORY_DB", True),
         patch.object(
             migration,
             func_to_patch,
@@ -2624,7 +2624,7 @@ async def test_clean_shutdown_when_schema_migration_fails(
 
 
 async def test_setup_fails_after_downgrade(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we fail to setup after a downgrade.
 
@@ -2636,7 +2636,7 @@ async def test_setup_fails_after_downgrade(
             "_get_current_schema_version",
             side_effect=[None, SCHEMA_VERSION + 1],
         ),
-        patch("homeassistant.components.recorder.ALLOW_IN_MEMORY_DB", True),
+        patch("smarthub.components.recorder.ALLOW_IN_MEMORY_DB", True),
     ):
         if recorder.DOMAIN not in hass.data:
             recorder_helper.async_initialize_recorder(hass)
@@ -2659,12 +2659,12 @@ async def test_setup_fails_after_downgrade(
     assert (
         f"The database schema version {SCHEMA_VERSION + 1} is newer "
         f"than {SCHEMA_VERSION} which is the maximum database schema "
-        "version supported by the installed version of Home Assistant Core"
+        "version supported by the installed version of SmartHub Core"
     ) in caplog.text
 
 
 async def test_events_are_recorded_until_final_write(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
     """Test that events are recorded until the final write."""
@@ -2710,7 +2710,7 @@ async def test_events_are_recorded_until_final_write(
 
 
 async def test_commit_before_commits_pending_writes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     recorder_db_url: str,
 ) -> None:
@@ -2778,14 +2778,14 @@ async def test_commit_before_commits_pending_writes(
     await verify_session_commit_future
 
 
-async def test_all_tables_use_default_table_args(hass: HomeAssistant) -> None:
+async def test_all_tables_use_default_table_args(hass: SmartHub) -> None:
     """Test that all tables use the default table args."""
     for table in db_schema.Base.metadata.tables.values():
         assert table.kwargs.items() >= db_schema._DEFAULT_TABLE_ARGS.items()
 
 
 async def test_empty_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2802,12 +2802,12 @@ async def test_empty_entity_id(
 
 
 async def test_setting_up_recorder_fails_entity_registry_listener(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test recorder setup fails if an entity registry listener is in place."""
     async_track_entity_registry_updated_event(hass, "test.test", lambda x: x)
     recorder_helper.async_initialize_recorder(hass)
-    with patch("homeassistant.components.recorder.ALLOW_IN_MEMORY_DB", True):
+    with patch("smarthub.components.recorder.ALLOW_IN_MEMORY_DB", True):
         assert not await async_setup_component(
             hass,
             recorder.DOMAIN,

@@ -9,13 +9,13 @@ import pypck.module
 from pypck.module import GroupConnection, ModuleConnection
 import pytest
 
-from homeassistant.components.lcn import PchkConnectionManager
-from homeassistant.components.lcn.config_flow import LcnFlowHandler
-from homeassistant.components.lcn.const import DOMAIN
-from homeassistant.components.lcn.helpers import AddressType, generate_unique_id
-from homeassistant.const import CONF_ADDRESS, CONF_DEVICES, CONF_ENTITIES, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.lcn import PchkConnectionManager
+from smarthub.components.lcn.config_flow import LcnFlowHandler
+from smarthub.components.lcn.const import DOMAIN
+from smarthub.components.lcn.helpers import AddressType, generate_unique_id
+from smarthub.const import CONF_ADDRESS, CONF_DEVICES, CONF_ENTITIES, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -111,9 +111,9 @@ def create_config_entry_myhome() -> MockConfigEntry:
 
 
 async def init_integration(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> MockPchkConnectionManager:
-    """Set up the LCN integration in Home Assistant."""
+    """Set up the LCN integration in SmartHub."""
     hass.http = Mock()  # needs to be mocked as hass.http.register_static_path is called when registering the frontend
     lcn_connection = None
 
@@ -124,7 +124,7 @@ async def init_integration(
 
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.lcn.PchkConnectionManager",
+        "smarthub.components.lcn.PchkConnectionManager",
         side_effect=lcn_connection_factory,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -134,7 +134,7 @@ async def init_integration(
 
 
 def get_device(
-    hass: HomeAssistant, entry: MockConfigEntry, address: AddressType
+    hass: SmartHub, entry: MockConfigEntry, address: AddressType
 ) -> dr.DeviceEntry:
     """Get LCN device for specified address."""
     device_registry = dr.async_get(hass)

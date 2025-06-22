@@ -2,23 +2,23 @@
 
 import pytest
 
-from homeassistant.components.abode import ATTR_DEVICE_ID
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.abode import ATTR_DEVICE_ID
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_platform
 
 
 async def test_entity_registry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests that the devices are registered in the entity registry."""
     await setup_platform(hass, SENSOR_DOMAIN)
@@ -27,7 +27,7 @@ async def test_entity_registry(
     assert entry.unique_id == "13545b21f4bdcd33d9abd461f8443e65-humidity"
 
 
-async def test_attributes(hass: HomeAssistant) -> None:
+async def test_attributes(hass: SmartHub) -> None:
     """Test the sensor attributes are correct."""
     await setup_platform(hass, SENSOR_DOMAIN)
 
@@ -46,6 +46,6 @@ async def test_attributes(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == "lx"
 
     state = hass.states.get("sensor.environment_sensor_temperature")
-    # Abodepy device JSON reports 19.5, but Home Assistant shows 19.4
+    # Abodepy device JSON reports 19.5, but SmartHub shows 19.4
     assert float(state.state) == pytest.approx(19.44444)
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfTemperature.CELSIUS

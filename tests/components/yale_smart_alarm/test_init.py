@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from unittest.mock import Mock, patch
 
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN
-from homeassistant.components.yale_smart_alarm.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN
+from smarthub.components.yale_smart_alarm.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ENTRY_CONFIG, OPTIONS_CONFIG
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_client: Mock,
 ) -> None:
     """Test setup entry."""
@@ -34,7 +34,7 @@ async def test_setup_entry(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
+        "smarthub.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
         return_value=get_client,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -47,7 +47,7 @@ async def test_setup_entry(
 
 
 async def test_migrate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_client: Mock,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -81,7 +81,7 @@ async def test_migrate_entry(
     )
 
     with patch(
-        "homeassistant.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
+        "smarthub.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
         return_value=get_client,
     ):
         await hass.config_entries.async_setup(entry.entry_id)

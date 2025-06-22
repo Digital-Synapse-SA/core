@@ -12,20 +12,20 @@ from aioesphomeapi import (
 )
 import pytest
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_UNIT_OF_MEASUREMENT, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.const import ATTR_ENTITY_ID, ATTR_UNIT_OF_MEASUREMENT, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import MockGenericDeviceEntryType
 
 
 async def test_generic_number_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_generic_number_entity(
 
 
 async def test_generic_number_nan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -97,7 +97,7 @@ async def test_generic_number_nan(
 
 
 async def test_generic_number_with_unit_of_measurement_as_empty_string(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -130,7 +130,7 @@ async def test_generic_number_with_unit_of_measurement_as_empty_string(
 
 
 async def test_generic_number_entity_set_when_disconnected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -158,7 +158,7 @@ async def test_generic_number_entity_set_when_disconnected(
 
     mock_client.number_command = Mock(side_effect=APIConnectionError("Not connected"))
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,

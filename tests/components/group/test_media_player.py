@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.group import DOMAIN
-from homeassistant.components.media_player import (
+from smarthub.components.group import DOMAIN
+from smarthub.components.media_player import (
     ATTR_MEDIA_ANNOUNCE,
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
@@ -27,7 +27,7 @@ from homeassistant.components.media_player import (
     SERVICE_VOLUME_SET,
     MediaPlayerEntityFeature,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     SERVICE_MEDIA_NEXT_TRACK,
@@ -46,23 +46,23 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_platform, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_platform, entity_registry as er
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(name="mock_media_seek")
 def media_player_media_seek_fixture():
     """Mock demo YouTube player media seek."""
     with patch(
-        "homeassistant.components.demo.media_player.DemoYoutubePlayer.media_seek",
+        "smarthub.components.demo.media_player.DemoYoutubePlayer.media_seek",
         autospec=True,
     ) as seek:
         yield seek
 
 
 async def test_default_state(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test media group default state."""
     hass.states.async_set("media_player.player_1", "on")
@@ -96,7 +96,7 @@ async def test_default_state(
     assert entry.unique_id == "unique_identifier"
 
 
-async def test_state_reporting(hass: HomeAssistant) -> None:
+async def test_state_reporting(hass: SmartHub) -> None:
     """Test the state reporting.
 
     The group state is unavailable if all group members are unavailable.
@@ -188,7 +188,7 @@ async def test_state_reporting(hass: HomeAssistant) -> None:
     assert hass.states.get("media_player.media_group").state == STATE_UNAVAILABLE
 
 
-async def test_supported_features(hass: HomeAssistant) -> None:
+async def test_supported_features(hass: SmartHub) -> None:
     """Test supported features reporting."""
     pause_play_stop = (
         MediaPlayerEntityFeature.PAUSE
@@ -256,7 +256,7 @@ async def test_supported_features(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_SUPPORTED_FEATURES] == pause_play_stop | play_media
 
 
-async def test_service_calls(hass: HomeAssistant, mock_media_seek: Mock) -> None:
+async def test_service_calls(hass: SmartHub, mock_media_seek: Mock) -> None:
     """Test service calls."""
     await async_setup_component(
         hass,
@@ -548,7 +548,7 @@ async def test_service_calls(hass: HomeAssistant, mock_media_seek: Mock) -> None
     assert hass.states.get("media_player.living_room").state == STATE_OFF
 
 
-async def test_nested_group(hass: HomeAssistant) -> None:
+async def test_nested_group(hass: SmartHub) -> None:
     """Test nested media group."""
     await async_setup_component(
         hass,
@@ -602,7 +602,7 @@ async def test_nested_group(hass: HomeAssistant) -> None:
     assert hass.states.get("media_player.nested_group").state == STATE_OFF
 
 
-async def test_service_play_media_kwargs(hass: HomeAssistant) -> None:
+async def test_service_play_media_kwargs(hass: SmartHub) -> None:
     """Test that kwargs get passed through on play_media service call."""
     await async_setup_component(
         hass,

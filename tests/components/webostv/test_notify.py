@@ -5,17 +5,17 @@ from unittest.mock import call
 from aiowebostv import WebOsTvCommandError
 import pytest
 
-from homeassistant.components.notify import (
+from smarthub.components.notify import (
     ATTR_DATA,
     ATTR_MESSAGE,
     DOMAIN as NOTIFY_DOMAIN,
 )
-from homeassistant.components.webostv import DOMAIN
-from homeassistant.const import ATTR_ICON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
-from homeassistant.util import slugify
+from smarthub.components.webostv import DOMAIN
+from smarthub.const import ATTR_ICON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
+from smarthub.util import slugify
 
 from . import setup_webostv
 from .const import TV_NAME
@@ -25,7 +25,7 @@ MESSAGE = "one, two, testing, testing"
 SERVICE_NAME = slugify(TV_NAME)
 
 
-async def test_notify(hass: HomeAssistant, client) -> None:
+async def test_notify(hass: SmartHub, client) -> None:
     """Test sending a message."""
     await setup_webostv(hass)
     assert hass.services.has_service(NOTIFY_DOMAIN, SERVICE_NAME)
@@ -96,7 +96,7 @@ async def test_notify(hass: HomeAssistant, client) -> None:
     ],
 )
 async def test_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     is_on: bool,
     exception: Exception,
@@ -109,7 +109,7 @@ async def test_errors(
     assert hass.services.has_service("notify", SERVICE_NAME)
 
     client.send_message.side_effect = exception
-    with pytest.raises(HomeAssistantError, match=error_message):
+    with pytest.raises(SmartHubError, match=error_message):
         await hass.services.async_call(
             NOTIFY_DOMAIN,
             SERVICE_NAME,
@@ -126,7 +126,7 @@ async def test_errors(
 
 
 async def test_no_discovery_info(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup without discovery info."""
     assert NOTIFY_DOMAIN not in hass.config.components

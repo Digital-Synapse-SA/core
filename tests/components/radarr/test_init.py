@@ -2,10 +2,10 @@
 
 import pytest
 
-from homeassistant.components.radarr.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.radarr.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import create_entry, mock_connection_invalid_auth, setup_integration
 
@@ -13,7 +13,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.mark.freeze_time("2021-12-03 00:00:00+00:00")
-async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_setup(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Test unload."""
     entry = await setup_integration(hass, aioclient_mock)
     assert entry.state is ConfigEntryState.LOADED
@@ -26,7 +26,7 @@ async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -
 
 
 async def test_async_setup_entry_not_ready(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     entry = await setup_integration(hass, aioclient_mock, connection_error=True)
@@ -36,7 +36,7 @@ async def test_async_setup_entry_not_ready(
 
 
 async def test_async_setup_entry_auth_failed(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that it throws ConfigEntryAuthFailed when authentication fails."""
     entry = create_entry(hass)
@@ -49,7 +49,7 @@ async def test_async_setup_entry_auth_failed(
 
 @pytest.mark.freeze_time("2021-12-03 00:00:00+00:00")
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:

@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.picnic import CONF_COUNTRY_CODE, DOMAIN
-from homeassistant.const import CONF_ACCESS_TOKEN
-from homeassistant.core import HomeAssistant
+from smarthub.components.picnic import CONF_COUNTRY_CODE, DOMAIN
+from smarthub.const import CONF_ACCESS_TOKEN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 from tests.typing import WebSocketGenerator
@@ -32,7 +32,7 @@ def mock_config_entry() -> MockConfigEntry:
 @pytest.fixture
 def mock_picnic_api():
     """Return a mocked PicnicAPI client."""
-    with patch("homeassistant.components.picnic.PicnicAPI") as mock:
+    with patch("smarthub.components.picnic.PicnicAPI") as mock:
         client = mock.return_value
         client.session.auth_token = "3q29fpwhulzes"
         client.get_cart.return_value = json.loads(load_fixture("picnic/cart.json"))
@@ -46,7 +46,7 @@ def mock_picnic_api():
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_picnic_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_picnic_api: MagicMock
 ) -> MockConfigEntry:
     """Set up the Picnic integration for testing."""
     mock_config_entry.add_to_hass(hass)

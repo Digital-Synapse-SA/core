@@ -2,9 +2,9 @@
 
 from pyatag import AtagException
 
-from homeassistant.components.atag import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.atag import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -91,12 +91,12 @@ def mock_connection(
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     skip_setup: bool = False,
     unique_id: str = UID,
 ) -> MockConfigEntry:
-    """Set up the Atag integration in Home Assistant."""
+    """Set up the Atag integration in SmartHub."""
     mock_connection(aioclient_mock)
     entry = MockConfigEntry(domain=DOMAIN, data=USER_INPUT, unique_id=unique_id)
     entry.add_to_hass(hass)

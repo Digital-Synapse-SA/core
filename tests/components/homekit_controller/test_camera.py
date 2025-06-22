@@ -7,9 +7,9 @@ from aiohomekit.model import Accessory
 from aiohomekit.model.services import ServicesTypes
 from aiohomekit.testing import FAKE_CAMERA_IMAGE
 
-from homeassistant.components import camera
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components import camera
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_test_component
 
@@ -20,7 +20,7 @@ def create_camera(accessory: Accessory) -> None:
 
 
 async def test_migrate_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:
@@ -38,7 +38,7 @@ async def test_migrate_unique_ids(
     )
 
 
-async def test_read_state(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_read_state(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test reading the state of a HomeKit camera."""
     helper = await setup_test_component(hass, get_next_aid(), create_camera)
 
@@ -46,7 +46,7 @@ async def test_read_state(hass: HomeAssistant, get_next_aid: Callable[[], int]) 
     assert state.state == "idle"
 
 
-async def test_get_image(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_get_image(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test getting a JPEG from a camera."""
     helper = await setup_test_component(hass, get_next_aid(), create_camera)
     image = await camera.async_get_image(hass, helper.entity_id)

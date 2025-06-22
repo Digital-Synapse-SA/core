@@ -1,14 +1,14 @@
 """Test KNX fan."""
 
-from homeassistant.components.knx.const import KNX_ADDRESS
-from homeassistant.components.knx.schema import FanSchema
-from homeassistant.const import CONF_NAME, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.components.knx.const import KNX_ADDRESS
+from smarthub.components.knx.schema import FanSchema
+from smarthub.const import CONF_NAME, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from .conftest import KNXTestKit
 
 
-async def test_fan_percent(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_fan_percent(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX fan with percentage speed."""
     await knx.setup_integration(
         {
@@ -52,7 +52,7 @@ async def test_fan_percent(hass: HomeAssistant, knx: KNXTestKit) -> None:
     await knx.assert_telegram_count(0)
 
 
-async def test_fan_step(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_fan_step(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX fan with speed steps."""
     await knx.setup_integration(
         {
@@ -104,7 +104,7 @@ async def test_fan_step(hass: HomeAssistant, knx: KNXTestKit) -> None:
     await knx.assert_telegram_count(0)
 
 
-async def test_fan_oscillation(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_fan_oscillation(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX fan oscillation."""
     await knx.setup_integration(
         {

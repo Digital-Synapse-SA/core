@@ -7,18 +7,18 @@ from pyloadapi import CannotConnect, InvalidAuth
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.pyload.switch import PyLoadSwitch
-from homeassistant.components.switch import (
+from smarthub.components.pyload.switch import PyLoadSwitch
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TOGGLE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -41,14 +41,14 @@ API_CALL = {
 def switch_only() -> Generator[None]:
     """Enable only the switch platform."""
     with patch(
-        "homeassistant.components.pyload.PLATFORMS",
+        "smarthub.components.pyload.PLATFORMS",
         [Platform.SWITCH],
     ):
         yield
 
 
 async def test_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -74,7 +74,7 @@ async def test_state(
     ],
 )
 async def test_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
     service_call: str,
@@ -119,7 +119,7 @@ async def test_turn_on_off(
     [CannotConnect, InvalidAuth],
 )
 async def test_turn_on_off_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
     service_call: str,

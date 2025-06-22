@@ -3,17 +3,17 @@
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.qnap_qsw.const import ATTR_MAX, DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.qnap_qsw.const import ATTR_MAX, DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .util import async_init_integration, init_config_entry
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_qnap_qsw_create_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test creation of sensors."""
@@ -382,7 +382,7 @@ async def test_qnap_qsw_create_sensors(
 
 
 async def test_cleanup_deprecated_uptime_seconds(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test cleanup of the Uptime seconds sensor entity."""

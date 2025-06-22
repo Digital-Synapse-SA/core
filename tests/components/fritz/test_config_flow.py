@@ -11,11 +11,11 @@ from fritzconnection.core.exceptions import (
 )
 import pytest
 
-from homeassistant.components.device_tracker import (
+from smarthub.components.device_tracker import (
     CONF_CONSIDER_HOME,
     DEFAULT_CONSIDER_HOME,
 )
-from homeassistant.components.fritz.const import (
+from smarthub.components.fritz.const import (
     CONF_FEATURE_DEVICE_TRACKING,
     CONF_OLD_DISCOVERY,
     DOMAIN,
@@ -25,17 +25,17 @@ from homeassistant.components.fritz.const import (
     ERROR_UPNP_NOT_CONFIGURED,
     FRITZ_AUTH_EXCEPTIONS,
 )
-from homeassistant.config_entries import SOURCE_SSDP, SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_SSDP, SOURCE_USER
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_SSL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_UDN,
     SsdpServiceInfo,
@@ -95,7 +95,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
     show_advanced_options: bool,
     user_input: dict,
@@ -104,14 +104,14 @@ async def test_user(
     """Test starting a flow by user."""
     with (
         patch(
-            "homeassistant.components.fritz.config_flow.FritzConnection",
+            "smarthub.components.fritz.config_flow.FritzConnection",
             side_effect=fc_class_mock,
         ),
         patch(
-            "homeassistant.components.fritz.coordinator.FritzBoxTools._update_device_info",
+            "smarthub.components.fritz.coordinator.FritzBoxTools._update_device_info",
             return_value=MOCK_FIRMWARE_INFO,
         ),
-        patch("homeassistant.components.fritz.async_setup_entry") as mock_setup_entry,
+        patch("smarthub.components.fritz.async_setup_entry") as mock_setup_entry,
         patch(
             "requests.get",
         ) as mock_request_get,
@@ -119,7 +119,7 @@ async def test_user(
             "requests.post",
         ) as mock_request_post,
         patch(
-            "homeassistant.components.fritz.config_flow.socket.gethostbyname",
+            "smarthub.components.fritz.config_flow.socket.gethostbyname",
             return_value=MOCK_IPS["fritz.box"],
         ),
     ):
@@ -157,7 +157,7 @@ async def test_user(
     [(True, MOCK_USER_INPUT_ADVANCED), (False, MOCK_USER_INPUT_SIMPLE)],
 )
 async def test_user_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
     show_advanced_options: bool,
     user_input,
@@ -169,11 +169,11 @@ async def test_user_already_configured(
 
     with (
         patch(
-            "homeassistant.components.fritz.config_flow.FritzConnection",
+            "smarthub.components.fritz.config_flow.FritzConnection",
             side_effect=fc_class_mock,
         ),
         patch(
-            "homeassistant.components.fritz.coordinator.FritzBoxTools._update_device_info",
+            "smarthub.components.fritz.coordinator.FritzBoxTools._update_device_info",
             return_value=MOCK_FIRMWARE_INFO,
         ),
         patch(
@@ -183,7 +183,7 @@ async def test_user_already_configured(
             "requests.post",
         ) as mock_request_post,
         patch(
-            "homeassistant.components.fritz.config_flow.socket.gethostbyname",
+            "smarthub.components.fritz.config_flow.socket.gethostbyname",
             return_value=MOCK_IPS["fritz.box"],
         ),
     ):
@@ -219,7 +219,7 @@ async def test_user_already_configured(
     [(True, MOCK_USER_INPUT_ADVANCED), (False, MOCK_USER_INPUT_SIMPLE)],
 )
 async def test_exception_security(
-    hass: HomeAssistant,
+    hass: SmartHub,
     error,
     show_advanced_options: bool,
     user_input,
@@ -234,7 +234,7 @@ async def test_exception_security(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.fritz.config_flow.FritzConnection",
+        "smarthub.components.fritz.config_flow.FritzConnection",
         side_effect=error,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -251,7 +251,7 @@ async def test_exception_security(
     [(True, MOCK_USER_INPUT_ADVANCED), (False, MOCK_USER_INPUT_SIMPLE)],
 )
 async def test_exception_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     show_advanced_options: bool,
     user_input,
 ) -> None:
@@ -265,7 +265,7 @@ async def test_exception_connection(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.fritz.config_flow.FritzConnection",
+        "smarthub.components.fritz.config_flow.FritzConnection",
         side_effect=FritzConnectionException,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -282,7 +282,7 @@ async def test_exception_connection(
     [(True, MOCK_USER_INPUT_ADVANCED), (False, MOCK_USER_INPUT_SIMPLE)],
 )
 async def test_exception_unknown(
-    hass: HomeAssistant, show_advanced_options: bool, user_input
+    hass: SmartHub, show_advanced_options: bool, user_input
 ) -> None:
     """Test starting a flow by user with an unknown exception."""
 
@@ -294,7 +294,7 @@ async def test_exception_unknown(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.fritz.config_flow.FritzConnection",
+        "smarthub.components.fritz.config_flow.FritzConnection",
         side_effect=OSError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -307,7 +307,7 @@ async def test_exception_unknown(
 
 
 async def test_reauth_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
 ) -> None:
     """Test starting a reauthentication flow."""
@@ -320,15 +320,15 @@ async def test_reauth_successful(
 
     with (
         patch(
-            "homeassistant.components.fritz.config_flow.FritzConnection",
+            "smarthub.components.fritz.config_flow.FritzConnection",
             side_effect=fc_class_mock,
         ),
         patch(
-            "homeassistant.components.fritz.coordinator.FritzBoxTools._update_device_info",
+            "smarthub.components.fritz.coordinator.FritzBoxTools._update_device_info",
             return_value=MOCK_FIRMWARE_INFO,
         ),
         patch(
-            "homeassistant.components.fritz.async_setup_entry",
+            "smarthub.components.fritz.async_setup_entry",
         ) as mock_setup_entry,
         patch(
             "requests.get",
@@ -365,7 +365,7 @@ async def test_reauth_successful(
     ],
 )
 async def test_reauth_not_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
     side_effect,
     error,
@@ -379,7 +379,7 @@ async def test_reauth_not_successful(
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.fritz.config_flow.FritzConnection",
+        "smarthub.components.fritz.config_flow.FritzConnection",
         side_effect=side_effect,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -426,7 +426,7 @@ async def test_reauth_not_successful(
     ],
 )
 async def test_reconfigure_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
     show_advanced_options: bool,
     user_input: dict,
@@ -439,15 +439,15 @@ async def test_reconfigure_successful(
 
     with (
         patch(
-            "homeassistant.components.fritz.config_flow.FritzConnection",
+            "smarthub.components.fritz.config_flow.FritzConnection",
             side_effect=fc_class_mock,
         ),
         patch(
-            "homeassistant.components.fritz.coordinator.FritzBoxTools._update_device_info",
+            "smarthub.components.fritz.coordinator.FritzBoxTools._update_device_info",
             return_value=MOCK_FIRMWARE_INFO,
         ),
         patch(
-            "homeassistant.components.fritz.async_setup_entry",
+            "smarthub.components.fritz.async_setup_entry",
         ) as mock_setup_entry,
         patch(
             "requests.get",
@@ -486,7 +486,7 @@ async def test_reconfigure_successful(
 
 
 async def test_reconfigure_not_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
 ) -> None:
     """Test starting a reconfigure flow but no connection found."""
@@ -496,15 +496,15 @@ async def test_reconfigure_not_successful(
 
     with (
         patch(
-            "homeassistant.components.fritz.config_flow.FritzConnection",
+            "smarthub.components.fritz.config_flow.FritzConnection",
             side_effect=[FritzConnectionException, fc_class_mock],
         ),
         patch(
-            "homeassistant.components.fritz.coordinator.FritzBoxTools._update_device_info",
+            "smarthub.components.fritz.coordinator.FritzBoxTools._update_device_info",
             return_value=MOCK_FIRMWARE_INFO,
         ),
         patch(
-            "homeassistant.components.fritz.async_setup_entry",
+            "smarthub.components.fritz.async_setup_entry",
         ),
         patch(
             "requests.get",
@@ -554,7 +554,7 @@ async def test_reconfigure_not_successful(
         }
 
 
-async def test_ssdp_already_configured(hass: HomeAssistant, fc_class_mock) -> None:
+async def test_ssdp_already_configured(hass: SmartHub, fc_class_mock) -> None:
     """Test starting a flow from discovery with an already configured device."""
 
     mock_config = MockConfigEntry(
@@ -566,11 +566,11 @@ async def test_ssdp_already_configured(hass: HomeAssistant, fc_class_mock) -> No
 
     with (
         patch(
-            "homeassistant.components.fritz.config_flow.FritzConnection",
+            "smarthub.components.fritz.config_flow.FritzConnection",
             side_effect=fc_class_mock,
         ),
         patch(
-            "homeassistant.components.fritz.config_flow.socket.gethostbyname",
+            "smarthub.components.fritz.config_flow.socket.gethostbyname",
             return_value=MOCK_IPS["fritz.box"],
         ),
     ):
@@ -581,7 +581,7 @@ async def test_ssdp_already_configured(hass: HomeAssistant, fc_class_mock) -> No
         assert result["reason"] == "already_configured"
 
 
-async def test_ssdp_already_configured_host(hass: HomeAssistant, fc_class_mock) -> None:
+async def test_ssdp_already_configured_host(hass: SmartHub, fc_class_mock) -> None:
     """Test starting a flow from discovery with an already configured host."""
 
     mock_config = MockConfigEntry(
@@ -593,11 +593,11 @@ async def test_ssdp_already_configured_host(hass: HomeAssistant, fc_class_mock) 
 
     with (
         patch(
-            "homeassistant.components.fritz.config_flow.FritzConnection",
+            "smarthub.components.fritz.config_flow.FritzConnection",
             side_effect=fc_class_mock,
         ),
         patch(
-            "homeassistant.components.fritz.config_flow.socket.gethostbyname",
+            "smarthub.components.fritz.config_flow.socket.gethostbyname",
             return_value=MOCK_IPS["fritz.box"],
         ),
     ):
@@ -609,7 +609,7 @@ async def test_ssdp_already_configured_host(hass: HomeAssistant, fc_class_mock) 
 
 
 async def test_ssdp_already_configured_host_uuid(
-    hass: HomeAssistant, fc_class_mock
+    hass: SmartHub, fc_class_mock
 ) -> None:
     """Test starting a flow from discovery with an already configured uuid."""
 
@@ -622,11 +622,11 @@ async def test_ssdp_already_configured_host_uuid(
 
     with (
         patch(
-            "homeassistant.components.fritz.config_flow.FritzConnection",
+            "smarthub.components.fritz.config_flow.FritzConnection",
             side_effect=fc_class_mock,
         ),
         patch(
-            "homeassistant.components.fritz.config_flow.socket.gethostbyname",
+            "smarthub.components.fritz.config_flow.socket.gethostbyname",
             return_value=MOCK_IPS["fritz.box"],
         ),
     ):
@@ -638,11 +638,11 @@ async def test_ssdp_already_configured_host_uuid(
 
 
 async def test_ssdp_already_in_progress_host(
-    hass: HomeAssistant, fc_class_mock
+    hass: SmartHub, fc_class_mock
 ) -> None:
     """Test starting a flow from discovery twice."""
     with patch(
-        "homeassistant.components.fritz.config_flow.FritzConnection",
+        "smarthub.components.fritz.config_flow.FritzConnection",
         side_effect=fc_class_mock,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -661,18 +661,18 @@ async def test_ssdp_already_in_progress_host(
         assert result["reason"] == "already_in_progress"
 
 
-async def test_ssdp(hass: HomeAssistant, fc_class_mock) -> None:
+async def test_ssdp(hass: SmartHub, fc_class_mock) -> None:
     """Test starting a flow from discovery."""
     with (
         patch(
-            "homeassistant.components.fritz.config_flow.FritzConnection",
+            "smarthub.components.fritz.config_flow.FritzConnection",
             side_effect=fc_class_mock,
         ),
         patch(
-            "homeassistant.components.fritz.coordinator.FritzBoxTools._update_device_info",
+            "smarthub.components.fritz.coordinator.FritzBoxTools._update_device_info",
             return_value=MOCK_FIRMWARE_INFO,
         ),
-        patch("homeassistant.components.fritz.async_setup_entry") as mock_setup_entry,
+        patch("smarthub.components.fritz.async_setup_entry") as mock_setup_entry,
         patch("requests.get") as mock_request_get,
         patch("requests.post") as mock_request_post,
     ):
@@ -703,10 +703,10 @@ async def test_ssdp(hass: HomeAssistant, fc_class_mock) -> None:
     assert mock_setup_entry.called
 
 
-async def test_ssdp_exception(hass: HomeAssistant) -> None:
+async def test_ssdp_exception(hass: SmartHub) -> None:
     """Test starting a flow from discovery but no device found."""
     with patch(
-        "homeassistant.components.fritz.config_flow.FritzConnection",
+        "smarthub.components.fritz.config_flow.FritzConnection",
         side_effect=FritzConnectionException,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -727,7 +727,7 @@ async def test_ssdp_exception(hass: HomeAssistant) -> None:
         assert result["step_id"] == "confirm"
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test options flow."""
 
     mock_config = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
@@ -749,7 +749,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_ssdp_ipv6_link_local(hass: HomeAssistant) -> None:
+async def test_ssdp_ipv6_link_local(hass: SmartHub) -> None:
     """Test ignoring ipv6-link-local while ssdp discovery."""
 
     result = await hass.config_entries.flow.async_init(
@@ -769,7 +769,7 @@ async def test_ssdp_ipv6_link_local(hass: HomeAssistant) -> None:
     assert result["reason"] == "ignore_ip6_link_local"
 
 
-async def test_upnp_not_enabled(hass: HomeAssistant) -> None:
+async def test_upnp_not_enabled(hass: SmartHub) -> None:
     """Test if UPNP service is enabled on the router."""
 
     result = await hass.config_entries.flow.async_init(
@@ -784,7 +784,7 @@ async def test_upnp_not_enabled(hass: HomeAssistant) -> None:
     services["X_AVM-DE_UPnP1"]["GetInfo"]["NewEnable"] = False
 
     with patch(
-        "homeassistant.components.fritz.config_flow.FritzConnection",
+        "smarthub.components.fritz.config_flow.FritzConnection",
         return_value=FritzConnectionMock(services),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -800,11 +800,11 @@ async def test_upnp_not_enabled(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.fritz.config_flow.FritzConnection",
+            "smarthub.components.fritz.config_flow.FritzConnection",
             return_value=FritzConnectionMock(services),
         ),
         patch(
-            "homeassistant.components.fritz.config_flow.socket.gethostbyname",
+            "smarthub.components.fritz.config_flow.socket.gethostbyname",
             return_value=MOCK_IPS["fritz.box"],
         ),
     ):

@@ -1,15 +1,15 @@
 """Test pi_hole component."""
 
-from homeassistant.components import pi_hole
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components import pi_hole
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from . import CONFIG_DATA_DEFAULTS, _create_mocked_hole, _patch_init_hole
 
 from tests.common import MockConfigEntry
 
 
-async def test_update(hass: HomeAssistant) -> None:
+async def test_update(hass: SmartHub) -> None:
     """Tests update entity."""
     mocked_hole = _create_mocked_hole()
     entry = MockConfigEntry(domain=pi_hole.DOMAIN, data=CONFIG_DATA_DEFAULTS)
@@ -50,7 +50,7 @@ async def test_update(hass: HomeAssistant) -> None:
     )
 
 
-async def test_update_no_versions(hass: HomeAssistant) -> None:
+async def test_update_no_versions(hass: SmartHub) -> None:
     """Tests update entity when no version data available."""
     mocked_hole = _create_mocked_hole(has_versions=False)
     entry = MockConfigEntry(domain=pi_hole.DOMAIN, data=CONFIG_DATA_DEFAULTS)
@@ -82,7 +82,7 @@ async def test_update_no_versions(hass: HomeAssistant) -> None:
     assert state.attributes["release_url"] is None
 
 
-async def test_update_no_updates(hass: HomeAssistant) -> None:
+async def test_update_no_updates(hass: SmartHub) -> None:
     """Tests update entity when no latest data available."""
     mocked_hole = _create_mocked_hole(has_versions=True, has_update=False)
     entry = MockConfigEntry(domain=pi_hole.DOMAIN, data=CONFIG_DATA_DEFAULTS)

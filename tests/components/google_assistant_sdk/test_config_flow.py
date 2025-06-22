@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.google_assistant_sdk.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub import config_entries
+from smarthub.components.google_assistant_sdk.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .conftest import CLIENT_ID, ComponentSetup
 
@@ -23,7 +23,7 @@ TITLE = "Google Assistant SDK"
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     setup_credentials,
@@ -63,7 +63,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.google_assistant_sdk.async_setup_entry",
+        "smarthub.components.google_assistant_sdk.async_setup_entry",
         return_value=True,
     ) as mock_setup:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
@@ -84,7 +84,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     setup_credentials,
@@ -139,7 +139,7 @@ async def test_reauth(
     )
 
     with patch(
-        "homeassistant.components.google_assistant_sdk.async_setup_entry",
+        "smarthub.components.google_assistant_sdk.async_setup_entry",
         return_value=True,
     ) as mock_setup:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
@@ -159,7 +159,7 @@ async def test_reauth(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_single_instance_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     setup_credentials,
@@ -184,7 +184,7 @@ async def test_single_instance_allowed(
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
 ) -> None:

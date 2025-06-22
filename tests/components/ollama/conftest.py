@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import ollama
-from homeassistant.const import CONF_LLM_HASS_API
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import llm
-from homeassistant.setup import async_setup_component
+from smarthub.components import ollama
+from smarthub.const import CONF_LLM_HASS_API
+from smarthub.core import SmartHub
+from smarthub.helpers import llm
+from smarthub.setup import async_setup_component
 
 from . import TEST_OPTIONS, TEST_USER_DATA
 
@@ -24,7 +24,7 @@ def mock_config_entry_options() -> dict[str, Any]:
 
 @pytest.fixture
 def mock_config_entry(
-    hass: HomeAssistant, mock_config_entry_options: dict[str, Any]
+    hass: SmartHub, mock_config_entry_options: dict[str, Any]
 ) -> MockConfigEntry:
     """Mock a config entry."""
     entry = MockConfigEntry(
@@ -38,7 +38,7 @@ def mock_config_entry(
 
 @pytest.fixture
 def mock_config_entry_with_assist(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> MockConfigEntry:
     """Mock a config entry with assist."""
     hass.config_entries.async_update_entry(
@@ -48,9 +48,9 @@ def mock_config_entry_with_assist(
 
 
 @pytest.fixture
-async def mock_init_component(hass: HomeAssistant, mock_config_entry: MockConfigEntry):
+async def mock_init_component(hass: SmartHub, mock_config_entry: MockConfigEntry):
     """Initialize integration."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     with patch(
         "ollama.AsyncClient.list",
@@ -61,6 +61,6 @@ async def mock_init_component(hass: HomeAssistant, mock_config_entry: MockConfig
 
 
 @pytest.fixture(autouse=True)
-async def setup_ha(hass: HomeAssistant) -> None:
-    """Set up Home Assistant."""
-    assert await async_setup_component(hass, "homeassistant", {})
+async def setup_ha(hass: SmartHub) -> None:
+    """Set up SmartHub."""
+    assert await async_setup_component(hass, "smarthub", {})

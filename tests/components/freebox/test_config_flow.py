@@ -9,12 +9,12 @@ from freebox_api.exceptions import (
     InvalidTokenError,
 )
 
-from homeassistant.components.freebox.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.freebox.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .const import MOCK_HOST, MOCK_PORT
 
@@ -41,7 +41,7 @@ MOCK_ZEROCONF_DATA = ZeroconfServiceInfo(
 )
 
 
-async def test_user(hass: HomeAssistant) -> None:
+async def test_user(hass: SmartHub) -> None:
     """Test user config."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -59,7 +59,7 @@ async def test_user(hass: HomeAssistant) -> None:
     assert result["step_id"] == "link"
 
 
-async def test_zeroconf(hass: HomeAssistant) -> None:
+async def test_zeroconf(hass: SmartHub) -> None:
     """Test zeroconf step."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -70,10 +70,10 @@ async def test_zeroconf(hass: HomeAssistant) -> None:
     assert result["step_id"] == "link"
 
 
-async def internal_test_link(hass: HomeAssistant) -> None:
+async def internal_test_link(hass: SmartHub) -> None:
     """Test linking internal, common to both router modes."""
     with patch(
-        "homeassistant.components.freebox.async_setup_entry",
+        "smarthub.components.freebox.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -92,18 +92,18 @@ async def internal_test_link(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_link(hass: HomeAssistant, router: Mock) -> None:
+async def test_link(hass: SmartHub, router: Mock) -> None:
     """Test link with standard router mode."""
     await internal_test_link(hass)
 
 
-async def test_link_bridge_mode(hass: HomeAssistant, router_bridge_mode: Mock) -> None:
+async def test_link_bridge_mode(hass: SmartHub, router_bridge_mode: Mock) -> None:
     """Test linking for a freebox in bridge mode."""
     await internal_test_link(hass)
 
 
 async def test_link_bridge_mode_error(
-    hass: HomeAssistant, mock_router_bridge_mode_error: Mock
+    hass: SmartHub, mock_router_bridge_mode_error: Mock
 ) -> None:
     """Test linking for a freebox in bridge mode, unknown error received from API."""
     result = await hass.config_entries.flow.async_init(
@@ -116,7 +116,7 @@ async def test_link_bridge_mode_error(
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
+async def test_abort_if_already_setup(hass: SmartHub) -> None:
     """Test we abort if component is already setup."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -134,7 +134,7 @@ async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_on_link_failed(hass: HomeAssistant) -> None:
+async def test_on_link_failed(hass: SmartHub) -> None:
     """Test when we have errors during linking the router."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -143,7 +143,7 @@ async def test_on_link_failed(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.freebox.router.Freepybox.open",
+        "smarthub.components.freebox.router.Freepybox.open",
         side_effect=AuthorizationError(),
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
@@ -151,7 +151,7 @@ async def test_on_link_failed(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "register_failed"}
 
     with patch(
-        "homeassistant.components.freebox.router.Freepybox.open",
+        "smarthub.components.freebox.router.Freepybox.open",
         side_effect=HttpRequestError(),
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
@@ -159,7 +159,7 @@ async def test_on_link_failed(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "cannot_connect"}
 
     with patch(
-        "homeassistant.components.freebox.router.Freepybox.open",
+        "smarthub.components.freebox.router.Freepybox.open",
         side_effect=InvalidTokenError(),
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"], {})

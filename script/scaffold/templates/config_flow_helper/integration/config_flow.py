@@ -7,10 +7,10 @@ from typing import Any, cast
 
 import voluptuous as vol
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import CONF_ENTITY_ID
-from homeassistant.helpers import selector
-from homeassistant.helpers.schema_config_entry_flow import (
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import CONF_ENTITY_ID
+from smarthub.helpers import selector
+from smarthub.helpers.schema_config_entry_flow import (
     SchemaConfigFlowHandler,
     SchemaFlowFormStep,
     SchemaFlowMenuStep,

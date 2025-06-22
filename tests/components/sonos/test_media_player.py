@@ -8,7 +8,7 @@ from soco.data_structures import SearchResult
 from sonos_websocket.exception import SonosWebsocketError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_INPUT_SOURCE_LIST,
     ATTR_MEDIA_ANNOUNCE,
@@ -26,20 +26,20 @@ from homeassistant.components.media_player import (
     MediaPlayerEnqueue,
     RepeatMode,
 )
-from homeassistant.components.sonos.const import (
+from smarthub.components.sonos.const import (
     DOMAIN,
     MEDIA_TYPE_DIRECTORY,
     SOURCE_LINEIN,
     SOURCE_TV,
 )
-from homeassistant.components.sonos.media_player import (
+from smarthub.components.sonos.media_player import (
     LONG_SERVICE_TIMEOUT,
     SERVICE_GET_QUEUE,
     SERVICE_RESTORE,
     SERVICE_SNAPSHOT,
     VOLUME_INCREMENT,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_MEDIA_NEXT_TRACK,
     SERVICE_MEDIA_PAUSE,
@@ -52,21 +52,21 @@ from homeassistant.const import (
     SERVICE_VOLUME_SET,
     SERVICE_VOLUME_UP,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.device_registry import (
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.device_registry import (
     CONNECTION_NETWORK_MAC,
     CONNECTION_UPNP,
     DeviceRegistry,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from .conftest import MockMusicServiceItem, MockSoCo, SoCoMockFactory, SonosMockEvent
 
 
 async def test_device_registry(
-    hass: HomeAssistant, device_registry: DeviceRegistry, async_autosetup_sonos, soco
+    hass: SmartHub, device_registry: DeviceRegistry, async_autosetup_sonos, soco
 ) -> None:
     """Test sonos device registered in the device registry."""
     reg_device = device_registry.async_get_device(
@@ -87,7 +87,7 @@ async def test_device_registry(
 
 
 async def test_device_registry_not_portable(
-    hass: HomeAssistant, device_registry: DeviceRegistry, async_setup_sonos, soco
+    hass: SmartHub, device_registry: DeviceRegistry, async_setup_sonos, soco
 ) -> None:
     """Test non-portable sonos device registered in the device registry to ensure area suggested."""
     soco.get_battery_info.return_value = {}
@@ -101,7 +101,7 @@ async def test_device_registry_not_portable(
 
 
 async def test_entity_basic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_autosetup_sonos,
     discover,
     entity_registry: er.EntityRegistry,
@@ -199,7 +199,7 @@ async def test_entity_basic(
     ],
 )
 async def test_play_media_library(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     media_content_type,
@@ -269,7 +269,7 @@ async def test_play_media_library(
     ],
 )
 async def test_play_media_library_content_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_autosetup_sonos,
     media_content_type,
     media_content_id,
@@ -296,7 +296,7 @@ _track_url = "S://192.168.42.100/music/iTunes/The%20Beatles/A%20Hard%20Day%2fs%I
 
 
 async def test_play_media_lib_track_play(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
 ) -> None:
@@ -325,7 +325,7 @@ async def test_play_media_lib_track_play(
 
 
 async def test_play_media_lib_track_next(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
 ) -> None:
@@ -353,7 +353,7 @@ async def test_play_media_lib_track_next(
 
 
 async def test_play_media_lib_track_replace(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
 ) -> None:
@@ -376,7 +376,7 @@ async def test_play_media_lib_track_replace(
 
 
 async def test_play_media_lib_track_add(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
 ) -> None:
@@ -406,7 +406,7 @@ _share_link: str = "spotify:playlist:abcdefghij0123456789XY"
 
 
 async def test_play_media_share_link_add(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     soco_sharelink,
@@ -434,7 +434,7 @@ async def test_play_media_share_link_add(
 
 
 async def test_play_media_share_link_next(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     soco_sharelink,
@@ -465,7 +465,7 @@ async def test_play_media_share_link_next(
 
 
 async def test_play_media_share_link_play(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     soco_sharelink,
@@ -499,7 +499,7 @@ async def test_play_media_share_link_play(
 
 
 async def test_play_media_share_link_replace(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     soco_sharelink,
@@ -560,7 +560,7 @@ _mock_playlists = [
     ],
 )
 async def test_play_media_music_library_playlist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     discover,
@@ -589,7 +589,7 @@ async def test_play_media_music_library_playlist(
 
 
 async def test_play_media_music_library_playlist_dne(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     caplog: pytest.LogCaptureFixture,
@@ -617,7 +617,7 @@ async def test_play_media_music_library_playlist_dne(
 
 
 async def test_play_sonos_playlist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_autosetup_sonos,
     soco: MockSoCo,
     sonos_playlists: SearchResult,
@@ -681,7 +681,7 @@ async def test_play_sonos_playlist(
     ],
 )
 async def test_select_source_line_in_tv(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     source: str,
@@ -735,7 +735,7 @@ async def test_select_source_line_in_tv(
     ],
 )
 async def test_select_source_play_uri(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     source: str,
@@ -776,7 +776,7 @@ async def test_select_source_play_uri(
     ],
 )
 async def test_select_source_play_queue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     source: str,
@@ -807,7 +807,7 @@ async def test_select_source_play_queue(
 
 
 async def test_select_source_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
 ) -> None:
@@ -827,7 +827,7 @@ async def test_select_source_error(
 
 
 async def test_shuffle_set(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco: MockSoCo,
     async_autosetup_sonos,
 ) -> None:
@@ -858,7 +858,7 @@ async def test_shuffle_set(
 
 
 async def test_shuffle_get(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco: MockSoCo,
     async_autosetup_sonos,
     no_media_event: SonosMockEvent,
@@ -889,7 +889,7 @@ async def test_shuffle_get(
 
 
 async def test_repeat_set(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco: MockSoCo,
     async_autosetup_sonos,
 ) -> None:
@@ -930,7 +930,7 @@ async def test_repeat_set(
 
 
 async def test_repeat_get(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco: MockSoCo,
     async_autosetup_sonos,
     no_media_event: SonosMockEvent,
@@ -968,7 +968,7 @@ async def test_repeat_get(
 
 
 async def test_play_media_favorite_item_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
 ) -> None:
@@ -1009,7 +1009,7 @@ async def test_play_media_favorite_item_id(
     assert "UNKNOWN_ID" in str(sve.value)
 
 
-async def _setup_hass(hass: HomeAssistant):
+async def _setup_hass(hass: SmartHub):
     await async_setup_component(
         hass,
         DOMAIN,
@@ -1026,7 +1026,7 @@ async def _setup_hass(hass: HomeAssistant):
 
 
 async def test_service_snapshot_restore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
 ) -> None:
     """Test the snapshot and restore services."""
@@ -1034,7 +1034,7 @@ async def test_service_snapshot_restore(
     soco_factory.cache_mock(MockSoCo(), "10.10.10.2", "Bedroom")
     await _setup_hass(hass)
     with patch(
-        "homeassistant.components.sonos.speaker.Snapshot.snapshot"
+        "smarthub.components.sonos.speaker.Snapshot.snapshot"
     ) as mock_snapshot:
         await hass.services.async_call(
             DOMAIN,
@@ -1047,7 +1047,7 @@ async def test_service_snapshot_restore(
     assert mock_snapshot.call_count == 2
 
     with patch(
-        "homeassistant.components.sonos.speaker.Snapshot.restore"
+        "smarthub.components.sonos.speaker.Snapshot.restore"
     ) as mock_restore:
         await hass.services.async_call(
             DOMAIN,
@@ -1061,7 +1061,7 @@ async def test_service_snapshot_restore(
 
 
 async def test_volume(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco: MockSoCo,
     async_autosetup_sonos,
 ) -> None:
@@ -1110,7 +1110,7 @@ async def test_volume(
     ],
 )
 async def test_media_transport(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco: MockSoCo,
     async_autosetup_sonos,
     service: str,
@@ -1129,7 +1129,7 @@ async def test_media_transport(
 
 
 async def test_play_media_announce(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco: MockSoCo,
     async_autosetup_sonos,
     sonos_websocket,
@@ -1158,7 +1158,7 @@ async def test_play_media_announce(
     sonos_websocket.play_clip.reset_mock()
     sonos_websocket.play_clip.side_effect = SonosWebsocketError("Error Message")
     with pytest.raises(
-        HomeAssistantError, match="Error when calling Sonos websocket: Error Message"
+        SmartHubError, match="Error when calling Sonos websocket: Error Message"
     ):
         await hass.services.async_call(
             MP_DOMAIN,
@@ -1180,7 +1180,7 @@ async def test_play_media_announce(
     retval = {"success": 0}
     sonos_websocket.play_clip.return_value = [retval, {}]
     with pytest.raises(
-        HomeAssistantError, match=f"Announcing clip {content_id} failed {retval}"
+        SmartHubError, match=f"Announcing clip {content_id} failed {retval}"
     ):
         await hass.services.async_call(
             MP_DOMAIN,
@@ -1218,7 +1218,7 @@ async def test_play_media_announce(
 
 
 async def test_media_get_queue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco: MockSoCo,
     async_autosetup_sonos,
     soco_factory,
@@ -1253,7 +1253,7 @@ async def test_media_get_queue(
     indirect=["speaker_model"],
 )
 async def test_media_source_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_autosetup_sonos,
     speaker_model: str,
     source_list: list[str] | None,

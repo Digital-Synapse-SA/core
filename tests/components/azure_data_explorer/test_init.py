@@ -8,12 +8,12 @@ from azure.kusto.data.exceptions import KustoAuthenticationError, KustoServiceEr
 from azure.kusto.ingest import StreamDescriptor
 import pytest
 
-from homeassistant.components import azure_data_explorer
-from homeassistant.components.azure_data_explorer.const import CONF_SEND_INTERVAL
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.components import azure_data_explorer
+from smarthub.components.azure_data_explorer.const import CONF_SEND_INTERVAL
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub
+from smarthub.util.dt import utcnow
 
 from . import FilterTest
 from .const import AZURE_DATA_EXPLORER_PATH, BASE_CONFIG_FULL, BASIC_OPTIONS
@@ -26,7 +26,7 @@ _LOGGER = logging.getLogger(__name__)
 @pytest.mark.freeze_time("2024-01-01 00:00:00")
 @pytest.mark.usefixtures("entry_managed")
 async def test_put_event_on_queue_with_managed_client(
-    hass: HomeAssistant, mock_managed_streaming: Mock
+    hass: SmartHub, mock_managed_streaming: Mock
 ) -> None:
     """Test listening to events from Hass. and writing to ADX with managed client."""
 
@@ -55,7 +55,7 @@ async def test_put_event_on_queue_with_managed_client(
 )
 @pytest.mark.usefixtures("entry_managed")
 async def test_put_event_on_queue_with_managed_client_with_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_managed_streaming: Mock,
     sideeffect: Exception,
     log_message: str,
@@ -76,7 +76,7 @@ async def test_put_event_on_queue_with_managed_client_with_errors(
 
 
 async def test_put_event_on_queue_with_queueing_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_queued: MockConfigEntry,
     mock_queued_ingest: Mock,
 ) -> None:
@@ -96,7 +96,7 @@ async def test_put_event_on_queue_with_queueing_client(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_managed: MockConfigEntry,
     mock_managed_streaming: Mock,
 ) -> None:
@@ -114,7 +114,7 @@ async def test_unload_entry(
 
 @pytest.mark.freeze_time("2024-01-01 00:00:00")
 @pytest.mark.usefixtures("entry_with_one_event")
-async def test_late_event(hass: HomeAssistant, mock_managed_streaming: Mock) -> None:
+async def test_late_event(hass: SmartHub, mock_managed_streaming: Mock) -> None:
     """Test the check on late events."""
     with patch(
         f"{AZURE_DATA_EXPLORER_PATH}.utcnow",
@@ -194,7 +194,7 @@ async def test_late_event(hass: HomeAssistant, mock_managed_streaming: Mock) -> 
     ids=["allowlist", "denylist", "filtered_allowlist", "filtered_denylist"],
 )
 async def test_filter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_managed: MockConfigEntry,
     tests: list[FilterTest],
     mock_managed_streaming: Mock,
@@ -222,7 +222,7 @@ async def test_filter(
     ids=["None_event", "Mailformed_event"],
 )
 async def test_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_managed: MockConfigEntry,
     mock_managed_streaming: Mock,
     event: str | None,
@@ -249,7 +249,7 @@ async def test_event(
     ids=["KustoServiceError", "KustoAuthenticationError", "Exception"],
 )
 async def test_connection(
-    hass: HomeAssistant, mock_execute_query: MagicMock, sideeffect: Exception
+    hass: SmartHub, mock_execute_query: MagicMock, sideeffect: Exception
 ) -> None:
     """Test Error when no getting proper connection with Exception."""
     entry = MockConfigEntry(

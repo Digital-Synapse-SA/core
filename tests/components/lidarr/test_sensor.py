@@ -2,16 +2,16 @@
 
 import pytest
 
-from homeassistant.components.sensor import CONF_STATE_CLASS, SensorStateClass
-from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT
-from homeassistant.core import HomeAssistant
+from smarthub.components.sensor import CONF_STATE_CLASS, SensorStateClass
+from smarthub.const import ATTR_UNIT_OF_MEASUREMENT
+from smarthub.core import SmartHub
 
 from .conftest import ComponentSetup
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     connection,
 ) -> None:

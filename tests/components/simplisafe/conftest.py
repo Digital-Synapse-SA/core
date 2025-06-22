@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from simplipy.system.v3 import SystemV3
 
-from homeassistant.components.simplisafe.const import DOMAIN
-from homeassistant.const import CONF_CODE, CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.json import JsonObjectType
+from smarthub.components.simplisafe.const import DOMAIN
+from smarthub.const import CONF_CODE, CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.json import JsonObjectType
 
 from .common import REFRESH_TOKEN, USER_ID, USERNAME
 
@@ -37,7 +37,7 @@ def api_fixture(
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config: dict[str, str], unique_id: str
+    hass: SmartHub, config: dict[str, str], unique_id: str
 ) -> MockConfigEntry:
     """Define a config entry."""
     entry = MockConfigEntry(
@@ -100,27 +100,27 @@ def reauth_config_fixture() -> dict[str, str]:
 
 @pytest.fixture(name="setup_simplisafe")
 async def setup_simplisafe_fixture(
-    hass: HomeAssistant, api: Mock, config: dict[str, str]
+    hass: SmartHub, api: Mock, config: dict[str, str]
 ) -> AsyncGenerator[None]:
     """Define a fixture to set up SimpliSafe."""
     with (
         patch(
-            "homeassistant.components.simplisafe.config_flow.API.async_from_auth",
+            "smarthub.components.simplisafe.config_flow.API.async_from_auth",
             return_value=api,
         ),
         patch(
-            "homeassistant.components.simplisafe.API.async_from_auth",
+            "smarthub.components.simplisafe.API.async_from_auth",
             return_value=api,
         ),
         patch(
-            "homeassistant.components.simplisafe.API.async_from_refresh_token",
+            "smarthub.components.simplisafe.API.async_from_refresh_token",
             return_value=api,
         ),
         patch(
-            "homeassistant.components.simplisafe.SimpliSafe._async_start_websocket_loop"
+            "smarthub.components.simplisafe.SimpliSafe._async_start_websocket_loop"
         ),
         patch(
-            "homeassistant.components.simplisafe.PLATFORMS",
+            "smarthub.components.simplisafe.PLATFORMS",
             [],
         ),
     ):

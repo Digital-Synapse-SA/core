@@ -3,8 +3,8 @@
 import pytest
 from pywaze.route_calculator import WRCError
 
-from homeassistant.components.waze_travel_time.config_flow import WazeConfigFlow
-from homeassistant.components.waze_travel_time.const import (
+from smarthub.components.waze_travel_time.config_flow import WazeConfigFlow
+from smarthub.components.waze_travel_time.const import (
     CONF_AVOID_FERRIES,
     CONF_AVOID_SUBSCRIPTION_ROADS,
     CONF_AVOID_TOLL_ROADS,
@@ -18,7 +18,7 @@ from homeassistant.components.waze_travel_time.const import (
     IMPERIAL_UNITS,
     METRIC_UNITS,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .const import MOCK_CONFIG
 
@@ -37,7 +37,7 @@ def mock_update_wrcerror_fixture(mock_update):
     [(MOCK_CONFIG, DEFAULT_OPTIONS)],
 )
 @pytest.mark.usefixtures("mock_update", "mock_config")
-async def test_sensor(hass: HomeAssistant) -> None:
+async def test_sensor(hass: SmartHub) -> None:
     """Test that sensor works."""
     assert hass.states.get("sensor.waze_travel_time").state == "150"
     assert (
@@ -82,7 +82,7 @@ async def test_sensor(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("mock_update", "mock_config")
-async def test_imperial(hass: HomeAssistant) -> None:
+async def test_imperial(hass: SmartHub) -> None:
     """Test that the imperial option works."""
     assert hass.states.get("sensor.waze_travel_time").attributes[
         "distance"
@@ -108,7 +108,7 @@ async def test_imperial(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("mock_update", "mock_config")
-async def test_incl_filter(hass: HomeAssistant) -> None:
+async def test_incl_filter(hass: SmartHub) -> None:
     """Test that incl_filter only includes route with the wanted street name."""
     assert hass.states.get("sensor.waze_travel_time").attributes["distance"] == 300
 
@@ -132,14 +132,14 @@ async def test_incl_filter(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("mock_update", "mock_config")
-async def test_excl_filter(hass: HomeAssistant) -> None:
+async def test_excl_filter(hass: SmartHub) -> None:
     """Test that excl_filter only includes route without the street name."""
     assert hass.states.get("sensor.waze_travel_time").attributes["distance"] == 300
 
 
 @pytest.mark.usefixtures("mock_update_wrcerror")
 async def test_sensor_failed_wrcerror(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that sensor update fails with log message."""
     config_entry = MockConfigEntry(

@@ -2,16 +2,16 @@
 
 import pytest
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("aioclient_mock_fixture")
 async def test_valve_switches(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test Flo by Moen valve switches."""
     config_entry.add_to_hass(hass)

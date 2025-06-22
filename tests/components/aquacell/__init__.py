@@ -2,13 +2,13 @@
 
 from aioaquacell import Brand
 
-from homeassistant.components.aquacell.const import (
+from smarthub.components.aquacell.const import (
     CONF_BRAND,
     CONF_REFRESH_TOKEN,
     CONF_REFRESH_TOKEN_CREATION_TIME,
 )
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -36,7 +36,7 @@ TEST_USER_INPUT = {
 DSN = "DSN"
 
 
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
 

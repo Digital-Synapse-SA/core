@@ -3,17 +3,17 @@
 from kasa import Feature
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.components.tplink.const import DOMAIN
-from homeassistant.components.tplink.entity import EXCLUDED_FEATURES
-from homeassistant.components.tplink.number import NUMBER_DESCRIPTIONS
-from homeassistant.const import ATTR_ENTITY_ID, CONF_HOST, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.tplink.const import DOMAIN
+from smarthub.components.tplink.entity import EXCLUDED_FEATURES
+from smarthub.components.tplink.number import NUMBER_DESCRIPTIONS
+from smarthub.const import ATTR_ENTITY_ID, CONF_HOST, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import (
     _mocked_device,
@@ -30,7 +30,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -50,7 +50,7 @@ async def test_states(
         assert hass.states.get(f"sensor.my_device_{excluded}") is None
 
 
-async def test_number(hass: HomeAssistant, entity_registry: er.EntityRegistry) -> None:
+async def test_number(hass: SmartHub, entity_registry: er.EntityRegistry) -> None:
     """Test number unique ids."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -77,7 +77,7 @@ async def test_number(hass: HomeAssistant, entity_registry: er.EntityRegistry) -
 
 
 async def test_number_children(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -121,7 +121,7 @@ async def test_number_children(
 
 
 async def test_number_set(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a number entity limits and setting values."""
     already_migrated_config_entry = MockConfigEntry(

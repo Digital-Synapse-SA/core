@@ -2,10 +2,10 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.advantage_air.const import DOMAIN
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.advantage_air.const import DOMAIN
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import add_mock_config
 
@@ -15,7 +15,7 @@ TEST_NEEDS_UPDATE = load_json_object_fixture("needsUpdate.json", DOMAIN)
 
 
 async def test_update_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_get: AsyncMock,
 ) -> None:

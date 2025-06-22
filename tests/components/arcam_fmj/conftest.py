@@ -7,11 +7,11 @@ from arcam.fmj.client import Client
 from arcam.fmj.state import State
 import pytest
 
-from homeassistant.components.arcam_fmj.const import DEFAULT_NAME
-from homeassistant.components.arcam_fmj.media_player import ArcamFmj
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.arcam_fmj.const import DEFAULT_NAME
+from smarthub.components.arcam_fmj.media_player import ArcamFmj
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, MockEntityPlatform
 
@@ -74,7 +74,7 @@ def state_fixture(state_1: State) -> State:
 
 
 @pytest.fixture(name="player")
-def player_fixture(hass: HomeAssistant, state: State) -> ArcamFmj:
+def player_fixture(hass: SmartHub, state: State) -> ArcamFmj:
     """Get standard player."""
     player = ArcamFmj(MOCK_NAME, state, MOCK_UUID)
     player.entity_id = MOCK_ENTITY_ID
@@ -86,7 +86,7 @@ def player_fixture(hass: HomeAssistant, state: State) -> ArcamFmj:
 
 @pytest.fixture(name="player_setup")
 async def player_setup_fixture(
-    hass: HomeAssistant, state_1: State, state_2: State, client: Mock
+    hass: SmartHub, state_1: State, state_2: State, client: Mock
 ) -> AsyncGenerator[str]:
     """Get standard player."""
     config_entry = MockConfigEntry(
@@ -101,15 +101,15 @@ async def player_setup_fixture(
             return state_2
         raise ValueError(f"Unknown player zone: {zone}")
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     with (
-        patch("homeassistant.components.arcam_fmj.Client", return_value=client),
+        patch("smarthub.components.arcam_fmj.Client", return_value=client),
         patch(
-            "homeassistant.components.arcam_fmj.media_player.State",
+            "smarthub.components.arcam_fmj.media_player.State",
             side_effect=state_mock,
         ),
-        patch("homeassistant.components.arcam_fmj._run_client", return_value=None),
+        patch("smarthub.components.arcam_fmj._run_client", return_value=None),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()

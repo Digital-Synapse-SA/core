@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import aiohttp
 
-from homeassistant.components.rituals_perfume_genie.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.rituals_perfume_genie.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     init_integration,
@@ -17,19 +17,19 @@ from .common import (
 )
 
 
-async def test_config_entry_not_ready(hass: HomeAssistant) -> None:
+async def test_config_entry_not_ready(hass: SmartHub) -> None:
     """Test the Rituals configuration entry setup if connection to Rituals is missing."""
     config_entry = mock_config_entry(unique_id="id_123_not_ready")
     config_entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.rituals_perfume_genie.Account.get_devices",
+        "smarthub.components.rituals_perfume_genie.Account.get_devices",
         side_effect=aiohttp.ClientError,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_config_entry_unload(hass: HomeAssistant) -> None:
+async def test_config_entry_unload(hass: SmartHub) -> None:
     """Test the Rituals Perfume Genie configuration entry setup and unloading."""
     config_entry = mock_config_entry(unique_id="id_123_unload")
     await init_integration(hass, config_entry, [mock_diffuser(hublot="lot123")])
@@ -42,7 +42,7 @@ async def test_config_entry_unload(hass: HomeAssistant) -> None:
 
 
 async def test_entity_id_migration(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the migration of unique IDs on config entry setup."""
     config_entry = mock_config_entry(unique_id="binary_sensor_test_diffuser_v1")

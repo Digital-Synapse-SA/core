@@ -1,8 +1,8 @@
 """Test Qbus scene entities."""
 
-from homeassistant.components.scene import DOMAIN as SCENE_DOMAIN, SERVICE_TURN_ON
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.scene import DOMAIN as SCENE_DOMAIN, SERVICE_TURN_ON
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from tests.common import async_fire_mqtt_message
 from tests.typing import MqttMockHAClient
@@ -17,7 +17,7 @@ _SCENE_ENTITY_ID = "scene.ctd_000001_watching_tv"
 
 
 async def test_scene(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     setup_integration: None,
 ) -> None:

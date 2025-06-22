@@ -6,18 +6,18 @@ from unittest.mock import Mock
 from aioshelly.exceptions import DeviceConnectionError, InvalidAuthError, RpcCallError
 import pytest
 
-from homeassistant.components.shelly.const import DOMAIN
-from homeassistant.components.text import (
+from smarthub.components.shelly.const import DOMAIN
+from smarthub.components.text import (
     ATTR_VALUE,
     DOMAIN as TEXT_PLATFORM,
     SERVICE_SET_VALUE,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import init_integration, register_device, register_entity
 
@@ -30,7 +30,7 @@ from . import init_integration, register_device, register_entity
     ],
 )
 async def test_rpc_device_virtual_text(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -78,7 +78,7 @@ async def test_rpc_device_virtual_text(
 
 
 async def test_rpc_remove_virtual_text_when_mode_label(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
     mock_rpc_device: Mock,
@@ -111,7 +111,7 @@ async def test_rpc_remove_virtual_text_when_mode_label(
 
 
 async def test_rpc_remove_virtual_text_when_orphaned(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
     mock_rpc_device: Mock,
@@ -148,7 +148,7 @@ async def test_rpc_remove_virtual_text_when_orphaned(
     ],
 )
 async def test_text_set_exc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     exception: Exception,
@@ -170,7 +170,7 @@ async def test_text_set_exc(
 
     mock_rpc_device.text_set.side_effect = exception
 
-    with pytest.raises(HomeAssistantError, match=error):
+    with pytest.raises(SmartHubError, match=error):
         await hass.services.async_call(
             TEXT_PLATFORM,
             SERVICE_SET_VALUE,
@@ -183,7 +183,7 @@ async def test_text_set_exc(
 
 
 async def test_text_set_reauth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

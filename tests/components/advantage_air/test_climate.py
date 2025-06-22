@@ -6,8 +6,8 @@ from advantage_air import ApiError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.advantage_air.climate import ADVANTAGE_AIR_MYAUTO
-from homeassistant.components.climate import (
+from smarthub.components.advantage_air.climate import ADVANTAGE_AIR_MYAUTO
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
     ATTR_HVAC_MODE,
@@ -27,16 +27,16 @@ from homeassistant.components.climate import (
     SERVICE_TURN_ON,
     HVACMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from . import add_mock_config
 
 
 async def test_climate_myzone_main(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_get: AsyncMock,
     mock_update: AsyncMock,
@@ -151,7 +151,7 @@ async def test_climate_myzone_main(
 
 
 async def test_climate_myzone_zone(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_get: AsyncMock,
     mock_update: AsyncMock,
@@ -204,7 +204,7 @@ async def test_climate_myzone_zone(
 
 
 async def test_climate_myauto_main(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_get: AsyncMock,
     mock_update: AsyncMock,
@@ -248,7 +248,7 @@ async def test_climate_myauto_main(
 
 
 async def test_climate_async_failed_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get: AsyncMock,
     mock_update: AsyncMock,
 ) -> None:
@@ -256,7 +256,7 @@ async def test_climate_async_failed_update(
 
     mock_update.side_effect = ApiError
     await add_mock_config(hass)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,

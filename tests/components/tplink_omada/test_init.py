@@ -2,9 +2,9 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.tplink_omada.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.tplink_omada.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 
@@ -18,7 +18,7 @@ MOCK_ENTRY_DATA = {
 
 
 async def test_missing_devices_removed_at_startup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_omada_client: MagicMock,
 ) -> None:

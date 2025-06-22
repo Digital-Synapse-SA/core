@@ -6,15 +6,15 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from pyuptimerobot import UptimeRobotAuthenticationException, UptimeRobotException
 
-from homeassistant import config_entries
-from homeassistant.components.uptimerobot.const import (
+from smarthub import config_entries
+from smarthub.components.uptimerobot.const import (
     COORDINATOR_UPDATE_INTERVAL,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .common import (
     MOCK_UPTIMEROBOT_CONFIG_ENTRY_DATA,
@@ -30,7 +30,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_reauthentication_trigger_in_setup(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reauthentication trigger."""
     mock_config_entry = MockConfigEntry(**MOCK_UPTIMEROBOT_CONFIG_ENTRY_DATA)
@@ -62,7 +62,7 @@ async def test_reauthentication_trigger_in_setup(
 
 
 async def test_reauthentication_trigger_key_read_only(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reauthentication trigger."""
     mock_config_entry = MockConfigEntry(
@@ -95,7 +95,7 @@ async def test_reauthentication_trigger_key_read_only(
 
 
 async def test_reauthentication_trigger_after_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -131,7 +131,7 @@ async def test_reauthentication_trigger_after_setup(
 
 
 async def test_integration_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test integration reload."""
@@ -152,7 +152,7 @@ async def test_integration_reload(
 
 
 async def test_update_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -196,7 +196,7 @@ async def test_update_errors(
 
 
 async def test_device_management(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:

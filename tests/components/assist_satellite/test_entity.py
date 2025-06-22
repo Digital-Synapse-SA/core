@@ -7,8 +7,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components import stt
-from homeassistant.components.assist_pipeline import (
+from smarthub.components import stt
+from smarthub.components.assist_pipeline import (
     OPTION_PREFERRED,
     AudioSettings,
     Pipeline,
@@ -19,17 +19,17 @@ from homeassistant.components.assist_pipeline import (
     async_update_pipeline,
     vad,
 )
-from homeassistant.components.assist_satellite import (
+from smarthub.components.assist_satellite import (
     AssistSatelliteAnnouncement,
     AssistSatelliteAnswer,
     SatelliteBusyError,
 )
-from homeassistant.components.assist_satellite.const import PREANNOUNCE_URL
-from homeassistant.components.assist_satellite.entity import AssistSatelliteState
-from homeassistant.components.media_source import PlayMedia
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.assist_satellite.const import PREANNOUNCE_URL
+from smarthub.components.assist_satellite.entity import AssistSatelliteState
+from smarthub.components.media_source import PlayMedia
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import ENTITY_ID
 from .conftest import MockAssistSatellite
@@ -40,13 +40,13 @@ from tests.components.tts.common import MockResultStream
 @pytest.fixture
 def mock_chat_session_conversation_id() -> Generator[Mock]:
     """Mock the ulid library."""
-    with patch("homeassistant.helpers.chat_session.ulid_now") as mock_ulid_now:
+    with patch("smarthub.helpers.chat_session.ulid_now") as mock_ulid_now:
         mock_ulid_now.return_value = "mock-conversation-id"
         yield mock_ulid_now
 
 
 @pytest.fixture(autouse=True)
-async def set_pipeline_tts(hass: HomeAssistant, init_components: ConfigEntry) -> None:
+async def set_pipeline_tts(hass: SmartHub, init_components: ConfigEntry) -> None:
     """Set up a pipeline with a TTS engine."""
     await async_update_pipeline(
         hass,
@@ -58,7 +58,7 @@ async def set_pipeline_tts(hass: HomeAssistant, init_components: ConfigEntry) ->
 
 
 async def test_entity_state(
-    hass: HomeAssistant, init_components: ConfigEntry, entity: MockAssistSatellite
+    hass: SmartHub, init_components: ConfigEntry, entity: MockAssistSatellite
 ) -> None:
     """Test entity state represent events."""
 
@@ -72,7 +72,7 @@ async def test_entity_state(
     entity.async_set_context(context)
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream"
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream"
     ) as mock_start_pipeline:
         await entity.async_accept_pipeline_from_satellite(audio_stream)
 
@@ -136,7 +136,7 @@ async def test_entity_state(
 
 
 async def test_new_pipeline_cancels_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
 ) -> None:
@@ -163,7 +163,7 @@ async def test_new_pipeline_cancels_pipeline(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
     ):
@@ -205,7 +205,7 @@ async def test_new_pipeline_cancels_pipeline(
             },
             AssistSatelliteAnnouncement(
                 message="Hello",
-                media_id="https://www.home-assistant.io/resolved.mp3",
+                media_id="https://www.smart-hub.io/resolved.mp3",
                 original_media_id="media-source://given",
                 tts_token=None,
                 media_id_source="media_id",
@@ -238,7 +238,7 @@ async def test_new_pipeline_cancels_pipeline(
     ],
 )
 async def test_announce(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     service_data: dict,
@@ -253,7 +253,7 @@ async def test_announce(
         await original_announce(announcement)
 
     def tts_generate_media_source_id(
-        hass: HomeAssistant,
+        hass: SmartHub,
         message: str,
         engine: str | None = None,
         language: str | None = None,
@@ -266,21 +266,21 @@ async def test_announce(
 
     with (
         patch(
-            "homeassistant.components.tts.generate_media_source_id",
+            "smarthub.components.tts.generate_media_source_id",
             new=tts_generate_media_source_id,
         ),
         patch(
-            "homeassistant.components.tts.async_resolve_engine",
+            "smarthub.components.tts.async_resolve_engine",
             return_value="tts.cloud",
         ),
         patch(
-            "homeassistant.components.tts.async_create_stream",
+            "smarthub.components.tts.async_create_stream",
             return_value=MockResultStream(hass, "wav", b""),
         ),
         patch(
-            "homeassistant.components.media_source.async_resolve_media",
+            "smarthub.components.media_source.async_resolve_media",
             return_value=PlayMedia(
-                url="https://www.home-assistant.io/resolved.mp3",
+                url="https://www.smart-hub.io/resolved.mp3",
                 mime_type="audio/mp3",
             ),
         ),
@@ -299,12 +299,12 @@ async def test_announce(
 
 
 async def test_announce_busy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
 ) -> None:
     """Test that announcing while an announcement is in progress raises an error."""
-    media_id = "https://www.home-assistant.io/resolved.mp3"
+    media_id = "https://www.smart-hub.io/resolved.mp3"
     announce_started = asyncio.Event()
     got_error = asyncio.Event()
 
@@ -331,12 +331,12 @@ async def test_announce_busy(
 
 
 async def test_announce_cancels_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
 ) -> None:
     """Test that announcements cancel any running pipeline."""
-    media_id = "https://www.home-assistant.io/resolved.mp3"
+    media_id = "https://www.smart-hub.io/resolved.mp3"
     pipeline_started = asyncio.Event()
     pipeline_finished = asyncio.Event()
     pipeline_cancelled = asyncio.Event()
@@ -353,7 +353,7 @@ async def test_announce_cancels_pipeline(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
         patch.object(entity, "async_announce") as mock_async_announce,
@@ -373,7 +373,7 @@ async def test_announce_cancels_pipeline(
 
 
 async def test_announce_default_preannounce(
-    hass: HomeAssistant, init_components: ConfigEntry, entity: MockAssistSatellite
+    hass: SmartHub, init_components: ConfigEntry, entity: MockAssistSatellite
 ) -> None:
     """Test announcing on a device with the default preannouncement sound."""
 
@@ -391,7 +391,7 @@ async def test_announce_default_preannounce(
 
 
 async def test_context_refresh(
-    hass: HomeAssistant, init_components: ConfigEntry, entity: MockAssistSatellite
+    hass: SmartHub, init_components: ConfigEntry, entity: MockAssistSatellite
 ) -> None:
     """Test that the context will be automatically refreshed."""
     audio_stream = object()
@@ -400,7 +400,7 @@ async def test_context_refresh(
     entity._context = None
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream"
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream"
     ):
         await entity.async_accept_pipeline_from_satellite(audio_stream)
 
@@ -409,7 +409,7 @@ async def test_context_refresh(
 
 
 async def test_pipeline_entity(
-    hass: HomeAssistant, init_components: ConfigEntry, entity: MockAssistSatellite
+    hass: SmartHub, init_components: ConfigEntry, entity: MockAssistSatellite
 ) -> None:
     """Test getting pipeline from an entity."""
     audio_stream = object()
@@ -439,11 +439,11 @@ async def test_pipeline_entity(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
         patch(
-            "homeassistant.components.assist_satellite.entity.async_get_pipelines",
+            "smarthub.components.assist_satellite.entity.async_get_pipelines",
             return_value=[pipeline],
         ),
     ):
@@ -453,7 +453,7 @@ async def test_pipeline_entity(
 
 
 async def test_pipeline_entity_preferred(
-    hass: HomeAssistant, init_components: ConfigEntry, entity: MockAssistSatellite
+    hass: SmartHub, init_components: ConfigEntry, entity: MockAssistSatellite
 ) -> None:
     """Test getting pipeline from an entity with a preferred state."""
     audio_stream = object()
@@ -471,7 +471,7 @@ async def test_pipeline_entity_preferred(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
     ):
@@ -481,7 +481,7 @@ async def test_pipeline_entity_preferred(
 
 
 async def test_vad_sensitivity_entity(
-    hass: HomeAssistant, init_components: ConfigEntry, entity: MockAssistSatellite
+    hass: SmartHub, init_components: ConfigEntry, entity: MockAssistSatellite
 ) -> None:
     """Test getting vad sensitivity from an entity."""
     audio_stream = object()
@@ -502,7 +502,7 @@ async def test_vad_sensitivity_entity(
         done.set()
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
         new=async_pipeline_from_audio_stream,
     ):
         async with asyncio.timeout(1):
@@ -511,7 +511,7 @@ async def test_vad_sensitivity_entity(
 
 
 async def test_pipeline_entity_not_found(
-    hass: HomeAssistant, init_components: ConfigEntry, entity: MockAssistSatellite
+    hass: SmartHub, init_components: ConfigEntry, entity: MockAssistSatellite
 ) -> None:
     """Test that setting the pipeline entity id to a non-existent entity raises an error."""
     audio_stream = object()
@@ -524,7 +524,7 @@ async def test_pipeline_entity_not_found(
 
 
 async def test_vad_sensitivity_entity_not_found(
-    hass: HomeAssistant, init_components: ConfigEntry, entity: MockAssistSatellite
+    hass: SmartHub, init_components: ConfigEntry, entity: MockAssistSatellite
 ) -> None:
     """Test that setting the vad sensitivity entity id to a non-existent entity raises an error."""
     audio_stream = object()
@@ -568,7 +568,7 @@ async def test_vad_sensitivity_entity_not_found(
                 "Hello",
                 AssistSatelliteAnnouncement(
                     message="Hello",
-                    media_id="https://www.home-assistant.io/resolved.mp3",
+                    media_id="https://www.smart-hub.io/resolved.mp3",
                     tts_token=None,
                     original_media_id="media-source://given",
                     media_id_source="media_id",
@@ -614,7 +614,7 @@ async def test_vad_sensitivity_entity_not_found(
 )
 @pytest.mark.usefixtures("mock_chat_session_conversation_id")
 async def test_start_conversation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     service_data: dict,
@@ -636,21 +636,21 @@ async def test_start_conversation(
 
     with (
         patch(
-            "homeassistant.components.tts.generate_media_source_id",
+            "smarthub.components.tts.generate_media_source_id",
             return_value="media-source://generated",
         ),
         patch(
-            "homeassistant.components.tts.async_resolve_engine",
+            "smarthub.components.tts.async_resolve_engine",
             return_value="tts.cloud",
         ),
         patch(
-            "homeassistant.components.tts.async_create_stream",
+            "smarthub.components.tts.async_create_stream",
             return_value=MockResultStream(hass, "wav", b""),
         ),
         patch(
-            "homeassistant.components.media_source.async_resolve_media",
+            "smarthub.components.media_source.async_resolve_media",
             return_value=PlayMedia(
-                url="https://www.home-assistant.io/resolved.mp3",
+                url="https://www.smart-hub.io/resolved.mp3",
                 mime_type="audio/mp3",
             ),
         ),
@@ -669,12 +669,12 @@ async def test_start_conversation(
 
 
 async def test_start_conversation_reject_builtin_agent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
 ) -> None:
     """Test starting a conversation on a device."""
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "assist_satellite",
             "start_conversation",
@@ -685,7 +685,7 @@ async def test_start_conversation_reject_builtin_agent(
 
 
 async def test_start_conversation_default_preannounce(
-    hass: HomeAssistant, init_components: ConfigEntry, entity: MockAssistSatellite
+    hass: SmartHub, init_components: ConfigEntry, entity: MockAssistSatellite
 ) -> None:
     """Test starting a conversation on a device with the default preannouncement sound."""
 
@@ -753,7 +753,7 @@ async def test_start_conversation_default_preannounce(
     ],
 )
 async def test_ask_question(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     service_data: dict,
@@ -787,10 +787,10 @@ async def test_ask_question(
         audio_stream = object()
         with (
             patch(
-                "homeassistant.components.assist_pipeline.pipeline.PipelineRun.prepare_speech_to_text"
+                "smarthub.components.assist_pipeline.pipeline.PipelineRun.prepare_speech_to_text"
             ),
             patch(
-                "homeassistant.components.assist_pipeline.pipeline.PipelineRun.speech_to_text",
+                "smarthub.components.assist_pipeline.pipeline.PipelineRun.speech_to_text",
                 speech_to_text,
             ),
         ):
@@ -800,21 +800,21 @@ async def test_ask_question(
 
     with (
         patch(
-            "homeassistant.components.tts.generate_media_source_id",
+            "smarthub.components.tts.generate_media_source_id",
             return_value="media-source://generated",
         ),
         patch(
-            "homeassistant.components.tts.async_resolve_engine",
+            "smarthub.components.tts.async_resolve_engine",
             return_value="tts.cloud",
         ),
         patch(
-            "homeassistant.components.tts.async_create_stream",
+            "smarthub.components.tts.async_create_stream",
             return_value=MockResultStream(hass, "wav", b""),
         ),
         patch(
-            "homeassistant.components.media_source.async_resolve_media",
+            "smarthub.components.media_source.async_resolve_media",
             return_value=PlayMedia(
-                url="https://www.home-assistant.io/resolved.mp3",
+                url="https://www.smart-hub.io/resolved.mp3",
                 mime_type="audio/mp3",
             ),
         ),
@@ -832,7 +832,7 @@ async def test_ask_question(
 
 
 async def test_wake_word_start_keeps_responding(
-    hass: HomeAssistant, init_components: ConfigEntry, entity: MockAssistSatellite
+    hass: SmartHub, init_components: ConfigEntry, entity: MockAssistSatellite
 ) -> None:
     """Test entity state stays responding on wake word start event."""
 
@@ -844,7 +844,7 @@ async def test_wake_word_start_keeps_responding(
     audio_stream = object()
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream"
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream"
     ) as mock_start_pipeline:
         await entity.async_accept_pipeline_from_satellite(
             audio_stream, start_stage=PipelineStage.TTS
@@ -862,7 +862,7 @@ async def test_wake_word_start_keeps_responding(
     audio_stream = object()
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream"
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream"
     ) as mock_start_pipeline:
         await entity.async_accept_pipeline_from_satellite(
             audio_stream, start_stage=PipelineStage.WAKE_WORD

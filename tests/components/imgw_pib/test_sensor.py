@@ -7,11 +7,11 @@ from imgw_pib import ApiError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.imgw_pib.const import DOMAIN, UPDATE_INTERVAL
-from homeassistant.components.sensor import DOMAIN as SENSOR_PLATFORM
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.imgw_pib.const import DOMAIN, UPDATE_INTERVAL
+from smarthub.components.sensor import DOMAIN as SENSOR_PLATFORM
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -22,20 +22,20 @@ ENTITY_ID = "sensor.river_name_station_name_water_level"
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_imgw_pib_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test states of the sensor."""
-    with patch("homeassistant.components.imgw_pib.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.imgw_pib.PLATFORMS", [Platform.SENSOR]):
         await init_integration(hass, mock_config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_imgw_pib_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -69,7 +69,7 @@ async def test_availability(
 
 
 async def test_remove_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imgw_pib_client: AsyncMock,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,

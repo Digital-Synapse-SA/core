@@ -4,20 +4,20 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from tests.common import MockConfigEntry
 
 
 async def test_adam_select_entities(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test a thermostat Select."""
 
@@ -27,7 +27,7 @@ async def test_adam_select_entities(
 
 
 async def test_adam_change_select_entity(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test changing of select entities."""
 
@@ -53,7 +53,7 @@ async def test_adam_change_select_entity(
 @pytest.mark.parametrize("chosen_env", ["m_adam_cooling"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_adam_select_regulation_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_adam_heat_cool: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -87,7 +87,7 @@ async def test_adam_select_regulation_mode(
 
 
 async def test_legacy_anna_select_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_legacy_anna: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -98,7 +98,7 @@ async def test_legacy_anna_select_entities(
 @pytest.mark.parametrize("chosen_env", ["anna_heatpump_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_adam_select_unavailable_regulation_mode(
-    hass: HomeAssistant, mock_smile_anna: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_anna: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test a regulation_mode non-available preset."""
 

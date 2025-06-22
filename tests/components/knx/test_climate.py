@@ -2,12 +2,12 @@
 
 import pytest
 
-from homeassistant.components.climate import HVACMode
-from homeassistant.components.knx.schema import ClimateSchema
-from homeassistant.const import CONF_NAME, STATE_IDLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.climate import HVACMode
+from smarthub.components.knx.schema import ClimateSchema
+from smarthub.const import CONF_NAME, STATE_IDLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import KNXTestKit
 
@@ -19,7 +19,7 @@ RAW_FLOAT_22_0 = (0x0C, 0x4C)
 
 
 async def test_climate_basic_temperature_set(
-    hass: HomeAssistant, knx: KNXTestKit
+    hass: SmartHub, knx: KNXTestKit
 ) -> None:
     """Test KNX climate basic."""
     await knx.setup_integration(
@@ -56,7 +56,7 @@ async def test_climate_basic_temperature_set(
 
 @pytest.mark.parametrize("heat_cool_ga", [None, "4/4/4"])
 async def test_climate_on_off(
-    hass: HomeAssistant, knx: KNXTestKit, heat_cool_ga: str | None
+    hass: SmartHub, knx: KNXTestKit, heat_cool_ga: str | None
 ) -> None:
     """Test KNX climate on/off."""
     on_off_ga = "3/3/3"
@@ -145,7 +145,7 @@ async def test_climate_on_off(
 
 @pytest.mark.parametrize("on_off_ga", [None, "4/4/4"])
 async def test_climate_hvac_mode(
-    hass: HomeAssistant, knx: KNXTestKit, on_off_ga: str | None
+    hass: SmartHub, knx: KNXTestKit, on_off_ga: str | None
 ) -> None:
     """Test KNX climate hvac mode."""
     controller_mode_ga = "3/3/3"
@@ -232,7 +232,7 @@ async def test_climate_hvac_mode(
 
 
 async def test_climate_heat_cool_read_only(
-    hass: HomeAssistant, knx: KNXTestKit
+    hass: SmartHub, knx: KNXTestKit
 ) -> None:
     """Test KNX climate hvac mode."""
     heat_cool_state_ga = "3/3/3"
@@ -270,7 +270,7 @@ async def test_climate_heat_cool_read_only(
 
 
 async def test_climate_heat_cool_read_only_on_off(
-    hass: HomeAssistant, knx: KNXTestKit
+    hass: SmartHub, knx: KNXTestKit
 ) -> None:
     """Test KNX climate hvac mode."""
     on_off_ga = "2/2/2"
@@ -316,7 +316,7 @@ async def test_climate_heat_cool_read_only_on_off(
 
 
 async def test_climate_preset_mode(
-    hass: HomeAssistant, knx: KNXTestKit, entity_registry: er.EntityRegistry
+    hass: SmartHub, knx: KNXTestKit, entity_registry: er.EntityRegistry
 ) -> None:
     """Test KNX climate preset mode."""
     await knx.setup_integration(
@@ -371,7 +371,7 @@ async def test_climate_preset_mode(
     assert len(knx.xknx.devices) == 0
 
 
-async def test_update_entity(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_update_entity(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test update climate entity for KNX."""
     await knx.setup_integration(
         {
@@ -385,7 +385,7 @@ async def test_update_entity(hass: HomeAssistant, knx: KNXTestKit) -> None:
             }
         }
     )
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     # read states state updater
     await knx.assert_read("1/2/3")
@@ -398,7 +398,7 @@ async def test_update_entity(hass: HomeAssistant, knx: KNXTestKit) -> None:
 
     # verify update entity retriggers group value reads to the bus
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         target={"entity_id": "climate.test"},
         blocking=True,
@@ -409,7 +409,7 @@ async def test_update_entity(hass: HomeAssistant, knx: KNXTestKit) -> None:
     await knx.assert_read("1/2/7")
 
 
-async def test_command_value_idle_mode(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_command_value_idle_mode(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX climate command_value."""
     await knx.setup_integration(
         {
@@ -441,7 +441,7 @@ async def test_command_value_idle_mode(hass: HomeAssistant, knx: KNXTestKit) -> 
     )
 
 
-async def test_fan_speed_3_steps(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_fan_speed_3_steps(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX climate fan speed 3 steps."""
     await knx.setup_integration(
         {
@@ -497,7 +497,7 @@ async def test_fan_speed_3_steps(hass: HomeAssistant, knx: KNXTestKit) -> None:
     knx.assert_state("climate.test", HVACMode.HEAT, fan_mode="off")
 
 
-async def test_fan_speed_2_steps(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_fan_speed_2_steps(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX climate fan speed 2 steps."""
     await knx.setup_integration(
         {
@@ -550,7 +550,7 @@ async def test_fan_speed_2_steps(hass: HomeAssistant, knx: KNXTestKit) -> None:
     knx.assert_state("climate.test", HVACMode.HEAT, fan_mode="off")
 
 
-async def test_fan_speed_1_step(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_fan_speed_1_step(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX climate fan speed 1 step."""
     await knx.setup_integration(
         {
@@ -593,7 +593,7 @@ async def test_fan_speed_1_step(hass: HomeAssistant, knx: KNXTestKit) -> None:
     knx.assert_state("climate.test", HVACMode.HEAT, fan_mode="off")
 
 
-async def test_fan_speed_5_steps(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_fan_speed_5_steps(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX climate fan speed 5 steps."""
     await knx.setup_integration(
         {
@@ -649,7 +649,7 @@ async def test_fan_speed_5_steps(hass: HomeAssistant, knx: KNXTestKit) -> None:
     knx.assert_state("climate.test", HVACMode.HEAT, fan_mode="off")
 
 
-async def test_fan_speed_percentage(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_fan_speed_percentage(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX climate fan speed percentage."""
     await knx.setup_integration(
         {
@@ -713,7 +713,7 @@ async def test_fan_speed_percentage(hass: HomeAssistant, knx: KNXTestKit) -> Non
 
 
 async def test_fan_speed_percentage_4_steps(
-    hass: HomeAssistant, knx: KNXTestKit
+    hass: SmartHub, knx: KNXTestKit
 ) -> None:
     """Test KNX climate fan speed percentage with 4 steps."""
     await knx.setup_integration(
@@ -774,7 +774,7 @@ async def test_fan_speed_percentage_4_steps(
     knx.assert_state("climate.test", HVACMode.HEAT, fan_mode="75%")
 
 
-async def test_fan_speed_zero_mode_auto(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_fan_speed_zero_mode_auto(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX climate fan speed 3 steps."""
     await knx.setup_integration(
         {
@@ -821,7 +821,7 @@ async def test_fan_speed_zero_mode_auto(hass: HomeAssistant, knx: KNXTestKit) ->
     knx.assert_state("climate.test", HVACMode.HEAT, fan_mode="auto")
 
 
-async def test_climate_humidity(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_climate_humidity(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX climate humidity."""
     await knx.setup_integration(
         {
@@ -852,7 +852,7 @@ async def test_climate_humidity(hass: HomeAssistant, knx: KNXTestKit) -> None:
     )
 
 
-async def test_swing(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_swing(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX climate swing."""
     await knx.setup_integration(
         {
@@ -896,7 +896,7 @@ async def test_swing(hass: HomeAssistant, knx: KNXTestKit) -> None:
     knx.assert_state("climate.test", HVACMode.HEAT, swing_mode="off")
 
 
-async def test_horizontal_swing(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_horizontal_swing(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX climate horizontal swing."""
     await knx.setup_integration(
         {

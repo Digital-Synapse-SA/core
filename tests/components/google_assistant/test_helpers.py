@@ -6,20 +6,20 @@ from unittest.mock import Mock, call, patch
 
 import pytest
 
-from homeassistant.components.google_assistant import helpers
-from homeassistant.components.google_assistant.const import (
+from smarthub.components.google_assistant import helpers
+from smarthub.components.google_assistant.const import (
     EVENT_COMMAND_RECEIVED,
     NOT_EXPOSE_LOCAL,
     SOURCE_CLOUD,
     SOURCE_LOCAL,
     STORE_GOOGLE_LOCAL_WEBHOOK_ID,
 )
-from homeassistant.components.matter import MatterDeviceInfo
-from homeassistant.core import HomeAssistant, State
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.matter import MatterDeviceInfo
+from smarthub.core import SmartHub, State
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import MockConfig
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry, async_capture_events, async_mock_servi
 from tests.typing import ClientSessionGenerator
 
 
-async def test_google_entity_sync_serialize_with_local_sdk(hass: HomeAssistant) -> None:
+async def test_google_entity_sync_serialize_with_local_sdk(hass: SmartHub) -> None:
     """Test sync serialize attributes of a GoogleEntity."""
     hass.states.async_set("light.ceiling_lights", "off")
     hass.config.api = Mock(port=1234, local_ip="192.168.123.123", use_ssl=False)
@@ -63,7 +63,7 @@ async def test_google_entity_sync_serialize_with_local_sdk(hass: HomeAssistant) 
 
     for device_type in NOT_EXPOSE_LOCAL:
         with patch(
-            "homeassistant.components.google_assistant.helpers.get_google_type",
+            "smarthub.components.google_assistant.helpers.get_google_type",
             return_value=device_type,
         ):
             serialized = entity.sync_serialize(None, "mock-uuid")
@@ -72,7 +72,7 @@ async def test_google_entity_sync_serialize_with_local_sdk(hass: HomeAssistant) 
 
 
 async def test_google_entity_sync_serialize_with_matter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -108,7 +108,7 @@ async def test_google_entity_sync_serialize_with_matter(
     hass.config.components.add("matter")
 
     with patch(
-        "homeassistant.components.matter.get_matter_device_info",
+        "smarthub.components.matter.get_matter_device_info",
         return_value=MatterDeviceInfo(
             unique_id="mock-unique-id",
             vendor_id="mock-vendor-id",
@@ -123,7 +123,7 @@ async def test_google_entity_sync_serialize_with_matter(
 
 
 async def test_config_local_sdk(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the local SDK."""
     command_events = async_capture_events(hass, EVENT_COMMAND_RECEIVED)
@@ -176,7 +176,7 @@ async def test_config_local_sdk(
 
     assert config.is_local_connected is True
     with patch(
-        "homeassistant.components.google_assistant.helpers.utcnow",
+        "smarthub.components.google_assistant.helpers.utcnow",
         return_value=dt_util.utcnow() + timedelta(seconds=90),
     ):
         assert config.is_local_connected is False
@@ -200,7 +200,7 @@ async def test_config_local_sdk(
 
 
 async def test_config_local_sdk_if_disabled(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the local SDK."""
     assert await async_setup_component(hass, "webhook", {})
@@ -241,7 +241,7 @@ async def test_config_local_sdk_if_disabled(
 
 
 async def test_config_local_sdk_if_ssl_enabled(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the local SDK is not enabled when SSL is enabled."""
     assert await async_setup_component(hass, "webhook", {})
@@ -365,7 +365,7 @@ def test_request_data() -> None:
 
 
 async def test_config_local_sdk_allow_min_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -409,7 +409,7 @@ async def test_config_local_sdk_allow_min_version(
 
 @pytest.mark.parametrize("version", [None, "2.1.4"])
 async def test_config_local_sdk_warn_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
     version,
@@ -455,7 +455,7 @@ async def test_config_local_sdk_warn_version(
     ) in caplog.text
 
 
-def test_async_get_entities_cached(hass: HomeAssistant) -> None:
+def test_async_get_entities_cached(hass: SmartHub) -> None:
     """Test async_get_entities is cached."""
     config = MockConfig()
 
@@ -472,7 +472,7 @@ def test_async_get_entities_cached(hass: HomeAssistant) -> None:
     }
 
     with patch(
-        "homeassistant.components.google_assistant.helpers.GoogleEntity.traits",
+        "smarthub.components.google_assistant.helpers.GoogleEntity.traits",
         return_value=RuntimeError("Should not be called"),
     ):
         google_entities = helpers.async_get_entities(hass, config)

@@ -1,8 +1,8 @@
 """Tests for the Atag sensor platform."""
 
-from homeassistant.components.atag.sensor import SENSORS
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.atag.sensor import SENSORS
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import UID, init_integration
 
@@ -10,7 +10,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     entity_registry: er.EntityRegistry,
 ) -> None:

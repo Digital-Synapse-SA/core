@@ -2,20 +2,20 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.octoprint.const import (
+from smarthub.components.octoprint.const import (
     CONF_BAUDRATE,
     DOMAIN,
     SERVICE_CONNECT,
 )
-from homeassistant.const import ATTR_DEVICE_ID, CONF_PORT, CONF_PROFILE_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.const import ATTR_DEVICE_ID, CONF_PORT, CONF_PROFILE_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import init_integration
 
 
 async def test_connect_default(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test the connect to printer service."""
     await init_integration(hass, "sensor")
@@ -40,7 +40,7 @@ async def test_connect_default(
 
 
 async def test_connect_all_arguments(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test the connect to printer service."""
     await init_integration(hass, "sensor")

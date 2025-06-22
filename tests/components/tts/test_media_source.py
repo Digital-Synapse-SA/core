@@ -6,14 +6,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components import media_source
-from homeassistant.components.media_player import BrowseError
-from homeassistant.components.tts.media_source import (
+from smarthub.components import media_source
+from smarthub.components.media_player import BrowseError
+from smarthub.components.tts.media_source import (
     generate_media_source_id,
     parse_media_source_id,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import (
     DEFAULT_LANG,
@@ -41,7 +41,7 @@ class MSProvider(MockTTSProvider):
 
 
 @pytest.fixture(autouse=True)
-async def setup_media_source(hass: HomeAssistant) -> None:
+async def setup_media_source(hass: SmartHub) -> None:
     """Set up media source."""
     assert await async_setup_component(hass, "media_source", {})
 
@@ -58,7 +58,7 @@ async def setup_media_source(hass: HomeAssistant) -> None:
     ],
     indirect=["setup"],
 )
-async def test_browsing(hass: HomeAssistant, setup: str) -> None:
+async def test_browsing(hass: SmartHub, setup: str) -> None:
     """Test browsing TTS media source."""
     item = await media_source.async_browse_media(hass, "media-source://tts")
 
@@ -79,7 +79,7 @@ async def test_browsing(hass: HomeAssistant, setup: str) -> None:
     assert item_child.children is None
     assert item_child.can_play is False
     assert item_child.can_expand is True
-    assert item_child.thumbnail == "https://brands.home-assistant.io/_/test/logo.png"
+    assert item_child.thumbnail == "https://brands.smart-hub.io/_/test/logo.png"
 
     item_child = await media_source.async_browse_media(
         hass, item.children[0].media_content_id + "?message=bla"
@@ -107,7 +107,7 @@ async def test_browsing(hass: HomeAssistant, setup: str) -> None:
     ],
 )
 async def test_legacy_resolving(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_provider: MSProvider,
     extra_options: str,
@@ -161,7 +161,7 @@ async def test_legacy_resolving(
     ],
 )
 async def test_resolving(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_tts_entity: MSEntity,
     extra_options: str,
@@ -223,7 +223,7 @@ async def test_resolving(
     ],
     indirect=["setup"],
 )
-async def test_resolving_errors(hass: HomeAssistant, setup: str, engine: str) -> None:
+async def test_resolving_errors(hass: SmartHub, setup: str, engine: str) -> None:
     """Test resolving."""
     # No message added
     with pytest.raises(media_source.Unresolvable):
@@ -269,7 +269,7 @@ async def test_resolving_errors(hass: HomeAssistant, setup: str, engine: str) ->
     indirect=["setup"],
 )
 async def test_generate_media_source_id_and_parse_media_source_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup: str,
     result_engine: str,
 ) -> None:

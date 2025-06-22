@@ -6,9 +6,9 @@ import pytest
 import ring_doorbell
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.siren import DOMAIN as SIREN_DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH
-from homeassistant.const import (
+from smarthub.components.siren import DOMAIN as SIREN_DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -16,9 +16,9 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .common import MockConfigEntry, setup_platform
 
@@ -26,7 +26,7 @@ from tests.common import snapshot_platform
 
 
 async def test_entity_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_ring_client,
 ) -> None:
@@ -38,7 +38,7 @@ async def test_entity_registry(
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -51,7 +51,7 @@ async def test_states(
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
-async def test_sirens_report_correctly(hass: HomeAssistant, mock_ring_client) -> None:
+async def test_sirens_report_correctly(hass: SmartHub, mock_ring_client) -> None:
     """Tests that the initial state of a device that should be on is correct."""
     await setup_platform(hass, Platform.SIREN)
 
@@ -61,7 +61,7 @@ async def test_sirens_report_correctly(hass: HomeAssistant, mock_ring_client) ->
 
 
 async def test_default_ding_chime_can_be_played(
-    hass: HomeAssistant, mock_ring_client, mock_ring_devices
+    hass: SmartHub, mock_ring_client, mock_ring_devices
 ) -> None:
     """Tests the play chime request is sent correctly."""
     await setup_platform(hass, Platform.SIREN)
@@ -83,7 +83,7 @@ async def test_default_ding_chime_can_be_played(
 
 
 async def test_turn_on_plays_default_chime(
-    hass: HomeAssistant, mock_ring_client, mock_ring_devices
+    hass: SmartHub, mock_ring_client, mock_ring_devices
 ) -> None:
     """Tests the play chime request is sent correctly when turned on."""
     await setup_platform(hass, Platform.SIREN)
@@ -105,7 +105,7 @@ async def test_turn_on_plays_default_chime(
 
 
 async def test_explicit_ding_chime_can_be_played(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     mock_ring_devices,
 ) -> None:
@@ -129,7 +129,7 @@ async def test_explicit_ding_chime_can_be_played(
 
 
 async def test_motion_chime_can_be_played(
-    hass: HomeAssistant, mock_ring_client, mock_ring_devices
+    hass: SmartHub, mock_ring_client, mock_ring_devices
 ) -> None:
     """Tests the play chime request is sent correctly."""
     await setup_platform(hass, Platform.SIREN)
@@ -160,7 +160,7 @@ async def test_motion_chime_can_be_played(
     ids=["Authentication", "Timeout", "Other"],
 )
 async def test_siren_errors_when_turned_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     mock_ring_devices,
     exception_type,
@@ -175,7 +175,7 @@ async def test_siren_errors_when_turned_on(
     downstairs_chime_mock = mock_ring_devices.get_device(123456)
     downstairs_chime_mock.async_test_sound.side_effect = exception_type
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "siren",
             "turn_on",
@@ -195,7 +195,7 @@ async def test_siren_errors_when_turned_on(
 
 
 async def test_camera_siren_on_off(
-    hass: HomeAssistant, mock_ring_client, mock_ring_devices
+    hass: SmartHub, mock_ring_client, mock_ring_devices
 ) -> None:
     """Tests siren on a ring camera turns on and off."""
     await setup_platform(hass, Platform.SIREN)

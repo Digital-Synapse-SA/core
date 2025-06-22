@@ -6,12 +6,12 @@ from unittest.mock import AsyncMock
 from aioruckus.const import ERROR_CONNECT_EOF, ERROR_LOGIN_INCORRECT
 from aioruckus.exceptions import AuthenticationError
 
-from homeassistant.components.ruckus_unleashed import DOMAIN
-from homeassistant.const import STATE_HOME, STATE_NOT_HOME, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.util import utcnow
+from smarthub.components.ruckus_unleashed import DOMAIN
+from smarthub.const import STATE_HOME, STATE_NOT_HOME, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.util import utcnow
 
 from . import (
     DEFAULT_UNIQUEID,
@@ -24,7 +24,7 @@ from . import (
 from tests.common import async_fire_time_changed
 
 
-async def test_client_connected(hass: HomeAssistant) -> None:
+async def test_client_connected(hass: SmartHub) -> None:
     """Test client connected."""
     await init_integration(hass)
 
@@ -38,7 +38,7 @@ async def test_client_connected(hass: HomeAssistant) -> None:
     assert test_client.state == STATE_HOME
 
 
-async def test_client_disconnected(hass: HomeAssistant) -> None:
+async def test_client_disconnected(hass: SmartHub) -> None:
     """Test client disconnected."""
     await init_integration(hass)
 
@@ -52,7 +52,7 @@ async def test_client_disconnected(hass: HomeAssistant) -> None:
         assert test_client.state == STATE_NOT_HOME
 
 
-async def test_clients_update_failed(hass: HomeAssistant) -> None:
+async def test_clients_update_failed(hass: SmartHub) -> None:
     """Test failed update."""
     await init_integration(hass)
 
@@ -68,7 +68,7 @@ async def test_clients_update_failed(hass: HomeAssistant) -> None:
         assert test_client.state == STATE_UNAVAILABLE
 
 
-async def test_clients_update_auth_failed(hass: HomeAssistant) -> None:
+async def test_clients_update_auth_failed(hass: SmartHub) -> None:
     """Test failed update with bad auth."""
     await init_integration(hass)
 
@@ -85,7 +85,7 @@ async def test_clients_update_auth_failed(hass: HomeAssistant) -> None:
 
 
 async def test_restoring_clients(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test restoring existing device_tracker entities if not detected on startup."""
     entry = mock_config_entry()

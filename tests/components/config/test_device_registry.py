@@ -6,12 +6,12 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components.config import device_registry
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components.config import device_registry
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, MockModule, mock_integration
 from tests.typing import MockHAClientWebSocket, WebSocketGenerator
@@ -24,7 +24,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 @pytest.fixture(name="client")
 async def client_fixture(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> MockHAClientWebSocket:
     """Fixture that can interact with the config manager API."""
     device_registry.async_setup(hass)
@@ -33,7 +33,7 @@ async def client_fixture(
 
 @pytest.mark.usefixtures("freezer")
 async def test_list_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MockHAClientWebSocket,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -163,7 +163,7 @@ async def test_list_devices(
     ],
 )
 async def test_update_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MockHAClientWebSocket,
     device_registry: dr.DeviceRegistry,
     freezer: FrozenDateTimeFactory,
@@ -218,7 +218,7 @@ async def test_update_device(
 
 
 async def test_update_device_labels(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MockHAClientWebSocket,
     device_registry: dr.DeviceRegistry,
     freezer: FrozenDateTimeFactory,
@@ -268,7 +268,7 @@ async def test_update_device_labels(
 
 
 async def test_remove_config_entry_from_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -279,7 +279,7 @@ async def test_remove_config_entry_from_device(
     can_remove = False
 
     async def async_remove_config_entry_device(
-        hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
+        hass: SmartHub, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
     ) -> bool:
         return can_remove
 
@@ -354,7 +354,7 @@ async def test_remove_config_entry_from_device(
 
 
 async def test_remove_config_entry_from_device_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -363,7 +363,7 @@ async def test_remove_config_entry_from_device_fails(
     ws_client = await hass_ws_client(hass)
 
     async def async_remove_config_entry_device(
-        hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
+        hass: SmartHub, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
     ) -> bool:
         return True
 
@@ -471,7 +471,7 @@ async def test_remove_config_entry_from_device_fails(
 
 
 async def test_remove_config_entry_from_device_if_integration_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -482,7 +482,7 @@ async def test_remove_config_entry_from_device_if_integration_remove(
     can_remove = False
 
     async def async_remove_config_entry_device(
-        hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
+        hass: SmartHub, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
     ) -> bool:
         if can_remove:
             device_registry.async_update_device(

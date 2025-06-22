@@ -4,14 +4,14 @@ from unittest.mock import MagicMock, patch
 
 from synology_dsm.exceptions import SynologyDSMLoginInvalidException
 
-from homeassistant.components.synology_dsm.const import (
+from smarthub.components.synology_dsm.const import (
     CONF_BACKUP_PATH,
     CONF_BACKUP_SHARE,
     DEFAULT_VERIFY_SSL,
     DOMAIN,
     SERVICES,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
@@ -21,22 +21,22 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .consts import HOST, MACS, PASSWORD, PORT, USE_SSL, USERNAME
 
 from tests.common import MockConfigEntry
 
 
-async def test_services_registered(hass: HomeAssistant, mock_dsm: MagicMock) -> None:
+async def test_services_registered(hass: SmartHub, mock_dsm: MagicMock) -> None:
     """Test if all services are registered."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=mock_dsm,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,
@@ -55,15 +55,15 @@ async def test_services_registered(hass: HomeAssistant, mock_dsm: MagicMock) -> 
             assert hass.services.has_service(DOMAIN, service)
 
 
-async def test_reauth_triggered(hass: HomeAssistant) -> None:
+async def test_reauth_triggered(hass: SmartHub) -> None:
     """Test if reauthentication flow is triggered."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.SynoApi.async_setup",
+            "smarthub.components.synology_dsm.SynoApi.async_setup",
             side_effect=SynologyDSMLoginInvalidException(USERNAME),
         ),
         patch(
-            "homeassistant.components.synology_dsm.config_flow.SynologyDSMFlowHandler.async_step_reauth",
+            "smarthub.components.synology_dsm.config_flow.SynologyDSMFlowHandler.async_step_reauth",
             return_value={
                 "type": FlowResultType.FORM,
                 "flow_id": "mock_flow",
@@ -89,15 +89,15 @@ async def test_reauth_triggered(hass: HomeAssistant) -> None:
 
 
 async def test_config_entry_migrations(
-    hass: HomeAssistant, mock_dsm: MagicMock
+    hass: SmartHub, mock_dsm: MagicMock
 ) -> None:
     """Test if reauthentication flow is triggered."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=mock_dsm,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,

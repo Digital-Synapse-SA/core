@@ -12,50 +12,50 @@ from freezegun import freeze_time
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant import loader
-from homeassistant.components.recorder import (
+from smarthub import loader
+from smarthub.components.recorder import (
     CONF_COMMIT_INTERVAL,
     DOMAIN as RECORDER_DOMAIN,
     Recorder,
     history,
 )
-from homeassistant.components.recorder.db_schema import (
+from smarthub.components.recorder.db_schema import (
     StateAttributes,
     States,
     StatesMeta,
     StatisticsMeta,
 )
-from homeassistant.components.recorder.models import (
+from smarthub.components.recorder.models import (
     StatisticData,
     StatisticMeanType,
     StatisticMetaData,
     process_timestamp,
 )
-from homeassistant.components.recorder.statistics import (
+from smarthub.components.recorder.statistics import (
     DEG_TO_RAD,
     RAD_TO_DEG,
     async_import_statistics,
     get_metadata,
     list_statistic_ids,
 )
-from homeassistant.components.recorder.util import get_instance, session_scope
-from homeassistant.components.sensor import (
+from smarthub.components.recorder.util import get_instance, session_scope
+from smarthub.components.sensor import (
     ATTR_OPTIONS,
     DOMAIN,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.components.sensor.recorder import (
+from smarthub.components.sensor.recorder import (
     MEAN_TYPE_CHANGED_ISSUE,
     STATE_CLASS_REMOVED_ISSUE,
     UNITS_CHANGED_ISSUE,
 )
-from homeassistant.const import ATTR_FRIENDLY_NAME, DEGREE, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
+from smarthub.const import ATTR_FRIENDLY_NAME, DEGREE, STATE_UNAVAILABLE
+from smarthub.core import SmartHub, State
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from .common import MockSensor
 
@@ -137,13 +137,13 @@ def setup_recorder(recorder_mock: Recorder) -> Recorder:
 def disable_mariadb_issue() -> None:
     """Disable creating issue about outdated MariaDB version."""
     with patch(
-        "homeassistant.components.recorder.util._async_create_mariadb_range_index_regression_issue"
+        "smarthub.components.recorder.util._async_create_mariadb_range_index_regression_issue"
     ):
         yield
 
 
 async def async_list_statistic_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     statistic_ids: set[str] | None = None,
     statistic_type: Literal["mean", "sum"] | None = None,
 ) -> list[dict]:
@@ -154,7 +154,7 @@ async def async_list_statistic_ids(
 
 
 async def assert_statistic_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_result: list[dict[str, Any]],
 ) -> None:
     """Assert statistic ids."""
@@ -170,7 +170,7 @@ async def assert_statistic_ids(
 
 
 def assert_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_issues: dict[str, dict[str, Any]],
 ) -> None:
     """Assert statistics issues."""
@@ -200,7 +200,7 @@ def assert_issues(
 
 
 async def assert_validation_result(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MockHAClientWebSocket,
     expected_validation_result: dict[str, list[dict[str, Any]]],
     expected_issues: Iterable[str],
@@ -263,7 +263,7 @@ async def assert_validation_result(
     ],
 )
 async def test_compile_hourly_statistics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -329,7 +329,7 @@ async def test_compile_hourly_statistics(
 
 
 async def test_compile_hourly_statistics_angle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test compiling hourly statistics for measurement_angle."""
@@ -403,7 +403,7 @@ async def test_compile_hourly_statistics_angle(
     ],
 )
 async def test_compile_hourly_statistics_with_some_same_last_updated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -502,7 +502,7 @@ async def test_compile_hourly_statistics_with_some_same_last_updated(
 
 
 async def test_compile_hourly_statistics_with_some_same_last_updated_angle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test compiling hourly statistics with the some of the same last updated value for measurement_angle.
@@ -651,7 +651,7 @@ async def test_compile_hourly_statistics_with_some_same_last_updated_angle(
     ],
 )
 async def test_compile_hourly_statistics_with_all_same_last_updated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     attributes: dict[str, Any],
     display_unit: str,
@@ -795,7 +795,7 @@ async def test_compile_hourly_statistics_with_all_same_last_updated(
     ],
 )
 async def test_compile_hourly_statistics_only_state_is_at_end_of_period(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     attributes: dict[str, Any],
     display_unit: str,
@@ -888,7 +888,7 @@ async def test_compile_hourly_statistics_only_state_is_at_end_of_period(
     ],
 )
 async def test_compile_hourly_statistics_purged_state_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -981,7 +981,7 @@ async def test_compile_hourly_statistics_purged_state_changes(
     ],
 )
 async def test_compile_hourly_statistics_ignore_future_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -1055,7 +1055,7 @@ async def test_compile_hourly_statistics_ignore_future_state(
 
 @pytest.mark.parametrize("attributes", [TEMPERATURE_SENSOR_ATTRIBUTES])
 async def test_compile_hourly_statistics_wrong_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     attributes,
 ) -> None:
@@ -1280,7 +1280,7 @@ async def test_compile_hourly_statistics_wrong_unit(
     ],
 )
 async def test_compile_hourly_sum_statistics_amount(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     units,
@@ -1467,7 +1467,7 @@ async def test_compile_hourly_sum_statistics_amount(
     ],
 )
 async def test_compile_hourly_sum_statistics_amount_reset_every_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     state_class,
     device_class,
@@ -1591,7 +1591,7 @@ async def test_compile_hourly_sum_statistics_amount_reset_every_state_change(
     ],
 )
 async def test_compile_hourly_sum_statistics_amount_invalid_last_reset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     state_class,
     device_class,
@@ -1692,7 +1692,7 @@ async def test_compile_hourly_sum_statistics_amount_invalid_last_reset(
     ],
 )
 async def test_compile_hourly_sum_statistics_nan_inf_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     state_class,
     device_class,
@@ -1797,7 +1797,7 @@ async def test_compile_hourly_sum_statistics_nan_inf_state(
             "energy",
             0,
             "",
-            "bug report at https://github.com/home-assistant/core/issues?q=is%3Aopen+is%3Aissue",
+            "bug report at https://github.com/smart-hub/core/issues?q=is%3Aopen+is%3Aissue",
         ),
         (
             "sensor.power_consumption",
@@ -1808,7 +1808,7 @@ async def test_compile_hourly_sum_statistics_nan_inf_state(
             "power",
             15,
             "from integration demo ",
-            "bug report at https://github.com/home-assistant/core/issues?q=is%3Aopen+is%3Aissue+label%3A%22integration%3A+demo%22",
+            "bug report at https://github.com/smart-hub/core/issues?q=is%3Aopen+is%3Aissue+label%3A%22integration%3A+demo%22",
         ),
         (
             "sensor.custom_sensor",
@@ -1825,7 +1825,7 @@ async def test_compile_hourly_sum_statistics_nan_inf_state(
 )
 @pytest.mark.parametrize("state_class", ["total_increasing"])
 async def test_compile_hourly_sum_statistics_negative_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     entity_id,
     warning_1,
@@ -1846,7 +1846,7 @@ async def test_compile_hourly_sum_statistics_negative_state(
     mocksensor._attr_should_poll = False
     setup_test_component_platform(hass, DOMAIN, [mocksensor], built_in=False)
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     with freeze_time(zero) as freezer:
         await async_setup_component(
             hass, "sensor", {"sensor": [{"platform": "demo"}, {"platform": "test"}]}
@@ -1943,7 +1943,7 @@ async def test_compile_hourly_sum_statistics_negative_state(
     ],
 )
 async def test_compile_hourly_sum_statistics_total_no_reset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -2057,7 +2057,7 @@ async def test_compile_hourly_sum_statistics_total_no_reset(
     ],
 )
 async def test_compile_hourly_sum_statistics_total_increasing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -2171,7 +2171,7 @@ async def test_compile_hourly_sum_statistics_total_increasing(
     ],
 )
 async def test_compile_hourly_sum_statistics_total_increasing_small_dip(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -2226,7 +2226,7 @@ async def test_compile_hourly_sum_statistics_total_increasing_small_dip(
         "Entity sensor.test1 has state class total_increasing, but its state is not "
         f"strictly increasing. Triggered by state {state} ({previous_state}) with "
         f"last_updated set to {last_updated}. Please create a bug report at "
-        "https://github.com/home-assistant/core/issues?q=is%3Aopen+is%3Aissue"
+        "https://github.com/smart-hub/core/issues?q=is%3Aopen+is%3Aissue"
     ) in caplog.text
     statistic_ids = await async_list_statistic_ids(hass)
     assert statistic_ids == [
@@ -2281,7 +2281,7 @@ async def test_compile_hourly_sum_statistics_total_increasing_small_dip(
 
 
 async def test_compile_hourly_energy_statistics_unsupported(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test compiling hourly statistics."""
     period0 = get_start_time(dt_util.utcnow())
@@ -2386,7 +2386,7 @@ async def test_compile_hourly_energy_statistics_unsupported(
 
 
 async def test_compile_hourly_energy_statistics_multiple(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test compiling multiple hourly statistics."""
     period0 = get_start_time(dt_util.utcnow())
@@ -2601,7 +2601,7 @@ async def test_compile_hourly_energy_statistics_multiple(
     ],
 )
 async def test_compile_hourly_statistics_unchanged(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -2648,7 +2648,7 @@ async def test_compile_hourly_statistics_unchanged(
 
 
 async def test_compile_hourly_statistics_unchanged_angle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test compiling hourly statistics, with no changes during the hour for measurement_angle."""
@@ -2699,7 +2699,7 @@ async def test_compile_hourly_statistics_unchanged_angle(
     ],
 )
 async def test_compile_hourly_statistics_partially_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     attributes: dict,
     expected_mean: float,
@@ -2767,7 +2767,7 @@ async def test_compile_hourly_statistics_partially_unavailable(
     ],
 )
 async def test_compile_hourly_statistics_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -2822,7 +2822,7 @@ async def test_compile_hourly_statistics_unavailable(
 
 
 async def test_compile_hourly_statistics_unavailable_angle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test compiling hourly statistics, with one sensor being unavailable for measurement_angle.
@@ -2874,7 +2874,7 @@ async def test_compile_hourly_statistics_unavailable_angle(
 
 
 async def test_compile_hourly_statistics_fails(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test compiling hourly statistics throws."""
     zero = get_start_time(dt_util.utcnow())
@@ -2882,7 +2882,7 @@ async def test_compile_hourly_statistics_fails(
     # Wait for the sensor recorder platform to be added
     await async_recorder_block_till_done(hass)
     with patch(
-        "homeassistant.components.sensor.recorder.compile_statistics",
+        "smarthub.components.sensor.recorder.compile_statistics",
         side_effect=Exception,
     ):
         do_adhoc_statistics(hass, start=zero)
@@ -3154,7 +3154,7 @@ async def test_compile_hourly_statistics_fails(
     ],
 )
 async def test_list_statistic_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     state_class: str | SensorStateClass,
     device_class: str | SensorDeviceClass,
     state_unit: str,
@@ -3222,7 +3222,7 @@ async def test_list_statistic_ids(
     [{**ENERGY_SENSOR_ATTRIBUTES, "last_reset": 0}, TEMPERATURE_SENSOR_ATTRIBUTES],
 )
 async def test_list_statistic_ids_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     energy_attributes: dict[str, Any],
 ) -> None:
     """Test listing future statistic ids for unsupported sensor."""
@@ -3262,7 +3262,7 @@ async def test_list_statistic_ids_unsupported(
     ],
 )
 async def test_compile_hourly_statistics_changing_units_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -3391,7 +3391,7 @@ async def test_compile_hourly_statistics_changing_units_1(
     ],
 )
 async def test_compile_hourly_statistics_changing_units_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -3471,7 +3471,7 @@ async def test_compile_hourly_statistics_changing_units_2(
     ],
 )
 async def test_compile_hourly_statistics_changing_units_3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -3596,7 +3596,7 @@ async def test_compile_hourly_statistics_changing_units_3(
     ],
 )
 async def test_compile_hourly_statistics_convert_units_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     state_unit_1,
     state_unit_2,
@@ -3758,7 +3758,7 @@ async def test_compile_hourly_statistics_convert_units_1(
     ],
 )
 async def test_compile_hourly_statistics_equivalent_units_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -3887,7 +3887,7 @@ async def test_compile_hourly_statistics_equivalent_units_1(
     ],
 )
 async def test_compile_hourly_statistics_equivalent_units_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -3977,7 +3977,7 @@ async def test_compile_hourly_statistics_equivalent_units_2(
     ],
 )
 async def test_compile_hourly_statistics_changing_device_class_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -4190,7 +4190,7 @@ async def test_compile_hourly_statistics_changing_device_class_1(
     ],
 )
 async def test_compile_hourly_statistics_changing_device_class_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -4332,7 +4332,7 @@ async def test_compile_hourly_statistics_changing_device_class_2(
     ],
 )
 async def test_compile_hourly_statistics_changing_state_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_class,
     state_unit,
@@ -4471,7 +4471,7 @@ async def test_compile_hourly_statistics_changing_state_class(
 @pytest.mark.parametrize("recorder_config", [{CONF_COMMIT_INTERVAL: 3600 * 4}])
 @pytest.mark.freeze_time("2021-09-01 05:00")  # August 31st, 23:00 local time
 async def test_compile_statistics_hourly_daily_monthly_summary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -4846,7 +4846,7 @@ async def test_compile_statistics_hourly_daily_monthly_summary(
 
 
 async def async_record_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     zero: datetime,
     entity_id: str,
@@ -4920,7 +4920,7 @@ async def async_record_states(
     ],
 )
 async def test_validate_unit_change_convertible(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     units,
     attributes,
@@ -5062,7 +5062,7 @@ async def test_validate_unit_change_convertible(
     ],
 )
 async def test_validate_statistics_unit_ignore_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     units,
     attributes,
@@ -5145,7 +5145,7 @@ async def test_validate_statistics_unit_ignore_device_class(
     ],
 )
 async def test_validate_statistics_unit_change_no_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     units,
     attributes,
@@ -5287,7 +5287,7 @@ async def test_validate_statistics_unit_change_no_device_class(
     ],
 )
 async def test_validate_statistics_state_class_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     units,
     attributes,
@@ -5355,7 +5355,7 @@ async def test_validate_statistics_state_class_removed(
     ],
 )
 async def test_validate_statistics_state_class_removed_issue_cleaned_up(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     units,
     attributes,
@@ -5414,7 +5414,7 @@ async def test_validate_statistics_state_class_removed_issue_cleaned_up(
     ],
 )
 async def test_validate_statistics_sensor_no_longer_recorded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     units,
     attributes,
@@ -5468,7 +5468,7 @@ async def test_validate_statistics_sensor_no_longer_recorded(
     ],
 )
 async def test_validate_statistics_sensor_not_recorded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     units,
     attributes,
@@ -5519,7 +5519,7 @@ async def test_validate_statistics_sensor_not_recorded(
     ],
 )
 async def test_validate_statistics_sensor_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     units,
     attributes,
@@ -5569,7 +5569,7 @@ async def test_validate_statistics_sensor_removed(
     ],
 )
 async def test_validate_statistics_unit_change_no_conversion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     attributes,
     unit1,
@@ -5708,7 +5708,7 @@ async def test_validate_statistics_unit_change_no_conversion(
     ],
 )
 async def test_validate_statistics_unit_change_equivalent_units(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     attributes,
     unit1,
@@ -5771,7 +5771,7 @@ async def test_validate_statistics_unit_change_equivalent_units(
     ],
 )
 async def test_validate_statistics_unit_change_equivalent_units_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     attributes,
     unit1,
@@ -5842,7 +5842,7 @@ async def test_validate_statistics_unit_change_equivalent_units_2(
 
 
 async def test_validate_statistics_other_domain(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test sensor does not raise issues for statistics for other domains."""
     await async_setup_component(hass, "sensor", {})
@@ -5881,7 +5881,7 @@ async def test_validate_statistics_other_domain(
     ],
 )
 async def test_update_statistics_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     units,
     attributes,
     unit,
@@ -5935,7 +5935,7 @@ async def test_update_statistics_issues(
 
 
 async def async_record_meter_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     zero: datetime,
     entity_id: str,
@@ -6002,7 +6002,7 @@ async def async_record_meter_states(
 
 
 async def async_record_meter_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     zero: datetime,
     entity_id: str,
@@ -6027,7 +6027,7 @@ async def async_record_meter_state(
 
 
 async def async_record_states_partially_unavailable(
-    hass: HomeAssistant, zero: datetime, entity_id: str, attributes: dict[str, Any]
+    hass: SmartHub, zero: datetime, entity_id: str, attributes: dict[str, Any]
 ) -> tuple[datetime, dict[str, list[State]]]:
     """Record some test states.
 
@@ -6060,7 +6060,7 @@ async def async_record_states_partially_unavailable(
 
 
 @pytest.mark.usefixtures("enable_custom_integrations")
-async def test_exclude_attributes(hass: HomeAssistant) -> None:
+async def test_exclude_attributes(hass: SmartHub) -> None:
     """Test sensor attributes to be excluded."""
     entity0 = MockSensor(
         has_entity_name=True,
@@ -6109,7 +6109,7 @@ async def test_exclude_attributes(hass: HomeAssistant) -> None:
     ],
 )
 async def test_clean_up_repairs(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test cleaning up repairs."""
     await async_setup_component(hass, "sensor", {})
@@ -6159,7 +6159,7 @@ async def test_clean_up_repairs(
 
 
 async def test_validate_statistics_mean_type_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -6205,13 +6205,13 @@ async def test_validate_statistics_mean_type_changed(
     ]
 
     expected_log_entry = (
-        "homeassistant.components.sensor.recorder",
+        "smarthub.components.sensor.recorder",
         logging.WARNING,
         (
             "The statistics mean algorithm for sensor.wind_direction have changed from"
             " CIRCULAR to ARITHMETIC. Generation of long term statistics will be "
             "suppressed unless it changes back or go to "
-            "https://my.home-assistant.io/redirect/developer_statistics "
+            "https://my.smart-hub.io/redirect/developer_statistics "
             "to delete the old statistics"
         ),
     )

@@ -9,9 +9,9 @@ from ondilo import OndiloError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ondilo_client: MagicMock,
     device_registry: dr.DeviceRegistry,
     config_entry: MockConfigEntry,
@@ -40,7 +40,7 @@ async def test_devices(
 
 
 async def test_get_pools_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ondilo_client: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -63,7 +63,7 @@ async def test_get_pools_error(
 
 
 async def test_init_with_no_ico_attached(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ondilo_client: MagicMock,
     device_registry: dr.DeviceRegistry,
     config_entry: MockConfigEntry,
@@ -89,7 +89,7 @@ async def test_init_with_no_ico_attached(
 
 
 async def test_adding_pool_after_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_ondilo_client: MagicMock,
     device_registry: dr.DeviceRegistry,
@@ -131,7 +131,7 @@ async def test_adding_pool_after_setup(
 
 
 async def test_removing_pool_after_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_ondilo_client: MagicMock,
     device_registry: dr.DeviceRegistry,
@@ -175,7 +175,7 @@ async def test_removing_pool_after_setup(
     ],
 )
 async def test_details_error_all_pools(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ondilo_client: MagicMock,
     device_registry: dr.DeviceRegistry,
     config_entry: MockConfigEntry,
@@ -200,7 +200,7 @@ async def test_details_error_all_pools(
 
 
 async def test_details_error_one_pool(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ondilo_client: MagicMock,
     device_registry: dr.DeviceRegistry,
     config_entry: MockConfigEntry,
@@ -225,7 +225,7 @@ async def test_details_error_one_pool(
 
 
 async def test_measures_error_one_pool(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_ondilo_client: MagicMock,
     device_registry: dr.DeviceRegistry,
@@ -276,7 +276,7 @@ async def test_measures_error_one_pool(
 
 
 async def test_measures_scheduling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_ondilo_client: MagicMock,
     device_registry: dr.DeviceRegistry,

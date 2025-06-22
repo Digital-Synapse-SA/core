@@ -7,11 +7,11 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from whirlpool.washerdryer import MachineState
 
-from homeassistant.components.whirlpool.sensor import SCAN_INTERVAL
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import as_timestamp, utc_from_timestamp, utcnow
+from smarthub.components.whirlpool.sensor import SCAN_INTERVAL
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import as_timestamp, utc_from_timestamp, utcnow
 
 from . import init_integration, snapshot_whirlpool_entities, trigger_attr_callback
 
@@ -25,7 +25,7 @@ DRYER_ENTITY_ID_BASE = "sensor.dryer"
 @pytest.mark.freeze_time("2025-05-04 12:00:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -43,7 +43,7 @@ async def test_all_entities(
 )
 @pytest.mark.freeze_time("2022-11-30 00:00:00")
 async def test_washer_dryer_time_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     mock_fixture: str,
     request: pytest.FixtureRequest,
@@ -118,7 +118,7 @@ async def test_washer_dryer_time_sensor(
 )
 @pytest.mark.freeze_time("2022-11-30 00:00:00")
 async def test_washer_dryer_time_sensor_no_restore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     mock_fixture: str,
     request: pytest.FixtureRequest,
@@ -181,7 +181,7 @@ async def test_washer_dryer_time_sensor_no_restore(
     ],
 )
 async def test_washer_dryer_machine_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     mock_fixture: str,
     machine_state: MachineState,
@@ -226,7 +226,7 @@ async def test_washer_dryer_machine_states(
     ],
 )
 async def test_washer_dryer_running_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     mock_fixture: str,
     filling: bool,
@@ -264,7 +264,7 @@ async def test_washer_dryer_running_states(
     ],
 )
 async def test_washer_dryer_door_open_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     mock_fixture: str,
     request: pytest.FixtureRequest,
@@ -309,7 +309,7 @@ async def test_washer_dryer_door_open_state(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_simple_enum_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     mock_fixture: str,
     mock_method_name: str,

@@ -11,20 +11,20 @@ from hass_nabucasa.api import CloudApiError, CloudApiNonRetryableError
 from hass_nabucasa.files import FilesError, StorageType
 import pytest
 
-from homeassistant.components.backup import (
+from smarthub.components.backup import (
     DOMAIN as BACKUP_DOMAIN,
     AddonInfo,
     AgentBackup,
     Folder,
 )
-from homeassistant.components.cloud import DOMAIN
-from homeassistant.components.cloud.backup import async_register_backup_agents_listener
-from homeassistant.components.cloud.const import EVENT_CLOUD_EVENT
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.backup import async_initialize_backup
-from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.setup import async_setup_component
-from homeassistant.util.aiohttp import MockStreamReaderChunked
+from smarthub.components.cloud import DOMAIN
+from smarthub.components.cloud.backup import async_register_backup_agents_listener
+from smarthub.components.cloud.const import EVENT_CLOUD_EVENT
+from smarthub.core import SmartHub
+from smarthub.helpers.backup import async_initialize_backup
+from smarthub.helpers.dispatcher import async_dispatcher_send
+from smarthub.setup import async_setup_component
+from smarthub.util.aiohttp import MockStreamReaderChunked
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 from tests.typing import ClientSessionGenerator, MagicMock, WebSocketGenerator
@@ -32,7 +32,7 @@ from tests.typing import ClientSessionGenerator, MagicMock, WebSocketGenerator
 
 @pytest.fixture(autouse=True)
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     cloud: MagicMock,
     cloud_logged_in: None,
@@ -40,8 +40,8 @@ async def setup_integration(
     """Set up cloud and backup integrations."""
     async_initialize_backup(hass)
     with (
-        patch("homeassistant.components.backup.is_hassio", return_value=False),
-        patch("homeassistant.components.backup.store.STORE_DELAY_SAVE", 0),
+        patch("smarthub.components.backup.is_hassio", return_value=False),
+        patch("smarthub.components.backup.store.STORE_DELAY_SAVE", 0),
     ):
         assert await async_setup_component(hass, BACKUP_DOMAIN, {BACKUP_DOMAIN: {}})
         assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -53,7 +53,7 @@ async def setup_integration(
 def mock_delete_file() -> Generator[MagicMock]:
     """Mock list files."""
     with patch(
-        "homeassistant.components.cloud.backup.async_files_delete_file",
+        "smarthub.components.cloud.backup.async_files_delete_file",
         spec_set=True,
     ) as delete_file:
         yield delete_file
@@ -63,7 +63,7 @@ def mock_delete_file() -> Generator[MagicMock]:
 def mock_list_files() -> Generator[MagicMock]:
     """Mock list files."""
     with patch(
-        "homeassistant.components.cloud.backup.async_files_list", spec_set=True
+        "smarthub.components.cloud.backup.async_files_list", spec_set=True
     ) as list_files:
         list_files.return_value = [
             {
@@ -77,8 +77,8 @@ def mock_list_files() -> Generator[MagicMock]:
                     "database_included": True,
                     "extra_metadata": {},
                     "folders": [],
-                    "homeassistant_included": True,
-                    "homeassistant_version": "2024.12.0.dev0",
+                    "smarthub_included": True,
+                    "smarthub_version": "2024.12.0.dev0",
                     "name": "Core 2024.12.0.dev0",
                     "protected": False,
                     "size": 34519040,
@@ -96,8 +96,8 @@ def mock_list_files() -> Generator[MagicMock]:
                     "database_included": True,
                     "extra_metadata": {},
                     "folders": [],
-                    "homeassistant_included": True,
-                    "homeassistant_version": "2024.12.0.dev0",
+                    "smarthub_included": True,
+                    "smarthub_version": "2024.12.0.dev0",
                     "name": "Core 2024.12.0.dev0",
                     "protected": False,
                     "size": 34519040,
@@ -115,7 +115,7 @@ def cloud_logged_in(cloud: MagicMock):
 
 
 async def test_agents_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test backup agent info."""
@@ -134,7 +134,7 @@ async def test_agents_info(
 
 
 async def test_agents_list_backups(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     mock_list_files: Mock,
@@ -159,8 +159,8 @@ async def test_agents_list_backups(
             "failed_agent_ids": [],
             "failed_folders": [],
             "folders": [],
-            "homeassistant_included": True,
-            "homeassistant_version": "2024.12.0.dev0",
+            "smarthub_included": True,
+            "smarthub_version": "2024.12.0.dev0",
             "name": "Core 2024.12.0.dev0",
             "with_automatic_settings": None,
         },
@@ -175,8 +175,8 @@ async def test_agents_list_backups(
             "failed_agent_ids": [],
             "failed_folders": [],
             "folders": [],
-            "homeassistant_included": True,
-            "homeassistant_version": "2024.12.0.dev0",
+            "smarthub_included": True,
+            "smarthub_version": "2024.12.0.dev0",
             "name": "Core 2024.12.0.dev0",
             "with_automatic_settings": None,
         },
@@ -185,7 +185,7 @@ async def test_agents_list_backups(
 
 @pytest.mark.parametrize("side_effect", [ClientError, CloudError])
 async def test_agents_list_backups_fail_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     mock_list_files: Mock,
@@ -227,8 +227,8 @@ async def test_agents_list_backups_fail_cloud(
                 "failed_agent_ids": [],
                 "failed_folders": [],
                 "folders": [],
-                "homeassistant_included": True,
-                "homeassistant_version": "2024.12.0.dev0",
+                "smarthub_included": True,
+                "smarthub_version": "2024.12.0.dev0",
                 "name": "Core 2024.12.0.dev0",
                 "with_automatic_settings": None,
             },
@@ -241,7 +241,7 @@ async def test_agents_list_backups_fail_cloud(
     ids=["found", "not_found"],
 )
 async def test_agents_get_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     backup_id: str,
@@ -261,7 +261,7 @@ async def test_agents_get_backup(
 
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_download(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     cloud: Mock,
@@ -283,7 +283,7 @@ async def test_agents_download(
 
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_download_fail_get(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     cloud: Mock,
 ) -> None:
@@ -301,7 +301,7 @@ async def test_agents_download_fail_get(
 
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_download_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test agent download backup raises error if not found."""
@@ -315,7 +315,7 @@ async def test_agents_download_not_found(
 
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_upload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
     cloud: Mock,
@@ -331,18 +331,18 @@ async def test_agents_upload(
         date="1970-01-01T00:00:00.000Z",
         extra_metadata={},
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=True,
         size=len(backup_data),
     )
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -372,7 +372,7 @@ async def test_agents_upload(
 @pytest.mark.parametrize("side_effect", [FilesError("Boom!"), CloudError("Boom!")])
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_upload_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
     side_effect: Exception,
@@ -390,8 +390,8 @@ async def test_agents_upload_fail(
         date="1970-01-01T00:00:00.000Z",
         extra_metadata={},
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=True,
         size=len(backup_data),
@@ -401,16 +401,16 @@ async def test_agents_upload_fail(
 
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
-        patch("homeassistant.components.cloud.backup.asyncio.sleep"),
-        patch("homeassistant.components.cloud.backup.random.randint", return_value=60),
-        patch("homeassistant.components.cloud.backup._RETRY_LIMIT", 2),
+        patch("smarthub.components.cloud.backup.asyncio.sleep"),
+        patch("smarthub.components.cloud.backup.random.randint", return_value=60),
+        patch("smarthub.components.cloud.backup._RETRY_LIMIT", 2),
     ):
         mocked_open.return_value.read = Mock(side_effect=[backup_data.encode(), b""])
         fetch_backup.return_value = test_backup
@@ -435,7 +435,7 @@ async def test_agents_upload_fail(
     [
         (
             CloudApiNonRetryableError("Boom!", code="NC-SH-FH-03"),
-            "The backup size of 13.37GB is too large to be uploaded to Home Assistant Cloud",
+            "The backup size of 13.37GB is too large to be uploaded to SmartHub Cloud",
         ),
         (
             CloudApiNonRetryableError("Boom!", code="NC-CE-01"),
@@ -445,7 +445,7 @@ async def test_agents_upload_fail(
 )
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_upload_fail_non_retryable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
     side_effect: Exception,
@@ -464,8 +464,8 @@ async def test_agents_upload_fail_non_retryable(
         date="1970-01-01T00:00:00.000Z",
         extra_metadata={},
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=True,
         size=14358124749,
@@ -475,14 +475,14 @@ async def test_agents_upload_fail_non_retryable(
 
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
-        patch("homeassistant.components.cloud.backup.calculate_b64md5"),
+        patch("smarthub.components.cloud.backup.calculate_b64md5"),
     ):
         mocked_open.return_value.read = Mock(side_effect=[backup_data.encode(), b""])
         fetch_backup.return_value = test_backup
@@ -503,7 +503,7 @@ async def test_agents_upload_fail_non_retryable(
 
 
 async def test_agents_upload_not_protected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -518,8 +518,8 @@ async def test_agents_upload_not_protected(
         date="1970-01-01T00:00:00.000Z",
         extra_metadata={},
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=False,
         size=len(backup_data),
@@ -527,7 +527,7 @@ async def test_agents_upload_not_protected(
     with (
         patch("pathlib.Path.open"),
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
     ):
@@ -547,7 +547,7 @@ async def test_agents_upload_not_protected(
 
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_upload_not_subscribed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
     cloud: Mock,
@@ -564,8 +564,8 @@ async def test_agents_upload_not_subscribed(
         date="1970-01-01T00:00:00.000Z",
         extra_metadata={},
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=True,
         size=len(backup_data),
@@ -573,10 +573,10 @@ async def test_agents_upload_not_subscribed(
 
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -600,7 +600,7 @@ async def test_agents_upload_not_subscribed(
 
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_upload_not_subscribed_midway(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
     cloud: Mock,
@@ -616,8 +616,8 @@ async def test_agents_upload_not_subscribed_midway(
         date="1970-01-01T00:00:00.000Z",
         extra_metadata={},
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=True,
         size=len(backup_data),
@@ -634,10 +634,10 @@ async def test_agents_upload_not_subscribed_midway(
 
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -661,7 +661,7 @@ async def test_agents_upload_not_subscribed_midway(
 
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_upload_wrong_size(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
     cloud: Mock,
@@ -677,18 +677,18 @@ async def test_agents_upload_wrong_size(
         date="1970-01-01T00:00:00.000Z",
         extra_metadata={},
         folders=[Folder.MEDIA, Folder.SHARE],
-        homeassistant_included=True,
-        homeassistant_version="2024.12.0",
+        smarthub_included=True,
+        smarthub_version="2024.12.0",
         name="Test",
         protected=True,
         size=len(backup_data) - 1,
     )
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -708,7 +708,7 @@ async def test_agents_upload_wrong_size(
 
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_delete(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: Mock,
     mock_delete_file: Mock,
@@ -737,7 +737,7 @@ async def test_agents_delete(
 @pytest.mark.parametrize("side_effect", [ClientError, CloudError])
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_delete_fail_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_delete_file: Mock,
     side_effect: Exception,
@@ -763,7 +763,7 @@ async def test_agents_delete_fail_cloud(
 
 @pytest.mark.usefixtures("cloud_logged_in", "mock_list_files")
 async def test_agents_delete_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test agent download backup raises error if not found."""
@@ -784,7 +784,7 @@ async def test_agents_delete_not_found(
 
 @pytest.mark.parametrize("event_type", ["login", "logout"])
 async def test_calling_listener_on_login_logout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     event_type: str,
 ) -> None:
     """Test calling listener for login and logout events."""
@@ -798,7 +798,7 @@ async def test_calling_listener_on_login_logout(
     assert listener.call_count == 1
 
 
-async def test_not_calling_listener_after_unsub(hass: HomeAssistant) -> None:
+async def test_not_calling_listener_after_unsub(hass: SmartHub) -> None:
     """Test only calling listener until unsub."""
     listener = MagicMock()
     unsub = async_register_backup_agents_listener(hass, listener=listener)
@@ -816,7 +816,7 @@ async def test_not_calling_listener_after_unsub(hass: HomeAssistant) -> None:
 
 
 async def test_not_calling_listener_with_unknown_event_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test not calling listener if we did not get the expected event type."""
     listener = MagicMock()

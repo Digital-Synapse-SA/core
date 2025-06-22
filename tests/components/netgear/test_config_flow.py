@@ -5,24 +5,24 @@ from unittest.mock import Mock, patch
 from pynetgear import DEFAULT_USER
 import pytest
 
-from homeassistant.components.netgear.const import (
+from smarthub.components.netgear.const import (
     CONF_CONSIDER_HOME,
     DOMAIN,
     MODELS_PORT_5555,
     PORT_80,
     PORT_5555,
 )
-from homeassistant.config_entries import SOURCE_SSDP, SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_SSDP, SOURCE_USER
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_SSL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_MODEL_NUMBER,
     ATTR_UPNP_PRESENTATION_URL,
     ATTR_UPNP_SERIAL,
@@ -74,8 +74,8 @@ SSDP_URL_SLL = f"https://{HOST}:{PORT}/rootDesc.xml"
 def mock_controller_service():
     """Mock a successful service."""
     with (
-        patch("homeassistant.components.netgear.async_setup_entry", return_value=True),
-        patch("homeassistant.components.netgear.router.Netgear") as service_mock,
+        patch("smarthub.components.netgear.async_setup_entry", return_value=True),
+        patch("smarthub.components.netgear.router.Netgear") as service_mock,
     ):
         service_mock.return_value.get_info = Mock(return_value=ROUTER_INFOS)
         service_mock.return_value.port = 80
@@ -83,7 +83,7 @@ def mock_controller_service():
         yield service_mock
 
 
-async def test_user(hass: HomeAssistant, service) -> None:
+async def test_user(hass: SmartHub, service) -> None:
     """Test user step."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -110,7 +110,7 @@ async def test_user(hass: HomeAssistant, service) -> None:
     assert result["data"][CONF_PASSWORD] == PASSWORD
 
 
-async def test_user_connect_error(hass: HomeAssistant, service) -> None:
+async def test_user_connect_error(hass: SmartHub, service) -> None:
     """Test user step with connection failure."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -148,7 +148,7 @@ async def test_user_connect_error(hass: HomeAssistant, service) -> None:
     assert result["errors"] == {"base": "config"}
 
 
-async def test_user_incomplete_info(hass: HomeAssistant, service) -> None:
+async def test_user_incomplete_info(hass: SmartHub, service) -> None:
     """Test user step with incomplete device info."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -179,7 +179,7 @@ async def test_user_incomplete_info(hass: HomeAssistant, service) -> None:
     assert result["data"][CONF_PASSWORD] == PASSWORD
 
 
-async def test_abort_if_already_setup(hass: HomeAssistant, service) -> None:
+async def test_abort_if_already_setup(hass: SmartHub, service) -> None:
     """Test we abort if the router is already setup."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -202,7 +202,7 @@ async def test_abort_if_already_setup(hass: HomeAssistant, service) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_ssdp_already_configured(hass: HomeAssistant) -> None:
+async def test_ssdp_already_configured(hass: SmartHub) -> None:
     """Test ssdp abort when the router is already configured."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -228,7 +228,7 @@ async def test_ssdp_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_ssdp_no_serial(hass: HomeAssistant) -> None:
+async def test_ssdp_no_serial(hass: SmartHub) -> None:
     """Test ssdp abort when the ssdp info does not include a serial number."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -247,7 +247,7 @@ async def test_ssdp_no_serial(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_serial"
 
 
-async def test_ssdp_ipv6(hass: HomeAssistant) -> None:
+async def test_ssdp_ipv6(hass: SmartHub) -> None:
     """Test ssdp abort when using a ipv6 address."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -273,7 +273,7 @@ async def test_ssdp_ipv6(hass: HomeAssistant) -> None:
     assert result["reason"] == "not_ipv4_address"
 
 
-async def test_ssdp(hass: HomeAssistant, service) -> None:
+async def test_ssdp(hass: SmartHub, service) -> None:
     """Test ssdp step."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -305,7 +305,7 @@ async def test_ssdp(hass: HomeAssistant, service) -> None:
     assert result["data"][CONF_PASSWORD] == PASSWORD
 
 
-async def test_ssdp_port_5555(hass: HomeAssistant, service) -> None:
+async def test_ssdp_port_5555(hass: SmartHub, service) -> None:
     """Test ssdp step with port 5555."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -340,7 +340,7 @@ async def test_ssdp_port_5555(hass: HomeAssistant, service) -> None:
     assert result["data"][CONF_PASSWORD] == PASSWORD
 
 
-async def test_options_flow(hass: HomeAssistant, service) -> None:
+async def test_options_flow(hass: SmartHub, service) -> None:
     """Test specifying non default settings using options flow."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

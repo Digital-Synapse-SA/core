@@ -104,7 +104,7 @@ class HassDecoratorChecker(BaseChecker):
     def visit_asyncfunctiondef(self, node: nodes.AsyncFunctionDef) -> None:
         """Apply checks on an AsyncFunctionDef node."""
         if decoratornames := node.decoratornames():
-            if "homeassistant.core.callback" in decoratornames:
+            if "smarthub.core.callback" in decoratornames:
                 self.add_message("hass-async-callback-decorator", node=node)
             self._check_pytest_fixture(node, decoratornames)
 

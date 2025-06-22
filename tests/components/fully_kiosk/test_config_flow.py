@@ -6,25 +6,25 @@ from aiohttp.client_exceptions import ClientConnectorError
 from fullykiosk import FullyKioskError
 import pytest
 
-from homeassistant.components.fully_kiosk.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_MQTT, SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.fully_kiosk.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_MQTT, SOURCE_USER
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
     CONF_SSL,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.mqtt import MqttServiceInfo
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.mqtt import MqttServiceInfo
 
 from tests.common import MockConfigEntry, async_load_fixture
 
 
 async def test_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk_config_flow: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -71,7 +71,7 @@ async def test_user_flow(
     ],
 )
 async def test_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk_config_flow: MagicMock,
     mock_setup_entry: AsyncMock,
     side_effect: Exception,
@@ -129,7 +129,7 @@ async def test_errors(
 
 
 async def test_duplicate_updates_existing_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk_config_flow: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -166,7 +166,7 @@ async def test_duplicate_updates_existing_entry(
 
 
 async def test_dhcp_discovery_updates_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test DHCP discovery updates config entries."""
@@ -194,7 +194,7 @@ async def test_dhcp_discovery_updates_entry(
 
 
 async def test_dhcp_unknown_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test unknown DHCP discovery aborts flow."""
@@ -215,7 +215,7 @@ async def test_dhcp_unknown_device(
 
 
 async def test_mqtt_discovery_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk_config_flow: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:

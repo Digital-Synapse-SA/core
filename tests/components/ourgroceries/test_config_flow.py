@@ -4,17 +4,17 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.ourgroceries.config_flow import (
+from smarthub import config_entries
+from smarthub.components.ourgroceries.config_flow import (
     ClientError,
     InvalidLoginException,
 )
-from homeassistant.components.ourgroceries.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.ourgroceries.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -23,7 +23,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.ourgroceries.config_flow.OurGroceries.login",
+        "smarthub.components.ourgroceries.config_flow.OurGroceries.login",
         return_value=True,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -54,7 +54,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     ],
 )
 async def test_form_error(
-    hass: HomeAssistant, exception: Exception, error: str, mock_setup_entry: AsyncMock
+    hass: SmartHub, exception: Exception, error: str, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle form errors."""
     result = await hass.config_entries.flow.async_init(
@@ -62,7 +62,7 @@ async def test_form_error(
     )
 
     with patch(
-        "homeassistant.components.ourgroceries.config_flow.OurGroceries.login",
+        "smarthub.components.ourgroceries.config_flow.OurGroceries.login",
         side_effect=exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -76,7 +76,7 @@ async def test_form_error(
     assert result2["type"] is FlowResultType.FORM
     assert result2["errors"] == {"base": error}
     with patch(
-        "homeassistant.components.ourgroceries.config_flow.OurGroceries.login",
+        "smarthub.components.ourgroceries.config_flow.OurGroceries.login",
         return_value=True,
     ):
         result3 = await hass.config_entries.flow.async_configure(

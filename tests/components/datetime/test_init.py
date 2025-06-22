@@ -5,10 +5,10 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from homeassistant.components.datetime import ATTR_DATETIME, DOMAIN, SERVICE_SET_VALUE
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_FRIENDLY_NAME, CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.datetime import ATTR_DATETIME, DOMAIN, SERVICE_SET_VALUE
+from smarthub.const import ATTR_ENTITY_ID, ATTR_FRIENDLY_NAME, CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import MockDateTimeEntity
 
@@ -17,7 +17,7 @@ from tests.common import setup_test_component_platform
 DEFAULT_VALUE = datetime(2020, 1, 1, 12, 0, 0, tzinfo=UTC)
 
 
-async def test_datetime(hass: HomeAssistant) -> None:
+async def test_datetime(hass: SmartHub) -> None:
     """Test date/time entity."""
     await hass.config.async_set_time_zone("UTC")
     setup_test_component_platform(

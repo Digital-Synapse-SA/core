@@ -5,17 +5,17 @@ from unittest.mock import MagicMock
 from demetriek import LaMetricConnectionError, LaMetricError
 import pytest
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.lametric.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.lametric.const import DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = [
     pytest.mark.usefixtures("init_integration"),
@@ -24,7 +24,7 @@ pytestmark = [
 
 
 async def test_button_app_next(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -71,7 +71,7 @@ async def test_button_app_next(
 
 
 async def test_button_app_previous(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -117,7 +117,7 @@ async def test_button_app_previous(
 
 
 async def test_button_dismiss_current_notification(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -165,7 +165,7 @@ async def test_button_dismiss_current_notification(
 
 
 async def test_button_dismiss_all_notifications(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -213,14 +213,14 @@ async def test_button_dismiss_all_notifications(
 
 
 async def test_button_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test error handling of the LaMetric buttons."""
     mock_lametric.app_next.side_effect = LaMetricError
 
     with pytest.raises(
-        HomeAssistantError, match="Invalid response from the LaMetric device"
+        SmartHubError, match="Invalid response from the LaMetric device"
     ):
         await hass.services.async_call(
             BUTTON_DOMAIN,
@@ -235,14 +235,14 @@ async def test_button_error(
 
 
 async def test_button_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test connection error handling of the LaMetric buttons."""
     mock_lametric.app_next.side_effect = LaMetricConnectionError
 
     with pytest.raises(
-        HomeAssistantError, match="Error communicating with the LaMetric device"
+        SmartHubError, match="Error communicating with the LaMetric device"
     ):
         await hass.services.async_call(
             BUTTON_DOMAIN,

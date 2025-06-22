@@ -6,9 +6,9 @@ from aiocomelit.exceptions import CannotAuthenticate, CannotConnect, CannotRetri
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.comelit.const import SCAN_INTERVAL
-from homeassistant.const import STATE_OFF, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.comelit.const import SCAN_INTERVAL
+from smarthub.const import STATE_OFF, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
     ],
 )
 async def test_coordinator_data_update_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,

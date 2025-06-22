@@ -8,11 +8,11 @@ from aiohttp import ClientError
 from freezegun.api import FrozenDateTimeFactory
 from pydrawise.schema import Controller
 
-from homeassistant.components.hydrawise.const import WATER_USE_SCAN_INTERVAL
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_OFF, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.hydrawise.const import WATER_USE_SCAN_INTERVAL
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_OFF, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -20,7 +20,7 @@ _SPECIAL_ENTITIES = {"binary_sensor.home_controller_connectivity": STATE_OFF}
 
 
 async def test_controller_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_add_config_entry: Callable[[], Awaitable[MockConfigEntry]],
     entity_registry: er.EntityRegistry,
     controller: Controller,
@@ -32,7 +32,7 @@ async def test_controller_offline(
 
 
 async def test_api_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_add_config_entry: Callable[[], Awaitable[MockConfigEntry]],
     entity_registry: er.EntityRegistry,
     mock_pydrawise: AsyncMock,
@@ -50,7 +50,7 @@ async def test_api_offline(
 
 
 def _test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:

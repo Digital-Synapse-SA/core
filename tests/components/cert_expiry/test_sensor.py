@@ -7,10 +7,10 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 
-from homeassistant.components.cert_expiry.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.components.cert_expiry.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT, STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import CoreState, SmartHub
+from smarthub.util.dt import utcnow
 
 from .const import HOST, PORT
 from .helpers import future_timestamp, static_datetime
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 @freeze_time(static_datetime())
-async def test_async_setup_entry(hass: HomeAssistant) -> None:
+async def test_async_setup_entry(hass: SmartHub) -> None:
     """Test async_setup_entry."""
     assert hass.state is CoreState.running
 
@@ -32,7 +32,7 @@ async def test_async_setup_entry(hass: HomeAssistant) -> None:
     timestamp = future_timestamp(100)
 
     with patch(
-        "homeassistant.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
+        "smarthub.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
         return_value=timestamp,
     ):
         entry.add_to_hass(hass)
@@ -47,7 +47,7 @@ async def test_async_setup_entry(hass: HomeAssistant) -> None:
     assert state.attributes.get("is_valid")
 
 
-async def test_async_setup_entry_bad_cert(hass: HomeAssistant) -> None:
+async def test_async_setup_entry_bad_cert(hass: SmartHub) -> None:
     """Test async_setup_entry with a bad/expired cert."""
     assert hass.state is CoreState.running
 
@@ -58,7 +58,7 @@ async def test_async_setup_entry_bad_cert(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.cert_expiry.helper.async_get_cert",
+        "smarthub.components.cert_expiry.helper.async_get_cert",
         side_effect=ssl.SSLError("some error"),
     ):
         entry.add_to_hass(hass)
@@ -72,7 +72,7 @@ async def test_async_setup_entry_bad_cert(hass: HomeAssistant) -> None:
     assert not state.attributes.get("is_valid")
 
 
-async def test_update_sensor(hass: HomeAssistant) -> None:
+async def test_update_sensor(hass: SmartHub) -> None:
     """Test async_update for sensor."""
     assert hass.state is CoreState.running
 
@@ -88,7 +88,7 @@ async def test_update_sensor(hass: HomeAssistant) -> None:
     with (
         freeze_time(starting_time),
         patch(
-            "homeassistant.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
+            "smarthub.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
             return_value=timestamp,
         ),
     ):
@@ -107,7 +107,7 @@ async def test_update_sensor(hass: HomeAssistant) -> None:
     with (
         freeze_time(next_update),
         patch(
-            "homeassistant.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
+            "smarthub.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
             return_value=timestamp,
         ),
     ):
@@ -122,7 +122,7 @@ async def test_update_sensor(hass: HomeAssistant) -> None:
     assert state.attributes.get("is_valid")
 
 
-async def test_update_sensor_network_errors(hass: HomeAssistant) -> None:
+async def test_update_sensor_network_errors(hass: SmartHub) -> None:
     """Test async_update for sensor."""
     assert hass.state is CoreState.running
 
@@ -138,7 +138,7 @@ async def test_update_sensor_network_errors(hass: HomeAssistant) -> None:
     with (
         freeze_time(starting_time),
         patch(
-            "homeassistant.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
+            "smarthub.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
             return_value=timestamp,
         ),
     ):
@@ -158,7 +158,7 @@ async def test_update_sensor_network_errors(hass: HomeAssistant) -> None:
     with (
         freeze_time(next_update),
         patch(
-            "homeassistant.components.cert_expiry.helper.async_get_cert",
+            "smarthub.components.cert_expiry.helper.async_get_cert",
             side_effect=socket.gaierror,
         ),
     ):
@@ -173,7 +173,7 @@ async def test_update_sensor_network_errors(hass: HomeAssistant) -> None:
     with (
         freeze_time(next_update),
         patch(
-            "homeassistant.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
+            "smarthub.components.cert_expiry.coordinator.get_cert_expiry_timestamp",
             return_value=timestamp,
         ),
     ):
@@ -192,7 +192,7 @@ async def test_update_sensor_network_errors(hass: HomeAssistant) -> None:
     with (
         freeze_time(next_update),
         patch(
-            "homeassistant.components.cert_expiry.helper.async_get_cert",
+            "smarthub.components.cert_expiry.helper.async_get_cert",
             side_effect=ssl.SSLError("something bad"),
         ),
     ):
@@ -210,7 +210,7 @@ async def test_update_sensor_network_errors(hass: HomeAssistant) -> None:
     with (
         freeze_time(next_update),
         patch(
-            "homeassistant.components.cert_expiry.helper.async_get_cert",
+            "smarthub.components.cert_expiry.helper.async_get_cert",
             side_effect=Exception(),
         ),
     ):

@@ -16,17 +16,17 @@ from inkbird_ble import (
 from inkbird_ble.parser import Model
 from sensor_state_data import SensorDeviceClass
 
-from homeassistant.components.inkbird.const import (
+from smarthub.components.inkbird.const import (
     CONF_DEVICE_DATA,
     CONF_DEVICE_TYPE,
     DOMAIN,
 )
-from homeassistant.components.inkbird.coordinator import FALLBACK_POLL_INTERVAL
-from homeassistant.components.sensor import ATTR_STATE_CLASS
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_FRIENDLY_NAME, ATTR_UNIT_OF_MEASUREMENT
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.inkbird.coordinator import FALLBACK_POLL_INTERVAL
+from smarthub.components.sensor import ATTR_STATE_CLASS
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_FRIENDLY_NAME, ATTR_UNIT_OF_MEASUREMENT
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import (
     IAM_T1_SERVICE_INFO,
@@ -69,7 +69,7 @@ def _make_sensor_update(name: str, humidity: float) -> SensorUpdate:
     )
 
 
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test setting up creates the sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -99,7 +99,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_device_with_corrupt_name(hass: HomeAssistant) -> None:
+async def test_device_with_corrupt_name(hass: SmartHub) -> None:
     """Test setting up a known device type with a corrupt name."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -128,7 +128,7 @@ async def test_device_with_corrupt_name(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_polling_sensor(hass: HomeAssistant) -> None:
+async def test_polling_sensor(hass: SmartHub) -> None:
     """Test setting up a device that needs polling."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -143,7 +143,7 @@ async def test_polling_sensor(hass: HomeAssistant) -> None:
     assert len(hass.states.async_all()) == 0
 
     with patch(
-        "homeassistant.components.inkbird.coordinator.INKBIRDBluetoothDeviceData.async_poll",
+        "smarthub.components.inkbird.coordinator.INKBIRDBluetoothDeviceData.async_poll",
         return_value=_make_sensor_update("IBS-TH", 10.24),
     ):
         inject_bluetooth_service_info(hass, SPS_PASSIVE_SERVICE_INFO)
@@ -160,7 +160,7 @@ async def test_polling_sensor(hass: HomeAssistant) -> None:
     assert entry.data[CONF_DEVICE_TYPE] == "IBS-TH"
 
     with patch(
-        "homeassistant.components.inkbird.coordinator.INKBIRDBluetoothDeviceData.async_poll",
+        "smarthub.components.inkbird.coordinator.INKBIRDBluetoothDeviceData.async_poll",
         return_value=_make_sensor_update("IBS-TH", 20.24),
     ):
         async_fire_time_changed(hass, dt_util.utcnow() + FALLBACK_POLL_INTERVAL)
@@ -175,7 +175,7 @@ async def test_polling_sensor(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_notify_sensor_no_advertisement(hass: HomeAssistant) -> None:
+async def test_notify_sensor_no_advertisement(hass: SmartHub) -> None:
     """Test setting up a notify sensor that has no advertisement."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -190,7 +190,7 @@ async def test_notify_sensor_no_advertisement(hass: HomeAssistant) -> None:
     assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_notify_sensor(hass: HomeAssistant) -> None:
+async def test_notify_sensor(hass: SmartHub) -> None:
     """Test setting up a notify sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -225,7 +225,7 @@ async def test_notify_sensor(hass: HomeAssistant) -> None:
     mock_client = MagicMock(start_notify=AsyncMock(), disconnect=AsyncMock())
     with (
         patch(
-            "homeassistant.components.inkbird.coordinator.INKBIRDBluetoothDeviceData",
+            "smarthub.components.inkbird.coordinator.INKBIRDBluetoothDeviceData",
             MockINKBIRDBluetoothDeviceData,
         ),
         patch("inkbird_ble.parser.establish_connection", return_value=mock_client),
@@ -259,7 +259,7 @@ async def test_notify_sensor(hass: HomeAssistant) -> None:
     assert entry.data[CONF_DEVICE_DATA] == {"temp_unit": "C"}
 
 
-async def test_ibs_p02b_sensors(hass: HomeAssistant) -> None:
+async def test_ibs_p02b_sensors(hass: SmartHub) -> None:
     """Test setting up creates the sensors for an IBS-P02B."""
     entry = MockConfigEntry(
         domain=DOMAIN,

@@ -1,13 +1,13 @@
 """Tests for alexa."""
 
-from homeassistant.components.alexa.const import EVENT_ALEXA_SMART_HOME
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.alexa.const import EVENT_ALEXA_SMART_HOME
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.components.logbook.common import MockRow, mock_humanify
 
 
-async def test_humanify_alexa_event(hass: HomeAssistant) -> None:
+async def test_humanify_alexa_event(hass: SmartHub) -> None:
     """Test humanifying Alexa event."""
     hass.config.components.add("recorder")
     await async_setup_component(hass, "alexa", {})

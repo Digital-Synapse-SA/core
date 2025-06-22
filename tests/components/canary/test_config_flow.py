@@ -4,21 +4,21 @@ from unittest.mock import patch
 
 from requests import ConnectTimeout, HTTPError
 
-from homeassistant.components.canary.const import (
+from smarthub.components.canary.const import (
     CONF_FFMPEG_ARGUMENTS,
     DEFAULT_FFMPEG_ARGUMENTS,
     DEFAULT_TIMEOUT,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_TIMEOUT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_TIMEOUT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import USER_INPUT, _patch_async_setup_entry, init_integration
 
 
-async def test_user_form(hass: HomeAssistant, canary_config_flow) -> None:
+async def test_user_form(hass: SmartHub, canary_config_flow) -> None:
     """Test we get the user initiated form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -42,7 +42,7 @@ async def test_user_form(hass: HomeAssistant, canary_config_flow) -> None:
 
 
 async def test_user_form_cannot_connect(
-    hass: HomeAssistant, canary_config_flow
+    hass: SmartHub, canary_config_flow
 ) -> None:
     """Test we handle errors that should trigger the cannot connect error."""
     canary_config_flow.side_effect = HTTPError()
@@ -71,7 +71,7 @@ async def test_user_form_cannot_connect(
 
 
 async def test_user_form_unexpected_exception(
-    hass: HomeAssistant, canary_config_flow
+    hass: SmartHub, canary_config_flow
 ) -> None:
     """Test we handle unexpected exception."""
     canary_config_flow.side_effect = Exception()
@@ -90,7 +90,7 @@ async def test_user_form_unexpected_exception(
 
 
 async def test_user_form_single_instance_allowed(
-    hass: HomeAssistant, canary_config_flow
+    hass: SmartHub, canary_config_flow
 ) -> None:
     """Test that configuring more than one instance is rejected."""
     await init_integration(hass, skip_entry_setup=True)
@@ -104,9 +104,9 @@ async def test_user_form_single_instance_allowed(
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_options_flow(hass: HomeAssistant, canary) -> None:
+async def test_options_flow(hass: SmartHub, canary) -> None:
     """Test updating options."""
-    with patch("homeassistant.components.canary.PLATFORMS", []):
+    with patch("smarthub.components.canary.PLATFORMS", []):
         entry = await init_integration(hass)
 
     assert entry.options[CONF_FFMPEG_ARGUMENTS] == DEFAULT_FFMPEG_ARGUMENTS

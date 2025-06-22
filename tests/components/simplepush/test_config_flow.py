@@ -5,11 +5,11 @@ from unittest.mock import patch
 import pytest
 from simplepush import UnknownError
 
-from homeassistant import config_entries
-from homeassistant.components.simplepush.const import CONF_DEVICE_KEY, CONF_SALT, DOMAIN
-from homeassistant.const import CONF_NAME, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.simplepush.const import CONF_DEVICE_KEY, CONF_SALT, DOMAIN
+from smarthub.const import CONF_NAME, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -23,7 +23,7 @@ MOCK_CONFIG = {
 def simplepush_setup_fixture():
     """Patch simplepush setup entry."""
     with patch(
-        "homeassistant.components.simplepush.async_setup_entry", return_value=True
+        "smarthub.components.simplepush.async_setup_entry", return_value=True
     ):
         yield
 
@@ -31,11 +31,11 @@ def simplepush_setup_fixture():
 @pytest.fixture(autouse=True)
 def mock_api_request():
     """Patch simplepush api request."""
-    with patch("homeassistant.components.simplepush.config_flow.send"):
+    with patch("smarthub.components.simplepush.config_flow.send"):
         yield
 
 
-async def test_flow_successful(hass: HomeAssistant) -> None:
+async def test_flow_successful(hass: SmartHub) -> None:
     """Test user initialized flow with minimum config."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -50,7 +50,7 @@ async def test_flow_successful(hass: HomeAssistant) -> None:
     assert result["data"] == MOCK_CONFIG
 
 
-async def test_flow_with_password(hass: HomeAssistant) -> None:
+async def test_flow_with_password(hass: SmartHub) -> None:
     """Test user initialized flow with password and salt."""
     mock_config_pass = {**MOCK_CONFIG, CONF_PASSWORD: "password", CONF_SALT: "salt"}
     result = await hass.config_entries.flow.async_init(
@@ -66,7 +66,7 @@ async def test_flow_with_password(hass: HomeAssistant) -> None:
     assert result["data"] == mock_config_pass
 
 
-async def test_flow_user_device_key_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_user_device_key_already_configured(hass: SmartHub) -> None:
     """Test user initialized flow with duplicate device key."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -88,7 +88,7 @@ async def test_flow_user_device_key_already_configured(hass: HomeAssistant) -> N
     assert result["reason"] == "already_configured"
 
 
-async def test_flow_user_name_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_user_name_already_configured(hass: SmartHub) -> None:
     """Test user initialized flow with duplicate name."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -113,10 +113,10 @@ async def test_flow_user_name_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_error_on_connection_failure(hass: HomeAssistant) -> None:
+async def test_error_on_connection_failure(hass: SmartHub) -> None:
     """Test when connection to api fails."""
     with patch(
-        "homeassistant.components.simplepush.config_flow.send",
+        "smarthub.components.simplepush.config_flow.send",
         side_effect=UnknownError,
     ):
         result = await hass.config_entries.flow.async_init(

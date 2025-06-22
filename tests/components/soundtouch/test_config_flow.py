@@ -7,18 +7,18 @@ from requests import RequestException
 import requests_mock
 from requests_mock import ANY, Mocker
 
-from homeassistant.components.soundtouch.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.soundtouch.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .conftest import DEVICE_1_ID, DEVICE_1_IP, DEVICE_1_NAME
 
 
 async def test_user_flow_create_entry(
-    hass: HomeAssistant, device1_requests_mock_standby: Mocker
+    hass: SmartHub, device1_requests_mock_standby: Mocker
 ) -> None:
     """Test the full manual user flow from start to finish."""
     result = await hass.config_entries.flow.async_init(
@@ -30,7 +30,7 @@ async def test_user_flow_create_entry(
     assert result.get("step_id") == "user"
 
     with patch(
-        "homeassistant.components.soundtouch.async_setup_entry", return_value=True
+        "smarthub.components.soundtouch.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -52,7 +52,7 @@ async def test_user_flow_create_entry(
 
 
 async def test_user_flow_cannot_connect(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test a manual user flow with an invalid host."""
     requests_mock.get(ANY, exc=RequestException())
@@ -70,7 +70,7 @@ async def test_user_flow_cannot_connect(
 
 
 async def test_zeroconf_flow_create_entry(
-    hass: HomeAssistant, device1_requests_mock_standby: Mocker
+    hass: SmartHub, device1_requests_mock_standby: Mocker
 ) -> None:
     """Test the zeroconf flow from start to finish."""
     result = await hass.config_entries.flow.async_init(
@@ -97,7 +97,7 @@ async def test_zeroconf_flow_create_entry(
     assert result.get("description_placeholders") == {"name": DEVICE_1_NAME}
 
     with patch(
-        "homeassistant.components.soundtouch.async_setup_entry", return_value=True
+        "smarthub.components.soundtouch.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], user_input={}

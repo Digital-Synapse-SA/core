@@ -4,15 +4,15 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import cover, template
-from homeassistant.components.cover import (
+from smarthub.components import cover, template
+from smarthub.components.cover import (
     ATTR_POSITION,
     ATTR_TILT_POSITION,
     DOMAIN as COVER_DOMAIN,
     CoverEntityFeature,
     CoverState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_CLOSE_COVER_TILT,
@@ -28,9 +28,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import ConfigurationStyle
 
@@ -105,7 +105,7 @@ UNIQUE_ID_CONFIG = {
 
 
 async def async_setup_legacy_format(
-    hass: HomeAssistant, count: int, cover_config: dict[str, Any]
+    hass: SmartHub, count: int, cover_config: dict[str, Any]
 ) -> None:
     """Do setup of cover integration via legacy format."""
     config = {"cover": {"platform": "template", "covers": cover_config}}
@@ -122,7 +122,7 @@ async def async_setup_legacy_format(
 
 
 async def async_setup_modern_format(
-    hass: HomeAssistant, count: int, cover_config: dict[str, Any]
+    hass: SmartHub, count: int, cover_config: dict[str, Any]
 ) -> None:
     """Do setup of cover integration via modern format."""
     config = {"template": {"cover": cover_config}}
@@ -140,7 +140,7 @@ async def async_setup_modern_format(
 
 
 async def async_setup_trigger_format(
-    hass: HomeAssistant, count: int, cover_config: dict[str, Any]
+    hass: SmartHub, count: int, cover_config: dict[str, Any]
 ) -> None:
     """Do setup of cover integration via trigger format."""
     config = {"template": {**TEST_STATE_TRIGGER, "cover": cover_config}}
@@ -158,7 +158,7 @@ async def async_setup_trigger_format(
 
 
 async def async_setup_cover_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     cover_config: dict[str, Any],
@@ -174,7 +174,7 @@ async def async_setup_cover_config(
 
 @pytest.fixture
 async def setup_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     cover_config: dict[str, Any],
@@ -185,7 +185,7 @@ async def setup_cover(
 
 @pytest.fixture
 async def setup_state_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -224,7 +224,7 @@ async def setup_state_cover(
 
 @pytest.fixture
 async def setup_position_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     position_template: str,
@@ -263,7 +263,7 @@ async def setup_position_cover(
 
 @pytest.fixture
 async def setup_single_attribute_state_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -308,7 +308,7 @@ async def setup_single_attribute_state_cover(
 
 @pytest.fixture
 async def setup_empty_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     script: str,
@@ -360,7 +360,7 @@ async def setup_empty_action(
 )
 @pytest.mark.usefixtures("setup_state_cover")
 async def test_template_state_text(
-    hass: HomeAssistant,
+    hass: SmartHub,
     set_state: str,
     test_state: str,
     text: str,
@@ -396,7 +396,7 @@ async def test_template_state_text(
 )
 @pytest.mark.usefixtures("setup_state_cover")
 async def test_template_state_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected: str,
 ) -> None:
     """Test state template states."""
@@ -463,7 +463,7 @@ async def test_template_state_states(
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_cover")
 async def test_template_state_text_with_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     states: list[tuple[str, str, str, int | None]],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -511,7 +511,7 @@ async def test_template_state_text_with_position(
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_cover")
 async def test_template_state_text_ignored_if_none_or_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
     set_state: str,
 ) -> None:
     """Test ignoring an empty state text of a template."""
@@ -530,7 +530,7 @@ async def test_template_state_text_ignored_if_none_or_empty(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 @pytest.mark.usefixtures("setup_state_cover")
-async def test_template_state_boolean(hass: HomeAssistant) -> None:
+async def test_template_state_boolean(hass: SmartHub) -> None:
     """Test the value_template attribute."""
     # This forces a trigger for trigger based entities
     hass.states.async_set(TEST_STATE_ENTITY_ID, None)
@@ -558,7 +558,7 @@ async def test_template_state_boolean(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("setup_position_cover")
 async def test_template_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     test_state: str,
     position: int | None,
     expected: str,
@@ -609,7 +609,7 @@ async def test_template_position(
     ],
 )
 @pytest.mark.usefixtures("setup_cover")
-async def test_template_not_optimistic(hass: HomeAssistant) -> None:
+async def test_template_not_optimistic(hass: SmartHub) -> None:
     """Test the is_closed attribute."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.state == STATE_UNKNOWN
@@ -646,7 +646,7 @@ async def test_template_not_optimistic(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_cover")
-async def test_template_tilt(hass: HomeAssistant, tilt_position: float | None) -> None:
+async def test_template_tilt(hass: SmartHub, tilt_position: float | None) -> None:
     """Test tilt in and out-of-bound conditions."""
     # This forces a trigger for trigger based entities
     hass.states.async_set(TEST_STATE_ENTITY_ID, None)
@@ -684,7 +684,7 @@ async def test_template_tilt(hass: HomeAssistant, tilt_position: float | None) -
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_cover")
-async def test_position_out_of_bounds(hass: HomeAssistant) -> None:
+async def test_position_out_of_bounds(hass: SmartHub) -> None:
     """Test position out-of-bounds condition."""
     # This forces a trigger for trigger based entities
     hass.states.async_set(TEST_STATE_ENTITY_ID, None)
@@ -754,7 +754,7 @@ async def test_position_out_of_bounds(hass: HomeAssistant) -> None:
     ],
 )
 async def test_template_open_or_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     cover_config: dict[str, Any],
@@ -776,7 +776,7 @@ async def test_template_open_or_position(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 @pytest.mark.usefixtures("setup_position_cover")
-async def test_open_action(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_open_action(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test the open_cover command."""
 
     # This forces a trigger for trigger based entities
@@ -850,7 +850,7 @@ async def test_open_action(hass: HomeAssistant, calls: list[ServiceCall]) -> Non
     ],
 )
 @pytest.mark.usefixtures("setup_cover")
-async def test_close_stop_action(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_close_stop_action(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test the close-cover and stop_cover commands."""
     # This forces a trigger for trigger based entities
     hass.states.async_set(TEST_STATE_ENTITY_ID, None)
@@ -911,7 +911,7 @@ async def test_close_stop_action(hass: HomeAssistant, calls: list[ServiceCall]) 
     ],
 )
 @pytest.mark.usefixtures("setup_cover")
-async def test_set_position(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_set_position(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test the set_position command."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.state == STATE_UNKNOWN
@@ -1024,7 +1024,7 @@ async def test_set_position(hass: HomeAssistant, calls: list[ServiceCall]) -> No
 )
 @pytest.mark.usefixtures("setup_cover")
 async def test_set_tilt_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service,
     attr,
     tilt_position,
@@ -1075,7 +1075,7 @@ async def test_set_tilt_position(
 )
 @pytest.mark.usefixtures("setup_cover")
 async def test_set_position_optimistic(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test optimistic position mode."""
     state = hass.states.get(TEST_ENTITY_ID)
@@ -1121,7 +1121,7 @@ async def test_set_position_optimistic(
 )
 @pytest.mark.usefixtures("setup_cover")
 async def test_non_optimistic_template_with_optimistic_state(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test optimistic state with non-optimistic template."""
     state = hass.states.get(TEST_ENTITY_ID)
@@ -1185,7 +1185,7 @@ async def test_non_optimistic_template_with_optimistic_state(
 )
 @pytest.mark.usefixtures("setup_cover")
 async def test_set_tilt_position_optimistic(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test the optimistic tilt_position mode."""
     state = hass.states.get(TEST_ENTITY_ID)
@@ -1235,7 +1235,7 @@ async def test_set_tilt_position_optimistic(
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_cover")
 async def test_icon_template(
-    hass: HomeAssistant, initial_expected_state: str | None
+    hass: SmartHub, initial_expected_state: str | None
 ) -> None:
     """Test icon template."""
     state = hass.states.get(TEST_ENTITY_ID)
@@ -1269,7 +1269,7 @@ async def test_icon_template(
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_cover")
 async def test_entity_picture_template(
-    hass: HomeAssistant, initial_expected_state: str | None
+    hass: SmartHub, initial_expected_state: str | None
 ) -> None:
     """Test icon template."""
     state = hass.states.get(TEST_ENTITY_ID)
@@ -1302,7 +1302,7 @@ async def test_entity_picture_template(
     ],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_cover")
-async def test_availability_template(hass: HomeAssistant) -> None:
+async def test_availability_template(hass: SmartHub) -> None:
     """Test availability template."""
     hass.states.async_set("availability_state.state", STATE_OFF)
     # This forces a trigger for trigger based entities
@@ -1367,7 +1367,7 @@ async def test_availability_template(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_invalid_availability_template_keeps_component_available(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, caplog_setup_text
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, caplog_setup_text
 ) -> None:
     """Test that an invalid availability keeps the device available."""
 
@@ -1390,7 +1390,7 @@ async def test_invalid_availability_template_keeps_component_available(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_cover")
-async def test_device_class(hass: HomeAssistant) -> None:
+async def test_device_class(hass: SmartHub) -> None:
     """Test device class."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.attributes.get("device_class") == "door"
@@ -1405,7 +1405,7 @@ async def test_device_class(hass: HomeAssistant) -> None:
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_cover")
-async def test_invalid_device_class(hass: HomeAssistant) -> None:
+async def test_invalid_device_class(hass: SmartHub) -> None:
     """Test device class."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert not state
@@ -1451,13 +1451,13 @@ async def test_invalid_device_class(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_cover")
-async def test_unique_id(hass: HomeAssistant) -> None:
+async def test_unique_id(hass: SmartHub) -> None:
     """Test unique_id option only creates one cover per id."""
     assert len(hass.states.async_all()) == 1
 
 
 async def test_nested_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a template unique_id propagates to switch unique_ids."""
     with assert_setup_component(1, template.DOMAIN):
@@ -1533,7 +1533,7 @@ async def test_nested_unique_id(
     ],
 )
 @pytest.mark.usefixtures("setup_cover")
-async def test_state_gets_lowercased(hass: HomeAssistant) -> None:
+async def test_state_gets_lowercased(hass: SmartHub) -> None:
     """Test True/False is lowercased."""
 
     hass.states.async_set("binary_sensor.garage_door_sensor", "off")
@@ -1567,7 +1567,7 @@ async def test_state_gets_lowercased(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("setup_single_attribute_state_cover")
 async def test_self_referencing_icon_with_no_template_is_not_a_loop(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test a self referencing icon with no value template is not a loop."""
     assert len(hass.states.async_all()) == 1
@@ -1596,7 +1596,7 @@ async def test_self_referencing_icon_with_no_template_is_not_a_loop(
 )
 @pytest.mark.usefixtures("setup_empty_action")
 async def test_empty_action_config(
-    hass: HomeAssistant, supported_feature: CoverEntityFeature
+    hass: SmartHub, supported_feature: CoverEntityFeature
 ) -> None:
     """Test configuration with empty script."""
     state = hass.states.get("cover.test_template_cover")

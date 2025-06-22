@@ -19,13 +19,13 @@ from kasa.interfaces import LightEffect
 from kasa.iot import IotDevice
 import pytest
 
-from homeassistant.components import tplink
-from homeassistant.components.homeassistant.scene import (
+from smarthub.components import tplink
+from smarthub.components.smarthub.scene import (
     CONF_SCENE_ID,
     CONF_SNAPSHOT,
     SERVICE_CREATE,
 )
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
@@ -43,25 +43,25 @@ from homeassistant.components.light import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.components.scene import DOMAIN as SCENE_DOMAIN
-from homeassistant.components.tplink.const import DOMAIN
-from homeassistant.components.tplink.light import (
+from smarthub.components.scene import DOMAIN as SCENE_DOMAIN
+from smarthub.components.tplink.const import DOMAIN
+from smarthub.components.tplink.light import (
     SERVICE_RANDOM_EFFECT,
     SERVICE_SEQUENCE_EFFECT,
 )
-from homeassistant.config_entries import SOURCE_REAUTH
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_REAUTH
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_HOST,
     STATE_OFF,
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     _mocked_device,
@@ -85,7 +85,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
     ],
 )
 async def test_light_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, device_type
+    hass: SmartHub, entity_registry: er.EntityRegistry, device_type
 ) -> None:
     """Test a light unique id."""
     already_migrated_config_entry = MockConfigEntry(
@@ -106,7 +106,7 @@ async def test_light_unique_id(
 
 
 async def test_legacy_dimmer_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test dimmer unique id."""
@@ -165,7 +165,7 @@ async def test_legacy_dimmer_unique_id(
     ],
 )
 async def test_color_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: MagicMock,
     extra_data: dict,
     expected_transition: float | None,
@@ -295,7 +295,7 @@ async def test_color_light(
     ],
 )
 async def test_color_light_with_active_effect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: MagicMock,
     extra_data: dict,
     expected_transition: float | None,
@@ -383,7 +383,7 @@ async def test_color_light_with_active_effect(
     light.set_hsv.reset_mock()
 
 
-async def test_color_light_no_temp(hass: HomeAssistant) -> None:
+async def test_color_light_no_temp(hass: SmartHub) -> None:
     """Test a color light with no color temp."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -445,7 +445,7 @@ async def test_color_light_no_temp(hass: HomeAssistant) -> None:
     light.set_hsv.reset_mock()
 
 
-async def test_color_temp_light_color(hass: HomeAssistant) -> None:
+async def test_color_temp_light_color(hass: SmartHub) -> None:
     """Test a color temp light with color."""
     device = _mocked_device(
         modules=[Module.Light],
@@ -530,7 +530,7 @@ async def test_color_temp_light_color(hass: HomeAssistant) -> None:
     light.set_color_temp.reset_mock()
 
 
-async def test_color_temp_light_no_color(hass: HomeAssistant) -> None:
+async def test_color_temp_light_no_color(hass: SmartHub) -> None:
     """Test a color temp light with no color."""
     device = _mocked_device(
         modules=[Module.Light],
@@ -617,7 +617,7 @@ async def test_color_temp_light_no_color(hass: HomeAssistant) -> None:
     light.set_color_temp.reset_mock()
 
 
-async def test_brightness_only_light(hass: HomeAssistant) -> None:
+async def test_brightness_only_light(hass: SmartHub) -> None:
     """Test a light brightness."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -664,7 +664,7 @@ async def test_brightness_only_light(hass: HomeAssistant) -> None:
     light.set_brightness.reset_mock()
 
 
-async def test_on_off_light(hass: HomeAssistant) -> None:
+async def test_on_off_light(hass: SmartHub) -> None:
     """Test a light turns on and off."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -697,7 +697,7 @@ async def test_on_off_light(hass: HomeAssistant) -> None:
     light.set_state.reset_mock()
 
 
-async def test_off_at_start_light(hass: HomeAssistant) -> None:
+async def test_off_at_start_light(hass: SmartHub) -> None:
     """Test a light off at startup."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -720,7 +720,7 @@ async def test_off_at_start_light(hass: HomeAssistant) -> None:
     assert attributes[ATTR_SUPPORTED_COLOR_MODES] == ["onoff"]
 
 
-async def test_dimmer_turn_on_fix(hass: HomeAssistant) -> None:
+async def test_dimmer_turn_on_fix(hass: SmartHub) -> None:
     """Test a dimmer turns on without brightness being set."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -757,7 +757,7 @@ async def test_dimmer_turn_on_fix(hass: HomeAssistant) -> None:
 
 
 async def test_smart_strip_effects(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test smart strip effects."""
     already_migrated_config_entry = MockConfigEntry(
@@ -885,7 +885,7 @@ async def test_smart_strip_effects(
     assert state.attributes[ATTR_EFFECT_LIST] is None
 
 
-async def test_smart_strip_custom_random_effect(hass: HomeAssistant) -> None:
+async def test_smart_strip_custom_random_effect(hass: SmartHub) -> None:
     """Test smart strip custom random effects."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -1065,7 +1065,7 @@ async def test_smart_strip_custom_random_effect(hass: HomeAssistant) -> None:
     ],
 )
 async def test_smart_strip_effect_service_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_name: str,
     service_params: dict,
     expected_extra_params: dict,
@@ -1105,7 +1105,7 @@ async def test_smart_strip_effect_service_error(
     expected_params = {**base, **expected_extra_params}
     expected_msg = f"Error trying to set custom effect {expected_params}: failed"
 
-    with pytest.raises(HomeAssistantError, match=re.escape(expected_msg)):
+    with pytest.raises(SmartHubError, match=re.escape(expected_msg)):
         await hass.services.async_call(
             DOMAIN,
             service_name,
@@ -1117,7 +1117,7 @@ async def test_smart_strip_effect_service_error(
         )
 
 
-async def test_smart_strip_custom_random_effect_at_start(hass: HomeAssistant) -> None:
+async def test_smart_strip_custom_random_effect_at_start(hass: SmartHub) -> None:
     """Test smart strip custom random effects at startup."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -1148,7 +1148,7 @@ async def test_smart_strip_custom_random_effect_at_start(hass: HomeAssistant) ->
     light.set_state.reset_mock()
 
 
-async def test_smart_strip_custom_sequence_effect(hass: HomeAssistant) -> None:
+async def test_smart_strip_custom_sequence_effect(hass: SmartHub) -> None:
     """Test smart strip custom sequence effects."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -1220,7 +1220,7 @@ async def test_smart_strip_custom_sequence_effect(hass: HomeAssistant) -> None:
     ids=["Authentication", "Timeout", "Other"],
 )
 async def test_light_errors_when_turned_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception_type,
     msg,
     reauth_expected,
@@ -1244,7 +1244,7 @@ async def test_light_errors_when_turned_on(
         already_migrated_config_entry.async_get_active_flows(hass, {SOURCE_REAUTH})
     )
 
-    with pytest.raises(HomeAssistantError, match=msg):
+    with pytest.raises(SmartHubError, match=msg):
         await hass.services.async_call(
             LIGHT_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: entity_id}, blocking=True
         )
@@ -1263,7 +1263,7 @@ async def test_light_errors_when_turned_on(
 
 
 async def test_light_child(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test child lights are added to parent device with the right ids."""
@@ -1302,7 +1302,7 @@ async def test_light_child(
 
 
 async def test_scene_effect_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test activating a scene works with effects.

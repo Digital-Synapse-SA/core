@@ -6,14 +6,14 @@ from unittest.mock import AsyncMock, patch
 from monzopy.monzopy import UserAccount
 import pytest
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.monzo.api import AuthenticatedMonzoAPI
-from homeassistant.components.monzo.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.monzo.api import AuthenticatedMonzoAPI
+from smarthub.components.monzo.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -48,7 +48,7 @@ USER_ID = 12345
 
 
 @pytest.fixture(autouse=True)
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -66,7 +66,7 @@ def mock_expires_at() -> int:
 
 @pytest.fixture
 def polling_config_entry(expires_at: int) -> MockConfigEntry:
-    """Create Monzo entry in Home Assistant."""
+    """Create Monzo entry in SmartHub."""
     return MockConfigEntry(
         domain=DOMAIN,
         title=TITLE,
@@ -100,7 +100,7 @@ def mock_basic_monzo():
     mock.user_account = mock_user_account
 
     with patch(
-        "homeassistant.components.monzo.AuthenticatedMonzoAPI",
+        "smarthub.components.monzo.AuthenticatedMonzoAPI",
         return_value=mock,
     ):
         yield mock
@@ -119,7 +119,7 @@ def mock_monzo():
     mock.user_account = mock_user_account
 
     with patch(
-        "homeassistant.components.monzo.AuthenticatedMonzoAPI",
+        "smarthub.components.monzo.AuthenticatedMonzoAPI",
         return_value=mock,
     ):
         yield mock

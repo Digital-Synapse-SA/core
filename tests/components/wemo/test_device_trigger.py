@@ -4,10 +4,10 @@ import pytest
 from pytest_unordered import unordered
 from pywemo.subscribe import EVENT_TYPE_LONG_PRESS
 
-from homeassistant.components.automation import DOMAIN as AUTOMATION_DOMAIN
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.wemo.const import DOMAIN, WEMO_SUBSCRIPTION_EVENT
-from homeassistant.const import (
+from smarthub.components.automation import DOMAIN as AUTOMATION_DOMAIN
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.wemo.const import DOMAIN, WEMO_SUBSCRIPTION_EVENT
+from smarthub.const import (
     CONF_DEVICE_ID,
     CONF_DOMAIN,
     CONF_ENTITY_ID,
@@ -15,9 +15,9 @@ from homeassistant.const import (
     CONF_TYPE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import async_get_device_automations, async_mock_service
 
@@ -31,7 +31,7 @@ def pywemo_model():
 
 
 async def setup_automation(
-    hass: HomeAssistant, device_id: str, trigger_type: str
+    hass: SmartHub, device_id: str, trigger_type: str
 ) -> None:
     """Set up an automation trigger for testing triggering."""
     return await async_setup_component(
@@ -56,7 +56,7 @@ async def setup_automation(
     )
 
 
-async def test_get_triggers(hass: HomeAssistant, wemo_entity) -> None:
+async def test_get_triggers(hass: SmartHub, wemo_entity) -> None:
     """Test that the triggers appear for a supported device."""
     assert wemo_entity.device_id is not None
 
@@ -100,7 +100,7 @@ async def test_get_triggers(hass: HomeAssistant, wemo_entity) -> None:
 
 
 async def test_fires_on_long_press(
-    hass: HomeAssistant, wemo_entity: er.RegistryEntry
+    hass: SmartHub, wemo_entity: er.RegistryEntry
 ) -> None:
     """Test wemo long press trigger firing."""
     assert await setup_automation(hass, wemo_entity.device_id, EVENT_TYPE_LONG_PRESS)

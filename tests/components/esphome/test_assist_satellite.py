@@ -21,30 +21,30 @@ from aioesphomeapi import (
 )
 import pytest
 
-from homeassistant.components import (
+from smarthub.components import (
     assist_pipeline,
     assist_satellite,
     conversation,
     tts,
 )
-from homeassistant.components.assist_pipeline import PipelineEvent, PipelineEventType
-from homeassistant.components.assist_satellite import (
+from smarthub.components.assist_pipeline import PipelineEvent, PipelineEventType
+from smarthub.components.assist_satellite import (
     AssistSatelliteConfiguration,
     AssistSatelliteEntityFeature,
     AssistSatelliteWakeWord,
 )
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.assist_satellite.entity import AssistSatelliteState
-from homeassistant.components.esphome.assist_satellite import VoiceAssistantUDPServer
-from homeassistant.components.select import (
+from smarthub.components.assist_satellite.entity import AssistSatelliteState
+from smarthub.components.esphome.assist_satellite import VoiceAssistantUDPServer
+from smarthub.components.select import (
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, intent as intent_helper
-from homeassistant.helpers.network import get_url
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, intent as intent_helper
+from smarthub.helpers.network import get_url
 
 from .common import get_satellite_entity
 from .conftest import MockESPHomeDeviceType
@@ -66,7 +66,7 @@ def mock_wav() -> bytes:
 
 
 async def test_no_satellite_without_voice_assistant(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -82,7 +82,7 @@ async def test_no_satellite_without_voice_assistant(
 
 
 async def test_pipeline_api_audio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -351,7 +351,7 @@ async def test_pipeline_api_audio(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
         patch.object(satellite, "handle_pipeline_finished", handle_pipeline_finished),
@@ -397,7 +397,7 @@ async def test_pipeline_api_audio(
 
 @pytest.mark.usefixtures("socket_enabled")
 async def test_pipeline_udp_audio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     mock_wav: bytes,
@@ -534,7 +534,7 @@ async def test_pipeline_udp_audio(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
         patch.object(satellite, "handle_pipeline_finished", handle_pipeline_finished),
@@ -604,7 +604,7 @@ async def test_udp_errors() -> None:
 
 
 async def test_pipeline_media_player(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     mock_wav: bytes,
@@ -723,7 +723,7 @@ async def test_pipeline_media_player(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
         patch.object(satellite, "handle_pipeline_finished", handle_pipeline_finished),
@@ -752,7 +752,7 @@ async def test_pipeline_media_player(
 
 
 async def test_timer_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -820,7 +820,7 @@ async def test_timer_events(
 
 
 async def test_unknown_timer_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -842,7 +842,7 @@ async def test_unknown_timer_event(
     assert dev is not None
 
     with patch(
-        "homeassistant.components.esphome.assist_satellite._TIMER_EVENT_TYPES.from_hass",
+        "smarthub.components.esphome.assist_satellite._TIMER_EVENT_TYPES.from_hass",
         side_effect=KeyError,
     ):
         await intent_helper.async_handle(
@@ -862,7 +862,7 @@ async def test_unknown_timer_event(
 
 
 async def test_streaming_tts_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     mock_wav: bytes,
@@ -941,7 +941,7 @@ async def test_streaming_tts_errors(
 
 
 async def test_tts_format_from_media_player(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -986,7 +986,7 @@ async def test_tts_format_from_media_player(
     assert satellite is not None
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
     ) as mock_pipeline_from_audio_stream:
         await satellite.handle_pipeline_start(
             conversation_id="",
@@ -1008,7 +1008,7 @@ async def test_tts_format_from_media_player(
 
 
 async def test_tts_minimal_format_from_media_player(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1053,7 +1053,7 @@ async def test_tts_minimal_format_from_media_player(
     assert satellite is not None
 
     with patch(
-        "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+        "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
     ) as mock_pipeline_from_audio_stream:
         await satellite.handle_pipeline_start(
             conversation_id="",
@@ -1072,7 +1072,7 @@ async def test_tts_minimal_format_from_media_player(
 
 
 async def test_announce_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1110,15 +1110,15 @@ async def test_announce_message(
 
     with (
         patch(
-            "homeassistant.components.tts.generate_media_source_id",
+            "smarthub.components.tts.generate_media_source_id",
             return_value="media-source://bla",
         ),
         patch(
-            "homeassistant.components.tts.async_resolve_engine",
+            "smarthub.components.tts.async_resolve_engine",
             return_value="tts.cloud_tts",
         ),
         patch(
-            "homeassistant.components.tts.async_create_stream",
+            "smarthub.components.tts.async_create_stream",
             return_value=MockResultStream(hass, "wav", b""),
         ),
         patch.object(
@@ -1143,7 +1143,7 @@ async def test_announce_message(
 
 
 async def test_announce_media_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     device_registry: dr.DeviceRegistry,
@@ -1197,7 +1197,7 @@ async def test_announce_media_id(
         preannounce_media_id: str | None = None,
     ):
         assert satellite.state == AssistSatelliteState.RESPONDING
-        assert media_id == "https://www.home-assistant.io/proxied.flac"
+        assert media_id == "https://www.smart-hub.io/proxied.flac"
         assert not start_conversation
         assert not preannounce_media_id
 
@@ -1210,8 +1210,8 @@ async def test_announce_media_id(
             new=send_voice_assistant_announcement_await_response,
         ),
         patch(
-            "homeassistant.components.esphome.assist_satellite.async_create_proxy_url",
-            return_value="https://www.home-assistant.io/proxied.flac",
+            "smarthub.components.esphome.assist_satellite.async_create_proxy_url",
+            return_value="https://www.smart-hub.io/proxied.flac",
         ) as mock_async_create_proxy_url,
     ):
         async with asyncio.timeout(1):
@@ -1220,7 +1220,7 @@ async def test_announce_media_id(
                 "announce",
                 {
                     ATTR_ENTITY_ID: satellite.entity_id,
-                    "media_id": "https://www.home-assistant.io/resolved.mp3",
+                    "media_id": "https://www.smart-hub.io/resolved.mp3",
                     "preannounce": False,
                 },
                 blocking=True,
@@ -1231,7 +1231,7 @@ async def test_announce_media_id(
         mock_async_create_proxy_url.assert_called_once_with(
             hass=hass,
             device_id=dev.id,
-            media_url="https://www.home-assistant.io/resolved.mp3",
+            media_url="https://www.smart-hub.io/resolved.mp3",
             media_format="flac",
             rate=48000,
             channels=2,
@@ -1240,7 +1240,7 @@ async def test_announce_media_id(
 
 
 async def test_announce_message_with_preannounce(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1278,15 +1278,15 @@ async def test_announce_message_with_preannounce(
 
     with (
         patch(
-            "homeassistant.components.tts.generate_media_source_id",
+            "smarthub.components.tts.generate_media_source_id",
             return_value="media-source://bla",
         ),
         patch(
-            "homeassistant.components.tts.async_resolve_engine",
+            "smarthub.components.tts.async_resolve_engine",
             return_value="tts.cloud_tts",
         ),
         patch(
-            "homeassistant.components.tts.async_create_stream",
+            "smarthub.components.tts.async_create_stream",
             return_value=MockResultStream(hass, "wav", b""),
         ),
         patch.object(
@@ -1311,7 +1311,7 @@ async def test_announce_message_with_preannounce(
 
 
 async def test_non_default_supported_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1334,7 +1334,7 @@ async def test_non_default_supported_features(
 
 
 async def test_start_conversation_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1387,15 +1387,15 @@ async def test_start_conversation_message(
 
     with (
         patch(
-            "homeassistant.components.tts.generate_media_source_id",
+            "smarthub.components.tts.generate_media_source_id",
             return_value="media-source://bla",
         ),
         patch(
-            "homeassistant.components.tts.async_resolve_engine",
+            "smarthub.components.tts.async_resolve_engine",
             return_value="tts.cloud_tts",
         ),
         patch(
-            "homeassistant.components.tts.async_create_stream",
+            "smarthub.components.tts.async_create_stream",
             return_value=MockResultStream(hass, "wav", b""),
         ),
         patch.object(
@@ -1404,7 +1404,7 @@ async def test_start_conversation_message(
             new=send_voice_assistant_announcement_await_response,
         ),
         patch(
-            "homeassistant.components.assist_satellite.entity.async_get_pipeline",
+            "smarthub.components.assist_satellite.entity.async_get_pipeline",
             return_value=pipeline,
         ),
     ):
@@ -1424,7 +1424,7 @@ async def test_start_conversation_message(
 
 
 async def test_start_conversation_media_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     device_registry: dr.DeviceRegistry,
@@ -1493,7 +1493,7 @@ async def test_start_conversation_media_id(
         preannounce_media_id: str,
     ):
         assert satellite.state == AssistSatelliteState.RESPONDING
-        assert media_id == "https://www.home-assistant.io/proxied.flac"
+        assert media_id == "https://www.smart-hub.io/proxied.flac"
         assert start_conversation
         assert not preannounce_media_id
 
@@ -1506,11 +1506,11 @@ async def test_start_conversation_media_id(
             new=send_voice_assistant_announcement_await_response,
         ),
         patch(
-            "homeassistant.components.esphome.assist_satellite.async_create_proxy_url",
-            return_value="https://www.home-assistant.io/proxied.flac",
+            "smarthub.components.esphome.assist_satellite.async_create_proxy_url",
+            return_value="https://www.smart-hub.io/proxied.flac",
         ) as mock_async_create_proxy_url,
         patch(
-            "homeassistant.components.assist_satellite.entity.async_get_pipeline",
+            "smarthub.components.assist_satellite.entity.async_get_pipeline",
             return_value=pipeline,
         ),
     ):
@@ -1520,7 +1520,7 @@ async def test_start_conversation_media_id(
                 "start_conversation",
                 {
                     ATTR_ENTITY_ID: satellite.entity_id,
-                    "start_media_id": "https://www.home-assistant.io/resolved.mp3",
+                    "start_media_id": "https://www.smart-hub.io/resolved.mp3",
                     "preannounce": False,
                 },
                 blocking=True,
@@ -1531,7 +1531,7 @@ async def test_start_conversation_media_id(
         mock_async_create_proxy_url.assert_called_once_with(
             hass=hass,
             device_id=dev.id,
-            media_url="https://www.home-assistant.io/resolved.mp3",
+            media_url="https://www.smart-hub.io/resolved.mp3",
             media_format="flac",
             rate=48000,
             channels=2,
@@ -1540,7 +1540,7 @@ async def test_start_conversation_media_id(
 
 
 async def test_start_conversation_message_with_preannounce(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1593,15 +1593,15 @@ async def test_start_conversation_message_with_preannounce(
 
     with (
         patch(
-            "homeassistant.components.tts.generate_media_source_id",
+            "smarthub.components.tts.generate_media_source_id",
             return_value="media-source://bla",
         ),
         patch(
-            "homeassistant.components.tts.async_resolve_engine",
+            "smarthub.components.tts.async_resolve_engine",
             return_value="tts.cloud_tts",
         ),
         patch(
-            "homeassistant.components.tts.async_create_stream",
+            "smarthub.components.tts.async_create_stream",
             return_value=MockResultStream(hass, "wav", b""),
         ),
         patch.object(
@@ -1610,7 +1610,7 @@ async def test_start_conversation_message_with_preannounce(
             new=send_voice_assistant_announcement_await_response,
         ),
         patch(
-            "homeassistant.components.assist_satellite.entity.async_get_pipeline",
+            "smarthub.components.assist_satellite.entity.async_get_pipeline",
             return_value=pipeline,
         ),
     ):
@@ -1630,7 +1630,7 @@ async def test_start_conversation_message_with_preannounce(
 
 
 async def test_satellite_unloaded_on_disconnect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1659,7 +1659,7 @@ async def test_satellite_unloaded_on_disconnect(
 
 
 async def test_pipeline_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1701,7 +1701,7 @@ async def test_pipeline_abort(
 
     with (
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             new=async_pipeline_from_audio_stream,
         ),
         patch.object(satellite, "handle_pipeline_finished", handle_pipeline_finished),
@@ -1730,7 +1730,7 @@ async def test_pipeline_abort(
 
 
 async def test_get_set_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -1777,7 +1777,7 @@ async def test_get_set_configuration(
 
 
 async def test_wake_word_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:

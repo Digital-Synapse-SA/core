@@ -8,15 +8,15 @@ from syrupy.filters import props
 from zigpy.profiles import zha
 from zigpy.zcl.clusters import security
 
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
 
@@ -32,13 +32,13 @@ from tests.typing import ClientSessionGenerator
 def required_platforms_only():
     """Only set up the required platform and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS", (Platform.ALARM_CONTROL_PANEL,)
+        "smarthub.components.zha.PLATFORMS", (Platform.ALARM_CONTROL_PANEL,)
     ):
         yield
 
 
 async def test_diagnostics_for_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     setup_zha,
@@ -81,7 +81,7 @@ async def test_diagnostics_for_config_entry(
 
 
 async def test_diagnostics_for_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     config_entry: MockConfigEntry,

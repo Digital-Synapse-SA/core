@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.overkiz.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.overkiz.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import load_setup_fixture
 from .test_config_flow import TEST_EMAIL, TEST_GATEWAY_ID, TEST_PASSWORD, TEST_SERVER
@@ -31,14 +31,14 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.overkiz.async_setup_entry", return_value=True
+        "smarthub.components.overkiz.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> MockConfigEntry:
     """Set up the Overkiz integration for testing."""

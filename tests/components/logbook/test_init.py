@@ -10,19 +10,19 @@ from freezegun import freeze_time
 import pytest
 import voluptuous as vol
 
-from homeassistant import core as ha
-from homeassistant.components import logbook, recorder
+from smarthub import core as ha
+from smarthub.components import logbook, recorder
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.alexa.smart_home import EVENT_ALEXA_SMART_HOME
-from homeassistant.components.automation import EVENT_AUTOMATION_TRIGGERED
-from homeassistant.components.logbook.models import EventAsRow, LazyEventPartialState
-from homeassistant.components.logbook.processor import EventProcessor
-from homeassistant.components.logbook.queries.common import PSEUDO_EVENT_STATE_CHANGED
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.script import EVENT_SCRIPT_STARTED
-from homeassistant.components.sensor import SensorStateClass
-from homeassistant.const import (
+from smarthub.components.alexa.smart_home import EVENT_ALEXA_SMART_HOME
+from smarthub.components.automation import EVENT_AUTOMATION_TRIGGERED
+from smarthub.components.logbook.models import EventAsRow, LazyEventPartialState
+from smarthub.components.logbook.processor import EventProcessor
+from smarthub.components.logbook.queries.common import PSEUDO_EVENT_STATE_CHANGED
+from smarthub.components.recorder import Recorder
+from smarthub.components.script import EVENT_SCRIPT_STARTED
+from smarthub.components.sensor import SensorStateClass
+from smarthub.const import (
     ATTR_DOMAIN,
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
@@ -41,11 +41,11 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entityfilter import CONF_ENTITY_GLOBS
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import Event, SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entityfilter import CONF_ENTITY_GLOBS
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .common import MockRow, mock_humanify
 
@@ -60,19 +60,19 @@ EMPTY_CONFIG = logbook.CONFIG_SCHEMA({logbook.DOMAIN: {}})
 
 
 @pytest.fixture
-async def hass_(recorder_mock: Recorder, hass: HomeAssistant) -> HomeAssistant:
+async def hass_(recorder_mock: Recorder, hass: SmartHub) -> SmartHub:
     """Set up things to be run when tests are started."""
     assert await async_setup_component(hass, logbook.DOMAIN, EMPTY_CONFIG)
     return hass
 
 
 @pytest.fixture
-async def set_utc(hass: HomeAssistant) -> None:
+async def set_utc(hass: SmartHub) -> None:
     """Set timezone to UTC."""
     await hass.config.async_set_time_zone("UTC")
 
 
-async def test_service_call_create_logbook_entry(hass_: HomeAssistant) -> None:
+async def test_service_call_create_logbook_entry(hass_: SmartHub) -> None:
     """Test if service call create log book entry."""
     calls = async_capture_events(hass_, logbook.EVENT_LOGBOOK_ENTRY)
 
@@ -127,7 +127,7 @@ async def test_service_call_create_logbook_entry(hass_: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_service_call_create_logbook_entry_invalid_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if service call create log book entry with an invalid entity id."""
     await async_setup_component(hass, "logbook", {})
@@ -157,7 +157,7 @@ async def test_service_call_create_logbook_entry_invalid_entity_id(
 
 
 async def test_service_call_create_log_book_entry_no_message(
-    hass_: HomeAssistant,
+    hass_: SmartHub,
 ) -> None:
     """Test if service call create log book entry without message."""
     calls = async_capture_events(hass_, logbook.EVENT_LOGBOOK_ENTRY)
@@ -174,7 +174,7 @@ async def test_service_call_create_log_book_entry_no_message(
 
 
 async def test_filter_sensor(
-    hass_: HomeAssistant, hass_client: ClientSessionGenerator
+    hass_: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test numeric sensors are filtered."""
 
@@ -222,9 +222,9 @@ async def test_filter_sensor(
     _assert_entry(entries[2], name="ble", entity_id=entity_id4, state="10")
 
 
-async def test_home_assistant_start_stop_not_grouped(hass_: HomeAssistant) -> None:
+async def test_home_assistant_start_stop_not_grouped(hass_: SmartHub) -> None:
     """Test if HA start and stop events are no longer grouped."""
-    await async_setup_component(hass_, "homeassistant", {})
+    await async_setup_component(hass_, "smarthub", {})
     await hass_.async_block_till_done()
     entries = mock_humanify(
         hass_,
@@ -235,13 +235,13 @@ async def test_home_assistant_start_stop_not_grouped(hass_: HomeAssistant) -> No
     )
 
     assert len(entries) == 2
-    assert_entry(entries[0], name="Home Assistant", message="stopped", domain=ha.DOMAIN)
-    assert_entry(entries[1], name="Home Assistant", message="started", domain=ha.DOMAIN)
+    assert_entry(entries[0], name="SmartHub", message="stopped", domain=ha.DOMAIN)
+    assert_entry(entries[1], name="SmartHub", message="started", domain=ha.DOMAIN)
 
 
-async def test_home_assistant_start(hass_: HomeAssistant) -> None:
+async def test_home_assistant_start(hass_: SmartHub) -> None:
     """Test if HA start is not filtered or converted into a restart."""
-    await async_setup_component(hass_, "homeassistant", {})
+    await async_setup_component(hass_, "smarthub", {})
     await hass_.async_block_till_done()
     entity_id = "switch.bla"
     pointA = dt_util.utcnow()
@@ -255,11 +255,11 @@ async def test_home_assistant_start(hass_: HomeAssistant) -> None:
     )
 
     assert len(entries) == 2
-    assert_entry(entries[0], name="Home Assistant", message="started", domain=ha.DOMAIN)
+    assert_entry(entries[0], name="SmartHub", message="started", domain=ha.DOMAIN)
     assert_entry(entries[1], pointA, "bla", entity_id=entity_id)
 
 
-def test_process_custom_logbook_entries(hass_: HomeAssistant) -> None:
+def test_process_custom_logbook_entries(hass_: SmartHub) -> None:
     """Test if custom log book entries get added as an entry."""
     name = "Nice name"
     message = "has a custom entry"
@@ -346,7 +346,7 @@ def create_state_changed_event_from_old_new(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_view(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view."""
     await async_setup_component(hass, "logbook", {})
@@ -358,7 +358,7 @@ async def test_logbook_view(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_view_invalid_start_date_time(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with an invalid date time."""
     await async_setup_component(hass, "logbook", {})
@@ -370,7 +370,7 @@ async def test_logbook_view_invalid_start_date_time(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_view_invalid_end_date_time(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view."""
     await async_setup_component(hass, "logbook", {})
@@ -384,7 +384,7 @@ async def test_logbook_view_invalid_end_date_time(
 
 @pytest.mark.usefixtures("recorder_mock", "set_utc")
 async def test_logbook_view_period_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test the logbook view with period and entity."""
@@ -469,7 +469,7 @@ async def test_logbook_view_period_entity(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_describe_event(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test teaching logbook about a new event."""
 
@@ -518,7 +518,7 @@ async def test_logbook_describe_event(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_exclude_described_event(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test exclusions of events that are described by another integration."""
     name = "My Automation Rule"
@@ -535,7 +535,7 @@ async def test_exclude_described_event(
         }
 
     def async_describe_events(
-        hass: HomeAssistant,
+        hass: SmartHub,
         async_describe_event: Callable[
             [str, str, Callable[[Event], dict[str, str]]], None
         ],
@@ -595,7 +595,7 @@ async def test_exclude_described_event(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_view_end_time_entity(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with end_time and entity."""
     await async_setup_component(hass, "logbook", {})
@@ -656,13 +656,13 @@ async def test_logbook_view_end_time_entity(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_entity_filter_with_automations(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with end_time and entity with automations and scripts."""
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook", "automation", "script")
+            for comp in ("smarthub", "logbook", "automation", "script")
         ]
     )
 
@@ -706,7 +706,7 @@ async def test_logbook_entity_filter_with_automations(
     assert json_dict[1]["entity_id"] == entity_id_second
     assert json_dict[2]["entity_id"] == "automation.mock_automation"
     assert json_dict[3]["entity_id"] == "script.mock_script"
-    assert json_dict[4]["domain"] == "homeassistant"
+    assert json_dict[4]["domain"] == "smarthub"
 
     # Test entries for 3 days with filter by entity_id
     end_time = start + timedelta(hours=72)
@@ -743,7 +743,7 @@ async def test_logbook_entity_filter_with_automations(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_entity_no_longer_in_state_machine(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with an entity that hass been removed from the state machine."""
     await async_setup_component(hass, "logbook", {})
@@ -783,7 +783,7 @@ async def test_logbook_entity_no_longer_in_state_machine(
 
 @pytest.mark.usefixtures("recorder_mock", "set_utc")
 async def test_filter_continuous_sensor_values(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test remove continuous sensor events from logbook."""
@@ -826,14 +826,14 @@ async def test_filter_continuous_sensor_values(
 
 @pytest.mark.usefixtures("recorder_mock", "set_utc")
 async def test_exclude_new_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test if events are excluded on first update."""
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook")
+            for comp in ("smarthub", "logbook")
         ]
     )
     await async_recorder_block_till_done(hass)
@@ -861,20 +861,20 @@ async def test_exclude_new_entities(
 
     assert len(response_json) == 2
     assert response_json[0]["entity_id"] == entity_id2
-    assert response_json[1]["domain"] == "homeassistant"
+    assert response_json[1]["domain"] == "smarthub"
     assert response_json[1]["message"] == "started"
 
 
 @pytest.mark.usefixtures("recorder_mock", "set_utc")
 async def test_exclude_removed_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test if events are excluded on last update."""
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook")
+            for comp in ("smarthub", "logbook")
         ]
     )
     await async_recorder_block_till_done(hass)
@@ -908,21 +908,21 @@ async def test_exclude_removed_entities(
 
     assert len(response_json) == 3
     assert response_json[0]["entity_id"] == entity_id
-    assert response_json[1]["domain"] == "homeassistant"
+    assert response_json[1]["domain"] == "smarthub"
     assert response_json[1]["message"] == "started"
     assert response_json[2]["entity_id"] == entity_id2
 
 
 @pytest.mark.usefixtures("recorder_mock", "set_utc")
 async def test_exclude_attribute_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test if events of attribute changes are filtered."""
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook")
+            for comp in ("smarthub", "logbook")
         ]
     )
     await async_recorder_block_till_done(hass)
@@ -952,20 +952,20 @@ async def test_exclude_attribute_changes(
     response_json = await response.json()
 
     assert len(response_json) == 3
-    assert response_json[0]["domain"] == "homeassistant"
+    assert response_json[0]["domain"] == "smarthub"
     assert response_json[1]["entity_id"] == "light.kitchen"
     assert response_json[2]["entity_id"] == "light.kitchen"
 
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_entity_context_id(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with end_time and entity with automations and scripts."""
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook", "automation", "script")
+            for comp in ("smarthub", "logbook", "automation", "script")
         ]
     )
 
@@ -1025,7 +1025,7 @@ async def test_logbook_entity_context_id(
         hass,
         "mock_name",
         "mock_message",
-        "homeassistant",
+        "smarthub",
         None,
         context,
     )
@@ -1092,7 +1092,7 @@ async def test_logbook_entity_context_id(
     assert json_dict[3]["context_entity_id_name"] == "Alarm Automation"
     assert json_dict[3]["context_user_id"] == "b400facee45711eaa9308bfd3d19e474"
 
-    assert json_dict[4]["domain"] == "homeassistant"
+    assert json_dict[4]["domain"] == "smarthub"
 
     assert json_dict[5]["entity_id"] == "alarm_control_panel.area_003"
     assert json_dict[5]["context_event_type"] == "automation_triggered"
@@ -1101,7 +1101,7 @@ async def test_logbook_entity_context_id(
     assert json_dict[5]["context_entity_id_name"] == "Alarm Automation"
     assert json_dict[5]["context_user_id"] == "b400facee45711eaa9308bfd3d19e474"
 
-    assert json_dict[6]["domain"] == "homeassistant"
+    assert json_dict[6]["domain"] == "smarthub"
     assert json_dict[6]["context_user_id"] == "b400facee45711eaa9308bfd3d19e474"
 
     assert json_dict[7]["entity_id"] == "light.switch"
@@ -1113,13 +1113,13 @@ async def test_logbook_entity_context_id(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_context_id_automation_script_started_manually(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook populates context_ids for scripts and automations started manually."""
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook", "automation", "script")
+            for comp in ("smarthub", "logbook", "automation", "script")
         ]
     )
 
@@ -1188,7 +1188,7 @@ async def test_logbook_context_id_automation_script_started_manually(
     assert json_dict[1]["context_user_id"] == "b400facee45711eaa9308bfd3d19e474"
     assert json_dict[1]["context_id"] == "01GTDGKBCH00GW0X476W5TVAAA"
 
-    assert json_dict[2]["domain"] == "homeassistant"
+    assert json_dict[2]["domain"] == "smarthub"
 
     assert json_dict[3]["entity_id"] is None
     assert json_dict[3]["name"] == "Mock script"
@@ -1206,13 +1206,13 @@ async def test_logbook_context_id_automation_script_started_manually(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_entity_context_parent_id(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view links events via context parent_id."""
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook", "automation", "script")
+            for comp in ("smarthub", "logbook", "automation", "script")
         ]
     )
 
@@ -1276,7 +1276,7 @@ async def test_logbook_entity_context_parent_id(
         hass,
         "mock_name",
         "mock_message",
-        "homeassistant",
+        "smarthub",
         None,
         child_context,
     )
@@ -1361,7 +1361,7 @@ async def test_logbook_entity_context_parent_id(
     assert json_dict[3]["context_entity_id_name"] == "mock script"
     assert json_dict[3]["context_user_id"] == "b400facee45711eaa9308bfd3d19e474"
 
-    assert json_dict[4]["domain"] == "homeassistant"
+    assert json_dict[4]["domain"] == "smarthub"
 
     assert json_dict[5]["entity_id"] == "alarm_control_panel.area_003"
     assert json_dict[5]["context_event_type"] == "script_started"
@@ -1370,7 +1370,7 @@ async def test_logbook_entity_context_parent_id(
     assert json_dict[5]["context_entity_id_name"] == "mock script"
     assert json_dict[5]["context_user_id"] == "b400facee45711eaa9308bfd3d19e474"
 
-    assert json_dict[6]["domain"] == "homeassistant"
+    assert json_dict[6]["domain"] == "smarthub"
     assert json_dict[6]["context_user_id"] == "b400facee45711eaa9308bfd3d19e474"
 
     assert json_dict[7]["entity_id"] == "light.switch"
@@ -1389,13 +1389,13 @@ async def test_logbook_entity_context_parent_id(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_context_from_template(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with end_time and entity with automations and scripts."""
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook")
+            for comp in ("smarthub", "logbook")
         ]
     )
 
@@ -1458,7 +1458,7 @@ async def test_logbook_context_from_template(
     assert response.status == HTTPStatus.OK
     json_dict = await response.json()
 
-    assert json_dict[0]["domain"] == "homeassistant"
+    assert json_dict[0]["domain"] == "smarthub"
     assert "context_entity_id" not in json_dict[0]
 
     assert json_dict[1]["entity_id"] == "switch.test_template_switch"
@@ -1480,7 +1480,7 @@ async def test_logbook_context_from_template(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with a single entity and ."""
     await async_setup_component(hass, "logbook", {})
@@ -1552,7 +1552,7 @@ async def test_logbook_(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_many_entities_multiple_calls(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with a many entities called multiple times."""
     await async_setup_component(hass, "logbook", {})
@@ -1625,7 +1625,7 @@ async def test_logbook_many_entities_multiple_calls(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_custom_log_entry_discoverable_via_(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test if a custom log entry is later discoverable via ."""
     await async_setup_component(hass, "logbook", {})
@@ -1663,7 +1663,7 @@ async def test_custom_log_entry_discoverable_via_(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_multiple_entities(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with a multiple entities."""
     await async_setup_component(hass, "logbook", {})
@@ -1790,7 +1790,7 @@ async def test_logbook_multiple_entities(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_invalid_entity(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with requesting an invalid entity."""
     await async_setup_component(hass, "logbook", {})
@@ -1811,13 +1811,13 @@ async def test_logbook_invalid_entity(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_icon_and_state(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test to ensure state and custom icons are returned."""
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook")
+            for comp in ("smarthub", "logbook")
         ]
     )
 
@@ -1846,7 +1846,7 @@ async def test_icon_and_state(
     response_json = await _async_fetch_logbook(client)
 
     assert len(response_json) == 3
-    assert response_json[0]["domain"] == "homeassistant"
+    assert response_json[0]["domain"] == "smarthub"
     assert response_json[1]["entity_id"] == "light.kitchen"
     assert response_json[1]["icon"] == "mdi:security"
     assert response_json[1]["state"] == STATE_ON
@@ -1857,7 +1857,7 @@ async def test_icon_and_state(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_fire_logbook_entries(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test many logbook entry calls."""
     await async_setup_component(hass, "logbook", {})
@@ -1896,13 +1896,13 @@ async def test_fire_logbook_entries(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_exclude_events_domain(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test if events are filtered if domain is excluded in config."""
     entity_id = "switch.bla"
     entity_id2 = "sensor.blu"
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     config = logbook.CONFIG_SCHEMA(
         {
             ha.DOMAIN: {},
@@ -1926,14 +1926,14 @@ async def test_exclude_events_domain(
 
     assert len(entries) == 2
     _assert_entry(
-        entries[0], name="Home Assistant", message="started", domain=ha.DOMAIN
+        entries[0], name="SmartHub", message="started", domain=ha.DOMAIN
     )
     _assert_entry(entries[1], name="blu", entity_id=entity_id2)
 
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_exclude_events_domain_glob(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test if events are filtered if domain or glob is excluded in config."""
     entity_id = "switch.bla"
@@ -1952,7 +1952,7 @@ async def test_exclude_events_domain_glob(
         }
     )
     await asyncio.gather(
-        async_setup_component(hass, "homeassistant", {}),
+        async_setup_component(hass, "smarthub", {}),
         async_setup_component(hass, "logbook", config),
     )
     await async_recorder_block_till_done(hass)
@@ -1972,14 +1972,14 @@ async def test_exclude_events_domain_glob(
 
     assert len(entries) == 2
     _assert_entry(
-        entries[0], name="Home Assistant", message="started", domain=ha.DOMAIN
+        entries[0], name="SmartHub", message="started", domain=ha.DOMAIN
     )
     _assert_entry(entries[1], name="blu", entity_id=entity_id2)
 
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_include_events_entity(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test if events are filtered if entity is included in config."""
     entity_id = "sensor.bla"
@@ -1990,14 +1990,14 @@ async def test_include_events_entity(
             ha.DOMAIN: {},
             logbook.DOMAIN: {
                 CONF_INCLUDE: {
-                    CONF_DOMAINS: ["homeassistant"],
+                    CONF_DOMAINS: ["smarthub"],
                     CONF_ENTITIES: [entity_id2],
                 }
             },
         }
     )
     await asyncio.gather(
-        async_setup_component(hass, "homeassistant", {}),
+        async_setup_component(hass, "smarthub", {}),
         async_setup_component(hass, "logbook", config),
     )
     await async_recorder_block_till_done(hass)
@@ -2015,14 +2015,14 @@ async def test_include_events_entity(
 
     assert len(entries) == 2
     _assert_entry(
-        entries[0], name="Home Assistant", message="started", domain=ha.DOMAIN
+        entries[0], name="SmartHub", message="started", domain=ha.DOMAIN
     )
     _assert_entry(entries[1], name="blu", entity_id=entity_id2)
 
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_exclude_events_entity(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test if events are filtered if entity is excluded in config."""
     entity_id = "sensor.bla"
@@ -2035,7 +2035,7 @@ async def test_exclude_events_entity(
         }
     )
     await asyncio.gather(
-        async_setup_component(hass, "homeassistant", {}),
+        async_setup_component(hass, "smarthub", {}),
         async_setup_component(hass, "logbook", config),
     )
     await async_recorder_block_till_done(hass)
@@ -2052,14 +2052,14 @@ async def test_exclude_events_entity(
     entries = await _async_fetch_logbook(client)
     assert len(entries) == 2
     _assert_entry(
-        entries[0], name="Home Assistant", message="started", domain=ha.DOMAIN
+        entries[0], name="SmartHub", message="started", domain=ha.DOMAIN
     )
     _assert_entry(entries[1], name="blu", entity_id=entity_id2)
 
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_include_events_domain(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test if events are filtered if domain is included in config."""
     assert await async_setup_component(hass, "alexa", {})
@@ -2069,12 +2069,12 @@ async def test_include_events_domain(
         {
             ha.DOMAIN: {},
             logbook.DOMAIN: {
-                CONF_INCLUDE: {CONF_DOMAINS: ["homeassistant", "sensor", "alexa"]}
+                CONF_INCLUDE: {CONF_DOMAINS: ["smarthub", "sensor", "alexa"]}
             },
         }
     )
     await asyncio.gather(
-        async_setup_component(hass, "homeassistant", {}),
+        async_setup_component(hass, "smarthub", {}),
         async_setup_component(hass, "logbook", config),
     )
     await async_recorder_block_till_done(hass)
@@ -2096,7 +2096,7 @@ async def test_include_events_domain(
 
     assert len(entries) == 3
     _assert_entry(
-        entries[0], name="Home Assistant", message="started", domain=ha.DOMAIN
+        entries[0], name="SmartHub", message="started", domain=ha.DOMAIN
     )
     _assert_entry(entries[1], name="Amazon Alexa", domain="alexa")
     _assert_entry(entries[2], name="blu", entity_id=entity_id2)
@@ -2104,7 +2104,7 @@ async def test_include_events_domain(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_include_events_domain_glob(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test if events are filtered if domain or glob is included in config."""
     assert await async_setup_component(hass, "alexa", {})
@@ -2116,14 +2116,14 @@ async def test_include_events_domain_glob(
             ha.DOMAIN: {},
             logbook.DOMAIN: {
                 CONF_INCLUDE: {
-                    CONF_DOMAINS: ["homeassistant", "sensor", "alexa"],
+                    CONF_DOMAINS: ["smarthub", "sensor", "alexa"],
                     CONF_ENTITY_GLOBS: ["*.included"],
                 }
             },
         }
     )
     await asyncio.gather(
-        async_setup_component(hass, "homeassistant", {}),
+        async_setup_component(hass, "smarthub", {}),
         async_setup_component(hass, "logbook", config),
     )
     await async_recorder_block_till_done(hass)
@@ -2155,7 +2155,7 @@ async def test_include_events_domain_glob(
 
     assert len(entries) == 4
     _assert_entry(
-        entries[0], name="Home Assistant", message="started", domain=ha.DOMAIN
+        entries[0], name="SmartHub", message="started", domain=ha.DOMAIN
     )
     _assert_entry(entries[1], name="Amazon Alexa", domain="alexa")
     _assert_entry(entries[2], name="blu", entity_id=entity_id2)
@@ -2164,7 +2164,7 @@ async def test_include_events_domain_glob(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_include_exclude_events_no_globs(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test if events are filtered if include and exclude is configured."""
     entity_id = "switch.bla"
@@ -2177,7 +2177,7 @@ async def test_include_exclude_events_no_globs(
             ha.DOMAIN: {},
             logbook.DOMAIN: {
                 CONF_INCLUDE: {
-                    CONF_DOMAINS: ["sensor", "homeassistant"],
+                    CONF_DOMAINS: ["sensor", "smarthub"],
                     CONF_ENTITIES: ["switch.bla"],
                 },
                 CONF_EXCLUDE: {
@@ -2188,7 +2188,7 @@ async def test_include_exclude_events_no_globs(
         }
     )
     await asyncio.gather(
-        async_setup_component(hass, "homeassistant", {}),
+        async_setup_component(hass, "smarthub", {}),
         async_setup_component(hass, "logbook", config),
     )
     await async_recorder_block_till_done(hass)
@@ -2212,7 +2212,7 @@ async def test_include_exclude_events_no_globs(
 
     assert len(entries) == 6
     _assert_entry(
-        entries[0], name="Home Assistant", message="started", domain=ha.DOMAIN
+        entries[0], name="SmartHub", message="started", domain=ha.DOMAIN
     )
     _assert_entry(entries[1], name="bla", entity_id=entity_id, state="10")
     _assert_entry(entries[2], name="blu", entity_id=entity_id2, state="10")
@@ -2223,7 +2223,7 @@ async def test_include_exclude_events_no_globs(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_include_exclude_events_with_glob_filters(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test if events are filtered if include and exclude is configured."""
     entity_id = "switch.bla"
@@ -2237,7 +2237,7 @@ async def test_include_exclude_events_with_glob_filters(
             ha.DOMAIN: {},
             logbook.DOMAIN: {
                 CONF_INCLUDE: {
-                    CONF_DOMAINS: ["sensor", "homeassistant"],
+                    CONF_DOMAINS: ["sensor", "smarthub"],
                     CONF_ENTITIES: ["switch.bla"],
                     CONF_ENTITY_GLOBS: ["*.included"],
                 },
@@ -2250,7 +2250,7 @@ async def test_include_exclude_events_with_glob_filters(
         }
     )
     await asyncio.gather(
-        async_setup_component(hass, "homeassistant", {}),
+        async_setup_component(hass, "smarthub", {}),
         async_setup_component(hass, "logbook", config),
     )
     await async_recorder_block_till_done(hass)
@@ -2278,7 +2278,7 @@ async def test_include_exclude_events_with_glob_filters(
 
     assert len(entries) == 7
     _assert_entry(
-        entries[0], name="Home Assistant", message="started", domain=ha.DOMAIN
+        entries[0], name="SmartHub", message="started", domain=ha.DOMAIN
     )
     _assert_entry(entries[1], name="bla", entity_id=entity_id, state="10")
     _assert_entry(entries[2], name="blu", entity_id=entity_id2, state="10")
@@ -2290,7 +2290,7 @@ async def test_include_exclude_events_with_glob_filters(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_empty_config(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test we can handle an empty entity filter."""
     entity_id = "sensor.blu"
@@ -2302,7 +2302,7 @@ async def test_empty_config(
         }
     )
     await asyncio.gather(
-        async_setup_component(hass, "homeassistant", {}),
+        async_setup_component(hass, "smarthub", {}),
         async_setup_component(hass, "logbook", config),
     )
     await async_recorder_block_till_done(hass)
@@ -2318,14 +2318,14 @@ async def test_empty_config(
 
     assert len(entries) == 2
     _assert_entry(
-        entries[0], name="Home Assistant", message="started", domain=ha.DOMAIN
+        entries[0], name="SmartHub", message="started", domain=ha.DOMAIN
     )
     _assert_entry(entries[1], name="blu", entity_id=entity_id)
 
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_context_filter(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test we can filter by context."""
     assert await async_setup_component(hass, "logbook", {})
@@ -2403,14 +2403,14 @@ def _assert_entry(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_get_events(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test logbook get_events."""
     now = dt_util.utcnow()
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook")
+            for comp in ("smarthub", "logbook")
         ]
     )
     await async_recorder_block_till_done(hass)
@@ -2524,7 +2524,7 @@ async def test_get_events(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_get_events_future_start_time(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get_events with a future start time."""
     await async_setup_component(hass, "logbook", {})
@@ -2550,7 +2550,7 @@ async def test_get_events_future_start_time(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_get_events_bad_start_time(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get_events bad start time."""
     await async_setup_component(hass, "logbook", {})
@@ -2571,7 +2571,7 @@ async def test_get_events_bad_start_time(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_get_events_bad_end_time(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get_events bad end time."""
     now = dt_util.utcnow()
@@ -2594,7 +2594,7 @@ async def test_get_events_bad_end_time(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_get_events_invalid_filters(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get_events invalid filters."""
     await async_setup_component(hass, "logbook", {})
@@ -2625,7 +2625,7 @@ async def test_get_events_invalid_filters(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_get_events_with_device_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -2634,7 +2634,7 @@ async def test_get_events_with_device_ids(
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook")
+            for comp in ("smarthub", "logbook")
         ]
     )
 
@@ -2656,7 +2656,7 @@ async def test_get_events_with_device_ids(
 
         @ha.callback
         def async_describe_events(
-            hass: HomeAssistant,  # noqa: N805
+            hass: SmartHub,  # noqa: N805
             async_describe_event: Callable[
                 [str, str, Callable[[Event], dict[str, str]]], None
             ],
@@ -2766,13 +2766,13 @@ async def test_get_events_with_device_ids(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_logbook_select_entities_context_id(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the logbook view with end_time and entity with automations and scripts."""
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook", "automation", "script")
+            for comp in ("smarthub", "logbook", "automation", "script")
         ]
     )
 
@@ -2830,7 +2830,7 @@ async def test_logbook_select_entities_context_id(
         hass,
         "mock_name",
         "mock_message",
-        "homeassistant",
+        "smarthub",
         None,
         context,
     )
@@ -2902,14 +2902,14 @@ async def test_logbook_select_entities_context_id(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_get_events_with_context_state(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test logbook get_events with a context state."""
     now = dt_util.utcnow()
     await asyncio.gather(
         *[
             async_setup_component(hass, comp, {})
-            for comp in ("homeassistant", "logbook")
+            for comp in ("smarthub", "logbook")
         ]
     )
     await async_recorder_block_till_done(hass)
@@ -2967,7 +2967,7 @@ async def test_get_events_with_context_state(
 
 
 @pytest.mark.usefixtures("recorder_mock")
-async def test_logbook_with_empty_config(hass: HomeAssistant) -> None:
+async def test_logbook_with_empty_config(hass: SmartHub) -> None:
     """Test we handle a empty configuration."""
     assert await async_setup_component(
         hass,
@@ -2981,7 +2981,7 @@ async def test_logbook_with_empty_config(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("recorder_mock")
-async def test_logbook_with_non_iterable_entity_filter(hass: HomeAssistant) -> None:
+async def test_logbook_with_non_iterable_entity_filter(hass: SmartHub) -> None:
     """Test we handle a non-iterable entity filter."""
     assert await async_setup_component(
         hass,

@@ -15,12 +15,12 @@ from hatasmota.utils import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import config_entries
-from homeassistant.components.tasmota.const import DEFAULT_PREFIX
-from homeassistant.const import ATTR_ASSUMED_STATE, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub import config_entries
+from smarthub.components.tasmota.const import DEFAULT_PREFIX
+from smarthub.const import ATTR_ASSUMED_STATE, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .test_common import (
     DEFAULT_CONFIG,
@@ -62,7 +62,7 @@ DEFAULT_SENSOR_CONFIG_UNKNOWN = {
 }
 
 # This configuration has some sensors where values are lists
-# Home Assistant maps this to one sensor for each list item
+# SmartHub maps this to one sensor for each list item
 LIST_SENSOR_CONFIG = {
     "sn": {
         "Time": "2020-09-25T12:47:15",
@@ -119,7 +119,7 @@ LIST_SENSOR_CONFIG_2 = {
 }
 
 # This configuration has some sensors where values are dicts
-# Home Assistant maps this to one sensor for each dictionary item
+# SmartHub maps this to one sensor for each dictionary item
 DICT_SENSOR_CONFIG_1 = {
     "sn": {
         "Time": "2020-03-03T00:00:00+00:00",
@@ -309,7 +309,7 @@ TEMPERATURE_SENSOR_CONFIG = {
     ],
 )
 async def test_controlling_state_via_mqtt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mqtt_mock: MqttMockHAClient,
     snapshot: SnapshotAssertion,
@@ -410,7 +410,7 @@ async def test_controlling_state_via_mqtt(
     ],
 )
 async def test_quantity_override(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -450,7 +450,7 @@ async def test_quantity_override(
 
 
 async def test_bad_indexed_sensor_state_via_mqtt(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test state update via MQTT where sensor is not matching configuration."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -565,7 +565,7 @@ async def test_bad_indexed_sensor_state_via_mqtt(
 
 @pytest.mark.parametrize("status_sensor_disabled", [False])
 async def test_status_sensor_state_via_mqtt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -628,7 +628,7 @@ async def test_status_sensor_state_via_mqtt(
 
 @pytest.mark.parametrize("status_sensor_disabled", [False])
 async def test_battery_sensor_state_via_mqtt(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test state update via MQTT."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -680,7 +680,7 @@ async def test_battery_sensor_state_via_mqtt(
 
 @pytest.mark.parametrize("status_sensor_disabled", [False])
 async def test_single_shot_status_sensor_state_via_mqtt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -766,7 +766,7 @@ async def test_single_shot_status_sensor_state_via_mqtt(
 @pytest.mark.parametrize("status_sensor_disabled", [False])
 @patch.object(hatasmota.status_sensor, "datetime", Mock(wraps=datetime.datetime))
 async def test_restart_time_status_sensor_state_via_mqtt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -817,7 +817,7 @@ async def test_restart_time_status_sensor_state_via_mqtt(
 
 
 async def test_attributes(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test correct attributes for sensors."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -857,7 +857,7 @@ async def test_attributes(
 
 
 async def test_nested_sensor_attributes(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test correct attributes for sensors."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -891,7 +891,7 @@ async def test_nested_sensor_attributes(
 
 
 async def test_indexed_sensor_attributes(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test correct attributes for sensors."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -945,7 +945,7 @@ async def test_indexed_sensor_attributes(
     ],
 )
 async def test_diagnostic_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -975,7 +975,7 @@ async def test_diagnostic_sensors(
 
 @pytest.mark.parametrize("status_sensor_disabled", [False])
 async def test_enable_status_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -1033,7 +1033,7 @@ async def test_enable_status_sensor(
 
 
 async def test_availability_when_connection_lost(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -1053,7 +1053,7 @@ async def test_availability_when_connection_lost(
 
 
 async def test_deep_sleep_availability_when_connection_lost(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -1073,7 +1073,7 @@ async def test_deep_sleep_availability_when_connection_lost(
 
 
 async def test_availability(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test availability."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -1089,7 +1089,7 @@ async def test_availability(
 
 
 async def test_deep_sleep_availability(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test availability."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -1105,7 +1105,7 @@ async def test_deep_sleep_availability(
 
 
 async def test_availability_discovery_update(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test availability discovery update."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -1121,7 +1121,7 @@ async def test_availability_discovery_update(
 
 
 async def test_availability_poll_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,
@@ -1143,7 +1143,7 @@ async def test_availability_poll_state(
 
 
 async def test_discovery_removal_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     caplog: pytest.LogCaptureFixture,
     setup_tasmota,
@@ -1167,7 +1167,7 @@ async def test_discovery_removal_sensor(
 
 
 async def test_discovery_update_unchanged_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     caplog: pytest.LogCaptureFixture,
     setup_tasmota,
@@ -1176,7 +1176,7 @@ async def test_discovery_update_unchanged_sensor(
     config = copy.deepcopy(DEFAULT_CONFIG)
     sensor_config = copy.deepcopy(DEFAULT_SENSOR_CONFIG)
     with patch(
-        "homeassistant.components.tasmota.sensor.TasmotaSensor.discovery_update"
+        "smarthub.components.tasmota.sensor.TasmotaSensor.discovery_update"
     ) as discovery_update:
         await help_test_discovery_update_unchanged(
             hass,
@@ -1192,7 +1192,7 @@ async def test_discovery_update_unchanged_sensor(
 
 
 async def test_discovery_device_remove(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test device registry remove."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -1204,7 +1204,7 @@ async def test_discovery_device_remove(
 
 
 async def test_entity_id_update_subscriptions(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test MQTT subscriptions are managed when entity_id is updated."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -1226,7 +1226,7 @@ async def test_entity_id_update_subscriptions(
 
 
 async def test_entity_id_update_discovery_update(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test MQTT discovery update when entity_id is updated."""
     config = copy.deepcopy(DEFAULT_CONFIG)

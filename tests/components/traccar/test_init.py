@@ -6,18 +6,18 @@ from unittest.mock import patch
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import traccar, zone
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
-from homeassistant.components.device_tracker.legacy import Device
-from homeassistant.components.traccar import DOMAIN, TRACKER_UPDATE
-from homeassistant.const import STATE_HOME, STATE_NOT_HOME
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.dispatcher import DATA_DISPATCHER
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components import traccar, zone
+from smarthub.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
+from smarthub.components.device_tracker.legacy import Device
+from smarthub.components.traccar import DOMAIN, TRACKER_UPDATE
+from smarthub.const import STATE_HOME, STATE_NOT_HOME
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.dispatcher import DATA_DISPATCHER
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -32,7 +32,7 @@ def mock_dev_track(mock_device_tracker_conf: list[Device]) -> None:
 
 @pytest.fixture(name="client")
 async def traccar_client(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> TestClient:
     """Mock client for Traccar (unauthenticated)."""
 
@@ -40,12 +40,12 @@ async def traccar_client(
 
     await hass.async_block_till_done()
 
-    with patch("homeassistant.components.device_tracker.legacy.update_config"):
+    with patch("smarthub.components.device_tracker.legacy.update_config"):
         return await hass_client_no_auth()
 
 
 @pytest.fixture(autouse=True)
-async def setup_zones(hass: HomeAssistant) -> None:
+async def setup_zones(hass: SmartHub) -> None:
     """Set up Zone config in HA."""
     assert await async_setup_component(
         hass,
@@ -63,7 +63,7 @@ async def setup_zones(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture(name="webhook_id")
-async def webhook_id_fixture(hass: HomeAssistant, client: TestClient) -> str:
+async def webhook_id_fixture(hass: SmartHub, client: TestClient) -> str:
     """Initialize the Traccar component and get the webhook_id."""
     await async_process_ha_core_config(
         hass,
@@ -81,7 +81,7 @@ async def webhook_id_fixture(hass: HomeAssistant, client: TestClient) -> str:
     return result["result"].data["webhook_id"]
 
 
-async def test_missing_data(hass: HomeAssistant, client, webhook_id) -> None:
+async def test_missing_data(hass: SmartHub, client, webhook_id) -> None:
     """Test missing data."""
     url = f"/api/webhook/{webhook_id}"
     data = {"lat": "1.0", "lon": "1.1", "id": "123"}
@@ -107,7 +107,7 @@ async def test_missing_data(hass: HomeAssistant, client, webhook_id) -> None:
 
 
 async def test_enter_and_exit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client,
@@ -147,7 +147,7 @@ async def test_enter_and_exit(
 
 
 async def test_enter_with_attrs_as_query(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     webhook_id,
 ) -> None:
@@ -202,7 +202,7 @@ async def test_enter_with_attrs_as_query(
 
 
 async def test_enter_with_attrs_as_payload(
-    hass: HomeAssistant, client, webhook_id
+    hass: SmartHub, client, webhook_id
 ) -> None:
     """Test when additional attributes are present in JSON payload."""
     url = f"/api/webhook/{webhook_id}"
@@ -240,7 +240,7 @@ async def test_enter_with_attrs_as_payload(
     assert state.attributes["altitude"] == 102.0
 
 
-async def test_two_devices(hass: HomeAssistant, client, webhook_id) -> None:
+async def test_two_devices(hass: SmartHub, client, webhook_id) -> None:
     """Test updating two different devices."""
     url = f"/api/webhook/{webhook_id}"
 
@@ -272,7 +272,7 @@ async def test_two_devices(hass: HomeAssistant, client, webhook_id) -> None:
 @pytest.mark.xfail(
     reason="The device_tracker component does not support unloading yet."
 )
-async def test_load_unload_entry(hass: HomeAssistant, client, webhook_id) -> None:
+async def test_load_unload_entry(hass: SmartHub, client, webhook_id) -> None:
     """Test that the appropriate dispatch signals are added and removed."""
     url = f"/api/webhook/{webhook_id}"
     data = {"lat": str(HOME_LATITUDE), "lon": str(HOME_LONGITUDE), "id": "123"}

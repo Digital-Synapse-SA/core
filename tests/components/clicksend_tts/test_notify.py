@@ -8,10 +8,10 @@ from unittest.mock import patch
 import pytest
 import requests_mock
 
-from homeassistant.components import notify
-from homeassistant.components.clicksend_tts import notify as cs_tts
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import notify
+from smarthub.components.clicksend_tts import notify as cs_tts
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component
 
@@ -41,12 +41,12 @@ CONFIG = {
 def mock_clicksend_tts_notify():
     """Mock Clicksend TTS notify service."""
     with patch(
-        "homeassistant.components.clicksend_tts.notify.get_service", autospec=True
+        "smarthub.components.clicksend_tts.notify.get_service", autospec=True
     ) as ns:
         yield ns
 
 
-async def setup_notify(hass: HomeAssistant) -> None:
+async def setup_notify(hass: SmartHub) -> None:
     """Test setup."""
     with assert_setup_component(1, notify.DOMAIN) as config:
         assert await async_setup_component(hass, notify.DOMAIN, CONFIG)
@@ -55,7 +55,7 @@ async def setup_notify(hass: HomeAssistant) -> None:
 
 
 async def test_no_notify_service(
-    hass: HomeAssistant, mock_clicksend_tts_notify, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_clicksend_tts_notify, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test missing platform notify service instance."""
     caplog.set_level(logging.ERROR)
@@ -66,7 +66,7 @@ async def test_no_notify_service(
     assert "Failed to initialize notification service clicksend_tts" in caplog.text
 
 
-async def test_send_simple_message(hass: HomeAssistant) -> None:
+async def test_send_simple_message(hass: SmartHub) -> None:
     """Test sending a simple message with success."""
 
     with requests_mock.Mocker() as mock:

@@ -6,14 +6,14 @@ from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 import pytest
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_DOMAIN,
     AlarmControlPanelEntityFeature,
     AlarmControlPanelState,
 )
-from homeassistant.components.risco import CannotConnectError, UnauthorizedError
-from homeassistant.components.risco.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.risco import CannotConnectError, UnauthorizedError
+from smarthub.components.risco.const import DOMAIN
+from smarthub.const import (
     SERVICE_ALARM_ARM_AWAY,
     SERVICE_ALARM_ARM_CUSTOM_BYPASS,
     SERVICE_ALARM_ARM_HOME,
@@ -21,10 +21,10 @@ from homeassistant.const import (
     SERVICE_ALARM_DISARM,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 from .util import TEST_SITE_UUID
 
@@ -101,7 +101,7 @@ def two_part_cloud_alarm():
             new_callable=PropertyMock(return_value=partition_mocks),
         ),
         patch(
-            "homeassistant.components.risco.RiscoCloud.get_state",
+            "smarthub.components.risco.RiscoCloud.get_state",
             return_value=alarm_mock,
         ),
     ):
@@ -126,11 +126,11 @@ def two_part_local_alarm():
             partition_mocks[1], "name", new_callable=PropertyMock(return_value="Name 1")
         ),
         patch(
-            "homeassistant.components.risco.RiscoLocal.zones",
+            "smarthub.components.risco.RiscoLocal.zones",
             new_callable=PropertyMock(return_value={}),
         ),
         patch(
-            "homeassistant.components.risco.RiscoLocal.partitions",
+            "smarthub.components.risco.RiscoLocal.partitions",
             new_callable=PropertyMock(return_value=partition_mocks),
         ),
     ):
@@ -139,7 +139,7 @@ def two_part_local_alarm():
 
 @pytest.mark.parametrize("exception", [CannotConnectError, UnauthorizedError])
 async def test_error_on_login(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     login_with_error,
     cloud_config_entry,
@@ -152,7 +152,7 @@ async def test_error_on_login(
 
 
 async def test_cloud_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     two_part_cloud_alarm,
@@ -176,7 +176,7 @@ async def test_cloud_setup(
 
 
 async def _check_cloud_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     partitions: dict[int, Any],
     property: str,
     state: str,
@@ -192,7 +192,7 @@ async def _check_cloud_state(
 
 @pytest.mark.parametrize("options", [CUSTOM_MAPPING_OPTIONS])
 async def test_cloud_states(
-    hass: HomeAssistant, two_part_cloud_alarm, setup_risco_cloud
+    hass: SmartHub, two_part_cloud_alarm, setup_risco_cloud
 ) -> None:
     """Test the various alarm states."""
     assert hass.states.get(FIRST_CLOUD_ENTITY_ID).state == STATE_UNKNOWN
@@ -258,7 +258,7 @@ async def test_cloud_states(
 
 
 async def _call_alarm_service(
-    hass: HomeAssistant, service: str, entity_id: str, **kwargs: Any
+    hass: SmartHub, service: str, entity_id: str, **kwargs: Any
 ) -> None:
     data = {"entity_id": entity_id, **kwargs}
 
@@ -268,7 +268,7 @@ async def _call_alarm_service(
 
 
 async def _test_cloud_service_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     method: str,
     entity_id: str,
@@ -276,27 +276,27 @@ async def _test_cloud_service_call(
     *args: Any,
     **kwargs: Any,
 ) -> None:
-    with patch(f"homeassistant.components.risco.RiscoCloud.{method}") as set_mock:
+    with patch(f"smarthub.components.risco.RiscoCloud.{method}") as set_mock:
         await _call_alarm_service(hass, service, entity_id, **kwargs)
         set_mock.assert_awaited_once_with(partition_id, *args)
 
 
 async def _test_cloud_no_service_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     method: str,
     entity_id: str,
     partition_id: int,
     **kwargs: Any,
 ) -> None:
-    with patch(f"homeassistant.components.risco.RiscoCloud.{method}") as set_mock:
+    with patch(f"smarthub.components.risco.RiscoCloud.{method}") as set_mock:
         await _call_alarm_service(hass, service, entity_id, **kwargs)
         set_mock.assert_not_awaited()
 
 
 @pytest.mark.parametrize("options", [CUSTOM_MAPPING_OPTIONS])
 async def test_cloud_sets_custom_mapping(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     two_part_cloud_alarm,
     setup_risco_cloud,
@@ -333,7 +333,7 @@ async def test_cloud_sets_custom_mapping(
 
 @pytest.mark.parametrize("options", [FULL_CUSTOM_MAPPING])
 async def test_cloud_sets_full_custom_mapping(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     two_part_cloud_alarm,
     setup_risco_cloud,
@@ -391,7 +391,7 @@ async def test_cloud_sets_full_custom_mapping(
     "options", [{**CUSTOM_MAPPING_OPTIONS, **CODES_REQUIRED_OPTIONS}]
 )
 async def test_cloud_sets_with_correct_code(
-    hass: HomeAssistant, two_part_cloud_alarm, setup_risco_cloud
+    hass: SmartHub, two_part_cloud_alarm, setup_risco_cloud
 ) -> None:
     """Test settings the various modes when code is required."""
     code = {"code": 1234}
@@ -431,7 +431,7 @@ async def test_cloud_sets_with_correct_code(
         "C",
         **code,
     )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await _test_cloud_no_service_call(
             hass,
             SERVICE_ALARM_ARM_CUSTOM_BYPASS,
@@ -440,7 +440,7 @@ async def test_cloud_sets_with_correct_code(
             0,
             **code,
         )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await _test_cloud_no_service_call(
             hass,
             SERVICE_ALARM_ARM_CUSTOM_BYPASS,
@@ -455,7 +455,7 @@ async def test_cloud_sets_with_correct_code(
     "options", [{**CUSTOM_MAPPING_OPTIONS, **CODES_REQUIRED_OPTIONS}]
 )
 async def test_cloud_sets_with_incorrect_code(
-    hass: HomeAssistant, two_part_cloud_alarm, setup_risco_cloud
+    hass: SmartHub, two_part_cloud_alarm, setup_risco_cloud
 ) -> None:
     """Test settings the various modes when code is required and incorrect."""
     code = {"code": 4321}
@@ -483,7 +483,7 @@ async def test_cloud_sets_with_incorrect_code(
     await _test_cloud_no_service_call(
         hass, SERVICE_ALARM_ARM_NIGHT, "group_arm", SECOND_CLOUD_ENTITY_ID, 1, **code
     )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await _test_cloud_no_service_call(
             hass,
             SERVICE_ALARM_ARM_CUSTOM_BYPASS,
@@ -492,7 +492,7 @@ async def test_cloud_sets_with_incorrect_code(
             0,
             **code,
         )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await _test_cloud_no_service_call(
             hass,
             SERVICE_ALARM_ARM_CUSTOM_BYPASS,
@@ -505,7 +505,7 @@ async def test_cloud_sets_with_incorrect_code(
 
 @pytest.mark.parametrize("exception", [CannotConnectError, UnauthorizedError])
 async def test_error_on_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     connect_with_error,
     local_config_entry,
@@ -518,7 +518,7 @@ async def test_error_on_connect(
 
 
 async def test_local_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     two_part_local_alarm,
@@ -539,13 +539,13 @@ async def test_local_setup(
     )
     assert device is not None
     assert device.manufacturer == "Risco"
-    with patch("homeassistant.components.risco.RiscoLocal.disconnect") as mock_close:
+    with patch("smarthub.components.risco.RiscoLocal.disconnect") as mock_close:
         await hass.config_entries.async_unload(setup_risco_local.entry_id)
         mock_close.assert_awaited_once()
 
 
 async def _check_local_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     partitions: dict[int, Any],
     property: str,
     state: str,
@@ -563,14 +563,14 @@ async def _check_local_state(
 def mock_partition_handler():
     """Create a mock for add_partition_handler."""
     with patch(
-        "homeassistant.components.risco.RiscoLocal.add_partition_handler"
+        "smarthub.components.risco.RiscoLocal.add_partition_handler"
     ) as mock:
         yield mock
 
 
 @pytest.mark.parametrize("options", [CUSTOM_MAPPING_OPTIONS])
 async def test_local_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     two_part_local_alarm,
     mock_partition_handler,
     setup_risco_local,
@@ -649,7 +649,7 @@ async def test_local_states(
 
 
 async def _test_local_service_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     method: str,
     entity_id: str,
@@ -663,7 +663,7 @@ async def _test_local_service_call(
 
 
 async def _test_local_no_service_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     method: str,
     entity_id: str,
@@ -677,7 +677,7 @@ async def _test_local_no_service_call(
 
 @pytest.mark.parametrize("options", [CUSTOM_MAPPING_OPTIONS])
 async def test_local_sets_custom_mapping(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     two_part_local_alarm,
     setup_risco_local,
@@ -748,7 +748,7 @@ async def test_local_sets_custom_mapping(
 
 @pytest.mark.parametrize("options", [FULL_CUSTOM_MAPPING])
 async def test_local_sets_full_custom_mapping(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     two_part_local_alarm,
     setup_risco_local,
@@ -840,7 +840,7 @@ async def test_local_sets_full_custom_mapping(
     "options", [{**CUSTOM_MAPPING_OPTIONS, **CODES_REQUIRED_OPTIONS}]
 )
 async def test_local_sets_with_correct_code(
-    hass: HomeAssistant, two_part_local_alarm, setup_risco_local
+    hass: SmartHub, two_part_local_alarm, setup_risco_local
 ) -> None:
     """Test settings the various modes when code is required."""
     code = {"code": 1234}
@@ -910,7 +910,7 @@ async def test_local_sets_with_correct_code(
         "C",
         **code,
     )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await _test_local_no_service_call(
             hass,
             SERVICE_ALARM_ARM_CUSTOM_BYPASS,
@@ -919,7 +919,7 @@ async def test_local_sets_with_correct_code(
             two_part_local_alarm[0],
             **code,
         )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await _test_local_no_service_call(
             hass,
             SERVICE_ALARM_ARM_CUSTOM_BYPASS,
@@ -934,7 +934,7 @@ async def test_local_sets_with_correct_code(
     "options", [{**CUSTOM_MAPPING_OPTIONS, **CODES_REQUIRED_OPTIONS}]
 )
 async def test_local_sets_with_incorrect_code(
-    hass: HomeAssistant, two_part_local_alarm, setup_risco_local
+    hass: SmartHub, two_part_local_alarm, setup_risco_local
 ) -> None:
     """Test settings the various modes when code is required and incorrect."""
     code = {"code": 4321}
@@ -1002,7 +1002,7 @@ async def test_local_sets_with_incorrect_code(
         two_part_local_alarm[1],
         **code,
     )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await _test_local_no_service_call(
             hass,
             SERVICE_ALARM_ARM_CUSTOM_BYPASS,
@@ -1011,7 +1011,7 @@ async def test_local_sets_with_incorrect_code(
             two_part_local_alarm[0],
             **code,
         )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await _test_local_no_service_call(
             hass,
             SERVICE_ALARM_ARM_CUSTOM_BYPASS,

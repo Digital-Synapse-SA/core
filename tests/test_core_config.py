@@ -13,7 +13,7 @@ import pytest
 from voluptuous import Invalid, MultipleInvalid
 from webrtc_models import RTCConfiguration, RTCIceServer
 
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ASSUMED_STATE,
     ATTR_FRIENDLY_NAME,
     CONF_AUTH_MFA_MODULES,
@@ -26,8 +26,8 @@ from homeassistant.const import (
     EVENT_CORE_CONFIG_UPDATE,
     __version__,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.core_config import (
+from smarthub.core import SmartHub, State
+from smarthub.core_config import (
     _CUSTOMIZE_DICT_SCHEMA,
     CORE_CONFIG_SCHEMA,
     CORE_STORAGE_KEY,
@@ -37,9 +37,9 @@ from homeassistant.core_config import (
     _validate_stun_or_turn_url,
     async_process_ha_core_config,
 )
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.entity import Entity
-from homeassistant.util.unit_system import (
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.entity import Entity
+from smarthub.util.unit_system import (
     METRIC_SYSTEM,
     US_CUSTOMARY_SYSTEM,
     UnitSystem,
@@ -215,7 +215,7 @@ def test_customize_glob_is_ordered() -> None:
     assert isinstance(conf["customize_glob"], OrderedDict)
 
 
-async def _compute_state(hass: HomeAssistant, config: dict[str, Any]) -> State | None:
+async def _compute_state(hass: SmartHub, config: dict[str, Any]) -> State | None:
     await async_process_ha_core_config(hass, config)
 
     entity = Entity()
@@ -229,7 +229,7 @@ async def _compute_state(hass: HomeAssistant, config: dict[str, Any]) -> State |
     return hass.states.get("test.test")
 
 
-async def test_entity_customization(hass: HomeAssistant) -> None:
+async def test_entity_customization(hass: SmartHub) -> None:
     """Test entity customization through configuration."""
     config = {
         CONF_LATITUDE: 50,
@@ -244,7 +244,7 @@ async def test_entity_customization(hass: HomeAssistant) -> None:
 
 
 async def test_loading_configuration_from_storage(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test loading core config onto hass object."""
     hass_storage["core.config"] = {
@@ -286,7 +286,7 @@ async def test_loading_configuration_from_storage(
 
 
 async def test_loading_configuration_from_storage_with_yaml_only(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test loading core and YAML config onto hass object."""
     hass_storage["core.config"] = {
@@ -318,7 +318,7 @@ async def test_loading_configuration_from_storage_with_yaml_only(
 
 
 async def test_migration_and_updating_configuration(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test updating configuration stores the new configuration."""
     core_data = {
@@ -363,7 +363,7 @@ async def test_migration_and_updating_configuration(
 
 
 async def test_override_stored_configuration(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test loading core and YAML config onto hass object."""
     hass_storage["core.config"] = {
@@ -393,7 +393,7 @@ async def test_override_stored_configuration(
     assert hass.config.config_source is ConfigSource.YAML
 
 
-async def test_loading_configuration(hass: HomeAssistant) -> None:
+async def test_loading_configuration(hass: SmartHub) -> None:
     """Test loading core config onto hass object."""
     await async_process_ha_core_config(
         hass,
@@ -474,7 +474,7 @@ async def test_loading_configuration(hass: HomeAssistant) -> None:
     ],
 )
 async def test_language_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     minor_version,
     users,
@@ -512,10 +512,10 @@ async def test_language_default(
 
 
 async def test_loading_configuration_default_media_dirs_docker(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test loading core config onto hass object."""
-    with patch("homeassistant.core_config.is_docker_env", return_value=True):
+    with patch("smarthub.core_config.is_docker_env", return_value=True):
         await async_process_ha_core_config(
             hass,
             {
@@ -529,7 +529,7 @@ async def test_loading_configuration_default_media_dirs_docker(
     assert hass.config.media_dirs == {"local": "/media"}
 
 
-async def test_loading_configuration_from_packages(hass: HomeAssistant) -> None:
+async def test_loading_configuration_from_packages(hass: SmartHub) -> None:
     """Test loading packages config onto hass object config."""
     await async_process_ha_core_config(
         hass,
@@ -578,7 +578,7 @@ async def test_loading_configuration_from_packages(hass: HomeAssistant) -> None:
     ],
 )
 async def test_loading_configuration_unit_system(
-    hass: HomeAssistant, unit_system_name: str, expected_unit_system: UnitSystem
+    hass: SmartHub, unit_system_name: str, expected_unit_system: UnitSystem
 ) -> None:
     """Test backward compatibility when loading core config."""
     await async_process_ha_core_config(
@@ -598,7 +598,7 @@ async def test_loading_configuration_unit_system(
     assert hass.config.units is expected_unit_system
 
 
-async def test_merge_customize(hass: HomeAssistant) -> None:
+async def test_merge_customize(hass: SmartHub) -> None:
     """Test loading core config onto hass object."""
     core_config = {
         "latitude": 60,
@@ -609,7 +609,7 @@ async def test_merge_customize(hass: HomeAssistant) -> None:
         "time_zone": "GMT",
         "customize": {"a.a": {"friendly_name": "A"}},
         "packages": {
-            "pkg1": {"homeassistant": {"customize": {"b.b": {"friendly_name": "BB"}}}}
+            "pkg1": {"smarthub": {"customize": {"b.b": {"friendly_name": "BB"}}}}
         },
     }
     await async_process_ha_core_config(hass, core_config)
@@ -617,7 +617,7 @@ async def test_merge_customize(hass: HomeAssistant) -> None:
     assert hass.data[DATA_CUSTOMIZE].get("b.b") == {"friendly_name": "BB"}
 
 
-async def test_auth_provider_config(hass: HomeAssistant) -> None:
+async def test_auth_provider_config(hass: SmartHub) -> None:
     """Test loading auth provider config onto hass object."""
     core_config = {
         "latitude": 60,
@@ -627,7 +627,7 @@ async def test_auth_provider_config(hass: HomeAssistant) -> None:
         "unit_system": "imperial",
         "time_zone": "GMT",
         CONF_AUTH_PROVIDERS: [
-            {"type": "homeassistant"},
+            {"type": "smarthub"},
         ],
         CONF_AUTH_MFA_MODULES: [{"type": "totp"}, {"type": "totp", "id": "second"}],
     }
@@ -636,13 +636,13 @@ async def test_auth_provider_config(hass: HomeAssistant) -> None:
     await async_process_ha_core_config(hass, core_config)
 
     assert len(hass.auth.auth_providers) == 1
-    assert hass.auth.auth_providers[0].type == "homeassistant"
+    assert hass.auth.auth_providers[0].type == "smarthub"
     assert len(hass.auth.auth_mfa_modules) == 2
     assert hass.auth.auth_mfa_modules[0].id == "totp"
     assert hass.auth.auth_mfa_modules[1].id == "second"
 
 
-async def test_auth_provider_config_default(hass: HomeAssistant) -> None:
+async def test_auth_provider_config_default(hass: SmartHub) -> None:
     """Test loading default auth provider config."""
     core_config = {
         "latitude": 60,
@@ -657,12 +657,12 @@ async def test_auth_provider_config_default(hass: HomeAssistant) -> None:
     await async_process_ha_core_config(hass, core_config)
 
     assert len(hass.auth.auth_providers) == 1
-    assert hass.auth.auth_providers[0].type == "homeassistant"
+    assert hass.auth.auth_providers[0].type == "smarthub"
     assert len(hass.auth.auth_mfa_modules) == 1
     assert hass.auth.auth_mfa_modules[0].id == "totp"
 
 
-async def test_disallowed_auth_provider_config(hass: HomeAssistant) -> None:
+async def test_disallowed_auth_provider_config(hass: SmartHub) -> None:
     """Test loading insecure example auth provider is disallowed."""
     core_config = {
         "latitude": 60,
@@ -688,7 +688,7 @@ async def test_disallowed_auth_provider_config(hass: HomeAssistant) -> None:
         await async_process_ha_core_config(hass, core_config)
 
 
-async def test_disallowed_duplicated_auth_provider_config(hass: HomeAssistant) -> None:
+async def test_disallowed_duplicated_auth_provider_config(hass: SmartHub) -> None:
     """Test loading insecure example auth provider is disallowed."""
     core_config = {
         "latitude": 60,
@@ -697,13 +697,13 @@ async def test_disallowed_duplicated_auth_provider_config(hass: HomeAssistant) -
         "name": "Huis",
         "unit_system": "imperial",
         "time_zone": "GMT",
-        CONF_AUTH_PROVIDERS: [{"type": "homeassistant"}, {"type": "homeassistant"}],
+        CONF_AUTH_PROVIDERS: [{"type": "smarthub"}, {"type": "smarthub"}],
     }
     with pytest.raises(Invalid):
         await async_process_ha_core_config(hass, core_config)
 
 
-async def test_disallowed_auth_mfa_module_config(hass: HomeAssistant) -> None:
+async def test_disallowed_auth_mfa_module_config(hass: SmartHub) -> None:
     """Test loading insecure example auth mfa module is disallowed."""
     core_config = {
         "latitude": 60,
@@ -724,7 +724,7 @@ async def test_disallowed_auth_mfa_module_config(hass: HomeAssistant) -> None:
 
 
 async def test_disallowed_duplicated_auth_mfa_module_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test loading insecure example auth mfa module is disallowed."""
     core_config = {
@@ -741,18 +741,18 @@ async def test_disallowed_duplicated_auth_mfa_module_config(
 
 
 async def test_core_config_schema_historic_currency(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test core config schema."""
     await async_process_ha_core_config(hass, {"currency": "LTT"})
 
-    issue = issue_registry.async_get_issue("homeassistant", "historic_currency")
+    issue = issue_registry.async_get_issue("smarthub", "historic_currency")
     assert issue
     assert issue.translation_placeholders == {"currency": "LTT"}
 
 
 async def test_core_store_historic_currency(
-    hass: HomeAssistant, hass_storage: dict[str, Any], issue_registry: ir.IssueRegistry
+    hass: SmartHub, hass_storage: dict[str, Any], issue_registry: ir.IssueRegistry
 ) -> None:
     """Test core config store."""
     core_data = {
@@ -767,27 +767,27 @@ async def test_core_store_historic_currency(
     await async_process_ha_core_config(hass, {})
 
     issue_id = "historic_currency"
-    issue = issue_registry.async_get_issue("homeassistant", issue_id)
+    issue = issue_registry.async_get_issue("smarthub", issue_id)
     assert issue
     assert issue.translation_placeholders == {"currency": "LTT"}
 
     await hass.config.async_update(currency="EUR")
-    issue = issue_registry.async_get_issue("homeassistant", issue_id)
+    issue = issue_registry.async_get_issue("smarthub", issue_id)
     assert not issue
 
 
 async def test_core_config_schema_no_country(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test core config schema."""
     await async_process_ha_core_config(hass, {})
 
-    issue = issue_registry.async_get_issue("homeassistant", "country_not_configured")
+    issue = issue_registry.async_get_issue("smarthub", "country_not_configured")
     assert issue
 
 
 async def test_core_store_no_country(
-    hass: HomeAssistant, hass_storage: dict[str, Any], issue_registry: ir.IssueRegistry
+    hass: SmartHub, hass_storage: dict[str, Any], issue_registry: ir.IssueRegistry
 ) -> None:
     """Test core config store."""
     core_data = {
@@ -800,15 +800,15 @@ async def test_core_store_no_country(
     await async_process_ha_core_config(hass, {})
 
     issue_id = "country_not_configured"
-    issue = issue_registry.async_get_issue("homeassistant", issue_id)
+    issue = issue_registry.async_get_issue("smarthub", issue_id)
     assert issue
 
     await hass.config.async_update(country="SE")
-    issue = issue_registry.async_get_issue("homeassistant", issue_id)
+    issue = issue_registry.async_get_issue("smarthub", issue_id)
     assert not issue
 
 
-async def test_configuration_legacy_template_is_removed(hass: HomeAssistant) -> None:
+async def test_configuration_legacy_template_is_removed(hass: SmartHub) -> None:
     """Test loading core config onto hass object."""
     await async_process_ha_core_config(
         hass,
@@ -982,7 +982,7 @@ async def test_config_is_allowed_external_url() -> None:
         assert not config.is_allowed_external_url(url)
 
 
-async def test_event_on_update(hass: HomeAssistant) -> None:
+async def test_event_on_update(hass: SmartHub) -> None:
     """Test that event is fired on update."""
     events = async_capture_events(hass, EVENT_CORE_CONFIG_UPDATE)
 
@@ -996,14 +996,14 @@ async def test_event_on_update(hass: HomeAssistant) -> None:
     assert events[0].data == {"latitude": 12}
 
 
-async def test_bad_timezone_raises_value_error(hass: HomeAssistant) -> None:
+async def test_bad_timezone_raises_value_error(hass: SmartHub) -> None:
     """Test bad timezone raises ValueError."""
     with pytest.raises(ValueError):
         await hass.config.async_update(time_zone="not_a_timezone")
 
 
 async def test_additional_data_in_core_config(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test that we can handle additional data in core configuration."""
     config = Config(hass, "/test/ha-config")
@@ -1017,7 +1017,7 @@ async def test_additional_data_in_core_config(
 
 
 async def test_incorrect_internal_external_url(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that we warn when detecting invalid internal/external url."""
     config = Config(hass, "/test/ha-config")
@@ -1040,8 +1040,8 @@ async def test_incorrect_internal_external_url(
     hass_storage[CORE_STORAGE_KEY] = {
         "version": 1,
         "data": {
-            "internal_url": "https://community.home-assistant.io/profile",
-            "external_url": "https://www.home-assistant.io/blue",
+            "internal_url": "https://community.smart-hub.io/profile",
+            "external_url": "https://www.smart-hub.io/blue",
         },
     }
     await config.async_load()
@@ -1049,30 +1049,30 @@ async def test_incorrect_internal_external_url(
     assert "Invalid internal_url set" in caplog.text
 
 
-async def test_top_level_components(hass: HomeAssistant) -> None:
+async def test_top_level_components(hass: SmartHub) -> None:
     """Test top level components are updated when components change."""
-    hass.config.components.add("homeassistant")
-    assert hass.config.components == {"homeassistant"}
-    assert hass.config.top_level_components == {"homeassistant"}
-    hass.config.components.add("homeassistant.scene")
-    assert hass.config.components == {"homeassistant", "homeassistant.scene"}
-    assert hass.config.top_level_components == {"homeassistant"}
-    hass.config.components.remove("homeassistant")
-    assert hass.config.components == {"homeassistant.scene"}
+    hass.config.components.add("smarthub")
+    assert hass.config.components == {"smarthub"}
+    assert hass.config.top_level_components == {"smarthub"}
+    hass.config.components.add("smarthub.scene")
+    assert hass.config.components == {"smarthub", "smarthub.scene"}
+    assert hass.config.top_level_components == {"smarthub"}
+    hass.config.components.remove("smarthub")
+    assert hass.config.components == {"smarthub.scene"}
     assert hass.config.top_level_components == set()
     with pytest.raises(ValueError):
-        hass.config.components.remove("homeassistant.scene")
+        hass.config.components.remove("smarthub.scene")
     with pytest.raises(NotImplementedError):
-        hass.config.components.discard("homeassistant")
+        hass.config.components.discard("smarthub")
 
 
-async def test_debug_mode_defaults_to_off(hass: HomeAssistant) -> None:
+async def test_debug_mode_defaults_to_off(hass: SmartHub) -> None:
     """Test debug mode defaults to off."""
     assert not hass.config.debug
 
 
 async def test_core_config_schema_imperial_unit(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test core config schema."""
     await async_process_ha_core_config(
@@ -1091,5 +1091,5 @@ async def test_core_config_schema_imperial_unit(
         },
     )
 
-    issue = issue_registry.async_get_issue("homeassistant", "imperial_unit_system")
+    issue = issue_registry.async_get_issue("smarthub", "imperial_unit_system")
     assert issue

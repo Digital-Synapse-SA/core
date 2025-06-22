@@ -9,19 +9,19 @@ from aiounifi.models.message import MessageKey
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN
-from homeassistant.components.unifi.const import CONF_SITE_ID
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import (
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN
+from smarthub.components.unifi.const import CONF_SITE_ID
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import (
     CONF_HOST,
     CONTENT_TYPE_JSON,
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_registry import RegistryEntryDisabler
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_registry import RegistryEntryDisabler
+from smarthub.util import dt as dt_util
 
 from .conftest import (
     ConfigEntryFactoryType,
@@ -138,14 +138,14 @@ WLAN_REGENERATE_PASSWORD = [
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entity_and_device_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     site_payload: dict[str, Any],
     snapshot: SnapshotAssertion,
 ) -> None:
     """Validate entity and device data with and without admin rights."""
-    with patch("homeassistant.components.unifi.PLATFORMS", [Platform.BUTTON]):
+    with patch("smarthub.components.unifi.PLATFORMS", [Platform.BUTTON]):
         config_entry = await config_entry_factory()
     if site_payload[0]["role"] == "admin":
         await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
@@ -154,7 +154,7 @@ async def test_entity_and_device_data(
 
 
 async def _test_button_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     mock_websocket_state: WebsocketStateManager,
     config_entry: MockConfigEntry,
@@ -225,7 +225,7 @@ async def _test_button_entity(
     ],
 )
 async def test_device_button_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     config_entry_setup: MockConfigEntry,
     mock_websocket_state: WebsocketStateManager,
@@ -272,7 +272,7 @@ async def test_device_button_entities(
     ],
 )
 async def test_wlan_button_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     aioclient_mock: AiohttpClientMocker,
     config_entry_setup: MockConfigEntry,
@@ -313,7 +313,7 @@ async def test_wlan_button_entities(
 @pytest.mark.parametrize("device_payload", [DEVICE_POWER_CYCLE_POE])
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_power_cycle_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_websocket_message: WebsocketMessageMock,
     device_payload: dict[str, Any],
 ) -> None:

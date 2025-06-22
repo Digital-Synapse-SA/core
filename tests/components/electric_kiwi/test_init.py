@@ -8,11 +8,11 @@ from aiohttp.client_exceptions import ClientResponseError
 from electrickiwi_api.exceptions import ApiException, AuthException
 import pytest
 
-from homeassistant.components.electric_kiwi.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.electric_kiwi.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_async_setup_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test a successful setup entry and unload of entry."""
     await init_integration(hass, config_entry)
@@ -35,7 +35,7 @@ async def test_async_setup_entry(
 
 
 async def test_async_setup_multiple_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     config_entry2: MockConfigEntry,
 ) -> None:
@@ -68,14 +68,14 @@ async def test_async_setup_multiple_entries(
     ids=["failure_requires_reauth", "transient_failure"],
 )
 async def test_refresh_token_validity_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     status: http.HTTPStatus,
     expected_state: ConfigEntryState,
 ) -> None:
     """Test token refresh failure status."""
     with patch(
-        "homeassistant.helpers.config_entry_oauth2_flow.OAuth2Session.async_ensure_token_valid",
+        "smarthub.helpers.config_entry_oauth2_flow.OAuth2Session.async_ensure_token_valid",
         side_effect=ClientResponseError(
             RequestInfo("", "POST", {}, ""), None, status=status
         ),
@@ -90,7 +90,7 @@ async def test_refresh_token_validity_failures(
 
 
 async def test_unique_id_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -112,7 +112,7 @@ async def test_unique_id_migration(
 
 
 async def test_unique_id_migration_failure(
-    hass: HomeAssistant, config_entry: MockConfigEntry, electrickiwi_api: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, electrickiwi_api: AsyncMock
 ) -> None:
     """Test that the unique ID is migrated to the customer number."""
     electrickiwi_api.set_active_session.side_effect = ApiException()
@@ -124,7 +124,7 @@ async def test_unique_id_migration_failure(
 
 
 async def test_unique_id_migration_auth_failure(
-    hass: HomeAssistant, config_entry: MockConfigEntry, electrickiwi_api: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, electrickiwi_api: AsyncMock
 ) -> None:
     """Test that the unique ID is migrated to the customer number."""
     electrickiwi_api.set_active_session.side_effect = AuthException()

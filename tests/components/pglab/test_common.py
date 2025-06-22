@@ -2,7 +2,7 @@
 
 import json
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import async_fire_mqtt_message
 
@@ -35,7 +35,7 @@ def get_device_discovery_payload(
 
 
 async def send_discovery_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     payload: dict[str, any] | None,
 ) -> None:
     """Send the discovery message to make E-BOARD device discoverable."""

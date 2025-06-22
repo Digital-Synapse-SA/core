@@ -6,11 +6,11 @@ from aiocomelit import CannotAuthenticate, CannotConnect
 from aiocomelit.const import BRIDGE, VEDO
 import pytest
 
-from homeassistant.components.comelit.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PIN, CONF_PORT, CONF_TYPE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.comelit.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PIN, CONF_PORT, CONF_TYPE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import (
     BRIDGE_HOST,
@@ -26,7 +26,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_flow_serial_bridge(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -58,7 +58,7 @@ async def test_flow_serial_bridge(
 
 
 async def test_flow_vedo(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vedo: AsyncMock,
     mock_vedo_config_entry: MockConfigEntry,
 ) -> None:
@@ -99,7 +99,7 @@ async def test_flow_vedo(
     ],
 )
 async def test_exception_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vedo: AsyncMock,
     mock_vedo_config_entry: MockConfigEntry,
     side_effect,
@@ -152,7 +152,7 @@ async def test_exception_connection(
 
 
 async def test_reauth_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vedo: AsyncMock,
     mock_vedo_config_entry: MockConfigEntry,
 ) -> None:
@@ -183,7 +183,7 @@ async def test_reauth_successful(
     ],
 )
 async def test_reauth_not_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vedo: AsyncMock,
     mock_vedo_config_entry: MockConfigEntry,
     side_effect: Exception,
@@ -222,7 +222,7 @@ async def test_reauth_not_successful(
 
 
 async def test_reconfigure_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -263,7 +263,7 @@ async def test_reconfigure_successful(
     ],
 )
 async def test_reconfigure_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
     side_effect: Exception,

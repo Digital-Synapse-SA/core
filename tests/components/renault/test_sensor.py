@@ -13,10 +13,10 @@ from renault_api.kamereon.exceptions import (
 )
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_ASSUMED_STATE, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import ATTR_ASSUMED_STATE, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import _get_fixtures, patch_get_vehicle_data
 
@@ -28,13 +28,13 @@ pytestmark = pytest.mark.usefixtures("patch_renault_account", "patch_get_vehicle
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.renault.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.renault.PLATFORMS", [Platform.SENSOR]):
         yield
 
 
 @pytest.mark.usefixtures("fixtures_with_data", "entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -49,7 +49,7 @@ async def test_sensors(
 @pytest.mark.usefixtures("fixtures_with_no_data", "entity_registry_enabled_by_default")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_sensor_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -66,7 +66,7 @@ async def test_sensor_empty(
 )
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_sensor_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -81,7 +81,7 @@ async def test_sensor_errors(
 @pytest.mark.usefixtures("fixtures_with_access_denied_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_sensor_access_denied(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -95,7 +95,7 @@ async def test_sensor_access_denied(
 @pytest.mark.usefixtures("fixtures_with_not_supported_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_sensor_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -108,7 +108,7 @@ async def test_sensor_not_supported(
 
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_sensor_throttling_during_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     vehicle_type: str,
     freezer: FrozenDateTimeFactory,
@@ -141,7 +141,7 @@ async def test_sensor_throttling_during_setup(
 
 @pytest.mark.parametrize("vehicle_type", ["zoe_40"], indirect=True)
 async def test_sensor_throttling_after_init(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     vehicle_type: str,
     caplog: pytest.LogCaptureFixture,
@@ -204,7 +204,7 @@ async def test_sensor_throttling_after_init(
     indirect=["vehicle_type"],
 )
 async def test_dynamic_scan_interval(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     vehicle_count: int,
     scan_interval: int,
@@ -243,7 +243,7 @@ async def test_dynamic_scan_interval(
     indirect=["vehicle_type"],
 )
 async def test_dynamic_scan_interval_failed_coordinator(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     vehicle_count: int,
     scan_interval: int,

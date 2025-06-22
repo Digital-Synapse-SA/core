@@ -9,9 +9,9 @@ from unittest.mock import AsyncMock, MagicMock
 from google_drive_api.exceptions import GoogleDriveApiError
 import pytest
 
-from homeassistant.components.google_drive.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.google_drive.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -21,7 +21,7 @@ type ComponentSetup = Callable[[], Awaitable[None]]
 
 @pytest.fixture(name="setup_integration")
 async def mock_setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> Callable[[], Coroutine[Any, Any, None]]:
     """Fixture for setting up the component."""
@@ -35,7 +35,7 @@ async def mock_setup_integration(
 
 
 async def test_setup_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     mock_api: MagicMock,
 ) -> None:
@@ -58,7 +58,7 @@ async def test_setup_success(
 
 
 async def test_create_folder_if_missing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     mock_api: MagicMock,
 ) -> None:
@@ -67,7 +67,7 @@ async def test_create_folder_if_missing(
     # and creates it if missing
     mock_api.list_files = AsyncMock(return_value={"files": []})
     mock_api.create_file = AsyncMock(
-        return_value={"id": "new folder id", "name": "Home Assistant"}
+        return_value={"id": "new folder id", "name": "SmartHub"}
     )
 
     await setup_integration()
@@ -81,7 +81,7 @@ async def test_create_folder_if_missing(
 
 
 async def test_setup_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     mock_api: MagicMock,
 ) -> None:
@@ -98,7 +98,7 @@ async def test_setup_error(
 
 @pytest.mark.parametrize("expires_at", [time.time() - 3600], ids=["expired"])
 async def test_expired_token_refresh_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
     mock_api: MagicMock,
@@ -144,7 +144,7 @@ async def test_expired_token_refresh_success(
     ids=["failure_requires_reauth", "transient_failure"],
 )
 async def test_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
     status: http.HTTPStatus,

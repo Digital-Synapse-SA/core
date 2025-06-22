@@ -7,12 +7,12 @@ from collections.abc import Callable
 from mysensors.sensor import Sensor
 import pytest
 
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_BATTERY_LEVEL,
     ATTR_DEVICE_CLASS,
     ATTR_ICON,
@@ -21,8 +21,8 @@ from homeassistant.const import (
     UnitOfPower,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util.unit_system import (
+from smarthub.core import SmartHub
+from smarthub.util.unit_system import (
     METRIC_SYSTEM,
     US_CUSTOMARY_SYSTEM,
     UnitSystem,
@@ -32,7 +32,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_gps_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     gps_sensor: Sensor,
     receive_message: Callable[[str], None],
 ) -> None:
@@ -59,7 +59,7 @@ async def test_gps_sensor(
 
 
 async def test_ir_transceiver(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ir_transceiver: Sensor,
     receive_message: Callable[[str], None],
 ) -> None:
@@ -82,7 +82,7 @@ async def test_ir_transceiver(
 
 
 async def test_battery_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     battery_sensor: Sensor,
     receive_message: Callable[[str], None],
 ) -> None:
@@ -103,7 +103,7 @@ async def test_battery_entity(
 
 
 async def test_power_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     power_sensor: Sensor,
     integration: MockConfigEntry,
 ) -> None:
@@ -121,7 +121,7 @@ async def test_power_sensor(
 
 
 async def test_energy_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     energy_sensor: Sensor,
     integration: MockConfigEntry,
 ) -> None:
@@ -139,7 +139,7 @@ async def test_energy_sensor(
 
 
 async def test_sound_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sound_sensor: Sensor,
     integration: MockConfigEntry,
 ) -> None:
@@ -156,7 +156,7 @@ async def test_sound_sensor(
 
 
 async def test_distance_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     distance_sensor: Sensor,
     integration: MockConfigEntry,
 ) -> None:
@@ -181,7 +181,7 @@ async def test_distance_sensor(
     ],
 )
 async def test_temperature_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     temperature_sensor: Sensor,
     receive_message: Callable[[str], None],
     unit_system: UnitSystem,

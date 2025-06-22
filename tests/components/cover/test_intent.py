@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     DOMAIN,
     SERVICE_CLOSE_COVER,
@@ -13,9 +13,9 @@ from homeassistant.components.cover import (
     CoverState,
     intent as cover_intent,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import intent
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import intent
+from smarthub.setup import async_setup_component
 
 from tests.common import async_mock_service
 
@@ -27,7 +27,7 @@ from tests.common import async_mock_service
         ({"device_class": {"value": "garage"}}),
     ],
 )
-async def test_open_cover_intent(hass: HomeAssistant, slots: dict[str, Any]) -> None:
+async def test_open_cover_intent(hass: SmartHub, slots: dict[str, Any]) -> None:
     """Test HassOpenCover intent."""
     await cover_intent.async_setup_intents(hass)
 
@@ -58,7 +58,7 @@ async def test_open_cover_intent(hass: HomeAssistant, slots: dict[str, Any]) -> 
         ({"device_class": {"value": "garage"}}),
     ],
 )
-async def test_close_cover_intent(hass: HomeAssistant, slots: dict[str, Any]) -> None:
+async def test_close_cover_intent(hass: SmartHub, slots: dict[str, Any]) -> None:
     """Test HassCloseCover intent."""
     await cover_intent.async_setup_intents(hass)
 
@@ -90,7 +90,7 @@ async def test_close_cover_intent(hass: HomeAssistant, slots: dict[str, Any]) ->
         ({"device_class": {"value": "shade"}, "position": {"value": 50}}),
     ],
 )
-async def test_set_cover_position(hass: HomeAssistant, slots: dict[str, Any]) -> None:
+async def test_set_cover_position(hass: SmartHub, slots: dict[str, Any]) -> None:
     """Test HassSetPosition intent for covers."""
     assert await async_setup_component(hass, "intent", {})
 

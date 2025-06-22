@@ -6,9 +6,9 @@ from pyhomeworks import exceptions as hw_exceptions
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN
-from homeassistant.components.homeworks.const import (
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN
+from smarthub.components.homeworks.const import (
     CONF_ADDR,
     CONF_INDEX,
     CONF_LED,
@@ -17,22 +17,22 @@ from homeassistant.components.homeworks.const import (
     CONF_RELEASE_DELAY,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_HOST,
     CONF_NAME,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_user_flow(
-    hass: HomeAssistant, mock_homeworks: MagicMock, mock_setup_entry
+    hass: SmartHub, mock_homeworks: MagicMock, mock_setup_entry
 ) -> None:
     """Test the user configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -66,7 +66,7 @@ async def test_user_flow(
 
 
 async def test_user_flow_credentials(
-    hass: HomeAssistant, mock_homeworks: MagicMock, mock_setup_entry
+    hass: SmartHub, mock_homeworks: MagicMock, mock_setup_entry
 ) -> None:
     """Test the user configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -104,7 +104,7 @@ async def test_user_flow_credentials(
 
 
 async def test_user_flow_credentials_user_only(
-    hass: HomeAssistant, mock_homeworks: MagicMock, mock_setup_entry
+    hass: SmartHub, mock_homeworks: MagicMock, mock_setup_entry
 ) -> None:
     """Test the user configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -139,7 +139,7 @@ async def test_user_flow_credentials_user_only(
 
 
 async def test_user_flow_credentials_password_only(
-    hass: HomeAssistant, mock_homeworks: MagicMock, mock_setup_entry
+    hass: SmartHub, mock_homeworks: MagicMock, mock_setup_entry
 ) -> None:
     """Test the user configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -164,7 +164,7 @@ async def test_user_flow_credentials_password_only(
 
 
 async def test_user_flow_already_exists(
-    hass: HomeAssistant, mock_empty_config_entry: MockConfigEntry, mock_setup_entry
+    hass: SmartHub, mock_empty_config_entry: MockConfigEntry, mock_setup_entry
 ) -> None:
     """Test the user configuration flow."""
     mock_empty_config_entry.add_to_hass(hass)
@@ -209,7 +209,7 @@ async def test_user_flow_already_exists(
     ],
 )
 async def test_user_flow_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homeworks: MagicMock,
     mock_setup_entry,
     side_effect: type[Exception],
@@ -236,7 +236,7 @@ async def test_user_flow_cannot_connect(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
 ) -> None:
     """Test reconfigure flow."""
     mock_config_entry.add_to_hass(hass)
@@ -282,7 +282,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_flow_flow_duplicate(
-    hass: HomeAssistant, mock_homeworks: MagicMock
+    hass: SmartHub, mock_homeworks: MagicMock
 ) -> None:
     """Test reconfigure flow."""
     entry1 = MockConfigEntry(
@@ -323,7 +323,7 @@ async def test_reconfigure_flow_flow_duplicate(
 
 
 async def test_reconfigure_flow_flow_no_change(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
 ) -> None:
     """Test reconfigure flow."""
     mock_config_entry.add_to_hass(hass)
@@ -368,7 +368,7 @@ async def test_reconfigure_flow_flow_no_change(
 
 
 async def test_reconfigure_flow_credentials_password_only(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
 ) -> None:
     """Test reconfigure flow."""
     mock_config_entry.add_to_hass(hass)
@@ -391,7 +391,7 @@ async def test_reconfigure_flow_credentials_password_only(
 
 
 async def test_options_add_light_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_empty_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:
@@ -442,7 +442,7 @@ async def test_options_add_light_flow(
 
 
 async def test_options_add_remove_light_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
 ) -> None:
     """Test options flow to add and remove a light."""
     mock_config_entry.add_to_hass(hass)
@@ -565,7 +565,7 @@ async def test_options_add_remove_light_flow(
     ],
 )
 async def test_options_add_remove_keypad_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
     keypad_address: str,
@@ -655,7 +655,7 @@ async def test_options_add_remove_keypad_flow(
 
 
 async def test_options_add_keypad_with_error(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
 ) -> None:
     """Test options flow to add and remove a keypad."""
     mock_config_entry.add_to_hass(hass)
@@ -711,7 +711,7 @@ async def test_options_add_keypad_with_error(
 
 
 async def test_options_edit_light_no_lights_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
 ) -> None:
     """Test options flow to edit a light."""
     mock_config_entry.add_to_hass(hass)
@@ -775,7 +775,7 @@ async def test_options_edit_light_no_lights_flow(
 
 
 async def test_options_edit_light_flow_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_empty_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:
@@ -800,7 +800,7 @@ async def test_options_edit_light_flow_empty(
 
 
 async def test_options_add_button_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
 ) -> None:
     """Test options flow to add a button."""
     mock_config_entry.add_to_hass(hass)
@@ -885,7 +885,7 @@ async def test_options_add_button_flow(
 
 
 async def test_options_add_button_flow_duplicate(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
 ) -> None:
     """Test options flow to add a button."""
     mock_config_entry.add_to_hass(hass)
@@ -935,7 +935,7 @@ async def test_options_add_button_flow_duplicate(
 
 
 async def test_options_edit_button_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
 ) -> None:
     """Test options flow to add a button."""
     mock_config_entry.add_to_hass(hass)
@@ -1023,7 +1023,7 @@ async def test_options_edit_button_flow(
 
 
 async def test_options_remove_button_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_homeworks: MagicMock
 ) -> None:
     """Test options flow to remove a button."""
     mock_config_entry.add_to_hass(hass)

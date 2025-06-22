@@ -29,10 +29,10 @@ from deebot_client.events import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ecovacs.const import DOMAIN
-from homeassistant.components.ecovacs.controller import EcovacsController
-from homeassistant.components.switch import DOMAIN as PLATFORM_DOMAIN
-from homeassistant.const import (
+from smarthub.components.ecovacs.const import DOMAIN
+from smarthub.components.ecovacs.controller import EcovacsController
+from smarthub.components.switch import DOMAIN as PLATFORM_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -40,8 +40,8 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .util import block_till_done
 
@@ -131,7 +131,7 @@ class SwitchTestCase:
     ids=["yna5x1", "5xu9h3"],
 )
 async def test_switch_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -208,7 +208,7 @@ async def test_switch_entities(
     ids=["yna5x1", "5xu9h3"],
 )
 async def test_disabled_by_default_switch_entities(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, entity_ids: list[str]
+    hass: SmartHub, entity_registry: er.EntityRegistry, entity_ids: list[str]
 ) -> None:
     """Test the disabled by default switch entities."""
     for entity_id in entity_ids:

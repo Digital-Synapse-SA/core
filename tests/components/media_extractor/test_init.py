@@ -9,15 +9,15 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from yt_dlp import DownloadError
 
-from homeassistant.components.media_extractor.const import (
+from smarthub.components.media_extractor.const import (
     ATTR_URL,
     DOMAIN,
     SERVICE_EXTRACT_MEDIA_URL,
 )
-from homeassistant.components.media_player import SERVICE_PLAY_MEDIA
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components.media_player import SERVICE_PLAY_MEDIA
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from . import YOUTUBE_EMPTY_PLAYLIST, YOUTUBE_PLAYLIST, YOUTUBE_VIDEO, MockYoutubeDL
 from .const import NO_FORMATS_RESPONSE, SOUNDCLOUD_TRACK
@@ -25,7 +25,7 @@ from .const import NO_FORMATS_RESPONSE, SOUNDCLOUD_TRACK
 from tests.common import MockConfigEntry, async_load_json_object_fixture
 
 
-async def test_play_media_service_is_registered(hass: HomeAssistant) -> None:
+async def test_play_media_service_is_registered(hass: SmartHub) -> None:
     """Test play media service is registered."""
     mock_config_entry = MockConfigEntry(domain=DOMAIN)
 
@@ -48,7 +48,7 @@ async def test_play_media_service_is_registered(hass: HomeAssistant) -> None:
     ],
 )
 async def test_extract_media_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_youtube_dl: MockYoutubeDL,
     snapshot: SnapshotAssertion,
     empty_media_extractor_config: dict[str, Any],
@@ -71,7 +71,7 @@ async def test_extract_media_service(
 
 
 async def test_extracting_playlist_no_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_youtube_dl: MockYoutubeDL,
     empty_media_extractor_config: dict[str, Any],
 ) -> None:
@@ -79,7 +79,7 @@ async def test_extracting_playlist_no_entries(
 
     await async_setup_component(hass, DOMAIN, empty_media_extractor_config)
     await hass.async_block_till_done()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_EXTRACT_MEDIA_URL,
@@ -101,7 +101,7 @@ async def test_extracting_playlist_no_entries(
     ],
 )
 async def test_play_media_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_youtube_dl: MockYoutubeDL,
     service_calls: list[ServiceCall],
     snapshot: SnapshotAssertion,
@@ -131,7 +131,7 @@ async def test_play_media_service(
 
 
 async def test_download_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     empty_media_extractor_config: dict[str, Any],
     service_calls: list[ServiceCall],
     caplog: pytest.LogCaptureFixture,
@@ -139,7 +139,7 @@ async def test_download_error(
     """Test handling DownloadError."""
 
     with patch(
-        "homeassistant.components.media_extractor.YoutubeDL.extract_info",
+        "smarthub.components.media_extractor.YoutubeDL.extract_info",
         side_effect=DownloadError("Message"),
     ):
         await async_setup_component(hass, DOMAIN, empty_media_extractor_config)
@@ -161,7 +161,7 @@ async def test_download_error(
 
 
 async def test_no_target_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_youtube_dl: MockYoutubeDL,
     empty_media_extractor_config: dict[str, Any],
     service_calls: list[ServiceCall],
@@ -188,7 +188,7 @@ async def test_no_target_entity(
 
 
 async def test_playlist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_youtube_dl: MockYoutubeDL,
     empty_media_extractor_config: dict[str, Any],
     service_calls: list[ServiceCall],
@@ -215,7 +215,7 @@ async def test_playlist(
 
 
 async def test_playlist_no_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_youtube_dl: MockYoutubeDL,
     empty_media_extractor_config: dict[str, Any],
     service_calls: list[ServiceCall],
@@ -244,7 +244,7 @@ async def test_playlist_no_entries(
 
 
 async def test_query_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     empty_media_extractor_config: dict[str, Any],
     service_calls: list[ServiceCall],
 ) -> None:
@@ -252,13 +252,13 @@ async def test_query_error(
 
     with (
         patch(
-            "homeassistant.components.media_extractor.YoutubeDL.extract_info",
+            "smarthub.components.media_extractor.YoutubeDL.extract_info",
             return_value=await async_load_json_object_fixture(
                 hass, "youtube_1_info.json", DOMAIN
             ),
         ),
         patch(
-            "homeassistant.components.media_extractor.YoutubeDL.process_ie_result",
+            "smarthub.components.media_extractor.YoutubeDL.process_ie_result",
             side_effect=DownloadError("Message"),
         ),
     ):
@@ -280,7 +280,7 @@ async def test_query_error(
 
 
 async def test_cookiefile_detection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_youtube_dl: MockYoutubeDL,
     empty_media_extractor_config: dict[str, Any],
     caplog: pytest.LogCaptureFixture,

@@ -5,18 +5,18 @@ from unittest.mock import patch
 from fritzconnection.core.exceptions import FritzConnectionException, FritzServiceError
 import pytest
 
-from homeassistant.components.fritz.const import DOMAIN
-from homeassistant.components.fritz.services import SERVICE_SET_GUEST_WIFI_PW
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.fritz.const import DOMAIN
+from smarthub.components.fritz.services import SERVICE_SET_GUEST_WIFI_PW
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .const import MOCK_USER_DATA
 
 from tests.common import MockConfigEntry
 
 
-async def test_setup_services(hass: HomeAssistant) -> None:
+async def test_setup_services(hass: SmartHub) -> None:
     """Test setup of Fritz!Tools services."""
     assert await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
@@ -27,7 +27,7 @@ async def test_setup_services(hass: HomeAssistant) -> None:
 
 
 async def test_service_set_guest_wifi_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
     fc_class_mock,
@@ -45,7 +45,7 @@ async def test_service_set_guest_wifi_password(
     )
     assert device
     with patch(
-        "homeassistant.components.fritz.coordinator.AvmWrapper.async_trigger_set_guest_password"
+        "smarthub.components.fritz.coordinator.AvmWrapper.async_trigger_set_guest_password"
     ) as mock_async_trigger_set_guest_password:
         await hass.services.async_call(
             DOMAIN, SERVICE_SET_GUEST_WIFI_PW, {"device_id": device.id}
@@ -54,7 +54,7 @@ async def test_service_set_guest_wifi_password(
 
 
 async def test_service_set_guest_wifi_password_unknown_parameter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
     fc_class_mock,
@@ -73,18 +73,18 @@ async def test_service_set_guest_wifi_password_unknown_parameter(
     assert device
 
     with patch(
-        "homeassistant.components.fritz.coordinator.AvmWrapper.async_trigger_set_guest_password",
+        "smarthub.components.fritz.coordinator.AvmWrapper.async_trigger_set_guest_password",
         side_effect=FritzServiceError("boom"),
     ) as mock_async_trigger_set_guest_password:
         await hass.services.async_call(
             DOMAIN, SERVICE_SET_GUEST_WIFI_PW, {"device_id": device.id}
         )
         assert mock_async_trigger_set_guest_password.called
-        assert "HomeAssistantError: Action or parameter unknown" in caplog.text
+        assert "SmartHubError: Action or parameter unknown" in caplog.text
 
 
 async def test_service_set_guest_wifi_password_service_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
     fc_class_mock,
@@ -103,18 +103,18 @@ async def test_service_set_guest_wifi_password_service_not_supported(
     assert device
 
     with patch(
-        "homeassistant.components.fritz.coordinator.AvmWrapper.async_trigger_set_guest_password",
+        "smarthub.components.fritz.coordinator.AvmWrapper.async_trigger_set_guest_password",
         side_effect=FritzConnectionException("boom"),
     ) as mock_async_trigger_set_guest_password:
         await hass.services.async_call(
             DOMAIN, SERVICE_SET_GUEST_WIFI_PW, {"device_id": device.id}
         )
         assert mock_async_trigger_set_guest_password.called
-        assert "HomeAssistantError: Action not supported" in caplog.text
+        assert "SmartHubError: Action not supported" in caplog.text
 
 
 async def test_service_set_guest_wifi_password_unloaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test service set_guest_wifi_password."""
@@ -122,7 +122,7 @@ async def test_service_set_guest_wifi_password_unloaded(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.fritz.coordinator.AvmWrapper.async_trigger_set_guest_password"
+        "smarthub.components.fritz.coordinator.AvmWrapper.async_trigger_set_guest_password"
     ) as mock_async_trigger_set_guest_password:
         await hass.services.async_call(
             DOMAIN, SERVICE_SET_GUEST_WIFI_PW, {"device_id": "12345678"}

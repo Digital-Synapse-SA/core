@@ -8,7 +8,7 @@ from aioshelly.exceptions import DeviceConnectionError, InvalidAuthError, RpcCal
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_MODE,
@@ -18,13 +18,13 @@ from homeassistant.components.number import (
     SERVICE_SET_VALUE,
     NumberMode,
 )
-from homeassistant.components.shelly.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_UNIT_OF_MEASUREMENT, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.components.shelly.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, ATTR_UNIT_OF_MEASUREMENT, STATE_UNKNOWN
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import init_integration, register_device, register_entity
 
@@ -34,7 +34,7 @@ DEVICE_BLOCK_ID = 4
 
 
 async def test_block_number_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -68,7 +68,7 @@ async def test_block_number_update(
 
 
 async def test_block_restored_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -117,7 +117,7 @@ async def test_block_restored_number(
 
 
 async def test_block_restored_number_no_last_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -157,7 +157,7 @@ async def test_block_restored_number_no_last_state(
 
 
 async def test_block_number_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -186,7 +186,7 @@ async def test_block_number_set_value(
 
 
 async def test_block_set_value_connection_error(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device set value connection error."""
     monkeypatch.setitem(
@@ -206,7 +206,7 @@ async def test_block_set_value_connection_error(
     await hass.async_block_till_done(wait_background_tasks=True)
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Device communication error occurred while calling action for number.test_name_valve_position of Test name",
     ):
         await hass.services.async_call(
@@ -218,7 +218,7 @@ async def test_block_set_value_connection_error(
 
 
 async def test_block_set_value_auth_error(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device set value authentication error."""
     monkeypatch.setitem(
@@ -283,7 +283,7 @@ async def test_block_set_value_auth_error(
     ],
 )
 async def test_rpc_device_virtual_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -341,7 +341,7 @@ async def test_rpc_device_virtual_number(
 
 
 async def test_rpc_remove_virtual_number_when_mode_label(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
     mock_rpc_device: Mock,
@@ -379,7 +379,7 @@ async def test_rpc_remove_virtual_number_when_mode_label(
 
 
 async def test_rpc_remove_virtual_number_when_orphaned(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
     mock_rpc_device: Mock,
@@ -403,7 +403,7 @@ async def test_rpc_remove_virtual_number_when_orphaned(
 
 
 async def test_blu_trv_number_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -426,7 +426,7 @@ async def test_blu_trv_number_entity(
 
 
 async def test_blu_trv_ext_temp_set_value(
-    hass: HomeAssistant, mock_blu_trv: Mock
+    hass: SmartHub, mock_blu_trv: Mock
 ) -> None:
     """Test the set value action for BLU TRV External Temperature number entity."""
     await init_integration(hass, 3, model=MODEL_BLU_GATEWAY_G3)
@@ -455,7 +455,7 @@ async def test_blu_trv_ext_temp_set_value(
 
 
 async def test_blu_trv_valve_pos_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -501,7 +501,7 @@ async def test_blu_trv_valve_pos_set_value(
     ],
 )
 async def test_blu_trv_number_exc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     exception: Exception,
     error: str,
@@ -511,7 +511,7 @@ async def test_blu_trv_number_exc(
 
     mock_blu_trv.blu_trv_set_external_temperature.side_effect = exception
 
-    with pytest.raises(HomeAssistantError, match=error):
+    with pytest.raises(SmartHubError, match=error):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -524,7 +524,7 @@ async def test_blu_trv_number_exc(
 
 
 async def test_blu_trv_number_reauth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -5,15 +5,15 @@ from unittest.mock import patch
 import pytest
 from pywaze.route_calculator import CalcRoutesResponse, WRCError
 
-from homeassistant.components.waze_travel_time.config_flow import WazeConfigFlow
-from homeassistant.components.waze_travel_time.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.waze_travel_time.config_flow import WazeConfigFlow
+from smarthub.components.waze_travel_time.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture(name="mock_config")
-async def mock_config_fixture(hass: HomeAssistant, data, options):
+async def mock_config_fixture(hass: SmartHub, data, options):
     """Mock a Waze Travel Time config entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -68,7 +68,7 @@ def invalidate_config_entry_fixture(validate_config_entry):
 def bypass_platform_setup_fixture():
     """Bypass platform setup."""
     with patch(
-        "homeassistant.components.waze_travel_time.sensor.async_setup_entry",
+        "smarthub.components.waze_travel_time.sensor.async_setup_entry",
         return_value=True,
     ):
         yield
@@ -78,7 +78,7 @@ def bypass_platform_setup_fixture():
 def bypass_setup_fixture():
     """Bypass entry setup."""
     with patch(
-        "homeassistant.components.waze_travel_time.async_setup_entry",
+        "smarthub.components.waze_travel_time.async_setup_entry",
         return_value=True,
     ):
         yield

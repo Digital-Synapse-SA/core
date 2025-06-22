@@ -1,0 +1,56 @@
+"""Constants for the SmartHub SkyConnect integration."""
+
+import dataclasses
+import enum
+from typing import Self
+
+DOMAIN = "smarthub_sky_connect"
+DOCS_WEB_FLASHER_URL = "https://skyconnect.smart-hub.io/firmware-update/"
+
+NABU_CASA_FIRMWARE_RELEASES_URL = (
+    "https://api.github.com/repos/NabuCasa/silabs-firmware-builder/releases/latest"
+)
+
+FIRMWARE = "firmware"
+FIRMWARE_VERSION = "firmware_version"
+SERIAL_NUMBER = "serial_number"
+MANUFACTURER = "manufacturer"
+PRODUCT = "product"
+DESCRIPTION = "description"
+PID = "pid"
+VID = "vid"
+DEVICE = "device"
+
+
+@dataclasses.dataclass(frozen=True)
+class VariantInfo:
+    """Hardware variant information."""
+
+    usb_product_name: str
+    short_name: str
+    full_name: str
+
+
+class HardwareVariant(VariantInfo, enum.Enum):
+    """Hardware variants."""
+
+    SKYCONNECT = (
+        "SkyConnect v1.0",
+        "SkyConnect",
+        "SmartHub SkyConnect",
+    )
+
+    CONNECT_ZBT1 = (
+        "SmartHub Connect ZBT-1",
+        "Connect ZBT-1",
+        "SmartHub Connect ZBT-1",
+    )
+
+    @classmethod
+    def from_usb_product_name(cls, usb_product_name: str) -> Self:
+        """Get the hardware variant from the USB product name."""
+        for variant in cls:
+            if variant.value.usb_product_name == usb_product_name:
+                return variant
+
+        raise ValueError(f"Unknown SkyConnect product name: {usb_product_name}")

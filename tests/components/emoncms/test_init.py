@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.emoncms.const import DOMAIN, FEED_ID, FEED_NAME
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
+from smarthub.components.emoncms.const import DOMAIN, FEED_ID, FEED_NAME
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
 
 from . import setup_integration
 from .conftest import EMONCMS_FAILURE, FEEDS
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     emoncms_client: AsyncMock,
 ) -> None:
@@ -33,7 +33,7 @@ async def test_load_unload_entry(
 
 
 async def test_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     emoncms_client: AsyncMock,
 ) -> None:
@@ -44,7 +44,7 @@ async def test_failure(
 
 
 async def test_migrate_uuid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     emoncms_client: AsyncMock,
@@ -77,7 +77,7 @@ async def test_migrate_uuid(
 
 
 async def test_no_uuid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     issue_registry: ir.IssueRegistry,
     emoncms_client: AsyncMock,

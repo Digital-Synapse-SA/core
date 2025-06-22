@@ -9,7 +9,7 @@ from pybalboa.enums import HeatMode, OffLowMediumHighState
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_FAN_MODE,
     ATTR_FAN_MODES,
     ATTR_HVAC_ACTION,
@@ -26,11 +26,11 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.const import ATTR_TEMPERATURE, Platform
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.const import ATTR_TEMPERATURE, Platform
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from . import client_update, init_integration
 
@@ -47,20 +47,20 @@ ENTITY_CLIMATE = "climate.fakespa"
 
 
 async def test_climate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test spa climate."""
-    with patch("homeassistant.components.balboa.PLATFORMS", [Platform.CLIMATE]):
+    with patch("smarthub.components.balboa.PLATFORMS", [Platform.CLIMATE]):
         entry = await init_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
 async def test_spa_defaults_fake_tscale(
-    hass: HomeAssistant, client: MagicMock, integration: MockConfigEntry
+    hass: SmartHub, client: MagicMock, integration: MockConfigEntry
 ) -> None:
     """Test supported features flags."""
     client.temperature_unit = 1
@@ -83,7 +83,7 @@ async def test_spa_defaults_fake_tscale(
 
 
 async def test_spa_temperature(
-    hass: HomeAssistant, client: MagicMock, integration: MockConfigEntry
+    hass: SmartHub, client: MagicMock, integration: MockConfigEntry
 ) -> None:
     """Test spa temperature settings."""
     client.temperature_minimum = 110
@@ -95,7 +95,7 @@ async def test_spa_temperature(
 
 
 async def test_spa_temperature_unit(
-    hass: HomeAssistant, client: MagicMock, integration: MockConfigEntry
+    hass: SmartHub, client: MagicMock, integration: MockConfigEntry
 ) -> None:
     """Test temperature unit conversions."""
     hass.config.units = US_CUSTOMARY_SYSTEM
@@ -105,7 +105,7 @@ async def test_spa_temperature_unit(
 
 
 async def test_spa_hvac_modes(
-    hass: HomeAssistant, client: MagicMock, integration: MockConfigEntry
+    hass: SmartHub, client: MagicMock, integration: MockConfigEntry
 ) -> None:
     """Test hvac modes."""
     # try out the different heat modes
@@ -117,7 +117,7 @@ async def test_spa_hvac_modes(
 
 
 async def test_spa_hvac_action(
-    hass: HomeAssistant, client: MagicMock, integration: MockConfigEntry
+    hass: SmartHub, client: MagicMock, integration: MockConfigEntry
 ) -> None:
     """Test setting of the HVAC action."""
     # try out the different heat states
@@ -129,7 +129,7 @@ async def test_spa_hvac_action(
 
 
 async def test_spa_preset_modes(
-    hass: HomeAssistant, client: MagicMock, integration: MockConfigEntry
+    hass: SmartHub, client: MagicMock, integration: MockConfigEntry
 ) -> None:
     """Test the various preset modes."""
     state = hass.states.get(ENTITY_CLIMATE)
@@ -157,7 +157,7 @@ async def test_spa_preset_modes(
     assert state.attributes[ATTR_PRESET_MODE] == "ready_in_rest"
 
 
-async def test_spa_with_blower(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_spa_with_blower(hass: SmartHub, client: MagicMock) -> None:
     """Test supported features flags."""
     blower = MagicMock(SpaControl)
     blower.state = OffLowMediumHighState.OFF
@@ -195,7 +195,7 @@ async def test_spa_with_blower(hass: HomeAssistant, client: MagicMock) -> None:
 # Helpers
 
 
-async def _patch_blower(hass: HomeAssistant, client: MagicMock, fan_mode: str) -> State:
+async def _patch_blower(hass: SmartHub, client: MagicMock, fan_mode: str) -> State:
     """Patch the blower state."""
     client.blowers[0].state = OffLowMediumHighState[fan_mode.upper()]
     await common.async_set_fan_mode(hass, fan_mode)
@@ -203,7 +203,7 @@ async def _patch_blower(hass: HomeAssistant, client: MagicMock, fan_mode: str) -
 
 
 async def _patch_spa_settemp(
-    hass: HomeAssistant, client: MagicMock, tscale: int, settemp: float
+    hass: SmartHub, client: MagicMock, tscale: int, settemp: float
 ) -> State:
     """Patch the settemp."""
     client.temperature_unit = tscale
@@ -215,7 +215,7 @@ async def _patch_spa_settemp(
 
 
 async def _patch_spa_heatmode(
-    hass: HomeAssistant, client: MagicMock, heat_mode: int
+    hass: SmartHub, client: MagicMock, heat_mode: int
 ) -> State:
     """Patch the heatmode."""
     client.heat_mode.state = heat_mode
@@ -224,7 +224,7 @@ async def _patch_spa_heatmode(
 
 
 async def _patch_spa_heatstate(
-    hass: HomeAssistant, client: MagicMock, heat_state: int
+    hass: SmartHub, client: MagicMock, heat_state: int
 ) -> State:
     """Patch the heatmode."""
     client.heat_state = heat_state

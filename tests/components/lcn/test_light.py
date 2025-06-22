@@ -7,13 +7,13 @@ from pypck.lcn_addr import LcnAddr
 from pypck.lcn_defs import RelayStateModifier
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.lcn.helpers import get_device_connection
-from homeassistant.components.light import (
+from smarthub.components.lcn.helpers import get_device_connection
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_TRANSITION,
     DOMAIN as DOMAIN_LIGHT,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -22,8 +22,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MockConfigEntry, MockModuleConnection, init_integration
 
@@ -35,19 +35,19 @@ LIGHT_RELAY1 = "light.testmodule_light_relay1"
 
 
 async def test_setup_lcn_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the setup of light."""
-    with patch("homeassistant.components.lcn.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.lcn.PLATFORMS", [Platform.LIGHT]):
         await init_integration(hass, entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_output_turn_on(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_output_turn_on(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the output light turns on."""
     await init_integration(hass, entry)
 
@@ -87,7 +87,7 @@ async def test_output_turn_on(hass: HomeAssistant, entry: MockConfigEntry) -> No
 
 
 async def test_output_turn_on_with_attributes(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the output light turns on."""
     await init_integration(hass, entry)
@@ -113,7 +113,7 @@ async def test_output_turn_on_with_attributes(
         assert state.state == STATE_ON
 
 
-async def test_output_turn_off(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_output_turn_off(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the output light turns off."""
     await init_integration(hass, entry)
 
@@ -156,7 +156,7 @@ async def test_output_turn_off(hass: HomeAssistant, entry: MockConfigEntry) -> N
 
 
 async def test_output_turn_off_with_attributes(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the output light turns off."""
     await init_integration(hass, entry)
@@ -184,7 +184,7 @@ async def test_output_turn_off_with_attributes(
         assert state.state == STATE_OFF
 
 
-async def test_relay_turn_on(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_relay_turn_on(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the relay light turns on."""
     await init_integration(hass, entry)
 
@@ -226,7 +226,7 @@ async def test_relay_turn_on(hass: HomeAssistant, entry: MockConfigEntry) -> Non
         assert state.state == STATE_ON
 
 
-async def test_relay_turn_off(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_relay_turn_off(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the relay light turns off."""
     await init_integration(hass, entry)
 
@@ -272,7 +272,7 @@ async def test_relay_turn_off(hass: HomeAssistant, entry: MockConfigEntry) -> No
 
 
 async def test_pushed_output_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the output light changes its state on status received."""
     await init_integration(hass, entry)
@@ -301,7 +301,7 @@ async def test_pushed_output_status_change(
 
 
 async def test_pushed_relay_status_change(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test the relay light changes its state on status received."""
     await init_integration(hass, entry)
@@ -331,7 +331,7 @@ async def test_pushed_relay_status_change(
     assert state.state == STATE_OFF
 
 
-async def test_unload_config_entry(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_unload_config_entry(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test the light is removed when the config entry is unloaded."""
     await init_integration(hass, entry)
 

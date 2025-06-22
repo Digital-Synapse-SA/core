@@ -1,6 +1,6 @@
 """Enforce that the integration implements reauthentication flow.
 
-https://developers.home-assistant.io/docs/core/integration-quality-scale/rules/reauthentication-flow/
+https://developers.smart-hub.io/docs/core/integration-quality-scale/rules/reauthentication-flow/
 """
 
 import ast

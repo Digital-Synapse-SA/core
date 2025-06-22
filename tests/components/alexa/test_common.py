@@ -8,10 +8,10 @@ from uuid import uuid4
 
 import pytest
 
-from homeassistant.components.alexa import config, smart_home
-from homeassistant.components.alexa.const import CONF_ENDPOINT, CONF_FILTER, CONF_LOCALE
-from homeassistant.core import Context, HomeAssistant, ServiceCall, callback
-from homeassistant.helpers import entityfilter
+from smarthub.components.alexa import config, smart_home
+from smarthub.components.alexa.const import CONF_ENDPOINT, CONF_FILTER, CONF_LOCALE
+from smarthub.core import Context, SmartHub, ServiceCall, callback
+from smarthub.helpers import entityfilter
 
 from tests.common import async_mock_service
 
@@ -31,7 +31,7 @@ class MockConfig(smart_home.AlexaConfig):
         "camera.test": {"display_categories": "CAMERA"},
     }
 
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self, hass: SmartHub) -> None:
         """Mock Alexa config."""
         super().__init__(
             hass,
@@ -65,7 +65,7 @@ class MockConfig(smart_home.AlexaConfig):
         """Accept a grant."""
 
 
-def get_default_config(hass: HomeAssistant) -> MockConfig:
+def get_default_config(hass: SmartHub) -> MockConfig:
     """Return a MockConfig instance."""
     return MockConfig(hass)
 
@@ -100,7 +100,7 @@ async def assert_request_calls_service(
     name: str,
     endpoint: str,
     service: str,
-    hass: HomeAssistant,
+    hass: SmartHub,
     response_type="Response",
     payload: dict[str, Any] | None = None,
     instance: str | None = None,
@@ -136,7 +136,7 @@ async def assert_request_fails(
     name: str,
     endpoint: str,
     service_not_called: str,
-    hass: HomeAssistant,
+    hass: SmartHub,
     payload: dict[str, Any] | None = None,
     instance: str | None = None,
 ) -> None:
@@ -164,7 +164,7 @@ async def assert_power_controller_works(
     endpoint: str,
     on_service: str,
     off_service: str,
-    hass: HomeAssistant,
+    hass: SmartHub,
     timestamp: str,
 ) -> None:
     """Assert PowerController API requests work."""
@@ -185,7 +185,7 @@ async def assert_scene_controller_works(
     endpoint: str,
     activate_service: str,
     deactivate_service: str,
-    hass: HomeAssistant,
+    hass: SmartHub,
     timestamp: str,
 ) -> None:
     """Assert SceneController API requests work."""
@@ -214,7 +214,7 @@ async def assert_scene_controller_works(
 
 
 async def reported_properties(
-    hass: HomeAssistant, endpoint: str, return_full_response: bool = False
+    hass: SmartHub, endpoint: str, return_full_response: bool = False
 ) -> ReportedProperties:
     """Use ReportState to get properties and return them.
 

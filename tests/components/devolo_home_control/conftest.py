@@ -23,15 +23,15 @@ def patch_mydevolo(credentials_valid: bool, maintenance: bool) -> Generator[None
     """Fixture to patch mydevolo into a desired state."""
     with (
         patch(
-            "homeassistant.components.devolo_home_control.Mydevolo.credentials_valid",
+            "smarthub.components.devolo_home_control.Mydevolo.credentials_valid",
             return_value=credentials_valid,
         ),
         patch(
-            "homeassistant.components.devolo_home_control.Mydevolo.maintenance",
+            "smarthub.components.devolo_home_control.Mydevolo.maintenance",
             return_value=maintenance,
         ),
         patch(
-            "homeassistant.components.devolo_home_control.Mydevolo.get_gateway_ids",
+            "smarthub.components.devolo_home_control.Mydevolo.get_gateway_ids",
             return_value=["1400000000000001", "1400000000000002"],
         ),
     ):

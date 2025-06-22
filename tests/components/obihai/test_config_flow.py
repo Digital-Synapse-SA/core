@@ -5,20 +5,20 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.obihai.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.obihai.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import DHCP_SERVICE_INFO, USER_INPUT, MockPyObihai, get_schema_suggestion
 
-VALIDATE_AUTH_PATCH = "homeassistant.components.obihai.config_flow.validate_auth"
+VALIDATE_AUTH_PATCH = "smarthub.components.obihai.config_flow.validate_auth"
 
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_user_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_user_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the user initiated form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -42,7 +42,7 @@ async def test_user_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> No
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_auth_failure(hass: HomeAssistant) -> None:
+async def test_auth_failure(hass: SmartHub) -> None:
     """Test we get the authentication error for user flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -60,7 +60,7 @@ async def test_auth_failure(hass: HomeAssistant) -> None:
     assert result["errors"]["base"] == "invalid_auth"
 
 
-async def test_connect_failure(hass: HomeAssistant, mock_gaierror: Generator) -> None:
+async def test_connect_failure(hass: SmartHub, mock_gaierror: Generator) -> None:
     """Test we get the connection error for user flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -78,7 +78,7 @@ async def test_connect_failure(hass: HomeAssistant, mock_gaierror: Generator) ->
     assert result["errors"]["base"] == "cannot_connect"
 
 
-async def test_dhcp_flow(hass: HomeAssistant) -> None:
+async def test_dhcp_flow(hass: SmartHub) -> None:
     """Test that DHCP discovery works."""
 
     with patch(
@@ -117,7 +117,7 @@ async def test_dhcp_flow(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_dhcp_flow_auth_failure(hass: HomeAssistant) -> None:
+async def test_dhcp_flow_auth_failure(hass: SmartHub) -> None:
     """Test that DHCP fails if creds aren't default."""
 
     with patch(

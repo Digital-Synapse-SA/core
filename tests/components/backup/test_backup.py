@@ -12,10 +12,10 @@ from unittest.mock import MagicMock, mock_open, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.backup import DOMAIN, AgentBackup
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.backup import async_initialize_backup
-from homeassistant.setup import async_setup_component
+from smarthub.components.backup import DOMAIN, AgentBackup
+from smarthub.core import SmartHub
+from smarthub.helpers.backup import async_initialize_backup
+from smarthub.setup import async_setup_component
 
 from .common import (
     TEST_BACKUP_ABC123,
@@ -40,7 +40,7 @@ def mock_read_backup(backup_path: Path) -> AgentBackup:
 def read_backup_fixture(path_glob: MagicMock) -> Generator[MagicMock]:
     """Mock read backup."""
     with patch(
-        "homeassistant.components.backup.backup.read_backup",
+        "smarthub.components.backup.backup.read_backup",
         side_effect=mock_read_backup,
     ) as read_backup:
         yield read_backup
@@ -57,7 +57,7 @@ def read_backup_fixture(path_glob: MagicMock) -> Generator[MagicMock]:
     ],
 )
 async def test_load_backups(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     read_backup: MagicMock,
@@ -80,7 +80,7 @@ async def test_load_backups(
 
 
 async def test_upload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test upload backup."""
@@ -94,7 +94,7 @@ async def test_upload(
         patch("pathlib.Path.open", open_mock),
         patch("shutil.move") as move_mock,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=TEST_BACKUP_ABC123,
         ),
     ):
@@ -129,7 +129,7 @@ async def test_upload(
     ],
 )
 async def test_delete_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,

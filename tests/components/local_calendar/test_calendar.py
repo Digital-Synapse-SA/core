@@ -5,10 +5,10 @@ import textwrap
 
 import pytest
 
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.template import DATE_STR_FORMAT
-from homeassistant.util import dt as dt_util
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers.template import DATE_STR_FORMAT
+from smarthub.util import dt as dt_util
 
 from .conftest import (
     FRIENDLY_NAME,
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_empty_calendar(
-    hass: HomeAssistant, setup_integration: None, get_events: GetEventsFn
+    hass: SmartHub, setup_integration: None, get_events: GetEventsFn
 ) -> None:
     """Test querying the API and fetching events."""
     events = await get_events("1997-07-14T00:00:00", "1997-07-16T00:00:00")
@@ -146,7 +146,7 @@ async def test_api_date_event(
 
 
 async def test_active_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ws_client: ClientFixture,
     setup_integration: None,
 ) -> None:
@@ -183,7 +183,7 @@ async def test_active_event(
 
 
 async def test_upcoming_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ws_client: ClientFixture,
     setup_integration: None,
 ) -> None:
@@ -222,7 +222,7 @@ async def test_upcoming_event(
 async def test_recurring_event(
     ws_client: ClientFixture,
     setup_integration: None,
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_events: GetEventsFn,
 ) -> None:
     """Test an event with a recurrence rule."""
@@ -746,7 +746,7 @@ async def test_websocket_update_recurring(
 async def test_invalid_rrule(
     ws_client: ClientFixture,
     setup_integration: None,
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_events: GetEventsFn,
     rrule: str,
 ) -> None:
@@ -780,7 +780,7 @@ async def test_invalid_rrule(
     ],
 )
 async def test_all_day_iter_order(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ws_client: ClientFixture,
     setup_integration: None,
     get_events: GetEventsFn,
@@ -926,7 +926,7 @@ async def test_invalid_date_formats(
 async def test_update_invalid_event_id(
     ws_client: ClientFixture,
     setup_integration: None,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test updating an event with an invalid event uid."""
     client = await ws_client()
@@ -951,7 +951,7 @@ async def test_update_invalid_event_id(
 async def test_delete_invalid_event_id(
     ws_client: ClientFixture,
     setup_integration: None,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test deleting an event with an invalid event uid."""
     client = await ws_client()
@@ -976,7 +976,7 @@ async def test_delete_invalid_event_id(
     ],
 )
 async def test_create_event_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     get_events: GetEventsFn,
     start_date_time: str,

@@ -2,10 +2,10 @@
 
 import pytest
 
-from homeassistant.components import freedns
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components import freedns
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from tests.common import async_fire_time_changed
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -17,7 +17,7 @@ UPDATE_URL = freedns.UPDATE_URL
 
 @pytest.fixture
 async def setup_freedns(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Fixture that sets up FreeDNS."""
     params = {}
@@ -38,7 +38,7 @@ async def setup_freedns(
     )
 
 
-async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_setup(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Test setup works if update passes."""
     params = {}
     params[ACCESS_TOKEN] = ""
@@ -65,7 +65,7 @@ async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -
 
 
 async def test_setup_fails_if_wrong_token(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup fails if first update fails through wrong token."""
     params = {}

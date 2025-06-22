@@ -7,7 +7,7 @@ import pytest
 from requests.exceptions import ConnectionError, RequestException
 import requests_mock
 
-from homeassistant.components.plex.const import (
+from smarthub.components.plex.const import (
     CONF_IGNORE_NEW_SHARED_USERS,
     CONF_IGNORE_PLEX_WEB_CLIENTS,
     CONF_MONITORED_USERS,
@@ -15,15 +15,15 @@ from homeassistant.components.plex.const import (
     DOMAIN,
     SERVERS,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from .const import DEFAULT_DATA, DEFAULT_OPTIONS
 from .helpers import trigger_plex_update, wait_for_debouncer
 
 
 async def test_new_users_available(
-    hass: HomeAssistant, entry, setup_plex_server
+    hass: SmartHub, entry, setup_plex_server
 ) -> None:
     """Test setting up when new users available on Plex server."""
     MONITORED_USERS = {"User 1": {"enabled": True}}
@@ -44,7 +44,7 @@ async def test_new_users_available(
 
 
 async def test_new_ignored_users_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     entry,
     mock_websocket,
@@ -97,7 +97,7 @@ async def test_new_ignored_users_available(
 
 
 async def test_network_error_during_refresh(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, mock_plex_server
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, mock_plex_server
 ) -> None:
     """Test network failures during refreshes."""
     server_id = mock_plex_server.machine_identifier
@@ -119,11 +119,11 @@ async def test_network_error_during_refresh(
 
 
 async def test_gdm_client_failure(
-    hass: HomeAssistant, mock_websocket, setup_plex_server
+    hass: SmartHub, mock_websocket, setup_plex_server
 ) -> None:
     """Test connection failure to a GDM discovered client."""
     with patch(
-        "homeassistant.components.plex.server.PlexClient", side_effect=ConnectionError
+        "smarthub.components.plex.server.PlexClient", side_effect=ConnectionError
     ):
         mock_plex_server = await setup_plex_server(disable_gdm=False)
         await hass.async_block_till_done()
@@ -140,7 +140,7 @@ async def test_gdm_client_failure(
 
 
 async def test_mark_sessions_idle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_plex_server,
     mock_websocket,
     requests_mock: requests_mock.Mocker,
@@ -167,7 +167,7 @@ async def test_mark_sessions_idle(
 
 
 async def test_ignore_plex_web_client(
-    hass: HomeAssistant, entry, setup_plex_server
+    hass: SmartHub, entry, setup_plex_server
 ) -> None:
     """Test option to ignore Plex Web clients."""
     OPTIONS = copy.deepcopy(DEFAULT_OPTIONS)

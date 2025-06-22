@@ -5,13 +5,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config
-from homeassistant.components.template import DOMAIN
-from homeassistant.const import SERVICE_RELOAD
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub import config
+from smarthub.components.template import DOMAIN
+from smarthub.const import SERVICE_RELOAD
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed, get_fixture_path
 
@@ -52,7 +52,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, get_fixture_p
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_reloadable(hass: HomeAssistant) -> None:
+async def test_reloadable(hass: SmartHub) -> None:
     """Test that we can reload."""
     hass.states.async_set("sensor.test_sensor", "mytest")
     await hass.async_block_till_done()
@@ -104,7 +104,7 @@ async def test_reloadable(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_reloadable_can_remove(hass: HomeAssistant) -> None:
+async def test_reloadable_can_remove(hass: SmartHub) -> None:
     """Test that we can reload and remove all template sensors."""
     hass.states.async_set("sensor.test_sensor", "mytest")
     await hass.async_block_till_done()
@@ -135,7 +135,7 @@ async def test_reloadable_can_remove(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_reloadable_stops_on_invalid_config(hass: HomeAssistant) -> None:
+async def test_reloadable_stops_on_invalid_config(hass: SmartHub) -> None:
     """Test we stop the reload if configuration.yaml is completely broken."""
     hass.states.async_set("sensor.test_sensor", "mytest")
     await hass.async_block_till_done()
@@ -164,7 +164,7 @@ async def test_reloadable_stops_on_invalid_config(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_reloadable_handles_partial_valid_config(hass: HomeAssistant) -> None:
+async def test_reloadable_handles_partial_valid_config(hass: SmartHub) -> None:
     """Test we can still setup valid sensors when configuration.yaml has a broken entry."""
     hass.states.async_set("sensor.test_sensor", "mytest")
     await hass.async_block_till_done()
@@ -196,7 +196,7 @@ async def test_reloadable_handles_partial_valid_config(hass: HomeAssistant) -> N
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_reloadable_multiple_platforms(hass: HomeAssistant) -> None:
+async def test_reloadable_multiple_platforms(hass: SmartHub) -> None:
     """Test that we can reload."""
     hass.states.async_set("sensor.test_sensor", "mytest")
     await async_setup_component(
@@ -242,7 +242,7 @@ async def test_reloadable_multiple_platforms(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("start_ha")
 async def test_reload_sensors_that_reference_other_template_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that we can reload sensor that reference other template sensors."""
     await async_yaml_patch_helper(hass, "ref_configuration.yaml")
@@ -251,7 +251,7 @@ async def test_reload_sensors_that_reference_other_template_sensors(
 
     next_time = dt_util.utcnow() + timedelta(seconds=1.2)
     with patch(
-        "homeassistant.helpers.ratelimit.time.time", return_value=next_time.timestamp()
+        "smarthub.helpers.ratelimit.time.time", return_value=next_time.timestamp()
     ):
         async_fire_time_changed(hass, next_time)
         await hass.async_block_till_done()
@@ -260,7 +260,7 @@ async def test_reload_sensors_that_reference_other_template_sensors(
     assert hass.states.get("sensor.test3").state == "2"
 
 
-async def async_yaml_patch_helper(hass: HomeAssistant, filename: str) -> None:
+async def async_yaml_patch_helper(hass: SmartHub, filename: str) -> None:
     """Help update configuration.yaml."""
     yaml_path = get_fixture_path(filename, "template")
     with patch.object(config, "YAML_CONFIG_FILE", yaml_path):
@@ -367,7 +367,7 @@ async def async_yaml_patch_helper(hass: HomeAssistant, filename: str) -> None:
     ],
 )
 async def test_change_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry_options: dict[str, str],
     config_user_input: dict[str, str],
@@ -459,7 +459,7 @@ async def test_change_device(
 
 
 async def test_fail_non_numerical_number_settings(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that non numerical number options causes config entry setup to fail.
 

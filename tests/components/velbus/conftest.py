@@ -17,10 +17,10 @@ from velbusaio.channels import (
 )
 from velbusaio.module import Module
 
-from homeassistant.components.velbus import VelbusConfigEntry
-from homeassistant.components.velbus.const import DOMAIN
-from homeassistant.const import CONF_NAME, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.velbus import VelbusConfigEntry
+from smarthub.components.velbus.const import DOMAIN
+from smarthub.const import CONF_NAME, CONF_PORT
+from smarthub.core import SmartHub
 
 from .const import PORT_TCP
 
@@ -44,9 +44,9 @@ def mock_controller(
 ) -> Generator[AsyncMock]:
     """Mock a successful velbus controller."""
     with (
-        patch("homeassistant.components.velbus.Velbus", autospec=True) as controller,
+        patch("smarthub.components.velbus.Velbus", autospec=True) as controller,
         patch(
-            "homeassistant.components.velbus.config_flow.velbusaio.controller.Velbus",
+            "smarthub.components.velbus.config_flow.velbusaio.controller.Velbus",
             new=controller,
         ),
     ):
@@ -322,7 +322,7 @@ def mock_cover_no_position() -> AsyncMock:
 
 @pytest.fixture(name="config_entry")
 async def mock_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     controller: AsyncMock,
 ) -> VelbusConfigEntry:
     """Create and register mock config entry."""

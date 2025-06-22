@@ -6,9 +6,9 @@ from pylamarzocco.const import ModelName
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import async_init_integration
 
@@ -18,7 +18,7 @@ pytestmark = pytest.mark.usefixtures("mock_websocket_terminated")
 
 
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -26,7 +26,7 @@ async def test_sensors(
 ) -> None:
     """Test the La Marzocco sensors."""
 
-    with patch("homeassistant.components.lamarzocco.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.lamarzocco.PLATFORMS", [Platform.SENSOR]):
         await async_init_integration(hass, mock_config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
@@ -36,7 +36,7 @@ async def test_sensors(
     [ModelName.GS3_AV, ModelName.GS3_MP, ModelName.LINEA_MINI, ModelName.LINEA_MICRA],
 )
 async def test_steam_ready_entity_for_all_machines(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,

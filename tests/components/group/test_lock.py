@@ -4,27 +4,27 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components.demo import lock as demo_lock
-from homeassistant.components.group import DOMAIN, SERVICE_RELOAD
-from homeassistant.components.lock import (
+from smarthub import config as hass_config
+from smarthub.components.demo import lock as demo_lock
+from smarthub.components.group import DOMAIN, SERVICE_RELOAD
+from smarthub.components.lock import (
     DOMAIN as LOCK_DOMAIN,
     SERVICE_LOCK,
     SERVICE_OPEN,
     SERVICE_UNLOCK,
     LockState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import get_fixture_path
 
 
 async def test_default_state(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test lock group default state."""
     hass.states.async_set("lock.front", "locked")
@@ -54,7 +54,7 @@ async def test_default_state(
     assert entry.unique_id == "unique_identifier"
 
 
-async def test_state_reporting(hass: HomeAssistant) -> None:
+async def test_state_reporting(hass: SmartHub) -> None:
     """Test the state reporting.
 
     The group state is unavailable if all group members are unavailable.
@@ -165,7 +165,7 @@ async def test_state_reporting(hass: HomeAssistant) -> None:
     assert hass.states.get("lock.lock_group").state == STATE_UNAVAILABLE
 
 
-async def test_service_calls_openable(hass: HomeAssistant) -> None:
+async def test_service_calls_openable(hass: SmartHub) -> None:
     """Test service calls with open support."""
     await async_setup_component(
         hass,
@@ -218,7 +218,7 @@ async def test_service_calls_openable(hass: HomeAssistant) -> None:
     assert hass.states.get("lock.another_openable_lock").state == LockState.UNLOCKED
 
 
-async def test_service_calls_basic(hass: HomeAssistant) -> None:
+async def test_service_calls_basic(hass: SmartHub) -> None:
     """Test service calls without open support."""
     await async_setup_component(
         hass,
@@ -261,7 +261,7 @@ async def test_service_calls_basic(hass: HomeAssistant) -> None:
     assert hass.states.get("lock.basic_lock").state == LockState.UNLOCKED
     assert hass.states.get("lock.another_basic_lock").state == LockState.UNLOCKED
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_OPEN,
@@ -270,7 +270,7 @@ async def test_service_calls_basic(hass: HomeAssistant) -> None:
         )
 
 
-async def test_reload(hass: HomeAssistant) -> None:
+async def test_reload(hass: SmartHub) -> None:
     """Test the ability to reload locks."""
     await async_setup_component(
         hass,
@@ -311,7 +311,7 @@ async def test_reload(hass: HomeAssistant) -> None:
     assert hass.states.get("lock.outside_locks_g") is not None
 
 
-async def test_reload_with_platform_not_setup(hass: HomeAssistant) -> None:
+async def test_reload_with_platform_not_setup(hass: SmartHub) -> None:
     """Test the ability to reload locks."""
     hass.states.async_set("lock.something", LockState.UNLOCKED)
     await async_setup_component(
@@ -350,7 +350,7 @@ async def test_reload_with_platform_not_setup(hass: HomeAssistant) -> None:
 
 
 async def test_reload_with_base_integration_platform_not_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the ability to reload locks."""
     assert await async_setup_component(
@@ -387,7 +387,7 @@ async def test_reload_with_base_integration_platform_not_setup(
 
 
 @patch.object(demo_lock, "LOCK_UNLOCK_DELAY", 0)
-async def test_nested_group(hass: HomeAssistant) -> None:
+async def test_nested_group(hass: SmartHub) -> None:
     """Test nested lock group."""
     await async_setup_component(
         hass,

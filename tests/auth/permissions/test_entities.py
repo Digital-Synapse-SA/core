@@ -3,13 +3,13 @@
 import pytest
 import voluptuous as vol
 
-from homeassistant.auth.permissions.entities import (
+from smarthub.auth.permissions.entities import (
     ENTITY_POLICY_SCHEMA,
     compile_entities,
 )
-from homeassistant.auth.permissions.models import PermissionLookup
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
+from smarthub.auth.permissions.models import PermissionLookup
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import DeviceEntry
 
 from tests.common import RegistryEntryWithDefaults, mock_device_registry, mock_registry
 
@@ -150,7 +150,7 @@ def test_entities_all_control() -> None:
     assert compiled("switch.kitchen", "control") is True
 
 
-def test_entities_device_id_boolean(hass: HomeAssistant) -> None:
+def test_entities_device_id_boolean(hass: SmartHub) -> None:
     """Test entity ID policy applying control on device id."""
     entity_registry = mock_registry(
         hass,
@@ -190,7 +190,7 @@ def test_entities_areas_true() -> None:
     assert compiled("light.kitchen", "read") is True
 
 
-def test_entities_areas_area_true(hass: HomeAssistant) -> None:
+def test_entities_areas_area_true(hass: SmartHub) -> None:
     """Test entity ID policy for areas with specific area."""
     entity_registry = mock_registry(
         hass,

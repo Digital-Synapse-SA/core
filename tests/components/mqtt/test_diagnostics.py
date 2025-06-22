@@ -5,10 +5,10 @@ from unittest.mock import ANY
 
 import pytest
 
-from homeassistant.components import mqtt
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components import mqtt
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import async_fire_mqtt_message
 from tests.components.diagnostics import (
@@ -26,7 +26,7 @@ default_entry_options = {
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     hass_client: ClientSessionGenerator,
     mqtt_mock_entry: MqttMockHAClientGenerator,
@@ -62,9 +62,9 @@ async def test_entry_diagnostics(
     data_sensor = json.dumps(config_sensor)
     data_trigger = json.dumps(config_trigger)
 
-    async_fire_mqtt_message(hass, "homeassistant/sensor/bla/config", data_sensor)
+    async_fire_mqtt_message(hass, "smarthub/sensor/bla/config", data_sensor)
     async_fire_mqtt_message(
-        hass, "homeassistant/device_automation/bla/config", data_trigger
+        hass, "smarthub/device_automation/bla/config", data_trigger
     )
     await hass.async_block_till_done()
 
@@ -77,7 +77,7 @@ async def test_entry_diagnostics(
                 "subscriptions": [{"topic": "foobar/sensor", "messages": []}],
                 "discovery_data": {
                     "payload": config_sensor,
-                    "topic": "homeassistant/sensor/bla/config",
+                    "topic": "smarthub/sensor/bla/config",
                 },
                 "transmitted": [],
             }
@@ -86,7 +86,7 @@ async def test_entry_diagnostics(
             {
                 "discovery_data": {
                     "payload": config_trigger,
-                    "topic": "homeassistant/device_automation/bla/config",
+                    "topic": "smarthub/device_automation/bla/config",
                 },
                 "trigger_key": ["device_automation", "bla"],
             }
@@ -155,7 +155,7 @@ async def test_entry_diagnostics(
     ],
 )
 async def test_redact_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hass_client: ClientSessionGenerator,
@@ -184,7 +184,7 @@ async def test_redact_diagnostics(
     data_tracker = json.dumps(config_tracker)
 
     async_fire_mqtt_message(
-        hass, "homeassistant/device_tracker/bla/config", data_tracker
+        hass, "smarthub/device_tracker/bla/config", data_tracker
     )
     await hass.async_block_till_done()
 
@@ -215,7 +215,7 @@ async def test_redact_diagnostics(
                 ],
                 "discovery_data": {
                     "payload": config_tracker,
-                    "topic": "homeassistant/device_tracker/bla/config",
+                    "topic": "smarthub/device_tracker/bla/config",
                 },
                 "transmitted": [],
             }

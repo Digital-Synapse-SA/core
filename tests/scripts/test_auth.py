@@ -9,9 +9,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.auth.providers import homeassistant as hass_auth
-from homeassistant.core import HomeAssistant
-from homeassistant.scripts import auth as script_auth
+from smarthub.auth.providers import smarthub as hass_auth
+from smarthub.core import SmartHub
+from smarthub.scripts import auth as script_auth
 
 from tests.common import register_auth_provider
 
@@ -19,22 +19,22 @@ from tests.common import register_auth_provider
 @pytest.fixture(autouse=True)
 def reset_log_level() -> Generator[None]:
     """Reset log level after each test case."""
-    logger = logging.getLogger("homeassistant.core")
+    logger = logging.getLogger("smarthub.core")
     orig_level = logger.level
     yield
     logger.setLevel(orig_level)
 
 
 @pytest.fixture
-async def provider(hass: HomeAssistant) -> hass_auth.HassAuthProvider:
-    """Home Assistant auth provider."""
-    provider = await register_auth_provider(hass, {"type": "homeassistant"})
+async def provider(hass: SmartHub) -> hass_auth.HassAuthProvider:
+    """SmartHub auth provider."""
+    provider = await register_auth_provider(hass, {"type": "smarthub"})
     await provider.async_initialize()
     return provider
 
 
 async def test_list_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     provider: hass_auth.HassAuthProvider,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
@@ -51,7 +51,7 @@ async def test_list_user(
 
 
 async def test_add_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     provider: hass_auth.HassAuthProvider,
     capsys: pytest.CaptureFixture[str],
     hass_storage: dict[str, Any],
@@ -72,7 +72,7 @@ async def test_add_user(
 
 
 async def test_validate_login(
-    hass: HomeAssistant,
+    hass: SmartHub,
     provider: hass_auth.HassAuthProvider,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
@@ -100,7 +100,7 @@ async def test_validate_login(
 
 
 async def test_change_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     provider: hass_auth.HassAuthProvider,
     capsys: pytest.CaptureFixture[str],
     hass_storage: dict[str, Any],
@@ -122,7 +122,7 @@ async def test_change_password(
 
 
 async def test_change_password_invalid_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     provider: hass_auth.HassAuthProvider,
     capsys: pytest.CaptureFixture[str],
     hass_storage: dict[str, Any],
@@ -148,7 +148,7 @@ async def test_parsing_args() -> None:
     called = False
 
     async def mock_func(
-        hass: HomeAssistant, provider: hass_auth.AuthProvider, args2: argparse.Namespace
+        hass: SmartHub, provider: hass_auth.AuthProvider, args2: argparse.Namespace
     ) -> None:
         """Mock function to be called."""
         nonlocal called

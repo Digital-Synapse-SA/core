@@ -2,8 +2,8 @@
 
 import pytest
 
-from homeassistant.components.diagnostics import REDACTED
-from homeassistant.core import HomeAssistant
+from smarthub.components.diagnostics import REDACTED
+from smarthub.core import SmartHub
 
 from . import init_integration
 from .consts import DUMMY_WATER_HEATER_DEVICE
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_bridge,
     monkeypatch: pytest.MonkeyPatch,

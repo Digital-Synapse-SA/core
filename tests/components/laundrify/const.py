@@ -1,6 +1,6 @@
 """Constants for the laundrify tests."""
 
-from homeassistant.const import CONF_CODE
+from smarthub.const import CONF_CODE
 
 VALID_AUTH_CODE = "999-001"
 VALID_ACCESS_TOKEN = "validAccessToken1234"

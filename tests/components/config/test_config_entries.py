@@ -11,18 +11,18 @@ import pytest
 from pytest_unordered import unordered
 import voluptuous as vol
 
-from homeassistant import config_entries as core_ce, data_entry_flow, loader
-from homeassistant.components.config import config_entries
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_RADIUS
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_flow, config_validation as cv
-from homeassistant.helpers.discovery_flow import DiscoveryKey
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
-from homeassistant.loader import IntegrationNotFound
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub import config_entries as core_ce, data_entry_flow, loader
+from smarthub.components.config import config_entries
+from smarthub.config_entries import ConfigFlow, ConfigFlowResult
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_RADIUS
+from smarthub.core import SmartHub, callback
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_flow, config_validation as cv
+from smarthub.helpers.discovery_flow import DiscoveryKey
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.loader import IntegrationNotFound
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from tests.common import (
     MockConfigEntry,
@@ -36,14 +36,14 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 @pytest.fixture(autouse=True)
-def mock_test_component(hass: HomeAssistant) -> None:
+def mock_test_component(hass: SmartHub) -> None:
     """Ensure a component called 'test' exists."""
     mock_integration(hass, MockModule("test"))
 
 
 @pytest.fixture
 async def client(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> TestClient:
     """Fixture that can interact with the config manager API."""
     await async_setup_component(hass, "http", {})
@@ -69,7 +69,7 @@ def mock_flow() -> Generator[None]:
 
 @pytest.mark.usefixtures("freezer")
 @pytest.mark.usefixtures("mock_flow")
-async def test_get_entries(hass: HomeAssistant, client: TestClient) -> None:
+async def test_get_entries(hass: SmartHub, client: TestClient) -> None:
     """Test get entries."""
     mock_integration(hass, MockModule("comp1"))
     mock_integration(
@@ -258,7 +258,7 @@ async def test_get_entries(hass: HomeAssistant, client: TestClient) -> None:
     assert data[0]["domain"] == "comp5"
 
 
-async def test_remove_entry(hass: HomeAssistant, client: TestClient) -> None:
+async def test_remove_entry(hass: SmartHub, client: TestClient) -> None:
     """Test removing an entry via the API."""
     entry = MockConfigEntry(domain="test", state=core_ce.ConfigEntryState.LOADED)
     entry.add_to_hass(hass)
@@ -269,7 +269,7 @@ async def test_remove_entry(hass: HomeAssistant, client: TestClient) -> None:
     assert len(hass.config_entries.async_entries()) == 0
 
 
-async def test_reload_entry(hass: HomeAssistant, client: TestClient) -> None:
+async def test_reload_entry(hass: SmartHub, client: TestClient) -> None:
     """Test reloading an entry via the API."""
     entry = MockConfigEntry(domain="test", state=core_ce.ConfigEntryState.LOADED)
     entry.add_to_hass(hass)
@@ -283,14 +283,14 @@ async def test_reload_entry(hass: HomeAssistant, client: TestClient) -> None:
     assert len(hass.config_entries.async_entries()) == 1
 
 
-async def test_reload_invalid_entry(hass: HomeAssistant, client: TestClient) -> None:
+async def test_reload_invalid_entry(hass: SmartHub, client: TestClient) -> None:
     """Test reloading an invalid entry via the API."""
     resp = await client.post("/api/config/config_entries/entry/invalid/reload")
     assert resp.status == HTTPStatus.NOT_FOUND
 
 
 async def test_remove_entry_unauth(
-    hass: HomeAssistant, client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test removing an entry via the API."""
     hass_admin_user.groups = []
@@ -302,7 +302,7 @@ async def test_remove_entry_unauth(
 
 
 async def test_reload_entry_unauth(
-    hass: HomeAssistant, client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test reloading an entry via the API."""
     hass_admin_user.groups = []
@@ -316,7 +316,7 @@ async def test_reload_entry_unauth(
 
 
 async def test_reload_entry_in_failed_state(
-    hass: HomeAssistant, client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test reloading an entry via the API that has already failed to unload."""
     entry = MockConfigEntry(domain="demo", state=core_ce.ConfigEntryState.FAILED_UNLOAD)
@@ -330,7 +330,7 @@ async def test_reload_entry_in_failed_state(
 
 
 async def test_reload_entry_in_setup_retry(
-    hass: HomeAssistant, client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test reloading an entry via the API that is in setup retry."""
     mock_setup_entry = AsyncMock(return_value=True)
@@ -372,7 +372,7 @@ async def test_reload_entry_in_setup_retry(
     ],
 )
 async def test_available_flows(
-    hass: HomeAssistant, client: TestClient, type_filter: str | None, result: set[str]
+    hass: SmartHub, client: TestClient, type_filter: str | None, result: set[str]
 ) -> None:
     """Test querying the available flows."""
     with patch.object(
@@ -395,7 +395,7 @@ async def test_available_flows(
 
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
-async def test_initialize_flow(hass: HomeAssistant, client: TestClient) -> None:
+async def test_initialize_flow(hass: SmartHub, client: TestClient) -> None:
     """Test we can initialize a flow."""
     mock_platform(hass, "test.config_flow", None)
 
@@ -446,7 +446,7 @@ async def test_initialize_flow(hass: HomeAssistant, client: TestClient) -> None:
 
 
 async def test_initialize_flow_unmet_dependency(
-    hass: HomeAssistant, client: TestClient
+    hass: SmartHub, client: TestClient
 ) -> None:
     """Test unmet dependencies are listed."""
     mock_platform(hass, "test.config_flow", None)
@@ -477,7 +477,7 @@ async def test_initialize_flow_unmet_dependency(
 
 
 async def test_initialize_flow_unauth(
-    hass: HomeAssistant, client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test we can initialize a flow."""
     hass_admin_user.groups = []
@@ -505,7 +505,7 @@ async def test_initialize_flow_unauth(
 
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
-async def test_abort(hass: HomeAssistant, client: TestClient) -> None:
+async def test_abort(hass: SmartHub, client: TestClient) -> None:
     """Test a flow that aborts."""
     mock_platform(hass, "test.config_flow", None)
 
@@ -530,7 +530,7 @@ async def test_abort(hass: HomeAssistant, client: TestClient) -> None:
 
 
 @pytest.mark.usefixtures("freezer")
-async def test_create_account(hass: HomeAssistant, client: TestClient) -> None:
+async def test_create_account(hass: SmartHub, client: TestClient) -> None:
     """Test a flow that creates an account."""
     mock_platform(hass, "test.config_flow", None)
 
@@ -594,7 +594,7 @@ async def test_create_account(hass: HomeAssistant, client: TestClient) -> None:
 
 
 @pytest.mark.usefixtures("freezer")
-async def test_two_step_flow(hass: HomeAssistant, client: TestClient) -> None:
+async def test_two_step_flow(hass: SmartHub, client: TestClient) -> None:
     """Test we can finish a two step flow."""
     mock_integration(
         hass, MockModule("test", async_setup_entry=AsyncMock(return_value=True))
@@ -680,7 +680,7 @@ async def test_two_step_flow(hass: HomeAssistant, client: TestClient) -> None:
 
 
 async def test_continue_flow_unauth(
-    hass: HomeAssistant, client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test we can't finish a two step flow."""
     mock_integration(
@@ -729,7 +729,7 @@ async def test_continue_flow_unauth(
 
 
 async def test_get_progress_index(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test querying for the flows that are in progress."""
     assert await async_setup_component(hass, "config", {})
@@ -800,7 +800,7 @@ async def test_get_progress_index(
 
 
 async def test_get_progress_index_unauth(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, hass_admin_user: MockUser
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, hass_admin_user: MockUser
 ) -> None:
     """Test we can't get flows that are in progress."""
     assert await async_setup_component(hass, "config", {})
@@ -815,7 +815,7 @@ async def test_get_progress_index_unauth(
 
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
-async def test_get_progress_flow(hass: HomeAssistant, client: TestClient) -> None:
+async def test_get_progress_flow(hass: SmartHub, client: TestClient) -> None:
     """Test we can query the API for same result as we get from init a flow."""
     mock_platform(hass, "test.config_flow", None)
 
@@ -850,7 +850,7 @@ async def test_get_progress_flow(hass: HomeAssistant, client: TestClient) -> Non
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_get_progress_flow_unauth(
-    hass: HomeAssistant, client: TestClient, hass_admin_user: MockUser
+    hass: SmartHub, client: TestClient, hass_admin_user: MockUser
 ) -> None:
     """Test we can can't query the API for result of flow."""
     mock_platform(hass, "test.config_flow", None)
@@ -884,7 +884,7 @@ async def test_get_progress_flow_unauth(
 
 
 async def test_get_progress_subscribe(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test querying for the flows that are in progress."""
     assert await async_setup_component(hass, "config", {})
@@ -999,7 +999,7 @@ async def test_get_progress_subscribe(
 
 
 async def test_get_progress_subscribe_in_progress(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test querying for the flows that are in progress."""
     assert await async_setup_component(hass, "config", {})
@@ -1119,7 +1119,7 @@ async def test_get_progress_subscribe_in_progress(
 
 
 async def test_get_progress_subscribe_unauth(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, hass_admin_user: MockUser
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, hass_admin_user: MockUser
 ) -> None:
     """Test we can't subscribe to flows."""
     assert await async_setup_component(hass, "config", {})
@@ -1133,7 +1133,7 @@ async def test_get_progress_subscribe_unauth(
     assert response["error"]["code"] == "unauthorized"
 
 
-async def test_options_flow(hass: HomeAssistant, client: TestClient) -> None:
+async def test_options_flow(hass: SmartHub, client: TestClient) -> None:
     """Test we can change options."""
 
     class TestFlow(core_ce.ConfigFlow):
@@ -1191,7 +1191,7 @@ async def test_options_flow(hass: HomeAssistant, client: TestClient) -> None:
     ],
 )
 async def test_options_flow_unauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: TestClient,
     hass_admin_user: MockUser,
     endpoint: str,
@@ -1230,7 +1230,7 @@ async def test_options_flow_unauth(
     assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
-async def test_two_step_options_flow(hass: HomeAssistant, client: TestClient) -> None:
+async def test_two_step_options_flow(hass: SmartHub, client: TestClient) -> None:
     """Test we can finish a two step options flow."""
     mock_integration(
         hass, MockModule("test", async_setup_entry=AsyncMock(return_value=True))
@@ -1297,7 +1297,7 @@ async def test_two_step_options_flow(hass: HomeAssistant, client: TestClient) ->
 
 
 async def test_options_flow_with_invalid_data(
-    hass: HomeAssistant, client: TestClient
+    hass: SmartHub, client: TestClient
 ) -> None:
     """Test an options flow with invalid_data."""
     mock_integration(
@@ -1372,7 +1372,7 @@ async def test_options_flow_with_invalid_data(
         assert data == {"errors": {"choices": "invalid is not a valid option"}}
 
 
-async def test_subentry_flow(hass: HomeAssistant, client) -> None:
+async def test_subentry_flow(hass: SmartHub, client) -> None:
     """Test we can start a subentry flow."""
 
     class TestFlow(core_ce.ConfigFlow):
@@ -1423,7 +1423,7 @@ async def test_subentry_flow(hass: HomeAssistant, client) -> None:
     }
 
 
-async def test_subentry_reconfigure_flow(hass: HomeAssistant, client) -> None:
+async def test_subentry_reconfigure_flow(hass: SmartHub, client) -> None:
     """Test we can start and finish a subentry reconfigure flow."""
 
     class TestFlow(core_ce.ConfigFlow):
@@ -1526,7 +1526,7 @@ async def test_subentry_reconfigure_flow(hass: HomeAssistant, client) -> None:
     }
 
 
-async def test_subentry_flow_abort_duplicate(hass: HomeAssistant, client) -> None:
+async def test_subentry_flow_abort_duplicate(hass: SmartHub, client) -> None:
     """Test we can handle a subentry flow raising due to unique_id collision."""
 
     class TestFlow(core_ce.ConfigFlow):
@@ -1609,7 +1609,7 @@ async def test_subentry_flow_abort_duplicate(hass: HomeAssistant, client) -> Non
 
 
 async def test_subentry_does_not_support_reconfigure(
-    hass: HomeAssistant, client: TestClient
+    hass: SmartHub, client: TestClient
 ) -> None:
     """Test a subentry flow that does not support reconfigure step."""
 
@@ -1668,7 +1668,7 @@ async def test_subentry_does_not_support_reconfigure(
     ],
 )
 async def test_subentry_flow_unauth(
-    hass: HomeAssistant, client, hass_admin_user: MockUser, endpoint: str, method: str
+    hass: SmartHub, client, hass_admin_user: MockUser, endpoint: str, method: str
 ) -> None:
     """Test unauthorized on subentry flow."""
 
@@ -1705,7 +1705,7 @@ async def test_subentry_flow_unauth(
     assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
-async def test_two_step_subentry_flow(hass: HomeAssistant, client) -> None:
+async def test_two_step_subentry_flow(hass: SmartHub, client) -> None:
     """Test we can finish a two step subentry flow."""
     mock_integration(
         hass, MockModule("test", async_setup_entry=AsyncMock(return_value=True))
@@ -1783,7 +1783,7 @@ async def test_two_step_subentry_flow(hass: HomeAssistant, client) -> None:
         }
 
 
-async def test_subentry_flow_with_invalid_data(hass: HomeAssistant, client) -> None:
+async def test_subentry_flow_with_invalid_data(hass: SmartHub, client) -> None:
     """Test a subentry flow with invalid_data."""
     mock_integration(
         hass, MockModule("test", async_setup_entry=AsyncMock(return_value=True))
@@ -1859,7 +1859,7 @@ async def test_subentry_flow_with_invalid_data(hass: HomeAssistant, client) -> N
 
 @pytest.mark.usefixtures("freezer")
 async def test_get_single(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that we can get a config entry."""
     assert await async_setup_component(hass, "config", {})
@@ -1918,7 +1918,7 @@ async def test_get_single(
 
 
 async def test_update_prefrences(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that we can update system options."""
     assert await async_setup_component(hass, "config", {})
@@ -1970,7 +1970,7 @@ async def test_update_prefrences(
 
 
 async def test_update_entry(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that we can update entry."""
     assert await async_setup_component(hass, "config", {})
@@ -1995,7 +1995,7 @@ async def test_update_entry(
 
 
 async def test_update_entry_nonexisting(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that we can update entry."""
     assert await async_setup_component(hass, "config", {})
@@ -2016,7 +2016,7 @@ async def test_update_entry_nonexisting(
 
 
 async def test_disable_entry(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that we can disable entry."""
     assert await async_setup_component(hass, "config", {})
@@ -2077,7 +2077,7 @@ async def test_disable_entry(
 
 
 async def test_disable_entry_nonexisting(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that we can disable entry."""
     assert await async_setup_component(hass, "config", {})
@@ -2114,7 +2114,7 @@ async def test_disable_entry_nonexisting(
     ],
 )
 async def test_ignore_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     flow_context: dict,
     entry_discovery_keys: dict[str, tuple[DiscoveryKey, ...]],
@@ -2167,7 +2167,7 @@ async def test_ignore_flow(
 
 
 async def test_ignore_flow_nonexisting(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can ignore a flow."""
     assert await async_setup_component(hass, "config", {})
@@ -2189,7 +2189,7 @@ async def test_ignore_flow_nonexisting(
 
 @pytest.mark.usefixtures("freezer")
 async def test_get_matching_entries_ws(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get entries with the websocket api."""
     assert await async_setup_component(hass, "config", {})
@@ -2488,7 +2488,7 @@ async def test_get_matching_entries_ws(
 
     # Verify we skip broken integrations
     with patch(
-        "homeassistant.components.config.config_entries.async_get_integrations",
+        "smarthub.components.config.config_entries.async_get_integrations",
         return_value={"any": IntegrationNotFound("any")},
     ):
         await ws_client.send_json_auto_id(
@@ -2609,7 +2609,7 @@ async def test_get_matching_entries_ws(
 
     # Verify we don't send config entries when only helpers are requested
     with patch(
-        "homeassistant.components.config.config_entries.async_get_integrations",
+        "smarthub.components.config.config_entries.async_get_integrations",
         return_value={"any": IntegrationNotFound("any")},
     ):
         await ws_client.send_json_auto_id(
@@ -2625,7 +2625,7 @@ async def test_get_matching_entries_ws(
     # Verify we raise if something really goes wrong
 
     with patch(
-        "homeassistant.components.config.config_entries.async_get_integrations",
+        "smarthub.components.config.config_entries.async_get_integrations",
         return_value={"any": Exception()},
     ):
         await ws_client.send_json_auto_id(
@@ -2640,7 +2640,7 @@ async def test_get_matching_entries_ws(
 
 
 async def test_subscribe_entries_ws(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -2858,7 +2858,7 @@ async def test_subscribe_entries_ws(
 
 
 async def test_subscribe_entries_ws_filtered(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -3095,7 +3095,7 @@ async def test_subscribe_entries_ws_filtered(
 
 
 async def test_flow_with_multiple_schema_errors(
-    hass: HomeAssistant, client: TestClient
+    hass: SmartHub, client: TestClient
 ) -> None:
     """Test an config flow with multiple schema errors."""
     mock_integration(
@@ -3139,7 +3139,7 @@ async def test_flow_with_multiple_schema_errors(
 
 
 async def test_flow_with_multiple_schema_errors_base(
-    hass: HomeAssistant, client: TestClient
+    hass: SmartHub, client: TestClient
 ) -> None:
     """Test an config flow with multiple schema errors where fields are not in the schema."""
     mock_integration(
@@ -3185,7 +3185,7 @@ async def test_flow_with_multiple_schema_errors_base(
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 @pytest.mark.usefixtures("freezer")
 async def test_supports_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: TestClient,
 ) -> None:
     """Test a flow that support reconfigure step."""
@@ -3260,7 +3260,7 @@ async def test_supports_reconfigure(
 
 
 async def test_does_not_support_reconfigure(
-    hass: HomeAssistant, client: TestClient
+    hass: SmartHub, client: TestClient
 ) -> None:
     """Test a flow that does not support reconfigure step."""
     mock_platform(hass, "test.config_flow", None)
@@ -3289,7 +3289,7 @@ async def test_does_not_support_reconfigure(
 
 
 async def test_list_subentries(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that we can list subentries."""
     assert await async_setup_component(hass, "config", {})
@@ -3348,7 +3348,7 @@ async def test_list_subentries(
 
 
 async def test_delete_subentry(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that we can delete a subentry."""
     assert await async_setup_component(hass, "config", {})

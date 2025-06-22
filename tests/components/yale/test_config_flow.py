@@ -5,15 +5,15 @@ from unittest.mock import ANY, Mock, patch
 
 import pytest
 
-from homeassistant.components.yale.application_credentials import (
+from smarthub.components.yale.application_credentials import (
     OAUTH2_AUTHORIZE,
     OAUTH2_TOKEN,
 )
-from homeassistant.components.yale.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.components.yale.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .mocks import USER_ID
 
@@ -28,7 +28,7 @@ CLIENT_ID = "1"
 def mock_setup_entry() -> Generator[Mock]:
     """Patch setup entry."""
     with patch(
-        "homeassistant.components.yale.async_setup_entry", return_value=True
+        "smarthub.components.yale.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -36,7 +36,7 @@ def mock_setup_entry() -> Generator[Mock]:
 @pytest.mark.usefixtures("client_credentials")
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     jwt: str,
@@ -103,7 +103,7 @@ async def test_full_flow(
 @pytest.mark.usefixtures("client_credentials")
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow_already_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     jwt: str,
@@ -157,7 +157,7 @@ async def test_full_flow_already_exists(
 @pytest.mark.usefixtures("client_credentials")
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_config_entry: MockConfigEntry,
@@ -217,7 +217,7 @@ async def test_reauth(
 @pytest.mark.usefixtures("client_credentials")
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_wrong_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_config_entry: MockConfigEntry,

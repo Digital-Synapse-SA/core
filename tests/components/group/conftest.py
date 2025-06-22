@@ -2,13 +2,13 @@
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.components.light.conftest import mock_light_profiles  # noqa: F401
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant):
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub):
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})

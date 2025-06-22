@@ -1,0 +1,11 @@
+"""Config flow for Traccar Client."""
+
+from smarthub.helpers import config_entry_flow
+
+from .const import DOMAIN
+
+config_entry_flow.register_webhook_flow(
+    DOMAIN,
+    "Traccar Client Webhook",
+    {"docs_url": "https://www.smart-hub.io/integrations/traccar/"},
+)

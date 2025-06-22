@@ -1,9 +1,9 @@
 """Test LIFX diagnostics."""
 
-from homeassistant.components import lifx
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import lifx
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -25,7 +25,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_bulb_diagnostics(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test diagnostics for a standard bulb."""
     config_entry = MockConfigEntry(
@@ -74,7 +74,7 @@ async def test_bulb_diagnostics(
 
 
 async def test_clean_bulb_diagnostics(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test diagnostics for a standard bulb."""
     config_entry = MockConfigEntry(
@@ -128,7 +128,7 @@ async def test_clean_bulb_diagnostics(
 
 
 async def test_infrared_bulb_diagnostics(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test diagnostics for a standard bulb."""
     config_entry = MockConfigEntry(
@@ -178,7 +178,7 @@ async def test_infrared_bulb_diagnostics(
 
 
 async def test_legacy_multizone_bulb_diagnostics(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test diagnostics for a standard bulb."""
     config_entry = MockConfigEntry(
@@ -307,7 +307,7 @@ async def test_legacy_multizone_bulb_diagnostics(
 
 
 async def test_multizone_bulb_diagnostics(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test diagnostics for a standard bulb."""
     config_entry = MockConfigEntry(

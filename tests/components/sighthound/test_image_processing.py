@@ -10,16 +10,16 @@ from PIL import UnidentifiedImageError
 import pytest
 import simplehound.core as hound
 
-from homeassistant.components.image_processing import DOMAIN as IP_DOMAIN, SERVICE_SCAN
-from homeassistant.components.sighthound import image_processing as sh
-from homeassistant.const import (
+from smarthub.components.image_processing import DOMAIN as IP_DOMAIN, SERVICE_SCAN
+from smarthub.components.sighthound import image_processing as sh
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_API_KEY,
     CONF_ENTITY_ID,
     CONF_SOURCE,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, callback
+from smarthub.setup import async_setup_component
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -53,9 +53,9 @@ MOCK_NOW = datetime.datetime(2020, 2, 20, 10, 5, 3)
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant):
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub):
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
 @pytest.fixture
@@ -71,7 +71,7 @@ def mock_detections():
 def mock_image():
     """Return a mock camera image."""
     with mock.patch(
-        "homeassistant.components.demo.camera.DemoCamera.camera_image",
+        "smarthub.components.demo.camera.DemoCamera.camera_image",
         return_value=b"Test",
     ) as image:
         yield image
@@ -81,7 +81,7 @@ def mock_image():
 def mock_bad_image_data():
     """Mock bad image data."""
     with mock.patch(
-        "homeassistant.components.sighthound.image_processing.Image.open",
+        "smarthub.components.sighthound.image_processing.Image.open",
         side_effect=UnidentifiedImageError,
     ) as bad_data:
         yield bad_data
@@ -90,12 +90,12 @@ def mock_bad_image_data():
 @pytest.fixture
 def mock_now():
     """Return a mock now datetime."""
-    with mock.patch("homeassistant.util.dt.now", return_value=MOCK_NOW) as now_dt:
+    with mock.patch("smarthub.util.dt.now", return_value=MOCK_NOW) as now_dt:
         yield now_dt
 
 
 async def test_bad_api_key(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Catch bad api key."""
     with mock.patch(
@@ -107,14 +107,14 @@ async def test_bad_api_key(
         assert not hass.states.get(VALID_ENTITY_ID)
 
 
-async def test_setup_platform(hass: HomeAssistant, mock_detections) -> None:
+async def test_setup_platform(hass: SmartHub, mock_detections) -> None:
     """Set up platform with one entity."""
     await async_setup_component(hass, IP_DOMAIN, VALID_CONFIG)
     await hass.async_block_till_done()
     assert hass.states.get(VALID_ENTITY_ID)
 
 
-async def test_process_image(hass: HomeAssistant, mock_image, mock_detections) -> None:
+async def test_process_image(hass: SmartHub, mock_image, mock_detections) -> None:
     """Process an image."""
     await async_setup_component(hass, IP_DOMAIN, VALID_CONFIG)
     await hass.async_block_till_done()
@@ -139,7 +139,7 @@ async def test_process_image(hass: HomeAssistant, mock_image, mock_detections) -
 
 
 async def test_catch_bad_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_image,
     mock_detections,
@@ -158,7 +158,7 @@ async def test_catch_bad_image(
     assert "Sighthound unable to process image" in caplog.text
 
 
-async def test_save_image(hass: HomeAssistant, mock_image, mock_detections) -> None:
+async def test_save_image(hass: SmartHub, mock_image, mock_detections) -> None:
     """Save a processed image."""
     valid_config_save_file = deepcopy(VALID_CONFIG)
     valid_config_save_file[IP_DOMAIN].update({sh.CONF_SAVE_FILE_FOLDER: TEST_DIR})
@@ -167,7 +167,7 @@ async def test_save_image(hass: HomeAssistant, mock_image, mock_detections) -> N
     assert hass.states.get(VALID_ENTITY_ID)
 
     with mock.patch(
-        "homeassistant.components.sighthound.image_processing.Image.open"
+        "smarthub.components.sighthound.image_processing.Image.open"
     ) as pil_img_open:
         pil_img = pil_img_open.return_value
         pil_img = pil_img.convert.return_value
@@ -184,7 +184,7 @@ async def test_save_image(hass: HomeAssistant, mock_image, mock_detections) -> N
 
 
 async def test_save_timestamped_image(
-    hass: HomeAssistant, mock_image, mock_detections, mock_now
+    hass: SmartHub, mock_image, mock_detections, mock_now
 ) -> None:
     """Save a processed image."""
     valid_config_save_ts_file = deepcopy(VALID_CONFIG)
@@ -195,7 +195,7 @@ async def test_save_timestamped_image(
     assert hass.states.get(VALID_ENTITY_ID)
 
     with mock.patch(
-        "homeassistant.components.sighthound.image_processing.Image.open"
+        "smarthub.components.sighthound.image_processing.Image.open"
     ) as pil_img_open:
         pil_img = pil_img_open.return_value
         pil_img = pil_img.convert.return_value

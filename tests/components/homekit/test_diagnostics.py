@@ -4,16 +4,16 @@ from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 
-from homeassistant.components.homekit.const import (
+from smarthub.components.homekit.const import (
     CONF_DEVICES,
     CONF_HOMEKIT_MODE,
     DOMAIN,
     HOMEKIT_MODE_ACCESSORY,
 )
-from homeassistant.const import CONF_NAME, CONF_PORT, EVENT_HOMEASSISTANT_STARTED
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_NAME, CONF_PORT, EVENT_HOMEASSISTANT_STARTED
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .util import async_init_integration
 
@@ -24,7 +24,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_config_entry_not_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hk_driver,
 ) -> None:
@@ -44,7 +44,7 @@ async def test_config_entry_not_running(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_config_entry_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hk_driver,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_config_entry_running(
                                 "iid": 3,
                                 "perms": ["pr"],
                                 "type": "20",
-                                "value": "Home Assistant",
+                                "value": "SmartHub",
                             },
                             {
                                 "format": "string",
@@ -147,8 +147,8 @@ async def test_config_entry_running(
 
     with (
         patch("pyhap.accessory_driver.AccessoryDriver.async_start"),
-        patch("homeassistant.components.homekit.HomeKit.async_stop"),
-        patch("homeassistant.components.homekit.async_port_is_available"),
+        patch("smarthub.components.homekit.HomeKit.async_stop"),
+        patch("smarthub.components.homekit.async_port_is_available"),
     ):
         assert await hass.config_entries.async_unload(entry.entry_id)
         await hass.async_block_till_done()
@@ -156,7 +156,7 @@ async def test_config_entry_running(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_config_entry_accessory(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hk_driver,
 ) -> None:
@@ -195,7 +195,7 @@ async def test_config_entry_accessory(
                                 "iid": 3,
                                 "perms": ["pr"],
                                 "type": "20",
-                                "value": "Home Assistant Light",
+                                "value": "SmartHub Light",
                             },
                             {
                                 "format": "string",
@@ -309,8 +309,8 @@ async def test_config_entry_accessory(
     }
     with (
         patch("pyhap.accessory_driver.AccessoryDriver.async_start"),
-        patch("homeassistant.components.homekit.HomeKit.async_stop"),
-        patch("homeassistant.components.homekit.async_port_is_available"),
+        patch("smarthub.components.homekit.HomeKit.async_stop"),
+        patch("smarthub.components.homekit.async_port_is_available"),
     ):
         assert await hass.config_entries.async_unload(entry.entry_id)
         await hass.async_block_till_done()
@@ -318,14 +318,14 @@ async def test_config_entry_accessory(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_config_entry_with_trigger_accessory(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hk_driver,
     demo_cleanup,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test generating diagnostics for a bridge config entry with a trigger accessory."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "demo", {"demo": {}})
     hk_driver.publish = MagicMock()
 
@@ -372,7 +372,7 @@ async def test_config_entry_with_trigger_accessory(
                                 "iid": 3,
                                 "perms": ["pr"],
                                 "type": "20",
-                                "value": "Home Assistant",
+                                "value": "SmartHub",
                             },
                             {
                                 "format": "string",
@@ -439,7 +439,7 @@ async def test_config_entry_with_trigger_accessory(
                                 "iid": 4,
                                 "perms": ["pr"],
                                 "type": "21",
-                                "value": "Home Assistant",
+                                "value": "SmartHub",
                             },
                             {
                                 "format": "string",
@@ -650,8 +650,8 @@ async def test_config_entry_with_trigger_accessory(
 
     with (
         patch("pyhap.accessory_driver.AccessoryDriver.async_start"),
-        patch("homeassistant.components.homekit.HomeKit.async_stop"),
-        patch("homeassistant.components.homekit.async_port_is_available"),
+        patch("smarthub.components.homekit.HomeKit.async_stop"),
+        patch("smarthub.components.homekit.async_port_is_available"),
     ):
         assert await hass.config_entries.async_unload(entry.entry_id)
         await hass.async_block_till_done()

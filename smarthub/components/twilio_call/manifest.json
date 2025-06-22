@@ -1,0 +1,10 @@
+{
+  "domain": "twilio_call",
+  "name": "Twilio Call",
+  "codeowners": [],
+  "dependencies": ["twilio"],
+  "documentation": "https://www.smart-hub.io/integrations/twilio_call",
+  "iot_class": "cloud_push",
+  "loggers": ["twilio"],
+  "quality_scale": "legacy"
+}

@@ -15,13 +15,13 @@ from google_photos_library_api.model import (
 )
 import pytest
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.google_photos.const import DOMAIN, OAUTH2_SCOPES
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.google_photos.const import DOMAIN, OAUTH2_SCOPES
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -92,7 +92,7 @@ def mock_config_entry(
 
 
 @pytest.fixture(autouse=True)
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -122,7 +122,7 @@ def mock_api_error() -> Exception | None:
 
 @pytest.fixture(name="mock_api")
 async def mock_client_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fixture_name: str,
     user_identifier: str,
     api_error: Exception,
@@ -197,7 +197,7 @@ async def mock_client_api(
 
 @pytest.fixture(name="setup_integration")
 async def mock_setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_api: Mock,
 ) -> Callable[[], Awaitable[bool]]:
@@ -205,7 +205,7 @@ async def mock_setup_integration(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.google_photos.GooglePhotosLibraryApi",
+        "smarthub.components.google_photos.GooglePhotosLibraryApi",
         return_value=mock_api,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

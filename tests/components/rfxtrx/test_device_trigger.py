@@ -7,12 +7,12 @@ from typing import Any, NamedTuple
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.rfxtrx import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.rfxtrx import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .conftest import create_rfx_test_cfg
 
@@ -46,7 +46,7 @@ EVENT_FIREALARM_1 = EventTestData(
 )
 
 
-async def setup_entry(hass: HomeAssistant, devices: dict[str, Any]) -> None:
+async def setup_entry(hass: SmartHub, devices: dict[str, Any]) -> None:
     """Construct a config setup."""
     entry_data = create_rfx_test_cfg(devices=devices)
     mock_entry = MockConfigEntry(domain="rfxtrx", unique_id=DOMAIN, data=entry_data)
@@ -80,7 +80,7 @@ async def setup_entry(hass: HomeAssistant, devices: dict[str, Any]) -> None:
     ],
 )
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     event: EventTestData,
     expected,
@@ -130,7 +130,7 @@ async def test_get_triggers(
     ],
 )
 async def test_firing_event(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, rfxtrx, event
+    hass: SmartHub, device_registry: dr.DeviceRegistry, rfxtrx, event
 ) -> None:
     """Test for turn_on and turn_off triggers firing."""
 
@@ -173,7 +173,7 @@ async def test_firing_event(
 
 
 async def test_invalid_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

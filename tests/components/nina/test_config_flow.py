@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 from pynina import ApiError
 
-from homeassistant.components.nina.const import (
+from smarthub.components.nina.const import (
     CONF_AREA_FILTER,
     CONF_HEADLINE_FILTER,
     CONF_MESSAGE_SLOTS,
@@ -22,10 +22,10 @@ from homeassistant.components.nina.const import (
     CONST_REGION_V_TO_Z,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import entity_registry as er
 
 from . import mocked_request_function
 
@@ -51,7 +51,7 @@ DUMMY_RESPONSE_WARNIGNS: dict[str, Any] = json.loads(
 )
 
 
-async def test_show_set_form(hass: HomeAssistant) -> None:
+async def test_show_set_form(hass: SmartHub) -> None:
     """Test that the setup form is served."""
     with patch(
         "pynina.baseApi.BaseAPI._makeRequest",
@@ -65,7 +65,7 @@ async def test_show_set_form(hass: HomeAssistant) -> None:
         assert result["step_id"] == "user"
 
 
-async def test_step_user_connection_error(hass: HomeAssistant) -> None:
+async def test_step_user_connection_error(hass: SmartHub) -> None:
     """Test starting a flow by user but no connection."""
     with patch(
         "pynina.baseApi.BaseAPI._makeRequest",
@@ -79,7 +79,7 @@ async def test_step_user_connection_error(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_step_user_unexpected_exception(hass: HomeAssistant) -> None:
+async def test_step_user_unexpected_exception(hass: SmartHub) -> None:
     """Test starting a flow by user but with an unexpected exception."""
     with patch(
         "pynina.baseApi.BaseAPI._makeRequest",
@@ -94,7 +94,7 @@ async def test_step_user_unexpected_exception(hass: HomeAssistant) -> None:
         hass.config_entries.flow.async_abort(result["flow_id"])
 
 
-async def test_step_user(hass: HomeAssistant) -> None:
+async def test_step_user(hass: SmartHub) -> None:
     """Test starting a flow by user with valid values."""
     with (
         patch(
@@ -102,7 +102,7 @@ async def test_step_user(hass: HomeAssistant) -> None:
             wraps=mocked_request_function,
         ),
         patch(
-            "homeassistant.components.nina.async_setup_entry",
+            "smarthub.components.nina.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -114,7 +114,7 @@ async def test_step_user(hass: HomeAssistant) -> None:
         assert result["title"] == "NINA"
 
 
-async def test_step_user_no_selection(hass: HomeAssistant) -> None:
+async def test_step_user_no_selection(hass: SmartHub) -> None:
     """Test starting a flow by user with no selection."""
     with patch(
         "pynina.baseApi.BaseAPI._makeRequest",
@@ -129,7 +129,7 @@ async def test_step_user_no_selection(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "no_selection"}
 
 
-async def test_step_user_already_configured(hass: HomeAssistant) -> None:
+async def test_step_user_already_configured(hass: SmartHub) -> None:
     """Test starting a flow by user but it was already configured."""
     with patch(
         "pynina.baseApi.BaseAPI._makeRequest",
@@ -147,7 +147,7 @@ async def test_step_user_already_configured(hass: HomeAssistant) -> None:
         assert result["reason"] == "single_instance_allowed"
 
 
-async def test_options_flow_init(hass: HomeAssistant) -> None:
+async def test_options_flow_init(hass: SmartHub) -> None:
     """Test config flow options."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -163,7 +163,7 @@ async def test_options_flow_init(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.nina.async_setup_entry", return_value=True),
+        patch("smarthub.components.nina.async_setup_entry", return_value=True),
         patch(
             "pynina.baseApi.BaseAPI._makeRequest",
             wraps=mocked_request_function,
@@ -208,7 +208,7 @@ async def test_options_flow_init(hass: HomeAssistant) -> None:
         }
 
 
-async def test_options_flow_with_no_selection(hass: HomeAssistant) -> None:
+async def test_options_flow_with_no_selection(hass: SmartHub) -> None:
     """Test config flow options with no selection."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -218,7 +218,7 @@ async def test_options_flow_with_no_selection(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.nina.async_setup_entry", return_value=True),
+        patch("smarthub.components.nina.async_setup_entry", return_value=True),
         patch(
             "pynina.baseApi.BaseAPI._makeRequest",
             wraps=mocked_request_function,
@@ -250,7 +250,7 @@ async def test_options_flow_with_no_selection(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "no_selection"}
 
 
-async def test_options_flow_connection_error(hass: HomeAssistant) -> None:
+async def test_options_flow_connection_error(hass: SmartHub) -> None:
     """Test config flow options but no connection."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -265,7 +265,7 @@ async def test_options_flow_connection_error(hass: HomeAssistant) -> None:
             side_effect=ApiError("Could not connect to Api"),
         ),
         patch(
-            "homeassistant.components.nina.async_setup_entry",
+            "smarthub.components.nina.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -278,7 +278,7 @@ async def test_options_flow_connection_error(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_options_flow_unexpected_exception(hass: HomeAssistant) -> None:
+async def test_options_flow_unexpected_exception(hass: SmartHub) -> None:
     """Test config flow options but with an unexpected exception."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -293,7 +293,7 @@ async def test_options_flow_unexpected_exception(hass: HomeAssistant) -> None:
             side_effect=Exception("DUMMY"),
         ),
         patch(
-            "homeassistant.components.nina.async_setup_entry",
+            "smarthub.components.nina.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -308,7 +308,7 @@ async def test_options_flow_unexpected_exception(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow_entity_removal(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test if old entities are removed."""
     config_entry = MockConfigEntry(
@@ -324,7 +324,7 @@ async def test_options_flow_entity_removal(
             wraps=mocked_request_function,
         ),
         patch(
-            "homeassistant.components.nina._async_update_listener"
+            "smarthub.components.nina._async_update_listener"
         ) as mock_update_listener,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

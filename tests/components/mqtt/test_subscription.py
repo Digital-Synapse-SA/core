@@ -2,19 +2,19 @@
 
 from unittest.mock import ANY
 
-from homeassistant.components.mqtt.subscription import (
+from smarthub.components.mqtt.subscription import (
     async_prepare_subscribe_topics,
     async_subscribe_topics,
     async_unsubscribe_topics,
 )
-from homeassistant.core import HomeAssistant, callback
+from smarthub.core import SmartHub, callback
 
 from tests.common import async_fire_mqtt_message
 from tests.typing import MqttMockHAClientGenerator
 
 
 async def test_subscribe_topics(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test subscription to topics."""
     await mqtt_mock_entry()
@@ -65,7 +65,7 @@ async def test_subscribe_topics(
 
 
 async def test_modify_topics(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test modification of topics."""
     await mqtt_mock_entry()
@@ -130,7 +130,7 @@ async def test_modify_topics(
 
 
 async def test_qos_encoding_default(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test default qos and encoding."""
     mqtt_mock = await mqtt_mock_entry()
@@ -150,7 +150,7 @@ async def test_qos_encoding_default(
 
 
 async def test_qos_encoding_custom(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test custom qos and encoding."""
     mqtt_mock = await mqtt_mock_entry()
@@ -177,7 +177,7 @@ async def test_qos_encoding_custom(
 
 
 async def test_no_change(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test subscription to topics without change."""
     mqtt_mock = await mqtt_mock_entry()

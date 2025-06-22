@@ -2,7 +2,7 @@
 
 from pywizlight import PilotBuilder
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP_KELVIN,
     ATTR_EFFECT,
@@ -10,15 +10,15 @@ from homeassistant.components.light import (
     ATTR_RGBWW_COLOR,
     DOMAIN as LIGHT_DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import (
     FAKE_MAC,
@@ -32,7 +32,7 @@ from . import (
 
 
 async def test_light_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a light unique id."""
     await async_setup_integration(hass)
@@ -43,7 +43,7 @@ async def test_light_unique_id(
 
 
 async def test_light_operation(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a light operation."""
     bulb, _ = await async_setup_integration(hass)
@@ -69,7 +69,7 @@ async def test_light_operation(
     assert hass.states.get(entity_id).state == STATE_ON
 
 
-async def test_rgbww_light(hass: HomeAssistant) -> None:
+async def test_rgbww_light(hass: SmartHub) -> None:
     """Test a light operation with a rgbww light."""
     bulb, _ = await async_setup_integration(hass, bulb_type=FAKE_RGBWW_BULB)
     entity_id = "light.mock_title"
@@ -132,7 +132,7 @@ async def test_rgbww_light(hass: HomeAssistant) -> None:
     assert pilot.pilot_params == {}
 
 
-async def test_rgbw_light(hass: HomeAssistant) -> None:
+async def test_rgbw_light(hass: SmartHub) -> None:
     """Test a light operation with a rgbww light."""
     bulb, _ = await async_setup_integration(hass, bulb_type=FAKE_RGBW_BULB)
     entity_id = "light.mock_title"
@@ -163,7 +163,7 @@ async def test_rgbw_light(hass: HomeAssistant) -> None:
     assert pilot.pilot_params == {"dimming": 50, "temp": 6535}
 
 
-async def test_turnable_light(hass: HomeAssistant) -> None:
+async def test_turnable_light(hass: SmartHub) -> None:
     """Test a light operation with a turnable light."""
     bulb, _ = await async_setup_integration(hass, bulb_type=FAKE_TURNABLE_BULB)
     entity_id = "light.mock_title"
@@ -184,7 +184,7 @@ async def test_turnable_light(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_COLOR_TEMP_KELVIN] == 6535
 
 
-async def test_old_firmware_dimmable_light(hass: HomeAssistant) -> None:
+async def test_old_firmware_dimmable_light(hass: SmartHub) -> None:
     """Test a light operation with a dimmable light with old firmware."""
     bulb, _ = await async_setup_integration(
         hass, bulb_type=FAKE_OLD_FIRMWARE_DIMMABLE_BULB

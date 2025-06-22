@@ -1,9 +1,9 @@
 """Tests Starlink integration init/unload."""
 
-from homeassistant.components.starlink.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_IP_ADDRESS
-from homeassistant.core import HomeAssistant
+from smarthub.components.starlink.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_IP_ADDRESS
+from smarthub.core import SmartHub
 
 from .patchers import (
     HISTORY_STATS_SUCCESS_PATCHER,
@@ -15,7 +15,7 @@ from .patchers import (
 from tests.common import MockConfigEntry
 
 
-async def test_successful_entry(hass: HomeAssistant) -> None:
+async def test_successful_entry(hass: SmartHub) -> None:
     """Test configuring Starlink."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -38,7 +38,7 @@ async def test_successful_entry(hass: HomeAssistant) -> None:
         assert entry.state is ConfigEntryState.LOADED
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test removing Starlink."""
     entry = MockConfigEntry(
         domain=DOMAIN,

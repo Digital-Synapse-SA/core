@@ -6,7 +6,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 import whirlpool
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_HUMIDITY,
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
@@ -27,7 +27,7 @@ from homeassistant.components.climate import (
     SWING_OFF,
     HVACMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     SERVICE_TURN_OFF,
@@ -35,9 +35,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration, snapshot_whirlpool_entities, trigger_attr_callback
 
@@ -55,7 +55,7 @@ def multiple_climate_entities(request: pytest.FixtureRequest) -> tuple[str, str]
 
 
 async def update_ac_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     mock_aircon_api_instance: MagicMock,
 ):
@@ -66,7 +66,7 @@ async def update_ac_state(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -76,7 +76,7 @@ async def test_all_entities(
 
 
 async def test_dynamic_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multiple_climate_entities: tuple[str, str],
     request: pytest.FixtureRequest,
 ) -> None:
@@ -220,7 +220,7 @@ async def test_dynamic_attributes(
     ],
 )
 async def test_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     service_data: dict,
     expected_call: str,
@@ -261,7 +261,7 @@ async def test_service_calls(
     ],
 )
 async def test_service_hvac_mode_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     service_data: dict,
     multiple_climate_entities: tuple[str, str],
@@ -310,7 +310,7 @@ async def test_service_hvac_mode_turn_on(
     ],
 )
 async def test_service_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     service_data: dict,
     exception: type[Exception],

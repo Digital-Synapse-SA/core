@@ -5,12 +5,12 @@ from unittest.mock import call, patch
 from grpc import RpcError
 import pytest
 
-from homeassistant.components import notify
-from homeassistant.components.google_assistant_sdk import DOMAIN
-from homeassistant.components.google_assistant_sdk.const import SUPPORTED_LANGUAGE_CODES
-from homeassistant.components.google_assistant_sdk.notify import broadcast_commands
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components import notify
+from smarthub.components.google_assistant_sdk import DOMAIN
+from smarthub.components.google_assistant_sdk.const import SUPPORTED_LANGUAGE_CODES
+from smarthub.components.google_assistant_sdk.notify import broadcast_commands
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import ComponentSetup, ExpectedCredentials
 
@@ -26,7 +26,7 @@ from .conftest import ComponentSetup, ExpectedCredentials
     ids=["english", "spanish", "korean", "japanese"],
 )
 async def test_broadcast_no_targets(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     language_code: str,
     message: str,
@@ -41,7 +41,7 @@ async def test_broadcast_no_targets(
     )
 
     with patch(
-        "homeassistant.components.google_assistant_sdk.helpers.TextAssistant"
+        "smarthub.components.google_assistant_sdk.helpers.TextAssistant"
     ) as mock_text_assistant:
         await hass.services.async_call(
             notify.DOMAIN,
@@ -57,7 +57,7 @@ async def test_broadcast_no_targets(
 
 
 async def test_broadcast_grpc_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
 ) -> None:
     """Test broadcast handling when RpcError is raised."""
@@ -65,10 +65,10 @@ async def test_broadcast_grpc_error(
 
     with (
         patch(
-            "homeassistant.components.google_assistant_sdk.helpers.TextAssistant.assist",
+            "smarthub.components.google_assistant_sdk.helpers.TextAssistant.assist",
             side_effect=RpcError(),
         ) as mock_assist_call,
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             notify.DOMAIN,
@@ -106,7 +106,7 @@ async def test_broadcast_grpc_error(
     ids=["english", "spanish", "korean", "japanese"],
 )
 async def test_broadcast_one_target(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     language_code: str,
     message: str,
@@ -122,7 +122,7 @@ async def test_broadcast_one_target(
     )
 
     with patch(
-        "homeassistant.components.google_assistant_sdk.helpers.TextAssistant.assist",
+        "smarthub.components.google_assistant_sdk.helpers.TextAssistant.assist",
         return_value=("text_response", None, b""),
     ) as mock_assist_call:
         await hass.services.async_call(
@@ -135,7 +135,7 @@ async def test_broadcast_one_target(
 
 
 async def test_broadcast_two_targets(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test broadcast to two targets."""
     await setup_integration()
@@ -146,7 +146,7 @@ async def test_broadcast_two_targets(
     expected_command1 = "broadcast to basement time for dinner"
     expected_command2 = "broadcast to master bedroom time for dinner"
     with patch(
-        "homeassistant.components.google_assistant_sdk.helpers.TextAssistant.assist",
+        "smarthub.components.google_assistant_sdk.helpers.TextAssistant.assist",
         return_value=("text_response", None, b""),
     ) as mock_assist_call:
         await hass.services.async_call(
@@ -161,13 +161,13 @@ async def test_broadcast_two_targets(
 
 
 async def test_broadcast_empty_message(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test broadcast empty message."""
     await setup_integration()
 
     with patch(
-        "homeassistant.components.google_assistant_sdk.helpers.TextAssistant.assist",
+        "smarthub.components.google_assistant_sdk.helpers.TextAssistant.assist",
         return_value=("text_response", None, b""),
     ) as mock_assist_call:
         await hass.services.async_call(
@@ -180,7 +180,7 @@ async def test_broadcast_empty_message(
 
 
 def test_broadcast_language_mapping(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test all supported languages have a mapped broadcast command."""
     for language_code in SUPPORTED_LANGUAGE_CODES:

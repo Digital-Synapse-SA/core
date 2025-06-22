@@ -14,13 +14,13 @@ from attr import asdict
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.homekit_controller.const import DOMAIN, ENTITY_MAP
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP, STATE_OFF, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components.homekit_controller.const import DOMAIN, ENTITY_MAP
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STOP, STATE_OFF, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from .common import (
     Helper,
@@ -48,12 +48,12 @@ def create_motion_sensor_service(accessory: Accessory) -> None:
 
 
 async def test_unload_on_stop(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test async_unload is called on stop."""
     await setup_test_component(hass, get_next_aid(), create_motion_sensor_service)
     with patch(
-        "homeassistant.components.homekit_controller.HKDevice.async_unload"
+        "smarthub.components.homekit_controller.HKDevice.async_unload"
     ) as async_unlock_mock:
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
         await hass.async_block_till_done()
@@ -62,7 +62,7 @@ async def test_unload_on_stop(
 
 
 async def test_async_remove_entry(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test unpairing a component."""
     helper = await setup_test_component(
@@ -91,7 +91,7 @@ def create_alive_service(accessory: Accessory) -> Service:
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
@@ -121,7 +121,7 @@ async def test_device_remove_devices(
 
 
 async def test_offline_device_raises(
-    hass: HomeAssistant, get_next_aid: Callable[[], int], controller
+    hass: SmartHub, get_next_aid: Callable[[], int], controller
 ) -> None:
     """Test an offline device raises ConfigEntryNotReady."""
 
@@ -176,7 +176,7 @@ async def test_offline_device_raises(
 
 @pytest.mark.usefixtures("fake_ble_discovery")
 async def test_ble_device_only_checks_is_available(
-    hass: HomeAssistant, get_next_aid: Callable[[], int], controller
+    hass: SmartHub, get_next_aid: Callable[[], int], controller
 ) -> None:
     """Test a BLE device only checks is_available."""
 
@@ -245,7 +245,7 @@ async def test_ble_device_only_checks_is_available(
 
 @pytest.mark.usefixtures("fake_ble_discovery", "fake_ble_pairing")
 async def test_ble_device_populates_connections(
-    hass: HomeAssistant, get_next_aid: Callable[[], int], controller
+    hass: SmartHub, get_next_aid: Callable[[], int], controller
 ) -> None:
     """Test a BLE device populates connections in the device registry."""
     aid = get_next_aid()
@@ -273,7 +273,7 @@ async def test_ble_device_populates_connections(
 
 @pytest.mark.parametrize("example", FIXTURES, ids=lambda val: str(val.stem))
 async def test_snapshots(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,

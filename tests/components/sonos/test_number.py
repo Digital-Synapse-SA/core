@@ -2,16 +2,16 @@
 
 from unittest.mock import PropertyMock, patch
 
-from homeassistant.components.number import DOMAIN as NUMBER_DOMAIN, SERVICE_SET_VALUE
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.number import DOMAIN as NUMBER_DOMAIN, SERVICE_SET_VALUE
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 CROSSOVER_ENTITY = "number.zone_a_sub_crossover_frequency"
 
 
 async def test_number_entities(
-    hass: HomeAssistant, async_autosetup_sonos, soco, entity_registry: er.EntityRegistry
+    hass: SmartHub, async_autosetup_sonos, soco, entity_registry: er.EntityRegistry
 ) -> None:
     """Test number entities."""
     balance_number = entity_registry.entities["number.zone_a_balance"]
@@ -71,7 +71,7 @@ async def test_number_entities(
 
 
 async def test_amp_number_entities(
-    hass: HomeAssistant, async_setup_sonos, soco, entity_registry: er.EntityRegistry
+    hass: SmartHub, async_setup_sonos, soco, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the sub_crossover feature only available on Sonos Amp devices.
 

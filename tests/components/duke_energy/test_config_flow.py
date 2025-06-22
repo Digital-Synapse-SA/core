@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock, Mock
 from aiohttp import ClientError, ClientResponseError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.duke_energy.const import DOMAIN
-from homeassistant.components.recorder import Recorder
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.duke_energy.const import DOMAIN
+from smarthub.components.recorder import Recorder
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def test_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     mock_api: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -42,7 +42,7 @@ async def test_user(
 
 
 async def test_abort_if_already_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     mock_api: AsyncMock,
     mock_config_entry: AsyncMock,
@@ -62,7 +62,7 @@ async def test_abort_if_already_setup(
 
 
 async def test_abort_if_already_setup_alternate_username(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     mock_api: AsyncMock,
     mock_config_entry: AsyncMock,
@@ -92,7 +92,7 @@ async def test_abort_if_already_setup_alternate_username(
     ],
 )
 async def test_api_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     mock_api: Mock,
     side_effect,

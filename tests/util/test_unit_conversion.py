@@ -1,4 +1,4 @@
-"""Test Home Assistant unit conversion utility functions."""
+"""Test SmartHub unit conversion utility functions."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from itertools import chain
 
 import pytest
 
-from homeassistant.const import (
+from smarthub.const import (
     CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
     CONCENTRATION_MILLIGRAMS_PER_CUBIC_METER,
     CONCENTRATION_PARTS_PER_BILLION,
@@ -34,9 +34,9 @@ from homeassistant.const import (
     UnitOfVolumeFlowRate,
     UnitOfVolumetricFlux,
 )
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util import unit_conversion
-from homeassistant.util.unit_conversion import (
+from smarthub.exceptions import SmartHubError
+from smarthub.util import unit_conversion
+from smarthub.util.unit_conversion import (
     AreaConverter,
     BaseUnitConverter,
     BloodGlucoseConcentrationConverter,
@@ -897,7 +897,7 @@ _CONVERTED_VALUE: dict[
     "converter",
     [
         # Generate list of all converters available in
-        # `homeassistant.util.unit_conversion` to ensure
+        # `smarthub.util.unit_conversion` to ensure
         # that we don't miss any in the tests.
         obj
         for _, obj in inspect.getmembers(unit_conversion)
@@ -952,10 +952,10 @@ def test_convert_invalid_unit(
     converter: type[BaseUnitConverter], valid_unit: str
 ) -> None:
     """Test exception is thrown for invalid units."""
-    with pytest.raises(HomeAssistantError, match="is not a recognized .* unit"):
+    with pytest.raises(SmartHubError, match="is not a recognized .* unit"):
         converter.convert(5, INVALID_SYMBOL, valid_unit)
 
-    with pytest.raises(HomeAssistantError, match="is not a recognized .* unit"):
+    with pytest.raises(SmartHubError, match="is not a recognized .* unit"):
         converter.convert(5, valid_unit, INVALID_SYMBOL)
 
 

@@ -15,26 +15,26 @@ from pysmartthings import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN, HVACMode
-from homeassistant.components.cover import DOMAIN as COVER_DOMAIN
-from homeassistant.components.fan import DOMAIN as FAN_DOMAIN
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.smartthings import EVENT_BUTTON
-from homeassistant.components.smartthings.const import (
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.climate import DOMAIN as CLIMATE_DOMAIN, HVACMode
+from smarthub.components.cover import DOMAIN as COVER_DOMAIN
+from smarthub.components.fan import DOMAIN as FAN_DOMAIN
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.smartthings import EVENT_BUTTON
+from smarthub.components.smartthings.const import (
     CONF_INSTALLED_APP_ID,
     CONF_LOCATION_ID,
     CONF_SUBSCRIPTION_ID,
     DOMAIN,
     SCOPES,
 )
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import Event, SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import setup_integration, trigger_update
 
@@ -42,7 +42,7 @@ from tests.common import MockConfigEntry, async_load_fixture
 
 
 async def test_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -61,7 +61,7 @@ async def test_devices(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_device_not_resetting_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -92,7 +92,7 @@ async def test_device_not_resetting_area(
 
 @pytest.mark.parametrize("device_fixture", ["button"])
 async def test_button_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -121,7 +121,7 @@ async def test_button_event(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_create_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -148,7 +148,7 @@ async def test_create_subscription(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_create_subscription_sink_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -168,7 +168,7 @@ async def test_create_subscription_sink_error(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_update_subscription_identifier(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -189,7 +189,7 @@ async def test_update_subscription_identifier(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_stale_subscription_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -213,7 +213,7 @@ async def test_stale_subscription_id(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_remove_subscription_identifier(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -234,7 +234,7 @@ async def test_remove_subscription_identifier(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_max_connections_handling(
-    hass: HomeAssistant, devices: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, devices: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test handling reaching max connections."""
     await setup_integration(hass, mock_config_entry)
@@ -255,7 +255,7 @@ async def test_max_connections_handling(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_unloading(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -275,11 +275,11 @@ async def test_unloading(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_shutdown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
-    """Test shutting down Home Assistant."""
+    """Test shutting down SmartHub."""
     await setup_integration(hass, mock_config_entry)
 
     hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
@@ -295,7 +295,7 @@ async def test_shutdown(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_removing_stale_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -315,13 +315,13 @@ async def test_removing_stale_devices(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_refreshing_expired_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test removing stale devices."""
     with patch(
-        "homeassistant.components.smartthings.OAuth2Session.async_ensure_token_valid",
+        "smarthub.components.smartthings.OAuth2Session.async_ensure_token_valid",
         side_effect=ClientResponseError(
             request_info=RequestInfo(
                 url="http://example.com",
@@ -341,13 +341,13 @@ async def test_refreshing_expired_token(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_error_refreshing_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test removing stale devices."""
     with patch(
-        "homeassistant.components.smartthings.OAuth2Session.async_ensure_token_valid",
+        "smarthub.components.smartthings.OAuth2Session.async_ensure_token_valid",
         side_effect=ClientResponseError(
             request_info=RequestInfo(
                 url="http://example.com",
@@ -365,7 +365,7 @@ async def test_error_refreshing_token(
 
 
 async def test_hub_via_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -397,7 +397,7 @@ async def test_hub_via_device(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_deleted_device_runtime(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -489,7 +489,7 @@ async def test_deleted_device_runtime(
     ],
 )
 async def test_entity_unique_id_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     expires_at: int,
     entity_registry: er.EntityRegistry,
@@ -677,7 +677,7 @@ async def test_entity_unique_id_migration(
     ],
 )
 async def test_entity_unique_id_migration_machine_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     expires_at: int,
     entity_registry: er.EntityRegistry,

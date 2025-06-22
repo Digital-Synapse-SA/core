@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.acmeda.const import DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components.acmeda.const import DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Return the default mocked config entry."""
     mock_config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -26,5 +26,5 @@ def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 @pytest.fixture
 def mock_hub_run() -> Generator[AsyncMock]:
     """Mock the hub run method."""
-    with patch("homeassistant.components.acmeda.hub.aiopulse.Hub.run") as mock_run:
+    with patch("smarthub.components.acmeda.hub.aiopulse.Hub.run") as mock_run:
         yield mock_run

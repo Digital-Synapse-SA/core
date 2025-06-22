@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from pytile.errors import InvalidAuthError, TileError
 
-from homeassistant.components.tile.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.tile.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import TEST_PASSWORD, TEST_USERNAME
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant, mock_pytile: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_pytile: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test a full flow."""
     result = await hass.config_entries.flow.async_init(
@@ -50,7 +50,7 @@ async def test_full_flow(
     ],
 )
 async def test_create_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pytile: AsyncMock,
     mock_setup_entry: AsyncMock,
     exception: Exception,
@@ -64,7 +64,7 @@ async def test_create_entry(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.tile.config_flow.async_login", side_effect=exception
+        "smarthub.components.tile.config_flow.async_login", side_effect=exception
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -88,7 +88,7 @@ async def test_create_entry(
 
 
 async def test_duplicate_error(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that errors are shown when duplicates are added."""
     mock_config_entry.add_to_hass(hass)
@@ -110,7 +110,7 @@ async def test_duplicate_error(
 
 
 async def test_step_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_pytile: AsyncMock,
@@ -137,7 +137,7 @@ async def test_step_reauth(
     ],
 )
 async def test_step_reauth_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_pytile: AsyncMock,
@@ -151,7 +151,7 @@ async def test_step_reauth_errors(
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.tile.config_flow.async_login", side_effect=exception
+        "smarthub.components.tile.config_flow.async_login", side_effect=exception
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],

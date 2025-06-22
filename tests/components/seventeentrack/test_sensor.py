@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 
 from pyseventeentrack.errors import SeventeenTrackError
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import init_integration
 from .conftest import DEFAULT_SUMMARY, get_package
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_full_valid_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -25,7 +25,7 @@ async def test_full_valid_config(
 
 
 async def test_valid_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -35,7 +35,7 @@ async def test_valid_config(
 
 
 async def test_invalid_config(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Ensure nothing is created when config is wrong."""
     await init_integration(hass, mock_config_entry)
@@ -43,7 +43,7 @@ async def test_invalid_config(
 
 
 async def test_login_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -56,7 +56,7 @@ async def test_login_exception(
 
 
 async def test_package_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -71,7 +71,7 @@ async def test_package_error(
 
 
 async def test_summary_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

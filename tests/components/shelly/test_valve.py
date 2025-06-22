@@ -5,10 +5,10 @@ from unittest.mock import Mock
 from aioshelly.const import MODEL_GAS
 import pytest
 
-from homeassistant.components.valve import DOMAIN as VALVE_DOMAIN, ValveState
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_CLOSE_VALVE, SERVICE_OPEN_VALVE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.components.valve import DOMAIN as VALVE_DOMAIN, ValveState
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_CLOSE_VALVE, SERVICE_OPEN_VALVE
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import init_integration
 
@@ -16,7 +16,7 @@ GAS_VALVE_BLOCK_ID = 6
 
 
 async def test_block_device_gas_valve(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,

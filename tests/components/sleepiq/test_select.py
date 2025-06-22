@@ -4,18 +4,18 @@ from unittest.mock import MagicMock
 
 from asyncsleepiq import FootWarmingTemps
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
     ATTR_OPTION,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import (
     BED_ID,
@@ -35,7 +35,7 @@ from .conftest import (
 
 
 async def test_split_foundation_preset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_asyncsleepiq: MagicMock,
 ) -> None:
@@ -92,7 +92,7 @@ async def test_split_foundation_preset(
 
 
 async def test_single_foundation_preset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_asyncsleepiq_single_foundation: MagicMock,
 ) -> None:
@@ -133,7 +133,7 @@ async def test_single_foundation_preset(
 
 
 async def test_foot_warmer(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_asyncsleepiq: MagicMock,
 ) -> None:

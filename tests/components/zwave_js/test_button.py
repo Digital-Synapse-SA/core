@@ -6,14 +6,14 @@ from unittest.mock import MagicMock
 import pytest
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.zwave_js.const import DOMAIN, SERVICE_REFRESH_VALUE
-from homeassistant.components.zwave_js.helpers import get_valueless_base_unique_id
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import ATTR_ENTITY_ID, EntityCategory, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.zwave_js.const import DOMAIN, SERVICE_REFRESH_VALUE
+from smarthub.components.zwave_js.helpers import get_valueless_base_unique_id
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import ATTR_ENTITY_ID, EntityCategory, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -25,7 +25,7 @@ def platforms() -> list[str]:
 
 
 async def test_ping_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
@@ -79,7 +79,7 @@ async def test_ping_entity(
 
 
 async def test_notification_idle_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
     multisensor_6: Node,

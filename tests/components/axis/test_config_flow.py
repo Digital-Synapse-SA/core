@@ -6,21 +6,21 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.axis import config_flow
-from homeassistant.components.axis.const import (
+from smarthub.components.axis import config_flow
+from smarthub.components.axis.const import (
     CONF_STREAM_PROFILE,
     CONF_VIDEO_SOURCE,
     DEFAULT_STREAM_PROFILE,
     DEFAULT_VIDEO_SOURCE,
     DOMAIN,
 )
-from homeassistant.config_entries import (
+from smarthub.config_entries import (
     SOURCE_DHCP,
     SOURCE_SSDP,
     SOURCE_USER,
     SOURCE_ZEROCONF,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_HOST,
     CONF_MODEL,
     CONF_NAME,
@@ -29,12 +29,12 @@ from homeassistant.const import (
     CONF_PROTOCOL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import BaseServiceInfo, FlowResultType
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.ssdp import SsdpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import BaseServiceInfo, FlowResultType
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.ssdp import SsdpServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .const import DEFAULT_HOST, MAC, MODEL, NAME
 
@@ -44,7 +44,7 @@ DHCP_FORMATTED_MAC = dr.format_mac(MAC).replace(":", "")
 
 
 @pytest.mark.usefixtures("mock_default_requests")
-async def test_flow_manual_configuration(hass: HomeAssistant) -> None:
+async def test_flow_manual_configuration(hass: SmartHub) -> None:
     """Test that config flow works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -78,7 +78,7 @@ async def test_flow_manual_configuration(hass: HomeAssistant) -> None:
 
 
 async def test_manual_configuration_duplicate_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_setup: MockConfigEntry,
     mock_requests: Callable[[str], None],
 ) -> None:
@@ -118,7 +118,7 @@ async def test_manual_configuration_duplicate_fails(
     ],
 )
 async def test_flow_fails_on_api(
-    hass: HomeAssistant, exc: Exception, error: str
+    hass: SmartHub, exc: Exception, error: str
 ) -> None:
     """Test that config flow fails on faulty credentials."""
     result = await hass.config_entries.flow.async_init(
@@ -129,7 +129,7 @@ async def test_flow_fails_on_api(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.axis.config_flow.get_axis_api",
+        "smarthub.components.axis.config_flow.get_axis_api",
         side_effect=exc,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -148,7 +148,7 @@ async def test_flow_fails_on_api(
 
 @pytest.mark.usefixtures("mock_default_requests")
 async def test_flow_create_entry_multiple_existing_entries_of_same_model(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that create entry can generate a name with other entries."""
     entry = MockConfigEntry(
@@ -196,7 +196,7 @@ async def test_flow_create_entry_multiple_existing_entries_of_same_model(
 
 
 async def test_reauth_flow_update_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_setup: MockConfigEntry,
     mock_requests: Callable[[str], None],
 ) -> None:
@@ -232,7 +232,7 @@ async def test_reauth_flow_update_configuration(
 
 
 async def test_reconfiguration_flow_update_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_setup: MockConfigEntry,
     mock_requests: Callable[[str], None],
 ) -> None:
@@ -331,7 +331,7 @@ async def test_reconfiguration_flow_update_configuration(
 )
 @pytest.mark.usefixtures("mock_default_requests")
 async def test_discovery_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     source: str,
     discovery_info: BaseServiceInfo,
 ) -> None:
@@ -411,7 +411,7 @@ async def test_discovery_flow(
     ],
 )
 async def test_discovered_device_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_setup: MockConfigEntry,
     source: str,
     discovery_info: BaseServiceInfo,
@@ -469,7 +469,7 @@ async def test_discovered_device_already_configured(
     ],
 )
 async def test_discovery_flow_updated_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_setup: MockConfigEntry,
     mock_requests: Callable[[str], None],
     source: str,
@@ -542,7 +542,7 @@ async def test_discovery_flow_updated_configuration(
     ],
 )
 async def test_discovery_flow_ignore_non_axis_device(
-    hass: HomeAssistant, source: str, discovery_info: BaseServiceInfo
+    hass: SmartHub, source: str, discovery_info: BaseServiceInfo
 ) -> None:
     """Test that discovery flow ignores devices with non Axis OUI."""
     result = await hass.config_entries.flow.async_init(
@@ -591,7 +591,7 @@ async def test_discovery_flow_ignore_non_axis_device(
     ],
 )
 async def test_discovery_flow_ignore_link_local_address(
-    hass: HomeAssistant, source: str, discovery_info: BaseServiceInfo
+    hass: SmartHub, source: str, discovery_info: BaseServiceInfo
 ) -> None:
     """Test that discovery flow ignores devices with link local addresses."""
     result = await hass.config_entries.flow.async_init(
@@ -603,7 +603,7 @@ async def test_discovery_flow_ignore_link_local_address(
 
 
 async def test_option_flow(
-    hass: HomeAssistant, config_entry_setup: MockConfigEntry
+    hass: SmartHub, config_entry_setup: MockConfigEntry
 ) -> None:
     """Test config flow options."""
     assert CONF_STREAM_PROFILE not in config_entry_setup.options

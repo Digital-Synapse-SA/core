@@ -11,14 +11,14 @@ from bimmer_connected.models import (
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.bmw_connected_drive import DOMAIN
-from homeassistant.components.bmw_connected_drive.const import (
+from smarthub.components.bmw_connected_drive import DOMAIN
+from smarthub.components.bmw_connected_drive.const import (
     CONF_REFRESH_TOKEN,
     SCAN_INTERVALS,
 )
-from homeassistant.const import CONF_REGION
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import issue_registry as ir
+from smarthub.const import CONF_REGION
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import issue_registry as ir
 
 from . import BIMMER_CONNECTED_VEHICLE_PATCH, FIXTURE_CONFIG_ENTRY
 
@@ -37,7 +37,7 @@ FIXTURE_DEFAULT_REGION = FIXTURE_CONFIG_ENTRY["data"][CONF_REGION]
 
 @pytest.mark.usefixtures("bmw_fixture")
 async def test_config_entry_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test if the coordinator updates the refresh token in config entry."""
@@ -66,7 +66,7 @@ async def test_config_entry_update(
 
 @pytest.mark.usefixtures("bmw_fixture")
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test a failing API call."""
@@ -103,7 +103,7 @@ async def test_update_failed(
 
 @pytest.mark.usefixtures("bmw_fixture")
 async def test_auth_failed_as_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -145,7 +145,7 @@ async def test_auth_failed_as_update_failed(
 
 @pytest.mark.usefixtures("bmw_fixture")
 async def test_auth_failed_init_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -203,7 +203,7 @@ async def test_auth_failed_init_reauth(
 
 @pytest.mark.usefixtures("bmw_fixture")
 async def test_captcha_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     issue_registry: ir.IssueRegistry,
 ) -> None:

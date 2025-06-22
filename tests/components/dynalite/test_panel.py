@@ -2,17 +2,17 @@
 
 from unittest.mock import patch
 
-from homeassistant.components import dynalite
-from homeassistant.components.cover import DEVICE_CLASSES
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components import dynalite
+from smarthub.components.cover import DEVICE_CLASSES
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
 async def test_get_config(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Get the config via websocket."""
     host = "1.2.3.4"
@@ -24,7 +24,7 @@ async def test_get_config(
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.dynalite.bridge.DynaliteDevices.async_setup",
+        "smarthub.components.dynalite.bridge.DynaliteDevices.async_setup",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -54,7 +54,7 @@ async def test_get_config(
 
 
 async def test_save_config(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Save the config via websocket."""
     host1 = "1.2.3.4"
@@ -70,7 +70,7 @@ async def test_save_config(
     )
     entry1.add_to_hass(hass)
     with patch(
-        "homeassistant.components.dynalite.bridge.DynaliteDevices.async_setup",
+        "smarthub.components.dynalite.bridge.DynaliteDevices.async_setup",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry1.entry_id)
@@ -81,7 +81,7 @@ async def test_save_config(
     )
     entry2.add_to_hass(hass)
     with patch(
-        "homeassistant.components.dynalite.bridge.DynaliteDevices.async_setup",
+        "smarthub.components.dynalite.bridge.DynaliteDevices.async_setup",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry2.entry_id)
@@ -110,7 +110,7 @@ async def test_save_config(
 
 
 async def test_save_config_invalid_entry(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Try to update nonexistent entry."""
     host1 = "1.2.3.4"
@@ -124,7 +124,7 @@ async def test_save_config_invalid_entry(
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.dynalite.bridge.DynaliteDevices.async_setup",
+        "smarthub.components.dynalite.bridge.DynaliteDevices.async_setup",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)

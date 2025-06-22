@@ -2,25 +2,25 @@
 
 from pytest_unordered import unordered
 
-from homeassistant.components.event import (
+from smarthub.components.event import (
     ATTR_EVENT_TYPE,
     ATTR_EVENT_TYPES,
     DOMAIN as EVENT_DOMAIN,
 )
-from homeassistant.components.group import DOMAIN
-from homeassistant.const import (
+from smarthub.components.group import DOMAIN
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 
 async def test_default_state(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test event group default state."""
     await async_setup_component(

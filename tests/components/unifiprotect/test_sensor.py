@@ -17,11 +17,11 @@ from uiprotect.data import (
 )
 from uiprotect.data.nvr import EventMetadata, LicensePlateMetadata
 
-from homeassistant.components.unifiprotect.const import (
+from smarthub.components.unifiprotect.const import (
     ATTR_EVENT_SCORE,
     DEFAULT_ATTRIBUTION,
 )
-from homeassistant.components.unifiprotect.sensor import (
+from smarthub.components.unifiprotect.sensor import (
     ALL_DEVICES_SENSORS,
     CAMERA_DISABLED_SENSORS,
     CAMERA_SENSORS,
@@ -31,15 +31,15 @@ from homeassistant.components.unifiprotect.sensor import (
     NVR_SENSORS,
     SENSE_SENSORS,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     EVENT_STATE_CHANGED,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import Event as HAEvent, EventStateChangedData, HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import Event as HAEvent, EventStateChangedData, SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .utils import (
     MockUFPFixture,
@@ -60,7 +60,7 @@ SENSE_SENSORS_WRITE = SENSE_SENSORS[:8]
 
 
 async def test_sensor_camera_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, unadopted_camera: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, unadopted_camera: Camera
 ) -> None:
     """Test removing and re-adding a camera device."""
 
@@ -74,7 +74,7 @@ async def test_sensor_camera_remove(
 
 
 async def test_sensor_sensor_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, sensor_all: Sensor
+    hass: SmartHub, ufp: MockUFPFixture, sensor_all: Sensor
 ) -> None:
     """Test removing and re-adding a light device."""
 
@@ -88,7 +88,7 @@ async def test_sensor_sensor_remove(
 
 
 async def test_sensor_setup_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     sensor_all: Sensor,
@@ -140,7 +140,7 @@ async def test_sensor_setup_sensor(
 
 
 async def test_sensor_setup_sensor_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     sensor: Sensor,
@@ -175,7 +175,7 @@ async def test_sensor_setup_sensor_none(
 
 
 async def test_sensor_setup_nvr(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     fixed_now: datetime,
@@ -252,7 +252,7 @@ async def test_sensor_setup_nvr(
 
 
 async def test_sensor_nvr_missing_values(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, ufp: MockUFPFixture
+    hass: SmartHub, entity_registry: er.EntityRegistry, ufp: MockUFPFixture
 ) -> None:
     """Test NVR sensor sensors if no data available."""
 
@@ -320,7 +320,7 @@ async def test_sensor_nvr_missing_values(
 
 
 async def test_sensor_setup_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -409,7 +409,7 @@ async def test_sensor_setup_camera(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_setup_camera_with_last_trip_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -439,7 +439,7 @@ async def test_sensor_setup_camera_with_last_trip_time(
 
 
 async def test_sensor_update_alarm(
-    hass: HomeAssistant, ufp: MockUFPFixture, sensor_all: Sensor, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, sensor_all: Sensor, fixed_now: datetime
 ) -> None:
     """Test sensor motion entity."""
 
@@ -485,7 +485,7 @@ async def test_sensor_update_alarm(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_update_alarm_with_last_trip_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     sensor_all: Sensor,
@@ -515,7 +515,7 @@ async def test_sensor_update_alarm_with_last_trip_time(
 
 
 async def test_camera_update_license_plate(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, camera: Camera, fixed_now: datetime
 ) -> None:
     """Test license plate sensor."""
 
@@ -630,7 +630,7 @@ async def test_camera_update_license_plate(
 
 
 async def test_camera_update_license_plate_changes_number_during_detect(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, camera: Camera, fixed_now: datetime
 ) -> None:
     """Test license plate sensor that changes number during detect."""
 
@@ -717,7 +717,7 @@ async def test_camera_update_license_plate_changes_number_during_detect(
 
 
 async def test_camera_update_license_plate_multiple_updates(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, camera: Camera, fixed_now: datetime
 ) -> None:
     """Test license plate sensor that updates multiple times."""
 
@@ -840,7 +840,7 @@ async def test_camera_update_license_plate_multiple_updates(
 
 
 async def test_camera_update_license_no_dupes(
-    hass: HomeAssistant, ufp: MockUFPFixture, camera: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, camera: Camera, fixed_now: datetime
 ) -> None:
     """Test license plate sensor does not generate duplicate reads."""
 
@@ -938,7 +938,7 @@ async def test_camera_update_license_no_dupes(
 
 
 async def test_sensor_precision(
-    hass: HomeAssistant, ufp: MockUFPFixture, sensor_all: Sensor, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, sensor_all: Sensor, fixed_now: datetime
 ) -> None:
     """Test sensor precision value is respected."""
 

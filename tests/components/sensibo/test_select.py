@@ -9,17 +9,17 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.components.sensibo.const import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
+from smarthub.components.sensibo.const import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er, issue_registry as ir
 
 from . import ENTRY_CONFIG
 
@@ -31,7 +31,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
     [[Platform.SELECT]],
 )
 async def test_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -55,7 +55,7 @@ async def test_select(
 
 
 async def test_select_set_option(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -84,7 +84,7 @@ async def test_select_set_option(
     }
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
     ):
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -114,7 +114,7 @@ async def test_select_set_option(
     }
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
     ):
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -161,7 +161,7 @@ async def test_select_set_option(
     [[Platform.SELECT]],
 )
 async def test_deprecated_horizontal_swing_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_platforms: list[Platform],
     mock_client: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -189,7 +189,7 @@ async def test_deprecated_horizontal_swing_select(
         suggested_object_id="hallway_horizontal_swing",
     )
 
-    with patch("homeassistant.components.sensibo.PLATFORMS", load_platforms):
+    with patch("smarthub.components.sensibo.PLATFORMS", load_platforms):
         await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()
 
@@ -200,10 +200,10 @@ async def test_deprecated_horizontal_swing_select(
     assert issue_registry.issues == {}
 
     with (
-        patch("homeassistant.components.sensibo.PLATFORMS", load_platforms),
+        patch("smarthub.components.sensibo.PLATFORMS", load_platforms),
         patch(
             # Patch check for automation, that one exist
-            "homeassistant.components.sensibo.select.automations_with_entity",
+            "smarthub.components.sensibo.select.automations_with_entity",
             return_value=["automation.test"],
         ),
     ):
@@ -224,9 +224,9 @@ async def test_deprecated_horizontal_swing_select(
     )
 
     with (
-        patch("homeassistant.components.sensibo.PLATFORMS", load_platforms),
+        patch("smarthub.components.sensibo.PLATFORMS", load_platforms),
         patch(
-            "homeassistant.components.sensibo.select.automations_with_entity",
+            "smarthub.components.sensibo.select.automations_with_entity",
             return_value=["automation.test"],
         ),
     ):

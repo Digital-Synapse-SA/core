@@ -8,30 +8,30 @@ from pydrawise.schema import Zone
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.hydrawise.const import DEFAULT_WATERING_TIME
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.hydrawise.const import DEFAULT_WATERING_TIME
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_all_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_add_config_entry: Callable[[], Awaitable[MockConfigEntry]],
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that all switches are working."""
     with patch(
-        "homeassistant.components.hydrawise.PLATFORMS",
+        "smarthub.components.hydrawise.PLATFORMS",
         [Platform.SWITCH],
     ):
         config_entry = await mock_add_config_entry()
@@ -39,7 +39,7 @@ async def test_all_switches(
 
 
 async def test_manual_watering_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_pydrawise: AsyncMock,
     zones: list[Zone],
@@ -73,7 +73,7 @@ async def test_manual_watering_services(
 
 @pytest.mark.freeze_time("2023-10-01 00:00:00+00:00")
 async def test_auto_watering_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_pydrawise: AsyncMock,
     zones: list[Zone],

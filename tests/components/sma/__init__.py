@@ -1,14 +1,14 @@
 """Tests for the sma integration."""
 
-from homeassistant.components.sma.const import CONF_GROUP
-from homeassistant.const import (
+from smarthub.components.sma.const import CONF_GROUP
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
     CONF_SSL,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -49,7 +49,7 @@ MOCK_DHCP_DISCOVERY = {
 }
 
 
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
 

@@ -10,23 +10,23 @@ from tesla_fleet_api.exceptions import (
     TeslaFleetError,
 )
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.tesla_fleet.config_flow import OAuth2FlowHandler
-from homeassistant.components.tesla_fleet.const import (
+from smarthub.components.tesla_fleet.config_flow import OAuth2FlowHandler
+from smarthub.components.tesla_fleet.const import (
     AUTHORIZE_URL,
     CONF_DOMAIN,
     DOMAIN,
     SCOPES,
     TOKEN_URL,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -37,7 +37,7 @@ UNIQUE_ID = "uid"
 
 
 @pytest.fixture
-async def access_token(hass: HomeAssistant) -> str:
+async def access_token(hass: SmartHub) -> str:
     """Return a valid access token."""
     return config_entry_oauth2_flow._encode_jwt(
         hass,
@@ -59,7 +59,7 @@ async def access_token(hass: HomeAssistant) -> str:
 
 
 @pytest.fixture(autouse=True)
-async def create_credential(hass: HomeAssistant) -> None:
+async def create_credential(hass: SmartHub) -> None:
     """Create a user credential."""
     # Create user application credential
     assert await async_setup_component(hass, "application_credentials", {})
@@ -88,7 +88,7 @@ def mock_private_key():
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow_with_domain_registration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     access_token: str,
@@ -137,10 +137,10 @@ async def test_full_flow_with_domain_registration(
 
     with (
         patch(
-            "homeassistant.components.tesla_fleet.config_flow.TeslaFleetApi"
+            "smarthub.components.tesla_fleet.config_flow.TeslaFleetApi"
         ) as mock_api_class,
         patch(
-            "homeassistant.components.tesla_fleet.async_setup_entry", return_value=True
+            "smarthub.components.tesla_fleet.async_setup_entry", return_value=True
         ),
     ):
         mock_api = AsyncMock()
@@ -177,7 +177,7 @@ async def test_full_flow_with_domain_registration(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_domain_input_invalid_domain(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     access_token: str,
@@ -211,7 +211,7 @@ async def test_domain_input_invalid_domain(
 
     with (
         patch(
-            "homeassistant.components.tesla_fleet.config_flow.TeslaFleetApi"
+            "smarthub.components.tesla_fleet.config_flow.TeslaFleetApi"
         ) as mock_api_class,
     ):
         mock_api = AsyncMock()
@@ -256,7 +256,7 @@ async def test_domain_input_invalid_domain(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_domain_registration_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     access_token: str,
@@ -292,7 +292,7 @@ async def test_domain_registration_errors(
 
     with (
         patch(
-            "homeassistant.components.tesla_fleet.config_flow.TeslaFleetApi"
+            "smarthub.components.tesla_fleet.config_flow.TeslaFleetApi"
         ) as mock_api_class,
     ):
         mock_api = AsyncMock()
@@ -308,7 +308,7 @@ async def test_domain_registration_errors(
 
         # Enter domain - this should fail and stay on domain_registration
         with patch(
-            "homeassistant.helpers.translation.async_get_translations", return_value={}
+            "smarthub.helpers.translation.async_get_translations", return_value={}
         ):
             result = await hass.config_entries.flow.async_configure(
                 result["flow_id"], {CONF_DOMAIN: "example.com"}
@@ -320,7 +320,7 @@ async def test_domain_registration_errors(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_domain_registration_precondition_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     access_token: str,
@@ -354,7 +354,7 @@ async def test_domain_registration_precondition_failed(
 
     with (
         patch(
-            "homeassistant.components.tesla_fleet.config_flow.TeslaFleetApi"
+            "smarthub.components.tesla_fleet.config_flow.TeslaFleetApi"
         ) as mock_api_class,
     ):
         mock_api = AsyncMock()
@@ -379,7 +379,7 @@ async def test_domain_registration_precondition_failed(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_domain_registration_public_key_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     access_token: str,
@@ -413,7 +413,7 @@ async def test_domain_registration_public_key_not_found(
 
     with (
         patch(
-            "homeassistant.components.tesla_fleet.config_flow.TeslaFleetApi"
+            "smarthub.components.tesla_fleet.config_flow.TeslaFleetApi"
         ) as mock_api_class,
     ):
         mock_api = AsyncMock()
@@ -438,7 +438,7 @@ async def test_domain_registration_public_key_not_found(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_domain_registration_public_key_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     access_token: str,
@@ -472,7 +472,7 @@ async def test_domain_registration_public_key_mismatch(
 
     with (
         patch(
-            "homeassistant.components.tesla_fleet.config_flow.TeslaFleetApi"
+            "smarthub.components.tesla_fleet.config_flow.TeslaFleetApi"
         ) as mock_api_class,
     ):
         mock_api = AsyncMock()
@@ -499,7 +499,7 @@ async def test_domain_registration_public_key_mismatch(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_registration_complete_no_domain(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test registration complete step without domain."""
 
@@ -513,7 +513,7 @@ async def test_registration_complete_no_domain(
 
 
 async def test_registration_complete_with_domain_and_user_input(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test registration complete step with domain and user input."""
 
@@ -529,7 +529,7 @@ async def test_registration_complete_with_domain_and_user_input(
 
 
 async def test_registration_complete_with_domain_no_user_input(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test registration complete step with domain but no user input."""
 
@@ -548,7 +548,7 @@ async def test_registration_complete_with_domain_no_user_input(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauthentication(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     access_token: str,
@@ -590,7 +590,7 @@ async def test_reauthentication(
     )
 
     with patch(
-        "homeassistant.components.tesla_fleet.async_setup_entry", return_value=True
+        "smarthub.components.tesla_fleet.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -601,7 +601,7 @@ async def test_reauthentication(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_account_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     access_token: str,
@@ -636,7 +636,7 @@ async def test_reauth_account_mismatch(
     )
 
     with patch(
-        "homeassistant.components.tesla_fleet.async_setup_entry", return_value=True
+        "smarthub.components.tesla_fleet.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -646,7 +646,7 @@ async def test_reauth_account_mismatch(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_duplicate_unique_id_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     access_token: str,
@@ -693,7 +693,7 @@ async def test_duplicate_unique_id_abort(
     assert result["reason"] == "already_configured"
 
 
-async def test_reauth_confirm_form(hass: HomeAssistant) -> None:
+async def test_reauth_confirm_form(hass: SmartHub) -> None:
     """Test reauth confirm form display."""
     old_entry = MockConfigEntry(
         domain=DOMAIN,

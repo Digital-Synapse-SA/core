@@ -2,13 +2,13 @@
 
 from datetime import timedelta
 
-from homeassistant.components.broadlink.const import DOMAIN
-from homeassistant.components.broadlink.updater import BroadlinkSP4UpdateManager
-from homeassistant.const import ATTR_FRIENDLY_NAME, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.util import dt as dt_util
+from smarthub.components.broadlink.const import DOMAIN
+from smarthub.components.broadlink.updater import BroadlinkSP4UpdateManager
+from smarthub.const import ATTR_FRIENDLY_NAME, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.util import dt as dt_util
 
 from . import get_device
 
@@ -16,7 +16,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_a1_sensor_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -58,7 +58,7 @@ async def test_a1_sensor_setup(
 
 
 async def test_a1_sensor_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -109,7 +109,7 @@ async def test_a1_sensor_update(
 
 
 async def test_rm_pro_sensor_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -139,7 +139,7 @@ async def test_rm_pro_sensor_setup(
 
 
 async def test_rm_pro_sensor_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -172,13 +172,13 @@ async def test_rm_pro_sensor_update(
 
 
 async def test_rm_pro_filter_crazy_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test we filter a crazy temperature variation.
 
-    Firmware issue. See https://github.com/home-assistant/core/issues/42100.
+    Firmware issue. See https://github.com/smart-hub/core/issues/42100.
     """
     device = get_device("Office")
     mock_api = device.get_mock_api()
@@ -208,7 +208,7 @@ async def test_rm_pro_filter_crazy_temperature(
 
 
 async def test_rm_mini3_no_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -229,7 +229,7 @@ async def test_rm_mini3_no_sensor(
 
 
 async def test_rm4_pro_hts2_sensor_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -262,7 +262,7 @@ async def test_rm4_pro_hts2_sensor_setup(
 
 
 async def test_rm4_pro_hts2_sensor_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -298,7 +298,7 @@ async def test_rm4_pro_hts2_sensor_update(
 
 
 async def test_rm4_pro_no_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -319,7 +319,7 @@ async def test_rm4_pro_no_sensor(
 
 
 async def test_scb1e_sensor_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -365,7 +365,7 @@ async def test_scb1e_sensor_setup(
 
 
 async def test_scb1e_sensor_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

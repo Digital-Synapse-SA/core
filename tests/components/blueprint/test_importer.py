@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.blueprint import DOMAIN, importer
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.blueprint import DOMAIN, importer
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import async_load_fixture, load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -24,16 +24,16 @@ def test_get_community_post_import_url() -> None:
     """Test variations of generating import forum url."""
     assert (
         importer._get_community_post_import_url(
-            "https://community.home-assistant.io/t/test-topic/123"
+            "https://community.smart-hub.io/t/test-topic/123"
         )
-        == "https://community.home-assistant.io/t/test-topic/123.json"
+        == "https://community.smart-hub.io/t/test-topic/123.json"
     )
 
     assert (
         importer._get_community_post_import_url(
-            "https://community.home-assistant.io/t/test-topic/123/2"
+            "https://community.smart-hub.io/t/test-topic/123/2"
         )
-        == "https://community.home-assistant.io/t/test-topic/123.json"
+        == "https://community.smart-hub.io/t/test-topic/123.json"
     )
 
 
@@ -41,16 +41,16 @@ def test_get_github_import_url() -> None:
     """Test getting github import url."""
     assert (
         importer._get_github_import_url(
-            "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml"
+            "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml"
         )
-        == "https://raw.githubusercontent.com/balloob/home-assistant-config/main/blueprints/automation/motion_light.yaml"
+        == "https://raw.githubusercontent.com/balloob/smart-hub-config/main/blueprints/automation/motion_light.yaml"
     )
 
     assert (
         importer._get_github_import_url(
-            "https://raw.githubusercontent.com/balloob/home-assistant-config/main/blueprints/automation/motion_light.yaml"
+            "https://raw.githubusercontent.com/balloob/smart-hub-config/main/blueprints/automation/motion_light.yaml"
         )
-        == "https://raw.githubusercontent.com/balloob/home-assistant-config/main/blueprints/automation/motion_light.yaml"
+        == "https://raw.githubusercontent.com/balloob/smart-hub-config/main/blueprints/automation/motion_light.yaml"
     )
 
 
@@ -68,7 +68,7 @@ def test_extract_blueprint_from_community_topic(
 
 def test_extract_blueprint_from_community_topic_invalid_yaml() -> None:
     """Test extracting blueprint with invalid YAML."""
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         importer._extract_blueprint_from_community_topic(
             "http://example.com",
             {
@@ -83,7 +83,7 @@ def test_extract_blueprint_from_community_topic_invalid_yaml() -> None:
 
 def test_extract_blueprint_from_community_topic_wrong_lang() -> None:
     """Test extracting blueprint with invalid YAML."""
-    with pytest.raises(importer.HomeAssistantError):
+    with pytest.raises(importer.SmartHubError):
         assert importer._extract_blueprint_from_community_topic(
             "http://example.com",
             {
@@ -97,17 +97,17 @@ def test_extract_blueprint_from_community_topic_wrong_lang() -> None:
 
 
 async def test_fetch_blueprint_from_community_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     community_post,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test fetching blueprint from url."""
     aioclient_mock.get(
-        "https://community.home-assistant.io/t/test-topic/123.json", text=community_post
+        "https://community.smart-hub.io/t/test-topic/123.json", text=community_post
     )
     imported_blueprint = await importer.fetch_blueprint_from_url(
-        hass, "https://community.home-assistant.io/t/test-topic/123/2"
+        hass, "https://community.smart-hub.io/t/test-topic/123/2"
     )
     assert isinstance(imported_blueprint, importer.ImportedBlueprint)
     assert imported_blueprint.blueprint.domain == "automation"
@@ -118,7 +118,7 @@ async def test_fetch_blueprint_from_community_url(
     )
     assert (
         imported_blueprint.blueprint.metadata["source_url"]
-        == "https://community.home-assistant.io/t/test-topic/123/2"
+        == "https://community.smart-hub.io/t/test-topic/123/2"
     )
     assert "gt;" not in imported_blueprint.raw_data
 
@@ -126,16 +126,16 @@ async def test_fetch_blueprint_from_community_url(
 @pytest.mark.parametrize(
     "url",
     [
-        "https://raw.githubusercontent.com/balloob/home-assistant-config/main/blueprints/automation/motion_light.yaml",
-        "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml",
+        "https://raw.githubusercontent.com/balloob/smart-hub-config/main/blueprints/automation/motion_light.yaml",
+        "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml",
     ],
 )
 async def test_fetch_blueprint_from_github_url(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, url: str
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, url: str
 ) -> None:
     """Test fetching blueprint from url."""
     aioclient_mock.get(
-        "https://raw.githubusercontent.com/balloob/home-assistant-config/main/blueprints/automation/motion_light.yaml",
+        "https://raw.githubusercontent.com/balloob/smart-hub-config/main/blueprints/automation/motion_light.yaml",
         text=Path(
             hass.config.path("blueprints/automation/test_event_service.yaml")
         ).read_text(encoding="utf8"),
@@ -154,7 +154,7 @@ async def test_fetch_blueprint_from_github_url(
 
 
 async def test_fetch_blueprint_from_github_gist_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -174,26 +174,26 @@ async def test_fetch_blueprint_from_github_gist_url(
 
 
 async def test_fetch_blueprint_from_website_url(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test fetching blueprint from url."""
     aioclient_mock.get(
-        "https://www.home-assistant.io/blueprints/awesome.yaml",
+        "https://www.smart-hub.io/blueprints/awesome.yaml",
         text=Path(
             hass.config.path("blueprints/automation/test_event_service.yaml")
         ).read_text(encoding="utf8"),
     )
 
-    url = "https://www.home-assistant.io/blueprints/awesome.yaml"
+    url = "https://www.smart-hub.io/blueprints/awesome.yaml"
     imported_blueprint = await importer.fetch_blueprint_from_url(hass, url)
     assert isinstance(imported_blueprint, importer.ImportedBlueprint)
     assert imported_blueprint.blueprint.domain == "automation"
-    assert imported_blueprint.suggested_filename == "homeassistant/awesome"
+    assert imported_blueprint.suggested_filename == "smarthub/awesome"
     assert imported_blueprint.blueprint.metadata["source_url"] == url
 
 
 async def test_fetch_blueprint_from_generic_url(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test fetching blueprint from url."""
     aioclient_mock.get(

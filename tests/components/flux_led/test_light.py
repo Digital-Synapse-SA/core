@@ -18,8 +18,8 @@ from flux_led.const import (
 from flux_led.protocol import MusicMode
 import pytest
 
-from homeassistant.components import flux_led
-from homeassistant.components.flux_led.const import (
+from smarthub.components import flux_led
+from smarthub.components.flux_led.const import (
     CONF_COLORS,
     CONF_CUSTOM_EFFECT_COLORS,
     CONF_CUSTOM_EFFECT_SPEED_PCT,
@@ -32,13 +32,13 @@ from homeassistant.components.flux_led.const import (
     MIN_RGB_BRIGHTNESS,
     TRANSITION_JUMP,
 )
-from homeassistant.components.flux_led.light import (
+from smarthub.components.flux_led.light import (
     ATTR_BACKGROUND_COLOR,
     ATTR_FOREGROUND_COLOR,
     ATTR_LIGHT_SCREEN,
     ATTR_SENSITIVITY,
 )
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
@@ -53,7 +53,7 @@ from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     ColorMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_EFFECT,
     CONF_HOST,
@@ -63,10 +63,10 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -83,7 +83,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_light_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a light unique id."""
     config_entry = MockConfigEntry(
@@ -104,7 +104,7 @@ async def test_light_unique_id(
 
 
 async def test_light_goes_unavailable_and_recovers(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a light goes unavailable and then recovers."""
     config_entry = MockConfigEntry(
@@ -139,7 +139,7 @@ async def test_light_goes_unavailable_and_recovers(
 
 
 async def test_light_mac_address_not_found(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a light when we cannot discover the mac address."""
     config_entry = MockConfigEntry(
@@ -165,7 +165,7 @@ async def test_light_mac_address_not_found(
     ],
 )
 async def test_light_device_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     protocol: str,
     sw_version: int,
@@ -196,7 +196,7 @@ async def test_light_device_registry(
     assert device.model == model
 
 
-async def test_rgb_light(hass: HomeAssistant) -> None:
+async def test_rgb_light(hass: SmartHub) -> None:
     """Test an rgb light."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -301,7 +301,7 @@ async def test_rgb_light(hass: HomeAssistant) -> None:
     bulb.async_set_effect.reset_mock()
 
 
-async def test_rgb_light_auto_on(hass: HomeAssistant) -> None:
+async def test_rgb_light_auto_on(hass: SmartHub) -> None:
     """Test an rgb light that does not need the turn on command sent."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -434,7 +434,7 @@ async def test_rgb_light_auto_on(hass: HomeAssistant) -> None:
     bulb.async_set_effect.reset_mock()
 
 
-async def test_rgbw_light_auto_on(hass: HomeAssistant) -> None:
+async def test_rgbw_light_auto_on(hass: SmartHub) -> None:
     """Test an rgbw light that does not need the turn on command sent."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -569,7 +569,7 @@ async def test_rgbw_light_auto_on(hass: HomeAssistant) -> None:
     bulb.async_set_effect.reset_mock()
 
 
-async def test_rgbww_light_auto_on(hass: HomeAssistant) -> None:
+async def test_rgbww_light_auto_on(hass: SmartHub) -> None:
     """Test an rgbww light that does not need the turn on command sent."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -687,7 +687,7 @@ async def test_rgbww_light_auto_on(hass: HomeAssistant) -> None:
     bulb.async_set_effect.reset_mock()
 
 
-async def test_rgb_cct_light(hass: HomeAssistant) -> None:
+async def test_rgb_cct_light(hass: SmartHub) -> None:
     """Test an rgb cct light."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -807,7 +807,7 @@ async def test_rgb_cct_light(hass: HomeAssistant) -> None:
     bulb.async_set_brightness.reset_mock()
 
 
-async def test_rgbw_light_cold_white(hass: HomeAssistant) -> None:
+async def test_rgbw_light_cold_white(hass: SmartHub) -> None:
     """Test an rgbw light with a cold white channel."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -913,7 +913,7 @@ async def test_rgbw_light_cold_white(hass: HomeAssistant) -> None:
     bulb.async_set_effect.reset_mock()
 
 
-async def test_rgbw_light_warm_white(hass: HomeAssistant) -> None:
+async def test_rgbw_light_warm_white(hass: SmartHub) -> None:
     """Test an rgbw light with a warm white channel."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1055,7 +1055,7 @@ async def test_rgbw_light_warm_white(hass: HomeAssistant) -> None:
     bulb.async_set_effect.reset_mock()
 
 
-async def test_rgb_or_w_light(hass: HomeAssistant) -> None:
+async def test_rgb_or_w_light(hass: SmartHub) -> None:
     """Test an rgb or w light."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1165,7 +1165,7 @@ async def test_rgb_or_w_light(hass: HomeAssistant) -> None:
     bulb.async_set_brightness.reset_mock()
 
 
-async def test_rgbcw_light(hass: HomeAssistant) -> None:
+async def test_rgbcw_light(hass: SmartHub) -> None:
     """Test an rgbcw light."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1323,7 +1323,7 @@ async def test_rgbcw_light(hass: HomeAssistant) -> None:
     bulb.async_set_white_temp.reset_mock()
 
 
-async def test_white_light(hass: HomeAssistant) -> None:
+async def test_white_light(hass: SmartHub) -> None:
     """Test a white light."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1374,7 +1374,7 @@ async def test_white_light(hass: HomeAssistant) -> None:
     bulb.async_set_brightness.reset_mock()
 
 
-async def test_no_color_modes(hass: HomeAssistant) -> None:
+async def test_no_color_modes(hass: SmartHub) -> None:
     """Test a light that has no color modes defined in the database."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1414,7 +1414,7 @@ async def test_no_color_modes(hass: HomeAssistant) -> None:
     bulb.async_turn_on.reset_mock()
 
 
-async def test_rgb_light_custom_effects(hass: HomeAssistant) -> None:
+async def test_rgb_light_custom_effects(hass: SmartHub) -> None:
     """Test an rgb light with a custom effect."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1493,7 +1493,7 @@ async def test_rgb_light_custom_effects(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("effect_colors", [":: CANNOT BE PARSED ::", None])
 async def test_rgb_light_custom_effects_invalid_colors(
-    hass: HomeAssistant, effect_colors: str
+    hass: SmartHub, effect_colors: str
 ) -> None:
     """Test an rgb light with a invalid effect."""
     options = {
@@ -1530,7 +1530,7 @@ async def test_rgb_light_custom_effects_invalid_colors(
 
 
 async def test_rgb_light_custom_effect_via_service(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test an rgb light with a custom effect set via the service."""
     config_entry = MockConfigEntry(
@@ -1612,7 +1612,7 @@ async def test_rgb_light_custom_effect_via_service(
     bulb.async_set_zones.reset_mock()
 
 
-async def test_addressable_light(hass: HomeAssistant) -> None:
+async def test_addressable_light(hass: SmartHub) -> None:
     """Test an addressable light."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1653,7 +1653,7 @@ async def test_addressable_light(hass: HomeAssistant) -> None:
     await async_mock_device_turn_on(hass, bulb)
 
 
-async def test_music_mode_service(hass: HomeAssistant) -> None:
+async def test_music_mode_service(hass: SmartHub) -> None:
     """Test music mode service."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

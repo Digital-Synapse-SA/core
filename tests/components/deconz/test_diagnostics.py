@@ -4,7 +4,7 @@ from pydeconz.websocket import State
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .conftest import WebsocketStateType
 
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry_setup: MockConfigEntry,
     mock_websocket_state: WebsocketStateType,

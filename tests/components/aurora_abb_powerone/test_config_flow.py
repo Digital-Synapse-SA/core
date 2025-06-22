@@ -5,20 +5,20 @@ from unittest.mock import patch
 from aurorapy.client import AuroraError, AuroraTimeoutError
 from serial.tools import list_ports_common
 
-from homeassistant import config_entries, setup
-from homeassistant.components.aurora_abb_powerone.const import (
+from smarthub import config_entries, setup
+from smarthub.components.aurora_abb_powerone.const import (
     ATTR_FIRMWARE,
     ATTR_MODEL,
     DOMAIN,
 )
-from homeassistant.const import ATTR_SERIAL_NUMBER, CONF_ADDRESS, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import ATTR_SERIAL_NUMBER, CONF_ADDRESS, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 TEST_DATA = {"device": "/dev/ttyUSB7", "address": 3, "name": "MyAuroraPV"}
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     await setup.async_setup_component(hass, "persistent_notification", {})
 
@@ -56,7 +56,7 @@ async def test_form(hass: HomeAssistant) -> None:
             return_value="1.234",
         ) as mock_setup,
         patch(
-            "homeassistant.components.aurora_abb_powerone.async_setup_entry",
+            "smarthub.components.aurora_abb_powerone.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -80,7 +80,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_no_comports(hass: HomeAssistant) -> None:
+async def test_form_no_comports(hass: SmartHub) -> None:
     """Test we display correct info when there are no com ports.."""
 
     fakecomports = []
@@ -95,7 +95,7 @@ async def test_form_no_comports(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_serial_ports"
 
 
-async def test_form_invalid_com_ports(hass: HomeAssistant) -> None:
+async def test_form_invalid_com_ports(hass: SmartHub) -> None:
     """Test we display correct info when the comport is invalid.."""
 
     fakecomports = []

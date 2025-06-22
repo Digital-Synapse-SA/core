@@ -1,23 +1,23 @@
-"""Test the Home Assistant Yellow integration."""
+"""Test the SmartHub Yellow integration."""
 
 from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import zha
-from homeassistant.components.hassio import DOMAIN as HASSIO_DOMAIN
-from homeassistant.components.homeassistant_hardware.util import (
+from smarthub.components import zha
+from smarthub.components.hassio import DOMAIN as HASSIO_DOMAIN
+from smarthub.components.smarthub_hardware.util import (
     ApplicationType,
     FirmwareInfo,
 )
-from homeassistant.components.homeassistant_yellow.config_flow import (
-    HomeAssistantYellowConfigFlow,
+from smarthub.components.smarthub_yellow.config_flow import (
+    SmartHubYellowConfigFlow,
 )
-from homeassistant.components.homeassistant_yellow.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components.smarthub_yellow.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, MockModule, mock_integration
 
@@ -26,7 +26,7 @@ from tests.common import MockConfigEntry, MockModule, mock_integration
     ("onboarded", "num_entries", "num_flows"), [(False, 1, 0), (True, 0, 1)]
 )
 async def test_setup_entry(
-    hass: HomeAssistant, onboarded, num_entries, num_flows, addon_store_info
+    hass: SmartHub, onboarded, num_entries, num_flows, addon_store_info
 ) -> None:
     """Test setup of a config entry, including setup of zha."""
     mock_integration(hass, MockModule("hassio"))
@@ -37,22 +37,22 @@ async def test_setup_entry(
         data={"firmware": ApplicationType.EZSP},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.homeassistant_yellow.get_os_info",
+            "smarthub.components.smarthub_yellow.get_os_info",
             return_value={"board": "yellow"},
         ) as mock_get_os_info,
         patch(
-            "homeassistant.components.onboarding.async_is_onboarded",
+            "smarthub.components.onboarding.async_is_onboarded",
             return_value=onboarded,
         ),
         patch(
-            "homeassistant.components.homeassistant_yellow.guess_firmware_info",
+            "smarthub.components.smarthub_yellow.guess_firmware_info",
             return_value=FirmwareInfo(  # Nothing is setup
                 device="/dev/ttyAMA1",
                 firmware_version=None,
@@ -86,7 +86,7 @@ async def test_setup_entry(
     assert await hass.config_entries.async_unload(config_entry.entry_id)
 
 
-async def test_setup_zha(hass: HomeAssistant, addon_store_info) -> None:
+async def test_setup_zha(hass: SmartHub, addon_store_info) -> None:
     """Test zha gets the right config."""
     mock_integration(hass, MockModule("hassio"))
     await async_setup_component(hass, HASSIO_DOMAIN, {})
@@ -96,18 +96,18 @@ async def test_setup_zha(hass: HomeAssistant, addon_store_info) -> None:
         data={"firmware": ApplicationType.EZSP},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.homeassistant_yellow.get_os_info",
+            "smarthub.components.smarthub_yellow.get_os_info",
             return_value={"board": "yellow"},
         ) as mock_get_os_info,
         patch(
-            "homeassistant.components.onboarding.async_is_onboarded", return_value=False
+            "smarthub.components.onboarding.async_is_onboarded", return_value=False
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -138,14 +138,14 @@ async def test_setup_zha(hass: HomeAssistant, addon_store_info) -> None:
     assert config_entry.title == "Yellow"
 
 
-async def test_setup_entry_no_hassio(hass: HomeAssistant) -> None:
+async def test_setup_entry_no_hassio(hass: SmartHub) -> None:
     """Test setup of a config entry without hassio."""
     # Setup the config entry
     config_entry = MockConfigEntry(
         data={"firmware": ApplicationType.EZSP},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
@@ -153,7 +153,7 @@ async def test_setup_entry_no_hassio(hass: HomeAssistant) -> None:
     assert len(hass.config_entries.async_entries()) == 1
 
     with patch(
-        "homeassistant.components.homeassistant_yellow.get_os_info"
+        "smarthub.components.smarthub_yellow.get_os_info"
     ) as mock_get_os_info:
         assert not await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()
@@ -162,7 +162,7 @@ async def test_setup_entry_no_hassio(hass: HomeAssistant) -> None:
     assert len(hass.config_entries.async_entries()) == 0
 
 
-async def test_setup_entry_wrong_board(hass: HomeAssistant) -> None:
+async def test_setup_entry_wrong_board(hass: SmartHub) -> None:
     """Test setup of a config entry with wrong board type."""
     mock_integration(hass, MockModule("hassio"))
     await async_setup_component(hass, HASSIO_DOMAIN, {})
@@ -172,7 +172,7 @@ async def test_setup_entry_wrong_board(hass: HomeAssistant) -> None:
         data={"firmware": ApplicationType.EZSP},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
@@ -180,7 +180,7 @@ async def test_setup_entry_wrong_board(hass: HomeAssistant) -> None:
     assert len(hass.config_entries.async_entries()) == 1
 
     with patch(
-        "homeassistant.components.homeassistant_yellow.get_os_info",
+        "smarthub.components.smarthub_yellow.get_os_info",
         return_value={"board": "generic-x86-64"},
     ) as mock_get_os_info:
         assert not await hass.config_entries.async_setup(config_entry.entry_id)
@@ -190,7 +190,7 @@ async def test_setup_entry_wrong_board(hass: HomeAssistant) -> None:
     assert len(hass.config_entries.async_entries()) == 0
 
 
-async def test_setup_entry_wait_hassio(hass: HomeAssistant) -> None:
+async def test_setup_entry_wait_hassio(hass: SmartHub) -> None:
     """Test setup of a config entry when hassio has not fetched os_info."""
     mock_integration(hass, MockModule("hassio"))
     await async_setup_component(hass, HASSIO_DOMAIN, {})
@@ -200,13 +200,13 @@ async def test_setup_entry_wait_hassio(hass: HomeAssistant) -> None:
         data={"firmware": ApplicationType.EZSP},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
     config_entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.homeassistant_yellow.get_os_info",
+        "smarthub.components.smarthub_yellow.get_os_info",
         return_value=None,
     ) as mock_get_os_info:
         assert not await hass.config_entries.async_setup(config_entry.entry_id)
@@ -217,7 +217,7 @@ async def test_setup_entry_wait_hassio(hass: HomeAssistant) -> None:
 
 
 async def test_setup_entry_addon_info_fails(
-    hass: HomeAssistant, addon_store_info
+    hass: SmartHub, addon_store_info
 ) -> None:
     """Test setup of a config entry when fetching addon info fails."""
     mock_integration(hass, MockModule("hassio"))
@@ -228,23 +228,23 @@ async def test_setup_entry_addon_info_fails(
         data={"firmware": ApplicationType.CPC},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.homeassistant_yellow.get_os_info",
+            "smarthub.components.smarthub_yellow.get_os_info",
             return_value={"board": "yellow"},
         ),
         patch(
-            "homeassistant.components.onboarding.async_is_onboarded",
+            "smarthub.components.onboarding.async_is_onboarded",
             return_value=False,
         ),
         patch(
-            "homeassistant.components.homeassistant_yellow.check_multi_pan_addon",
-            side_effect=HomeAssistantError("Boom"),
+            "smarthub.components.smarthub_yellow.check_multi_pan_addon",
+            side_effect=SmartHubError("Boom"),
         ),
     ):
         assert not await hass.config_entries.async_setup(config_entry.entry_id)
@@ -272,7 +272,7 @@ async def test_setup_entry_addon_info_fails(
     ],
 )
 async def test_migrate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     start_version: int,
     data: dict,
     migrated_data: dict,
@@ -286,7 +286,7 @@ async def test_migrate_entry(
         data=data,
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=start_version,
     )
@@ -294,15 +294,15 @@ async def test_migrate_entry(
 
     with (
         patch(
-            "homeassistant.components.homeassistant_yellow.get_os_info",
+            "smarthub.components.smarthub_yellow.get_os_info",
             return_value={"board": "yellow"},
         ),
         patch(
-            "homeassistant.components.onboarding.async_is_onboarded",
+            "smarthub.components.onboarding.async_is_onboarded",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.homeassistant_yellow.guess_firmware_info",
+            "smarthub.components.smarthub_yellow.guess_firmware_info",
             return_value=FirmwareInfo(  # Nothing is setup
                 device="/dev/ttyAMA1",
                 firmware_version="1234",
@@ -317,5 +317,5 @@ async def test_migrate_entry(
 
     assert config_entry.data == migrated_data
     assert config_entry.options == {}
-    assert config_entry.minor_version == HomeAssistantYellowConfigFlow.MINOR_VERSION
-    assert config_entry.version == HomeAssistantYellowConfigFlow.VERSION
+    assert config_entry.minor_version == SmartHubYellowConfigFlow.MINOR_VERSION
+    assert config_entry.version == SmartHubYellowConfigFlow.VERSION

@@ -1,0 +1,9 @@
+{
+  "domain": "flux",
+  "name": "Flux",
+  "after_dependencies": ["light"],
+  "codeowners": [],
+  "documentation": "https://www.smart-hub.io/integrations/flux",
+  "iot_class": "calculated",
+  "quality_scale": "internal"
+}

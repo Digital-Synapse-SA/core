@@ -3,7 +3,7 @@
 from bleak.backends.scanner import AdvertisementData
 import pytest
 
-from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
+from smarthub.components.bluetooth import BluetoothServiceInfoBleak
 
 from .const import MAC
 

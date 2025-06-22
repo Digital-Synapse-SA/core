@@ -7,11 +7,11 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from tesla_fleet_api.exceptions import NotOnWhitelistFault
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, setup_platform
 from .const import COMMAND_OK
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     normal_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -50,7 +50,7 @@ async def test_button(
     ],
 )
 async def test_press(
-    hass: HomeAssistant, normal_config_entry: MockConfigEntry, name: str, func: str
+    hass: SmartHub, normal_config_entry: MockConfigEntry, name: str, func: str
 ) -> None:
     """Test pressing the API buttons."""
     await setup_platform(hass, normal_config_entry, [Platform.BUTTON])
@@ -69,7 +69,7 @@ async def test_press(
 
 
 async def test_press_signing_error(
-    hass: HomeAssistant, normal_config_entry: MockConfigEntry, mock_products: AsyncMock
+    hass: SmartHub, normal_config_entry: MockConfigEntry, mock_products: AsyncMock
 ) -> None:
     """Test pressing a button with a signing error."""
     # Enable Signing
@@ -78,17 +78,17 @@ async def test_press_signing_error(
     mock_products.return_value = new_product
 
     with (
-        patch("homeassistant.components.tesla_fleet.TeslaFleetApi.get_private_key"),
+        patch("smarthub.components.tesla_fleet.TeslaFleetApi.get_private_key"),
     ):
         await setup_platform(hass, normal_config_entry, [Platform.BUTTON])
 
     with (
-        patch("homeassistant.components.tesla_fleet.TeslaFleetApi.get_private_key"),
+        patch("smarthub.components.tesla_fleet.TeslaFleetApi.get_private_key"),
         patch(
             "tesla_fleet_api.tesla.VehicleSigned.flash_lights",
             side_effect=NotOnWhitelistFault,
         ),
-        pytest.raises(HomeAssistantError) as error,
+        pytest.raises(SmartHubError) as error,
     ):
         await hass.services.async_call(
             BUTTON_DOMAIN,

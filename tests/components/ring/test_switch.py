@@ -6,10 +6,10 @@ import pytest
 import ring_doorbell
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ring.const import DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry
-from homeassistant.const import (
+from smarthub.components.ring.const import DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntry
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -17,9 +17,9 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .common import MockConfigEntry, setup_platform
 
@@ -28,7 +28,7 @@ from tests.common import snapshot_platform
 
 @pytest.fixture
 def create_deprecated_siren_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ):
@@ -51,7 +51,7 @@ def create_deprecated_siren_entity(
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -66,7 +66,7 @@ async def test_states(
 
 
 async def test_siren_off_reports_correctly(
-    hass: HomeAssistant, mock_ring_client, create_deprecated_siren_entity
+    hass: SmartHub, mock_ring_client, create_deprecated_siren_entity
 ) -> None:
     """Tests that the initial state of a device that should be off is correct."""
     await setup_platform(hass, Platform.SWITCH)
@@ -77,7 +77,7 @@ async def test_siren_off_reports_correctly(
 
 
 async def test_siren_on_reports_correctly(
-    hass: HomeAssistant, mock_ring_client, create_deprecated_siren_entity
+    hass: SmartHub, mock_ring_client, create_deprecated_siren_entity
 ) -> None:
     """Tests that the initial state of a device that should be on is correct."""
     await setup_platform(hass, Platform.SWITCH)
@@ -96,7 +96,7 @@ async def test_siren_on_reports_correctly(
     ],
 )
 async def test_switch_can_be_turned_on_and_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     create_deprecated_siren_entity,
     entity_id,
@@ -139,7 +139,7 @@ async def test_switch_can_be_turned_on_and_off(
     ids=["Authentication", "Timeout", "Other"],
 )
 async def test_switch_errors_when_turned_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     mock_ring_devices,
     exception_type,
@@ -155,7 +155,7 @@ async def test_switch_errors_when_turned_on(
     front_siren_mock = mock_ring_devices.get_device(765432)
     front_siren_mock.async_set_siren.side_effect = exception_type
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "switch", "turn_on", {"entity_id": "switch.front_siren"}, blocking=True
         )

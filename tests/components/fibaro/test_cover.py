@@ -2,10 +2,10 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.components.cover import CoverEntityFeature, CoverState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.cover import CoverEntityFeature, CoverState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import init_integration
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_positionable_cover_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
@@ -26,7 +26,7 @@ async def test_positionable_cover_setup(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_positionable_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         # Assert
@@ -43,7 +43,7 @@ async def test_positionable_cover_setup(
 
 
 async def test_cover_opening(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_positionable_cover: Mock,
@@ -55,7 +55,7 @@ async def test_cover_opening(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_positionable_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         # Assert
@@ -63,7 +63,7 @@ async def test_cover_opening(
 
 
 async def test_cover_opening_closing_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_positionable_cover: Mock,
@@ -76,7 +76,7 @@ async def test_cover_opening_closing_none(
     mock_positionable_cover.state.str_value.return_value = ""
     mock_fibaro_client.read_devices.return_value = [mock_positionable_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         # Assert
@@ -84,7 +84,7 @@ async def test_cover_opening_closing_none(
 
 
 async def test_cover_closing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_positionable_cover: Mock,
@@ -97,7 +97,7 @@ async def test_cover_closing(
     mock_positionable_cover.state.str_value.return_value = "closing"
     mock_fibaro_client.read_devices.return_value = [mock_positionable_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         # Assert
@@ -105,7 +105,7 @@ async def test_cover_closing(
 
 
 async def test_cover_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
@@ -118,7 +118,7 @@ async def test_cover_setup(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         # Assert
@@ -137,7 +137,7 @@ async def test_cover_setup(
 
 
 async def test_cover_open_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_cover: Mock,
@@ -149,7 +149,7 @@ async def test_cover_open_action(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         await hass.services.async_call(
@@ -164,7 +164,7 @@ async def test_cover_open_action(
 
 
 async def test_cover_close_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_cover: Mock,
@@ -176,7 +176,7 @@ async def test_cover_close_action(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         await hass.services.async_call(
@@ -191,7 +191,7 @@ async def test_cover_close_action(
 
 
 async def test_cover_stop_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_cover: Mock,
@@ -203,7 +203,7 @@ async def test_cover_stop_action(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         await hass.services.async_call(
@@ -218,7 +218,7 @@ async def test_cover_stop_action(
 
 
 async def test_cover_open_slats_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_cover: Mock,
@@ -230,7 +230,7 @@ async def test_cover_open_slats_action(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         await hass.services.async_call(
@@ -245,7 +245,7 @@ async def test_cover_open_slats_action(
 
 
 async def test_cover_close_tilt_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_cover: Mock,
@@ -257,7 +257,7 @@ async def test_cover_close_tilt_action(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         await hass.services.async_call(
@@ -272,7 +272,7 @@ async def test_cover_close_tilt_action(
 
 
 async def test_cover_stop_slats_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
     mock_cover: Mock,
@@ -284,7 +284,7 @@ async def test_cover_stop_slats_action(
     mock_fibaro_client.read_rooms.return_value = [mock_room]
     mock_fibaro_client.read_devices.return_value = [mock_cover]
 
-    with patch("homeassistant.components.fibaro.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fibaro.PLATFORMS", [Platform.COVER]):
         # Act
         await init_integration(hass, mock_config_entry)
         await hass.services.async_call(

@@ -4,21 +4,21 @@ from unittest.mock import ANY, Mock
 
 from pytest_unordered import unordered
 
-from homeassistant.components.device_tracker import DOMAIN as DT_DOMAIN
-from homeassistant.components.freebox.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_PORT, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.device_tracker import DOMAIN as DT_DOMAIN
+from smarthub.components.freebox.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_PORT, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import MOCK_HOST, MOCK_PORT
 
 from tests.common import MockConfigEntry
 
 
-async def test_setup(hass: HomeAssistant, router: Mock) -> None:
+async def test_setup(hass: SmartHub, router: Mock) -> None:
     """Test setup of integration."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -34,7 +34,7 @@ async def test_setup(hass: HomeAssistant, router: Mock) -> None:
     assert router().open.call_count == 1
 
 
-async def test_setup_import(hass: HomeAssistant, router: Mock) -> None:
+async def test_setup_import(hass: SmartHub, router: Mock) -> None:
     """Test setup of integration from import."""
 
     entry = MockConfigEntry(
@@ -53,7 +53,7 @@ async def test_setup_import(hass: HomeAssistant, router: Mock) -> None:
     assert router().open.call_count == 1
 
 
-async def test_unload_remove(hass: HomeAssistant, router: Mock) -> None:
+async def test_unload_remove(hass: SmartHub, router: Mock) -> None:
     """Test unload and remove of integration."""
     entity_id_dt = f"{DT_DOMAIN}.freebox_server_r2"
     entity_id_sensor = f"{SENSOR_DOMAIN}.freebox_download_speed"

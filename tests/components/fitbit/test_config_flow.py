@@ -8,11 +8,11 @@ from unittest.mock import patch
 import pytest
 from requests_mock.mocker import Mocker
 
-from homeassistant import config_entries
-from homeassistant.components.fitbit.const import DOMAIN, OAUTH2_AUTHORIZE, OAUTH2_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub import config_entries
+from smarthub.components.fitbit.const import DOMAIN, OAUTH2_AUTHORIZE, OAUTH2_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .conftest import (
     CLIENT_ID,
@@ -33,7 +33,7 @@ REDIRECT_URL = "https://example.com/auth/external/callback"
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     profile: None,
@@ -69,7 +69,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.fitbit.async_setup_entry", return_value=True
+        "smarthub.components.fitbit.async_setup_entry", return_value=True
     ) as mock_setup:
         await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -98,7 +98,7 @@ async def test_full_flow(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_token_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     profile: None,
@@ -156,7 +156,7 @@ async def test_token_error(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_api_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     requests_mock: Mocker,
@@ -208,7 +208,7 @@ async def test_api_failure(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_config_entry_already_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     setup_credentials: None,
@@ -256,7 +256,7 @@ async def test_config_entry_already_exists(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
@@ -309,7 +309,7 @@ async def test_reauth_flow(
     )
 
     with patch(
-        "homeassistant.components.fitbit.async_setup_entry", return_value=True
+        "smarthub.components.fitbit.async_setup_entry", return_value=True
     ) as mock_setup:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -325,7 +325,7 @@ async def test_reauth_flow(
 @pytest.mark.parametrize("profile_id", ["other-user-id"])
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_wrong_user_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
@@ -377,7 +377,7 @@ async def test_reauth_wrong_user_id(
     )
 
     with patch(
-        "homeassistant.components.fitbit.async_setup_entry", return_value=True
+        "smarthub.components.fitbit.async_setup_entry", return_value=True
     ) as mock_setup:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -397,7 +397,7 @@ async def test_reauth_wrong_user_id(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_partial_profile_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     profile: None,
@@ -433,7 +433,7 @@ async def test_partial_profile_data(
     )
 
     with patch(
-        "homeassistant.components.fitbit.async_setup_entry", return_value=True
+        "smarthub.components.fitbit.async_setup_entry", return_value=True
     ) as mock_setup:
         await hass.config_entries.flow.async_configure(result["flow_id"])
 

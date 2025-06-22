@@ -5,12 +5,12 @@ from unittest.mock import patch
 from pysnmp.hlapi.asyncio import SnmpEngine
 from pysnmp.hlapi.asyncio.cmdgen import lcd
 
-from homeassistant.components import snmp
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
+from smarthub.components import snmp
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
 
 
-async def test_async_get_snmp_engine(hass: HomeAssistant) -> None:
+async def test_async_get_snmp_engine(hass: SmartHub) -> None:
     """Test async_get_snmp_engine."""
     engine = await snmp.async_get_snmp_engine(hass)
     assert isinstance(engine, SnmpEngine)

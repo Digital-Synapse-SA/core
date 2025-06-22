@@ -9,22 +9,22 @@ import pytest
 from telegram import Bot, Chat, ChatFullInfo, Message, User
 from telegram.constants import AccentColor, ChatType
 
-from homeassistant.components.telegram_bot import (
+from smarthub.components.telegram_bot import (
     ATTR_PARSER,
     CONF_ALLOWED_CHAT_IDS,
     CONF_TRUSTED_NETWORKS,
     DOMAIN,
     PARSER_MD,
 )
-from homeassistant.components.telegram_bot.const import (
+from smarthub.components.telegram_bot.const import (
     CONF_CHAT_ID,
     PLATFORM_BROADCAST,
     PLATFORM_WEBHOOKS,
 )
-from homeassistant.config_entries import ConfigSubentryData
-from homeassistant.const import CONF_API_KEY, CONF_PLATFORM, CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigSubentryData
+from smarthub.const import CONF_API_KEY, CONF_PLATFORM, CONF_URL
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -74,11 +74,11 @@ def mock_register_webhook() -> Generator[None]:
     """Mock calls made by telegram_bot when (de)registering webhook."""
     with (
         patch(
-            "homeassistant.components.telegram_bot.webhooks.PushBot.register_webhook",
+            "smarthub.components.telegram_bot.webhooks.PushBot.register_webhook",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.telegram_bot.webhooks.PushBot.deregister_webhook",
+            "smarthub.components.telegram_bot.webhooks.PushBot.deregister_webhook",
             return_value=True,
         ),
     ):
@@ -117,7 +117,7 @@ def mock_external_calls() -> Generator[None]:
             return True
 
     with (
-        patch("homeassistant.components.telegram_bot.bot.Bot", BotMock),
+        patch("smarthub.components.telegram_bot.bot.Bot", BotMock),
         patch.object(BotMock, "get_chat", return_value=test_chat),
         patch.object(BotMock, "get_me", return_value=test_user),
         patch.object(BotMock, "bot", test_user),
@@ -140,7 +140,7 @@ def mock_generate_secret_token() -> Generator[str]:
     """Mock secret token generated for webhook."""
     mock_secret_token = "DEADBEEF12345678DEADBEEF87654321"
     with patch(
-        "homeassistant.components.telegram_bot.webhooks.secrets.choice",
+        "smarthub.components.telegram_bot.webhooks.secrets.choice",
         side_effect=mock_secret_token,
     ):
         yield mock_secret_token
@@ -292,7 +292,7 @@ def mock_webhooks_config_entry() -> MockConfigEntry:
 
 @pytest.fixture
 async def webhook_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_webhooks: dict[str, Any],
     mock_register_webhook: None,
     mock_external_calls: None,
@@ -311,11 +311,11 @@ async def webhook_platform(
 
 @pytest.fixture
 async def polling_platform(
-    hass: HomeAssistant, config_polling: dict[str, Any], mock_external_calls: None
+    hass: SmartHub, config_polling: dict[str, Any], mock_external_calls: None
 ) -> None:
     """Fixture for setting up the polling platform using appropriate config and mocks."""
     with patch(
-        "homeassistant.components.telegram_bot.polling.ApplicationBuilder"
+        "smarthub.components.telegram_bot.polling.ApplicationBuilder"
     ) as application_builder_class:
         application = (
             application_builder_class.return_value.bot.return_value.build.return_value

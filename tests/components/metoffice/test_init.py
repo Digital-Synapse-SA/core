@@ -6,10 +6,10 @@ import json
 import pytest
 import requests_mock
 
-from homeassistant.components.metoffice.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.util import utcnow
+from smarthub.components.metoffice.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.util import utcnow
 
 from .const import METOFFICE_CONFIG_WAVERTREE
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, async_load_fi
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_reauth_on_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock: requests_mock.Mocker,
     device_registry: dr.DeviceRegistry,
 ) -> None:

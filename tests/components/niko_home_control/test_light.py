@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import ATTR_BRIGHTNESS, DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import (
+from smarthub.components.light import ATTR_BRIGHTNESS, DOMAIN as LIGHT_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -15,8 +15,8 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import find_update_callback, setup_integration
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_niko_home_control_connection: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -32,7 +32,7 @@ async def test_entities(
 ) -> None:
     """Test all entities."""
     with patch(
-        "homeassistant.components.niko_home_control.PLATFORMS", [Platform.LIGHT]
+        "smarthub.components.niko_home_control.PLATFORMS", [Platform.LIGHT]
     ):
         await setup_integration(hass, mock_config_entry)
 
@@ -51,7 +51,7 @@ async def test_entities(
     ],
 )
 async def test_turning_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_niko_home_control_connection: AsyncMock,
     mock_config_entry: MockConfigEntry,
     light_id: int,
@@ -80,7 +80,7 @@ async def test_turning_on(
     ],
 )
 async def test_turning_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_niko_home_control_connection: AsyncMock,
     mock_config_entry: MockConfigEntry,
     light_id: int,
@@ -101,7 +101,7 @@ async def test_turning_off(
 
 
 async def test_updating(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_niko_home_control_connection: AsyncMock,
     mock_config_entry: MockConfigEntry,
     light: AsyncMock,

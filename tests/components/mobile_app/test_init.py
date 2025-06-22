@@ -6,18 +6,18 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components.cloud import CloudNotAvailable
-from homeassistant.components.mobile_app.const import (
+from smarthub.components.cloud import CloudNotAvailable
+from smarthub.components.mobile_app.const import (
     ATTR_DEVICE_NAME,
     CONF_CLOUDHOOK_URL,
     CONF_USER_ID,
     DATA_DELETED_IDS,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import ATTR_DEVICE_ID, CONF_WEBHOOK_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.const import ATTR_DEVICE_ID, CONF_WEBHOOK_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .const import CALL_SERVICE, REGISTER_CLEARTEXT
 
@@ -30,7 +30,7 @@ from tests.common import (
 
 
 @pytest.mark.usefixtures("create_registrations")
-async def test_unload_unloads(hass: HomeAssistant, webhook_client) -> None:
+async def test_unload_unloads(hass: SmartHub, webhook_client) -> None:
     """Test we clean up when we unload."""
     # Second config entry is the one without encryption
     config_entry = hass.config_entries.async_entries("mobile_app")[1]
@@ -50,7 +50,7 @@ async def test_unload_unloads(hass: HomeAssistant, webhook_client) -> None:
 
 @pytest.mark.usefixtures("create_registrations")
 async def test_remove_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -64,7 +64,7 @@ async def test_remove_entry(
 
 
 async def _test_create_cloud_hook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
     additional_config: dict[str, Any],
     async_active_subscription_return_value: bool,
@@ -86,13 +86,13 @@ async def _test_create_cloud_hook(
 
     with (
         patch(
-            "homeassistant.components.cloud.async_active_subscription",
+            "smarthub.components.cloud.async_active_subscription",
             return_value=async_active_subscription_return_value,
         ),
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_get_or_create_cloudhook",
+            "smarthub.components.cloud.async_get_or_create_cloudhook",
             autospec=True,
         ) as mock_async_get_or_create_cloudhook,
     ):
@@ -108,7 +108,7 @@ async def _test_create_cloud_hook(
 
 
 async def test_create_cloud_hook_on_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
 ) -> None:
     """Test creating a cloud hook during setup."""
@@ -126,7 +126,7 @@ async def test_create_cloud_hook_on_setup(
 
 @pytest.mark.parametrize("exception", [CloudNotAvailable, ValueError])
 async def test_remove_cloudhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
     caplog: pytest.LogCaptureFixture,
     exception: Exception,
@@ -139,7 +139,7 @@ async def test_remove_cloudhook(
         webhook_id = config_entry.data[CONF_WEBHOOK_ID]
         assert config_entry.data[CONF_CLOUDHOOK_URL] == cloud_hook
         with patch(
-            "homeassistant.components.cloud.async_delete_cloudhook",
+            "smarthub.components.cloud.async_delete_cloudhook",
             side_effect=exception,
         ) as delete_cloudhook:
             await hass.config_entries.async_remove(config_entry.entry_id)
@@ -151,7 +151,7 @@ async def test_remove_cloudhook(
 
 
 async def test_create_cloud_hook_aleady_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
 ) -> None:
     """Test creating a cloud hook is not called, when a cloud hook already exists."""
@@ -169,7 +169,7 @@ async def test_create_cloud_hook_aleady_exists(
 
 
 async def test_create_cloud_hook_after_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
 ) -> None:
     """Test creating a cloud hook when connected to the cloud."""
@@ -195,7 +195,7 @@ async def test_create_cloud_hook_after_connection(
     [(True, True), (False, False)],
 )
 async def test_delete_cloud_hook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
     cloud_logged_in: bool,
     should_cloudhook_exist: bool,
@@ -218,7 +218,7 @@ async def test_delete_cloud_hook(
 
     with (
         patch(
-            "homeassistant.components.cloud.async_is_logged_in",
+            "smarthub.components.cloud.async_is_logged_in",
             return_value=cloud_logged_in,
         ),
     ):
@@ -229,7 +229,7 @@ async def test_delete_cloud_hook(
 
 
 async def test_remove_entry_on_user_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
 ) -> None:
     """Test removing related config entry, when a user gets removed from HA."""

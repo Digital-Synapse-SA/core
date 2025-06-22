@@ -2,13 +2,13 @@
 
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_airzone_create_sensors(hass: HomeAssistant) -> None:
+async def test_airzone_create_sensors(hass: SmartHub) -> None:
     """Test creation of sensors."""
 
     await async_init_integration(hass)

@@ -6,16 +6,16 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.devolo_home_network.const import (
+from smarthub.components.devolo_home_network.const import (
     DOMAIN,
     FIRMWARE_UPDATE_INTERVAL,
 )
-from homeassistant.components.update import DOMAIN as PLATFORM, SERVICE_INSTALL
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.update import DOMAIN as PLATFORM, SERVICE_INSTALL
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import configure_integration
 from .const import FIRMWARE_UPDATE_AVAILABLE
@@ -26,7 +26,7 @@ from tests.common import async_fire_time_changed
 
 @pytest.mark.usefixtures("mock_device")
 async def test_update_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test default setup of the update component."""
@@ -40,7 +40,7 @@ async def test_update_setup(
 
 
 async def test_update_firmware(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -89,7 +89,7 @@ async def test_update_firmware(
 
 
 async def test_device_failure_check(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -115,7 +115,7 @@ async def test_device_failure_check(
 
 
 async def test_device_failure_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
 ) -> None:
     """Test device failure when starting update."""
@@ -129,7 +129,7 @@ async def test_device_failure_update(
     mock_device.device.async_start_firmware_update.side_effect = DeviceUnavailable
 
     # Emulate update start
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             PLATFORM,
             SERVICE_INSTALL,
@@ -138,7 +138,7 @@ async def test_device_failure_update(
         )
 
 
-async def test_auth_failed(hass: HomeAssistant, mock_device: MockDevice) -> None:
+async def test_auth_failed(hass: SmartHub, mock_device: MockDevice) -> None:
     """Test updating unauthorized triggers the reauth flow."""
     entry = configure_integration(hass)
     device_name = entry.title.replace(" ", "_").lower()
@@ -149,7 +149,7 @@ async def test_auth_failed(hass: HomeAssistant, mock_device: MockDevice) -> None
 
     mock_device.device.async_start_firmware_update.side_effect = DevicePasswordProtected
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         assert await hass.services.async_call(
             PLATFORM,
             SERVICE_INSTALL,

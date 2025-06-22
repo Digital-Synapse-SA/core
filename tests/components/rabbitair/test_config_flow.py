@@ -9,13 +9,13 @@ from unittest.mock import MagicMock, Mock, patch
 import pytest
 from rabbitair import Mode, Model, Speed
 
-from homeassistant import config_entries
-from homeassistant.components.rabbitair.const import DOMAIN
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_HOST, CONF_MAC
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.device_registry import format_mac
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.rabbitair.const import DOMAIN
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_HOST, CONF_MAC
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.device_registry import format_mac
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 TEST_HOST = "1.1.1.1"
 TEST_NAME = "abcdef1234_123456789012345678"
@@ -79,7 +79,7 @@ def get_mock_state(
 
 
 @pytest.mark.usefixtures("rabbitair_connect")
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -88,7 +88,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert not result["errors"]
 
     with patch(
-        "homeassistant.components.rabbitair.async_setup_entry",
+        "smarthub.components.rabbitair.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -121,7 +121,7 @@ async def test_form(hass: HomeAssistant) -> None:
     ],
 )
 async def test_form_cannot_connect(
-    hass: HomeAssistant, error_type: type[Exception], base_value: str
+    hass: SmartHub, error_type: type[Exception], base_value: str
 ) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
@@ -146,7 +146,7 @@ async def test_form_cannot_connect(
     assert result2["errors"] == {"base": base_value}
 
 
-async def test_form_unknown_error(hass: HomeAssistant) -> None:
+async def test_form_unknown_error(hass: SmartHub) -> None:
     """Test we handle unknown error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -155,7 +155,7 @@ async def test_form_unknown_error(hass: HomeAssistant) -> None:
     assert not result["errors"]
 
     with patch(
-        "homeassistant.components.rabbitair.config_flow.validate_input",
+        "smarthub.components.rabbitair.config_flow.validate_input",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -171,7 +171,7 @@ async def test_form_unknown_error(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("rabbitair_connect")
-async def test_zeroconf_discovery(hass: HomeAssistant) -> None:
+async def test_zeroconf_discovery(hass: SmartHub) -> None:
     """Test zeroconf discovery setup flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_ZEROCONF}, data=ZEROCONF_DATA
@@ -181,7 +181,7 @@ async def test_zeroconf_discovery(hass: HomeAssistant) -> None:
     assert not result["errors"]
 
     with patch(
-        "homeassistant.components.rabbitair.async_setup_entry",
+        "smarthub.components.rabbitair.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(

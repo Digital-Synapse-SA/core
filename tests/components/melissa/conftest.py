@@ -4,17 +4,17 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.melissa import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.melissa import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import async_load_json_object_fixture
 
 
 @pytest.fixture
-async def mock_melissa(hass: HomeAssistant):
+async def mock_melissa(hass: SmartHub):
     """Mock the Melissa API."""
     with patch(
-        "homeassistant.components.melissa.AsyncMelissa", autospec=True
+        "smarthub.components.melissa.AsyncMelissa", autospec=True
     ) as mock_client:
         mock_client.return_value.async_connect = AsyncMock()
         mock_client.return_value.async_fetch_devices.return_value = (

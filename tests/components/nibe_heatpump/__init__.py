@@ -8,9 +8,9 @@ from nibe.connection import Connection
 from nibe.exceptions import ReadException
 from nibe.heatpump import HeatPump, Model
 
-from homeassistant.components.nibe_heatpump import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.nibe_heatpump import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -57,7 +57,7 @@ class MockConnection(Connection):
         self.heatpump.notify_coil_update(CoilData(coil, value))
 
 
-async def async_add_entry(hass: HomeAssistant, data: dict[str, Any]) -> MockConfigEntry:
+async def async_add_entry(hass: SmartHub, data: dict[str, Any]) -> MockConfigEntry:
     """Add entry and get the coordinator."""
     entry = MockConfigEntry(domain=DOMAIN, title="Dummy", data=data)
 
@@ -68,6 +68,6 @@ async def async_add_entry(hass: HomeAssistant, data: dict[str, Any]) -> MockConf
     return entry
 
 
-async def async_add_model(hass: HomeAssistant, model: Model) -> MockConfigEntry:
+async def async_add_model(hass: SmartHub, model: Model) -> MockConfigEntry:
     """Add entry of specific model."""
     return await async_add_entry(hass, {**MOCK_ENTRY_DATA, "model": model.name})

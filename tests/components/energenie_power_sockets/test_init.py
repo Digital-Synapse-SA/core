@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 from pyegps.exceptions import UsbError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     valid_config_entry: MockConfigEntry,
     mock_get_device: MagicMock,
 ) -> None:
@@ -31,7 +31,7 @@ async def test_load_unload_entry(
 
 
 async def test_device_not_found_on_load_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     valid_config_entry: MockConfigEntry,
     mock_get_device: MagicMock,
 ) -> None:
@@ -47,7 +47,7 @@ async def test_device_not_found_on_load_entry(
 
 
 async def test_usb_error(
-    hass: HomeAssistant, valid_config_entry: MockConfigEntry, mock_get_device: MagicMock
+    hass: SmartHub, valid_config_entry: MockConfigEntry, mock_get_device: MagicMock
 ) -> None:
     """Test no USB access on config entry setup."""
 

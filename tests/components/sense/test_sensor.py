@@ -8,12 +8,12 @@ import pytest
 from sense_energy import Scale
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.sense.const import ACTIVE_UPDATE_RATE, TREND_UPDATE_RATE
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components.sense.const import ACTIVE_UPDATE_RATE, TREND_UPDATE_RATE
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import setup_platform
 from .const import (
@@ -30,7 +30,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_sense: MagicMock,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -42,7 +42,7 @@ async def test_sensors(
 
 
 async def test_device_power_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_sense: MagicMock,
     config_entry: MockConfigEntry,
@@ -72,7 +72,7 @@ async def test_device_power_sensors(
 
 
 async def test_device_energy_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_sense: MagicMock,
     config_entry: MockConfigEntry,
@@ -113,7 +113,7 @@ async def test_device_energy_sensors(
 
 
 async def test_voltage_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_sense: MagicMock,
     config_entry: MockConfigEntry,
@@ -142,7 +142,7 @@ async def test_voltage_sensors(
 
 
 async def test_active_power_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_sense: MagicMock,
     config_entry: MockConfigEntry,
@@ -173,7 +173,7 @@ async def test_active_power_sensors(
 
 
 async def test_trend_energy_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_sense: MagicMock,
     config_entry: MockConfigEntry,

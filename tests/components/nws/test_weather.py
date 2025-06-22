@@ -8,22 +8,22 @@ from pynws import NwsNoDataError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import nws
-from homeassistant.components.nws.const import (
+from smarthub.components import nws
+from smarthub.components.nws.const import (
     DEFAULT_SCAN_INTERVAL,
     OBSERVATION_VALID_TIME,
 )
-from homeassistant.components.weather import (
+from smarthub.components.weather import (
     ATTR_CONDITION_CLEAR_NIGHT,
     ATTR_CONDITION_SUNNY,
     DOMAIN as WEATHER_DOMAIN,
     SERVICE_GET_FORECASTS,
 )
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from .const import (
     CLEAR_NIGHT_OBSERVATION,
@@ -52,7 +52,7 @@ from tests.typing import WebSocketGenerator
     ],
 )
 async def test_imperial_metric(
-    hass: HomeAssistant,
+    hass: SmartHub,
     units,
     result_observation,
     result_forecast,
@@ -79,7 +79,7 @@ async def test_imperial_metric(
         assert data.get(key) == value
 
 
-async def test_night_clear(hass: HomeAssistant, mock_simple_nws, no_sensor) -> None:
+async def test_night_clear(hass: SmartHub, mock_simple_nws, no_sensor) -> None:
     """Test with clear-night in observation."""
     instance = mock_simple_nws.return_value
     instance.observation = CLEAR_NIGHT_OBSERVATION
@@ -96,7 +96,7 @@ async def test_night_clear(hass: HomeAssistant, mock_simple_nws, no_sensor) -> N
     assert state.state == ATTR_CONDITION_CLEAR_NIGHT
 
 
-async def test_none_values(hass: HomeAssistant, mock_simple_nws, no_sensor) -> None:
+async def test_none_values(hass: SmartHub, mock_simple_nws, no_sensor) -> None:
     """Test with none values in observation and forecast dicts."""
     instance = mock_simple_nws.return_value
     instance.observation = NONE_OBSERVATION
@@ -118,7 +118,7 @@ async def test_none_values(hass: HomeAssistant, mock_simple_nws, no_sensor) -> N
 
 
 async def test_data_caching_error_observation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_simple_nws,
     no_sensor,
@@ -165,7 +165,7 @@ async def test_data_caching_error_observation(
 
 
 async def test_no_data_error_observation(
-    hass: HomeAssistant, mock_simple_nws, no_sensor, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_simple_nws, no_sensor, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test catching NwsNoDataDrror."""
     instance = mock_simple_nws.return_value
@@ -183,7 +183,7 @@ async def test_no_data_error_observation(
 
 
 async def test_no_data_error_forecast(
-    hass: HomeAssistant, mock_simple_nws, no_sensor, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_simple_nws, no_sensor, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test catching NwsNoDataDrror."""
     instance = mock_simple_nws.return_value
@@ -203,7 +203,7 @@ async def test_no_data_error_forecast(
 
 
 async def test_no_data_error_forecast_hourly(
-    hass: HomeAssistant, mock_simple_nws, no_sensor, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_simple_nws, no_sensor, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test catching NwsNoDataDrror."""
     instance = mock_simple_nws.return_value
@@ -223,7 +223,7 @@ async def test_no_data_error_forecast_hourly(
     )
 
 
-async def test_none(hass: HomeAssistant, mock_simple_nws, no_sensor) -> None:
+async def test_none(hass: SmartHub, mock_simple_nws, no_sensor) -> None:
     """Test with None as observation and forecast."""
     instance = mock_simple_nws.return_value
     instance.observation = None
@@ -246,7 +246,7 @@ async def test_none(hass: HomeAssistant, mock_simple_nws, no_sensor) -> None:
         assert data.get(key) is None
 
 
-async def test_error_station(hass: HomeAssistant, mock_simple_nws, no_sensor) -> None:
+async def test_error_station(hass: SmartHub, mock_simple_nws, no_sensor) -> None:
     """Test error in setting station."""
 
     instance = mock_simple_nws.return_value
@@ -263,11 +263,11 @@ async def test_error_station(hass: HomeAssistant, mock_simple_nws, no_sensor) ->
     assert hass.states.get("weather.abc") is None
 
 
-async def test_entity_refresh(hass: HomeAssistant, mock_simple_nws, no_sensor) -> None:
+async def test_entity_refresh(hass: SmartHub, mock_simple_nws, no_sensor) -> None:
     """Test manual refresh."""
     instance = mock_simple_nws.return_value
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     entry = MockConfigEntry(
         domain=nws.DOMAIN,
@@ -281,7 +281,7 @@ async def test_entity_refresh(hass: HomeAssistant, mock_simple_nws, no_sensor) -
     instance.update_forecast_hourly.assert_called_once()
 
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {"entity_id": "weather.abc"},
         blocking=True,
@@ -293,7 +293,7 @@ async def test_entity_refresh(hass: HomeAssistant, mock_simple_nws, no_sensor) -
 
 
 async def test_error_observation(
-    hass: HomeAssistant, mock_simple_nws, no_sensor
+    hass: SmartHub, mock_simple_nws, no_sensor
 ) -> None:
     """Test error during update observation."""
     instance = mock_simple_nws.return_value
@@ -316,7 +316,7 @@ async def test_error_observation(
 
 
 async def test_new_config_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, no_sensor
+    hass: SmartHub, entity_registry: er.EntityRegistry, no_sensor
 ) -> None:
     """Test the expected entities are created."""
     entry = MockConfigEntry(
@@ -340,7 +340,7 @@ async def test_new_config_entry(
     ],
 )
 async def test_forecast_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
     mock_simple_nws,
@@ -448,7 +448,7 @@ async def test_forecast_service(
     [("hourly", "weather.abc")],
 )
 async def test_forecast_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -515,7 +515,7 @@ async def test_forecast_subscription(
     [("hourly", "weather.abc")],
 )
 async def test_forecast_subscription_with_failing_coordinator(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -564,7 +564,7 @@ async def test_forecast_subscription_with_failing_coordinator(
     ],
 )
 async def test_detailed_forecast_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
     mock_simple_nws,
@@ -603,7 +603,7 @@ async def test_detailed_forecast_service(
     ],
 )
 async def test_detailed_forecast_service_no_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
     mock_simple_nws,

@@ -4,17 +4,17 @@ from unittest.mock import call
 
 import pytest
 
-from homeassistant.components.light import ATTR_BRIGHTNESS
-from homeassistant.components.rfxtrx import DOMAIN
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, State
+from smarthub.components.light import ATTR_BRIGHTNESS
+from smarthub.components.rfxtrx import DOMAIN
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub, State
 
 from .conftest import create_rfx_test_cfg
 
 from tests.common import MockConfigEntry, mock_restore_cache
 
 
-async def test_one_light(hass: HomeAssistant, rfxtrx) -> None:
+async def test_one_light(hass: SmartHub, rfxtrx) -> None:
     """Test with 1 light."""
     entry_data = create_rfx_test_cfg(devices={"0b1100cd0213c7f210020f51": {}})
     mock_entry = MockConfigEntry(domain="rfxtrx", unique_id=DOMAIN, data=entry_data)
@@ -93,7 +93,7 @@ async def test_one_light(hass: HomeAssistant, rfxtrx) -> None:
 @pytest.mark.parametrize(
     ("state", "brightness"), [("on", 100), ("on", 50), ("off", None)]
 )
-async def test_state_restore(hass: HomeAssistant, rfxtrx, state, brightness) -> None:
+async def test_state_restore(hass: SmartHub, rfxtrx, state, brightness) -> None:
     """State restoration."""
 
     entity_id = "light.ac_213c7f2_16"
@@ -114,7 +114,7 @@ async def test_state_restore(hass: HomeAssistant, rfxtrx, state, brightness) -> 
     assert hass.states.get(entity_id).attributes.get(ATTR_BRIGHTNESS) == brightness
 
 
-async def test_several_lights(hass: HomeAssistant, rfxtrx) -> None:
+async def test_several_lights(hass: SmartHub, rfxtrx) -> None:
     """Test with 3 lights."""
     entry_data = create_rfx_test_cfg(
         devices={
@@ -163,7 +163,7 @@ async def test_several_lights(hass: HomeAssistant, rfxtrx) -> None:
     assert state.attributes.get("brightness") == 255
 
 
-async def test_discover_light(hass: HomeAssistant, rfxtrx_automatic) -> None:
+async def test_discover_light(hass: SmartHub, rfxtrx_automatic) -> None:
     """Test with discovery of lights."""
     rfxtrx = rfxtrx_automatic
 

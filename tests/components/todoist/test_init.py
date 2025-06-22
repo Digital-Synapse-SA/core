@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.todoist.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.todoist.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     todoist_config_entry: MockConfigEntry | None,
 ) -> None:
@@ -29,7 +29,7 @@ async def test_load_unload(
 
 @pytest.mark.parametrize("todoist_api_status", [HTTPStatus.INTERNAL_SERVER_ERROR])
 async def test_init_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     api: AsyncMock,
     todoist_config_entry: MockConfigEntry | None,

@@ -6,23 +6,23 @@ from unittest.mock import call, patch
 from androidtv.constants import KEYS
 import pytest
 
-from homeassistant.components.androidtv.const import (
+from smarthub.components.androidtv.const import (
     CONF_TURN_OFF_COMMAND,
     CONF_TURN_ON_COMMAND,
 )
-from homeassistant.components.remote import (
+from smarthub.components.remote import (
     ATTR_NUM_REPEATS,
     DOMAIN as REMOTE_DOMAIN,
     SERVICE_SEND_COMMAND,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_COMMAND,
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from . import patchers
 from .common import (
@@ -42,7 +42,7 @@ def _setup(config: dict[str, Any]) -> tuple[str, str, MockConfigEntry]:
 
 
 async def _test_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id,
     ha_service_name,
     androidtv_method,
@@ -76,7 +76,7 @@ async def _test_service(
 
 
 @pytest.mark.parametrize("config", [CONFIG_ANDROID_DEFAULT, CONFIG_FIRETV_DEFAULT])
-async def test_services_remote(hass: HomeAssistant, config) -> None:
+async def test_services_remote(hass: SmartHub, config) -> None:
     """Test services for remote entity."""
     patch_key, entity_id, config_entry = _setup(config)
     config_entry.add_to_hass(hass)
@@ -108,7 +108,7 @@ async def test_services_remote(hass: HomeAssistant, config) -> None:
 
 
 @pytest.mark.parametrize("config", [CONFIG_ANDROID_DEFAULT, CONFIG_FIRETV_DEFAULT])
-async def test_services_remote_custom(hass: HomeAssistant, config) -> None:
+async def test_services_remote_custom(hass: SmartHub, config) -> None:
     """Test services with custom options for remote entity."""
     patch_key, entity_id, config_entry = _setup(config)
     config_entry.add_to_hass(hass)
@@ -137,7 +137,7 @@ async def test_services_remote_custom(hass: HomeAssistant, config) -> None:
             )
 
 
-async def test_remote_unicode_decode_error(hass: HomeAssistant) -> None:
+async def test_remote_unicode_decode_error(hass: SmartHub) -> None:
     """Test sending a command via the send_command remote service that raises a UnicodeDecodeError exception."""
     patch_key, entity_id, config_entry = _setup(CONFIG_ANDROID_DEFAULT)
     config_entry.add_to_hass(hass)

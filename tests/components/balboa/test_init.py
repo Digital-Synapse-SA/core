@@ -2,10 +2,10 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.balboa.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components.balboa.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from . import TEST_HOST
 
@@ -13,7 +13,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_setup_entry(
-    hass: HomeAssistant, client: MagicMock, integration: MockConfigEntry
+    hass: SmartHub, client: MagicMock, integration: MockConfigEntry
 ) -> None:
     """Validate that setup entry also configure the client."""
     assert integration.state is ConfigEntryState.LOADED
@@ -21,7 +21,7 @@ async def test_setup_entry(
     assert integration.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_setup_entry_fails(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_setup_entry_fails(hass: SmartHub, client: MagicMock) -> None:
     """Validate that setup entry also configure the client."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

@@ -5,9 +5,9 @@ from unittest.mock import MagicMock
 import pytest
 from requests.exceptions import ConnectTimeout
 
-from homeassistant import config_entries
-from homeassistant.components.qnap import const
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components.qnap import const
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
@@ -15,8 +15,8 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import TEST_HOST, TEST_PASSWORD, TEST_USERNAME
 
@@ -30,7 +30,7 @@ STANDARD_CONFIG = {
 pytestmark = pytest.mark.usefixtures("mock_setup_entry", "qnap_connect")
 
 
-async def test_config_flow(hass: HomeAssistant, qnap_connect: MagicMock) -> None:
+async def test_config_flow(hass: SmartHub, qnap_connect: MagicMock) -> None:
     """Config flow manually initialized by the user."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}

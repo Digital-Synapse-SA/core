@@ -4,9 +4,9 @@ from typing import Any
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.environment_canada.const import CONF_STATION
-from homeassistant.const import CONF_LANGUAGE, CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
+from smarthub.components.environment_canada.const import CONF_STATION
+from smarthub.const import CONF_LANGUAGE, CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
 
 from . import init_integration
 
@@ -22,7 +22,7 @@ FIXTURE_USER_INPUT = {
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
     ec_data: dict[str, Any],

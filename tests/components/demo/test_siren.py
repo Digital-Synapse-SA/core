@@ -4,13 +4,13 @@ from unittest.mock import call, patch
 
 import pytest
 
-from homeassistant.components.siren import (
+from smarthub.components.siren import (
     ATTR_AVAILABLE_TONES,
     ATTR_TONE,
     ATTR_VOLUME_LEVEL,
     DOMAIN as SIREN_DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TOGGLE,
     SERVICE_TURN_OFF,
@@ -19,8 +19,8 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 ENTITY_SIREN = "siren.siren"
 ENTITY_SIREN_WITH_ALL_FEATURES = "siren.siren_with_all_features"
@@ -30,14 +30,14 @@ ENTITY_SIREN_WITH_ALL_FEATURES = "siren.siren_with_all_features"
 async def siren_only() -> None:
     """Enable only the datetime platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.SIREN],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_demo_siren(hass: HomeAssistant, siren_only: None):
+async def setup_demo_siren(hass: SmartHub, siren_only: None):
     """Initialize setup demo siren."""
     assert await async_setup_component(
         hass, SIREN_DOMAIN, {"siren": {"platform": "demo"}}
@@ -45,20 +45,20 @@ async def setup_demo_siren(hass: HomeAssistant, siren_only: None):
     await hass.async_block_till_done()
 
 
-def test_setup_params(hass: HomeAssistant) -> None:
+def test_setup_params(hass: SmartHub) -> None:
     """Test the initial parameters."""
     state = hass.states.get(ENTITY_SIREN)
     assert state.state == STATE_ON
     assert ATTR_AVAILABLE_TONES not in state.attributes
 
 
-def test_all_setup_params(hass: HomeAssistant) -> None:
+def test_all_setup_params(hass: SmartHub) -> None:
     """Test the setup with all parameters."""
     state = hass.states.get(ENTITY_SIREN_WITH_ALL_FEATURES)
     assert state.attributes.get(ATTR_AVAILABLE_TONES) == ["fire", "alarm"]
 
 
-async def test_turn_on(hass: HomeAssistant) -> None:
+async def test_turn_on(hass: SmartHub) -> None:
     """Test turn on device."""
     await hass.services.async_call(
         SIREN_DOMAIN, SERVICE_TURN_OFF, {ATTR_ENTITY_ID: ENTITY_SIREN}, blocking=True
@@ -82,7 +82,7 @@ async def test_turn_on(hass: HomeAssistant) -> None:
         )
 
 
-async def test_turn_off(hass: HomeAssistant) -> None:
+async def test_turn_off(hass: SmartHub) -> None:
     """Test turn off device."""
     await hass.services.async_call(
         SIREN_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: ENTITY_SIREN}, blocking=True
@@ -97,7 +97,7 @@ async def test_turn_off(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_toggle(hass: HomeAssistant) -> None:
+async def test_toggle(hass: SmartHub) -> None:
     """Test toggle device."""
     await hass.services.async_call(
         SIREN_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: ENTITY_SIREN}, blocking=True
@@ -118,10 +118,10 @@ async def test_toggle(hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_turn_on_strip_attributes(hass: HomeAssistant) -> None:
+async def test_turn_on_strip_attributes(hass: SmartHub) -> None:
     """Test attributes are stripped from turn_on service call when not supported."""
     with patch(
-        "homeassistant.components.demo.siren.DemoSiren.async_turn_on"
+        "smarthub.components.demo.siren.DemoSiren.async_turn_on"
     ) as svc_call:
         await hass.services.async_call(
             SIREN_DOMAIN,

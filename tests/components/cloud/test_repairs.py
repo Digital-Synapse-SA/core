@@ -6,15 +6,15 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.cloud.const import DOMAIN
-from homeassistant.components.cloud.repairs import (
+from smarthub.components.cloud.const import DOMAIN
+from smarthub.components.cloud.repairs import (
     async_manage_legacy_subscription_issue,
 )
-from homeassistant.components.repairs import DOMAIN as REPAIRS_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.repairs import DOMAIN as REPAIRS_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import mock_cloud
 
@@ -24,11 +24,11 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_do_not_create_repair_issues_at_startup_if_not_logged_in(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test that we create repair issue at startup if we are logged in."""
-    with patch("homeassistant.components.cloud.Cloud.is_logged_in", False):
+    with patch("smarthub.components.cloud.Cloud.is_logged_in", False):
         await mock_cloud(hass)
 
         async_fire_time_changed(hass, dt_util.utcnow() + timedelta(hours=1))
@@ -41,7 +41,7 @@ async def test_do_not_create_repair_issues_at_startup_if_not_logged_in(
 
 @pytest.mark.usefixtures("mock_auth")
 async def test_create_repair_issues_at_startup_if_logged_in(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -51,7 +51,7 @@ async def test_create_repair_issues_at_startup_if_logged_in(
         json={"provider": "legacy"},
     )
 
-    with patch("homeassistant.components.cloud.Cloud.is_logged_in", True):
+    with patch("smarthub.components.cloud.Cloud.is_logged_in", True):
         await mock_cloud(hass)
 
         async_fire_time_changed(hass, dt_util.utcnow() + timedelta(hours=1))
@@ -63,7 +63,7 @@ async def test_create_repair_issues_at_startup_if_logged_in(
 
 
 async def test_legacy_subscription_delete_issue_if_no_longer_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test that we delete the legacy subscription issue if no longer legacy."""
@@ -80,7 +80,7 @@ async def test_legacy_subscription_delete_issue_if_no_longer_legacy(
 
 @pytest.mark.usefixtures("mock_auth")
 async def test_legacy_subscription_repair_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
@@ -165,7 +165,7 @@ async def test_legacy_subscription_repair_flow(
 
 @pytest.mark.usefixtures("mock_auth")
 async def test_legacy_subscription_repair_flow_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     issue_registry: ir.IssueRegistry,
@@ -210,7 +210,7 @@ async def test_legacy_subscription_repair_flow_timeout(
         "preview": None,
     }
 
-    with patch("homeassistant.components.cloud.repairs.MAX_RETRIES", new=0):
+    with patch("smarthub.components.cloud.repairs.MAX_RETRIES", new=0):
         resp = await client.post(f"/api/repairs/issues/fix/{flow_id}")
         assert resp.status == HTTPStatus.OK
         data = await resp.json()

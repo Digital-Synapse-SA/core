@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from homeassistant.components.homee.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.components.homee.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
 
 from tests.common import MockConfigEntry
 
@@ -22,7 +22,7 @@ TESTPASS = "testpass"
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.homee.async_setup_entry", return_value=True
+        "smarthub.components.homee.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
@@ -48,10 +48,10 @@ def mock_homee() -> Generator[AsyncMock]:
     """Return a mock Homee instance."""
     with (
         patch(
-            "homeassistant.components.homee.config_flow.Homee", autospec=True
+            "smarthub.components.homee.config_flow.Homee", autospec=True
         ) as mocked_homee,
         patch(
-            "homeassistant.components.homee.Homee",
+            "smarthub.components.homee.Homee",
             new=mocked_homee,
         ),
     ):

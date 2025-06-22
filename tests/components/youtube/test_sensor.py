@@ -7,10 +7,10 @@ from unittest.mock import patch
 from syrupy.assertion import SnapshotAssertion
 from youtubeaio.types import UnauthorizedError, YouTubeBackendError
 
-from homeassistant import config_entries
-from homeassistant.components.youtube.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub import config_entries
+from smarthub.components.youtube.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import MockYouTube
 from .conftest import ComponentSetup
@@ -19,7 +19,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_sensor(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, setup_integration: ComponentSetup
+    hass: SmartHub, snapshot: SnapshotAssertion, setup_integration: ComponentSetup
 ) -> None:
     """Test sensor."""
     await setup_integration()
@@ -35,13 +35,13 @@ async def test_sensor(
 
 
 async def test_sensor_without_uploaded_video(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, setup_integration: ComponentSetup
+    hass: SmartHub, snapshot: SnapshotAssertion, setup_integration: ComponentSetup
 ) -> None:
     """Test sensor when there is no video on the channel."""
     await setup_integration()
 
     with patch(
-        "homeassistant.components.youtube.api.AsyncConfigEntryAuth.get_resource",
+        "smarthub.components.youtube.api.AsyncConfigEntryAuth.get_resource",
         return_value=MockYouTube(
             hass, playlist_items_fixture="get_no_playlist_items.json"
         ),
@@ -62,7 +62,7 @@ async def test_sensor_without_uploaded_video(
 
 
 async def test_sensor_updating(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test updating sensor."""
     await setup_integration()
@@ -72,7 +72,7 @@ async def test_sensor_updating(
     assert state.attributes["video_id"] == "wysukDrMdqU"
 
     with patch(
-        "homeassistant.components.youtube.api.AsyncConfigEntryAuth.get_resource",
+        "smarthub.components.youtube.api.AsyncConfigEntryAuth.get_resource",
         return_value=MockYouTube(
             hass, playlist_items_fixture="get_playlist_items_2.json"
         ),
@@ -93,7 +93,7 @@ async def test_sensor_updating(
 
 
 async def test_sensor_reauth_trigger(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test reauth is triggered after a refresh error."""
     mock = await setup_integration()
@@ -122,7 +122,7 @@ async def test_sensor_reauth_trigger(
 
 
 async def test_sensor_unavailable(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test update failed."""
     mock = await setup_integration()

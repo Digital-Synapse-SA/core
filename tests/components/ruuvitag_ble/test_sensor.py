@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from homeassistant.components.ruuvitag_ble.const import DOMAIN
-from homeassistant.components.sensor import ATTR_STATE_CLASS
-from homeassistant.const import ATTR_FRIENDLY_NAME, ATTR_UNIT_OF_MEASUREMENT
-from homeassistant.core import HomeAssistant
+from smarthub.components.ruuvitag_ble.const import DOMAIN
+from smarthub.components.sensor import ATTR_STATE_CLASS
+from smarthub.const import ATTR_FRIENDLY_NAME, ATTR_UNIT_OF_MEASUREMENT
+from smarthub.core import SmartHub
 
 from .fixtures import CONFIGURED_NAME, CONFIGURED_PREFIX, RUUVITAG_SERVICE_INFO
 
@@ -16,7 +16,7 @@ from tests.components.bluetooth import inject_bluetooth_service_info
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test the RuuviTag BLE sensors."""
     entry = MockConfigEntry(domain=DOMAIN, unique_id=RUUVITAG_SERVICE_INFO.address)
     entry.add_to_hass(hass)

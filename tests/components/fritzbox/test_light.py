@@ -6,24 +6,24 @@ from unittest.mock import Mock, call, patch
 from requests.exceptions import HTTPError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fritzbox.const import COLOR_MODE, COLOR_TEMP_MODE, DOMAIN
-from homeassistant.components.light import (
+from smarthub.components.fritzbox.const import COLOR_MODE, COLOR_TEMP_MODE, DOMAIN
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP_KELVIN,
     ATTR_HS_COLOR,
     DOMAIN as LIGHT_DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_DEVICES,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import FritzDeviceLightMock, set_devices, setup_config_entry
 from .const import CONF_FAKE_NAME, MOCK_CONFIG
@@ -34,7 +34,7 @@ ENTITY_ID = f"{LIGHT_DOMAIN}.{CONF_FAKE_NAME}"
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     fritz: Mock,
@@ -48,7 +48,7 @@ async def test_setup(
     device.color_mode = COLOR_TEMP_MODE
     device.color_temp = 2700
 
-    with patch("homeassistant.components.fritzbox.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.fritzbox.PLATFORMS", [Platform.LIGHT]):
         entry = await setup_config_entry(
             hass, MOCK_CONFIG[DOMAIN][CONF_DEVICES][0], ENTITY_ID, device, fritz
         )
@@ -58,7 +58,7 @@ async def test_setup(
 
 
 async def test_setup_non_color(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     fritz: Mock,
@@ -69,7 +69,7 @@ async def test_setup_non_color(
     device.get_color_temps.return_value = []
     device.get_colors.return_value = {}
 
-    with patch("homeassistant.components.fritzbox.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.fritzbox.PLATFORMS", [Platform.LIGHT]):
         entry = await setup_config_entry(
             hass, MOCK_CONFIG[DOMAIN][CONF_DEVICES][0], ENTITY_ID, device, fritz
         )
@@ -79,7 +79,7 @@ async def test_setup_non_color(
 
 
 async def test_setup_non_color_non_level(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     fritz: Mock,
@@ -91,7 +91,7 @@ async def test_setup_non_color_non_level(
     device.get_color_temps.return_value = []
     device.get_colors.return_value = {}
 
-    with patch("homeassistant.components.fritzbox.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.fritzbox.PLATFORMS", [Platform.LIGHT]):
         entry = await setup_config_entry(
             hass, MOCK_CONFIG[DOMAIN][CONF_DEVICES][0], ENTITY_ID, device, fritz
         )
@@ -101,7 +101,7 @@ async def test_setup_non_color_non_level(
 
 
 async def test_setup_color(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     fritz: Mock,
@@ -116,7 +116,7 @@ async def test_setup_color(
     device.hue = 100
     device.saturation = 70 * 255.0 / 100.0
 
-    with patch("homeassistant.components.fritzbox.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.fritzbox.PLATFORMS", [Platform.LIGHT]):
         entry = await setup_config_entry(
             hass, MOCK_CONFIG[DOMAIN][CONF_DEVICES][0], ENTITY_ID, device, fritz
         )
@@ -125,7 +125,7 @@ async def test_setup_color(
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_turn_on(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_turn_on(hass: SmartHub, fritz: Mock) -> None:
     """Test turn device on."""
     device = FritzDeviceLightMock()
     device.get_color_temps.return_value = [2700, 6500]
@@ -149,7 +149,7 @@ async def test_turn_on(hass: HomeAssistant, fritz: Mock) -> None:
     assert device.set_level.call_args_list == [call(100, True)]
 
 
-async def test_turn_on_color(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_turn_on_color(hass: SmartHub, fritz: Mock) -> None:
     """Test turn device on in color mode."""
     device = FritzDeviceLightMock()
     device.get_color_temps.return_value = [2700, 6500]
@@ -177,7 +177,7 @@ async def test_turn_on_color(hass: HomeAssistant, fritz: Mock) -> None:
 
 
 async def test_turn_on_color_no_fullcolorsupport(
-    hass: HomeAssistant, fritz: Mock
+    hass: SmartHub, fritz: Mock
 ) -> None:
     """Test turn device on in mapped color mode if unmapped is not supported."""
     device = FritzDeviceLightMock()
@@ -204,7 +204,7 @@ async def test_turn_on_color_no_fullcolorsupport(
     assert device.set_color.call_args_list == [call((100, 70), 0, True)]
 
 
-async def test_turn_off(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_turn_off(hass: SmartHub, fritz: Mock) -> None:
     """Test turn device off."""
     device = FritzDeviceLightMock()
     device.get_color_temps.return_value = [2700, 6500]
@@ -220,7 +220,7 @@ async def test_turn_off(hass: HomeAssistant, fritz: Mock) -> None:
     assert device.set_state_off.call_count == 1
 
 
-async def test_update(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_update(hass: SmartHub, fritz: Mock) -> None:
     """Test update without error."""
     device = FritzDeviceLightMock()
     device.get_color_temps.return_value = [2700, 6500]
@@ -241,7 +241,7 @@ async def test_update(hass: HomeAssistant, fritz: Mock) -> None:
     assert fritz().login.call_count == 1
 
 
-async def test_update_error(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_update_error(hass: SmartHub, fritz: Mock) -> None:
     """Test update with error."""
     device = FritzDeviceLightMock()
     device.get_color_temps.return_value = [2700, 6500]
@@ -264,7 +264,7 @@ async def test_update_error(hass: HomeAssistant, fritz: Mock) -> None:
     assert fritz().login.call_count == 4
 
 
-async def test_discover_new_device(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_discover_new_device(hass: SmartHub, fritz: Mock) -> None:
     """Test adding new discovered devices during runtime."""
     device = FritzDeviceLightMock()
     device.get_color_temps.return_value = [2700, 6500]

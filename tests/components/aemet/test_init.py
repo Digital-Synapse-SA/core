@@ -5,11 +5,11 @@ from unittest.mock import patch
 from aemet_opendata.exceptions import AemetTimeout
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.aemet.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.aemet.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .util import mock_api_call
 
@@ -24,7 +24,7 @@ CONFIG = {
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -33,7 +33,7 @@ async def test_unload_entry(
     await hass.config.async_set_time_zone("UTC")
     freezer.move_to("2021-01-09 12:00:00+00:00")
     with patch(
-        "homeassistant.components.aemet.AEMET.api_call",
+        "smarthub.components.aemet.AEMET.api_call",
         side_effect=mock_api_call,
     ):
         config_entry = MockConfigEntry(
@@ -57,7 +57,7 @@ async def test_unload_entry(
 
 
 async def test_init_town_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test TownNotFound when loading the AEMET integration."""
@@ -65,7 +65,7 @@ async def test_init_town_not_found(
     await hass.config.async_set_time_zone("UTC")
     freezer.move_to("2021-01-09 12:00:00+00:00")
     with patch(
-        "homeassistant.components.aemet.AEMET.api_call",
+        "smarthub.components.aemet.AEMET.api_call",
         side_effect=mock_api_call,
     ):
         config_entry = MockConfigEntry(
@@ -83,7 +83,7 @@ async def test_init_town_not_found(
 
 
 async def test_init_api_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test API timeouts when loading the AEMET integration."""
@@ -91,7 +91,7 @@ async def test_init_api_timeout(
     await hass.config.async_set_time_zone("UTC")
     freezer.move_to("2021-01-09 12:00:00+00:00")
     with patch(
-        "homeassistant.components.aemet.AEMET.api_call",
+        "smarthub.components.aemet.AEMET.api_call",
         side_effect=AemetTimeout,
     ):
         config_entry = MockConfigEntry(

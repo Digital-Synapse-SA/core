@@ -7,18 +7,18 @@ from homewizard_energy.errors import DisabledError, RequestError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import switch
-from homeassistant.components.homewizard.const import UPDATE_INTERVAL
-from homeassistant.const import (
+from smarthub.components import switch
+from smarthub.components.homewizard.const import UPDATE_INTERVAL
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
@@ -75,7 +75,7 @@ pytestmark = [
     ],
 )
 async def test_entities_not_created_for_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_ids: list[str],
 ) -> None:
     """Ensures entities for a specific device are not created."""
@@ -100,7 +100,7 @@ async def test_entities_not_created_for_device(
     ],
 )
 async def test_switch_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_homewizardenergy: MagicMock,
@@ -148,7 +148,7 @@ async def test_switch_entities(
     mocked_method.side_effect = RequestError
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"^An error occurred while communicating with your HomeWizard Energy device$",
     ):
         await hass.services.async_call(
@@ -159,7 +159,7 @@ async def test_switch_entities(
         )
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"^An error occurred while communicating with your HomeWizard Energy device$",
     ):
         await hass.services.async_call(
@@ -173,7 +173,7 @@ async def test_switch_entities(
     mocked_method.side_effect = DisabledError
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"^The local API is disabled$",
     ):
         await hass.services.async_call(
@@ -184,7 +184,7 @@ async def test_switch_entities(
         )
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"^The local API is disabled$",
     ):
         await hass.services.async_call(
@@ -206,7 +206,7 @@ async def test_switch_entities(
     ],
 )
 async def test_switch_unreachable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     exception: Exception,
     entity_id: str,

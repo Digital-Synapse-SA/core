@@ -1,0 +1,7 @@
+{
+  "domain": "intent_script",
+  "name": "Intent Script",
+  "codeowners": [],
+  "documentation": "https://www.smart-hub.io/integrations/intent_script",
+  "quality_scale": "internal"
+}

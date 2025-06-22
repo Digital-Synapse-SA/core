@@ -17,22 +17,22 @@ from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.sql.elements import TextClause
 from sqlalchemy.sql.lambdas import StatementLambdaElement
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder import Recorder, util
-from homeassistant.components.recorder.const import (
+from smarthub.components import recorder
+from smarthub.components.recorder import Recorder, util
+from smarthub.components.recorder.const import (
     DOMAIN,
     SQLITE_URL_PREFIX,
     SupportedDialect,
 )
-from homeassistant.components.recorder.db_schema import RecorderRuns
-from homeassistant.components.recorder.history.modern import (
+from smarthub.components.recorder.db_schema import RecorderRuns
+from smarthub.components.recorder.history.modern import (
     _get_single_entity_start_time_stmt,
 )
-from homeassistant.components.recorder.models import (
+from smarthub.components.recorder.models import (
     UnsupportedDialect,
     process_timestamp,
 )
-from homeassistant.components.recorder.util import (
+from smarthub.components.recorder.util import (
     MIN_VERSION_SQLITE,
     RETRYABLE_MYSQL_ERRORS,
     database_job_retry_wrapper,
@@ -43,10 +43,10 @@ from homeassistant.components.recorder.util import (
     retryable_database_job_method,
     session_scope,
 )
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.util import dt as dt_util
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.util import dt as dt_util
 
 from .common import (
     async_wait_recording_done,
@@ -71,7 +71,7 @@ def setup_recorder(recorder_mock: Recorder) -> None:
 
 
 async def test_session_scope_not_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
 ) -> None:
     """Try to create a session scope when not setup."""
@@ -83,7 +83,7 @@ async def test_session_scope_not_setup(
         pass
 
 
-async def test_recorder_bad_execute(hass: HomeAssistant, setup_recorder: None) -> None:
+async def test_recorder_bad_execute(hass: SmartHub, setup_recorder: None) -> None:
     """Bad execute, retry 3 times."""
 
     def to_native(validate_entity_id=True):
@@ -95,7 +95,7 @@ async def test_recorder_bad_execute(hass: HomeAssistant, setup_recorder: None) -
 
     with (
         pytest.raises(SQLAlchemyError),
-        patch("homeassistant.components.recorder.core.time.sleep") as e_mock,
+        patch("smarthub.components.recorder.core.time.sleep") as e_mock,
     ):
         util.execute((mck1,), to_native=True)
 
@@ -103,7 +103,7 @@ async def test_recorder_bad_execute(hass: HomeAssistant, setup_recorder: None) -
 
 
 def test_validate_or_move_away_sqlite_database(
-    hass: HomeAssistant, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Ensure a malformed sqlite database is moved away."""
     test_dir = tmp_path.joinpath("test_validate_or_move_away_sqlite_database")
@@ -152,7 +152,7 @@ async def test_last_run_was_recently_clean(
 
         # Test last_run_was_recently_clean is not called on new DB
         with patch(
-            "homeassistant.components.recorder.util.last_run_was_recently_clean",
+            "smarthub.components.recorder.util.last_run_was_recently_clean",
             wraps=_last_run_was_recently_clean,
         ) as last_run_was_recently_clean_mock:
             await async_setup_recorder_instance(hass, config)
@@ -166,7 +166,7 @@ async def test_last_run_was_recently_clean(
 
     async with async_test_home_assistant() as hass:
         with patch(
-            "homeassistant.components.recorder.util.last_run_was_recently_clean",
+            "smarthub.components.recorder.util.last_run_was_recently_clean",
             wraps=_last_run_was_recently_clean,
         ) as last_run_was_recently_clean_mock:
             await async_setup_recorder_instance(hass, config)
@@ -183,11 +183,11 @@ async def test_last_run_was_recently_clean(
     async with async_test_home_assistant() as hass:
         with (
             patch(
-                "homeassistant.components.recorder.util.last_run_was_recently_clean",
+                "smarthub.components.recorder.util.last_run_was_recently_clean",
                 wraps=_last_run_was_recently_clean,
             ) as last_run_was_recently_clean_mock,
             patch(
-                "homeassistant.components.recorder.core.dt_util.utcnow",
+                "smarthub.components.recorder.core.dt_util.utcnow",
                 return_value=thirty_min_future_time,
             ),
         ):
@@ -637,7 +637,7 @@ def test_warn_unsupported_dialect(
     ],
 )
 async def test_issue_for_mariadb_with_MDEV_25020(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mysql_version,
     min_version,
@@ -696,7 +696,7 @@ async def test_issue_for_mariadb_with_MDEV_25020(
     ],
 )
 async def test_no_issue_for_mariadb_with_MDEV_25020(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mysql_version,
     issue_registry: ir.IssueRegistry,
@@ -745,7 +745,7 @@ async def test_no_issue_for_mariadb_with_MDEV_25020(
 @pytest.mark.skip_on_db_engine(["mysql", "postgresql"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_basic_sanity_check(
-    hass: HomeAssistant, setup_recorder: None, recorder_db_url: str
+    hass: SmartHub, setup_recorder: None, recorder_db_url: str
 ) -> None:
     """Test the basic sanity checks with a missing table.
 
@@ -764,7 +764,7 @@ async def test_basic_sanity_check(
 @pytest.mark.skip_on_db_engine(["mysql", "postgresql"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_combined_checks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
     caplog: pytest.LogCaptureFixture,
     recorder_db_url: str,
@@ -786,7 +786,7 @@ async def test_combined_checks(
     # We are patching recorder.util here in order
     # to avoid creating the full database on disk
     with patch(
-        "homeassistant.components.recorder.util.basic_sanity_check", return_value=False
+        "smarthub.components.recorder.util.basic_sanity_check", return_value=False
     ):
         caplog.clear()
         assert util.run_checks_on_open_db("fake_db_path", cursor) is None
@@ -794,7 +794,7 @@ async def test_combined_checks(
 
     # We are patching recorder.util here in order
     # to avoid creating the full database on disk
-    with patch("homeassistant.components.recorder.util.last_run_was_recently_clean"):
+    with patch("smarthub.components.recorder.util.last_run_was_recently_clean"):
         caplog.clear()
         assert util.run_checks_on_open_db("fake_db_path", cursor) is None
         assert "restarted cleanly and passed the basic sanity check" in caplog.text
@@ -802,7 +802,7 @@ async def test_combined_checks(
     caplog.clear()
     with (
         patch(
-            "homeassistant.components.recorder.util.last_run_was_recently_clean",
+            "smarthub.components.recorder.util.last_run_was_recently_clean",
             side_effect=sqlite3.DatabaseError,
         ),
         pytest.raises(sqlite3.DatabaseError),
@@ -812,7 +812,7 @@ async def test_combined_checks(
     caplog.clear()
     with (
         patch(
-            "homeassistant.components.recorder.util.last_run_was_recently_clean",
+            "smarthub.components.recorder.util.last_run_was_recently_clean",
             side_effect=sqlite3.DatabaseError,
         ),
         pytest.raises(sqlite3.DatabaseError),
@@ -831,7 +831,7 @@ async def test_combined_checks(
 
 
 async def test_end_incomplete_runs(
-    hass: HomeAssistant, setup_recorder: None, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, setup_recorder: None, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Ensure we can end incomplete runs."""
     with session_scope(hass=hass) as session:
@@ -857,7 +857,7 @@ async def test_end_incomplete_runs(
 @pytest.mark.skip_on_db_engine(["mysql", "postgresql"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_periodic_db_cleanups(
-    hass: HomeAssistant, setup_recorder: None, recorder_db_url: str
+    hass: SmartHub, setup_recorder: None, recorder_db_url: str
 ) -> None:
     """Test periodic db cleanups.
 
@@ -878,7 +878,7 @@ async def test_periodic_db_cleanups(
 @pytest.mark.parametrize("persistent_database", [True])
 async def test_write_lock_db(
     async_setup_recorder_instance: RecorderInstanceGenerator,
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_db_url: str,
 ) -> None:
     """Test database write lock.
@@ -936,9 +936,9 @@ def test_build_mysqldb_conv() -> None:
     )
 
 
-@patch("homeassistant.components.recorder.util.QUERY_RETRY_WAIT", 0)
+@patch("smarthub.components.recorder.util.QUERY_RETRY_WAIT", 0)
 async def test_execute_stmt_lambda_element(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_recorder: None,
 ) -> None:
     """Test executing with execute_stmt_lambda_element."""
@@ -1063,7 +1063,7 @@ async def test_execute_stmt_lambda_element(
     ],
 )
 async def test_resolve_period(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     start_time: datetime,
     periods: dict[tuple[str, int], tuple[str, str]],

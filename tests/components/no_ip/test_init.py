@@ -4,10 +4,10 @@ from datetime import timedelta
 
 import pytest
 
-from homeassistant.components import no_ip
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components import no_ip
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from tests.common import async_fire_time_changed
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -22,7 +22,7 @@ USERNAME = "abc@123.com"
 
 
 @pytest.fixture
-async def setup_no_ip(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def setup_no_ip(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Fixture that sets up NO-IP."""
     aioclient_mock.get(UPDATE_URL, params={"hostname": DOMAIN}, text="good 0.0.0.0")
 
@@ -39,7 +39,7 @@ async def setup_no_ip(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) 
     )
 
 
-async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_setup(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Test setup works if update passes."""
     aioclient_mock.get(UPDATE_URL, params={"hostname": DOMAIN}, text="nochg 0.0.0.0")
 
@@ -57,7 +57,7 @@ async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -
 
 
 async def test_setup_fails_if_update_fails(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup fails if first update fails."""
     aioclient_mock.get(UPDATE_URL, params={"hostname": DOMAIN}, text="nohost")
@@ -72,7 +72,7 @@ async def test_setup_fails_if_update_fails(
 
 
 async def test_setup_fails_if_wrong_auth(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup fails if first update fails through wrong authentication."""
     aioclient_mock.get(UPDATE_URL, params={"hostname": DOMAIN}, text="badauth")

@@ -7,7 +7,7 @@ from aiorussound.exceptions import CommandError
 from aiorussound.models import PlayStatus
 import pytest
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_MEDIA_SEEK_POSITION,
     ATTR_MEDIA_VOLUME_LEVEL,
@@ -15,7 +15,7 @@ from homeassistant.components.media_player import (
     DOMAIN as MP_DOMAIN,
     SERVICE_SELECT_SOURCE,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_MEDIA_SEEK,
     SERVICE_TURN_OFF,
@@ -31,8 +31,8 @@ from homeassistant.const import (
     STATE_PAUSED,
     STATE_PLAYING,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import mock_state_update, setup_integration
 from .const import ENTITY_ID_ZONE_1
@@ -53,7 +53,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_entity_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_russound_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     zone_status: bool,
@@ -72,7 +72,7 @@ async def test_entity_state(
 
 
 async def test_media_volume(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_russound_client: AsyncMock,
 ) -> None:
@@ -112,7 +112,7 @@ async def test_media_volume(
 
 
 async def test_volume_mute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_russound_client: AsyncMock,
 ) -> None:
@@ -172,7 +172,7 @@ async def test_volume_mute(
     ],
 )
 async def test_source_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_russound_client: AsyncMock,
     source_name: str,
@@ -194,7 +194,7 @@ async def test_source_service(
 
 
 async def test_invalid_source_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_russound_client: AsyncMock,
 ) -> None:
@@ -206,7 +206,7 @@ async def test_invalid_source_service(
     ].select_source.side_effect = CommandError
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Error executing async_select_source on entity media_player.backyard",
     ):
         await hass.services.async_call(
@@ -218,7 +218,7 @@ async def test_invalid_source_service(
 
 
 async def test_power_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_russound_client: AsyncMock,
 ) -> None:
@@ -237,7 +237,7 @@ async def test_power_service(
 
 
 async def test_media_seek(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_russound_client: AsyncMock,
 ) -> None:

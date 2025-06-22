@@ -9,11 +9,11 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from voluptuous.error import MultipleInvalid
 
-from homeassistant.components.husqvarna_automower.const import DOMAIN
-from homeassistant.components.husqvarna_automower.coordinator import SCAN_INTERVAL
-from homeassistant.components.lawn_mower import LawnMowerActivity
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.components.husqvarna_automower.const import DOMAIN
+from smarthub.components.husqvarna_automower.coordinator import SCAN_INTERVAL
+from smarthub.components.lawn_mower import LawnMowerActivity
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from . import setup_integration
 from .const import TEST_MOWER_ID
@@ -45,7 +45,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
     ],
 )
 async def test_lawn_mower_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -78,7 +78,7 @@ async def test_lawn_mower_states(
     ],
 )
 async def test_lawn_mower_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioautomower_command: str,
     service: str,
     mock_automower_client: AsyncMock,
@@ -97,7 +97,7 @@ async def test_lawn_mower_commands(
 
     mocked_method.side_effect = ApiError("Test error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Failed to send command: Test error",
     ):
         await hass.services.async_call(
@@ -132,7 +132,7 @@ async def test_lawn_mower_commands(
     ],
 )
 async def test_lawn_mower_service_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioautomower_command: str,
     extra_data: timedelta,
     service: str,
@@ -154,7 +154,7 @@ async def test_lawn_mower_service_commands(
 
     mocked_method.side_effect = ApiError("Test error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Failed to send command: Test error",
     ):
         await hass.services.async_call(
@@ -182,7 +182,7 @@ async def test_lawn_mower_service_commands(
     ],
 )
 async def test_lawn_mower_override_work_area_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioautomower_command: str,
     extra_data1: int,
     extra_data2: timedelta,
@@ -207,7 +207,7 @@ async def test_lawn_mower_override_work_area_command(
         mock_automower_client.commands, aioautomower_command
     ).side_effect = ApiError("Test error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Failed to send command: Test error",
     ):
         await hass.services.async_call(
@@ -252,7 +252,7 @@ async def test_lawn_mower_override_work_area_command(
     ],
 )
 async def test_lawn_mower_wrong_service_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     service_data: dict[str, int] | None,
     mower_support_wa: bool,

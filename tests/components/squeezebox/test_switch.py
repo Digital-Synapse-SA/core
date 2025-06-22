@@ -6,11 +6,11 @@ from unittest.mock import MagicMock
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.squeezebox.const import PLAYER_UPDATE_INTERVAL
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import CONF_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.components.squeezebox.const import PLAYER_UPDATE_INTERVAL
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import CONF_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from .conftest import TEST_ALARM_ID
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 
 async def test_entity_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_alarms_player: MagicMock,
     snapshot: SnapshotAssertion,
@@ -29,7 +29,7 @@ async def test_entity_registry(
 
 
 async def test_switch_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_alarms_player: MagicMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -44,7 +44,7 @@ async def test_switch_state(
 
 
 async def test_switch_deleted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_alarms_player: MagicMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -59,7 +59,7 @@ async def test_switch_deleted(
 
 
 async def test_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_alarms_player: MagicMock,
 ) -> None:
     """Test turning on the switch."""
@@ -75,7 +75,7 @@ async def test_turn_on(
 
 
 async def test_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_alarms_player: MagicMock,
 ) -> None:
     """Test turning on the switch."""
@@ -91,7 +91,7 @@ async def test_turn_off(
 
 
 async def test_alarms_enabled_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_alarms_player: MagicMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -108,7 +108,7 @@ async def test_alarms_enabled_state(
 
 
 async def test_alarms_enabled_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_alarms_player: MagicMock,
 ) -> None:
     """Test turning on the alarms enabled switch."""
@@ -122,7 +122,7 @@ async def test_alarms_enabled_turn_on(
 
 
 async def test_alarms_enabled_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_alarms_player: MagicMock,
 ) -> None:
     """Test turning off the alarms enabled switch."""

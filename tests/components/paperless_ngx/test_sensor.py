@@ -10,12 +10,12 @@ from pypaperless.exceptions import (
 from pypaperless.models import Statistic
 import pytest
 
-from homeassistant.components.paperless_ngx.coordinator import (
+from smarthub.components.paperless_ngx.coordinator import (
     UPDATE_INTERVAL_STATISTICS,
 )
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -30,13 +30,13 @@ from tests.common import (
 
 
 async def test_sensor_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test paperless_ngx update sensors."""
-    with patch("homeassistant.components.paperless_ngx.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.paperless_ngx.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
@@ -44,7 +44,7 @@ async def test_sensor_platform(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_statistic_sensor_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_paperless: AsyncMock,
     freezer: FrozenDateTimeFactory,
     mock_statistic_data_update,
@@ -80,7 +80,7 @@ async def test_statistic_sensor_state(
     ],
 )
 async def test__statistic_sensor_state_on_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_paperless: AsyncMock,
     freezer: FrozenDateTimeFactory,
     mock_statistic_data_update,

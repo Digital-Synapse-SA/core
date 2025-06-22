@@ -4,20 +4,20 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.update import (
+from smarthub.components.update import (
     ATTR_IN_PROGRESS,
     DOMAIN as UPDATE_DOMAIN,
     SERVICE_INSTALL,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import assert_entities, setup_platform
 
 
 async def test_updates(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
+    hass: SmartHub, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests that update entity is correct."""
 
@@ -28,7 +28,7 @@ async def test_updates(
     entity_id = "update.test_update"
 
     with patch(
-        "homeassistant.components.tessie.update.schedule_software_update"
+        "smarthub.components.tessie.update.schedule_software_update"
     ) as mock_update:
         await hass.services.async_call(
             UPDATE_DOMAIN,

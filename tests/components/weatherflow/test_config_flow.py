@@ -6,21 +6,21 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from pyweatherflowudp.errors import AddressInUseError
 
-from homeassistant import config_entries
-from homeassistant.components.weatherflow.const import (
+from smarthub import config_entries
+from smarthub.components.weatherflow.const import (
     DOMAIN,
     ERROR_MSG_ADDRESS_IN_USE,
     ERROR_MSG_CANNOT_CONNECT,
     ERROR_MSG_NO_DEVICE_FOUND,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_single_instance(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_has_devices: AsyncMock,
 ) -> None:
@@ -35,7 +35,7 @@ async def test_single_instance(
 
 
 async def test_devices_with_mocks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_start: AsyncMock,
     mock_stop: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -61,7 +61,7 @@ async def test_devices_with_mocks(
     ],
 )
 async def test_devices_with_various_mocks_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_start: AsyncMock,
     mock_stop: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -71,7 +71,7 @@ async def test_devices_with_various_mocks_errors(
     """Test the various on error states - then finally complete the test."""
 
     with patch(
-        "homeassistant.components.weatherflow.config_flow.WeatherFlowListener.on",
+        "smarthub.components.weatherflow.config_flow.WeatherFlowListener.on",
         side_effect=exception,
     ):
         result = await hass.config_entries.flow.async_init(

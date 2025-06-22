@@ -5,16 +5,16 @@ from __future__ import annotations
 import pytest
 from voip_utils import CallInfo
 
-from homeassistant.components.voip import DOMAIN
-from homeassistant.components.voip.devices import VoIPDevice, VoIPDevices
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.voip import DOMAIN
+from smarthub.components.voip.devices import VoIPDevice, VoIPDevices
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_device_registry_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     call_info: CallInfo,
     device_registry: dr.DeviceRegistry,
@@ -45,7 +45,7 @@ async def test_device_registry_info(
 
 
 async def test_device_registry_info_from_unknown_phone(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_devices: VoIPDevices,
     call_info: CallInfo,
     device_registry: dr.DeviceRegistry,
@@ -64,7 +64,7 @@ async def test_device_registry_info_from_unknown_phone(
 
 
 async def test_remove_device_registry_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     voip_device: VoIPDevice,
     voip_devices: VoIPDevices,
     device_registry: dr.DeviceRegistry,
@@ -104,7 +104,7 @@ async def legacy_dev_reg_entry(
 
 
 async def test_device_registry_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     legacy_dev_reg_entry: dr.DeviceEntry,
     voip_devices: VoIPDevices,
     call_info: CallInfo,

@@ -3,8 +3,8 @@
 import pytest
 from zeversolar import StatusEnum, ZeverSolarData
 
-from homeassistant.components.zeversolar.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
+from smarthub.components.zeversolar.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
 
 from tests.common import MockConfigEntry
 

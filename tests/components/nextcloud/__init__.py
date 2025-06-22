@@ -2,9 +2,9 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.components.nextcloud.const import DOMAIN
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
+from smarthub.components.nextcloud.const import DOMAIN
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
 
 from .const import MOCKED_ENTRY_ID
 
@@ -19,7 +19,7 @@ def mock_config_entry(config: dict) -> MockConfigEntry:
 
 
 async def init_integration(
-    hass: HomeAssistant, config: dict, data: dict
+    hass: SmartHub, config: dict, data: dict
 ) -> MockConfigEntry:
     """Set up the nextcloud integration."""
     entry = mock_config_entry(config)
@@ -27,7 +27,7 @@ async def init_integration(
 
     with (
         patch(
-            "homeassistant.components.nextcloud.NextcloudMonitor",
+            "smarthub.components.nextcloud.NextcloudMonitor",
         ) as mock_nextcloud_monitor,
     ):
         mock_nextcloud_monitor.update = Mock(return_value=True)

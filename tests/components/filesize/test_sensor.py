@@ -7,11 +7,11 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.filesize.const import DOMAIN
-from homeassistant.const import CONF_FILE_PATH, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.components.filesize.const import DOMAIN
+from smarthub.const import CONF_FILE_PATH, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 from . import TEST_FILE_NAME, async_create_file
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     tmp_path: Path,
     entity_registry: er.EntityRegistry,
@@ -55,7 +55,7 @@ async def test_sensors(
 
 
 async def test_invalid_path(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, tmp_path: Path
+    hass: SmartHub, mock_config_entry: MockConfigEntry, tmp_path: Path
 ) -> None:
     """Test that an invalid path is caught."""
     test_file = str(tmp_path.joinpath(TEST_FILE_NAME))
@@ -69,7 +69,7 @@ async def test_invalid_path(
 
 
 async def test_valid_path(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -99,7 +99,7 @@ async def test_valid_path(
 
 
 async def test_state_unavailable(
-    hass: HomeAssistant, tmp_path: Path, mock_config_entry: MockConfigEntry
+    hass: SmartHub, tmp_path: Path, mock_config_entry: MockConfigEntry
 ) -> None:
     """Verify we handle state unavailable."""
     testfile = str(tmp_path.joinpath("file.txt"))

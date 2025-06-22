@@ -4,8 +4,8 @@ import datetime as dt
 
 import pytest
 
-from homeassistant.components.jewish_calendar.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.jewish_calendar.const import DOMAIN
+from smarthub.core import SmartHub
 
 
 @pytest.mark.parametrize(
@@ -72,7 +72,7 @@ from homeassistant.core import HomeAssistant
 )
 @pytest.mark.usefixtures("setup_at_time")
 async def test_get_omer_blessing(
-    hass: HomeAssistant, service_data: dict[str, str | dt.date | bool], expected: str
+    hass: SmartHub, service_data: dict[str, str | dt.date | bool], expected: str
 ) -> None:
     """Test get omer blessing."""
 

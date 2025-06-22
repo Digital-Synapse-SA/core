@@ -1,8 +1,8 @@
 """Test flux_led diagnostics."""
 
-from homeassistant.components.flux_led.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.flux_led.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import (
     _mock_config_entry_for_bulb,
@@ -16,7 +16,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test generating diagnostics for a config entry."""
     entry = _mock_config_entry_for_bulb(hass)

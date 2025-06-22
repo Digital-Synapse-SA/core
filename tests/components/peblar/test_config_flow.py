@@ -6,12 +6,12 @@ from unittest.mock import MagicMock
 from peblar import PeblarAuthenticationError, PeblarConnectionError
 import pytest
 
-from homeassistant.components.peblar.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.peblar.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 @pytest.mark.usefixtures("mock_peblar")
-async def test_user_flow(hass: HomeAssistant) -> None:
+async def test_user_flow(hass: SmartHub) -> None:
     """Test the full happy path user flow from start to finish."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -57,7 +57,7 @@ async def test_user_flow(hass: HomeAssistant) -> None:
     ],
 )
 async def test_user_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     side_effect: Exception,
     expected_error: dict[str, str],
@@ -99,7 +99,7 @@ async def test_user_flow_errors(
 
 @pytest.mark.usefixtures("mock_peblar")
 async def test_user_flow_already_configured(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test configuration flow aborts when the device is already configured."""
     mock_config_entry.add_to_hass(hass)
@@ -119,7 +119,7 @@ async def test_user_flow_already_configured(
 
 @pytest.mark.usefixtures("mock_peblar")
 async def test_reconfigure_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test the full happy path reconfigure flow from start to finish."""
     mock_config_entry.add_to_hass(hass)
@@ -153,7 +153,7 @@ async def test_reconfigure_flow(
 
 @pytest.mark.usefixtures("mock_peblar")
 async def test_reconfigure_to_different_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test reconfiguring to a different device doesn't work."""
@@ -185,7 +185,7 @@ async def test_reconfigure_to_different_device(
     ],
 )
 async def test_reconfigure_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     mock_config_entry: MockConfigEntry,
     side_effect: Exception,
@@ -227,7 +227,7 @@ async def test_reconfigure_flow_errors(
 
 
 @pytest.mark.usefixtures("mock_peblar")
-async def test_zeroconf_flow(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow(hass: SmartHub) -> None:
     """Test the zeroconf happy flow from start to finish."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -268,7 +268,7 @@ async def test_zeroconf_flow(hass: HomeAssistant) -> None:
     assert not config_entry.options
 
 
-async def test_zeroconf_flow_abort_no_serial(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow_abort_no_serial(hass: SmartHub) -> None:
     """Test the zeroconf aborts when it advertises incompatible data."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -297,7 +297,7 @@ async def test_zeroconf_flow_abort_no_serial(hass: HomeAssistant) -> None:
     ],
 )
 async def test_zeroconf_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     side_effect: Exception,
     expected_error: dict[str, str],
@@ -353,7 +353,7 @@ async def test_zeroconf_flow_errors(
 
 @pytest.mark.usefixtures("mock_peblar")
 async def test_zeroconf_flow_not_discovered_again(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the zeroconf doesn't re-discover an existing device."""
@@ -381,7 +381,7 @@ async def test_zeroconf_flow_not_discovered_again(
 
 
 @pytest.mark.usefixtures("mock_peblar")
-async def test_user_flow_with_zeroconf_in_progress(hass: HomeAssistant) -> None:
+async def test_user_flow_with_zeroconf_in_progress(hass: SmartHub) -> None:
     """Test the full happy path user flow from start to finish.
 
     While zeroconf discovery is already in progress.
@@ -432,7 +432,7 @@ async def test_user_flow_with_zeroconf_in_progress(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_peblar")
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the reauthentication configuration flow."""
@@ -467,7 +467,7 @@ async def test_reauth_flow(
     ],
 )
 async def test_reauth_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_peblar: MagicMock,
     side_effect: Exception,

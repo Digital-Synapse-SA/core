@@ -7,7 +7,7 @@ from homematicip.base.enums import AbsenceType
 from homematicip.functionalHomes import IndoorClimateHome
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_HVAC_ACTION,
     ATTR_PRESET_MODE,
@@ -18,13 +18,13 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.homematicip_cloud import DOMAIN
-from homeassistant.components.homematicip_cloud.climate import (
+from smarthub.components.homematicip_cloud import DOMAIN
+from smarthub.components.homematicip_cloud.climate import (
     ATTR_PRESET_END_TIME,
     PERMANENT_END_TIME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from .helper import (
     HAPID,
@@ -35,7 +35,7 @@ from .helper import (
 
 
 async def test_hmip_heating_group_heat(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipHeatingGroup."""
     entity_id = "climate.badezimmer"
@@ -246,7 +246,7 @@ async def test_hmip_heating_group_heat(
 
 
 async def test_hmip_heating_group_cool(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipHeatingGroup."""
     entity_id = "climate.badezimmer"
@@ -369,7 +369,7 @@ async def test_hmip_heating_group_cool(
 
 
 async def test_hmip_heating_group_heat_with_switch(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipHeatingGroup."""
     entity_id = "climate.schlafzimmer"
@@ -400,7 +400,7 @@ async def test_hmip_heating_group_heat_with_switch(
 
 
 async def test_hmip_heating_group_heat_with_radiator(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipHeatingGroup."""
     entity_id = "climate.vorzimmer"
@@ -429,7 +429,7 @@ async def test_hmip_heating_group_heat_with_radiator(
 
 
 async def test_hmip_heating_profile_default_name(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test visible profile 1 without a name should be displayed as 'Default'."""
     entity_id = "climate.vorzimmer3"
@@ -454,7 +454,7 @@ async def test_hmip_heating_profile_default_name(
 
 
 async def test_hmip_heating_profile_naming(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test Heating Profile Naming."""
     entity_id = "climate.vorzimmer2"
@@ -479,7 +479,7 @@ async def test_hmip_heating_profile_naming(
 
 
 async def test_hmip_heating_profile_name_not_in_list(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test set profile when profile is not in available profiles."""
     expected_profile = "Testprofile"
@@ -495,7 +495,7 @@ async def test_hmip_heating_profile_name_not_in_list(
     )
 
     with patch(
-        "homeassistant.components.homematicip_cloud.climate.NICE_PROFILE_NAMES",
+        "smarthub.components.homematicip_cloud.climate.NICE_PROFILE_NAMES",
         return_value={},
     ):
         await hass.services.async_call(
@@ -510,7 +510,7 @@ async def test_hmip_heating_profile_name_not_in_list(
 
 
 async def test_hmip_climate_services(
-    hass: HomeAssistant, mock_hap_with_service
+    hass: SmartHub, mock_hap_with_service
 ) -> None:
     """Test HomematicipHeatingGroup."""
 
@@ -625,7 +625,7 @@ async def test_hmip_climate_services(
 
 
 async def test_hmip_set_home_cooling_mode(
-    hass: HomeAssistant, mock_hap_with_service
+    hass: SmartHub, mock_hap_with_service
 ) -> None:
     """Test HomematicipSetHomeCoolingMode."""
 
@@ -673,7 +673,7 @@ async def test_hmip_set_home_cooling_mode(
 
 
 async def test_hmip_heating_group_services(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipHeatingGroup services."""
     entity_id = "climate.badezimmer"

@@ -3,12 +3,12 @@
 import pytest
 import pywemo
 
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.wemo.switch import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.wemo.switch import (
     ATTR_CURRENT_STATE_DETAIL,
     ATTR_ON_LATEST_TIME,
     ATTR_ON_TODAY_TIME,
@@ -18,15 +18,15 @@ from homeassistant.components.wemo.switch import (
     ATTR_SWITCH_MODE,
     MAKER_SWITCH_MOMENTARY,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_OFF,
     STATE_ON,
     STATE_STANDBY,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import entity_test_helpers
 from .conftest import (
@@ -57,7 +57,7 @@ test_async_update_locked_callback_and_update = (
 
 
 async def test_switch_registry_state_callback(
-    hass: HomeAssistant, pywemo_registry, pywemo_device, wemo_entity
+    hass: SmartHub, pywemo_registry, pywemo_device, wemo_entity
 ) -> None:
     """Verify that the switch receives state updates from the registry."""
     # On state.
@@ -74,7 +74,7 @@ async def test_switch_registry_state_callback(
 
 
 async def test_switch_update_entity(
-    hass: HomeAssistant, pywemo_registry, pywemo_device, wemo_entity
+    hass: SmartHub, pywemo_registry, pywemo_device, wemo_entity
 ) -> None:
     """Verify that the switch performs state updates."""
     await async_setup_component(hass, HA_DOMAIN, {})
@@ -101,7 +101,7 @@ async def test_switch_update_entity(
 
 
 async def test_available_after_update(
-    hass: HomeAssistant, pywemo_registry, pywemo_device, wemo_entity
+    hass: SmartHub, pywemo_registry, pywemo_device, wemo_entity
 ) -> None:
     """Test the availability when an On call fails and after an update."""
     pywemo_device.on.side_effect = pywemo.exceptions.ActionException
@@ -111,12 +111,12 @@ async def test_available_after_update(
     )
 
 
-async def test_turn_off_state(hass: HomeAssistant, wemo_entity) -> None:
+async def test_turn_off_state(hass: SmartHub, wemo_entity) -> None:
     """Test that the device state is updated after turning off."""
     await entity_test_helpers.test_turn_off_state(hass, wemo_entity, SWITCH_DOMAIN)
 
 
-async def test_insight_state_attributes(hass: HomeAssistant, pywemo_registry) -> None:
+async def test_insight_state_attributes(hass: SmartHub, pywemo_registry) -> None:
     """Verify the switch attributes are set for the Insight device."""
     await async_setup_component(hass, HA_DOMAIN, {})
     with create_pywemo_device(pywemo_registry, "Insight") as insight:
@@ -155,7 +155,7 @@ async def test_insight_state_attributes(hass: HomeAssistant, pywemo_registry) ->
         assert attributes[ATTR_CURRENT_STATE_DETAIL] == STATE_UNKNOWN
 
 
-async def test_maker_state_attributes(hass: HomeAssistant, pywemo_registry) -> None:
+async def test_maker_state_attributes(hass: SmartHub, pywemo_registry) -> None:
     """Verify the switch attributes are set for the Insight device."""
     await async_setup_component(hass, HA_DOMAIN, {})
     with create_pywemo_device(pywemo_registry, "Maker") as maker:

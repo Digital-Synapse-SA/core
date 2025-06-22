@@ -2,15 +2,15 @@
 
 from unittest.mock import patch
 
-from homeassistant.components import bluetooth
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components import bluetooth
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import MockESPHomeDevice
 
 
 async def test_bluetooth_connect_with_raw_adv(
-    hass: HomeAssistant, mock_bluetooth_entry_with_raw_adv: MockESPHomeDevice
+    hass: SmartHub, mock_bluetooth_entry_with_raw_adv: MockESPHomeDevice
 ) -> None:
     """Test bluetooth connect with raw advertisements."""
     scanner = bluetooth.async_scanner_by_source(hass, "AA:BB:CC:DD:EE:FC")
@@ -30,7 +30,7 @@ async def test_bluetooth_connect_with_raw_adv(
 
 
 async def test_bluetooth_connect_with_legacy_adv(
-    hass: HomeAssistant, mock_bluetooth_entry_with_legacy_adv: MockESPHomeDevice
+    hass: SmartHub, mock_bluetooth_entry_with_legacy_adv: MockESPHomeDevice
 ) -> None:
     """Test bluetooth connect with legacy advertisements."""
     scanner = bluetooth.async_scanner_by_source(hass, "AA:BB:CC:DD:EE:FC")
@@ -50,7 +50,7 @@ async def test_bluetooth_connect_with_legacy_adv(
 
 
 async def test_bluetooth_device_linked_via_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bluetooth_entry_with_raw_adv: MockESPHomeDevice,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -78,7 +78,7 @@ async def test_bluetooth_device_linked_via_device(
 
 
 async def test_bluetooth_cleanup_on_remove_entry(
-    hass: HomeAssistant, mock_bluetooth_entry_with_raw_adv: MockESPHomeDevice
+    hass: SmartHub, mock_bluetooth_entry_with_raw_adv: MockESPHomeDevice
 ) -> None:
     """Test bluetooth is cleaned up on entry removal."""
     scanner = bluetooth.async_scanner_by_source(hass, "AA:BB:CC:DD:EE:FC")
@@ -87,7 +87,7 @@ async def test_bluetooth_cleanup_on_remove_entry(
         mock_bluetooth_entry_with_raw_adv.entry.entry_id
     )
 
-    with patch("homeassistant.components.esphome.async_remove_scanner") as remove_mock:
+    with patch("smarthub.components.esphome.async_remove_scanner") as remove_mock:
         await hass.config_entries.async_remove(
             mock_bluetooth_entry_with_raw_adv.entry.entry_id
         )

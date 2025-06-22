@@ -5,15 +5,15 @@ from __future__ import annotations
 from aioshelly.ble.const import BLE_SCAN_RESULT_EVENT
 import pytest
 
-from homeassistant.components import bluetooth
-from homeassistant.components.shelly.const import CONF_BLE_SCANNER_MODE, BLEScannerMode
-from homeassistant.core import HomeAssistant
+from smarthub.components import bluetooth
+from smarthub.components.shelly.const import CONF_BLE_SCANNER_MODE, BLEScannerMode
+from smarthub.core import SmartHub
 
 from .. import init_integration, inject_rpc_device_event
 
 
 async def test_scanner_v1(
-    hass: HomeAssistant, mock_rpc_device, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test injecting data into the scanner v1."""
     await init_integration(
@@ -53,7 +53,7 @@ async def test_scanner_v1(
 
 
 async def test_scanner_v2(
-    hass: HomeAssistant, mock_rpc_device, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test injecting data into the scanner v2."""
     await init_integration(
@@ -97,7 +97,7 @@ async def test_scanner_v2(
 
 
 async def test_scanner_ignores_non_ble_events(
-    hass: HomeAssistant, mock_rpc_device, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test injecting non ble data into the scanner."""
     await init_integration(
@@ -123,7 +123,7 @@ async def test_scanner_ignores_non_ble_events(
 
 
 async def test_scanner_ignores_wrong_version_and_logs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
@@ -159,7 +159,7 @@ async def test_scanner_ignores_wrong_version_and_logs(
 
 
 async def test_scanner_warns_on_corrupt_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device,
     monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,

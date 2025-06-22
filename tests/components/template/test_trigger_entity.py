@@ -2,12 +2,12 @@
 
 import pytest
 
-from homeassistant.components.template import trigger_entity
-from homeassistant.components.template.coordinator import TriggerUpdateCoordinator
-from homeassistant.const import CONF_ICON, CONF_NAME, CONF_STATE, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import template
-from homeassistant.helpers.trigger_template_entity import CONF_PICTURE
+from smarthub.components.template import trigger_entity
+from smarthub.components.template.coordinator import TriggerUpdateCoordinator
+from smarthub.const import CONF_ICON, CONF_NAME, CONF_STATE, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import template
+from smarthub.helpers.trigger_template_entity import CONF_PICTURE
 
 _ICON_TEMPLATE = 'mdi:o{{ "n" if value=="on" else "ff" }}'
 _PICTURE_TEMPLATE = '/local/picture_o{{ "n" if value=="on" else "ff" }}'
@@ -25,7 +25,7 @@ class TestEntity(trigger_entity.TriggerEntity):
         return self._rendered.get(CONF_STATE)
 
 
-async def test_reference_blueprints_is_none(hass: HomeAssistant) -> None:
+async def test_reference_blueprints_is_none(hass: SmartHub) -> None:
     """Test template entity requires hass to be set before accepting templates."""
     coordinator = TriggerUpdateCoordinator(hass, {})
     entity = trigger_entity.TriggerEntity(hass, coordinator, {})
@@ -33,7 +33,7 @@ async def test_reference_blueprints_is_none(hass: HomeAssistant) -> None:
     assert entity.referenced_blueprint is None
 
 
-async def test_template_state(hass: HomeAssistant) -> None:
+async def test_template_state(hass: SmartHub) -> None:
     """Test manual trigger template entity with a state."""
     config = {
         CONF_NAME: template.Template("test_entity", hass),
@@ -63,7 +63,7 @@ async def test_template_state(hass: HomeAssistant) -> None:
     assert entity.entity_picture == "/local/picture_off"
 
 
-async def test_bad_template_state(hass: HomeAssistant) -> None:
+async def test_bad_template_state(hass: SmartHub) -> None:
     """Test manual trigger template entity with a state."""
     config = {
         CONF_NAME: template.Template("test_entity", hass),
@@ -95,7 +95,7 @@ async def test_bad_template_state(hass: HomeAssistant) -> None:
 
 
 async def test_template_state_syntax_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test manual trigger template entity when state render fails."""
     config = {
@@ -120,7 +120,7 @@ async def test_template_state_syntax_error(
     assert entity.entity_picture is None
 
 
-async def test_script_variables_from_coordinator(hass: HomeAssistant) -> None:
+async def test_script_variables_from_coordinator(hass: SmartHub) -> None:
     """Test script variables."""
     coordinator = TriggerUpdateCoordinator(hass, {})
     entity = TestEntity(hass, coordinator, {})

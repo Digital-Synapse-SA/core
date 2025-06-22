@@ -7,10 +7,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 import voluptuous as vol
 
-from homeassistant import core as ha
-from homeassistant.components import input_boolean, switch
-from homeassistant.components.generic_hygrostat import DOMAIN
-from homeassistant.components.humidifier import (
+from smarthub import core as ha
+from smarthub.components import input_boolean, switch
+from smarthub.components.generic_hygrostat import DOMAIN
+from smarthub.components.humidifier import (
     ATTR_HUMIDITY,
     DOMAIN as HUMIDIFIER_DOMAIN,
     MODE_AWAY,
@@ -18,7 +18,7 @@ from homeassistant.components.humidifier import (
     SERVICE_SET_HUMIDITY,
     SERVICE_SET_MODE,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_MODE,
     SERVICE_TURN_OFF,
@@ -27,18 +27,18 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import (
+from smarthub.core import (
     DOMAIN as HOMEASSISTANT_DOMAIN,
     CoreState,
-    HomeAssistant,
+    SmartHub,
     ServiceCall,
     State,
     callback,
 )
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.typing import StateType
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.typing import StateType
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -58,7 +58,7 @@ MAX_HUMIDITY = 65
 TARGET_HUMIDITY = 42
 
 
-async def test_setup_missing_conf(hass: HomeAssistant) -> None:
+async def test_setup_missing_conf(hass: SmartHub) -> None:
     """Test set up humidity_control with missing config values."""
     config = {
         "platform": "generic_hygrostat",
@@ -70,7 +70,7 @@ async def test_setup_missing_conf(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_valid_conf(hass: HomeAssistant) -> None:
+async def test_valid_conf(hass: SmartHub) -> None:
     """Test set up generic_hygrostat with valid config values."""
     assert await async_setup_component(
         hass,
@@ -88,14 +88,14 @@ async def test_valid_conf(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-async def setup_comp_1(hass: HomeAssistant) -> None:
+async def setup_comp_1(hass: SmartHub) -> None:
     """Initialize components."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     await hass.async_block_till_done()
 
 
 @pytest.mark.usefixtures("setup_comp_1")
-async def test_humidifier_input_boolean(hass: HomeAssistant) -> None:
+async def test_humidifier_input_boolean(hass: SmartHub) -> None:
     """Test humidifier switching input_boolean."""
     humidifier_switch = "input_boolean.test"
     assert await async_setup_component(
@@ -136,7 +136,7 @@ async def test_humidifier_input_boolean(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_comp_1")
 async def test_humidifier_switch(
-    hass: HomeAssistant, mock_switch_entities: list[MockSwitch]
+    hass: SmartHub, mock_switch_entities: list[MockSwitch]
 ) -> None:
     """Test humidifier switching test switch."""
     setup_test_component_platform(hass, switch.DOMAIN, mock_switch_entities)
@@ -181,7 +181,7 @@ async def test_humidifier_switch(
 
 @pytest.mark.usefixtures("setup_comp_1")
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test setting a unique ID."""
     unique_id = "some_unique_id"
@@ -207,13 +207,13 @@ async def test_unique_id(
     assert entry.unique_id == unique_id
 
 
-def _setup_sensor(hass: HomeAssistant, humidity: StateType) -> None:
+def _setup_sensor(hass: SmartHub, humidity: StateType) -> None:
     """Set up the test sensor."""
     hass.states.async_set(ENT_SENSOR, humidity)
 
 
 @pytest.fixture
-async def setup_comp_0(hass: HomeAssistant) -> None:
+async def setup_comp_0(hass: SmartHub) -> None:
     """Initialize components."""
     _setup_sensor(hass, 45)
     hass.states.async_set(ENT_SWITCH, STATE_OFF)
@@ -239,7 +239,7 @@ async def setup_comp_0(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-async def setup_comp_2(hass: HomeAssistant) -> None:
+async def setup_comp_2(hass: SmartHub) -> None:
     """Initialize components."""
     _setup_sensor(hass, 45)
     hass.states.async_set(ENT_SWITCH, STATE_OFF)
@@ -263,7 +263,7 @@ async def setup_comp_2(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_unavailable_state(hass: HomeAssistant) -> None:
+async def test_unavailable_state(hass: SmartHub) -> None:
     """Test the setting of defaults to unknown."""
     await async_setup_component(
         hass,
@@ -290,7 +290,7 @@ async def test_unavailable_state(hass: HomeAssistant) -> None:
     assert hass.states.get(ENTITY).state == STATE_OFF
 
 
-async def test_setup_defaults_to_unknown(hass: HomeAssistant) -> None:
+async def test_setup_defaults_to_unknown(hass: SmartHub) -> None:
     """Test the setting of defaults to unknown."""
     await async_setup_component(
         hass,
@@ -312,7 +312,7 @@ async def test_setup_defaults_to_unknown(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_default_setup_params(hass: HomeAssistant) -> None:
+async def test_default_setup_params(hass: SmartHub) -> None:
     """Test the setup with default parameters."""
     state = hass.states.get(ENTITY)
     assert state.attributes.get("min_humidity") == 0
@@ -322,7 +322,7 @@ async def test_default_setup_params(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_0")
-async def test_default_setup_params_dehumidifier(hass: HomeAssistant) -> None:
+async def test_default_setup_params_dehumidifier(hass: SmartHub) -> None:
     """Test the setup with default parameters for dehumidifier."""
     state = hass.states.get(ENTITY)
     assert state.attributes.get("min_humidity") == 0
@@ -332,7 +332,7 @@ async def test_default_setup_params_dehumidifier(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_get_modes(hass: HomeAssistant) -> None:
+async def test_get_modes(hass: SmartHub) -> None:
     """Test that the attributes returns the correct modes."""
     state = hass.states.get(ENTITY)
     modes = state.attributes.get("available_modes")
@@ -340,7 +340,7 @@ async def test_get_modes(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_target_humidity(hass: HomeAssistant) -> None:
+async def test_set_target_humidity(hass: SmartHub) -> None:
     """Test the setting of the target humidity."""
     await hass.services.async_call(
         HUMIDIFIER_DOMAIN,
@@ -364,7 +364,7 @@ async def test_set_target_humidity(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_away_mode(hass: HomeAssistant) -> None:
+async def test_set_away_mode(hass: SmartHub) -> None:
     """Test the setting away mode."""
     await hass.services.async_call(
         HUMIDIFIER_DOMAIN,
@@ -385,7 +385,7 @@ async def test_set_away_mode(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_away_mode_and_restore_prev_humidity(hass: HomeAssistant) -> None:
+async def test_set_away_mode_and_restore_prev_humidity(hass: SmartHub) -> None:
     """Test the setting and removing away mode.
 
     Verify original humidity is restored.
@@ -419,7 +419,7 @@ async def test_set_away_mode_and_restore_prev_humidity(hass: HomeAssistant) -> N
 
 @pytest.mark.usefixtures("setup_comp_2")
 async def test_set_away_mode_twice_and_restore_prev_humidity(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the setting away mode twice in a row.
 
@@ -460,7 +460,7 @@ async def test_set_away_mode_twice_and_restore_prev_humidity(
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_sensor_affects_attribute(hass: HomeAssistant) -> None:
+async def test_sensor_affects_attribute(hass: SmartHub) -> None:
     """Test that the sensor changes are reflected in the current_humidity attribute."""
     state = hass.states.get(ENTITY)
     assert state.attributes.get("current_humidity") == 45
@@ -473,7 +473,7 @@ async def test_sensor_affects_attribute(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_sensor_bad_value(hass: HomeAssistant) -> None:
+async def test_sensor_bad_value(hass: SmartHub) -> None:
     """Test sensor that have None as state."""
     assert hass.states.get(ENTITY).state == STATE_ON
 
@@ -485,7 +485,7 @@ async def test_sensor_bad_value(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_comp_2")
 async def test_sensor_bad_value_twice(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test sensor that the second bad value is not logged as warning."""
     assert hass.states.get(ENTITY).state == STATE_ON
@@ -514,7 +514,7 @@ async def test_sensor_bad_value_twice(
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_target_humidity_humidifier_on(hass: HomeAssistant) -> None:
+async def test_set_target_humidity_humidifier_on(hass: SmartHub) -> None:
     """Test if target humidity turn humidifier on."""
     calls = await _setup_switch(hass, False)
     _setup_sensor(hass, 36)
@@ -535,7 +535,7 @@ async def test_set_target_humidity_humidifier_on(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_set_target_humidity_humidifier_off(hass: HomeAssistant) -> None:
+async def test_set_target_humidity_humidifier_off(hass: SmartHub) -> None:
     """Test if target humidity turn humidifier off."""
     calls = await _setup_switch(hass, True)
     _setup_sensor(hass, 45)
@@ -557,7 +557,7 @@ async def test_set_target_humidity_humidifier_off(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_comp_2")
 async def test_humidity_change_humidifier_on_within_tolerance(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change doesn't turn on within tolerance."""
     calls = await _setup_switch(hass, False)
@@ -575,7 +575,7 @@ async def test_humidity_change_humidifier_on_within_tolerance(
 
 @pytest.mark.usefixtures("setup_comp_2")
 async def test_humidity_change_humidifier_on_outside_tolerance(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change turn humidifier on outside dry tolerance."""
     calls = await _setup_switch(hass, False)
@@ -597,7 +597,7 @@ async def test_humidity_change_humidifier_on_outside_tolerance(
 
 @pytest.mark.usefixtures("setup_comp_2")
 async def test_humidity_change_humidifier_off_within_tolerance(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change doesn't turn off within tolerance."""
     calls = await _setup_switch(hass, True)
@@ -615,7 +615,7 @@ async def test_humidity_change_humidifier_off_within_tolerance(
 
 @pytest.mark.usefixtures("setup_comp_2")
 async def test_humidity_change_humidifier_off_outside_tolerance(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change turn humidifier off outside wet tolerance."""
     calls = await _setup_switch(hass, True)
@@ -636,7 +636,7 @@ async def test_humidity_change_humidifier_off_outside_tolerance(
 
 
 @pytest.mark.usefixtures("setup_comp_2")
-async def test_operation_mode_humidify(hass: HomeAssistant) -> None:
+async def test_operation_mode_humidify(hass: SmartHub) -> None:
     """Test change mode from OFF to HUMIDIFY.
 
     Switch turns on when humidity below setpoint and mode changes.
@@ -672,7 +672,7 @@ async def test_operation_mode_humidify(hass: HomeAssistant) -> None:
     assert call.data["entity_id"] == ENT_SWITCH
 
 
-async def _setup_switch(hass: HomeAssistant, is_on: bool) -> list[ServiceCall]:
+async def _setup_switch(hass: SmartHub, is_on: bool) -> list[ServiceCall]:
     """Set up the test switch."""
     hass.states.async_set(ENT_SWITCH, STATE_ON if is_on else STATE_OFF)
     calls = []
@@ -690,7 +690,7 @@ async def _setup_switch(hass: HomeAssistant, is_on: bool) -> list[ServiceCall]:
 
 
 @pytest.fixture
-async def setup_comp_3(hass: HomeAssistant) -> None:
+async def setup_comp_3(hass: SmartHub) -> None:
     """Initialize components."""
     assert await async_setup_component(
         hass,
@@ -714,7 +714,7 @@ async def setup_comp_3(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_set_target_humidity_dry_off(hass: HomeAssistant) -> None:
+async def test_set_target_humidity_dry_off(hass: SmartHub) -> None:
     """Test if target humidity turn dry off."""
     calls = await _setup_switch(hass, True)
     _setup_sensor(hass, 50)
@@ -735,7 +735,7 @@ async def test_set_target_humidity_dry_off(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_turn_away_mode_on_drying(hass: HomeAssistant) -> None:
+async def test_turn_away_mode_on_drying(hass: SmartHub) -> None:
     """Test the setting away mode when drying."""
     await _setup_switch(hass, True)
     _setup_sensor(hass, 50)
@@ -759,7 +759,7 @@ async def test_turn_away_mode_on_drying(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_operation_mode_dry(hass: HomeAssistant) -> None:
+async def test_operation_mode_dry(hass: SmartHub) -> None:
     """Test change mode from OFF to DRY.
 
     Switch turns on when humidity below setpoint and state changes.
@@ -793,7 +793,7 @@ async def test_operation_mode_dry(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_set_target_humidity_dry_on(hass: HomeAssistant) -> None:
+async def test_set_target_humidity_dry_on(hass: SmartHub) -> None:
     """Test if target humidity turn dry on."""
     calls = await _setup_switch(hass, False)
     _setup_sensor(hass, 45)
@@ -806,7 +806,7 @@ async def test_set_target_humidity_dry_on(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_init_ignores_tolerance(hass: HomeAssistant) -> None:
+async def test_init_ignores_tolerance(hass: SmartHub) -> None:
     """Test if tolerance is ignored on initialization."""
     calls = await _setup_switch(hass, True)
     _setup_sensor(hass, 39)
@@ -819,7 +819,7 @@ async def test_init_ignores_tolerance(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_humidity_change_dry_off_within_tolerance(hass: HomeAssistant) -> None:
+async def test_humidity_change_dry_off_within_tolerance(hass: SmartHub) -> None:
     """Test if humidity change doesn't turn dry off within tolerance."""
     calls = await _setup_switch(hass, True)
     _setup_sensor(hass, 45)
@@ -830,7 +830,7 @@ async def test_humidity_change_dry_off_within_tolerance(hass: HomeAssistant) -> 
 
 @pytest.mark.usefixtures("setup_comp_3")
 async def test_set_humidity_change_dry_off_outside_tolerance(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change turn dry off."""
     calls = await _setup_switch(hass, True)
@@ -844,7 +844,7 @@ async def test_set_humidity_change_dry_off_outside_tolerance(
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_humidity_change_dry_on_within_tolerance(hass: HomeAssistant) -> None:
+async def test_humidity_change_dry_on_within_tolerance(hass: SmartHub) -> None:
     """Test if humidity change doesn't turn dry on within tolerance."""
     calls = await _setup_switch(hass, False)
     _setup_sensor(hass, 37)
@@ -854,7 +854,7 @@ async def test_humidity_change_dry_on_within_tolerance(hass: HomeAssistant) -> N
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_humidity_change_dry_on_outside_tolerance(hass: HomeAssistant) -> None:
+async def test_humidity_change_dry_on_outside_tolerance(hass: SmartHub) -> None:
     """Test if humidity change turn dry on."""
     calls = await _setup_switch(hass, False)
     _setup_sensor(hass, 45)
@@ -867,7 +867,7 @@ async def test_humidity_change_dry_on_outside_tolerance(hass: HomeAssistant) -> 
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_running_when_operating_mode_is_off_2(hass: HomeAssistant) -> None:
+async def test_running_when_operating_mode_is_off_2(hass: SmartHub) -> None:
     """Test that the switch turns off when enabled is set False."""
     calls = await _setup_switch(hass, True)
     _setup_sensor(hass, 45)
@@ -888,7 +888,7 @@ async def test_running_when_operating_mode_is_off_2(hass: HomeAssistant) -> None
 
 
 @pytest.mark.usefixtures("setup_comp_3")
-async def test_no_state_change_when_operation_mode_off_2(hass: HomeAssistant) -> None:
+async def test_no_state_change_when_operation_mode_off_2(hass: SmartHub) -> None:
     """Test that the switch doesn't turn on when enabled is False."""
     calls = await _setup_switch(hass, False)
     _setup_sensor(hass, 30)
@@ -907,7 +907,7 @@ async def test_no_state_change_when_operation_mode_off_2(hass: HomeAssistant) ->
 
 
 @pytest.fixture
-async def setup_comp_4(hass: HomeAssistant) -> None:
+async def setup_comp_4(hass: SmartHub) -> None:
     """Initialize components."""
     assert await async_setup_component(
         hass,
@@ -932,7 +932,7 @@ async def setup_comp_4(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_comp_4")
 async def test_humidity_change_dry_trigger_on_not_long_enough(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change turn dry on."""
     calls = await _setup_switch(hass, False)
@@ -946,7 +946,7 @@ async def test_humidity_change_dry_trigger_on_not_long_enough(
 
 
 @pytest.mark.usefixtures("setup_comp_4")
-async def test_humidity_change_dry_trigger_on_long_enough(hass: HomeAssistant) -> None:
+async def test_humidity_change_dry_trigger_on_long_enough(hass: SmartHub) -> None:
     """Test if humidity change turn dry on."""
     fake_changed = datetime.datetime(1970, 11, 11, 11, 11, 11, tzinfo=datetime.UTC)
     with freeze_time(fake_changed):
@@ -966,7 +966,7 @@ async def test_humidity_change_dry_trigger_on_long_enough(hass: HomeAssistant) -
 
 @pytest.mark.usefixtures("setup_comp_4")
 async def test_humidity_change_dry_trigger_off_not_long_enough(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change turn dry on."""
     calls = await _setup_switch(hass, True)
@@ -980,7 +980,7 @@ async def test_humidity_change_dry_trigger_off_not_long_enough(
 
 
 @pytest.mark.usefixtures("setup_comp_4")
-async def test_humidity_change_dry_trigger_off_long_enough(hass: HomeAssistant) -> None:
+async def test_humidity_change_dry_trigger_off_long_enough(hass: SmartHub) -> None:
     """Test if humidity change turn dry on."""
     fake_changed = datetime.datetime(1970, 11, 11, 11, 11, 11, tzinfo=datetime.UTC)
     with freeze_time(fake_changed):
@@ -999,7 +999,7 @@ async def test_humidity_change_dry_trigger_off_long_enough(hass: HomeAssistant) 
 
 
 @pytest.mark.usefixtures("setup_comp_4")
-async def test_mode_change_dry_trigger_off_not_long_enough(hass: HomeAssistant) -> None:
+async def test_mode_change_dry_trigger_off_not_long_enough(hass: SmartHub) -> None:
     """Test if mode change turns dry off despite minimum cycle."""
     calls = await _setup_switch(hass, True)
     _setup_sensor(hass, 45)
@@ -1014,13 +1014,13 @@ async def test_mode_change_dry_trigger_off_not_long_enough(hass: HomeAssistant) 
     await hass.async_block_till_done()
     assert len(calls) == 1
     call = calls[0]
-    assert call.domain == "homeassistant"
+    assert call.domain == "smarthub"
     assert call.service == SERVICE_TURN_OFF
     assert call.data["entity_id"] == ENT_SWITCH
 
 
 @pytest.mark.usefixtures("setup_comp_4")
-async def test_mode_change_dry_trigger_on_not_long_enough(hass: HomeAssistant) -> None:
+async def test_mode_change_dry_trigger_on_not_long_enough(hass: SmartHub) -> None:
     """Test if mode change turns dry on despite minimum cycle."""
     calls = await _setup_switch(hass, False)
     _setup_sensor(hass, 35)
@@ -1044,13 +1044,13 @@ async def test_mode_change_dry_trigger_on_not_long_enough(hass: HomeAssistant) -
     await hass.async_block_till_done()
     assert len(calls) == 1
     call = calls[0]
-    assert call.domain == "homeassistant"
+    assert call.domain == "smarthub"
     assert call.service == SERVICE_TURN_ON
     assert call.data["entity_id"] == ENT_SWITCH
 
 
 @pytest.fixture
-async def setup_comp_6(hass: HomeAssistant) -> None:
+async def setup_comp_6(hass: SmartHub) -> None:
     """Initialize components."""
     assert await async_setup_component(
         hass,
@@ -1074,7 +1074,7 @@ async def setup_comp_6(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_comp_6")
 async def test_humidity_change_humidifier_trigger_off_not_long_enough(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change doesn't turn humidifier off because of time."""
     calls = await _setup_switch(hass, True)
@@ -1089,7 +1089,7 @@ async def test_humidity_change_humidifier_trigger_off_not_long_enough(
 
 @pytest.mark.usefixtures("setup_comp_6")
 async def test_humidity_change_humidifier_trigger_on_not_long_enough(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change doesn't turn humidifier on because of time."""
     calls = await _setup_switch(hass, False)
@@ -1104,7 +1104,7 @@ async def test_humidity_change_humidifier_trigger_on_not_long_enough(
 
 @pytest.mark.usefixtures("setup_comp_6")
 async def test_humidity_change_humidifier_trigger_on_long_enough(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change turn humidifier on after min cycle."""
     fake_changed = datetime.datetime(1970, 11, 11, 11, 11, 11, tzinfo=datetime.UTC)
@@ -1125,7 +1125,7 @@ async def test_humidity_change_humidifier_trigger_on_long_enough(
 
 @pytest.mark.usefixtures("setup_comp_6")
 async def test_humidity_change_humidifier_trigger_off_long_enough(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if humidity change turn humidifier off after min cycle."""
     fake_changed = datetime.datetime(1970, 11, 11, 11, 11, 11, tzinfo=datetime.UTC)
@@ -1146,7 +1146,7 @@ async def test_humidity_change_humidifier_trigger_off_long_enough(
 
 @pytest.mark.usefixtures("setup_comp_6")
 async def test_mode_change_humidifier_trigger_off_not_long_enough(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if mode change turns humidifier off despite minimum cycle."""
     calls = await _setup_switch(hass, True)
@@ -1163,14 +1163,14 @@ async def test_mode_change_humidifier_trigger_off_not_long_enough(
     await hass.async_block_till_done()
     assert len(calls) == 1
     call = calls[0]
-    assert call.domain == "homeassistant"
+    assert call.domain == "smarthub"
     assert call.service == SERVICE_TURN_OFF
     assert call.data["entity_id"] == ENT_SWITCH
 
 
 @pytest.mark.usefixtures("setup_comp_6")
 async def test_mode_change_humidifier_trigger_on_not_long_enough(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if mode change turns humidifier on despite minimum cycle."""
     calls = await _setup_switch(hass, False)
@@ -1200,13 +1200,13 @@ async def test_mode_change_humidifier_trigger_on_not_long_enough(
     await hass.async_block_till_done()
     assert len(calls) == 1
     call = calls[0]
-    assert call.domain == "homeassistant"
+    assert call.domain == "smarthub"
     assert call.service == SERVICE_TURN_ON
     assert call.data["entity_id"] == ENT_SWITCH
 
 
 @pytest.fixture
-async def setup_comp_7(hass: HomeAssistant) -> None:
+async def setup_comp_7(hass: SmartHub) -> None:
     """Initialize components."""
     assert await async_setup_component(
         hass,
@@ -1232,7 +1232,7 @@ async def setup_comp_7(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_comp_7")
 async def test_humidity_change_dry_trigger_on_long_enough_3(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if turn on signal is sent at keep-alive intervals."""
     calls = await _setup_switch(hass, True)
@@ -1253,7 +1253,7 @@ async def test_humidity_change_dry_trigger_on_long_enough_3(
 
 @pytest.mark.usefixtures("setup_comp_7")
 async def test_humidity_change_dry_trigger_off_long_enough_3(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if turn on signal is sent at keep-alive intervals."""
     calls = await _setup_switch(hass, False)
@@ -1273,7 +1273,7 @@ async def test_humidity_change_dry_trigger_off_long_enough_3(
 
 
 @pytest.fixture
-async def setup_comp_8(hass: HomeAssistant) -> None:
+async def setup_comp_8(hass: SmartHub) -> None:
     """Initialize components."""
     assert await async_setup_component(
         hass,
@@ -1298,7 +1298,7 @@ async def setup_comp_8(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_comp_8")
 async def test_humidity_change_humidifier_trigger_on_long_enough_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if turn on signal is sent at keep-alive intervals."""
     calls = await _setup_switch(hass, True)
@@ -1319,7 +1319,7 @@ async def test_humidity_change_humidifier_trigger_on_long_enough_2(
 
 @pytest.mark.usefixtures("setup_comp_8")
 async def test_humidity_change_humidifier_trigger_off_long_enough_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test if turn on signal is sent at keep-alive intervals."""
     calls = await _setup_switch(hass, False)
@@ -1338,7 +1338,7 @@ async def test_humidity_change_humidifier_trigger_off_long_enough_2(
     assert call.data["entity_id"] == ENT_SWITCH
 
 
-async def test_float_tolerance_values(hass: HomeAssistant) -> None:
+async def test_float_tolerance_values(hass: SmartHub) -> None:
     """Test if dehumidifier does not turn on within floating point tolerance."""
     assert await async_setup_component(
         hass,
@@ -1364,7 +1364,7 @@ async def test_float_tolerance_values(hass: HomeAssistant) -> None:
     assert len(calls) == 0
 
 
-async def test_float_tolerance_values_2(hass: HomeAssistant) -> None:
+async def test_float_tolerance_values_2(hass: SmartHub) -> None:
     """Test if dehumidifier turns off when oudside of floating point tolerance values."""
     assert await async_setup_component(
         hass,
@@ -1393,7 +1393,7 @@ async def test_float_tolerance_values_2(hass: HomeAssistant) -> None:
     assert call.data["entity_id"] == ENT_SWITCH
 
 
-async def test_custom_setup_params(hass: HomeAssistant) -> None:
+async def test_custom_setup_params(hass: SmartHub) -> None:
     """Test the setup with custom parameters."""
     _setup_sensor(hass, 45)
     await hass.async_block_till_done()
@@ -1420,7 +1420,7 @@ async def test_custom_setup_params(hass: HomeAssistant) -> None:
     assert state.attributes.get("humidity") == TARGET_HUMIDITY
 
 
-async def test_restore_state(hass: HomeAssistant) -> None:
+async def test_restore_state(hass: SmartHub) -> None:
     """Ensure states are restored on startup."""
     _setup_sensor(hass, 45)
     await hass.async_block_till_done()
@@ -1458,7 +1458,7 @@ async def test_restore_state(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_restore_state_target_humidity(hass: HomeAssistant) -> None:
+async def test_restore_state_target_humidity(hass: SmartHub) -> None:
     """Ensure restore target humidity if available."""
     _setup_sensor(hass, 45)
     await hass.async_block_till_done()
@@ -1496,7 +1496,7 @@ async def test_restore_state_target_humidity(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_restore_state_and_return_to_normal(hass: HomeAssistant) -> None:
+async def test_restore_state_and_return_to_normal(hass: SmartHub) -> None:
     """Ensure retain of target humidity for normal mode."""
     _setup_sensor(hass, 55)
     await hass.async_block_till_done()
@@ -1553,7 +1553,7 @@ async def test_restore_state_and_return_to_normal(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_no_restore_state(hass: HomeAssistant) -> None:
+async def test_no_restore_state(hass: SmartHub) -> None:
     """Ensure states are restored on startup if they exist.
 
     Allows for graceful reboot.
@@ -1594,7 +1594,7 @@ async def test_no_restore_state(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_restore_state_uncoherence_case(hass: HomeAssistant) -> None:
+async def test_restore_state_uncoherence_case(hass: SmartHub) -> None:
     """Test restore from a strange state.
 
     - Turn the generic hygrostat off
@@ -1618,7 +1618,7 @@ async def test_restore_state_uncoherence_case(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def _setup_humidifier(hass: HomeAssistant) -> None:
+async def _setup_humidifier(hass: SmartHub) -> None:
     assert await async_setup_component(
         hass,
         HUMIDIFIER_DOMAIN,
@@ -1639,7 +1639,7 @@ async def _setup_humidifier(hass: HomeAssistant) -> None:
 
 
 def _mock_restore_cache(
-    hass: HomeAssistant, humidity: int = 40, state: str = STATE_OFF
+    hass: SmartHub, humidity: int = 40, state: str = STATE_OFF
 ) -> None:
     mock_restore_cache(
         hass,
@@ -1657,7 +1657,7 @@ def _mock_restore_cache(
     )
 
 
-async def test_away_fixed_humidity_mode(hass: HomeAssistant) -> None:
+async def test_away_fixed_humidity_mode(hass: SmartHub) -> None:
     """Ensure retain of target humidity for normal mode."""
     _setup_sensor(hass, 45)
     await hass.async_block_till_done()
@@ -1734,7 +1734,7 @@ async def test_away_fixed_humidity_mode(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_comp_1")
 async def test_sensor_stale_duration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -1835,7 +1835,7 @@ async def test_sensor_stale_duration(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:

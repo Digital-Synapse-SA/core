@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 from energyflip import EnergyFlipException
 
-from homeassistant.components.huisbaasje.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ID, CONF_PASSWORD, CONF_USERNAME, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.huisbaasje.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_ID, CONF_PASSWORD, CONF_USERNAME, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from .test_data import MOCK_CURRENT_MEASUREMENTS
 
 from tests.common import MockConfigEntry
 
 
-async def test_setup_entry(hass: HomeAssistant) -> None:
+async def test_setup_entry(hass: SmartHub) -> None:
     """Test for successfully setting a config entry."""
     with (
         patch(
@@ -58,7 +58,7 @@ async def test_setup_entry(hass: HomeAssistant) -> None:
         assert len(mock_current_measurements.mock_calls) == 1
 
 
-async def test_setup_entry_error(hass: HomeAssistant) -> None:
+async def test_setup_entry_error(hass: SmartHub) -> None:
     """Test for successfully setting a config entry."""
     with patch(
         "energyflip.EnergyFlip.authenticate", side_effect=EnergyFlipException
@@ -92,7 +92,7 @@ async def test_setup_entry_error(hass: HomeAssistant) -> None:
         assert len(mock_authenticate.mock_calls) == 1
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test for successfully unloading the config entry."""
     with (
         patch(

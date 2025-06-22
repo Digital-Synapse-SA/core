@@ -6,19 +6,19 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.mcp.const import (
+from smarthub.components.mcp.const import (
     CONF_ACCESS_TOKEN,
     CONF_AUTHORIZATION_URL,
     CONF_TOKEN_URL,
     DOMAIN,
 )
-from homeassistant.const import CONF_TOKEN, CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_TOKEN, CONF_URL
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -35,7 +35,7 @@ OAUTH_TOKEN_URL = "https://example-auth-server.com/token-path"
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.mcp.async_setup_entry", return_value=True
+        "smarthub.components.mcp.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -44,15 +44,15 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 def mock_mcp_client() -> Generator[AsyncMock]:
     """Fixture to mock the MCP client."""
     with (
-        patch("homeassistant.components.mcp.coordinator.sse_client"),
-        patch("homeassistant.components.mcp.coordinator.ClientSession") as mock_session,
-        patch("homeassistant.components.mcp.coordinator.TIMEOUT", 1),
+        patch("smarthub.components.mcp.coordinator.sse_client"),
+        patch("smarthub.components.mcp.coordinator.ClientSession") as mock_session,
+        patch("smarthub.components.mcp.coordinator.TIMEOUT", 1),
     ):
         yield mock_session.return_value.__aenter__
 
 
 @pytest.fixture(name="config_entry")
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Fixture to load the integration."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -64,7 +64,7 @@ def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 
 @pytest.fixture(name="credential")
-async def mock_credential(hass: HomeAssistant) -> None:
+async def mock_credential(hass: SmartHub) -> None:
     """Fixture that provides the ClientCredential for the test."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -83,7 +83,7 @@ def mock_config_entry_token_expiration() -> datetime.datetime:
 
 @pytest.fixture(name="config_entry_with_auth")
 def mock_config_entry_with_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_token_expiration: datetime.datetime,
 ) -> MockConfigEntry:
     """Fixture to load the integration with authentication."""

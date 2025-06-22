@@ -4,10 +4,10 @@ from unittest.mock import call
 
 import pytest
 
-from homeassistant.components.rfxtrx import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, State
+from smarthub.components.rfxtrx import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub, State
 
 from .conftest import create_rfx_test_cfg
 
@@ -17,7 +17,7 @@ EVENT_RFY_ENABLE_SUN_AUTO = "0C1a0000030101011300000003"
 EVENT_RFY_DISABLE_SUN_AUTO = "0C1a0000030101011400000003"
 
 
-async def test_one_switch(hass: HomeAssistant, rfxtrx) -> None:
+async def test_one_switch(hass: SmartHub, rfxtrx) -> None:
     """Test with 1 switch."""
     entry_data = create_rfx_test_cfg(devices={"0b1100cd0213c7f210010f51": {}})
     mock_entry = MockConfigEntry(domain="rfxtrx", unique_id=DOMAIN, data=entry_data)
@@ -52,7 +52,7 @@ async def test_one_switch(hass: HomeAssistant, rfxtrx) -> None:
     ]
 
 
-async def test_one_pt2262_switch(hass: HomeAssistant, rfxtrx) -> None:
+async def test_one_pt2262_switch(hass: SmartHub, rfxtrx) -> None:
     """Test with 1 PT2262 switch."""
     entry_data = create_rfx_test_cfg(
         devices={
@@ -96,7 +96,7 @@ async def test_one_pt2262_switch(hass: HomeAssistant, rfxtrx) -> None:
 
 
 @pytest.mark.parametrize("state", ["on", "off"])
-async def test_state_restore(hass: HomeAssistant, rfxtrx, state) -> None:
+async def test_state_restore(hass: SmartHub, rfxtrx, state) -> None:
     """State restoration."""
 
     entity_id = "switch.ac_213c7f2_16"
@@ -114,7 +114,7 @@ async def test_state_restore(hass: HomeAssistant, rfxtrx, state) -> None:
     assert hass.states.get(entity_id).state == state
 
 
-async def test_several_switches(hass: HomeAssistant, rfxtrx) -> None:
+async def test_several_switches(hass: SmartHub, rfxtrx) -> None:
     """Test with 3 switches."""
     entry_data = create_rfx_test_cfg(
         devices={
@@ -146,7 +146,7 @@ async def test_several_switches(hass: HomeAssistant, rfxtrx) -> None:
     assert state.attributes.get("friendly_name") == "AC 1118cdea:2"
 
 
-async def test_switch_events(hass: HomeAssistant, rfxtrx) -> None:
+async def test_switch_events(hass: SmartHub, rfxtrx) -> None:
     """Event test with 2 switches."""
     entry_data = create_rfx_test_cfg(
         devices={
@@ -202,7 +202,7 @@ async def test_switch_events(hass: HomeAssistant, rfxtrx) -> None:
     assert hass.states.get("switch.ac_213c7f2_16").state == "off"
 
 
-async def test_pt2262_switch_events(hass: HomeAssistant, rfxtrx) -> None:
+async def test_pt2262_switch_events(hass: SmartHub, rfxtrx) -> None:
     """Test with 1 PT2262 switch."""
     entry_data = create_rfx_test_cfg(
         devices={
@@ -242,7 +242,7 @@ async def test_pt2262_switch_events(hass: HomeAssistant, rfxtrx) -> None:
     assert hass.states.get("switch.pt2262_226700").state == "off"
 
 
-async def test_discover_switch(hass: HomeAssistant, rfxtrx_automatic) -> None:
+async def test_discover_switch(hass: SmartHub, rfxtrx_automatic) -> None:
     """Test with discovery of switches."""
     rfxtrx = rfxtrx_automatic
 
@@ -257,7 +257,7 @@ async def test_discover_switch(hass: HomeAssistant, rfxtrx_automatic) -> None:
     assert state.state == "on"
 
 
-async def test_discover_rfy_sun_switch(hass: HomeAssistant, rfxtrx_automatic) -> None:
+async def test_discover_rfy_sun_switch(hass: SmartHub, rfxtrx_automatic) -> None:
     """Test with discovery of switches."""
     rfxtrx = rfxtrx_automatic
 
@@ -272,7 +272,7 @@ async def test_discover_rfy_sun_switch(hass: HomeAssistant, rfxtrx_automatic) ->
     assert state.state == "on"
 
 
-async def test_unknown_event_code(hass: HomeAssistant, rfxtrx) -> None:
+async def test_unknown_event_code(hass: SmartHub, rfxtrx) -> None:
     """Test with 3 switches."""
     entry_data = create_rfx_test_cfg(devices={"1234567890": {}})
     mock_entry = MockConfigEntry(domain="rfxtrx", unique_id=DOMAIN, data=entry_data)

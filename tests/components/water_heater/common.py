@@ -4,7 +4,7 @@ All containing methods are legacy helpers that should not be used by new
 components. Instead call the service directly.
 """
 
-from homeassistant.components.water_heater import (
+from smarthub.components.water_heater import (
     _LOGGER,
     ATTR_AWAY_MODE,
     ATTR_OPERATION_MODE,
@@ -15,12 +15,12 @@ from homeassistant.components.water_heater import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, ENTITY_MATCH_ALL
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, ENTITY_MATCH_ALL
+from smarthub.core import SmartHub
 
 
 async def async_set_away_mode(
-    hass: HomeAssistant, away_mode: bool, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, away_mode: bool, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Turn all or specified water_heater devices away mode on."""
     data = {ATTR_AWAY_MODE: away_mode}
@@ -32,7 +32,7 @@ async def async_set_away_mode(
 
 
 async def async_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     temperature: float,
     entity_id: str = ENTITY_MATCH_ALL,
     operation_mode: str | None = None,
@@ -54,7 +54,7 @@ async def async_set_temperature(
 
 
 async def async_set_operation_mode(
-    hass: HomeAssistant, operation_mode: str, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, operation_mode: str, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Set new target operation mode."""
     data = {ATTR_OPERATION_MODE: operation_mode}
@@ -67,7 +67,7 @@ async def async_set_operation_mode(
     )
 
 
-async def async_turn_on(hass: HomeAssistant, entity_id: str = ENTITY_MATCH_ALL) -> None:
+async def async_turn_on(hass: SmartHub, entity_id: str = ENTITY_MATCH_ALL) -> None:
     """Turn all or specified water_heater devices on."""
     data = {}
 
@@ -78,7 +78,7 @@ async def async_turn_on(hass: HomeAssistant, entity_id: str = ENTITY_MATCH_ALL) 
 
 
 async def async_turn_off(
-    hass: HomeAssistant, entity_id: str = ENTITY_MATCH_ALL
+    hass: SmartHub, entity_id: str = ENTITY_MATCH_ALL
 ) -> None:
     """Turn all or specified water_heater devices off."""
     data = {}

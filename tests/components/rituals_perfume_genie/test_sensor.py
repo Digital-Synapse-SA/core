@@ -1,14 +1,14 @@
 """Tests for the Rituals Perfume Genie sensor platform."""
 
-from homeassistant.components.rituals_perfume_genie.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.rituals_perfume_genie.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     init_integration,
@@ -18,7 +18,7 @@ from .common import (
 
 
 async def test_sensors_diffuser_v1_battery_cartridge(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the creation and values of the Rituals Perfume Genie sensors."""
     config_entry = mock_config_entry(unique_id="id_123_sensor_test_diffuser_v1")

@@ -4,9 +4,9 @@ from enum import Enum
 
 import pytest
 
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers.typing import ConfigType
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component, async_mock_service
 
@@ -20,14 +20,14 @@ class ConfigurationStyle(Enum):
 
 
 @pytest.fixture
-def calls(hass: HomeAssistant) -> list[ServiceCall]:
+def calls(hass: SmartHub) -> list[ServiceCall]:
     """Track calls to a mock service."""
     return async_mock_service(hass, "test", "automation")
 
 
 @pytest.fixture
 async def start_ha(
-    hass: HomeAssistant, count: int, domain: str, config: ConfigType
+    hass: SmartHub, count: int, domain: str, config: ConfigType
 ) -> None:
     """Do setup of integration."""
     with assert_setup_component(count, domain):

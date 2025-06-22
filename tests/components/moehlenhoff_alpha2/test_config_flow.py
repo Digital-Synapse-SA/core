@@ -3,17 +3,17 @@
 from functools import partialmethod
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.moehlenhoff_alpha2.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.moehlenhoff_alpha2.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import MOCK_BASE_HOST, mock_update_data
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -24,11 +24,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.moehlenhoff_alpha2.config_flow.Alpha2Base.update_data",
+            "smarthub.components.moehlenhoff_alpha2.config_flow.Alpha2Base.update_data",
             partialmethod(mock_update_data, hass),
         ),
         patch(
-            "homeassistant.components.moehlenhoff_alpha2.async_setup_entry",
+            "smarthub.components.moehlenhoff_alpha2.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -44,7 +44,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_duplicate_error(hass: HomeAssistant) -> None:
+async def test_form_duplicate_error(hass: SmartHub) -> None:
     """Test that errors are shown when duplicates are added."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -68,7 +68,7 @@ async def test_form_duplicate_error(hass: HomeAssistant) -> None:
         assert result["reason"] == "already_configured"
 
 
-async def test_form_cannot_connect_error(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect_error(hass: SmartHub) -> None:
     """Test connection error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -83,7 +83,7 @@ async def test_form_cannot_connect_error(hass: HomeAssistant) -> None:
         assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_unexpected_error(hass: HomeAssistant) -> None:
+async def test_form_unexpected_error(hass: SmartHub) -> None:
     """Test unexpected error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}

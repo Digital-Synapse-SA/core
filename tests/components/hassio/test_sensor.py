@@ -8,15 +8,15 @@ from aiohasupervisor import SupervisorError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.hassio import DOMAIN, HASSIO_UPDATE_INTERVAL
-from homeassistant.components.hassio.const import REQUEST_REFRESH_DELAY
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub import config_entries
+from smarthub.components.hassio import DOMAIN, HASSIO_UPDATE_INTERVAL
+from smarthub.components.hassio.const import REQUEST_REFRESH_DELAY
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .common import MOCK_REPOSITORIES, MOCK_STORE_ADDONS
 
@@ -41,7 +41,7 @@ def mock_all(
 
 def _install_default_mocks(aioclient_mock: AiohttpClientMocker):
     """Install default mocks."""
-    aioclient_mock.post("http://127.0.0.1/homeassistant/options", json={"result": "ok"})
+    aioclient_mock.post("http://127.0.0.1/smarthub/options", json={"result": "ok"})
     aioclient_mock.post("http://127.0.0.1/supervisor/options", json={"result": "ok"})
     aioclient_mock.get(
         "http://127.0.0.1/info",
@@ -49,7 +49,7 @@ def _install_default_mocks(aioclient_mock: AiohttpClientMocker):
             "result": "ok",
             "data": {
                 "supervisor": "222",
-                "homeassistant": "0.110.0",
+                "smarthub": "0.110.0",
                 "hassos": "1.2.3",
             },
         },
@@ -93,7 +93,7 @@ def _install_default_mocks(aioclient_mock: AiohttpClientMocker):
                         "version": "2.0.0",
                         "version_latest": "2.0.1",
                         "repository": "core",
-                        "url": "https://github.com/home-assistant/addons/test",
+                        "url": "https://github.com/smart-hub/addons/test",
                         "icon": False,
                     },
                     {
@@ -181,7 +181,7 @@ def _install_default_mocks(aioclient_mock: AiohttpClientMocker):
     ],
 )
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id,
     expected,
     aioclient_mock: AiohttpClientMocker,
@@ -232,7 +232,7 @@ async def test_sensor(
 )
 @patch.dict(os.environ, MOCK_ENVIRON)
 async def test_stats_addon_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id,
     expected,
     aioclient_mock: AiohttpClientMocker,

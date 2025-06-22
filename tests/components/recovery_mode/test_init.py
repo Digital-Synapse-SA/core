@@ -1,12 +1,12 @@
 """Tests for the Recovery Mode integration."""
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_get_persistent_notifications
 
 
-async def test_works(hass: HomeAssistant) -> None:
+async def test_works(hass: SmartHub) -> None:
     """Test Recovery Mode works."""
     assert await async_setup_component(hass, "recovery_mode", {})
     await hass.async_block_till_done()

@@ -6,10 +6,10 @@ from bleak import BleakError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.husqvarna_automower_ble.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.husqvarna_automower_ble.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import AUTOMOWER_SERVICE_INFO
 
@@ -19,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("mock_automower_client")
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -40,7 +40,7 @@ async def test_setup(
 
 
 async def test_setup_retry_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: Mock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -56,7 +56,7 @@ async def test_setup_retry_connect(
 
 
 async def test_setup_failed_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: Mock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

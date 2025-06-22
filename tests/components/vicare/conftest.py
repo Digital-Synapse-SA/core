@@ -10,8 +10,8 @@ import pytest
 from PyViCare.PyViCareDeviceConfig import PyViCareDeviceConfig
 from PyViCare.PyViCareService import ViCareDeviceAccessor, readFeature
 
-from homeassistant.components.vicare.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.vicare.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import ENTRY_CONFIG, MODULE, setup_integration
 
@@ -79,7 +79,7 @@ def mock_config_entry() -> MockConfigEntry:
 
 @pytest.fixture
 async def mock_vicare_gas_boiler(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> AsyncGenerator[MockConfigEntry]:
     """Return a mocked ViCare API representing a single gas boiler device."""
     fixtures: list[Fixture] = [Fixture({"type:boiler"}, "vicare/Vitodens300W.json")]
@@ -94,7 +94,7 @@ async def mock_vicare_gas_boiler(
 
 @pytest.fixture
 async def mock_vicare_room_sensors(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> AsyncGenerator[MockConfigEntry]:
     """Return a mocked ViCare API representing multiple room sensor devices."""
     fixtures: list[Fixture] = [

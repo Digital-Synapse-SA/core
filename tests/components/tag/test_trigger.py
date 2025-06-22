@@ -4,12 +4,12 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.components.tag import async_scan_tag
-from homeassistant.components.tag.const import DEVICE_ID, DOMAIN, TAG_ID
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.tag import async_scan_tag
+from smarthub.components.tag.const import DEVICE_ID, DOMAIN, TAG_ID
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(autouse=True, name="stub_blueprint_populate")
@@ -18,7 +18,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 @pytest.fixture
-def tag_setup(hass: HomeAssistant, hass_storage: dict[str, Any]):
+def tag_setup(hass: SmartHub, hass_storage: dict[str, Any]):
     """Tag setup."""
 
     async def _storage(items=None):
@@ -38,7 +38,7 @@ def tag_setup(hass: HomeAssistant, hass_storage: dict[str, Any]):
 
 
 async def test_triggers(
-    hass: HomeAssistant, tag_setup, service_calls: list[ServiceCall]
+    hass: SmartHub, tag_setup, service_calls: list[ServiceCall]
 ) -> None:
     """Test tag triggers."""
     assert await tag_setup()
@@ -86,7 +86,7 @@ async def test_triggers(
 
 
 async def test_exception_bad_trigger(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test for exception on event triggers firing."""
 
@@ -110,7 +110,7 @@ async def test_exception_bad_trigger(
 
 
 async def test_multiple_tags_and_devices_trigger(
-    hass: HomeAssistant, tag_setup, service_calls: list[ServiceCall]
+    hass: SmartHub, tag_setup, service_calls: list[ServiceCall]
 ) -> None:
     """Test multiple tags and devices triggers."""
     assert await tag_setup()

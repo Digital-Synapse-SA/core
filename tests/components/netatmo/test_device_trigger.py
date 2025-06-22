@@ -3,20 +3,20 @@
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.netatmo import DOMAIN
-from homeassistant.components.netatmo.const import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.netatmo import DOMAIN
+from smarthub.components.netatmo.const import (
     CLIMATE_TRIGGERS,
     INDOOR_CAMERA_TRIGGERS,
     NETATMO_EVENT,
     OUTDOOR_CAMERA_TRIGGERS,
 )
-from homeassistant.components.netatmo.device_trigger import SUBTYPES
-from homeassistant.const import ATTR_DEVICE_ID
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.netatmo.device_trigger import SUBTYPES
+from smarthub.const import ATTR_DEVICE_ID
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -35,7 +35,7 @@ from tests.common import (
     ],
 )
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     platform,
@@ -105,7 +105,7 @@ async def test_get_triggers(
     ],
 )
 async def test_if_fires_on_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -188,7 +188,7 @@ async def test_if_fires_on_event(
     ],
 )
 async def test_if_fires_on_event_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -267,7 +267,7 @@ async def test_if_fires_on_event_legacy(
     ],
 )
 async def test_if_fires_on_event_with_subtype(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -348,7 +348,7 @@ async def test_if_fires_on_event_with_subtype(
     [("climate", "NAPlug", trigger) for trigger in CLIMATE_TRIGGERS],
 )
 async def test_if_invalid_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     platform,

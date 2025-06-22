@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, patch
 from pyprosegur.installation import Status
 import pytest
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_DOMAIN,
     AlarmControlPanelState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     ATTR_SUPPORTED_FEATURES,
@@ -19,8 +19,8 @@ from homeassistant.const import (
     SERVICE_ALARM_DISARM,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_component, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_component, entity_registry as er
 
 from .conftest import CONTRACT
 
@@ -48,7 +48,7 @@ def mock_status(request: pytest.FixtureRequest) -> Generator[None]:
 
 
 async def test_entity_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration,
     mock_auth,
@@ -68,7 +68,7 @@ async def test_entity_registry(
 
 
 async def test_connection_error(
-    hass: HomeAssistant, init_integration, mock_auth, mock_config_entry
+    hass: SmartHub, init_integration, mock_auth, mock_config_entry
 ) -> None:
     """Test the alarm control panel when connection can't be made to the cloud service."""
 
@@ -103,7 +103,7 @@ async def test_connection_error(
     ],
 )
 async def test_arm(
-    hass: HomeAssistant, init_integration, mock_auth, code, alarm_service, alarm_state
+    hass: SmartHub, init_integration, mock_auth, code, alarm_service, alarm_state
 ) -> None:
     """Test the alarm control panel can be set to away."""
 

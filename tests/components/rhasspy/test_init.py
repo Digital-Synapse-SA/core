@@ -1,13 +1,13 @@
 """Tests for the Rhasspy integration."""
 
-from homeassistant.components.rhasspy.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.rhasspy.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_load_unload_config_entry(hass: HomeAssistant) -> None:
+async def test_load_unload_config_entry(hass: SmartHub) -> None:
     """Test the Rhasspy configuration entry loading/unloading."""
     mock_config_entry = MockConfigEntry(
         title="Rhasspy",

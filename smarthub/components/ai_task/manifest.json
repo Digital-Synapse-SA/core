@@ -1,0 +1,9 @@
+{
+  "domain": "ai_task",
+  "name": "AI Task",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["conversation"],
+  "documentation": "https://www.smart-hub.io/integrations/ai_task",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

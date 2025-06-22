@@ -6,15 +6,15 @@ from freezegun.api import FrozenDateTimeFactory
 from nice_go import AuthFailedError
 import pytest
 
-from homeassistant.components.nice_go.const import (
+from smarthub.components.nice_go.const import (
     CONF_REFRESH_TOKEN,
     CONF_REFRESH_TOKEN_CREATION_TIME,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_setup_entry: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -57,7 +57,7 @@ async def test_form(
     [(AuthFailedError, "invalid_auth"), (Exception, "unknown")],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_setup_entry: AsyncMock,
     side_effect: Exception,
@@ -92,7 +92,7 @@ async def test_form_exceptions(
 
 
 async def test_duplicate_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_nice_go: AsyncMock,
 ) -> None:
@@ -114,7 +114,7 @@ async def test_duplicate_device(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_nice_go: AsyncMock,
 ) -> None:
@@ -145,7 +145,7 @@ async def test_reauth(
     [(AuthFailedError, "invalid_auth"), (Exception, "unknown")],
 )
 async def test_reauth_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_nice_go: AsyncMock,
     side_effect: Exception,

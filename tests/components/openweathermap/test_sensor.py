@@ -5,15 +5,15 @@ from unittest.mock import MagicMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.openweathermap.const import (
+from smarthub.components.openweathermap.const import (
     OWM_MODE_AIRPOLLUTION,
     OWM_MODE_FREE_CURRENT,
     OWM_MODE_FREE_FORECAST,
     OWM_MODE_V30,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_platform
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, snapshot_platform
     "mode", [OWM_MODE_V30, OWM_MODE_FREE_CURRENT, OWM_MODE_AIRPOLLUTION], indirect=True
 )
 async def test_sensor_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
@@ -39,7 +39,7 @@ async def test_sensor_states(
 
 @pytest.mark.parametrize("mode", [OWM_MODE_FREE_FORECAST], indirect=True)
 async def test_mode_no_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,

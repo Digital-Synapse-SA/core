@@ -4,16 +4,16 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pykulersky
 
-from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
-from homeassistant.components.kulersky.config_flow import DOMAIN
-from homeassistant.config_entries import (
+from smarthub.components.bluetooth import BluetoothServiceInfoBleak
+from smarthub.components.kulersky.config_flow import DOMAIN
+from smarthub.config_entries import (
     SOURCE_BLUETOOTH,
     SOURCE_INTEGRATION_DISCOVERY,
     SOURCE_USER,
 )
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.components.bluetooth import generate_advertisement_data, generate_ble_device
 
@@ -38,7 +38,7 @@ KULERSKY_SERVICE_INFO = BluetoothServiceInfoBleak(
 )
 
 
-async def test_bluetooth_discovery(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -62,10 +62,10 @@ async def test_bluetooth_discovery(hass: HomeAssistant) -> None:
     }
 
 
-async def test_integration_discovery(hass: HomeAssistant) -> None:
+async def test_integration_discovery(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device."""
     with patch(
-        "homeassistant.components.kulersky.config_flow.async_last_service_info",
+        "smarthub.components.kulersky.config_flow.async_last_service_info",
         return_value=KULERSKY_SERVICE_INFO,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -81,7 +81,7 @@ async def test_integration_discovery(hass: HomeAssistant) -> None:
     }
 
 
-async def test_integration_discovery_no_last_service_info(hass: HomeAssistant) -> None:
+async def test_integration_discovery_no_last_service_info(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -96,10 +96,10 @@ async def test_integration_discovery_no_last_service_info(hass: HomeAssistant) -
     }
 
 
-async def test_user_setup(hass: HomeAssistant) -> None:
+async def test_user_setup(hass: SmartHub) -> None:
     """Test the user manually setting up the integration."""
     with patch(
-        "homeassistant.components.kulersky.config_flow.async_discovered_service_info",
+        "smarthub.components.kulersky.config_flow.async_discovered_service_info",
         return_value=[
             KULERSKY_SERVICE_INFO,
             KULERSKY_SERVICE_INFO,
@@ -126,10 +126,10 @@ async def test_user_setup(hass: HomeAssistant) -> None:
     }
 
 
-async def test_user_setup_no_devices(hass: HomeAssistant) -> None:
+async def test_user_setup_no_devices(hass: SmartHub) -> None:
     """Test the user manually setting up the integration."""
     with patch(
-        "homeassistant.components.kulersky.config_flow.async_discovered_service_info",
+        "smarthub.components.kulersky.config_flow.async_discovered_service_info",
         return_value=[],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -140,7 +140,7 @@ async def test_user_setup_no_devices(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_connection_error(hass: HomeAssistant) -> None:
+async def test_connection_error(hass: SmartHub) -> None:
     """Test a connection error trying to set up."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -161,7 +161,7 @@ async def test_connection_error(hass: HomeAssistant) -> None:
     assert result["errors"]["base"] == "cannot_connect"
 
 
-async def test_unexpected_error(hass: HomeAssistant) -> None:
+async def test_unexpected_error(hass: SmartHub) -> None:
     """Test an unexpected error trying to set up."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,

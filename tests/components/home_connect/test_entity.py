@@ -30,9 +30,9 @@ from aiohomeconnect.model.program import (
 )
 import pytest
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     STATE_OFF,
@@ -41,8 +41,8 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry
 
@@ -95,7 +95,7 @@ def platforms() -> list[str]:
     indirect=["appliance"],
 )
 async def test_program_options_retrieval(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -249,7 +249,7 @@ async def test_program_options_retrieval(
     ],
 )
 async def test_no_options_retrieval_on_unknown_program(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -324,7 +324,7 @@ async def test_no_options_retrieval_on_unknown_program(
     indirect=["appliance"],
 )
 async def test_program_options_retrieval_after_appliance_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -444,7 +444,7 @@ async def test_program_options_retrieval_after_appliance_connection(
     ],
 )
 async def test_option_entity_functionality_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -480,7 +480,7 @@ async def test_option_entity_functionality_exception(
             side_effect=set_selected_program_option_side_effect
         )
 
-    with pytest.raises(HomeAssistantError, match=r"Error.*setting.*option.*"):
+    with pytest.raises(SmartHubError, match=r"Error.*setting.*option.*"):
         await hass.services.async_call(
             SWITCH_DOMAIN, SERVICE_TURN_OFF, {ATTR_ENTITY_ID: entity_id}, blocking=True
         )

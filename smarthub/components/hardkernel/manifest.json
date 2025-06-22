@@ -1,0 +1,11 @@
+{
+  "domain": "hardkernel",
+  "name": "Hardkernel",
+  "after_dependencies": ["hassio"],
+  "codeowners": ["@smart-hub/core"],
+  "config_flow": false,
+  "dependencies": ["hardware"],
+  "documentation": "https://www.smart-hub.io/integrations/hardkernel",
+  "integration_type": "hardware",
+  "single_config_entry": true
+}

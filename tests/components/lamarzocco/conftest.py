@@ -14,9 +14,9 @@ from pylamarzocco.models import (
 )
 import pytest
 
-from homeassistant.components.lamarzocco.const import DOMAIN
-from homeassistant.const import CONF_ADDRESS, CONF_TOKEN
-from homeassistant.core import HomeAssistant
+from smarthub.components.lamarzocco.const import DOMAIN
+from smarthub.const import CONF_ADDRESS, CONF_TOKEN
+from smarthub.core import SmartHub
 
 from . import SERIAL_DICT, USER_INPUT, async_init_integration
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry, load_json_object_fixture
 
 @pytest.fixture
 def mock_config_entry(
-    hass: HomeAssistant, mock_lamarzocco: MagicMock
+    hass: SmartHub, mock_lamarzocco: MagicMock
 ) -> MockConfigEntry:
     """Return the default mocked config entry."""
     return MockConfigEntry(
@@ -43,7 +43,7 @@ def mock_config_entry(
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_lamarzocco: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_lamarzocco: MagicMock
 ) -> MockConfigEntry:
     """Set up the La Marzocco integration for testing."""
     await async_init_integration(hass, mock_config_entry)
@@ -62,11 +62,11 @@ def mock_cloud_client() -> Generator[MagicMock]:
     """Return a mocked LM cloud client."""
     with (
         patch(
-            "homeassistant.components.lamarzocco.config_flow.LaMarzoccoCloudClient",
+            "smarthub.components.lamarzocco.config_flow.LaMarzoccoCloudClient",
             autospec=True,
         ) as cloud_client,
         patch(
-            "homeassistant.components.lamarzocco.LaMarzoccoCloudClient",
+            "smarthub.components.lamarzocco.LaMarzoccoCloudClient",
             new=cloud_client,
         ),
     ):
@@ -96,7 +96,7 @@ def mock_lamarzocco(device_fixture: ModelName) -> Generator[MagicMock]:
 
     with (
         patch(
-            "homeassistant.components.lamarzocco.LaMarzoccoMachine",
+            "smarthub.components.lamarzocco.LaMarzoccoMachine",
             autospec=True,
         ) as machine_mock_init,
     ):
@@ -134,7 +134,7 @@ def mock_ble_device() -> BLEDevice:
 def mock_websocket_terminated() -> Generator[bool]:
     """Mock websocket terminated."""
     with patch(
-        "homeassistant.components.lamarzocco.coordinator.LaMarzoccoUpdateCoordinator.websocket_terminated",
+        "smarthub.components.lamarzocco.coordinator.LaMarzoccoUpdateCoordinator.websocket_terminated",
         new=False,
     ) as mock_websocket_terminated:
         yield mock_websocket_terminated

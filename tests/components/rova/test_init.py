@@ -6,11 +6,11 @@ import pytest
 from requests import ConnectTimeout
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.rova import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, issue_registry as ir
+from smarthub.components.rova import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, issue_registry as ir
 
 from . import setup_with_selected_platforms
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rova: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_reload(
 
 
 async def test_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rova: MagicMock,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -58,7 +58,7 @@ async def test_service(
     ],
 )
 async def test_retry_after_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rova: MagicMock,
     mock_config_entry: MockConfigEntry,
     method: str,
@@ -73,7 +73,7 @@ async def test_retry_after_failure(
 
 
 async def test_issue_if_not_rova_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rova: MagicMock,
     mock_config_entry: MockConfigEntry,
     issue_registry: ir.IssueRegistry,

@@ -6,13 +6,13 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.habitica.const import DOMAIN
-from homeassistant.components.habitica.sensor import HabiticaSensorEntity
-from homeassistant.components.sensor.const import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
+from smarthub.components.habitica.const import DOMAIN
+from smarthub.components.habitica.sensor import HabiticaSensorEntity
+from smarthub.components.sensor.const import DOMAIN as SENSOR_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 def sensor_only() -> Generator[None]:
     """Enable only the sensor platform."""
     with patch(
-        "homeassistant.components.habitica.PLATFORMS",
+        "smarthub.components.habitica.PLATFORMS",
         [Platform.SENSOR],
     ):
         yield
@@ -29,7 +29,7 @@ def sensor_only() -> Generator[None]:
 
 @pytest.mark.usefixtures("habitica", "entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -68,7 +68,7 @@ async def test_sensors(
 )
 @pytest.mark.usefixtures("habitica", "entity_registry_enabled_by_default")
 async def test_sensor_deprecation_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     issue_registry: ir.IssueRegistry,
     entity_registry: er.EntityRegistry,
@@ -86,7 +86,7 @@ async def test_sensor_deprecation_issue(
 
     assert entity_registry is not None
     with patch(
-        "homeassistant.components.habitica.sensor.entity_used_in", return_value=True
+        "smarthub.components.habitica.sensor.entity_used_in", return_value=True
     ):
         config_entry.add_to_hass(hass)
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -112,7 +112,7 @@ async def test_sensor_deprecation_issue(
 )
 @pytest.mark.usefixtures("habitica", "entity_registry_enabled_by_default")
 async def test_sensor_deprecation_delete_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     issue_registry: ir.IssueRegistry,
     entity_registry: er.EntityRegistry,
@@ -131,7 +131,7 @@ async def test_sensor_deprecation_delete_disabled(
 
     assert entity_registry is not None
     with patch(
-        "homeassistant.components.habitica.sensor.entity_used_in", return_value=True
+        "smarthub.components.habitica.sensor.entity_used_in", return_value=True
     ):
         config_entry.add_to_hass(hass)
         await hass.config_entries.async_setup(config_entry.entry_id)

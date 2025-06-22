@@ -6,15 +6,15 @@ from unittest.mock import ANY, patch
 
 import pytest
 
-from homeassistant.components.tasmota.const import DEFAULT_PREFIX
-from homeassistant.components.tasmota.discovery import ALREADY_DISCOVERED
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub.components.tasmota.const import DEFAULT_PREFIX
+from smarthub.components.tasmota.discovery import ALREADY_DISCOVERED
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from .conftest import setup_tasmota_helper
 from .test_common import DEFAULT_CONFIG, DEFAULT_CONFIG_9_0_0_3, remove_device
@@ -24,7 +24,7 @@ from tests.typing import MqttMockHAClient, WebSocketGenerator
 
 
 async def test_subscribing_config_topic(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, setup_tasmota
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, setup_tasmota
 ) -> None:
     """Test setting up discovery."""
     discovery_topic = DEFAULT_PREFIX
@@ -36,7 +36,7 @@ async def test_subscribing_config_topic(
 
 
 async def test_future_discovery_message(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle backwards compatible discovery messages."""
     config = copy.deepcopy(DEFAULT_CONFIG)
@@ -44,7 +44,7 @@ async def test_future_discovery_message(
     config["so"]["another_future_option"] = "EVEN_BETTER"
 
     with patch(
-        "homeassistant.components.tasmota.discovery.tasmota_get_device_config",
+        "smarthub.components.tasmota.discovery.tasmota_get_device_config",
         return_value={},
     ) as mock_tasmota_get_device_config:
         await setup_tasmota_helper(hass)
@@ -57,13 +57,13 @@ async def test_future_discovery_message(
 
 
 async def test_valid_discovery_message(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test discovery callback called."""
     config = copy.deepcopy(DEFAULT_CONFIG)
 
     with patch(
-        "homeassistant.components.tasmota.discovery.tasmota_get_device_config",
+        "smarthub.components.tasmota.discovery.tasmota_get_device_config",
         return_value={},
     ) as mock_tasmota_get_device_config:
         await setup_tasmota_helper(hass)
@@ -75,10 +75,10 @@ async def test_valid_discovery_message(
         assert mock_tasmota_get_device_config.called
 
 
-async def test_invalid_topic(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_invalid_topic(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test receiving discovery message on wrong topic."""
     with patch(
-        "homeassistant.components.tasmota.discovery.tasmota_get_device_config"
+        "smarthub.components.tasmota.discovery.tasmota_get_device_config"
     ) as mock_tasmota_get_device_config:
         await setup_tasmota_helper(hass)
 
@@ -88,11 +88,11 @@ async def test_invalid_topic(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -
 
 
 async def test_invalid_message(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test receiving an invalid message."""
     with patch(
-        "homeassistant.components.tasmota.discovery.tasmota_get_device_config"
+        "smarthub.components.tasmota.discovery.tasmota_get_device_config"
     ) as mock_tasmota_get_device_config:
         await setup_tasmota_helper(hass)
 
@@ -103,13 +103,13 @@ async def test_invalid_message(
 
 
 async def test_invalid_mac(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mqtt_mock: MqttMockHAClient, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test topic is not matching device MAC."""
     config = copy.deepcopy(DEFAULT_CONFIG)
 
     with patch(
-        "homeassistant.components.tasmota.discovery.tasmota_get_device_config"
+        "smarthub.components.tasmota.discovery.tasmota_get_device_config"
     ) as mock_tasmota_get_device_config:
         await setup_tasmota_helper(hass)
 
@@ -122,7 +122,7 @@ async def test_invalid_mac(
 
 
 async def test_correct_config_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -156,7 +156,7 @@ async def test_correct_config_discovery(
 
 
 async def test_device_discover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
     setup_tasmota,
@@ -185,7 +185,7 @@ async def test_device_discover(
 
 
 async def test_device_discover_deprecated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
     setup_tasmota,
@@ -213,7 +213,7 @@ async def test_device_discover_deprecated(
 
 
 async def test_device_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
     setup_tasmota,
@@ -261,7 +261,7 @@ async def test_device_update(
 
 
 async def test_device_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
     setup_tasmota,
@@ -298,7 +298,7 @@ async def test_device_remove(
 
 
 async def test_device_remove_multiple_config_entries_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
     setup_tasmota,
@@ -347,7 +347,7 @@ async def test_device_remove_multiple_config_entries_1(
 
 
 async def test_device_remove_multiple_config_entries_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
     setup_tasmota,
@@ -409,7 +409,7 @@ async def test_device_remove_multiple_config_entries_2(
 
 
 async def test_device_remove_stale(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
@@ -444,7 +444,7 @@ async def test_device_remove_stale(
 
 
 async def test_device_rediscover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
     setup_tasmota,
@@ -495,7 +495,7 @@ async def test_device_rediscover(
 
 
 async def test_entity_duplicate_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     caplog: pytest.LogCaptureFixture,
     setup_tasmota,
@@ -530,7 +530,7 @@ async def test_entity_duplicate_discovery(
 
 
 async def test_entity_duplicate_removal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     caplog: pytest.LogCaptureFixture,
     setup_tasmota,
@@ -558,7 +558,7 @@ async def test_entity_duplicate_removal(
 
 
 async def test_same_topic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -681,7 +681,7 @@ async def test_same_topic(
 
 
 async def test_topic_no_prefix(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,

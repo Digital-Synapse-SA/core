@@ -3,8 +3,8 @@
 import pytest
 from surepy.exceptions import SurePetcareError
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import HOUSEHOLD_ID, MOCK_CAT_FLAP, MOCK_PET_FLAP
 
@@ -21,7 +21,7 @@ EXPECTED_ENTITY_IDS = {
 
 
 async def test_locks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     surepetcare,
     mock_config_entry_setup: MockConfigEntry,
@@ -81,7 +81,7 @@ async def test_locks(
 
 
 async def test_lock_failing(
-    hass: HomeAssistant, surepetcare, mock_config_entry_setup: MockConfigEntry
+    hass: SmartHub, surepetcare, mock_config_entry_setup: MockConfigEntry
 ) -> None:
     """Test handling of lock failing."""
     surepetcare.lock_in.side_effect = SurePetcareError
@@ -98,7 +98,7 @@ async def test_lock_failing(
 
 
 async def test_unlock_failing(
-    hass: HomeAssistant, surepetcare, mock_config_entry_setup: MockConfigEntry
+    hass: SmartHub, surepetcare, mock_config_entry_setup: MockConfigEntry
 ) -> None:
     """Test handling of unlock failing."""
     entity_id = list(EXPECTED_ENTITY_IDS)[0]

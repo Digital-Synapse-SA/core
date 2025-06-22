@@ -2,17 +2,17 @@
 
 import pytest
 
-from homeassistant.components.acmeda.const import DOMAIN
-from homeassistant.components.cover import DOMAIN as COVER_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.acmeda.const import DOMAIN
+from smarthub.components.cover import DOMAIN as COVER_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_hub_run")
 async def test_cover_id_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:

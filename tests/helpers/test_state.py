@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.lock import LockState
-from homeassistant.components.sun import STATE_ABOVE_HORIZON, STATE_BELOW_HORIZON
-from homeassistant.const import (
+from smarthub.components.lock import LockState
+from smarthub.components.sun import STATE_ABOVE_HORIZON, STATE_BELOW_HORIZON
+from smarthub.const import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_CLOSED,
@@ -17,22 +17,22 @@ from homeassistant.const import (
     STATE_ON,
     STATE_OPEN,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import state
+from smarthub.core import SmartHub, State
+from smarthub.helpers import state
 
 from tests.common import async_mock_service
 
 
-async def test_call_to_component(hass: HomeAssistant) -> None:
+async def test_call_to_component(hass: SmartHub) -> None:
     """Test calls to components state reproduction functions."""
     with patch(
-        "homeassistant.components.media_player.reproduce_state.async_reproduce_states"
+        "smarthub.components.media_player.reproduce_state.async_reproduce_states"
     ) as media_player_fun:
         media_player_fun.return_value = asyncio.Future()
         media_player_fun.return_value.set_result(None)
 
         with patch(
-            "homeassistant.components.climate.reproduce_state.async_reproduce_states"
+            "smarthub.components.climate.reproduce_state.async_reproduce_states"
         ) as climate_fun:
             climate_fun.return_value = asyncio.Future()
             climate_fun.return_value.set_result(None)
@@ -56,7 +56,7 @@ async def test_call_to_component(hass: HomeAssistant) -> None:
             )
 
 
-async def test_reproduce_with_no_entity(hass: HomeAssistant) -> None:
+async def test_reproduce_with_no_entity(hass: SmartHub) -> None:
     """Test reproduce_state with no entity."""
     calls = async_mock_service(hass, "light", SERVICE_TURN_ON)
 
@@ -68,7 +68,7 @@ async def test_reproduce_with_no_entity(hass: HomeAssistant) -> None:
     assert hass.states.get("light.test") is None
 
 
-async def test_reproduce_turn_on(hass: HomeAssistant) -> None:
+async def test_reproduce_turn_on(hass: SmartHub) -> None:
     """Test reproduce_state with SERVICE_TURN_ON."""
     calls = async_mock_service(hass, "light", SERVICE_TURN_ON)
 
@@ -85,7 +85,7 @@ async def test_reproduce_turn_on(hass: HomeAssistant) -> None:
     assert last_call.data.get("entity_id") == "light.test"
 
 
-async def test_reproduce_turn_off(hass: HomeAssistant) -> None:
+async def test_reproduce_turn_off(hass: SmartHub) -> None:
     """Test reproduce_state with SERVICE_TURN_OFF."""
     calls = async_mock_service(hass, "light", SERVICE_TURN_OFF)
 
@@ -102,7 +102,7 @@ async def test_reproduce_turn_off(hass: HomeAssistant) -> None:
     assert last_call.data.get("entity_id") == "light.test"
 
 
-async def test_reproduce_complex_data(hass: HomeAssistant) -> None:
+async def test_reproduce_complex_data(hass: SmartHub) -> None:
     """Test reproduce_state with complex service data."""
     calls = async_mock_service(hass, "light", SERVICE_TURN_ON)
 
@@ -123,7 +123,7 @@ async def test_reproduce_complex_data(hass: HomeAssistant) -> None:
     assert last_call.data.get("rgb_color") == complex_data
 
 
-async def test_reproduce_bad_state(hass: HomeAssistant) -> None:
+async def test_reproduce_bad_state(hass: SmartHub) -> None:
     """Test reproduce_state with bad state."""
     calls = async_mock_service(hass, "light", SERVICE_TURN_ON)
 
@@ -137,7 +137,7 @@ async def test_reproduce_bad_state(hass: HomeAssistant) -> None:
     assert hass.states.get("light.test").state == "off"
 
 
-async def test_as_number_states(hass: HomeAssistant) -> None:
+async def test_as_number_states(hass: SmartHub) -> None:
     """Test state_as_number with states."""
     zero_states = (
         STATE_OFF,
@@ -159,7 +159,7 @@ async def test_as_number_states(hass: HomeAssistant) -> None:
         assert state.state_as_number(State("domain.test", _state, {})) == 1
 
 
-async def test_as_number_coercion(hass: HomeAssistant) -> None:
+async def test_as_number_coercion(hass: SmartHub) -> None:
     """Test state_as_number with number."""
     for _state in ("0", "0.0", 0, 0.0):
         assert state.state_as_number(State("domain.test", _state, {})) == 0.0
@@ -167,7 +167,7 @@ async def test_as_number_coercion(hass: HomeAssistant) -> None:
         assert state.state_as_number(State("domain.test", _state, {})) == 1.0
 
 
-async def test_as_number_invalid_cases(hass: HomeAssistant) -> None:
+async def test_as_number_invalid_cases(hass: SmartHub) -> None:
     """Test state_as_number with invalid cases."""
     for _state in ("", "foo", "foo.bar", None, False, True, object, object()):
         with pytest.raises(ValueError):

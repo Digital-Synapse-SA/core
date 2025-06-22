@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock
 import pytest
 from requests import RequestException
 
-from homeassistant.const import STATE_HOME
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_HOME
+from smarthub.core import SmartHub
 
 from . import setup_platform
 
@@ -14,7 +14,7 @@ from tests.components.device_tracker.test_init import mock_yaml_devices  # noqa:
 
 
 @pytest.mark.usefixtures("yaml_devices")
-async def test_get_scanner(hass: HomeAssistant, mock_scanner: AsyncMock) -> None:
+async def test_get_scanner(hass: SmartHub, mock_scanner: AsyncMock) -> None:
     """Test creating a quantum gateway scanner."""
     await setup_platform(hass)
 
@@ -28,7 +28,7 @@ async def test_get_scanner(hass: HomeAssistant, mock_scanner: AsyncMock) -> None
 
 
 @pytest.mark.usefixtures("yaml_devices")
-async def test_get_scanner_error(hass: HomeAssistant, mock_scanner: AsyncMock) -> None:
+async def test_get_scanner_error(hass: SmartHub, mock_scanner: AsyncMock) -> None:
     """Test failure when creating a quantum gateway scanner."""
     mock_scanner.side_effect = RequestException("Error")
     await setup_platform(hass)
@@ -37,7 +37,7 @@ async def test_get_scanner_error(hass: HomeAssistant, mock_scanner: AsyncMock) -
 
 
 @pytest.mark.usefixtures("yaml_devices")
-async def test_scan_devices_error(hass: HomeAssistant, mock_scanner: AsyncMock) -> None:
+async def test_scan_devices_error(hass: SmartHub, mock_scanner: AsyncMock) -> None:
     """Test failure when scanning devices."""
     mock_scanner.return_value.scan_devices.side_effect = RequestException("Error")
     await setup_platform(hass)

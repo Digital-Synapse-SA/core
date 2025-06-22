@@ -11,10 +11,10 @@ from pynordpool import API
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import async_fire_time_changed, snapshot_platform
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -23,7 +23,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 @pytest.mark.freeze_time("2024-11-05T18:00:00+00:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -36,7 +36,7 @@ async def test_sensor(
 @pytest.mark.freeze_time("2024-11-05T18:00:00+00:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_current_price_is_0(
-    hass: HomeAssistant, load_int: ConfigEntry
+    hass: SmartHub, load_int: ConfigEntry
 ) -> None:
     """Test the Nord Pool sensor working if price is 0."""
 
@@ -48,7 +48,7 @@ async def test_sensor_current_price_is_0(
 
 @pytest.mark.freeze_time("2024-11-05T23:00:00+00:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_sensor_no_next_price(hass: HomeAssistant, load_int: ConfigEntry) -> None:
+async def test_sensor_no_next_price(hass: SmartHub, load_int: ConfigEntry) -> None:
     """Test the Nord Pool sensor."""
 
     current_price = hass.states.get("sensor.nord_pool_se3_current_price")
@@ -66,7 +66,7 @@ async def test_sensor_no_next_price(hass: HomeAssistant, load_int: ConfigEntry) 
 @pytest.mark.freeze_time("2024-11-06T00:00:00+01:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_no_previous_price(
-    hass: HomeAssistant, load_int: ConfigEntry
+    hass: SmartHub, load_int: ConfigEntry
 ) -> None:
     """Test the Nord Pool sensor."""
 
@@ -85,7 +85,7 @@ async def test_sensor_no_previous_price(
 @pytest.mark.freeze_time("2024-11-05T11:00:01+01:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_empty_response(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     load_json: list[dict[str, Any]],
     aioclient_mock: AiohttpClientMocker,

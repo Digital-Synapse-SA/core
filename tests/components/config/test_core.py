@@ -5,13 +5,13 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components import config
-from homeassistant.components.config import core
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util, location as location_util
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.components import config
+from smarthub.components.config import core
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util, location as location_util
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from tests.common import MockUser
 from tests.typing import (
@@ -23,7 +23,7 @@ from tests.typing import (
 
 @pytest.fixture
 async def client(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> MockHAClientWebSocket:
     """Fixture that can interact with the config manager API."""
     with patch.object(config, "SECTIONS", [core]):
@@ -32,7 +32,7 @@ async def client(
 
 
 async def test_validate_config_ok(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test checking config."""
     with patch.object(config, "SECTIONS", [core]):
@@ -46,7 +46,7 @@ async def test_validate_config_ok(
     no_error.warning_str = ""
 
     with patch(
-        "homeassistant.components.config.core.check_config.async_check_ha_config_file",
+        "smarthub.components.config.core.check_config.async_check_ha_config_file",
         return_value=no_error,
     ):
         resp = await client.post("/api/config/core/check_config")
@@ -63,7 +63,7 @@ async def test_validate_config_ok(
     error_warning.warning_str = "milk"
 
     with patch(
-        "homeassistant.components.config.core.check_config.async_check_ha_config_file",
+        "smarthub.components.config.core.check_config.async_check_ha_config_file",
         return_value=error_warning,
     ):
         resp = await client.post("/api/config/core/check_config")
@@ -80,7 +80,7 @@ async def test_validate_config_ok(
     warning.warning_str = "milk"
 
     with patch(
-        "homeassistant.components.config.core.check_config.async_check_ha_config_file",
+        "smarthub.components.config.core.check_config.async_check_ha_config_file",
         return_value=warning,
     ):
         resp = await client.post("/api/config/core/check_config")
@@ -93,7 +93,7 @@ async def test_validate_config_ok(
 
 
 async def test_validate_config_requires_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_read_only_access_token: str,
 ) -> None:
@@ -107,7 +107,7 @@ async def test_validate_config_requires_admin(
     assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
-async def test_websocket_core_update(hass: HomeAssistant, client) -> None:
+async def test_websocket_core_update(hass: SmartHub, client) -> None:
     """Test core config update websocket command."""
     assert hass.config.latitude != 60
     assert hass.config.longitude != 50
@@ -123,9 +123,9 @@ async def test_websocket_core_update(hass: HomeAssistant, client) -> None:
     assert hass.config.radius != 150
 
     with (
-        patch("homeassistant.util.dt.set_default_time_zone") as mock_set_tz,
+        patch("smarthub.util.dt.set_default_time_zone") as mock_set_tz,
         patch(
-            "homeassistant.components.config.core.async_update_suggested_units"
+            "smarthub.components.config.core.async_update_suggested_units"
         ) as mock_update_sensor_units,
     ):
         await client.send_json(
@@ -170,9 +170,9 @@ async def test_websocket_core_update(hass: HomeAssistant, client) -> None:
     assert mock_set_tz.mock_calls[0][1][0] == dt_util.get_time_zone("America/New_York")
 
     with (
-        patch("homeassistant.util.dt.set_default_time_zone") as mock_set_tz,
+        patch("smarthub.util.dt.set_default_time_zone") as mock_set_tz,
         patch(
-            "homeassistant.components.config.core.async_update_suggested_units"
+            "smarthub.components.config.core.async_update_suggested_units"
         ) as mock_update_sensor_units,
     ):
         await client.send_json(
@@ -190,7 +190,7 @@ async def test_websocket_core_update(hass: HomeAssistant, client) -> None:
 
 
 async def test_websocket_core_update_not_admin(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, hass_admin_user: MockUser
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, hass_admin_user: MockUser
 ) -> None:
     """Test core config fails for non admin."""
     hass_admin_user.groups = []
@@ -208,7 +208,7 @@ async def test_websocket_core_update_not_admin(
     assert msg["error"]["code"] == "unauthorized"
 
 
-async def test_websocket_bad_core_update(hass: HomeAssistant, client) -> None:
+async def test_websocket_bad_core_update(hass: SmartHub, client) -> None:
     """Test core config update fails with bad parameters."""
     await client.send_json({"id": 7, "type": "config/core/update", "latituude": 23})
 
@@ -220,10 +220,10 @@ async def test_websocket_bad_core_update(hass: HomeAssistant, client) -> None:
     assert msg["error"]["code"] == "invalid_format"
 
 
-async def test_detect_config(hass: HomeAssistant, client) -> None:
+async def test_detect_config(hass: SmartHub, client) -> None:
     """Test detect config."""
     with patch(
-        "homeassistant.util.location.async_detect_location_info",
+        "smarthub.util.location.async_detect_location_info",
         return_value=None,
     ):
         await client.send_json({"id": 1, "type": "config/core/detect"})
@@ -234,10 +234,10 @@ async def test_detect_config(hass: HomeAssistant, client) -> None:
     assert msg["result"] == {}
 
 
-async def test_detect_config_fail(hass: HomeAssistant, client) -> None:
+async def test_detect_config_fail(hass: SmartHub, client) -> None:
     """Test detect config."""
     with patch(
-        "homeassistant.util.location.async_detect_location_info",
+        "smarthub.util.location.async_detect_location_info",
         return_value=location_util.LocationInfo(
             ip=None,
             country_code=None,

@@ -3,10 +3,10 @@
 import asyncio
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.hlk_sw16.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.hlk_sw16.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 class MockSW16Client:
@@ -49,7 +49,7 @@ async def create_mock_hlk_sw16_connection(fail):
     return client
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -67,14 +67,14 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.hlk_sw16.config_flow.create_hlk_sw16_connection",
+            "smarthub.components.hlk_sw16.config_flow.create_hlk_sw16_connection",
             return_value=mock_hlk_sw16_connection,
         ),
         patch(
-            "homeassistant.components.hlk_sw16.async_setup", return_value=True
+            "smarthub.components.hlk_sw16.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.hlk_sw16.async_setup_entry",
+            "smarthub.components.hlk_sw16.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -96,7 +96,7 @@ async def test_form(hass: HomeAssistant) -> None:
     mock_hlk_sw16_connection = await create_mock_hlk_sw16_connection(False)
 
     with patch(
-        "homeassistant.components.hlk_sw16.config_flow.create_hlk_sw16_connection",
+        "smarthub.components.hlk_sw16.config_flow.create_hlk_sw16_connection",
         return_value=mock_hlk_sw16_connection,
     ):
         result3 = await hass.config_entries.flow.async_init(
@@ -114,7 +114,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result4["reason"] == "already_configured"
 
 
-async def test_import(hass: HomeAssistant) -> None:
+async def test_import(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -132,14 +132,14 @@ async def test_import(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.hlk_sw16.config_flow.connect_client",
+            "smarthub.components.hlk_sw16.config_flow.connect_client",
             return_value=mock_hlk_sw16_connection,
         ),
         patch(
-            "homeassistant.components.hlk_sw16.async_setup", return_value=True
+            "smarthub.components.hlk_sw16.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.hlk_sw16.async_setup_entry",
+            "smarthub.components.hlk_sw16.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -159,7 +159,7 @@ async def test_import(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_data(hass: HomeAssistant) -> None:
+async def test_form_invalid_data(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -173,7 +173,7 @@ async def test_form_invalid_data(hass: HomeAssistant) -> None:
     }
 
     with patch(
-        "homeassistant.components.hlk_sw16.config_flow.connect_client",
+        "smarthub.components.hlk_sw16.config_flow.connect_client",
         return_value=mock_hlk_sw16_connection,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -185,7 +185,7 @@ async def test_form_invalid_data(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -197,7 +197,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     }
 
     with patch(
-        "homeassistant.components.hlk_sw16.config_flow.connect_client",
+        "smarthub.components.hlk_sw16.config_flow.connect_client",
         side_effect=TimeoutError,
         return_value=None,
     ):

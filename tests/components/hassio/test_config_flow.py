@@ -1,21 +1,21 @@
-"""Test the Home Assistant Supervisor config flow."""
+"""Test the SmartHub Supervisor config flow."""
 
 from unittest.mock import patch
 
-from homeassistant.components.hassio import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.hassio import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_config_flow(hass: HomeAssistant) -> None:
+async def test_config_flow(hass: SmartHub) -> None:
     """Test we get the form."""
 
     with (
         patch(
-            "homeassistant.components.hassio.async_setup", return_value=True
+            "smarthub.components.hassio.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.hassio.async_setup_entry",
+            "smarthub.components.hassio.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -31,7 +31,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_multiple_entries(hass: HomeAssistant) -> None:
+async def test_multiple_entries(hass: SmartHub) -> None:
     """Test creating multiple hassio entries."""
     await test_config_flow(hass)
     result = await hass.config_entries.flow.async_init(

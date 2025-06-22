@@ -10,11 +10,11 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.rehlko.const import GENERATOR_DATA_DEVICE
-from homeassistant.components.rehlko.coordinator import SCAN_INTERVAL_MINUTES
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.rehlko.const import GENERATOR_DATA_DEVICE
+from smarthub.components.rehlko.coordinator import SCAN_INTERVAL_MINUTES
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
@@ -22,13 +22,13 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 @pytest.fixture(name="platform_binary_sensor", autouse=True)
 async def platform_binary_sensor_fixture():
     """Patch Rehlko to only load binary_sensor platform."""
-    with patch("homeassistant.components.rehlko.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.rehlko.PLATFORMS", [Platform.BINARY_SENSOR]):
         yield
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     rehlko_config_entry: MockConfigEntry,
@@ -41,7 +41,7 @@ async def test_sensors(
 
 
 async def test_binary_sensor_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     generator: dict[str, Any],
     mock_rehlko: AsyncMock,
     load_rehlko_config_entry: None,
@@ -73,7 +73,7 @@ async def test_binary_sensor_states(
 
 
 async def test_binary_sensor_connectivity_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     generator: dict[str, Any],
     mock_rehlko: AsyncMock,
     load_rehlko_config_entry: None,

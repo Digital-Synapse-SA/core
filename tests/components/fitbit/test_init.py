@@ -6,13 +6,13 @@ from http import HTTPStatus
 import pytest
 from requests_mock.mocker import Mocker
 
-from homeassistant.components.fitbit.const import (
+from smarthub.components.fitbit.const import (
     CONF_CLIENT_ID,
     CONF_CLIENT_SECRET,
     OAUTH2_TOKEN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .conftest import (
     CLIENT_ID,
@@ -28,7 +28,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration_setup: Callable[[], Awaitable[bool]],
     config_entry: MockConfigEntry,
     setup_credentials: None,
@@ -115,7 +115,7 @@ async def test_token_refresh_success(
 )
 @pytest.mark.parametrize("closing", [True, False])
 async def test_token_requires_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration_setup: Callable[[], Awaitable[bool]],
     config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
@@ -140,7 +140,7 @@ async def test_token_requires_reauth(
 
 
 async def test_device_update_coordinator_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration_setup: Callable[[], Awaitable[bool]],
     config_entry: MockConfigEntry,
     setup_credentials: None,
@@ -160,7 +160,7 @@ async def test_device_update_coordinator_failure(
 
 
 async def test_device_update_coordinator_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration_setup: Callable[[], Awaitable[bool]],
     config_entry: MockConfigEntry,
     setup_credentials: None,

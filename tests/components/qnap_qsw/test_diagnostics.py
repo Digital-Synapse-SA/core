@@ -29,10 +29,10 @@ from aioqsw.const import (
     QSD_VERSION,
 )
 
-from homeassistant.components.diagnostics import REDACTED
-from homeassistant.components.qnap_qsw.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.diagnostics import REDACTED
+from smarthub.components.qnap_qsw.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from .util import (
     CONFIG,
@@ -49,7 +49,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_config_entry_diagnostics(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test config entry diagnostics."""
     await async_init_integration(hass)

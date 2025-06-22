@@ -6,13 +6,13 @@ from peco import HttpError, IncompatibleMeterError, UnresponsiveMeterError
 import pytest
 from voluptuous.error import Invalid
 
-from homeassistant import config_entries
-from homeassistant.components.peco.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.peco.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -22,7 +22,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.peco.async_setup_entry",
+        "smarthub.components.peco.async_setup_entry",
         return_value=True,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -41,7 +41,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result2["context"]["unique_id"] == "PHILADELPHIA"
 
 
-async def test_invalid_county(hass: HomeAssistant) -> None:
+async def test_invalid_county(hass: SmartHub) -> None:
     """Test if the InvalidCounty error works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -51,7 +51,7 @@ async def test_invalid_county(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.peco.async_setup_entry",
+            "smarthub.components.peco.async_setup_entry",
             return_value=True,
         ),
         pytest.raises(Invalid),
@@ -64,7 +64,7 @@ async def test_invalid_county(hass: HomeAssistant) -> None:
         )
 
 
-async def test_meter_value_error(hass: HomeAssistant) -> None:
+async def test_meter_value_error(hass: SmartHub) -> None:
     """Test if the MeterValueError error works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -86,7 +86,7 @@ async def test_meter_value_error(hass: HomeAssistant) -> None:
     assert result["errors"] == {"phone_number": "invalid_phone_number"}
 
 
-async def test_incompatible_meter_error(hass: HomeAssistant) -> None:
+async def test_incompatible_meter_error(hass: SmartHub) -> None:
     """Test if the IncompatibleMeter error works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -108,7 +108,7 @@ async def test_incompatible_meter_error(hass: HomeAssistant) -> None:
         assert result["reason"] == "incompatible_meter"
 
 
-async def test_unresponsive_meter_error(hass: HomeAssistant) -> None:
+async def test_unresponsive_meter_error(hass: SmartHub) -> None:
     """Test if the UnresponsiveMeter error works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -131,7 +131,7 @@ async def test_unresponsive_meter_error(hass: HomeAssistant) -> None:
     assert result["errors"] == {"phone_number": "unresponsive_meter"}
 
 
-async def test_meter_http_error(hass: HomeAssistant) -> None:
+async def test_meter_http_error(hass: SmartHub) -> None:
     """Test if the InvalidMeter error works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -154,7 +154,7 @@ async def test_meter_http_error(hass: HomeAssistant) -> None:
     assert result["errors"] == {"phone_number": "http_error"}
 
 
-async def test_smart_meter(hass: HomeAssistant) -> None:
+async def test_smart_meter(hass: SmartHub) -> None:
     """Test if the Smart Meter step works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}

@@ -8,9 +8,9 @@ from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.go2rtc.server import Server
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.go2rtc.server import Server
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 TEST_BINARY = "/bin/go2rtc"
 
@@ -22,7 +22,7 @@ def enable_ui() -> bool:
 
 
 @pytest.fixture
-def server(hass: HomeAssistant, enable_ui: bool) -> Server:
+def server(hass: SmartHub, enable_ui: bool) -> Server:
     """Fixture to initialize the Server."""
     return Server(hass, binary=TEST_BINARY, enable_ui=enable_ui)
 
@@ -31,7 +31,7 @@ def server(hass: HomeAssistant, enable_ui: bool) -> Server:
 def mock_tempfile() -> Generator[Mock]:
     """Fixture to mock NamedTemporaryFile."""
     with patch(
-        "homeassistant.components.go2rtc.server.NamedTemporaryFile", autospec=True
+        "smarthub.components.go2rtc.server.NamedTemporaryFile", autospec=True
     ) as mock_tempfile:
         file = mock_tempfile.return_value.__enter__.return_value
         file.name = "test.yaml"
@@ -48,7 +48,7 @@ def _assert_server_output_logged(
     for entry in server_stdout:
         assert (
             (
-                "homeassistant.components.go2rtc.server",
+                "smarthub.components.go2rtc.server",
                 loglevel,
                 entry,
             )
@@ -105,7 +105,7 @@ async def test_server_run_success(
 
     # Verify that the config file was written
     mock_tempfile.write.assert_called_once_with(
-        f"""# This file is managed by Home Assistant
+        f"""# This file is managed by SmartHub
 # Do not edit it manually
 
 api:
@@ -144,7 +144,7 @@ async def test_server_timeout_on_stop(
     # Simulate timeout
     mock_create_subprocess.return_value.wait.side_effect = sleep
 
-    with patch("homeassistant.components.go2rtc.server._TERMINATE_TIMEOUT", new=0.1):
+    with patch("smarthub.components.go2rtc.server._TERMINATE_TIMEOUT", new=0.1):
         await server.stop()
 
     # Ensure terminate and kill were called due to timeout
@@ -170,8 +170,8 @@ async def test_server_failed_to_start(
 ) -> None:
     """Test server, where an exception is raised if the expected log entry was not received until the timeout."""
     with (
-        patch("homeassistant.components.go2rtc.server._SETUP_TIMEOUT", new=0.1),
-        pytest.raises(HomeAssistantError, match="Go2rtc server didn't start correctly"),
+        patch("smarthub.components.go2rtc.server._SETUP_TIMEOUT", new=0.1),
+        pytest.raises(SmartHubError, match="Go2rtc server didn't start correctly"),
     ):
         await server.start()
 
@@ -180,7 +180,7 @@ async def test_server_failed_to_start(
     assert_server_output_logged(server_stdout, caplog, logging.WARNING)
 
     assert (
-        "homeassistant.components.go2rtc.server",
+        "smarthub.components.go2rtc.server",
         logging.ERROR,
         "Go2rtc server didn't start correctly",
     ) in caplog.record_tuples
@@ -225,9 +225,9 @@ async def test_server_failed_to_start(
         )
     ],
 )
-@patch("homeassistant.components.go2rtc.server._RESPAWN_COOLDOWN", 0)
+@patch("smarthub.components.go2rtc.server._RESPAWN_COOLDOWN", 0)
 async def test_log_level_mapping(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_create_subprocess: MagicMock,
     server_stdout: list[str],
     rest_client: AsyncMock,
@@ -251,7 +251,7 @@ async def test_log_level_mapping(
     # Verify go2rtc binary stdout was logged with default level
     for i, entry in enumerate(server_stdout):
         assert (
-            "homeassistant.components.go2rtc.server",
+            "smarthub.components.go2rtc.server",
             expected_loglevel[i],
             entry,
         ) in caplog.record_tuples
@@ -265,9 +265,9 @@ async def test_log_level_mapping(
     await server.stop()
 
 
-@patch("homeassistant.components.go2rtc.server._RESPAWN_COOLDOWN", 0)
+@patch("smarthub.components.go2rtc.server._RESPAWN_COOLDOWN", 0)
 async def test_server_restart_process_exit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_create_subprocess: AsyncMock,
     server_stdout: list[str],
     rest_client: AsyncMock,
@@ -303,9 +303,9 @@ async def test_server_restart_process_exit(
     await server.stop()
 
 
-@patch("homeassistant.components.go2rtc.server._RESPAWN_COOLDOWN", 0)
+@patch("smarthub.components.go2rtc.server._RESPAWN_COOLDOWN", 0)
 async def test_server_restart_process_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_create_subprocess: AsyncMock,
     server_stdout: list[str],
     rest_client: AsyncMock,
@@ -332,9 +332,9 @@ async def test_server_restart_process_error(
     await server.stop()
 
 
-@patch("homeassistant.components.go2rtc.server._RESPAWN_COOLDOWN", 0)
+@patch("smarthub.components.go2rtc.server._RESPAWN_COOLDOWN", 0)
 async def test_server_restart_api_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_create_subprocess: AsyncMock,
     server_stdout: list[str],
     rest_client: AsyncMock,
@@ -361,9 +361,9 @@ async def test_server_restart_api_error(
     await server.stop()
 
 
-@patch("homeassistant.components.go2rtc.server._RESPAWN_COOLDOWN", 0)
+@patch("smarthub.components.go2rtc.server._RESPAWN_COOLDOWN", 0)
 async def test_server_restart_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_create_subprocess: AsyncMock,
     server_stdout: list[str],
     rest_client: AsyncMock,

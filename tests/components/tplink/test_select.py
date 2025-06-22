@@ -4,17 +4,17 @@ from kasa import Feature
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.components.tplink.const import DOMAIN
-from homeassistant.components.tplink.entity import EXCLUDED_FEATURES
-from homeassistant.components.tplink.select import SELECT_DESCRIPTIONS
-from homeassistant.const import ATTR_ENTITY_ID, CONF_HOST, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.tplink.const import DOMAIN
+from smarthub.components.tplink.entity import EXCLUDED_FEATURES
+from smarthub.components.tplink.select import SELECT_DESCRIPTIONS
+from smarthub.const import ATTR_ENTITY_ID, CONF_HOST, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import (
     _mocked_device,
@@ -44,7 +44,7 @@ def mocked_feature_select() -> Feature:
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -65,7 +65,7 @@ async def test_states(
 
 
 async def test_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mocked_feature_select: Feature,
 ) -> None:
@@ -89,7 +89,7 @@ async def test_select(
 
 
 async def test_select_children(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mocked_feature_select: Feature,
@@ -126,7 +126,7 @@ async def test_select_children(
 
 
 async def test_select_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mocked_feature_select: Feature,
 ) -> None:

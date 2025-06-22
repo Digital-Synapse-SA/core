@@ -4,10 +4,10 @@ import logging
 
 import pytest
 
-from homeassistant.components.event import DOMAIN, EventEntity
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub.components.event import DOMAIN, EventEntity
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_platform import AddEntitiesCallback
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
 
 from .const import TEST_DOMAIN
 
@@ -26,11 +26,11 @@ class MockEventEntity(MockEntity, EventEntity):
 
 
 @pytest.fixture
-async def mock_event_platform(hass: HomeAssistant) -> None:
+async def mock_event_platform(hass: SmartHub) -> None:
     """Mock the event entity platform."""
 
     async def async_setup_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         async_add_entities: AddEntitiesCallback,
         discovery_info: DiscoveryInfoType | None = None,

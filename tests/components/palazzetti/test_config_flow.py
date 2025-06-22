@@ -4,18 +4,18 @@ from unittest.mock import AsyncMock
 
 from pypalazzetti.exceptions import CommunicationError
 
-from homeassistant.components.palazzetti.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.palazzetti.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_user_flow(
-    hass: HomeAssistant, mock_palazzetti_client: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_palazzetti_client: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test the full user configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -38,7 +38,7 @@ async def test_full_user_flow(
 
 
 async def test_invalid_host(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_palazzetti_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -70,7 +70,7 @@ async def test_invalid_host(
 
 
 async def test_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_palazzetti_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -96,7 +96,7 @@ async def test_duplicate(
 
 
 async def test_dhcp_flow(
-    hass: HomeAssistant, mock_palazzetti_client: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_palazzetti_client: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test the DHCP flow."""
     result = await hass.config_entries.flow.async_init(
@@ -123,7 +123,7 @@ async def test_dhcp_flow(
 
 
 async def test_dhcp_flow_error(
-    hass: HomeAssistant, mock_palazzetti_client: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_palazzetti_client: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test the DHCP flow."""
     mock_palazzetti_client.connect.side_effect = CommunicationError()

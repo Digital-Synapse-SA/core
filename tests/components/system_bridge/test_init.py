@@ -2,18 +2,18 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.system_bridge.config_flow import SystemBridgeConfigFlow
-from homeassistant.components.system_bridge.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_API_KEY, CONF_HOST, CONF_PORT, CONF_TOKEN
-from homeassistant.core import HomeAssistant
+from smarthub.components.system_bridge.config_flow import SystemBridgeConfigFlow
+from smarthub.components.system_bridge.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_API_KEY, CONF_HOST, CONF_PORT, CONF_TOKEN
+from smarthub.core import SmartHub
 
 from . import FIXTURE_USER_INPUT, FIXTURE_UUID
 
 from tests.common import MockConfigEntry
 
 
-async def test_migration_minor_1_to_2(hass: HomeAssistant) -> None:
+async def test_migration_minor_1_to_2(hass: SmartHub) -> None:
     """Test migration."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -28,7 +28,7 @@ async def test_migration_minor_1_to_2(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.system_bridge.async_setup_entry",
+        "smarthub.components.system_bridge.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         config_entry.add_to_hass(hass)
@@ -49,7 +49,7 @@ async def test_migration_minor_1_to_2(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.LOADED
 
 
-async def test_migration_minor_future_version(hass: HomeAssistant) -> None:
+async def test_migration_minor_future_version(hass: SmartHub) -> None:
     """Test migration."""
     config_entry_data = {
         CONF_API_KEY: FIXTURE_USER_INPUT[CONF_TOKEN],
@@ -68,7 +68,7 @@ async def test_migration_minor_future_version(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.system_bridge.async_setup_entry",
+        "smarthub.components.system_bridge.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         config_entry.add_to_hass(hass)
@@ -83,7 +83,7 @@ async def test_migration_minor_future_version(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.LOADED
 
 
-async def test_setup_timeout(hass: HomeAssistant) -> None:
+async def test_setup_timeout(hass: SmartHub) -> None:
     """Test setup with timeout error."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -105,7 +105,7 @@ async def test_setup_timeout(hass: HomeAssistant) -> None:
         assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_coordinator_get_data_timeout(hass: HomeAssistant) -> None:
+async def test_coordinator_get_data_timeout(hass: SmartHub) -> None:
     """Test coordinator handling timeout during get_data."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -121,7 +121,7 @@ async def test_coordinator_get_data_timeout(hass: HomeAssistant) -> None:
             return_value=True,
         ),
         patch(
-            "homeassistant.components.system_bridge.coordinator.SystemBridgeDataUpdateCoordinator.async_get_data",
+            "smarthub.components.system_bridge.coordinator.SystemBridgeDataUpdateCoordinator.async_get_data",
             side_effect=TimeoutError,
         ),
     ):

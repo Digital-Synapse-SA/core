@@ -2,14 +2,14 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.remote import (
+from smarthub.components.remote import (
     ATTR_COMMAND,
     DOMAIN as REMOTE_DOMAIN,
     SERVICE_SEND_COMMAND,
 )
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import UPNP_SERIAL
 
@@ -18,13 +18,13 @@ from tests.common import MockConfigEntry
 MAIN_ENTITY_ID = f"{REMOTE_DOMAIN}.my_roku_3"
 
 
-async def test_setup(hass: HomeAssistant, init_integration: MockConfigEntry) -> None:
+async def test_setup(hass: SmartHub, init_integration: MockConfigEntry) -> None:
     """Test setup with basic config."""
     assert hass.states.get(MAIN_ENTITY_ID)
 
 
 async def test_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_unique_id(
 
 
 async def test_main_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:

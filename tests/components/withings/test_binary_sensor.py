@@ -7,8 +7,8 @@ from aiowithings import NotificationCategory
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from . import call_webhook, prepare_webhook_setup, setup_integration
 from .conftest import USER_ID, WEBHOOK_ID
@@ -18,7 +18,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     webhook_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -66,7 +66,7 @@ async def test_binary_sensor(
 
 
 async def test_polling_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     withings: AsyncMock,
     polling_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,

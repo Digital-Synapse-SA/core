@@ -11,7 +11,7 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import FailedZWaveCommand
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_HUMIDITY,
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
@@ -33,10 +33,10 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.zwave_js.climate import ATTR_FAN_STATE
-from homeassistant.components.zwave_js.const import DOMAIN, SERVICE_REFRESH_VALUE
-from homeassistant.components.zwave_js.helpers import ZwaveValueMatcher
-from homeassistant.const import (
+from smarthub.components.zwave_js.climate import ATTR_FAN_STATE
+from smarthub.components.zwave_js.const import DOMAIN, SERVICE_REFRESH_VALUE
+from smarthub.components.zwave_js.helpers import ZwaveValueMatcher
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     ATTR_TEMPERATURE,
@@ -44,8 +44,8 @@ from homeassistant.const import (
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from .common import (
     CLIMATE_DANFOSS_LC13_ENTITY,
@@ -64,7 +64,7 @@ def platforms() -> list[str]:
 
 
 async def test_thermostat_v2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus,
     integration,
@@ -391,7 +391,7 @@ async def test_thermostat_v2(
 
 
 async def test_thermostat_v2_turn_on_after_off(
-    hass: HomeAssistant, client, climate_radio_thermostat_ct100_plus, integration
+    hass: SmartHub, client, climate_radio_thermostat_ct100_plus, integration
 ) -> None:
     """Test thermostat v2 command class entity that is turned on after starting off."""
     node = climate_radio_thermostat_ct100_plus
@@ -442,7 +442,7 @@ async def test_thermostat_v2_turn_on_after_off(
 
 
 async def test_thermostat_turn_on_after_off_no_heat_cool_auto(
-    hass: HomeAssistant, client, aeotec_radiator_thermostat_state, integration
+    hass: SmartHub, client, aeotec_radiator_thermostat_state, integration
 ) -> None:
     """Test thermostat that is turned on after starting off w/o heat, cool, or auto."""
     node_state = copy.deepcopy(aeotec_radiator_thermostat_state)
@@ -484,7 +484,7 @@ async def test_thermostat_turn_on_after_off_no_heat_cool_auto(
 
 
 async def test_thermostat_turn_on_after_off_with_resume(
-    hass: HomeAssistant, client, aeotec_radiator_thermostat_state, integration
+    hass: SmartHub, client, aeotec_radiator_thermostat_state, integration
 ) -> None:
     """Test thermostat that is turned on after starting off with resume support."""
     node_state = copy.deepcopy(aeotec_radiator_thermostat_state)
@@ -530,7 +530,7 @@ async def test_thermostat_turn_on_after_off_with_resume(
 
 
 async def test_thermostat_different_endpoints(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     integration,
@@ -545,7 +545,7 @@ async def test_thermostat_different_endpoints(
 
 
 async def test_setpoint_thermostat(
-    hass: HomeAssistant, client, climate_danfoss_lc_13, integration
+    hass: SmartHub, client, climate_danfoss_lc_13, integration
 ) -> None:
     """Test a setpoint thermostat command class entity."""
     node = climate_danfoss_lc_13
@@ -641,7 +641,7 @@ async def test_setpoint_thermostat(
 
 
 async def test_thermostat_heatit_z_trm6(
-    hass: HomeAssistant, client, climate_heatit_z_trm6, integration
+    hass: SmartHub, client, climate_heatit_z_trm6, integration
 ) -> None:
     """Test a heatit Z-TRM6 entity."""
     node = climate_heatit_z_trm6
@@ -715,7 +715,7 @@ async def test_thermostat_heatit_z_trm6(
 
 
 async def test_thermostat_heatit_z_trm3_no_value(
-    hass: HomeAssistant, client, climate_heatit_z_trm3_no_value, integration
+    hass: SmartHub, client, climate_heatit_z_trm3_no_value, integration
 ) -> None:
     """Test a heatit Z-TRM3 entity that is missing a value."""
     # When the config parameter that specifies what sensor to use has no value, we fall
@@ -725,7 +725,7 @@ async def test_thermostat_heatit_z_trm3_no_value(
 
 
 async def test_thermostat_heatit_z_trm3(
-    hass: HomeAssistant, client, climate_heatit_z_trm3, integration
+    hass: SmartHub, client, climate_heatit_z_trm3, integration
 ) -> None:
     """Test a heatit Z-TRM3 entity."""
     node = climate_heatit_z_trm3
@@ -797,7 +797,7 @@ async def test_thermostat_heatit_z_trm3(
 
 
 async def test_thermostat_heatit_z_trm2fx(
-    hass: HomeAssistant, client, climate_heatit_z_trm2fx, integration
+    hass: SmartHub, client, climate_heatit_z_trm2fx, integration
 ) -> None:
     """Test a heatit Z-TRM2fx entity."""
     node = climate_heatit_z_trm2fx
@@ -847,7 +847,7 @@ async def test_thermostat_heatit_z_trm2fx(
 
 
 async def test_thermostat_srt321_hrt4_zw(
-    hass: HomeAssistant, client, srt321_hrt4_zw, integration
+    hass: SmartHub, client, srt321_hrt4_zw, integration
 ) -> None:
     """Test a climate entity from a HRT4-ZW / SRT321 thermostat device.
 
@@ -866,7 +866,7 @@ async def test_thermostat_srt321_hrt4_zw(
 
 
 async def test_preset_and_no_setpoint(
-    hass: HomeAssistant, client, climate_eurotronic_spirit_z, integration
+    hass: SmartHub, client, climate_eurotronic_spirit_z, integration
 ) -> None:
     """Test preset without setpoint value."""
     node = climate_eurotronic_spirit_z
@@ -965,7 +965,7 @@ async def test_preset_and_no_setpoint(
 
 
 async def test_temp_unit_fix(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct101_multiple_temp_units,
     climate_radio_thermostat_ct100_mode_and_setpoint_on_different_endpoints,
@@ -982,7 +982,7 @@ async def test_temp_unit_fix(
 
 
 async def test_thermostat_unknown_values(
-    hass: HomeAssistant, client, climate_radio_thermostat_ct100_plus_state, integration
+    hass: SmartHub, client, climate_radio_thermostat_ct100_plus_state, integration
 ) -> None:
     """Test a thermostat v2 with unknown values."""
     node_state = replace_value_of_zwave_value(

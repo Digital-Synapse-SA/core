@@ -6,9 +6,9 @@ from devialet import DevialetApi
 from devialet.const import UrlSuffix
 from yarl import URL
 
-from homeassistant.components.devialet.media_player import SUPPORT_DEVIALET
-from homeassistant.components.homeassistant import SERVICE_UPDATE_ENTITY
-from homeassistant.components.media_player import (
+from smarthub.components.devialet.media_player import SUPPORT_DEVIALET
+from smarthub.components.smarthub import SERVICE_UPDATE_ENTITY
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_INPUT_SOURCE_LIST,
     ATTR_MEDIA_ALBUM_NAME,
@@ -26,8 +26,8 @@ from homeassistant.components.media_player import (
     SERVICE_SELECT_SOURCE,
     MediaPlayerState,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_ENTITY_PICTURE,
     ATTR_SUPPORTED_FEATURES,
@@ -44,8 +44,8 @@ from homeassistant.const import (
     SERVICE_VOLUME_UP,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import HOST, NAME, setup_integration
 
@@ -101,16 +101,16 @@ SERVICE_TO_DATA = {
 
 
 async def test_media_player_playing(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the Devialet configuration entry loading and unloading."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     entry = await setup_integration(hass, aioclient_mock)
 
     assert entry.state is ConfigEntryState.LOADED
 
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         SERVICE_UPDATE_ENTITY,
         {ATTR_ENTITY_ID: [f"{MP_DOMAIN}.{NAME.lower()}"]},
         blocking=True,
@@ -135,7 +135,7 @@ async def test_media_player_playing(
     assert state.attributes[ATTR_SOUND_MODE] is not None
 
     with patch(
-        "homeassistant.components.devialet.DevialetApi.playing_state",
+        "smarthub.components.devialet.DevialetApi.playing_state",
         new_callable=PropertyMock,
     ) as mock:
         mock.return_value = MediaPlayerState.PAUSED
@@ -148,7 +148,7 @@ async def test_media_player_playing(
         )
 
     with patch(
-        "homeassistant.components.devialet.DevialetApi.playing_state",
+        "smarthub.components.devialet.DevialetApi.playing_state",
         new_callable=PropertyMock,
     ) as mock:
         mock.return_value = MediaPlayerState.ON
@@ -229,7 +229,7 @@ async def test_media_player_playing(
 
 
 async def test_media_player_offline(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the Devialet configuration entry loading and unloading."""
     entry = await setup_integration(hass, aioclient_mock, state=STATE_UNAVAILABLE)
@@ -247,7 +247,7 @@ async def test_media_player_offline(
 
 
 async def test_media_player_without_serial(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the Devialet configuration entry loading and unloading."""
     entry = await setup_integration(hass, aioclient_mock, serial=None)
@@ -262,7 +262,7 @@ async def test_media_player_without_serial(
 
 
 async def test_media_player_services(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the Devialet services."""
     entry = await setup_integration(

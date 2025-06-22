@@ -8,8 +8,8 @@ from uuid import uuid4
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.local_calendar.const import (
+from smarthub import config_entries
+from smarthub.components.local_calendar.const import (
     ATTR_CREATE_EMPTY,
     ATTR_IMPORT_ICS_FILE,
     CONF_CALENDAR_NAME,
@@ -18,8 +18,8 @@ from homeassistant.components.local_calendar.const import (
     CONF_STORAGE_KEY,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -43,7 +43,7 @@ def mock_process_uploaded_file(
 
     @contextmanager
     def _mock_process_uploaded_file(
-        hass: HomeAssistant, uploaded_file_id: str
+        hass: SmartHub, uploaded_file_id: str
     ) -> Iterator[Path | None]:
         with open(tmp_path / uploaded_file_id, "wb") as icsfile:
             icsfile.write(mock_ics_content)
@@ -51,7 +51,7 @@ def mock_process_uploaded_file(
 
     with (
         patch(
-            "homeassistant.components.local_calendar.config_flow.process_uploaded_file",
+            "smarthub.components.local_calendar.config_flow.process_uploaded_file",
             side_effect=_mock_process_uploaded_file,
         ) as mock_upload,
         patch(
@@ -64,7 +64,7 @@ def mock_process_uploaded_file(
         yield mock_upload
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -73,7 +73,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.local_calendar.async_setup_entry",
+        "smarthub.components.local_calendar.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -95,7 +95,7 @@ async def test_form(hass: HomeAssistant) -> None:
 
 
 async def test_form_import_ics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_process_uploaded_file: MagicMock,
 ) -> None:
     """Test we get the import form."""
@@ -112,7 +112,7 @@ async def test_form_import_ics(
     assert result2["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.local_calendar.async_setup_entry",
+        "smarthub.components.local_calendar.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         file_id = mock_process_uploaded_file.file_id
@@ -127,7 +127,7 @@ async def test_form_import_ics(
 
 
 async def test_duplicate_name(
-    hass: HomeAssistant, setup_integration: None, config_entry: MockConfigEntry
+    hass: SmartHub, setup_integration: None, config_entry: MockConfigEntry
 ) -> None:
     """Test two calendars cannot be added with the same name."""
 
@@ -152,7 +152,7 @@ async def test_duplicate_name(
 
 @pytest.mark.parametrize("mock_ics_content", [b"invalid-ics-content"])
 async def test_invalid_ics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_process_uploaded_file: MagicMock,
 ) -> None:
     """Test invalid ics content raises error."""

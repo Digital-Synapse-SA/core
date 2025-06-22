@@ -7,14 +7,14 @@ from unittest.mock import PropertyMock, patch
 import pytest
 from subarulink.exceptions import InvalidCredentials, InvalidPIN, SubaruException
 
-from homeassistant import config_entries
-from homeassistant.components.subaru import config_flow
-from homeassistant.components.subaru.const import CONF_UPDATE_ENABLED, DOMAIN
-from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.const import CONF_DEVICE_ID, CONF_PIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components.subaru import config_flow
+from smarthub.components.subaru.const import CONF_UPDATE_ENABLED, DOMAIN
+from smarthub.config_entries import ConfigFlowResult
+from smarthub.const import CONF_DEVICE_ID, CONF_PIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from .conftest import (
     MOCK_API_2FA_CONTACTS,
@@ -34,7 +34,7 @@ from .conftest import (
 
 from tests.common import MockConfigEntry
 
-ASYNC_SETUP_ENTRY = "homeassistant.components.subaru.async_setup_entry"
+ASYNC_SETUP_ENTRY = "smarthub.components.subaru.async_setup_entry"
 MOCK_2FA_CONTACTS = {
     "phone": "123-123-1234",
     "userName": "email@addr.com",
@@ -50,7 +50,7 @@ async def test_user_form_init(user_form) -> None:
     assert user_form["type"] is FlowResultType.FORM
 
 
-async def test_user_form_repeat_identifier(hass: HomeAssistant, user_form) -> None:
+async def test_user_form_repeat_identifier(hass: SmartHub, user_form) -> None:
     """Test we handle repeat identifiers."""
     entry = MockConfigEntry(
         domain=DOMAIN, title=TEST_USERNAME, data=TEST_CREDS, options=None
@@ -70,7 +70,7 @@ async def test_user_form_repeat_identifier(hass: HomeAssistant, user_form) -> No
     assert result["reason"] == "already_configured"
 
 
-async def test_user_form_cannot_connect(hass: HomeAssistant, user_form) -> None:
+async def test_user_form_cannot_connect(hass: SmartHub, user_form) -> None:
     """Test we handle cannot connect error."""
     with patch(
         MOCK_API_CONNECT,
@@ -85,7 +85,7 @@ async def test_user_form_cannot_connect(hass: HomeAssistant, user_form) -> None:
     assert result["reason"] == "cannot_connect"
 
 
-async def test_user_form_invalid_auth(hass: HomeAssistant, user_form) -> None:
+async def test_user_form_invalid_auth(hass: SmartHub, user_form) -> None:
     """Test we handle invalid auth."""
     with patch(
         MOCK_API_CONNECT,
@@ -101,7 +101,7 @@ async def test_user_form_invalid_auth(hass: HomeAssistant, user_form) -> None:
 
 
 async def test_user_form_pin_not_required(
-    hass: HomeAssistant, two_factor_verify_form
+    hass: SmartHub, two_factor_verify_form
 ) -> None:
     """Test successful login when no PIN is required."""
     with (
@@ -144,7 +144,7 @@ async def test_user_form_pin_not_required(
     assert result == expected
 
 
-async def test_registered_pin_required(hass: HomeAssistant, user_form) -> None:
+async def test_registered_pin_required(hass: SmartHub, user_form) -> None:
     """Test if the device is already registered and PIN required."""
     with (
         patch(MOCK_API_CONNECT, return_value=True),
@@ -159,7 +159,7 @@ async def test_registered_pin_required(hass: HomeAssistant, user_form) -> None:
         )
 
 
-async def test_registered_no_pin_required(hass: HomeAssistant, user_form) -> None:
+async def test_registered_no_pin_required(hass: SmartHub, user_form) -> None:
     """Test if the device is already registered and PIN not required."""
     with (
         patch(MOCK_API_CONNECT, return_value=True),
@@ -175,7 +175,7 @@ async def test_registered_no_pin_required(hass: HomeAssistant, user_form) -> Non
 
 
 async def test_two_factor_request_success(
-    hass: HomeAssistant, two_factor_start_form
+    hass: SmartHub, two_factor_start_form
 ) -> None:
     """Test two factor contact method selection."""
     with (
@@ -194,7 +194,7 @@ async def test_two_factor_request_success(
 
 
 async def test_two_factor_request_fail(
-    hass: HomeAssistant, two_factor_start_form
+    hass: SmartHub, two_factor_start_form
 ) -> None:
     """Test two factor auth request failure."""
     with (
@@ -215,7 +215,7 @@ async def test_two_factor_request_fail(
 
 
 async def test_two_factor_verify_success(
-    hass: HomeAssistant, two_factor_verify_form
+    hass: SmartHub, two_factor_verify_form
 ) -> None:
     """Test two factor verification."""
     with (
@@ -234,7 +234,7 @@ async def test_two_factor_verify_success(
 
 
 async def test_two_factor_verify_bad_format(
-    hass: HomeAssistant, two_factor_verify_form
+    hass: SmartHub, two_factor_verify_form
 ) -> None:
     """Test two factor verification bad format."""
     with (
@@ -254,7 +254,7 @@ async def test_two_factor_verify_bad_format(
 
 
 async def test_two_factor_verify_fail(
-    hass: HomeAssistant, two_factor_verify_form
+    hass: SmartHub, two_factor_verify_form
 ) -> None:
     """Test two factor verification failure."""
     with (
@@ -289,7 +289,7 @@ async def test_pin_form_init(pin_form) -> None:
     assert pin_form == expected
 
 
-async def test_pin_form_bad_pin_format(hass: HomeAssistant, pin_form) -> None:
+async def test_pin_form_bad_pin_format(hass: SmartHub, pin_form) -> None:
     """Test we handle invalid pin."""
     with (
         patch(
@@ -309,7 +309,7 @@ async def test_pin_form_bad_pin_format(hass: HomeAssistant, pin_form) -> None:
     assert result["errors"] == {"base": "bad_pin_format"}
 
 
-async def test_pin_form_success(hass: HomeAssistant, pin_form) -> None:
+async def test_pin_form_success(hass: SmartHub, pin_form) -> None:
     """Test successful PIN entry."""
     with (
         patch(
@@ -348,7 +348,7 @@ async def test_pin_form_success(hass: HomeAssistant, pin_form) -> None:
     assert result == expected
 
 
-async def test_pin_form_incorrect_pin(hass: HomeAssistant, pin_form) -> None:
+async def test_pin_form_incorrect_pin(hass: SmartHub, pin_form) -> None:
     """Test we handle invalid pin."""
     with (
         patch(
@@ -377,7 +377,7 @@ async def test_option_flow_form(options_form) -> None:
     assert options_form["type"] is FlowResultType.FORM
 
 
-async def test_option_flow(hass: HomeAssistant, options_form) -> None:
+async def test_option_flow(hass: SmartHub, options_form) -> None:
     """Test config flow options."""
     result = await hass.config_entries.options.async_configure(
         options_form["flow_id"],
@@ -392,7 +392,7 @@ async def test_option_flow(hass: HomeAssistant, options_form) -> None:
 
 
 @pytest.fixture
-async def user_form(hass: HomeAssistant) -> ConfigFlowResult:
+async def user_form(hass: SmartHub) -> ConfigFlowResult:
     """Return initial form for Subaru config flow."""
     return await hass.config_entries.flow.async_init(
         config_flow.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -401,7 +401,7 @@ async def user_form(hass: HomeAssistant) -> ConfigFlowResult:
 
 @pytest.fixture
 async def two_factor_start_form(
-    hass: HomeAssistant, user_form: ConfigFlowResult
+    hass: SmartHub, user_form: ConfigFlowResult
 ) -> ConfigFlowResult:
     """Return two factor form for Subaru config flow."""
     with (
@@ -416,7 +416,7 @@ async def two_factor_start_form(
 
 @pytest.fixture
 async def two_factor_verify_form(
-    hass: HomeAssistant, two_factor_start_form: ConfigFlowResult
+    hass: SmartHub, two_factor_start_form: ConfigFlowResult
 ) -> ConfigFlowResult:
     """Return two factor form for Subaru config flow."""
     with (
@@ -435,7 +435,7 @@ async def two_factor_verify_form(
 
 @pytest.fixture
 async def pin_form(
-    hass: HomeAssistant, two_factor_verify_form: ConfigFlowResult
+    hass: SmartHub, two_factor_verify_form: ConfigFlowResult
 ) -> ConfigFlowResult:
     """Return PIN input form for Subaru config flow."""
     with (
@@ -452,7 +452,7 @@ async def pin_form(
 
 
 @pytest.fixture
-async def options_form(hass: HomeAssistant) -> ConfigFlowResult:
+async def options_form(hass: SmartHub) -> ConfigFlowResult:
     """Return options form for Subaru config flow."""
     entry = MockConfigEntry(domain=DOMAIN, data={}, options=None)
     entry.add_to_hass(hass)

@@ -7,10 +7,10 @@ from unittest.mock import AsyncMock
 import pytest
 from sensorpush_ha import SensorPushCloudAuthError
 
-from homeassistant.components.sensorpush_cloud.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.sensorpush_cloud.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import CONF_DATA, CONF_EMAIL
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_api: AsyncMock,
     mock_helper: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -43,7 +43,7 @@ async def test_user(
 
 
 async def test_user_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_api: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -62,7 +62,7 @@ async def test_user_already_configured(
     [(SensorPushCloudAuthError, "invalid_auth"), (Exception, "unknown")],
 )
 async def test_user_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_api: AsyncMock,
     mock_setup_entry: AsyncMock,
     error: Exception,

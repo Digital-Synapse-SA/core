@@ -5,10 +5,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.event import ATTR_EVENT_TYPE
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.event import ATTR_EVENT_TYPE
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import build_mock_node, setup_integration
 
@@ -42,7 +42,7 @@ from tests.common import MockConfigEntry, snapshot_platform
     ],
 )
 async def test_event_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_id: str,
@@ -67,14 +67,14 @@ async def test_event_triggers(
 
 
 async def test_event_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the event entity snapshot."""
-    with patch("homeassistant.components.homee.PLATFORMS", [Platform.EVENT]):
+    with patch("smarthub.components.homee.PLATFORMS", [Platform.EVENT]):
         mock_homee.nodes = [build_mock_node("events.json")]
         mock_homee.get_node_by_id.return_value = mock_homee.nodes[0]
         await setup_integration(hass, mock_config_entry)

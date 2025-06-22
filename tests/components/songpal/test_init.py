@@ -2,9 +2,9 @@
 
 from unittest.mock import patch
 
-from homeassistant.components import songpal
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import songpal
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import (
     CONF_DATA,
@@ -23,12 +23,12 @@ def _patch_media_setup():
         return True
 
     return patch(
-        "homeassistant.components.songpal.media_player.async_setup_entry",
+        "smarthub.components.songpal.media_player.async_setup_entry",
         side_effect=_async_return,
     )
 
 
-async def test_setup_empty(hass: HomeAssistant) -> None:
+async def test_setup_empty(hass: SmartHub) -> None:
     """Test setup without any configuration."""
     with _patch_media_setup() as setup:
         assert await async_setup_component(hass, songpal.DOMAIN, {}) is True
@@ -36,7 +36,7 @@ async def test_setup_empty(hass: HomeAssistant) -> None:
     setup.assert_not_called()
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test setup the platform."""
     mocked_device = _create_mocked_device()
 
@@ -52,7 +52,7 @@ async def test_setup(hass: HomeAssistant) -> None:
     setup.assert_called_once()
 
 
-async def test_unload(hass: HomeAssistant) -> None:
+async def test_unload(hass: SmartHub) -> None:
     """Test unload entity."""
     entry = MockConfigEntry(domain=songpal.DOMAIN, data=CONF_DATA)
     entry.add_to_hass(hass)

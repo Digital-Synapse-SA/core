@@ -9,15 +9,15 @@ from google.protobuf import duration_pb2
 from google.type import localized_text_pb2
 import pytest
 
-from homeassistant.components.google_travel_time.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.google_travel_time.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture(name="mock_config")
 async def mock_config_fixture(
-    hass: HomeAssistant, data: dict[str, Any], options: dict[str, Any]
+    hass: SmartHub, data: dict[str, Any], options: dict[str, Any]
 ) -> MockConfigEntry:
     """Mock a Google Travel Time config entry."""
     config_entry = MockConfigEntry(
@@ -36,7 +36,7 @@ async def mock_config_fixture(
 def mock_setup_entry() -> Generator[None]:
     """Bypass entry setup."""
     with patch(
-        "homeassistant.components.google_travel_time.async_setup_entry",
+        "smarthub.components.google_travel_time.async_setup_entry",
         return_value=True,
     ):
         yield
@@ -47,11 +47,11 @@ def routes_mock() -> Generator[AsyncMock]:
     """Return valid API result."""
     with (
         patch(
-            "homeassistant.components.google_travel_time.helpers.RoutesAsyncClient",
+            "smarthub.components.google_travel_time.helpers.RoutesAsyncClient",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.google_travel_time.sensor.RoutesAsyncClient",
+            "smarthub.components.google_travel_time.sensor.RoutesAsyncClient",
             new=mock_client,
         ),
     ):

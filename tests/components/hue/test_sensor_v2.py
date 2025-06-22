@@ -2,12 +2,12 @@
 
 from unittest.mock import Mock
 
-from homeassistant.components import hue
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util.json import JsonArrayType
+from smarthub.components import hue
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util.json import JsonArrayType
 
 from .conftest import setup_bridge, setup_platform
 from .const import FAKE_DEVICE, FAKE_SENSOR, FAKE_ZIGBEE_CONNECTIVITY
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_bridge_v2: Mock,
     v2_resources_test_data: JsonArrayType,
@@ -69,7 +69,7 @@ async def test_sensors(
 
 
 async def test_enable_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_bridge_v2: Mock,
     v2_resources_test_data: JsonArrayType,
@@ -113,7 +113,7 @@ async def test_enable_sensor(
     assert state.attributes["mac_address"] == "00:17:88:01:0b:aa:bb:99"
 
 
-async def test_sensor_add_update(hass: HomeAssistant, mock_bridge_v2: Mock) -> None:
+async def test_sensor_add_update(hass: SmartHub, mock_bridge_v2: Mock) -> None:
     """Test if sensors get added/updated from events."""
     await mock_bridge_v2.api.load_test_data([FAKE_DEVICE, FAKE_ZIGBEE_CONNECTIVITY])
     await setup_platform(hass, mock_bridge_v2, Platform.SENSOR)

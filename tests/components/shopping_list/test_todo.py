@@ -5,16 +5,16 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.todo import (
+from smarthub.components.todo import (
     ATTR_ITEM,
     ATTR_RENAME,
     ATTR_STATUS,
     DOMAIN as TODO_DOMAIN,
     TodoServices,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from tests.typing import WebSocketGenerator
 
@@ -65,7 +65,7 @@ async def ws_move_item(hass_ws_client: WebSocketGenerator) -> WsMoveItemType:
 
 
 async def test_get_items(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     sl_setup: None,
     ws_get_items: WsGetItemsType,
@@ -97,7 +97,7 @@ async def test_get_items(
 
 
 async def test_add_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sl_setup: None,
     ws_get_items: WsGetItemsType,
 ) -> None:
@@ -124,7 +124,7 @@ async def test_add_item(
 
 
 async def test_remove_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sl_setup: None,
     ws_get_items: WsGetItemsType,
 ) -> None:
@@ -165,7 +165,7 @@ async def test_remove_item(
 
 
 async def test_bulk_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sl_setup: None,
     ws_get_items: WsGetItemsType,
 ) -> None:
@@ -209,7 +209,7 @@ async def test_bulk_remove(
 
 
 async def test_update_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sl_setup: None,
     ws_get_items: WsGetItemsType,
 ) -> None:
@@ -262,7 +262,7 @@ async def test_update_item(
 
 
 async def test_partial_update_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sl_setup: None,
     ws_get_items: WsGetItemsType,
 ) -> None:
@@ -338,7 +338,7 @@ async def test_partial_update_item(
 
 
 async def test_update_invalid_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sl_setup: None,
     ws_get_items: WsGetItemsType,
 ) -> None:
@@ -384,7 +384,7 @@ async def test_update_invalid_item(
     ],
 )
 async def test_move_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sl_setup: None,
     ws_get_items: WsGetItemsType,
     ws_move_item: WsMoveItemType,
@@ -426,7 +426,7 @@ async def test_move_item(
 
 
 async def test_move_invalid_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sl_setup: None,
     ws_get_items: WsGetItemsType,
     ws_move_item: WsMoveItemType,
@@ -453,7 +453,7 @@ async def test_move_invalid_item(
 
 
 async def test_subscribe_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sl_setup: None,
     hass_ws_client: WebSocketGenerator,
 ) -> None:

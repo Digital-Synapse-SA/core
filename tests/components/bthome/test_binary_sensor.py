@@ -6,18 +6,18 @@ import time
 
 import pytest
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
 )
-from homeassistant.components.bthome.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.bthome.const import DOMAIN
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import make_bthome_v1_adv, make_bthome_v2_adv
 
@@ -82,7 +82,7 @@ _LOGGER = logging.getLogger(__name__)
     ],
 )
 async def test_v1_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac_address,
     advertisement,
     bind_key,
@@ -168,7 +168,7 @@ async def test_v1_binary_sensors(
     ],
 )
 async def test_v2_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac_address,
     advertisement,
     bind_key,
@@ -203,7 +203,7 @@ async def test_v2_binary_sensors(
     await hass.async_block_till_done()
 
 
-async def test_unavailable(hass: HomeAssistant) -> None:
+async def test_unavailable(hass: SmartHub) -> None:
     """Test normal device goes to unavailable after 60 minutes."""
     start_monotonic = time.monotonic()
 
@@ -254,7 +254,7 @@ async def test_unavailable(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_sleepy_device(hass: HomeAssistant) -> None:
+async def test_sleepy_device(hass: SmartHub) -> None:
     """Test sleepy device does not go to unavailable after 60 minutes."""
     start_monotonic = time.monotonic()
 
@@ -305,7 +305,7 @@ async def test_sleepy_device(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_sleepy_device_restores_state(hass: HomeAssistant) -> None:
+async def test_sleepy_device_restores_state(hass: SmartHub) -> None:
     """Test sleepy device does not go to unavailable after 60 minutes."""
     start_monotonic = time.monotonic()
 

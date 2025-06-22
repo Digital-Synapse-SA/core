@@ -5,14 +5,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import init_integration
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 @pytest.mark.usefixtures("classic_vario_mock", "heater_mock")
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -31,9 +31,9 @@ async def test_setup(
     mock_config_entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.eheimdigital.PLATFORMS", [Platform.NUMBER]),
+        patch("smarthub.components.eheimdigital.PLATFORMS", [Platform.NUMBER]),
         patch(
-            "homeassistant.components.eheimdigital.coordinator.asyncio.Event",
+            "smarthub.components.eheimdigital.coordinator.asyncio.Event",
             new=AsyncMock,
         ),
     ):
@@ -107,7 +107,7 @@ async def test_setup(
     ],
 )
 async def test_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     device_name: str,
@@ -201,7 +201,7 @@ async def test_set_value(
     ],
 )
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     device_name: str,

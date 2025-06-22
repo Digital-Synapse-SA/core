@@ -6,10 +6,10 @@ from unittest.mock import patch
 from pylast import Track, WSError
 import pytest
 
-from homeassistant.components.lastfm.const import CONF_MAIN_USER, CONF_USERS, DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.lastfm.const import CONF_MAIN_USER, CONF_USERS, DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import API_KEY, USERNAME_1, USERNAME_2, MockNetwork, MockUser
 
@@ -20,7 +20,7 @@ type ComponentSetup = Callable[[MockConfigEntry, MockUser], Awaitable[None]]
 
 @pytest.fixture(name="config_entry")
 def mock_config_entry() -> MockConfigEntry:
-    """Create LastFM entry in Home Assistant."""
+    """Create LastFM entry in SmartHub."""
     return MockConfigEntry(
         domain=DOMAIN,
         data={},
@@ -34,7 +34,7 @@ def mock_config_entry() -> MockConfigEntry:
 
 @pytest.fixture(name="imported_config_entry")
 def mock_imported_config_entry() -> MockConfigEntry:
-    """Create LastFM entry in Home Assistant."""
+    """Create LastFM entry in SmartHub."""
     return MockConfigEntry(
         domain=DOMAIN,
         data={},
@@ -48,7 +48,7 @@ def mock_imported_config_entry() -> MockConfigEntry:
 
 @pytest.fixture(name="setup_integration")
 async def mock_setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> Callable[[MockConfigEntry, MockUser], Awaitable[None]]:
     """Fixture for setting up the component."""
 

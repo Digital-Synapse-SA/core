@@ -5,7 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_CURRENT_TILT_POSITION,
     ATTR_POSITION,
@@ -21,9 +21,9 @@ from homeassistant.components.cover import (
     SERVICE_STOP_COVER_TILT,
     CoverState,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import init_integration, mutate_rpc_device_status
 
@@ -31,7 +31,7 @@ ROLLER_BLOCK_ID = 1
 
 
 async def test_block_device_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -82,7 +82,7 @@ async def test_block_device_services(
 
 
 async def test_block_device_update(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device update."""
     monkeypatch.setattr(mock_block_device.blocks[ROLLER_BLOCK_ID], "rollerPos", 0)
@@ -100,7 +100,7 @@ async def test_block_device_update(
 
 
 async def test_block_device_no_roller_blocks(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device without roller blocks."""
     monkeypatch.setattr(mock_block_device.blocks[ROLLER_BLOCK_ID], "type", None)
@@ -110,7 +110,7 @@ async def test_block_device_no_roller_blocks(
 
 
 async def test_rpc_device_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -172,7 +172,7 @@ async def test_rpc_device_services(
 
 
 async def test_rpc_device_no_cover_keys(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test RPC device without cover keys."""
     monkeypatch.delitem(mock_rpc_device.status, "cover:0")
@@ -182,7 +182,7 @@ async def test_rpc_device_no_cover_keys(
 
 
 async def test_rpc_device_update(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test RPC device update."""
     entity_id = "cover.test_name_test_cover_0"
@@ -201,7 +201,7 @@ async def test_rpc_device_update(
 
 
 async def test_rpc_device_no_position_control(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test RPC device with no position control."""
     mutate_rpc_device_status(
@@ -215,7 +215,7 @@ async def test_rpc_device_no_position_control(
 
 
 async def test_rpc_cover_tilt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,

@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.proximity.const import (
+from smarthub.components.proximity.const import (
     CONF_IGNORED_ZONES,
     CONF_TOLERANCE,
     CONF_TRACKED_ENTITIES,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_ZONE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_ZONE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -50,7 +50,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_user_flow(
-    hass: HomeAssistant, user_input: dict, expected_result: dict
+    hass: SmartHub, user_input: dict, expected_result: dict
 ) -> None:
     """Test starting a flow by user."""
     result = await hass.config_entries.flow.async_init(
@@ -60,7 +60,7 @@ async def test_user_flow(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.proximity.async_setup_entry", return_value=True
+        "smarthub.components.proximity.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -77,7 +77,7 @@ async def test_user_flow(
     assert mock_setup_entry.called
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test options flow."""
 
     mock_config = MockConfigEntry(
@@ -94,7 +94,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     mock_config.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.proximity.async_setup_entry", return_value=True
+        "smarthub.components.proximity.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         await hass.config_entries.async_setup(mock_config.entry_id)
         await hass.async_block_till_done()
@@ -120,7 +120,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_abort_duplicated_entry(hass: HomeAssistant) -> None:
+async def test_abort_duplicated_entry(hass: SmartHub) -> None:
     """Test if we abort on duplicate user input data."""
     DATA = {
         CONF_ZONE: "zone.home",
@@ -140,7 +140,7 @@ async def test_abort_duplicated_entry(hass: HomeAssistant) -> None:
         DOMAIN, context={"source": SOURCE_USER}
     )
     with patch(
-        "homeassistant.components.proximity.async_setup_entry", return_value=True
+        "smarthub.components.proximity.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -152,7 +152,7 @@ async def test_abort_duplicated_entry(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_avoid_duplicated_title(hass: HomeAssistant) -> None:
+async def test_avoid_duplicated_title(hass: SmartHub) -> None:
     """Test if we avoid duplicate titles."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -179,7 +179,7 @@ async def test_avoid_duplicated_title(hass: HomeAssistant) -> None:
     ).add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.proximity.async_setup_entry", return_value=True
+        "smarthub.components.proximity.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": SOURCE_USER}

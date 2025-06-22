@@ -10,18 +10,18 @@ from aioairzone.exceptions import (
 )
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.airzone.const import DOMAIN
-from homeassistant.components.airzone.coordinator import SCAN_INTERVAL
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.components.airzone.const import DOMAIN
+from smarthub.components.airzone.coordinator import SCAN_INTERVAL
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.util.dt import utcnow
 
 from .util import CONFIG, HVAC_MOCK, HVAC_MOCK_NEW_ZONES, HVAC_VERSION_MOCK
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_coordinator_client_connector_error(hass: HomeAssistant) -> None:
+async def test_coordinator_client_connector_error(hass: SmartHub) -> None:
     """Test ClientConnectorError on coordinator update."""
 
     config_entry = MockConfigEntry(
@@ -34,23 +34,23 @@ async def test_coordinator_client_connector_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_dhw",
+            "smarthub.components.airzone.AirzoneLocalApi.get_dhw",
             side_effect=HotWaterNotAvailable,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_hvac",
+            "smarthub.components.airzone.AirzoneLocalApi.get_hvac",
             return_value=HVAC_MOCK,
         ) as mock_hvac,
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_hvac_systems",
+            "smarthub.components.airzone.AirzoneLocalApi.get_hvac_systems",
             side_effect=SystemOutOfRange,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_version",
+            "smarthub.components.airzone.AirzoneLocalApi.get_version",
             return_value=HVAC_VERSION_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_webserver",
+            "smarthub.components.airzone.AirzoneLocalApi.get_webserver",
             side_effect=InvalidMethod,
         ),
     ):
@@ -69,7 +69,7 @@ async def test_coordinator_client_connector_error(hass: HomeAssistant) -> None:
 
 
 async def test_coordinator_new_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test new devices on coordinator update."""
@@ -84,23 +84,23 @@ async def test_coordinator_new_devices(
 
     with (
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_dhw",
+            "smarthub.components.airzone.AirzoneLocalApi.get_dhw",
             side_effect=HotWaterNotAvailable,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_hvac",
+            "smarthub.components.airzone.AirzoneLocalApi.get_hvac",
             return_value=HVAC_MOCK_NEW_ZONES,
         ) as mock_hvac,
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_hvac_systems",
+            "smarthub.components.airzone.AirzoneLocalApi.get_hvac_systems",
             side_effect=SystemOutOfRange,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_version",
+            "smarthub.components.airzone.AirzoneLocalApi.get_version",
             return_value=HVAC_VERSION_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_webserver",
+            "smarthub.components.airzone.AirzoneLocalApi.get_webserver",
             side_effect=InvalidMethod,
         ),
     ):

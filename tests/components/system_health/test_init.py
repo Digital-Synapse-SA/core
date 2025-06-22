@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from aiohttp.client_exceptions import ClientError
 
-from homeassistant.components import system_health
-from homeassistant.components.system_health import async_register_info
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import system_health
+from smarthub.components.system_health import async_register_info
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import get_system_health_info, mock_platform
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -16,7 +16,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def gather_system_health_info(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> dict[str, Any]:
     """Gather all info."""
     client = await hass_ws_client(hass)
@@ -52,13 +52,13 @@ async def gather_system_health_info(
 
 
 async def test_info_endpoint_return_info(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the info endpoint works."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     with patch(
-        "homeassistant.components.homeassistant.system_health.system_health_info",
+        "smarthub.components.smarthub.system_health.system_health_info",
         return_value={"hello": True},
     ):
         assert await async_setup_component(hass, "system_health", {})
@@ -66,16 +66,16 @@ async def test_info_endpoint_return_info(
     data = await gather_system_health_info(hass, hass_ws_client)
 
     assert len(data) == 1
-    data = data["homeassistant"]
+    data = data["smarthub"]
     assert data == {"info": {"hello": True}}
 
 
 async def test_info_endpoint_register_callback(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the info endpoint allows registering callbacks."""
 
-    async def mock_info(hass: HomeAssistant) -> dict[str, Any]:
+    async def mock_info(hass: SmartHub) -> dict[str, Any]:
         return {"storage": "YAML"}
 
     async_register_info(hass, "lovelace", mock_info)
@@ -91,11 +91,11 @@ async def test_info_endpoint_register_callback(
 
 
 async def test_info_endpoint_register_callback_timeout(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the info endpoint timing out."""
 
-    async def mock_info(hass: HomeAssistant) -> dict[str, Any]:
+    async def mock_info(hass: SmartHub) -> dict[str, Any]:
         raise TimeoutError
 
     async_register_info(hass, "lovelace", mock_info)
@@ -108,11 +108,11 @@ async def test_info_endpoint_register_callback_timeout(
 
 
 async def test_info_endpoint_register_callback_exc(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the info endpoint requires auth."""
 
-    async def mock_info(hass: HomeAssistant) -> dict[str, Any]:
+    async def mock_info(hass: SmartHub) -> dict[str, Any]:
         raise Exception("TEST ERROR")  # noqa: TRY002
 
     async_register_info(hass, "lovelace", mock_info)
@@ -125,7 +125,7 @@ async def test_info_endpoint_register_callback_exc(
 
 
 async def test_platform_loading(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:

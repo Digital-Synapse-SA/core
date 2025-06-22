@@ -13,8 +13,8 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import async_fire_time_changed
 
@@ -28,7 +28,7 @@ from tests.common import async_fire_time_changed
 )
 @pytest.mark.usefixtures("setup_integration")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     entity_name: str,
     snapshot: SnapshotAssertion,
@@ -52,7 +52,7 @@ async def test_sensor(
 )
 @pytest.mark.usefixtures("setup_integration")
 async def test_sensor_update_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     electricity_maps: AsyncMock,
     error: Exception,
@@ -88,7 +88,7 @@ async def test_sensor_update_fail(
 
 @pytest.mark.usefixtures("setup_integration")
 async def test_sensor_reauth_triggered(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     electricity_maps: AsyncMock,
 ) -> None:

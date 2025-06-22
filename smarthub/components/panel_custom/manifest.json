@@ -1,0 +1,9 @@
+{
+  "domain": "panel_custom",
+  "name": "Custom Panel",
+  "codeowners": ["@smart-hub/frontend"],
+  "dependencies": ["frontend"],
+  "documentation": "https://www.smart-hub.io/integrations/panel_custom",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

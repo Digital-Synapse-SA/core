@@ -3,15 +3,15 @@
 from datetime import UTC, datetime
 from unittest.mock import MagicMock
 
-from homeassistant.components.forecast_solar import energy
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.forecast_solar import energy
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_energy_solar_forecast(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_forecast_solar: MagicMock,
 ) -> None:

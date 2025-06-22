@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, patch
 
 from aioruckus import AjaxSession, RuckusAjaxApi
 
-from homeassistant.components.ruckus_unleashed.const import (
+from smarthub.components.ruckus_unleashed.const import (
     API_AP_DEVNAME,
     API_AP_MAC,
     API_AP_MODEL,
@@ -26,9 +26,9 @@ from homeassistant.components.ruckus_unleashed.const import (
     API_SYS_UNLEASHEDNETWORK_TOKEN,
     DOMAIN,
 )
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 
@@ -88,8 +88,8 @@ def mock_config_entry() -> MockConfigEntry:
     )
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the Ruckus integration in Home Assistant."""
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
+    """Set up the Ruckus integration in SmartHub."""
     entry = mock_config_entry()
     entry.add_to_hass(hass)
     # Make device tied to other integration so device tracker entities get enabled

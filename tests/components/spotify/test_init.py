@@ -5,8 +5,8 @@ from unittest.mock import MagicMock
 import pytest
 from spotifyaio import SpotifyConnectionError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("setup_credentials")
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -38,7 +38,7 @@ async def test_setup(
     ],
 )
 async def test_setup_with_required_calls_failing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_spotify: MagicMock,
     mock_config_entry: MockConfigEntry,
     method: str,

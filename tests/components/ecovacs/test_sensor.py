@@ -16,11 +16,11 @@ from deebot_client.events import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ecovacs.const import DOMAIN
-from homeassistant.components.ecovacs.controller import EcovacsController
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.ecovacs.const import DOMAIN
+from smarthub.components.ecovacs.controller import EcovacsController
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .util import block_till_done
 
@@ -33,7 +33,7 @@ def platforms() -> Platform | list[Platform]:
     return Platform.SENSOR
 
 
-async def notify_events(hass: HomeAssistant, event_bus: EventBus):
+async def notify_events(hass: SmartHub, event_bus: EventBus):
     """Notify events."""
     event_bus.notify(StatsEvent(10, 300, "spotArea"))
     event_bus.notify(TotalStatsEvent(60, 144000, 123))
@@ -114,7 +114,7 @@ async def notify_events(hass: HomeAssistant, event_bus: EventBus):
     ids=["yna5x1", "5xu9h3", "qhe2o2"],
 )
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -166,7 +166,7 @@ async def test_sensors(
     ids=["yna5x1", "5xu9h3"],
 )
 async def test_disabled_by_default_sensors(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, entity_ids: list[str]
+    hass: SmartHub, entity_registry: er.EntityRegistry, entity_ids: list[str]
 ) -> None:
     """Test the disabled by default sensors."""
     for entity_id in entity_ids:
@@ -184,7 +184,7 @@ async def test_disabled_by_default_sensors(
 )
 @pytest.mark.parametrize(("device_fixture"), ["123"])
 async def test_legacy_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

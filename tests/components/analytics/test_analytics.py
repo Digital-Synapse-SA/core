@@ -10,8 +10,8 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.matchers import path_type
 
-from homeassistant.components.analytics.analytics import Analytics
-from homeassistant.components.analytics.const import (
+from smarthub.components.analytics.analytics import Analytics
+from smarthub.components.analytics.const import (
     ANALYTICS_ENDPOINT_URL,
     ANALYTICS_ENDPOINT_URL_DEV,
     ATTR_BASE,
@@ -19,11 +19,11 @@ from homeassistant.components.analytics.const import (
     ATTR_STATISTICS,
     ATTR_USAGE,
 )
-from homeassistant.config_entries import ConfigEntryDisabler, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.loader import IntegrationNotFound
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntryDisabler, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.loader import IntegrationNotFound
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, MockModule, mock_integration
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -46,7 +46,7 @@ def uuid_mock() -> Generator[None]:
 def ha_version_mock() -> Generator[None]:
     """Mock the core version."""
     with patch(
-        "homeassistant.components.analytics.analytics.HA_VERSION",
+        "smarthub.components.analytics.analytics.HA_VERSION",
         MOCK_VERSION,
     ):
         yield
@@ -56,8 +56,8 @@ def ha_version_mock() -> Generator[None]:
 def installation_type_mock() -> Generator[None]:
     """Mock the async_get_system_info."""
     with patch(
-        "homeassistant.components.analytics.analytics.async_get_system_info",
-        return_value={"installation_type": "Home Assistant Tests"},
+        "smarthub.components.analytics.analytics.async_get_system_info",
+        return_value={"installation_type": "SmartHub Tests"},
     ):
         yield
 
@@ -69,14 +69,14 @@ def _last_call_payload(aioclient: AiohttpClientMocker) -> dict[str, Any]:
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_no_send(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test send when no preferences are defined."""
     analytics = Analytics(hass)
     with patch(
-        "homeassistant.components.analytics.analytics.is_hassio",
+        "smarthub.components.analytics.analytics.is_hassio",
         side_effect=Mock(return_value=False),
     ):
         assert not analytics.preferences[ATTR_BASE]
@@ -87,17 +87,17 @@ async def test_no_send(
     assert len(aioclient_mock.mock_calls) == 0
 
 
-async def test_load_with_supervisor_diagnostics(hass: HomeAssistant) -> None:
+async def test_load_with_supervisor_diagnostics(hass: SmartHub) -> None:
     """Test loading with a supervisor that has diagnostics enabled."""
     analytics = Analytics(hass)
     assert not analytics.preferences[ATTR_DIAGNOSTICS]
     with (
         patch(
-            "homeassistant.components.hassio.get_supervisor_info",
+            "smarthub.components.hassio.get_supervisor_info",
             side_effect=Mock(return_value={"diagnostics": True}),
         ),
         patch(
-            "homeassistant.components.analytics.analytics.is_hassio",
+            "smarthub.components.analytics.analytics.is_hassio",
             side_effect=Mock(return_value=True),
         ),
     ):
@@ -105,7 +105,7 @@ async def test_load_with_supervisor_diagnostics(hass: HomeAssistant) -> None:
     assert analytics.preferences[ATTR_DIAGNOSTICS]
 
 
-async def test_load_with_supervisor_without_diagnostics(hass: HomeAssistant) -> None:
+async def test_load_with_supervisor_without_diagnostics(hass: SmartHub) -> None:
     """Test loading with a supervisor that has not diagnostics enabled."""
     analytics = Analytics(hass)
     analytics._data.preferences[ATTR_DIAGNOSTICS] = True
@@ -114,11 +114,11 @@ async def test_load_with_supervisor_without_diagnostics(hass: HomeAssistant) -> 
 
     with (
         patch(
-            "homeassistant.components.hassio.get_supervisor_info",
+            "smarthub.components.hassio.get_supervisor_info",
             side_effect=Mock(return_value={"diagnostics": False}),
         ),
         patch(
-            "homeassistant.components.analytics.analytics.is_hassio",
+            "smarthub.components.analytics.analytics.is_hassio",
             side_effect=Mock(return_value=True),
         ),
     ):
@@ -129,7 +129,7 @@ async def test_load_with_supervisor_without_diagnostics(hass: HomeAssistant) -> 
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_failed_to_send(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -148,7 +148,7 @@ async def test_failed_to_send(
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_failed_to_send_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -164,7 +164,7 @@ async def test_failed_to_send_raises(
 
 @pytest.mark.usefixtures("installation_type_mock", "supervisor_client")
 async def test_send_base(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -187,7 +187,7 @@ async def test_send_base(
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_send_base_with_supervisor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -201,29 +201,29 @@ async def test_send_base_with_supervisor(
 
     with (
         patch(
-            "homeassistant.components.hassio.get_supervisor_info",
+            "smarthub.components.hassio.get_supervisor_info",
             side_effect=Mock(
                 return_value={"supported": True, "healthy": True, "arch": "amd64"}
             ),
         ),
         patch(
-            "homeassistant.components.hassio.get_os_info",
+            "smarthub.components.hassio.get_os_info",
             side_effect=Mock(return_value={"board": "blue", "version": "123"}),
         ),
         patch(
-            "homeassistant.components.hassio.get_info",
+            "smarthub.components.hassio.get_info",
             side_effect=Mock(return_value={}),
         ),
         patch(
-            "homeassistant.components.hassio.get_host_info",
+            "smarthub.components.hassio.get_host_info",
             side_effect=Mock(return_value={}),
         ),
         patch(
-            "homeassistant.components.analytics.analytics.is_hassio",
+            "smarthub.components.analytics.analytics.is_hassio",
             side_effect=Mock(return_value=True),
         ) as is_hassio_mock,
         patch(
-            "homeassistant.helpers.system_info.is_hassio",
+            "smarthub.helpers.system_info.is_hassio",
             new=is_hassio_mock,
         ),
     ):
@@ -240,7 +240,7 @@ async def test_send_base_with_supervisor(
 
 @pytest.mark.usefixtures("installation_type_mock", "supervisor_client")
 async def test_send_usage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -256,13 +256,13 @@ async def test_send_usage(
     hass.config.components.add("default_config")
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         return_value={"default_config": {}},
     ):
         await analytics.send_analytics()
 
     assert (
-        "Submitted analytics to Home Assistant servers. Information submitted includes"
+        "Submitted analytics to SmartHub servers. Information submitted includes"
         in caplog.text
     )
 
@@ -275,7 +275,7 @@ async def test_send_usage(
 
 @pytest.mark.usefixtures("mock_hass_config")
 async def test_send_usage_with_supervisor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -295,7 +295,7 @@ async def test_send_usage_with_supervisor(
     )
     with (
         patch(
-            "homeassistant.components.hassio.get_supervisor_info",
+            "smarthub.components.hassio.get_supervisor_info",
             side_effect=Mock(
                 return_value={
                     "healthy": True,
@@ -306,23 +306,23 @@ async def test_send_usage_with_supervisor(
             ),
         ),
         patch(
-            "homeassistant.components.hassio.get_os_info",
+            "smarthub.components.hassio.get_os_info",
             side_effect=Mock(return_value={}),
         ),
         patch(
-            "homeassistant.components.hassio.get_info",
+            "smarthub.components.hassio.get_info",
             side_effect=Mock(return_value={}),
         ),
         patch(
-            "homeassistant.components.hassio.get_host_info",
+            "smarthub.components.hassio.get_host_info",
             side_effect=Mock(return_value={}),
         ),
         patch(
-            "homeassistant.components.analytics.analytics.is_hassio",
+            "smarthub.components.analytics.analytics.is_hassio",
             side_effect=Mock(return_value=True),
         ) as is_hassio_mock,
         patch(
-            "homeassistant.helpers.system_info.is_hassio",
+            "smarthub.helpers.system_info.is_hassio",
             new=is_hassio_mock,
         ),
     ):
@@ -337,7 +337,7 @@ async def test_send_usage_with_supervisor(
 
 @pytest.mark.usefixtures("installation_type_mock", "supervisor_client")
 async def test_send_statistics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -351,7 +351,7 @@ async def test_send_statistics(
     hass.config.components.add("default_config")
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         return_value={"default_config": {}},
     ):
         await analytics.send_analytics()
@@ -365,7 +365,7 @@ async def test_send_statistics(
 
 @pytest.mark.usefixtures("mock_hass_config", "supervisor_client")
 async def test_send_statistics_one_integration_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test send statistics preferences are defined."""
@@ -377,7 +377,7 @@ async def test_send_statistics_one_integration_fails(
     hass.config.components = ["default_config"]
 
     with patch(
-        "homeassistant.components.analytics.analytics.async_get_integrations",
+        "smarthub.components.analytics.analytics.async_get_integrations",
         return_value={"any": IntegrationNotFound("any")},
     ):
         await analytics.send_analytics()
@@ -391,7 +391,7 @@ async def test_send_statistics_one_integration_fails(
     "installation_type_mock", "mock_hass_config", "supervisor_client"
 )
 async def test_send_statistics_disabled_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -405,7 +405,7 @@ async def test_send_statistics_disabled_integration(
     hass.config.components = ["default_config"]
 
     with patch(
-        "homeassistant.components.analytics.analytics.async_get_integrations",
+        "smarthub.components.analytics.analytics.async_get_integrations",
         return_value={
             "disabled_integration_manifest": mock_integration(
                 hass,
@@ -430,7 +430,7 @@ async def test_send_statistics_disabled_integration(
     "installation_type_mock", "mock_hass_config", "supervisor_client"
 )
 async def test_send_statistics_ignored_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -450,7 +450,7 @@ async def test_send_statistics_ignored_integration(
     mock_config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.analytics.analytics.async_get_integrations",
+        "smarthub.components.analytics.analytics.async_get_integrations",
         return_value={
             "ignored_integration": mock_integration(
                 hass,
@@ -473,7 +473,7 @@ async def test_send_statistics_ignored_integration(
 
 @pytest.mark.usefixtures("mock_hass_config", "supervisor_client")
 async def test_send_statistics_async_get_integration_unknown_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test send statistics preferences are defined."""
@@ -487,7 +487,7 @@ async def test_send_statistics_async_get_integration_unknown_exception(
     with (
         pytest.raises(ValueError),
         patch(
-            "homeassistant.components.analytics.analytics.async_get_integrations",
+            "smarthub.components.analytics.analytics.async_get_integrations",
             return_value={"any": ValueError()},
         ),
     ):
@@ -496,7 +496,7 @@ async def test_send_statistics_async_get_integration_unknown_exception(
 
 @pytest.mark.usefixtures("mock_hass_config")
 async def test_send_statistics_with_supervisor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -514,7 +514,7 @@ async def test_send_statistics_with_supervisor(
     )
     with (
         patch(
-            "homeassistant.components.hassio.get_supervisor_info",
+            "smarthub.components.hassio.get_supervisor_info",
             side_effect=Mock(
                 return_value={
                     "healthy": True,
@@ -525,23 +525,23 @@ async def test_send_statistics_with_supervisor(
             ),
         ),
         patch(
-            "homeassistant.components.hassio.get_os_info",
+            "smarthub.components.hassio.get_os_info",
             side_effect=Mock(return_value={}),
         ),
         patch(
-            "homeassistant.components.hassio.get_info",
+            "smarthub.components.hassio.get_info",
             side_effect=Mock(return_value={}),
         ),
         patch(
-            "homeassistant.components.hassio.get_host_info",
+            "smarthub.components.hassio.get_host_info",
             side_effect=Mock(return_value={}),
         ),
         patch(
-            "homeassistant.components.analytics.analytics.is_hassio",
+            "smarthub.components.analytics.analytics.is_hassio",
             side_effect=Mock(return_value=True),
         ) as is_hassio_mock,
         patch(
-            "homeassistant.helpers.system_info.is_hassio",
+            "smarthub.helpers.system_info.is_hassio",
             new=is_hassio_mock,
         ),
     ):
@@ -556,7 +556,7 @@ async def test_send_statistics_with_supervisor(
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_reusing_uuid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test reusing the stored UUID."""
@@ -576,7 +576,7 @@ async def test_reusing_uuid(
     "enable_custom_integrations", "installation_type_mock", "supervisor_client"
 )
 async def test_custom_integrations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
     snapshot: SnapshotAssertion,
@@ -589,7 +589,7 @@ async def test_custom_integrations(
     await analytics.save_preferences({ATTR_BASE: True, ATTR_USAGE: True})
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         return_value={"test_package": {}},
     ):
         await analytics.send_analytics()
@@ -603,7 +603,7 @@ async def test_custom_integrations(
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_dev_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test sending payload to dev url."""
@@ -612,7 +612,7 @@ async def test_dev_url(
     await analytics.save_preferences({ATTR_BASE: True})
 
     with patch(
-        "homeassistant.components.analytics.analytics.HA_VERSION", MOCK_VERSION_DEV
+        "smarthub.components.analytics.analytics.HA_VERSION", MOCK_VERSION_DEV
     ):
         await analytics.send_analytics()
 
@@ -622,7 +622,7 @@ async def test_dev_url(
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_dev_url_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -632,7 +632,7 @@ async def test_dev_url_error(
     await analytics.save_preferences({ATTR_BASE: True})
 
     with patch(
-        "homeassistant.components.analytics.analytics.HA_VERSION", MOCK_VERSION_DEV
+        "smarthub.components.analytics.analytics.HA_VERSION", MOCK_VERSION_DEV
     ):
         await analytics.send_analytics()
 
@@ -646,7 +646,7 @@ async def test_dev_url_error(
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_nightly_endpoint(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test sending payload to production url when running nightly."""
@@ -655,7 +655,7 @@ async def test_nightly_endpoint(
     await analytics.save_preferences({ATTR_BASE: True})
 
     with patch(
-        "homeassistant.components.analytics.analytics.HA_VERSION", MOCK_VERSION_NIGHTLY
+        "smarthub.components.analytics.analytics.HA_VERSION", MOCK_VERSION_NIGHTLY
     ):
         await analytics.send_analytics()
 
@@ -667,7 +667,7 @@ async def test_nightly_endpoint(
     "installation_type_mock", "mock_hass_config", "supervisor_client"
 )
 async def test_send_with_no_energy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
     snapshot: SnapshotAssertion,
@@ -681,11 +681,11 @@ async def test_send_with_no_energy(
 
     with (
         patch(
-            "homeassistant.components.analytics.analytics.energy_is_configured",
+            "smarthub.components.analytics.analytics.energy_is_configured",
             AsyncMock(),
         ) as energy_is_configured,
         patch(
-            "homeassistant.components.analytics.analytics.get_recorder_instance",
+            "smarthub.components.analytics.analytics.get_recorder_instance",
             Mock(),
         ) as get_recorder_instance,
     ):
@@ -705,7 +705,7 @@ async def test_send_with_no_energy(
     "recorder_mock", "installation_type_mock", "mock_hass_config", "supervisor_client"
 )
 async def test_send_with_no_energy_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
     snapshot: SnapshotAssertion,
@@ -718,7 +718,7 @@ async def test_send_with_no_energy_config(
     assert await async_setup_component(hass, "energy", {})
 
     with patch(
-        "homeassistant.components.analytics.analytics.energy_is_configured", AsyncMock()
+        "smarthub.components.analytics.analytics.energy_is_configured", AsyncMock()
     ) as energy_is_configured:
         energy_is_configured.return_value = False
         await analytics.send_analytics()
@@ -738,7 +738,7 @@ async def test_send_with_no_energy_config(
     "recorder_mock", "installation_type_mock", "mock_hass_config", "supervisor_client"
 )
 async def test_send_with_energy_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
     snapshot: SnapshotAssertion,
@@ -751,7 +751,7 @@ async def test_send_with_energy_config(
     assert await async_setup_component(hass, "energy", {})
 
     with patch(
-        "homeassistant.components.analytics.analytics.energy_is_configured", AsyncMock()
+        "smarthub.components.analytics.analytics.energy_is_configured", AsyncMock()
     ) as energy_is_configured:
         energy_is_configured.return_value = True
         await analytics.send_analytics()
@@ -771,7 +771,7 @@ async def test_send_with_energy_config(
     "installation_type_mock", "mock_hass_config", "supervisor_client"
 )
 async def test_send_usage_with_certificate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -797,7 +797,7 @@ async def test_send_usage_with_certificate(
 
 @pytest.mark.usefixtures("recorder_mock", "installation_type_mock", "supervisor_client")
 async def test_send_with_recorder(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
     snapshot: SnapshotAssertion,
@@ -810,7 +810,7 @@ async def test_send_with_recorder(
     await analytics.save_preferences({ATTR_BASE: True, ATTR_USAGE: True})
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         return_value={"recorder": {}},
     ):
         await analytics.send_analytics()
@@ -828,7 +828,7 @@ async def test_send_with_recorder(
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_send_with_problems_loading_yaml(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -837,8 +837,8 @@ async def test_send_with_problems_loading_yaml(
 
     await analytics.save_preferences({ATTR_BASE: True, ATTR_USAGE: True})
     with patch(
-        "homeassistant.config.load_yaml_config_file",
-        side_effect=HomeAssistantError("Error loading YAML file"),
+        "smarthub.config.load_yaml_config_file",
+        side_effect=SmartHubError("Error loading YAML file"),
     ):
         await analytics.send_analytics()
 
@@ -848,7 +848,7 @@ async def test_send_with_problems_loading_yaml(
 
 @pytest.mark.usefixtures("mock_hass_config", "supervisor_client")
 async def test_timeout_while_sending(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -858,7 +858,7 @@ async def test_timeout_while_sending(
 
     await analytics.save_preferences({ATTR_BASE: True})
     with patch(
-        "homeassistant.components.analytics.analytics.HA_VERSION", MOCK_VERSION_DEV
+        "smarthub.components.analytics.analytics.HA_VERSION", MOCK_VERSION_DEV
     ):
         await analytics.send_analytics()
 
@@ -867,7 +867,7 @@ async def test_timeout_while_sending(
 
 @pytest.mark.usefixtures("installation_type_mock", "supervisor_client")
 async def test_not_check_config_entries_if_yaml(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -894,7 +894,7 @@ async def test_not_check_config_entries_if_yaml(
 
     with (
         patch(
-            "homeassistant.components.analytics.analytics.async_get_integrations",
+            "smarthub.components.analytics.analytics.async_get_integrations",
             return_value={
                 "default_config": mock_integration(
                     hass,
@@ -907,7 +907,7 @@ async def test_not_check_config_entries_if_yaml(
             },
         ),
         patch(
-            "homeassistant.config.load_yaml_config_file",
+            "smarthub.config.load_yaml_config_file",
             return_value={"default_config": {}},
         ),
     ):
@@ -924,7 +924,7 @@ async def test_not_check_config_entries_if_yaml(
 
 @pytest.mark.usefixtures("installation_type_mock", "supervisor_client")
 async def test_submitting_legacy_integrations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     aioclient_mock: AiohttpClientMocker,
     snapshot: SnapshotAssertion,
@@ -941,7 +941,7 @@ async def test_submitting_legacy_integrations(
 
     with (
         patch(
-            "homeassistant.components.analytics.analytics.async_get_integrations",
+            "smarthub.components.analytics.analytics.async_get_integrations",
             return_value={
                 "default_config": mock_integration(
                     hass,
@@ -954,7 +954,7 @@ async def test_submitting_legacy_integrations(
             },
         ),
         patch(
-            "homeassistant.config.async_hass_config_yaml",
+            "smarthub.config.async_hass_config_yaml",
             return_value={"binary_sensor": [{"platform": "legacy_binary_sensor"}]},
         ),
     ):

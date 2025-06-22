@@ -4,17 +4,17 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.plugwise.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.components.plugwise.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 from tests.common import MockConfigEntry
 
 
 async def test_adam_climate_sensor_entities(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test creation of climate related sensor entities."""
     state = hass.states.get("sensor.adam_outdoor_temperature")
@@ -41,7 +41,7 @@ async def test_adam_climate_sensor_entities(
 
 
 async def test_adam_climate_sensor_entity_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_adam_jip: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -52,7 +52,7 @@ async def test_adam_climate_sensor_entity_2(
 
 
 async def test_unique_id_migration_humidity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_smile_adam_jip: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -97,7 +97,7 @@ async def test_unique_id_migration_humidity(
 @pytest.mark.parametrize("chosen_env", ["anna_heatpump_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_anna_as_smt_climate_sensor_entities(
-    hass: HomeAssistant, mock_smile_anna: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_anna: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test creation of climate related sensor entities."""
     state = hass.states.get("sensor.opentherm_outdoor_air_temperature")
@@ -122,7 +122,7 @@ async def test_anna_as_smt_climate_sensor_entities(
     "gateway_id", ["a455b61e52394b2db5081ce025a430f3"], indirect=True
 )
 async def test_p1_dsmr_sensor_entities(
-    hass: HomeAssistant, mock_smile_p1: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_p1: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test creation of power related sensor entities."""
     state = hass.states.get("sensor.p1_net_electricity_point")
@@ -151,7 +151,7 @@ async def test_p1_dsmr_sensor_entities(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_p1_3ph_dsmr_sensor_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_smile_p1: MagicMock,
     init_integration: MockConfigEntry,
@@ -180,7 +180,7 @@ async def test_p1_3ph_dsmr_sensor_entities(
     "gateway_id", ["03e65b16e4b247a29ae0d75a78cb492e"], indirect=True
 )
 async def test_p1_3ph_dsmr_sensor_disabled_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_smile_p1: MagicMock,
     init_integration: MockConfigEntry,
@@ -191,7 +191,7 @@ async def test_p1_3ph_dsmr_sensor_disabled_entities(
 
 
 async def test_stretch_sensor_entities(
-    hass: HomeAssistant, mock_stretch: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_stretch: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test creation of power related sensor entities."""
     state = hass.states.get("sensor.koelkast_92c4a_electricity_consumed")

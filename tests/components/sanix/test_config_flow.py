@@ -5,15 +5,15 @@ from unittest.mock import MagicMock
 import pytest
 from sanix.exceptions import SanixException, SanixInvalidAuthException
 
-from homeassistant.components.sanix.const import (
+from smarthub.components.sanix.const import (
     CONF_SERIAL_NUMBER,
     DOMAIN,
     MANUFACTURER,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -21,7 +21,7 @@ CONFIG = {CONF_SERIAL_NUMBER: "1810088", CONF_TOKEN: "75868dcf8ea4c64e2063f6c4e7
 
 
 async def test_create_entry(
-    hass: HomeAssistant, mock_sanix: MagicMock, mock_setup_entry
+    hass: SmartHub, mock_sanix: MagicMock, mock_setup_entry
 ) -> None:
     """Test that the user step works."""
 
@@ -53,7 +53,7 @@ async def test_create_entry(
     ],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     error: str,
     mock_sanix: MagicMock,
@@ -92,7 +92,7 @@ async def test_form_exceptions(
 
 
 async def test_duplicate_error(
-    hass: HomeAssistant, mock_sanix: MagicMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_sanix: MagicMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that errors are shown when duplicates are added."""
 

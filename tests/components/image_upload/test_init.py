@@ -7,10 +7,10 @@ from unittest.mock import patch
 from aiohttp import ClientSession, ClientWebSocketResponse
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import TEST_IMAGE
 
@@ -18,7 +18,7 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 async def test_upload_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,

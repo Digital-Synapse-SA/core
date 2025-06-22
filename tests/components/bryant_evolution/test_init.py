@@ -6,12 +6,12 @@ from unittest.mock import AsyncMock
 from evolutionhttp import BryantEvolutionLocalClient
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.bryant_evolution.const import CONF_SYSTEM_ZONE, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_FILENAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.components.bryant_evolution.const import CONF_SYSTEM_ZONE, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_FILENAME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from .conftest import DEFAULT_SYSTEM_ZONES
 from .test_climate import trigger_polling
@@ -22,7 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def test_setup_integration_prevented_by_unavailable_client(
-    hass: HomeAssistant, mock_evolution_client_factory: AsyncMock
+    hass: SmartHub, mock_evolution_client_factory: AsyncMock
 ) -> None:
     """Test that setup throws ConfigEntryNotReady when the client is unavailable."""
     mock_evolution_client_factory.side_effect = FileNotFoundError("test error")
@@ -40,7 +40,7 @@ async def test_setup_integration_prevented_by_unavailable_client(
 
 
 async def test_setup_integration_client_returns_none(
-    hass: HomeAssistant, mock_evolution_client_factory: AsyncMock
+    hass: SmartHub, mock_evolution_client_factory: AsyncMock
 ) -> None:
     """Test that an unavailable client causes ConfigEntryNotReady."""
     mock_client = AsyncMock(spec=BryantEvolutionLocalClient)
@@ -62,7 +62,7 @@ async def test_setup_integration_client_returns_none(
 
 
 async def test_setup_multiple_systems_zones(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_evolution_client_factory: AsyncMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:

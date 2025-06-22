@@ -3,17 +3,17 @@
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components.search import ItemType, Searcher
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub.components.search import ItemType, Searcher
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     area_registry as ar,
     device_registry as dr,
     entity_registry as er,
     floor_registry as fr,
     label_registry as lr,
 )
-from homeassistant.helpers.entity import EntityInfo
-from homeassistant.setup import async_setup_component
+from smarthub.helpers.entity import EntityInfo
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
@@ -25,7 +25,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 async def test_search(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -119,7 +119,7 @@ async def test_search(
 
     scene_wled_hue_entity = entity_registry.async_get_or_create(
         "scene",
-        "homeassistant",
+        "smarthub",
         "wled_hue",
         suggested_object_id="scene_wled_hue",
     )
@@ -319,7 +319,7 @@ async def test_search(
                     "trigger": {"platform": "template", "value_template": "true"},
                     "action": [
                         {
-                            "service": "homeassistant.turn_on",
+                            "service": "smarthub.turn_on",
                             "target": {"entity_id": "group.wled_hue"},
                         },
                     ],

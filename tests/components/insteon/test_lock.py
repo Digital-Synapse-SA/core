@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import insteon
-from homeassistant.components.insteon import (
+from smarthub.components import insteon
+from smarthub.components.insteon import (
     DOMAIN,
     entity as insteon_entity,
     utils as insteon_utils,
 )
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN, LockState
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN, LockState
+from smarthub.const import EVENT_HOMEASSISTANT_STOP, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .const import MOCK_USER_INPUT_PLM
 from .mock_devices import MockDevices
@@ -27,7 +27,7 @@ devices = MockDevices()
 def lock_platform_only():
     """Only setup the lock and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.insteon.INSTEON_PLATFORMS",
+        "smarthub.components.insteon.INSTEON_PLATFORMS",
         (Platform.LOCK,),
     ):
         yield
@@ -52,7 +52,7 @@ async def mock_connection(*args, **kwargs):
 
 
 async def test_lock_lock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test locking an Insteon lock device."""
@@ -79,7 +79,7 @@ async def test_lock_lock(
 
 
 async def test_lock_unlock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test locking an Insteon lock device."""

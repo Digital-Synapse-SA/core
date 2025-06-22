@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock, patch
 from freezegun import freeze_time
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components import geonetnz_volcano
-from homeassistant.components.geo_location import ATTR_DISTANCE
-from homeassistant.components.geonetnz_volcano import DEFAULT_SCAN_INTERVAL
-from homeassistant.components.geonetnz_volcano.const import (
+from smarthub.components import geonetnz_volcano
+from smarthub.components.geo_location import ATTR_DISTANCE
+from smarthub.components.geonetnz_volcano import DEFAULT_SCAN_INTERVAL
+from smarthub.components.geonetnz_volcano.const import (
     ATTR_ACTIVITY,
     ATTR_EXTERNAL_ID,
     ATTR_HAZARDS,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
@@ -23,10 +23,10 @@ from homeassistant.const import (
     CONF_RADIUS,
     EVENT_HOMEASSISTANT_START,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from . import _generate_mock_feed_entry
 
@@ -35,7 +35,7 @@ from tests.common import async_fire_time_changed
 CONFIG = {geonetnz_volcano.DOMAIN: {CONF_RADIUS: 200}}
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test the general setup of the integration."""
     # Set up some mock feed entries for this test.
     mock_entry_1 = _generate_mock_feed_entry(
@@ -155,7 +155,7 @@ async def test_setup(hass: HomeAssistant) -> None:
 
 
 async def test_setup_imperial(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test the setup of the integration using imperial unit system."""
     hass.config.units = US_CUSTOMARY_SYSTEM

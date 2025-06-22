@@ -8,16 +8,16 @@ import pytest
 import respx
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import ATTR_BRIGHTNESS, DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import (
+from smarthub.components.light import ATTR_BRIGHTNESS, DOMAIN as LIGHT_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType, RtspEventMock
 from .const import DEFAULT_HOST, NAME
@@ -75,7 +75,7 @@ def light_control_fixture(light_control_items: list[dict[str, Any]]) -> None:
 @pytest.mark.parametrize("light_control_items", [[]])
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_no_light_entity_without_light_control_representation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rtsp_event: RtspEventMock,
 ) -> None:
     """Verify no lights entities get created without light control representation."""
@@ -93,7 +93,7 @@ async def test_no_light_entity_without_light_control_representation(
 
 @pytest.mark.parametrize("api_discovery_items", [API_DISCOVERY_LIGHT_CONTROL])
 async def test_lights(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     mock_rtsp_event: RtspEventMock,
@@ -134,7 +134,7 @@ async def test_lights(
         },
     )
 
-    with patch("homeassistant.components.axis.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.axis.PLATFORMS", [Platform.LIGHT]):
         config_entry = await config_entry_factory()
 
     mock_rtsp_event(

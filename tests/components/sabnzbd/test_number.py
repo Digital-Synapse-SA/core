@@ -8,22 +8,22 @@ from pysabnzbd import SabnzbdApiException
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
 
-@patch("homeassistant.components.sabnzbd.PLATFORMS", [Platform.NUMBER])
+@patch("smarthub.components.sabnzbd.PLATFORMS", [Platform.NUMBER])
 async def test_number_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -41,7 +41,7 @@ async def test_number_setup(
 )
 @pytest.mark.usefixtures("setup_integration")
 async def test_number_set(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sabnzbd: AsyncMock,
     number: str,
     input_number: float,
@@ -69,7 +69,7 @@ async def test_number_set(
 )
 @pytest.mark.usefixtures("setup_integration")
 async def test_number_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sabnzbd: AsyncMock,
     number: str,
     input_number: float,
@@ -80,7 +80,7 @@ async def test_number_exception(
     function.side_effect = SabnzbdApiException("Boom")
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Unable to send command to SABnzbd due to a connection error, try again later",
     ):
         await hass.services.async_call(
@@ -102,7 +102,7 @@ async def test_number_exception(
 )
 @pytest.mark.usefixtures("setup_integration")
 async def test_number_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     sabnzbd: AsyncMock,
     number: str,

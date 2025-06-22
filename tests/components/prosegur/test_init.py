@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 
@@ -17,7 +17,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
     ],
 )
 async def test_setup_entry_fail_retrieve(
-    hass: HomeAssistant, mock_config_entry, error
+    hass: SmartHub, mock_config_entry, error
 ) -> None:
     """Test loading the Prosegur entry."""
 
@@ -33,7 +33,7 @@ async def test_setup_entry_fail_retrieve(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration,
     mock_config_entry,
     aioclient_mock: AiohttpClientMocker,

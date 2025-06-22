@@ -6,12 +6,12 @@ from gotailwind import TailwindError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.tailwind.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.tailwind.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = [
     pytest.mark.usefixtures("init_integration"),
@@ -20,7 +20,7 @@ pytestmark = [
 
 
 async def test_number_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_tailwind: MagicMock,
@@ -54,7 +54,7 @@ async def test_number_entities(
     # Test error handling
     mock_tailwind.identify.side_effect = TailwindError("Some error")
 
-    with pytest.raises(HomeAssistantError, match="Some error") as excinfo:
+    with pytest.raises(SmartHubError, match="Some error") as excinfo:
         await hass.services.async_call(
             BUTTON_DOMAIN,
             SERVICE_PRESS,

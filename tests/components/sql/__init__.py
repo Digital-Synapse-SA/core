@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.components.recorder import CONF_DB_URL
-from homeassistant.components.sensor import (
+from smarthub.components.recorder import CONF_DB_URL
+from smarthub.components.sensor import (
     CONF_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.components.sql.const import CONF_COLUMN_NAME, CONF_QUERY, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.sql.const import CONF_COLUMN_NAME, CONF_QUERY, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_DEVICE_CLASS,
     CONF_ICON,
     CONF_NAME,
@@ -21,8 +21,8 @@ from homeassistant.const import (
     CONF_VALUE_TEMPLATE,
     UnitOfInformation,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.trigger_template_entity import (
+from smarthub.core import SmartHub
+from smarthub.helpers.trigger_template_entity import (
     CONF_AVAILABILITY,
     CONF_PICTURE,
 )
@@ -261,12 +261,12 @@ YAML_CONFIG_ALL_TEMPLATES = {
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any] | None = None,
     entry_id: str = "1",
     source: str = SOURCE_USER,
 ) -> MockConfigEntry:
-    """Set up the SQL integration in Home Assistant."""
+    """Set up the SQL integration in SmartHub."""
     if not config:
         config = ENTRY_CONFIG
 

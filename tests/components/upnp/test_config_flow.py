@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.upnp.const import (
+from smarthub import config_entries
+from smarthub.components.upnp.const import (
     CONFIG_ENTRY_FORCE_POLL,
     CONFIG_ENTRY_HOST,
     CONFIG_ENTRY_LOCATION,
@@ -18,9 +18,9 @@ from homeassistant.components.upnp.const import (
     DOMAIN,
     ST_IGD_V1,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_DEVICE_TYPE,
     ATTR_UPNP_UDN,
     SsdpServiceInfo,
@@ -45,7 +45,7 @@ from tests.common import MockConfigEntry
     "mock_setup_entry",
     "mock_mac_address_from_host",
 )
-async def test_flow_ssdp(hass: HomeAssistant) -> None:
+async def test_flow_ssdp(hass: SmartHub) -> None:
     """Test config flow: discovered + configured through ssdp."""
     # Discovered via step ssdp.
     result = await hass.config_entries.flow.async_init(
@@ -78,7 +78,7 @@ async def test_flow_ssdp(hass: HomeAssistant) -> None:
     "mock_setup_entry",
     "mock_mac_address_from_host",
 )
-async def test_flow_ssdp_ignore(hass: HomeAssistant) -> None:
+async def test_flow_ssdp_ignore(hass: SmartHub) -> None:
     """Test config flow: discovered + ignore through ssdp."""
     # Discovered via step ssdp.
     result = await hass.config_entries.flow.async_init(
@@ -107,7 +107,7 @@ async def test_flow_ssdp_ignore(hass: HomeAssistant) -> None:
     }
 
 
-async def test_flow_ssdp_incomplete_discovery(hass: HomeAssistant) -> None:
+async def test_flow_ssdp_incomplete_discovery(hass: SmartHub) -> None:
     """Test config flow: incomplete discovery through ssdp."""
     # Discovered via step ssdp.
     result = await hass.config_entries.flow.async_init(
@@ -128,7 +128,7 @@ async def test_flow_ssdp_incomplete_discovery(hass: HomeAssistant) -> None:
     assert result["reason"] == "incomplete_discovery"
 
 
-async def test_flow_ssdp_non_igd_device(hass: HomeAssistant) -> None:
+async def test_flow_ssdp_non_igd_device(hass: SmartHub) -> None:
     """Test config flow: incomplete discovery through ssdp."""
     # Discovered via step ssdp.
     result = await hass.config_entries.flow.async_init(
@@ -154,7 +154,7 @@ async def test_flow_ssdp_non_igd_device(hass: HomeAssistant) -> None:
     "mock_setup_entry",
     "mock_no_mac_address_from_host",
 )
-async def test_flow_ssdp_no_mac_address(hass: HomeAssistant) -> None:
+async def test_flow_ssdp_no_mac_address(hass: SmartHub) -> None:
     """Test config flow: discovered + configured through ssdp."""
     # Discovered via step ssdp.
     result = await hass.config_entries.flow.async_init(
@@ -183,7 +183,7 @@ async def test_flow_ssdp_no_mac_address(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_mac_address_from_host")
-async def test_flow_ssdp_discovery_changed_udn_match_mac(hass: HomeAssistant) -> None:
+async def test_flow_ssdp_discovery_changed_udn_match_mac(hass: SmartHub) -> None:
     """Test config flow: discovery through ssdp, same device, but new UDN, matched on mac address."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -215,7 +215,7 @@ async def test_flow_ssdp_discovery_changed_udn_match_mac(hass: HomeAssistant) ->
 
 
 @pytest.mark.usefixtures("mock_mac_address_from_host")
-async def test_flow_ssdp_discovery_changed_udn_match_host(hass: HomeAssistant) -> None:
+async def test_flow_ssdp_discovery_changed_udn_match_host(hass: SmartHub) -> None:
     """Test config flow: discovery through ssdp, same device, but new UDN, matched on mac address."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -251,7 +251,7 @@ async def test_flow_ssdp_discovery_changed_udn_match_host(hass: HomeAssistant) -
     "mock_setup_entry",
 )
 async def test_flow_ssdp_discovery_changed_udn_but_st_differs(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test config flow: discovery through ssdp, same device, but new UDN, and different ST, so not matched --> new discovery."""
     entry = MockConfigEntry(
@@ -272,7 +272,7 @@ async def test_flow_ssdp_discovery_changed_udn_but_st_differs(
     # UDN + mac address different: New discovery via step ssdp.
     new_udn = TEST_UDN + "2"
     with patch(
-        "homeassistant.components.upnp.device.get_mac_address",
+        "smarthub.components.upnp.device.get_mac_address",
         return_value=TEST_MAC_ADDRESS + "2",
     ):
         new_discovery = deepcopy(TEST_DISCOVERY)
@@ -288,7 +288,7 @@ async def test_flow_ssdp_discovery_changed_udn_but_st_differs(
 
     # UDN + ST different: New discovery via step ssdp.
     with patch(
-        "homeassistant.components.upnp.device.get_mac_address",
+        "smarthub.components.upnp.device.get_mac_address",
         return_value=TEST_MAC_ADDRESS,
     ):
         new_st = TEST_ST + "2"
@@ -306,7 +306,7 @@ async def test_flow_ssdp_discovery_changed_udn_but_st_differs(
 
 
 @pytest.mark.usefixtures("mock_mac_address_from_host")
-async def test_flow_ssdp_discovery_changed_location(hass: HomeAssistant) -> None:
+async def test_flow_ssdp_discovery_changed_location(hass: SmartHub) -> None:
     """Test config flow: discovery through ssdp, same device, but new location."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -341,7 +341,7 @@ async def test_flow_ssdp_discovery_changed_location(hass: HomeAssistant) -> None
 
 
 @pytest.mark.usefixtures("mock_mac_address_from_host")
-async def test_flow_ssdp_discovery_ignored_entry(hass: HomeAssistant) -> None:
+async def test_flow_ssdp_discovery_ignored_entry(hass: SmartHub) -> None:
     """Test config flow: discovery through ssdp, same device, but new UDN, matched on mac address."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -368,7 +368,7 @@ async def test_flow_ssdp_discovery_ignored_entry(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_mac_address_from_host")
 async def test_flow_ssdp_discovery_changed_udn_ignored_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test config flow: discovery through ssdp, same device, but new UDN, matched on mac address, entry ignored."""
     entry = MockConfigEntry(
@@ -404,7 +404,7 @@ async def test_flow_ssdp_discovery_changed_udn_ignored_entry(
     "mock_setup_entry",
     "mock_mac_address_from_host",
 )
-async def test_flow_user(hass: HomeAssistant) -> None:
+async def test_flow_user(hass: SmartHub) -> None:
     """Test config flow: discovered + configured through user."""
     # Discovered via step user.
     result = await hass.config_entries.flow.async_init(
@@ -435,7 +435,7 @@ async def test_flow_user(hass: HomeAssistant) -> None:
     "mock_setup_entry",
     "mock_mac_address_from_host",
 )
-async def test_flow_user_no_discovery(hass: HomeAssistant) -> None:
+async def test_flow_user_no_discovery(hass: SmartHub) -> None:
     """Test config flow: user, but no discovery."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -449,7 +449,7 @@ async def test_flow_user_no_discovery(hass: HomeAssistant) -> None:
     "mock_setup_entry",
     "mock_mac_address_from_host",
 )
-async def test_flow_ssdp_with_mismatched_udn(hass: HomeAssistant) -> None:
+async def test_flow_ssdp_with_mismatched_udn(hass: SmartHub) -> None:
     """Test config flow: discovered + configured through ssdp, where the UDN differs in the SSDP-discovery vs device description."""
     # Discovered via step ssdp.
     test_discovery = copy.deepcopy(TEST_DISCOVERY)
@@ -481,7 +481,7 @@ async def test_flow_ssdp_with_mismatched_udn(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that the options flow works."""
     result = await hass.config_entries.options.async_init(mock_config_entry.entry_id)

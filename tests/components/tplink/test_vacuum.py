@@ -6,7 +6,7 @@ from kasa import Device, Module
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.vacuum import (
+from smarthub.components.vacuum import (
     ATTR_BATTERY_LEVEL,
     ATTR_FAN_SPEED,
     DOMAIN as VACUUM_DOMAIN,
@@ -17,9 +17,9 @@ from homeassistant.components.vacuum import (
     SERVICE_START,
     VacuumActivity,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     translation,
@@ -33,14 +33,14 @@ ENTITY_ID = "vacuum.my_vacuum"
 
 
 @pytest.fixture
-async def mocked_vacuum(hass: HomeAssistant) -> Device:
+async def mocked_vacuum(hass: SmartHub) -> Device:
     """Return mocked tplink vacuum."""
 
     return _mocked_device(modules=[Module.Clean, Module.Speaker], alias="my_vacuum")
 
 
 async def test_vacuum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -72,7 +72,7 @@ async def test_vacuum(
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -104,7 +104,7 @@ async def test_states(
     ],
 )
 async def test_vacuum_module(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mocked_vacuum: Device,
     service_call: str,

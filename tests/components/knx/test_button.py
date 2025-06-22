@@ -6,14 +6,14 @@ import logging
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.knx.const import (
+from smarthub.components.knx.const import (
     CONF_PAYLOAD_LENGTH,
     KNX_ADDRESS,
     KNX_MODULE_KEY,
 )
-from homeassistant.components.knx.schema import ButtonSchema
-from homeassistant.const import CONF_NAME, CONF_PAYLOAD, CONF_TYPE
-from homeassistant.core import HomeAssistant
+from smarthub.components.knx.schema import ButtonSchema
+from smarthub.const import CONF_NAME, CONF_PAYLOAD, CONF_TYPE
+from smarthub.core import SmartHub
 
 from .conftest import KNXTestKit
 
@@ -21,7 +21,7 @@ from tests.common import async_capture_events, async_fire_time_changed
 
 
 async def test_button_simple(
-    hass: HomeAssistant, knx: KNXTestKit, freezer: FrozenDateTimeFactory
+    hass: SmartHub, knx: KNXTestKit, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test KNX button with default payload."""
     await knx.setup_integration(
@@ -57,7 +57,7 @@ async def test_button_simple(
     await knx.assert_telegram_count(0)
 
 
-async def test_button_raw(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_button_raw(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX button with raw payload."""
     await knx.setup_integration(
         {
@@ -76,7 +76,7 @@ async def test_button_raw(hass: HomeAssistant, knx: KNXTestKit) -> None:
     await knx.assert_write("1/2/3", False)
 
 
-async def test_button_type(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_button_type(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX button with encoded payload."""
     await knx.setup_integration(
         {
@@ -111,7 +111,7 @@ async def test_button_type(hass: HomeAssistant, knx: KNXTestKit) -> None:
     ],
 )
 async def test_button_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     knx: KNXTestKit,
     conf_type: str,

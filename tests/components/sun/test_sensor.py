@@ -7,20 +7,20 @@ import astral.sun
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components import sun
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import sun
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_setting_rising(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -186,7 +186,7 @@ async def test_setting_rising(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_deprecation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     issue_registry: ir.IssueRegistry,
     freezer: FrozenDateTimeFactory,

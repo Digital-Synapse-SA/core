@@ -8,15 +8,15 @@ from pylamarzocco.exceptions import RequestNotSuccessful
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import WAKE_UP_SLEEP_ENTRY_IDS, async_init_integration
 
@@ -24,13 +24,13 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the La Marzocco switches."""
-    with patch("homeassistant.components.lamarzocco.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.lamarzocco.PLATFORMS", [Platform.SWITCH]):
         await async_init_integration(hass, mock_config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
@@ -52,7 +52,7 @@ async def test_switches(
     ],
 )
 async def test_switches_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_name: str,
@@ -92,7 +92,7 @@ async def test_switches_actions(
 
 
 async def test_auto_on_off_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -147,7 +147,7 @@ async def test_auto_on_off_switches(
 
 
 async def test_switch_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -161,7 +161,7 @@ async def test_switch_exceptions(
 
     mock_lamarzocco.set_power.side_effect = RequestNotSuccessful("Boom")
 
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
@@ -172,7 +172,7 @@ async def test_switch_exceptions(
         )
     assert exc_info.value.translation_key == "switch_off_error"
 
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -187,7 +187,7 @@ async def test_switch_exceptions(
     assert state
 
     mock_lamarzocco.set_wakeup_schedule.side_effect = RequestNotSuccessful("Boom")
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,

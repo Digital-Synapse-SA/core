@@ -1,11 +1,11 @@
-"""Test Home Assistant language util methods."""
+"""Test SmartHub language util methods."""
 
 from __future__ import annotations
 
 import pytest
 
-from homeassistant.const import MATCH_ALL
-from homeassistant.util import language
+from smarthub.const import MATCH_ALL
+from smarthub.util import language
 
 
 def test_match_all() -> None:

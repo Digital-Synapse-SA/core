@@ -5,15 +5,15 @@ from unittest.mock import patch
 from pykrakenapi.pykrakenapi import CallRateLimitError, KrakenAPIError
 import pytest
 
-from homeassistant.components.kraken.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.kraken.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .const import TICKER_INFORMATION_RESPONSE, TRADEABLE_ASSET_PAIR_RESPONSE
 
 from tests.common import MockConfigEntry
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test unload for Kraken."""
     with (
         patch(
@@ -35,7 +35,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
 
 
 async def test_unknown_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test unload for Kraken."""
     with (
@@ -57,7 +57,7 @@ async def test_unknown_error(
 
 
 async def test_callrate_limit(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test unload for Kraken."""
     with (

@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from homeassistant.components.imeon_inverter.const import DOMAIN
-from homeassistant.config_entries import SOURCE_SSDP, SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_SERIAL
+from smarthub.components.imeon_inverter.const import DOMAIN
+from smarthub.config_entries import SOURCE_SSDP, SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import ATTR_UPNP_SERIAL
 
 from .conftest import TEST_DISCOVER, TEST_SERIAL, TEST_USER_INPUT
 
@@ -20,7 +20,7 @@ pytestmark = pytest.mark.usefixtures("mock_async_setup_entry")
 
 
 async def test_form_valid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_async_setup_entry: AsyncMock,
 ) -> None:
     """Test we get the form and the config is created with the good entries."""
@@ -42,7 +42,7 @@ async def test_form_valid(
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant, mock_imeon_inverter: MagicMock
+    hass: SmartHub, mock_imeon_inverter: MagicMock
 ) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
@@ -77,7 +77,7 @@ async def test_form_invalid_auth(
     ],
 )
 async def test_form_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_imeon_inverter: MagicMock,
     error: Exception,
     expected: str,
@@ -106,7 +106,7 @@ async def test_form_exception(
 
 
 async def test_manual_setup_already_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test that a flow with an existing id aborts."""
@@ -125,7 +125,7 @@ async def test_manual_setup_already_exists(
 
 
 async def test_get_serial_timeout(
-    hass: HomeAssistant, mock_imeon_inverter: MagicMock
+    hass: SmartHub, mock_imeon_inverter: MagicMock
 ) -> None:
     """Test the timeout error handling of getting the serial number."""
     result = await hass.config_entries.flow.async_init(
@@ -150,7 +150,7 @@ async def test_get_serial_timeout(
     assert result["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_ssdp(hass: HomeAssistant) -> None:
+async def test_ssdp(hass: SmartHub) -> None:
     """Test a ssdp discovery."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -174,7 +174,7 @@ async def test_ssdp(hass: HomeAssistant) -> None:
 
 
 async def test_ssdp_already_exist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test that a ssdp discovery flow with an existing id aborts."""
@@ -190,7 +190,7 @@ async def test_ssdp_already_exist(
     assert result["reason"] == "already_configured"
 
 
-async def test_ssdp_abort(hass: HomeAssistant) -> None:
+async def test_ssdp_abort(hass: SmartHub) -> None:
     """Test that a ssdp discovery aborts if serial is unknown."""
     data = deepcopy(TEST_DISCOVER)
     data.upnp.pop(ATTR_UPNP_SERIAL, None)

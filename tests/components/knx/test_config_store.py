@@ -4,12 +4,12 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.knx.storage.config_store import (
+from smarthub.components.knx.storage.config_store import (
     STORAGE_KEY as KNX_CONFIG_STORAGE_KEY,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import KnxEntityGenerator
 from .conftest import KNXTestKit
@@ -18,7 +18,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_create_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
@@ -64,7 +64,7 @@ async def test_create_entity(
 
 
 async def test_create_entity_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -108,7 +108,7 @@ async def test_create_entity_error(
 
 
 async def test_update_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
@@ -157,7 +157,7 @@ async def test_update_entity(
 
 
 async def test_update_entity_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
     create_ui_entity: KnxEntityGenerator,
@@ -230,7 +230,7 @@ async def test_update_entity_error(
 
 
 async def test_delete_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
@@ -263,7 +263,7 @@ async def test_delete_entity(
 
 
 async def test_delete_entity_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
@@ -301,7 +301,7 @@ async def test_delete_entity_error(
 
 
 async def test_get_entity_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
     create_ui_entity: KnxEntityGenerator,
@@ -348,7 +348,7 @@ async def test_get_entity_config(
     ],
 )
 async def test_get_entity_config_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
     test_entity_id: str,
@@ -371,7 +371,7 @@ async def test_get_entity_config_error(
 
 
 async def test_validate_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_ws_client: WebSocketGenerator,
 ) -> None:

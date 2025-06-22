@@ -1,0 +1,10 @@
+{
+  "domain": "demo",
+  "name": "Demo",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["conversation", "group", "zone"],
+  "documentation": "https://www.smart-hub.io/integrations/demo",
+  "iot_class": "calculated",
+  "quality_scale": "internal",
+  "single_config_entry": true
+}

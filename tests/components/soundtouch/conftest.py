@@ -3,9 +3,9 @@
 import pytest
 from requests_mock import Mocker
 
-from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
-from homeassistant.components.soundtouch.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_NAME
+from smarthub.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
+from smarthub.components.soundtouch.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_NAME
 
 from tests.common import MockConfigEntry, load_fixture
 

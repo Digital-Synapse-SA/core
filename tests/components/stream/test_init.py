@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import av
 import pytest
 
-from homeassistant.components.stream import (
+from smarthub.components.stream import (
     SOURCE_TIMEOUT,
     StreamClientError,
     StreamOpenClientError,
@@ -15,30 +15,30 @@ from homeassistant.components.stream import (
     async_check_stream_client_error,
     create_stream,
 )
-from homeassistant.components.stream.const import ATTR_PREFER_TCP
-from homeassistant.const import EVENT_LOGGING_CHANGED
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components.stream.const import ATTR_PREFER_TCP
+from smarthub.const import EVENT_LOGGING_CHANGED
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from .common import dynamic_stream_settings
 
 
-async def test_stream_not_setup(hass: HomeAssistant, h264_video) -> None:
+async def test_stream_not_setup(hass: SmartHub, h264_video) -> None:
     """Test hls stream.
 
     Purposefully not mocking anything here to test full
     integration with the stream component.
     """
-    with pytest.raises(HomeAssistantError, match="Stream integration is not set up"):
+    with pytest.raises(SmartHubError, match="Stream integration is not set up"):
         create_stream(hass, "rtsp://foobar", {}, dynamic_stream_settings())
 
-    with pytest.raises(HomeAssistantError, match="Stream integration is not set up"):
+    with pytest.raises(SmartHubError, match="Stream integration is not set up"):
         await async_check_stream_client_error(hass, "rtsp://foobar")
 
 
 async def test_log_levels(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that the worker logs the url without username and password."""
 
@@ -81,7 +81,7 @@ async def test_log_levels(
     assert "SHOULD NOT PASS" not in caplog.text
 
 
-async def test_check_open_stream_params(hass: HomeAssistant) -> None:
+async def test_check_open_stream_params(hass: SmartHub) -> None:
     """Test check open stream params."""
     await async_setup_component(hass, "stream", {"stream": {}})
 
@@ -101,7 +101,7 @@ async def test_check_open_stream_params(hass: HomeAssistant) -> None:
     container_mock.reset_mock()
     with (
         patch("av.open", return_value=container_mock) as open_mock,
-        pytest.raises(HomeAssistantError, match="Invalid stream options"),
+        pytest.raises(SmartHubError, match="Invalid stream options"),
     ):
         await async_check_stream_client_error(hass, source, {"foo": "bar"})
 
@@ -131,7 +131,7 @@ async def test_check_open_stream_params(hass: HomeAssistant) -> None:
     ],
 )
 async def test_try_open_stream_error(
-    hass: HomeAssistant, error: av.HTTPClientError, enum_result: StreamClientError
+    hass: SmartHub, error: av.HTTPClientError, enum_result: StreamClientError
 ) -> None:
     """Test trying to open a stream."""
     await async_setup_component(hass, "stream", {"stream": {}})
@@ -170,7 +170,7 @@ async def test_try_open_stream_error(
     ],
 )
 async def test_convert_stream_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     options: dict[str, Any],
     expected_pyav_options: dict[str, Any],
 ) -> None:

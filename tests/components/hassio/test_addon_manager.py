@@ -11,14 +11,14 @@ from aiohasupervisor import SupervisorError
 from aiohasupervisor.models import AddonsOptions, Discovery
 import pytest
 
-from homeassistant.components.hassio.addon_manager import (
+from smarthub.components.hassio.addon_manager import (
     AddonError,
     AddonInfo,
     AddonManager,
     AddonState,
 )
-from homeassistant.components.hassio.handler import HassioAPIError
-from homeassistant.core import HomeAssistant
+from smarthub.components.hassio.handler import HassioAPIError
+from smarthub.core import SmartHub
 
 
 async def test_not_installed_raises_exception(
@@ -167,7 +167,7 @@ async def test_get_addon_info_error(
 
 
 async def test_set_addon_options(
-    hass: HomeAssistant, addon_manager: AddonManager, set_addon_options: AsyncMock
+    hass: SmartHub, addon_manager: AddonManager, set_addon_options: AsyncMock
 ) -> None:
     """Test set addon options."""
     await addon_manager.async_set_addon_options({"test_key": "test"})
@@ -179,7 +179,7 @@ async def test_set_addon_options(
 
 
 async def test_set_addon_options_error(
-    hass: HomeAssistant, addon_manager: AddonManager, set_addon_options: AsyncMock
+    hass: SmartHub, addon_manager: AddonManager, set_addon_options: AsyncMock
 ) -> None:
     """Test set addon options raises error."""
     set_addon_options.side_effect = SupervisorError("Boom")
@@ -498,7 +498,7 @@ async def test_stop_addon_error(
 
 
 async def test_update_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_manager: AddonManager,
     addon_info: AsyncMock,
     addon_installed: AsyncMock,
@@ -536,7 +536,7 @@ async def test_update_addon_no_update(
 
 
 async def test_update_addon_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_manager: AddonManager,
     addon_info: AsyncMock,
     addon_installed: AsyncMock,
@@ -561,7 +561,7 @@ async def test_update_addon_error(
 
 
 async def test_schedule_update_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_manager: AddonManager,
     addon_info: AsyncMock,
     addon_installed: AsyncMock,
@@ -705,7 +705,7 @@ async def test_schedule_update_addon_logs_error(
 
 
 async def test_create_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_manager: AddonManager,
     addon_info: AsyncMock,
     addon_installed: AsyncMock,
@@ -722,7 +722,7 @@ async def test_create_backup(
 
 
 async def test_create_backup_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_manager: AddonManager,
     addon_info: AsyncMock,
     addon_installed: AsyncMock,

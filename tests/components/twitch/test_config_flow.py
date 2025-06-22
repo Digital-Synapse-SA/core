@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock
 import pytest
 from twitchAPI.object.api import TwitchUser
 
-from homeassistant.components.twitch.const import (
+from smarthub.components.twitch.const import (
     CONF_CHANNELS,
     DOMAIN,
     OAUTH2_AUTHORIZE,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResult, FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from . import get_generator, setup_integration
 from .conftest import CLIENT_ID, TITLE
@@ -23,7 +23,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def _do_get_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     result: FlowResult,
     hass_client_no_auth: ClientSessionGenerator,
     scopes: list[str],
@@ -50,7 +50,7 @@ async def _do_get_token(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mock_setup_entry,
     twitch_mock: AsyncMock,
@@ -73,12 +73,12 @@ async def test_full_flow(
     assert result["result"].data["token"]["access_token"] == "mock-access-token"
     assert result["result"].data["token"]["refresh_token"] == "mock-refresh-token"
     assert result["result"].unique_id == "123"
-    assert result["options"] == {CONF_CHANNELS: ["internetofthings", "homeassistant"]}
+    assert result["options"] == {CONF_CHANNELS: ["internetofthings", "smarthub"]}
 
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     mock_setup_entry,
@@ -100,7 +100,7 @@ async def test_already_configured(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     mock_setup_entry,
@@ -125,7 +125,7 @@ async def test_reauth(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_from_import(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mock_setup_entry,
     twitch_mock: AsyncMock,
@@ -160,12 +160,12 @@ async def test_reauth_from_import(
     entries = hass.config_entries.async_entries(DOMAIN)
     entry = entries[0]
     assert "imported" not in entry.data
-    assert entry.options == {CONF_CHANNELS: ["internetofthings", "homeassistant"]}
+    assert entry.options == {CONF_CHANNELS: ["internetofthings", "smarthub"]}
 
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_wrong_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     mock_setup_entry,

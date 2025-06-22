@@ -6,15 +6,15 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components import notify
-from homeassistant.components.smtp.const import DOMAIN
-from homeassistant.components.smtp.notify import MailNotificationService
-from homeassistant.const import SERVICE_RELOAD
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.setup import async_setup_component
-from homeassistant.util.ssl import create_client_context
+from smarthub import config as hass_config
+from smarthub.components import notify
+from smarthub.components.smtp.const import DOMAIN
+from smarthub.components.smtp.notify import MailNotificationService
+from smarthub.const import SERVICE_RELOAD
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.setup import async_setup_component
+from smarthub.util.ssl import create_client_context
 
 from tests.common import get_fixture_path
 
@@ -27,11 +27,11 @@ class MockSMTP(MailNotificationService):
         return msg.as_string(), recipients
 
 
-async def test_reload_notify(hass: HomeAssistant) -> None:
+async def test_reload_notify(hass: SmartHub) -> None:
     """Verify we can reload the notify service."""
 
     with patch(
-        "homeassistant.components.smtp.notify.MailNotificationService.connection_is_valid"
+        "smarthub.components.smtp.notify.MailNotificationService.connection_is_valid"
     ):
         assert await async_setup_component(
             hass,
@@ -55,7 +55,7 @@ async def test_reload_notify(hass: HomeAssistant) -> None:
     with (
         patch.object(hass_config, "YAML_CONFIG_FILE", yaml_path),
         patch(
-            "homeassistant.components.smtp.notify.MailNotificationService.connection_is_valid"
+            "smarthub.components.smtp.notify.MailNotificationService.connection_is_valid"
         ),
     ):
         await hass.services.async_call(
@@ -82,7 +82,7 @@ def message():
         "testuser",
         "testpass",
         ["recip1@example.com", "testrecip@test.com"],
-        "Home Assistant",
+        "SmartHub",
         0,
         True,
         create_client_context(),
@@ -139,7 +139,7 @@ EMAIL_DATA = [
     ],
 )
 def test_send_message(
-    hass: HomeAssistant, message_data, data, content_type, message
+    hass: SmartHub, message_data, data, content_type, message
 ) -> None:
     """Verify if we can send messages of all types correctly."""
     sample_email = "<mock@mock>"
@@ -161,7 +161,7 @@ def test_send_message(
     ],
 )
 def test_sending_insecure_files_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     message_data,
     data,
     content_type,
@@ -185,16 +185,16 @@ def test_sending_insecure_files_fails(
     assert exc.value.translation_placeholders["file_name"] == "test.jpg"
 
 
-def test_send_text_message(hass: HomeAssistant, message) -> None:
+def test_send_text_message(hass: SmartHub, message) -> None:
     """Verify if we can send simple text message."""
     expected = (
         '^Content-Type: text/plain; charset="us-ascii"\n'
         "MIME-Version: 1.0\n"
         "Content-Transfer-Encoding: 7bit\n"
-        "Subject: Home Assistant\n"
+        "Subject: SmartHub\n"
         "To: recip1@example.com,testrecip@test.com\n"
-        "From: Home Assistant <test@test.com>\n"
-        "X-Mailer: Home Assistant\n"
+        "From: SmartHub <test@test.com>\n"
+        "X-Mailer: SmartHub\n"
         "Date: [^\n]+\n"
         "Message-Id: <[^@]+@[^>]+>\n"
         "\n"
@@ -218,7 +218,7 @@ def test_send_text_message(hass: HomeAssistant, message) -> None:
         "Verify email recipient can be overwritten by target arg.",
     ],
 )
-def test_send_target_message(target, hass: HomeAssistant, message) -> None:
+def test_send_target_message(target, hass: SmartHub, message) -> None:
     """Verify if we can send email to correct recipient."""
     sample_email = "<mock@mock>"
     message_data = "Test msg"

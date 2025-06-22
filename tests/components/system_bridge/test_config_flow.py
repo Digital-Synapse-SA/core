@@ -8,10 +8,10 @@ from systembridgeconnector.exceptions import (
     ConnectionErrorException,
 )
 
-from homeassistant import config_entries
-from homeassistant.components.system_bridge.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.system_bridge.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     FIXTURE_AUTH_INPUT,
@@ -27,7 +27,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_show_user_form(hass: HomeAssistant) -> None:
+async def test_show_user_form(hass: SmartHub) -> None:
     """Test that the setup form is served."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -37,7 +37,7 @@ async def test_show_user_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_user_flow(hass: HomeAssistant) -> None:
+async def test_user_flow(hass: SmartHub) -> None:
     """Test full user flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -48,7 +48,7 @@ async def test_user_flow(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.system_bridge.config_flow.WebSocketClient.connect"
+            "smarthub.components.system_bridge.config_flow.WebSocketClient.connect"
         ),
         patch(
             "systembridgeconnector.websocket_client.WebSocketClient.get_data",
@@ -59,7 +59,7 @@ async def test_user_flow(hass: HomeAssistant) -> None:
             new=mock_data_listener,
         ),
         patch(
-            "homeassistant.components.system_bridge.async_setup_entry",
+            "smarthub.components.system_bridge.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -74,7 +74,7 @@ async def test_user_flow(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -97,7 +97,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_connection_closed_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_connection_closed_cannot_connect(hass: SmartHub) -> None:
     """Test we handle connection closed cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -108,7 +108,7 @@ async def test_form_connection_closed_cannot_connect(hass: HomeAssistant) -> Non
 
     with (
         patch(
-            "homeassistant.components.system_bridge.config_flow.WebSocketClient.connect"
+            "smarthub.components.system_bridge.config_flow.WebSocketClient.connect"
         ),
         patch(
             "systembridgeconnector.websocket_client.WebSocketClient.get_data",
@@ -129,7 +129,7 @@ async def test_form_connection_closed_cannot_connect(hass: HomeAssistant) -> Non
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_timeout_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_timeout_cannot_connect(hass: SmartHub) -> None:
     """Test we handle timeout cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -140,7 +140,7 @@ async def test_form_timeout_cannot_connect(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.system_bridge.config_flow.WebSocketClient.connect"
+            "smarthub.components.system_bridge.config_flow.WebSocketClient.connect"
         ),
         patch(
             "systembridgeconnector.websocket_client.WebSocketClient.get_data",
@@ -161,7 +161,7 @@ async def test_form_timeout_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -172,7 +172,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.system_bridge.config_flow.WebSocketClient.connect"
+            "smarthub.components.system_bridge.config_flow.WebSocketClient.connect"
         ),
         patch(
             "systembridgeconnector.websocket_client.WebSocketClient.get_data",
@@ -193,7 +193,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_uuid_error(hass: HomeAssistant) -> None:
+async def test_form_uuid_error(hass: SmartHub) -> None:
     """Test we handle error from bad uuid."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -204,7 +204,7 @@ async def test_form_uuid_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.system_bridge.config_flow.WebSocketClient.connect"
+            "smarthub.components.system_bridge.config_flow.WebSocketClient.connect"
         ),
         patch(
             "systembridgeconnector.websocket_client.WebSocketClient.get_data",
@@ -225,7 +225,7 @@ async def test_form_uuid_error(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_unknown_error(hass: HomeAssistant) -> None:
+async def test_form_unknown_error(hass: SmartHub) -> None:
     """Test we handle unknown errors."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -236,7 +236,7 @@ async def test_form_unknown_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.system_bridge.config_flow.WebSocketClient.connect"
+            "smarthub.components.system_bridge.config_flow.WebSocketClient.connect"
         ),
         patch(
             "systembridgeconnector.websocket_client.WebSocketClient.get_data",
@@ -257,7 +257,7 @@ async def test_form_unknown_error(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_reauth_authorization_error(hass: HomeAssistant) -> None:
+async def test_reauth_authorization_error(hass: SmartHub) -> None:
     """Test we show user form on authorization error."""
     mock_config = MockConfigEntry(
         domain=DOMAIN, unique_id=FIXTURE_UUID, data=FIXTURE_USER_INPUT
@@ -271,7 +271,7 @@ async def test_reauth_authorization_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.system_bridge.config_flow.WebSocketClient.connect"
+            "smarthub.components.system_bridge.config_flow.WebSocketClient.connect"
         ),
         patch(
             "systembridgeconnector.websocket_client.WebSocketClient.get_data",
@@ -292,7 +292,7 @@ async def test_reauth_authorization_error(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_reauth_connection_error(hass: HomeAssistant) -> None:
+async def test_reauth_connection_error(hass: SmartHub) -> None:
     """Test we show user form on connection error."""
     mock_config = MockConfigEntry(
         domain=DOMAIN, unique_id=FIXTURE_UUID, data=FIXTURE_USER_INPUT
@@ -340,7 +340,7 @@ async def test_reauth_connection_error(hass: HomeAssistant) -> None:
     assert result3["errors"] == {"base": "cannot_connect"}
 
 
-async def test_reauth_connection_closed_error(hass: HomeAssistant) -> None:
+async def test_reauth_connection_closed_error(hass: SmartHub) -> None:
     """Test we show user form on connection error."""
     mock_config = MockConfigEntry(
         domain=DOMAIN, unique_id=FIXTURE_UUID, data=FIXTURE_USER_INPUT
@@ -354,7 +354,7 @@ async def test_reauth_connection_closed_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.system_bridge.config_flow.WebSocketClient.connect"
+            "smarthub.components.system_bridge.config_flow.WebSocketClient.connect"
         ),
         patch(
             "systembridgeconnector.websocket_client.WebSocketClient.get_data",
@@ -375,7 +375,7 @@ async def test_reauth_connection_closed_error(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_reauth_flow(hass: HomeAssistant) -> None:
+async def test_reauth_flow(hass: SmartHub) -> None:
     """Test reauth flow."""
     mock_config = MockConfigEntry(
         domain=DOMAIN, unique_id=FIXTURE_UUID, data=FIXTURE_USER_INPUT
@@ -389,7 +389,7 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.system_bridge.config_flow.WebSocketClient.connect"
+            "smarthub.components.system_bridge.config_flow.WebSocketClient.connect"
         ),
         patch(
             "systembridgeconnector.websocket_client.WebSocketClient.get_data",
@@ -400,7 +400,7 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
             new=mock_data_listener,
         ),
         patch(
-            "homeassistant.components.system_bridge.async_setup_entry",
+            "smarthub.components.system_bridge.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -413,7 +413,7 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
     assert result2["reason"] == "reauth_successful"
 
 
-async def test_zeroconf_flow(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow(hass: SmartHub) -> None:
     """Test zeroconf flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -427,7 +427,7 @@ async def test_zeroconf_flow(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.system_bridge.config_flow.WebSocketClient.connect"
+            "smarthub.components.system_bridge.config_flow.WebSocketClient.connect"
         ),
         patch(
             "systembridgeconnector.websocket_client.WebSocketClient.get_data",
@@ -438,7 +438,7 @@ async def test_zeroconf_flow(hass: HomeAssistant) -> None:
             new=mock_data_listener,
         ),
         patch(
-            "homeassistant.components.system_bridge.async_setup_entry",
+            "smarthub.components.system_bridge.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -453,7 +453,7 @@ async def test_zeroconf_flow(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_zeroconf_cannot_connect(hass: HomeAssistant) -> None:
+async def test_zeroconf_cannot_connect(hass: SmartHub) -> None:
     """Test zeroconf cannot connect flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -479,7 +479,7 @@ async def test_zeroconf_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_zeroconf_bad_zeroconf_info(hass: HomeAssistant) -> None:
+async def test_zeroconf_bad_zeroconf_info(hass: SmartHub) -> None:
     """Test zeroconf cannot connect flow."""
 
     result = await hass.config_entries.flow.async_init(

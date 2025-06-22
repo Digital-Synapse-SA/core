@@ -5,25 +5,25 @@ from unittest.mock import AsyncMock, patch
 from aiowatttime.errors import CoordinatesNotFoundError, InvalidCredentialsError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.watttime.config_flow import (
+from smarthub import config_entries
+from smarthub.components.watttime.config_flow import (
     CONF_LOCATION_TYPE,
     LOCATION_TYPE_HOME,
 )
-from homeassistant.components.watttime.const import (
+from smarthub.components.watttime.const import (
     CONF_BALANCING_AUTHORITY,
     CONF_BALANCING_AUTHORITY_ABBREV,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_PASSWORD,
     CONF_SHOW_ON_MAP,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -33,11 +33,11 @@ from tests.common import MockConfigEntry
     [(InvalidCredentialsError, "invalid_auth"), (Exception, "unknown")],
 )
 async def test_auth_errors(
-    hass: HomeAssistant, config_auth, config_location_type, exc, error
+    hass: SmartHub, config_auth, config_location_type, exc, error
 ) -> None:
     """Test that issues with auth show the correct error."""
     with patch(
-        "homeassistant.components.watttime.config_flow.Client.async_login",
+        "smarthub.components.watttime.config_flow.Client.async_login",
         side_effect=exc,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -61,7 +61,7 @@ async def test_auth_errors(
     ],
 )
 async def test_coordinate_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_auth,
     config_coordinates,
     config_location_type,
@@ -86,7 +86,7 @@ async def test_coordinate_errors(
     "config_location_type", [{CONF_LOCATION_TYPE: LOCATION_TYPE_HOME}]
 )
 async def test_duplicate_error(
-    hass: HomeAssistant, config_auth, config_entry, config_location_type, setup_watttime
+    hass: SmartHub, config_auth, config_entry, config_location_type, setup_watttime
 ) -> None:
     """Test that errors are shown when duplicate entries are added."""
     result = await hass.config_entries.flow.async_init(
@@ -99,10 +99,10 @@ async def test_duplicate_error(
     assert result["reason"] == "already_configured"
 
 
-async def test_options_flow(hass: HomeAssistant, config_entry) -> None:
+async def test_options_flow(hass: SmartHub, config_entry) -> None:
     """Test config flow options."""
     with patch(
-        "homeassistant.components.watttime.async_setup_entry", return_value=True
+        "smarthub.components.watttime.async_setup_entry", return_value=True
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
         result = await hass.config_entries.options.async_init(config_entry.entry_id)
@@ -117,7 +117,7 @@ async def test_options_flow(hass: HomeAssistant, config_entry) -> None:
 
 
 async def test_show_form_coordinates(
-    hass: HomeAssistant, config_auth, config_location_type, setup_watttime
+    hass: SmartHub, config_auth, config_location_type, setup_watttime
 ) -> None:
     """Test showing the form to input custom latitude/longitude."""
     result = await hass.config_entries.flow.async_init(
@@ -135,7 +135,7 @@ async def test_show_form_coordinates(
     assert result["errors"] is None
 
 
-async def test_show_form_user(hass: HomeAssistant) -> None:
+async def test_show_form_user(hass: SmartHub) -> None:
     """Test showing the form to select the authentication type."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -146,14 +146,14 @@ async def test_show_form_user(hass: HomeAssistant) -> None:
 
 
 async def test_step_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     setup_watttime,
 ) -> None:
     """Test a full reauth flow."""
     result = await config_entry.start_reauth_flow(hass)
     with patch(
-        "homeassistant.components.watttime.async_setup_entry",
+        "smarthub.components.watttime.async_setup_entry",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -167,7 +167,7 @@ async def test_step_reauth(
 
 
 async def test_step_user_coordinates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_auth,
     config_location_type,
     config_coordinates,
@@ -199,7 +199,7 @@ async def test_step_user_coordinates(
     "config_location_type", [{CONF_LOCATION_TYPE: LOCATION_TYPE_HOME}]
 )
 async def test_step_user_home(
-    hass: HomeAssistant, config_auth, config_location_type, setup_watttime
+    hass: SmartHub, config_auth, config_location_type, setup_watttime
 ) -> None:
     """Test a full login flow (selecting the home location)."""
     result = await hass.config_entries.flow.async_init(

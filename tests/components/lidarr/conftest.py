@@ -9,16 +9,16 @@ from aiohttp.client_exceptions import ClientError
 from aiopyarr.lidarr_client import LidarrClient
 import pytest
 
-from homeassistant.components.lidarr.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.lidarr.const import DOMAIN
+from smarthub.const import (
     CONF_API_KEY,
     CONF_URL,
     CONF_VERIFY_SSL,
     CONTENT_TYPE_JSON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers.aiohttp_client import async_get_clientsession
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -130,17 +130,17 @@ def mock_connection(aioclient_mock: AiohttpClientMocker) -> None:
 
 
 @pytest.fixture(name="config_entry")
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
-    """Create Lidarr entry in Home Assistant."""
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
+    """Create Lidarr entry in SmartHub."""
     return MockConfigEntry(domain=DOMAIN, data=CONF_DATA)
 
 
 @pytest.fixture(name="setup_integration")
 async def mock_setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> Generator[ComponentSetup]:
-    """Set up the lidarr integration in Home Assistant."""
+    """Set up the lidarr integration in SmartHub."""
     config_entry.add_to_hass(hass)
 
     async def func() -> None:

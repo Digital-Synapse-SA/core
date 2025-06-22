@@ -4,20 +4,20 @@ from unittest.mock import patch
 
 from requests.models import HTTPError
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     UnitOfEnergy,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_loading_sensors(hass: HomeAssistant, init_integration) -> None:
+async def test_loading_sensors(hass: SmartHub, init_integration) -> None:
     """Test the srp energy sensors."""
     # Validate the Config Entry was initialized
     assert init_integration.state is ConfigEntryState.LOADED
@@ -26,7 +26,7 @@ async def test_loading_sensors(hass: HomeAssistant, init_integration) -> None:
     assert len(hass.states.async_all()) == 1
 
 
-async def test_srp_entity(hass: HomeAssistant, init_integration) -> None:
+async def test_srp_entity(hass: SmartHub, init_integration) -> None:
     """Test the SrpEntity."""
     usage_state = hass.states.get("sensor.srp_energy_mock_title_energy_usage")
     assert usage_state.state == "150.8"
@@ -45,13 +45,13 @@ async def test_srp_entity(hass: HomeAssistant, init_integration) -> None:
 
 
 async def test_srp_entity_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the SrpEntity."""
 
     with patch(
-        "homeassistant.components.srp_energy.SrpEnergyClient", autospec=True
+        "smarthub.components.srp_energy.SrpEnergyClient", autospec=True
     ) as srp_energy_mock:
         client = srp_energy_mock.return_value
         client.validate.return_value = True
@@ -66,16 +66,16 @@ async def test_srp_entity_update_failed(
 
 
 async def test_srp_entity_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the SrpEntity timing out."""
 
     with (
         patch(
-            "homeassistant.components.srp_energy.SrpEnergyClient", autospec=True
+            "smarthub.components.srp_energy.SrpEnergyClient", autospec=True
         ) as srp_energy_mock,
-        patch("homeassistant.components.srp_energy.coordinator.TIMEOUT", 0),
+        patch("smarthub.components.srp_energy.coordinator.TIMEOUT", 0),
     ):
         client = srp_energy_mock.return_value
         client.validate.return_value = True

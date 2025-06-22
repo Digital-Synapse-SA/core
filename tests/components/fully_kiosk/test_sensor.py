@@ -5,28 +5,28 @@ from unittest.mock import MagicMock
 from freezegun.api import FrozenDateTimeFactory
 from fullykiosk import FullyKioskError
 
-from homeassistant.components.fully_kiosk.const import DOMAIN, UPDATE_INTERVAL
-from homeassistant.components.sensor import (
+from smarthub.components.fully_kiosk.const import DOMAIN, UPDATE_INTERVAL
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_sensors_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     freezer: FrozenDateTimeFactory,
@@ -65,10 +65,10 @@ async def test_sensors_sensors(
 
     state = hass.states.get("sensor.amazon_fire_current_page")
     assert state
-    assert state.state == "https://homeassistant.local"
+    assert state.state == "https://smarthub.local"
     assert state.attributes.get(ATTR_DEVICE_CLASS) is None
     assert state.attributes.get(ATTR_FRIENDLY_NAME) == "Amazon Fire Current page"
-    assert state.attributes.get("full_url") == "https://homeassistant.local"
+    assert state.attributes.get("full_url") == "https://smarthub.local"
     assert not state.attributes.get("truncated")
 
     entry = entity_registry.async_get("sensor.amazon_fire_current_page")
@@ -163,15 +163,15 @@ async def test_sensors_sensors(
 
 
 async def test_url_sensor_truncating(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
     """Test that long URLs get truncated."""
     state = hass.states.get("sensor.amazon_fire_current_page")
     assert state
-    assert state.state == "https://homeassistant.local"
-    assert state.attributes.get("full_url") == "https://homeassistant.local"
+    assert state.state == "https://smarthub.local"
+    assert state.attributes.get("full_url") == "https://smarthub.local"
     assert not state.attributes.get("truncated")
 
     long_url = "https://01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"

@@ -5,21 +5,21 @@ from unittest.mock import Mock, patch
 import httpx
 import pytest
 
-from homeassistant.const import EVENT_HOMEASSISTANT_CLOSE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import httpx_client as client
+from smarthub.const import EVENT_HOMEASSISTANT_CLOSE
+from smarthub.core import SmartHub
+from smarthub.helpers import httpx_client as client
 
 from tests.common import MockModule, extract_stack_to_frame, mock_integration
 
 
-async def test_get_async_client_with_ssl(hass: HomeAssistant) -> None:
+async def test_get_async_client_with_ssl(hass: SmartHub) -> None:
     """Test init async client with ssl."""
     client.get_async_client(hass)
 
     assert isinstance(hass.data[client.DATA_ASYNC_CLIENT], httpx.AsyncClient)
 
 
-async def test_get_async_client_without_ssl(hass: HomeAssistant) -> None:
+async def test_get_async_client_without_ssl(hass: SmartHub) -> None:
     """Test init async client without ssl."""
     client.get_async_client(hass, verify_ssl=False)
 
@@ -27,7 +27,7 @@ async def test_get_async_client_without_ssl(hass: HomeAssistant) -> None:
 
 
 async def test_create_async_httpx_client_with_ssl_and_cookies(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test init async client with ssl and cookies."""
     client.get_async_client(hass)
@@ -38,7 +38,7 @@ async def test_create_async_httpx_client_with_ssl_and_cookies(
 
 
 async def test_create_async_httpx_client_without_ssl_and_cookies(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test init async client without ssl and cookies."""
     client.get_async_client(hass, verify_ssl=False)
@@ -50,7 +50,7 @@ async def test_create_async_httpx_client_without_ssl_and_cookies(
     assert hass.data[client.DATA_ASYNC_CLIENT_NOVERIFY] != httpx_client
 
 
-async def test_get_async_client_cleanup(hass: HomeAssistant) -> None:
+async def test_get_async_client_cleanup(hass: SmartHub) -> None:
     """Test init async client with ssl."""
     client.get_async_client(hass)
 
@@ -62,7 +62,7 @@ async def test_get_async_client_cleanup(hass: HomeAssistant) -> None:
     assert hass.data[client.DATA_ASYNC_CLIENT].is_closed
 
 
-async def test_get_async_client_cleanup_without_ssl(hass: HomeAssistant) -> None:
+async def test_get_async_client_cleanup_without_ssl(hass: SmartHub) -> None:
     """Test init async client without ssl."""
     client.get_async_client(hass, verify_ssl=False)
 
@@ -74,7 +74,7 @@ async def test_get_async_client_cleanup_without_ssl(hass: HomeAssistant) -> None
     assert hass.data[client.DATA_ASYNC_CLIENT_NOVERIFY].is_closed
 
 
-async def test_get_async_client_patched_close(hass: HomeAssistant) -> None:
+async def test_get_async_client_patched_close(hass: SmartHub) -> None:
     """Test closing the async client does not work."""
 
     with patch("httpx.AsyncClient.aclose") as mock_aclose:
@@ -87,7 +87,7 @@ async def test_get_async_client_patched_close(hass: HomeAssistant) -> None:
         assert mock_aclose.call_count == 0
 
 
-async def test_get_async_client_context_manager(hass: HomeAssistant) -> None:
+async def test_get_async_client_context_manager(hass: SmartHub) -> None:
     """Test using the async client with a context manager does not close the session."""
 
     with patch("httpx.AsyncClient.aclose") as mock_aclose:
@@ -101,25 +101,25 @@ async def test_get_async_client_context_manager(hass: HomeAssistant) -> None:
 
 
 async def test_warning_close_session_integration(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test log warning message when closing the session from integration context."""
     with (
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value="await session.aclose()",
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=extract_stack_to_frame(
                 [
                     Mock(
-                        filename="/home/paulus/homeassistant/core.py",
+                        filename="/home/paulus/smarthub/core.py",
                         lineno="23",
                         line="do_something()",
                     ),
                     Mock(
-                        filename="/home/paulus/homeassistant/components/hue/light.py",
+                        filename="/home/paulus/smarthub/components/hue/light.py",
                         lineno="23",
                         line="await session.aclose()",
                     ),
@@ -136,29 +136,29 @@ async def test_warning_close_session_integration(
         await httpx_session.aclose()
 
     assert (
-        "Detected that integration 'hue' closes the Home Assistant httpx client at "
-        "homeassistant/components/hue/light.py, line 23: await session.aclose(). "
-        "Please create a bug report at https://github.com/home-assistant/core/issues?"
+        "Detected that integration 'hue' closes the SmartHub httpx client at "
+        "smarthub/components/hue/light.py, line 23: await session.aclose(). "
+        "Please create a bug report at https://github.com/smart-hub/core/issues?"
         "q=is%3Aopen+is%3Aissue+label%3A%22integration%3A+hue%22"
     ) in caplog.text
 
 
 async def test_warning_close_session_custom(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test log warning message when closing the session from custom context."""
     mock_integration(hass, MockModule("hue"), built_in=False)
     with (
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value="await session.aclose()",
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=extract_stack_to_frame(
                 [
                     Mock(
-                        filename="/home/paulus/homeassistant/core.py",
+                        filename="/home/paulus/smarthub/core.py",
                         lineno="23",
                         line="do_something()",
                     ),
@@ -179,7 +179,7 @@ async def test_warning_close_session_custom(
         httpx_session = client.get_async_client(hass)
         await httpx_session.aclose()
     assert (
-        "Detected that custom integration 'hue' closes the Home Assistant httpx client "
+        "Detected that custom integration 'hue' closes the SmartHub httpx client "
         "at custom_components/hue/light.py, line 23: await session.aclose(). "
         "Please report it to the author of the 'hue' custom integration"
     ) in caplog.text

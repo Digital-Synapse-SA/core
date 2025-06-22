@@ -7,13 +7,13 @@ from pyloadapi import CannotConnect, InvalidAuth
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.pyload.button import PyLoadButtonEntity
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.pyload.button import PyLoadButtonEntity
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -29,7 +29,7 @@ API_CALL = {
 def button_only() -> Generator[None]:
     """Enable only the button platform."""
     with patch(
-        "homeassistant.components.pyload.PLATFORMS",
+        "smarthub.components.pyload.PLATFORMS",
         [Platform.BUTTON],
     ):
         yield
@@ -37,7 +37,7 @@ def button_only() -> Generator[None]:
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -56,7 +56,7 @@ async def test_state(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_button_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
     entity_registry: er.EntityRegistry,
@@ -90,7 +90,7 @@ async def test_button_press(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_button_press_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pyloadapi: AsyncMock,
     entity_registry: er.EntityRegistry,

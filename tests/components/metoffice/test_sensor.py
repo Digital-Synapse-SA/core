@@ -7,10 +7,10 @@ import re
 import pytest
 import requests_mock
 
-from homeassistant.components.metoffice.const import ATTRIBUTION, DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.metoffice.const import ATTRIBUTION, DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .const import (
     DEVICE_KEY_KINGSLYNN,
@@ -29,7 +29,7 @@ from tests.common import MockConfigEntry, async_load_fixture, get_sensor_display
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_one_sensor_site_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     requests_mock: requests_mock.Mocker,
@@ -79,7 +79,7 @@ async def test_one_sensor_site_running(
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_two_sensor_sites_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     requests_mock: requests_mock.Mocker,
@@ -174,7 +174,7 @@ async def test_two_sensor_sites_running(
     ],
 )
 async def test_legacy_entities_are_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     requests_mock: requests_mock.Mocker,
     old_unique_id: str,

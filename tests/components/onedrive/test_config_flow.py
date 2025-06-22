@@ -7,8 +7,8 @@ from onedrive_personal_sdk.exceptions import OneDriveException
 from onedrive_personal_sdk.models.items import AppRoot, Folder, ItemUpdate
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.onedrive.const import (
+from smarthub import config_entries
+from smarthub.components.onedrive.const import (
     CONF_DELETE_PERMANENTLY,
     CONF_FOLDER_ID,
     CONF_FOLDER_NAME,
@@ -16,11 +16,11 @@ from homeassistant.components.onedrive.const import (
     OAUTH2_AUTHORIZE,
     OAUTH2_TOKEN,
 )
-from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.config_entries import ConfigFlowResult
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from . import setup_integration
 from .const import CLIENT_ID
@@ -31,7 +31,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def _do_get_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     result: ConfigFlowResult,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
@@ -70,7 +70,7 @@ async def _do_get_token(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,
@@ -106,7 +106,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow_with_owner_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,
@@ -143,7 +143,7 @@ async def test_full_flow_with_owner_not_found(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_folder_already_in_use(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,
@@ -186,7 +186,7 @@ async def test_folder_already_in_use(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_error_during_folder_creation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,
@@ -234,7 +234,7 @@ async def test_error_during_folder_creation(
     ],
 )
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_onedrive_client: MagicMock,
@@ -257,7 +257,7 @@ async def test_flow_errors(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,
@@ -278,7 +278,7 @@ async def test_already_configured(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,
@@ -303,7 +303,7 @@ async def test_reauth_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_flow_id_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,
@@ -332,7 +332,7 @@ async def test_reauth_flow_id_changed(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_onedrive_client: MagicMock,
@@ -364,7 +364,7 @@ async def test_reconfigure_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reconfigure_flow_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_onedrive_client: MagicMock,
@@ -405,7 +405,7 @@ async def test_reconfigure_flow_error(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reconfigure_flow_id_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,
@@ -429,7 +429,7 @@ async def test_reconfigure_flow_id_changed(
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test options flow."""

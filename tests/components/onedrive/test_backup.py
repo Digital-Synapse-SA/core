@@ -14,15 +14,15 @@ from onedrive_personal_sdk.exceptions import (
 from onedrive_personal_sdk.models.items import File
 import pytest
 
-from homeassistant.components.backup import DOMAIN as BACKUP_DOMAIN, AgentBackup
-from homeassistant.components.onedrive.backup import (
+from smarthub.components.backup import DOMAIN as BACKUP_DOMAIN, AgentBackup
+from smarthub.components.onedrive.backup import (
     async_register_backup_agents_listener,
 )
-from homeassistant.components.onedrive.const import DATA_BACKUP_AGENT_LISTENERS, DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.backup import async_initialize_backup
-from homeassistant.setup import async_setup_component
+from smarthub.components.onedrive.const import DATA_BACKUP_AGENT_LISTENERS, DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH
+from smarthub.core import SmartHub
+from smarthub.helpers.backup import async_initialize_backup
+from smarthub.setup import async_setup_component
 
 from . import setup_integration
 from .const import BACKUP_METADATA
@@ -33,14 +33,14 @@ from tests.typing import ClientSessionGenerator, MagicMock, WebSocketGenerator
 
 @pytest.fixture(autouse=True)
 async def setup_backup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> AsyncGenerator[None]:
     """Set up onedrive and backup integrations."""
     async_initialize_backup(hass)
     with (
-        patch("homeassistant.components.backup.is_hassio", return_value=False),
-        patch("homeassistant.components.backup.store.STORE_DELAY_SAVE", 0),
+        patch("smarthub.components.backup.is_hassio", return_value=False),
+        patch("smarthub.components.backup.store.STORE_DELAY_SAVE", 0),
     ):
         assert await async_setup_component(hass, BACKUP_DOMAIN, {BACKUP_DOMAIN: {}})
         await setup_integration(hass, mock_config_entry)
@@ -50,7 +50,7 @@ async def setup_backup_integration(
 
 
 async def test_agents_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -73,7 +73,7 @@ async def test_agents_info(
 
 
 async def test_agents_list_backups(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test agent list backups."""
@@ -98,8 +98,8 @@ async def test_agents_list_backups(
             "failed_agent_ids": [],
             "failed_folders": [],
             "folders": [],
-            "homeassistant_included": True,
-            "homeassistant_version": "2024.12.0.dev0",
+            "smarthub_included": True,
+            "smarthub_version": "2024.12.0.dev0",
             "name": "Core 2024.12.0.dev0",
             "with_automatic_settings": None,
         }
@@ -107,7 +107,7 @@ async def test_agents_list_backups(
 
 
 async def test_agents_list_backups_with_download_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_onedrive_client: MagicMock,
 ) -> None:
@@ -123,7 +123,7 @@ async def test_agents_list_backups_with_download_failure(
 
 
 async def test_agents_get_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -152,15 +152,15 @@ async def test_agents_get_backup(
         "failed_agent_ids": [],
         "failed_folders": [],
         "folders": [],
-        "homeassistant_included": True,
-        "homeassistant_version": "2024.12.0.dev0",
+        "smarthub_included": True,
+        "smarthub_version": "2024.12.0.dev0",
         "name": "Core 2024.12.0.dev0",
         "with_automatic_settings": None,
     }
 
 
 async def test_agents_delete(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_onedrive_client: MagicMock,
 ) -> None:
@@ -193,10 +193,10 @@ async def test_agents_upload(
 
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -228,10 +228,10 @@ async def test_agents_upload_corrupt_upload(
 
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -264,10 +264,10 @@ async def test_agents_upload_metadata_upload_failed(
 
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -300,10 +300,10 @@ async def test_agents_upload_metadata_metadata_failed(
 
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backup",
+            "smarthub.components.backup.manager.BackupManager.async_get_backup",
         ) as fetch_backup,
         patch(
-            "homeassistant.components.backup.manager.read_backup",
+            "smarthub.components.backup.manager.read_backup",
             return_value=test_backup,
         ),
         patch("pathlib.Path.open") as mocked_open,
@@ -353,7 +353,7 @@ async def test_error_on_agents_download(
         [],
     ]
 
-    with patch("homeassistant.components.onedrive.backup.CACHE_TTL", -1):
+    with patch("smarthub.components.onedrive.backup.CACHE_TTL", -1):
         resp = await client.get(
             f"/api/backup/download/{backup_id}?agent_id={DOMAIN}.{mock_config_entry.unique_id}"
         )
@@ -371,7 +371,7 @@ async def test_error_on_agents_download(
     ],
 )
 async def test_delete_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_onedrive_client: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -400,7 +400,7 @@ async def test_delete_error(
 
 
 async def test_agents_delete_not_found_does_not_throw(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_onedrive_client: MagicMock,
 ) -> None:
@@ -421,7 +421,7 @@ async def test_agents_delete_not_found_does_not_throw(
 
 
 async def test_agents_backup_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_onedrive_client: MagicMock,
 ) -> None:
@@ -438,7 +438,7 @@ async def test_agents_backup_not_found(
 
 
 async def test_reauth_on_403(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_onedrive_client: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -470,7 +470,7 @@ async def test_reauth_on_403(
     assert flow["context"]["entry_id"] == mock_config_entry.entry_id
 
 
-async def test_listeners_get_cleaned_up(hass: HomeAssistant) -> None:
+async def test_listeners_get_cleaned_up(hass: SmartHub) -> None:
     """Test listener gets cleaned up."""
     listener = MagicMock()
     remove_listener = async_register_backup_agents_listener(hass, listener=listener)

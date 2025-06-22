@@ -10,13 +10,13 @@ import pytest
 from roborock import RoborockException
 from vacuum_map_parser_base.map_data import ImageConfig, ImageData
 
-from homeassistant.components.roborock import DOMAIN
-from homeassistant.components.roborock.const import V1_LOCAL_NOT_CLEANING_INTERVAL
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.roborock import DOMAIN
+from smarthub.components.roborock.const import V1_LOCAL_NOT_CLEANING_INTERVAL
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .mock_data import MAP_DATA, PROP
 
@@ -31,7 +31,7 @@ def platforms() -> list[Platform]:
 
 
 async def test_floorplan_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -59,15 +59,15 @@ async def test_floorplan_image(
     )
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
+            "smarthub.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
             return_value=prop,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.dt_util.utcnow",
+            "smarthub.components.roborock.coordinator.dt_util.utcnow",
             return_value=now,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMapDataParser.parse",
+            "smarthub.components.roborock.coordinator.RoborockMapDataParser.parse",
             return_value=MAP_DATA,
         ) as parse_map,
     ):
@@ -86,7 +86,7 @@ async def test_floorplan_image(
 
 
 async def test_floorplan_image_failed_parse(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -102,15 +102,15 @@ async def test_floorplan_image_failed_parse(
     # Update image, but get none for parse image.
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMapDataParser.parse",
+            "smarthub.components.roborock.coordinator.RoborockMapDataParser.parse",
             return_value=map_data,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
+            "smarthub.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
             return_value=prop,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.dt_util.utcnow",
+            "smarthub.components.roborock.coordinator.dt_util.utcnow",
             return_value=now,
         ),
     ):
@@ -123,7 +123,7 @@ async def test_floorplan_image_failed_parse(
 
 
 async def test_fail_to_save_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_roborock_entry: MockConfigEntry,
     bypass_api_fixture,
@@ -141,7 +141,7 @@ async def test_fail_to_save_image(
     assert resp.status == HTTPStatus.OK
 
     with patch(
-        "homeassistant.components.roborock.roborock_storage.Path.write_bytes",
+        "smarthub.components.roborock.roborock_storage.Path.write_bytes",
         side_effect=OSError,
     ):
         await hass.config_entries.async_unload(mock_roborock_entry.entry_id)
@@ -152,7 +152,7 @@ async def test_fail_to_save_image(
 
 
 async def test_fail_to_load_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -160,15 +160,15 @@ async def test_fail_to_load_image(
     """Test that we gracefully handle failing to load an image."""
     with (
         patch(
-            "homeassistant.components.roborock.roborock_storage.Path.exists",
+            "smarthub.components.roborock.roborock_storage.Path.exists",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.roborock.roborock_storage.Path.read_bytes",
+            "smarthub.components.roborock.roborock_storage.Path.read_bytes",
             side_effect=OSError,
         ) as read_bytes,
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockDataUpdateCoordinator.refresh_coordinator_map"
+            "smarthub.components.roborock.coordinator.RoborockDataUpdateCoordinator.refresh_coordinator_map"
         ),
     ):
         # Reload the config entry so that the map is saved in storage and entities exist.
@@ -179,7 +179,7 @@ async def test_fail_to_load_image(
 
 
 async def test_fail_parse_on_startup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_roborock_entry: MockConfigEntry,
     bypass_api_fixture,
@@ -188,7 +188,7 @@ async def test_fail_parse_on_startup(
     map_data = copy.deepcopy(MAP_DATA)
     map_data.image = None
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockMapDataParser.parse",
+        "smarthub.components.roborock.coordinator.RoborockMapDataParser.parse",
         return_value=map_data,
     ):
         await async_setup_component(hass, DOMAIN, {})
@@ -200,7 +200,7 @@ async def test_fail_parse_on_startup(
 
 
 async def test_fail_get_map_on_startup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_roborock_entry: MockConfigEntry,
     bypass_api_fixture,
@@ -208,7 +208,7 @@ async def test_fail_get_map_on_startup(
     """Test that if we fail getting map on startup, we can still create the entity."""
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMqttClientV1.get_map_v1",
+            "smarthub.components.roborock.coordinator.RoborockMqttClientV1.get_map_v1",
             return_value=None,
         ),
     ):
@@ -221,7 +221,7 @@ async def test_fail_get_map_on_startup(
 
 
 async def test_fail_updating_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -237,19 +237,19 @@ async def test_fail_updating_image(
     previous_state = hass.states.get("image.roborock_s7_maxv_upstairs").state
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMapDataParser.parse",
+            "smarthub.components.roborock.coordinator.RoborockMapDataParser.parse",
             return_value=map_data,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
+            "smarthub.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
             return_value=prop,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.dt_util.utcnow",
+            "smarthub.components.roborock.coordinator.dt_util.utcnow",
             return_value=now,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMqttClientV1.get_map_v1",
+            "smarthub.components.roborock.coordinator.RoborockMqttClientV1.get_map_v1",
             side_effect=RoborockException,
         ),
     ):
@@ -262,7 +262,7 @@ async def test_fail_updating_image(
 
 
 async def test_index_error_map(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -276,15 +276,15 @@ async def test_index_error_map(
     # Update image, but get IndexError for image.
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMapDataParser.parse",
+            "smarthub.components.roborock.coordinator.RoborockMapDataParser.parse",
             side_effect=IndexError,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
+            "smarthub.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
             return_value=prop,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.dt_util.utcnow",
+            "smarthub.components.roborock.coordinator.dt_util.utcnow",
             return_value=now,
         ),
     ):
@@ -297,7 +297,7 @@ async def test_index_error_map(
 
 
 async def test_map_status_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -324,15 +324,15 @@ async def test_map_status_change(
     )
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
+            "smarthub.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
             return_value=prop,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.dt_util.utcnow",
+            "smarthub.components.roborock.coordinator.dt_util.utcnow",
             return_value=now,
         ),
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockMapDataParser.parse",
+            "smarthub.components.roborock.coordinator.RoborockMapDataParser.parse",
             return_value=new_map_data,
         ),
     ):

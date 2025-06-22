@@ -3,7 +3,7 @@
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.components.cloud.const import (
+from smarthub.components.cloud.const import (
     DATA_CLOUD,
     DOMAIN,
     PREF_ALEXA_SETTINGS_VERSION,
@@ -12,13 +12,13 @@ from homeassistant.components.cloud.const import (
     PREF_GOOGLE_SECURE_DEVICES_PIN,
     PREF_GOOGLE_SETTINGS_VERSION,
 )
-from homeassistant.components.cloud.prefs import (
+from smarthub.components.cloud.prefs import (
     ALEXA_SETTINGS_VERSION,
     GOOGLE_SETTINGS_VERSION,
     CloudPreferences,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 PIPELINE_DATA = {
     "items": [
@@ -27,7 +27,7 @@ PIPELINE_DATA = {
             "conversation_language": "language_1",
             "id": "01GX8ZWBAQYWNB1XV3EXEZ75DY",
             "language": "language_1",
-            "name": "Home Assistant Cloud",
+            "name": "SmartHub Cloud",
             "stt_engine": "cloud",
             "stt_language": "language_1",
             "tts_engine": "cloud",
@@ -72,11 +72,11 @@ PIPELINE_DATA = {
 }
 
 
-async def mock_cloud(hass: HomeAssistant, config: dict[str, Any] | None = None) -> None:
+async def mock_cloud(hass: SmartHub, config: dict[str, Any] | None = None) -> None:
     """Mock cloud."""
-    # The homeassistant integration is needed by cloud. It's not in it's requirements
+    # The smarthub integration is needed by cloud. It's not in it's requirements
     # because it's always setup by bootstrap. Set it up manually in tests.
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     assert await async_setup_component(hass, DOMAIN, {"cloud": config or {}})
     cloud_inst = hass.data[DATA_CLOUD]
@@ -84,7 +84,7 @@ async def mock_cloud(hass: HomeAssistant, config: dict[str, Any] | None = None) 
         await cloud_inst.initialize()
 
 
-def mock_cloud_prefs(hass: HomeAssistant, prefs: dict[str, Any]) -> CloudPreferences:
+def mock_cloud_prefs(hass: SmartHub, prefs: dict[str, Any]) -> CloudPreferences:
     """Fixture for cloud component."""
     prefs_to_set = {
         PREF_ALEXA_SETTINGS_VERSION: ALEXA_SETTINGS_VERSION,

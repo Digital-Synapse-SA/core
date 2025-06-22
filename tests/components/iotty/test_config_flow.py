@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock, MagicMock
 import multidict
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.application_credentials import (
+from smarthub import config_entries
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.iotty.application_credentials import OAUTH2_TOKEN
-from homeassistant.components.iotty.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.setup import async_setup_component
+from smarthub.components.iotty.application_credentials import OAUTH2_TOKEN
+from smarthub.components.iotty.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.setup import async_setup_component
 
 from .conftest import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
 
@@ -25,7 +25,7 @@ from tests.typing import ClientSessionGenerator
 
 
 @pytest.fixture
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup application credentials component."""
     await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -45,7 +45,7 @@ def current_request_with_host(current_request: MagicMock) -> None:
     )
 
 
-async def test_config_flow_no_credentials(hass: HomeAssistant) -> None:
+async def test_config_flow_no_credentials(hass: SmartHub) -> None:
     """Test config flow base case with no credentials registered."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -56,7 +56,7 @@ async def test_config_flow_no_credentials(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host", "setup_credentials")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_setup_entry: AsyncMock,

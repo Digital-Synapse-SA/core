@@ -11,9 +11,9 @@ from evohomeasync2 import EvohomeClient, exceptions as exc
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.evohome.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.evohome.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .conftest import mock_post_request
 from .const import TEST_INSTALLS
@@ -40,45 +40,45 @@ LOG_HINT_OTH_AUTH = ("evohome.auth", logging.ERROR, _MSG_OTH)
 LOG_HINT_USR_AUTH = ("evohome.auth", logging.ERROR, _MSG_USR)
 
 LOG_FAIL_CONNECTION = (
-    "homeassistant.components.evohome",
+    "smarthub.components.evohome",
     logging.ERROR,
     "Failed to fetch initial data: Authenticator response is invalid: Connection error",
 )
 LOG_FAIL_CREDENTIALS = (
-    "homeassistant.components.evohome",
+    "smarthub.components.evohome",
     logging.ERROR,
     "Failed to fetch initial data: "
     "Authenticator response is invalid: {'error': 'invalid_grant'}",
 )
 LOG_FAIL_GATEWAY = (
-    "homeassistant.components.evohome",
+    "smarthub.components.evohome",
     logging.ERROR,
     "Failed to fetch initial data: "
     "Authenticator response is invalid: 502 Bad Gateway, response=None",
 )
 LOG_FAIL_TOO_MANY = (
-    "homeassistant.components.evohome",
+    "smarthub.components.evohome",
     logging.ERROR,
     "Failed to fetch initial data: "
     "Authenticator response is invalid: 429 Too Many Requests, response=None",
 )
 
 LOG_FGET_CONNECTION = (
-    "homeassistant.components.evohome",
+    "smarthub.components.evohome",
     logging.ERROR,
     "Failed to fetch initial data: "
     "GET https://tccna.resideo.com/WebAPI/emea/api/v1/userAccount: "
     "Connection error",
 )
 LOG_FGET_GATEWAY = (
-    "homeassistant.components.evohome",
+    "smarthub.components.evohome",
     logging.ERROR,
     "Failed to fetch initial data: "
     "GET https://tccna.resideo.com/WebAPI/emea/api/v1/userAccount: "
     "502 Bad Gateway, response=None",
 )
 LOG_FGET_TOO_MANY = (
-    "homeassistant.components.evohome",
+    "smarthub.components.evohome",
     logging.ERROR,
     "Failed to fetch initial data: "
     "GET https://tccna.resideo.com/WebAPI/emea/api/v1/userAccount: "
@@ -87,7 +87,7 @@ LOG_FGET_TOO_MANY = (
 
 
 LOG_SETUP_FAILED = (
-    "homeassistant.setup",
+    "smarthub.setup",
     logging.ERROR,
     "Setup failed for 'evohome': Integration failed to initialize.",
 )
@@ -125,7 +125,7 @@ CLIENT_REQUEST_TESTS: dict[Exception, list] = {
 
 @pytest.mark.parametrize("exception", AUTHENTICATION_TESTS)
 async def test_authentication_failure_v2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, str],
     exception: Exception,
     caplog: pytest.LogCaptureFixture,
@@ -150,7 +150,7 @@ async def test_authentication_failure_v2(
 
 @pytest.mark.parametrize("exception", CLIENT_REQUEST_TESTS)
 async def test_client_request_failure_v2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, str],
     exception: Exception,
     caplog: pytest.LogCaptureFixture,
@@ -177,7 +177,7 @@ async def test_client_request_failure_v2(
 
 @pytest.mark.parametrize("install", [*TEST_INSTALLS, "botched"])
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     evohome: EvohomeClient,
     snapshot: SnapshotAssertion,
 ) -> None:

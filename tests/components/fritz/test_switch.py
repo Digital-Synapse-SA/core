@@ -7,10 +7,10 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fritz.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.fritz.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .const import MOCK_CALL_DEFLECTION_DATA, MOCK_FB_SERVICES, MOCK_USER_DATA
 
@@ -179,7 +179,7 @@ MOCK_WLANCONFIGS_DIFF2_SSID: dict[str, dict] = {
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_switch_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     fc_class_mock,
     fh_class_mock,
@@ -189,7 +189,7 @@ async def test_switch_setup(
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
     entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.fritz.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.fritz.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done(wait_background_tasks=True)
 

@@ -5,11 +5,11 @@ from typing import Any
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.tag import DOMAIN, EVENT_TAG_SCANNED, async_scan_tag
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.tag import DOMAIN, EVENT_TAG_SCANNED, async_scan_tag
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import TEST_DEVICE_ID, TEST_TAG_ID, TEST_TAG_NAME
 
@@ -19,7 +19,7 @@ from tests.typing import WebSocketGenerator
 
 @pytest.fixture
 def storage_setup_named_tag(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ):
     """Storage setup for test case of named tags."""
@@ -51,7 +51,7 @@ def storage_setup_named_tag(
 
 
 async def test_named_tag_scanned_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     storage_setup_named_tag,
@@ -78,7 +78,7 @@ async def test_named_tag_scanned_event(
 
 
 @pytest.fixture
-def storage_setup_unnamed_tag(hass: HomeAssistant, hass_storage: dict[str, Any]):
+def storage_setup_unnamed_tag(hass: SmartHub, hass_storage: dict[str, Any]):
     """Storage setup for test case of unnamed tags."""
 
     async def _storage(items=None):
@@ -98,7 +98,7 @@ def storage_setup_unnamed_tag(hass: HomeAssistant, hass_storage: dict[str, Any])
 
 
 async def test_unnamed_tag_scanned_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     storage_setup_unnamed_tag,

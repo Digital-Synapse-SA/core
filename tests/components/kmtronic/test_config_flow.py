@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, Mock, patch
 from aiohttp import ClientConnectorError, ClientResponseError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.kmtronic.const import CONF_REVERSE, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.kmtronic.const import CONF_REVERSE, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -18,7 +18,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -28,7 +28,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.kmtronic.config_flow.KMTronicHubAPI.async_get_status",
+        "smarthub.components.kmtronic.config_flow.KMTronicHubAPI.async_get_status",
         return_value=[Mock()],
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -52,7 +52,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
 
 
 async def test_form_options(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that the options form."""
     config_entry = MockConfigEntry(
@@ -90,14 +90,14 @@ async def test_form_options(
     assert config_entry.state is ConfigEntryState.LOADED
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.kmtronic.config_flow.KMTronicHubAPI.async_get_status",
+        "smarthub.components.kmtronic.config_flow.KMTronicHubAPI.async_get_status",
         side_effect=ClientResponseError(None, None, status=HTTPStatus.BAD_REQUEST),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -113,14 +113,14 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.kmtronic.config_flow.KMTronicHubAPI.async_get_status",
+        "smarthub.components.kmtronic.config_flow.KMTronicHubAPI.async_get_status",
         side_effect=ClientConnectorError(None, Mock()),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -136,14 +136,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_unknown_error(hass: HomeAssistant) -> None:
+async def test_form_unknown_error(hass: SmartHub) -> None:
     """Test we handle unknown errors."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.kmtronic.config_flow.KMTronicHubAPI.async_get_status",
+        "smarthub.components.kmtronic.config_flow.KMTronicHubAPI.async_get_status",
         side_effect=Exception(),
     ):
         result2 = await hass.config_entries.flow.async_configure(

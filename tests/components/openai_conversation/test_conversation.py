@@ -38,9 +38,9 @@ from openai.types.responses.response import IncompleteDetails
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import conversation
-from homeassistant.components.homeassistant.exposed_entities import async_expose_entity
-from homeassistant.components.openai_conversation.const import (
+from smarthub.components import conversation
+from smarthub.components.smarthub.exposed_entities import async_expose_entity
+from smarthub.components.openai_conversation.const import (
     CONF_WEB_SEARCH,
     CONF_WEB_SEARCH_CITY,
     CONF_WEB_SEARCH_CONTEXT_SIZE,
@@ -49,10 +49,10 @@ from homeassistant.components.openai_conversation.const import (
     CONF_WEB_SEARCH_TIMEZONE,
     CONF_WEB_SEARCH_USER_LOCATION,
 )
-from homeassistant.const import CONF_LLM_HASS_API
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.helpers import intent
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_LLM_HASS_API
+from smarthub.core import Context, SmartHub
+from smarthub.helpers import intent
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.components.conversation import (
@@ -148,7 +148,7 @@ def mock_create_stream() -> Generator[AsyncMock]:
 
 
 async def test_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -196,7 +196,7 @@ async def test_entity(
     ],
 )
 async def test_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
     exception,
@@ -234,7 +234,7 @@ async def test_error_handling(
     ],
 )
 async def test_incomplete_response(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
     mock_create_stream: AsyncMock,
@@ -309,7 +309,7 @@ async def test_incomplete_response(
     ],
 )
 async def test_failed_response(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
     mock_create_stream: AsyncMock,
@@ -332,7 +332,7 @@ async def test_failed_response(
 
 
 async def test_conversation_agent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
 ) -> None:
@@ -538,7 +538,7 @@ def create_web_search_item(id: str, output_index: int) -> list[ResponseStreamEve
 
 
 async def test_function_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
     mock_create_stream: AsyncMock,
@@ -597,7 +597,7 @@ async def test_function_call(
 
 
 async def test_function_call_without_reasoning(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
     mock_create_stream: AsyncMock,
@@ -670,7 +670,7 @@ async def test_function_call_without_reasoning(
     ],
 )
 async def test_function_call_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
     mock_create_stream: AsyncMock,
@@ -691,7 +691,7 @@ async def test_function_call_invalid(
 
 
 async def test_assist_api_tools_conversion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_with_assist: MockConfigEntry,
     mock_init_component,
     mock_create_stream,
@@ -728,7 +728,7 @@ async def test_assist_api_tools_conversion(
 
 
 async def test_web_search(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_init_component,
     mock_create_stream,
@@ -750,7 +750,7 @@ async def test_web_search(
     )
     await hass.config_entries.async_reload(mock_config_entry.entry_id)
 
-    message = "Home Assistant now supports ChatGPT Search in Assist"
+    message = "SmartHub now supports ChatGPT Search in Assist"
     mock_create_stream.return_value = [
         # Initial conversation
         (

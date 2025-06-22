@@ -6,8 +6,8 @@ from unittest.mock import patch
 from yalexs.const import Brand
 from yalexs.doorbell import ContentTokenExpired
 
-from homeassistant.components.camera import CameraState
-from homeassistant.core import HomeAssistant
+from smarthub.components.camera import CameraState
+from smarthub.core import SmartHub
 
 from .mocks import _create_yale_with_devices, _mock_doorbell_from_fixture
 
@@ -15,7 +15,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_create_doorbell(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test creation of a doorbell."""
     doorbell_one = await _mock_doorbell_from_fixture(hass, "get_doorbell.json")
@@ -42,7 +42,7 @@ async def test_create_doorbell(
 
 
 async def test_doorbell_refresh_content_token_recover(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test camera image content token expired."""
     doorbell_two = await _mock_doorbell_from_fixture(hass, "get_doorbell.json")
@@ -69,7 +69,7 @@ async def test_doorbell_refresh_content_token_recover(
 
 
 async def test_doorbell_refresh_content_token_fail(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test camera image content token expired."""
     doorbell_two = await _mock_doorbell_from_fixture(hass, "get_doorbell.json")

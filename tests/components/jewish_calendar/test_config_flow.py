@@ -2,8 +2,8 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant import config_entries, setup
-from homeassistant.components.jewish_calendar.const import (
+from smarthub import config_entries, setup
+from smarthub.components.jewish_calendar.const import (
     CONF_CANDLE_LIGHT_MINUTES,
     CONF_DIASPORA,
     CONF_HAVDALAH_OFFSET_MINUTES,
@@ -12,21 +12,21 @@ from homeassistant.components.jewish_calendar.const import (
     DEFAULT_LANGUAGE,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_ELEVATION,
     CONF_LANGUAGE,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_TIME_ZONE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_step_user(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_step_user(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test user config."""
     await setup.async_setup_component(hass, "persistent_notification", {})
     result = await hass.config_entries.flow.async_init(
@@ -56,7 +56,7 @@ async def test_step_user(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> No
 
 
 async def test_single_instance_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort if already setup."""
@@ -70,7 +70,7 @@ async def test_single_instance_allowed(
     assert result.get("reason") == "single_instance_allowed"
 
 
-async def test_options(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_options(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test updating options."""
     config_entry.add_to_hass(hass)
 
@@ -95,7 +95,7 @@ async def test_options(hass: HomeAssistant, config_entry: MockConfigEntry) -> No
 
 
 async def test_options_reconfigure(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test that updating the options of the Jewish Calendar integration triggers a value update."""
     config_entry.add_to_hass(hass)
@@ -117,7 +117,7 @@ async def test_options_reconfigure(
     assert config_entry.options[CONF_CANDLE_LIGHT_MINUTES] == DEFAULT_CANDLE_LIGHT + 1
 
 
-async def test_reconfigure(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_reconfigure(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test starting a reconfigure flow."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)

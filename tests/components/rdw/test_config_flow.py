@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 from vehicle.exceptions import RDWConnectionError, RDWUnknownLicensePlateError
 
-from homeassistant.components.rdw.const import CONF_LICENSE_PLATE, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.rdw.const import CONF_LICENSE_PLATE, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def test_full_user_flow(
-    hass: HomeAssistant, mock_rdw_config_flow: MagicMock, mock_setup_entry: MagicMock
+    hass: SmartHub, mock_rdw_config_flow: MagicMock, mock_setup_entry: MagicMock
 ) -> None:
     """Test the full user configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -34,7 +34,7 @@ async def test_full_user_flow(
 
 
 async def test_full_flow_with_authentication_error(
-    hass: HomeAssistant, mock_rdw_config_flow: MagicMock, mock_setup_entry: MagicMock
+    hass: SmartHub, mock_rdw_config_flow: MagicMock, mock_setup_entry: MagicMock
 ) -> None:
     """Test the full user configuration flow with incorrect license plate.
 
@@ -74,7 +74,7 @@ async def test_full_flow_with_authentication_error(
 
 
 async def test_connection_error(
-    hass: HomeAssistant, mock_rdw_config_flow: MagicMock
+    hass: SmartHub, mock_rdw_config_flow: MagicMock
 ) -> None:
     """Test API connection error."""
     mock_rdw_config_flow.vehicle.side_effect = RDWConnectionError

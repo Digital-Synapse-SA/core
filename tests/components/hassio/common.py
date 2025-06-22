@@ -19,8 +19,8 @@ from aiohasupervisor.models import (
     StoreAddonComplete,
 )
 
-from homeassistant.components.hassio.addon_manager import AddonManager
-from homeassistant.core import HomeAssistant
+from smarthub.components.hassio.addon_manager import AddonManager
+from smarthub.core import SmartHub
 
 LOGGER = logging.getLogger(__name__)
 INSTALLED_ADDON_FIELDS = [field.name for field in fields(InstalledAddonComplete)]
@@ -36,7 +36,7 @@ MOCK_STORE_ADDONS = [
         available=True,
         build=False,
         description="Test add-on service",
-        homeassistant=None,
+        smarthub=None,
         icon=False,
         logo=False,
         repository="core",
@@ -55,8 +55,8 @@ MOCK_REPOSITORIES = [
         slug="core",
         name="Official add-ons",
         source="core",
-        url="https://home-assistant.io/addons",
-        maintainer="Home Assistant",
+        url="https://smart-hub.io/addons",
+        maintainer="SmartHub",
     )
 ]
 
@@ -70,7 +70,7 @@ def mock_to_dict(obj: Mock, fields: list[str]) -> dict[str, Any]:
     }
 
 
-def mock_addon_manager(hass: HomeAssistant) -> AddonManager:
+def mock_addon_manager(hass: SmartHub) -> AddonManager:
     """Return an AddonManager instance."""
     return AddonManager(hass, LOGGER, "Test", "test_addon")
 
@@ -200,7 +200,7 @@ def mock_set_addon_options_side_effect(addon_options: dict[str, Any]) -> Any | N
 def mock_create_backup() -> Generator[AsyncMock]:
     """Mock create backup."""
     with patch(
-        "homeassistant.components.hassio.addon_manager.async_create_backup"
+        "smarthub.components.hassio.addon_manager.async_create_backup"
     ) as create_backup:
         yield create_backup
 

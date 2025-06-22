@@ -5,15 +5,15 @@ from __future__ import annotations
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
 
 from tests.components.diagnostics import get_diagnostics_for_config_entry
 from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     load_int: ConfigEntry,
     snapshot: SnapshotAssertion,

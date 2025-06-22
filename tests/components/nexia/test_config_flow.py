@@ -6,15 +6,15 @@ import aiohttp
 from nexia.const import BRAND_ASAIR, BRAND_NEXIA
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.nexia.const import CONF_BRAND, DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.nexia.const import CONF_BRAND, DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 @pytest.mark.parametrize("brand", [BRAND_ASAIR, BRAND_NEXIA])
-async def test_form(hass: HomeAssistant, brand) -> None:
+async def test_form(hass: SmartHub, brand) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -25,15 +25,15 @@ async def test_form(hass: HomeAssistant, brand) -> None:
 
     with (
         patch(
-            "homeassistant.components.nexia.config_flow.NexiaHome.get_name",
+            "smarthub.components.nexia.config_flow.NexiaHome.get_name",
             return_value="myhouse",
         ),
         patch(
-            "homeassistant.components.nexia.config_flow.NexiaHome.login",
+            "smarthub.components.nexia.config_flow.NexiaHome.login",
             side_effect=MagicMock(),
         ),
         patch(
-            "homeassistant.components.nexia.async_setup_entry",
+            "smarthub.components.nexia.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -53,7 +53,7 @@ async def test_form(hass: HomeAssistant, brand) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -61,10 +61,10 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nexia.config_flow.NexiaHome.login",
+            "smarthub.components.nexia.config_flow.NexiaHome.login",
         ),
         patch(
-            "homeassistant.components.nexia.config_flow.NexiaHome.get_name",
+            "smarthub.components.nexia.config_flow.NexiaHome.get_name",
             return_value=None,
         ),
     ):
@@ -81,14 +81,14 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nexia.config_flow.NexiaHome.login",
+        "smarthub.components.nexia.config_flow.NexiaHome.login",
         side_effect=TimeoutError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -104,14 +104,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_invalid_auth_http_401(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth_http_401(hass: SmartHub) -> None:
     """Test we handle invalid auth error from http 401."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nexia.config_flow.NexiaHome.login",
+        "smarthub.components.nexia.config_flow.NexiaHome.login",
         side_effect=aiohttp.ClientResponseError(
             status=401, request_info=MagicMock(), history=MagicMock()
         ),
@@ -129,14 +129,14 @@ async def test_form_invalid_auth_http_401(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect_not_found(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect_not_found(hass: SmartHub) -> None:
     """Test we handle cannot connect from an http not found error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nexia.config_flow.NexiaHome.login",
+        "smarthub.components.nexia.config_flow.NexiaHome.login",
         side_effect=aiohttp.ClientResponseError(
             status=404, request_info=MagicMock(), history=MagicMock()
         ),
@@ -154,14 +154,14 @@ async def test_form_cannot_connect_not_found(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_broad_exception(hass: HomeAssistant) -> None:
+async def test_form_broad_exception(hass: SmartHub) -> None:
     """Test we handle invalid auth error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nexia.config_flow.NexiaHome.login",
+        "smarthub.components.nexia.config_flow.NexiaHome.login",
         side_effect=ValueError,
     ):
         result2 = await hass.config_entries.flow.async_configure(

@@ -4,9 +4,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import MOCK_SERIAL
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MagicMock,
     mock_integration: MockConfigEntry,
 ) -> None:
@@ -31,7 +31,7 @@ async def test_unload_config_entry(
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

@@ -7,16 +7,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components.command_line.const import DOMAIN
-from homeassistant.const import SERVICE_RELOAD, STATE_ON, STATE_OPEN
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub import config as hass_config
+from smarthub.components.command_line.const import DOMAIN
+from smarthub.const import SERVICE_RELOAD, STATE_ON, STATE_OPEN
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed, get_fixture_path
 
 
-async def test_setup_config(hass: HomeAssistant, load_yaml_integration: None) -> None:
+async def test_setup_config(hass: SmartHub, load_yaml_integration: None) -> None:
     """Test setup from yaml."""
 
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=10))
@@ -34,7 +34,7 @@ async def test_setup_config(hass: HomeAssistant, load_yaml_integration: None) ->
 
 
 async def test_reload_service(
-    hass: HomeAssistant, load_yaml_integration: None, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, load_yaml_integration: None, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reload serviice."""
 

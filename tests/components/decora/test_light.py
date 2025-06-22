@@ -2,17 +2,17 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.components.decora import DOMAIN
-from homeassistant.components.light import DOMAIN as PLATFORM_DOMAIN
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.decora import DOMAIN
+from smarthub.components.light import DOMAIN as PLATFORM_DOMAIN
+from smarthub.const import CONF_PLATFORM
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 
 @patch.dict("sys.modules", {"bluepy": Mock(), "bluepy.btle": Mock(), "decora": Mock()})
 async def test_repair_issue_is_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test repair issue is created."""

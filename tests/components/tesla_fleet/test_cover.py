@@ -6,16 +6,16 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from tesla_fleet_api.exceptions import VehicleOffline
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
     SERVICE_STOP_COVER,
     CoverState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, setup_platform
 from .const import COMMAND_OK, VEHICLE_DATA_ALT
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     normal_config_entry: MockConfigEntry,
@@ -38,7 +38,7 @@ async def test_cover(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_cover_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -53,7 +53,7 @@ async def test_cover_alt(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_cover_readonly(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     readonly_config_entry: MockConfigEntry,
@@ -65,7 +65,7 @@ async def test_cover_readonly(
 
 
 async def test_cover_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vehicle_data: AsyncMock,
     normal_config_entry: MockConfigEntry,
 ) -> None:
@@ -79,7 +79,7 @@ async def test_cover_offline(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_cover_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
 ) -> None:
     """Tests that the cover entities are correct."""

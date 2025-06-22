@@ -6,11 +6,11 @@ from unittest.mock import MagicMock, call, patch
 
 import requests
 
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
-from homeassistant.components.xiaomi import device_tracker as xiaomi
-from homeassistant.components.xiaomi.device_tracker import get_scanner
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PLATFORM, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
+from smarthub.components.xiaomi import device_tracker as xiaomi
+from smarthub.components.xiaomi.device_tracker import get_scanner
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_PLATFORM, CONF_USERNAME
+from smarthub.core import SmartHub
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -148,10 +148,10 @@ def mocked_requests(*args, **kwargs):
 
 
 @patch(
-    "homeassistant.components.xiaomi.device_tracker.XiaomiDeviceScanner",
+    "smarthub.components.xiaomi.device_tracker.XiaomiDeviceScanner",
     return_value=MagicMock(),
 )
-async def test_config(xiaomi_mock, hass: HomeAssistant) -> None:
+async def test_config(xiaomi_mock, hass: SmartHub) -> None:
     """Testing minimal configuration."""
     config = {
         DEVICE_TRACKER_DOMAIN: xiaomi.PLATFORM_SCHEMA(
@@ -173,10 +173,10 @@ async def test_config(xiaomi_mock, hass: HomeAssistant) -> None:
 
 
 @patch(
-    "homeassistant.components.xiaomi.device_tracker.XiaomiDeviceScanner",
+    "smarthub.components.xiaomi.device_tracker.XiaomiDeviceScanner",
     return_value=MagicMock(),
 )
-async def test_config_full(xiaomi_mock, hass: HomeAssistant) -> None:
+async def test_config_full(xiaomi_mock, hass: SmartHub) -> None:
     """Testing full configuration."""
     config = {
         DEVICE_TRACKER_DOMAIN: xiaomi.PLATFORM_SCHEMA(
@@ -200,7 +200,7 @@ async def test_config_full(xiaomi_mock, hass: HomeAssistant) -> None:
 
 @patch("requests.get", side_effect=mocked_requests)
 @patch("requests.post", side_effect=mocked_requests)
-async def test_invalid_credential(mock_get, mock_post, hass: HomeAssistant) -> None:
+async def test_invalid_credential(mock_get, mock_post, hass: SmartHub) -> None:
     """Testing invalid credential handling."""
     config = {
         DEVICE_TRACKER_DOMAIN: xiaomi.PLATFORM_SCHEMA(
@@ -217,7 +217,7 @@ async def test_invalid_credential(mock_get, mock_post, hass: HomeAssistant) -> N
 
 @patch("requests.get", side_effect=mocked_requests)
 @patch("requests.post", side_effect=mocked_requests)
-async def test_valid_credential(mock_get, mock_post, hass: HomeAssistant) -> None:
+async def test_valid_credential(mock_get, mock_post, hass: SmartHub) -> None:
     """Testing valid refresh."""
     config = {
         DEVICE_TRACKER_DOMAIN: xiaomi.PLATFORM_SCHEMA(
@@ -238,7 +238,7 @@ async def test_valid_credential(mock_get, mock_post, hass: HomeAssistant) -> Non
 
 @patch("requests.get", side_effect=mocked_requests)
 @patch("requests.post", side_effect=mocked_requests)
-async def test_token_timed_out(mock_get, mock_post, hass: HomeAssistant) -> None:
+async def test_token_timed_out(mock_get, mock_post, hass: SmartHub) -> None:
     """Testing refresh with a timed out token.
 
     New token is requested and list is downloaded a second time.

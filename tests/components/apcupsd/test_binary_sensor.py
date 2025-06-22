@@ -5,10 +5,10 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import slugify
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import slugify
 
 from . import MOCK_STATUS, async_init_integration
 
@@ -16,17 +16,17 @@ from tests.common import snapshot_platform
 
 
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test states of binary sensors."""
-    with patch("homeassistant.components.apcupsd.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.apcupsd.PLATFORMS", [Platform.BINARY_SENSOR]):
         config_entry = await async_init_integration(hass, status=MOCK_STATUS)
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
 
-async def test_no_binary_sensor(hass: HomeAssistant) -> None:
+async def test_no_binary_sensor(hass: SmartHub) -> None:
     """Test binary sensor when STATFLAG is not available."""
     status = MOCK_STATUS.copy()
     status.pop("STATFLAG")
@@ -44,7 +44,7 @@ async def test_no_binary_sensor(hass: HomeAssistant) -> None:
         ("0x02040010 Status Flag", "off"),
     ],
 )
-async def test_statflag(hass: HomeAssistant, override: str, expected: str) -> None:
+async def test_statflag(hass: SmartHub, override: str, expected: str) -> None:
     """Test binary sensor for different STATFLAG values."""
     status = MOCK_STATUS.copy()
     status["STATFLAG"] = override

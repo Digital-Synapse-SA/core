@@ -7,11 +7,11 @@ from aiohttp.client_exceptions import ClientError
 from openwebif.error import InvalidAuthError
 import pytest
 
-from homeassistant.components.enigma2.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.enigma2.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import TEST_FULL, TEST_REQUIRED
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-async def user_flow(hass: HomeAssistant) -> str:
+async def user_flow(hass: SmartHub) -> str:
     """Return a user-initiated flow after filling in host info."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -34,7 +34,7 @@ async def user_flow(hass: HomeAssistant) -> str:
     ("test_config"),
     [(TEST_FULL), (TEST_REQUIRED)],
 )
-async def test_form_user(hass: HomeAssistant, test_config: dict[str, Any]) -> None:
+async def test_form_user(hass: SmartHub, test_config: dict[str, Any]) -> None:
     """Test a successful user initiated flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -58,7 +58,7 @@ async def test_form_user(hass: HomeAssistant, test_config: dict[str, Any]) -> No
     ],
 )
 async def test_form_user_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     openwebif_device_mock: AsyncMock,
     side_effect: Exception,
     error_value: str,
@@ -98,7 +98,7 @@ async def test_form_user_errors(
 
 @pytest.mark.usefixtures("openwebif_device_mock")
 async def test_duplicate_host(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that a duplicate host aborts the config flow."""
     mock_config_entry.add_to_hass(hass)
@@ -117,7 +117,7 @@ async def test_duplicate_host(
 
 
 @pytest.mark.usefixtures("openwebif_device_mock")
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test the form options."""
 
     entry = MockConfigEntry(domain=DOMAIN, data=TEST_FULL, options={}, entry_id="1")

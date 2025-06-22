@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.update import (
+from smarthub.components.update import (
     ATTR_IN_PROGRESS,
     ATTR_INSTALLED_VERSION,
     ATTR_LATEST_VERSION,
@@ -16,7 +16,7 @@ from homeassistant.components.update import (
     SERVICE_INSTALL,
     UpdateDeviceClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_ENTITY_PICTURE,
@@ -24,23 +24,23 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.event import async_track_state_change_event
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, callback
+from smarthub.helpers.event import async_track_state_change_event
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture
 async def update_only() -> None:
     """Enable only the update platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.UPDATE],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_demo_update(hass: HomeAssistant, update_only) -> None:
+async def setup_demo_update(hass: SmartHub, update_only) -> None:
     """Initialize setup demo update entity."""
     assert await async_setup_component(
         hass, UPDATE_DOMAIN, {"update": {"platform": "demo"}}
@@ -48,7 +48,7 @@ async def setup_demo_update(hass: HomeAssistant, update_only) -> None:
     await hass.async_block_till_done()
 
 
-def test_setup_params(hass: HomeAssistant) -> None:
+def test_setup_params(hass: SmartHub) -> None:
     """Test the initial parameters."""
     state = hass.states.get("update.demo_update_no_install")
     assert state
@@ -62,7 +62,7 @@ def test_setup_params(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_RELEASE_URL] == "https://www.example.com/release/1.0.1"
     assert (
         state.attributes[ATTR_ENTITY_PICTURE]
-        == "https://brands.home-assistant.io/_/demo/icon.png"
+        == "https://brands.smart-hub.io/_/demo/icon.png"
     )
 
     state = hass.states.get("update.demo_no_update")
@@ -75,7 +75,7 @@ def test_setup_params(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_RELEASE_URL] is None
     assert (
         state.attributes[ATTR_ENTITY_PICTURE]
-        == "https://brands.home-assistant.io/_/demo/icon.png"
+        == "https://brands.smart-hub.io/_/demo/icon.png"
     )
 
     state = hass.states.get("update.demo_add_on")
@@ -90,7 +90,7 @@ def test_setup_params(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_RELEASE_URL] == "https://www.example.com/release/1.0.1"
     assert (
         state.attributes[ATTR_ENTITY_PICTURE]
-        == "https://brands.home-assistant.io/_/demo/icon.png"
+        == "https://brands.smart-hub.io/_/demo/icon.png"
     )
 
     state = hass.states.get("update.demo_living_room_bulb_update")
@@ -106,7 +106,7 @@ def test_setup_params(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_DEVICE_CLASS] == UpdateDeviceClass.FIRMWARE
     assert (
         state.attributes[ATTR_ENTITY_PICTURE]
-        == "https://brands.home-assistant.io/_/demo/icon.png"
+        == "https://brands.smart-hub.io/_/demo/icon.png"
     )
 
     state = hass.states.get("update.demo_update_with_progress")
@@ -122,7 +122,7 @@ def test_setup_params(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_DEVICE_CLASS] == UpdateDeviceClass.FIRMWARE
     assert (
         state.attributes[ATTR_ENTITY_PICTURE]
-        == "https://brands.home-assistant.io/_/demo/icon.png"
+        == "https://brands.smart-hub.io/_/demo/icon.png"
     )
 
 
@@ -134,7 +134,7 @@ def test_setup_params(hass: HomeAssistant) -> None:
     ],
 )
 async def test_update_with_progress(
-    hass: HomeAssistant, entity_id: str, steps: int
+    hass: SmartHub, entity_id: str, steps: int
 ) -> None:
     """Test update with progress."""
     state = hass.states.get(entity_id)
@@ -151,7 +151,7 @@ async def test_update_with_progress(
         callback(lambda event: events.append(event)),
     )
 
-    with patch("homeassistant.components.demo.update.FAKE_INSTALL_SLEEP_TIME", new=0):
+    with patch("smarthub.components.demo.update.FAKE_INSTALL_SLEEP_TIME", new=0):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,
@@ -180,7 +180,7 @@ async def test_update_with_progress(
     ],
 )
 async def test_update_with_progress_raising(
-    hass: HomeAssistant, entity_id: str, steps: int
+    hass: SmartHub, entity_id: str, steps: int
 ) -> None:
     """Test update with progress failing to install."""
     state = hass.states.get(entity_id)
@@ -199,7 +199,7 @@ async def test_update_with_progress_raising(
 
     with (
         patch(
-            "homeassistant.components.demo.update._fake_install",
+            "smarthub.components.demo.update._fake_install",
             side_effect=[None, None, None, None, RuntimeError],
         ) as fake_sleep,
         pytest.raises(RuntimeError),

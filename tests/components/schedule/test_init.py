@@ -10,8 +10,8 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.schedule import STORAGE_VERSION, STORAGE_VERSION_MINOR
-from homeassistant.components.schedule.const import (
+from smarthub.components.schedule import STORAGE_VERSION, STORAGE_VERSION_MINOR
+from smarthub.components.schedule.const import (
     ATTR_NEXT_EVENT,
     CONF_ALL_DAYS,
     CONF_DATA,
@@ -27,7 +27,7 @@ from homeassistant.components.schedule.const import (
     DOMAIN,
     SERVICE_GET,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_EDITABLE,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
@@ -41,9 +41,9 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import Context, SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockUser, async_capture_events, async_fire_time_changed
 from tests.typing import WebSocketGenerator
@@ -51,7 +51,7 @@ from tests.typing import WebSocketGenerator
 
 @pytest.fixture
 def schedule_setup(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> Callable[..., Coroutine[Any, Any, bool]]:
     """Schedule setup."""
 
@@ -131,7 +131,7 @@ def schedule_setup(
     return _schedule_setup
 
 
-async def test_invalid_config(hass: HomeAssistant) -> None:
+async def test_invalid_config(hass: SmartHub) -> None:
     """Test invalid configs."""
     invalid_configs = [
         None,
@@ -183,7 +183,7 @@ async def test_invalid_config(hass: HomeAssistant) -> None:
     ],
 )
 async def test_invalid_schedules(
-    hass: HomeAssistant,
+    hass: SmartHub,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
     caplog: pytest.LogCaptureFixture,
     schedule: list[dict[str, str]],
@@ -205,7 +205,7 @@ async def test_invalid_schedules(
 
 
 async def test_events_one_day(
-    hass: HomeAssistant,
+    hass: SmartHub,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
@@ -249,7 +249,7 @@ async def test_events_one_day(
 
 
 async def test_adjacent_cross_midnight(
-    hass: HomeAssistant,
+    hass: SmartHub,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
@@ -310,7 +310,7 @@ async def test_adjacent_cross_midnight(
 
 
 async def test_adjacent_within_day(
-    hass: HomeAssistant,
+    hass: SmartHub,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
@@ -373,7 +373,7 @@ async def test_adjacent_within_day(
 
 
 async def test_non_adjacent_within_day(
-    hass: HomeAssistant,
+    hass: SmartHub,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
@@ -452,7 +452,7 @@ async def test_non_adjacent_within_day(
     ],
 )
 async def test_to_midnight(
-    hass: HomeAssistant,
+    hass: SmartHub,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
     caplog: pytest.LogCaptureFixture,
     schedule: list[dict[str, str]],
@@ -496,13 +496,13 @@ async def test_to_midnight(
     assert state.attributes[ATTR_NEXT_EVENT].isoformat() == "2022-09-11T00:00:00-07:00"
 
 
-async def test_setup_no_config(hass: HomeAssistant, hass_admin_user: MockUser) -> None:
+async def test_setup_no_config(hass: SmartHub, hass_admin_user: MockUser) -> None:
     """Test component setup with no config."""
     count_start = len(hass.states.async_entity_ids())
     assert await async_setup_component(hass, DOMAIN, {})
 
     with patch(
-        "homeassistant.config.load_yaml_config_file", autospec=True, return_value={}
+        "smarthub.config.load_yaml_config_file", autospec=True, return_value={}
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -517,7 +517,7 @@ async def test_setup_no_config(hass: HomeAssistant, hass_admin_user: MockUser) -
 
 @pytest.mark.freeze_time("2022-08-10 20:10:00-07:00")
 async def test_load(
-    hass: HomeAssistant,
+    hass: SmartHub,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
 ) -> None:
     """Test set up from storage and YAML."""
@@ -541,7 +541,7 @@ async def test_load(
 
 
 async def test_schedule_updates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -564,7 +564,7 @@ async def test_schedule_updates(
 
 
 async def test_ws_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
 ) -> None:
@@ -594,7 +594,7 @@ async def test_ws_list(
 
 
 async def test_ws_delete(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
@@ -630,7 +630,7 @@ async def test_ws_delete(
     ],
 )
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
@@ -701,7 +701,7 @@ async def test_update(
     ],
 )
 async def test_ws_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],
@@ -761,7 +761,7 @@ async def test_ws_create(
 
 
 async def test_service_get(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     schedule_setup: Callable[..., Coroutine[Any, Any, bool]],

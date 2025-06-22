@@ -6,10 +6,10 @@ from unittest.mock import AsyncMock
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.glances.const import DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.glances.const import DOMAIN
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import HA_SENSOR_DATA, MOCK_REFERENCE_DATE, MOCK_USER_INPUT
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_sensor_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -43,7 +43,7 @@ async def test_sensor_states(
 
 
 async def test_uptime_variation(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, mock_api: AsyncMock
+    hass: SmartHub, freezer: FrozenDateTimeFactory, mock_api: AsyncMock
 ) -> None:
     """Test uptime small variation update."""
 
@@ -75,7 +75,7 @@ async def test_uptime_variation(
 
 
 async def test_sensor_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_api: AsyncMock,
     entity_registry: er.EntityRegistry,

@@ -7,15 +7,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pyipp import Printer
 import pytest
 
-from homeassistant.components.ipp.const import CONF_BASE_PATH, DOMAIN
-from homeassistant.const import (
+from smarthub.components.ipp.const import CONF_BASE_PATH, DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_PORT,
     CONF_SSL,
     CONF_UUID,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 
@@ -42,14 +42,14 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.ipp.async_setup_entry", return_value=True
+        "smarthub.components.ipp.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 @pytest.fixture
 async def mock_printer(
-    hass: HomeAssistant,
+    hass: SmartHub,
     request: pytest.FixtureRequest,
 ) -> Printer:
     """Return the mocked printer."""
@@ -65,7 +65,7 @@ def mock_ipp_config_flow(mock_printer: Printer) -> Generator[MagicMock]:
     """Return a mocked IPP client."""
 
     with patch(
-        "homeassistant.components.ipp.config_flow.IPP", autospec=True
+        "smarthub.components.ipp.config_flow.IPP", autospec=True
     ) as ipp_mock:
         client = ipp_mock.return_value
         client.printer.return_value = mock_printer
@@ -77,7 +77,7 @@ def mock_ipp(mock_printer: Printer) -> Generator[MagicMock]:
     """Return a mocked IPP client."""
 
     with patch(
-        "homeassistant.components.ipp.coordinator.IPP", autospec=True
+        "smarthub.components.ipp.coordinator.IPP", autospec=True
     ) as ipp_mock:
         client = ipp_mock.return_value
         client.printer.return_value = mock_printer
@@ -86,7 +86,7 @@ def mock_ipp(mock_printer: Printer) -> Generator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_ipp: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_ipp: MagicMock
 ) -> MockConfigEntry:
     """Set up the IPP integration for testing."""
     mock_config_entry.add_to_hass(hass)

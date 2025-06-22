@@ -6,20 +6,20 @@ from incomfortclient import FaultCode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MOCK_HEATER_STATUS
 
 from tests.common import snapshot_platform
 
 
-@patch("homeassistant.components.incomfort.PLATFORMS", [Platform.BINARY_SENSOR])
+@patch("smarthub.components.incomfort.PLATFORMS", [Platform.BINARY_SENSOR])
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -45,10 +45,10 @@ async def test_setup_platform(
     ],
     ids=["is_failed", "is_pumping", "is_burning", "is_tapping"],
 )
-@patch("homeassistant.components.incomfort.PLATFORMS", [Platform.BINARY_SENSOR])
+@patch("smarthub.components.incomfort.PLATFORMS", [Platform.BINARY_SENSOR])
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_setup_binary_sensors_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_incomfort: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

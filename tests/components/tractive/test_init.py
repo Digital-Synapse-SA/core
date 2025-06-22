@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, patch
 from aiotractive.exceptions import TractiveError, UnauthorizedError
 import pytest
 
-from homeassistant.components.tractive.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.tractive.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STOP, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import init_integration
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -27,7 +27,7 @@ async def test_setup_entry(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -37,7 +37,7 @@ async def test_unload_entry(
     assert len(hass.config_entries.async_entries(DOMAIN)) == 1
     assert mock_config_entry.state is ConfigEntryState.LOADED
 
-    with patch("homeassistant.components.tractive.TractiveClient.unsubscribe"):
+    with patch("smarthub.components.tractive.TractiveClient.unsubscribe"):
         assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
         await hass.async_block_till_done()
 
@@ -54,7 +54,7 @@ async def test_unload_entry(
     ],
 )
 async def test_setup_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     method: str,
@@ -70,7 +70,7 @@ async def test_setup_failed(
 
 
 async def test_config_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_config_not_ready(
 
 
 async def test_trackable_without_details(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -103,7 +103,7 @@ async def test_trackable_without_details(
 
 
 async def test_trackable_without_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -118,7 +118,7 @@ async def test_trackable_without_device_id(
 
 
 async def test_unsubscribe_on_ha_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -126,7 +126,7 @@ async def test_unsubscribe_on_ha_stop(
     await init_integration(hass, mock_config_entry)
 
     with patch(
-        "homeassistant.components.tractive.TractiveClient.unsubscribe"
+        "smarthub.components.tractive.TractiveClient.unsubscribe"
     ) as mock_unsuscribe:
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
         await hass.async_block_till_done()
@@ -135,7 +135,7 @@ async def test_unsubscribe_on_ha_stop(
 
 
 async def test_server_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

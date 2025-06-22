@@ -8,11 +8,11 @@ from aiohttp import ClientConnectionError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.myuplink.const import DOMAIN, OAUTH2_TOKEN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.myuplink.const import DOMAIN, OAUTH2_TOKEN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import setup_integration
 from .const import UNIQUE_ID
@@ -23,7 +23,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_myuplink_client: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -56,7 +56,7 @@ async def test_load_unload_entry(
     ids=["unauthorized", "internal_server_error"],
 )
 async def test_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
     status: http.HTTPStatus,
@@ -88,7 +88,7 @@ async def test_expired_token_refresh_failure(
     ],
 )
 async def test_expired_token_refresh_connection_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
     expected_state: ConfigEntryState,
@@ -111,7 +111,7 @@ async def test_expired_token_refresh_connection_failure(
     [load_fixture("systems.json", DOMAIN)],
 )
 async def test_devices_created_count(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_myuplink_client: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -123,7 +123,7 @@ async def test_devices_created_count(
 
 
 async def test_devices_multiple_created_count(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_myuplink_client: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -135,7 +135,7 @@ async def test_devices_multiple_created_count(
 
 
 async def test_migrate_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_myuplink_client: MagicMock,
     expires_at: float,
@@ -168,7 +168,7 @@ async def test_migrate_config_entry(
 
 
 async def test_oaut2_scope_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_myuplink_client: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -181,7 +181,7 @@ async def test_oaut2_scope_failure(
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_config_entry: MockConfigEntry,
     mock_myuplink_client: MagicMock,
@@ -247,7 +247,7 @@ async def test_device_remove_devices(
     ],
 )
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_myuplink_client: MagicMock,
     mock_config_entry: MockConfigEntry,

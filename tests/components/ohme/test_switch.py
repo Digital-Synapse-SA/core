@@ -4,14 +4,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -19,21 +19,21 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
 ) -> None:
     """Test the Ohme switches."""
-    with patch("homeassistant.components.ohme.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.ohme.PLATFORMS", [Platform.SWITCH]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_cap_switch_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
 ) -> None:
@@ -54,7 +54,7 @@ async def test_cap_switch_on(
 
 
 async def test_cap_switch_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
 ) -> None:
@@ -75,7 +75,7 @@ async def test_cap_switch_off(
 
 
 async def test_config_switch_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
 ) -> None:
@@ -95,7 +95,7 @@ async def test_config_switch_on(
 
 
 async def test_config_switch_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
 ) -> None:

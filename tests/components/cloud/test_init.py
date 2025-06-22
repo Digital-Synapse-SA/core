@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.cloud import (
+from smarthub.components.cloud import (
     CloudConnectionState,
     CloudNotAvailable,
     CloudNotConnected,
@@ -14,22 +14,22 @@ from homeassistant.components.cloud import (
     async_listen_connection_change,
     async_remote_ui_url,
 )
-from homeassistant.components.cloud.const import (
+from smarthub.components.cloud.const import (
     DATA_CLOUD,
     DOMAIN,
     MODE_DEV,
     PREF_CLOUDHOOKS,
 )
-from homeassistant.components.cloud.prefs import STORAGE_KEY
-from homeassistant.const import CONF_MODE, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import Unauthorized
-from homeassistant.setup import async_setup_component
+from smarthub.components.cloud.prefs import STORAGE_KEY
+from smarthub.const import CONF_MODE, EVENT_HOMEASSISTANT_STOP
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import Unauthorized
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, MockUser
 
 
-async def test_constructor_loads_info_from_config(hass: HomeAssistant) -> None:
+async def test_constructor_loads_info_from_config(hass: SmartHub) -> None:
     """Test non-dev mode loads info from SERVERS constant."""
     with patch("hass_nabucasa.Cloud.initialize"):
         result = await async_setup_component(
@@ -67,7 +67,7 @@ async def test_constructor_loads_info_from_config(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_cloud_fixture")
 async def test_remote_services(
-    hass: HomeAssistant, hass_read_only_user: MockUser
+    hass: SmartHub, hass_read_only_user: MockUser
 ) -> None:
     """Setup cloud component and test services."""
     cloud = hass.data[DATA_CLOUD]
@@ -114,7 +114,7 @@ async def test_remote_services(
 
 
 @pytest.mark.usefixtures("mock_cloud_fixture")
-async def test_shutdown_event(hass: HomeAssistant) -> None:
+async def test_shutdown_event(hass: SmartHub) -> None:
     """Test if the cloud will stop on shutdown event."""
     with patch("hass_nabucasa.Cloud.stop") as mock_stop:
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
@@ -124,7 +124,7 @@ async def test_shutdown_event(hass: HomeAssistant) -> None:
 
 
 async def test_setup_existing_cloud_user(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test setup with API push default data."""
     user = await hass.auth.async_create_system_user("Cloud test")
@@ -150,7 +150,7 @@ async def test_setup_existing_cloud_user(
 
 
 @pytest.mark.usefixtures("mock_cloud_fixture")
-async def test_on_connect(hass: HomeAssistant) -> None:
+async def test_on_connect(hass: SmartHub) -> None:
     """Test cloud on connect triggers."""
     cl = hass.data[DATA_CLOUD]
 
@@ -179,7 +179,7 @@ async def test_on_connect(hass: HomeAssistant) -> None:
 
     assert len(hass.states.async_entity_ids("binary_sensor")) == 1
 
-    with patch("homeassistant.helpers.discovery.async_load_platform") as mock_load:
+    with patch("smarthub.helpers.discovery.async_load_platform") as mock_load:
         await cl._on_start[-1]()
         await hass.async_block_till_done()
 
@@ -208,7 +208,7 @@ async def test_on_connect(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_cloud_fixture")
-async def test_remote_ui_url(hass: HomeAssistant) -> None:
+async def test_remote_ui_url(hass: SmartHub) -> None:
     """Test getting remote ui url."""
     cl = hass.data[DATA_CLOUD]
 
@@ -216,7 +216,7 @@ async def test_remote_ui_url(hass: HomeAssistant) -> None:
     with pytest.raises(CloudNotAvailable):
         async_remote_ui_url(hass)
 
-    with patch("homeassistant.components.cloud.async_is_logged_in", return_value=True):
+    with patch("smarthub.components.cloud.async_is_logged_in", return_value=True):
         # Remote not enabled
         with pytest.raises(CloudNotAvailable):
             async_remote_ui_url(hass)
@@ -236,7 +236,7 @@ async def test_remote_ui_url(hass: HomeAssistant) -> None:
 
 
 async def test_async_get_or_create_cloudhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     set_cloud_prefs: Callable[[dict[str, Any]], Coroutine[Any, Any, None]],
 ) -> None:
@@ -249,7 +249,7 @@ async def test_async_get_or_create_cloudhook(
     cloudhook_url = "https://cloudhook.nabu.casa/abcdefg"
 
     with patch(
-        "homeassistant.components.cloud.async_create_cloudhook",
+        "smarthub.components.cloud.async_create_cloudhook",
         return_value=cloudhook_url,
     ) as async_create_cloudhook_mock:
         # create cloudhook as it does not exist
@@ -291,7 +291,7 @@ async def test_async_get_or_create_cloudhook(
 
 
 async def test_cloud_logout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
 ) -> None:
     """Test cloud setup with existing config entry when user is logged out."""

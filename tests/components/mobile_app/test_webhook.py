@@ -12,20 +12,20 @@ from nacl.encoding import Base64Encoder
 from nacl.secret import SecretBox
 import pytest
 
-from homeassistant.components.camera import CameraEntityFeature
-from homeassistant.components.mobile_app.const import CONF_SECRET, DATA_DEVICES, DOMAIN
-from homeassistant.components.tag import EVENT_TAG_SCANNED
-from homeassistant.components.zone import DOMAIN as ZONE_DOMAIN
-from homeassistant.const import (
+from smarthub.components.camera import CameraEntityFeature
+from smarthub.components.mobile_app.const import CONF_SECRET, DATA_DEVICES, DOMAIN
+from smarthub.components.tag import EVENT_TAG_SCANNED
+from smarthub.components.zone import DOMAIN as ZONE_DOMAIN
+from smarthub.const import (
     CONF_WEBHOOK_ID,
     STATE_HOME,
     STATE_NOT_HOME,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, callback
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .const import CALL_SERVICE, FIRE_EVENT, REGISTER_CLEARTEXT, RENDER_TEMPLATE, UPDATE
 
@@ -34,9 +34,9 @@ from tests.components.conversation import MockAgent
 
 
 @pytest.fixture
-async def homeassistant(hass: HomeAssistant) -> None:
-    """Load the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def smarthub(hass: SmartHub) -> None:
+    """Load the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
 def encrypt_payload(secret_key, payload, encode_json=True):
@@ -125,7 +125,7 @@ async def test_webhook_handle_render_template(
 
 
 async def test_webhook_handle_call_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -143,7 +143,7 @@ async def test_webhook_handle_call_services(
 
 
 async def test_webhook_handle_fire_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -194,7 +194,7 @@ async def test_webhook_update_registration(webhook_client: TestClient) -> None:
 
 
 async def test_webhook_handle_get_zones(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -202,7 +202,7 @@ async def test_webhook_handle_get_zones(
     # Zone is already loaded as part of the fixture,
     # so we just trigger a reload.
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={
             ZONE_DOMAIN: [
@@ -248,7 +248,7 @@ async def test_webhook_handle_get_zones(
 
 
 async def test_webhook_handle_get_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -337,11 +337,11 @@ async def test_webhook_returns_error_incorrect_json(
     ],
 )
 async def test_webhook_handle_decryption(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
     msg: dict[str, Any],
-    generate_response: Callable[[HomeAssistant], dict[str, Any]],
+    generate_response: Callable[[SmartHub], dict[str, Any]],
 ) -> None:
     """Test that we can encrypt/decrypt properly."""
     key = create_registrations[0]["secret"]
@@ -552,7 +552,7 @@ async def test_webhook_requires_encryption(
 
 
 async def test_webhook_update_location_without_locations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -591,7 +591,7 @@ async def test_webhook_update_location_without_locations(
 
 
 async def test_webhook_update_location_with_gps(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -615,7 +615,7 @@ async def test_webhook_update_location_with_gps(
 
 
 async def test_webhook_update_location_with_gps_without_accuracy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -635,14 +635,14 @@ async def test_webhook_update_location_with_gps_without_accuracy(
 
 
 async def test_webhook_update_location_with_location_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
     """Test that location can be updated."""
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={
             ZONE_DOMAIN: [
@@ -699,7 +699,7 @@ async def test_webhook_update_location_with_location_name(
 
 
 async def test_webhook_enable_encryption(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -752,7 +752,7 @@ async def test_webhook_enable_encryption(
 
 
 async def test_webhook_camera_stream_non_existent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -773,7 +773,7 @@ async def test_webhook_camera_stream_non_existent(
 
 
 async def test_webhook_camera_stream_non_hls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -800,7 +800,7 @@ async def test_webhook_camera_stream_non_hls(
 
 
 async def test_webhook_camera_stream_stream_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -814,7 +814,7 @@ async def test_webhook_camera_stream_stream_available(
     webhook_id = create_registrations[1]["webhook_id"]
 
     with patch(
-        "homeassistant.components.camera.async_request_stream",
+        "smarthub.components.camera.async_request_stream",
         return_value="/api/streams/some_hls_stream",
     ):
         resp = await webhook_client.post(
@@ -832,7 +832,7 @@ async def test_webhook_camera_stream_stream_available(
 
 
 async def test_webhook_camera_stream_stream_available_but_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -846,8 +846,8 @@ async def test_webhook_camera_stream_stream_available_but_errors(
     webhook_id = create_registrations[1]["webhook_id"]
 
     with patch(
-        "homeassistant.components.camera.async_request_stream",
-        side_effect=HomeAssistantError(),
+        "smarthub.components.camera.async_request_stream",
+        side_effect=SmartHubError(),
     ):
         resp = await webhook_client.post(
             f"/api/webhook/{webhook_id}",
@@ -864,7 +864,7 @@ async def test_webhook_camera_stream_stream_available_but_errors(
 
 
 async def test_webhook_handle_scan_tag(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
@@ -890,7 +890,7 @@ async def test_webhook_handle_scan_tag(
 
 
 async def test_register_sensor_limits_state_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -933,7 +933,7 @@ async def test_register_sensor_limits_state_class(
 
 
 async def test_reregister_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
@@ -1037,9 +1037,9 @@ async def test_reregister_sensor(
     assert entry.original_icon is None
 
 
-@pytest.mark.usefixtures("homeassistant")
+@pytest.mark.usefixtures("smarthub")
 async def test_webhook_handle_conversation_process(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
     mock_conversation_agent: MockAgent,
@@ -1048,7 +1048,7 @@ async def test_webhook_handle_conversation_process(
     webhook_client.server.app.router._frozen = False
 
     with patch(
-        "homeassistant.components.conversation.agent_manager.async_get_agent",
+        "smarthub.components.conversation.agent_manager.async_get_agent",
         return_value=mock_conversation_agent,
     ):
         resp = await webhook_client.post(
@@ -1086,7 +1086,7 @@ async def test_webhook_handle_conversation_process(
 
 
 async def test_sending_sensor_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,

@@ -1,15 +1,15 @@
 """The tests for the utility_meter select platform."""
 
-from homeassistant.components.utility_meter.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.utility_meter.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
 async def test_select_entity_name_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test for Utility Meter select platform."""
 
@@ -45,7 +45,7 @@ async def test_select_entity_name_config_entry(
 
 
 async def test_select_entity_name_yaml(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test for Utility Meter select platform."""
 
@@ -70,7 +70,7 @@ async def test_select_entity_name_yaml(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

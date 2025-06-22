@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from homeassistant.components.local_ip.const import DOMAIN
-from homeassistant.components.network import MDNS_TARGET_IP, async_get_source_ip
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.local_ip.const import DOMAIN
+from smarthub.components.network import MDNS_TARGET_IP, async_get_source_ip
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_basic_setup(hass: HomeAssistant) -> None:
+async def test_basic_setup(hass: SmartHub) -> None:
     """Test component setup creates entry from config."""
     entry = MockConfigEntry(domain=DOMAIN, data={})
     entry.add_to_hass(hass)

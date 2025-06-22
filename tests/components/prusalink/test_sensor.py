@@ -5,13 +5,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_OPTIONS,
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
@@ -20,19 +20,19 @@ from homeassistant.const import (
     UnitOfLength,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(autouse=True)
 def setup_sensor_platform_only():
     """Only setup sensor platform."""
-    with patch("homeassistant.components.prusalink.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.prusalink.PLATFORMS", [Platform.SENSOR]):
         yield
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_sensors_no_job(hass: HomeAssistant, mock_config_entry, mock_api) -> None:
+async def test_sensors_no_job(hass: SmartHub, mock_config_entry, mock_api) -> None:
     """Test sensors while no job active."""
     assert await async_setup_component(hass, "prusalink", {})
 
@@ -137,7 +137,7 @@ async def test_sensors_no_job(hass: HomeAssistant, mock_config_entry, mock_api) 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors_idle_job_mk3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry,
     mock_api,
     mock_job_api_idle_mk3,
@@ -246,7 +246,7 @@ async def test_sensors_idle_job_mk3(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors_active_job(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry,
     mock_api,
     mock_get_status_printing,
@@ -254,7 +254,7 @@ async def test_sensors_active_job(
 ) -> None:
     """Test sensors while active job."""
     with patch(
-        "homeassistant.components.prusalink.sensor.utcnow",
+        "smarthub.components.prusalink.sensor.utcnow",
         return_value=datetime(2022, 8, 27, 14, 0, 0, tzinfo=UTC),
     ):
         assert await async_setup_component(hass, "prusalink", {})

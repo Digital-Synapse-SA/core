@@ -11,11 +11,11 @@ from switchbot_api import (
     SwitchBotConnectionError,
 )
 
-from homeassistant.components.switchbot_cloud import SwitchBotAPI
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_WEBHOOK_ID, EVENT_HOMEASSISTANT_START
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
+from smarthub.components.switchbot_cloud import SwitchBotAPI
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_WEBHOOK_ID, EVENT_HOMEASSISTANT_START
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
 
 from . import configure_integration
 
@@ -60,7 +60,7 @@ def mock_setup_webhook():
 
 
 async def test_setup_entry_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_list_devices,
     mock_get_status,
     mock_get_webook_configuration,
@@ -138,7 +138,7 @@ async def test_setup_entry_success(
     ],
 )
 async def test_setup_entry_fails_when_listing_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     error: Exception,
     state: ConfigEntryState,
     mock_list_devices,
@@ -156,7 +156,7 @@ async def test_setup_entry_fails_when_listing_devices(
 
 
 async def test_setup_entry_fails_when_refreshing(
-    hass: HomeAssistant, mock_list_devices, mock_get_status
+    hass: SmartHub, mock_list_devices, mock_get_status
 ) -> None:
     """Test error handling in get_status in setup of entry."""
     mock_list_devices.return_value = [
@@ -179,7 +179,7 @@ async def test_setup_entry_fails_when_refreshing(
 
 
 async def test_posting_to_webhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_list_devices,
     mock_get_status,
     mock_get_webook_configuration,

@@ -2,12 +2,12 @@
 
 from unittest.mock import PropertyMock, patch
 
-from homeassistant.components.abode import ATTR_DEVICE_ID
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.abode import ATTR_DEVICE_ID
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_DOMAIN,
     AlarmControlPanelState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     ATTR_SUPPORTED_FEATURES,
@@ -15,8 +15,8 @@ from homeassistant.const import (
     SERVICE_ALARM_ARM_HOME,
     SERVICE_ALARM_DISARM,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_platform
 
@@ -24,7 +24,7 @@ DEVICE_ID = "alarm_control_panel.abode_alarm"
 
 
 async def test_entity_registry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests that the devices are registered in the entity registry."""
     await setup_platform(hass, ALARM_DOMAIN)
@@ -34,7 +34,7 @@ async def test_entity_registry(
     assert entry.unique_id == "001122334455"
 
 
-async def test_attributes(hass: HomeAssistant) -> None:
+async def test_attributes(hass: SmartHub) -> None:
     """Test the alarm control panel attributes are correct."""
     await setup_platform(hass, ALARM_DOMAIN)
 
@@ -47,7 +47,7 @@ async def test_attributes(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_SUPPORTED_FEATURES) == 3
 
 
-async def test_set_alarm_away(hass: HomeAssistant) -> None:
+async def test_set_alarm_away(hass: SmartHub) -> None:
     """Test the alarm control panel can be set to away."""
     with patch(
         "jaraco.abode.event_controller.EventController.add_device_callback"
@@ -78,7 +78,7 @@ async def test_set_alarm_away(hass: HomeAssistant) -> None:
             assert state.state == AlarmControlPanelState.ARMED_AWAY
 
 
-async def test_set_alarm_home(hass: HomeAssistant) -> None:
+async def test_set_alarm_home(hass: SmartHub) -> None:
     """Test the alarm control panel can be set to home."""
     with patch(
         "jaraco.abode.event_controller.EventController.add_device_callback"
@@ -108,7 +108,7 @@ async def test_set_alarm_home(hass: HomeAssistant) -> None:
             assert state.state == AlarmControlPanelState.ARMED_HOME
 
 
-async def test_set_alarm_standby(hass: HomeAssistant) -> None:
+async def test_set_alarm_standby(hass: SmartHub) -> None:
     """Test the alarm control panel can be set to standby."""
     with patch(
         "jaraco.abode.event_controller.EventController.add_device_callback"
@@ -137,7 +137,7 @@ async def test_set_alarm_standby(hass: HomeAssistant) -> None:
             assert state.state == AlarmControlPanelState.DISARMED
 
 
-async def test_state_unknown(hass: HomeAssistant) -> None:
+async def test_state_unknown(hass: SmartHub) -> None:
     """Test an unknown alarm control panel state."""
     with patch(
         "jaraco.abode.devices.alarm.Alarm.mode", new_callable=PropertyMock

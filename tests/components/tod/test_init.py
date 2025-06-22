@@ -2,16 +2,16 @@
 
 import pytest
 
-from homeassistant.components.tod.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.tod.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.freeze_time("2022-03-16 17:37:00", tz_offset=-7)
 async def test_setup_and_remove_config_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test setting up and removing a config entry."""
     tod_entity_id = "binary_sensor.my_tod"

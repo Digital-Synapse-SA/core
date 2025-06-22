@@ -4,15 +4,15 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.cpuspeed.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.cpuspeed.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_cpuinfo: MagicMock,
 ) -> None:
@@ -32,7 +32,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_config_entry_not_compatible(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_cpuinfo: MagicMock,
     caplog: pytest.LogCaptureFixture,

@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import konnected
-from homeassistant.components.konnected import config_flow
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.setup import async_setup_component
+from smarthub.components import konnected
+from smarthub.components.konnected import config_flow
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.typing import ClientSessionGenerator
@@ -45,7 +45,7 @@ async def mock_panel_fixture():
         yield konn_client
 
 
-async def test_config_schema(hass: HomeAssistant) -> None:
+async def test_config_schema(hass: SmartHub) -> None:
     """Test that config schema is imported properly."""
     config = {
         konnected.DOMAIN: {
@@ -222,7 +222,7 @@ async def test_config_schema(hass: HomeAssistant) -> None:
     }
 
 
-async def test_setup_with_no_config(hass: HomeAssistant) -> None:
+async def test_setup_with_no_config(hass: SmartHub) -> None:
     """Test that we do not discover anything or try to set up a Konnected panel."""
     assert await async_setup_component(hass, konnected.DOMAIN, {})
 
@@ -235,7 +235,7 @@ async def test_setup_with_no_config(hass: HomeAssistant) -> None:
     assert konnected.YAML_CONFIGS not in hass.data[konnected.DOMAIN]
 
 
-async def test_setup_defined_hosts_known_auth(hass: HomeAssistant, mock_panel) -> None:
+async def test_setup_defined_hosts_known_auth(hass: SmartHub, mock_panel) -> None:
     """Test we don't initiate a config entry if configured panel is known."""
     MockConfigEntry(
         domain="konnected",
@@ -275,7 +275,7 @@ async def test_setup_defined_hosts_known_auth(hass: HomeAssistant, mock_panel) -
     assert len(hass.config_entries.flow.async_progress()) == 0
 
 
-async def test_setup_defined_hosts_no_known_auth(hass: HomeAssistant) -> None:
+async def test_setup_defined_hosts_no_known_auth(hass: SmartHub) -> None:
     """Test we initiate config entry if config panel is not known."""
     assert (
         await async_setup_component(
@@ -295,7 +295,7 @@ async def test_setup_defined_hosts_no_known_auth(hass: HomeAssistant) -> None:
     assert len(hass.config_entries.flow.async_progress()) == 1
 
 
-async def test_setup_multiple(hass: HomeAssistant) -> None:
+async def test_setup_multiple(hass: SmartHub) -> None:
     """Test we initiate config entry for multiple panels."""
     assert (
         await async_setup_component(
@@ -359,7 +359,7 @@ async def test_setup_multiple(hass: HomeAssistant) -> None:
     )
 
 
-async def test_config_passed_to_config_entry(hass: HomeAssistant) -> None:
+async def test_config_passed_to_config_entry(hass: SmartHub) -> None:
     """Test that configured options for a host are loaded via config entry."""
     entry = MockConfigEntry(
         domain=konnected.DOMAIN,
@@ -388,7 +388,7 @@ async def test_config_passed_to_config_entry(hass: HomeAssistant) -> None:
     assert p_entry is entry
 
 
-async def test_unload_entry(hass: HomeAssistant, mock_panel) -> None:
+async def test_unload_entry(hass: SmartHub, mock_panel) -> None:
     """Test being able to unload an entry."""
     await async_process_ha_core_config(
         hass,
@@ -406,7 +406,7 @@ async def test_unload_entry(hass: HomeAssistant, mock_panel) -> None:
 
 
 async def test_api(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator, mock_panel
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator, mock_panel
 ) -> None:
     """Test callback view."""
     await async_setup_component(hass, "http", {"http": {}})
@@ -575,7 +575,7 @@ async def test_api(
 
 
 async def test_state_updates_zone(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator, mock_panel
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator, mock_panel
 ) -> None:
     """Test callback view."""
     await async_process_ha_core_config(
@@ -728,7 +728,7 @@ async def test_state_updates_zone(
 
 
 async def test_state_updates_pin(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator, mock_panel
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator, mock_panel
 ) -> None:
     """Test callback view."""
     await async_process_ha_core_config(

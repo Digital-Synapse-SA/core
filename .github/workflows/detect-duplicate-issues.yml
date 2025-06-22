@@ -235,7 +235,7 @@ jobs:
         with:
           model: openai/gpt-4o
           system-prompt: |
-            You are a Home Assistant issue duplicate detector. Your task is to identify TRUE DUPLICATES - issues that report the EXACT SAME problem, not just similar or related issues.
+            You are a SmartHub issue duplicate detector. Your task is to identify TRUE DUPLICATES - issues that report the EXACT SAME problem, not just similar or related issues.
 
             CRITICAL: An issue is ONLY a duplicate if:
             - It describes the SAME problem with the SAME root cause

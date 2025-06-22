@@ -7,8 +7,8 @@ from ayla_iot_unofficial.fujitsu_consts import FGLAIR_APP_CREDENTIALS
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.climate import HVACMode
-from homeassistant.components.fujitsu_fglair.const import (
+from smarthub.components.climate import HVACMode
+from smarthub.components.fujitsu_fglair.const import (
     API_REFRESH,
     API_TIMEOUT,
     CONF_EUROPE,
@@ -17,10 +17,10 @@ from homeassistant.components.fujitsu_fglair.const import (
     REGION_DEFAULT,
     REGION_EU,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import aiohttp_client
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import aiohttp_client
 
 from . import entity_id, setup_integration
 from .conftest import TEST_PASSWORD, TEST_USERNAME
@@ -29,7 +29,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_auth_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_ayla_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -51,7 +51,7 @@ async def test_auth_failure(
     "mock_config_entry", FGLAIR_APP_CREDENTIALS.keys(), indirect=True
 )
 async def test_auth_regions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_ayla_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -59,7 +59,7 @@ async def test_auth_regions(
 ) -> None:
     """Test that we use the correct credentials if europe is selected."""
     with patch(
-        "homeassistant.components.fujitsu_fglair.new_ayla_api", return_value=AsyncMock()
+        "smarthub.components.fujitsu_fglair.new_ayla_api", return_value=AsyncMock()
     ) as new_ayla_api_patch:
         await setup_integration(hass, mock_config_entry)
         new_ayla_api_patch.assert_called_once_with(
@@ -75,7 +75,7 @@ async def test_auth_regions(
 
 @pytest.mark.parametrize("is_europe", [True, False])
 async def test_migrate_entry_v11_v12(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_ayla_api: AsyncMock,
     is_europe: bool,
@@ -105,7 +105,7 @@ async def test_migrate_entry_v11_v12(
 
 
 async def test_device_auth_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_ayla_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -126,7 +126,7 @@ async def test_device_auth_failure(
 
 
 async def test_device_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_ayla_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -146,7 +146,7 @@ async def test_device_offline(
 
 
 async def test_token_expired(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ayla_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_token_expired(
 
 
 async def test_token_expiring_soon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ayla_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -172,7 +172,7 @@ async def test_token_expiring_soon(
 
 @pytest.mark.parametrize("exception", [AylaAuthError, TimeoutError])
 async def test_startup_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ayla_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,

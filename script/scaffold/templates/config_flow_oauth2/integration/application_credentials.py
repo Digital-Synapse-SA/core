@@ -1,12 +1,12 @@
 """Application credentials platform for the NEW_NAME integration."""
 
-from homeassistant.components.application_credentials import AuthorizationServer
-from homeassistant.core import HomeAssistant
+from smarthub.components.application_credentials import AuthorizationServer
+from smarthub.core import SmartHub
 
 from .const import OAUTH2_AUTHORIZE, OAUTH2_TOKEN
 
 
-async def async_get_authorization_server(hass: HomeAssistant) -> AuthorizationServer:
+async def async_get_authorization_server(hass: SmartHub) -> AuthorizationServer:
     """Return authorization server."""
     return AuthorizationServer(
         authorize_url=OAUTH2_AUTHORIZE,

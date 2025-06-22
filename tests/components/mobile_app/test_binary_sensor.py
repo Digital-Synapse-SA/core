@@ -6,13 +6,13 @@ from typing import Any
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
@@ -100,7 +100,7 @@ async def test_sensor(
 
 
 async def test_sensor_must_register(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -125,7 +125,7 @@ async def test_sensor_must_register(
 
 
 async def test_sensor_id_no_dupes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
     caplog: pytest.LogCaptureFixture,
@@ -189,7 +189,7 @@ async def test_sensor_id_no_dupes(
 
 
 async def test_register_sensor_no_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -250,7 +250,7 @@ async def test_register_sensor_no_state(
 
 
 async def test_update_sensor_no_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:

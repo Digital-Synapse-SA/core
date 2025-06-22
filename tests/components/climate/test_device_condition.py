@@ -4,18 +4,18 @@ import pytest
 from pytest_unordered import unordered
 import voluptuous_serialize
 
-from homeassistant.components import automation
-from homeassistant.components.climate import DOMAIN, HVACMode, const, device_condition
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import (
+from smarthub.components import automation
+from smarthub.components.climate import DOMAIN, HVACMode, const, device_condition
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.const import EntityCategory
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import (
     config_validation as cv,
     device_registry as dr,
     entity_registry as er,
 )
-from homeassistant.helpers.entity_registry import RegistryEntryHider
-from homeassistant.setup import async_setup_component
+from smarthub.helpers.entity_registry import RegistryEntryHider
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_get_device_automations
 
@@ -45,7 +45,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
     ],
 )
 async def test_get_conditions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     set_state,
@@ -99,7 +99,7 @@ async def test_get_conditions(
     ],
 )
 async def test_get_conditions_hidden_auxiliary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hidden_by,
@@ -138,7 +138,7 @@ async def test_get_conditions_hidden_auxiliary(
 
 
 async def test_if_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -259,7 +259,7 @@ async def test_if_state(
 
 
 async def test_if_state_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -385,7 +385,7 @@ async def test_if_state_legacy(
     ],
 )
 async def test_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     set_state,
@@ -504,7 +504,7 @@ async def test_capabilities(
     ],
 )
 async def test_capabilities_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     set_state,
@@ -560,7 +560,7 @@ async def test_capabilities_legacy(
     [("is_hvac_mode", "hvac_mode"), ("is_preset_mode", "preset_mode")],
 )
 async def test_capabilities_missing_entity(
-    hass: HomeAssistant, condition, capability_name
+    hass: SmartHub, condition, capability_name
 ) -> None:
     """Test getting capabilities."""
     config_entry = MockConfigEntry(domain="test", data={})

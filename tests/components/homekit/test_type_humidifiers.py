@@ -10,7 +10,7 @@ from pyhap.const import (
 )
 import pytest
 
-from homeassistant.components.homekit.const import (
+from smarthub.components.homekit.const import (
     ATTR_VALUE,
     CONF_LINKED_HUMIDITY_SENSOR,
     PROP_MAX_VALUE,
@@ -18,8 +18,8 @@ from homeassistant.components.homekit.const import (
     PROP_MIN_VALUE,
     PROP_VALID_VALUES,
 )
-from homeassistant.components.homekit.type_humidifiers import HumidifierDehumidifier
-from homeassistant.components.humidifier import (
+from smarthub.components.homekit.type_humidifiers import HumidifierDehumidifier
+from smarthub.components.humidifier import (
     ATTR_CURRENT_HUMIDITY,
     ATTR_HUMIDITY,
     ATTR_MAX_HUMIDITY,
@@ -30,8 +30,8 @@ from homeassistant.components.humidifier import (
     SERVICE_SET_HUMIDITY,
     HumidifierDeviceClass,
 )
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -42,12 +42,12 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import Event, HomeAssistant
+from smarthub.core import Event, SmartHub
 
 from tests.common import async_mock_service
 
 
-async def test_humidifier(hass: HomeAssistant, hk_driver, events: list[Event]) -> None:
+async def test_humidifier(hass: SmartHub, hk_driver, events: list[Event]) -> None:
     """Test if humidifier accessory and HA are updated accordingly."""
     entity_id = "humidifier.test"
 
@@ -135,7 +135,7 @@ async def test_humidifier(hass: HomeAssistant, hk_driver, events: list[Event]) -
 
 
 async def test_dehumidifier(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if dehumidifier accessory and HA are updated accordingly."""
     entity_id = "humidifier.test"
@@ -227,7 +227,7 @@ async def test_dehumidifier(
 
 
 async def test_hygrostat_power_state(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "humidifier.test"
@@ -309,7 +309,7 @@ async def test_hygrostat_power_state(
 
 
 async def test_hygrostat_get_humidity_range(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if humidity range is evaluated correctly."""
     entity_id = "humidifier.test"
@@ -373,7 +373,7 @@ async def test_hygrostat_get_humidity_range(
 
 
 async def test_humidifier_with_linked_humidity_sensor(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test a humidifier with a linked humidity sensor can update."""
     humidity_sensor_entity_id = "sensor.bedroom_humidity"
@@ -437,7 +437,7 @@ async def test_humidifier_with_linked_humidity_sensor(
 
 
 async def test_humidifier_with_a_missing_linked_humidity_sensor(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test a humidifier with a configured linked motion sensor that is missing."""
     humidity_sensor_entity_id = "sensor.bedroom_humidity"
@@ -462,7 +462,7 @@ async def test_humidifier_with_a_missing_linked_humidity_sensor(
 
 
 async def test_humidifier_as_dehumidifier(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     events: list[Event],
     caplog: pytest.LogCaptureFixture,
@@ -508,7 +508,7 @@ async def test_humidifier_as_dehumidifier(
 
 
 async def test_dehumidifier_as_humidifier(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     events: list[Event],
     caplog: pytest.LogCaptureFixture,
@@ -554,7 +554,7 @@ async def test_dehumidifier_as_humidifier(
 
 
 async def test_humidifier_that_reports_current_humidity(
-    hass: HomeAssistant, hk_driver: AccessoryDriver
+    hass: SmartHub, hk_driver: AccessoryDriver
 ) -> None:
     """Test a humidifier that provides current humidity can update."""
     entity_id = "humidifier.test"

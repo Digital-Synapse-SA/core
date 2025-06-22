@@ -8,10 +8,10 @@ from aiotractive.trackable_object import TrackableObject
 from aiotractive.tracker import Tracker
 import pytest
 
-from homeassistant.components.tractive.const import DOMAIN, SERVER_UNAVAILABLE
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.dispatcher import async_dispatcher_send
+from smarthub.components.tractive.const import DOMAIN, SERVER_UNAVAILABLE
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.helpers.dispatcher import async_dispatcher_send
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -78,7 +78,7 @@ def mock_tractive_client() -> Generator[AsyncMock]:
             }
         entry.runtime_data.client._send_switch_update(event)
 
-    def send_server_unavailable_event(hass: HomeAssistant) -> None:
+    def send_server_unavailable_event(hass: SmartHub) -> None:
         """Send server unavailable event."""
         async_dispatcher_send(hass, f"{SERVER_UNAVAILABLE}-12345")
 
@@ -89,7 +89,7 @@ def mock_tractive_client() -> Generator[AsyncMock]:
 
     with (
         patch(
-            "homeassistant.components.tractive.aiotractive.Tractive", autospec=True
+            "smarthub.components.tractive.aiotractive.Tractive", autospec=True
         ) as mock_client,
     ):
         client = mock_client.return_value

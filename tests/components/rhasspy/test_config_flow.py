@@ -2,15 +2,15 @@
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.rhasspy.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.rhasspy.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -19,7 +19,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.rhasspy.async_setup_entry",
+        "smarthub.components.rhasspy.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -34,7 +34,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_single_entry(hass: HomeAssistant) -> None:
+async def test_single_entry(hass: SmartHub) -> None:
     """Test we only allow single entry."""
     MockConfigEntry(domain=DOMAIN).add_to_hass(hass)
 

@@ -8,12 +8,12 @@ from matter_server.common.models import EventType
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.matter.binary_sensor import (
+from smarthub.components.matter.binary_sensor import (
     DISCOVERY_SCHEMAS as BINARY_SENSOR_SCHEMAS,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -26,7 +26,7 @@ from .common import (
 def binary_sensor_platform() -> Generator[None]:
     """Load only the binary sensor platform."""
     with patch(
-        "homeassistant.components.matter.discovery.DISCOVERY_SCHEMAS",
+        "smarthub.components.matter.discovery.DISCOVERY_SCHEMAS",
         new={
             Platform.BINARY_SENSOR: BINARY_SENSOR_SCHEMAS,
         },
@@ -36,7 +36,7 @@ def binary_sensor_platform() -> Generator[None]:
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -46,7 +46,7 @@ async def test_binary_sensors(
 
 @pytest.mark.parametrize("node_fixture", ["occupancy_sensor"])
 async def test_occupancy_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -73,7 +73,7 @@ async def test_occupancy_sensor(
     ],
 )
 async def test_boolean_state_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -97,7 +97,7 @@ async def test_boolean_state_sensors(
 
 @pytest.mark.parametrize("node_fixture", ["door_lock"])
 async def test_battery_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     matter_client: MagicMock,
     matter_node: MatterNode,
@@ -120,7 +120,7 @@ async def test_battery_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["door_lock"])
 async def test_optional_sensor_from_featuremap(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     matter_client: MagicMock,
     matter_node: MatterNode,
@@ -151,7 +151,7 @@ async def test_optional_sensor_from_featuremap(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_evse_charging"])
 async def test_evse_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -201,7 +201,7 @@ async def test_evse_sensor(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_water_heater"])
 async def test_water_heater(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -221,7 +221,7 @@ async def test_water_heater(
 
 @pytest.mark.parametrize("node_fixture", ["pump"])
 async def test_pump(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

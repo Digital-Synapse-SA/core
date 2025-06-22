@@ -10,22 +10,22 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.eheimdigital.const import EFFECT_DAYCL_MODE
-from homeassistant.components.light import (
+from smarthub.components.eheimdigital.const import EFFECT_DAYCL_MODE
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_EFFECT,
     DOMAIN as LIGHT_DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.color import value_to_brightness
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.color import value_to_brightness
 
 from .conftest import init_integration
 
@@ -41,7 +41,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
     ],
 )
 async def test_setup_classic_led_ctrl(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     tankconfig: list[list[str]],
     mock_config_entry: MockConfigEntry,
@@ -55,9 +55,9 @@ async def test_setup_classic_led_ctrl(
     classic_led_ctrl_mock.tankconfig = tankconfig
 
     with (
-        patch("homeassistant.components.eheimdigital.PLATFORMS", [Platform.LIGHT]),
+        patch("smarthub.components.eheimdigital.PLATFORMS", [Platform.LIGHT]),
         patch(
-            "homeassistant.components.eheimdigital.coordinator.asyncio.Event",
+            "smarthub.components.eheimdigital.coordinator.asyncio.Event",
             new=AsyncMock,
         ),
     ):
@@ -72,7 +72,7 @@ async def test_setup_classic_led_ctrl(
 
 
 async def test_dynamic_new_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     classic_led_ctrl_mock: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -85,9 +85,9 @@ async def test_dynamic_new_devices(
     eheimdigital_hub_mock.return_value.devices = {}
 
     with (
-        patch("homeassistant.components.eheimdigital.PLATFORMS", [Platform.LIGHT]),
+        patch("smarthub.components.eheimdigital.PLATFORMS", [Platform.LIGHT]),
         patch(
-            "homeassistant.components.eheimdigital.coordinator.asyncio.Event",
+            "smarthub.components.eheimdigital.coordinator.asyncio.Event",
             new=AsyncMock,
         ),
     ):
@@ -116,7 +116,7 @@ async def test_dynamic_new_devices(
 
 @pytest.mark.usefixtures("eheimdigital_hub_mock")
 async def test_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     classic_led_ctrl_mock: EheimDigitalClassicLEDControl,
 ) -> None:
@@ -154,7 +154,7 @@ async def test_turn_off(
     ],
 )
 async def test_turn_on_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     classic_led_ctrl_mock: EheimDigitalClassicLEDControl,
@@ -190,7 +190,7 @@ async def test_turn_on_brightness(
 
 
 async def test_turn_on_effect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     classic_led_ctrl_mock: EheimDigitalClassicLEDControl,
@@ -225,7 +225,7 @@ async def test_turn_on_effect(
 
 
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     classic_led_ctrl_mock: EheimDigitalClassicLEDControl,
@@ -247,7 +247,7 @@ async def test_state_update(
 
 
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

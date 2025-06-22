@@ -3,16 +3,16 @@
 from base64 import b64decode
 from unittest.mock import call
 
-from homeassistant.components.broadlink.const import DOMAIN
-from homeassistant.components.remote import (
+from smarthub.components.broadlink.const import DOMAIN
+from smarthub.components.remote import (
     DOMAIN as REMOTE_DOMAIN,
     SERVICE_SEND_COMMAND,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import get_device
 
@@ -25,7 +25,7 @@ IR_PACKET = (
 
 
 async def test_remote_setup_works(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -50,7 +50,7 @@ async def test_remote_setup_works(
 
 
 async def test_remote_send_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -79,7 +79,7 @@ async def test_remote_send_command(
 
 
 async def test_remote_turn_off_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

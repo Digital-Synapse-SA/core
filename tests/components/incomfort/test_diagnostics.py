@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, SnapshotAssertion
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -10,7 +10,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
     mock_incomfort: MagicMock,

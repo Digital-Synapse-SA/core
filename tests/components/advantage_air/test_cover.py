@@ -2,7 +2,7 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_POSITION,
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
@@ -11,15 +11,15 @@ from homeassistant.components.cover import (
     CoverDeviceClass,
     CoverState,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import add_mock_config
 
 
 async def test_ac_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_get: AsyncMock,
     mock_update: AsyncMock,
@@ -107,7 +107,7 @@ async def test_ac_cover(
 
 
 async def test_things_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_get: AsyncMock,
     mock_update: AsyncMock,

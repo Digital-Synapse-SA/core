@@ -2,17 +2,17 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.homekit.const import DOMAIN
-from homeassistant.const import CONF_NAME, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.homekit.const import DOMAIN
+from smarthub.const import CONF_NAME, CONF_PORT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
-PATH_HOMEKIT = "homeassistant.components.homekit"
+PATH_HOMEKIT = "smarthub.components.homekit"
 
 
-async def async_init_integration(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the homekit integration in Home Assistant."""
+async def async_init_integration(hass: SmartHub) -> MockConfigEntry:
+    """Set up the homekit integration in SmartHub."""
 
     with patch(f"{PATH_HOMEKIT}.HomeKit.async_start"):
         entry = MockConfigEntry(
@@ -24,8 +24,8 @@ async def async_init_integration(hass: HomeAssistant) -> MockConfigEntry:
         return entry
 
 
-async def async_init_entry(hass: HomeAssistant, entry: MockConfigEntry):
-    """Set up the homekit integration in Home Assistant."""
+async def async_init_entry(hass: SmartHub, entry: MockConfigEntry):
+    """Set up the homekit integration in SmartHub."""
 
     with patch(f"{PATH_HOMEKIT}.HomeKit.async_start"):
         entry.add_to_hass(hass)

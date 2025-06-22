@@ -1,0 +1,9 @@
+{
+  "domain": "persistent_notification",
+  "name": "Persistent Notification",
+  "codeowners": ["@smart-hub/core"],
+  "documentation": "https://www.smart-hub.io/integrations/persistent_notification",
+  "integration_type": "system",
+  "iot_class": "local_push",
+  "quality_scale": "internal"
+}

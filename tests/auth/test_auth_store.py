@@ -7,8 +7,8 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.auth import auth_store
-from homeassistant.core import HomeAssistant
+from smarthub.auth import auth_store
+from smarthub.core import SmartHub
 
 MOCK_STORAGE_DATA = {
     "version": 1,
@@ -67,7 +67,7 @@ MOCK_STORAGE_DATA = {
 
 
 async def test_loading_no_group_data_format(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test we correctly load old data without any groups."""
     hass_storage[auth_store.STORAGE_KEY] = MOCK_STORAGE_DATA
@@ -110,7 +110,7 @@ async def test_loading_no_group_data_format(
 
 
 async def test_loading_all_access_group_data_format(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test we correctly load old data with single group."""
     hass_storage[auth_store.STORAGE_KEY] = MOCK_STORAGE_DATA
@@ -153,7 +153,7 @@ async def test_loading_all_access_group_data_format(
 
 
 async def test_loading_empty_data(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test we correctly load with no existing data."""
     store = auth_store.AuthStore(hass)
@@ -178,7 +178,7 @@ async def test_loading_empty_data(
 
 
 async def test_system_groups_store_id_and_name(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test that for system groups we store the ID and name.
 
@@ -195,14 +195,14 @@ async def test_system_groups_store_id_and_name(
     ]
 
 
-async def test_loading_only_once(hass: HomeAssistant) -> None:
+async def test_loading_only_once(hass: SmartHub) -> None:
     """Test only one storage load is allowed."""
     store = auth_store.AuthStore(hass)
     with (
-        patch("homeassistant.helpers.entity_registry.async_get") as mock_ent_registry,
-        patch("homeassistant.helpers.device_registry.async_get") as mock_dev_registry,
+        patch("smarthub.helpers.entity_registry.async_get") as mock_ent_registry,
+        patch("smarthub.helpers.device_registry.async_get") as mock_dev_registry,
         patch(
-            "homeassistant.helpers.storage.Store.async_load", return_value=None
+            "smarthub.helpers.storage.Store.async_load", return_value=None
         ) as mock_load,
     ):
         await store.async_load()
@@ -218,7 +218,7 @@ async def test_loading_only_once(hass: HomeAssistant) -> None:
 
 
 async def test_dont_change_expire_at_on_load(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test we correctly don't modify expired_at store load."""
     hass_storage[auth_store.STORAGE_KEY] = {
@@ -278,7 +278,7 @@ async def test_dont_change_expire_at_on_load(
 
 
 async def test_loading_does_not_write_right_away(
-    hass: HomeAssistant, hass_storage: dict[str, Any], freezer: FrozenDateTimeFactory
+    hass: SmartHub, hass_storage: dict[str, Any], freezer: FrozenDateTimeFactory
 ) -> None:
     """Test after calling load we wait five minutes to write."""
     hass_storage[auth_store.STORAGE_KEY] = MOCK_STORAGE_DATA
@@ -301,7 +301,7 @@ async def test_loading_does_not_write_right_away(
 
 
 async def test_add_remove_user_affects_tokens(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test adding and removing a user removes the tokens."""
     store = auth_store.AuthStore(hass)
@@ -322,7 +322,7 @@ async def test_add_remove_user_affects_tokens(
 
 
 async def test_set_expiry_date(
-    hass: HomeAssistant, hass_storage: dict[str, Any], freezer: FrozenDateTimeFactory
+    hass: SmartHub, hass_storage: dict[str, Any], freezer: FrozenDateTimeFactory
 ) -> None:
     """Test set expiry date of a refresh token."""
     hass_storage[auth_store.STORAGE_KEY] = {

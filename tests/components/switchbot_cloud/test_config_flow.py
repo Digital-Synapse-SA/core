@@ -4,23 +4,23 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.switchbot_cloud.config_flow import (
+from smarthub import config_entries
+from smarthub.components.switchbot_cloud.config_flow import (
     SwitchBotAuthenticationError,
     SwitchBotConnectionError,
 )
-from homeassistant.components.switchbot_cloud.const import DOMAIN, ENTRY_TITLE
-from homeassistant.const import CONF_API_KEY, CONF_API_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.switchbot_cloud.const import DOMAIN, ENTRY_TITLE
+from smarthub.const import CONF_API_KEY, CONF_API_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def _fill_out_form_and_assert_entry_created(
-    hass: HomeAssistant, flow_id: str, mock_setup_entry: AsyncMock
+    hass: SmartHub, flow_id: str, mock_setup_entry: AsyncMock
 ) -> None:
     """Util function to fill out a form and assert that a config entry is created."""
     with patch(
-        "homeassistant.components.switchbot_cloud.config_flow.SwitchBotAPI.list_devices",
+        "smarthub.components.switchbot_cloud.config_flow.SwitchBotAPI.list_devices",
         return_value=[],
     ):
         result_configure = await hass.config_entries.flow.async_configure(
@@ -41,7 +41,7 @@ async def _fill_out_form_and_assert_entry_created(
         mock_setup_entry.assert_called_once()
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result_init = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -63,7 +63,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     ],
 )
 async def test_form_fails(
-    hass: HomeAssistant, error: Exception, message: str, mock_setup_entry: AsyncMock
+    hass: SmartHub, error: Exception, message: str, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle error cases."""
     result_init = await hass.config_entries.flow.async_init(
@@ -71,7 +71,7 @@ async def test_form_fails(
     )
 
     with patch(
-        "homeassistant.components.switchbot_cloud.config_flow.SwitchBotAPI.list_devices",
+        "smarthub.components.switchbot_cloud.config_flow.SwitchBotAPI.list_devices",
         side_effect=error,
     ):
         result_configure = await hass.config_entries.flow.async_configure(

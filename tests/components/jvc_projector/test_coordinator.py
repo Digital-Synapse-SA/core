@@ -5,19 +5,19 @@ from unittest.mock import AsyncMock
 
 from jvcprojector import JvcProjectorAuthError, JvcProjectorConnectError
 
-from homeassistant.components.jvc_projector.coordinator import (
+from smarthub.components.jvc_projector.coordinator import (
     INTERVAL_FAST,
     INTERVAL_SLOW,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_coordinator_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: AsyncMock,
     mock_integration: MockConfigEntry,
 ) -> None:
@@ -33,7 +33,7 @@ async def test_coordinator_update(
 
 
 async def test_coordinator_connect_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -46,7 +46,7 @@ async def test_coordinator_connect_error(
 
 
 async def test_coordinator_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -59,7 +59,7 @@ async def test_coordinator_auth_error(
 
 
 async def test_coordinator_device_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

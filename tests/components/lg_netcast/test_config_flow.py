@@ -3,17 +3,17 @@
 from datetime import timedelta
 from unittest.mock import DEFAULT, patch
 
-from homeassistant import data_entry_flow
-from homeassistant.components.lg_netcast.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub import data_entry_flow
+from smarthub.components.lg_netcast.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_ACCESS_TOKEN,
     CONF_HOST,
     CONF_ID,
     CONF_MODEL,
     CONF_NAME,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import (
     FAKE_PIN,
@@ -25,7 +25,7 @@ from . import (
 )
 
 
-async def test_show_form(hass: HomeAssistant) -> None:
+async def test_show_form(hass: SmartHub) -> None:
     """Test that the form is served with no input."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -35,7 +35,7 @@ async def test_show_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_user_invalid_host(hass: HomeAssistant) -> None:
+async def test_user_invalid_host(hass: SmartHub) -> None:
     """Test that errors are shown when the host is invalid."""
     with _patch_lg_netcast():
         result = await hass.config_entries.flow.async_init(
@@ -45,7 +45,7 @@ async def test_user_invalid_host(hass: HomeAssistant) -> None:
         assert result["errors"] == {CONF_HOST: "invalid_host"}
 
 
-async def test_manual_host(hass: HomeAssistant) -> None:
+async def test_manual_host(hass: SmartHub) -> None:
     """Test manual host configuration."""
     with _patch_lg_netcast():
         result = await hass.config_entries.flow.async_init(
@@ -77,7 +77,7 @@ async def test_manual_host(hass: HomeAssistant) -> None:
         }
 
 
-async def test_manual_host_no_connection_during_authorize(hass: HomeAssistant) -> None:
+async def test_manual_host_no_connection_during_authorize(hass: SmartHub) -> None:
     """Test manual host configuration."""
     with _patch_lg_netcast(fail_connection=True):
         result = await hass.config_entries.flow.async_init(
@@ -89,7 +89,7 @@ async def test_manual_host_no_connection_during_authorize(hass: HomeAssistant) -
 
 
 async def test_manual_host_invalid_details_during_authorize(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test manual host configuration."""
     with _patch_lg_netcast(invalid_details=True):
@@ -101,7 +101,7 @@ async def test_manual_host_invalid_details_during_authorize(
         assert result["reason"] == "cannot_connect"
 
 
-async def test_manual_host_unsuccessful_details_response(hass: HomeAssistant) -> None:
+async def test_manual_host_unsuccessful_details_response(hass: SmartHub) -> None:
     """Test manual host configuration."""
     with _patch_lg_netcast(always_404=True):
         result = await hass.config_entries.flow.async_init(
@@ -112,7 +112,7 @@ async def test_manual_host_unsuccessful_details_response(hass: HomeAssistant) ->
         assert result["reason"] == "cannot_connect"
 
 
-async def test_manual_host_no_unique_id_response(hass: HomeAssistant) -> None:
+async def test_manual_host_no_unique_id_response(hass: SmartHub) -> None:
     """Test manual host configuration."""
     with _patch_lg_netcast(no_unique_id=True):
         result = await hass.config_entries.flow.async_init(
@@ -123,7 +123,7 @@ async def test_manual_host_no_unique_id_response(hass: HomeAssistant) -> None:
         assert result["reason"] == "invalid_host"
 
 
-async def test_invalid_session_id(hass: HomeAssistant) -> None:
+async def test_invalid_session_id(hass: SmartHub) -> None:
     """Test Invalid Session ID."""
     with _patch_lg_netcast(session_error=True):
         result = await hass.config_entries.flow.async_init(
@@ -144,11 +144,11 @@ async def test_invalid_session_id(hass: HomeAssistant) -> None:
         assert result2["errors"]["base"] == "cannot_connect"
 
 
-async def test_display_access_token_aborted(hass: HomeAssistant) -> None:
+async def test_display_access_token_aborted(hass: SmartHub) -> None:
     """Test Access token display is cancelled."""
 
     def _async_track_time_interval(
-        hass: HomeAssistant,
+        hass: SmartHub,
         action,
         interval: timedelta,
         *,
@@ -161,7 +161,7 @@ async def test_display_access_token_aborted(hass: HomeAssistant) -> None:
     with (
         _patch_lg_netcast(session_error=True),
         patch(
-            "homeassistant.components.lg_netcast.config_flow.async_track_time_interval"
+            "smarthub.components.lg_netcast.config_flow.async_track_time_interval"
         ) as mock_interval,
     ):
         mock_interval.side_effect = _async_track_time_interval

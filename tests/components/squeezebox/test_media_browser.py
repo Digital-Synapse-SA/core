@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
     DOMAIN as MEDIA_PLAYER_DOMAIN,
@@ -13,12 +13,12 @@ from homeassistant.components.media_player import (
     MediaClass,
     MediaType,
 )
-from homeassistant.components.squeezebox.browse_media import (
+from smarthub.components.squeezebox.browse_media import (
     LIBRARY,
     MEDIA_TYPE_TO_SQUEEZEBOX,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
 
 from .conftest import FAKE_VALID_ITEM_ID
 
@@ -28,17 +28,17 @@ from tests.typing import WebSocketGenerator
 
 @pytest.fixture(autouse=True)
 async def setup_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry, lms: MagicMock
+    hass: SmartHub, config_entry: MockConfigEntry, lms: MagicMock
 ) -> None:
     """Fixture for setting up the component."""
     with (
-        patch("homeassistant.components.squeezebox.Server", return_value=lms),
+        patch("smarthub.components.squeezebox.Server", return_value=lms),
         patch(
-            "homeassistant.components.squeezebox.PLATFORMS",
+            "smarthub.components.squeezebox.PLATFORMS",
             [Platform.MEDIA_PLAYER],
         ),
         patch(
-            "homeassistant.components.squeezebox.media_player.start_server_discovery"
+            "smarthub.components.squeezebox.media_player.start_server_discovery"
         ),
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -46,7 +46,7 @@ async def setup_integration(
 
 
 async def test_async_browse_media_root(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -84,7 +84,7 @@ async def test_async_browse_media_root(
     ],
 )
 async def test_async_browse_media_with_subitems(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
     category: str,
@@ -92,7 +92,7 @@ async def test_async_browse_media_with_subitems(
 ) -> None:
     """Test each category with subitems."""
     with patch(
-        "homeassistant.components.squeezebox.browse_media.is_internal_request",
+        "smarthub.components.squeezebox.browse_media.is_internal_request",
         return_value=False,
     ):
         client = await hass_ws_client()
@@ -131,13 +131,13 @@ async def test_async_browse_media_with_subitems(
 
 
 async def test_async_browse_media_for_apps(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test browsing for app category."""
     with patch(
-        "homeassistant.components.squeezebox.browse_media.is_internal_request",
+        "smarthub.components.squeezebox.browse_media.is_internal_request",
         return_value=False,
     ):
         category = "Apps"
@@ -185,7 +185,7 @@ async def test_async_browse_media_for_apps(
     ],
 )
 async def test_async_search_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
     category: str,
@@ -193,7 +193,7 @@ async def test_async_search_media(
 ) -> None:
     """Test each category with subitems."""
     with patch(
-        "homeassistant.components.squeezebox.browse_media.is_internal_request",
+        "smarthub.components.squeezebox.browse_media.is_internal_request",
         return_value=False,
     ):
         client = await hass_ws_client()
@@ -215,13 +215,13 @@ async def test_async_search_media(
 
 
 async def test_async_search_media_invalid_filter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test search_media action with invalid media_filter_class."""
     with patch(
-        "homeassistant.components.squeezebox.browse_media.is_internal_request",
+        "smarthub.components.squeezebox.browse_media.is_internal_request",
         return_value=False,
     ):
         client = await hass_ws_client()
@@ -242,13 +242,13 @@ async def test_async_search_media_invalid_filter(
 
 
 async def test_async_search_media_invalid_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test search_media action with invalid media_content_type."""
     with patch(
-        "homeassistant.components.squeezebox.browse_media.is_internal_request",
+        "smarthub.components.squeezebox.browse_media.is_internal_request",
         return_value=False,
     ):
         client = await hass_ws_client()
@@ -269,13 +269,13 @@ async def test_async_search_media_invalid_type(
 
 
 async def test_async_search_media_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test trying to play an item that doesn't exist."""
     with patch(
-        "homeassistant.components.squeezebox.browse_media.is_internal_request",
+        "smarthub.components.squeezebox.browse_media.is_internal_request",
         return_value=False,
     ):
         client = await hass_ws_client()
@@ -295,12 +295,12 @@ async def test_async_search_media_not_found(
 
 
 async def test_generate_playlist_for_app(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test the generate_playlist for app-fakecommand media type."""
     with patch(
-        "homeassistant.components.squeezebox.browse_media.is_internal_request",
+        "smarthub.components.squeezebox.browse_media.is_internal_request",
         return_value=False,
     ):
         category = "Apps"
@@ -333,13 +333,13 @@ async def test_generate_playlist_for_app(
 
 
 async def test_async_browse_tracks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test tracks (no subitems)."""
     with patch(
-        "homeassistant.components.squeezebox.browse_media.is_internal_request",
+        "smarthub.components.squeezebox.browse_media.is_internal_request",
         return_value=True,
     ):
         client = await hass_ws_client()
@@ -360,7 +360,7 @@ async def test_async_browse_tracks(
 
 
 async def test_async_browse_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -380,7 +380,7 @@ async def test_async_browse_error(
 
 
 async def test_play_browse_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test play browse item."""
@@ -396,7 +396,7 @@ async def test_play_browse_item(
 
 
 async def test_play_browse_item_nonexistent(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test trying to play an item that doesn't exist."""
     with pytest.raises(BrowseError):
@@ -413,7 +413,7 @@ async def test_play_browse_item_nonexistent(
 
 
 async def test_play_browse_item_bad_category(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test trying to play an item whose category doesn't exist."""

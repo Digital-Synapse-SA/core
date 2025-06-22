@@ -3,11 +3,11 @@
 import pytest
 from ttn_client import TTNAuthError
 
-from homeassistant.components.thethingsnetwork.const import CONF_APP_ID, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.thethingsnetwork.const import CONF_APP_ID, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import init_integration
 from .conftest import API_KEY, APP_ID, HOST
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 USER_DATA = {CONF_HOST: HOST, CONF_APP_ID: APP_ID, CONF_API_KEY: API_KEY}
 
 
-async def test_user(hass: HomeAssistant, mock_ttnclient) -> None:
+async def test_user(hass: SmartHub, mock_ttnclient) -> None:
     """Test user config."""
 
     result = await hass.config_entries.flow.async_init(
@@ -45,7 +45,7 @@ async def test_user(hass: HomeAssistant, mock_ttnclient) -> None:
     [(TTNAuthError, "invalid_auth"), (Exception, "unknown")],
 )
 async def test_user_errors(
-    hass: HomeAssistant, fetch_data_exception, base_error, mock_ttnclient
+    hass: SmartHub, fetch_data_exception, base_error, mock_ttnclient
 ) -> None:
     """Test user config errors."""
 
@@ -70,7 +70,7 @@ async def test_user_errors(
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant, mock_ttnclient, mock_config_entry
+    hass: SmartHub, mock_ttnclient, mock_config_entry
 ) -> None:
     """Test that duplicate entries are caught."""
 
@@ -94,7 +94,7 @@ async def test_duplicate_entry(
 
 
 async def test_step_reauth(
-    hass: HomeAssistant, mock_ttnclient, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_ttnclient, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that the reauth step works."""
 

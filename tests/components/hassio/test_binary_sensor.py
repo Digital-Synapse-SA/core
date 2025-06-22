@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.hassio import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.hassio import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import MOCK_REPOSITORIES, MOCK_STORE_ADDONS
 
@@ -28,7 +28,7 @@ def mock_all(
     resolution_info: AsyncMock,
 ) -> None:
     """Mock all setup requests."""
-    aioclient_mock.post("http://127.0.0.1/homeassistant/options", json={"result": "ok"})
+    aioclient_mock.post("http://127.0.0.1/smarthub/options", json={"result": "ok"})
     aioclient_mock.post("http://127.0.0.1/supervisor/options", json={"result": "ok"})
     aioclient_mock.get(
         "http://127.0.0.1/info",
@@ -36,7 +36,7 @@ def mock_all(
             "result": "ok",
             "data": {
                 "supervisor": "222",
-                "homeassistant": "0.110.0",
+                "smarthub": "0.110.0",
                 "hassos": "1.2.3",
             },
         },
@@ -89,7 +89,7 @@ def mock_all(
                         "version": "2.0.0",
                         "version_latest": "2.0.1",
                         "repository": "core",
-                        "url": "https://github.com/home-assistant/addons/test",
+                        "url": "https://github.com/smart-hub/addons/test",
                     },
                     {
                         "name": "test2",
@@ -164,7 +164,7 @@ def mock_all(
     ],
 )
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     expected: str,
     addon_state: str,

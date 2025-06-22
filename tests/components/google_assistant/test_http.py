@@ -12,8 +12,8 @@ from uuid import uuid4
 import py
 import pytest
 
-from homeassistant.components.google_assistant import GOOGLE_ASSISTANT_SCHEMA
-from homeassistant.components.google_assistant.const import (
+from smarthub.components.google_assistant import GOOGLE_ASSISTANT_SCHEMA
+from smarthub.components.google_assistant.const import (
     DOMAIN,
     EVENT_COMMAND_RECEIVED,
     HOMEGRAPH_TOKEN_URL,
@@ -21,17 +21,17 @@ from homeassistant.components.google_assistant.const import (
     STORE_AGENT_USER_IDS,
     STORE_GOOGLE_LOCAL_WEBHOOK_ID,
 )
-from homeassistant.components.google_assistant.http import (
+from smarthub.components.google_assistant.http import (
     GoogleConfig,
     GoogleConfigStore,
     _get_homegraph_jwt,
     _get_homegraph_token,
     async_get_users,
 )
-from homeassistant.const import CLOUD_NEVER_EXPOSED_ENTITIES
-from homeassistant.core import HomeAssistant, State
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.const import CLOUD_NEVER_EXPOSED_ENTITIES
+from smarthub.core import SmartHub, State
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     async_capture_events,
@@ -60,7 +60,7 @@ MOCK_HEADER = {
 }
 
 
-async def test_get_jwt(hass: HomeAssistant) -> None:
+async def test_get_jwt(hass: SmartHub) -> None:
     """Test signing of key."""
 
     jwt = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkdW1teUBkdW1teS5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInNjb3BlIjoiaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vYXV0aC9ob21lZ3JhcGgiLCJhdWQiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20vby9vYXV0aDIvdG9rZW4iLCJpYXQiOjE1NzEwMTEyMDAsImV4cCI6MTU3MTAxNDgwMH0.akHbMhOflXdIDHVvUVwO0AoJONVOPUdCghN6hAdVz4gxjarrQeGYc_Qn2r84bEvCU7t6EvimKKr0fyupyzBAzfvKULs5mTHO3h2CwSgvOBMv8LnILboJmbO4JcgdnRV7d9G3ktQs7wWSCXJsI5i5jUr1Wfi9zWwxn2ebaAAgrp8"
@@ -73,7 +73,7 @@ async def test_get_jwt(hass: HomeAssistant) -> None:
 
 
 async def test_get_access_token(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the function to get access token."""
     jwt = "dummyjwt"
@@ -92,7 +92,7 @@ async def test_get_access_token(
     }
 
 
-async def test_update_access_token(hass: HomeAssistant) -> None:
+async def test_update_access_token(hass: SmartHub) -> None:
     """Test the function to update access token when expired."""
     jwt = "dummyjwt"
 
@@ -102,13 +102,13 @@ async def test_update_access_token(hass: HomeAssistant) -> None:
     base_time = datetime(2019, 10, 14, tzinfo=UTC)
     with (
         patch(
-            "homeassistant.components.google_assistant.http._get_homegraph_token"
+            "smarthub.components.google_assistant.http._get_homegraph_token"
         ) as mock_get_token,
         patch(
-            "homeassistant.components.google_assistant.http._get_homegraph_jwt"
+            "smarthub.components.google_assistant.http._get_homegraph_jwt"
         ) as mock_get_jwt,
         patch(
-            "homeassistant.core.dt_util.utcnow",
+            "smarthub.core.dt_util.utcnow",
         ) as mock_utcnow,
     ):
         mock_utcnow.return_value = base_time
@@ -132,7 +132,7 @@ async def test_update_access_token(hass: HomeAssistant) -> None:
 
 
 async def test_call_homegraph_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_storage: dict[str, Any],
     caplog: pytest.LogCaptureFixture,
@@ -142,7 +142,7 @@ async def test_call_homegraph_api(
     await config.async_initialize()
 
     with patch(
-        "homeassistant.components.google_assistant.http._get_homegraph_token"
+        "smarthub.components.google_assistant.http._get_homegraph_token"
     ) as mock_get_token:
         mock_get_token.return_value = MOCK_TOKEN
 
@@ -160,7 +160,7 @@ async def test_call_homegraph_api(
 
 
 async def test_call_homegraph_api_retry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -169,7 +169,7 @@ async def test_call_homegraph_api_retry(
     await config.async_initialize()
 
     with patch(
-        "homeassistant.components.google_assistant.http._get_homegraph_token"
+        "smarthub.components.google_assistant.http._get_homegraph_token"
     ) as mock_get_token:
         mock_get_token.return_value = MOCK_TOKEN
 
@@ -189,7 +189,7 @@ async def test_call_homegraph_api_retry(
 
 
 async def test_report_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -214,7 +214,7 @@ async def test_report_state(
 
 
 async def test_report_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -246,7 +246,7 @@ async def test_report_event(
 
 
 async def test_google_config_local_fulfillment(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -279,7 +279,7 @@ async def test_google_config_local_fulfillment(
     assert config.get_local_user_id("INCORRECT") is None
 
 
-async def test_secure_device_pin_config(hass: HomeAssistant) -> None:
+async def test_secure_device_pin_config(hass: SmartHub) -> None:
     """Test the setting of the secure device pin configuration."""
     secure_pin = "TEST"
     secure_config = GOOGLE_ASSISTANT_SCHEMA(
@@ -297,7 +297,7 @@ async def test_secure_device_pin_config(hass: HomeAssistant) -> None:
     assert config.secure_devices_pin == secure_pin
 
 
-async def test_should_expose(hass: HomeAssistant) -> None:
+async def test_should_expose(hass: SmartHub) -> None:
     """Test the google config should expose method."""
     config = GoogleConfig(hass, DUMMY_CONFIG)
     await config.async_initialize()
@@ -318,7 +318,7 @@ async def test_should_expose(hass: HomeAssistant) -> None:
     assert config.should_expose(State(CLOUD_NEVER_EXPOSED_ENTITIES[0], "mock")) is False
 
 
-async def test_missing_service_account(hass: HomeAssistant) -> None:
+async def test_missing_service_account(hass: SmartHub) -> None:
     """Test the google config _async_request_sync_devices."""
     incorrect_config = GOOGLE_ASSISTANT_SCHEMA(
         {
@@ -342,7 +342,7 @@ async def test_missing_service_account(hass: HomeAssistant) -> None:
 
 
 async def test_async_enable_local_sdk(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
     caplog: pytest.LogCaptureFixture,
@@ -489,7 +489,7 @@ async def test_async_enable_local_sdk(
 
 
 async def test_agent_user_id_storage(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test a disconnect message."""
 
@@ -554,7 +554,7 @@ async def test_agent_user_id_storage(
     )
 
 
-async def test_async_get_users_no_store(hass: HomeAssistant) -> None:
+async def test_async_get_users_no_store(hass: SmartHub) -> None:
     """Test async_get_users when there is no store."""
     assert await async_get_users(hass) == []
 

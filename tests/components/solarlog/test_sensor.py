@@ -1,4 +1,4 @@
-"""Test the Home Assistant solarlog sensor module."""
+"""Test the SmartHub solarlog sensor module."""
 
 from datetime import timedelta
 from unittest.mock import AsyncMock
@@ -12,10 +12,10 @@ from solarlog_cli.solarlog_exceptions import (
 from solarlog_cli.solarlog_models import InverterData
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import setup_platform
 
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_solarlog_connector: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -36,7 +36,7 @@ async def test_all_entities(
 
 
 async def test_add_remove_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_solarlog_connector: AsyncMock,
     mock_config_entry: MockConfigEntry,
     device_registry: DeviceRegistry,
@@ -86,7 +86,7 @@ async def test_add_remove_entities(
     ],
 )
 async def test_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     mock_solarlog_connector: AsyncMock,
     mock_config_entry: MockConfigEntry,

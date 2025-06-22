@@ -26,8 +26,8 @@ import av
 import numpy as np
 import pytest
 
-from homeassistant.components.stream import KeyFrameConverter, Stream, create_stream
-from homeassistant.components.stream.const import (
+from smarthub.components.stream import KeyFrameConverter, Stream, create_stream
+from smarthub.components.stream.const import (
     ATTR_SETTINGS,
     CONF_LL_HLS,
     CONF_PART_DURATION,
@@ -40,16 +40,16 @@ from homeassistant.components.stream.const import (
     SEGMENT_DURATION_ADJUSTER,
     TARGET_SEGMENT_DURATION_NON_LL_HLS,
 )
-from homeassistant.components.stream.core import Orientation, StreamSettings
-from homeassistant.components.stream.exceptions import StreamClientError
-from homeassistant.components.stream.worker import (
+from smarthub.components.stream.core import Orientation, StreamSettings
+from smarthub.components.stream.exceptions import StreamClientError
+from smarthub.components.stream.worker import (
     StreamEndedError,
     StreamState,
     StreamWorkerError,
     stream_worker,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import dynamic_stream_settings, generate_h264_video, generate_h265_video
 from .test_ll_hls import TEST_PART_DURATION
@@ -86,7 +86,7 @@ def filename(tmp_path: Path) -> str:
 
 
 @pytest.fixture(autouse=True)
-def mock_stream_settings(hass: HomeAssistant) -> None:
+def mock_stream_settings(hass: SmartHub) -> None:
     """Set the stream settings data in hass before each test."""
     hass.data[DOMAIN] = {
         ATTR_SETTINGS: StreamSettings(
@@ -287,7 +287,7 @@ class MockPyAv:
 
 
 def run_worker(
-    hass: HomeAssistant,
+    hass: SmartHub,
     stream: Stream,
     stream_source: str,
     stream_settings: StreamSettings | None = None,
@@ -305,7 +305,7 @@ def run_worker(
 
 
 async def async_decode_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     packets: PacketSequence,
     py_av: MockPyAv | None = None,
     stream_settings: StreamSettings | None = None,
@@ -327,7 +327,7 @@ async def async_decode_stream(
     with (
         patch("av.open", new=py_av.open),
         patch(
-            "homeassistant.components.stream.core.StreamOutput.put",
+            "smarthub.components.stream.core.StreamOutput.put",
             side_effect=py_av.capture_buffer.capture_output_segment,
         ),
     ):
@@ -354,7 +354,7 @@ async def async_decode_stream(
     ],
 )
 async def test_stream_open_fails(
-    hass: HomeAssistant, exception: Exception, error_code: StreamClientError
+    hass: SmartHub, exception: Exception, error_code: StreamClientError
 ) -> None:
     """Test failure on stream open."""
     stream = Stream(
@@ -373,7 +373,7 @@ async def test_stream_open_fails(
         assert err.value.error_code == error_code
 
 
-async def test_stream_worker_success(hass: HomeAssistant) -> None:
+async def test_stream_worker_success(hass: SmartHub) -> None:
     """Test a short stream that ends and outputs everything correctly."""
     decoded_stream = await async_decode_stream(
         hass, PacketSequence(TEST_SEQUENCE_LENGTH)
@@ -393,7 +393,7 @@ async def test_stream_worker_success(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_skip_out_of_order_packet(hass: HomeAssistant) -> None:
+async def test_skip_out_of_order_packet(hass: SmartHub) -> None:
     """Skip a single out of order packet."""
     packets = list(PacketSequence(TEST_SEQUENCE_LENGTH))
     # for this test, make sure the out of order index doesn't happen on a keyframe
@@ -433,7 +433,7 @@ async def test_skip_out_of_order_packet(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_discard_old_packets(hass: HomeAssistant) -> None:
+async def test_discard_old_packets(hass: SmartHub) -> None:
     """Skip a series of out of order packets."""
 
     packets = list(PacketSequence(TEST_SEQUENCE_LENGTH))
@@ -457,7 +457,7 @@ async def test_discard_old_packets(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_packet_overflow(hass: HomeAssistant) -> None:
+async def test_packet_overflow(hass: SmartHub) -> None:
     """Packet is too far out of order, and looks like overflow, ending stream early."""
 
     packets = list(PacketSequence(TEST_SEQUENCE_LENGTH))
@@ -482,7 +482,7 @@ async def test_packet_overflow(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_skip_initial_bad_packets(hass: HomeAssistant) -> None:
+async def test_skip_initial_bad_packets(hass: SmartHub) -> None:
     """Tests a small number of initial "bad" packets with missing dts."""
 
     num_packets = LONGER_TEST_SEQUENCE_LENGTH
@@ -512,7 +512,7 @@ async def test_skip_initial_bad_packets(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_too_many_initial_bad_packets_fails(hass: HomeAssistant) -> None:
+async def test_too_many_initial_bad_packets_fails(hass: SmartHub) -> None:
     """Test initial bad packets are too high, causing it to never start."""
 
     num_packets = LONGER_TEST_SEQUENCE_LENGTH
@@ -531,7 +531,7 @@ async def test_too_many_initial_bad_packets_fails(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_skip_missing_dts(hass: HomeAssistant) -> None:
+async def test_skip_missing_dts(hass: SmartHub) -> None:
     """Test packets in the middle of the stream missing DTS are skipped."""
 
     num_packets = LONGER_TEST_SEQUENCE_LENGTH
@@ -555,7 +555,7 @@ async def test_skip_missing_dts(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_too_many_bad_packets(hass: HomeAssistant) -> None:
+async def test_too_many_bad_packets(hass: SmartHub) -> None:
     """Test bad packets are too many, causing it to end."""
 
     num_packets = LONGER_TEST_SEQUENCE_LENGTH
@@ -575,7 +575,7 @@ async def test_too_many_bad_packets(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_no_video_stream(hass: HomeAssistant) -> None:
+async def test_no_video_stream(hass: SmartHub) -> None:
     """Test no video stream in the container means no resulting output."""
     py_av = MockPyAv(video=False)
 
@@ -591,7 +591,7 @@ async def test_no_video_stream(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_audio_packets_not_found(hass: HomeAssistant) -> None:
+async def test_audio_packets_not_found(hass: SmartHub) -> None:
     """Set up an audio stream, but no audio packets are found."""
     py_av = MockPyAv(audio=True)
 
@@ -605,7 +605,7 @@ async def test_audio_packets_not_found(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_audio_is_first_packet(hass: HomeAssistant) -> None:
+async def test_audio_is_first_packet(hass: SmartHub) -> None:
     """Set up an audio stream and audio packet is the first packet in the stream."""
     py_av = MockPyAv(audio=True)
 
@@ -628,7 +628,7 @@ async def test_audio_is_first_packet(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 1
 
 
-async def test_audio_packets_found(hass: HomeAssistant) -> None:
+async def test_audio_packets_found(hass: SmartHub) -> None:
     """Set up an audio stream and audio packets are found at the start of the stream."""
     py_av = MockPyAv(audio=True)
 
@@ -646,7 +646,7 @@ async def test_audio_packets_found(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 1
 
 
-async def test_pts_out_of_order(hass: HomeAssistant) -> None:
+async def test_pts_out_of_order(hass: SmartHub) -> None:
     """Test pts can be out of order and still be valid."""
 
     # Create a sequence of packets with some out of order pts
@@ -671,7 +671,7 @@ async def test_pts_out_of_order(hass: HomeAssistant) -> None:
     assert len(decoded_stream.audio_packets) == 0
 
 
-async def test_stream_stopped_while_decoding(hass: HomeAssistant) -> None:
+async def test_stream_stopped_while_decoding(hass: SmartHub) -> None:
     """Tests that worker quits when stop() is called while decoding."""
     # Add some synchronization so that the test can pause the background
     # worker. When the worker is stopped, the test invokes stop() which
@@ -711,7 +711,7 @@ async def test_stream_stopped_while_decoding(hass: HomeAssistant) -> None:
     assert stream.available
 
 
-async def test_update_stream_source(hass: HomeAssistant) -> None:
+async def test_update_stream_source(hass: SmartHub) -> None:
     """Tests that the worker is re-invoked when the stream source is updated."""
     worker_open = threading.Event()
     worker_wake = threading.Event()
@@ -781,7 +781,7 @@ test_worker_log_cases = (
 
 @pytest.mark.parametrize(("stream_url", "redacted_url"), test_worker_log_cases)
 async def test_worker_log(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, stream_url, redacted_url
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, stream_url, redacted_url
 ) -> None:
     """Test that the worker logs the url without username and password."""
     stream = Stream(
@@ -824,7 +824,7 @@ def worker_finished_stream():
     return worker_finished, MockStream
 
 
-async def test_durations(hass: HomeAssistant, worker_finished_stream) -> None:
+async def test_durations(hass: SmartHub, worker_finished_stream) -> None:
     """Test that the duration metadata matches the media."""
 
     # Use a target part duration which has a slight mismatch
@@ -847,7 +847,7 @@ async def test_durations(hass: HomeAssistant, worker_finished_stream) -> None:
     )
     worker_finished, mock_stream = worker_finished_stream
 
-    with patch("homeassistant.components.stream.Stream", wraps=mock_stream):
+    with patch("smarthub.components.stream.Stream", wraps=mock_stream):
         stream = create_stream(
             hass, source, {}, dynamic_stream_settings(), stream_label="camera"
         )
@@ -907,7 +907,7 @@ async def test_durations(hass: HomeAssistant, worker_finished_stream) -> None:
 
 
 async def test_has_keyframe(
-    hass: HomeAssistant, h264_video, worker_finished_stream
+    hass: SmartHub, h264_video, worker_finished_stream
 ) -> None:
     """Test that the has_keyframe metadata matches the media."""
     await async_setup_component(
@@ -926,7 +926,7 @@ async def test_has_keyframe(
 
     worker_finished, mock_stream = worker_finished_stream
 
-    with patch("homeassistant.components.stream.Stream", wraps=mock_stream):
+    with patch("smarthub.components.stream.Stream", wraps=mock_stream):
         stream = create_stream(
             hass, h264_video, {}, dynamic_stream_settings(), stream_label="camera"
         )
@@ -952,7 +952,7 @@ async def test_has_keyframe(
     await stream.stop()
 
 
-async def test_h265_video_is_hvc1(hass: HomeAssistant, worker_finished_stream) -> None:
+async def test_h265_video_is_hvc1(hass: SmartHub, worker_finished_stream) -> None:
     """Test that a h265 video gets muxed as hvc1."""
     await async_setup_component(
         hass,
@@ -969,7 +969,7 @@ async def test_h265_video_is_hvc1(hass: HomeAssistant, worker_finished_stream) -
     source = generate_h265_video()
 
     worker_finished, mock_stream = worker_finished_stream
-    with patch("homeassistant.components.stream.Stream", wraps=mock_stream):
+    with patch("smarthub.components.stream.Stream", wraps=mock_stream):
         stream = create_stream(
             hass, source, {}, dynamic_stream_settings(), stream_label="camera"
         )
@@ -999,13 +999,13 @@ async def test_h265_video_is_hvc1(hass: HomeAssistant, worker_finished_stream) -
     }
 
 
-async def test_get_image(hass: HomeAssistant, h264_video, filename) -> None:
+async def test_get_image(hass: SmartHub, h264_video, filename) -> None:
     """Test getting an image from the stream."""
     await async_setup_component(hass, "stream", {"stream": {}})
 
     # Since libjpeg-turbo is not installed on the CI runner, we use a mock
     with patch(
-        "homeassistant.components.camera.img_util.TurboJPEGSingleton"
+        "smarthub.components.camera.img_util.TurboJPEGSingleton"
     ) as mock_turbo_jpeg_singleton:
         mock_turbo_jpeg_singleton.instance.return_value = mock_turbo_jpeg()
         stream = create_stream(hass, h264_video, {}, dynamic_stream_settings())
@@ -1041,7 +1041,7 @@ async def test_get_image(hass: HomeAssistant, h264_video, filename) -> None:
     await stream.stop()
 
 
-async def test_worker_disable_ll_hls(hass: HomeAssistant) -> None:
+async def test_worker_disable_ll_hls(hass: SmartHub) -> None:
     """Test that the worker disables ll-hls for hls inputs."""
     stream_settings = StreamSettings(
         ll_hls=True,
@@ -1062,13 +1062,13 @@ async def test_worker_disable_ll_hls(hass: HomeAssistant) -> None:
     assert stream_settings.ll_hls is False
 
 
-async def test_get_image_rotated(hass: HomeAssistant, h264_video, filename) -> None:
+async def test_get_image_rotated(hass: SmartHub, h264_video, filename) -> None:
     """Test getting a rotated image."""
     await async_setup_component(hass, "stream", {"stream": {}})
 
     # Since libjpeg-turbo is not installed on the CI runner, we use a mock
     with patch(
-        "homeassistant.components.camera.img_util.TurboJPEGSingleton"
+        "smarthub.components.camera.img_util.TurboJPEGSingleton"
     ) as mock_turbo_jpeg_singleton:
         mock_turbo_jpeg_singleton.instance.return_value = mock_turbo_jpeg()
         for orientation in (Orientation.NO_TRANSFORM, Orientation.ROTATE_RIGHT):

@@ -1,0 +1,10 @@
+{
+  "domain": "group",
+  "name": "Group",
+  "codeowners": ["@smart-hub/core"],
+  "config_flow": true,
+  "documentation": "https://www.smart-hub.io/integrations/group",
+  "integration_type": "helper",
+  "iot_class": "calculated",
+  "quality_scale": "internal"
+}

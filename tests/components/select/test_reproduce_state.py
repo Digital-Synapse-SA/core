@@ -2,21 +2,21 @@
 
 import pytest
 
-from homeassistant.components.select.const import (
+from smarthub.components.select.const import (
     ATTR_OPTION,
     ATTR_OPTIONS,
     DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.state import async_reproduce_state
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub, State
+from smarthub.helpers.state import async_reproduce_state
 
 from tests.common import async_mock_service
 
 
 async def test_reproducing_states(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reproducing select states."""
     calls = async_mock_service(hass, DOMAIN, SERVICE_SELECT_OPTION)

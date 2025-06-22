@@ -7,16 +7,16 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import psutil_home_assistant as ha_psutil
 
-from homeassistant.components.hardware.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.hardware.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.typing import WebSocketGenerator
 
 
 async def test_board_info(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can get the board info."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -35,7 +35,7 @@ TEST_TIME_ADVANCE_INTERVAL = datetime.timedelta(seconds=5 + 1)
 
 
 async def test_system_status_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -50,7 +50,7 @@ async def test_system_status_subscription(
         return mock_psutil
 
     with patch(
-        "homeassistant.components.hardware.ha_psutil.PsutilWrapper",
+        "smarthub.components.hardware.ha_psutil.PsutilWrapper",
         wraps=create_mock_psutil,
     ):
         assert await async_setup_component(hass, DOMAIN, {})

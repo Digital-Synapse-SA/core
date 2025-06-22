@@ -2,9 +2,9 @@
 
 from aioesphomeapi import APIClient, CameraInfo, CameraState as ESPHomeCameraState
 
-from homeassistant.components.camera import CameraState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.camera import CameraState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from .conftest import MockESPHomeDeviceType
 
@@ -19,7 +19,7 @@ SMALLEST_VALID_JPEG_BYTES = bytes.fromhex(SMALLEST_VALID_JPEG)
 
 
 async def test_camera_single_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     hass_client: ClientSessionGenerator,
@@ -64,7 +64,7 @@ async def test_camera_single_image(
 
 
 async def test_camera_single_image_unavailable_before_requested(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     hass_client: ClientSessionGenerator,
@@ -102,7 +102,7 @@ async def test_camera_single_image_unavailable_before_requested(
 
 
 async def test_camera_single_image_unavailable_during_request(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     hass_client: ClientSessionGenerator,
@@ -144,7 +144,7 @@ async def test_camera_single_image_unavailable_during_request(
 
 
 async def test_camera_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     hass_client: ClientSessionGenerator,
@@ -201,7 +201,7 @@ async def test_camera_stream(
 
 
 async def test_camera_stream_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     hass_client: ClientSessionGenerator,
@@ -238,7 +238,7 @@ async def test_camera_stream_unavailable(
 
 
 async def test_camera_stream_with_disconnection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     hass_client: ClientSessionGenerator,

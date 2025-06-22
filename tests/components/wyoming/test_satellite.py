@@ -24,13 +24,13 @@ from wyoming.tts import Synthesize
 from wyoming.vad import VoiceStarted, VoiceStopped
 from wyoming.wake import Detect, Detection
 
-from homeassistant.components import assist_pipeline, assist_satellite, wyoming
-from homeassistant.components.wyoming.assist_satellite import WyomingAssistSatellite
-from homeassistant.components.wyoming.devices import SatelliteDevice
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er, intent as intent_helper
-from homeassistant.setup import async_setup_component
+from smarthub.components import assist_pipeline, assist_satellite, wyoming
+from smarthub.components.wyoming.assist_satellite import WyomingAssistSatellite
+from smarthub.components.wyoming.devices import SatelliteDevice
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er, intent as intent_helper
+from smarthub.setup import async_setup_component
 
 from . import SATELLITE_INFO, WAKE_WORD_INFO, MockAsyncTcpClient
 
@@ -38,7 +38,7 @@ from tests.common import MockConfigEntry
 from tests.components.tts.common import MockResultStream
 
 
-async def setup_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+async def setup_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Set up config entry for Wyoming satellite.
 
     This is separated from the satellite_config_entry method in conftest.py so
@@ -210,7 +210,7 @@ class SatelliteAsyncTcpClient(MockAsyncTcpClient):
         self._responses_ready.set()
 
 
-async def test_satellite_pipeline(hass: HomeAssistant) -> None:
+async def test_satellite_pipeline(hass: SmartHub) -> None:
     """Test running a pipeline with a satellite."""
     assert await async_setup_component(hass, assist_pipeline.DOMAIN, {})
 
@@ -230,7 +230,7 @@ async def test_satellite_pipeline(hass: HomeAssistant) -> None:
     audio_chunk_received = asyncio.Event()
 
     async def async_pipeline_from_audio_stream(
-        hass: HomeAssistant,
+        hass: SmartHub,
         context,
         event_callback,
         stt_metadata,
@@ -249,18 +249,18 @@ async def test_satellite_pipeline(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient(events),
         ) as mock_client,
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             async_pipeline_from_audio_stream,
         ),
-        patch("homeassistant.components.wyoming.assist_satellite._PING_SEND_DELAY", 0),
+        patch("smarthub.components.wyoming.assist_satellite._PING_SEND_DELAY", 0),
     ):
         entry = await setup_config_entry(hass)
         device: SatelliteDevice = hass.data[wyoming.DOMAIN][entry.entry_id].device
@@ -442,7 +442,7 @@ async def test_satellite_pipeline(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_satellite_muted(hass: HomeAssistant) -> None:
+async def test_satellite_muted(hass: SmartHub) -> None:
     """Test callback for a satellite that has been muted."""
     on_muted_event = asyncio.Event()
 
@@ -462,19 +462,19 @@ async def test_satellite_muted(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient([]),
         ),
         patch(
-            "homeassistant.components.wyoming.switch.WyomingSatelliteMuteSwitch.async_get_last_state",
+            "smarthub.components.wyoming.switch.WyomingSatelliteMuteSwitch.async_get_last_state",
             return_value=State("switch.test_mute", STATE_ON),
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite.on_muted",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite.on_muted",
             on_muted,
         ),
     ):
@@ -487,7 +487,7 @@ async def test_satellite_muted(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_satellite_restart(hass: HomeAssistant) -> None:
+async def test_satellite_restart(hass: SmartHub) -> None:
     """Test pipeline loop restart after unexpected error."""
     on_restart_event = asyncio.Event()
 
@@ -500,25 +500,25 @@ async def test_satellite_restart(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite._connect_and_loop",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite._connect_and_loop",
             side_effect=RuntimeError(),
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite.on_restart",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite.on_restart",
             on_restart,
         ),
-        patch("homeassistant.components.wyoming.assist_satellite._RESTART_SECONDS", 0),
+        patch("smarthub.components.wyoming.assist_satellite._RESTART_SECONDS", 0),
     ):
         await setup_config_entry(hass)
         async with asyncio.timeout(1):
             await on_restart_event.wait()
 
 
-async def test_satellite_reconnect(hass: HomeAssistant) -> None:
+async def test_satellite_reconnect(hass: SmartHub) -> None:
     """Test satellite reconnect call after connection refused."""
     num_reconnects = 0
     reconnect_event = asyncio.Event()
@@ -540,23 +540,23 @@ async def test_satellite_reconnect(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient.connect",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient.connect",
             side_effect=ConnectionRefusedError(),
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite.on_reconnect",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite.on_reconnect",
             on_reconnect,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite.on_stopped",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite.on_stopped",
             on_stopped,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite._RECONNECT_SECONDS", 0
+            "smarthub.components.wyoming.assist_satellite._RECONNECT_SECONDS", 0
         ),
     ):
         await setup_config_entry(hass)
@@ -565,7 +565,7 @@ async def test_satellite_reconnect(hass: HomeAssistant) -> None:
             await stopped_event.wait()
 
 
-async def test_satellite_disconnect_before_pipeline(hass: HomeAssistant) -> None:
+async def test_satellite_disconnect_before_pipeline(hass: SmartHub) -> None:
     """Test satellite disconnecting before pipeline run."""
     on_restart_event = asyncio.Event()
 
@@ -575,18 +575,18 @@ async def test_satellite_disconnect_before_pipeline(hass: HomeAssistant) -> None
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             MockAsyncTcpClient([]),  # no RunPipeline event
         ),
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
         ) as mock_run_pipeline,
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite.on_restart",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite.on_restart",
             on_restart,
         ),
     ):
@@ -598,7 +598,7 @@ async def test_satellite_disconnect_before_pipeline(hass: HomeAssistant) -> None
         mock_run_pipeline.assert_not_called()
 
 
-async def test_satellite_disconnect_during_pipeline(hass: HomeAssistant) -> None:
+async def test_satellite_disconnect_during_pipeline(hass: SmartHub) -> None:
     """Test satellite disconnecting during pipeline run."""
     events = [
         RunPipeline(
@@ -620,22 +620,22 @@ async def test_satellite_disconnect_during_pipeline(hass: HomeAssistant) -> None
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             MockAsyncTcpClient(events),
         ),
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
         ) as mock_run_pipeline,
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite.on_restart",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite.on_restart",
             on_restart,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite.on_stopped",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite.on_stopped",
             on_stopped,
         ),
     ):
@@ -653,7 +653,7 @@ async def test_satellite_disconnect_during_pipeline(hass: HomeAssistant) -> None
         assert not device.is_active
 
 
-async def test_satellite_error_during_pipeline(hass: HomeAssistant) -> None:
+async def test_satellite_error_during_pipeline(hass: SmartHub) -> None:
     """Test satellite error occurring during pipeline run."""
     events = [
         RunPipeline(
@@ -668,15 +668,15 @@ async def test_satellite_error_during_pipeline(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient(events),
         ) as mock_client,
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             wraps=_async_pipeline_from_audio_stream,
         ) as mock_run_pipeline,
     ):
@@ -704,7 +704,7 @@ async def test_satellite_error_during_pipeline(hass: HomeAssistant) -> None:
         assert mock_client.error.code == "test code"
 
 
-async def test_tts_not_wav(hass: HomeAssistant) -> None:
+async def test_tts_not_wav(hass: SmartHub) -> None:
     """Test satellite receiving non-WAV audio from text-to-speech."""
     assert await async_setup_component(hass, assist_pipeline.DOMAIN, {})
 
@@ -727,19 +727,19 @@ async def test_tts_not_wav(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient(events),
         ) as mock_client,
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             wraps=_async_pipeline_from_audio_stream,
         ) as mock_run_pipeline,
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite._stream_tts",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite._stream_tts",
             _stream_tts,
         ),
     ):
@@ -784,7 +784,7 @@ async def test_tts_not_wav(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_pipeline_changed(hass: HomeAssistant) -> None:
+async def test_pipeline_changed(hass: SmartHub) -> None:
     """Test that changing the pipeline setting stops the current pipeline."""
     assert await async_setup_component(hass, assist_pipeline.DOMAIN, {})
 
@@ -801,7 +801,7 @@ async def test_pipeline_changed(hass: HomeAssistant) -> None:
     pipeline_stopped = asyncio.Event()
 
     async def async_pipeline_from_audio_stream(
-        hass: HomeAssistant,
+        hass: SmartHub,
         context,
         event_callback,
         stt_metadata,
@@ -819,15 +819,15 @@ async def test_pipeline_changed(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient(events),
         ) as mock_client,
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             async_pipeline_from_audio_stream,
         ),
     ):
@@ -856,7 +856,7 @@ async def test_pipeline_changed(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_audio_settings_changed(hass: HomeAssistant) -> None:
+async def test_audio_settings_changed(hass: SmartHub) -> None:
     """Test that changing audio settings stops the current pipeline."""
     assert await async_setup_component(hass, assist_pipeline.DOMAIN, {})
 
@@ -873,7 +873,7 @@ async def test_audio_settings_changed(hass: HomeAssistant) -> None:
     pipeline_stopped = asyncio.Event()
 
     async def async_pipeline_from_audio_stream(
-        hass: HomeAssistant,
+        hass: SmartHub,
         context,
         event_callback,
         stt_metadata,
@@ -891,15 +891,15 @@ async def test_audio_settings_changed(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient(events),
         ) as mock_client,
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             async_pipeline_from_audio_stream,
         ),
     ):
@@ -928,7 +928,7 @@ async def test_audio_settings_changed(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_invalid_stages(hass: HomeAssistant) -> None:
+async def test_invalid_stages(hass: SmartHub) -> None:
     """Test error when providing invalid pipeline stages."""
     assert await async_setup_component(hass, assist_pipeline.DOMAIN, {})
 
@@ -963,15 +963,15 @@ async def test_invalid_stages(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient(events),
         ) as mock_client,
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite._run_pipeline_once",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite._run_pipeline_once",
             _run_pipeline_once,
         ),
     ):
@@ -990,7 +990,7 @@ async def test_invalid_stages(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_client_stops_pipeline(hass: HomeAssistant) -> None:
+async def test_client_stops_pipeline(hass: SmartHub) -> None:
     """Test that an AudioStop message stops the current pipeline."""
     assert await async_setup_component(hass, assist_pipeline.DOMAIN, {})
 
@@ -1007,7 +1007,7 @@ async def test_client_stops_pipeline(hass: HomeAssistant) -> None:
     pipeline_stopped = asyncio.Event()
 
     async def async_pipeline_from_audio_stream(
-        hass: HomeAssistant,
+        hass: SmartHub,
         context,
         event_callback,
         stt_metadata,
@@ -1025,15 +1025,15 @@ async def test_client_stops_pipeline(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient(events),
         ) as mock_client,
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             async_pipeline_from_audio_stream,
         ),
     ):
@@ -1061,7 +1061,7 @@ async def test_client_stops_pipeline(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_wake_word_phrase(hass: HomeAssistant) -> None:
+async def test_wake_word_phrase(hass: SmartHub) -> None:
     """Test that wake word phrase from info is given to pipeline."""
     events = [
         # Fake local wake word detection
@@ -1079,15 +1079,15 @@ async def test_wake_word_phrase(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient(events),
         ),
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             wraps=_async_pipeline_from_audio_stream,
         ) as mock_run_pipeline,
     ):
@@ -1104,17 +1104,17 @@ async def test_wake_word_phrase(hass: HomeAssistant) -> None:
         )
 
 
-async def test_timers(hass: HomeAssistant) -> None:
+async def test_timers(hass: SmartHub) -> None:
     """Test timer events."""
     assert await async_setup_component(hass, "intent", {})
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient([]),
         ) as mock_client,
     ):
@@ -1286,27 +1286,27 @@ async def test_timers(hass: HomeAssistant) -> None:
 
 
 async def test_announce(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test announce on satellite."""
     assert await async_setup_component(hass, assist_pipeline.DOMAIN, {})
 
-    def async_process_play_media_url(hass: HomeAssistant, media_id: str) -> str:
+    def async_process_play_media_url(hass: SmartHub, media_id: str) -> str:
         # Don't create a URL
         return media_id
 
     with (
         tempfile.NamedTemporaryFile(mode="wb+", suffix=".wav") as temp_wav_file,
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient(responses=[], block_until_inject=True),
         ) as mock_client,
         patch(
-            "homeassistant.components.assist_satellite.entity.async_process_play_media_url",
+            "smarthub.components.assist_satellite.entity.async_process_play_media_url",
             new=async_process_play_media_url,
         ),
     ):
@@ -1368,7 +1368,7 @@ async def test_announce(
 
 
 async def test_tts_timeout(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test entity state goes back to IDLE on a timeout."""
     events = [
@@ -1383,7 +1383,7 @@ async def test_tts_timeout(
     run_pipeline_called = asyncio.Event()
 
     async def async_pipeline_from_audio_stream(
-        hass: HomeAssistant,
+        hass: SmartHub,
         context,
         event_callback,
         stt_metadata,
@@ -1403,24 +1403,24 @@ async def test_tts_timeout(
 
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.AsyncTcpClient",
+            "smarthub.components.wyoming.assist_satellite.AsyncTcpClient",
             SatelliteAsyncTcpClient(events),
         ),
         patch(
-            "homeassistant.components.assist_satellite.entity.async_pipeline_from_audio_stream",
+            "smarthub.components.assist_satellite.entity.async_pipeline_from_audio_stream",
             async_pipeline_from_audio_stream,
         ),
-        patch("homeassistant.components.wyoming.assist_satellite._PING_SEND_DELAY", 0),
+        patch("smarthub.components.wyoming.assist_satellite._PING_SEND_DELAY", 0),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite.tts_response_finished",
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite.tts_response_finished",
             tts_response_finished,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite._TTS_TIMEOUT_EXTRA",
+            "smarthub.components.wyoming.assist_satellite._TTS_TIMEOUT_EXTRA",
             0,
         ),
     ):

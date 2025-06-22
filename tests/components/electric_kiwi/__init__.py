@@ -1,11 +1,11 @@
 """Tests for the Electric Kiwi integration."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def init_integration(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def init_integration(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Fixture for setting up the integration with args."""
     entry.add_to_hass(hass)
 

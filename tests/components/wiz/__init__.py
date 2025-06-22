@@ -11,10 +11,10 @@ from pywizlight import SCENES, BulbType, PilotParser, wizlight
 from pywizlight.bulblibrary import BulbClass, Features, KelvinRange
 from pywizlight.discovery import DiscoveredBulb
 
-from homeassistant.components.wiz.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.wiz.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -175,8 +175,8 @@ FAKE_OLD_FIRMWARE_DIMMABLE_BULB = BulbType(
 )
 
 
-async def setup_integration(hass: HomeAssistant) -> MockConfigEntry:
-    """Mock ConfigEntry in Home Assistant."""
+async def setup_integration(hass: SmartHub) -> MockConfigEntry:
+    """Mock ConfigEntry in SmartHub."""
 
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -242,9 +242,9 @@ def _patch_wizlight(
     def _patcher() -> Generator[None]:
         bulb = device or _mocked_wizlight(device, extended_white_range, bulb_type)
         with (
-            patch("homeassistant.components.wiz.wizlight", return_value=bulb),
+            patch("smarthub.components.wiz.wizlight", return_value=bulb),
             patch(
-                "homeassistant.components.wiz.config_flow.wizlight",
+                "smarthub.components.wiz.config_flow.wizlight",
                 return_value=bulb,
             ),
         ):
@@ -257,7 +257,7 @@ def _patch_discovery() -> _GeneratorContextManager[None]:
     @contextmanager
     def _patcher() -> Generator[None]:
         with patch(
-            "homeassistant.components.wiz.discovery.find_wizlights",
+            "smarthub.components.wiz.discovery.find_wizlights",
             return_value=[DiscoveredBulb(FAKE_IP, FAKE_MAC)],
         ):
             yield
@@ -266,7 +266,7 @@ def _patch_discovery() -> _GeneratorContextManager[None]:
 
 
 async def async_setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     wizlight: wizlight | None = None,
     device: dict[str, Any] | None = None,
     extended_white_range: list[int] | None = None,
@@ -287,7 +287,7 @@ async def async_setup_integration(
 
 
 async def async_push_update(
-    hass: HomeAssistant, device: wizlight, params: dict[str, Any]
+    hass: SmartHub, device: wizlight, params: dict[str, Any]
 ) -> None:
     """Push an update to the device."""
     device.state = PilotParser(params)

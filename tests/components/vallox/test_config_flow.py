@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 from vallox_websocket_api import ValloxApiException, ValloxWebsocketException
 
-from homeassistant.components.vallox.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.vallox.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import create_mock_entry, do_setup_vallox_entry
 
 
-async def test_form_no_input(hass: HomeAssistant) -> None:
+async def test_form_no_input(hass: SmartHub) -> None:
     """Test that the form is returned with no input."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -23,7 +23,7 @@ async def test_form_no_input(hass: HomeAssistant) -> None:
     assert result["errors"] is None
 
 
-async def test_form_create_entry(hass: HomeAssistant) -> None:
+async def test_form_create_entry(hass: SmartHub) -> None:
     """Test that an entry is created with valid input."""
     init = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -34,11 +34,11 @@ async def test_form_create_entry(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.vallox.config_flow.Vallox.fetch_metric_data",
+            "smarthub.components.vallox.config_flow.Vallox.fetch_metric_data",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.vallox.async_setup_entry",
+            "smarthub.components.vallox.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -54,7 +54,7 @@ async def test_form_create_entry(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_ip(hass: HomeAssistant) -> None:
+async def test_form_invalid_ip(hass: SmartHub) -> None:
     """Test that invalid IP error is handled."""
     init = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -71,11 +71,11 @@ async def test_form_invalid_ip(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.vallox.config_flow.Vallox.fetch_metric_data",
+            "smarthub.components.vallox.config_flow.Vallox.fetch_metric_data",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.vallox.async_setup_entry",
+            "smarthub.components.vallox.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -90,14 +90,14 @@ async def test_form_invalid_ip(hass: HomeAssistant) -> None:
     assert result["data"] == {"host": "1.2.3.4", "name": "Vallox"}
 
 
-async def test_form_vallox_api_exception_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_vallox_api_exception_cannot_connect(hass: SmartHub) -> None:
     """Test that cannot connect error is handled."""
     init = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.vallox.config_flow.Vallox.fetch_metric_data",
+        "smarthub.components.vallox.config_flow.Vallox.fetch_metric_data",
         side_effect=ValloxApiException,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -111,11 +111,11 @@ async def test_form_vallox_api_exception_cannot_connect(hass: HomeAssistant) -> 
 
     with (
         patch(
-            "homeassistant.components.vallox.config_flow.Vallox.fetch_metric_data",
+            "smarthub.components.vallox.config_flow.Vallox.fetch_metric_data",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.vallox.async_setup_entry",
+            "smarthub.components.vallox.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -130,14 +130,14 @@ async def test_form_vallox_api_exception_cannot_connect(hass: HomeAssistant) -> 
     assert result["data"] == {"host": "1.2.3.4", "name": "Vallox"}
 
 
-async def test_form_os_error_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_os_error_cannot_connect(hass: SmartHub) -> None:
     """Test that cannot connect error is handled."""
     init = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.vallox.config_flow.Vallox.fetch_metric_data",
+        "smarthub.components.vallox.config_flow.Vallox.fetch_metric_data",
         side_effect=ValloxWebsocketException,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -151,11 +151,11 @@ async def test_form_os_error_cannot_connect(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.vallox.config_flow.Vallox.fetch_metric_data",
+            "smarthub.components.vallox.config_flow.Vallox.fetch_metric_data",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.vallox.async_setup_entry",
+            "smarthub.components.vallox.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -170,14 +170,14 @@ async def test_form_os_error_cannot_connect(hass: HomeAssistant) -> None:
     assert result["data"] == {"host": "1.2.3.4", "name": "Vallox"}
 
 
-async def test_form_unknown_exception(hass: HomeAssistant) -> None:
+async def test_form_unknown_exception(hass: SmartHub) -> None:
     """Test that unknown exceptions are handled."""
     init = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.vallox.config_flow.Vallox.fetch_metric_data",
+        "smarthub.components.vallox.config_flow.Vallox.fetch_metric_data",
         side_effect=Exception,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -191,11 +191,11 @@ async def test_form_unknown_exception(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.vallox.config_flow.Vallox.fetch_metric_data",
+            "smarthub.components.vallox.config_flow.Vallox.fetch_metric_data",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.vallox.async_setup_entry",
+            "smarthub.components.vallox.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -210,7 +210,7 @@ async def test_form_unknown_exception(hass: HomeAssistant) -> None:
     assert result["data"] == {"host": "1.2.3.4", "name": "Vallox"}
 
 
-async def test_form_already_configured(hass: HomeAssistant) -> None:
+async def test_form_already_configured(hass: SmartHub) -> None:
     """Test that already configured error is handled."""
     init = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -228,7 +228,7 @@ async def test_form_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_reconfigure_host(hass: HomeAssistant, init_reconfigure_flow) -> None:
+async def test_reconfigure_host(hass: SmartHub, init_reconfigure_flow) -> None:
     """Test that the host can be reconfigured."""
     entry, init_flow_result = init_reconfigure_flow
 
@@ -247,7 +247,7 @@ async def test_reconfigure_host(hass: HomeAssistant, init_reconfigure_flow) -> N
 
 
 async def test_reconfigure_host_to_same_host_as_another_fails(
-    hass: HomeAssistant, init_reconfigure_flow
+    hass: SmartHub, init_reconfigure_flow
 ) -> None:
     """Test that changing host to a host that already exists fails."""
     entry, init_flow_result = init_reconfigure_flow
@@ -271,7 +271,7 @@ async def test_reconfigure_host_to_same_host_as_another_fails(
 
 
 async def test_reconfigure_host_to_invalid_ip_fails(
-    hass: HomeAssistant, init_reconfigure_flow
+    hass: SmartHub, init_reconfigure_flow
 ) -> None:
     """Test that an invalid IP error is handled by the reconfigure step."""
     entry, init_flow_result = init_reconfigure_flow
@@ -305,13 +305,13 @@ async def test_reconfigure_host_to_invalid_ip_fails(
 
 
 async def test_reconfigure_host_vallox_api_exception_cannot_connect(
-    hass: HomeAssistant, init_reconfigure_flow
+    hass: SmartHub, init_reconfigure_flow
 ) -> None:
     """Test that cannot connect error is handled by the reconfigure step."""
     entry, init_flow_result = init_reconfigure_flow
 
     with patch(
-        "homeassistant.components.vallox.config_flow.Vallox.fetch_metric_data",
+        "smarthub.components.vallox.config_flow.Vallox.fetch_metric_data",
         side_effect=ValloxApiException,
     ):
         reconfigure_result = await hass.config_entries.flow.async_configure(
@@ -344,13 +344,13 @@ async def test_reconfigure_host_vallox_api_exception_cannot_connect(
 
 
 async def test_reconfigure_host_unknown_exception(
-    hass: HomeAssistant, init_reconfigure_flow
+    hass: SmartHub, init_reconfigure_flow
 ) -> None:
     """Test that cannot connect error is handled by the reconfigure step."""
     entry, init_flow_result = init_reconfigure_flow
 
     with patch(
-        "homeassistant.components.vallox.config_flow.Vallox.fetch_metric_data",
+        "smarthub.components.vallox.config_flow.Vallox.fetch_metric_data",
         side_effect=Exception,
     ):
         reconfigure_result = await hass.config_entries.flow.async_configure(

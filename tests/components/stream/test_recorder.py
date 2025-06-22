@@ -10,18 +10,18 @@ from unittest.mock import patch
 import av
 import pytest
 
-from homeassistant.components.stream import Stream, create_stream
-from homeassistant.components.stream.const import (
+from smarthub.components.stream import Stream, create_stream
+from smarthub.components.stream.const import (
     HLS_PROVIDER,
     OUTPUT_IDLE_TIMEOUT,
     RECORDER_PROVIDER,
 )
-from homeassistant.components.stream.core import Orientation, Part
-from homeassistant.components.stream.fmp4utils import find_box
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.stream.core import Orientation, Part
+from smarthub.components.stream.fmp4utils import find_box
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .common import (
     DefaultSegment as Segment,
@@ -35,7 +35,7 @@ from tests.common import async_fire_time_changed
 
 
 @pytest.fixture(autouse=True)
-async def stream_component(hass: HomeAssistant) -> None:
+async def stream_component(hass: SmartHub) -> None:
     """Set up the component before each test."""
     await async_setup_component(hass, "stream", {"stream": {}})
 
@@ -46,7 +46,7 @@ def filename(tmp_path: Path) -> str:
     return str(tmp_path / "test.mp4")
 
 
-async def test_record_stream(hass: HomeAssistant, filename, h264_video) -> None:
+async def test_record_stream(hass: SmartHub, filename, h264_video) -> None:
     """Test record stream."""
 
     worker_finished = asyncio.Event()
@@ -59,7 +59,7 @@ async def test_record_stream(hass: HomeAssistant, filename, h264_video) -> None:
             await Stream.remove_provider(self, provider)
             worker_finished.set()
 
-    with patch("homeassistant.components.stream.Stream", wraps=MockStream):
+    with patch("smarthub.components.stream.Stream", wraps=MockStream):
         stream = create_stream(hass, h264_video, {}, dynamic_stream_settings())
 
     with patch.object(hass.config, "is_allowed_path", return_value=True):
@@ -80,7 +80,7 @@ async def test_record_stream(hass: HomeAssistant, filename, h264_video) -> None:
     assert os.path.exists(filename)
 
 
-async def test_record_lookback(hass: HomeAssistant, filename, h264_video) -> None:
+async def test_record_lookback(hass: SmartHub, filename, h264_video) -> None:
     """Exercise record with lookback."""
 
     stream = create_stream(hass, h264_video, {}, dynamic_stream_settings())
@@ -97,13 +97,13 @@ async def test_record_lookback(hass: HomeAssistant, filename, h264_video) -> Non
     await stream.stop()
 
 
-async def test_record_path_not_allowed(hass: HomeAssistant, h264_video) -> None:
+async def test_record_path_not_allowed(hass: SmartHub, h264_video) -> None:
     """Test where the output path is not allowed by home assistant configuration."""
 
     stream = create_stream(hass, h264_video, {}, dynamic_stream_settings())
     with (
         patch.object(hass.config, "is_allowed_path", return_value=False),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await stream.async_record("/example/path")
 
@@ -123,7 +123,7 @@ def add_parts_to_segment(segment, source):
 
 
 async def test_recorder_discontinuity(
-    hass: HomeAssistant, filename, h264_video
+    hass: SmartHub, filename, h264_video
 ) -> None:
     """Test recorder save across a discontinuity."""
 
@@ -152,8 +152,8 @@ async def test_recorder_discontinuity(
 
     with (
         patch.object(hass.config, "is_allowed_path", return_value=True),
-        patch("homeassistant.components.stream.Stream", wraps=MockStream),
-        patch("homeassistant.components.stream.recorder.RecorderOutput.recv"),
+        patch("smarthub.components.stream.Stream", wraps=MockStream),
+        patch("smarthub.components.stream.recorder.RecorderOutput.recv"),
     ):
         stream = create_stream(hass, "blank", {}, dynamic_stream_settings())
         make_recording = hass.async_create_task(stream.async_record(filename))
@@ -172,7 +172,7 @@ async def test_recorder_discontinuity(
     assert os.path.exists(filename)
 
 
-async def test_recorder_no_segments(hass: HomeAssistant, filename) -> None:
+async def test_recorder_no_segments(hass: SmartHub, filename) -> None:
     """Test recorder behavior with a stream failure which causes no segments."""
 
     stream = create_stream(hass, BytesIO(), {}, dynamic_stream_settings())
@@ -201,7 +201,7 @@ def h264_mov_video():
     ],
 )
 async def test_record_stream_audio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     filename,
     audio_codec,
     expected_audio_streams,
@@ -226,7 +226,7 @@ async def test_record_stream_audio(
             await Stream.remove_provider(self, provider)
             worker_finished.set()
 
-    with patch("homeassistant.components.stream.Stream", wraps=MockStream):
+    with patch("smarthub.components.stream.Stream", wraps=MockStream):
         stream = create_stream(hass, source, {}, dynamic_stream_settings())
 
     with patch.object(hass.config, "is_allowed_path", return_value=True):
@@ -260,7 +260,7 @@ async def test_record_stream_audio(
 
 
 async def test_recorder_log(
-    hass: HomeAssistant, filename, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, filename, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test starting a stream to record logs the url without username and password."""
     stream = create_stream(
@@ -272,7 +272,7 @@ async def test_recorder_log(
     assert "https://****:****@foo.bar" in caplog.text
 
 
-async def test_record_stream_rotate(hass: HomeAssistant, filename, h264_video) -> None:
+async def test_record_stream_rotate(hass: SmartHub, filename, h264_video) -> None:
     """Test record stream with rotation."""
 
     worker_finished = asyncio.Event()
@@ -285,7 +285,7 @@ async def test_record_stream_rotate(hass: HomeAssistant, filename, h264_video) -
             await Stream.remove_provider(self, provider)
             worker_finished.set()
 
-    with patch("homeassistant.components.stream.Stream", wraps=MockStream):
+    with patch("smarthub.components.stream.Stream", wraps=MockStream):
         stream = create_stream(hass, h264_video, {}, dynamic_stream_settings())
         stream.dynamic_stream_settings.orientation = Orientation.ROTATE_RIGHT
 

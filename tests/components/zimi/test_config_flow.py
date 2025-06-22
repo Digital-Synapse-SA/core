@@ -12,12 +12,12 @@ from zcc import (
     ControlPointTimeoutError,
 )
 
-from homeassistant import config_entries
-from homeassistant.components.zimi.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.device_registry import format_mac
+from smarthub import config_entries
+from smarthub.components.zimi.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.device_registry import format_mac
 
 from tests.common import MockConfigEntry
 
@@ -37,7 +37,7 @@ SELECTED_HOST_AND_PORT = "selected_host_and_port"
 def discovery_mock():
     """Mock the ControlPointDiscoveryService."""
     with patch(
-        "homeassistant.components.zimi.config_flow.ControlPointDiscoveryService",
+        "smarthub.components.zimi.config_flow.ControlPointDiscoveryService",
         autospec=True,
     ) as mock:
         mock.return_value = mock
@@ -45,7 +45,7 @@ def discovery_mock():
 
 
 async def test_user_discovery_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     discovery_mock: MagicMock,
 ) -> None:
     """Test user form transitions to creation if zcc discovery succeeds."""
@@ -75,7 +75,7 @@ async def test_user_discovery_success(
 
 
 async def test_user_discovery_success_selection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     discovery_mock: MagicMock,
 ) -> None:
     """Test user form transitions via selection to creation if zcc discovery succeeds has multiple hosts."""
@@ -115,7 +115,7 @@ async def test_user_discovery_success_selection(
 
 
 async def test_user_discovery_duplicates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     discovery_mock: MagicMock,
 ) -> None:
     """Test that flow is aborted if duplicates are added."""
@@ -147,7 +147,7 @@ async def test_user_discovery_duplicates(
 
 
 async def test_finish_manual_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     discovery_mock: MagicMock,
 ) -> None:
     """Test manual form transitions to creation with valid data."""
@@ -183,7 +183,7 @@ async def test_finish_manual_success(
 
 
 async def test_manual_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     discovery_mock: MagicMock,
 ) -> None:
     """Test manual form transitions via cannot_connect to creation."""
@@ -239,7 +239,7 @@ async def test_manual_cannot_connect(
 
 
 async def test_manual_gethostbyname_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     discovery_mock: MagicMock,
 ) -> None:
     """Test manual form transitions via gethostbyname failure to creation."""
@@ -320,7 +320,7 @@ async def test_manual_gethostbyname_error(
     ],
 )
 async def test_manual_connection_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     discovery_mock: MagicMock,
     side_effect: Exception,
     error_expected: dict,

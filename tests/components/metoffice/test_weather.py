@@ -11,15 +11,15 @@ import requests_mock
 from requests_mock.adapter import _Matcher
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.metoffice.const import DEFAULT_SCAN_INTERVAL, DOMAIN
-from homeassistant.components.weather import (
+from smarthub.components.metoffice.const import DEFAULT_SCAN_INTERVAL, DOMAIN
+from smarthub.components.weather import (
     DOMAIN as WEATHER_DOMAIN,
     SERVICE_GET_FORECASTS,
 )
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import utcnow
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import utcnow
 
 from .const import (
     DEVICE_KEY_KINGSLYNN,
@@ -37,14 +37,14 @@ from tests.typing import WebSocketGenerator
 def no_sensor():
     """Remove sensors."""
     with patch(
-        "homeassistant.components.metoffice.sensor.async_setup_entry", return_value=True
+        "smarthub.components.metoffice.sensor.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 @pytest.fixture
 async def wavertree_data(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> dict[str, _Matcher]:
     """Mock data for the Wavertree location."""
     # all metoffice test data encapsulated in here
@@ -68,7 +68,7 @@ async def wavertree_data(
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_site_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     requests_mock: requests_mock.Mocker,
 ) -> None:
@@ -102,7 +102,7 @@ async def test_site_cannot_connect(
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_site_cannot_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock: requests_mock.Mocker,
     wavertree_data,
 ) -> None:
@@ -154,7 +154,7 @@ async def test_site_cannot_update(
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_one_weather_site_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     requests_mock: requests_mock.Mocker,
     wavertree_data,
@@ -188,7 +188,7 @@ async def test_one_weather_site_running(
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_two_weather_sites_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     requests_mock: requests_mock.Mocker,
     wavertree_data,
@@ -260,7 +260,7 @@ async def test_two_weather_sites_running(
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_new_config_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, no_sensor, wavertree_data
+    hass: SmartHub, entity_registry: er.EntityRegistry, no_sensor, wavertree_data
 ) -> None:
     """Test the expected entities are created."""
 
@@ -283,7 +283,7 @@ async def test_new_config_entry(
     [SERVICE_GET_FORECASTS],
 )
 async def test_forecast_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     requests_mock: requests_mock.Mocker,
     snapshot: SnapshotAssertion,
@@ -337,7 +337,7 @@ async def test_forecast_service(
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_legacy_config_entry_is_removed(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, no_sensor, wavertree_data
+    hass: SmartHub, entity_registry: er.EntityRegistry, no_sensor, wavertree_data
 ) -> None:
     """Test the expected entities are created."""
     # Pre-create the daily entity
@@ -364,7 +364,7 @@ async def test_legacy_config_entry_is_removed(
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_forecast_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,

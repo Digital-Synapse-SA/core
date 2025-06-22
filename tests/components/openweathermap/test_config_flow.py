@@ -5,14 +5,14 @@ from unittest.mock import AsyncMock
 from pyopenweathermap import RequestError
 import pytest
 
-from homeassistant.components.openweathermap.const import (
+from smarthub.components.openweathermap.const import (
     DEFAULT_LANGUAGE,
     DEFAULT_OWM_MODE,
     DOMAIN,
     OWM_MODE_V30,
 )
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import (
     CONF_API_KEY,
     CONF_LANGUAGE,
     CONF_LATITUDE,
@@ -20,8 +20,8 @@ from homeassistant.const import (
     CONF_MODE,
     CONF_NAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import LATITUDE, LONGITUDE
 
@@ -40,7 +40,7 @@ VALID_YAML_CONFIG = {CONF_API_KEY: "foo"}
 
 
 async def test_successful_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     owm_client_mock: AsyncMock,
 ) -> None:
     """Test that the form is served with valid input."""
@@ -75,7 +75,7 @@ async def test_successful_config_flow(
 
 @pytest.mark.parametrize("mode", [OWM_MODE_V30], indirect=True)
 async def test_abort_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     owm_client_mock: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -95,7 +95,7 @@ async def test_abort_config_flow(
 
 
 async def test_config_flow_options_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     owm_client_mock: AsyncMock,
 ) -> None:
     """Test that the options form."""
@@ -152,7 +152,7 @@ async def test_config_flow_options_change(
 
 
 async def test_form_invalid_api_key(
-    hass: HomeAssistant,
+    hass: SmartHub,
     owm_client_mock: AsyncMock,
 ) -> None:
     """Test that the form is served with no input."""
@@ -173,7 +173,7 @@ async def test_form_invalid_api_key(
 
 
 async def test_form_api_call_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     owm_client_mock: AsyncMock,
 ) -> None:
     """Test setting up with api call error."""

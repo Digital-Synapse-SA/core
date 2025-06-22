@@ -5,25 +5,25 @@ import logging
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.conversation import HOME_ASSISTANT_AGENT, default_agent
-from homeassistant.components.conversation.const import DATA_DEFAULT_ENTITY
-from homeassistant.components.conversation.models import ConversationInput
-from homeassistant.core import Context, HomeAssistant, ServiceCall
-from homeassistant.helpers import trigger
-from homeassistant.setup import async_setup_component
+from smarthub.components.conversation import HOME_ASSISTANT_AGENT, default_agent
+from smarthub.components.conversation.const import DATA_DEFAULT_ENTITY
+from smarthub.components.conversation.models import ConversationInput
+from smarthub.core import Context, SmartHub, ServiceCall
+from smarthub.helpers import trigger
+from smarthub.setup import async_setup_component
 
 from tests.typing import WebSocketGenerator
 
 
 @pytest.fixture(autouse=True)
-async def setup_comp(hass: HomeAssistant) -> None:
+async def setup_comp(hass: SmartHub) -> None:
     """Initialize components."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})
 
 
 async def test_if_fires_on_event(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test the firing of events."""
     assert await async_setup_component(
@@ -93,7 +93,7 @@ async def test_if_fires_on_event(
     }
 
 
-async def test_response(hass: HomeAssistant) -> None:
+async def test_response(hass: SmartHub) -> None:
     """Test the conversation response action."""
     response = "I'm sorry, Dave. I'm afraid I can't do that"
     assert await async_setup_component(
@@ -125,7 +125,7 @@ async def test_response(hass: HomeAssistant) -> None:
     assert service_response["response"]["speech"]["plain"]["speech"] == response
 
 
-async def test_empty_response(hass: HomeAssistant) -> None:
+async def test_empty_response(hass: SmartHub) -> None:
     """Test the conversation response action with an empty response."""
     assert await async_setup_component(
         hass,
@@ -156,7 +156,7 @@ async def test_empty_response(hass: HomeAssistant) -> None:
 
 
 async def test_response_same_sentence(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test the conversation response action with multiple triggers using the same sentence."""
     assert await async_setup_component(
@@ -243,7 +243,7 @@ async def test_response_same_sentence(
 
 
 async def test_response_same_sentence_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test the conversation response action with multiple triggers using the same sentence and an error."""
@@ -295,7 +295,7 @@ async def test_response_same_sentence_with_error(
 
 
 async def test_subscribe_trigger_does_not_interfere_with_responses(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that subscribing to a trigger from the websocket API does not interfere with responses."""
     websocket_client = await hass_ws_client()
@@ -352,7 +352,7 @@ async def test_subscribe_trigger_does_not_interfere_with_responses(
 
 
 async def test_same_trigger_multiple_sentences(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test matching of multiple sentences from the same trigger."""
     assert await async_setup_component(
@@ -421,7 +421,7 @@ async def test_same_trigger_multiple_sentences(
 
 
 async def test_same_sentence_multiple_triggers(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test use of the same sentence in multiple triggers."""
     assert await async_setup_component(
@@ -512,7 +512,7 @@ async def test_same_sentence_multiple_triggers(
     "command",
     ["hello?", "hello!", "4 a.m."],
 )
-async def test_fails_on_punctuation(hass: HomeAssistant, command: str) -> None:
+async def test_fails_on_punctuation(hass: SmartHub, command: str) -> None:
     """Test that validation fails when sentences contain punctuation."""
     with pytest.raises(vol.Invalid):
         await trigger.async_validate_trigger_config(
@@ -533,7 +533,7 @@ async def test_fails_on_punctuation(hass: HomeAssistant, command: str) -> None:
     "command",
     [""],
 )
-async def test_fails_on_empty(hass: HomeAssistant, command: str) -> None:
+async def test_fails_on_empty(hass: SmartHub, command: str) -> None:
     """Test that validation fails when sentences are empty."""
     with pytest.raises(vol.Invalid):
         await trigger.async_validate_trigger_config(
@@ -550,7 +550,7 @@ async def test_fails_on_empty(hass: HomeAssistant, command: str) -> None:
         )
 
 
-async def test_fails_on_no_sentences(hass: HomeAssistant) -> None:
+async def test_fails_on_no_sentences(hass: SmartHub) -> None:
     """Test that validation fails when no sentences are provided."""
     with pytest.raises(vol.Invalid):
         await trigger.async_validate_trigger_config(
@@ -565,7 +565,7 @@ async def test_fails_on_no_sentences(hass: HomeAssistant) -> None:
         )
 
 
-async def test_wildcards(hass: HomeAssistant, service_calls: list[ServiceCall]) -> None:
+async def test_wildcards(hass: SmartHub, service_calls: list[ServiceCall]) -> None:
     """Test wildcards in trigger sentences."""
     assert await async_setup_component(
         hass,
@@ -648,7 +648,7 @@ async def test_wildcards(hass: HomeAssistant, service_calls: list[ServiceCall]) 
     }
 
 
-async def test_trigger_with_device_id(hass: HomeAssistant) -> None:
+async def test_trigger_with_device_id(hass: SmartHub) -> None:
     """Test that a trigger receives a device_id."""
     assert await async_setup_component(
         hass,

@@ -7,11 +7,11 @@ from caldav.lib.error import AuthorizationError, DAVError
 import pytest
 import requests
 
-from homeassistant import config_entries
-from homeassistant.components.caldav.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME, CONF_VERIFY_SSL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.caldav.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME, CONF_VERIFY_SSL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import TEST_PASSWORD, TEST_URL, TEST_USERNAME
 
@@ -22,13 +22,13 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        f"homeassistant.components.{DOMAIN}.async_setup_entry", return_value=True
+        f"smarthub.components.{DOMAIN}.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
 ) -> None:
     """Test successful config flow setup."""
@@ -71,7 +71,7 @@ async def test_form(
     ],
 )
 async def test_caldav_client_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: Exception,
     expected_error: str,
     dav_client: Mock,
@@ -98,7 +98,7 @@ async def test_caldav_client_error(
 
 
 async def test_reauth_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -132,7 +132,7 @@ async def test_reauth_success(
 
 
 async def test_reauth_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     config_entry: MockConfigEntry,
     dav_client: Mock,
@@ -197,7 +197,7 @@ async def test_reauth_failure(
     ],
 )
 async def test_multiple_config_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     config_entry: MockConfigEntry,
     user_input: dict[str, str],
@@ -247,7 +247,7 @@ async def test_multiple_config_entries(
     ],
 )
 async def test_duplicate_config_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     config_entry: MockConfigEntry,
     user_input: dict[str, str],

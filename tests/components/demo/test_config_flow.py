@@ -4,18 +4,18 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries, setup
-from homeassistant.components.demo import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries, setup
+from smarthub.components.demo import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("disable_platforms")
-async def test_import(hass: HomeAssistant) -> None:
+async def test_import(hass: SmartHub) -> None:
     """Test that we can import a config entry."""
-    with patch("homeassistant.components.demo.async_setup_entry", return_value=True):
+    with patch("smarthub.components.demo.async_setup_entry", return_value=True):
         assert await setup.async_setup_component(hass, DOMAIN, {DOMAIN: {}})
         await hass.async_block_till_done()
 
@@ -25,10 +25,10 @@ async def test_import(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("disable_platforms")
-async def test_import_once(hass: HomeAssistant) -> None:
+async def test_import_once(hass: SmartHub) -> None:
     """Test that we don't create multiple config entries."""
     with patch(
-        "homeassistant.components.demo.async_setup_entry",
+        "smarthub.components.demo.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -43,7 +43,7 @@ async def test_import_once(hass: HomeAssistant) -> None:
     mock_setup_entry.assert_called_once()
 
     # Test importing again doesn't create a 2nd entry
-    with patch("homeassistant.components.demo.async_setup_entry") as mock_setup_entry:
+    with patch("smarthub.components.demo.async_setup_entry") as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
             context={"source": config_entries.SOURCE_IMPORT},
@@ -55,7 +55,7 @@ async def test_import_once(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("disable_platforms")
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test config flow options."""
     config_entry = MockConfigEntry(domain=DOMAIN)
     config_entry.add_to_hass(hass)

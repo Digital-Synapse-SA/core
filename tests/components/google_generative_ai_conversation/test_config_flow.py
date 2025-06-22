@@ -5,11 +5,11 @@ from unittest.mock import Mock, patch
 import pytest
 from requests.exceptions import Timeout
 
-from homeassistant import config_entries
-from homeassistant.components.google_generative_ai_conversation.config_flow import (
+from smarthub import config_entries
+from smarthub.components.google_generative_ai_conversation.config_flow import (
     RECOMMENDED_OPTIONS,
 )
-from homeassistant.components.google_generative_ai_conversation.const import (
+from smarthub.components.google_generative_ai_conversation.const import (
     CONF_CHAT_MODEL,
     CONF_DANGEROUS_BLOCK_THRESHOLD,
     CONF_HARASSMENT_BLOCK_THRESHOLD,
@@ -30,9 +30,9 @@ from homeassistant.components.google_generative_ai_conversation.const import (
     RECOMMENDED_TOP_P,
     RECOMMENDED_USE_GOOGLE_SEARCH_TOOL,
 )
-from homeassistant.const import CONF_LLM_HASS_API
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_LLM_HASS_API
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import API_ERROR_500, CLIENT_ERROR_API_KEY_INVALID
 
@@ -74,7 +74,7 @@ def get_models_pager():
     return models_pager()
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     # Pretend we already set up a config entry.
     hass.config.components.add("google_generative_ai_conversation")
@@ -94,7 +94,7 @@ async def test_form(hass: HomeAssistant) -> None:
             "google.genai.models.AsyncModels.list",
         ),
         patch(
-            "homeassistant.components.google_generative_ai_conversation.async_setup_entry",
+            "smarthub.components.google_generative_ai_conversation.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -284,7 +284,7 @@ def will_options_be_rendered_again(current_options, new_options) -> bool:
 )
 @pytest.mark.usefixtures("mock_init_component")
 async def test_options_switching(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     current_options,
     new_options,
@@ -353,7 +353,7 @@ async def test_options_switching(
         (Exception, "unknown"),
     ],
 )
-async def test_form_errors(hass: HomeAssistant, side_effect, error) -> None:
+async def test_form_errors(hass: SmartHub, side_effect, error) -> None:
     """Test we handle errors."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -371,7 +371,7 @@ async def test_form_errors(hass: HomeAssistant, side_effect, error) -> None:
     assert result2["errors"] == {"base": error}
 
 
-async def test_reauth_flow(hass: HomeAssistant) -> None:
+async def test_reauth_flow(hass: SmartHub) -> None:
     """Test the reauth flow."""
     hass.config.components.add("google_generative_ai_conversation")
     mock_config_entry = MockConfigEntry(
@@ -399,11 +399,11 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
             "google.genai.models.AsyncModels.list",
         ),
         patch(
-            "homeassistant.components.google_generative_ai_conversation.async_setup_entry",
+            "smarthub.components.google_generative_ai_conversation.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.google_generative_ai_conversation.async_unload_entry",
+            "smarthub.components.google_generative_ai_conversation.async_unload_entry",
             return_value=True,
         ) as mock_unload_entry,
     ):

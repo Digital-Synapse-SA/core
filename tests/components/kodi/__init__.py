@@ -2,8 +2,8 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.kodi.const import CONF_WS_PORT, DOMAIN
-from homeassistant.const import (
+from smarthub.components.kodi.const import CONF_WS_PORT, DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_NAME,
     CONF_PASSWORD,
@@ -11,15 +11,15 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .util import MockConnection
 
 from tests.common import MockConfigEntry
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the Kodi integration in Home Assistant."""
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
+    """Set up the Kodi integration in SmartHub."""
     entry_data = {
         CONF_NAME: "name",
         CONF_HOST: "1.1.1.1",
@@ -33,13 +33,13 @@ async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
     entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.kodi.Kodi.ping", return_value=True),
+        patch("smarthub.components.kodi.Kodi.ping", return_value=True),
         patch(
-            "homeassistant.components.kodi.Kodi.get_application_properties",
+            "smarthub.components.kodi.Kodi.get_application_properties",
             return_value={"version": {"major": 1, "minor": 1}},
         ),
         patch(
-            "homeassistant.components.kodi.get_kodi_connection",
+            "smarthub.components.kodi.get_kodi_connection",
             return_value=MockConnection(),
         ),
     ):

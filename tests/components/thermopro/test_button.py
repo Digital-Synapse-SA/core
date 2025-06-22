@@ -6,12 +6,12 @@ import time
 import pytest
 from thermopro_ble import ThermoProDevice
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import TP357_SERVICE_INFO, TP358_SERVICE_INFO
 
@@ -24,7 +24,7 @@ from tests.components.bluetooth import (
 
 
 @pytest.mark.usefixtures("setup_thermopro")
-async def test_buttons_tp357(hass: HomeAssistant) -> None:
+async def test_buttons_tp357(hass: SmartHub) -> None:
     """Test setting up creates the sensors."""
     assert not hass.states.async_all()
     assert not hass.states.get("button.tp358_4221_set_date_time")
@@ -34,7 +34,7 @@ async def test_buttons_tp357(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_thermopro")
-async def test_buttons_tp358_discovery(hass: HomeAssistant) -> None:
+async def test_buttons_tp358_discovery(hass: SmartHub) -> None:
     """Test discovery of device with button."""
     assert not hass.states.async_all()
     assert not hass.states.get("button.tp358_4221_set_date_time")
@@ -47,7 +47,7 @@ async def test_buttons_tp358_discovery(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_thermopro")
-async def test_buttons_tp358_unavailable(hass: HomeAssistant) -> None:
+async def test_buttons_tp358_unavailable(hass: SmartHub) -> None:
     """Test tp358 set date&time button goes to unavailability."""
     start_monotonic = time.monotonic()
     assert not hass.states.async_all()
@@ -76,7 +76,7 @@ async def test_buttons_tp358_unavailable(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_thermopro")
-async def test_buttons_tp358_reavailable(hass: HomeAssistant) -> None:
+async def test_buttons_tp358_reavailable(hass: SmartHub) -> None:
     """Test TP358/TP393 set date&time button goes to unavailablity and recovers."""
     start_monotonic = time.monotonic()
     assert not hass.states.async_all()
@@ -113,7 +113,7 @@ async def test_buttons_tp358_reavailable(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_thermopro")
 async def test_buttons_tp358_press(
-    hass: HomeAssistant, mock_now: datetime, mock_thermoprodevice: ThermoProDevice
+    hass: SmartHub, mock_now: datetime, mock_thermoprodevice: ThermoProDevice
 ) -> None:
     """Test TP358/TP393 set date&time button press."""
     assert not hass.states.async_all()

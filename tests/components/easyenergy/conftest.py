@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from easyenergy import Electricity, Gas
 import pytest
 
-from homeassistant.components.easyenergy.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.easyenergy.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_json_array_fixture
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry, async_load_json_array_fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.easyenergy.async_setup_entry", return_value=True
+        "smarthub.components.easyenergy.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
@@ -33,10 +33,10 @@ def mock_config_entry() -> MockConfigEntry:
 
 
 @pytest.fixture
-async def mock_easyenergy(hass: HomeAssistant) -> AsyncGenerator[MagicMock]:
+async def mock_easyenergy(hass: SmartHub) -> AsyncGenerator[MagicMock]:
     """Return a mocked easyEnergy client."""
     with patch(
-        "homeassistant.components.easyenergy.coordinator.EasyEnergy", autospec=True
+        "smarthub.components.easyenergy.coordinator.EasyEnergy", autospec=True
     ) as easyenergy_mock:
         client = easyenergy_mock.return_value
         client.energy_prices.return_value = Electricity.from_dict(
@@ -50,7 +50,7 @@ async def mock_easyenergy(hass: HomeAssistant) -> AsyncGenerator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_easyenergy: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_easyenergy: MagicMock
 ) -> MockConfigEntry:
     """Set up the easyEnergy integration for testing."""
     mock_config_entry.add_to_hass(hass)

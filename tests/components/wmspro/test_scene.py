@@ -4,11 +4,11 @@ from unittest.mock import AsyncMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.wmspro.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.wmspro.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import setup_config_entry
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_scene_room_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_configuration_test: AsyncMock,
@@ -35,7 +35,7 @@ async def test_scene_room_device(
 
 
 async def test_scene_activate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_configuration_test: AsyncMock,
@@ -52,9 +52,9 @@ async def test_scene_activate(
     assert entity is not None
     assert entity == snapshot
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         SERVICE_TURN_ON,
         {ATTR_ENTITY_ID: entity.entity_id},
         blocking=True,

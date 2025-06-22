@@ -3,9 +3,9 @@
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.ai_task import AITaskPreferences
-from homeassistant.components.ai_task.const import DATA_PREFERENCES
-from homeassistant.core import HomeAssistant
+from smarthub.components.ai_task import AITaskPreferences
+from smarthub.components.ai_task.const import DATA_PREFERENCES
+from smarthub.core import SmartHub
 
 from .conftest import TEST_ENTITY_ID
 
@@ -13,7 +13,7 @@ from tests.common import flush_store
 
 
 async def test_preferences_storage_load(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that AITaskPreferences are stored and loaded correctly."""
     preferences = AITaskPreferences(hass)
@@ -59,7 +59,7 @@ async def test_preferences_storage_load(
     ],
 )
 async def test_generate_text_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: None,
     freezer: FrozenDateTimeFactory,
     set_preferences: dict[str, str | None],

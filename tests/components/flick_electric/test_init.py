@@ -6,15 +6,15 @@ import jwt
 from pyflick.types import APIException, AuthException
 import pytest
 
-from homeassistant.components.flick_electric import CONF_ID_TOKEN, HassFlickAuth
-from homeassistant.components.flick_electric.const import (
+from smarthub.components.flick_electric import CONF_ID_TOKEN, HassFlickAuth
+from smarthub.components.flick_electric.const import (
     CONF_ACCOUNT_ID,
     CONF_TOKEN_EXPIRY,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ACCESS_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_ACCESS_TOKEN
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import CONF, setup_integration
 
@@ -39,7 +39,7 @@ EXPIRED_TOKEN = jwt.encode(
     ],
 )
 async def test_init_auth_failure_triggers_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_flick_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
@@ -53,7 +53,7 @@ async def test_init_auth_failure_triggers_auth(
 
 
 async def test_init_migration_single_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_old_config_entry: MockConfigEntry,
     mock_flick_client: AsyncMock,
 ) -> None:
@@ -68,7 +68,7 @@ async def test_init_migration_single_account(
 
 
 async def test_init_migration_multi_account_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_old_config_entry: MockConfigEntry,
     mock_flick_client_multiple: AsyncMock,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_init_migration_multi_account_reauth(
 
 
 async def test_fetch_fresh_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_flick_client: AsyncMock,
 ) -> None:
@@ -91,7 +91,7 @@ async def test_fetch_fresh_token(
     await setup_integration(hass, mock_config_entry)
 
     with patch(
-        "homeassistant.components.flick_electric.config_flow.SimpleFlickAuth.get_new_token",
+        "smarthub.components.flick_electric.config_flow.SimpleFlickAuth.get_new_token",
         return_value={CONF_ID_TOKEN: NEW_TOKEN},
     ) as mock_get_new_token:
         auth = HassFlickAuth(hass, mock_config_entry)
@@ -101,7 +101,7 @@ async def test_fetch_fresh_token(
 
 
 async def test_reuse_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_flick_client: AsyncMock,
 ) -> None:
@@ -118,7 +118,7 @@ async def test_reuse_token(
     )
 
     with patch(
-        "homeassistant.components.flick_electric.config_flow.SimpleFlickAuth.get_new_token",
+        "smarthub.components.flick_electric.config_flow.SimpleFlickAuth.get_new_token",
         return_value={CONF_ID_TOKEN: NEW_TOKEN},
     ) as mock_get_new_token:
         auth = HassFlickAuth(hass, mock_config_entry)
@@ -128,7 +128,7 @@ async def test_reuse_token(
 
 
 async def test_fetch_expired_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_flick_client: AsyncMock,
 ) -> None:
@@ -145,7 +145,7 @@ async def test_fetch_expired_token(
     )
 
     with patch(
-        "homeassistant.components.flick_electric.config_flow.SimpleFlickAuth.get_new_token",
+        "smarthub.components.flick_electric.config_flow.SimpleFlickAuth.get_new_token",
         return_value={CONF_ID_TOKEN: NEW_TOKEN},
     ) as mock_get_new_token:
         auth = HassFlickAuth(hass, mock_config_entry)

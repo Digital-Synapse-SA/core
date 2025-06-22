@@ -6,11 +6,11 @@ from google_drive_api.exceptions import GoogleDriveApiError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.google_drive.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.components.google_drive.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .conftest import CLIENT_ID, TEST_USER_EMAIL
 
@@ -27,7 +27,7 @@ TITLE = "Google Drive"
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_api: MagicMock,
@@ -77,7 +77,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.google_drive.async_setup_entry", return_value=True
+        "smarthub.components.google_drive.async_setup_entry", return_value=True
     ) as mock_setup:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -103,7 +103,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_create_folder_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_api: MagicMock,
@@ -169,7 +169,7 @@ async def test_create_folder_error(
     ids=["api_not_enabled", "general_exception"],
 )
 async def test_get_email_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_api: MagicMock,
@@ -241,7 +241,7 @@ async def test_get_email_error(
     ids=["reauth_successful", "wrong_account"],
 )
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
@@ -290,7 +290,7 @@ async def test_reauth(
     )
 
     with patch(
-        "homeassistant.components.google_drive.async_setup_entry", return_value=True
+        "smarthub.components.google_drive.async_setup_entry", return_value=True
     ) as mock_setup:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
         await hass.async_block_till_done()
@@ -312,7 +312,7 @@ async def test_reauth(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,

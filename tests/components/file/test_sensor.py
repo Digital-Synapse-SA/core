@@ -4,9 +4,9 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.file import DOMAIN
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.file import DOMAIN
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, get_fixture_path
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry, get_fixture_path
 @patch("os.path.isfile", Mock(return_value=True))
 @patch("os.access", Mock(return_value=True))
 async def test_file_value_entry_setup(
-    hass: HomeAssistant, mock_is_allowed_path: MagicMock
+    hass: SmartHub, mock_is_allowed_path: MagicMock
 ) -> None:
     """Test the File sensor from an entry setup."""
     data = {
@@ -40,7 +40,7 @@ async def test_file_value_entry_setup(
 @patch("os.path.isfile", Mock(return_value=True))
 @patch("os.access", Mock(return_value=True))
 async def test_file_value_template(
-    hass: HomeAssistant, mock_is_allowed_path: MagicMock
+    hass: SmartHub, mock_is_allowed_path: MagicMock
 ) -> None:
     """Test the File sensor with JSON entries."""
     data = {
@@ -68,7 +68,7 @@ async def test_file_value_template(
 
 @patch("os.path.isfile", Mock(return_value=True))
 @patch("os.access", Mock(return_value=True))
-async def test_file_empty(hass: HomeAssistant, mock_is_allowed_path: MagicMock) -> None:
+async def test_file_empty(hass: SmartHub, mock_is_allowed_path: MagicMock) -> None:
     """Test the File sensor with an empty file."""
     data = {
         "platform": "sensor",
@@ -94,7 +94,7 @@ async def test_file_empty(hass: HomeAssistant, mock_is_allowed_path: MagicMock) 
 @patch("os.access", Mock(return_value=True))
 @pytest.mark.parametrize("is_allowed", [False])
 async def test_file_path_invalid(
-    hass: HomeAssistant, mock_is_allowed_path: MagicMock
+    hass: SmartHub, mock_is_allowed_path: MagicMock
 ) -> None:
     """Test the File sensor with invalid path."""
     data = {

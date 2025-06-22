@@ -5,11 +5,11 @@ from unittest.mock import Mock
 
 from aiohttp import ClientError
 
-from homeassistant.components.isy994.const import DOMAIN, ISY_URL_POSTFIX
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.isy994.const import DOMAIN, ISY_URL_POSTFIX
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .test_config_flow import MOCK_HOSTNAME, MOCK_UUID
 
@@ -22,7 +22,7 @@ MOCK_HEARTBEAT = "2021-05-01T00:00:00.000000"
 
 
 async def test_system_health(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test system health."""
     aioclient_mock.get(f"http://{MOCK_HOSTNAME}{ISY_URL_POSTFIX}", text="")
@@ -64,7 +64,7 @@ async def test_system_health(
 
 
 async def test_system_health_failed_connect(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test system health."""
     aioclient_mock.get(f"http://{MOCK_HOSTNAME}{ISY_URL_POSTFIX}", exc=ClientError)

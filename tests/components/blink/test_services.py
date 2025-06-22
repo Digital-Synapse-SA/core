@@ -4,15 +4,15 @@ from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
 
-from homeassistant.components.blink.const import (
+from smarthub.components.blink.const import (
     ATTR_CONFIG_ENTRY_ID,
     DOMAIN,
     SERVICE_SEND_PIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_PIN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_PIN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry
 
@@ -22,7 +22,7 @@ PIN = "1234"
 
 
 async def test_pin_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blink_api: MagicMock,
     mock_blink_auth_api: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -44,7 +44,7 @@ async def test_pin_service_calls(
     )
     assert mock_blink_api.auth.send_auth_key.assert_awaited_once
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SEND_PIN,
@@ -54,7 +54,7 @@ async def test_pin_service_calls(
 
 
 async def test_service_pin_called_with_non_blink_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blink_api: MagicMock,
     mock_blink_auth_api: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -80,7 +80,7 @@ async def test_service_pin_called_with_non_blink_device(
         CONF_PIN: PIN,
     }
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SEND_PIN,
@@ -90,7 +90,7 @@ async def test_service_pin_called_with_non_blink_device(
 
 
 async def test_service_pin_called_with_unloaded_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blink_api: MagicMock,
     mock_blink_auth_api: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -106,7 +106,7 @@ async def test_service_pin_called_with_unloaded_entry(
 
     parameters = {ATTR_CONFIG_ENTRY_ID: [mock_config_entry.entry_id], CONF_PIN: PIN}
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SEND_PIN,

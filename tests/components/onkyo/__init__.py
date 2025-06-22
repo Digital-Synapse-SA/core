@@ -2,9 +2,9 @@
 
 from unittest.mock import AsyncMock, Mock, patch
 
-from homeassistant.components.onkyo.receiver import Receiver, ReceiverInfo
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components.onkyo.receiver import Receiver, ReceiverInfo
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -68,7 +68,7 @@ def create_empty_config_entry() -> MockConfigEntry:
 
 
 async def setup_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry, receiver_info: ReceiverInfo
+    hass: SmartHub, config_entry: MockConfigEntry, receiver_info: ReceiverInfo
 ) -> None:
     """Fixture for setting up the component."""
 
@@ -81,7 +81,7 @@ async def setup_integration(
 
     with (
         patch(
-            "homeassistant.components.onkyo.async_interview",
+            "smarthub.components.onkyo.async_interview",
             return_value=receiver_info,
         ),
         patch.object(Receiver, "async_create", return_value=mock_receiver),

@@ -7,13 +7,13 @@ from awesomeversion import AwesomeVersion
 from go2rtc_client.rest import _StreamClient, _WebRTCClient
 import pytest
 
-from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
-from homeassistant.components.go2rtc.const import DOMAIN, RECOMMENDED_VERSION
-from homeassistant.components.go2rtc.server import Server
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.camera import DOMAIN as CAMERA_DOMAIN
+from smarthub.components.go2rtc.const import DOMAIN, RECOMMENDED_VERSION
+from smarthub.components.go2rtc.server import Server
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import MockCamera
 
@@ -26,7 +26,7 @@ from tests.common import (
     setup_test_component_platform,
 )
 
-GO2RTC_PATH = "homeassistant.components.go2rtc"
+GO2RTC_PATH = "smarthub.components.go2rtc"
 
 
 @pytest.fixture
@@ -34,9 +34,9 @@ def rest_client() -> Generator[AsyncMock]:
     """Mock a go2rtc rest client."""
     with (
         patch(
-            "homeassistant.components.go2rtc.Go2RtcRestClient", autospec=True
+            "smarthub.components.go2rtc.Go2RtcRestClient", autospec=True
         ) as mock_client,
-        patch("homeassistant.components.go2rtc.server.Go2RtcRestClient", mock_client),
+        patch("smarthub.components.go2rtc.server.Go2RtcRestClient", mock_client),
     ):
         client = mock_client.return_value
         client.streams = streams = Mock(spec_set=_StreamClient)
@@ -52,7 +52,7 @@ def rest_client() -> Generator[AsyncMock]:
 def ws_client() -> Generator[Mock]:
     """Mock a go2rtc websocket client."""
     with patch(
-        "homeassistant.components.go2rtc.Go2RtcWsClient", autospec=True
+        "smarthub.components.go2rtc.Go2RtcWsClient", autospec=True
     ) as ws_client_mock:
         yield ws_client_mock.return_value
 
@@ -122,7 +122,7 @@ def is_docker_env_fixture() -> bool:
 def mock_is_docker_env(is_docker_env: bool) -> Generator[Mock]:
     """Mock is_docker_env."""
     with patch(
-        "homeassistant.components.go2rtc.is_docker_env",
+        "smarthub.components.go2rtc.is_docker_env",
         return_value=is_docker_env,
     ) as mock_is_docker_env:
         yield mock_is_docker_env
@@ -138,7 +138,7 @@ def go2rtc_binary_fixture() -> str:
 def mock_get_binary(go2rtc_binary: str) -> Generator[Mock]:
     """Mock _get_binary."""
     with patch(
-        "homeassistant.components.go2rtc.shutil.which",
+        "smarthub.components.go2rtc.shutil.which",
         return_value=go2rtc_binary,
     ) as mock_which:
         yield mock_which
@@ -146,7 +146,7 @@ def mock_get_binary(go2rtc_binary: str) -> Generator[Mock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     rest_client: AsyncMock,
     mock_is_docker_env: Generator[Mock],
     mock_get_binary: Generator[Mock],
@@ -160,7 +160,7 @@ TEST_DOMAIN = "test"
 
 
 @pytest.fixture
-def integration_config_entry(hass: HomeAssistant) -> ConfigEntry:
+def integration_config_entry(hass: SmartHub) -> ConfigEntry:
     """Test mock config entry."""
     entry = MockConfigEntry(domain=TEST_DOMAIN)
     entry.add_to_hass(hass)
@@ -169,13 +169,13 @@ def integration_config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 @pytest.fixture
 async def init_test_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration_config_entry: ConfigEntry,
 ) -> MockCamera:
     """Initialize components."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -184,7 +184,7 @@ async def init_test_integration(
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Unload test config entry."""
         await hass.config_entries.async_forward_entry_unload(

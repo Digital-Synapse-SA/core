@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fastdotcom.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
+from smarthub.components.fastdotcom.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_get_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -32,7 +32,7 @@ async def test_get_config_entry_diagnostics(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.fastdotcom.coordinator.fast_com", return_value=50.3
+        "smarthub.components.fastdotcom.coordinator.fast_com", return_value=50.3
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()

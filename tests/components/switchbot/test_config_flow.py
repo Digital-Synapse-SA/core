@@ -4,22 +4,22 @@ from unittest.mock import patch
 
 from switchbot import SwitchbotAccountConnectionError, SwitchbotAuthenticationError
 
-from homeassistant.components.switchbot.const import (
+from smarthub.components.switchbot.const import (
     CONF_ENCRYPTION_KEY,
     CONF_KEY_ID,
     CONF_LOCK_NIGHTLATCH,
     CONF_RETRY_COUNT,
 )
-from homeassistant.config_entries import SOURCE_BLUETOOTH, SOURCE_IGNORE, SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_BLUETOOTH, SOURCE_IGNORE, SOURCE_USER
+from smarthub.const import (
     CONF_ADDRESS,
     CONF_NAME,
     CONF_PASSWORD,
     CONF_SENSOR_TYPE,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     NOT_SWITCHBOT_INFO,
@@ -41,7 +41,7 @@ from tests.common import MockConfigEntry
 DOMAIN = "switchbot"
 
 
-async def test_bluetooth_discovery(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -68,7 +68,7 @@ async def test_bluetooth_discovery(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_bluetooth_discovery_requires_password(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery_requires_password(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device that needs a password."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -96,7 +96,7 @@ async def test_bluetooth_discovery_requires_password(hass: HomeAssistant) -> Non
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_bluetooth_discovery_encrypted_key(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery_encrypted_key(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a lock."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -159,7 +159,7 @@ async def test_bluetooth_discovery_encrypted_key(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_bluetooth_discovery_key(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery_key(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a encrypted device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -204,7 +204,7 @@ async def test_bluetooth_discovery_key(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_bluetooth_discovery_already_setup(hass: HomeAssistant) -> None:
+async def test_bluetooth_discovery_already_setup(hass: SmartHub) -> None:
     """Test discovery via bluetooth with a valid device when already setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -226,7 +226,7 @@ async def test_bluetooth_discovery_already_setup(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_async_step_bluetooth_not_switchbot(hass: HomeAssistant) -> None:
+async def test_async_step_bluetooth_not_switchbot(hass: SmartHub) -> None:
     """Test discovery via bluetooth not switchbot."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -237,7 +237,7 @@ async def test_async_step_bluetooth_not_switchbot(hass: HomeAssistant) -> None:
     assert result["reason"] == "not_supported"
 
 
-async def test_async_step_bluetooth_not_connectable(hass: HomeAssistant) -> None:
+async def test_async_step_bluetooth_not_connectable(hass: SmartHub) -> None:
     """Test discovery via bluetooth and its not connectable switchbot."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -248,11 +248,11 @@ async def test_async_step_bluetooth_not_connectable(hass: HomeAssistant) -> None
     assert result["reason"] == "not_supported"
 
 
-async def test_user_setup_wohand(hass: HomeAssistant) -> None:
+async def test_user_setup_wohand(hass: SmartHub) -> None:
     """Test the user initiated form with password and valid mac."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WOHAND_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -279,7 +279,7 @@ async def test_user_setup_wohand(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_setup_wohand_already_configured(hass: HomeAssistant) -> None:
+async def test_user_setup_wohand_already_configured(hass: SmartHub) -> None:
     """Test the user initiated form with password and valid mac."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -293,7 +293,7 @@ async def test_user_setup_wohand_already_configured(hass: HomeAssistant) -> None
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WOHAND_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -303,14 +303,14 @@ async def test_user_setup_wohand_already_configured(hass: HomeAssistant) -> None
     assert result["reason"] == "no_devices_found"
 
 
-async def test_user_setup_wohand_replaces_ignored(hass: HomeAssistant) -> None:
+async def test_user_setup_wohand_replaces_ignored(hass: SmartHub) -> None:
     """Test setting up a switchbot replaces an ignored entry."""
     entry = MockConfigEntry(
         domain=DOMAIN, data={}, unique_id="aabbccddeeff", source=SOURCE_IGNORE
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WOHAND_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -336,11 +336,11 @@ async def test_user_setup_wohand_replaces_ignored(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_setup_wocurtain(hass: HomeAssistant) -> None:
+async def test_user_setup_wocurtain(hass: SmartHub) -> None:
     """Test the user initiated form with password and valid mac."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WOCURTAIN_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -367,11 +367,11 @@ async def test_user_setup_wocurtain(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_setup_wocurtain_or_bot(hass: HomeAssistant) -> None:
+async def test_user_setup_wocurtain_or_bot(hass: SmartHub) -> None:
     """Test the user initiated form with valid address."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[
             NOT_SWITCHBOT_INFO,
             WOCURTAIN_SERVICE_INFO,
@@ -403,11 +403,11 @@ async def test_user_setup_wocurtain_or_bot(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_setup_wocurtain_or_bot_with_password(hass: HomeAssistant) -> None:
+async def test_user_setup_wocurtain_or_bot_with_password(hass: SmartHub) -> None:
     """Test the user initiated form and valid address and a bot with a password."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[
             WOCURTAIN_SERVICE_INFO,
             WOHAND_ENCRYPTED_SERVICE_INFO,
@@ -447,11 +447,11 @@ async def test_user_setup_wocurtain_or_bot_with_password(hass: HomeAssistant) ->
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_setup_single_bot_with_password(hass: HomeAssistant) -> None:
+async def test_user_setup_single_bot_with_password(hass: SmartHub) -> None:
     """Test the user initiated form for a bot with a password."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WOHAND_ENCRYPTED_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -479,11 +479,11 @@ async def test_user_setup_single_bot_with_password(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_setup_woencrypted_key(hass: HomeAssistant) -> None:
+async def test_user_setup_woencrypted_key(hass: SmartHub) -> None:
     """Test the user initiated form for a lock."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WOLOCK_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -545,11 +545,11 @@ async def test_user_setup_woencrypted_key(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_setup_woencrypted_auth(hass: HomeAssistant) -> None:
+async def test_user_setup_woencrypted_auth(hass: SmartHub) -> None:
     """Test the user initiated form for a lock."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WOLOCK_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -619,12 +619,12 @@ async def test_user_setup_woencrypted_auth(hass: HomeAssistant) -> None:
 
 
 async def test_user_setup_woencrypted_auth_switchbot_api_down(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the user initiated form for a lock when the switchbot api is down."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WOLOCK_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -658,11 +658,11 @@ async def test_user_setup_woencrypted_auth_switchbot_api_down(
     assert result["description_placeholders"] == {"error_detail": "Switchbot API down"}
 
 
-async def test_user_setup_wolock_or_bot(hass: HomeAssistant) -> None:
+async def test_user_setup_wolock_or_bot(hass: SmartHub) -> None:
     """Test the user initiated form for a lock."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[
             WOLOCK_SERVICE_INFO,
             WOHAND_SERVICE_ALT_ADDRESS_INFO,
@@ -719,10 +719,10 @@ async def test_user_setup_wolock_or_bot(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_setup_wosensor(hass: HomeAssistant) -> None:
+async def test_user_setup_wosensor(hass: SmartHub) -> None:
     """Test the user initiated form with password and valid mac."""
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WOSENSORTH_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -749,10 +749,10 @@ async def test_user_setup_wosensor(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_no_devices(hass: HomeAssistant) -> None:
+async def test_user_no_devices(hass: SmartHub) -> None:
     """Test the user initiated form with password and valid mac."""
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -763,7 +763,7 @@ async def test_user_no_devices(hass: HomeAssistant) -> None:
 
 
 async def test_async_step_user_takes_precedence_over_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test manual setup takes precedence over discovery."""
     result = await hass.config_entries.flow.async_init(
@@ -775,7 +775,7 @@ async def test_async_step_user_takes_precedence_over_discovery(
     assert result["step_id"] == "confirm"
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WOCURTAIN_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -802,7 +802,7 @@ async def test_async_step_user_takes_precedence_over_discovery(
     assert not hass.config_entries.flow.async_progress(DOMAIN)
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test updating options."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -866,7 +866,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     assert entry.options[CONF_RETRY_COUNT] == 6
 
 
-async def test_options_flow_lock_pro(hass: HomeAssistant) -> None:
+async def test_options_flow_lock_pro(hass: SmartHub) -> None:
     """Test updating options."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -928,11 +928,11 @@ async def test_options_flow_lock_pro(hass: HomeAssistant) -> None:
     assert entry.options[CONF_LOCK_NIGHTLATCH] is True
 
 
-async def test_user_setup_worelay_switch_1pm_key(hass: HomeAssistant) -> None:
+async def test_user_setup_worelay_switch_1pm_key(hass: SmartHub) -> None:
     """Test the user initiated form for a relay switch 1pm."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WORELAY_SWITCH_1PM_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -976,11 +976,11 @@ async def test_user_setup_worelay_switch_1pm_key(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_setup_worelay_switch_1pm_auth(hass: HomeAssistant) -> None:
+async def test_user_setup_worelay_switch_1pm_auth(hass: SmartHub) -> None:
     """Test the user initiated form for a relay switch 1pm."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WORELAY_SWITCH_1PM_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -1049,12 +1049,12 @@ async def test_user_setup_worelay_switch_1pm_auth(hass: HomeAssistant) -> None:
 
 
 async def test_user_setup_worelay_switch_1pm_auth_switchbot_api_down(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the user initiated form for a relay switch 1pm when the switchbot api is down."""
 
     with patch(
-        "homeassistant.components.switchbot.config_flow.async_discovered_service_info",
+        "smarthub.components.switchbot.config_flow.async_discovered_service_info",
         return_value=[WORELAY_SWITCH_1PM_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(

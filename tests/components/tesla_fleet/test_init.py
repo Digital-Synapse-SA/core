@@ -20,8 +20,8 @@ from tesla_fleet_api.exceptions import (
     VehicleOffline,
 )
 
-from homeassistant.components.tesla_fleet.const import AUTHORIZE_URL
-from homeassistant.components.tesla_fleet.coordinator import (
+from smarthub.components.tesla_fleet.const import AUTHORIZE_URL
+from smarthub.components.tesla_fleet.coordinator import (
     ENERGY_HISTORY_INTERVAL,
     ENERGY_INTERVAL,
     ENERGY_INTERVAL_SECONDS,
@@ -29,11 +29,11 @@ from homeassistant.components.tesla_fleet.coordinator import (
     VEHICLE_INTERVAL_SECONDS,
     VEHICLE_WAIT,
 )
-from homeassistant.components.tesla_fleet.models import TeslaFleetData
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.tesla_fleet.models import TeslaFleetData
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
 
 from . import setup_platform
 from .const import VEHICLE_ASLEEP, VEHICLE_DATA_ALT
@@ -49,7 +49,7 @@ ERRORS = [
 
 
 async def test_load_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
 ) -> None:
     """Test load and unload."""
@@ -66,7 +66,7 @@ async def test_load_unload(
 
 @pytest.mark.parametrize(("side_effect", "state"), ERRORS)
 async def test_init_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_products: AsyncMock,
     side_effect: TeslaFleetError,
@@ -80,7 +80,7 @@ async def test_init_error(
 
 
 async def test_oauth_refresh_expired(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_products: AsyncMock,
 ) -> None:
@@ -88,7 +88,7 @@ async def test_oauth_refresh_expired(
 
     # Patch the token refresh to raise an error
     with patch(
-        "homeassistant.components.tesla_fleet.OAuth2Session.async_ensure_token_valid",
+        "smarthub.components.tesla_fleet.OAuth2Session.async_ensure_token_valid",
         side_effect=ClientResponseError(
             RequestInfo(AUTHORIZE_URL, "POST", {}, AUTHORIZE_URL), None, status=401
         ),
@@ -102,7 +102,7 @@ async def test_oauth_refresh_expired(
 
 
 async def test_oauth_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_products: AsyncMock,
 ) -> None:
@@ -110,7 +110,7 @@ async def test_oauth_refresh_error(
 
     # Patch the token refresh to raise an error
     with patch(
-        "homeassistant.components.tesla_fleet.OAuth2Session.async_ensure_token_valid",
+        "smarthub.components.tesla_fleet.OAuth2Session.async_ensure_token_valid",
         side_effect=ClientResponseError(
             RequestInfo(AUTHORIZE_URL, "POST", {}, AUTHORIZE_URL), None, status=400
         ),
@@ -125,7 +125,7 @@ async def test_oauth_refresh_error(
 
 # Test devices
 async def test_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,
@@ -142,7 +142,7 @@ async def test_devices(
 
 # Vehicle Coordinator
 async def test_vehicle_refresh_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_vehicle_state: AsyncMock,
     mock_vehicle_data: AsyncMock,
@@ -180,7 +180,7 @@ async def test_vehicle_refresh_offline(
 
 @pytest.mark.parametrize(("side_effect"), ERRORS)
 async def test_vehicle_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_vehicle_data: AsyncMock,
     side_effect: TeslaFleetError,
@@ -200,7 +200,7 @@ async def test_vehicle_refresh_error(
 
 
 async def test_vehicle_refresh_ratelimited(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_vehicle_data: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -226,7 +226,7 @@ async def test_vehicle_refresh_ratelimited(
 
 
 async def test_vehicle_sleep(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_vehicle_data: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -236,7 +236,7 @@ async def test_vehicle_sleep(
     TEST_INTERVAL = timedelta(seconds=120)
 
     with patch(
-        "homeassistant.components.tesla_fleet.coordinator.VEHICLE_INTERVAL",
+        "smarthub.components.tesla_fleet.coordinator.VEHICLE_INTERVAL",
         TEST_INTERVAL,
     ):
         await setup_platform(hass, normal_config_entry)
@@ -289,7 +289,7 @@ async def test_vehicle_sleep(
 # Test Energy Live Coordinator
 @pytest.mark.parametrize(("side_effect", "state"), ERRORS)
 async def test_energy_live_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_live_status: AsyncMock,
     side_effect: TeslaFleetError,
@@ -304,7 +304,7 @@ async def test_energy_live_refresh_error(
 # Test Energy Site Coordinator
 @pytest.mark.parametrize(("side_effect", "state"), ERRORS)
 async def test_energy_site_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_site_info: AsyncMock,
     side_effect: TeslaFleetError,
@@ -319,7 +319,7 @@ async def test_energy_site_refresh_error(
 # Test Energy History Coordinator
 @pytest.mark.parametrize(("side_effect", "state"), ERRORS)
 async def test_energy_history_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_energy_history: AsyncMock,
     side_effect: TeslaFleetError,
@@ -332,7 +332,7 @@ async def test_energy_history_refresh_error(
 
 
 async def test_energy_live_refresh_ratelimited(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_live_status,
     freezer: FrozenDateTimeFactory,
@@ -363,7 +363,7 @@ async def test_energy_live_refresh_ratelimited(
 
 
 async def test_energy_info_refresh_ratelimited(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_site_info: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -394,7 +394,7 @@ async def test_energy_info_refresh_ratelimited(
 
 
 async def test_energy_history_refresh_ratelimited(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_energy_history: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -427,7 +427,7 @@ async def test_energy_history_refresh_ratelimited(
 
 
 async def test_init_region_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_products: AsyncMock,
     mock_find_server: AsyncMock,
@@ -441,7 +441,7 @@ async def test_init_region_issue(
 
 
 async def test_init_region_issue_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_products: AsyncMock,
     mock_find_server: AsyncMock,
@@ -456,7 +456,7 @@ async def test_init_region_issue_failed(
 
 
 async def test_signing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     mock_products: AsyncMock,
 ) -> None:
@@ -468,14 +468,14 @@ async def test_signing(
     mock_products.return_value = products
 
     with patch(
-        "homeassistant.components.tesla_fleet.TeslaFleetApi.get_private_key"
+        "smarthub.components.tesla_fleet.TeslaFleetApi.get_private_key"
     ) as mock_get_private_key:
         await setup_platform(hass, normal_config_entry)
         mock_get_private_key.assert_called_once()
 
 
 async def test_bad_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bad_config_entry: MockConfigEntry,
 ) -> None:
     """Test handling of a bad authentication implementation."""

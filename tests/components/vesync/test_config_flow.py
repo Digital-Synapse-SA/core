@@ -2,15 +2,15 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.vesync import DOMAIN, config_flow
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.vesync import DOMAIN, config_flow
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_abort_already_setup(hass: HomeAssistant) -> None:
+async def test_abort_already_setup(hass: SmartHub) -> None:
     """Test if we abort because component is already setup."""
     flow = config_flow.VeSyncFlowHandler()
     flow.hass = hass
@@ -23,7 +23,7 @@ async def test_abort_already_setup(hass: HomeAssistant) -> None:
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_invalid_login_error(hass: HomeAssistant) -> None:
+async def test_invalid_login_error(hass: SmartHub) -> None:
     """Test if we return error for invalid username and password."""
     test_dict = {CONF_USERNAME: "user", CONF_PASSWORD: "pass"}
     flow = config_flow.VeSyncFlowHandler()
@@ -35,7 +35,7 @@ async def test_invalid_login_error(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_config_flow_user_input(hass: HomeAssistant) -> None:
+async def test_config_flow_user_input(hass: SmartHub) -> None:
     """Test config flow with user input."""
     flow = config_flow.VeSyncFlowHandler()
     flow.hass = hass
@@ -50,7 +50,7 @@ async def test_config_flow_user_input(hass: HomeAssistant) -> None:
         assert result["data"][CONF_PASSWORD] == "pass"
 
 
-async def test_reauth_flow(hass: HomeAssistant) -> None:
+async def test_reauth_flow(hass: SmartHub) -> None:
     """Test a successful reauth flow."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -76,7 +76,7 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_reauth_flow_invalid_auth(hass: HomeAssistant) -> None:
+async def test_reauth_flow_invalid_auth(hass: SmartHub) -> None:
     """Test an authorization error reauth flow."""
 
     mock_entry = MockConfigEntry(

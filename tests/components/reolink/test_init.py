@@ -14,19 +14,19 @@ from reolink_aio.exceptions import (
     ReolinkError,
 )
 
-from homeassistant.components.reolink import (
+from smarthub.components.reolink import (
     DEVICE_UPDATE_INTERVAL,
     FIRMWARE_UPDATE_INTERVAL,
     NUM_CRED_ERRORS,
 )
-from homeassistant.components.reolink.const import (
+from smarthub.components.reolink.const import (
     BATTERY_ALL_WAKE_UPDATE_INTERVAL,
     BATTERY_PASSIVE_WAKE_UPDATE_INTERVAL,
     CONF_BC_PORT,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
@@ -37,15 +37,15 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.helpers import (
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
 )
-from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, format_mac
-from homeassistant.setup import async_setup_component
+from smarthub.helpers.device_registry import CONNECTION_NETWORK_MAC, format_mac
+from smarthub.setup import async_setup_component
 
 from .conftest import (
     CONF_SUPPORTS_PRIVACY_MODE,
@@ -115,7 +115,7 @@ async def test_wait(*args, **key_args) -> None:
     ],
 )
 async def test_failures_parametrized(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_host: MagicMock,
     config_entry: MockConfigEntry,
     attr: str,
@@ -133,14 +133,14 @@ async def test_failures_parametrized(
 
 
 async def test_firmware_error_twice(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     reolink_host: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test when the firmware update fails 2 times."""
     reolink_host.check_new_firmware.side_effect = ReolinkError("Test error")
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.UPDATE]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.UPDATE]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -157,14 +157,14 @@ async def test_firmware_error_twice(
 
 
 async def test_credential_error_three(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     reolink_host: MagicMock,
     config_entry: MockConfigEntry,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test when the update gives credential error 3 times."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -182,7 +182,7 @@ async def test_credential_error_three(
 
 
 async def test_entry_reloading(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
 ) -> None:
@@ -228,7 +228,7 @@ async def test_entry_reloading(
     ],
 )
 async def test_removing_disconnected_cams(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
@@ -243,7 +243,7 @@ async def test_removing_disconnected_cams(
     assert await async_setup_component(hass, "config", {})
     client = await hass_ws_client(hass)
     # setup CH 0 and NVR switch entities/device
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -290,7 +290,7 @@ async def test_removing_disconnected_cams(
     ],
 )
 async def test_removing_chime(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
@@ -306,7 +306,7 @@ async def test_removing_chime(
     assert await async_setup_component(hass, "config", {})
     client = await hass_ws_client(hass)
     # setup CH 0 and NVR switch entities/device
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -428,7 +428,7 @@ async def test_removing_chime(
     ],
 )
 async def test_migrate_entity_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -480,7 +480,7 @@ async def test_migrate_entity_ids(
         )
 
     # setup CH 0 and host entities/device
-    with patch("homeassistant.components.reolink.PLATFORMS", [domain]):
+    with patch("smarthub.components.reolink.PLATFORMS", [domain]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -497,7 +497,7 @@ async def test_migrate_entity_ids(
 
 
 async def test_migrate_with_already_existing_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -534,7 +534,7 @@ async def test_migrate_with_already_existing_device(
     assert device_registry.async_get_device(identifiers={(DOMAIN, new_dev_id)})
 
     # setup CH 0 and host entities/device
-    with patch("homeassistant.components.reolink.PLATFORMS", [domain]):
+    with patch("smarthub.components.reolink.PLATFORMS", [domain]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -546,7 +546,7 @@ async def test_migrate_with_already_existing_device(
 
 
 async def test_migrate_with_already_existing_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -598,7 +598,7 @@ async def test_migrate_with_already_existing_entity(
     assert entity_registry.async_get_entity_id(domain, DOMAIN, new_id)
 
     # setup CH 0 and host entities/device
-    with patch("homeassistant.components.reolink.PLATFORMS", [domain]):
+    with patch("smarthub.components.reolink.PLATFORMS", [domain]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -607,7 +607,7 @@ async def test_migrate_with_already_existing_entity(
 
 
 async def test_cleanup_mac_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -643,7 +643,7 @@ async def test_cleanup_mac_connection(
     assert device.connections == {(CONNECTION_NETWORK_MAC, TEST_MAC)}
 
     # setup CH 0 and host entities/device
-    with patch("homeassistant.components.reolink.PLATFORMS", [domain]):
+    with patch("smarthub.components.reolink.PLATFORMS", [domain]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -654,7 +654,7 @@ async def test_cleanup_mac_connection(
 
 
 async def test_cleanup_combined_with_NVR(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -695,7 +695,7 @@ async def test_cleanup_combined_with_NVR(
     assert device.identifiers == start_identifiers
 
     # setup CH 0 and host entities/device
-    with patch("homeassistant.components.reolink.PLATFORMS", [domain]):
+    with patch("smarthub.components.reolink.PLATFORMS", [domain]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -712,7 +712,7 @@ async def test_cleanup_combined_with_NVR(
 
 
 async def test_cleanup_hub_and_direct_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -752,7 +752,7 @@ async def test_cleanup_hub_and_direct_connection(
     assert device.identifiers == start_identifiers
 
     # setup CH 0 and host entities/device
-    with patch("homeassistant.components.reolink.PLATFORMS", [domain]):
+    with patch("smarthub.components.reolink.PLATFORMS", [domain]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -763,11 +763,11 @@ async def test_cleanup_hub_and_direct_connection(
 
 
 async def test_no_repair_issue(
-    hass: HomeAssistant, config_entry: MockConfigEntry, issue_registry: ir.IssueRegistry
+    hass: SmartHub, config_entry: MockConfigEntry, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test no repairs issue is raised when http local url is used."""
     await async_process_ha_core_config(
-        hass, {"country": "GB", "internal_url": "http://test_homeassistant_address"}
+        hass, {"country": "GB", "internal_url": "http://test_smarthub_address"}
     )
 
     assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -781,7 +781,7 @@ async def test_no_repair_issue(
 
 
 async def test_https_repair_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     issue_registry: ir.IssueRegistry,
@@ -789,16 +789,16 @@ async def test_https_repair_issue(
     """Test repairs issue is raised when https local url is used."""
     reolink_host.get_states = test_wait
     await async_process_ha_core_config(
-        hass, {"country": "GB", "internal_url": "https://test_homeassistant_address"}
+        hass, {"country": "GB", "internal_url": "https://test_smarthub_address"}
     )
 
     with (
-        patch("homeassistant.components.reolink.host.FIRST_ONVIF_TIMEOUT", new=0),
+        patch("smarthub.components.reolink.host.FIRST_ONVIF_TIMEOUT", new=0),
         patch(
-            "homeassistant.components.reolink.host.FIRST_ONVIF_LONG_POLL_TIMEOUT", new=0
+            "smarthub.components.reolink.host.FIRST_ONVIF_LONG_POLL_TIMEOUT", new=0
         ),
         patch(
-            "homeassistant.components.reolink.host.ReolinkHost._async_long_polling",
+            "smarthub.components.reolink.host.ReolinkHost._async_long_polling",
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -808,7 +808,7 @@ async def test_https_repair_issue(
 
 
 async def test_ssl_repair_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     issue_registry: ir.IssueRegistry,
@@ -819,16 +819,16 @@ async def test_ssl_repair_issue(
     hass.config.api.use_ssl = True
 
     await async_process_ha_core_config(
-        hass, {"country": "GB", "internal_url": "http://test_homeassistant_address"}
+        hass, {"country": "GB", "internal_url": "http://test_smarthub_address"}
     )
 
     with (
-        patch("homeassistant.components.reolink.host.FIRST_ONVIF_TIMEOUT", new=0),
+        patch("smarthub.components.reolink.host.FIRST_ONVIF_TIMEOUT", new=0),
         patch(
-            "homeassistant.components.reolink.host.FIRST_ONVIF_LONG_POLL_TIMEOUT", new=0
+            "smarthub.components.reolink.host.FIRST_ONVIF_LONG_POLL_TIMEOUT", new=0
         ),
         patch(
-            "homeassistant.components.reolink.host.ReolinkHost._async_long_polling",
+            "smarthub.components.reolink.host.ReolinkHost._async_long_polling",
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -839,7 +839,7 @@ async def test_ssl_repair_issue(
 
 @pytest.mark.parametrize("protocol", ["rtsp", "rtmp"])
 async def test_port_repair_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     protocol: str,
@@ -858,7 +858,7 @@ async def test_port_repair_issue(
 
 
 async def test_webhook_repair_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     issue_registry: ir.IssueRegistry,
@@ -866,12 +866,12 @@ async def test_webhook_repair_issue(
     """Test repairs issue is raised when the webhook url is unreachable."""
     reolink_host.get_states = test_wait
     with (
-        patch("homeassistant.components.reolink.host.FIRST_ONVIF_TIMEOUT", new=0),
+        patch("smarthub.components.reolink.host.FIRST_ONVIF_TIMEOUT", new=0),
         patch(
-            "homeassistant.components.reolink.host.FIRST_ONVIF_LONG_POLL_TIMEOUT", new=0
+            "smarthub.components.reolink.host.FIRST_ONVIF_LONG_POLL_TIMEOUT", new=0
         ),
         patch(
-            "homeassistant.components.reolink.host.ReolinkHost._async_long_polling",
+            "smarthub.components.reolink.host.ReolinkHost._async_long_polling",
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -881,7 +881,7 @@ async def test_webhook_repair_issue(
 
 
 async def test_firmware_repair_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
     issue_registry: ir.IssueRegistry,
@@ -895,7 +895,7 @@ async def test_firmware_repair_issue(
 
 
 async def test_password_too_long_repair_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_host: MagicMock,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -928,13 +928,13 @@ async def test_password_too_long_repair_issue(
 
 
 async def test_new_device_discovered(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     reolink_host: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test the entry is reloaded when a new camera or chime is detected."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -949,7 +949,7 @@ async def test_new_device_discovered(
 
 
 async def test_port_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_host: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -964,7 +964,7 @@ async def test_port_changed(
 
 
 async def test_baichuan_port_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_host: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -979,7 +979,7 @@ async def test_baichuan_port_changed(
 
 
 async def test_privacy_mode_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     reolink_host: MagicMock,
     config_entry: MockConfigEntry,
@@ -988,7 +988,7 @@ async def test_privacy_mode_on(
     reolink_host.baichuan.privacy_mode.return_value = True
     reolink_host.get_states = AsyncMock(side_effect=LoginPrivacyModeError("Test error"))
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -996,7 +996,7 @@ async def test_privacy_mode_on(
 
 
 async def test_LoginPrivacyModeError(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     reolink_host: MagicMock,
     config_entry: MockConfigEntry,
@@ -1005,7 +1005,7 @@ async def test_LoginPrivacyModeError(
     reolink_host.baichuan.privacy_mode.return_value = False
     reolink_host.get_states = AsyncMock(side_effect=LoginPrivacyModeError("Test error"))
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -1020,7 +1020,7 @@ async def test_LoginPrivacyModeError(
 
 
 async def test_privacy_mode_change_callback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
@@ -1045,7 +1045,7 @@ async def test_privacy_mode_change_callback(
     reolink_host.baichuan.privacy_mode.return_value = True
     reolink_host.audio_record.return_value = True
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -1086,7 +1086,7 @@ async def test_privacy_mode_change_callback(
 
 
 async def test_camera_wake_callback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
     reolink_host: MagicMock,
@@ -1112,9 +1112,9 @@ async def test_camera_wake_callback(
     reolink_host.audio_record.return_value = True
 
     with (
-        patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]),
+        patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]),
         patch(
-            "homeassistant.components.reolink.host.time",
+            "smarthub.components.reolink.host.time",
             return_value=BATTERY_ALL_WAKE_UPDATE_INTERVAL,
         ),
     ):
@@ -1134,13 +1134,13 @@ async def test_camera_wake_callback(
     assert callback_mock.callback_func is not None
     with (
         patch(
-            "homeassistant.components.reolink.host.time",
+            "smarthub.components.reolink.host.time",
             return_value=BATTERY_ALL_WAKE_UPDATE_INTERVAL
             + BATTERY_PASSIVE_WAKE_UPDATE_INTERVAL
             + 5,
         ),
         patch(
-            "homeassistant.components.reolink.time",
+            "smarthub.components.reolink.time",
             return_value=BATTERY_ALL_WAKE_UPDATE_INTERVAL
             + BATTERY_PASSIVE_WAKE_UPDATE_INTERVAL
             + 5,
@@ -1155,20 +1155,20 @@ async def test_camera_wake_callback(
 
 
 async def test_baichaun_only(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_connect: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test initializing a baichuan only device."""
     reolink_connect.baichuan_only = True
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SWITCH]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
 
 async def test_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_host: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:

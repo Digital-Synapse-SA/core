@@ -2,18 +2,18 @@
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.device_automation.exceptions import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.device_automation.exceptions import (
     InvalidDeviceAutomationConfig,
 )
-from homeassistant.components.samsungtv import device_trigger
-from homeassistant.components.samsungtv.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.samsungtv import device_trigger
+from smarthub.components.samsungtv.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import setup_samsungtv_entry
 from .const import ENTRYDATA_ENCRYPTED_WEBSOCKET
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry, async_get_device_automations
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
 async def test_get_triggers(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test we get the expected triggers."""
     await setup_samsungtv_entry(hass, ENTRYDATA_ENCRYPTED_WEBSOCKET)
@@ -48,7 +48,7 @@ async def test_get_triggers(
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
 async def test_if_fires_on_turn_on_request(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -111,13 +111,13 @@ async def test_if_fires_on_turn_on_request(
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
 async def test_failure_scenarios(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test failure scenarios."""
     await setup_samsungtv_entry(hass, ENTRYDATA_ENCRYPTED_WEBSOCKET)
 
     # Test wrong trigger platform type
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await device_trigger.async_attach_trigger(
             hass, {"type": "wrong.type", "device_id": "invalid_device_id"}, None, {}
         )

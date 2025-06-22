@@ -8,9 +8,9 @@ from zigpy.zcl import Cluster
 from zigpy.zcl.clusters import general, homeautomation, hvac, measurement, smartenergy
 from zigpy.zcl.clusters.hvac import Thermostat
 
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.components.zha.helpers import get_zha_gateway
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.components.zha.helpers import get_zha_gateway
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     LIGHT_LUX,
@@ -25,7 +25,7 @@ from homeassistant.const import (
     UnitOfPressure,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import send_attributes_report
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
@@ -38,7 +38,7 @@ ENTITY_ID_PREFIX = "sensor.fakemanufacturer_fakemodel_{}"
 def sensor_platform_only():
     """Only set up the sensor and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.DEVICE_TRACKER,
             Platform.SENSOR,
@@ -47,19 +47,19 @@ def sensor_platform_only():
         yield
 
 
-async def async_test_humidity(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def async_test_humidity(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Test humidity sensor."""
     await send_attributes_report(hass, cluster, {1: 1, 0: 1000, 2: 100})
     assert_state(hass, entity_id, "10.0", PERCENTAGE)
 
 
-async def async_test_temperature(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def async_test_temperature(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Test temperature sensor."""
     await send_attributes_report(hass, cluster, {1: 1, 0: 2900, 2: 100})
     assert_state(hass, entity_id, "29.0", UnitOfTemperature.CELSIUS)
 
 
-async def async_test_pressure(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def async_test_pressure(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Test pressure sensor."""
     await send_attributes_report(hass, cluster, {1: 1, 0: 1000, 2: 10000})
     assert_state(hass, entity_id, "1000", UnitOfPressure.HPA)
@@ -68,7 +68,7 @@ async def async_test_pressure(hass: HomeAssistant, cluster: Cluster, entity_id: 
     assert_state(hass, entity_id, "1000", UnitOfPressure.HPA)
 
 
-async def async_test_illuminance(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def async_test_illuminance(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Test illuminance sensor."""
     await send_attributes_report(hass, cluster, {1: 1, 0: 10, 2: 20})
     assert_state(hass, entity_id, "1", LIGHT_LUX)
@@ -80,7 +80,7 @@ async def async_test_illuminance(hass: HomeAssistant, cluster: Cluster, entity_i
     assert_state(hass, entity_id, "unknown", LIGHT_LUX)
 
 
-async def async_test_metering(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def async_test_metering(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Test Smart Energy metering sensor."""
     await send_attributes_report(hass, cluster, {1025: 1, 1024: 12345, 1026: 100})
     assert_state(hass, entity_id, "12345.0", None)
@@ -127,7 +127,7 @@ async def async_test_metering(hass: HomeAssistant, cluster: Cluster, entity_id: 
 
 
 async def async_test_smart_energy_summation_delivered(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test SmartEnergy Summation delivered sensor."""
 
@@ -144,7 +144,7 @@ async def async_test_smart_energy_summation_delivered(
 
 
 async def async_test_smart_energy_summation_received(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test SmartEnergy Summation received sensor."""
 
@@ -161,7 +161,7 @@ async def async_test_smart_energy_summation_received(
 
 
 async def async_test_electrical_measurement(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test electrical measurement sensor."""
     # update divisor cached value
@@ -185,7 +185,7 @@ async def async_test_electrical_measurement(
 
 
 async def async_test_em_apparent_power(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test electrical measurement Apparent Power sensor."""
     # update divisor cached value
@@ -205,7 +205,7 @@ async def async_test_em_apparent_power(
 
 
 async def async_test_em_power_factor(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test electrical measurement Power Factor sensor."""
     # update divisor cached value
@@ -225,7 +225,7 @@ async def async_test_em_power_factor(
 
 
 async def async_test_em_rms_current(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test electrical measurement RMS Current sensor."""
 
@@ -245,7 +245,7 @@ async def async_test_em_rms_current(
 
 
 async def async_test_em_rms_voltage(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test electrical measurement RMS Voltage sensor."""
 
@@ -265,7 +265,7 @@ async def async_test_em_rms_voltage(
 
 
 async def async_test_powerconfiguration(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test powerconfiguration/battery sensor."""
     await send_attributes_report(hass, cluster, {33: 98})
@@ -278,7 +278,7 @@ async def async_test_powerconfiguration(
 
 
 async def async_test_powerconfiguration2(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test powerconfiguration/battery sensor."""
     await send_attributes_report(hass, cluster, {33: -1})
@@ -292,7 +292,7 @@ async def async_test_powerconfiguration2(
 
 
 async def async_test_device_temperature(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test temperature sensor."""
     await send_attributes_report(hass, cluster, {0: 2900})
@@ -300,7 +300,7 @@ async def async_test_device_temperature(
 
 
 async def async_test_setpoint_change_source(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test the translation of numerical state into enum text."""
     await send_attributes_report(
@@ -311,7 +311,7 @@ async def async_test_setpoint_change_source(
 
 
 async def async_test_pi_heating_demand(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test pi heating demand is correctly returned."""
     await send_attributes_report(
@@ -518,7 +518,7 @@ async def async_test_pi_heating_demand(
     ],
 )
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_zha,
     zigpy_device_mock,
     cluster_id,
@@ -581,7 +581,7 @@ async def test_sensor(
     await test_func(hass, cluster, entity_id)
 
 
-def assert_state(hass: HomeAssistant, entity_id, state, unit_of_measurement):
+def assert_state(hass: SmartHub, entity_id, state, unit_of_measurement):
     """Check that the state is what is expected.
 
     This is used to ensure that the logic in each sensor class handled the

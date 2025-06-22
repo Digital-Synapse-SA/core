@@ -14,14 +14,14 @@ from freezegun.api import FrozenDateTimeFactory
 from gcal_sync.auth import API_BASE_URL
 import pytest
 
-from homeassistant.components.google.const import CONF_CALENDAR_ACCESS, DOMAIN
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_registry import RegistryEntryDisabler
-from homeassistant.helpers.template import DATE_STR_FORMAT
-from homeassistant.util import dt as dt_util
+from smarthub.components.google.const import CONF_CALENDAR_ACCESS, DOMAIN
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_registry import RegistryEntryDisabler
+from smarthub.helpers.template import DATE_STR_FORMAT
+from smarthub.util import dt as dt_util
 
 from .conftest import (
     CALENDAR_ID,
@@ -110,7 +110,7 @@ type ClientFixture = Callable[[], Awaitable[Client]]
 
 @pytest.fixture
 async def ws_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> ClientFixture:
     """Fixture for creating the test websocket client."""
@@ -123,7 +123,7 @@ async def ws_client(
 
 
 async def test_all_day_event(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test for an all day calendar event."""
     week_from_today = dt_util.now().date() + datetime.timedelta(days=7)
@@ -154,7 +154,7 @@ async def test_all_day_event(
 
 
 async def test_future_event(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test for an upcoming event."""
     one_hour_from_now = dt_util.now() + datetime.timedelta(minutes=30)
@@ -185,7 +185,7 @@ async def test_future_event(
 
 
 async def test_in_progress_event(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test an event that is active now."""
     middle_of_event = dt_util.now() - datetime.timedelta(minutes=30)
@@ -216,7 +216,7 @@ async def test_in_progress_event(
 
 
 async def test_offset_in_progress_event(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test an event that is active now with an offset."""
     middle_of_event = dt_util.now() + datetime.timedelta(minutes=14)
@@ -249,7 +249,7 @@ async def test_offset_in_progress_event(
 
 
 async def test_all_day_offset_in_progress_event(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test an all day event that is currently in progress due to an offset."""
     tomorrow = dt_util.now().date() + datetime.timedelta(days=1)
@@ -282,7 +282,7 @@ async def test_all_day_offset_in_progress_event(
 
 
 async def test_all_day_offset_event(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test an all day event that not in progress due to an offset."""
     now = dt_util.now()
@@ -317,7 +317,7 @@ async def test_all_day_offset_event(
 
 
 async def test_missing_summary(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test that a summary is optional."""
     start_event = dt_util.now() + datetime.timedelta(minutes=14)
@@ -349,7 +349,7 @@ async def test_missing_summary(
 
 
 async def test_update_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup,
     mock_events_list,
     aioclient_mock: AiohttpClientMocker,
@@ -384,7 +384,7 @@ async def test_update_error(
     aioclient_mock.clear_requests()
     mock_events_list({}, exc=ClientError())
 
-    with patch("homeassistant.util.utcnow", return_value=now):
+    with patch("smarthub.util.utcnow", return_value=now):
         async_fire_time_changed(hass, now)
         await hass.async_block_till_done()
         # Ensure coordinator update completes
@@ -416,7 +416,7 @@ async def test_update_error(
         }
     )
 
-    with patch("homeassistant.util.utcnow", return_value=now):
+    with patch("smarthub.util.utcnow", return_value=now):
         async_fire_time_changed(hass, now)
         await hass.async_block_till_done()
         # Ensure coordinator update completes
@@ -430,7 +430,7 @@ async def test_update_error(
 
 
 async def test_calendars_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     component_setup,
     mock_events_list_items,
@@ -452,7 +452,7 @@ async def test_calendars_api(
 
 
 async def test_http_event_api_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     component_setup,
     mock_events_list,
@@ -474,7 +474,7 @@ async def test_http_event_api_failure(
 
 @pytest.mark.freeze_time("2022-03-27 12:05:00+00:00")
 async def test_http_api_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_events_list_items,
     component_setup,
@@ -502,7 +502,7 @@ async def test_http_api_event(
 
 @pytest.mark.freeze_time("2022-03-27 12:05:00+00:00")
 async def test_http_api_all_day_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_events_list_items,
     component_setup,
@@ -543,7 +543,7 @@ async def test_http_api_all_day_event(
     ],
 )
 async def test_opaque_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_calendars_yaml,
     mock_events_list_items,
@@ -573,7 +573,7 @@ async def test_opaque_event(
 
 
 async def test_declined_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_calendars_yaml,
     mock_events_list_items,
@@ -601,7 +601,7 @@ async def test_declined_event(
 
 
 async def test_attending_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_calendars_yaml,
     mock_events_list_items,
@@ -630,7 +630,7 @@ async def test_attending_event(
 
 @pytest.mark.parametrize("mock_test_setup", [None])
 async def test_scan_calendar_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup,
     mock_calendars_list: ApiResult,
     config_entry,
@@ -643,7 +643,7 @@ async def test_scan_calendar_error(
 
 
 async def test_future_event_update_behavior(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_events_list_items,
     component_setup,
@@ -680,7 +680,7 @@ async def test_future_event_update_behavior(
 
 
 async def test_future_event_offset_update_behavior(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_events_list_items,
     component_setup,
@@ -721,7 +721,7 @@ async def test_future_event_offset_update_behavior(
 
 
 async def test_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_events_list_items,
     component_setup,
@@ -743,7 +743,7 @@ async def test_unique_id(
     "old_unique_id", [CALENDAR_ID, f"{CALENDAR_ID}-we_are_we_are_a_test_calendar"]
 )
 async def test_unique_id_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_events_list_items,
     component_setup,
@@ -798,7 +798,7 @@ async def test_unique_id_migration(
     ],
 )
 async def test_invalid_unique_id_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_events_list_items,
     component_setup,
@@ -850,7 +850,7 @@ async def test_invalid_unique_id_cleanup(
     ],
 )
 async def test_all_day_iter_order(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_events_list_items,
     component_setup,
@@ -896,7 +896,7 @@ async def test_all_day_iter_order(
 
 
 async def test_websocket_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     test_api_calendar: dict[str, Any],
     mock_insert_event: Callable[..., None],
@@ -938,7 +938,7 @@ async def test_websocket_create(
 
 
 async def test_websocket_create_all_day(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     test_api_calendar: dict[str, Any],
     mock_insert_event: Callable[..., None],
@@ -1135,7 +1135,7 @@ async def test_websocket_delete_recurring_event_instance(
     ],
 )
 async def test_readonly_websocket_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     test_api_calendar: dict[str, Any],
     mock_insert_event: Callable[..., None],
@@ -1186,7 +1186,7 @@ async def test_readonly_websocket_create(
     ],
 )
 async def test_readonly_search_calendar(
-    hass: HomeAssistant,
+    hass: SmartHub,
     component_setup: ComponentSetup,
     mock_calendars_yaml,
     mock_insert_event: Callable[..., None],
@@ -1221,7 +1221,7 @@ async def test_readonly_search_calendar(
 
 @pytest.mark.parametrize("calendar_access_role", ["reader", "freeBusyReader"])
 async def test_all_day_reader_access(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test that reader / freebusy reader access can load properly."""
     week_from_today = dt_util.now().date() + datetime.timedelta(days=7)
@@ -1252,7 +1252,7 @@ async def test_all_day_reader_access(
 
 @pytest.mark.parametrize("calendar_access_role", ["reader", "freeBusyReader"])
 async def test_reader_in_progress_event(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test reader access for an event in process."""
     middle_of_event = dt_util.now() - datetime.timedelta(minutes=30)
@@ -1282,7 +1282,7 @@ async def test_reader_in_progress_event(
 
 
 async def test_all_day_event_without_duration(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test that an all day event without a duration is adjusted to have a duration of one day."""
     week_from_today = dt_util.now().date() + datetime.timedelta(days=7)
@@ -1314,7 +1314,7 @@ async def test_all_day_event_without_duration(
 
 
 async def test_event_without_duration(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Google calendar UI allows creating events without a duration."""
     one_hour_from_now = dt_util.now() + datetime.timedelta(minutes=30)
@@ -1339,7 +1339,7 @@ async def test_event_without_duration(
 
 
 async def test_event_differs_timezone(
-    hass: HomeAssistant, mock_events_list_items, component_setup
+    hass: SmartHub, mock_events_list_items, component_setup
 ) -> None:
     """Test a case where the event has a different start/end timezone."""
     one_hour_from_now = dt_util.now() + datetime.timedelta(minutes=30)
@@ -1374,7 +1374,7 @@ async def test_event_differs_timezone(
 
 @pytest.mark.freeze_time("2023-11-30 12:15:00 +00:00")
 async def test_invalid_rrule_fix(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_events_list_items,
     component_setup,
@@ -1429,7 +1429,7 @@ async def test_invalid_rrule_fix(
     ],
 )
 async def test_working_location_ignored(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_events_list_items: Callable[[list[dict[str, Any]]], None],
     component_setup: ComponentSetup,
@@ -1461,7 +1461,7 @@ async def test_working_location_ignored(
 )
 @pytest.mark.parametrize("calendar_is_primary", [True])
 async def test_working_location_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     entity_registry: er.EntityRegistry,
     mock_events_list_items: Callable[[list[dict[str, Any]]], None],
@@ -1499,7 +1499,7 @@ async def test_working_location_entity(
 
 @pytest.mark.parametrize("calendar_is_primary", [False])
 async def test_no_working_location_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     entity_registry: er.EntityRegistry,
     mock_events_list_items: Callable[[list[dict[str, Any]]], None],
@@ -1528,7 +1528,7 @@ async def test_no_working_location_entity(
 )
 @pytest.mark.parametrize("calendar_is_primary", [True])
 async def test_birthday_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     entity_registry: er.EntityRegistry,
     mock_events_list_items: Callable[[list[dict[str, Any]]], None],

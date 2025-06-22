@@ -3,10 +3,10 @@
 from collections.abc import Generator
 from unittest.mock import patch
 
-from homeassistant.components.valve import ValveState
-from homeassistant.components.watergate.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.valve import ValveState
+from smarthub.components.watergate.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import init_integration
 from .const import MOCK_WEBHOOK_ID
@@ -16,7 +16,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_async_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry: MockConfigEntry,
     mock_watergate_client: Generator[AsyncMock],
 ) -> None:
@@ -24,7 +24,7 @@ async def test_async_setup_entry(
     hass.config.internal_url = "http://hassio.local"
 
     with (
-        patch("homeassistant.components.watergate.async_register") as mock_webhook,
+        patch("smarthub.components.watergate.async_register") as mock_webhook,
     ):
         await init_integration(hass, mock_entry)
 
@@ -44,7 +44,7 @@ async def test_async_setup_entry(
 
 
 async def test_handle_webhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mock_entry: MockConfigEntry,
     mock_watergate_client: Generator[AsyncMock],

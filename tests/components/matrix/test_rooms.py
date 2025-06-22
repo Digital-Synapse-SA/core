@@ -2,18 +2,18 @@
 
 import pytest
 
-from homeassistant.components.matrix import MatrixBot
-from homeassistant.components.matrix.const import DOMAIN
-from homeassistant.components.notify import DOMAIN as NOTIFY_DOMAIN
-from homeassistant.const import EVENT_HOMEASSISTANT_START
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.matrix import MatrixBot
+from smarthub.components.matrix.const import DOMAIN
+from smarthub.components.notify import DOMAIN as NOTIFY_DOMAIN
+from smarthub.const import EVENT_HOMEASSISTANT_START
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .conftest import MOCK_CONFIG_DATA, TEST_BAD_ROOM, TEST_JOINABLE_ROOMS
 
 
 async def test_join(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_client,
     mock_save_json,
@@ -41,7 +41,7 @@ async def test_join(
     )
 
 
-async def test_resolve_aliases(hass: HomeAssistant, matrix_bot: MatrixBot) -> None:
+async def test_resolve_aliases(hass: SmartHub, matrix_bot: MatrixBot) -> None:
     """Test resolving configured room aliases into room ids."""
 
     await hass.async_start()

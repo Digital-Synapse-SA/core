@@ -7,14 +7,14 @@ from unittest.mock import patch
 
 from PyTado.http import Http
 
-from homeassistant.components.tado import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.tado import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_v1_migration(hass: HomeAssistant) -> None:
+async def test_v1_migration(hass: SmartHub) -> None:
     """Test migration from v1 to v2 config entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -32,7 +32,7 @@ async def test_v1_migration(hass: HomeAssistant) -> None:
     assert CONF_USERNAME not in entry.data
 
 
-async def test_refresh_token_threading_lock(hass: HomeAssistant) -> None:
+async def test_refresh_token_threading_lock(hass: SmartHub) -> None:
     """Test that threading.Lock in Http._refresh_token serializes concurrent calls."""
 
     timestamps: list[tuple[str, float]] = []

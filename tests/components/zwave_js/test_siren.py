@@ -3,13 +3,13 @@
 import pytest
 from zwave_js_server.event import Event
 
-from homeassistant.components.siren import (
+from smarthub.components.siren import (
     ATTR_AVAILABLE_TONES,
     ATTR_TONE,
     ATTR_VOLUME_LEVEL,
 )
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
 
 SIREN_ENTITY = "siren.indoor_siren_6_play_tone_2"
 
@@ -72,7 +72,7 @@ def platforms() -> list[str]:
 
 
 async def test_siren(
-    hass: HomeAssistant, client, aeotec_zw164_siren, integration
+    hass: SmartHub, client, aeotec_zw164_siren, integration
 ) -> None:
     """Test the siren entity."""
     node = aeotec_zw164_siren

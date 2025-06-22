@@ -7,15 +7,15 @@ from aioshelly.const import MODEL_1PM, MODEL_GAS, MODEL_MOTION
 from aioshelly.exceptions import DeviceConnectionError, InvalidAuthError, RpcCallError
 import pytest
 
-from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN
-from homeassistant.components.shelly.const import (
+from smarthub.components.climate import DOMAIN as CLIMATE_DOMAIN
+from smarthub.components.shelly.const import (
     DOMAIN,
     MODEL_WALL_DISPLAY,
     MOTION_MODELS,
 )
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -23,10 +23,10 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import init_integration, register_device, register_entity
 
@@ -38,7 +38,7 @@ MOTION_BLOCK_ID = 3
 
 
 async def test_block_device_services(
-    hass: HomeAssistant, mock_block_device: Mock
+    hass: SmartHub, mock_block_device: Mock
 ) -> None:
     """Test block device turn on/off services."""
     await init_integration(hass, 1)
@@ -66,7 +66,7 @@ async def test_block_device_services(
 
 @pytest.mark.parametrize("model", MOTION_MODELS)
 async def test_block_motion_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     model: str,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -116,7 +116,7 @@ async def test_block_motion_switch(
 
 @pytest.mark.parametrize("model", MOTION_MODELS)
 async def test_block_restored_motion_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     model: str,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
@@ -155,7 +155,7 @@ async def test_block_restored_motion_switch(
 
 @pytest.mark.parametrize("model", MOTION_MODELS)
 async def test_block_restored_motion_switch_no_last_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     model: str,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
@@ -203,7 +203,7 @@ async def test_block_restored_motion_switch_no_last_state(
     ],
 )
 async def test_block_device_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -226,7 +226,7 @@ async def test_block_device_unique_ids(
 
 
 async def test_block_set_state_connection_error(
-    hass: HomeAssistant, mock_block_device, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device set state connection error."""
     monkeypatch.setattr(
@@ -237,7 +237,7 @@ async def test_block_set_state_connection_error(
     await init_integration(hass, 1)
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Device communication error occurred while calling action for switch.test_name_channel_1 of Test name",
     ):
         await hass.services.async_call(
@@ -249,7 +249,7 @@ async def test_block_set_state_connection_error(
 
 
 async def test_block_set_state_auth_error(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device set state authentication error."""
     monkeypatch.setattr(
@@ -283,7 +283,7 @@ async def test_block_set_state_auth_error(
 
 
 async def test_block_device_update(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device update."""
     monkeypatch.setattr(mock_block_device.blocks[RELAY_BLOCK_ID], "output", False)
@@ -300,7 +300,7 @@ async def test_block_device_update(
 
 
 async def test_block_device_no_relay_blocks(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device without relay blocks."""
     monkeypatch.setattr(mock_block_device.blocks[RELAY_BLOCK_ID], "type", "roller")
@@ -309,7 +309,7 @@ async def test_block_device_no_relay_blocks(
 
 
 async def test_block_device_mode_roller(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device in roller mode."""
     monkeypatch.setitem(mock_block_device.settings, "mode", "roller")
@@ -318,7 +318,7 @@ async def test_block_device_mode_roller(
 
 
 async def test_block_device_app_type_light(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device in app type set to light mode."""
     monkeypatch.setitem(
@@ -329,7 +329,7 @@ async def test_block_device_app_type_light(
 
 
 async def test_rpc_device_services(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test RPC device turn on/off services."""
     monkeypatch.delitem(mock_rpc_device.status, "cover:0")
@@ -359,7 +359,7 @@ async def test_rpc_device_services(
 
 
 async def test_rpc_device_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -374,7 +374,7 @@ async def test_rpc_device_unique_ids(
 
 
 async def test_rpc_device_switch_type_lights_mode(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test RPC device with switch in consumption type lights mode."""
     monkeypatch.setitem(
@@ -399,7 +399,7 @@ async def test_rpc_device_switch_type_lights_mode(
     ],
 )
 async def test_rpc_set_state_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exc: Exception,
     error: str,
     mock_rpc_device: Mock,
@@ -411,7 +411,7 @@ async def test_rpc_set_state_errors(
     monkeypatch.setitem(mock_rpc_device.status["sys"], "relay_in_thermostat", False)
     await init_integration(hass, 2)
 
-    with pytest.raises(HomeAssistantError, match=error):
+    with pytest.raises(SmartHubError, match=error):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
@@ -421,7 +421,7 @@ async def test_rpc_set_state_errors(
 
 
 async def test_rpc_auth_error(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test RPC device set state authentication error."""
     monkeypatch.setattr(
@@ -457,7 +457,7 @@ async def test_rpc_auth_error(
 
 
 async def test_remove_gas_valve_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     entity_registry: EntityRegistry,
 ) -> None:
@@ -474,7 +474,7 @@ async def test_remove_gas_valve_switch(
 
 
 async def test_wall_display_relay_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -519,7 +519,7 @@ async def test_wall_display_relay_mode(
     ],
 )
 async def test_rpc_device_virtual_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -570,7 +570,7 @@ async def test_rpc_device_virtual_switch(
 
 
 async def test_rpc_device_virtual_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -591,7 +591,7 @@ async def test_rpc_device_virtual_binary_sensor(
 
 
 async def test_rpc_remove_virtual_switch_when_mode_label(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
     mock_rpc_device: Mock,
@@ -624,7 +624,7 @@ async def test_rpc_remove_virtual_switch_when_mode_label(
 
 
 async def test_rpc_remove_virtual_switch_when_orphaned(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
     mock_rpc_device: Mock,
@@ -649,7 +649,7 @@ async def test_rpc_remove_virtual_switch_when_orphaned(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_rpc_device_script_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,

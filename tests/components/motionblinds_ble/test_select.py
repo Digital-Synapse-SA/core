@@ -9,13 +9,13 @@ from motionblindsble.const import MotionSpeedLevel
 from motionblindsble.device import MotionDevice
 import pytest
 
-from homeassistant.components.motionblinds_ble.const import ATTR_SPEED
-from homeassistant.components.select import (
+from smarthub.components.motionblinds_ble.const import ATTR_SPEED
+from smarthub.components.select import (
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_OPTION
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, ATTR_OPTION
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.parametrize(("select", "args"), [(ATTR_SPEED, MotionSpeedLevel.HIGH)])
 async def test_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motion_device: Mock,
     name: str,
@@ -58,7 +58,7 @@ async def test_select(
     ],
 )
 async def test_select_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motion_device: Mock,
     name: str,

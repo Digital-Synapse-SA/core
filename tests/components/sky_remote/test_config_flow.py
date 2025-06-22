@@ -7,17 +7,17 @@ from unittest.mock import AsyncMock
 import pytest
 from skyboxremote import LEGACY_PORT, SkyBoxConnectionError
 
-from homeassistant.components.sky_remote.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.sky_remote.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import SAMPLE_CONFIG
 
 
 async def test_user_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_remote_control
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_remote_control
 ) -> None:
     """Test we can setup an entry."""
 
@@ -39,7 +39,7 @@ async def test_user_flow(
 
 
 async def test_device_exists_abort(
-    hass: HomeAssistant, mock_config_entry, mock_remote_control
+    hass: SmartHub, mock_config_entry, mock_remote_control
 ) -> None:
     """Test we abort flow if device already configured."""
     mock_config_entry.add_to_hass(hass)
@@ -56,7 +56,7 @@ async def test_device_exists_abort(
 
 @pytest.mark.parametrize("mock_remote_control", [LEGACY_PORT], indirect=True)
 async def test_user_flow_legacy_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_remote_control,
 ) -> None:
@@ -88,7 +88,7 @@ async def test_user_flow_legacy_device(
 
 @pytest.mark.parametrize("mock_remote_control", [6], indirect=True)
 async def test_user_flow_unconnectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_remote_control,
 ) -> None:

@@ -6,7 +6,7 @@ from aurorapy.client import AuroraError, AuroraTimeoutError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.aurora_abb_powerone.const import (
+from smarthub.components.aurora_abb_powerone.const import (
     ATTR_DEVICE_NAME,
     ATTR_FIRMWARE,
     ATTR_MODEL,
@@ -14,10 +14,10 @@ from homeassistant.components.aurora_abb_powerone.const import (
     DOMAIN,
     SCAN_INTERVAL,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_SERIAL_NUMBER, CONF_ADDRESS, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntryDisabler
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_SERIAL_NUMBER, CONF_ADDRESS, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry, RegistryEntryDisabler
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -64,7 +64,7 @@ def _mock_config_entry():
     )
 
 
-async def test_sensors(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
+async def test_sensors(hass: SmartHub, entity_registry: EntityRegistry) -> None:
     """Test data coming back from inverter."""
     mock_entry = _mock_config_entry()
 
@@ -146,7 +146,7 @@ async def test_sensors(hass: HomeAssistant, entity_registry: EntityRegistry) -> 
             assert item.state == value
 
 
-async def test_sensor_dark(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+async def test_sensor_dark(hass: SmartHub, freezer: FrozenDateTimeFactory) -> None:
     """Test that darkness (no comms) is handled correctly."""
     mock_entry = _mock_config_entry()
 
@@ -243,7 +243,7 @@ async def test_sensor_dark(hass: HomeAssistant, freezer: FrozenDateTimeFactory) 
 
 
 async def test_sensor_unknown_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:

@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 from total_connect_client.exceptions import AuthenticationError
 
-from homeassistant.components.totalconnect.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.totalconnect.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import CONFIG_DATA
 
 from tests.common import MockConfigEntry
 
 
-async def test_reauth_started(hass: HomeAssistant) -> None:
+async def test_reauth_started(hass: SmartHub) -> None:
     """Test that reauth is started when we have login errors."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -23,7 +23,7 @@ async def test_reauth_started(hass: HomeAssistant) -> None:
     mock_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.totalconnect.TotalConnectClient",
+        "smarthub.components.totalconnect.TotalConnectClient",
     ) as mock_client:
         mock_client.side_effect = AuthenticationError()
         assert await async_setup_component(hass, DOMAIN, {})

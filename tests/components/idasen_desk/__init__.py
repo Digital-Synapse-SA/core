@@ -1,9 +1,9 @@
 """Tests for the IKEA Idasen Desk integration."""
 
-from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
-from homeassistant.components.idasen_desk.const import DOMAIN
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
+from smarthub.components.bluetooth import BluetoothServiceInfoBleak
+from smarthub.components.idasen_desk.const import DOMAIN
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.components.bluetooth import generate_advertisement_data, generate_ble_device
@@ -39,8 +39,8 @@ NOT_IDASEN_DISCOVERY_INFO = BluetoothServiceInfoBleak(
 )
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the IKEA Idasen Desk integration in Home Assistant."""
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
+    """Set up the IKEA Idasen Desk integration in SmartHub."""
     entry = MockConfigEntry(
         title="Test",
         domain=DOMAIN,

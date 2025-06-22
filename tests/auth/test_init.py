@@ -1,4 +1,4 @@
-"""Tests for the Home Assistant auth module."""
+"""Tests for the SmartHub auth module."""
 
 from datetime import timedelta
 import time
@@ -10,18 +10,18 @@ import jwt
 import pytest
 import voluptuous as vol
 
-from homeassistant import auth, data_entry_flow
-from homeassistant.auth import (
+from smarthub import auth, data_entry_flow
+from smarthub.auth import (
     EVENT_USER_UPDATED,
     InvalidAuthError,
     auth_store,
     const as auth_const,
     models as auth_models,
 )
-from homeassistant.auth.const import GROUP_ID_ADMIN, MFA_SESSION_EXPIRATION
-from homeassistant.auth.models import Credentials
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.util import dt as dt_util
+from smarthub.auth.const import GROUP_ID_ADMIN, MFA_SESSION_EXPIRATION
+from smarthub.auth.models import Credentials
+from smarthub.core import SmartHub, callback
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     CLIENT_ID,
@@ -34,8 +34,8 @@ from tests.common import (
 
 
 @pytest.fixture
-def mock_hass(hass: HomeAssistant) -> HomeAssistant:
-    """Home Assistant mock with minimum amount of data set to make it work with auth."""
+def mock_hass(hass: SmartHub) -> SmartHub:
+    """SmartHub mock with minimum amount of data set to make it work with auth."""
     return hass
 
 
@@ -144,7 +144,7 @@ async def test_auth_manager_from_config_auth_modules(mock_hass) -> None:
     ]
 
 
-async def test_create_new_user(hass: HomeAssistant) -> None:
+async def test_create_new_user(hass: SmartHub) -> None:
     """Test creating new user."""
     events = []
 
@@ -258,7 +258,7 @@ async def test_login_as_existing_user(mock_hass) -> None:
 
 
 async def test_linking_user_to_two_auth_providers(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test linking user to two auth providers."""
     manager = await auth.auth_manager_from_config(
@@ -307,7 +307,7 @@ async def test_linking_user_to_two_auth_providers(
 
 
 async def test_saving_loading(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test storing and saving data.
 
@@ -364,7 +364,7 @@ async def test_saving_loading(
             pytest.fail(f"Unknown client_id: {r_token.client_id}")
 
 
-async def test_cannot_retrieve_expired_access_token(hass: HomeAssistant) -> None:
+async def test_cannot_retrieve_expired_access_token(hass: SmartHub) -> None:
     """Test that we cannot retrieve expired access tokens."""
     manager = await auth.auth_manager_from_config(hass, [], [])
     user = MockUser().add_to_auth_manager(manager)
@@ -380,7 +380,7 @@ async def test_cannot_retrieve_expired_access_token(hass: HomeAssistant) -> None
     # to the patched time. If we freeze time for the test it will be frozen for jwt
     # as well and the token will not be expired.
     with patch(
-        "homeassistant.auth.time.time",
+        "smarthub.auth.time.time",
         return_value=time.time()
         - auth_const.ACCESS_TOKEN_EXPIRATION.total_seconds()
         - 11,
@@ -390,7 +390,7 @@ async def test_cannot_retrieve_expired_access_token(hass: HomeAssistant) -> None
     assert manager.async_validate_access_token(access_token) is None
 
 
-async def test_generating_system_user(hass: HomeAssistant) -> None:
+async def test_generating_system_user(hass: SmartHub) -> None:
     """Test that we can add a system user."""
     events = []
 
@@ -433,7 +433,7 @@ async def test_generating_system_user(hass: HomeAssistant) -> None:
     assert events[1].data["user_id"] == user.id
 
 
-async def test_refresh_token_requires_client_for_user(hass: HomeAssistant) -> None:
+async def test_refresh_token_requires_client_for_user(hass: SmartHub) -> None:
     """Test create refresh token for a user with client_id."""
     manager = await auth.auth_manager_from_config(hass, [], [])
     user = MockUser().add_to_auth_manager(manager)
@@ -451,7 +451,7 @@ async def test_refresh_token_requires_client_for_user(hass: HomeAssistant) -> No
 
 
 async def test_refresh_token_not_requires_client_for_system_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test create refresh token for a system user w/o client_id."""
     manager = await auth.auth_manager_from_config(hass, [], [])
@@ -468,7 +468,7 @@ async def test_refresh_token_not_requires_client_for_system_user(
 
 
 async def test_refresh_token_with_specific_access_token_expiration(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test create a refresh token with specific access token expiration."""
     manager = await auth.auth_manager_from_config(hass, [], [])
@@ -484,7 +484,7 @@ async def test_refresh_token_with_specific_access_token_expiration(
     assert token.expire_at is not None
 
 
-async def test_refresh_token_type(hass: HomeAssistant) -> None:
+async def test_refresh_token_type(hass: SmartHub) -> None:
     """Test create a refresh token with token type."""
     manager = await auth.auth_manager_from_config(hass, [], [])
     user = MockUser().add_to_auth_manager(manager)
@@ -502,7 +502,7 @@ async def test_refresh_token_type(hass: HomeAssistant) -> None:
     assert token.token_type == auth_models.TOKEN_TYPE_NORMAL
 
 
-async def test_refresh_token_type_long_lived_access_token(hass: HomeAssistant) -> None:
+async def test_refresh_token_type_long_lived_access_token(hass: SmartHub) -> None:
     """Test create a refresh token has long-lived access token type."""
     manager = await auth.auth_manager_from_config(hass, [], [])
     user = MockUser().add_to_auth_manager(manager)
@@ -558,7 +558,7 @@ async def test_refresh_token_provider_validation(mock_hass) -> None:
 
     with (
         patch(
-            "homeassistant.auth.providers.insecure_example.ExampleAuthProvider.async_validate_refresh_token",
+            "smarthub.auth.providers.insecure_example.ExampleAuthProvider.async_validate_refresh_token",
             side_effect=InvalidAuthError("Invalid access"),
         ) as call,
         pytest.raises(InvalidAuthError),
@@ -577,7 +577,7 @@ async def test_cannot_deactive_owner(mock_hass) -> None:
         await manager.async_deactivate_user(owner)
 
 
-async def test_remove_refresh_token(hass: HomeAssistant) -> None:
+async def test_remove_refresh_token(hass: SmartHub) -> None:
     """Test that we can remove a refresh token."""
     manager = await auth.auth_manager_from_config(hass, [], [])
     user = MockUser().add_to_auth_manager(manager)
@@ -590,7 +590,7 @@ async def test_remove_refresh_token(hass: HomeAssistant) -> None:
     assert manager.async_validate_access_token(access_token) is None
 
 
-async def test_remove_expired_refresh_token(hass: HomeAssistant) -> None:
+async def test_remove_expired_refresh_token(hass: SmartHub) -> None:
     """Test that expired refresh tokens are deleted."""
     manager = await auth.auth_manager_from_config(hass, [], [])
     user = MockUser().add_to_auth_manager(manager)
@@ -629,7 +629,7 @@ async def test_remove_expired_refresh_token(hass: HomeAssistant) -> None:
         assert manager.async_get_refresh_token(refresh_token2.id) is None
 
 
-async def test_update_expire_at_refresh_token(hass: HomeAssistant) -> None:
+async def test_update_expire_at_refresh_token(hass: SmartHub) -> None:
     """Test that expire at is updated when refresh token is used."""
     manager = await auth.auth_manager_from_config(hass, [], [])
     user = MockUser().add_to_auth_manager(manager)
@@ -981,7 +981,7 @@ async def test_auth_module_expired_session(mock_hass) -> None:
 
 
 async def test_enable_mfa_for_user(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test enable mfa module for user."""
     manager = await auth.auth_manager_from_config(
@@ -1053,7 +1053,7 @@ async def test_enable_mfa_for_user(
     await manager.async_disable_user_mfa(user, "insecure_example")
 
 
-async def test_async_remove_user(hass: HomeAssistant) -> None:
+async def test_async_remove_user(hass: SmartHub) -> None:
     """Test removing a user."""
     events = async_capture_events(hass, "user_removed")
     manager = await auth.auth_manager_from_config(
@@ -1101,7 +1101,7 @@ async def test_async_remove_user(hass: HomeAssistant) -> None:
 
 
 async def test_async_remove_user_fail_if_remove_credential_fails(
-    hass: HomeAssistant, hass_admin_user: MockUser, hass_admin_credential: Credentials
+    hass: SmartHub, hass_admin_user: MockUser, hass_admin_credential: Credentials
 ) -> None:
     """Test removing a user."""
     await hass.auth.async_link_user(hass_admin_user, hass_admin_credential)
@@ -1191,7 +1191,7 @@ async def test_rename_does_not_change_refresh_token(mock_hass) -> None:
     assert token_before == token_after
 
 
-async def test_event_user_updated_fires(hass: HomeAssistant) -> None:
+async def test_event_user_updated_fires(hass: SmartHub) -> None:
     """Test the user updated event fires."""
     manager = await auth.auth_manager_from_config(hass, [], [])
     user = MockUser().add_to_auth_manager(manager)

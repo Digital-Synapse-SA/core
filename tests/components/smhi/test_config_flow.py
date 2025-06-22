@@ -7,13 +7,13 @@ from unittest.mock import MagicMock, patch
 from pysmhi import SmhiForecastException
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.smhi.const import DOMAIN
-from homeassistant.components.weather import DOMAIN as WEATHER_DOMAIN
-from homeassistant.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub import config_entries
+from smarthub.components.smhi.const import DOMAIN
+from smarthub.components.weather import DOMAIN as WEATHER_DOMAIN
+from smarthub.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -21,7 +21,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
 ) -> None:
     """Test we get the form and create an entry."""
@@ -36,7 +36,7 @@ async def test_form(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.smhi.async_setup_entry",
+        "smarthub.components.smhi.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -85,7 +85,7 @@ async def test_form(
 
 
 async def test_form_invalid_coordinates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
 ) -> None:
     """Test we handle invalid coordinates."""
@@ -131,7 +131,7 @@ async def test_form_invalid_coordinates(
 
 
 async def test_form_unique_id_exist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
 ) -> None:
     """Test we handle unique id already exist."""
@@ -166,7 +166,7 @@ async def test_form_unique_id_exist(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,

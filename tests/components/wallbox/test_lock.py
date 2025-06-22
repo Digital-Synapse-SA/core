@@ -3,10 +3,10 @@
 import pytest
 import requests_mock
 
-from homeassistant.components.lock import SERVICE_LOCK, SERVICE_UNLOCK
-from homeassistant.components.wallbox.const import CHARGER_LOCKED_UNLOCKED_KEY
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.lock import SERVICE_LOCK, SERVICE_UNLOCK
+from smarthub.components.wallbox.const import CHARGER_LOCKED_UNLOCKED_KEY
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from . import (
     authorisation_response,
@@ -19,7 +19,7 @@ from .const import MOCK_LOCK_ENTITY_ID
 from tests.common import MockConfigEntry
 
 
-async def test_wallbox_lock_class(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_wallbox_lock_class(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test wallbox lock class."""
 
     await setup_integration(hass, entry)
@@ -60,7 +60,7 @@ async def test_wallbox_lock_class(hass: HomeAssistant, entry: MockConfigEntry) -
 
 
 async def test_wallbox_lock_class_connection_error(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox lock class connection error."""
 
@@ -99,7 +99,7 @@ async def test_wallbox_lock_class_connection_error(
 
 
 async def test_wallbox_lock_class_authentication_error(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox lock not loaded on authentication error."""
 
@@ -111,7 +111,7 @@ async def test_wallbox_lock_class_authentication_error(
 
 
 async def test_wallbox_lock_class_platform_not_ready(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox lock not loaded on authentication error."""
 

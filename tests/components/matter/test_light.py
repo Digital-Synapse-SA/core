@@ -7,10 +7,10 @@ from matter_server.client.models.node import MatterNode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import ColorMode
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.light import ColorMode
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -21,7 +21,7 @@ from .common import (
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_lights(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_lights(
     ],
 )
 async def test_light_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -124,7 +124,7 @@ async def test_light_turn_on_off(
     ],
 )
 async def test_dimmable_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -190,7 +190,7 @@ async def test_dimmable_light(
     ],
 )
 async def test_color_temperature_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -278,7 +278,7 @@ async def test_color_temperature_light(
     ],
 )
 async def test_extended_color_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,

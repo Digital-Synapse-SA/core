@@ -5,7 +5,7 @@ from http import HTTPStatus
 import requests
 import requests_mock
 
-from homeassistant.components.wallbox.const import (
+from smarthub.components.wallbox.const import (
     CHARGER_ADDED_ENERGY_KEY,
     CHARGER_ADDED_RANGE_KEY,
     CHARGER_CHARGING_POWER_KEY,
@@ -30,7 +30,7 @@ from homeassistant.components.wallbox.const import (
     CHARGER_SOFTWARE_KEY,
     CHARGER_STATUS_ID_KEY,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .const import ERROR, REFRESH_TOKEN_TTL, STATUS, TTL, USER_ID
 
@@ -193,7 +193,7 @@ authorisation_response_unauthorised = {
 }
 
 
-async def setup_integration(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test wallbox sensor class setup."""
     with requests_mock.Mocker() as mock_request:
         mock_request.get(
@@ -217,7 +217,7 @@ async def setup_integration(hass: HomeAssistant, entry: MockConfigEntry) -> None
 
 
 async def setup_integration_no_eco_mode(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class setup."""
     with requests_mock.Mocker() as mock_request:
@@ -242,7 +242,7 @@ async def setup_integration_no_eco_mode(
 
 
 async def setup_integration_select(
-    hass: HomeAssistant, entry: MockConfigEntry, response
+    hass: SmartHub, entry: MockConfigEntry, response
 ) -> None:
     """Test wallbox sensor class setup."""
     with requests_mock.Mocker() as mock_request:
@@ -266,7 +266,7 @@ async def setup_integration_select(
         await hass.async_block_till_done()
 
 
-async def setup_integration_bidir(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def setup_integration_bidir(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test wallbox sensor class setup."""
     with requests_mock.Mocker() as mock_request:
         mock_request.get(
@@ -290,7 +290,7 @@ async def setup_integration_bidir(hass: HomeAssistant, entry: MockConfigEntry) -
 
 
 async def setup_integration_connection_error(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class setup with a connection error."""
     with requests_mock.Mocker() as mock_request:
@@ -315,7 +315,7 @@ async def setup_integration_connection_error(
 
 
 async def setup_integration_read_only(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class setup for read only."""
 
@@ -341,7 +341,7 @@ async def setup_integration_read_only(
 
 
 async def setup_integration_platform_not_ready(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class setup for read only."""
 

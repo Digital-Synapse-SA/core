@@ -4,11 +4,11 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.switcher_kis.const import DOMAIN
-from homeassistant.const import CONF_TOKEN, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.switcher_kis.const import DOMAIN
+from smarthub.const import CONF_TOKEN, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .consts import (
     DUMMY_DUAL_SHUTTER_SINGLE_LIGHT_DEVICE,
@@ -35,10 +35,10 @@ from tests.common import MockConfigEntry
     indirect=True,
 )
 async def test_user_setup(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_bridge
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_bridge
 ) -> None:
     """Test we can finish a config flow."""
-    with patch("homeassistant.components.switcher_kis.utils.DISCOVERY_TIME_SEC", 0):
+    with patch("smarthub.components.switcher_kis.utils.DISCOVERY_TIME_SEC", 0):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}
         )
@@ -69,10 +69,10 @@ async def test_user_setup(
     indirect=True,
 )
 async def test_user_setup_found_token_device_valid_token(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_bridge
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_bridge
 ) -> None:
     """Test we can finish a config flow with token device found."""
-    with patch("homeassistant.components.switcher_kis.utils.DISCOVERY_TIME_SEC", 0):
+    with patch("smarthub.components.switcher_kis.utils.DISCOVERY_TIME_SEC", 0):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}
         )
@@ -87,7 +87,7 @@ async def test_user_setup_found_token_device_valid_token(
     assert result2["step_id"] == "credentials"
 
     with patch(
-        "homeassistant.components.switcher_kis.config_flow.validate_token",
+        "smarthub.components.switcher_kis.config_flow.validate_token",
         return_value=True,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -114,10 +114,10 @@ async def test_user_setup_found_token_device_valid_token(
     indirect=True,
 )
 async def test_user_setup_found_token_device_invalid_token(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_bridge
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_bridge
 ) -> None:
     """Test we can finish a config flow with token device found."""
-    with patch("homeassistant.components.switcher_kis.utils.DISCOVERY_TIME_SEC", 0):
+    with patch("smarthub.components.switcher_kis.utils.DISCOVERY_TIME_SEC", 0):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}
         )
@@ -131,7 +131,7 @@ async def test_user_setup_found_token_device_invalid_token(
     assert result2["step_id"] == "credentials"
 
     with patch(
-        "homeassistant.components.switcher_kis.config_flow.validate_token",
+        "smarthub.components.switcher_kis.config_flow.validate_token",
         return_value=False,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -144,10 +144,10 @@ async def test_user_setup_found_token_device_invalid_token(
 
 
 async def test_user_setup_abort_no_devices_found(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_bridge
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_bridge
 ) -> None:
     """Test we abort a config flow if no devices found."""
-    with patch("homeassistant.components.switcher_kis.utils.DISCOVERY_TIME_SEC", 0):
+    with patch("smarthub.components.switcher_kis.utils.DISCOVERY_TIME_SEC", 0):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}
         )
@@ -166,7 +166,7 @@ async def test_user_setup_abort_no_devices_found(
         assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_single_instance(hass: HomeAssistant) -> None:
+async def test_single_instance(hass: SmartHub) -> None:
     """Test we only allow a single config flow."""
     MockConfigEntry(domain=DOMAIN).add_to_hass(hass)
     await hass.async_block_till_done()
@@ -186,7 +186,7 @@ async def test_single_instance(hass: HomeAssistant) -> None:
     ],
 )
 async def test_reauth_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     user_input: dict[str, str],
 ) -> None:
     """Test starting a reauthentication flow."""
@@ -201,7 +201,7 @@ async def test_reauth_successful(
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.switcher_kis.config_flow.validate_token",
+        "smarthub.components.switcher_kis.config_flow.validate_token",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -213,7 +213,7 @@ async def test_reauth_successful(
     assert result["reason"] == "reauth_successful"
 
 
-async def test_reauth_invalid_auth(hass: HomeAssistant) -> None:
+async def test_reauth_invalid_auth(hass: SmartHub) -> None:
     """Test reauthentication flow with invalid credentials."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -226,7 +226,7 @@ async def test_reauth_invalid_auth(hass: HomeAssistant) -> None:
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.switcher_kis.config_flow.validate_token",
+        "smarthub.components.switcher_kis.config_flow.validate_token",
         return_value=False,
     ):
         result2 = await hass.config_entries.flow.async_configure(

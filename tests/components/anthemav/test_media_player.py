@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_APP_NAME,
     ATTR_INPUT_SOURCE,
     ATTR_INPUT_SOURCE_LIST,
@@ -13,8 +13,8 @@ from homeassistant.components.media_player import (
     ATTR_MEDIA_VOLUME_LEVEL,
     ATTR_MEDIA_VOLUME_MUTED,
 )
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_zones_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     entity_id: str,
     entity_name: str,
@@ -42,7 +42,7 @@ async def test_zones_loaded(
 
 
 async def test_update_states_zone1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_anthemav: AsyncMock,
     update_callback: Callable[[str], None],

@@ -8,7 +8,7 @@ from pysmartthings.models import HealthStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
@@ -22,8 +22,8 @@ from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     ColorMode,
 )
-from homeassistant.components.smartthings.const import MAIN
-from homeassistant.const import (
+from smarthub.components.smartthings.const import MAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -32,8 +32,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er
 
 from . import (
     set_attribute_value,
@@ -47,7 +47,7 @@ from tests.common import MockConfigEntry, mock_restore_cache_with_extra_data
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -137,7 +137,7 @@ async def test_all_entities(
     ],
 )
 async def test_turn_on_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     data: dict[str, Any],
@@ -185,7 +185,7 @@ async def test_turn_on_light(
     ],
 )
 async def test_turn_off_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     data: dict[str, Any],
@@ -205,7 +205,7 @@ async def test_turn_off_light(
 
 @pytest.mark.parametrize("device_fixture", ["hue_rgbw_color_bulb"])
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -228,7 +228,7 @@ async def test_state_update(
 
 @pytest.mark.parametrize("device_fixture", ["hue_rgbw_color_bulb"])
 async def test_updating_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -261,7 +261,7 @@ async def test_updating_brightness(
 
 @pytest.mark.parametrize("device_fixture", ["hue_rgbw_color_bulb"])
 async def test_updating_hs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -300,7 +300,7 @@ async def test_updating_hs(
 
 @pytest.mark.parametrize("device_fixture", ["hue_rgbw_color_bulb"])
 async def test_updating_color_temp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -343,7 +343,7 @@ async def test_updating_color_temp(
 
 @pytest.mark.parametrize("device_fixture", ["hue_rgbw_color_bulb"])
 async def test_color_modes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -388,7 +388,7 @@ async def test_color_modes(
 
 @pytest.mark.parametrize("device_fixture", ["hue_rgbw_color_bulb"])
 async def test_color_mode_after_startup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -420,7 +420,7 @@ async def test_color_mode_after_startup(
 
 @pytest.mark.parametrize("device_fixture", ["hue_rgbw_color_bulb"])
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -444,7 +444,7 @@ async def test_availability(
 
 @pytest.mark.parametrize("device_fixture", ["hue_rgbw_color_bulb"])
 async def test_availability_at_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unavailable_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

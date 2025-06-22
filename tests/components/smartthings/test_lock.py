@@ -7,17 +7,17 @@ from pysmartthings.models import HealthStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN, LockState
-from homeassistant.components.smartthings.const import MAIN
-from homeassistant.const import (
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN, LockState
+from smarthub.components.smartthings.const import MAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_LOCK,
     SERVICE_UNLOCK,
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import (
     setup_integration,
@@ -30,7 +30,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -51,7 +51,7 @@ async def test_all_entities(
     ],
 )
 async def test_lock_unlock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     action: str,
@@ -76,7 +76,7 @@ async def test_lock_unlock(
 
 @pytest.mark.parametrize("device_fixture", ["yale_push_button_deadbolt_lock"])
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -99,7 +99,7 @@ async def test_state_update(
 
 @pytest.mark.parametrize("device_fixture", ["yale_push_button_deadbolt_lock"])
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -123,7 +123,7 @@ async def test_availability(
 
 @pytest.mark.parametrize("device_fixture", ["yale_push_button_deadbolt_lock"])
 async def test_availability_at_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unavailable_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

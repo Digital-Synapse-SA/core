@@ -9,10 +9,10 @@ from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
 
-from homeassistant.components import shell_command
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, TemplateError
-from homeassistant.setup import async_setup_component
+from smarthub.components import shell_command
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, TemplateError
+from smarthub.setup import async_setup_component
 
 
 def mock_process_creator(error: bool = False):
@@ -31,7 +31,7 @@ def mock_process_creator(error: bool = False):
     return mock_process
 
 
-async def test_executing_service(hass: HomeAssistant) -> None:
+async def test_executing_service(hass: SmartHub) -> None:
     """Test if able to call a configured service."""
     with tempfile.TemporaryDirectory() as tempdirname:
         path = os.path.join(tempdirname, "called.txt")
@@ -47,7 +47,7 @@ async def test_executing_service(hass: HomeAssistant) -> None:
         assert os.path.isfile(path)
 
 
-async def test_config_not_dict(hass: HomeAssistant) -> None:
+async def test_config_not_dict(hass: SmartHub) -> None:
     """Test that setup fails if config is not a dict."""
     assert not await async_setup_component(
         hass,
@@ -56,7 +56,7 @@ async def test_config_not_dict(hass: HomeAssistant) -> None:
     )
 
 
-async def test_config_not_valid_service_names(hass: HomeAssistant) -> None:
+async def test_config_not_valid_service_names(hass: SmartHub) -> None:
     """Test that setup fails if config contains invalid service names."""
     assert not await async_setup_component(
         hass,
@@ -65,8 +65,8 @@ async def test_config_not_valid_service_names(hass: HomeAssistant) -> None:
     )
 
 
-@patch("homeassistant.components.shell_command.asyncio.create_subprocess_shell")
-async def test_template_render_no_template(mock_call, hass: HomeAssistant) -> None:
+@patch("smarthub.components.shell_command.asyncio.create_subprocess_shell")
+async def test_template_render_no_template(mock_call, hass: SmartHub) -> None:
     """Ensure shell_commands without templates get rendered properly."""
     mock_call.return_value = mock_process_creator(error=False)
 
@@ -85,8 +85,8 @@ async def test_template_render_no_template(mock_call, hass: HomeAssistant) -> No
     assert cmd == "ls /bin"
 
 
-@patch("homeassistant.components.shell_command.asyncio.create_subprocess_shell")
-async def test_incorrect_template(mock_call, hass: HomeAssistant) -> None:
+@patch("smarthub.components.shell_command.asyncio.create_subprocess_shell")
+async def test_incorrect_template(mock_call, hass: SmartHub) -> None:
     """Ensure shell_commands with invalid templates are handled properly."""
     mock_call.return_value = mock_process_creator(error=False)
     assert await async_setup_component(
@@ -107,8 +107,8 @@ async def test_incorrect_template(mock_call, hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-@patch("homeassistant.components.shell_command.asyncio.create_subprocess_exec")
-async def test_template_render(mock_call, hass: HomeAssistant) -> None:
+@patch("smarthub.components.shell_command.asyncio.create_subprocess_exec")
+async def test_template_render(mock_call, hass: SmartHub) -> None:
     """Ensure shell_commands with templates get rendered properly."""
     hass.states.async_set("sensor.test_state", "Works")
     mock_call.return_value = mock_process_creator(error=False)
@@ -131,9 +131,9 @@ async def test_template_render(mock_call, hass: HomeAssistant) -> None:
     assert cmd == ("ls", "/bin", "Works")
 
 
-@patch("homeassistant.components.shell_command.asyncio.create_subprocess_shell")
-@patch("homeassistant.components.shell_command._LOGGER.error")
-async def test_subprocess_error(mock_error, mock_call, hass: HomeAssistant) -> None:
+@patch("smarthub.components.shell_command.asyncio.create_subprocess_shell")
+@patch("smarthub.components.shell_command._LOGGER.error")
+async def test_subprocess_error(mock_error, mock_call, hass: SmartHub) -> None:
     """Test subprocess that returns an error."""
     mock_call.return_value = mock_process_creator(error=True)
     with tempfile.TemporaryDirectory() as tempdirname:
@@ -154,8 +154,8 @@ async def test_subprocess_error(mock_error, mock_call, hass: HomeAssistant) -> N
         assert response["returncode"] == 1
 
 
-@patch("homeassistant.components.shell_command._LOGGER.debug")
-async def test_stdout_captured(mock_output, hass: HomeAssistant) -> None:
+@patch("smarthub.components.shell_command._LOGGER.debug")
+async def test_stdout_captured(mock_output, hass: SmartHub) -> None:
     """Test subprocess that has stdout."""
     test_phrase = "I have output"
     assert await async_setup_component(
@@ -175,9 +175,9 @@ async def test_stdout_captured(mock_output, hass: HomeAssistant) -> None:
     assert response["returncode"] == 0
 
 
-@patch("homeassistant.components.shell_command._LOGGER.debug")
+@patch("smarthub.components.shell_command._LOGGER.debug")
 async def test_non_text_stdout_capture(
-    mock_output, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    mock_output, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test handling of non-text output."""
     assert await async_setup_component(
@@ -185,7 +185,7 @@ async def test_non_text_stdout_capture(
         shell_command.DOMAIN,
         {
             shell_command.DOMAIN: {
-                "output_image": "curl -o - https://raw.githubusercontent.com/home-assistant/assets/master/misc/loading-screen.gif"
+                "output_image": "curl -o - https://raw.githubusercontent.com/smart-hub/assets/master/misc/loading-screen.gif"
             }
         },
     )
@@ -200,8 +200,8 @@ async def test_non_text_stdout_capture(
 
     # Non-text output throws with 'return_response'
     with pytest.raises(
-        HomeAssistantError,
-        match="Unable to handle non-utf8 output of command: `curl -o - https://raw.githubusercontent.com/home-assistant/assets/master/misc/loading-screen.gif`",
+        SmartHubError,
+        match="Unable to handle non-utf8 output of command: `curl -o - https://raw.githubusercontent.com/smart-hub/assets/master/misc/loading-screen.gif`",
     ):
         response = await hass.services.async_call(
             "shell_command", "output_image", blocking=True, return_response=True
@@ -212,8 +212,8 @@ async def test_non_text_stdout_capture(
     assert "Unable to handle non-utf8 output of command" in caplog.text
 
 
-@patch("homeassistant.components.shell_command._LOGGER.debug")
-async def test_stderr_captured(mock_output, hass: HomeAssistant) -> None:
+@patch("smarthub.components.shell_command._LOGGER.debug")
+async def test_stderr_captured(mock_output, hass: SmartHub) -> None:
     """Test subprocess that has stderr."""
     test_phrase = "I have error"
     assert await async_setup_component(
@@ -233,7 +233,7 @@ async def test_stderr_captured(mock_output, hass: HomeAssistant) -> None:
 
 
 async def test_do_not_run_forever(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test subprocesses terminate after the timeout."""
 
@@ -257,12 +257,12 @@ async def test_do_not_run_forever(
     with (
         patch.object(shell_command, "COMMAND_TIMEOUT", 0.001),
         patch(
-            "homeassistant.components.shell_command.asyncio.create_subprocess_shell",
+            "smarthub.components.shell_command.asyncio.create_subprocess_shell",
             side_effect=mock_create_subprocess_shell,
         ),
     ):
         with pytest.raises(
-            HomeAssistantError,
+            SmartHubError,
             match="Timed out running command: `mock_sleep 10000`, after: 0.001 seconds",
         ):
             await hass.services.async_call(

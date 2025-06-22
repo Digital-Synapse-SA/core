@@ -11,7 +11,7 @@ from aioesphomeapi import (
     FanState,
 )
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_DIRECTION,
     ATTR_OSCILLATING,
     ATTR_PERCENTAGE,
@@ -27,14 +27,14 @@ from homeassistant.components.fan import (
     SERVICE_TURN_ON,
     STATE_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import MockGenericDeviceEntryType
 
 
 async def test_fan_entity_with_all_features_old_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -136,7 +136,7 @@ async def test_fan_entity_with_all_features_old_api(
 
 
 async def test_fan_entity_with_all_features_new_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -290,7 +290,7 @@ async def test_fan_entity_with_all_features_new_api(
 
 
 async def test_fan_entity_with_no_features_new_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:

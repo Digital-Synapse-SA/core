@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, Mock, patch
 from aiohttp import ClientError
 import pytest
 
-from homeassistant.components.solaredge.const import CONF_SITE_ID, DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import SOURCE_IGNORE, SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.solaredge.const import CONF_SITE_ID, DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import SOURCE_IGNORE, SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -24,13 +24,13 @@ def mock_controller():
     api = Mock()
     api.get_details = AsyncMock(return_value={"details": {"status": "active"}})
     with patch(
-        "homeassistant.components.solaredge.config_flow.aiosolaredge.SolarEdge",
+        "smarthub.components.solaredge.config_flow.aiosolaredge.SolarEdge",
         return_value=api,
     ):
         yield api
 
 
-async def test_user(hass: HomeAssistant, test_api: Mock) -> None:
+async def test_user(hass: SmartHub, test_api: Mock) -> None:
     """Test user config."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -53,7 +53,7 @@ async def test_user(hass: HomeAssistant, test_api: Mock) -> None:
     assert data[CONF_API_KEY] == API_KEY
 
 
-async def test_abort_if_already_setup(hass: HomeAssistant, test_api: str) -> None:
+async def test_abort_if_already_setup(hass: SmartHub, test_api: str) -> None:
     """Test we abort if the site_id is already setup."""
     MockConfigEntry(
         domain="solaredge",
@@ -71,7 +71,7 @@ async def test_abort_if_already_setup(hass: HomeAssistant, test_api: str) -> Non
 
 
 async def test_ignored_entry_does_not_cause_error(
-    hass: HomeAssistant, test_api: str
+    hass: SmartHub, test_api: str
 ) -> None:
     """Test an ignored entry does not cause and error and we can still create an new entry."""
     MockConfigEntry(
@@ -95,7 +95,7 @@ async def test_ignored_entry_does_not_cause_error(
     assert data[CONF_API_KEY] == "test"
 
 
-async def test_asserts(hass: HomeAssistant, test_api: Mock) -> None:
+async def test_asserts(hass: SmartHub, test_api: Mock) -> None:
     """Test the _site_in_configuration_exists method."""
 
     # test with inactive site

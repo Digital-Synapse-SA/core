@@ -2,8 +2,8 @@
 
 from uiprotect.data import NVR, Light
 
-from homeassistant.components.unifiprotect.const import CONF_ALLOW_EA
-from homeassistant.core import HomeAssistant
+from smarthub.components.unifiprotect.const import CONF_ALLOW_EA
+from smarthub.core import SmartHub
 
 from .utils import MockUFPFixture, init_entry
 
@@ -12,7 +12,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     light: Light,
     hass_client: ClientSessionGenerator,

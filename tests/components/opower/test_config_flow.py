@@ -6,12 +6,12 @@ from unittest.mock import AsyncMock, patch
 from opower import CannotConnect, InvalidAuth
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.opower.const import DOMAIN
-from homeassistant.components.recorder import Recorder
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.opower.const import DOMAIN
+from smarthub.components.recorder import Recorder
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry
 def override_async_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.opower.async_setup_entry", return_value=True
+        "smarthub.components.opower.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -29,14 +29,14 @@ def override_async_setup_entry() -> Generator[AsyncMock]:
 def mock_unload_entry() -> Generator[AsyncMock]:
     """Mock unloading a config entry."""
     with patch(
-        "homeassistant.components.opower.async_unload_entry",
+        "smarthub.components.opower.async_unload_entry",
         return_value=True,
     ) as mock_unload_entry:
         yield mock_unload_entry
 
 
 async def test_form(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -46,7 +46,7 @@ async def test_form(
     assert not result["errors"]
 
     with patch(
-        "homeassistant.components.opower.config_flow.Opower.async_login",
+        "smarthub.components.opower.config_flow.Opower.async_login",
     ) as mock_login:
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -70,7 +70,7 @@ async def test_form(
 
 
 async def test_form_with_mfa(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -91,7 +91,7 @@ async def test_form_with_mfa(
     assert not result2["errors"]
 
     with patch(
-        "homeassistant.components.opower.config_flow.Opower.async_login",
+        "smarthub.components.opower.config_flow.Opower.async_login",
     ) as mock_login:
         result3 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -113,7 +113,7 @@ async def test_form_with_mfa(
 
 
 async def test_form_with_mfa_bad_secret(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test MFA asks for password again when validation fails."""
     result = await hass.config_entries.flow.async_init(
@@ -134,7 +134,7 @@ async def test_form_with_mfa_bad_secret(
     assert not result2["errors"]
 
     with patch(
-        "homeassistant.components.opower.config_flow.Opower.async_login",
+        "smarthub.components.opower.config_flow.Opower.async_login",
         side_effect=InvalidAuth,
     ) as mock_login:
         result3 = await hass.config_entries.flow.async_configure(
@@ -150,7 +150,7 @@ async def test_form_with_mfa_bad_secret(
     }
 
     with patch(
-        "homeassistant.components.opower.config_flow.Opower.async_login",
+        "smarthub.components.opower.config_flow.Opower.async_login",
     ) as mock_login:
         result4 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -181,7 +181,7 @@ async def test_form_with_mfa_bad_secret(
     ],
 )
 async def test_form_exceptions(
-    recorder_mock: Recorder, hass: HomeAssistant, api_exception, expected_error
+    recorder_mock: Recorder, hass: SmartHub, api_exception, expected_error
 ) -> None:
     """Test we handle exceptions."""
     result = await hass.config_entries.flow.async_init(
@@ -189,7 +189,7 @@ async def test_form_exceptions(
     )
 
     with patch(
-        "homeassistant.components.opower.config_flow.Opower.async_login",
+        "smarthub.components.opower.config_flow.Opower.async_login",
         side_effect=api_exception,
     ) as mock_login:
         result2 = await hass.config_entries.flow.async_configure(
@@ -208,7 +208,7 @@ async def test_form_exceptions(
 
 async def test_form_already_configured(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test user input for config_entry that already exists."""
@@ -217,7 +217,7 @@ async def test_form_already_configured(
     )
 
     with patch(
-        "homeassistant.components.opower.config_flow.Opower.async_login",
+        "smarthub.components.opower.config_flow.Opower.async_login",
     ) as mock_login:
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -235,7 +235,7 @@ async def test_form_already_configured(
 
 async def test_form_not_already_configured(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -245,7 +245,7 @@ async def test_form_not_already_configured(
     )
 
     with patch(
-        "homeassistant.components.opower.config_flow.Opower.async_login",
+        "smarthub.components.opower.config_flow.Opower.async_login",
     ) as mock_login:
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -272,7 +272,7 @@ async def test_form_not_already_configured(
 
 async def test_form_valid_reauth(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -291,7 +291,7 @@ async def test_form_valid_reauth(
     assert result["context"]["title_placeholders"] == {"name": mock_config_entry.title}
 
     with patch(
-        "homeassistant.components.opower.config_flow.Opower.async_login",
+        "smarthub.components.opower.config_flow.Opower.async_login",
     ) as mock_login:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -314,7 +314,7 @@ async def test_form_valid_reauth(
 
 async def test_form_valid_reauth_with_mfa(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_unload_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -338,7 +338,7 @@ async def test_form_valid_reauth_with_mfa(
     result = flows[0]
 
     with patch(
-        "homeassistant.components.opower.config_flow.Opower.async_login",
+        "smarthub.components.opower.config_flow.Opower.async_login",
     ) as mock_login:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],

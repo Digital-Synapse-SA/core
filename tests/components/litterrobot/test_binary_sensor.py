@@ -4,12 +4,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.binary_sensor import (
+from smarthub.components.binary_sensor import (
     DOMAIN as BINARY_SENSOR_DOMAIN,
     BinarySensorDeviceClass,
 )
-from homeassistant.const import ATTR_DEVICE_CLASS
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_DEVICE_CLASS
+from smarthub.core import SmartHub
 
 from .conftest import setup_integration
 
@@ -17,7 +17,7 @@ from .conftest import setup_integration
 @pytest.mark.freeze_time("2022-09-18 23:00:44+00:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_account: MagicMock,
 ) -> None:
     """Tests binary sensors."""
@@ -34,7 +34,7 @@ async def test_binary_sensors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_litterhopper_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_account_with_litterhopper: MagicMock,
 ) -> None:
     """Tests LitterHopper-specific binary sensors."""

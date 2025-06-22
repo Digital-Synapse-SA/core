@@ -2,10 +2,10 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.venstar.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_SSL
-from homeassistant.core import HomeAssistant
+from smarthub.components.venstar.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_SSL
+from smarthub.core import SmartHub
 
 from . import VenstarColorTouchMock
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 TEST_HOST = "venstartest.localdomain"
 
 
-async def test_setup_entry(hass: HomeAssistant) -> None:
+async def test_setup_entry(hass: SmartHub) -> None:
     """Validate that setup entry also configure the client."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -27,27 +27,27 @@ async def test_setup_entry(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.venstar.VenstarColorTouch._request",
+            "smarthub.components.venstar.VenstarColorTouch._request",
             new=VenstarColorTouchMock._request,
         ),
         patch(
-            "homeassistant.components.venstar.VenstarColorTouch.update_sensors",
+            "smarthub.components.venstar.VenstarColorTouch.update_sensors",
             new=VenstarColorTouchMock.update_sensors,
         ),
         patch(
-            "homeassistant.components.venstar.VenstarColorTouch.update_info",
+            "smarthub.components.venstar.VenstarColorTouch.update_info",
             new=VenstarColorTouchMock.update_info,
         ),
         patch(
-            "homeassistant.components.venstar.VenstarColorTouch.update_alerts",
+            "smarthub.components.venstar.VenstarColorTouch.update_alerts",
             new=VenstarColorTouchMock.update_alerts,
         ),
         patch(
-            "homeassistant.components.venstar.VenstarColorTouch.get_runtimes",
+            "smarthub.components.venstar.VenstarColorTouch.get_runtimes",
             new=VenstarColorTouchMock.get_runtimes,
         ),
         patch(
-            "homeassistant.components.venstar.coordinator.VENSTAR_SLEEP",
+            "smarthub.components.venstar.coordinator.VENSTAR_SLEEP",
             new=0,
         ),
     ):
@@ -61,7 +61,7 @@ async def test_setup_entry(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_setup_entry_exception(hass: HomeAssistant) -> None:
+async def test_setup_entry_exception(hass: SmartHub) -> None:
     """Validate that setup entry also configure the client."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -74,23 +74,23 @@ async def test_setup_entry_exception(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.venstar.VenstarColorTouch._request",
+            "smarthub.components.venstar.VenstarColorTouch._request",
             new=VenstarColorTouchMock._request,
         ),
         patch(
-            "homeassistant.components.venstar.VenstarColorTouch.update_sensors",
+            "smarthub.components.venstar.VenstarColorTouch.update_sensors",
             new=VenstarColorTouchMock.update_sensors,
         ),
         patch(
-            "homeassistant.components.venstar.VenstarColorTouch.update_info",
+            "smarthub.components.venstar.VenstarColorTouch.update_info",
             new=VenstarColorTouchMock.broken_update_info,
         ),
         patch(
-            "homeassistant.components.venstar.VenstarColorTouch.update_alerts",
+            "smarthub.components.venstar.VenstarColorTouch.update_alerts",
             new=VenstarColorTouchMock.update_alerts,
         ),
         patch(
-            "homeassistant.components.venstar.VenstarColorTouch.get_runtimes",
+            "smarthub.components.venstar.VenstarColorTouch.get_runtimes",
             new=VenstarColorTouchMock.get_runtimes,
         ),
     ):

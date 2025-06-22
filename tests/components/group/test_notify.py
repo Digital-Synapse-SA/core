@@ -7,26 +7,26 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components import notify
-from homeassistant.components.group import DOMAIN, SERVICE_RELOAD
-from homeassistant.components.notify import (
+from smarthub import config as hass_config
+from smarthub.components import notify
+from smarthub.components.group import DOMAIN, SERVICE_RELOAD
+from smarthub.components.notify import (
     ATTR_MESSAGE,
     ATTR_TITLE,
     DOMAIN as NOTIFY_DOMAIN,
     SERVICE_SEND_MESSAGE,
     NotifyEntity,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -51,7 +51,7 @@ class MockNotifyPlatform(MockPlatform):
 
 
 def mock_notify_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     async_get_service: Any = None,
 ):
@@ -63,7 +63,7 @@ def mock_notify_platform(
 
 
 async def help_setup_notify(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     targets: dict[str, None] | None = None,
     group_setup: list[dict[str, None]] | None = None,
@@ -87,7 +87,7 @@ async def help_setup_notify(
             send_message_mock(message, kwargs)
 
     async def async_get_service(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         discovery_info: DiscoveryInfoType | None = None,
     ) -> notify.BaseNotificationService:
@@ -106,7 +106,7 @@ async def help_setup_notify(
     return send_message_mock
 
 
-async def test_send_message_with_data(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_send_message_with_data(hass: SmartHub, tmp_path: Path) -> None:
     """Test sending a message with to a notify group."""
     assert await async_setup_component(
         hass,
@@ -204,7 +204,7 @@ async def test_send_message_with_data(hass: HomeAssistant, tmp_path: Path) -> No
 
 
 async def test_invalid_configuration(
-    hass: HomeAssistant, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test failing to set up group with an invalid configuration."""
     assert await async_setup_component(
@@ -238,7 +238,7 @@ async def test_invalid_configuration(
     )
 
 
-async def test_reload_notify(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_reload_notify(hass: SmartHub, tmp_path: Path) -> None:
     """Verify we can reload the notify service."""
     assert await async_setup_component(
         hass,
@@ -286,7 +286,7 @@ class MockFlow(ConfigFlow):
 
 
 @pytest.fixture
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, "test.config_flow")
 
@@ -308,7 +308,7 @@ class MockNotifyEntity(MockEntity, NotifyEntity):
 
 
 async def help_async_setup_entry_init(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> bool:
     """Set up test config entry."""
     await hass.config_entries.async_forward_entry_setups(
@@ -318,7 +318,7 @@ async def help_async_setup_entry_init(
 
 
 async def help_async_unload_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> bool:
     """Unload test config entry."""
     return await hass.config_entries.async_unload_platforms(
@@ -328,7 +328,7 @@ async def help_async_unload_entry(
 
 @pytest.fixture
 async def mock_notifiers(
-    hass: HomeAssistant, config_flow_fixture: None
+    hass: SmartHub, config_flow_fixture: None
 ) -> list[NotifyEntity]:
     """Set up the notify entities."""
     entity = MockNotifyEntity(name="test", entity_id="notify.test")
@@ -351,7 +351,7 @@ async def mock_notifiers(
 
 
 async def test_notify_entity_group(
-    hass: HomeAssistant, mock_notifiers: list[NotifyEntity]
+    hass: SmartHub, mock_notifiers: list[NotifyEntity]
 ) -> None:
     """Test sending a message to a notify group."""
     entity, entity2 = mock_notifiers
@@ -393,7 +393,7 @@ async def test_notify_entity_group(
     )
 
 
-async def test_state_reporting(hass: HomeAssistant) -> None:
+async def test_state_reporting(hass: SmartHub) -> None:
     """Test sending a message to a notify group."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

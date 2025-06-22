@@ -8,9 +8,9 @@ from openwebif.api import OpenWebIfServiceEvent, OpenWebIfStatus
 from openwebif.enums import PowerState, RemoteControlCodes, SetVolumeOption
 import pytest
 
-from homeassistant.components.enigma2.const import DOMAIN
-from homeassistant.components.enigma2.media_player import ATTR_MEDIA_CURRENTLY_RECORDING
-from homeassistant.components.media_player import (
+from smarthub.components.enigma2.const import DOMAIN
+from smarthub.components.enigma2.media_player import ATTR_MEDIA_CURRENTLY_RECORDING
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_MEDIA_VOLUME_LEVEL,
     ATTR_MEDIA_VOLUME_MUTED,
@@ -18,7 +18,7 @@ from homeassistant.components.media_player import (
     SERVICE_SELECT_SOURCE,
     MediaPlayerState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_MEDIA_NEXT_TRACK,
     SERVICE_MEDIA_PAUSE,
@@ -32,7 +32,7 @@ from homeassistant.const import (
     SERVICE_VOLUME_SET,
     SERVICE_VOLUME_UP,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import (
     MockConfigEntry,
@@ -46,7 +46,7 @@ from tests.common import (
     [(False, PowerState.STANDBY), (True, PowerState.DEEP_STANDBY)],
 )
 async def test_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
     deep_standby: bool,
@@ -67,7 +67,7 @@ async def test_turn_off(
 
 
 async def test_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
 ) -> None:
@@ -85,7 +85,7 @@ async def test_turn_on(
 
 
 async def test_set_volume_level(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_set_volume_level(
 
 
 async def test_volume_up(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
 ) -> None:
@@ -123,7 +123,7 @@ async def test_volume_up(
 
 
 async def test_volume_down(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
 ) -> None:
@@ -153,7 +153,7 @@ async def test_volume_down(
     ],
 )
 async def test_remote_control_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
     service: str,
@@ -178,7 +178,7 @@ async def test_remote_control_actions(
 
 @pytest.mark.parametrize("mute", [False, True])
 async def test_volume_mute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
     mute: bool,
@@ -199,7 +199,7 @@ async def test_volume_mute(
 
 
 async def test_select_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
 ) -> None:
@@ -221,7 +221,7 @@ async def test_select_source(
 
 
 async def test_update_data_standby(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -254,7 +254,7 @@ async def test_update_data_standby(
 
 
 async def test_update_volume(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -281,7 +281,7 @@ async def test_update_volume(
 
 
 async def test_update_volume_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     openwebif_device_mock: AsyncMock,
     freezer: FrozenDateTimeFactory,

@@ -7,10 +7,10 @@ from pypaperless.exceptions import PaperlessConnectionError
 from pypaperless.models import RemoteVersion
 import pytest
 
-from homeassistant.components.paperless_ngx.update import SCAN_INTERVAL
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.paperless_ngx.update import SCAN_INTERVAL
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -25,13 +25,13 @@ from tests.common import (
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_update_platfom(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test paperless_ngx update sensors."""
-    with patch("homeassistant.components.paperless_ngx.PLATFORMS", [Platform.UPDATE]):
+    with patch("smarthub.components.paperless_ngx.PLATFORMS", [Platform.UPDATE]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
@@ -39,7 +39,7 @@ async def test_update_platfom(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_update_sensor_downgrade_upgrade(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_paperless: AsyncMock,
     freezer: FrozenDateTimeFactory,
     init_integration: MockConfigEntry,
@@ -72,7 +72,7 @@ async def test_update_sensor_downgrade_upgrade(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_update_sensor_state_on_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_paperless: AsyncMock,
     freezer: FrozenDateTimeFactory,
     mock_remote_version_data: MagicMock,
@@ -105,7 +105,7 @@ async def test_update_sensor_state_on_error(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_update_sensor_version_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_paperless: AsyncMock,
     freezer: FrozenDateTimeFactory,
     mock_remote_version_data_unavailable: MagicMock,

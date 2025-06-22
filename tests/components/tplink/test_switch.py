@@ -8,17 +8,17 @@ from kasa.iot import IotStrip
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import tplink
-from homeassistant.components.switch import (
+from smarthub.components import tplink
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.components.tplink.const import DOMAIN
-from homeassistant.components.tplink.entity import EXCLUDED_FEATURES
-from homeassistant.components.tplink.switch import SWITCH_DESCRIPTIONS
-from homeassistant.config_entries import SOURCE_REAUTH
-from homeassistant.const import (
+from smarthub.components.tplink.const import DOMAIN
+from smarthub.components.tplink.entity import EXCLUDED_FEATURES
+from smarthub.components.tplink.switch import SWITCH_DESCRIPTIONS
+from smarthub.config_entries import SOURCE_REAUTH
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_HOST,
     STATE_OFF,
@@ -26,10 +26,10 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util, slugify
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util, slugify
 
 from . import (
     _mocked_device,
@@ -45,7 +45,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -65,7 +65,7 @@ async def test_states(
         assert hass.states.get(f"sensor.my_device_{excluded}") is None
 
 
-async def test_plug(hass: HomeAssistant) -> None:
+async def test_plug(hass: SmartHub) -> None:
     """Test a smart plug."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -114,7 +114,7 @@ async def test_plug(hass: HomeAssistant) -> None:
         ),
     ],
 )
-async def test_led_switch(hass: HomeAssistant, dev: Device, domain: str) -> None:
+async def test_led_switch(hass: SmartHub, dev: Device, domain: str) -> None:
     """Test LED setting for plugs, strips and dimmers."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -146,7 +146,7 @@ async def test_led_switch(hass: HomeAssistant, dev: Device, domain: str) -> None
 
 
 async def test_plug_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a plug unique id."""
     already_migrated_config_entry = MockConfigEntry(
@@ -162,7 +162,7 @@ async def test_plug_unique_id(
     assert entity_registry.async_get(entity_id).unique_id == DEVICE_ID
 
 
-async def test_plug_update_fails(hass: HomeAssistant) -> None:
+async def test_plug_update_fails(hass: SmartHub) -> None:
     """Test a smart plug update failure."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -184,7 +184,7 @@ async def test_plug_update_fails(hass: HomeAssistant) -> None:
     assert state.state == STATE_UNAVAILABLE
 
 
-async def test_strip(hass: HomeAssistant) -> None:
+async def test_strip(hass: SmartHub) -> None:
     """Test a smart strip."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -238,7 +238,7 @@ async def test_strip(hass: HomeAssistant) -> None:
 
 
 async def test_strip_unique_ids(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a strip unique id."""
     already_migrated_config_entry = MockConfigEntry(
@@ -262,7 +262,7 @@ async def test_strip_unique_ids(
 
 
 async def test_strip_blank_alias(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -325,7 +325,7 @@ async def test_strip_blank_alias(
     ids=["Authentication", "Timeout", "Other"],
 )
 async def test_plug_errors_when_turned_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception_type,
     msg,
     reauth_expected,
@@ -349,7 +349,7 @@ async def test_plug_errors_when_turned_on(
         already_migrated_config_entry.async_get_active_flows(hass, {SOURCE_REAUTH})
     )
 
-    with pytest.raises(HomeAssistantError, match=msg):
+    with pytest.raises(SmartHubError, match=msg):
         await hass.services.async_call(
             SWITCH_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: entity_id}, blocking=True
         )

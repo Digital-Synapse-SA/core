@@ -1,6 +1,6 @@
 """Test the Person significant change platform."""
 
-from homeassistant.components.person.significant_change import (
+from smarthub.components.person.significant_change import (
     async_check_significant_change,
 )
 

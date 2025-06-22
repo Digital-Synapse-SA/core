@@ -7,7 +7,7 @@ from aiocomelit.const import AlarmAreaState, AlarmZoneState
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     ATTR_CODE,
     DOMAIN as ALARM_DOMAIN,
     SERVICE_ALARM_ARM_AWAY,
@@ -16,9 +16,9 @@ from homeassistant.components.alarm_control_panel import (
     SERVICE_ALARM_DISARM,
     AlarmControlPanelState,
 )
-from homeassistant.components.comelit.const import SCAN_INTERVAL
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.comelit.const import SCAN_INTERVAL
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .const import VEDO_PIN
@@ -40,7 +40,7 @@ ENTITY_ID = "alarm_control_panel.area0"
     ],
 )
 async def test_entity_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_vedo: AsyncMock,
     mock_vedo_config_entry: MockConfigEntry,
@@ -104,7 +104,7 @@ async def test_entity_availability(
     ],
 )
 async def test_arming_disarming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vedo: AsyncMock,
     mock_vedo_config_entry: MockConfigEntry,
     service: str,
@@ -131,7 +131,7 @@ async def test_arming_disarming(
 
 
 async def test_wrong_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vedo: AsyncMock,
     mock_vedo_config_entry: MockConfigEntry,
 ) -> None:

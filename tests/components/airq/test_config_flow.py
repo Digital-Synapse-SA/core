@@ -7,15 +7,15 @@ from aioairq import DeviceInfo, InvalidAuth
 from aiohttp.client_exceptions import ClientConnectionError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.airq.const import (
+from smarthub import config_entries
+from smarthub.components.airq.const import (
     CONF_CLIP_NEGATIVE,
     CONF_RETURN_AVERAGE,
     DOMAIN,
 )
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_IP_ADDRESS, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -38,7 +38,7 @@ DEFAULT_OPTIONS = {
 }
 
 
-async def test_form(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_form(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test we get the form."""
     caplog.set_level(logging.DEBUG)
     result = await hass.config_entries.flow.async_init(
@@ -63,7 +63,7 @@ async def test_form(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> No
     assert result2["data"] == TEST_USER_DATA
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -78,7 +78,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -93,7 +93,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_duplicate_error(hass: HomeAssistant) -> None:
+async def test_duplicate_error(hass: SmartHub) -> None:
     """Test that errors are shown when duplicates are added."""
     MockConfigEntry(
         data=TEST_USER_DATA,
@@ -119,7 +119,7 @@ async def test_duplicate_error(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     "user_input", [{}, {CONF_RETURN_AVERAGE: False}, {CONF_CLIP_NEGATIVE: False}]
 )
-async def test_options_flow(hass: HomeAssistant, user_input) -> None:
+async def test_options_flow(hass: SmartHub, user_input) -> None:
     """Test that the options flow works."""
     entry = MockConfigEntry(
         domain=DOMAIN, data=TEST_USER_DATA, unique_id=TEST_DEVICE_INFO["id"]

@@ -5,8 +5,8 @@ from typing import Any
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.knx.const import ColorTempModes
-from homeassistant.components.knx.storage.knx_selector import GASelector
+from smarthub.components.knx.const import ColorTempModes
+from smarthub.components.knx.storage.knx_selector import GASelector
 
 INVALID = "invalid"
 

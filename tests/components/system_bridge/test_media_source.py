@@ -4,22 +4,22 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import paths
 
-from homeassistant.components.media_player import BrowseError
-from homeassistant.components.media_source import (
+from smarthub.components.media_player import BrowseError
+from smarthub.components.media_source import (
     DOMAIN as MEDIA_SOURCE_DOMAIN,
     URI_SCHEME,
     async_browse_media,
     async_resolve_media,
 )
-from homeassistant.components.system_bridge.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.system_bridge.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture(autouse=True)
-async def setup_component(hass: HomeAssistant) -> None:
+async def setup_component(hass: SmartHub) -> None:
     """Set up component."""
     assert await async_setup_component(
         hass,
@@ -29,7 +29,7 @@ async def setup_component(hass: HomeAssistant) -> None:
 
 
 async def test_root(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -46,7 +46,7 @@ async def test_root(
 
 
 async def test_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -63,7 +63,7 @@ async def test_entry(
 
 
 async def test_directory(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -80,7 +80,7 @@ async def test_directory(
 
 
 async def test_subdirectory(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -97,7 +97,7 @@ async def test_subdirectory(
 
 
 async def test_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -124,7 +124,7 @@ async def test_file(
 
 
 async def test_bad_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
 ) -> None:
     """Test invalid entry raises BrowseError."""

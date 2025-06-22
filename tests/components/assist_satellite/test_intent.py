@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import intent
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers import intent
+from smarthub.setup import async_setup_component
 
 from .conftest import TEST_DOMAIN, MockAssistSatellite
 
@@ -15,16 +15,16 @@ from tests.components.tts.common import MockResultStream
 
 
 @pytest.fixture
-async def mock_tts(hass: HomeAssistant):
+async def mock_tts(hass: SmartHub):
     """Mock TTS service."""
     assert await async_setup_component(hass, "tts", {})
     with (
         patch(
-            "homeassistant.components.tts.generate_media_source_id",
+            "smarthub.components.tts.generate_media_source_id",
             return_value="media-source://bla",
         ),
         patch(
-            "homeassistant.components.tts.async_create_stream",
+            "smarthub.components.tts.async_create_stream",
             return_value=MockResultStream(hass, "wav", b""),
         ),
     ):
@@ -32,7 +32,7 @@ async def mock_tts(hass: HomeAssistant):
 
 
 async def test_broadcast_intent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     entity2: MockAssistSatellite,
@@ -42,7 +42,7 @@ async def test_broadcast_intent(
     """Test we can invoke a broadcast intent."""
 
     with patch(
-        "homeassistant.components.tts.async_resolve_engine",
+        "smarthub.components.tts.async_resolve_engine",
         return_value="tts.cloud",
     ):
         result = await intent.async_handle(
@@ -76,7 +76,7 @@ async def test_broadcast_intent(
     assert len(entity_no_features.announcements) == 0
 
     with patch(
-        "homeassistant.components.tts.async_resolve_engine",
+        "smarthub.components.tts.async_resolve_engine",
         return_value="tts.cloud",
     ):
         result = await intent.async_handle(
@@ -109,7 +109,7 @@ async def test_broadcast_intent(
 
 
 async def test_broadcast_intent_excluded_domains(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: ConfigEntry,
     entity: MockAssistSatellite,
     entity2: MockAssistSatellite,
@@ -119,7 +119,7 @@ async def test_broadcast_intent_excluded_domains(
 
     # Exclude the "test" domain
     with patch(
-        "homeassistant.components.assist_satellite.intent.EXCLUDED_DOMAINS",
+        "smarthub.components.assist_satellite.intent.EXCLUDED_DOMAINS",
         new={TEST_DOMAIN},
     ):
         result = await intent.async_handle(

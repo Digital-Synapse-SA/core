@@ -6,8 +6,8 @@ from bring_api import BringItemsResponse
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.bring.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.bring.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -16,7 +16,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("mock_bring_client")
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     bring_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

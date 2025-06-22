@@ -12,16 +12,16 @@ from pytrafikverket import (
     UnknownError,
 )
 
-from homeassistant import config_entries
-from homeassistant.components.trafikverket_camera.const import DOMAIN
-from homeassistant.const import CONF_API_KEY, CONF_ID, CONF_LOCATION
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.trafikverket_camera.const import DOMAIN
+from smarthub.const import CONF_API_KEY, CONF_ID, CONF_LOCATION
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant, get_camera: CameraInfoModel) -> None:
+async def test_form(hass: SmartHub, get_camera: CameraInfoModel) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -32,11 +32,11 @@ async def test_form(hass: HomeAssistant, get_camera: CameraInfoModel) -> None:
 
     with (
         patch(
-            "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+            "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
             return_value=[get_camera],
         ),
         patch(
-            "homeassistant.components.trafikverket_camera.async_setup_entry",
+            "smarthub.components.trafikverket_camera.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -60,7 +60,7 @@ async def test_form(hass: HomeAssistant, get_camera: CameraInfoModel) -> None:
 
 
 async def test_form_multiple_cameras(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_cameras: list[CameraInfoModel],
     get_camera2: CameraInfoModel,
 ) -> None:
@@ -73,7 +73,7 @@ async def test_form_multiple_cameras(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+        "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
         return_value=get_cameras,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -87,11 +87,11 @@ async def test_form_multiple_cameras(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+            "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
             return_value=[get_camera2],
         ),
         patch(
-            "homeassistant.components.trafikverket_camera.async_setup_entry",
+            "smarthub.components.trafikverket_camera.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -114,7 +114,7 @@ async def test_form_multiple_cameras(
 
 
 async def test_form_no_location_data(
-    hass: HomeAssistant, get_camera_no_location: CameraInfoModel
+    hass: SmartHub, get_camera_no_location: CameraInfoModel
 ) -> None:
     """Test we get the form."""
 
@@ -126,11 +126,11 @@ async def test_form_no_location_data(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+            "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
             return_value=[get_camera_no_location],
         ),
         patch(
-            "homeassistant.components.trafikverket_camera.async_setup_entry",
+            "smarthub.components.trafikverket_camera.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -174,7 +174,7 @@ async def test_form_no_location_data(
     ],
 )
 async def test_flow_fails(
-    hass: HomeAssistant, side_effect: Exception, error_key: str, base_error: str
+    hass: SmartHub, side_effect: Exception, error_key: str, base_error: str
 ) -> None:
     """Test config flow errors."""
     result4 = await hass.config_entries.flow.async_init(
@@ -185,7 +185,7 @@ async def test_flow_fails(
     assert result4["step_id"] == config_entries.SOURCE_USER
 
     with patch(
-        "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+        "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
         side_effect=side_effect,
     ):
         result4 = await hass.config_entries.flow.async_configure(
@@ -199,7 +199,7 @@ async def test_flow_fails(
     assert result4["errors"] == {error_key: base_error}
 
 
-async def test_reauth_flow(hass: HomeAssistant) -> None:
+async def test_reauth_flow(hass: SmartHub) -> None:
     """Test a reauthentication flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -219,10 +219,10 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+            "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
         ),
         patch(
-            "homeassistant.components.trafikverket_camera.async_setup_entry",
+            "smarthub.components.trafikverket_camera.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -261,7 +261,7 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
     ],
 )
 async def test_reauth_flow_error(
-    hass: HomeAssistant, side_effect: Exception, error_key: str, p_error: str
+    hass: SmartHub, side_effect: Exception, error_key: str, p_error: str
 ) -> None:
     """Test a reauthentication flow with error."""
     entry = MockConfigEntry(
@@ -279,7 +279,7 @@ async def test_reauth_flow_error(
     result = await entry.start_reauth_flow(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+        "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
         side_effect=side_effect,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -294,10 +294,10 @@ async def test_reauth_flow_error(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+            "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
         ),
         patch(
-            "homeassistant.components.trafikverket_camera.async_setup_entry",
+            "smarthub.components.trafikverket_camera.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -316,7 +316,7 @@ async def test_reauth_flow_error(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_cameras: list[CameraInfoModel],
     get_camera2: CameraInfoModel,
 ) -> None:
@@ -338,7 +338,7 @@ async def test_reconfigure_flow(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+        "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
         return_value=get_cameras,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -352,11 +352,11 @@ async def test_reconfigure_flow(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+            "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
             return_value=[get_camera2],
         ),
         patch(
-            "homeassistant.components.trafikverket_camera.async_setup_entry",
+            "smarthub.components.trafikverket_camera.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -397,7 +397,7 @@ async def test_reconfigure_flow(
     ],
 )
 async def test_reconfigure_flow_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_camera: CameraInfoModel,
     side_effect: Exception,
     error_key: str,
@@ -419,7 +419,7 @@ async def test_reconfigure_flow_error(
     result = await entry.start_reconfigure_flow(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+        "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
         side_effect=side_effect,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -437,11 +437,11 @@ async def test_reconfigure_flow_error(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
+            "smarthub.components.trafikverket_camera.config_flow.TrafikverketCamera.async_get_cameras",
             return_value=[get_camera],
         ),
         patch(
-            "homeassistant.components.trafikverket_camera.async_setup_entry",
+            "smarthub.components.trafikverket_camera.async_setup_entry",
             return_value=True,
         ),
     ):

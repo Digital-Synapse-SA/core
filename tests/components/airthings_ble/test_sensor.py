@@ -2,10 +2,10 @@
 
 import logging
 
-from homeassistant.components.airthings_ble.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.airthings_ble.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import (
     CO2_V1,
@@ -28,7 +28,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def test_migration_from_v1_to_v3_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -69,7 +69,7 @@ async def test_migration_from_v1_to_v3_unique_id(
 
 
 async def test_migration_from_v2_to_v3_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -110,7 +110,7 @@ async def test_migration_from_v2_to_v3_unique_id(
 
 
 async def test_migration_from_v1_and_v2_to_v3_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -160,7 +160,7 @@ async def test_migration_from_v1_and_v2_to_v3_unique_id(
 
 
 async def test_migration_with_all_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:

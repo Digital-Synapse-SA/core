@@ -5,17 +5,17 @@ from datetime import timedelta
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.components.utility_meter import DEFAULT_OFFSET
-from homeassistant.components.utility_meter.const import (
+from smarthub.components.utility_meter import DEFAULT_OFFSET
+from smarthub.components.utility_meter.const import (
     ATTR_VALUE,
     DAILY,
     DOMAIN,
@@ -24,14 +24,14 @@ from homeassistant.components.utility_meter.const import (
     SERVICE_CALIBRATE_METER,
     SERVICE_RESET,
 )
-from homeassistant.components.utility_meter.sensor import (
+from smarthub.components.utility_meter.sensor import (
     ATTR_LAST_RESET,
     ATTR_STATUS,
     COLLECTING,
     PAUSED,
     UtilityMeterSensor,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -41,11 +41,11 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfVolume,
 )
-from homeassistant.core import CoreState, HomeAssistant, State
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.event import async_track_state_change_event
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import CoreState, SmartHub, State
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.event import async_track_state_change_event
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -55,7 +55,7 @@ from tests.common import (
 
 
 @pytest.fixture(autouse=True)
-async def set_utc(hass: HomeAssistant):
+async def set_utc(hass: SmartHub):
     """Set timezone to UTC."""
     await hass.config.async_set_time_zone("UTC")
 
@@ -89,7 +89,7 @@ async def set_utc(hass: HomeAssistant):
         ),
     ],
 )
-async def test_state(hass: HomeAssistant, yaml_config, config_entry_config) -> None:
+async def test_state(hass: SmartHub, yaml_config, config_entry_config) -> None:
     """Test utility sensor state."""
     if yaml_config:
         assert await async_setup_component(hass, DOMAIN, yaml_config)
@@ -265,7 +265,7 @@ async def test_state(hass: HomeAssistant, yaml_config, config_entry_config) -> N
     ],
 )
 async def test_state_always_available(
-    hass: HomeAssistant, yaml_config, config_entry_config
+    hass: SmartHub, yaml_config, config_entry_config
 ) -> None:
     """Test utility sensor state."""
     if yaml_config:
@@ -350,7 +350,7 @@ async def test_state_always_available(
         ),
     ],
 )
-async def test_not_unique_tariffs(hass: HomeAssistant, yaml_config) -> None:
+async def test_not_unique_tariffs(hass: SmartHub, yaml_config) -> None:
     """Test utility sensor state initialization."""
     assert not await async_setup_component(hass, DOMAIN, yaml_config)
 
@@ -384,7 +384,7 @@ async def test_not_unique_tariffs(hass: HomeAssistant, yaml_config) -> None:
         ),
     ],
 )
-async def test_init(hass: HomeAssistant, yaml_config, config_entry_config) -> None:
+async def test_init(hass: SmartHub, yaml_config, config_entry_config) -> None:
     """Test utility sensor state initialization."""
     if yaml_config:
         assert await async_setup_component(hass, DOMAIN, yaml_config)
@@ -431,7 +431,7 @@ async def test_init(hass: HomeAssistant, yaml_config, config_entry_config) -> No
 
 
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test unique_id configuration option."""
     yaml_config = {
@@ -496,7 +496,7 @@ async def test_unique_id(
         ),
     ],
 )
-async def test_entity_name(hass: HomeAssistant, yaml_config, entity_id, name) -> None:
+async def test_entity_name(hass: SmartHub, yaml_config, entity_id, name) -> None:
     """Test utility sensor state initialization."""
     assert await async_setup_component(hass, DOMAIN, yaml_config)
     await hass.async_block_till_done()
@@ -607,7 +607,7 @@ async def test_entity_name(hass: HomeAssistant, yaml_config, entity_id, name) ->
     ],
 )
 async def test_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     yaml_config,
     config_entry_configs,
     energy_sensor_attributes,
@@ -699,7 +699,7 @@ async def test_device_class(
     ],
 )
 async def test_restore_state(
-    hass: HomeAssistant, yaml_config, config_entry_config
+    hass: SmartHub, yaml_config, config_entry_config
 ) -> None:
     """Test utility sensor restore state."""
     # Home assistant is not runnit yet
@@ -839,7 +839,7 @@ async def test_restore_state(
     ],
 )
 async def test_service_reset_no_tariffs(
-    hass: HomeAssistant, yaml_config, config_entry_config
+    hass: SmartHub, yaml_config, config_entry_config
 ) -> None:
     """Test utility sensor service reset for sensor with no tariffs."""
     # Home assistant is not runnit yet
@@ -956,7 +956,7 @@ async def test_service_reset_no_tariffs(
     ],
 )
 async def test_service_reset_no_tariffs_correct_with_multi(
-    hass: HomeAssistant, yaml_config, config_entry_configs
+    hass: SmartHub, yaml_config, config_entry_configs
 ) -> None:
     """Test complex utility sensor service reset for multiple sensors with no tarrifs.
 
@@ -1087,7 +1087,7 @@ async def test_service_reset_no_tariffs_correct_with_multi(
     ],
 )
 async def test_net_consumption(
-    hass: HomeAssistant, yaml_config, config_entry_config
+    hass: SmartHub, yaml_config, config_entry_config
 ) -> None:
     """Test utility sensor state."""
     if yaml_config:
@@ -1158,7 +1158,7 @@ async def test_net_consumption(
     ],
 )
 async def test_non_net_consumption(
-    hass: HomeAssistant,
+    hass: SmartHub,
     yaml_config,
     config_entry_config,
     caplog: pytest.LogCaptureFixture,
@@ -1244,7 +1244,7 @@ async def test_non_net_consumption(
     ],
 )
 async def test_delta_values(
-    hass: HomeAssistant,
+    hass: SmartHub,
     yaml_config,
     config_entry_config,
     caplog: pytest.LogCaptureFixture,
@@ -1356,7 +1356,7 @@ async def test_delta_values(
     ],
 )
 async def test_non_periodically_resetting(
-    hass: HomeAssistant, yaml_config, config_entry_config
+    hass: SmartHub, yaml_config, config_entry_config
 ) -> None:
     """Test utility meter "non periodically resetting" mode."""
     # Home assistant is not runnit yet
@@ -1489,7 +1489,7 @@ async def test_non_periodically_resetting(
     ],
 )
 async def test_non_periodically_resetting_meter_with_tariffs(
-    hass: HomeAssistant, yaml_config, config_entry_config
+    hass: SmartHub, yaml_config, config_entry_config
 ) -> None:
     """Test test_non_periodically_resetting_meter_with_tariffs."""
     if yaml_config:
@@ -1608,7 +1608,7 @@ def gen_config(cycle, offset=None):
 
 
 async def _test_self_reset(
-    hass: HomeAssistant, config, start_time, expect_reset=True
+    hass: SmartHub, config, start_time, expect_reset=True
 ) -> None:
     """Test energy sensor self reset."""
     now = dt_util.parse_datetime(start_time)
@@ -1706,7 +1706,7 @@ async def _test_self_reset(
         assert state.state == "9"
 
 
-async def test_self_reset_cron_pattern(hass: HomeAssistant) -> None:
+async def test_self_reset_cron_pattern(hass: SmartHub) -> None:
     """Test cron pattern reset of meter."""
     config = {
         "utility_meter": {
@@ -1717,42 +1717,42 @@ async def test_self_reset_cron_pattern(hass: HomeAssistant) -> None:
     await _test_self_reset(hass, config, "2017-01-31T23:59:00.000000+00:00")
 
 
-async def test_self_reset_quarter_hourly(hass: HomeAssistant) -> None:
+async def test_self_reset_quarter_hourly(hass: SmartHub) -> None:
     """Test quarter-hourly reset of meter."""
     await _test_self_reset(
         hass, gen_config("quarter-hourly"), "2017-12-31T23:59:00.000000+00:00"
     )
 
 
-async def test_self_reset_quarter_hourly_first_quarter(hass: HomeAssistant) -> None:
+async def test_self_reset_quarter_hourly_first_quarter(hass: SmartHub) -> None:
     """Test quarter-hourly reset of meter."""
     await _test_self_reset(
         hass, gen_config("quarter-hourly"), "2017-12-31T23:14:00.000000+00:00"
     )
 
 
-async def test_self_reset_quarter_hourly_second_quarter(hass: HomeAssistant) -> None:
+async def test_self_reset_quarter_hourly_second_quarter(hass: SmartHub) -> None:
     """Test quarter-hourly reset of meter."""
     await _test_self_reset(
         hass, gen_config("quarter-hourly"), "2017-12-31T23:29:00.000000+00:00"
     )
 
 
-async def test_self_reset_quarter_hourly_third_quarter(hass: HomeAssistant) -> None:
+async def test_self_reset_quarter_hourly_third_quarter(hass: SmartHub) -> None:
     """Test quarter-hourly reset of meter."""
     await _test_self_reset(
         hass, gen_config("quarter-hourly"), "2017-12-31T23:44:00.000000+00:00"
     )
 
 
-async def test_self_reset_hourly(hass: HomeAssistant) -> None:
+async def test_self_reset_hourly(hass: SmartHub) -> None:
     """Test hourly reset of meter."""
     await _test_self_reset(
         hass, gen_config("hourly"), "2017-12-31T23:59:00.000000+00:00"
     )
 
 
-async def test_self_reset_hourly_dst(hass: HomeAssistant) -> None:
+async def test_self_reset_hourly_dst(hass: SmartHub) -> None:
     """Test hourly reset of meter in DST change conditions."""
 
     hass.config.time_zone = "Europe/Lisbon"
@@ -1762,7 +1762,7 @@ async def test_self_reset_hourly_dst(hass: HomeAssistant) -> None:
     )
 
 
-async def test_self_reset_hourly_dst2(hass: HomeAssistant) -> None:
+async def test_self_reset_hourly_dst2(hass: SmartHub) -> None:
     """Test weekly reset of meter in DST change conditions."""
 
     hass.config.time_zone = "Europe/Berlin"
@@ -1782,7 +1782,7 @@ async def test_self_reset_hourly_dst2(hass: HomeAssistant) -> None:
     assert state.attributes.get("next_reset") == next_reset
 
 
-async def test_tz_changes(hass: HomeAssistant) -> None:
+async def test_tz_changes(hass: SmartHub) -> None:
     """Test that a timezone change changes the scheduler."""
 
     await hass.config.async_update(time_zone="Europe/Prague")
@@ -1799,35 +1799,35 @@ async def test_tz_changes(hass: HomeAssistant) -> None:
     assert state.attributes.get("next_reset") != "2024-10-28T00:00:00+01:00"
 
 
-async def test_self_reset_daily(hass: HomeAssistant) -> None:
+async def test_self_reset_daily(hass: SmartHub) -> None:
     """Test daily reset of meter."""
     await _test_self_reset(
         hass, gen_config("daily"), "2017-12-31T23:59:00.000000+00:00"
     )
 
 
-async def test_self_reset_weekly(hass: HomeAssistant) -> None:
+async def test_self_reset_weekly(hass: SmartHub) -> None:
     """Test weekly reset of meter."""
     await _test_self_reset(
         hass, gen_config("weekly"), "2017-12-31T23:59:00.000000+00:00"
     )
 
 
-async def test_self_reset_monthly(hass: HomeAssistant) -> None:
+async def test_self_reset_monthly(hass: SmartHub) -> None:
     """Test monthly reset of meter."""
     await _test_self_reset(
         hass, gen_config("monthly"), "2017-12-31T23:59:00.000000+00:00"
     )
 
 
-async def test_self_reset_bimonthly(hass: HomeAssistant) -> None:
+async def test_self_reset_bimonthly(hass: SmartHub) -> None:
     """Test bimonthly reset of meter occurs on even months."""
     await _test_self_reset(
         hass, gen_config("bimonthly"), "2017-12-31T23:59:00.000000+00:00"
     )
 
 
-async def test_self_no_reset_bimonthly(hass: HomeAssistant) -> None:
+async def test_self_no_reset_bimonthly(hass: SmartHub) -> None:
     """Test bimonthly reset of meter does not occur on odd months."""
     await _test_self_reset(
         hass,
@@ -1837,21 +1837,21 @@ async def test_self_no_reset_bimonthly(hass: HomeAssistant) -> None:
     )
 
 
-async def test_self_reset_quarterly(hass: HomeAssistant) -> None:
+async def test_self_reset_quarterly(hass: SmartHub) -> None:
     """Test quarterly reset of meter."""
     await _test_self_reset(
         hass, gen_config("quarterly"), "2017-03-31T23:59:00.000000+00:00"
     )
 
 
-async def test_self_reset_yearly(hass: HomeAssistant) -> None:
+async def test_self_reset_yearly(hass: SmartHub) -> None:
     """Test yearly reset of meter."""
     await _test_self_reset(
         hass, gen_config("yearly"), "2017-12-31T23:59:00.000000+00:00"
     )
 
 
-async def test_self_no_reset_yearly(hass: HomeAssistant) -> None:
+async def test_self_no_reset_yearly(hass: SmartHub) -> None:
     """Test yearly reset of meter does not occur after 1st January."""
     await _test_self_reset(
         hass,
@@ -1861,7 +1861,7 @@ async def test_self_no_reset_yearly(hass: HomeAssistant) -> None:
     )
 
 
-async def test_reset_yearly_offset(hass: HomeAssistant) -> None:
+async def test_reset_yearly_offset(hass: SmartHub) -> None:
     """Test yearly reset of meter."""
     await _test_self_reset(
         hass,
@@ -1870,7 +1870,7 @@ async def test_reset_yearly_offset(hass: HomeAssistant) -> None:
     )
 
 
-async def test_no_reset_yearly_offset(hass: HomeAssistant) -> None:
+async def test_no_reset_yearly_offset(hass: SmartHub) -> None:
     """Test yearly reset of meter."""
     await _test_self_reset(
         hass,
@@ -1880,7 +1880,7 @@ async def test_no_reset_yearly_offset(hass: HomeAssistant) -> None:
     )
 
 
-async def test_bad_offset(hass: HomeAssistant) -> None:
+async def test_bad_offset(hass: SmartHub) -> None:
     """Test bad offset of meter."""
     assert not await async_setup_component(
         hass, DOMAIN, gen_config("monthly", timedelta(days=31))
@@ -1913,7 +1913,7 @@ def test_calculate_adjustment_invalid_new_state(
 
 
 async def test_unit_of_measurement_missing_invalid_new_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test that a suggestion is created when new_state is missing unit_of_measurement."""
@@ -1946,7 +1946,7 @@ async def test_unit_of_measurement_missing_invalid_new_state(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

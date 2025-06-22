@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 from homematicip.base.enums import EventType
 
-from homeassistant.components.homematicip_cloud.hap import HomematicipHAP
-from homeassistant.const import STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.homematicip_cloud.hap import HomematicipHAP
+from smarthub.const import STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .helper import HomeFactory, async_manipulate_test_data, get_and_check_entity_basics
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_hmip_load_all_supported_devices(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Ensure that all supported devices could be loaded."""
     mock_hap = await default_mock_hap_factory.async_get_mock_hap(
@@ -26,7 +26,7 @@ async def test_hmip_load_all_supported_devices(
 
 
 async def test_hmip_remove_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     default_mock_hap_factory: HomeFactory,
@@ -60,7 +60,7 @@ async def test_hmip_remove_device(
 
 
 async def test_hmip_add_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     default_mock_hap_factory: HomeFactory,
@@ -95,13 +95,13 @@ async def test_hmip_add_device(
     reloaded_hap = HomematicipHAP(hass, hmip_config_entry)
     with (
         patch(
-            "homeassistant.components.homematicip_cloud.HomematicipHAP",
+            "smarthub.components.homematicip_cloud.HomematicipHAP",
             return_value=reloaded_hap,
         ),
         patch.object(reloaded_hap, "async_connect"),
         patch.object(reloaded_hap, "get_hap", return_value=mock_hap.home),
         patch(
-            "homeassistant.components.homematicip_cloud.hap.asyncio.sleep",
+            "smarthub.components.homematicip_cloud.hap.asyncio.sleep",
         ),
     ):
         mock_hap.home.fire_create_event(event_type=EventType.DEVICE_ADDED)
@@ -114,7 +114,7 @@ async def test_hmip_add_device(
 
 
 async def test_hmip_remove_group(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     default_mock_hap_factory: HomeFactory,
@@ -145,7 +145,7 @@ async def test_hmip_remove_group(
 
 
 async def test_all_devices_unavailable_when_hap_not_connected(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test make all devices unavaulable when hap is not connected."""
     entity_id = "light.treppe_ch"
@@ -171,7 +171,7 @@ async def test_all_devices_unavailable_when_hap_not_connected(
 
 
 async def test_hap_reconnected(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test reconnect hap."""
     entity_id = "light.treppe_ch"
@@ -203,7 +203,7 @@ async def test_hap_reconnected(
 
 
 async def test_hap_with_name(
-    hass: HomeAssistant, mock_connection, hmip_config_entry: MockConfigEntry
+    hass: SmartHub, mock_connection, hmip_config_entry: MockConfigEntry
 ) -> None:
     """Test hap with name."""
     home_name = "TestName"
@@ -230,7 +230,7 @@ async def test_hap_with_name(
 
 
 async def test_hmip_reset_energy_counter_services(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test reset_energy_counter service."""
     entity_id = "switch.pc"
@@ -262,7 +262,7 @@ async def test_hmip_reset_energy_counter_services(
 
 
 async def test_hmip_multi_area_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     default_mock_hap_factory: HomeFactory,

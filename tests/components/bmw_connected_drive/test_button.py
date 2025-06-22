@@ -8,10 +8,10 @@ import pytest
 import respx
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import (
     REMOTE_SERVICE_EXC_TRANSLATION,
@@ -25,7 +25,7 @@ from tests.common import snapshot_platform
 @pytest.mark.usefixtures("bmw_fixture")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entity_state_attrs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -33,7 +33,7 @@ async def test_entity_state_attrs(
 
     # Setup component
     with patch(
-        "homeassistant.components.bmw_connected_drive.PLATFORMS",
+        "smarthub.components.bmw_connected_drive.PLATFORMS",
         [Platform.BUTTON],
     ):
         mock_config_entry = await setup_mocked_integration(hass)
@@ -49,7 +49,7 @@ async def test_entity_state_attrs(
     ],
 )
 async def test_service_call_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     remote_service: str,
     bmw_fixture: respx.Router,
@@ -71,7 +71,7 @@ async def test_service_call_success(
 
 @pytest.mark.usefixtures("bmw_fixture")
 async def test_service_call_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test failed button press."""
@@ -91,7 +91,7 @@ async def test_service_call_fail(
     )
 
     # Test
-    with pytest.raises(HomeAssistantError, match=REMOTE_SERVICE_EXC_TRANSLATION):
+    with pytest.raises(SmartHubError, match=REMOTE_SERVICE_EXC_TRANSLATION):
         await hass.services.async_call(
             "button",
             "press",
@@ -138,7 +138,7 @@ async def test_service_call_fail(
     ],
 )
 async def test_service_call_success_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     state_entity_id: str,
     new_value: str,
@@ -177,7 +177,7 @@ async def test_service_call_success_state_change(
     ],
 )
 async def test_service_call_success_attr_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     state_entity_id: str,
     new_attrs: dict,

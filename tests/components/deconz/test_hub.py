@@ -6,13 +6,13 @@ from pydeconz.websocket import State
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.deconz.config_flow import DECONZ_MANUFACTURERURL
-from homeassistant.components.deconz.const import DOMAIN
-from homeassistant.config_entries import SOURCE_SSDP
-from homeassistant.const import STATE_OFF, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.components.deconz.config_flow import DECONZ_MANUFACTURERURL
+from smarthub.components.deconz.const import DOMAIN
+from smarthub.config_entries import SOURCE_SSDP
+from smarthub.const import STATE_OFF, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_MANUFACTURER_URL,
     ATTR_UPNP_SERIAL,
     ATTR_UPNP_UDN,
@@ -50,7 +50,7 @@ async def test_device_registry_entry(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_connection_status_signalling(
-    hass: HomeAssistant, mock_websocket_state
+    hass: SmartHub, mock_websocket_state
 ) -> None:
     """Make sure that connection status triggers a dispatcher send."""
     assert hass.states.get("binary_sensor.presence").state == STATE_OFF
@@ -67,14 +67,14 @@ async def test_connection_status_signalling(
 
 
 async def test_update_address(
-    hass: HomeAssistant, config_entry_setup: MockConfigEntry
+    hass: SmartHub, config_entry_setup: MockConfigEntry
 ) -> None:
     """Make sure that connection status triggers a dispatcher send."""
     assert config_entry_setup.data["host"] == "1.2.3.4"
 
     with (
         patch(
-            "homeassistant.components.deconz.async_setup_entry",
+            "smarthub.components.deconz.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch("pydeconz.gateway.WSClient") as ws_mock,

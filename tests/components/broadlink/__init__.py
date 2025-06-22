@@ -3,8 +3,8 @@
 from dataclasses import dataclass
 from unittest.mock import MagicMock, patch
 
-from homeassistant.components.broadlink.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.broadlink.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -140,7 +140,7 @@ class BroadlinkDevice:
 
     async def setup_entry(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         mock_api: MagicMock | None = None,
         mock_entry: MockConfigEntry | None = None,
     ) -> MockSetup:
@@ -150,7 +150,7 @@ class BroadlinkDevice:
         mock_entry.add_to_hass(hass)
 
         with patch(
-            "homeassistant.components.broadlink.device.blk.gendevice",
+            "smarthub.components.broadlink.device.blk.gendevice",
             return_value=mock_api,
         ) as mock_factory:
             await hass.config_entries.async_setup(mock_entry.entry_id)

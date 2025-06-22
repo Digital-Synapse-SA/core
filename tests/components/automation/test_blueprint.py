@@ -11,13 +11,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.components.blueprint import models
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util, yaml as yaml_util
+from smarthub.components import automation
+from smarthub.components.blueprint import models
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub, callback
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util, yaml as yaml_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed, async_mock_service
 
@@ -45,14 +45,14 @@ def patch_blueprint(
         )
 
     with patch(
-        "homeassistant.components.blueprint.models.DomainBlueprints._load_blueprint",
+        "smarthub.components.blueprint.models.DomainBlueprints._load_blueprint",
         mock_load_blueprint,
     ):
         yield
 
 
 async def test_notify_leaving_zone(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test notifying leaving a zone blueprint."""
     config_entry = MockConfigEntry(domain="fake_integration", data={})
@@ -97,7 +97,7 @@ async def test_notify_leaving_zone(
         )
 
     with patch(
-        "homeassistant.components.mobile_app.device_action.async_call_action_from_config"
+        "smarthub.components.mobile_app.device_action.async_call_action_from_config"
     ) as mock_call_action:
         # Leaving zone to no zone
         set_person_state("not_home", {})
@@ -149,7 +149,7 @@ async def test_notify_leaving_zone(
         assert len(mock_call_action.mock_calls) == 3
 
 
-async def test_motion_light(hass: HomeAssistant) -> None:
+async def test_motion_light(hass: SmartHub) -> None:
     """Test motion light blueprint."""
     hass.states.async_set("binary_sensor.kitchen", "off")
 

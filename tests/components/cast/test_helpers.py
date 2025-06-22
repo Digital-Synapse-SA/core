@@ -3,14 +3,14 @@
 from aiohttp import client_exceptions
 import pytest
 
-from homeassistant.components.cast.const import DOMAIN
-from homeassistant.components.cast.helpers import (
+from smarthub.components.cast.const import DOMAIN
+from smarthub.components.cast.helpers import (
     PlaylistError,
     PlaylistItem,
     PlaylistSupported,
     parse_playlist,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -37,7 +37,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
     ],
 )
 async def test_hls_playlist_supported(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, url, fixture, content_type
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, url, fixture, content_type
 ) -> None:
     """Test playlist parsing of HLS playlist."""
     headers = {"content-type": content_type}
@@ -102,7 +102,7 @@ async def test_hls_playlist_supported(
     ],
 )
 async def test_parse_playlist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     url,
     fixture,
@@ -134,7 +134,7 @@ async def test_parse_playlist(
     ],
 )
 async def test_parse_bad_playlist(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, url, fixture
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, url, fixture
 ) -> None:
     """Test playlist parsing of HLS playlist."""
     aioclient_mock.get(url, text=await async_load_fixture(hass, fixture, DOMAIN))
@@ -150,7 +150,7 @@ async def test_parse_bad_playlist(
     ],
 )
 async def test_parse_http_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, url, exc
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, url, exc
 ) -> None:
     """Test playlist parsing of HLS playlist when aioclient raises."""
     aioclient_mock.get(url, text="", exc=exc)

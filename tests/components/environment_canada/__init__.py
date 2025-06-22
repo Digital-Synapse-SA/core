@@ -3,9 +3,9 @@
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from homeassistant.components.environment_canada.const import CONF_STATION, DOMAIN
-from homeassistant.const import CONF_LANGUAGE, CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
+from smarthub.components.environment_canada.const import CONF_STATION, DOMAIN
+from smarthub.const import CONF_LANGUAGE, CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -17,8 +17,8 @@ FIXTURE_USER_INPUT = {
 }
 
 
-async def init_integration(hass: HomeAssistant, ec_data) -> MockConfigEntry:
-    """Set up the Environment Canada integration in Home Assistant."""
+async def init_integration(hass: SmartHub, ec_data) -> MockConfigEntry:
+    """Set up the Environment Canada integration in SmartHub."""
 
     def mock_ec():
         ec_mock = MagicMock()
@@ -46,19 +46,19 @@ async def init_integration(hass: HomeAssistant, ec_data) -> MockConfigEntry:
 
     with (
         patch(
-            "homeassistant.components.environment_canada.ECWeather",
+            "smarthub.components.environment_canada.ECWeather",
             return_value=weather_mock,
         ),
         patch(
-            "homeassistant.components.environment_canada.ECAirQuality",
+            "smarthub.components.environment_canada.ECAirQuality",
             return_value=mock_ec(),
         ),
         patch(
-            "homeassistant.components.environment_canada.ECRadar",
+            "smarthub.components.environment_canada.ECRadar",
             return_value=radar_mock,
         ),
         patch(
-            "homeassistant.components.environment_canada.config_flow.ECWeather",
+            "smarthub.components.environment_canada.config_flow.ECWeather",
             return_value=weather_mock,
         ),
     ):

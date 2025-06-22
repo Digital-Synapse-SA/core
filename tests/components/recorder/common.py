@@ -18,33 +18,33 @@ from freezegun import freeze_time
 from sqlalchemy import create_engine, event as sqlalchemy_event
 from sqlalchemy.orm.session import Session
 
-from homeassistant import core as ha
-from homeassistant.components import recorder
-from homeassistant.components.recorder import (
+from smarthub import core as ha
+from smarthub.components import recorder
+from smarthub.components.recorder import (
     Recorder,
     core,
     get_instance,
     migration,
     statistics,
 )
-from homeassistant.components.recorder.db_schema import (
+from smarthub.components.recorder.db_schema import (
     Events,
     EventTypes,
     RecorderRuns,
     States,
     StatesMeta,
 )
-from homeassistant.components.recorder.tasks import RecorderTask, StatisticsTask
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import DEGREE, UnitOfTemperature
-from homeassistant.core import Event, HomeAssistant, State
-from homeassistant.helpers import recorder as recorder_helper
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder.tasks import RecorderTask, StatisticsTask
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.const import DEGREE, UnitOfTemperature
+from smarthub.core import Event, SmartHub, State
+from smarthub.helpers import recorder as recorder_helper
+from smarthub.util import dt as dt_util
 
 from . import db_schema_0
 
 DEFAULT_PURGE_TASKS = 3
-CREATE_ENGINE_TARGET = "homeassistant.components.recorder.core.create_engine"
+CREATE_ENGINE_TARGET = "smarthub.components.recorder.core.create_engine"
 
 
 @dataclass
@@ -69,7 +69,7 @@ class ForceReturnConnectionToPool(RecorderTask):
         instance.event_session.commit()
 
 
-async def async_block_recorder(hass: HomeAssistant, seconds: float) -> None:
+async def async_block_recorder(hass: SmartHub, seconds: float) -> None:
     """Block the recorders event loop for testing.
 
     Returns as soon as the recorder has started the block.
@@ -81,7 +81,7 @@ async def async_block_recorder(hass: HomeAssistant, seconds: float) -> None:
     await event.wait()
 
 
-async def async_wait_recorder(hass: HomeAssistant) -> bool:
+async def async_wait_recorder(hass: SmartHub) -> bool:
     """Wait for recorder to initialize and return connection status."""
     return await hass.data[recorder_helper.DATA_RECORDER].db_connected
 
@@ -92,7 +92,7 @@ def get_start_time(start: datetime) -> datetime:
     return start.replace(minute=start_minutes, second=0, microsecond=0)
 
 
-def do_adhoc_statistics(hass: HomeAssistant, **kwargs: Any) -> None:
+def do_adhoc_statistics(hass: SmartHub, **kwargs: Any) -> None:
     """Trigger an adhoc statistics run."""
     if not (start := kwargs.get("start")):
         start = statistics.get_start_time()
@@ -101,7 +101,7 @@ def do_adhoc_statistics(hass: HomeAssistant, **kwargs: Any) -> None:
     get_instance(hass).queue_task(StatisticsTask(start, False))
 
 
-def wait_recording_done(hass: HomeAssistant) -> None:
+def wait_recording_done(hass: SmartHub) -> None:
     """Block till recording is done."""
     hass.block_till_done()
     trigger_db_commit(hass)
@@ -110,12 +110,12 @@ def wait_recording_done(hass: HomeAssistant) -> None:
     hass.block_till_done()
 
 
-def trigger_db_commit(hass: HomeAssistant) -> None:
+def trigger_db_commit(hass: SmartHub) -> None:
     """Force the recorder to commit."""
     recorder.get_instance(hass)._async_commit(dt_util.utcnow())
 
 
-async def async_wait_recording_done(hass: HomeAssistant) -> None:
+async def async_wait_recording_done(hass: SmartHub) -> None:
     """Async wait until recording is done."""
     await hass.async_block_till_done()
     async_trigger_db_commit(hass)
@@ -125,7 +125,7 @@ async def async_wait_recording_done(hass: HomeAssistant) -> None:
 
 
 async def async_wait_purge_done(
-    hass: HomeAssistant, max_number: int | None = None
+    hass: SmartHub, max_number: int | None = None
 ) -> None:
     """Wait for max number of purge events.
 
@@ -141,12 +141,12 @@ async def async_wait_purge_done(
 
 
 @ha.callback
-def async_trigger_db_commit(hass: HomeAssistant) -> None:
+def async_trigger_db_commit(hass: SmartHub) -> None:
     """Force the recorder to commit. Async friendly."""
     recorder.get_instance(hass)._async_commit(dt_util.utcnow())
 
 
-async def async_recorder_block_till_done(hass: HomeAssistant) -> None:
+async def async_recorder_block_till_done(hass: SmartHub) -> None:
     """Non blocking version of recorder.block_till_done()."""
     await hass.async_add_executor_job(recorder.get_instance(hass).block_till_done)
 
@@ -187,7 +187,7 @@ def run_information_with_session(
 
 
 def statistics_during_period(
-    hass: HomeAssistant,
+    hass: SmartHub,
     start_time: datetime,
     end_time: datetime | None = None,
     statistic_ids: set[str] | None = None,
@@ -273,14 +273,14 @@ def assert_dict_of_states_equal_without_context_and_last_changed(
 
 
 async def async_record_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> tuple[datetime, datetime, dict[str, list[State | None]]]:
     """Record some test states."""
     return await hass.async_add_executor_job(record_states, hass)
 
 
 def record_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> tuple[datetime, datetime, dict[str, list[State | None]]]:
     """Record some test states.
 
@@ -426,7 +426,7 @@ def create_engine_test_for_schema_version_postfix(
     old_db_schema = sys.modules[schema_module]
     instance: Recorder | None = None
     if "hass" in kwargs:
-        hass: HomeAssistant = kwargs.pop("hass")
+        hass: SmartHub = kwargs.pop("hass")
         instance = recorder.get_instance(hass)
     engine = create_engine(*args, **kwargs)
     if instance is not None:
@@ -453,7 +453,7 @@ def get_schema_module_path(schema_version_postfix: str) -> str:
 
 
 @contextmanager
-def old_db_schema(hass: HomeAssistant, schema_version_postfix: str) -> Iterator[None]:
+def old_db_schema(hass: SmartHub, schema_version_postfix: str) -> Iterator[None]:
     """Fixture to initialize the db with the old schema."""
     schema_module = get_schema_module_path(schema_version_postfix)
     importlib.import_module(schema_module)
@@ -481,7 +481,7 @@ def old_db_schema(hass: HomeAssistant, schema_version_postfix: str) -> Iterator[
         yield
 
 
-async def async_attach_db_engine(hass: HomeAssistant) -> None:
+async def async_attach_db_engine(hass: SmartHub) -> None:
     """Attach a database engine to the recorder."""
     instance = recorder.get_instance(hass)
 

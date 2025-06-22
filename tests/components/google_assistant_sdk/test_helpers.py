@@ -1,22 +1,22 @@
 """Test the Google Assistant SDK helpers."""
 
-from homeassistant.components.google_assistant_sdk.const import SUPPORTED_LANGUAGE_CODES
-from homeassistant.components.google_assistant_sdk.helpers import (
+from smarthub.components.google_assistant_sdk.const import SUPPORTED_LANGUAGE_CODES
+from smarthub.components.google_assistant_sdk.helpers import (
     DEFAULT_LANGUAGE_CODES,
     best_matching_language_code,
     default_language_code,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
-def test_default_language_codes(hass: HomeAssistant) -> None:
+def test_default_language_codes(hass: SmartHub) -> None:
     """Test all supported languages have a default language_code."""
     for language_code in SUPPORTED_LANGUAGE_CODES:
         lang = language_code.split("-", maxsplit=1)[0]
         assert DEFAULT_LANGUAGE_CODES.get(lang)
 
 
-def test_default_language_code(hass: HomeAssistant) -> None:
+def test_default_language_code(hass: SmartHub) -> None:
     """Test default_language_code."""
     assert default_language_code(hass) == "en-US"
 
@@ -49,7 +49,7 @@ def test_default_language_code(hass: HomeAssistant) -> None:
     assert default_language_code(hass) == "en-US"
 
 
-def test_best_matching_language_code(hass: HomeAssistant) -> None:
+def test_best_matching_language_code(hass: SmartHub) -> None:
     """Test best_matching_language_code."""
     hass.config.language = "es"
     hass.config.country = "MX"

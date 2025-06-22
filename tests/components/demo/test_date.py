@@ -4,14 +4,14 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.date import (
+from smarthub.components.date import (
     ATTR_DATE,
     DOMAIN as DATE_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 ENTITY_DATE = "date.date"
 
@@ -20,14 +20,14 @@ ENTITY_DATE = "date.date"
 async def date_only() -> None:
     """Enable only the date platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.DATE],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_demo_date(hass: HomeAssistant, date_only) -> None:
+async def setup_demo_date(hass: SmartHub, date_only) -> None:
     """Initialize setup demo date."""
     assert await async_setup_component(
         hass, DATE_DOMAIN, {"date": {"platform": "demo"}}
@@ -35,13 +35,13 @@ async def setup_demo_date(hass: HomeAssistant, date_only) -> None:
     await hass.async_block_till_done()
 
 
-def test_setup_params(hass: HomeAssistant) -> None:
+def test_setup_params(hass: SmartHub) -> None:
     """Test the initial parameters."""
     state = hass.states.get(ENTITY_DATE)
     assert state.state == "2020-01-01"
 
 
-async def test_set_datetime(hass: HomeAssistant) -> None:
+async def test_set_datetime(hass: SmartHub) -> None:
     """Test set datetime service."""
     await hass.services.async_call(
         DATE_DOMAIN,

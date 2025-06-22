@@ -4,16 +4,16 @@ import json
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from homeassistant.components.nut.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.nut.const import DOMAIN
+from smarthub.const import (
     CONF_ALIAS,
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_load_fixture
 
@@ -40,7 +40,7 @@ def _get_mock_nutclient(
 
 
 async def async_init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ups_fixture: str | None = None,
     host: str = "mock",
     port: int = 1234,
@@ -53,7 +53,7 @@ async def async_init_integration(
     list_commands_side_effect=None,
     run_command: MagicMock | None = None,
 ) -> MockConfigEntry:
-    """Set up the nut integration in Home Assistant."""
+    """Set up the nut integration in SmartHub."""
 
     if list_ups is None:
         list_ups = {"ups1": "UPS 1"}
@@ -72,7 +72,7 @@ async def async_init_integration(
     )
 
     with patch(
-        "homeassistant.components.nut.AIONUTClient",
+        "smarthub.components.nut.AIONUTClient",
         return_value=mock_pynut,
     ):
         extra_config_entry_data: dict[str, Any] = {}
@@ -102,7 +102,7 @@ async def async_init_integration(
 
 
 def _test_sensor_and_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     unique_id: str,
     device_id: str,

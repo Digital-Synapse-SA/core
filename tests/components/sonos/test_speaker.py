@@ -4,14 +4,14 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     DOMAIN as MP_DOMAIN,
     SERVICE_MEDIA_PLAY,
 )
-from homeassistant.components.sonos import DOMAIN
-from homeassistant.components.sonos.const import SCAN_INTERVAL
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.sonos import DOMAIN
+from smarthub.components.sonos.const import SCAN_INTERVAL
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .conftest import MockSoCo, SonosMockEvent
 
@@ -24,7 +24,7 @@ from tests.common import (
 
 
 async def test_fallback_to_polling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry,
     soco,
     fire_zgs_event,
@@ -47,9 +47,9 @@ async def test_fallback_to_polling(
 
     # Ensure subscriptions are cancelled and polling methods are called when subscriptions time out
     with (
-        patch("homeassistant.components.sonos.media.SonosMedia.poll_media"),
+        patch("smarthub.components.sonos.media.SonosMedia.poll_media"),
         patch(
-            "homeassistant.components.sonos.speaker.SonosSpeaker.subscription_address"
+            "smarthub.components.sonos.speaker.SonosSpeaker.subscription_address"
         ),
     ):
         async_fire_time_changed(hass, dt_util.utcnow() + SCAN_INTERVAL)
@@ -61,11 +61,11 @@ async def test_fallback_to_polling(
 
 
 async def test_subscription_creation_fails(
-    hass: HomeAssistant, async_setup_sonos, config_entry: MockConfigEntry
+    hass: SmartHub, async_setup_sonos, config_entry: MockConfigEntry
 ) -> None:
     """Test that subscription creation failures are handled."""
     with patch(
-        "homeassistant.components.sonos.speaker.SonosSpeaker._subscribe",
+        "smarthub.components.sonos.speaker.SonosSpeaker._subscribe",
         side_effect=ConnectionError("Took too long"),
     ):
         await async_setup_sonos()
@@ -105,7 +105,7 @@ def _create_avtransport_sonos_event(
     return SonosMockEvent(soco, soco.avTransport, variables)
 
 
-async def _media_play(hass: HomeAssistant, entity: str) -> None:
+async def _media_play(hass: SmartHub, entity: str) -> None:
     """Call media play service."""
     await hass.services.async_call(
         MP_DOMAIN,
@@ -118,7 +118,7 @@ async def _media_play(hass: HomeAssistant, entity: str) -> None:
 
 
 async def test_zgs_event_group_speakers(
-    hass: HomeAssistant, sonos_setup_two_speakers: list[MockSoCo]
+    hass: SmartHub, sonos_setup_two_speakers: list[MockSoCo]
 ) -> None:
     """Tests grouping and ungrouping two speakers."""
     # When Sonos speakers are grouped; one of the speakers is the coordinator and is in charge
@@ -186,7 +186,7 @@ async def test_zgs_event_group_speakers(
 
 
 async def test_zgs_avtransport_group_speakers(
-    hass: HomeAssistant, sonos_setup_two_speakers: list[MockSoCo]
+    hass: SmartHub, sonos_setup_two_speakers: list[MockSoCo]
 ) -> None:
     """Test processing avtransport and zgs events to change group membership."""
     soco_lr = sonos_setup_two_speakers[0]

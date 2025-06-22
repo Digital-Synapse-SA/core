@@ -11,17 +11,17 @@ from peblar import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.peblar.const import DOMAIN
-from homeassistant.components.select import (
+from smarthub.components.peblar.const import DOMAIN
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -32,7 +32,7 @@ pytestmark = [
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -55,7 +55,7 @@ async def test_entities(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select_option(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
 ) -> None:
     """Test the Peblar EV charger selects."""
@@ -103,7 +103,7 @@ async def test_select_option(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select_option_communication_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     mock_config_entry: MockConfigEntry,
     error: Exception,
@@ -116,7 +116,7 @@ async def test_select_option_communication_error(
     mock_peblar.smart_charging.side_effect = error
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=error_match,
     ) as excinfo:
         await hass.services.async_call(
@@ -135,7 +135,7 @@ async def test_select_option_communication_error(
 
 
 async def test_select_option_authentication_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -147,7 +147,7 @@ async def test_select_option_authentication_error(
     mock_peblar.login.side_effect = PeblarAuthenticationError("Authentication error")
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=(
             r"An authentication failure occurred while communicating "
             r"with the Peblar EV charger"

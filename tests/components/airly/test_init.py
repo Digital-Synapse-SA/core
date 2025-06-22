@@ -5,13 +5,13 @@ from typing import Any
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.air_quality import DOMAIN as AIR_QUALITY_PLATFORM
-from homeassistant.components.airly.const import DOMAIN
-from homeassistant.components.airly.coordinator import set_update_interval
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.air_quality import DOMAIN as AIR_QUALITY_PLATFORM
+from smarthub.components.airly.const import DOMAIN
+from smarthub.components.airly.coordinator import set_update_interval
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import API_POINT_URL, init_integration
 
@@ -20,7 +20,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_async_setup_entry(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test a successful setup entry."""
     await init_integration(hass, aioclient_mock)
@@ -32,7 +32,7 @@ async def test_async_setup_entry(
 
 
 async def test_config_not_ready(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test for setup failure if connection to Airly is missing."""
     entry = MockConfigEntry(
@@ -55,7 +55,7 @@ async def test_config_not_ready(
 
 
 async def test_config_without_unique_id(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test for setup entry without unique_id."""
     entry = MockConfigEntry(
@@ -79,7 +79,7 @@ async def test_config_without_unique_id(
 
 
 async def test_config_with_turned_off_station(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test for setup entry for a turned off measuring station."""
     entry = MockConfigEntry(
@@ -103,7 +103,7 @@ async def test_config_with_turned_off_station(
 
 
 async def test_update_interval(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -185,7 +185,7 @@ async def test_update_interval(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass, aioclient_mock)
@@ -202,7 +202,7 @@ async def test_unload_entry(
 
 @pytest.mark.parametrize("old_identifier", [(DOMAIN, 123, 456), (DOMAIN, "123", "456")])
 async def test_migrate_device_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     old_identifier: tuple[str, Any, Any],
     device_registry: dr.DeviceRegistry,
@@ -239,7 +239,7 @@ async def test_migrate_device_entry(
 
 
 async def test_remove_air_quality_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     entity_registry: er.EntityRegistry,
 ) -> None:

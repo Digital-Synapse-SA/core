@@ -6,16 +6,16 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.kitchen_sink import DOMAIN
-from homeassistant.components.switch import (
+from smarthub.components.kitchen_sink import DOMAIN
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 SWITCH_ENTITY_IDS = ["switch.outlet_1", "switch.outlet_2"]
 
@@ -24,21 +24,21 @@ SWITCH_ENTITY_IDS = ["switch.outlet_1", "switch.outlet_2"]
 def switch_only() -> Generator[None]:
     """Enable only the switch platform."""
     with patch(
-        "homeassistant.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
+        "smarthub.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
         [Platform.SWITCH],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_comp(hass: HomeAssistant, switch_only: None) -> None:
+async def setup_comp(hass: SmartHub, switch_only: None) -> None:
     """Set up demo component."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     await hass.async_block_till_done()
 
 
 async def test_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -56,7 +56,7 @@ async def test_state(
 
 
 @pytest.mark.parametrize("switch_entity_id", SWITCH_ENTITY_IDS)
-async def test_turn_on(hass: HomeAssistant, switch_entity_id: str) -> None:
+async def test_turn_on(hass: SmartHub, switch_entity_id: str) -> None:
     """Test switch turn on method."""
     await hass.services.async_call(
         SWITCH_DOMAIN,
@@ -80,7 +80,7 @@ async def test_turn_on(hass: HomeAssistant, switch_entity_id: str) -> None:
 
 
 @pytest.mark.parametrize("switch_entity_id", SWITCH_ENTITY_IDS)
-async def test_turn_off(hass: HomeAssistant, switch_entity_id: str) -> None:
+async def test_turn_off(hass: SmartHub, switch_entity_id: str) -> None:
     """Test switch turn off method."""
     await hass.services.async_call(
         SWITCH_DOMAIN,

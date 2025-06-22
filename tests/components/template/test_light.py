@@ -4,8 +4,8 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import light, template
-from homeassistant.components.light import (
+from smarthub.components import light, template
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP_KELVIN,
     ATTR_EFFECT,
@@ -17,8 +17,8 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntityFeature,
 )
-from homeassistant.components.template.light import rewrite_legacy_to_modern_conf
-from homeassistant.const import (
+from smarthub.components.template.light import rewrite_legacy_to_modern_conf
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -27,10 +27,10 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.template import Template
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.template import Template
+from smarthub.setup import async_setup_component
 
 from .conftest import ConfigurationStyle
 
@@ -365,7 +365,7 @@ TEST_UNIQUE_ID_CONFIG = {
     ],
 )
 async def test_legacy_to_modern_config(
-    hass: HomeAssistant, old_attr: str, new_attr: str, attr_template: str
+    hass: SmartHub, old_attr: str, new_attr: str, attr_template: str
 ) -> None:
     """Test the conversion of legacy template to modern template."""
     config = {
@@ -411,7 +411,7 @@ async def test_legacy_to_modern_config(
 
 
 async def async_setup_legacy_format(
-    hass: HomeAssistant, count: int, light_config: dict[str, Any]
+    hass: SmartHub, count: int, light_config: dict[str, Any]
 ) -> None:
     """Do setup of light integration via legacy format."""
     config = {"light": {"platform": "template", "lights": light_config}}
@@ -429,7 +429,7 @@ async def async_setup_legacy_format(
 
 
 async def async_setup_legacy_format_with_attribute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     attribute: str,
     attribute_template: str,
@@ -451,7 +451,7 @@ async def async_setup_legacy_format_with_attribute(
 
 
 async def async_setup_modern_format(
-    hass: HomeAssistant, count: int, light_config: dict[str, Any]
+    hass: SmartHub, count: int, light_config: dict[str, Any]
 ) -> None:
     """Do setup of light integration via new format."""
     config = {"template": {"light": light_config}}
@@ -469,7 +469,7 @@ async def async_setup_modern_format(
 
 
 async def async_setup_modern_format_with_attribute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     attribute: str,
     attribute_template: str,
@@ -490,7 +490,7 @@ async def async_setup_modern_format_with_attribute(
 
 
 async def async_setup_trigger_format(
-    hass: HomeAssistant, count: int, light_config: dict[str, Any]
+    hass: SmartHub, count: int, light_config: dict[str, Any]
 ) -> None:
     """Do setup of light integration via new format."""
     config = {
@@ -513,7 +513,7 @@ async def async_setup_trigger_format(
 
 
 async def async_setup_trigger_format_with_attribute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     attribute: str,
     attribute_template: str,
@@ -535,7 +535,7 @@ async def async_setup_trigger_format_with_attribute(
 
 @pytest.fixture
 async def setup_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     light_config: dict[str, Any],
@@ -551,7 +551,7 @@ async def setup_light(
 
 @pytest.fixture
 async def setup_state_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -592,7 +592,7 @@ async def setup_state_light(
 
 @pytest.fixture
 async def setup_single_attribute_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     attribute: str,
@@ -616,7 +616,7 @@ async def setup_single_attribute_light(
 
 @pytest.fixture
 async def setup_single_action_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     extra_config: dict,
@@ -638,7 +638,7 @@ async def setup_single_action_light(
 
 @pytest.fixture
 async def setup_empty_action_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     action: str,
@@ -674,7 +674,7 @@ async def setup_empty_action_light(
 
 @pytest.fixture
 async def setup_light_with_effects(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     effect_list_template: str,
@@ -736,7 +736,7 @@ async def setup_light_with_effects(
 
 @pytest.fixture
 async def setup_light_with_mireds(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     attribute: str,
@@ -794,7 +794,7 @@ async def setup_light_with_mireds(
 
 @pytest.fixture
 async def setup_light_with_transition_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     transition_template: str,
@@ -869,7 +869,7 @@ async def setup_light_with_transition_template(
 )
 @pytest.mark.parametrize("state_template", ["{{states.test['big.fat...']}}"])
 async def test_template_state_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supported_features,
     supported_color_modes,
     expected_state,
@@ -893,7 +893,7 @@ async def test_template_state_invalid(
     ],
 )
 @pytest.mark.parametrize("state_template", ["{{ states.light.test_state.state }}"])
-async def test_template_state_text(hass: HomeAssistant, setup_state_light) -> None:
+async def test_template_state_text(hass: SmartHub, setup_state_light) -> None:
     """Test the state text of a template."""
     set_state = STATE_ON
     hass.states.async_set("light.test_state", set_state)
@@ -939,7 +939,7 @@ async def test_template_state_text(hass: HomeAssistant, setup_state_light) -> No
     ],
 )
 async def test_template_state_boolean(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_color_mode,
     expected_state,
     style,
@@ -1001,7 +1001,7 @@ async def test_template_state_boolean(
         ),
     ],
 )
-async def test_template_config_errors(hass: HomeAssistant, setup_light) -> None:
+async def test_template_config_errors(hass: SmartHub, setup_light) -> None:
     """Test template light configuration errors."""
     assert hass.states.async_all("light") == []
 
@@ -1026,7 +1026,7 @@ async def test_template_config_errors(hass: HomeAssistant, setup_light) -> None:
         ),
     ],
 )
-async def test_missing_key(hass: HomeAssistant, count, setup_light) -> None:
+async def test_missing_key(hass: SmartHub, count, setup_light) -> None:
     """Test missing template."""
     if count:
         assert hass.states.async_all("light") != []
@@ -1045,7 +1045,7 @@ async def test_missing_key(hass: HomeAssistant, count, setup_light) -> None:
 )
 @pytest.mark.parametrize("state_template", ["{{ states.light.test_state.state }}"])
 async def test_on_action(
-    hass: HomeAssistant, setup_state_light, calls: list[ServiceCall]
+    hass: SmartHub, setup_state_light, calls: list[ServiceCall]
 ) -> None:
     """Test on action."""
     hass.states.async_set("light.test_state", STATE_OFF)
@@ -1109,7 +1109,7 @@ async def test_on_action(
     ],
 )
 async def test_on_action_with_transition(
-    hass: HomeAssistant, setup_light, calls: list[ServiceCall]
+    hass: SmartHub, setup_light, calls: list[ServiceCall]
 ) -> None:
     """Test on action with transition."""
     hass.states.async_set("light.test_state", STATE_OFF)
@@ -1169,7 +1169,7 @@ async def test_on_action_with_transition(
     ],
 )
 async def test_on_action_optimistic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     initial_state: str,
     setup_light,
     calls: list[ServiceCall],
@@ -1229,7 +1229,7 @@ async def test_on_action_optimistic(
 )
 @pytest.mark.parametrize("state_template", ["{{ states.light.test_state.state }}"])
 async def test_off_action(
-    hass: HomeAssistant, setup_state_light, calls: list[ServiceCall]
+    hass: SmartHub, setup_state_light, calls: list[ServiceCall]
 ) -> None:
     """Test off action."""
     hass.states.async_set("light.test_state", STATE_ON)
@@ -1292,7 +1292,7 @@ async def test_off_action(
     ],
 )
 async def test_off_action_with_transition(
-    hass: HomeAssistant, setup_light, calls: list[ServiceCall]
+    hass: SmartHub, setup_light, calls: list[ServiceCall]
 ) -> None:
     """Test off action with transition."""
     hass.states.async_set("light.test_state", STATE_ON)
@@ -1351,7 +1351,7 @@ async def test_off_action_with_transition(
     ],
 )
 async def test_off_action_optimistic(
-    hass: HomeAssistant, initial_state, setup_light, calls: list[ServiceCall]
+    hass: SmartHub, initial_state, setup_light, calls: list[ServiceCall]
 ) -> None:
     """Test off action with optimistic state."""
     state = hass.states.get("light.test_template_light")
@@ -1386,7 +1386,7 @@ async def test_off_action_optimistic(
 )
 @pytest.mark.parametrize("state_template", ["{{1 == 1}}"])
 async def test_level_action_no_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_state_light,
     calls: list[ServiceCall],
 ) -> None:
@@ -1442,7 +1442,7 @@ async def test_level_action_no_template(
     ],
 )
 async def test_level_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     style: ConfigurationStyle,
     expected_level: Any,
     expected_color_mode: ColorMode,
@@ -1486,7 +1486,7 @@ async def test_level_template(
     ],
 )
 async def test_temperature_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     style: ConfigurationStyle,
     expected_temp: Any,
     expected_color_mode: ColorMode,
@@ -1517,7 +1517,7 @@ async def test_temperature_template(
     ],
 )
 async def test_temperature_action_no_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_single_action_light,
     calls: list[ServiceCall],
 ) -> None:
@@ -1582,7 +1582,7 @@ async def test_temperature_action_no_template(
         ),
     ],
 )
-async def test_friendly_name(hass: HomeAssistant, entity_id: str, setup_light) -> None:
+async def test_friendly_name(hass: SmartHub, entity_id: str, setup_light) -> None:
     """Test the accessibility of the friendly_name attribute."""
 
     state = hass.states.get(entity_id)
@@ -1605,7 +1605,7 @@ async def test_friendly_name(hass: HomeAssistant, entity_id: str, setup_light) -
 @pytest.mark.parametrize(
     "attribute_template", ["{% if states.light.test_state.state %}mdi:check{% endif %}"]
 )
-async def test_icon_template(hass: HomeAssistant, setup_single_attribute_light) -> None:
+async def test_icon_template(hass: SmartHub, setup_single_attribute_light) -> None:
     """Test icon template."""
     state = hass.states.get("light.test_template_light")
     assert state.attributes.get("icon") in ("", None)
@@ -1634,7 +1634,7 @@ async def test_icon_template(hass: HomeAssistant, setup_single_attribute_light) 
     ["{% if states.light.test_state.state %}/local/light.png{% endif %}"],
 )
 async def test_entity_picture_template(
-    hass: HomeAssistant, setup_single_attribute_light
+    hass: SmartHub, setup_single_attribute_light
 ) -> None:
     """Test entity_picture template."""
     state = hass.states.get("light.test_template_light")
@@ -1661,7 +1661,7 @@ async def test_entity_picture_template(
     ],
 )
 async def test_legacy_color_action_no_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_single_action_light,
     calls: list[ServiceCall],
 ) -> None:
@@ -1705,7 +1705,7 @@ async def test_legacy_color_action_no_template(
     ],
 )
 async def test_hs_color_action_no_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_single_action_light,
     calls: list[ServiceCall],
 ) -> None:
@@ -1747,7 +1747,7 @@ async def test_hs_color_action_no_template(
     ],
 )
 async def test_rgb_color_action_no_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_single_action_light,
     calls: list[ServiceCall],
 ) -> None:
@@ -1790,7 +1790,7 @@ async def test_rgb_color_action_no_template(
     ],
 )
 async def test_rgbw_color_action_no_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_single_action_light,
     calls: list[ServiceCall],
 ) -> None:
@@ -1837,7 +1837,7 @@ async def test_rgbw_color_action_no_template(
     ],
 )
 async def test_rgbww_color_action_no_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_single_action_light,
     calls: list[ServiceCall],
 ) -> None:
@@ -1888,7 +1888,7 @@ async def test_rgbww_color_action_no_template(
     ],
 )
 async def test_legacy_color_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_hs: tuple[float, float] | None,
     expected_color_mode: ColorMode,
     count: int,
@@ -1938,7 +1938,7 @@ async def test_legacy_color_template(
     ],
 )
 async def test_hs_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_hs,
     expected_color_mode,
     style: ConfigurationStyle,
@@ -1985,7 +1985,7 @@ async def test_hs_template(
     ],
 )
 async def test_rgb_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_rgb,
     expected_color_mode,
     style: ConfigurationStyle,
@@ -2033,7 +2033,7 @@ async def test_rgb_template(
     ],
 )
 async def test_rgbw_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_rgbw,
     expected_color_mode,
     style: ConfigurationStyle,
@@ -2086,7 +2086,7 @@ async def test_rgbw_template(
     ],
 )
 async def test_rgbww_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_rgbww,
     expected_color_mode,
     style: ConfigurationStyle,
@@ -2140,7 +2140,7 @@ async def test_rgbww_template(
     ],
 )
 async def test_all_colors_mode_no_template(
-    hass: HomeAssistant, setup_light, calls: list[ServiceCall]
+    hass: SmartHub, setup_light, calls: list[ServiceCall]
 ) -> None:
     """Test setting color and color temperature with optimistic template."""
     state = hass.states.get("light.test_template_light")
@@ -2345,7 +2345,7 @@ async def test_all_colors_mode_no_template(
     ],
 )
 async def test_effect_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     effect: str,
     expected: Any,
     style: ConfigurationStyle,
@@ -2404,7 +2404,7 @@ async def test_effect_action(
     ],
 )
 async def test_effect_list_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_effect_list,
     style: ConfigurationStyle,
     setup_light_with_effects,
@@ -2438,7 +2438,7 @@ async def test_effect_list_template(
     ],
 )
 async def test_effect_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_effect,
     style: ConfigurationStyle,
     setup_light_with_effects,
@@ -2474,7 +2474,7 @@ async def test_effect_template(
     ],
 )
 async def test_min_mireds_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_min_mireds,
     style: ConfigurationStyle,
     setup_light_with_mireds,
@@ -2510,7 +2510,7 @@ async def test_min_mireds_template(
     ],
 )
 async def test_max_mireds_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     expected_max_mireds,
     style: ConfigurationStyle,
     setup_light_with_mireds,
@@ -2548,7 +2548,7 @@ async def test_max_mireds_template(
     ],
 )
 async def test_supports_transition_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     style: ConfigurationStyle,
     expected_supports_transition,
     setup_single_attribute_light,
@@ -2580,7 +2580,7 @@ async def test_supports_transition_template(
     [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN, ConfigurationStyle.TRIGGER],
 )
 async def test_supports_transition_template_updates(
-    hass: HomeAssistant, style: ConfigurationStyle, setup_light_with_transition_template
+    hass: SmartHub, style: ConfigurationStyle, setup_light_with_transition_template
 ) -> None:
     """Test the template for the supports transition dynamically."""
     state = hass.states.get("light.test_template_light")
@@ -2644,7 +2644,7 @@ async def test_supports_transition_template_updates(
     ],
 )
 async def test_available_template_with_entities(
-    hass: HomeAssistant, style: ConfigurationStyle, setup_single_attribute_light
+    hass: SmartHub, style: ConfigurationStyle, setup_single_attribute_light
 ) -> None:
     """Test availability templates with values from other entities."""
     # When template returns true..
@@ -2690,7 +2690,7 @@ async def test_available_template_with_entities(
     ],
 )
 async def test_invalid_availability_template_keeps_component_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_single_attribute_light,
     caplog_setup_text,
 ) -> None:
@@ -2738,13 +2738,13 @@ async def test_invalid_availability_template_keeps_component_available(
         ),
     ],
 )
-async def test_unique_id(hass: HomeAssistant, setup_light) -> None:
+async def test_unique_id(hass: SmartHub, setup_light) -> None:
     """Test unique_id option only creates one light per id."""
     assert len(hass.states.async_all("light")) == 1
 
 
 async def test_nested_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test unique_id option creates one light per nested id."""
 
@@ -2806,7 +2806,7 @@ async def test_nested_unique_id(
     ],
 )
 async def test_empty_color_mode_action_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     color_mode: ColorMode,
     setup_empty_action_light,
 ) -> None:
@@ -2857,7 +2857,7 @@ async def test_empty_color_mode_action_config(
 )
 @pytest.mark.parametrize("action", ["set_effect"])
 async def test_effect_with_empty_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_empty_action_light,
 ) -> None:
     """Test empty set_effect action."""

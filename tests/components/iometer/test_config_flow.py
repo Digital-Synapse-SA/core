@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock
 
 from iometer import IOmeterConnectionError
 
-from homeassistant.components import zeroconf
-from homeassistant.components.iometer.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components import zeroconf
+from smarthub.components.iometer.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -29,7 +29,7 @@ ZEROCONF_DISCOVERY = zeroconf.ZeroconfServiceInfo(
 
 
 async def test_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_iometer_client: AsyncMock,
 ) -> None:
     """Test full user configuration flow."""
@@ -54,7 +54,7 @@ async def test_user_flow(
 
 
 async def test_zeroconf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_iometer_client: AsyncMock,
 ) -> None:
     """Test zeroconf flow."""
@@ -79,7 +79,7 @@ async def test_zeroconf_flow(
 
 
 async def test_zeroconf_flow_abort_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test zeroconf flow aborts with duplicate."""
@@ -94,7 +94,7 @@ async def test_zeroconf_flow_abort_duplicate(
 
 
 async def test_zeroconf_flow_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_iometer_client: AsyncMock,
 ) -> None:
     """Test zeroconf flow."""
@@ -110,7 +110,7 @@ async def test_zeroconf_flow_connection_error(
 
 
 async def test_user_flow_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_iometer_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -145,7 +145,7 @@ async def test_user_flow_connection_error(
 
 
 async def test_flow_abort_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_iometer_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 from pyhaversion.consts import HaVersionChannel, HaVersionSource
 
-from homeassistant import config_entries
-from homeassistant.components.version.const import (
+from smarthub import config_entries
+from smarthub.components.version.const import (
     CONF_BETA,
     CONF_BOARD,
     CONF_CHANNEL,
@@ -18,18 +18,18 @@ from homeassistant.components.version.const import (
     VERSION_SOURCE_PYPI,
     VERSION_SOURCE_VERSIONS,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.util import dt as dt_util
 
 from .common import MOCK_VERSION, MOCK_VERSION_DATA, setup_version_integration
 
 from tests.common import async_fire_time_changed
 
 
-async def test_reload_config_entry(hass: HomeAssistant) -> None:
+async def test_reload_config_entry(hass: SmartHub) -> None:
     """Test reloading the config entry."""
     config_entry = await setup_version_integration(hass)
     assert config_entry.state is ConfigEntryState.LOADED
@@ -48,7 +48,7 @@ async def test_reload_config_entry(hass: HomeAssistant) -> None:
     assert entry.state is ConfigEntryState.LOADED
 
 
-async def test_basic_form(hass: HomeAssistant) -> None:
+async def test_basic_form(hass: SmartHub) -> None:
     """Test that we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -57,7 +57,7 @@ async def test_basic_form(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.version.async_setup_entry",
+        "smarthub.components.version.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -76,7 +76,7 @@ async def test_basic_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_advanced_form_pypi(hass: HomeAssistant) -> None:
+async def test_advanced_form_pypi(hass: SmartHub) -> None:
     """Show advanced form when pypi is selected."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -98,7 +98,7 @@ async def test_advanced_form_pypi(hass: HomeAssistant) -> None:
     assert result["step_id"] == "version_source"
 
     with patch(
-        "homeassistant.components.version.async_setup_entry",
+        "smarthub.components.version.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -117,7 +117,7 @@ async def test_advanced_form_pypi(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_advanced_form_container(hass: HomeAssistant) -> None:
+async def test_advanced_form_container(hass: SmartHub) -> None:
     """Show advanced form when container source is selected."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -139,11 +139,11 @@ async def test_advanced_form_container(hass: HomeAssistant) -> None:
     assert result["step_id"] == "version_source"
 
     with patch(
-        "homeassistant.components.version.async_setup_entry",
+        "smarthub.components.version.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
-            result["flow_id"], {CONF_IMAGE: "odroid-n2-homeassistant"}
+            result["flow_id"], {CONF_IMAGE: "odroid-n2-smarthub"}
         )
         await hass.async_block_till_done()
 
@@ -151,14 +151,14 @@ async def test_advanced_form_container(hass: HomeAssistant) -> None:
     assert result["title"] == VERSION_SOURCE_DOCKER_HUB
     assert result["data"] == {
         **DEFAULT_CONFIGURATION,
-        CONF_IMAGE: "odroid-n2-homeassistant",
+        CONF_IMAGE: "odroid-n2-smarthub",
         CONF_SOURCE: HaVersionSource.CONTAINER,
         CONF_VERSION_SOURCE: VERSION_SOURCE_DOCKER_HUB,
     }
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_advanced_form_supervisor(hass: HomeAssistant) -> None:
+async def test_advanced_form_supervisor(hass: SmartHub) -> None:
     """Show advanced form when docker source is selected."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -180,7 +180,7 @@ async def test_advanced_form_supervisor(hass: HomeAssistant) -> None:
     assert result["step_id"] == "version_source"
 
     with patch(
-        "homeassistant.components.version.async_setup_entry",
+        "smarthub.components.version.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(

@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.stiebel_eltron import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
+from smarthub.components.stiebel_eltron import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
 
 from tests.common import MockConfigEntry
 
@@ -16,11 +16,11 @@ def mock_stiebel_eltron_client() -> Generator[MagicMock]:
     """Mock a stiebel eltron client."""
     with (
         patch(
-            "homeassistant.components.stiebel_eltron.StiebelEltronAPI",
+            "smarthub.components.stiebel_eltron.StiebelEltronAPI",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.stiebel_eltron.config_flow.StiebelEltronAPI",
+            "smarthub.components.stiebel_eltron.config_flow.StiebelEltronAPI",
             new=mock_client,
         ),
     ):
@@ -34,11 +34,11 @@ def mock_modbus() -> Generator[MagicMock]:
     """Mock a modbus client."""
     with (
         patch(
-            "homeassistant.components.stiebel_eltron.ModbusTcpClient",
+            "smarthub.components.stiebel_eltron.ModbusTcpClient",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.stiebel_eltron.config_flow.ModbusTcpClient",
+            "smarthub.components.stiebel_eltron.config_flow.ModbusTcpClient",
             new=mock_client,
         ),
     ):

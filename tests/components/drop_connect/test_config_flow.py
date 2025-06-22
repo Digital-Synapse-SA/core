@@ -1,14 +1,14 @@
 """Test config flow."""
 
-from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.mqtt import MqttServiceInfo
+from smarthub import config_entries
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.mqtt import MqttServiceInfo
 
 from tests.typing import MqttMockHAClient
 
 
-async def test_mqtt_setup(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_mqtt_setup(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test we can finish a config flow through MQTT with custom prefix."""
     discovery_info = MqttServiceInfo(
         topic="drop_connect/discovery/DROP-1_C0FFEE/255",
@@ -45,7 +45,7 @@ async def test_mqtt_setup(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> N
     }
 
 
-async def test_duplicate(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_duplicate(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test we can finish a config flow through MQTT with custom prefix."""
     discovery_info = MqttServiceInfo(
         topic="drop_connect/discovery/DROP-1_C0FFEE/255",
@@ -83,7 +83,7 @@ async def test_duplicate(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> No
 
 
 async def test_mqtt_setup_incomplete_payload(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test we can finish a config flow through MQTT with custom prefix."""
     discovery_info = MqttServiceInfo(
@@ -105,7 +105,7 @@ async def test_mqtt_setup_incomplete_payload(
 
 
 async def test_mqtt_setup_bad_json(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test we can finish a config flow through MQTT with custom prefix."""
     discovery_info = MqttServiceInfo(
@@ -127,7 +127,7 @@ async def test_mqtt_setup_bad_json(
 
 
 async def test_mqtt_setup_bad_topic(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test we can finish a config flow through MQTT with custom prefix."""
     discovery_info = MqttServiceInfo(
@@ -149,7 +149,7 @@ async def test_mqtt_setup_bad_topic(
 
 
 async def test_mqtt_setup_no_payload(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test we can finish a config flow through MQTT with custom prefix."""
     discovery_info = MqttServiceInfo(
@@ -170,7 +170,7 @@ async def test_mqtt_setup_no_payload(
     assert result["reason"] == "invalid_discovery_info"
 
 
-async def test_user_setup(hass: HomeAssistant) -> None:
+async def test_user_setup(hass: SmartHub) -> None:
     """Test user setup."""
     result = await hass.config_entries.flow.async_init(
         "drop_connect", context={"source": config_entries.SOURCE_USER}

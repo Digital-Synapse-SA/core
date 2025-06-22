@@ -4,18 +4,18 @@ from unittest.mock import AsyncMock
 
 from intellifire4py.exceptions import LoginError
 
-from homeassistant import config_entries
-from homeassistant.components.intellifire.const import CONF_SERIAL, DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.intellifire.const import CONF_SERIAL, DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from tests.common import MockConfigEntry
 
 
 async def test_standard_config_with_single_fireplace(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_apis_single_fp,
 ) -> None:
@@ -47,7 +47,7 @@ async def test_standard_config_with_single_fireplace(
 
 
 async def test_standard_config_with_pre_configured_fireplace(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry_current,
     mock_apis_single_fp,
@@ -74,7 +74,7 @@ async def test_standard_config_with_pre_configured_fireplace(
 
 
 async def test_standard_config_with_single_fireplace_and_bad_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_apis_single_fp,
 ) -> None:
@@ -120,7 +120,7 @@ async def test_standard_config_with_single_fireplace_and_bad_credentials(
 
 
 async def test_standard_config_with_multiple_fireplace(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_apis_multifp,
 ) -> None:
@@ -157,7 +157,7 @@ async def test_standard_config_with_multiple_fireplace(
 
 
 async def test_dhcp_discovery_intellifire_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_apis_multifp,
 ) -> None:
@@ -183,7 +183,7 @@ async def test_dhcp_discovery_intellifire_device(
 
 
 async def test_dhcp_discovery_non_intellifire_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_apis_multifp,
 ) -> None:
@@ -208,7 +208,7 @@ async def test_dhcp_discovery_non_intellifire_device(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_current: MockConfigEntry,
     mock_apis_single_fp,
     mock_setup_entry: AsyncMock,

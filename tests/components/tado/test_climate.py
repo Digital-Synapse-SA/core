@@ -6,20 +6,20 @@ from PyTado.interface.api.my_tado import TadoZone
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_MODE,
     DOMAIN as CLIMATE_DOMAIN,
     SERVICE_SET_HVAC_MODE,
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 
-async def test_air_con(hass: HomeAssistant) -> None:
+async def test_air_con(hass: SmartHub) -> None:
     """Test creation of aircon climate."""
 
     await async_init_integration(hass)
@@ -48,7 +48,7 @@ async def test_air_con(hass: HomeAssistant) -> None:
     assert all(item in state.attributes.items() for item in expected_attributes.items())
 
 
-async def test_heater(hass: HomeAssistant) -> None:
+async def test_heater(hass: SmartHub) -> None:
     """Test creation of heater climate."""
 
     await async_init_integration(hass)
@@ -75,7 +75,7 @@ async def test_heater(hass: HomeAssistant) -> None:
     assert all(item in state.attributes.items() for item in expected_attributes.items())
 
 
-async def test_smartac_with_swing(hass: HomeAssistant) -> None:
+async def test_smartac_with_swing(hass: SmartHub) -> None:
     """Test creation of smart ac with swing climate."""
 
     await async_init_integration(hass)
@@ -106,7 +106,7 @@ async def test_smartac_with_swing(hass: HomeAssistant) -> None:
 
 
 async def test_smartac_with_fanlevel_vertical_and_horizontal_swing(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test creation of smart ac with swing climate."""
 
@@ -138,7 +138,7 @@ async def test_smartac_with_fanlevel_vertical_and_horizontal_swing(
 
 
 async def test_heater_set_temperature(
-    hass: HomeAssistant, snapshot: SnapshotAssertion
+    hass: SmartHub, snapshot: SnapshotAssertion
 ) -> None:
     """Test the set temperature of the heater."""
 
@@ -146,10 +146,10 @@ async def test_heater_set_temperature(
 
     with (
         patch(
-            "homeassistant.components.tado.PyTado.interface.api.Tado.set_zone_overlay"
+            "smarthub.components.tado.PyTado.interface.api.Tado.set_zone_overlay"
         ) as mock_set_state,
         patch(
-            "homeassistant.components.tado.PyTado.interface.api.Tado.get_zone_state",
+            "smarthub.components.tado.PyTado.interface.api.Tado.get_zone_state",
             return_value={"setting": {"temperature": {"celsius": 22.0}}},
         ),
     ):
@@ -175,7 +175,7 @@ async def test_heater_set_temperature(
     ],
 )
 async def test_aircon_set_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     hvac_mode: HVACMode,
     set_hvac_mode: str,
@@ -186,10 +186,10 @@ async def test_aircon_set_hvac_mode(
 
     with (
         patch(
-            "homeassistant.components.tado.__init__.PyTado.interface.api.Tado.set_zone_overlay"
+            "smarthub.components.tado.__init__.PyTado.interface.api.Tado.set_zone_overlay"
         ) as mock_set_state,
         patch(
-            "homeassistant.components.tado.__init__.PyTado.interface.api.Tado.get_zone_state",
+            "smarthub.components.tado.__init__.PyTado.interface.api.Tado.get_zone_state",
             return_value=TadoZone(
                 zone_id=1,
                 current_temp=18.7,

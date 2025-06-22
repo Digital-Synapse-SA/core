@@ -2,10 +2,10 @@
 
 import pytest
 
-from homeassistant.components.ibeacon.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.ibeacon.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import BLUECHARM_BEACON_SERVICE_INFO
 
@@ -20,7 +20,7 @@ def mock_bluetooth(enable_bluetooth: None) -> None:
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     hass_ws_client: WebSocketGenerator,
 ) -> None:

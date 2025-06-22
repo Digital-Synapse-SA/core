@@ -11,24 +11,24 @@ from rokuecp import (
     RokuError,
 )
 
-from homeassistant.components.roku.const import DOMAIN
-from homeassistant.components.roku.coordinator import SCAN_INTERVAL
-from homeassistant.components.select import (
+from smarthub.components.roku.const import DOMAIN
+from smarthub.components.roku.coordinator import SCAN_INTERVAL
+from smarthub.components.select import (
     ATTR_OPTION,
     ATTR_OPTIONS,
     DOMAIN as SELECT_DOMAIN,
 )
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_SELECT_OPTION
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_SELECT_OPTION
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_application_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_device: RokuDevice,
@@ -120,7 +120,7 @@ async def test_application_state(
     ],
 )
 async def test_application_select_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_roku: MagicMock,
@@ -142,7 +142,7 @@ async def test_application_select_error(
 
     mock_roku.launch.side_effect = error
 
-    with pytest.raises(HomeAssistantError, match=error_string):
+    with pytest.raises(SmartHubError, match=error_string):
         await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
@@ -162,7 +162,7 @@ async def test_application_select_error(
 
 @pytest.mark.parametrize("mock_device", ["roku/rokutv-7820x.json"], indirect=True)
 async def test_channel_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
     mock_device: RokuDevice,
@@ -230,14 +230,14 @@ async def test_channel_state(
 
 @pytest.mark.parametrize("mock_device", ["roku/rokutv-7820x.json"], indirect=True)
 async def test_channel_select_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_roku: MagicMock,
 ) -> None:
     """Test error handling of the Roku selects."""
     mock_roku.tune.side_effect = RokuError
 
-    with pytest.raises(HomeAssistantError, match="Invalid response from Roku API"):
+    with pytest.raises(SmartHubError, match="Invalid response from Roku API"):
         await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,

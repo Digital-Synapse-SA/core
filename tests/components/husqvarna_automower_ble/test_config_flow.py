@@ -5,11 +5,11 @@ from unittest.mock import Mock, patch
 from bleak import BleakError
 import pytest
 
-from homeassistant.components.husqvarna_automower_ble.const import DOMAIN
-from homeassistant.config_entries import SOURCE_BLUETOOTH, SOURCE_USER
-from homeassistant.const import CONF_ADDRESS, CONF_CLIENT_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.husqvarna_automower_ble.const import DOMAIN
+from smarthub.config_entries import SOURCE_BLUETOOTH, SOURCE_USER
+from smarthub.const import CONF_ADDRESS, CONF_CLIENT_ID
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     AUTOMOWER_SERVICE_INFO,
@@ -27,13 +27,13 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 def mock_random() -> Mock:
     """Mock random to generate predictable client id."""
     with patch(
-        "homeassistant.components.husqvarna_automower_ble.config_flow.random"
+        "smarthub.components.husqvarna_automower_ble.config_flow.random"
     ) as mock_random:
         mock_random.randint.return_value = 1197489078
         yield mock_random
 
 
-async def test_user_selection(hass: HomeAssistant) -> None:
+async def test_user_selection(hass: SmartHub) -> None:
     """Test we can select a device."""
 
     inject_bluetooth_service_info(hass, AUTOMOWER_SERVICE_INFO)
@@ -67,7 +67,7 @@ async def test_user_selection(hass: HomeAssistant) -> None:
     }
 
 
-async def test_bluetooth(hass: HomeAssistant) -> None:
+async def test_bluetooth(hass: SmartHub) -> None:
     """Test bluetooth device discovery."""
 
     inject_bluetooth_service_info(hass, AUTOMOWER_SERVICE_INFO)
@@ -91,7 +91,7 @@ async def test_bluetooth(hass: HomeAssistant) -> None:
     }
 
 
-async def test_bluetooth_invalid(hass: HomeAssistant) -> None:
+async def test_bluetooth_invalid(hass: SmartHub) -> None:
     """Test bluetooth device discovery with invalid data."""
 
     inject_bluetooth_service_info(hass, AUTOMOWER_UNSUPPORTED_GROUP_SERVICE_INFO)
@@ -107,7 +107,7 @@ async def test_bluetooth_invalid(hass: HomeAssistant) -> None:
 
 
 async def test_failed_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: Mock,
 ) -> None:
     """Test we can select a device."""
@@ -146,7 +146,7 @@ async def test_failed_connect(
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: Mock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -176,7 +176,7 @@ async def test_duplicate_entry(
 
 
 async def test_exception_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: Mock,
 ) -> None:
     """Test we can select a device."""

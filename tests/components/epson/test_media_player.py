@@ -5,16 +5,16 @@ from unittest.mock import patch
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.epson.const import CONF_CONNECTION_TYPE, DOMAIN, HTTP
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.epson.const import CONF_CONNECTION_TYPE, DOMAIN, HTTP
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_set_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -26,7 +26,7 @@ async def test_set_unique_id(
         entry_id="1cb78c095906279574a0442a1f0003ef",
     )
     entry.add_to_hass(hass)
-    with patch("homeassistant.components.epson.Projector.get_power"):
+    with patch("smarthub.components.epson.Projector.get_power"):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
         assert entry.unique_id is None
@@ -34,13 +34,13 @@ async def test_set_unique_id(
         assert entity_entry
         assert entity_entry.unique_id == entry.entry_id
     with (
-        patch("homeassistant.components.epson.Projector.get_power", return_value="01"),
+        patch("smarthub.components.epson.Projector.get_power", return_value="01"),
         patch(
-            "homeassistant.components.epson.Projector.get_serial_number",
+            "smarthub.components.epson.Projector.get_serial_number",
             return_value="123",
         ),
         patch(
-            "homeassistant.components.epson.Projector.get_property",
+            "smarthub.components.epson.Projector.get_property",
         ),
     ):
         freezer.tick(timedelta(seconds=30))

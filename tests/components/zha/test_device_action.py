@@ -8,14 +8,14 @@ from zigpy.profiles import zha
 from zigpy.zcl.clusters import general, security
 import zigpy.zcl.foundation as zcl_f
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.zha import DOMAIN
-from homeassistant.components.zha.helpers import get_zha_gateway
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.zha import DOMAIN
+from smarthub.components.zha.helpers import get_zha_gateway
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
 
@@ -36,7 +36,7 @@ COMMAND_SINGLE = "single"
 def required_platforms_only():
     """Only set up the required platforms and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.BINARY_SENSOR,
             Platform.BUTTON,
@@ -53,7 +53,7 @@ def required_platforms_only():
 
 
 async def test_get_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     setup_zha,
@@ -140,7 +140,7 @@ async def test_get_actions(
 
 
 async def test_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     setup_zha,
     zigpy_device_mock,
@@ -221,7 +221,7 @@ async def test_action(
 
 
 async def test_invalid_zha_event_type(
-    hass: HomeAssistant, setup_zha, zigpy_device_mock
+    hass: SmartHub, setup_zha, zigpy_device_mock
 ) -> None:
     """Test that unexpected types are not passed to `zha_send_event`."""
     await setup_zha()
@@ -261,7 +261,7 @@ async def test_invalid_zha_event_type(
 
 
 async def test_client_unique_id_suffix_stripped(
-    hass: HomeAssistant, setup_zha, zigpy_device_mock
+    hass: SmartHub, setup_zha, zigpy_device_mock
 ) -> None:
     """Test that the `_CLIENT_` unique ID suffix is stripped."""
     assert await async_setup_component(

@@ -3,8 +3,8 @@
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from .const import TEST_BUTTON_EVENT_ENTITY_ID
 
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_async_get_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     hass_client: ClientSessionGenerator,
     integration: None,

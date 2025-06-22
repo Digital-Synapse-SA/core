@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics_polling_instance(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -30,7 +30,7 @@ async def test_diagnostics_polling_instance(
 
 
 async def test_diagnostics_webhook_instance(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_overseerr_client_cloudhook: AsyncMock,
     mock_cloudhook_config_entry: MockConfigEntry,

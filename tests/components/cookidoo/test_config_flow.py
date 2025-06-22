@@ -9,11 +9,11 @@ from cookidoo_api.exceptions import (
 )
 import pytest
 
-from homeassistant.components.cookidoo.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_COUNTRY, CONF_EMAIL, CONF_LANGUAGE, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.cookidoo.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_COUNTRY, CONF_EMAIL, CONF_LANGUAGE, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import COUNTRY, EMAIL, LANGUAGE, PASSWORD
 from .test_init import setup_integration
@@ -32,7 +32,7 @@ MOCK_DATA_LANGUAGE_STEP = {
 
 
 async def test_flow_user_success(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_cookidoo_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_cookidoo_client: AsyncMock
 ) -> None:
     """Test we get the user flow and create entry with success."""
     result = await hass.config_entries.flow.async_init(
@@ -71,7 +71,7 @@ async def test_flow_user_success(
     ],
 )
 async def test_flow_user_init_data_unknown_error_and_recover_on_step_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cookidoo_client: AsyncMock,
     raise_error: Exception,
     text_error: str,
@@ -121,7 +121,7 @@ async def test_flow_user_init_data_unknown_error_and_recover_on_step_1(
     ],
 )
 async def test_flow_user_init_data_unknown_error_and_recover_on_step_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cookidoo_client: AsyncMock,
     raise_error: Exception,
     text_error: str,
@@ -162,7 +162,7 @@ async def test_flow_user_init_data_unknown_error_and_recover_on_step_2(
 
 
 async def test_flow_user_init_data_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cookidoo_client: AsyncMock,
     cookidoo_config_entry: MockConfigEntry,
 ) -> None:
@@ -184,7 +184,7 @@ async def test_flow_user_init_data_already_configured(
 
 
 async def test_flow_reconfigure_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cookidoo_config_entry: AsyncMock,
     mock_cookidoo_client: AsyncMock,
 ) -> None:
@@ -237,7 +237,7 @@ async def test_flow_reconfigure_success(
     ],
 )
 async def test_flow_reconfigure_init_data_unknown_error_and_recover_on_step_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cookidoo_config_entry: AsyncMock,
     mock_cookidoo_client: AsyncMock,
     raise_error: Exception,
@@ -296,7 +296,7 @@ async def test_flow_reconfigure_init_data_unknown_error_and_recover_on_step_1(
     ],
 )
 async def test_flow_reconfigure_init_data_unknown_error_and_recover_on_step_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cookidoo_config_entry: AsyncMock,
     mock_cookidoo_client: AsyncMock,
     raise_error: Exception,
@@ -348,7 +348,7 @@ async def test_flow_reconfigure_init_data_unknown_error_and_recover_on_step_2(
 
 
 async def test_flow_reconfigure_id_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cookidoo_client: AsyncMock,
     cookidoo_config_entry: MockConfigEntry,
 ) -> None:
@@ -377,7 +377,7 @@ async def test_flow_reconfigure_id_mismatch(
 
 
 async def test_flow_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cookidoo_client: AsyncMock,
     cookidoo_config_entry: MockConfigEntry,
 ) -> None:
@@ -415,7 +415,7 @@ async def test_flow_reauth(
     ],
 )
 async def test_flow_reauth_error_and_recover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cookidoo_client: AsyncMock,
     cookidoo_config_entry: MockConfigEntry,
     raise_error,
@@ -456,7 +456,7 @@ async def test_flow_reauth_error_and_recover(
 
 
 async def test_flow_reauth_id_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cookidoo_client: AsyncMock,
     cookidoo_config_entry: MockConfigEntry,
 ) -> None:

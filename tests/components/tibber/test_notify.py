@@ -5,13 +5,13 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.recorder import Recorder
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 
 async def test_notification_services(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_tibber_setup: MagicMock
+    recorder_mock: Recorder, hass: SmartHub, mock_tibber_setup: MagicMock
 ) -> None:
     """Test create entry from user input."""
     # Assert notify entity has been added
@@ -33,7 +33,7 @@ async def test_notification_services(
 
     calls.side_effect = TimeoutError
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         # Test notify entity service
         await hass.services.async_call(
             "notify",

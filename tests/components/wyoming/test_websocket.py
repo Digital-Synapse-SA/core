@@ -1,13 +1,13 @@
 """Websocket tests for Wyoming integration."""
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
 
 from tests.typing import WebSocketGenerator
 
 
 async def test_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     init_components,
     init_wyoming_stt: ConfigEntry,

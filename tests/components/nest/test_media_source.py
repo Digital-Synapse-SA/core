@@ -18,19 +18,19 @@ from freezegun import freeze_time
 import numpy as np
 import pytest
 
-from homeassistant.components.media_player import BrowseError
-from homeassistant.components.media_source import (
+from smarthub.components.media_player import BrowseError
+from smarthub.components.media_source import (
     URI_SCHEME,
     Unresolvable,
     async_browse_media,
     async_resolve_media,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.template import DATE_STR_FORMAT
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.template import DATE_STR_FORMAT
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .common import (
     DEVICE_ID,
@@ -106,7 +106,7 @@ def platforms() -> list[str]:
 
 
 @pytest.fixture(autouse=True)
-async def setup_components(hass: HomeAssistant) -> None:
+async def setup_components(hass: SmartHub) -> None:
     """Fixture to initialize the integration."""
     await async_setup_component(hass, "media_source", {})
 
@@ -178,7 +178,7 @@ def cache_size() -> int:
 @pytest.fixture(autouse=True)
 def apply_cache_size(cache_size):
     """Fixture for patching the cache size."""
-    with patch("homeassistant.components.nest.EVENT_MEDIA_CACHE_SIZE", new=cache_size):
+    with patch("smarthub.components.nest.EVENT_MEDIA_CACHE_SIZE", new=cache_size):
         yield
 
 
@@ -242,7 +242,7 @@ def create_battery_event_data(
         )
     ],
 )
-async def test_no_eligible_devices(hass: HomeAssistant, setup_platform) -> None:
+async def test_no_eligible_devices(hass: SmartHub, setup_platform) -> None:
     """Test a media source with no eligible camera devices."""
     await setup_platform()
     browse = await async_browse_media(hass, f"{URI_SCHEME}{DOMAIN}")
@@ -254,7 +254,7 @@ async def test_no_eligible_devices(hass: HomeAssistant, setup_platform) -> None:
 
 @pytest.mark.parametrize("device_traits", [CAMERA_TRAITS, BATTERY_CAMERA_TRAITS])
 async def test_supported_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, setup_platform
+    hass: SmartHub, device_registry: dr.DeviceRegistry, setup_platform
 ) -> None:
     """Test a media source with a supported camera."""
     await setup_platform()
@@ -285,7 +285,7 @@ async def test_supported_device(
 
 
 async def test_integration_unloaded(
-    hass: HomeAssistant, auth: FakeAuth, setup_platform
+    hass: SmartHub, auth: FakeAuth, setup_platform
 ) -> None:
     """Test the media player loads, but has no devices, when config unloaded."""
     await setup_platform()
@@ -313,7 +313,7 @@ async def test_integration_unloaded(
 
 
 async def test_camera_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     subscriber,
@@ -417,7 +417,7 @@ async def test_camera_event(
 
 
 async def test_event_order(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     subscriber,
@@ -487,7 +487,7 @@ async def test_event_order(
 
 
 async def test_multiple_image_events_in_session(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -602,7 +602,7 @@ async def test_multiple_image_events_in_session(
 
 @pytest.mark.parametrize("device_traits", [BATTERY_CAMERA_TRAITS])
 async def test_multiple_clip_preview_events_in_session(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -701,7 +701,7 @@ async def test_multiple_clip_preview_events_in_session(
 
 
 async def test_browse_invalid_device_id(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, auth, setup_platform
+    hass: SmartHub, device_registry: dr.DeviceRegistry, auth, setup_platform
 ) -> None:
     """Test a media source request for an invalid device id."""
     await setup_platform()
@@ -721,7 +721,7 @@ async def test_browse_invalid_device_id(
 
 
 async def test_browse_invalid_event_id(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, auth, setup_platform
+    hass: SmartHub, device_registry: dr.DeviceRegistry, auth, setup_platform
 ) -> None:
     """Test a media source browsing for an invalid event id."""
     await setup_platform()
@@ -743,7 +743,7 @@ async def test_browse_invalid_event_id(
 
 
 async def test_resolve_missing_event_id(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, auth, setup_platform
+    hass: SmartHub, device_registry: dr.DeviceRegistry, auth, setup_platform
 ) -> None:
     """Test a media source request missing an event id."""
     await setup_platform()
@@ -761,7 +761,7 @@ async def test_resolve_missing_event_id(
 
 
 async def test_resolve_invalid_device_id(
-    hass: HomeAssistant, auth, setup_platform
+    hass: SmartHub, auth, setup_platform
 ) -> None:
     """Test resolving media for an invalid event id."""
     await setup_platform()
@@ -774,7 +774,7 @@ async def test_resolve_invalid_device_id(
 
 
 async def test_resolve_invalid_event_id(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, auth, setup_platform
+    hass: SmartHub, device_registry: dr.DeviceRegistry, auth, setup_platform
 ) -> None:
     """Test resolving media for an invalid event id."""
     await setup_platform()
@@ -798,7 +798,7 @@ async def test_resolve_invalid_event_id(
 
 @pytest.mark.parametrize("device_traits", [BATTERY_CAMERA_TRAITS])
 async def test_camera_event_clip_preview(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -907,7 +907,7 @@ async def test_camera_event_clip_preview(
 
 
 async def test_event_media_render_invalid_device_id(
-    hass: HomeAssistant, auth, hass_client: ClientSessionGenerator, setup_platform
+    hass: SmartHub, auth, hass_client: ClientSessionGenerator, setup_platform
 ) -> None:
     """Test event media API called with an invalid device id."""
     await setup_platform()
@@ -917,7 +917,7 @@ async def test_event_media_render_invalid_device_id(
 
 
 async def test_event_media_render_invalid_event_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -935,7 +935,7 @@ async def test_event_media_render_invalid_event_id(
 
 
 async def test_event_media_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -990,7 +990,7 @@ async def test_event_media_failure(
 
 
 async def test_media_permission_unauthorized(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -1020,7 +1020,7 @@ async def test_media_permission_unauthorized(
 
 
 async def test_multiple_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -1106,7 +1106,7 @@ async def test_multiple_devices(
 def event_store() -> Generator[None]:
     """Persist changes to event store immediately."""
     with patch(
-        "homeassistant.components.nest.media_source.STORAGE_SAVE_DELAY_SECONDS",
+        "smarthub.components.nest.media_source.STORAGE_SAVE_DELAY_SECONDS",
         new=0,
     ):
         yield
@@ -1114,7 +1114,7 @@ def event_store() -> Generator[None]:
 
 @pytest.mark.parametrize("device_traits", [BATTERY_CAMERA_TRAITS])
 async def test_media_store_persistence(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -1207,7 +1207,7 @@ async def test_media_store_persistence(
 
 @pytest.mark.parametrize("device_traits", [BATTERY_CAMERA_TRAITS])
 async def test_media_store_save_filesystem_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -1224,7 +1224,7 @@ async def test_media_store_save_filesystem_error(
     # The client fetches the media from the server, but has a failure when
     # persisting the media to disk.
     client = await hass_client()
-    with patch("homeassistant.components.nest.media_source.open", side_effect=OSError):
+    with patch("smarthub.components.nest.media_source.open", side_effect=OSError):
         await subscriber.async_receive_event(
             create_event_message(
                 create_battery_event_data(MOTION_EVENT),
@@ -1261,7 +1261,7 @@ async def test_media_store_save_filesystem_error(
 
 @pytest.mark.parametrize("device_traits", [BATTERY_CAMERA_TRAITS])
 async def test_media_store_load_filesystem_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -1304,7 +1304,7 @@ async def test_media_store_load_filesystem_error(
 
     # Fetch the media from the server, and simluate a failure reading from disk
     client = await hass_client()
-    with patch("homeassistant.components.nest.media_source.open", side_effect=OSError):
+    with patch("smarthub.components.nest.media_source.open", side_effect=OSError):
         response = await client.get(
             f"/api/nest/event_media/{device.id}/{event_identifier}"
         )
@@ -1315,7 +1315,7 @@ async def test_media_store_load_filesystem_error(
 
 @pytest.mark.parametrize(("device_traits", "cache_size"), [(BATTERY_CAMERA_TRAITS, 5)])
 async def test_camera_event_media_eviction(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -1363,7 +1363,7 @@ async def test_camera_event_media_eviction(
     ts = event_timestamp + datetime.timedelta(seconds=8)
     # Simulate a failure case removing the media on cache eviction
     with patch(
-        "homeassistant.components.nest.media_source.os.remove", side_effect=OSError
+        "smarthub.components.nest.media_source.os.remove", side_effect=OSError
     ) as mock_remove:
         await subscriber.async_receive_event(
             create_event_message(
@@ -1392,7 +1392,7 @@ async def test_camera_event_media_eviction(
 
 
 async def test_camera_image_resize(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     hass_client: ClientSessionGenerator,
@@ -1471,7 +1471,7 @@ async def test_camera_image_resize(
 
 
 async def test_event_media_attachment(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     subscriber,
@@ -1525,7 +1525,7 @@ async def test_event_media_attachment(
 
 @pytest.mark.parametrize("device_traits", [BATTERY_CAMERA_TRAITS])
 async def test_event_clip_media_attachment(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     subscriber,
@@ -1580,7 +1580,7 @@ async def test_event_clip_media_attachment(
 
 @pytest.mark.parametrize(("device_traits", "cache_size"), [(BATTERY_CAMERA_TRAITS, 5)])
 async def test_remove_stale_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     auth,
     mp4,

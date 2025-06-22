@@ -12,9 +12,9 @@ from requests.exceptions import ConnectionError
 import requests_mock
 from requests_mock import ANY
 
-from homeassistant import config_entries
-from homeassistant.components.huawei_lte.const import CONF_UNAUTHENTICATED_MODE, DOMAIN
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components.huawei_lte.const import CONF_UNAUTHENTICATED_MODE, DOMAIN
+from smarthub.const import (
     CONF_NAME,
     CONF_PASSWORD,
     CONF_RECIPIENT,
@@ -22,9 +22,9 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_DEVICE_TYPE,
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_MANUFACTURER,
@@ -54,7 +54,7 @@ FIXTURE_USER_INPUT_OPTIONS = {
 }
 
 
-async def test_show_set_form(hass: HomeAssistant) -> None:
+async def test_show_set_form(hass: SmartHub) -> None:
     """Test that the setup form is served."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}, data=None
@@ -65,7 +65,7 @@ async def test_show_set_form(hass: HomeAssistant) -> None:
 
 
 async def test_urlize_plain_host(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test that plain host or IP gets converted to a URL."""
     requests_mock.request(ANY, ANY, exc=ConnectionError())
@@ -81,7 +81,7 @@ async def test_urlize_plain_host(
 
 
 async def test_already_configured(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker, login_requests_mock
+    hass: SmartHub, requests_mock: requests_mock.Mocker, login_requests_mock
 ) -> None:
     """Test we reject already configured devices."""
     MockConfigEntry(
@@ -125,7 +125,7 @@ async def test_already_configured(
     ],
 )
 async def test_connection_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock: requests_mock.Mocker,
     exception: Exception,
     errors: dict[str, str],
@@ -217,7 +217,7 @@ def login_requests_mock(requests_mock: requests_mock.Mocker) -> requests_mock.Mo
     ],
 )
 async def test_login_error(
-    hass: HomeAssistant, login_requests_mock, request_outcome, fixture_override, errors
+    hass: SmartHub, login_requests_mock, request_outcome, fixture_override, errors
 ) -> None:
     """Test we show user form with appropriate error on response failure."""
     login_requests_mock.request(
@@ -237,7 +237,7 @@ async def test_login_error(
 
 
 @pytest.mark.parametrize("scheme", ["http", "https"])
-async def test_success(hass: HomeAssistant, login_requests_mock, scheme: str) -> None:
+async def test_success(hass: SmartHub, login_requests_mock, scheme: str) -> None:
     """Test successful flow provides entry creation data."""
     user_input = {
         **FIXTURE_USER_INPUT,
@@ -252,8 +252,8 @@ async def test_success(hass: HomeAssistant, login_requests_mock, scheme: str) ->
         text="<response>OK</response>",
     )
     with (
-        patch("homeassistant.components.huawei_lte.async_setup"),
-        patch("homeassistant.components.huawei_lte.async_setup_entry"),
+        patch("smarthub.components.huawei_lte.async_setup"),
+        patch("smarthub.components.huawei_lte.async_setup_entry"),
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -320,7 +320,7 @@ async def test_success(hass: HomeAssistant, login_requests_mock, scheme: str) ->
     ],
 )
 async def test_ssdp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     login_requests_mock,
     requests_mock_request_kwargs,
     upnp_data,
@@ -380,7 +380,7 @@ async def test_ssdp(
     ],
 )
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     login_requests_mock,
     login_response_text,
     expected_result,
@@ -426,7 +426,7 @@ async def test_reauth(
         assert entry.data[k] == v
 
 
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test options produce expected data."""
 
     config_entry = MockConfigEntry(

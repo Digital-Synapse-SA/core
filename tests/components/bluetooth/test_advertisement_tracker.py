@@ -7,18 +7,18 @@ import time
 from habluetooth.advertisement_tracker import ADVERTISING_TIMES_NEEDED
 import pytest
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     async_get_learned_advertising_interval,
     async_register_scanner,
     async_track_unavailable,
 )
-from homeassistant.components.bluetooth.const import (
+from smarthub.components.bluetooth.const import (
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
     SOURCE_LOCAL,
     UNAVAILABLE_TRACK_SECONDS,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub, callback
+from smarthub.util import dt as dt_util
 
 from . import (
     FakeScanner,
@@ -36,7 +36,7 @@ ONE_HOUR_SECONDS = 3600
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
 async def test_advertisment_interval_shorter_than_adapter_stack_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we can determine the advertisement interval."""
     start_monotonic_time = time.monotonic()
@@ -84,7 +84,7 @@ async def test_advertisment_interval_shorter_than_adapter_stack_timeout(
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
 async def test_advertisment_interval_longer_than_adapter_stack_timeout_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test device with a long advertisement interval."""
     start_monotonic_time = time.monotonic()
@@ -134,7 +134,7 @@ async def test_advertisment_interval_longer_than_adapter_stack_timeout_connectab
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
 async def test_advertisment_interval_longer_than_adapter_stack_timeout_adapter_change_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test device with a long advertisement interval with an adapter change."""
     start_monotonic_time = time.monotonic()
@@ -197,7 +197,7 @@ async def test_advertisment_interval_longer_than_adapter_stack_timeout_adapter_c
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
 async def test_advertisment_interval_longer_than_adapter_stack_timeout_not_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test device with a long advertisement interval that is not connectable not reaching the advertising interval."""
     start_monotonic_time = time.monotonic()
@@ -250,7 +250,7 @@ async def test_advertisment_interval_longer_than_adapter_stack_timeout_not_conne
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
 async def test_advertisment_interval_shorter_than_adapter_stack_timeout_adapter_change_not_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test device with a short advertisement interval with an adapter change that is not connectable."""
     start_monotonic_time = time.monotonic()
@@ -323,7 +323,7 @@ async def test_advertisment_interval_shorter_than_adapter_stack_timeout_adapter_
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
 async def test_advertisment_interval_longer_than_adapter_stack_timeout_adapter_change_not_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test device with a long advertisement interval with an adapter change that is not connectable."""
     start_monotonic_time = time.monotonic()
@@ -427,7 +427,7 @@ async def test_advertisment_interval_longer_than_adapter_stack_timeout_adapter_c
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
 async def test_advertisment_interval_longer_increasing_than_adapter_stack_timeout_adapter_change_not_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test device with a increasing advertisement interval with an adapter change that is not connectable."""
     start_monotonic_time = time.monotonic()

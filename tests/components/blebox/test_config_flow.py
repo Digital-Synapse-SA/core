@@ -1,4 +1,4 @@
-"""Test Home Assistant config flow for BleBox devices."""
+"""Test SmartHub config flow for BleBox devices."""
 
 from ipaddress import ip_address
 from unittest.mock import DEFAULT, AsyncMock, PropertyMock, patch
@@ -6,21 +6,21 @@ from unittest.mock import DEFAULT, AsyncMock, PropertyMock, patch
 import blebox_uniapi
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.blebox import config_flow
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_IP_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components.blebox import config_flow
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_IP_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.setup import async_setup_component
 
 from .conftest import mock_config, mock_feature, mock_only_feature, setup_product_mock
 
 from tests.common import MockConfigEntry
 
 
-def create_valid_feature_mock(path="homeassistant.components.blebox.Products"):
+def create_valid_feature_mock(path="smarthub.components.blebox.Products"):
     """Return a valid, complete BleBox feature mock."""
     feature = mock_only_feature(
         blebox_uniapi.cover.Cover,
@@ -54,12 +54,12 @@ def valid_feature_mock_fixture():
 def flow_feature_mock_fixture():
     """Return a mocked user flow feature."""
     return create_valid_feature_mock(
-        "homeassistant.components.blebox.config_flow.Products"
+        "smarthub.components.blebox.config_flow.Products"
     )
 
 
 async def test_flow_works(
-    hass: HomeAssistant, valid_feature_mock, flow_feature_mock
+    hass: SmartHub, valid_feature_mock, flow_feature_mock
 ) -> None:
     """Test that config flow works."""
 
@@ -87,12 +87,12 @@ async def test_flow_works(
 @pytest.fixture(name="product_class_mock")
 def product_class_mock_fixture():
     """Return a mocked feature."""
-    path = "homeassistant.components.blebox.config_flow.Box"
+    path = "smarthub.components.blebox.config_flow.Box"
     return patch(path, DEFAULT, blebox_uniapi.box.Box, True, True)
 
 
 async def test_flow_with_connection_failure(
-    hass: HomeAssistant, product_class_mock
+    hass: SmartHub, product_class_mock
 ) -> None:
     """Test that config flow works."""
     with product_class_mock as products_class:
@@ -108,7 +108,7 @@ async def test_flow_with_connection_failure(
         assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_flow_with_api_failure(hass: HomeAssistant, product_class_mock) -> None:
+async def test_flow_with_api_failure(hass: SmartHub, product_class_mock) -> None:
     """Test that config flow works."""
     with product_class_mock as products_class:
         products_class.async_from_host = AsyncMock(
@@ -124,7 +124,7 @@ async def test_flow_with_api_failure(hass: HomeAssistant, product_class_mock) ->
 
 
 async def test_flow_with_unknown_failure(
-    hass: HomeAssistant, product_class_mock
+    hass: SmartHub, product_class_mock
 ) -> None:
     """Test that config flow works."""
     with product_class_mock as products_class:
@@ -138,7 +138,7 @@ async def test_flow_with_unknown_failure(
 
 
 async def test_flow_with_unsupported_version(
-    hass: HomeAssistant, product_class_mock
+    hass: SmartHub, product_class_mock
 ) -> None:
     """Test that config flow works."""
     with product_class_mock as products_class:
@@ -154,7 +154,7 @@ async def test_flow_with_unsupported_version(
         assert result["errors"] == {"base": "unsupported_version"}
 
 
-async def test_flow_with_auth_failure(hass: HomeAssistant, product_class_mock) -> None:
+async def test_flow_with_auth_failure(hass: SmartHub, product_class_mock) -> None:
     """Test that config flow works."""
     with product_class_mock as products_class:
         products_class.async_from_host = AsyncMock(
@@ -169,13 +169,13 @@ async def test_flow_with_auth_failure(hass: HomeAssistant, product_class_mock) -
         assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_async_setup(hass: HomeAssistant) -> None:
+async def test_async_setup(hass: SmartHub) -> None:
     """Test async_setup (for coverage)."""
     assert await async_setup_component(hass, "blebox", {"host": "172.2.3.4"})
     await hass.async_block_till_done()
 
 
-async def test_already_configured(hass: HomeAssistant, valid_feature_mock) -> None:
+async def test_already_configured(hass: SmartHub, valid_feature_mock) -> None:
     """Test that same device cannot be added twice."""
 
     config = mock_config("172.2.3.4")
@@ -193,7 +193,7 @@ async def test_already_configured(hass: HomeAssistant, valid_feature_mock) -> No
     assert result["reason"] == "address_already_configured"
 
 
-async def test_async_setup_entry(hass: HomeAssistant, valid_feature_mock) -> None:
+async def test_async_setup_entry(hass: SmartHub, valid_feature_mock) -> None:
     """Test async_setup_entry (for coverage)."""
 
     config = mock_config()
@@ -206,7 +206,7 @@ async def test_async_setup_entry(hass: HomeAssistant, valid_feature_mock) -> Non
     assert config.state is ConfigEntryState.LOADED
 
 
-async def test_async_remove_entry(hass: HomeAssistant, valid_feature_mock) -> None:
+async def test_async_remove_entry(hass: SmartHub, valid_feature_mock) -> None:
     """Test async_setup_entry (for coverage)."""
 
     config = mock_config()
@@ -222,7 +222,7 @@ async def test_async_remove_entry(hass: HomeAssistant, valid_feature_mock) -> No
     assert config.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_flow_with_zeroconf(hass: HomeAssistant) -> None:
+async def test_flow_with_zeroconf(hass: SmartHub) -> None:
     """Test setup from zeroconf discovery."""
     result = await hass.config_entries.flow.async_init(
         config_flow.DOMAIN,
@@ -240,7 +240,7 @@ async def test_flow_with_zeroconf(hass: HomeAssistant) -> None:
 
     assert result["type"] is FlowResultType.FORM
 
-    with patch("homeassistant.components.blebox.async_setup_entry", return_value=True):
+    with patch("smarthub.components.blebox.async_setup_entry", return_value=True):
         result2 = await hass.config_entries.flow.async_configure(result["flow_id"], {})
         await hass.async_block_till_done()
 
@@ -248,7 +248,7 @@ async def test_flow_with_zeroconf(hass: HomeAssistant) -> None:
     assert result2["data"] == {"host": "172.100.123.4", "port": 80}
 
 
-async def test_flow_with_zeroconf_when_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_with_zeroconf_when_already_configured(hass: SmartHub) -> None:
     """Test behaviour if device already configured."""
     entry = MockConfigEntry(
         domain=config_flow.DOMAIN,
@@ -261,7 +261,7 @@ async def test_flow_with_zeroconf_when_already_configured(hass: HomeAssistant) -
         blebox_uniapi.sensor.Temperature,
     )
     with patch(
-        "homeassistant.components.blebox.config_flow.Box.async_from_host",
+        "smarthub.components.blebox.config_flow.Box.async_from_host",
         return_value=feature.product,
     ):
         result2 = await hass.config_entries.flow.async_init(
@@ -282,10 +282,10 @@ async def test_flow_with_zeroconf_when_already_configured(hass: HomeAssistant) -
         assert result2["reason"] == "already_configured"
 
 
-async def test_flow_with_zeroconf_when_device_unsupported(hass: HomeAssistant) -> None:
+async def test_flow_with_zeroconf_when_device_unsupported(hass: SmartHub) -> None:
     """Test behaviour when device is not supported."""
     with patch(
-        "homeassistant.components.blebox.config_flow.Box.async_from_host",
+        "smarthub.components.blebox.config_flow.Box.async_from_host",
         side_effect=blebox_uniapi.error.UnsupportedBoxVersion,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -306,12 +306,12 @@ async def test_flow_with_zeroconf_when_device_unsupported(hass: HomeAssistant) -
 
 
 async def test_flow_with_zeroconf_when_device_response_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test behaviour when device returned unsupported response."""
 
     with patch(
-        "homeassistant.components.blebox.config_flow.Box.async_from_host",
+        "smarthub.components.blebox.config_flow.Box.async_from_host",
         side_effect=blebox_uniapi.error.UnsupportedBoxResponse,
     ):
         result = await hass.config_entries.flow.async_init(

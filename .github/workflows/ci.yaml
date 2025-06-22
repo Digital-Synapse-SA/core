@@ -104,7 +104,7 @@ jobs:
             hashFiles('requirements_test.txt', 'requirements_test_pre_commit.txt') }}-${{
             hashFiles('requirements.txt') }}-${{
             hashFiles('requirements_all.txt') }}-${{
-            hashFiles('homeassistant/package_constraints.txt') }}-${{
+            hashFiles('smarthub/package_constraints.txt') }}-${{
             hashFiles('script/gen_requirements_all.py') }}" >> $GITHUB_OUTPUT
       - name: Generate partial pre-commit restore key
         id: generate_pre-commit_cache_key
@@ -118,10 +118,10 @@ jobs:
           filters: .core_files.yaml
       - name: Create a list of integrations to filter for changes
         run: |
-          integrations=$(ls -Ad ./homeassistant/components/[!_]*  | xargs -n 1 basename)
+          integrations=$(ls -Ad ./smarthub/components/[!_]*  | xargs -n 1 basename)
           touch .integration_paths.yaml
           for integration in $integrations; do
-            echo "${integration}: [homeassistant/components/${integration}/**, tests/components/${integration}/**]" \
+            echo "${integration}: [smarthub/components/${integration}/**, tests/components/${integration}/**]" \
               >> .integration_paths.yaml;
           done
           echo "Result:"
@@ -199,7 +199,7 @@ jobs:
             || [[ "${{ github.event.inputs.mypy-only }}" == "true" ]] \
             || [[ "${{ github.event.inputs.audit-licenses-only }}" == "true" ]] \
             || [[ "${{ github.event_name }}" == "push" \
-              && "${{ github.event.repository.full_name }}" != "home-assistant/core" ]];
+              && "${{ github.event.repository.full_name }}" != "smart-hub/core" ]];
           then
             lint_only="true"
             skip_coverage="true"
@@ -426,7 +426,7 @@ jobs:
         run: |
           . venv/bin/activate
           shopt -s globstar
-          pre-commit run --hook-stage manual prettier --files {homeassistant,tests}/components/${{ needs.info.outputs.integrations_glob }}/{*,**/*}
+          pre-commit run --hook-stage manual prettier --files {smarthub,tests}/components/${{ needs.info.outputs.integrations_glob }}/{*,**/*}
 
       - name: Register check executables problem matcher
         run: |
@@ -741,14 +741,14 @@ jobs:
         run: |
           . venv/bin/activate
           python --version
-          pylint --ignore-missing-annotations=y homeassistant
+          pylint --ignore-missing-annotations=y smarthub
       - name: Run pylint (partially)
         if: needs.info.outputs.test_full_suite == 'false'
         shell: bash
         run: |
           . venv/bin/activate
           python --version
-          pylint --ignore-missing-annotations=y homeassistant/components/${{ needs.info.outputs.integrations_glob }}
+          pylint --ignore-missing-annotations=y smarthub/components/${{ needs.info.outputs.integrations_glob }}
 
   pylint-tests:
     name: Check pylint on tests
@@ -851,14 +851,14 @@ jobs:
         run: |
           . venv/bin/activate
           python --version
-          mypy homeassistant pylint
+          mypy smarthub pylint
       - name: Run mypy (partially)
         if: needs.info.outputs.test_full_suite == 'false'
         shell: bash
         run: |
           . venv/bin/activate
           python --version
-          mypy homeassistant/components/${{ needs.info.outputs.integrations_glob }}
+          mypy smarthub/components/${{ needs.info.outputs.integrations_glob }}
 
   prepare-pytest-full:
     runs-on: ubuntu-24.04
@@ -988,7 +988,7 @@ jobs:
           set -o pipefail
           cov_params=()
           if [[ "${{ needs.info.outputs.skip_coverage }}" != "true" ]]; then
-            cov_params+=(--cov="homeassistant")
+            cov_params+=(--cov="smarthub")
             cov_params+=(--cov-report=xml)
             cov_params+=(--junitxml=junit.xml -o junit_family=legacy)
           fi
@@ -1124,7 +1124,7 @@ jobs:
           echo "mariadb=${mariadb}" >> $GITHUB_OUTPUT
           cov_params=()
           if [[ "${{ needs.info.outputs.skip_coverage }}" != "true" ]]; then
-            cov_params+=(--cov="homeassistant.components.recorder")
+            cov_params+=(--cov="smarthub.components.recorder")
             cov_params+=(--cov-report=xml)
             cov_params+=(--cov-report=term-missing)
             cov_params+=(--junitxml=junit.xml -o junit_family=legacy)
@@ -1140,7 +1140,7 @@ jobs:
             --durations=10 \
             -p no:sugar \
             --exclude-warning-annotations \
-            --dburl=mysql://root:password@127.0.0.1/homeassistant-test \
+            --dburl=mysql://root:password@127.0.0.1/smarthub-test \
             tests/components/history \
             tests/components/logbook \
             tests/components/recorder \
@@ -1266,7 +1266,7 @@ jobs:
           echo "postgresql=${postgresql}" >> $GITHUB_OUTPUT
           cov_params=()
           if [[ "${{ needs.info.outputs.skip_coverage }}" != "true" ]]; then
-            cov_params+=(--cov="homeassistant.components.recorder")
+            cov_params+=(--cov="smarthub.components.recorder")
             cov_params+=(--cov-report=xml)
             cov_params+=(--cov-report=term-missing)
             cov_params+=(--junitxml=junit.xml -o junit_family=legacy)
@@ -1283,7 +1283,7 @@ jobs:
             --durations-min=10 \
             -p no:sugar \
             --exclude-warning-annotations \
-            --dburl=postgresql://postgres:password@127.0.0.1/homeassistant-test \
+            --dburl=postgresql://postgres:password@127.0.0.1/smarthub-test \
             tests/components/history \
             tests/components/logbook \
             tests/components/recorder \
@@ -1425,7 +1425,7 @@ jobs:
 
           cov_params=()
           if [[ "${{ needs.info.outputs.skip_coverage }}" != "true" ]]; then
-            cov_params+=(--cov="homeassistant.components.${{ matrix.group }}")
+            cov_params+=(--cov="smarthub.components.${{ matrix.group }}")
             cov_params+=(--cov-report=xml)
             cov_params+=(--cov-report=term-missing)
             cov_params+=(--junitxml=junit.xml -o junit_family=legacy)

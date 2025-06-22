@@ -9,12 +9,12 @@ import pytest
 import python_otbr_api
 from zeroconf.asyncio import AsyncServiceInfo
 
-from homeassistant.components import otbr, thread
-from homeassistant.components.thread import discovery
-from homeassistant.config_entries import SOURCE_HASSIO, SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components import otbr, thread
+from smarthub.components.thread import discovery
+from smarthub.config_entries import SOURCE_HASSIO, SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from . import (
     BASE_URL,
@@ -51,7 +51,7 @@ def enable_mocks_fixture(
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_import_dataset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_async_zeroconf: MagicMock,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -80,7 +80,7 @@ async def test_import_dataset(
 
     with (
         patch(
-            "homeassistant.components.thread.dataset_store.BORDER_AGENT_DISCOVERY_TIMEOUT",
+            "smarthub.components.thread.dataset_store.BORDER_AGENT_DISCOVERY_TIMEOUT",
             0.1,
         ),
     ):
@@ -126,7 +126,7 @@ async def test_import_dataset(
 
 
 async def test_import_share_radio_channel_collision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multiprotocol_addon_manager_mock,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -147,7 +147,7 @@ async def test_import_share_radio_channel_collision(
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.thread.dataset_store.DatasetStore.async_add"
+            "smarthub.components.thread.dataset_store.DatasetStore.async_add"
         ) as mock_add,
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -166,7 +166,7 @@ async def test_import_share_radio_channel_collision(
 
 @pytest.mark.parametrize("dataset", [DATASET_CH15, DATASET_NO_CHANNEL])
 async def test_import_share_radio_no_channel_collision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multiprotocol_addon_manager_mock,
     dataset: bytes,
     issue_registry: ir.IssueRegistry,
@@ -187,7 +187,7 @@ async def test_import_share_radio_no_channel_collision(
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.thread.dataset_store.DatasetStore.async_add"
+            "smarthub.components.thread.dataset_store.DatasetStore.async_add"
         ) as mock_add,
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -210,7 +210,7 @@ async def test_import_share_radio_no_channel_collision(
     "dataset", [DATASET_INSECURE_NW_KEY, DATASET_INSECURE_PASSPHRASE]
 )
 async def test_import_insecure_dataset(
-    hass: HomeAssistant, dataset: bytes, issue_registry: ir.IssueRegistry
+    hass: SmartHub, dataset: bytes, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test the active dataset is imported at setup.
 
@@ -226,7 +226,7 @@ async def test_import_insecure_dataset(
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.thread.dataset_store.DatasetStore.async_add"
+            "smarthub.components.thread.dataset_store.DatasetStore.async_add"
         ) as mock_add,
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -251,7 +251,7 @@ async def test_import_insecure_dataset(
     ],
 )
 async def test_config_entry_not_ready(
-    hass: HomeAssistant, get_active_dataset_tlvs: AsyncMock, error
+    hass: SmartHub, get_active_dataset_tlvs: AsyncMock, error
 ) -> None:
     """Test raising ConfigEntryNotReady ."""
 
@@ -268,7 +268,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_border_agent_id_not_supported(
-    hass: HomeAssistant, get_border_agent_id: AsyncMock
+    hass: SmartHub, get_border_agent_id: AsyncMock
 ) -> None:
     """Test border router does not support border agent ID."""
 
@@ -284,7 +284,7 @@ async def test_border_agent_id_not_supported(
     assert not await hass.config_entries.async_setup(config_entry.entry_id)
 
 
-async def test_config_entry_update(hass: HomeAssistant) -> None:
+async def test_config_entry_update(hass: SmartHub) -> None:
     """Test update config entry settings."""
     config_entry = MockConfigEntry(
         data=CONFIG_ENTRY_DATA_MULTIPAN,
@@ -317,7 +317,7 @@ async def test_config_entry_update(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_remove_entry(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, otbr_config_entry_multipan
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, otbr_config_entry_multipan
 ) -> None:
     """Test async_get_active_dataset_tlvs after removing the config entry."""
 
@@ -337,7 +337,7 @@ async def test_remove_entry(
     ],
 )
 async def test_update_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     source: str,
     unique_id: str | None,

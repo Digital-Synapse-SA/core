@@ -2,9 +2,9 @@
 
 from london_tube_status import API_URL
 
-from homeassistant.components.london_underground.const import CONF_LINE, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.london_underground.const import CONF_LINE, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -15,7 +15,7 @@ VALID_CONFIG = {
 
 
 async def test_valid_state(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test for operational london_underground sensor with proper attributes."""
     aioclient_mock.get(

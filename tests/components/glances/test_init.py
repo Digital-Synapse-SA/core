@@ -9,16 +9,16 @@ from glances_api.exceptions import (
 )
 import pytest
 
-from homeassistant.components.glances.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.glances.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import MOCK_USER_INPUT
 
 from tests.common import MockConfigEntry
 
 
-async def test_successful_config_entry(hass: HomeAssistant) -> None:
+async def test_successful_config_entry(hass: SmartHub) -> None:
     """Test that Glances is configured successfully."""
 
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_INPUT)
@@ -38,7 +38,7 @@ async def test_successful_config_entry(hass: HomeAssistant) -> None:
     ],
 )
 async def test_setup_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     error: Exception,
     entry_state: ConfigEntryState,
     mock_api: MagicMock,
@@ -53,7 +53,7 @@ async def test_setup_error(
     assert entry.state is entry_state
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test removing Glances."""
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_INPUT)
     entry.add_to_hass(hass)

@@ -9,9 +9,9 @@ from bleak_retry_connector import Allocations
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components.bluetooth import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.components.bluetooth import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.util.dt import utcnow
 
 from . import (
     HCI0_SOURCE_ADDRESS,
@@ -30,7 +30,7 @@ from tests.typing import WebSocketGenerator
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_subscribe_advertisements(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
     hass_ws_client: WebSocketGenerator,
@@ -125,7 +125,7 @@ async def test_subscribe_advertisements(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_subscribe_connection_allocations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_hci0_scanner: None,
     register_hci1_scanner: None,
     register_non_connectable_scanner: None,
@@ -221,7 +221,7 @@ async def test_subscribe_connection_allocations(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_subscribe_connection_allocations_specific_scanner(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_non_connectable_scanner: None,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -257,7 +257,7 @@ async def test_subscribe_connection_allocations_specific_scanner(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_subscribe_connection_allocations_invalid_config_entry_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test bluetooth subscribe_connection_allocations for an invalid config entry id."""
@@ -278,7 +278,7 @@ async def test_subscribe_connection_allocations_invalid_config_entry_id(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_subscribe_connection_allocations_invalid_scanner(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test bluetooth subscribe_connection_allocations for an invalid source address."""
@@ -301,7 +301,7 @@ async def test_subscribe_connection_allocations_invalid_scanner(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_subscribe_scanner_details(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test bluetooth subscribe_connection_allocations."""
@@ -363,7 +363,7 @@ async def test_subscribe_scanner_details(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_subscribe_scanner_details_specific_scanner(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test bluetooth subscribe_scanner_details for a specific source address."""
@@ -413,7 +413,7 @@ async def test_subscribe_scanner_details_specific_scanner(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_subscribe_scanner_details_invalid_config_entry_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test bluetooth subscribe_scanner_details for an invalid config entry id."""

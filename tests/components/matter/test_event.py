@@ -7,17 +7,17 @@ from matter_server.common.models import EventType, MatterNodeEvent
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.event import ATTR_EVENT_TYPE, ATTR_EVENT_TYPES
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.event import ATTR_EVENT_TYPE, ATTR_EVENT_TYPES
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import snapshot_matter_entities, trigger_subscription_callback
 
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -27,7 +27,7 @@ async def test_events(
 
 @pytest.mark.parametrize("node_fixture", ["generic_switch"])
 async def test_generic_switch_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -66,7 +66,7 @@ async def test_generic_switch_node(
 
 @pytest.mark.parametrize("node_fixture", ["generic_switch_multi"])
 async def test_generic_switch_multi_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

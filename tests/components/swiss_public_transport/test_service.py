@@ -11,7 +11,7 @@ from opendata_transport.exceptions import (
 import pytest
 from voluptuous import error as vol_er
 
-from homeassistant.components.swiss_public_transport.const import (
+from smarthub.components.swiss_public_transport.const import (
     ATTR_CONFIG_ENTRY_ID,
     ATTR_LIMIT,
     CONF_DESTINATION,
@@ -21,9 +21,9 @@ from homeassistant.components.swiss_public_transport.const import (
     DOMAIN,
     SERVICE_FETCH_CONNECTIONS,
 )
-from homeassistant.components.swiss_public_transport.helper import unique_id_from_config
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.components.swiss_public_transport.helper import unique_id_from_config
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from . import setup_integration
 
@@ -48,7 +48,7 @@ MOCK_DATA_STEP_BASE = {
     ],
 )
 async def test_service_call_fetch_connections_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     data: dict,
     config_data,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_service_call_fetch_connections_success(
     )
 
     with patch(
-        "homeassistant.components.swiss_public_transport.OpendataTransport",
+        "smarthub.components.swiss_public_transport.OpendataTransport",
         return_value=AsyncMock(),
     ) as mock:
         mock().connections = json.loads(
@@ -102,19 +102,19 @@ async def test_service_call_fetch_connections_success(
         (
             1,
             MOCK_DATA_STEP_BASE,
-            pytest.raises(HomeAssistantError),
+            pytest.raises(SmartHubError),
             OpendataTransportConnectionError(),
         ),
         (
             2,
             MOCK_DATA_STEP_BASE,
-            pytest.raises(HomeAssistantError),
+            pytest.raises(SmartHubError),
             OpendataTransportError(),
         ),
     ],
 )
 async def test_service_call_fetch_connections_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     limit,
     config_data,
     expected_result,
@@ -133,7 +133,7 @@ async def test_service_call_fetch_connections_error(
     )
 
     with patch(
-        "homeassistant.components.swiss_public_transport.OpendataTransport",
+        "smarthub.components.swiss_public_transport.OpendataTransport",
         return_value=AsyncMock(),
     ) as mock:
         mock().connections = json.loads(
@@ -158,7 +158,7 @@ async def test_service_call_fetch_connections_error(
 
 
 async def test_service_call_load_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test service call with integration error."""
 
@@ -175,7 +175,7 @@ async def test_service_call_load_unload(
     bad_entry_id = "bad_entry_id"
 
     with patch(
-        "homeassistant.components.swiss_public_transport.OpendataTransport",
+        "smarthub.components.swiss_public_transport.OpendataTransport",
         return_value=AsyncMock(),
     ) as mock:
         mock().connections = json.loads(

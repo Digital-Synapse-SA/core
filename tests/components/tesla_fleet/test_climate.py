@@ -7,7 +7,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from tesla_fleet_api.exceptions import InvalidCommand, VehicleOffline
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_HVAC_MODE,
     ATTR_PRESET_MODE,
     ATTR_TARGET_TEMP_HIGH,
@@ -21,16 +21,16 @@ from homeassistant.components.climate import (
     SERVICE_TURN_ON,
     HVACMode,
 )
-from homeassistant.components.tesla_fleet.coordinator import VEHICLE_INTERVAL
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import (
-    HomeAssistantError,
+from smarthub.components.tesla_fleet.coordinator import VEHICLE_INTERVAL
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import (
+    SmartHubError,
     ServiceNotSupported,
     ServiceValidationError,
 )
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import assert_entities, setup_platform
 from .const import (
@@ -46,7 +46,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     normal_config_entry: MockConfigEntry,
@@ -58,7 +58,7 @@ async def test_climate(
 
 
 async def test_climate_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     normal_config_entry: MockConfigEntry,
@@ -130,7 +130,7 @@ async def test_climate_services(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate_overheat_protection_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     normal_config_entry: MockConfigEntry,
@@ -218,7 +218,7 @@ async def test_climate_overheat_protection_services(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -233,7 +233,7 @@ async def test_climate_alt(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_climate_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -247,7 +247,7 @@ async def test_climate_offline(
 
 
 async def test_invalid_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
 ) -> None:
     """Tests service error is handled."""
@@ -261,7 +261,7 @@ async def test_invalid_error(
             side_effect=InvalidCommand,
         ) as mock_on,
         pytest.raises(
-            HomeAssistantError,
+            SmartHubError,
             match="Command failed: The data request or command is unknown.",
         ),
     ):
@@ -276,7 +276,7 @@ async def test_invalid_error(
 
 @pytest.mark.parametrize("response", COMMAND_ERRORS)
 async def test_errors(
-    hass: HomeAssistant, response: str, normal_config_entry: MockConfigEntry
+    hass: SmartHub, response: str, normal_config_entry: MockConfigEntry
 ) -> None:
     """Tests service reason is handled."""
 
@@ -288,7 +288,7 @@ async def test_errors(
             "tesla_fleet_api.tesla.VehicleFleet.auto_conditioning_start",
             return_value=response,
         ) as mock_on,
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -300,7 +300,7 @@ async def test_errors(
 
 
 async def test_ignored_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
 ) -> None:
     """Tests ignored error is handled."""
@@ -322,7 +322,7 @@ async def test_ignored_error(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_asleep_or_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vehicle_data: AsyncMock,
     mock_wake_up: AsyncMock,
     mock_vehicle_state: AsyncMock,
@@ -348,7 +348,7 @@ async def test_asleep_or_offline(
     # Run a command but fail trying to wake up the vehicle
     mock_wake_up.side_effect = InvalidCommand
     with pytest.raises(
-        HomeAssistantError, match="The data request or command is unknown."
+        SmartHubError, match="The data request or command is unknown."
     ):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -365,8 +365,8 @@ async def test_asleep_or_offline(
     mock_wake_up.return_value = VEHICLE_ASLEEP
     mock_vehicle_state.return_value = VEHICLE_ASLEEP
     with (
-        patch("homeassistant.components.tesla_fleet.helpers.asyncio.sleep"),
-        pytest.raises(HomeAssistantError, match="Could not wake up vehicle"),
+        patch("smarthub.components.tesla_fleet.helpers.asyncio.sleep"),
+        pytest.raises(SmartHubError, match="Could not wake up vehicle"),
     ):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -391,12 +391,12 @@ async def test_asleep_or_offline(
 
 
 async def test_climate_noscope(
-    hass: HomeAssistant,
+    hass: SmartHub,
     readonly_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Tests with no command scopes."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await setup_platform(hass, readonly_config_entry, [Platform.CLIMATE])
     entity_id = "climate.test_climate"
 
@@ -433,7 +433,7 @@ async def test_climate_noscope(
     ],
 )
 async def test_climate_notemp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     normal_config_entry: MockConfigEntry,
     entity_id: str,
     high: int,

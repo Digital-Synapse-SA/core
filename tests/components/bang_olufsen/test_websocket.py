@@ -6,14 +6,14 @@ from unittest.mock import AsyncMock, Mock
 from mozart_api.models import SoftwareUpdateState
 import pytest
 
-from homeassistant.components.bang_olufsen.const import (
+from smarthub.components.bang_olufsen.const import (
     BANG_OLUFSEN_WEBSOCKET_EVENT,
     CONNECTION_STATUS,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.dispatcher import async_dispatcher_connect
 
 from .const import TEST_NAME
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -51,7 +51,7 @@ async def test_connection(
 
 
 async def test_connection_lost(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -76,7 +76,7 @@ async def test_connection_lost(
 
 
 async def test_on_software_update_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: DeviceRegistry,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -102,7 +102,7 @@ async def test_on_software_update_state(
 
 
 async def test_on_all_notifications_raw(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: DeviceRegistry,
     integration: None,

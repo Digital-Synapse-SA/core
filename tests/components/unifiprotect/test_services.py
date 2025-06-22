@@ -9,7 +9,7 @@ from uiprotect.data import Camera, Chime, Color, Light, ModelType
 from uiprotect.data.devices import CameraZone
 from uiprotect.exceptions import BadRequest
 
-from homeassistant.components.unifiprotect.const import (
+from smarthub.components.unifiprotect.const import (
     ATTR_MESSAGE,
     DOMAIN,
     KEYRINGS_KEY_TYPE,
@@ -19,25 +19,25 @@ from homeassistant.components.unifiprotect.const import (
     KEYRINGS_USER_FULL_NAME,
     KEYRINGS_USER_STATUS,
 )
-from homeassistant.components.unifiprotect.services import (
+from smarthub.components.unifiprotect.services import (
     SERVICE_ADD_DOORBELL_TEXT,
     SERVICE_GET_USER_KEYRING_INFO,
     SERVICE_REMOVE_DOORBELL_TEXT,
     SERVICE_REMOVE_PRIVACY_ZONE,
     SERVICE_SET_CHIME_PAIRED,
 )
-from homeassistant.config_entries import ConfigEntryDisabler
-from homeassistant.const import ATTR_DEVICE_ID, ATTR_ENTITY_ID, ATTR_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.config_entries import ConfigEntryDisabler
+from smarthub.const import ATTR_DEVICE_ID, ATTR_ENTITY_ID, ATTR_NAME
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .utils import MockUFPFixture, init_entry
 
 
 @pytest.fixture(name="device")
 async def device_fixture(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, ufp: MockUFPFixture
+    hass: SmartHub, device_registry: dr.DeviceRegistry, ufp: MockUFPFixture
 ):
     """Fixture with entry setup to call services with."""
 
@@ -48,7 +48,7 @@ async def device_fixture(
 
 @pytest.fixture(name="subdevice")
 async def subdevice_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     ufp: MockUFPFixture,
     light: Light,
@@ -61,7 +61,7 @@ async def subdevice_fixture(
 
 
 async def test_global_service_bad_device(
-    hass: HomeAssistant, ufp: MockUFPFixture
+    hass: SmartHub, ufp: MockUFPFixture
 ) -> None:
     """Test global service, invalid device ID."""
 
@@ -71,7 +71,7 @@ async def test_global_service_bad_device(
     )
     nvr.add_custom_doorbell_message = AsyncMock()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_ADD_DOORBELL_TEXT,
@@ -82,7 +82,7 @@ async def test_global_service_bad_device(
 
 
 async def test_global_service_exception(
-    hass: HomeAssistant, device: dr.DeviceEntry, ufp: MockUFPFixture
+    hass: SmartHub, device: dr.DeviceEntry, ufp: MockUFPFixture
 ) -> None:
     """Test global service, unexpected error."""
 
@@ -92,7 +92,7 @@ async def test_global_service_exception(
     )
     nvr.add_custom_doorbell_message = AsyncMock(side_effect=BadRequest)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_ADD_DOORBELL_TEXT,
@@ -103,7 +103,7 @@ async def test_global_service_exception(
 
 
 async def test_add_doorbell_text(
-    hass: HomeAssistant, device: dr.DeviceEntry, ufp: MockUFPFixture
+    hass: SmartHub, device: dr.DeviceEntry, ufp: MockUFPFixture
 ) -> None:
     """Test add_doorbell_text service."""
 
@@ -123,7 +123,7 @@ async def test_add_doorbell_text(
 
 
 async def test_remove_doorbell_text(
-    hass: HomeAssistant, subdevice: dr.DeviceEntry, ufp: MockUFPFixture
+    hass: SmartHub, subdevice: dr.DeviceEntry, ufp: MockUFPFixture
 ) -> None:
     """Test remove_doorbell_text service."""
 
@@ -143,7 +143,7 @@ async def test_remove_doorbell_text(
 
 
 async def test_add_doorbell_text_disabled_config_entry(
-    hass: HomeAssistant, device: dr.DeviceEntry, ufp: MockUFPFixture
+    hass: SmartHub, device: dr.DeviceEntry, ufp: MockUFPFixture
 ) -> None:
     """Test add_doorbell_text service."""
     nvr = ufp.api.bootstrap.nvr
@@ -157,7 +157,7 @@ async def test_add_doorbell_text_disabled_config_entry(
     )
     await hass.async_block_till_done()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_ADD_DOORBELL_TEXT,
@@ -168,7 +168,7 @@ async def test_add_doorbell_text_disabled_config_entry(
 
 
 async def test_set_chime_paired_doorbells(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     chime: Chime,
@@ -210,7 +210,7 @@ async def test_set_chime_paired_doorbells(
 
 
 async def test_remove_privacy_zone_no_zone(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -224,7 +224,7 @@ async def test_remove_privacy_zone_no_zone(
 
     camera_entry = entity_registry.async_get("binary_sensor.test_camera_doorbell")
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_REMOVE_PRIVACY_ZONE,
@@ -235,7 +235,7 @@ async def test_remove_privacy_zone_no_zone(
 
 
 async def test_remove_privacy_zone(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -263,7 +263,7 @@ async def test_remove_privacy_zone(
 
 @pytest.mark.asyncio
 async def get_user_keyring_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -318,7 +318,7 @@ async def get_user_keyring_info(
 
 
 async def test_get_user_keyring_info_no_users(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -333,7 +333,7 @@ async def test_get_user_keyring_info_no_users(
     camera_entry = entity_registry.async_get("binary_sensor.test_camera_doorbell")
 
     with pytest.raises(
-        HomeAssistantError, match="No users found, please check Protect permissions."
+        SmartHubError, match="No users found, please check Protect permissions."
     ):
         await hass.services.async_call(
             DOMAIN,

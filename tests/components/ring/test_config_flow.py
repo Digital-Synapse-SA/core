@@ -5,13 +5,13 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 import ring_doorbell
 
-from homeassistant import config_entries
-from homeassistant.components.ring import DOMAIN
-from homeassistant.const import CONF_DEVICE_ID, CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.ring import DOMAIN
+from smarthub.const import CONF_DEVICE_ID, CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .conftest import MOCK_HARDWARE_ID
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_ring_client: Mock,
 ) -> None:
@@ -34,15 +34,15 @@ async def test_form(
     with patch("uuid.uuid4", return_value=MOCK_HARDWARE_ID):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
-            {"username": "hello@home-assistant.io", "password": "test-password"},
+            {"username": "hello@smart-hub.io", "password": "test-password"},
         )
         await hass.async_block_till_done()
 
     assert result2["type"] is FlowResultType.CREATE_ENTRY
-    assert result2["title"] == "hello@home-assistant.io"
+    assert result2["title"] == "hello@smart-hub.io"
     assert result2["data"] == {
         CONF_DEVICE_ID: MOCK_HARDWARE_ID,
-        CONF_USERNAME: "hello@home-assistant.io",
+        CONF_USERNAME: "hello@smart-hub.io",
         CONF_TOKEN: {"access_token": "mock-token"},
     }
     assert len(mock_setup_entry.mock_calls) == 1
@@ -57,7 +57,7 @@ async def test_form(
     ids=["invalid-auth", "unknown-error"],
 )
 async def test_form_error(
-    hass: HomeAssistant, mock_ring_auth: Mock, error_type, errors_msg
+    hass: SmartHub, mock_ring_auth: Mock, error_type, errors_msg
 ) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
@@ -66,7 +66,7 @@ async def test_form_error(
     mock_ring_auth.async_fetch_token.side_effect = error_type
     result2 = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {"username": "hello@home-assistant.io", "password": "test-password"},
+        {"username": "hello@smart-hub.io", "password": "test-password"},
     )
 
     assert result2["type"] is FlowResultType.FORM
@@ -74,7 +74,7 @@ async def test_form_error(
 
 
 async def test_form_2fa(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_ring_auth: Mock,
 ) -> None:
@@ -122,7 +122,7 @@ async def test_form_2fa(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_ring_auth: Mock,
@@ -178,7 +178,7 @@ async def test_reauth(
     ids=["invalid-auth", "unknown-error"],
 )
 async def test_reauth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_ring_auth: Mock,
@@ -233,7 +233,7 @@ async def test_reauth_error(
 
 
 async def test_account_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_added_config_entry: Mock,
 ) -> None:
@@ -255,7 +255,7 @@ async def test_account_configured(
 
 
 async def test_dhcp_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_ring_client: Mock,
     device_registry: dr.DeviceRegistry,
@@ -264,7 +264,7 @@ async def test_dhcp_discovery(
     mac_address = "1234567890abcd"
     hostname = "Ring-90abcd"
     ip_address = "127.0.0.1"
-    username = "hello@home-assistant.io"
+    username = "hello@smart-hub.io"
 
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -280,7 +280,7 @@ async def test_dhcp_discovery(
             {"username": username, "password": "test-password"},
         )
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["title"] == "hello@home-assistant.io"
+    assert result["title"] == "hello@smart-hub.io"
     assert result["data"] == {
         CONF_DEVICE_ID: MOCK_HARDWARE_ID,
         CONF_USERNAME: username,
@@ -307,7 +307,7 @@ async def test_dhcp_discovery(
 
 
 async def test_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_ring_client: Mock,
     mock_added_config_entry: MockConfigEntry,
@@ -342,7 +342,7 @@ async def test_reconfigure(
     ids=["invalid-auth", "unknown-error"],
 )
 async def test_reconfigure_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_added_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_ring_auth: Mock,

@@ -2,8 +2,8 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.nuheat.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.nuheat.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .mocks import MOCK_CONFIG_ENTRY, _get_mock_nuheat
 
@@ -15,12 +15,12 @@ VALID_CONFIG = {
 INVALID_CONFIG = {"nuheat": {"username": "warm", "password": "feet"}}
 
 
-async def test_init_success(hass: HomeAssistant) -> None:
+async def test_init_success(hass: SmartHub) -> None:
     """Test that we can setup with valid config."""
     mock_nuheat = _get_mock_nuheat()
 
     with patch(
-        "homeassistant.components.nuheat.nuheat.NuHeat",
+        "smarthub.components.nuheat.nuheat.NuHeat",
         return_value=mock_nuheat,
     ):
         config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG_ENTRY)

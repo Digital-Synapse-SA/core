@@ -1,8 +1,8 @@
 """Tests for the diagnostics data provided by the Nut integration."""
 
-from homeassistant.components.diagnostics import async_redact_data
-from homeassistant.components.nut.diagnostics import TO_REDACT
-from homeassistant.core import HomeAssistant
+from smarthub.components.diagnostics import async_redact_data
+from smarthub.components.nut.diagnostics import TO_REDACT
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
@@ -11,7 +11,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test diagnostics."""

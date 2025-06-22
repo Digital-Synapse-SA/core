@@ -2,8 +2,8 @@
 
 from pyblu.errors import PlayerUnreachableError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .conftest import PlayerMocks
 
@@ -11,7 +11,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_setup_entry(
-    hass: HomeAssistant, setup_config_entry: None, config_entry: MockConfigEntry
+    hass: SmartHub, setup_config_entry: None, config_entry: MockConfigEntry
 ) -> None:
     """Test a successful setup entry."""
     assert hass.states.get("media_player.player_name1111").state == "playing"
@@ -25,7 +25,7 @@ async def test_setup_entry(
 
 
 async def test_unload_entry_while_player_is_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     config_entry: MockConfigEntry,
     player_mocks: PlayerMocks,

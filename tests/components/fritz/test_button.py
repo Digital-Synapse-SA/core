@@ -7,13 +7,13 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.fritz.const import DOMAIN, MeshRoles
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.fritz.const import DOMAIN, MeshRoles
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util.dt import utcnow
 
 from .const import (
     MOCK_HOST_ATTRIBUTES_DATA,
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_button_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     fc_class_mock,
     fh_class_mock,
@@ -38,7 +38,7 @@ async def test_button_setup(
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
     entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.fritz.PLATFORMS", [Platform.BUTTON]):
+    with patch("smarthub.components.fritz.PLATFORMS", [Platform.BUTTON]):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
@@ -55,7 +55,7 @@ async def test_button_setup(
     ],
 )
 async def test_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     wrapper_method: str,
     fc_class_mock,
@@ -73,7 +73,7 @@ async def test_buttons(
     assert button
     assert button.state == STATE_UNKNOWN
     with patch(
-        f"homeassistant.components.fritz.coordinator.AvmWrapper.{wrapper_method}"
+        f"smarthub.components.fritz.coordinator.AvmWrapper.{wrapper_method}"
     ) as mock_press_action:
         await hass.services.async_call(
             BUTTON_DOMAIN,
@@ -89,7 +89,7 @@ async def test_buttons(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_wol_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
     fh_class_mock,
 ) -> None:
@@ -106,7 +106,7 @@ async def test_wol_button(
     assert button
     assert button.state == STATE_UNKNOWN
     with patch(
-        "homeassistant.components.fritz.coordinator.AvmWrapper.async_wake_on_lan"
+        "smarthub.components.fritz.coordinator.AvmWrapper.async_wake_on_lan"
     ) as mock_press_action:
         await hass.services.async_call(
             BUTTON_DOMAIN,
@@ -122,7 +122,7 @@ async def test_wol_button(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_wol_button_new_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
     fh_class_mock,
 ) -> None:
@@ -150,7 +150,7 @@ async def test_wol_button_new_device(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_wol_button_absent_for_mesh_slave(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
     fh_class_mock,
 ) -> None:
@@ -172,7 +172,7 @@ async def test_wol_button_absent_for_mesh_slave(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_wol_button_absent_for_non_lan_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
     fh_class_mock,
 ) -> None:
@@ -197,7 +197,7 @@ async def test_wol_button_absent_for_non_lan_device(
 
 
 async def test_cleanup_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     fc_class_mock,

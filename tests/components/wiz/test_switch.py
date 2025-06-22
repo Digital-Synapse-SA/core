@@ -2,8 +2,8 @@
 
 import datetime
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -11,9 +11,9 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import FAKE_MAC, FAKE_SOCKET, async_push_update, async_setup_integration
 
@@ -21,7 +21,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_switch_operation(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test switch operation."""
     switch, _ = await async_setup_integration(hass, bulb_type=FAKE_SOCKET)
@@ -47,7 +47,7 @@ async def test_switch_operation(
 
 
 async def test_update_fails(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test switch update fails when push updates are not working."""
     switch, _ = await async_setup_integration(hass, bulb_type=FAKE_SOCKET)

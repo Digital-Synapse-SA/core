@@ -7,8 +7,8 @@ from pydeconz.models.sensor.ancillary_control import (
 from pydeconz.models.sensor.presence import PresenceStatePresenceEvent
 import pytest
 
-from homeassistant.components.deconz.const import DOMAIN
-from homeassistant.components.deconz.deconz_event import (
+from smarthub.components.deconz.const import DOMAIN
+from smarthub.components.deconz.deconz_event import (
     ATTR_DURATION,
     ATTR_ROTATION,
     CONF_DECONZ_ALARM_EVENT,
@@ -17,9 +17,9 @@ from homeassistant.components.deconz.deconz_event import (
     CONF_DECONZ_RELATIVE_ROTARY_EVENT,
     RELATIVE_ROTARY_DECONZ_TO_EVENT,
 )
-from homeassistant.const import CONF_DEVICE_ID, CONF_EVENT, CONF_ID, CONF_UNIQUE_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.const import CONF_DEVICE_ID, CONF_EVENT, CONF_ID, CONF_UNIQUE_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import WebsocketDataType
 
@@ -69,7 +69,7 @@ from tests.common import MockConfigEntry, async_capture_events
     ],
 )
 async def test_deconz_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry_setup: MockConfigEntry,
     sensor_ws_data: WebsocketDataType,
@@ -226,7 +226,7 @@ async def test_deconz_events(
     ],
 )
 async def test_deconz_alarm_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry_setup: MockConfigEntry,
     sensor_ws_data: WebsocketDataType,
@@ -349,7 +349,7 @@ async def test_deconz_alarm_events(
     ],
 )
 async def test_deconz_presence_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry_setup: MockConfigEntry,
     sensor_ws_data: WebsocketDataType,
@@ -426,7 +426,7 @@ async def test_deconz_presence_events(
     ],
 )
 async def test_deconz_relative_rotary_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry_setup: MockConfigEntry,
     sensor_ws_data: WebsocketDataType,
@@ -496,7 +496,7 @@ async def test_deconz_relative_rotary_events(
     ],
 )
 async def test_deconz_events_bad_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry_setup: MockConfigEntry,
 ) -> None:

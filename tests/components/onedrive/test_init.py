@@ -15,14 +15,14 @@ from onedrive_personal_sdk.models.items import AppRoot, Drive, File, Folder, Ite
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.onedrive.const import (
+from smarthub.components.onedrive.const import (
     CONF_FOLDER_ID,
     CONF_FOLDER_NAME,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, issue_registry as ir
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, issue_registry as ir
 
 from . import setup_integration
 from .const import BACKUP_METADATA, INSTANCE_ID
@@ -31,7 +31,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client_init: MagicMock,
     mock_onedrive_client: MagicMock,
@@ -63,7 +63,7 @@ async def test_load_unload_config_entry(
     ],
 )
 async def test_approot_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
     side_effect: Exception,
@@ -76,7 +76,7 @@ async def test_approot_errors(
 
 
 async def test_get_integration_folder_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
     caplog: pytest.LogCaptureFixture,
@@ -89,7 +89,7 @@ async def test_get_integration_folder_error(
 
 
 async def test_get_integration_folder_creation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
     mock_approot: AppRoot,
@@ -111,7 +111,7 @@ async def test_get_integration_folder_creation(
 
 
 async def test_get_integration_folder_creation_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
     caplog: pytest.LogCaptureFixture,
@@ -126,7 +126,7 @@ async def test_get_integration_folder_creation_error(
 
 
 async def test_update_instance_id_description(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
     mock_folder: Folder,
@@ -142,7 +142,7 @@ async def test_update_instance_id_description(
 
 
 async def test_migrate_metadata_files(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
     mock_backup_file: File,
@@ -160,7 +160,7 @@ async def test_migrate_metadata_files(
 
 
 async def test_migrate_metadata_files_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
 ) -> None:
@@ -172,7 +172,7 @@ async def test_migrate_metadata_files_errors(
 
 
 async def test_auth_error_during_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
 ) -> None:
@@ -184,7 +184,7 @@ async def test_auth_error_during_update(
 
 
 async def test_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,
@@ -215,7 +215,7 @@ async def test_device(
     ],
 )
 async def test_data_cap_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
     mock_drive: Drive,
@@ -235,7 +235,7 @@ async def test_data_cap_issues(
 
 
 async def test_1_1_to_1_2_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_folder: Folder,
 ) -> None:
@@ -257,7 +257,7 @@ async def test_1_1_to_1_2_migration(
 
 
 async def test_1_1_to_1_2_migration_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_onedrive_client: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -281,7 +281,7 @@ async def test_1_1_to_1_2_migration_failure(
 
 
 async def test_migration_guard_against_major_downgrade(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test migration guards against major downgrades."""

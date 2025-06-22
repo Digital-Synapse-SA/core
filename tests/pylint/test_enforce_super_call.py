@@ -120,7 +120,7 @@ def test_enforce_super_call(
     code: str,
 ) -> None:
     """Good test cases."""
-    root_node = astroid.parse(code, "homeassistant.components.pylint_test")
+    root_node = astroid.parse(code, "smarthub.components.pylint_test")
     walker = ASTWalker(linter)
     walker.add_checker(super_call_checker)
 
@@ -204,7 +204,7 @@ def test_enforce_super_call_bad(
     node_idx: int,
 ) -> None:
     """Bad test cases."""
-    root_node = astroid.parse(code, "homeassistant.components.pylint_test")
+    root_node = astroid.parse(code, "smarthub.components.pylint_test")
     walker = ASTWalker(linter)
     walker.add_checker(super_call_checker)
     node = root_node.body[node_idx].body[0]

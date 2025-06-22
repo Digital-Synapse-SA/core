@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pypaperless.models import RemoteVersion, Statistic, Status
 import pytest
 
-from homeassistant.components.paperless_ngx.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.paperless_ngx.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .const import USER_INPUT_ONE
@@ -54,15 +54,15 @@ def mock_paperless(
     """Mock the pypaperless.Paperless client."""
     with (
         patch(
-            "homeassistant.components.paperless_ngx.coordinator.Paperless",
+            "smarthub.components.paperless_ngx.coordinator.Paperless",
             autospec=True,
         ) as paperless_mock,
         patch(
-            "homeassistant.components.paperless_ngx.config_flow.Paperless",
+            "smarthub.components.paperless_ngx.config_flow.Paperless",
             new=paperless_mock,
         ),
         patch(
-            "homeassistant.components.paperless_ngx.Paperless",
+            "smarthub.components.paperless_ngx.Paperless",
             new=paperless_mock,
         ),
     ):
@@ -103,7 +103,7 @@ def mock_config_entry() -> MockConfigEntry:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_paperless: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_paperless: MagicMock
 ) -> MockConfigEntry:
     """Set up the Paperless-ngx integration for testing."""
     await setup_integration(hass, mock_config_entry)

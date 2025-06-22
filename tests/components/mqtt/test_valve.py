@@ -5,18 +5,18 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import mqtt, valve
-from homeassistant.components.mqtt.valve import (
+from smarthub.components import mqtt, valve
+from smarthub.components.mqtt.valve import (
     MQTT_VALVE_ATTRIBUTES_BLOCKED,
     ValveEntityFeature,
 )
-from homeassistant.components.valve import (
+from smarthub.components.valve import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
     SERVICE_SET_VALVE_POSITION,
     ValveState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ASSUMED_STATE,
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
@@ -25,7 +25,7 @@ from homeassistant.const import (
     SERVICE_STOP_VALVE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import (
     help_custom_config,
@@ -111,7 +111,7 @@ DEFAULT_CONFIG_REPORTS_POSITION = {
     ],
 )
 async def test_state_via_state_topic_no_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     message: str,
     asserted_state: str,
@@ -159,7 +159,7 @@ async def test_state_via_state_topic_no_position(
     ],
 )
 async def test_state_via_state_topic_with_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     message: str,
     asserted_state: str,
@@ -205,7 +205,7 @@ async def test_state_via_state_topic_with_template(
     ],
 )
 async def test_state_via_state_topic_with_position_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     message: str,
     asserted_state: str,
@@ -262,7 +262,7 @@ async def test_state_via_state_topic_with_position_template(
     ],
 )
 async def test_state_via_state_topic_through_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     message: str,
     asserted_state: str,
@@ -303,7 +303,7 @@ async def test_state_via_state_topic_through_position(
     ],
 )
 async def test_opening_closing_state_is_reset(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the controlling state via topic through position.
 
@@ -372,7 +372,7 @@ async def test_opening_closing_state_is_reset(
     ],
 )
 async def test_invalid_state_updates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
     message: str,
@@ -429,7 +429,7 @@ async def test_invalid_state_updates(
     ],
 )
 async def test_state_via_state_trough_position_with_alt_range(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     message: str,
     asserted_state: str,
@@ -480,7 +480,7 @@ async def test_state_via_state_trough_position_with_alt_range(
     ],
 )
 async def test_controlling_valve_by_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     service: str,
     asserted_message: str,
@@ -556,7 +556,7 @@ async def test_controlling_valve_by_state(
     ],
 )
 async def test_supported_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     supported_features: ValveEntityFeature,
 ) -> None:
@@ -586,7 +586,7 @@ async def test_supported_features(
     ],
 )
 async def test_open_close_payload_config_not_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -634,7 +634,7 @@ async def test_open_close_payload_config_not_allowed(
     ],
 )
 async def test_controlling_valve_by_state_optimistic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     service: str,
     asserted_message: str,
@@ -686,7 +686,7 @@ async def test_controlling_valve_by_state_optimistic(
     ],
 )
 async def test_controlling_valve_by_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     service: str,
     asserted_message: str,
@@ -733,7 +733,7 @@ async def test_controlling_valve_by_position(
     [(0, "0"), (30, "30"), (100, "100")],
 )
 async def test_controlling_valve_by_set_valve_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     position: int,
     asserted_message: str,
@@ -785,7 +785,7 @@ async def test_controlling_valve_by_set_valve_position(
     ],
 )
 async def test_controlling_valve_optimistic_by_set_valve_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     position: int,
     asserted_message: str,
@@ -837,7 +837,7 @@ async def test_controlling_valve_optimistic_by_set_valve_position(
     [(0, "-128"), (30, "-52"), (80, "76"), (100, "127")],
 )
 async def test_controlling_valve_with_alt_range_by_set_valve_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     position: int,
     asserted_message: str,
@@ -888,7 +888,7 @@ async def test_controlling_valve_with_alt_range_by_set_valve_position(
     ],
 )
 async def test_controlling_valve_with_alt_range_by_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     service: str,
     asserted_message: str,
@@ -949,7 +949,7 @@ async def test_controlling_valve_with_alt_range_by_position(
     ],
 )
 async def test_controlling_valve_by_position_optimistic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     service: str,
     asserted_message: str,
@@ -1008,7 +1008,7 @@ async def test_controlling_valve_by_position_optimistic(
     ],
 )
 async def test_controlling_valve_optimistic_alt_range_by_set_valve_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     position: int,
     asserted_message: str,
@@ -1039,7 +1039,7 @@ async def test_controlling_valve_optimistic_alt_range_by_set_valve_position(
 
 @pytest.mark.parametrize("hass_config", [DEFAULT_CONFIG])
 async def test_availability_when_connection_lost(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability after MQTT disconnection."""
     await help_test_availability_when_connection_lost(
@@ -1049,7 +1049,7 @@ async def test_availability_when_connection_lost(
 
 @pytest.mark.parametrize("hass_config", [DEFAULT_CONFIG])
 async def test_availability_without_topic(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability without defined availability topic."""
     await help_test_availability_without_topic(
@@ -1058,7 +1058,7 @@ async def test_availability_without_topic(
 
 
 async def test_default_availability_payload(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability by default payload with defined topic."""
     await help_test_default_availability_payload(
@@ -1067,7 +1067,7 @@ async def test_default_availability_payload(
 
 
 async def test_custom_availability_payload(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test availability by custom payload with defined topic."""
     await help_test_custom_availability_payload(
@@ -1090,7 +1090,7 @@ async def test_custom_availability_payload(
     ],
 )
 async def test_valid_device_class(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of a valid device class."""
     await mqtt_mock_entry()
@@ -1122,7 +1122,7 @@ async def test_invalid_device_class(
 
 
 async def test_setting_attribute_via_mqtt_json_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_attribute_via_mqtt_json_message(
@@ -1131,7 +1131,7 @@ async def test_setting_attribute_via_mqtt_json_message(
 
 
 async def test_setting_blocked_attribute_via_mqtt_json_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_blocked_attribute_via_mqtt_json_message(
@@ -1144,7 +1144,7 @@ async def test_setting_blocked_attribute_via_mqtt_json_message(
 
 
 async def test_setting_attribute_with_template(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test the setting of attribute via MQTT with JSON payload."""
     await help_test_setting_attribute_with_template(
@@ -1153,7 +1153,7 @@ async def test_setting_attribute_with_template(
 
 
 async def test_update_with_json_attrs_not_dict(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -1164,7 +1164,7 @@ async def test_update_with_json_attrs_not_dict(
 
 
 async def test_update_with_json_attrs_bad_json(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -1175,7 +1175,7 @@ async def test_update_with_json_attrs_bad_json(
 
 
 async def test_discovery_update_attr(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered MQTTAttributes."""
     await help_test_discovery_update_attr(
@@ -1205,14 +1205,14 @@ async def test_discovery_update_attr(
     ],
 )
 async def test_unique_id(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test unique_id option only creates one valve per id."""
     await help_test_unique_id(hass, mqtt_mock_entry, valve.DOMAIN)
 
 
 async def test_discovery_removal_valve(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test removal of discovered valve."""
     data = '{ "name": "test", "command_topic": "test_topic" }'
@@ -1220,7 +1220,7 @@ async def test_discovery_removal_valve(
 
 
 async def test_discovery_update_valve(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered valve."""
     config1 = {"name": "Beer", "command_topic": "test_topic"}
@@ -1231,12 +1231,12 @@ async def test_discovery_update_valve(
 
 
 async def test_discovery_update_unchanged_valve(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test update of discovered valve."""
     data1 = '{ "name": "Beer", "command_topic": "test_topic" }'
     with patch(
-        "homeassistant.components.mqtt.valve.MqttValve.discovery_update"
+        "smarthub.components.mqtt.valve.MqttValve.discovery_update"
     ) as discovery_update:
         await help_test_discovery_update_unchanged(
             hass, mqtt_mock_entry, valve.DOMAIN, data1, discovery_update
@@ -1245,7 +1245,7 @@ async def test_discovery_update_unchanged_valve(
 
 @pytest.mark.no_fail_on_log_exception
 async def test_discovery_broken(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test handling of bad discovery message."""
     data1 = '{ "name": "Beer", "command_topic": "test_topic#" }'
@@ -1254,7 +1254,7 @@ async def test_discovery_broken(
 
 
 async def test_entity_device_info_with_connection(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT valve device registry integration."""
     await help_test_entity_device_info_with_connection(
@@ -1263,7 +1263,7 @@ async def test_entity_device_info_with_connection(
 
 
 async def test_entity_device_info_with_identifier(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT valve device registry integration."""
     await help_test_entity_device_info_with_identifier(
@@ -1272,7 +1272,7 @@ async def test_entity_device_info_with_identifier(
 
 
 async def test_entity_device_info_update(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test device registry update."""
     await help_test_entity_device_info_update(
@@ -1281,7 +1281,7 @@ async def test_entity_device_info_update(
 
 
 async def test_entity_device_info_remove(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test device registry remove."""
     await help_test_entity_device_info_remove(
@@ -1290,7 +1290,7 @@ async def test_entity_device_info_remove(
 
 
 async def test_entity_id_update_subscriptions(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT subscriptions are managed when entity_id is updated."""
     await help_test_entity_id_update_subscriptions(
@@ -1299,7 +1299,7 @@ async def test_entity_id_update_subscriptions(
 
 
 async def test_entity_id_update_discovery_update(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT discovery update when entity_id is updated."""
     await help_test_entity_id_update_discovery_update(
@@ -1308,7 +1308,7 @@ async def test_entity_id_update_discovery_update(
 
 
 async def test_entity_debug_info_message(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test MQTT debug info."""
     await help_test_entity_debug_info_message(
@@ -1334,7 +1334,7 @@ async def test_entity_debug_info_message(
     ],
 )
 async def test_publishing_with_custom_encoding(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
     service: str,
@@ -1362,7 +1362,7 @@ async def test_publishing_with_custom_encoding(
 
 
 async def test_reloadable(
-    hass: HomeAssistant, mqtt_client_mock: MqttMockPahoClient
+    hass: SmartHub, mqtt_client_mock: MqttMockPahoClient
 ) -> None:
     """Test reloading the MQTT platform."""
     domain = valve.DOMAIN
@@ -1378,7 +1378,7 @@ async def test_reloadable(
     ],
 )
 async def test_encoding_subscribable_topics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     topic: str,
     value: str,
@@ -1405,7 +1405,7 @@ async def test_encoding_subscribable_topics(
     ids=["platform_key", "listed"],
 )
 async def test_setup_manual_entity_from_yaml(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test setup manual configured MQTT entity."""
     await mqtt_mock_entry()
@@ -1414,7 +1414,7 @@ async def test_setup_manual_entity_from_yaml(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, mqtt_mock_entry: MqttMockHAClientGenerator
+    hass: SmartHub, mqtt_mock_entry: MqttMockHAClientGenerator
 ) -> None:
     """Test unloading the config entry."""
     domain = valve.DOMAIN
@@ -1449,7 +1449,7 @@ async def test_unload_entry(
     ],
 )
 async def test_skipped_async_ha_write_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     topic: str,
     payload1: str,
@@ -1476,7 +1476,7 @@ async def test_skipped_async_ha_write_state(
     ],
 )
 async def test_value_template_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

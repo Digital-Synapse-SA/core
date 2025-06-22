@@ -8,10 +8,10 @@ from matter_server.client.models.node import MatterNode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import CoverEntityFeature, CoverState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.cover import CoverEntityFeature, CoverState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -22,7 +22,7 @@ from .common import (
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_covers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -41,7 +41,7 @@ async def test_covers(
     ],
 )
 async def test_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -109,7 +109,7 @@ async def test_cover(
     ],
 )
 async def test_cover_lift(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -155,7 +155,7 @@ async def test_cover_lift(
     ],
 )
 async def test_cover_lift_only(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -192,7 +192,7 @@ async def test_cover_lift_only(
     ],
 )
 async def test_cover_position_aware_lift(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -238,7 +238,7 @@ async def test_cover_position_aware_lift(
     ],
 )
 async def test_cover_tilt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -286,7 +286,7 @@ async def test_cover_tilt(
     ],
 )
 async def test_cover_tilt_only(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -321,7 +321,7 @@ async def test_cover_tilt_only(
     ],
 )
 async def test_cover_position_aware_tilt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -352,7 +352,7 @@ async def test_cover_position_aware_tilt(
 
 @pytest.mark.parametrize("node_fixture", ["window_covering_full"])
 async def test_cover_full_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

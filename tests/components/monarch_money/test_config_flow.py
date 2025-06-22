@@ -4,15 +4,15 @@ from unittest.mock import AsyncMock
 
 from monarchmoney import LoginFailedException, RequireMFAException
 
-from homeassistant.components.monarch_money.const import CONF_MFA_CODE, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.monarch_money.const import CONF_MFA_CODE, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def test_form_simple(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_config_api: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_config_api: AsyncMock
 ) -> None:
     """Test simple case (no MFA / no errors)."""
     result = await hass.config_entries.flow.async_init(
@@ -39,7 +39,7 @@ async def test_form_simple(
 
 
 async def test_add_duplicate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry,
     mock_setup_entry: AsyncMock,
     mock_config_api: AsyncMock,
@@ -66,7 +66,7 @@ async def test_add_duplicate_entry(
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_config_api: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_config_api: AsyncMock
 ) -> None:
     """Test config flow with a login error."""
     result = await hass.config_entries.flow.async_init(
@@ -110,7 +110,7 @@ async def test_form_invalid_auth(
 
 
 async def test_form_mfa(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_config_api: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_config_api: AsyncMock
 ) -> None:
     """Test MFA enabled on account configuration."""
     result = await hass.config_entries.flow.async_init(

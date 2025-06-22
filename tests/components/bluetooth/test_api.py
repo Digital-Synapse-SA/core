@@ -5,15 +5,15 @@ import time
 from bleak.backends.scanner import AdvertisementData, BLEDevice
 import pytest
 
-from homeassistant.components import bluetooth
-from homeassistant.components.bluetooth import (
+from smarthub.components import bluetooth
+from smarthub.components.bluetooth import (
     MONOTONIC_TIME,
     BaseHaRemoteScanner,
     HaBluetoothConnector,
     async_scanner_by_source,
     async_scanner_devices_by_address,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import (
     FakeScanner,
@@ -25,7 +25,7 @@ from . import (
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_scanner_by_source(hass: HomeAssistant) -> None:
+async def test_scanner_by_source(hass: SmartHub) -> None:
     """Test we can get a scanner by source."""
 
     hci2_scanner = FakeScanner("hci2", "hci2")
@@ -42,7 +42,7 @@ async def test_monotonic_time() -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_async_get_advertisement_callback(hass: HomeAssistant) -> None:
+async def test_async_get_advertisement_callback(hass: SmartHub) -> None:
     """Test getting advertisement callback."""
     callback = bluetooth.async_get_advertisement_callback(hass)
     assert callback is not None
@@ -50,7 +50,7 @@ async def test_async_get_advertisement_callback(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_async_scanner_devices_by_address_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test getting scanner devices by address with connectable devices."""
     manager = _get_manager()
@@ -108,7 +108,7 @@ async def test_async_scanner_devices_by_address_connectable(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_async_scanner_devices_by_address_non_connectable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test getting scanner devices by address with non-connectable devices."""
     manager = _get_manager()

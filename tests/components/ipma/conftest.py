@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.ipma.const import DOMAIN
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.ipma.const import DOMAIN
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
+from smarthub.core import SmartHub
 
 from . import MockLocation
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-def config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def config_entry(hass: SmartHub) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -30,7 +30,7 @@ def config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> MockConfigEntry:
     """Set up the IPMA integration for testing."""
     config_entry.add_to_hass(hass)

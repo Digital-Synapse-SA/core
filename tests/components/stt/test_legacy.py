@@ -6,16 +6,16 @@ from pathlib import Path
 
 import pytest
 
-from homeassistant.components.stt import Provider
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.discovery import async_load_platform
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub.components.stt import Provider
+from smarthub.core import SmartHub
+from smarthub.helpers.discovery import async_load_platform
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
 
 from .common import mock_stt_platform
 
 
 async def test_invalid_platform(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, tmp_path: Path
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, tmp_path: Path
 ) -> None:
     """Test platform setup with an invalid platform."""
     await async_load_platform(
@@ -31,12 +31,12 @@ async def test_invalid_platform(
 
 
 async def test_platform_setup_with_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, tmp_path: Path
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, tmp_path: Path
 ) -> None:
     """Test platform setup with an error during setup."""
 
     async def async_get_engine(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         discovery_info: DiscoveryInfoType | None = None,
     ) -> Provider:

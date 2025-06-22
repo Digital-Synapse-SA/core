@@ -2,9 +2,9 @@
 
 import requests_mock
 
-from homeassistant.components import youless
-from homeassistant.const import CONF_DEVICE, CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components import youless
+from smarthub.const import CONF_DEVICE, CONF_HOST
+from smarthub.core import SmartHub
 
 from tests.common import (
     MockConfigEntry,
@@ -13,7 +13,7 @@ from tests.common import (
 )
 
 
-async def init_component(hass: HomeAssistant) -> MockConfigEntry:
+async def init_component(hass: SmartHub) -> MockConfigEntry:
     """Check if the setup of the integration succeeds."""
     with requests_mock.Mocker() as mock:
         mock.get(

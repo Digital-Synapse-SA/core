@@ -6,16 +6,16 @@ import pytest
 from python_overseerr import OverseerrConnectionError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.overseerr.const import (
+from smarthub.components.overseerr.const import (
     ATTR_CONFIG_ENTRY_ID,
     ATTR_REQUESTED_BY,
     ATTR_SORT_ORDER,
     ATTR_STATUS,
     DOMAIN,
 )
-from homeassistant.components.overseerr.services import SERVICE_GET_REQUESTS
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.components.overseerr.services import SERVICE_GET_REQUESTS
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from . import setup_integration
 
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_service_get_requests(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -53,7 +53,7 @@ async def test_service_get_requests(
 
 
 async def test_service_get_requests_no_meta(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -83,13 +83,13 @@ async def test_service_get_requests_no_meta(
             {},
             "get_requests",
             OverseerrConnectionError("Timeout"),
-            HomeAssistantError,
+            SmartHubError,
             "Error connecting to the Overseerr instance: Timeout",
         )
     ],
 )
 async def test_services_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     service: str,
@@ -122,7 +122,7 @@ async def test_services_connection_error(
     ],
 )
 async def test_service_entry_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     service: str,

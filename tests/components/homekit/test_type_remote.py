@@ -4,35 +4,35 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.homekit.accessories import HomeDriver
-from homeassistant.components.homekit.const import (
+from smarthub.components.homekit.accessories import HomeDriver
+from smarthub.components.homekit.const import (
     ATTR_KEY_NAME,
     ATTR_VALUE,
     EVENT_HOMEKIT_TV_REMOTE_KEY_PRESSED,
     KEY_ARROW_RIGHT,
 )
-from homeassistant.components.homekit.type_remotes import ActivityRemote
-from homeassistant.components.remote import (
+from smarthub.components.homekit.type_remotes import ActivityRemote
+from smarthub.components.remote import (
     ATTR_ACTIVITY,
     ATTR_ACTIVITY_LIST,
     ATTR_CURRENT_ACTIVITY,
     DOMAIN as REMOTE_DOMAIN,
     RemoteEntityFeature,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     STATE_OFF,
     STATE_ON,
     STATE_STANDBY,
 )
-from homeassistant.core import Event, HomeAssistant
+from smarthub.core import Event, SmartHub
 
 from tests.common import async_mock_service
 
 
 async def test_activity_remote(
-    hass: HomeAssistant, hk_driver: HomeDriver, events: list[Event]
+    hass: SmartHub, hk_driver: HomeDriver, events: list[Event]
 ) -> None:
     """Test if remote accessory and HA are updated accordingly."""
     entity_id = "remote.harmony"
@@ -156,7 +156,7 @@ async def test_activity_remote(
 
 
 async def test_activity_remote_bad_names(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     events: list[Event],
     caplog: pytest.LogCaptureFixture,

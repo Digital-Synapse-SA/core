@@ -5,24 +5,24 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.smartthings import OLD_DATA
-from homeassistant.components.smartthings.const import (
+from smarthub.components.smartthings import OLD_DATA
+from smarthub.components.smartthings.const import (
     CONF_INSTALLED_APP_ID,
     CONF_LOCATION_ID,
     CONF_REFRESH_TOKEN,
     CONF_SUBSCRIPTION_ID,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import (
     CONF_ACCESS_TOKEN,
     CONF_CLIENT_ID,
     CONF_CLIENT_SECRET,
     CONF_TOKEN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -30,14 +30,14 @@ from tests.typing import ClientSessionGenerator
 
 
 @pytest.fixture
-def use_cloud(hass: HomeAssistant) -> None:
+def use_cloud(hass: SmartHub) -> None:
     """Set up the cloud component."""
     hass.config.components.add("cloud")
 
 
 @pytest.mark.usefixtures("current_request_with_host", "use_cloud")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,
@@ -109,7 +109,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host", "use_cloud")
 async def test_not_enough_scopes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,
@@ -170,7 +170,7 @@ async def test_not_enough_scopes(
 
 @pytest.mark.usefixtures("current_request_with_host", "use_cloud")
 async def test_duplicate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,
@@ -232,7 +232,7 @@ async def test_duplicate_entry(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_no_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,
@@ -249,7 +249,7 @@ async def test_no_cloud(
 
 @pytest.mark.usefixtures("current_request_with_host", "use_cloud")
 async def test_reauthentication(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,
@@ -311,7 +311,7 @@ async def test_reauthentication(
 
 @pytest.mark.usefixtures("current_request_with_host", "use_cloud")
 async def test_reauthentication_wrong_scopes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,
@@ -362,7 +362,7 @@ async def test_reauthentication_wrong_scopes(
 
 @pytest.mark.usefixtures("current_request_with_host", "use_cloud")
 async def test_reauth_account_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,
@@ -413,7 +413,7 @@ async def test_reauth_account_mismatch(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauthentication_no_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,
@@ -436,7 +436,7 @@ async def test_reauthentication_no_cloud(
 
 @pytest.mark.usefixtures("current_request_with_host", "use_cloud")
 async def test_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,
@@ -518,7 +518,7 @@ async def test_migration(
 
 @pytest.mark.usefixtures("current_request_with_host", "use_cloud")
 async def test_migration_wrong_location(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,
@@ -591,7 +591,7 @@ async def test_migration_wrong_location(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_migration_no_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_smartthings: AsyncMock,

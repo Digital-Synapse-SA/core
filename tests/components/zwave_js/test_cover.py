@@ -11,7 +11,7 @@ from zwave_js_server.const import (
 from zwave_js_server.event import Event
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_CURRENT_TILT_POSITION,
     ATTR_POSITION,
@@ -29,16 +29,16 @@ from homeassistant.components.cover import (
     CoverEntityFeature,
     CoverState,
 )
-from homeassistant.components.zwave_js.const import LOGGER
-from homeassistant.components.zwave_js.helpers import ZwaveValueMatcher
-from homeassistant.const import (
+from smarthub.components.zwave_js.const import LOGGER
+from smarthub.components.zwave_js.helpers import ZwaveValueMatcher
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import replace_value_of_zwave_value
 
@@ -59,7 +59,7 @@ def platforms() -> list[str]:
 
 
 async def test_window_cover(
-    hass: HomeAssistant, client, chain_actuator_zws12, integration
+    hass: SmartHub, client, chain_actuator_zws12, integration
 ) -> None:
     """Test the cover entity."""
     node = chain_actuator_zws12
@@ -242,7 +242,7 @@ async def test_window_cover(
 
 
 async def test_fibaro_fgr222_shutter_cover(
-    hass: HomeAssistant, client, fibaro_fgr222_shutter, integration
+    hass: SmartHub, client, fibaro_fgr222_shutter, integration
 ) -> None:
     """Test tilt function of the Fibaro Shutter devices."""
     state = hass.states.get(FIBARO_FGR_222_SHUTTER_COVER_ENTITY)
@@ -343,7 +343,7 @@ async def test_fibaro_fgr222_shutter_cover(
 
 
 async def test_fibaro_fgr223_shutter_cover(
-    hass: HomeAssistant, client, fibaro_fgr223_shutter, integration
+    hass: SmartHub, client, fibaro_fgr223_shutter, integration
 ) -> None:
     """Test tilt function of the Fibaro Shutter devices."""
     state = hass.states.get(FIBARO_FGR_223_SHUTTER_COVER_ENTITY)
@@ -437,7 +437,7 @@ async def test_fibaro_fgr223_shutter_cover(
 
 
 async def test_aeotec_nano_shutter_cover(
-    hass: HomeAssistant, client, aeotec_nano_shutter, integration
+    hass: SmartHub, client, aeotec_nano_shutter, integration
 ) -> None:
     """Test movement of an Aeotec Nano Shutter cover entity. Useful to make sure the stop command logic is handled properly."""
     node = aeotec_nano_shutter
@@ -555,7 +555,7 @@ async def test_aeotec_nano_shutter_cover(
 
 
 async def test_blind_cover(
-    hass: HomeAssistant, client, iblinds_v2, integration
+    hass: SmartHub, client, iblinds_v2, integration
 ) -> None:
     """Test a blind cover entity."""
     state = hass.states.get(BLIND_COVER_ENTITY)
@@ -565,7 +565,7 @@ async def test_blind_cover(
 
 
 async def test_shutter_cover(
-    hass: HomeAssistant, client, qubino_shutter, integration
+    hass: SmartHub, client, qubino_shutter, integration
 ) -> None:
     """Test a shutter cover entity."""
     state = hass.states.get(SHUTTER_COVER_ENTITY)
@@ -575,7 +575,7 @@ async def test_shutter_cover(
 
 
 async def test_motor_barrier_cover(
-    hass: HomeAssistant, client, gdc_zw062, integration
+    hass: SmartHub, client, gdc_zw062, integration
 ) -> None:
     """Test the cover entity."""
     node = gdc_zw062
@@ -753,7 +753,7 @@ async def test_motor_barrier_cover(
 
 
 async def test_motor_barrier_cover_no_primary_value(
-    hass: HomeAssistant, client, gdc_zw062_state, integration
+    hass: SmartHub, client, gdc_zw062_state, integration
 ) -> None:
     """Test the cover entity where primary value value is None."""
     node_state = replace_value_of_zwave_value(
@@ -779,7 +779,7 @@ async def test_motor_barrier_cover_no_primary_value(
 
 
 async def test_fibaro_fgr222_shutter_cover_no_tilt(
-    hass: HomeAssistant, client, fibaro_fgr222_shutter_state, integration
+    hass: SmartHub, client, fibaro_fgr222_shutter_state, integration
 ) -> None:
     """Test tilt function of the Fibaro Shutter devices with tilt value is None."""
     node_state = replace_value_of_zwave_value(
@@ -809,7 +809,7 @@ async def test_fibaro_fgr222_shutter_cover_no_tilt(
 
 
 async def test_fibaro_fgr223_shutter_cover_no_tilt(
-    hass: HomeAssistant, client, fibaro_fgr223_shutter_state, integration
+    hass: SmartHub, client, fibaro_fgr223_shutter_state, integration
 ) -> None:
     """Test absence of tilt function for Fibaro Shutter roller blind.
 
@@ -838,7 +838,7 @@ async def test_fibaro_fgr223_shutter_cover_no_tilt(
 
 
 async def test_iblinds_v3_cover(
-    hass: HomeAssistant, client, iblinds_v3, integration
+    hass: SmartHub, client, iblinds_v3, integration
 ) -> None:
     """Test iBlinds v3 cover which uses Window Covering CC."""
     entity_id = "cover.blind_west_bed_1_horizontal_slats_angle"
@@ -942,7 +942,7 @@ async def test_iblinds_v3_cover(
 
 
 async def test_nice_ibt4zwave_cover(
-    hass: HomeAssistant, client, nice_ibt4zwave, integration
+    hass: SmartHub, client, nice_ibt4zwave, integration
 ) -> None:
     """Test Nice IBT4ZWAVE cover."""
     entity_id = "cover.portail"
@@ -1002,7 +1002,7 @@ async def test_nice_ibt4zwave_cover(
 
 
 async def test_window_covering_open_close(
-    hass: HomeAssistant, client, window_covering_outbound_bottom, integration
+    hass: SmartHub, client, window_covering_outbound_bottom, integration
 ) -> None:
     """Test Window Covering device open and close commands.
 

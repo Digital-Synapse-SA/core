@@ -2,10 +2,10 @@
 
 import aiohttp
 
-from homeassistant import config_entries
-from homeassistant.components.adguard.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components.adguard.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
@@ -14,9 +14,9 @@ from homeassistant.const import (
     CONF_VERIFY_SSL,
     CONTENT_TYPE_JSON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -31,7 +31,7 @@ FIXTURE_USER_INPUT = {
 }
 
 
-async def test_show_authenticate_form(hass: HomeAssistant) -> None:
+async def test_show_authenticate_form(hass: SmartHub) -> None:
     """Test that the setup form is served."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -42,7 +42,7 @@ async def test_show_authenticate_form(hass: HomeAssistant) -> None:
 
 
 async def test_connection_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we show user form on AdGuard Home connection error."""
     aioclient_mock.get(
@@ -65,7 +65,7 @@ async def test_connection_error(
 
 
 async def test_full_flow_implementation(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test registering an integration and finishing flow works."""
     aioclient_mock.get(
@@ -106,7 +106,7 @@ async def test_full_flow_implementation(
     assert not config_entry.options
 
 
-async def test_integration_already_exists(hass: HomeAssistant) -> None:
+async def test_integration_already_exists(hass: SmartHub) -> None:
     """Test we only allow a single config flow."""
     MockConfigEntry(
         domain=DOMAIN, data={"host": "mock-adguard", "port": "3000"}
@@ -122,7 +122,7 @@ async def test_integration_already_exists(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_hassio_already_configured(hass: HomeAssistant) -> None:
+async def test_hassio_already_configured(hass: SmartHub) -> None:
     """Test we only allow a single config flow."""
     MockConfigEntry(
         domain=DOMAIN, data={"host": "mock-adguard", "port": "3000"}
@@ -147,7 +147,7 @@ async def test_hassio_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_hassio_ignored(hass: HomeAssistant) -> None:
+async def test_hassio_ignored(hass: SmartHub) -> None:
     """Test we supervisor discovered instance can be ignored."""
     MockConfigEntry(domain=DOMAIN, source=config_entries.SOURCE_IGNORE).add_to_hass(
         hass
@@ -173,7 +173,7 @@ async def test_hassio_ignored(hass: HomeAssistant) -> None:
 
 
 async def test_hassio_confirm(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we can finish a config flow."""
     aioclient_mock.get(
@@ -219,7 +219,7 @@ async def test_hassio_confirm(
 
 
 async def test_hassio_connection_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we show Hass.io confirm form on AdGuard Home connection error."""
     aioclient_mock.get(

@@ -8,10 +8,10 @@ from unittest.mock import patch
 from nacl.encoding import Base64Encoder
 from nacl.secret import SecretBox
 
-from homeassistant.components.mobile_app.const import CONF_SECRET, DOMAIN
-from homeassistant.const import CONF_WEBHOOK_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.mobile_app.const import CONF_SECRET, DOMAIN
+from smarthub.const import CONF_WEBHOOK_ID
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import REGISTER, REGISTER_CLEARTEXT, RENDER_TEMPLATE
 
@@ -20,7 +20,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_registration(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, hass_admin_user: MockUser
+    hass: SmartHub, hass_client: ClientSessionGenerator, hass_admin_user: MockUser
 ) -> None:
     """Test that registrations happen."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -28,7 +28,7 @@ async def test_registration(
     api_client = await hass_client()
 
     with patch(
-        "homeassistant.components.person.async_add_user_device_tracker",
+        "smarthub.components.person.async_add_user_device_tracker",
         spec=True,
     ) as add_user_dev_track:
         resp = await api_client.post(
@@ -46,7 +46,7 @@ async def test_registration(
 
     entries = hass.config_entries.async_entries(DOMAIN)
 
-    assert entries[0].unique_id == "io.homeassistant.mobile_app_test-mock-device-id"
+    assert entries[0].unique_id == "io.smarthub.mobile_app_test-mock-device-id"
     assert entries[0].data["device_id"] == REGISTER_CLEARTEXT["device_id"]
     assert entries[0].data["app_data"] == REGISTER_CLEARTEXT["app_data"]
     assert entries[0].data["app_id"] == REGISTER_CLEARTEXT["app_id"]
@@ -64,7 +64,7 @@ async def test_registration(
 
 
 async def test_registration_encryption(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that registrations happen."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -102,7 +102,7 @@ async def test_registration_encryption(
 
 
 async def test_registration_encryption_legacy(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that registrations happen."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})

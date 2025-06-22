@@ -7,15 +7,15 @@ from unittest.mock import Mock, patch
 from google_photos_library_api.exceptions import GooglePhotosApiError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.google_photos.const import (
+from smarthub import config_entries
+from smarthub.components.google_photos.const import (
     DOMAIN,
     OAUTH2_AUTHORIZE,
     OAUTH2_TOKEN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .conftest import EXPIRES_IN, FAKE_ACCESS_TOKEN, FAKE_REFRESH_TOKEN, USER_IDENTIFIER
 
@@ -31,7 +31,7 @@ CLIENT_SECRET = "5678"
 def mock_setup_entry() -> Generator[Mock]:
     """Fixture to mock out integration setup."""
     with patch(
-        "homeassistant.components.google_photos.async_setup_entry", return_value=True
+        "smarthub.components.google_photos.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
@@ -40,7 +40,7 @@ def mock_setup_entry() -> Generator[Mock]:
 def mock_patch_api(mock_api: Mock) -> Generator[None]:
     """Fixture to patch the config flow api."""
     with patch(
-        "homeassistant.components.google_photos.config_flow.GooglePhotosLibraryApi",
+        "smarthub.components.google_photos.config_flow.GooglePhotosLibraryApi",
         return_value=mock_api,
     ):
         yield
@@ -72,7 +72,7 @@ def mock_token_request(
 @pytest.mark.usefixtures("current_request_with_host", "mock_api")
 @pytest.mark.parametrize("fixture_name", ["list_mediaitems.json"])
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mock_setup: Mock,
 ) -> None:
@@ -142,7 +142,7 @@ async def test_full_flow(
     ],
 )
 async def test_api_not_enabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
 ) -> None:
     """Check flow aborts if api is not enabled."""
@@ -181,7 +181,7 @@ async def test_api_not_enabled(
 
 @pytest.mark.usefixtures("current_request_with_host", "setup_credentials")
 async def test_general_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     mock_api: Mock,
 ) -> None:
@@ -253,7 +253,7 @@ async def test_general_exception(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     user_identifier: str,

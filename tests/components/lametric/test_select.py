@@ -5,28 +5,28 @@ from unittest.mock import MagicMock
 from demetriek import BrightnessMode, LaMetricConnectionError, LaMetricError
 import pytest
 
-from homeassistant.components.lametric.const import DOMAIN
-from homeassistant.components.select import (
+from smarthub.components.lametric.const import DOMAIN
+from smarthub.components.select import (
     ATTR_OPTIONS,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     ATTR_OPTION,
     STATE_UNAVAILABLE,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = pytest.mark.usefixtures("init_integration")
 
 
 async def test_brightness_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -73,7 +73,7 @@ async def test_brightness_mode(
 
 
 async def test_select_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test error handling of the LaMetric selects."""
@@ -84,7 +84,7 @@ async def test_select_error(
     assert state.state == BrightnessMode.AUTO
 
     with pytest.raises(
-        HomeAssistantError, match="Invalid response from the LaMetric device"
+        SmartHubError, match="Invalid response from the LaMetric device"
     ):
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -102,7 +102,7 @@ async def test_select_error(
 
 
 async def test_select_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test connection error handling of the LaMetric selects."""
@@ -113,7 +113,7 @@ async def test_select_connection_error(
     assert state.state == BrightnessMode.AUTO
 
     with pytest.raises(
-        HomeAssistantError, match="Error communicating with the LaMetric device"
+        SmartHubError, match="Error communicating with the LaMetric device"
     ):
         await hass.services.async_call(
             SELECT_DOMAIN,

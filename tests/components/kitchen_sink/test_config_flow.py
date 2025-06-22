@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries, setup
-from homeassistant.components.kitchen_sink import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries, setup
+from smarthub.components.kitchen_sink import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -18,15 +18,15 @@ from tests.common import MockConfigEntry
 def no_platforms() -> Generator[None]:
     """Don't enable any platforms."""
     with patch(
-        "homeassistant.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
+        "smarthub.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
         [],
     ):
         yield
 
 
-async def test_import(hass: HomeAssistant) -> None:
+async def test_import(hass: SmartHub) -> None:
     """Test that we can import a config entry."""
-    with patch("homeassistant.components.kitchen_sink.async_setup_entry"):
+    with patch("smarthub.components.kitchen_sink.async_setup_entry"):
         assert await setup.async_setup_component(hass, DOMAIN, {DOMAIN: {}})
         await hass.async_block_till_done()
 
@@ -35,10 +35,10 @@ async def test_import(hass: HomeAssistant) -> None:
     assert entry.data == {}
 
 
-async def test_import_once(hass: HomeAssistant) -> None:
+async def test_import_once(hass: SmartHub) -> None:
     """Test that we don't create multiple config entries."""
     with patch(
-        "homeassistant.components.kitchen_sink.async_setup_entry",
+        "smarthub.components.kitchen_sink.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -54,7 +54,7 @@ async def test_import_once(hass: HomeAssistant) -> None:
 
     # Test importing again doesn't create a 2nd entry
     with patch(
-        "homeassistant.components.kitchen_sink.async_setup_entry"
+        "smarthub.components.kitchen_sink.async_setup_entry"
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -66,7 +66,7 @@ async def test_import_once(hass: HomeAssistant) -> None:
     mock_setup_entry.assert_not_called()
 
 
-async def test_reauth(hass: HomeAssistant) -> None:
+async def test_reauth(hass: SmartHub) -> None:
     """Test reauth works."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     await hass.async_block_till_done()
@@ -84,7 +84,7 @@ async def test_reauth(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("no_platforms")
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test config flow options."""
     config_entry = MockConfigEntry(domain=DOMAIN)
     config_entry.add_to_hass(hass)
@@ -116,7 +116,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("no_platforms")
-async def test_subentry_flow(hass: HomeAssistant) -> None:
+async def test_subentry_flow(hass: SmartHub) -> None:
     """Test config flow options."""
     config_entry = MockConfigEntry(domain=DOMAIN)
     config_entry.add_to_hass(hass)
@@ -151,7 +151,7 @@ async def test_subentry_flow(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("no_platforms")
-async def test_subentry_reconfigure_flow(hass: HomeAssistant) -> None:
+async def test_subentry_reconfigure_flow(hass: SmartHub) -> None:
     """Test config flow options."""
     subentry_id = "mock_id"
     config_entry = MockConfigEntry(

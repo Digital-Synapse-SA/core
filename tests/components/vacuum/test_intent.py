@@ -1,19 +1,19 @@
 """The tests for the vacuum platform."""
 
-from homeassistant.components.vacuum import (
+from smarthub.components.vacuum import (
     DOMAIN,
     SERVICE_RETURN_TO_BASE,
     SERVICE_START,
     intent as vacuum_intent,
 )
-from homeassistant.const import STATE_IDLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import intent
+from smarthub.const import STATE_IDLE
+from smarthub.core import SmartHub
+from smarthub.helpers import intent
 
 from tests.common import async_mock_service
 
 
-async def test_start_vacuum_intent(hass: HomeAssistant) -> None:
+async def test_start_vacuum_intent(hass: SmartHub) -> None:
     """Test HassTurnOn intent for vacuums."""
     await vacuum_intent.async_setup_intents(hass)
 
@@ -37,7 +37,7 @@ async def test_start_vacuum_intent(hass: HomeAssistant) -> None:
     assert call.data == {"entity_id": entity_id}
 
 
-async def test_start_vacuum_without_name(hass: HomeAssistant) -> None:
+async def test_start_vacuum_without_name(hass: SmartHub) -> None:
     """Test starting a vacuum without specifying the name."""
     await vacuum_intent.async_setup_intents(hass)
 
@@ -58,7 +58,7 @@ async def test_start_vacuum_without_name(hass: HomeAssistant) -> None:
     assert call.data == {"entity_id": entity_id}
 
 
-async def test_stop_vacuum_intent(hass: HomeAssistant) -> None:
+async def test_stop_vacuum_intent(hass: SmartHub) -> None:
     """Test HassTurnOff intent for vacuums."""
     await vacuum_intent.async_setup_intents(hass)
 
@@ -82,7 +82,7 @@ async def test_stop_vacuum_intent(hass: HomeAssistant) -> None:
     assert call.data == {"entity_id": entity_id}
 
 
-async def test_stop_vacuum_without_name(hass: HomeAssistant) -> None:
+async def test_stop_vacuum_without_name(hass: SmartHub) -> None:
     """Test stopping a vacuum without specifying the name."""
     await vacuum_intent.async_setup_intents(hass)
 

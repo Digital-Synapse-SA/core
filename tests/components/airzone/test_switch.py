@@ -4,20 +4,20 @@ from unittest.mock import patch
 
 from aioairzone.const import API_DATA, API_ON, API_SYSTEM_ID, API_ZONE_ID
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 
-async def test_airzone_create_switches(hass: HomeAssistant) -> None:
+async def test_airzone_create_switches(hass: SmartHub) -> None:
     """Test creation of switches."""
 
     await async_init_integration(hass)
@@ -38,7 +38,7 @@ async def test_airzone_create_switches(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_airzone_switch_off(hass: HomeAssistant) -> None:
+async def test_airzone_switch_off(hass: SmartHub) -> None:
     """Test switch off."""
 
     await async_init_integration(hass)
@@ -54,7 +54,7 @@ async def test_airzone_switch_off(hass: HomeAssistant) -> None:
     }
 
     with patch(
-        "homeassistant.components.airzone.AirzoneLocalApi.put_hvac",
+        "smarthub.components.airzone.AirzoneLocalApi.put_hvac",
         return_value=put_hvac_off,
     ):
         await hass.services.async_call(
@@ -70,7 +70,7 @@ async def test_airzone_switch_off(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_airzone_switch_on(hass: HomeAssistant) -> None:
+async def test_airzone_switch_on(hass: SmartHub) -> None:
     """Test switch on."""
 
     await async_init_integration(hass)
@@ -86,7 +86,7 @@ async def test_airzone_switch_on(hass: HomeAssistant) -> None:
     }
 
     with patch(
-        "homeassistant.components.airzone.AirzoneLocalApi.put_hvac",
+        "smarthub.components.airzone.AirzoneLocalApi.put_hvac",
         return_value=put_hvac_on,
     ):
         await hass.services.async_call(

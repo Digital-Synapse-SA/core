@@ -6,19 +6,19 @@ from unittest.mock import patch
 from aiopyarr.exceptions import ArrConnectionException
 import pytest
 
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import setup_integration
 
@@ -54,7 +54,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     windows: bool,
     single: bool,
@@ -80,7 +80,7 @@ async def test_sensors(
 
 @pytest.mark.freeze_time("2021-12-03 00:00:00+00:00")
 async def test_windows(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test for successfully setting up the Radarr platform on Windows."""
     await setup_integration(hass, aioclient_mock, windows=True)
@@ -90,7 +90,7 @@ async def test_windows(
 
 
 async def test_update_failed(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test coordinator updates handle failures."""
     entry = await setup_integration(hass, aioclient_mock)
@@ -99,7 +99,7 @@ async def test_update_failed(
     assert hass.states.get(entity).state == "263.10"
 
     with patch(
-        "homeassistant.components.radarr.RadarrClient._async_request",
+        "smarthub.components.radarr.RadarrClient._async_request",
         side_effect=ArrConnectionException,
     ) as updater:
         next_update = dt_util.utcnow() + timedelta(minutes=1)

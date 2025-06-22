@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from homeassistant.components.otp.const import CONF_NEW_TOKEN, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_CODE, CONF_NAME, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.otp.const import CONF_NEW_TOKEN, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_CODE, CONF_NAME, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 TEST_DATA = {
     CONF_NAME: "OTP Sensor",
@@ -32,7 +32,7 @@ TEST_DATA_3 = {
 
 
 @pytest.mark.usefixtures("mock_pyotp")
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -60,7 +60,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     ],
 )
 async def test_errors_and_recover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_pyotp: MagicMock,
     exception: Exception,
@@ -99,7 +99,7 @@ async def test_errors_and_recover(
 
 @pytest.mark.usefixtures("mock_pyotp")
 async def test_generate_new_token(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test form generate new token."""
     result = await hass.config_entries.flow.async_init(
@@ -131,7 +131,7 @@ async def test_generate_new_token(
 
 
 async def test_generate_new_token_errors(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_pyotp
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_pyotp
 ) -> None:
     """Test input validation errors."""
     result = await hass.config_entries.flow.async_init(

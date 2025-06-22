@@ -6,19 +6,19 @@ from freezegun.api import FrozenDateTimeFactory
 from holidays import CATHOLIC
 import pytest
 
-from homeassistant.components.calendar import (
+from smarthub.components.calendar import (
     DOMAIN as CALENDAR_DOMAIN,
     SERVICE_GET_EVENTS,
 )
-from homeassistant.components.holiday.const import (
+from smarthub.components.holiday.const import (
     CONF_CATEGORIES,
     CONF_PROVINCE,
     DOMAIN,
 )
-from homeassistant.const import CONF_COUNTRY
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.const import CONF_COUNTRY
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
     "time_zone", ["Asia/Tokyo", "Europe/Berlin", "America/Chicago", "US/Hawaii"]
 )
 async def test_holiday_calendar_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     time_zone: str,
 ) -> None:
@@ -115,7 +115,7 @@ async def test_holiday_calendar_entity(
     "time_zone", ["Asia/Tokyo", "Europe/Berlin", "America/Chicago", "US/Hawaii"]
 )
 async def test_default_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     time_zone: str,
 ) -> None:
@@ -192,7 +192,7 @@ async def test_default_language(
     "time_zone", ["Asia/Tokyo", "Europe/Berlin", "America/Chicago", "US/Hawaii"]
 )
 async def test_no_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     time_zone: str,
 ) -> None:
@@ -239,7 +239,7 @@ async def test_no_language(
     "time_zone", ["Asia/Tokyo", "Europe/Berlin", "America/Chicago", "US/Hawaii"]
 )
 async def test_no_next_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     time_zone: str,
 ) -> None:
@@ -272,7 +272,7 @@ async def test_no_next_event(
     "time_zone", ["Asia/Tokyo", "Europe/Berlin", "America/Chicago", "US/Hawaii"]
 )
 async def test_language_not_exist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     time_zone: str,
 ) -> None:
@@ -361,7 +361,7 @@ async def test_language_not_exist(
 
 
 async def test_categories(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test if there is no next event."""

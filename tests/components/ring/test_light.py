@@ -6,11 +6,11 @@ import pytest
 import ring_doorbell
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import SOURCE_REAUTH
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import SOURCE_REAUTH
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .common import MockConfigEntry, setup_platform
 
@@ -18,7 +18,7 @@ from tests.common import snapshot_platform
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -31,7 +31,7 @@ async def test_states(
 
 
 async def test_light_off_reports_correctly(
-    hass: HomeAssistant, mock_ring_client
+    hass: SmartHub, mock_ring_client
 ) -> None:
     """Tests that the initial state of a device that should be off is correct."""
     await setup_platform(hass, Platform.LIGHT)
@@ -42,7 +42,7 @@ async def test_light_off_reports_correctly(
 
 
 async def test_light_on_reports_correctly(
-    hass: HomeAssistant, mock_ring_client
+    hass: SmartHub, mock_ring_client
 ) -> None:
     """Tests that the initial state of a device that should be on is correct."""
     await setup_platform(hass, Platform.LIGHT)
@@ -52,7 +52,7 @@ async def test_light_on_reports_correctly(
     assert state.attributes.get("friendly_name") == "Internal Light"
 
 
-async def test_light_can_be_turned_on(hass: HomeAssistant, mock_ring_client) -> None:
+async def test_light_can_be_turned_on(hass: SmartHub, mock_ring_client) -> None:
     """Tests the light turns on correctly."""
     await setup_platform(hass, Platform.LIGHT)
 
@@ -78,7 +78,7 @@ async def test_light_can_be_turned_on(hass: HomeAssistant, mock_ring_client) -> 
     ids=["Authentication", "Timeout", "Other"],
 )
 async def test_light_errors_when_turned_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client,
     mock_ring_devices,
     exception_type,
@@ -93,7 +93,7 @@ async def test_light_errors_when_turned_on(
     front_light_mock = mock_ring_devices.get_device(765432)
     front_light_mock.async_set_lights.side_effect = exception_type
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "light", "turn_on", {"entity_id": "light.front_light"}, blocking=True
         )

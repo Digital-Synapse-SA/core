@@ -7,7 +7,7 @@ from mcstatus.responses import BedrockStatusResponse, JavaStatusResponse
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .const import (
     TEST_BEDROCK_STATUS_RESPONSE,
@@ -29,7 +29,7 @@ from tests.typing import ClientSessionGenerator
     ],
 )
 async def test_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_config_entry: MockConfigEntry,
     server: JavaServer | BedrockServer,

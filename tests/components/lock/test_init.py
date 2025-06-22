@@ -8,8 +8,8 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import lock
-from homeassistant.components.lock import (
+from smarthub.components import lock
+from smarthub.components.lock import (
     ATTR_CODE,
     CONF_DEFAULT_CODE,
     DOMAIN,
@@ -19,10 +19,10 @@ from homeassistant.components.lock import (
     LockEntityFeature,
     LockState,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.typing import UNDEFINED, UndefinedType
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.typing import UNDEFINED, UndefinedType
 
 from .conftest import MockLock
 
@@ -30,7 +30,7 @@ from tests.common import help_test_all, import_and_test_deprecated_constant_enum
 
 
 async def help_test_async_lock_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     service: str,
     code: str | None | UndefinedType = UNDEFINED,
@@ -43,7 +43,7 @@ async def help_test_async_lock_service(
     await hass.services.async_call(DOMAIN, service, data, blocking=True)
 
 
-async def test_lock_default(hass: HomeAssistant, mock_lock_entity: MockLock) -> None:
+async def test_lock_default(hass: SmartHub, mock_lock_entity: MockLock) -> None:
     """Test lock entity with defaults."""
 
     assert mock_lock_entity.code_format is None
@@ -56,7 +56,7 @@ async def test_lock_default(hass: HomeAssistant, mock_lock_entity: MockLock) -> 
     assert mock_lock_entity.is_open is None
 
 
-async def test_lock_states(hass: HomeAssistant, mock_lock_entity: MockLock) -> None:
+async def test_lock_states(hass: SmartHub, mock_lock_entity: MockLock) -> None:
     """Test lock entity states."""
 
     assert mock_lock_entity.state is None
@@ -103,7 +103,7 @@ async def test_lock_states(hass: HomeAssistant, mock_lock_entity: MockLock) -> N
     [(r"^\d{4}$", LockEntityFeature.OPEN)],
 )
 async def test_set_mock_lock_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_lock_entity: MockLock,
 ) -> None:
@@ -122,7 +122,7 @@ async def test_set_mock_lock_options(
 
 @pytest.mark.parametrize("code_format", [r"^\d{4}$"])
 async def test_default_code_option_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_lock_entity: MockLock,
 ) -> None:
@@ -143,7 +143,7 @@ async def test_default_code_option_update(
     [(r"^\d{4}$", LockEntityFeature.OPEN)],
 )
 async def test_lock_open_with_code(
-    hass: HomeAssistant, mock_lock_entity: MockLock
+    hass: SmartHub, mock_lock_entity: MockLock
 ) -> None:
     """Test lock entity with open service."""
     state = hass.states.get(mock_lock_entity.entity_id)
@@ -173,7 +173,7 @@ async def test_lock_open_with_code(
     [(r"^\d{4}$", LockEntityFeature.OPEN)],
 )
 async def test_lock_lock_with_code(
-    hass: HomeAssistant, mock_lock_entity: MockLock
+    hass: SmartHub, mock_lock_entity: MockLock
 ) -> None:
     """Test lock entity with open service."""
     state = hass.states.get(mock_lock_entity.entity_id)
@@ -209,7 +209,7 @@ async def test_lock_lock_with_code(
     [(r"^\d{4}$", LockEntityFeature.OPEN)],
 )
 async def test_lock_unlock_with_code(
-    hass: HomeAssistant, mock_lock_entity: MockLock
+    hass: SmartHub, mock_lock_entity: MockLock
 ) -> None:
     """Test unlock entity with open service."""
     state = hass.states.get(mock_lock_entity.entity_id)
@@ -245,7 +245,7 @@ async def test_lock_unlock_with_code(
     [(r"^\d{4}$", LockEntityFeature.OPEN)],
 )
 async def test_lock_with_illegal_code(
-    hass: HomeAssistant, mock_lock_entity: MockLock
+    hass: SmartHub, mock_lock_entity: MockLock
 ) -> None:
     """Test lock entity with default code that does not match the code format."""
 
@@ -268,7 +268,7 @@ async def test_lock_with_illegal_code(
     [(None, LockEntityFeature.OPEN)],
 )
 async def test_lock_with_no_code(
-    hass: HomeAssistant, mock_lock_entity: MockLock
+    hass: SmartHub, mock_lock_entity: MockLock
 ) -> None:
     """Test lock entity without code."""
     await help_test_async_lock_service(hass, mock_lock_entity.entity_id, SERVICE_OPEN)
@@ -301,7 +301,7 @@ async def test_lock_with_no_code(
     [(r"^\d{4}$", LockEntityFeature.OPEN)],
 )
 async def test_lock_with_default_code(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_lock_entity: MockLock
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_lock_entity: MockLock
 ) -> None:
     """Test lock entity with default code."""
     entity_registry.async_update_entity_options(
@@ -348,7 +348,7 @@ async def test_lock_with_default_code(
     [(r"^\d{4}$", LockEntityFeature.OPEN)],
 )
 async def test_lock_with_illegal_default_code(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_lock_entity: MockLock
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_lock_entity: MockLock
 ) -> None:
     """Test lock entity with illegal default code."""
     entity_registry.async_update_entity_options(

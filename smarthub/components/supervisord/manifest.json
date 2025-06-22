@@ -1,0 +1,8 @@
+{
+  "domain": "supervisord",
+  "name": "Supervisord",
+  "codeowners": [],
+  "documentation": "https://www.smart-hub.io/integrations/supervisord",
+  "iot_class": "local_polling",
+  "quality_scale": "legacy"
+}

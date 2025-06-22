@@ -2,22 +2,22 @@
 
 from datetime import time
 
-from homeassistant.components.time import DOMAIN, SERVICE_SET_VALUE
-from homeassistant.const import (
+from smarthub.components.time import DOMAIN, SERVICE_SET_VALUE
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     ATTR_TIME,
     CONF_PLATFORM,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import MockTimeEntity
 
 from tests.common import setup_test_component_platform
 
 
-async def test_date(hass: HomeAssistant) -> None:
+async def test_date(hass: SmartHub) -> None:
     """Test time entity."""
     entity = MockTimeEntity(
         name="test",

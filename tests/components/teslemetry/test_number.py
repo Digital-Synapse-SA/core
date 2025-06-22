@@ -6,14 +6,14 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from teslemetry_stream import Signal
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, reload_platform, setup_platform
 from .const import COMMAND_OK, VEHICLE_DATA_ALT
@@ -21,7 +21,7 @@ from .const import COMMAND_OK, VEHICLE_DATA_ALT
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_legacy: AsyncMock,
@@ -34,7 +34,7 @@ async def test_number(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_number_services(
-    hass: HomeAssistant, mock_vehicle_data: AsyncMock
+    hass: SmartHub, mock_vehicle_data: AsyncMock
 ) -> None:
     """Tests that the number services work."""
     mock_vehicle_data.return_value = VEHICLE_DATA_ALT
@@ -105,7 +105,7 @@ async def test_number_services(
 
 
 async def test_number_streaming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_vehicle_data: AsyncMock,
     mock_add_listener: AsyncMock,

@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.elevenlabs.const import (
+from smarthub.components.elevenlabs.const import (
     CONF_CONFIGURE_VOICE,
     CONF_MODEL,
     CONF_OPTIMIZE_LATENCY,
@@ -21,16 +21,16 @@ from homeassistant.components.elevenlabs.const import (
     DEFAULT_USE_SPEAKER_BOOST,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_user_step(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_async_client: AsyncMock,
 ) -> None:
@@ -58,7 +58,7 @@ async def test_user_step(
 
 
 async def test_invalid_api_key(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_async_client_api_error: AsyncMock,
     request: pytest.FixtureRequest,
@@ -102,7 +102,7 @@ async def test_invalid_api_key(
 
 
 async def test_options_flow_init(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_async_client: AsyncMock,
     mock_entry: MockConfigEntry,
@@ -132,7 +132,7 @@ async def test_options_flow_init(
 
 
 async def test_options_flow_voice_settings_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_async_client: AsyncMock,
     mock_entry: MockConfigEntry,

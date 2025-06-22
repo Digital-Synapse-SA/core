@@ -1,8 +1,8 @@
 """Tests for the LG webOS TV integration."""
 
-from homeassistant.components.webostv.const import DOMAIN
-from homeassistant.const import CONF_CLIENT_SECRET, CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components.webostv.const import DOMAIN
+from smarthub.const import CONF_CLIENT_SECRET, CONF_HOST
+from smarthub.core import SmartHub
 
 from .const import CLIENT_KEY, FAKE_UUID, HOST, TV_NAME
 
@@ -10,7 +10,7 @@ from tests.common import MockConfigEntry
 
 
 async def setup_webostv(
-    hass: HomeAssistant, unique_id: str | None = FAKE_UUID
+    hass: SmartHub, unique_id: str | None = FAKE_UUID
 ) -> MockConfigEntry:
     """Initialize webostv and media_player for tests."""
     entry = MockConfigEntry(

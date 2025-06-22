@@ -3,12 +3,12 @@
 from typing import Any
 from unittest.mock import AsyncMock
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> bool:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> bool:
     """Set up the component."""
     config_entry.add_to_hass(hass)
     if success := await hass.config_entries.async_setup(config_entry.entry_id):

@@ -5,8 +5,8 @@ from unittest.mock import Mock
 from freezegun.api import FrozenDateTimeFactory
 from yalexs.pubnub_async import AugustPubNub
 
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .mocks import (
     _create_august_with_devices,
@@ -19,7 +19,7 @@ from .mocks import (
 from tests.common import async_fire_time_changed
 
 
-async def test_create_doorbell(hass: HomeAssistant) -> None:
+async def test_create_doorbell(hass: SmartHub) -> None:
     """Test creation of a doorbell."""
     doorbell_one = await _mock_doorbell_from_fixture(hass, "get_doorbell.json")
     await _create_august_with_devices(hass, [doorbell_one])
@@ -32,7 +32,7 @@ async def test_create_doorbell(hass: HomeAssistant) -> None:
     assert doorbell_state.state == STATE_UNKNOWN
 
 
-async def test_create_doorbell_offline(hass: HomeAssistant) -> None:
+async def test_create_doorbell_offline(hass: SmartHub) -> None:
     """Test creation of a doorbell that is offline."""
     doorbell_one = await _mock_doorbell_from_fixture(hass, "get_doorbell.offline.json")
     await _create_august_with_devices(hass, [doorbell_one])
@@ -45,7 +45,7 @@ async def test_create_doorbell_offline(hass: HomeAssistant) -> None:
 
 
 async def test_create_doorbell_with_motion(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test creation of a doorbell."""
     doorbell_one = await _mock_doorbell_from_fixture(hass, "get_doorbell.json")
@@ -70,7 +70,7 @@ async def test_create_doorbell_with_motion(
 
 
 async def test_doorbell_update_via_pubnub(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test creation of a doorbell that can be updated via pubnub."""
     doorbell_one = await _mock_doorbell_from_fixture(hass, "get_doorbell.json")
@@ -158,7 +158,7 @@ async def test_doorbell_update_via_pubnub(
     assert motion_state.state == isotime
 
 
-async def test_create_lock_with_doorbell(hass: HomeAssistant) -> None:
+async def test_create_lock_with_doorbell(hass: SmartHub) -> None:
     """Test creation of a lock with a doorbell."""
     lock_one = await _mock_lock_from_fixture(hass, "lock_with_doorbell.online.json")
     await _create_august_with_devices(hass, [lock_one])

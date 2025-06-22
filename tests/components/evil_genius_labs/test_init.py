@@ -2,14 +2,14 @@
 
 import pytest
 
-from homeassistant.components.evil_genius_labs import PLATFORMS
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.evil_genius_labs import PLATFORMS
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 
 @pytest.mark.parametrize("platforms", [PLATFORMS])
 async def test_setup_unload_entry(
-    hass: HomeAssistant, setup_evil_genius_labs, config_entry
+    hass: SmartHub, setup_evil_genius_labs, config_entry
 ) -> None:
     """Test setting up and unloading a config entry."""
     assert len(hass.states.async_entity_ids()) == 1

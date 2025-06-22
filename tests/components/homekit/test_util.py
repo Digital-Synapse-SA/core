@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, Mock, patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.homekit.const import (
+from smarthub.components.homekit.const import (
     BRIDGE_NAME,
     CONF_AUDIO_CODEC,
     CONF_AUDIO_MAP,
@@ -51,8 +51,8 @@ from homeassistant.components.homekit.const import (
     TYPE_SWITCH,
     TYPE_VALVE,
 )
-from homeassistant.components.homekit.models import HomeKitEntryData
-from homeassistant.components.homekit.util import (
+from smarthub.components.homekit.models import HomeKitEntryData
+from smarthub.components.homekit.util import (
     accessory_friendly_name,
     async_dismiss_setup_message,
     async_find_next_available_port,
@@ -69,8 +69,8 @@ from homeassistant.components.homekit.util import (
     validate_entity_config as vec,
     validate_media_player_features,
 )
-from homeassistant.components.persistent_notification import async_create, async_dismiss
-from homeassistant.const import (
+from smarthub.components.persistent_notification import async_create, async_dismiss
+from smarthub.const import (
     ATTR_CODE,
     ATTR_SUPPORTED_FEATURES,
     CONF_NAME,
@@ -79,7 +79,7 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant, State
+from smarthub.core import SmartHub, State
 
 from .util import async_init_integration
 
@@ -311,7 +311,7 @@ def test_density_to_air_quality() -> None:
     assert density_to_air_quality(200) == 5
 
 
-async def test_async_show_setup_msg(hass: HomeAssistant, hk_driver) -> None:
+async def test_async_show_setup_msg(hass: SmartHub, hk_driver) -> None:
     """Test show setup message as persistence notification."""
     pincode = b"123-45-678"
 
@@ -319,7 +319,7 @@ async def test_async_show_setup_msg(hass: HomeAssistant, hk_driver) -> None:
     assert entry
 
     with patch(
-        "homeassistant.components.persistent_notification.async_create",
+        "smarthub.components.persistent_notification.async_create",
         side_effect=async_create,
     ) as mock_create:
         async_show_setup_message(
@@ -340,10 +340,10 @@ async def test_async_show_setup_msg(hass: HomeAssistant, hk_driver) -> None:
     assert pincode.decode() in mock_create.mock_calls[0][1][1]
 
 
-async def test_async_dismiss_setup_msg(hass: HomeAssistant) -> None:
+async def test_async_dismiss_setup_msg(hass: SmartHub) -> None:
     """Test dismiss setup message."""
     with patch(
-        "homeassistant.components.persistent_notification.async_dismiss",
+        "smarthub.components.persistent_notification.async_dismiss",
         side_effect=async_dismiss,
     ) as mock_dismiss:
         async_dismiss_setup_message(hass, "entry_id")
@@ -353,40 +353,40 @@ async def test_async_dismiss_setup_msg(hass: HomeAssistant) -> None:
     assert mock_dismiss.mock_calls[0][1][1] == "entry_id"
 
 
-async def test_port_is_available(hass: HomeAssistant) -> None:
+async def test_port_is_available(hass: SmartHub) -> None:
     """Test we can get an available port and it is actually available."""
     with patch(
-        "homeassistant.components.homekit.util.socket.socket",
+        "smarthub.components.homekit.util.socket.socket",
         return_value=_mock_socket(0),
     ):
         next_port = async_find_next_available_port(hass, DEFAULT_CONFIG_FLOW_PORT)
     assert next_port
     with patch(
-        "homeassistant.components.homekit.util.socket.socket",
+        "smarthub.components.homekit.util.socket.socket",
         return_value=_mock_socket(0),
     ):
         assert async_port_is_available(next_port)
 
     with patch(
-        "homeassistant.components.homekit.util.socket.socket",
+        "smarthub.components.homekit.util.socket.socket",
         return_value=_mock_socket(5),
     ):
         next_port = async_find_next_available_port(hass, DEFAULT_CONFIG_FLOW_PORT)
     assert next_port == DEFAULT_CONFIG_FLOW_PORT + 5
     with patch(
-        "homeassistant.components.homekit.util.socket.socket",
+        "smarthub.components.homekit.util.socket.socket",
         return_value=_mock_socket(0),
     ):
         assert async_port_is_available(next_port)
 
     with patch(
-        "homeassistant.components.homekit.util.socket.socket",
+        "smarthub.components.homekit.util.socket.socket",
         return_value=_mock_socket(1),
     ):
         assert not async_port_is_available(next_port)
 
 
-async def test_port_is_available_skips_existing_entries(hass: HomeAssistant) -> None:
+async def test_port_is_available_skips_existing_entries(hass: SmartHub) -> None:
     """Test we can get an available port and it is actually available."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -396,7 +396,7 @@ async def test_port_is_available_skips_existing_entries(hass: HomeAssistant) -> 
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.homekit.util.socket.socket",
+        "smarthub.components.homekit.util.socket.socket",
         return_value=_mock_socket(),
     ):
         next_port = async_find_next_available_port(hass, DEFAULT_CONFIG_FLOW_PORT)
@@ -404,20 +404,20 @@ async def test_port_is_available_skips_existing_entries(hass: HomeAssistant) -> 
     assert next_port == DEFAULT_CONFIG_FLOW_PORT + 1
 
     with patch(
-        "homeassistant.components.homekit.util.socket.socket",
+        "smarthub.components.homekit.util.socket.socket",
         return_value=_mock_socket(),
     ):
         assert async_port_is_available(next_port)
 
     with patch(
-        "homeassistant.components.homekit.util.socket.socket",
+        "smarthub.components.homekit.util.socket.socket",
         return_value=_mock_socket(4),
     ):
         next_port = async_find_next_available_port(hass, DEFAULT_CONFIG_FLOW_PORT)
 
     assert next_port == DEFAULT_CONFIG_FLOW_PORT + 5
     with patch(
-        "homeassistant.components.homekit.util.socket.socket",
+        "smarthub.components.homekit.util.socket.socket",
         return_value=_mock_socket(),
     ):
         assert async_port_is_available(next_port)
@@ -425,7 +425,7 @@ async def test_port_is_available_skips_existing_entries(hass: HomeAssistant) -> 
     with (
         pytest.raises(OSError),
         patch(
-            "homeassistant.components.homekit.util.socket.socket",
+            "smarthub.components.homekit.util.socket.socket",
             return_value=_mock_socket(10),
         ),
     ):
@@ -466,7 +466,7 @@ async def test_accessory_friendly_name() -> None:
     assert accessory_friendly_name("hass title", accessory) == "Hass title 123"
 
 
-async def test_lock_state_needs_accessory_mode(hass: HomeAssistant) -> None:
+async def test_lock_state_needs_accessory_mode(hass: SmartHub) -> None:
     """Test that locks are setup as accessories."""
     hass.states.async_set("lock.mine", "locked")
     assert state_needs_accessory_mode(hass.states.get("lock.mine")) is True

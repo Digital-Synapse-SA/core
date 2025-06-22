@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock
 import mpd
 import pytest
 
-from homeassistant.components.mpd.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.mpd.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mpd_client: AsyncMock,
 ) -> None:
@@ -54,7 +54,7 @@ async def test_full_flow(
     ],
 )
 async def test_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mpd_client: AsyncMock,
     exception: Exception,
@@ -89,7 +89,7 @@ async def test_errors(
 
 
 async def test_existing_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we abort if an entry already exists."""
     mock_config_entry.add_to_hass(hass)

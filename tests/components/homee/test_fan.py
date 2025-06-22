@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     ATTR_PRESET_MODE,
     DOMAIN as FAN_DOMAIN,
@@ -17,16 +17,16 @@ from homeassistant.components.fan import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.components.homee.const import (
+from smarthub.components.homee.const import (
     DOMAIN,
     PRESET_AUTO,
     PRESET_MANUAL,
     PRESET_SUMMER,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from . import build_mock_node, setup_integration
 
@@ -48,7 +48,7 @@ from tests.common import MockConfigEntry, snapshot_platform
     ],
 )
 async def test_percentage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     speed: int,
@@ -71,7 +71,7 @@ async def test_percentage(
     ],
 )
 async def test_preset_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     mode_value: int,
@@ -108,7 +108,7 @@ async def test_preset_mode(
     ],
 )
 async def test_fan_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
     service: str,
@@ -133,7 +133,7 @@ async def test_fan_services(
 
 
 async def test_turn_on_preset_last_value_zero(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
 ) -> None:
@@ -156,7 +156,7 @@ async def test_turn_on_preset_last_value_zero(
 
 
 async def test_turn_on_invalid_preset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: MagicMock,
 ) -> None:
@@ -177,7 +177,7 @@ async def test_turn_on_invalid_preset(
 
 
 async def test_fan_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -186,7 +186,7 @@ async def test_fan_snapshot(
     """Test the fan snapshot."""
     mock_homee.nodes = [build_mock_node("fan.json")]
     mock_homee.get_node_by_id.return_value = mock_homee.nodes[0]
-    with patch("homeassistant.components.homee.PLATFORMS", [Platform.FAN]):
+    with patch("smarthub.components.homee.PLATFORMS", [Platform.FAN]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

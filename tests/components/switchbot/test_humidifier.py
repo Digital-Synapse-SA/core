@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from switchbot.devices.device import SwitchbotOperationError
 
-from homeassistant.components.humidifier import (
+from smarthub.components.humidifier import (
     ATTR_HUMIDITY,
     ATTR_MODE,
     DOMAIN as HUMIDIFIER_DOMAIN,
@@ -17,9 +17,9 @@ from homeassistant.components.humidifier import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import HUMIDIFIER_SERVICE_INFO
 
@@ -68,7 +68,7 @@ from tests.components.bluetooth import inject_bluetooth_service_info
     ],
 )
 async def test_humidifier_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_factory: Callable[[str], MockConfigEntry],
     service: str,
     service_data: dict,
@@ -84,23 +84,23 @@ async def test_humidifier_services(
 
     with (
         patch(
-            "homeassistant.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.set_level",
+            "smarthub.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.set_level",
             new=AsyncMock(return_value=True),
         ) as mock_set_humidity_level,
         patch(
-            "homeassistant.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.async_set_auto",
+            "smarthub.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.async_set_auto",
             new=AsyncMock(return_value=True),
         ) as mock_set_auto_mode,
         patch(
-            "homeassistant.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.async_set_manual",
+            "smarthub.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.async_set_manual",
             new=AsyncMock(return_value=True),
         ) as mock_set_manual_mode,
         patch(
-            "homeassistant.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.turn_off",
+            "smarthub.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.turn_off",
             new=AsyncMock(return_value=True),
         ) as mock_turn_off,
         patch(
-            "homeassistant.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.turn_on",
+            "smarthub.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.turn_on",
             new=AsyncMock(return_value=True),
         ) as mock_turn_on,
     ):
@@ -145,7 +145,7 @@ async def test_humidifier_services(
     ],
 )
 async def test_exception_handling_humidifier_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_factory: Callable[[str], MockConfigEntry],
     service: str,
     service_data: dict,
@@ -160,13 +160,13 @@ async def test_exception_handling_humidifier_service(
     entry.add_to_hass(hass)
     entity_id = "humidifier.test_name"
 
-    patch_target = f"homeassistant.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.{mock_method}"
+    patch_target = f"smarthub.components.switchbot.humidifier.switchbot.SwitchbotHumidifier.{mock_method}"
 
     with patch(patch_target, new=AsyncMock(side_effect=exception)):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
-        with pytest.raises(HomeAssistantError, match=error_message):
+        with pytest.raises(SmartHubError, match=error_message):
             await hass.services.async_call(
                 HUMIDIFIER_DOMAIN,
                 service,

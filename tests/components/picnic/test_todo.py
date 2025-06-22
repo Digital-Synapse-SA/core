@@ -5,10 +5,10 @@ from unittest.mock import MagicMock, Mock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.todo import ATTR_ITEM, DOMAIN as TODO_DOMAIN, TodoServices
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.components.todo import ATTR_ITEM, DOMAIN as TODO_DOMAIN, TodoServices
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from .conftest import ENTITY_ID
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_cart_list_with_items(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration,
     get_items,
     snapshot: SnapshotAssertion,
@@ -30,7 +30,7 @@ async def test_cart_list_with_items(
 
 
 async def test_cart_list_empty_items(
-    hass: HomeAssistant, mock_picnic_api: MagicMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_picnic_api: MagicMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test loading of shopping cart without items."""
     mock_picnic_api.get_cart.return_value = {"items": []}
@@ -44,7 +44,7 @@ async def test_cart_list_empty_items(
 
 
 async def test_cart_list_unexpected_response(
-    hass: HomeAssistant, mock_picnic_api: MagicMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_picnic_api: MagicMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test loading of shopping cart without expected response."""
     mock_picnic_api.get_cart.return_value = {}
@@ -57,7 +57,7 @@ async def test_cart_list_unexpected_response(
 
 
 async def test_cart_list_null_response(
-    hass: HomeAssistant, mock_picnic_api: MagicMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_picnic_api: MagicMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test loading of shopping cart without response."""
     mock_picnic_api.get_cart.return_value = None
@@ -70,7 +70,7 @@ async def test_cart_list_null_response(
 
 
 async def test_create_todo_list_item(
-    hass: HomeAssistant, init_integration: MockConfigEntry, mock_picnic_api: MagicMock
+    hass: SmartHub, init_integration: MockConfigEntry, mock_picnic_api: MagicMock
 ) -> None:
     """Test for creating a picnic cart item."""
     assert len(mock_picnic_api.get_cart.mock_calls) == 1
@@ -111,7 +111,7 @@ async def test_create_todo_list_item(
 
 
 async def test_create_todo_list_item_not_found(
-    hass: HomeAssistant, init_integration: MockConfigEntry, mock_picnic_api: MagicMock
+    hass: SmartHub, init_integration: MockConfigEntry, mock_picnic_api: MagicMock
 ) -> None:
     """Test for creating a picnic cart item when ID is not found."""
     mock_picnic_api.search = Mock()

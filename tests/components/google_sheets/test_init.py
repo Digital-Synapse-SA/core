@@ -10,15 +10,15 @@ from gspread.exceptions import APIError
 import pytest
 from requests.models import Response
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.google_sheets.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components.google_sheets.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -60,7 +60,7 @@ def mock_config_entry(expires_at: int, scopes: list[str]) -> MockConfigEntry:
 
 @pytest.fixture(name="setup_integration")
 async def mock_setup_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> Callable[[], Coroutine[Any, Any, None]]:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
@@ -81,7 +81,7 @@ async def mock_setup_integration(
 
 
 async def test_setup_success(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test successful setup and unload."""
     await setup_integration()
@@ -109,7 +109,7 @@ async def test_setup_success(
     ids=["no_scope", "required_scope_prefix", "other_scope"],
 )
 async def test_missing_required_scopes_requires_reauth(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test that reauth is invoked when required scopes are not present."""
     await setup_integration()
@@ -125,7 +125,7 @@ async def test_missing_required_scopes_requires_reauth(
 
 @pytest.mark.parametrize("expires_at", [time.time() - 3600], ids=["expired"])
 async def test_expired_token_refresh_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -167,7 +167,7 @@ async def test_expired_token_refresh_success(
     ids=["failure_requires_reauth", "transient_failure"],
 )
 async def test_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     aioclient_mock: AiohttpClientMocker,
     status: http.HTTPStatus,
@@ -188,7 +188,7 @@ async def test_expired_token_refresh_failure(
 
 
 async def test_append_sheet(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -199,7 +199,7 @@ async def test_append_sheet(
     assert len(entries) == 1
     assert entries[0].state is ConfigEntryState.LOADED
 
-    with patch("homeassistant.components.google_sheets.services.Client") as mock_client:
+    with patch("smarthub.components.google_sheets.services.Client") as mock_client:
         await hass.services.async_call(
             DOMAIN,
             "append_sheet",
@@ -214,7 +214,7 @@ async def test_append_sheet(
 
 
 async def test_append_sheet_multiple_rows(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -225,7 +225,7 @@ async def test_append_sheet_multiple_rows(
     assert len(entries) == 1
     assert entries[0].state is ConfigEntryState.LOADED
 
-    with patch("homeassistant.components.google_sheets.services.Client") as mock_client:
+    with patch("smarthub.components.google_sheets.services.Client") as mock_client:
         await hass.services.async_call(
             DOMAIN,
             "append_sheet",
@@ -240,7 +240,7 @@ async def test_append_sheet_multiple_rows(
 
 
 async def test_append_sheet_api_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -255,9 +255,9 @@ async def test_append_sheet_api_error(
     response.status_code = 503
 
     with (
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
         patch(
-            "homeassistant.components.google_sheets.services.Client.request",
+            "smarthub.components.google_sheets.services.Client.request",
             side_effect=APIError(response),
         ),
     ):
@@ -274,7 +274,7 @@ async def test_append_sheet_api_error(
 
 
 async def test_append_sheet_invalid_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
     expires_at: int,

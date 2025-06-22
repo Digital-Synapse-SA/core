@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.min_max.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.min_max.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry, get_schema_suggested_value
 
 
 @pytest.mark.parametrize("platform", ["sensor"])
-async def test_config_flow(hass: HomeAssistant, platform: str) -> None:
+async def test_config_flow(hass: SmartHub, platform: str) -> None:
     """Test the config flow."""
     input_sensors = ["sensor.input_one", "sensor.input_two"]
 
@@ -24,7 +24,7 @@ async def test_config_flow(hass: HomeAssistant, platform: str) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.min_max.async_setup_entry",
+        "smarthub.components.min_max.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -56,7 +56,7 @@ async def test_config_flow(hass: HomeAssistant, platform: str) -> None:
 
 
 @pytest.mark.parametrize("platform", ["sensor"])
-async def test_options(hass: HomeAssistant, platform: str) -> None:
+async def test_options(hass: SmartHub, platform: str) -> None:
     """Test reconfiguring."""
     hass.states.async_set("sensor.input_one", "10")
     hass.states.async_set("sensor.input_two", "20")

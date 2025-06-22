@@ -7,16 +7,16 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from wled import Device as WLEDDevice, WLEDConnectionError, WLEDError
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.components.wled.const import DOMAIN, SCAN_INTERVAL
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.wled.const import DOMAIN, SCAN_INTERVAL
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import async_fire_time_changed, async_load_json_object_fixture
 
@@ -31,7 +31,7 @@ pytestmark = pytest.mark.usefixtures("init_integration")
     ],
 )
 async def test_numbers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -64,7 +64,7 @@ async def test_numbers(
 
     # Test with WLED error
     mock_wled.segment.side_effect = WLEDError
-    with pytest.raises(HomeAssistantError, match="Invalid response from WLED API"):
+    with pytest.raises(SmartHubError, match="Invalid response from WLED API"):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -79,7 +79,7 @@ async def test_numbers(
 
     # Test when a connection error occurs
     mock_wled.segment.side_effect = WLEDConnectionError
-    with pytest.raises(HomeAssistantError, match="Error communicating with WLED API"):
+    with pytest.raises(SmartHubError, match="Error communicating with WLED API"):
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,
@@ -112,7 +112,7 @@ async def test_numbers(
     ],
 )
 async def test_speed_dynamically_handle_segments(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_wled: MagicMock,
     entity_id_segment0: str,

@@ -8,17 +8,17 @@ from nice_go import ApiError, AuthFailedError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
     CoverState,
 )
-from homeassistant.components.nice_go.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.nice_go.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -30,7 +30,7 @@ from tests.common import (
 
 
 async def test_covers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -44,7 +44,7 @@ async def test_covers(
 
 
 async def test_open_cover(
-    hass: HomeAssistant, mock_nice_go: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_nice_go: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that opening the cover works as intended."""
 
@@ -70,7 +70,7 @@ async def test_open_cover(
 
 
 async def test_close_cover(
-    hass: HomeAssistant, mock_nice_go: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_nice_go: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that closing the cover works as intended."""
 
@@ -96,7 +96,7 @@ async def test_close_cover(
 
 
 async def test_update_cover_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -139,7 +139,7 @@ async def test_update_cover_state(
     ],
 )
 async def test_cover_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -155,7 +155,7 @@ async def test_cover_exceptions(
     mock_nice_go.open_barrier.side_effect = error
     mock_nice_go.close_barrier.side_effect = error
 
-    with pytest.raises(HomeAssistantError, match=expected_error):
+    with pytest.raises(SmartHubError, match=expected_error):
         await hass.services.async_call(
             COVER_DOMAIN,
             action,
@@ -165,7 +165,7 @@ async def test_cover_exceptions(
 
 
 async def test_auth_failed_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -190,7 +190,7 @@ async def test_auth_failed_error(
     mock_nice_go.open_barrier.side_effect = _open_side_effect
     mock_nice_go.close_barrier.side_effect = _close_side_effect
 
-    with pytest.raises(HomeAssistantError, match="Error opening the barrier"):
+    with pytest.raises(SmartHubError, match="Error opening the barrier"):
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
@@ -201,7 +201,7 @@ async def test_auth_failed_error(
     assert mock_nice_go.authenticate.call_count == 1
     assert mock_nice_go.open_barrier.call_count == 2
 
-    with pytest.raises(HomeAssistantError, match="Error closing the barrier"):
+    with pytest.raises(SmartHubError, match="Error closing the barrier"):
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_CLOSE_COVER,
@@ -226,7 +226,7 @@ async def test_auth_failed_error(
 
     # One more time but with an ApiError instead of AuthFailed
 
-    with pytest.raises(HomeAssistantError, match="Error opening the barrier"):
+    with pytest.raises(SmartHubError, match="Error opening the barrier"):
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
@@ -234,7 +234,7 @@ async def test_auth_failed_error(
             blocking=True,
         )
 
-    with pytest.raises(HomeAssistantError, match="Error closing the barrier"):
+    with pytest.raises(SmartHubError, match="Error closing the barrier"):
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_CLOSE_COVER,

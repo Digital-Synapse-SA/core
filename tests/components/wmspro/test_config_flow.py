@@ -4,12 +4,12 @@ from unittest.mock import AsyncMock, patch
 
 import aiohttp
 
-from homeassistant.components.wmspro.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER, ConfigEntryState
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.wmspro.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER, ConfigEntryState
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import setup_config_entry
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_config_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_hub_refresh: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_hub_refresh: AsyncMock
 ) -> None:
     """Test we can handle user-input to create a config entry."""
     result = await hass.config_entries.flow.async_init(
@@ -46,7 +46,7 @@ async def test_config_flow(
 
 
 async def test_config_flow_from_dhcp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_hub_refresh: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_hub_refresh: AsyncMock
 ) -> None:
     """Test we can handle DHCP discovery to create a config entry."""
     info = DhcpServiceInfo(
@@ -78,7 +78,7 @@ async def test_config_flow_from_dhcp(
 
 
 async def test_config_flow_from_dhcp_add_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_hub_refresh: AsyncMock,
 ) -> None:
@@ -120,7 +120,7 @@ async def test_config_flow_from_dhcp_add_mac(
 
 
 async def test_config_flow_from_dhcp_ip_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_hub_refresh: AsyncMock,
 ) -> None:
@@ -166,7 +166,7 @@ async def test_config_flow_from_dhcp_ip_update(
 
 
 async def test_config_flow_from_dhcp_no_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_hub_refresh: AsyncMock,
 ) -> None:
@@ -212,7 +212,7 @@ async def test_config_flow_from_dhcp_no_update(
 
 
 async def test_config_flow_ping_failed(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_hub_refresh: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_hub_refresh: AsyncMock
 ) -> None:
     """Test we handle ping failed error."""
     result = await hass.config_entries.flow.async_init(
@@ -253,7 +253,7 @@ async def test_config_flow_ping_failed(
 
 
 async def test_config_flow_cannot_connect(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_hub_refresh: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_hub_refresh: AsyncMock
 ) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
@@ -294,7 +294,7 @@ async def test_config_flow_cannot_connect(
 
 
 async def test_config_flow_unknown_error(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_hub_refresh: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_hub_refresh: AsyncMock
 ) -> None:
     """Test we handle an unknown error."""
     result = await hass.config_entries.flow.async_init(
@@ -335,7 +335,7 @@ async def test_config_flow_unknown_error(
 
 
 async def test_config_flow_duplicate_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_dest_refresh: AsyncMock,
@@ -362,7 +362,7 @@ async def test_config_flow_duplicate_entries(
 
 
 async def test_config_flow_multiple_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_dest_refresh: AsyncMock,

@@ -2,8 +2,8 @@
 
 from unittest.mock import MagicMock, patch
 
-from homeassistant.components.kira import sensor as kira
-from homeassistant.core import HomeAssistant
+from smarthub.components.kira import sensor as kira
+from smarthub.core import SmartHub
 
 from tests.common import MockEntityPlatform
 
@@ -19,9 +19,9 @@ def add_entities(devices):
     DEVICES.extend(devices)
 
 
-@patch("homeassistant.components.kira.sensor.KiraReceiver.schedule_update_ha_state")
+@patch("smarthub.components.kira.sensor.KiraReceiver.schedule_update_ha_state")
 def test_kira_sensor_callback(
-    mock_schedule_update_ha_state, hass: HomeAssistant
+    mock_schedule_update_ha_state, hass: SmartHub
 ) -> None:
     """Ensure Kira sensor properly updates its attributes from callback."""
     mock_kira = MagicMock()

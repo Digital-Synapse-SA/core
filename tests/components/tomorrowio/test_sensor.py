@@ -8,25 +8,25 @@ from typing import Any
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, async_rounded_state
-from homeassistant.components.tomorrowio.config_flow import (
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN, async_rounded_state
+from smarthub.components.tomorrowio.config_flow import (
     _get_config_schema,
     _get_unique_id,
 )
-from homeassistant.components.tomorrowio.const import (
+from smarthub.components.tomorrowio.const import (
     ATTRIBUTION,
     CONF_TIMESTEP,
     DEFAULT_NAME,
     DEFAULT_TIMESTEP,
     DOMAIN,
 )
-from homeassistant.components.tomorrowio.sensor import TomorrowioSensorEntityDescription
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY, SOURCE_USER
-from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME
-from homeassistant.core import HomeAssistant, State, callback
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.components.tomorrowio.sensor import TomorrowioSensorEntityDescription
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY, SOURCE_USER
+from smarthub.const import ATTR_ATTRIBUTION, CONF_NAME
+from smarthub.core import SmartHub, State, callback
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from .const import API_V4_ENTRY_DATA
 
@@ -101,7 +101,7 @@ V4_FIELDS = [
 
 
 @callback
-def _enable_entity(hass: HomeAssistant, entity_name: str) -> None:
+def _enable_entity(hass: SmartHub, entity_name: str) -> None:
     """Enable disabled entity."""
     ent_reg = er.async_get(hass)
     entry = ent_reg.async_get(entity_name)
@@ -111,7 +111,7 @@ def _enable_entity(hass: HomeAssistant, entity_name: str) -> None:
 
 
 async def _setup(
-    hass: HomeAssistant, sensors: list[str], config: dict[str, Any]
+    hass: SmartHub, sensors: list[str], config: dict[str, Any]
 ) -> State:
     """Set up entry and return entity state."""
     with freeze_time(
@@ -140,7 +140,7 @@ async def _setup(
         assert len(hass.states.async_entity_ids(SENSOR_DOMAIN)) == len(sensors)
 
 
-def check_sensor_state(hass: HomeAssistant, entity_name: str, value: str):
+def check_sensor_state(hass: SmartHub, entity_name: str, value: str):
     """Check the state of a Tomorrow.io sensor."""
     entity_id = CC_SENSOR_ENTITY_ID.format(entity_name)
     state = hass.states.get(entity_id)
@@ -149,7 +149,7 @@ def check_sensor_state(hass: HomeAssistant, entity_name: str, value: str):
     assert state.attributes[ATTR_ATTRIBUTION] == ATTRIBUTION
 
 
-async def test_v4_sensor(hass: HomeAssistant) -> None:
+async def test_v4_sensor(hass: SmartHub) -> None:
     """Test v4 sensor data."""
     await _setup(hass, V4_FIELDS, API_V4_ENTRY_DATA)
     check_sensor_state(hass, O3, "91.35")
@@ -181,7 +181,7 @@ async def test_v4_sensor(hass: HomeAssistant) -> None:
     check_sensor_state(hass, UV_HEALTH_CONCERN, "moderate")
 
 
-async def test_v4_sensor_imperial(hass: HomeAssistant) -> None:
+async def test_v4_sensor_imperial(hass: SmartHub) -> None:
     """Test v4 sensor data."""
     hass.config.units = US_CUSTOMARY_SYSTEM
     await _setup(hass, V4_FIELDS, API_V4_ENTRY_DATA)

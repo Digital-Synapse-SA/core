@@ -4,23 +4,23 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.const import (
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_ENTITY_PICTURE,
     ATTR_FRIENDLY_NAME,
     ATTR_SUPPORTED_FEATURES,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 from tests.components.recorder.common import async_wait_recording_done
 
 
 async def test_exclude_attributes(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_image_platform
+    recorder_mock: Recorder, hass: SmartHub, mock_image_platform
 ) -> None:
     """Test camera registered attributes to be excluded."""
     now = dt_util.utcnow()

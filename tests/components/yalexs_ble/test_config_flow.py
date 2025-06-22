@@ -7,17 +7,17 @@ from bleak import BleakError
 import pytest
 from yalexs_ble import AuthError, DoorStatus, LockInfo, LockState, LockStatus
 
-from homeassistant import config_entries
-from homeassistant.components.yalexs_ble.const import (
+from smarthub import config_entries
+from smarthub.components.yalexs_ble.const import (
     CONF_ALWAYS_CONNECTED,
     CONF_KEY,
     CONF_LOCAL_NAME,
     CONF_SLOT,
     DOMAIN,
 )
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     LOCK_DISCOVERY_INFO_UUID_ADDRESS,
@@ -48,10 +48,10 @@ def _get_mock_push_lock():
 
 
 @pytest.mark.parametrize("slot", [0, 1, 66])
-async def test_user_step_success(hass: HomeAssistant, slot: int) -> None:
+async def test_user_step_success(hass: SmartHub, slot: int) -> None:
     """Test user step success path."""
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.config_flow.async_discovered_service_info",
         return_value=[NOT_YALE_DISCOVERY_INFO, YALE_ACCESS_LOCK_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -63,10 +63,10 @@ async def test_user_step_success(hass: HomeAssistant, slot: int) -> None:
 
     with (
         patch(
-            "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+            "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         ),
         patch(
-            "homeassistant.components.yalexs_ble.async_setup_entry",
+            "smarthub.components.yalexs_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -93,7 +93,7 @@ async def test_user_step_success(hass: HomeAssistant, slot: int) -> None:
 
 
 @pytest.mark.parametrize("slot", [0, 1, 66])
-async def test_user_step_from_ignored(hass: HomeAssistant, slot: int) -> None:
+async def test_user_step_from_ignored(hass: SmartHub, slot: int) -> None:
     """Test user step replaces an ignored entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -103,7 +103,7 @@ async def test_user_step_from_ignored(hass: HomeAssistant, slot: int) -> None:
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.config_flow.async_discovered_service_info",
         return_value=[NOT_YALE_DISCOVERY_INFO, YALE_ACCESS_LOCK_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -115,10 +115,10 @@ async def test_user_step_from_ignored(hass: HomeAssistant, slot: int) -> None:
 
     with (
         patch(
-            "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+            "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         ),
         patch(
-            "homeassistant.components.yalexs_ble.async_setup_entry",
+            "smarthub.components.yalexs_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -144,10 +144,10 @@ async def test_user_step_from_ignored(hass: HomeAssistant, slot: int) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_step_no_devices_found(hass: HomeAssistant) -> None:
+async def test_user_step_no_devices_found(hass: SmartHub) -> None:
     """Test user step with no devices found."""
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.config_flow.async_discovered_service_info",
         return_value=[NOT_YALE_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -157,7 +157,7 @@ async def test_user_step_no_devices_found(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_user_step_no_new_devices_found(hass: HomeAssistant) -> None:
+async def test_user_step_no_new_devices_found(hass: SmartHub) -> None:
     """Test user step with only existing devices found."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -171,7 +171,7 @@ async def test_user_step_no_new_devices_found(hass: HomeAssistant) -> None:
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.config_flow.async_discovered_service_info",
         return_value=[YALE_ACCESS_LOCK_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -181,10 +181,10 @@ async def test_user_step_no_new_devices_found(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_user_step_invalid_keys(hass: HomeAssistant) -> None:
+async def test_user_step_invalid_keys(hass: SmartHub) -> None:
     """Test user step with invalid keys tried first."""
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.config_flow.async_discovered_service_info",
         return_value=[YALE_ACCESS_LOCK_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -232,10 +232,10 @@ async def test_user_step_invalid_keys(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+            "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         ),
         patch(
-            "homeassistant.components.yalexs_ble.async_setup_entry",
+            "smarthub.components.yalexs_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -261,10 +261,10 @@ async def test_user_step_invalid_keys(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_step_cannot_connect(hass: HomeAssistant) -> None:
+async def test_user_step_cannot_connect(hass: SmartHub) -> None:
     """Test user step and we cannot connect."""
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.config_flow.async_discovered_service_info",
         return_value=[YALE_ACCESS_LOCK_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -275,7 +275,7 @@ async def test_user_step_cannot_connect(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+        "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         side_effect=BleakError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -294,10 +294,10 @@ async def test_user_step_cannot_connect(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+            "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         ),
         patch(
-            "homeassistant.components.yalexs_ble.async_setup_entry",
+            "smarthub.components.yalexs_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -323,10 +323,10 @@ async def test_user_step_cannot_connect(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_step_auth_exception(hass: HomeAssistant) -> None:
+async def test_user_step_auth_exception(hass: SmartHub) -> None:
     """Test user step with an authentication exception."""
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.config_flow.async_discovered_service_info",
         return_value=[YALE_ACCESS_LOCK_DISCOVERY_INFO, NOT_YALE_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -337,7 +337,7 @@ async def test_user_step_auth_exception(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+        "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         side_effect=AuthError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -356,10 +356,10 @@ async def test_user_step_auth_exception(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+            "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         ),
         patch(
-            "homeassistant.components.yalexs_ble.async_setup_entry",
+            "smarthub.components.yalexs_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -385,10 +385,10 @@ async def test_user_step_auth_exception(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_step_unknown_exception(hass: HomeAssistant) -> None:
+async def test_user_step_unknown_exception(hass: SmartHub) -> None:
     """Test user step with an unknown exception."""
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.config_flow.async_discovered_service_info",
         return_value=[NOT_YALE_DISCOVERY_INFO, YALE_ACCESS_LOCK_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -399,7 +399,7 @@ async def test_user_step_unknown_exception(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+        "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         side_effect=RuntimeError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -418,10 +418,10 @@ async def test_user_step_unknown_exception(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+            "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         ),
         patch(
-            "homeassistant.components.yalexs_ble.async_setup_entry",
+            "smarthub.components.yalexs_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -447,7 +447,7 @@ async def test_user_step_unknown_exception(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_bluetooth_step_success(hass: HomeAssistant) -> None:
+async def test_bluetooth_step_success(hass: SmartHub) -> None:
     """Test bluetooth step success path."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -460,10 +460,10 @@ async def test_bluetooth_step_success(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+            "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         ),
         patch(
-            "homeassistant.components.yalexs_ble.async_setup_entry",
+            "smarthub.components.yalexs_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -489,10 +489,10 @@ async def test_bluetooth_step_success(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_integration_discovery_success(hass: HomeAssistant) -> None:
+async def test_integration_discovery_success(hass: SmartHub) -> None:
     """Test integration discovery step success path."""
     with patch(
-        "homeassistant.components.yalexs_ble.util.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.util.async_discovered_service_info",
         return_value=[YALE_ACCESS_LOCK_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -511,7 +511,7 @@ async def test_integration_discovery_success(hass: HomeAssistant) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.yalexs_ble.async_setup_entry",
+        "smarthub.components.yalexs_ble.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -532,10 +532,10 @@ async def test_integration_discovery_success(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_integration_discovery_device_not_found(hass: HomeAssistant) -> None:
+async def test_integration_discovery_device_not_found(hass: SmartHub) -> None:
     """Test integration discovery when the device is not found."""
     with patch(
-        "homeassistant.components.yalexs_ble.util.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.util.async_discovered_service_info",
         return_value=[],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -554,7 +554,7 @@ async def test_integration_discovery_device_not_found(hass: HomeAssistant) -> No
 
 
 async def test_integration_discovery_takes_precedence_over_bluetooth(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test integration discovery dismisses bluetooth discovery."""
     result = await hass.config_entries.flow.async_init(
@@ -571,7 +571,7 @@ async def test_integration_discovery_takes_precedence_over_bluetooth(
     assert flows[0].local_name == YALE_ACCESS_LOCK_DISCOVERY_INFO.name
 
     with patch(
-        "homeassistant.components.yalexs_ble.util.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.util.async_discovered_service_info",
         return_value=[YALE_ACCESS_LOCK_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -602,7 +602,7 @@ async def test_integration_discovery_takes_precedence_over_bluetooth(
     assert len(flows) == 1
 
     with patch(
-        "homeassistant.components.yalexs_ble.async_setup_entry",
+        "smarthub.components.yalexs_ble.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -630,7 +630,7 @@ async def test_integration_discovery_takes_precedence_over_bluetooth(
 
 
 async def test_integration_discovery_updates_key_unique_local_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test integration discovery updates the key with a unique local name."""
     entry = MockConfigEntry(
@@ -647,11 +647,11 @@ async def test_integration_discovery_updates_key_unique_local_name(
 
     with (
         patch(
-            "homeassistant.components.yalexs_ble.util.async_discovered_service_info",
+            "smarthub.components.yalexs_ble.util.async_discovered_service_info",
             return_value=[LOCK_DISCOVERY_INFO_UUID_ADDRESS],
         ),
         patch(
-            "homeassistant.components.yalexs_ble.async_setup_entry",
+            "smarthub.components.yalexs_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -675,7 +675,7 @@ async def test_integration_discovery_updates_key_unique_local_name(
 
 
 async def test_integration_discovery_updates_key_without_unique_local_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test integration discovery updates the key without a unique local name."""
     entry = MockConfigEntry(
@@ -691,7 +691,7 @@ async def test_integration_discovery_updates_key_without_unique_local_name(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.yalexs_ble.util.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.util.async_discovered_service_info",
         return_value=[LOCK_DISCOVERY_INFO_UUID_ADDRESS],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -713,7 +713,7 @@ async def test_integration_discovery_updates_key_without_unique_local_name(
 
 
 async def test_integration_discovery_updates_key_duplicate_local_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test integration discovery updates the key with duplicate local names."""
     entry = MockConfigEntry(
@@ -740,7 +740,7 @@ async def test_integration_discovery_updates_key_duplicate_local_name(
     entry2.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.yalexs_ble.util.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.util.async_discovered_service_info",
         return_value=[LOCK_DISCOVERY_INFO_UUID_ADDRESS],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -765,7 +765,7 @@ async def test_integration_discovery_updates_key_duplicate_local_name(
 
 
 async def test_integration_discovery_takes_precedence_over_bluetooth_uuid_address(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test integration discovery dismisses bluetooth discovery with a uuid address."""
     result = await hass.config_entries.flow.async_init(
@@ -782,7 +782,7 @@ async def test_integration_discovery_takes_precedence_over_bluetooth_uuid_addres
     assert flows[0].local_name == LOCK_DISCOVERY_INFO_UUID_ADDRESS.name
 
     with patch(
-        "homeassistant.components.yalexs_ble.util.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.util.async_discovered_service_info",
         return_value=[LOCK_DISCOVERY_INFO_UUID_ADDRESS],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -813,7 +813,7 @@ async def test_integration_discovery_takes_precedence_over_bluetooth_uuid_addres
     assert len(flows) == 1
 
     with patch(
-        "homeassistant.components.yalexs_ble.async_setup_entry",
+        "smarthub.components.yalexs_ble.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -841,7 +841,7 @@ async def test_integration_discovery_takes_precedence_over_bluetooth_uuid_addres
 
 
 async def test_integration_discovery_takes_precedence_over_bluetooth_non_unique_local_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test integration discovery dismisses bluetooth discovery with a non unique local name."""
     result = await hass.config_entries.flow.async_init(
@@ -858,7 +858,7 @@ async def test_integration_discovery_takes_precedence_over_bluetooth_non_unique_
     assert flows[0].local_name == OLD_FIRMWARE_LOCK_DISCOVERY_INFO.name
 
     with patch(
-        "homeassistant.components.yalexs_ble.util.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.util.async_discovered_service_info",
         return_value=[OLD_FIRMWARE_LOCK_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -890,14 +890,14 @@ async def test_integration_discovery_takes_precedence_over_bluetooth_non_unique_
 
 
 async def test_user_is_setting_up_lock_and_discovery_happens_in_the_middle(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that the user is setting up the lock and waiting for validation and the keys get discovered.
 
     In this case the integration discovery should abort and let the user continue setting up the lock.
     """
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.yalexs_ble.config_flow.async_discovered_service_info",
         return_value=[NOT_YALE_DISCOVERY_INFO, YALE_ACCESS_LOCK_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -916,11 +916,11 @@ async def test_user_is_setting_up_lock_and_discovery_happens_in_the_middle(
 
     with (
         patch(
-            "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+            "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
             side_effect=_wait_for_user_flow,
         ),
         patch(
-            "homeassistant.components.yalexs_ble.async_setup_entry",
+            "smarthub.components.yalexs_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -937,7 +937,7 @@ async def test_user_is_setting_up_lock_and_discovery_happens_in_the_middle(
         await valdidate_started.wait()
 
         with patch(
-            "homeassistant.components.yalexs_ble.util.async_discovered_service_info",
+            "smarthub.components.yalexs_ble.util.async_discovered_service_info",
             return_value=[LOCK_DISCOVERY_INFO_UUID_ADDRESS],
         ):
             discovery_result = await hass.config_entries.flow.async_init(
@@ -972,7 +972,7 @@ async def test_user_is_setting_up_lock_and_discovery_happens_in_the_middle(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_reauth(hass: HomeAssistant) -> None:
+async def test_reauth(hass: SmartHub) -> None:
     """Test reauthentication."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -990,7 +990,7 @@ async def test_reauth(hass: HomeAssistant) -> None:
     assert result["step_id"] == "reauth_validate"
 
     with patch(
-        "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+        "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         side_effect=RuntimeError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -1008,14 +1008,14 @@ async def test_reauth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.yalexs_ble.config_flow.async_ble_device_from_address",
+            "smarthub.components.yalexs_ble.config_flow.async_ble_device_from_address",
             return_value=YALE_ACCESS_LOCK_DISCOVERY_INFO,
         ),
         patch(
-            "homeassistant.components.yalexs_ble.config_flow.PushLock.validate",
+            "smarthub.components.yalexs_ble.config_flow.PushLock.validate",
         ),
         patch(
-            "homeassistant.components.yalexs_ble.async_setup_entry",
+            "smarthub.components.yalexs_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -1033,7 +1033,7 @@ async def test_reauth(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test options."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -1048,7 +1048,7 @@ async def test_options(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.yalexs_ble.PushLock",
+        "smarthub.components.yalexs_ble.PushLock",
         return_value=_get_mock_push_lock(),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -1062,7 +1062,7 @@ async def test_options(hass: HomeAssistant) -> None:
     assert result["step_id"] == "device_options"
 
     with patch(
-        "homeassistant.components.yalexs_ble.async_setup_entry",
+        "smarthub.components.yalexs_ble.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.options.async_configure(

@@ -5,22 +5,22 @@ from datetime import timedelta
 from freezegun.api import FrozenDateTimeFactory
 from laundrify_aio import LaundrifyDevice, exceptions
 
-from homeassistant.components.laundrify.const import DEFAULT_POLL_INTERVAL
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant, State
-from homeassistant.util import slugify
+from smarthub.components.laundrify.const import DEFAULT_POLL_INTERVAL
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub, State
+from smarthub.util import slugify
 
 from tests.common import async_fire_time_changed
 
 
-def get_coord_entity(hass: HomeAssistant, mock_device: LaundrifyDevice) -> State:
+def get_coord_entity(hass: SmartHub, mock_device: LaundrifyDevice) -> State:
     """Get the coordinated energy sensor entity."""
     device_slug = slugify(mock_device.name, separator="_")
     return hass.states.get(f"sensor.{device_slug}_energy")
 
 
 async def test_coordinator_update_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     laundrify_config_entry,
     mock_device: LaundrifyDevice,
     freezer: FrozenDateTimeFactory,
@@ -35,7 +35,7 @@ async def test_coordinator_update_success(
 
 
 async def test_coordinator_update_unauthorized(
-    hass: HomeAssistant,
+    hass: SmartHub,
     laundrify_config_entry,
     laundrify_api_mock,
     mock_device: LaundrifyDevice,
@@ -53,7 +53,7 @@ async def test_coordinator_update_unauthorized(
 
 
 async def test_coordinator_update_connection_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     laundrify_config_entry,
     laundrify_api_mock,
     mock_device: LaundrifyDevice,

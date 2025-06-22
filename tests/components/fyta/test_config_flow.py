@@ -9,12 +9,12 @@ from fyta_cli.fyta_exceptions import (
 )
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.fyta.const import CONF_EXPIRATION, DOMAIN
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.fyta.const import CONF_EXPIRATION, DOMAIN
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .const import ACCESS_TOKEN, EXPIRATION, PASSWORD, USERNAME
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def user_step(
-    hass: HomeAssistant, flow_id: str, mock_setup_entry: AsyncMock
+    hass: SmartHub, flow_id: str, mock_setup_entry: AsyncMock
 ) -> None:
     """Test user step (helper function)."""
 
@@ -42,7 +42,7 @@ async def user_step(
 
 
 async def test_user_flow(
-    hass: HomeAssistant, mock_fyta_connector: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_fyta_connector: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form."""
 
@@ -65,7 +65,7 @@ async def test_user_flow(
     ],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     error: dict[str, str],
     mock_fyta_connector: AsyncMock,
@@ -108,7 +108,7 @@ async def test_form_exceptions(
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant, mock_fyta_connector: AsyncMock
+    hass: SmartHub, mock_fyta_connector: AsyncMock
 ) -> None:
     """Test duplicate setup handling."""
     entry = MockConfigEntry(
@@ -146,7 +146,7 @@ async def test_duplicate_entry(
     ],
 )
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     error: dict[str, str],
     mock_fyta_connector: AsyncMock,
@@ -201,7 +201,7 @@ async def test_reauth(
 
 
 async def test_dhcp_discovery(
-    hass: HomeAssistant, mock_fyta_connector: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_fyta_connector: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test DHCP discovery flow."""
 

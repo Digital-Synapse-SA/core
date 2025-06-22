@@ -5,19 +5,19 @@ from unittest.mock import AsyncMock, MagicMock, Mock, call
 
 import pytest
 
-from homeassistant.components.homeassistant_hardware.const import DATA_COMPONENT
-from homeassistant.components.homeassistant_hardware.helpers import (
+from smarthub.components.smarthub_hardware.const import DATA_COMPONENT
+from smarthub.components.smarthub_hardware.helpers import (
     async_notify_firmware_info,
     async_register_firmware_info_callback,
     async_register_firmware_info_provider,
 )
-from homeassistant.components.homeassistant_hardware.util import (
+from smarthub.components.smarthub_hardware.util import (
     ApplicationType,
     FirmwareInfo,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -38,10 +38,10 @@ FIRMWARE_INFO_SPINEL = FirmwareInfo(
 )
 
 
-async def test_dispatcher_registration(hass: HomeAssistant) -> None:
+async def test_dispatcher_registration(hass: SmartHub) -> None:
     """Test HardwareInfoDispatcher registration."""
 
-    await async_setup_component(hass, "homeassistant_hardware", {})
+    await async_setup_component(hass, "smarthub_hardware", {})
 
     # Mock provider 1 with a synchronous method to pull firmware info
     provider1_config_entry = MockConfigEntry(
@@ -113,11 +113,11 @@ async def test_dispatcher_registration(hass: HomeAssistant) -> None:
 
 
 async def test_dispatcher_iter_error_handling(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test HardwareInfoDispatcher ignoring errors from firmware info providers."""
 
-    await async_setup_component(hass, "homeassistant_hardware", {})
+    await async_setup_component(hass, "smarthub_hardware", {})
 
     provider1_config_entry = MockConfigEntry(
         domain="zha",
@@ -153,11 +153,11 @@ async def test_dispatcher_iter_error_handling(
 
 
 async def test_dispatcher_callback_error_handling(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test HardwareInfoDispatcher ignoring errors from firmware info callbacks."""
 
-    await async_setup_component(hass, "homeassistant_hardware", {})
+    await async_setup_component(hass, "smarthub_hardware", {})
     provider1_config_entry = MockConfigEntry(
         domain="zha",
         unique_id="some_unique_id1",

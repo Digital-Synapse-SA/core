@@ -2,12 +2,12 @@
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.components.arcam_fmj.const import DOMAIN
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.arcam_fmj.const import DOMAIN
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_get_device_automations
 
@@ -18,7 +18,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -57,7 +57,7 @@ async def test_get_triggers(
 
 
 async def test_if_fires_on_turn_on_request(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
     player_setup,
@@ -107,7 +107,7 @@ async def test_if_fires_on_turn_on_request(
 
 
 async def test_if_fires_on_turn_on_request_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
     player_setup,

@@ -7,12 +7,12 @@ from unittest.mock import patch
 import pytest
 import requests_mock
 
-from homeassistant import config_entries
-from homeassistant.components.metoffice.const import DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
+from smarthub import config_entries
+from smarthub.components.metoffice.const import DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
 
 from .const import (
     METOFFICE_CONFIG_WAVERTREE,
@@ -25,7 +25,7 @@ from .const import (
 from tests.common import MockConfigEntry, async_load_fixture
 
 
-async def test_form(hass: HomeAssistant, requests_mock: requests_mock.Mocker) -> None:
+async def test_form(hass: SmartHub, requests_mock: requests_mock.Mocker) -> None:
     """Test we get the form."""
     hass.config.latitude = TEST_LATITUDE_WAVERTREE
     hass.config.longitude = TEST_LONGITUDE_WAVERTREE
@@ -45,7 +45,7 @@ async def test_form(hass: HomeAssistant, requests_mock: requests_mock.Mocker) ->
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.metoffice.async_setup_entry",
+        "smarthub.components.metoffice.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -65,7 +65,7 @@ async def test_form(hass: HomeAssistant, requests_mock: requests_mock.Mocker) ->
 
 
 async def test_form_already_configured(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test we handle duplicate entries."""
     hass.config.latitude = TEST_LATITUDE_WAVERTREE
@@ -96,7 +96,7 @@ async def test_form_already_configured(
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker
+    hass: SmartHub, requests_mock: requests_mock.Mocker
 ) -> None:
     """Test we handle cannot connect error."""
     hass.config.latitude = TEST_LATITUDE_WAVERTREE
@@ -120,7 +120,7 @@ async def test_form_cannot_connect(
 
 
 async def test_form_unknown_error(
-    hass: HomeAssistant, mock_simple_manager_fail
+    hass: SmartHub, mock_simple_manager_fail
 ) -> None:
     """Test we handle unknown error."""
     mock_instance = mock_simple_manager_fail.return_value
@@ -141,7 +141,7 @@ async def test_form_unknown_error(
 
 @pytest.mark.freeze_time(datetime.datetime(2024, 11, 23, 12, tzinfo=datetime.UTC))
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock: requests_mock.Mocker,
     device_registry: dr.DeviceRegistry,
 ) -> None:

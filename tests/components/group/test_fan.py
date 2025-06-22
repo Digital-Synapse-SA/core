@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components.fan import (
+from smarthub import config as hass_config
+from smarthub.components.fan import (
     ATTR_DIRECTION,
     ATTR_OSCILLATING,
     ATTR_PERCENTAGE,
@@ -22,9 +22,9 @@ from homeassistant.components.fan import (
     SERVICE_TURN_ON,
     FanEntityFeature,
 )
-from homeassistant.components.group import SERVICE_RELOAD
-from homeassistant.components.group.fan import DEFAULT_NAME
-from homeassistant.const import (
+from smarthub.components.group import SERVICE_RELOAD
+from smarthub.components.group.fan import DEFAULT_NAME
+from smarthub.const import (
     ATTR_ASSUMED_STATE,
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
@@ -36,9 +36,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import CoreState, SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component, get_fixture_path
 
@@ -104,7 +104,7 @@ CONFIG_ATTRIBUTES = {
 
 @pytest.fixture
 async def setup_comp(
-    hass: HomeAssistant, config_count: tuple[dict[str, Any], int]
+    hass: SmartHub, config_count: tuple[dict[str, Any], int]
 ) -> None:
     """Set up group fan component."""
     config, count = config_count
@@ -117,7 +117,7 @@ async def setup_comp(
 
 @pytest.mark.parametrize("config_count", [(CONFIG_ATTRIBUTES, 1)])
 @pytest.mark.usefixtures("setup_comp")
-async def test_state(hass: HomeAssistant, entity_registry: er.EntityRegistry) -> None:
+async def test_state(hass: SmartHub, entity_registry: er.EntityRegistry) -> None:
     """Test handling of state.
 
     The group state is on if at least one group member is on.
@@ -213,7 +213,7 @@ async def test_state(hass: HomeAssistant, entity_registry: er.EntityRegistry) ->
 
 @pytest.mark.parametrize("config_count", [(CONFIG_ATTRIBUTES, 1)])
 @pytest.mark.usefixtures("setup_comp")
-async def test_attributes(hass: HomeAssistant) -> None:
+async def test_attributes(hass: SmartHub) -> None:
     """Test handling of state attributes."""
     state = hass.states.get(FAN_GROUP)
     assert state.state == STATE_UNAVAILABLE
@@ -271,7 +271,7 @@ async def test_attributes(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("config_count", [(CONFIG_FULL_SUPPORT, 2)])
 @pytest.mark.usefixtures("setup_comp")
-async def test_direction_oscillating(hass: HomeAssistant) -> None:
+async def test_direction_oscillating(hass: SmartHub) -> None:
     """Test handling of direction and oscillating attributes."""
 
     hass.states.async_set(
@@ -383,14 +383,14 @@ async def test_direction_oscillating(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("config_count", [(CONFIG_MISSING_FAN, 2)])
 @pytest.mark.usefixtures("setup_comp")
-async def test_state_missing_entity_id(hass: HomeAssistant) -> None:
+async def test_state_missing_entity_id(hass: SmartHub) -> None:
     """Test we can still setup with a missing entity id."""
     state = hass.states.get(FAN_GROUP)
     await hass.async_block_till_done()
     assert state.state == STATE_OFF
 
 
-async def test_setup_before_started(hass: HomeAssistant) -> None:
+async def test_setup_before_started(hass: SmartHub) -> None:
     """Test we can setup before starting."""
     hass.set_state(CoreState.stopped)
     assert await async_setup_component(hass, FAN_DOMAIN, CONFIG_MISSING_FAN)
@@ -404,7 +404,7 @@ async def test_setup_before_started(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("config_count", [(CONFIG_MISSING_FAN, 2)])
 @pytest.mark.usefixtures("setup_comp")
-async def test_reload(hass: HomeAssistant) -> None:
+async def test_reload(hass: SmartHub) -> None:
     """Test the ability to reload fans."""
     await hass.async_block_till_done()
     await hass.async_start()
@@ -428,7 +428,7 @@ async def test_reload(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("config_count", [(CONFIG_FULL_SUPPORT, 2)])
 @pytest.mark.usefixtures("setup_comp")
-async def test_service_calls(hass: HomeAssistant) -> None:
+async def test_service_calls(hass: SmartHub) -> None:
     """Test calling services."""
     await hass.services.async_call(
         FAN_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: FAN_GROUP}, blocking=True
@@ -534,7 +534,7 @@ async def test_service_calls(hass: HomeAssistant) -> None:
     assert fan_group_state.attributes[ATTR_DIRECTION] == DIRECTION_REVERSE
 
 
-async def test_nested_group(hass: HomeAssistant) -> None:
+async def test_nested_group(hass: SmartHub) -> None:
     """Test nested fan group."""
     await async_setup_component(
         hass,

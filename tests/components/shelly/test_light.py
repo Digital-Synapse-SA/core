@@ -14,7 +14,7 @@ from aioshelly.const import (
 )
 import pytest
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_BRIGHTNESS_PCT,
     ATTR_COLOR_MODE,
@@ -33,15 +33,15 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntityFeature,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import (
     get_entity,
@@ -58,7 +58,7 @@ SHELLY_PLUS_RGBW_CHANNELS = 4
 
 
 async def test_block_device_rgbw_bulb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -139,7 +139,7 @@ async def test_block_device_rgbw_bulb(
 
 
 async def test_block_device_rgb_bulb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -245,7 +245,7 @@ async def test_block_device_rgb_bulb(
 
 
 async def test_block_device_white_bulb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -321,7 +321,7 @@ async def test_block_device_white_bulb(
     ],
 )
 async def test_block_device_support_transition(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     entity_registry: EntityRegistry,
     model: str,
@@ -375,7 +375,7 @@ async def test_block_device_support_transition(
 
 
 async def test_block_device_relay_app_type_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -439,7 +439,7 @@ async def test_block_device_relay_app_type_light(
 
 
 async def test_block_device_no_light_blocks(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device without light blocks."""
     monkeypatch.setattr(mock_block_device.blocks[LIGHT_BLOCK_ID], "type", "roller")
@@ -449,7 +449,7 @@ async def test_block_device_no_light_blocks(
 
 
 async def test_rpc_device_switch_type_lights_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -488,7 +488,7 @@ async def test_rpc_device_switch_type_lights_mode(
 
 
 async def test_rpc_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -593,7 +593,7 @@ async def test_rpc_light(
 
 
 async def test_rpc_device_rgb_profile(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -637,7 +637,7 @@ async def test_rpc_device_rgb_profile(
 
 
 async def test_rpc_device_rgbw_profile(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -684,7 +684,7 @@ async def test_rpc_device_rgbw_profile(
 
 
 async def test_rpc_rgbw_device_light_mode_remove_others(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
@@ -744,7 +744,7 @@ async def test_rpc_rgbw_device_light_mode_remove_others(
     ],
 )
 async def test_rpc_rgbw_device_rgb_w_modes_remove_others(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
@@ -803,7 +803,7 @@ async def test_rpc_rgbw_device_rgb_w_modes_remove_others(
 
 
 async def test_rpc_cct_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -901,7 +901,7 @@ async def test_rpc_cct_light(
 
 
 async def test_rpc_remove_cct_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     device_registry: DeviceRegistry,
 ) -> None:

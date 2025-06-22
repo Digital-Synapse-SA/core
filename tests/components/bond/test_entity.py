@@ -6,11 +6,11 @@ from unittest.mock import patch
 from bond_async import BPUPSubscriptions, DeviceType
 from bond_async.bpup import BPUP_ALIVE_TIMEOUT
 
-from homeassistant.components import fan
-from homeassistant.components.fan import DOMAIN as FAN_DOMAIN
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.util import utcnow
+from smarthub.components import fan
+from smarthub.components.fan import DOMAIN as FAN_DOMAIN
+from smarthub.const import EVENT_HOMEASSISTANT_STOP, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import CoreState, SmartHub
+from smarthub.util import utcnow
 
 from .common import patch_bond_device_state, setup_platform
 
@@ -26,7 +26,7 @@ def ceiling_fan(name: str):
     }
 
 
-async def test_bpup_goes_offline_and_recovers_same_entity(hass: HomeAssistant) -> None:
+async def test_bpup_goes_offline_and_recovers_same_entity(hass: SmartHub) -> None:
     """Test that push updates fail and we fallback to polling and then bpup recovers.
 
     The BPUP recovery is triggered by an update for the entity and
@@ -34,7 +34,7 @@ async def test_bpup_goes_offline_and_recovers_same_entity(hass: HomeAssistant) -
     """
     bpup_subs = BPUPSubscriptions()
     with patch(
-        "homeassistant.components.bond.BPUPSubscriptions",
+        "smarthub.components.bond.BPUPSubscriptions",
         return_value=bpup_subs,
     ):
         await setup_platform(
@@ -110,7 +110,7 @@ async def test_bpup_goes_offline_and_recovers_same_entity(hass: HomeAssistant) -
 
 
 async def test_bpup_goes_offline_and_recovers_different_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that push updates fail and we fallback to polling and then bpup recovers.
 
@@ -119,7 +119,7 @@ async def test_bpup_goes_offline_and_recovers_different_entity(
     """
     bpup_subs = BPUPSubscriptions()
     with patch(
-        "homeassistant.components.bond.BPUPSubscriptions",
+        "smarthub.components.bond.BPUPSubscriptions",
         return_value=bpup_subs,
     ):
         await setup_platform(
@@ -172,7 +172,7 @@ async def test_bpup_goes_offline_and_recovers_different_entity(
     assert state.attributes[fan.ATTR_PERCENTAGE] == 33
 
 
-async def test_polling_fails_and_recovers(hass: HomeAssistant) -> None:
+async def test_polling_fails_and_recovers(hass: SmartHub) -> None:
     """Test that polling fails and we recover."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"
@@ -193,7 +193,7 @@ async def test_polling_fails_and_recovers(hass: HomeAssistant) -> None:
     assert state.attributes[fan.ATTR_PERCENTAGE] == 33
 
 
-async def test_polling_stops_at_the_stop_event(hass: HomeAssistant) -> None:
+async def test_polling_stops_at_the_stop_event(hass: SmartHub) -> None:
     """Test that polling stops at the stop event."""
     await setup_platform(
         hass, FAN_DOMAIN, ceiling_fan("name-1"), bond_device_id="test-device-id"

@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.deluge.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.deluge.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import CONF_DATA
 
@@ -51,11 +51,11 @@ def mock_api_unknown_error():
 @pytest.fixture(name="deluge_setup", autouse=True)
 def deluge_setup_fixture():
     """Mock deluge entry setup."""
-    with patch("homeassistant.components.deluge.async_setup_entry", return_value=True):
+    with patch("smarthub.components.deluge.async_setup_entry", return_value=True):
         yield
 
 
-async def test_flow_user(hass: HomeAssistant, api) -> None:
+async def test_flow_user(hass: SmartHub, api) -> None:
     """Test user initialized flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -67,7 +67,7 @@ async def test_flow_user(hass: HomeAssistant, api) -> None:
     assert result["data"] == CONF_DATA
 
 
-async def test_flow_user_already_configured(hass: HomeAssistant, api) -> None:
+async def test_flow_user_already_configured(hass: SmartHub, api) -> None:
     """Test user initialized flow with duplicate server."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -84,7 +84,7 @@ async def test_flow_user_already_configured(hass: HomeAssistant, api) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_flow_user_cannot_connect(hass: HomeAssistant, conn_error) -> None:
+async def test_flow_user_cannot_connect(hass: SmartHub, conn_error) -> None:
     """Test user initialized flow with unreachable server."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={CONF_SOURCE: SOURCE_USER}, data=CONF_DATA
@@ -94,7 +94,7 @@ async def test_flow_user_cannot_connect(hass: HomeAssistant, conn_error) -> None
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_flow_user_unknown_error(hass: HomeAssistant, unknown_error) -> None:
+async def test_flow_user_unknown_error(hass: SmartHub, unknown_error) -> None:
     """Test user initialized flow with unreachable server."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={CONF_SOURCE: SOURCE_USER}, data=CONF_DATA
@@ -104,7 +104,7 @@ async def test_flow_user_unknown_error(hass: HomeAssistant, unknown_error) -> No
     assert result["errors"] == {"base": "unknown"}
 
 
-async def test_flow_reauth(hass: HomeAssistant, api) -> None:
+async def test_flow_reauth(hass: SmartHub, api) -> None:
     """Test reauth step."""
     entry = MockConfigEntry(
         domain=DOMAIN,

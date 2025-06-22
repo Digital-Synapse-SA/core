@@ -5,12 +5,12 @@ from unittest.mock import MagicMock, patch
 from pybalboa.exceptions import SpaConnectionError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.balboa.const import CONF_SYNC_TIME, DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.balboa.const import CONF_SYNC_TIME, DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -22,7 +22,7 @@ TEST_DHCP_SERVICE_INFO = DhcpServiceInfo(
 )
 
 
-async def test_form(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_form(hass: SmartHub, client: MagicMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -32,11 +32,11 @@ async def test_form(hass: HomeAssistant, client: MagicMock) -> None:
 
     with (
         patch(
-            "homeassistant.components.balboa.config_flow.SpaClient.__aenter__",
+            "smarthub.components.balboa.config_flow.SpaClient.__aenter__",
             return_value=client,
         ),
         patch(
-            "homeassistant.components.balboa.async_setup_entry",
+            "smarthub.components.balboa.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -51,14 +51,14 @@ async def test_form(hass: HomeAssistant, client: MagicMock) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_form_cannot_connect(hass: SmartHub, client: MagicMock) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.balboa.config_flow.SpaClient.__aenter__",
+        "smarthub.components.balboa.config_flow.SpaClient.__aenter__",
         return_value=client,
         side_effect=SpaConnectionError(),
     ):
@@ -70,14 +70,14 @@ async def test_form_cannot_connect(hass: HomeAssistant, client: MagicMock) -> No
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_spa_not_configured(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_form_spa_not_configured(hass: SmartHub, client: MagicMock) -> None:
     """Test we handle spa not configured error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.balboa.config_flow.SpaClient.__aenter__",
+        "smarthub.components.balboa.config_flow.SpaClient.__aenter__",
         return_value=client,
     ):
         client.async_configuration_loaded.return_value = False
@@ -89,14 +89,14 @@ async def test_form_spa_not_configured(hass: HomeAssistant, client: MagicMock) -
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_unknown_error(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_unknown_error(hass: SmartHub, client: MagicMock) -> None:
     """Test we handle unknown error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.balboa.config_flow.SpaClient.__aenter__",
+        "smarthub.components.balboa.config_flow.SpaClient.__aenter__",
         return_value=client,
         side_effect=Exception("Boom"),
     ):
@@ -109,7 +109,7 @@ async def test_unknown_error(hass: HomeAssistant, client: MagicMock) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_already_configured(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_already_configured(hass: SmartHub, client: MagicMock) -> None:
     """Test when provided credentials are already configured."""
     MockConfigEntry(domain=DOMAIN, data=TEST_DATA, unique_id=TEST_MAC).add_to_hass(hass)
 
@@ -122,11 +122,11 @@ async def test_already_configured(hass: HomeAssistant, client: MagicMock) -> Non
 
     with (
         patch(
-            "homeassistant.components.balboa.config_flow.SpaClient.__aenter__",
+            "smarthub.components.balboa.config_flow.SpaClient.__aenter__",
             return_value=client,
         ),
         patch(
-            "homeassistant.components.balboa.async_setup_entry",
+            "smarthub.components.balboa.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -140,7 +140,7 @@ async def test_already_configured(hass: HomeAssistant, client: MagicMock) -> Non
     assert result2["reason"] == "already_configured"
 
 
-async def test_options_flow(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_options_flow(hass: SmartHub, client: MagicMock) -> None:
     """Test specifying non default settings using options flow."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=TEST_DATA, unique_id=TEST_MAC)
     config_entry.add_to_hass(hass)
@@ -154,7 +154,7 @@ async def test_options_flow(hass: HomeAssistant, client: MagicMock) -> None:
     assert result["step_id"] == "init"
 
     with patch(
-        "homeassistant.components.balboa.async_setup_entry",
+        "smarthub.components.balboa.async_setup_entry",
         return_value=True,
     ):
         result = await hass.config_entries.options.async_configure(
@@ -167,10 +167,10 @@ async def test_options_flow(hass: HomeAssistant, client: MagicMock) -> None:
     assert dict(config_entry.options) == {CONF_SYNC_TIME: True}
 
 
-async def test_dhcp_discovery(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_dhcp_discovery(hass: SmartHub, client: MagicMock) -> None:
     """Test we can process the discovery from dhcp."""
     with patch(
-        "homeassistant.components.balboa.config_flow.SpaClient.__aenter__",
+        "smarthub.components.balboa.config_flow.SpaClient.__aenter__",
         return_value=client,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -198,7 +198,7 @@ async def test_dhcp_discovery(hass: HomeAssistant, client: MagicMock) -> None:
 
 
 async def test_dhcp_discovery_updates_host(
-    hass: HomeAssistant, client: MagicMock
+    hass: SmartHub, client: MagicMock
 ) -> None:
     """Test dhcp discovery updates host and aborts."""
     entry = MockConfigEntry(domain=DOMAIN, data=TEST_DATA, unique_id=TEST_MAC)
@@ -226,11 +226,11 @@ async def test_dhcp_discovery_updates_host(
     ],
 )
 async def test_dhcp_discovery_failed(
-    hass: HomeAssistant, client: MagicMock, side_effect: Exception, reason: str
+    hass: SmartHub, client: MagicMock, side_effect: Exception, reason: str
 ) -> None:
     """Test failed setup from dhcp."""
     with patch(
-        "homeassistant.components.balboa.config_flow.SpaClient.__aenter__",
+        "smarthub.components.balboa.config_flow.SpaClient.__aenter__",
         return_value=client,
         side_effect=side_effect(),
     ):
@@ -244,11 +244,11 @@ async def test_dhcp_discovery_failed(
 
 
 async def test_dhcp_discovery_manual_user_setup(
-    hass: HomeAssistant, client: MagicMock
+    hass: SmartHub, client: MagicMock
 ) -> None:
     """Test dhcp discovery with manual user setup."""
     with patch(
-        "homeassistant.components.balboa.config_flow.SpaClient.__aenter__",
+        "smarthub.components.balboa.config_flow.SpaClient.__aenter__",
         return_value=client,
     ):
         result = await hass.config_entries.flow.async_init(

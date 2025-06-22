@@ -6,16 +6,16 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.kitchen_sink import DOMAIN
-from homeassistant.components.notify import (
+from smarthub.components.kitchen_sink import DOMAIN
+from smarthub.components.notify import (
     ATTR_MESSAGE,
     DOMAIN as NOTIFY_DOMAIN,
     SERVICE_SEND_MESSAGE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 ENTITY_DIRECT_MESSAGE = "notify.mybox_personal_notifier"
 
@@ -24,20 +24,20 @@ ENTITY_DIRECT_MESSAGE = "notify.mybox_personal_notifier"
 async def notify_only() -> AsyncGenerator[None]:
     """Enable only the button platform."""
     with patch(
-        "homeassistant.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
+        "smarthub.components.kitchen_sink.COMPONENTS_WITH_DEMO_PLATFORM",
         [Platform.NOTIFY],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_comp(hass: HomeAssistant, notify_only: None):
+async def setup_comp(hass: SmartHub, notify_only: None):
     """Set up demo component."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     await hass.async_block_till_done()
 
 
-def test_setup_params(hass: HomeAssistant) -> None:
+def test_setup_params(hass: SmartHub) -> None:
     """Test the initial parameters."""
     state = hass.states.get(ENTITY_DIRECT_MESSAGE)
     assert state
@@ -45,7 +45,7 @@ def test_setup_params(hass: HomeAssistant) -> None:
 
 
 async def test_send_message(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test pressing the button."""
     state = hass.states.get(ENTITY_DIRECT_MESSAGE)

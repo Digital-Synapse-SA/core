@@ -9,7 +9,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.backup import (
+from smarthub.components.backup import (
     AddonInfo,
     AgentBackup,
     BackupAgentError,
@@ -18,20 +18,20 @@ from homeassistant.components.backup import (
     Folder,
     store,
 )
-from homeassistant.components.backup.agent import BackupAgentUnreachableError
-from homeassistant.components.backup.const import DATA_MANAGER, DOMAIN
-from homeassistant.components.backup.manager import (
+from smarthub.components.backup.agent import BackupAgentUnreachableError
+from smarthub.components.backup.const import DATA_MANAGER, DOMAIN
+from smarthub.components.backup.manager import (
     AgentBackupStatus,
     CreateBackupEvent,
     CreateBackupState,
     ManagerBackup,
     NewBackup,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.backup import async_initialize_backup
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.backup import async_initialize_backup
+from smarthub.setup import async_setup_component
 
 from .common import (
     LOCAL_AGENT_ID,
@@ -53,7 +53,7 @@ BACKUP_CALL = call(
     include_all_addons=False,
     include_database=True,
     include_folders=None,
-    include_homeassistant=True,
+    include_smarthub=True,
     password="test-password",
     on_progress=ANY,
 )
@@ -94,8 +94,8 @@ TEST_MANAGER_BACKUP = ManagerBackup(
     failed_agent_ids=[],
     failed_folders=[],
     folders=[Folder.MEDIA, Folder.SHARE],
-    homeassistant_included=True,
-    homeassistant_version="2024.12.0",
+    smarthub_included=True,
+    smarthub_version="2024.12.0",
     name="Test",
     with_automatic_settings=True,
 )
@@ -116,7 +116,7 @@ def sync_access_token_proxy(
 @pytest.fixture(autouse=True)
 def mock_delay_save() -> Generator[None]:
     """Mock the delay save constant."""
-    with patch("homeassistant.components.backup.store.STORE_DELAY_SAVE", 0):
+    with patch("smarthub.components.backup.store.STORE_DELAY_SAVE", 0):
         yield
 
 
@@ -124,7 +124,7 @@ def mock_delay_save() -> Generator[None]:
 def mock_get_backups() -> Generator[AsyncMock]:
     """Mock manager get backups."""
     with patch(
-        "homeassistant.components.backup.BackupManager.async_get_backups"
+        "smarthub.components.backup.BackupManager.async_get_backups"
     ) as mock_get_backups:
         yield mock_get_backups
 
@@ -139,7 +139,7 @@ def mock_get_backups() -> Generator[AsyncMock]:
     ],
 )
 async def test_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     remote_agents: list[str],
     remote_backups: dict[str, list[AgentBackup]],
@@ -162,10 +162,10 @@ async def test_info(
 
 @pytest.mark.parametrize(
     "side_effect",
-    [Exception("Oops"), HomeAssistantError("Boom!"), BackupAgentUnreachableError],
+    [Exception("Oops"), SmartHubError("Boom!"), BackupAgentUnreachableError],
 )
 async def test_info_with_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     side_effect: Exception,
     snapshot: SnapshotAssertion,
@@ -203,7 +203,7 @@ async def test_info_with_errors(
     ],
 )
 async def test_details(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     remote_agents: list[str],
     backups: dict[str, list[AgentBackup]],
@@ -226,10 +226,10 @@ async def test_details(
 
 @pytest.mark.parametrize(
     "side_effect",
-    [Exception("Oops"), HomeAssistantError("Boom!"), BackupAgentUnreachableError],
+    [Exception("Oops"), SmartHubError("Boom!"), BackupAgentUnreachableError],
 )
 async def test_details_with_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     side_effect: Exception,
     snapshot: SnapshotAssertion,
@@ -254,7 +254,7 @@ async def test_details_with_errors(
 
 
 async def test_details_get_backup_returns_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     snapshot: SnapshotAssertion,
@@ -295,7 +295,7 @@ async def test_details_get_backup_returns_none(
     ],
 )
 async def test_delete(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     remote_agents: list[str],
     backups: dict[str, list[AgentBackup]],
@@ -343,10 +343,10 @@ async def test_delete(
     ],
 )
 @pytest.mark.parametrize(
-    "side_effect", [None, HomeAssistantError("Boom!"), BackupAgentUnreachableError]
+    "side_effect", [None, SmartHubError("Boom!"), BackupAgentUnreachableError]
 )
 async def test_delete_with_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
     side_effect: Exception,
@@ -382,7 +382,7 @@ async def test_delete_with_errors(
 
 
 async def test_agent_delete_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -415,7 +415,7 @@ async def test_agent_delete_backup(
 )
 @pytest.mark.usefixtures("mock_backup_generation")
 async def test_generate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     data: dict[str, Any] | None,
     freezer: FrozenDateTimeFactory,
@@ -441,8 +441,8 @@ async def test_generate(
     ("parameters", "expected_error"),
     [
         (
-            {"include_homeassistant": False},
-            "Home Assistant must be included in backup",
+            {"include_smarthub": False},
+            "SmartHub must be included in backup",
         ),
         (
             {"include_addons": ["blah"]},
@@ -459,7 +459,7 @@ async def test_generate(
     ],
 )
 async def test_generate_wrong_parameters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     parameters: dict[str, Any],
     expected_error: str,
@@ -502,7 +502,7 @@ async def test_generate_wrong_parameters(
     ],
 )
 async def test_generate_calls_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -517,7 +517,7 @@ async def test_generate_calls_create(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_initiate_backup",
+        "smarthub.components.backup.manager.BackupManager.async_initiate_backup",
         return_value=NewBackup(backup_job_id="abc123"),
     ) as generate_backup:
         await client.send_json_auto_id({"type": "backup/generate"} | params)
@@ -527,7 +527,7 @@ async def test_generate_calls_create(
         generate_backup.assert_called_once_with(
             **{
                 "include_all_addons": False,
-                "include_homeassistant": True,
+                "include_smarthub": True,
                 "include_addons": None,
                 "include_database": True,
                 "include_folders": None,
@@ -567,7 +567,7 @@ async def test_generate_calls_create(
                 "include_all_addons": False,
                 "include_database": True,
                 "include_folders": None,
-                "include_homeassistant": True,
+                "include_smarthub": True,
                 "on_progress": ANY,
                 "password": None,
             },
@@ -595,7 +595,7 @@ async def test_generate_calls_create(
                 "include_all_addons": False,
                 "include_database": True,
                 "include_folders": [Folder.MEDIA],
-                "include_homeassistant": True,
+                "include_smarthub": True,
                 "on_progress": ANY,
                 "password": "test-password",
             },
@@ -623,7 +623,7 @@ async def test_generate_calls_create(
                 "include_all_addons": False,
                 "include_database": True,
                 "include_folders": None,
-                "include_homeassistant": True,
+                "include_smarthub": True,
                 "on_progress": ANY,
                 "password": None,
             },
@@ -633,7 +633,7 @@ async def test_generate_calls_create(
     ],
 )
 async def test_generate_with_default_settings_calls_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
     freezer: FrozenDateTimeFactory,
@@ -708,14 +708,14 @@ async def test_generate_with_default_settings_calls_create(
     ],
 )
 async def test_restore_local_agent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     backups: dict[str, list[AgentBackup]],
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test calling the restore command."""
     await setup_backup_integration(hass, with_hassio=False, backups=backups)
-    restart_calls = async_mock_service(hass, "homeassistant", "restart")
+    restart_calls = async_mock_service(hass, "smarthub", "restart")
 
     client = await hass_ws_client(hass)
     await hass.async_block_till_done()
@@ -723,7 +723,7 @@ async def test_restore_local_agent(
     with (
         patch("pathlib.Path.exists", return_value=True),
         patch("pathlib.Path.write_text"),
-        patch("homeassistant.components.backup.manager.validate_password"),
+        patch("smarthub.components.backup.manager.validate_password"),
     ):
         await client.send_json_auto_id(
             {
@@ -744,7 +744,7 @@ async def test_restore_local_agent(
     ],
 )
 async def test_restore_remote_agent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     remote_agents: list[str],
     backups: dict[str, list[AgentBackup]],
@@ -755,7 +755,7 @@ async def test_restore_remote_agent(
     await setup_backup_integration(
         hass, with_hassio=False, backups=backups, remote_agents=remote_agents
     )
-    restart_calls = async_mock_service(hass, "homeassistant", "restart")
+    restart_calls = async_mock_service(hass, "smarthub", "restart")
 
     client = await hass_ws_client(hass)
     await hass.async_block_till_done()
@@ -763,7 +763,7 @@ async def test_restore_remote_agent(
     with (
         patch("pathlib.Path.write_text"),
         patch("pathlib.Path.open"),
-        patch("homeassistant.components.backup.manager.validate_password"),
+        patch("smarthub.components.backup.manager.validate_password"),
     ):
         await client.send_json_auto_id(
             {
@@ -777,7 +777,7 @@ async def test_restore_remote_agent(
 
 
 async def test_restore_remote_agent_get_backup_returns_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     snapshot: SnapshotAssertion,
@@ -786,7 +786,7 @@ async def test_restore_remote_agent_get_backup_returns_none(
     mock_agents = await setup_backup_integration(hass, remote_agents=["test.remote"])
     mock_agents["test.remote"].async_get_backup.return_value = None
     mock_agents["test.remote"].async_get_backup.side_effect = None
-    restart_calls = async_mock_service(hass, "homeassistant", "restart")
+    restart_calls = async_mock_service(hass, "smarthub", "restart")
 
     client = await hass_ws_client(hass)
     await hass.async_block_till_done()
@@ -807,7 +807,7 @@ async def test_restore_remote_agent_get_backup_returns_none(
 
 
 async def test_restore_wrong_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -815,7 +815,7 @@ async def test_restore_wrong_password(
     await setup_backup_integration(
         hass, with_hassio=False, backups={LOCAL_AGENT_ID: [TEST_BACKUP_ABC123]}
     )
-    restart_calls = async_mock_service(hass, "homeassistant", "restart")
+    restart_calls = async_mock_service(hass, "smarthub", "restart")
 
     client = await hass_ws_client(hass)
     await hass.async_block_till_done()
@@ -824,7 +824,7 @@ async def test_restore_wrong_password(
         patch("pathlib.Path.exists", return_value=True),
         patch("pathlib.Path.write_text"),
         patch(
-            "homeassistant.components.backup.manager.validate_password",
+            "smarthub.components.backup.manager.validate_password",
             return_value=False,
         ),
     ):
@@ -852,7 +852,7 @@ async def test_restore_wrong_password(
 )
 @pytest.mark.usefixtures("supervisor_client")
 async def test_backup_end(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     sync_access_token_proxy: str,
@@ -867,7 +867,7 @@ async def test_backup_end(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_post_backup_actions",
+        "smarthub.components.backup.manager.BackupManager.async_post_backup_actions",
     ):
         await client.send_json_auto_id({"type": "backup/end"})
         assert await client.receive_json() == snapshot
@@ -886,7 +886,7 @@ async def test_backup_end(
 )
 @pytest.mark.usefixtures("supervisor_client")
 async def test_backup_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     sync_access_token_proxy: str,
@@ -901,7 +901,7 @@ async def test_backup_start(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_pre_backup_actions",
+        "smarthub.components.backup.manager.BackupManager.async_pre_backup_actions",
     ):
         await client.send_json_auto_id({"type": "backup/start"})
         assert await client.receive_json() == snapshot
@@ -911,13 +911,13 @@ async def test_backup_start(
     "exception",
     [
         TimeoutError(),
-        HomeAssistantError("Boom"),
+        SmartHubError("Boom"),
         Exception("Boom"),
     ],
 )
 @pytest.mark.usefixtures("supervisor_client")
 async def test_backup_end_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     hass_supervisor_access_token: str,
@@ -930,7 +930,7 @@ async def test_backup_end_exception(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_post_backup_actions",
+        "smarthub.components.backup.manager.BackupManager.async_post_backup_actions",
         side_effect=exception,
     ):
         await client.send_json_auto_id({"type": "backup/end"})
@@ -941,13 +941,13 @@ async def test_backup_end_exception(
     "exception",
     [
         TimeoutError(),
-        HomeAssistantError("Boom"),
+        SmartHubError("Boom"),
         Exception("Boom"),
     ],
 )
 @pytest.mark.usefixtures("supervisor_client")
 async def test_backup_start_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     hass_supervisor_access_token: str,
@@ -960,7 +960,7 @@ async def test_backup_start_exception(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_pre_backup_actions",
+        "smarthub.components.backup.manager.BackupManager.async_pre_backup_actions",
         side_effect=exception,
     ):
         await client.send_json_auto_id({"type": "backup/start"})
@@ -968,7 +968,7 @@ async def test_backup_start_exception(
 
 
 async def test_agents_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -1331,9 +1331,9 @@ async def test_agents_info(
     ],
 )
 @pytest.mark.usefixtures("supervisor_client")
-@patch("homeassistant.components.backup.config.random.randint", Mock(return_value=600))
+@patch("smarthub.components.backup.config.random.randint", Mock(return_value=600))
 async def test_config_load_config_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -1509,9 +1509,9 @@ async def test_config_load_config_info(
         ],
     ],
 )
-@patch("homeassistant.components.backup.config.random.randint", Mock(return_value=600))
+@patch("smarthub.components.backup.config.random.randint", Mock(return_value=600))
 async def test_config_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -1615,7 +1615,7 @@ async def test_config_update(
     ],
 )
 async def test_config_update_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     command: dict[str, Any],
@@ -1917,9 +1917,9 @@ async def test_config_update_errors(
         ),
     ],
 )
-@patch("homeassistant.components.backup.config.random.randint", Mock(return_value=600))
+@patch("smarthub.components.backup.config.random.randint", Mock(return_value=600))
 async def test_config_schedule_logic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     hass_storage: dict[str, Any],
@@ -2828,9 +2828,9 @@ async def test_config_schedule_logic(
         ),
     ],
 )
-@patch("homeassistant.components.backup.config.BACKUP_START_TIME_JITTER", 0)
+@patch("smarthub.components.backup.config.BACKUP_START_TIME_JITTER", 0)
 async def test_config_retention_copies_logic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     hass_storage: dict[str, Any],
@@ -3111,7 +3111,7 @@ async def test_config_retention_copies_logic(
     ],
 )
 async def test_config_retention_copies_logic_manual_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     hass_storage: dict[str, Any],
@@ -3778,7 +3778,7 @@ async def test_config_retention_copies_logic_manual_backup(
     ],
 )
 async def test_config_retention_days_logic(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     hass_storage: dict[str, Any],
@@ -3857,7 +3857,7 @@ async def test_config_retention_days_logic(
 
 
 async def test_configured_agents_unavailable_repair(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     issue_registry: ir.IssueRegistry,
     hass_storage: dict[str, Any],
@@ -4036,7 +4036,7 @@ async def test_configured_agents_unavailable_repair(
 
 
 async def test_subscribe_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -4058,7 +4058,7 @@ async def test_subscribe_event(
 
 
 async def test_subscribe_event_early(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -4095,7 +4095,7 @@ async def test_subscribe_event_early(
 )
 @pytest.mark.usefixtures("mock_backups")
 async def test_can_decrypt_on_download(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     agent_id: str,
@@ -4127,7 +4127,7 @@ async def test_can_decrypt_on_download(
 )
 @pytest.mark.usefixtures("mock_backups")
 async def test_can_decrypt_on_download_with_agent_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
     error: Exception,
@@ -4156,7 +4156,7 @@ async def test_can_decrypt_on_download_with_agent_error(
 
 @pytest.mark.usefixtures("mock_backups")
 async def test_can_decrypt_on_download_get_backup_returns_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     snapshot: SnapshotAssertion,

@@ -6,16 +6,16 @@ from peblar import PeblarAuthenticationError, PeblarConnectionError, PeblarError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.peblar.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.peblar.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_peblar: MagicMock,
 ) -> None:
@@ -39,7 +39,7 @@ async def test_load_unload_config_entry(
     [PeblarConnectionError, PeblarError],
 )
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_peblar: MagicMock,
     exception: Exception,
@@ -56,7 +56,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_config_entry_authentication_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_peblar: MagicMock,
 ) -> None:

@@ -6,12 +6,12 @@ from unittest.mock import Mock
 from gardena_bluetooth.const import Battery
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.gardena_bluetooth import DeviceUnavailable
-from homeassistant.components.gardena_bluetooth.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.util import utcnow
+from smarthub.components.gardena_bluetooth import DeviceUnavailable
+from smarthub.components.gardena_bluetooth.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.util import utcnow
 
 from . import WATER_TIMER_SERVICE_INFO
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_entry: MockConfigEntry,
     mock_read_char_raw: dict[str, bytes],
@@ -42,7 +42,7 @@ async def test_setup(
 
 
 async def test_setup_retry(
-    hass: HomeAssistant, mock_entry: MockConfigEntry, mock_client: Mock
+    hass: SmartHub, mock_entry: MockConfigEntry, mock_client: Mock
 ) -> None:
     """Test setup creates expected devices."""
 

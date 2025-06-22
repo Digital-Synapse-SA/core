@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.teslemetry.const import DOMAIN
-from homeassistant.components.teslemetry.services import (
+from smarthub.components.teslemetry.const import DOMAIN
+from smarthub.components.teslemetry.services import (
     ATTR_DEPARTURE_TIME,
     ATTR_ENABLE,
     ATTR_END_OFF_PEAK_TIME,
@@ -24,10 +24,10 @@ from homeassistant.components.teslemetry.services import (
     SERVICE_TIME_OF_USE,
     SERVICE_VALET_MODE,
 )
-from homeassistant.const import CONF_DEVICE_ID, CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import CONF_DEVICE_ID, CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_platform
 from .const import COMMAND_ERROR, COMMAND_OK
@@ -37,7 +37,7 @@ lon = 153.3726526
 
 
 async def test_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Tests that the custom services are correct."""
 
@@ -205,7 +205,7 @@ async def test_services(
             "tesla_fleet_api.teslemetry.EnergySite.time_of_use_settings",
             return_value=COMMAND_ERROR,
         ) as set_time_of_use,
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -219,7 +219,7 @@ async def test_services(
 
 
 async def test_service_validation_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Tests that the custom services handle bad data."""
 

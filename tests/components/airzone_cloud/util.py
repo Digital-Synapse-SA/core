@@ -113,9 +113,9 @@ from aioairzone_cloud.const import (
 from aioairzone_cloud.device import Device
 from aioairzone_cloud.webserver import WebServer
 
-from homeassistant.components.airzone_cloud.const import DOMAIN
-from homeassistant.const import CONF_ID, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.airzone_cloud.const import DOMAIN
+from smarthub.const import CONF_ID, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -520,9 +520,9 @@ def mock_get_webserver(webserver: WebServer, devices: bool) -> dict[str, Any]:
 
 
 async def async_init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
-    """Set up the Airzone integration in Home Assistant."""
+    """Set up the Airzone integration in SmartHub."""
 
     config_entry = MockConfigEntry(
         data=CONFIG,
@@ -534,27 +534,27 @@ async def async_init_integration(
 
     with (
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_device_config",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_device_config",
             side_effect=mock_get_device_config,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_device_status",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_device_status",
             side_effect=mock_get_device_status,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_installation",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_installation",
             return_value=GET_INSTALLATION_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_installations",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_installations",
             return_value=GET_INSTALLATIONS_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_get_webserver",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.api_get_webserver",
             side_effect=mock_get_webserver,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.login",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.login",
             return_value=None,
         ),
     ):

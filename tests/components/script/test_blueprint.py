@@ -8,17 +8,17 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import script
-from homeassistant.components.blueprint import (
+from smarthub.components import script
+from smarthub.components.blueprint import (
     BLUEPRINT_SCHEMA,
     Blueprint,
     DomainBlueprints,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import Context, HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr, template
-from homeassistant.setup import async_setup_component
-from homeassistant.util import yaml as yaml_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import Context, SmartHub, callback
+from smarthub.helpers import device_registry as dr, template
+from smarthub.setup import async_setup_component
+from smarthub.util import yaml as yaml_util
 
 from tests.common import MockConfigEntry, async_mock_service
 
@@ -44,14 +44,14 @@ def patch_blueprint(blueprint_path: str, data_path: str) -> Iterator[None]:
         )
 
     with patch(
-        "homeassistant.components.blueprint.models.DomainBlueprints._load_blueprint",
+        "smarthub.components.blueprint.models.DomainBlueprints._load_blueprint",
         mock_load_blueprint,
     ):
         yield
 
 
 async def test_confirmable_notification(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test confirmable notification blueprint."""
     config_entry = MockConfigEntry(domain="fake_integration", data={})
@@ -81,7 +81,7 @@ async def test_confirmable_notification(
                                 "message": "Throw ring in mountain?",
                                 "confirm_action": [
                                     {
-                                        "action": "homeassistant.turn_on",
+                                        "action": "smarthub.turn_on",
                                         "target": {"entity_id": "mount.doom"},
                                     }
                                 ],
@@ -92,11 +92,11 @@ async def test_confirmable_notification(
             },
         )
 
-    turn_on_calls = async_mock_service(hass, "homeassistant", "turn_on")
+    turn_on_calls = async_mock_service(hass, "smarthub", "turn_on")
     context = Context()
 
     with patch(
-        "homeassistant.components.mobile_app.device_action.async_call_action_from_config"
+        "smarthub.components.mobile_app.device_action.async_call_action_from_config"
     ) as mock_call_action:
         # Trigger script
         await hass.services.async_call(script.DOMAIN, "confirm", context=context)

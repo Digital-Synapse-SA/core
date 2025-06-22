@@ -1,14 +1,14 @@
 """Tests for the Switch as X Lock platform."""
 
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN, LockState
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.switch_as_x.config_flow import SwitchAsXConfigFlowHandler
-from homeassistant.components.switch_as_x.const import (
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN, LockState
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.switch_as_x.config_flow import SwitchAsXConfigFlowHandler
+from smarthub.components.switch_as_x.const import (
     CONF_INVERT,
     CONF_TARGET_DOMAIN,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_ENTITY_ID,
     SERVICE_LOCK,
     SERVICE_TOGGLE,
@@ -19,13 +19,13 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
-async def test_default_state(hass: HomeAssistant) -> None:
+async def test_default_state(hass: SmartHub) -> None:
     """Test lock switch default state."""
     config_entry = MockConfigEntry(
         data={},
@@ -48,7 +48,7 @@ async def test_default_state(hass: HomeAssistant) -> None:
     assert state.state == "unavailable"
 
 
-async def test_service_calls(hass: HomeAssistant) -> None:
+async def test_service_calls(hass: SmartHub) -> None:
     """Test service calls affecting the switch as lock entity."""
     await async_setup_component(hass, "switch", {"switch": [{"platform": "demo"}]})
     await hass.async_block_till_done()
@@ -121,7 +121,7 @@ async def test_service_calls(hass: HomeAssistant) -> None:
     assert hass.states.get("lock.decorative_lights").state == LockState.LOCKED
 
 
-async def test_service_calls_inverted(hass: HomeAssistant) -> None:
+async def test_service_calls_inverted(hass: SmartHub) -> None:
     """Test service calls affecting the switch as lock entity."""
     await async_setup_component(hass, "switch", {"switch": [{"platform": "demo"}]})
     await hass.async_block_till_done()

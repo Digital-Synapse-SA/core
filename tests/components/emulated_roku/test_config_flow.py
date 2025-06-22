@@ -1,14 +1,14 @@
 """Tests for emulated_roku config flow."""
 
-from homeassistant import config_entries
-from homeassistant.components.emulated_roku import config_flow
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.emulated_roku import config_flow
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_flow_works(hass: HomeAssistant) -> None:
+async def test_flow_works(hass: SmartHub) -> None:
     """Test that config flow works."""
     result = await hass.config_entries.flow.async_init(
         config_flow.DOMAIN,
@@ -21,7 +21,7 @@ async def test_flow_works(hass: HomeAssistant) -> None:
     assert result["data"] == {"name": "Emulated Roku Test", "listen_port": 8060}
 
 
-async def test_flow_already_registered_entry(hass: HomeAssistant) -> None:
+async def test_flow_already_registered_entry(hass: SmartHub) -> None:
     """Test that config flow doesn't allow existing names."""
     MockConfigEntry(
         domain="emulated_roku", data={"name": "Emulated Roku Test", "listen_port": 8062}

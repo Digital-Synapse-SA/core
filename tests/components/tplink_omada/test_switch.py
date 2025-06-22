@@ -16,12 +16,12 @@ from tplink_omada_client.devices import (
 )
 from tplink_omada_client.exceptions import InvalidDevice
 
-from homeassistant.components import switch
-from homeassistant.components.tplink_omada.coordinator import POLL_GATEWAY
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant, ServiceResponse
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components import switch
+from smarthub.components.tplink_omada.coordinator import POLL_GATEWAY
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub, ServiceResponse
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -30,7 +30,7 @@ POLL_INTERVAL = timedelta(seconds=POLL_GATEWAY + 10)
 
 
 async def test_poe_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_omada_site_client: MagicMock,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -60,7 +60,7 @@ async def test_poe_switches(
 
 
 async def test_sfp_port_has_no_poe_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
 ) -> None:
     """Test PoE switch SFP ports have no PoE controls."""
@@ -71,7 +71,7 @@ async def test_sfp_port_has_no_poe_switch(
 
 
 async def test_gateway_connect_ipv4_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_omada_site_client: MagicMock,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -124,7 +124,7 @@ async def test_gateway_connect_ipv4_switch(
 
 
 async def test_gateway_port_poe_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_omada_site_client: MagicMock,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -165,7 +165,7 @@ async def test_gateway_port_poe_switch(
 
 
 async def test_gateway_wan_port_has_no_poe_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
 ) -> None:
     """Test PoE switch SFP ports have no PoE controls."""
@@ -188,7 +188,7 @@ def _assert_gateway_poe_set(mock_omada_site_client, test_gateway, poe_enabled: b
 
 
 async def test_gateway_api_fail_disables_switch_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_omada_site_client: MagicMock,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -210,7 +210,7 @@ async def test_gateway_api_fail_disables_switch_entities(
 
 
 async def test_gateway_port_change_disables_switch_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_omada_site_client: MagicMock,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -237,7 +237,7 @@ async def test_gateway_port_change_disables_switch_entities(
 
 
 async def _test_poe_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_omada_site_client: MagicMock,
     entity_id: str,
     network_switch_mac: str,
@@ -336,7 +336,7 @@ def _get_updated_gateway_port_status(
     return OmadaGatewayPortStatus(gateway_data["portStats"][port])
 
 
-def call_service(hass: HomeAssistant, service: str, entity_id: str) -> ServiceResponse:
+def call_service(hass: SmartHub, service: str, entity_id: str) -> ServiceResponse:
     """Call any service on entity."""
     return hass.services.async_call(
         switch.DOMAIN, service, {ATTR_ENTITY_ID: entity_id}, blocking=True

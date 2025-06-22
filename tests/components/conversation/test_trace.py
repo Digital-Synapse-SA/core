@@ -4,23 +4,23 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import conversation
-from homeassistant.components.conversation import trace
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components import conversation
+from smarthub.components.conversation import trace
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture
-async def init_components(hass: HomeAssistant):
+async def init_components(hass: SmartHub):
     """Initialize relevant components with empty configs."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})
     assert await async_setup_component(hass, "intent", {})
 
 
 async def test_converation_trace(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: None,
     sl_setup: None,
 ) -> None:
@@ -62,14 +62,14 @@ async def test_converation_trace(
 
 
 async def test_converation_trace_uncaught_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: None,
     sl_setup: None,
 ) -> None:
     """Test tracing a conversation that raises an uncaught error."""
     with (
         patch(
-            "homeassistant.components.conversation.default_agent.DefaultAgent.async_process",
+            "smarthub.components.conversation.default_agent.DefaultAgent.async_process",
             side_effect=ValueError("Unexpected error"),
         ),
         pytest.raises(ValueError),
@@ -91,16 +91,16 @@ async def test_converation_trace_uncaught_error(
     assert not last_trace.get("result")
 
 
-async def test_converation_trace_homeassistant_error(
-    hass: HomeAssistant,
+async def test_converation_trace_smarthub_error(
+    hass: SmartHub,
     init_components: None,
     sl_setup: None,
 ) -> None:
-    """Test tracing a conversation with a HomeAssistant error."""
+    """Test tracing a conversation with a SmartHub error."""
     with (
         patch(
-            "homeassistant.components.conversation.default_agent.DefaultAgent.async_process",
-            side_effect=HomeAssistantError("Failed to talk to agent"),
+            "smarthub.components.conversation.default_agent.DefaultAgent.async_process",
+            side_effect=SmartHubError("Failed to talk to agent"),
         ),
     ):
         await conversation.async_converse(

@@ -5,18 +5,18 @@ from unittest.mock import AsyncMock
 import pytest
 from python_snoo.exceptions import InvalidSnooAuth, SnooAuthException
 
-from homeassistant import config_entries
-from homeassistant.components.snoo.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.snoo.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import create_entry
 
 
 async def test_config_flow_success(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, bypass_api: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, bypass_api: AsyncMock
 ) -> None:
     """Test we create the entry successfully."""
     result = await hass.config_entries.flow.async_init(
@@ -52,7 +52,7 @@ async def test_config_flow_success(
     ],
 )
 async def test_form_auth_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     bypass_api: AsyncMock,
     exception,
@@ -93,7 +93,7 @@ async def test_form_auth_issues(
 
 
 async def test_account_already_configured(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, bypass_api: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, bypass_api: AsyncMock
 ) -> None:
     """Ensure we abort if the config flow already exists."""
     create_entry(hass)

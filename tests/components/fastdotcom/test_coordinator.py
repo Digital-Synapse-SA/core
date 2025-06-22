@@ -5,16 +5,16 @@ from unittest.mock import patch
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.fastdotcom.const import DEFAULT_NAME, DOMAIN
-from homeassistant.components.fastdotcom.coordinator import DEFAULT_INTERVAL
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.fastdotcom.const import DEFAULT_NAME, DOMAIN
+from smarthub.components.fastdotcom.coordinator import DEFAULT_INTERVAL
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_fastdotcom_data_update_coordinator(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test the update coordinator."""
     config_entry = MockConfigEntry(
@@ -25,7 +25,7 @@ async def test_fastdotcom_data_update_coordinator(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.fastdotcom.coordinator.fast_com", return_value=5.0
+        "smarthub.components.fastdotcom.coordinator.fast_com", return_value=5.0
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()
@@ -35,7 +35,7 @@ async def test_fastdotcom_data_update_coordinator(
     assert state.state == "5.0"
 
     with patch(
-        "homeassistant.components.fastdotcom.coordinator.fast_com", return_value=10.0
+        "smarthub.components.fastdotcom.coordinator.fast_com", return_value=10.0
     ):
         freezer.tick(timedelta(hours=DEFAULT_INTERVAL))
         async_fire_time_changed(hass)
@@ -45,7 +45,7 @@ async def test_fastdotcom_data_update_coordinator(
     assert state.state == "10.0"
 
     with patch(
-        "homeassistant.components.fastdotcom.coordinator.fast_com",
+        "smarthub.components.fastdotcom.coordinator.fast_com",
         side_effect=Exception("Test error"),
     ):
         freezer.tick(timedelta(hours=DEFAULT_INTERVAL))

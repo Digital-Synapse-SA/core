@@ -8,19 +8,19 @@ from bring_api import BringItemOperation, BringItemsResponse, BringRequestExcept
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.bring.const import DOMAIN
-from homeassistant.components.todo import (
+from smarthub.components.bring.const import DOMAIN
+from smarthub.components.todo import (
     ATTR_DESCRIPTION,
     ATTR_ITEM,
     ATTR_RENAME,
     DOMAIN as TODO_DOMAIN,
     TodoServices,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_load_fixture, snapshot_platform
 
@@ -29,7 +29,7 @@ from tests.common import MockConfigEntry, async_load_fixture, snapshot_platform
 def todo_only() -> Generator[None]:
     """Enable only the todo platform."""
     with patch(
-        "homeassistant.components.bring.PLATFORMS",
+        "smarthub.components.bring.PLATFORMS",
         [Platform.TODO],
     ):
         yield
@@ -37,7 +37,7 @@ def todo_only() -> Generator[None]:
 
 @pytest.mark.usefixtures("mock_bring_client")
 async def test_todo(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -65,7 +65,7 @@ async def test_todo(
 
 @pytest.mark.usefixtures("mock_uuid")
 async def test_add_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -94,7 +94,7 @@ async def test_add_item(
 
 
 async def test_add_item_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -108,7 +108,7 @@ async def test_add_item_exception(
 
     mock_bring_client.save_item.side_effect = BringRequestException
     with pytest.raises(
-        HomeAssistantError, match="Failed to save item Äpfel to Bring! list"
+        SmartHubError, match="Failed to save item Äpfel to Bring! list"
     ):
         await hass.services.async_call(
             TODO_DOMAIN,
@@ -121,7 +121,7 @@ async def test_add_item_exception(
 
 @pytest.mark.usefixtures("mock_uuid")
 async def test_update_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -157,7 +157,7 @@ async def test_update_item(
 
 
 async def test_update_item_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -171,7 +171,7 @@ async def test_update_item_exception(
 
     mock_bring_client.batch_update_list.side_effect = BringRequestException
     with pytest.raises(
-        HomeAssistantError, match="Failed to update item Paprika to Bring! list"
+        SmartHubError, match="Failed to update item Paprika to Bring! list"
     ):
         await hass.services.async_call(
             TODO_DOMAIN,
@@ -188,7 +188,7 @@ async def test_update_item_exception(
 
 @pytest.mark.usefixtures("mock_uuid")
 async def test_rename_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -232,7 +232,7 @@ async def test_rename_item(
 
 
 async def test_rename_item_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -246,7 +246,7 @@ async def test_rename_item_exception(
 
     mock_bring_client.batch_update_list.side_effect = BringRequestException
     with pytest.raises(
-        HomeAssistantError, match="Failed to rename item Gurke to Bring! list"
+        SmartHubError, match="Failed to rename item Gurke to Bring! list"
     ):
         await hass.services.async_call(
             TODO_DOMAIN,
@@ -263,7 +263,7 @@ async def test_rename_item_exception(
 
 @pytest.mark.usefixtures("mock_uuid")
 async def test_delete_items(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -297,7 +297,7 @@ async def test_delete_items(
 
 
 async def test_delete_items_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bring_config_entry: MockConfigEntry,
     mock_bring_client: AsyncMock,
 ) -> None:
@@ -310,7 +310,7 @@ async def test_delete_items_exception(
     assert bring_config_entry.state is ConfigEntryState.LOADED
     mock_bring_client.batch_update_list.side_effect = BringRequestException
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Failed to delete 1 item(s) from Bring! list"),
     ):
         await hass.services.async_call(

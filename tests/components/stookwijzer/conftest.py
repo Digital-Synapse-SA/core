@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from homeassistant.components.stookwijzer.const import DOMAIN
-from homeassistant.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
+from smarthub.components.stookwijzer.const import DOMAIN
+from smarthub.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -57,7 +57,7 @@ def mock_v1_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.stookwijzer.async_setup_entry", return_value=True
+        "smarthub.components.stookwijzer.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
@@ -67,15 +67,15 @@ def mock_stookwijzer() -> Generator[MagicMock]:
     """Return a mocked Stookwijzer client."""
     with (
         patch(
-            "homeassistant.components.stookwijzer.Stookwijzer",
+            "smarthub.components.stookwijzer.Stookwijzer",
             autospec=True,
         ) as stookwijzer_mock,
         patch(
-            "homeassistant.components.stookwijzer.coordinator.Stookwijzer",
+            "smarthub.components.stookwijzer.coordinator.Stookwijzer",
             new=stookwijzer_mock,
         ),
         patch(
-            "homeassistant.components.stookwijzer.config_flow.Stookwijzer",
+            "smarthub.components.stookwijzer.config_flow.Stookwijzer",
             new=stookwijzer_mock,
         ),
     ):
@@ -117,7 +117,7 @@ def mock_stookwijzer() -> Generator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_stookwijzer: MagicMock,
 ) -> MockConfigEntry:

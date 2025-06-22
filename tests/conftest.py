@@ -42,50 +42,50 @@ import respx
 from syrupy.assertion import SnapshotAssertion
 from syrupy.session import SnapshotSession
 
-# Setup patching of JSON functions before any other Home Assistant imports
+# Setup patching of JSON functions before any other SmartHub imports
 from . import patch_json  # isort:skip
 
-from homeassistant import block_async_io
-from homeassistant.exceptions import ServiceNotFound
+from smarthub import block_async_io
+from smarthub.exceptions import ServiceNotFound
 
-# Setup patching of recorder functions before any other Home Assistant imports
+# Setup patching of recorder functions before any other SmartHub imports
 from . import patch_recorder  # isort:skip
 
-# Setup patching of dt_util time functions before any other Home Assistant imports
+# Setup patching of dt_util time functions before any other SmartHub imports
 from . import patch_time  # isort:skip
 
-from homeassistant import components, core as ha, loader, runner
-from homeassistant.auth.const import GROUP_ID_ADMIN, GROUP_ID_READ_ONLY
-from homeassistant.auth.models import Credentials
-from homeassistant.auth.providers import homeassistant
-from homeassistant.components.device_tracker.legacy import Device
+from smarthub import components, core as ha, loader, runner
+from smarthub.auth.const import GROUP_ID_ADMIN, GROUP_ID_READ_ONLY
+from smarthub.auth.models import Credentials
+from smarthub.auth.providers import smarthub
+from smarthub.components.device_tracker.legacy import Device
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.websocket_api.auth import (
+from smarthub.components.websocket_api.auth import (
     TYPE_AUTH,
     TYPE_AUTH_OK,
     TYPE_AUTH_REQUIRED,
 )
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.websocket_api.http import URL
-from homeassistant.config import YAML_CONFIG_FILE
-from homeassistant.config_entries import (
+from smarthub.components.websocket_api.http import URL
+from smarthub.config import YAML_CONFIG_FILE
+from smarthub.config_entries import (
     ConfigEntries,
     ConfigEntry,
     ConfigEntryState,
     ConfigSubentryData,
 )
-from homeassistant.const import BASE_PLATFORMS, HASSIO_USER_NAME
-from homeassistant.core import (
+from smarthub.const import BASE_PLATFORMS, HASSIO_USER_NAME
+from smarthub.core import (
     Context,
     CoreState,
     HassJob,
-    HomeAssistant,
+    SmartHub,
     ServiceCall,
     ServiceResponse,
 )
-from homeassistant.helpers import (
+from smarthub.helpers import (
     area_registry as ar,
     category_registry as cr,
     config_entry_oauth2_flow,
@@ -98,16 +98,16 @@ from homeassistant.helpers import (
     recorder as recorder_helper,
     translation as translation_helper,
 )
-from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.translation import _TranslationsCacheData
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util, location as location_util
-from homeassistant.util.async_ import create_eager_task, get_scheduled_timer_handles
-from homeassistant.util.json import json_loads
+from smarthub.helpers.dispatcher import async_dispatcher_send
+from smarthub.helpers.translation import _TranslationsCacheData
+from smarthub.helpers.typing import ConfigType
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util, location as location_util
+from smarthub.util.async_ import create_eager_task, get_scheduled_timer_handles
+from smarthub.util.json import json_loads
 
 from .ignore_uncaught_exceptions import IGNORE_UNCAUGHT_EXCEPTIONS
-from .syrupy import HomeAssistantSnapshotExtension, override_syrupy_finish
+from .syrupy import SmartHubSnapshotExtension, override_syrupy_finish
 from .typing import (
     ClientSessionGenerator,
     MockHAClientWebSocket,
@@ -122,8 +122,8 @@ from .typing import (
 if TYPE_CHECKING:
     # Local import to avoid processing recorder and SQLite modules when running a
     # testcase which does not use the recorder.
-    from homeassistant.auth.models import RefreshToken
-    from homeassistant.components import recorder
+    from smarthub.auth.models import RefreshToken
+    from smarthub.components import recorder
 
 
 pytest.register_assert_rewrite("tests.common")
@@ -307,7 +307,7 @@ def skip_stop_scripts(
         yield
         return
     with patch(
-        "homeassistant.helpers.script._schedule_stop_scripts_after_shutdown",
+        "smarthub.helpers.script._schedule_stop_scripts_after_shutdown",
         Mock(),
     ):
         yield
@@ -559,8 +559,8 @@ async def hass(
     hass_storage: dict[str, Any],
     request: pytest.FixtureRequest,
     mock_recorder_before_hass: None,
-) -> AsyncGenerator[HomeAssistant]:
-    """Create a test instance of Home Assistant."""
+) -> AsyncGenerator[SmartHub]:
+    """Create a test instance of SmartHub."""
 
     loop = asyncio.get_running_loop()
     hass_fixture_setup.append(True)
@@ -621,7 +621,7 @@ async def hass(
 @pytest.fixture
 async def stop_hass() -> AsyncGenerator[None]:
     """Make sure all hass are stopped."""
-    orig_hass = ha.HomeAssistant
+    orig_hass = ha.SmartHub
 
     event_loop = asyncio.get_running_loop()
     created = []
@@ -631,7 +631,7 @@ async def stop_hass() -> AsyncGenerator[None]:
         created.append(hass_inst)
         return hass_inst
 
-    with patch("homeassistant.core.HomeAssistant", mock_hass):
+    with patch("smarthub.core.SmartHub", mock_hass):
         yield
 
     for hass_inst in created:
@@ -669,13 +669,13 @@ def mock_device_tracker_conf() -> Generator[list[Device]]:
     with (
         patch(
             (
-                "homeassistant.components.device_tracker.legacy"
+                "smarthub.components.device_tracker.legacy"
                 ".DeviceTracker.async_update_config"
             ),
             side_effect=mock_update_config,
         ),
         patch(
-            "homeassistant.components.device_tracker.legacy.async_load_config",
+            "smarthub.components.device_tracker.legacy.async_load_config",
             side_effect=lambda *args: devices,
         ),
     ):
@@ -684,12 +684,12 @@ def mock_device_tracker_conf() -> Generator[list[Device]]:
 
 @pytest.fixture
 async def hass_admin_credential(
-    hass: HomeAssistant, local_auth: homeassistant.HassAuthProvider
+    hass: SmartHub, local_auth: smarthub.HassAuthProvider
 ) -> Credentials:
     """Provide credentials for admin user."""
     return Credentials(
         id="mock-credential-id",
-        auth_provider_type="homeassistant",
+        auth_provider_type="smarthub",
         auth_provider_id=None,
         data={"username": "admin"},
         is_new=False,
@@ -698,9 +698,9 @@ async def hass_admin_credential(
 
 @pytest.fixture
 async def hass_access_token(
-    hass: HomeAssistant, hass_admin_user: MockUser, hass_admin_credential: Credentials
+    hass: SmartHub, hass_admin_user: MockUser, hass_admin_credential: Credentials
 ) -> str:
-    """Return an access token to access Home Assistant."""
+    """Return an access token to access SmartHub."""
     await hass.auth.async_link_user(hass_admin_user, hass_admin_credential)
 
     refresh_token = await hass.auth.async_create_refresh_token(
@@ -711,40 +711,40 @@ async def hass_access_token(
 
 @pytest.fixture
 def hass_owner_user(
-    hass: HomeAssistant, local_auth: homeassistant.HassAuthProvider
+    hass: SmartHub, local_auth: smarthub.HassAuthProvider
 ) -> MockUser:
-    """Return a Home Assistant admin user."""
+    """Return a SmartHub admin user."""
     return MockUser(is_owner=True).add_to_hass(hass)
 
 
 @pytest.fixture
 async def hass_admin_user(
-    hass: HomeAssistant, local_auth: homeassistant.HassAuthProvider
+    hass: SmartHub, local_auth: smarthub.HassAuthProvider
 ) -> MockUser:
-    """Return a Home Assistant admin user."""
+    """Return a SmartHub admin user."""
     admin_group = await hass.auth.async_get_group(GROUP_ID_ADMIN)
     return MockUser(groups=[admin_group]).add_to_hass(hass)
 
 
 @pytest.fixture
 async def hass_read_only_user(
-    hass: HomeAssistant, local_auth: homeassistant.HassAuthProvider
+    hass: SmartHub, local_auth: smarthub.HassAuthProvider
 ) -> MockUser:
-    """Return a Home Assistant read only user."""
+    """Return a SmartHub read only user."""
     read_only_group = await hass.auth.async_get_group(GROUP_ID_READ_ONLY)
     return MockUser(groups=[read_only_group]).add_to_hass(hass)
 
 
 @pytest.fixture
 async def hass_read_only_access_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_read_only_user: MockUser,
-    local_auth: homeassistant.HassAuthProvider,
+    local_auth: smarthub.HassAuthProvider,
 ) -> str:
-    """Return a Home Assistant read only user."""
+    """Return a SmartHub read only user."""
     credential = Credentials(
         id="mock-readonly-credential-id",
-        auth_provider_type="homeassistant",
+        auth_provider_type="smarthub",
         auth_provider_id=None,
         data={"username": "readonly"},
         is_new=False,
@@ -759,9 +759,9 @@ async def hass_read_only_access_token(
 
 @pytest.fixture
 async def hass_supervisor_user(
-    hass: HomeAssistant, local_auth: homeassistant.HassAuthProvider
+    hass: SmartHub, local_auth: smarthub.HassAuthProvider
 ) -> MockUser:
-    """Return the Home Assistant Supervisor user."""
+    """Return the SmartHub Supervisor user."""
     admin_group = await hass.auth.async_get_group(GROUP_ID_ADMIN)
     return MockUser(
         name=HASSIO_USER_NAME, groups=[admin_group], system_generated=True
@@ -770,20 +770,20 @@ async def hass_supervisor_user(
 
 @pytest.fixture
 async def hass_supervisor_access_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_supervisor_user: MockUser,
-    local_auth: homeassistant.HassAuthProvider,
+    local_auth: smarthub.HassAuthProvider,
 ) -> str:
-    """Return a Home Assistant Supervisor access token."""
+    """Return a SmartHub Supervisor access token."""
     refresh_token = await hass.auth.async_create_refresh_token(hass_supervisor_user)
     return hass.auth.async_create_access_token(refresh_token)
 
 
 @pytest.fixture
-async def local_auth(hass: HomeAssistant) -> homeassistant.HassAuthProvider:
+async def local_auth(hass: SmartHub) -> smarthub.HassAuthProvider:
     """Load local auth provider."""
-    prv = homeassistant.HassAuthProvider(
-        hass, hass.auth._store, {"type": "homeassistant"}
+    prv = smarthub.HassAuthProvider(
+        hass, hass.auth._store, {"type": "smarthub"}
     )
     await prv.async_initialize()
     hass.auth._providers[(prv.type, prv.id)] = prv
@@ -792,7 +792,7 @@ async def local_auth(hass: HomeAssistant) -> homeassistant.HassAuthProvider:
 
 @pytest.fixture
 def hass_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     hass_access_token: str,
     socket_enabled: None,
@@ -810,7 +810,7 @@ def hass_client(
 
 @pytest.fixture
 def hass_client_no_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     socket_enabled: None,
 ) -> ClientSessionGenerator:
@@ -826,7 +826,7 @@ def hass_client_no_auth(
 @pytest.fixture
 def current_request() -> Generator[MagicMock]:
     """Mock current request."""
-    with patch("homeassistant.helpers.http.current_request") as mock_request_context:
+    with patch("smarthub.helpers.http.current_request") as mock_request_context:
         mocked_request = make_mocked_request(
             "GET",
             "/some/request",
@@ -851,13 +851,13 @@ def current_request_with_host(current_request: MagicMock) -> None:
 def hass_ws_client(
     aiohttp_client: ClientSessionGenerator,
     hass_access_token: str,
-    hass: HomeAssistant,
+    hass: SmartHub,
     socket_enabled: None,
 ) -> WebSocketGenerator:
     """Websocket client fixture connected to websocket server."""
 
     async def create_client(
-        hass: HomeAssistant = hass, access_token: str | None = hass_access_token
+        hass: SmartHub = hass, access_token: str | None = hass_access_token
     ) -> MockHAClientWebSocket:
         """Create a websocket client."""
         assert await async_setup_component(hass, "websocket_api", {})
@@ -916,7 +916,7 @@ def fail_on_log_exception(
     def log_exception(format_err, *args):
         raise  # noqa: PLE0704
 
-    monkeypatch.setattr("homeassistant.util.logging.log_exception", log_exception)
+    monkeypatch.setattr("smarthub.util.logging.log_exception", log_exception)
 
 
 @pytest.fixture
@@ -938,7 +938,7 @@ def mqtt_config_entry_options() -> dict[str, Any] | None:
 
 
 @pytest.fixture
-def mqtt_client_mock(hass: HomeAssistant) -> Generator[MqttMockPahoClient]:
+def mqtt_client_mock(hass: SmartHub) -> Generator[MqttMockPahoClient]:
     """Fixture to mock MQTT client."""
 
     mid: int = 0
@@ -956,7 +956,7 @@ def mqtt_client_mock(hass: HomeAssistant) -> Generator[MqttMockPahoClient]:
             self.rc = 0
 
     with patch(
-        "homeassistant.components.mqtt.async_client.AsyncMQTTClient"
+        "smarthub.components.mqtt.async_client.AsyncMQTTClient"
     ) as mock_client:
         # The below use a call_soon for the on_publish/on_subscribe/on_unsubscribe
         # callbacks to simulate the behavior of the real MQTT client which will
@@ -1012,7 +1012,7 @@ def mqtt_client_mock(hass: HomeAssistant) -> Generator[MqttMockPahoClient]:
 
 @pytest.fixture
 async def mqtt_mock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_hass_config: None,
     mqtt_client_mock: MqttMockPahoClient,
     mqtt_config_entry_data: dict[str, Any] | None,
@@ -1026,7 +1026,7 @@ async def mqtt_mock(
 
 @asynccontextmanager
 async def _mqtt_mock_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
     mqtt_config_entry_data: dict[str, Any] | None,
     mqtt_config_entry_options: dict[str, Any] | None,
@@ -1035,7 +1035,7 @@ async def _mqtt_mock_entry(
     """Fixture to mock a delayed setup of the MQTT config entry."""
     # Local import to avoid processing MQTT modules when running a testcase
     # which does not use MQTT.
-    from homeassistant.components import mqtt  # noqa: PLC0415
+    from smarthub.components import mqtt  # noqa: PLC0415
 
     if mqtt_config_entry_data is None:
         mqtt_config_entry_data = {mqtt.CONF_BROKER: "mock-broker"}
@@ -1060,7 +1060,7 @@ async def _mqtt_mock_entry(
     mock_mqtt_instance = None
 
     async def _setup_mqtt_entry(
-        setup_entry: Callable[[HomeAssistant, ConfigEntry], Coroutine[Any, Any, bool]],
+        setup_entry: Callable[[SmartHub, ConfigEntry], Coroutine[Any, Any, bool]],
     ) -> MagicMock:
         """Set up the MQTT config entry."""
         assert await setup_entry(hass, entry)
@@ -1091,7 +1091,7 @@ async def _mqtt_mock_entry(
         )
         return mock_mqtt_instance
 
-    with patch("homeassistant.components.mqtt.MQTT", side_effect=create_mock_mqtt):
+    with patch("smarthub.components.mqtt.MQTT", side_effect=create_mock_mqtt):
         yield _setup_mqtt_entry
 
 
@@ -1107,15 +1107,15 @@ def hass_config() -> ConfigType:
 
 
 @pytest.fixture
-def mock_hass_config(hass: HomeAssistant, hass_config: ConfigType) -> Generator[None]:
+def mock_hass_config(hass: SmartHub, hass_config: ConfigType) -> Generator[None]:
     """Fixture to mock the content of main configuration.
 
-    Patches homeassistant.config.load_yaml_config_file and hass.config_entries
+    Patches smarthub.config.load_yaml_config_file and hass.config_entries
     with `hass_config` as parameterized.
     """
     if hass_config:
         hass.config_entries = ConfigEntries(hass, hass_config)
-    with patch("homeassistant.config.load_yaml_config_file", return_value=hass_config):
+    with patch("smarthub.config.load_yaml_config_file", return_value=hass_config):
         yield
 
 
@@ -1145,7 +1145,7 @@ def hass_config_yaml_files(hass_config_yaml: str) -> dict[str, str]:
 
 @pytest.fixture
 def mock_hass_config_yaml(
-    hass: HomeAssistant, hass_config_yaml_files: dict[str, str]
+    hass: SmartHub, hass_config_yaml_files: dict[str, str]
 ) -> Generator[None]:
     """Fixture to mock the content of the yaml configuration files.
 
@@ -1158,7 +1158,7 @@ def mock_hass_config_yaml(
 
 @pytest.fixture
 async def mqtt_mock_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
     mqtt_config_entry_data: dict[str, Any] | None,
     mqtt_config_entry_options: dict[str, Any] | None,
@@ -1167,7 +1167,7 @@ async def mqtt_mock_entry(
     """Set up an MQTT config entry."""
 
     async def _async_setup_config_entry(
-        hass: HomeAssistant, entry: ConfigEntry
+        hass: SmartHub, entry: ConfigEntry
     ) -> bool:
         """Help set up the config entry."""
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -1193,7 +1193,7 @@ def mock_network() -> Generator[None]:
     """Mock network."""
     with (
         patch(
-            "homeassistant.components.network.util.ifaddr.get_adapters",
+            "smarthub.components.network.util.ifaddr.get_adapters",
             return_value=[
                 Mock(
                     nice_name="eth0",
@@ -1203,7 +1203,7 @@ def mock_network() -> Generator[None]:
             ],
         ),
         patch(
-            "homeassistant.components.network.async_get_loaded_adapters",
+            "smarthub.components.network.async_get_loaded_adapters",
             return_value=[
                 {
                     "auto": True,
@@ -1224,7 +1224,7 @@ def mock_network() -> Generator[None]:
 def mock_get_source_ip() -> Generator[_patch]:
     """Mock network util's async_get_source_ip."""
     patcher = patch(
-        "homeassistant.components.network.util.async_get_source_ip",
+        "smarthub.components.network.util.async_get_source_ip",
         return_value="10.10.10.10",
     )
     patcher.start()
@@ -1243,7 +1243,7 @@ def translations_once() -> Generator[_patch]:
     """
     cache = _TranslationsCacheData({}, {})
     patcher = patch(
-        "homeassistant.helpers.translation._TranslationsCacheData",
+        "smarthub.helpers.translation._TranslationsCacheData",
         return_value=cache,
     )
     patcher.start()
@@ -1258,7 +1258,7 @@ def evict_faked_translations(translations_once) -> Generator[_patch]:
     """Clear translations for mocked integrations from the cache after each module."""
     real_component_strings = translation_helper._async_get_component_strings
     with patch(
-        "homeassistant.helpers.translation._async_get_component_strings",
+        "smarthub.helpers.translation._async_get_component_strings",
         wraps=real_component_strings,
     ) as mock_component_strings:
         yield
@@ -1293,7 +1293,7 @@ async def mock_zeroconf_resolver() -> AsyncGenerator[_patch]:
     resolver = AsyncResolver()
     resolver.real_close = resolver.close
     patcher = patch(
-        "homeassistant.helpers.aiohttp_client._async_make_resolver",
+        "smarthub.helpers.aiohttp_client._async_make_resolver",
         return_value=resolver,
     )
     patcher.start()
@@ -1319,9 +1319,9 @@ def mock_zeroconf() -> Generator[MagicMock]:
     from zeroconf import DNSCache  # noqa: PLC0415
 
     with (
-        patch("homeassistant.components.zeroconf.HaZeroconf") as mock_zc,
+        patch("smarthub.components.zeroconf.HaZeroconf") as mock_zc,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceBrowser",
+            "smarthub.components.zeroconf.discovery.AsyncServiceBrowser",
         ) as mock_browser,
     ):
         asb = mock_browser.return_value
@@ -1340,7 +1340,7 @@ def mock_async_zeroconf(mock_zeroconf: MagicMock) -> Generator[MagicMock]:
     from zeroconf.asyncio import AsyncZeroconf  # noqa: PLC0415
 
     with patch(
-        "homeassistant.components.zeroconf.HaAsyncZeroconf", spec=AsyncZeroconf
+        "smarthub.components.zeroconf.HaAsyncZeroconf", spec=AsyncZeroconf
     ) as mock_aiozc:
         zc = mock_aiozc.return_value
         zc.async_unregister_service = AsyncMock()
@@ -1358,7 +1358,7 @@ def mock_async_zeroconf(mock_zeroconf: MagicMock) -> Generator[MagicMock]:
 
 
 @pytest.fixture
-def enable_custom_integrations(hass: HomeAssistant) -> None:
+def enable_custom_integrations(hass: SmartHub) -> None:
     """Enable custom integrations defined in the test dir."""
     hass.data.pop(loader.DATA_CUSTOM_COMPONENTS)
 
@@ -1530,7 +1530,7 @@ def recorder_db_url(
 
 
 async def _async_init_recorder_component(
-    hass: HomeAssistant,
+    hass: SmartHub,
     add_config: dict[str, Any] | None = None,
     db_url: str | None = None,
     *,
@@ -1538,7 +1538,7 @@ async def _async_init_recorder_component(
     wait_setup: bool,
 ) -> None:
     """Initialize the recorder asynchronously."""
-    from homeassistant.components import recorder  # noqa: PLC0415
+    from smarthub.components import recorder  # noqa: PLC0415
 
     config = dict(add_config) if add_config else {}
     if recorder.CONF_DB_URL not in config:
@@ -1546,7 +1546,7 @@ async def _async_init_recorder_component(
         if recorder.CONF_COMMIT_INTERVAL not in config:
             config[recorder.CONF_COMMIT_INTERVAL] = 0
 
-    with patch("homeassistant.components.recorder.ALLOW_IN_MEMORY_DB", True):
+    with patch("smarthub.components.recorder.ALLOW_IN_MEMORY_DB", True):
         if recorder.DOMAIN not in hass.data:
             recorder_helper.async_initialize_recorder(hass)
         setup_task = asyncio.ensure_future(
@@ -1589,8 +1589,8 @@ async def async_test_recorder(
     enable_migrate_event_ids: bool,
 ) -> AsyncGenerator[RecorderInstanceContextManager]:
     """Yield context manager to setup recorder instance."""
-    from homeassistant.components import recorder  # noqa: PLC0415
-    from homeassistant.components.recorder import migration  # noqa: PLC0415
+    from smarthub.components import recorder  # noqa: PLC0415
+    from smarthub.components.recorder import migration  # noqa: PLC0415
 
     from .components.recorder.common import (  # noqa: PLC0415
         async_recorder_block_till_done,
@@ -1603,7 +1603,7 @@ async def async_test_recorder(
     @contextmanager
     def debug_session_scope(
         *,
-        hass: HomeAssistant | None = None,
+        hass: SmartHub | None = None,
         session: Session | None = None,
         exception_filter: Callable[[Exception], bool] | None = None,
         read_only: bool = False,
@@ -1663,47 +1663,47 @@ async def async_test_recorder(
     )
     with (
         patch(
-            "homeassistant.components.recorder.Recorder.async_nightly_tasks",
+            "smarthub.components.recorder.Recorder.async_nightly_tasks",
             side_effect=nightly,
             autospec=True,
         ),
         patch(
-            "homeassistant.components.recorder.Recorder.async_periodic_statistics",
+            "smarthub.components.recorder.Recorder.async_periodic_statistics",
             side_effect=stats,
             autospec=True,
         ),
         patch(
-            "homeassistant.components.recorder.migration._find_schema_errors",
+            "smarthub.components.recorder.migration._find_schema_errors",
             side_effect=schema_validate,
             autospec=True,
         ),
         patch(
-            "homeassistant.components.recorder.migration.EventsContextIDMigration.migrate_data",
+            "smarthub.components.recorder.migration.EventsContextIDMigration.migrate_data",
             side_effect=migrate_events_context_ids,
             autospec=True,
         ),
         patch(
-            "homeassistant.components.recorder.migration.StatesContextIDMigration.migrate_data",
+            "smarthub.components.recorder.migration.StatesContextIDMigration.migrate_data",
             side_effect=migrate_states_context_ids,
             autospec=True,
         ),
         patch(
-            "homeassistant.components.recorder.migration.EventTypeIDMigration.migrate_data",
+            "smarthub.components.recorder.migration.EventTypeIDMigration.migrate_data",
             side_effect=migrate_event_type_ids,
             autospec=True,
         ),
         patch(
-            "homeassistant.components.recorder.migration.EntityIDMigration.migrate_data",
+            "smarthub.components.recorder.migration.EntityIDMigration.migrate_data",
             side_effect=migrate_entity_ids,
             autospec=True,
         ),
         patch(
-            "homeassistant.components.recorder.migration.EventIDPostMigration._legacy_event_id_foreign_key_exists",
+            "smarthub.components.recorder.migration.EventIDPostMigration._legacy_event_id_foreign_key_exists",
             side_effect=legacy_event_id_foreign_key_exists,
             autospec=True,
         ),
         patch(
-            "homeassistant.components.recorder.Recorder._schedule_compile_missing_statistics",
+            "smarthub.components.recorder.Recorder._schedule_compile_missing_statistics",
             side_effect=compile_missing,
             autospec=True,
         ),
@@ -1717,7 +1717,7 @@ async def async_test_recorder(
 
         @asynccontextmanager
         async def async_test_recorder(
-            hass: HomeAssistant,
+            hass: SmartHub,
             config: ConfigType | None = None,
             *,
             expected_setup_result: bool = True,
@@ -1734,7 +1734,7 @@ async def async_test_recorder(
             )
             await hass.async_block_till_done()
             instance = hass.data[recorder.DATA_INSTANCE]
-            # The recorder's worker is not started until Home Assistant is running
+            # The recorder's worker is not started until SmartHub is running
             if hass.state is CoreState.running and wait_recorder:
                 await async_recorder_block_till_done(hass)
             try:
@@ -1755,7 +1755,7 @@ async def async_setup_recorder_instance(
     async with AsyncExitStack() as stack:
 
         async def async_setup_recorder(
-            hass: HomeAssistant,
+            hass: SmartHub,
             config: ConfigType | None = None,
             *,
             expected_setup_result: bool = True,
@@ -1781,7 +1781,7 @@ async def async_setup_recorder_instance(
 async def recorder_mock(
     recorder_config: dict[str, Any] | None,
     async_test_recorder: RecorderInstanceContextManager,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> AsyncGenerator[recorder.Recorder]:
     """Fixture with in-memory recorder."""
     async with async_test_recorder(hass, recorder_config) as instance:
@@ -1799,7 +1799,7 @@ def mock_recorder_before_hass() -> None:
 
 @pytest.fixture(name="enable_bluetooth")
 async def mock_enable_bluetooth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bleak_scanner_start: MagicMock,
     mock_bluetooth_adapters: None,
 ) -> AsyncGenerator[None]:
@@ -1827,7 +1827,7 @@ def mock_bluetooth_adapters() -> Generator[None]:
                     "address": "00:00:00:00:00:01",
                     "hw_version": "usb:v1D6Bp0246d053F",
                     "passive_scan": False,
-                    "sw_version": "homeassistant",
+                    "sw_version": "smarthub",
                     "manufacturer": "ACME",
                     "product": "Bluetooth Adapter 5.0",
                     "product_id": "aa01",
@@ -1865,7 +1865,7 @@ def mock_bleak_scanner_start() -> Generator[MagicMock]:
 @pytest.fixture
 def hassio_env(supervisor_is_connected: AsyncMock) -> Generator[None]:
     """Fixture to inject hassio env."""
-    from homeassistant.components.hassio import HassioAPIError  # noqa: PLC0415
+    from smarthub.components.hassio import HassioAPIError  # noqa: PLC0415
 
     from .components.hassio import SUPERVISOR_TOKEN  # noqa: PLC0415
 
@@ -1873,7 +1873,7 @@ def hassio_env(supervisor_is_connected: AsyncMock) -> Generator[None]:
         patch.dict(os.environ, {"SUPERVISOR": "127.0.0.1"}),
         patch.dict(os.environ, {"SUPERVISOR_TOKEN": SUPERVISOR_TOKEN}),
         patch(
-            "homeassistant.components.hassio.HassIO.get_info",
+            "smarthub.components.hassio.HassIO.get_info",
             Mock(side_effect=HassioAPIError()),
         ),
     ):
@@ -1883,33 +1883,33 @@ def hassio_env(supervisor_is_connected: AsyncMock) -> Generator[None]:
 @pytest.fixture
 async def hassio_stubs(
     hassio_env: None,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     supervisor_client: AsyncMock,
 ) -> RefreshToken:
     """Create mock hassio http client."""
-    from homeassistant.components.hassio import HassioAPIError  # noqa: PLC0415
+    from smarthub.components.hassio import HassioAPIError  # noqa: PLC0415
 
     with (
         patch(
-            "homeassistant.components.hassio.HassIO.update_hass_api",
+            "smarthub.components.hassio.HassIO.update_hass_api",
             return_value={"result": "ok"},
         ) as hass_api,
         patch(
-            "homeassistant.components.hassio.HassIO.update_hass_config",
+            "smarthub.components.hassio.HassIO.update_hass_config",
             return_value={"result": "ok"},
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_info",
+            "smarthub.components.hassio.HassIO.get_info",
             side_effect=HassioAPIError(),
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_ingress_panels",
+            "smarthub.components.hassio.HassIO.get_ingress_panels",
             return_value={"panels": []},
         ),
         patch(
-            "homeassistant.components.hassio.issues.SupervisorIssues.setup",
+            "smarthub.components.hassio.issues.SupervisorIssues.setup",
         ),
     ):
         await async_setup_component(hass, "hassio", {})
@@ -1925,12 +1925,12 @@ def integration_frame_path() -> str:
     `@pytest.mark.parametrize("integration_frame_path", ["path_to_frame"])`
 
     - "custom_components/XYZ" for a custom integration
-    - "homeassistant/components/XYZ" for a core integration
-    - "homeassistant/XYZ" for core (no integration)
+    - "smarthub/components/XYZ" for a core integration
+    - "smarthub/XYZ" for core (no integration)
 
     Defaults to core component `hue`
     """
-    return "homeassistant/components/hue"
+    return "smarthub/components/hue"
 
 
 @pytest.fixture
@@ -1950,15 +1950,15 @@ def mock_integration_frame(integration_frame_path: str) -> Generator[Mock]:
     with (
         patch.dict(sys.modules, {correct_module_name: Mock(__file__=correct_filename)}),
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value=correct_frame.line,
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=extract_stack_to_frame(
                 [
                     Mock(
-                        filename="/home/paulus/homeassistant/core.py",
+                        filename="/home/paulus/smarthub/core.py",
                         lineno="23",
                         line="do_something()",
                     ),
@@ -1983,49 +1983,49 @@ def mock_bluetooth(
 
 
 @pytest.fixture
-def category_registry(hass: HomeAssistant) -> cr.CategoryRegistry:
+def category_registry(hass: SmartHub) -> cr.CategoryRegistry:
     """Return the category registry from the current hass instance."""
     return cr.async_get(hass)
 
 
 @pytest.fixture
-def area_registry(hass: HomeAssistant) -> ar.AreaRegistry:
+def area_registry(hass: SmartHub) -> ar.AreaRegistry:
     """Return the area registry from the current hass instance."""
     return ar.async_get(hass)
 
 
 @pytest.fixture
-def device_registry(hass: HomeAssistant) -> dr.DeviceRegistry:
+def device_registry(hass: SmartHub) -> dr.DeviceRegistry:
     """Return the device registry from the current hass instance."""
     return dr.async_get(hass)
 
 
 @pytest.fixture
-def entity_registry(hass: HomeAssistant) -> er.EntityRegistry:
+def entity_registry(hass: SmartHub) -> er.EntityRegistry:
     """Return the entity registry from the current hass instance."""
     return er.async_get(hass)
 
 
 @pytest.fixture
-def floor_registry(hass: HomeAssistant) -> fr.FloorRegistry:
+def floor_registry(hass: SmartHub) -> fr.FloorRegistry:
     """Return the floor registry from the current hass instance."""
     return fr.async_get(hass)
 
 
 @pytest.fixture
-def issue_registry(hass: HomeAssistant) -> ir.IssueRegistry:
+def issue_registry(hass: SmartHub) -> ir.IssueRegistry:
     """Return the issue registry from the current hass instance."""
     return ir.async_get(hass)
 
 
 @pytest.fixture
-def label_registry(hass: HomeAssistant) -> lr.LabelRegistry:
+def label_registry(hass: SmartHub) -> lr.LabelRegistry:
     """Return the label registry from the current hass instance."""
     return lr.async_get(hass)
 
 
 @pytest.fixture
-def service_calls(hass: HomeAssistant) -> Generator[list[ServiceCall]]:
+def service_calls(hass: SmartHub) -> Generator[list[ServiceCall]]:
     """Track all service calls."""
     calls = []
 
@@ -2058,14 +2058,14 @@ def service_calls(hass: HomeAssistant) -> Generator[list[ServiceCall]]:
             _LOGGER.debug("Ignoring unknown service call to %s.%s", domain, service)
         return None
 
-    with patch("homeassistant.core.ServiceRegistry.async_call", _async_call):
+    with patch("smarthub.core.ServiceRegistry.async_call", _async_call):
         yield calls
 
 
 @pytest.fixture
 def snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    """Return snapshot assertion fixture with the Home Assistant extension."""
-    return snapshot.use_extension(HomeAssistantSnapshotExtension)
+    """Return snapshot assertion fixture with the SmartHub extension."""
+    return snapshot.use_extension(SmartHubSnapshotExtension)
 
 
 @pytest.fixture

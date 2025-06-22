@@ -4,15 +4,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from luftdaten.exceptions import LuftdatenError
 
-from homeassistant.components.luftdaten.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.luftdaten.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_luftdaten: AsyncMock,
 ) -> None:
@@ -31,12 +31,12 @@ async def test_load_unload_config_entry(
 
 
 @patch(
-    "homeassistant.components.luftdaten.Luftdaten.get_data",
+    "smarthub.components.luftdaten.Luftdaten.get_data",
     side_effect=LuftdatenError,
 )
 async def test_config_entry_not_ready(
     mock_get_data: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the Luftdaten configuration entry not ready."""
@@ -49,7 +49,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_config_entry_not_ready_no_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_luftdaten: MagicMock,
 ) -> None:
@@ -64,7 +64,7 @@ async def test_config_entry_not_ready_no_data(
 
 
 async def test_setting_unique_id(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_luftdaten: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_luftdaten: MagicMock
 ) -> None:
     """Test we set unique ID if not set yet."""
     mock_config_entry.add_to_hass(hass)

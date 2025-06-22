@@ -11,13 +11,13 @@ from sqlalchemy import create_engine, inspect
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder import core, migration, statistics
-from homeassistant.components.recorder.queries import select_event_type_ids
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.const import EVENT_STATE_CHANGED
-from homeassistant.core import Event, EventOrigin, State
-from homeassistant.util import dt as dt_util
+from smarthub.components import recorder
+from smarthub.components.recorder import core, migration, statistics
+from smarthub.components.recorder.queries import select_event_type_ids
+from smarthub.components.recorder.util import session_scope
+from smarthub.const import EVENT_STATE_CHANGED
+from smarthub.core import Event, EventOrigin, State
+from smarthub.util import dt as dt_util
 
 from .common import async_wait_recording_done
 from .conftest import instrument_migration
@@ -25,7 +25,7 @@ from .conftest import instrument_migration
 from tests.common import async_test_home_assistant
 from tests.typing import RecorderInstanceContextManager
 
-CREATE_ENGINE_TARGET = "homeassistant.components.recorder.core.create_engine"
+CREATE_ENGINE_TARGET = "smarthub.components.recorder.core.create_engine"
 SCHEMA_MODULE_30 = "tests.components.recorder.db_schema_30"
 SCHEMA_MODULE_32 = "tests.components.recorder.db_schema_32"
 
@@ -606,11 +606,11 @@ async def test_out_of_disk_space_while_rebuild_states_table(
     # - patching DropConstraint to raise InternalError for MySQL and PostgreSQL
     with (
         patch(
-            "homeassistant.components.recorder.migration.CreateTable",
+            "smarthub.components.recorder.migration.CreateTable",
             side_effect=SQLAlchemyError,
         ),
         patch(
-            "homeassistant.components.recorder.migration.DropConstraint",
+            "smarthub.components.recorder.migration.DropConstraint",
             side_effect=OperationalError(
                 None, None, OSError("No space left on device")
             ),
@@ -803,7 +803,7 @@ async def test_out_of_disk_space_while_removing_foreign_key(
                 # - patching DropConstraint to raise InternalError for MySQL and PostgreSQL
                 with (
                     patch(
-                        "homeassistant.components.recorder.migration.sqlalchemy.inspect",
+                        "smarthub.components.recorder.migration.sqlalchemy.inspect",
                         side_effect=OperationalError(
                             None, None, OSError("No space left on device")
                         ),

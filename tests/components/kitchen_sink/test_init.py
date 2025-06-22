@@ -8,32 +8,32 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 import voluptuous as vol
 
-from homeassistant.components.kitchen_sink import DOMAIN
-from homeassistant.components.recorder import get_instance
-from homeassistant.components.recorder.statistics import (
+from smarthub.components.kitchen_sink import DOMAIN
+from smarthub.components.recorder import get_instance
+from smarthub.components.recorder.statistics import (
     StatisticMeanType,
     async_add_external_statistics,
     get_last_statistics,
     list_statistic_ids,
 )
-from homeassistant.components.repairs import DOMAIN as REPAIRS_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.components.repairs import DOMAIN as REPAIRS_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from tests.components.recorder.common import async_wait_recording_done
 from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 @pytest.fixture
-def mock_history(hass: HomeAssistant) -> None:
+def mock_history(hass: SmartHub) -> None:
     """Mock history component loaded."""
     hass.config.components.add("history")
 
 
 @pytest.mark.usefixtures("recorder_mock", "mock_history")
-async def test_demo_statistics(hass: HomeAssistant) -> None:
+async def test_demo_statistics(hass: SmartHub) -> None:
     """Test that the kitchen sink component makes some statistics available."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     await hass.async_block_till_done()
@@ -68,7 +68,7 @@ async def test_demo_statistics(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("recorder_mock", "mock_history")
-async def test_demo_statistics_growth(hass: HomeAssistant) -> None:
+async def test_demo_statistics_growth(hass: SmartHub) -> None:
     """Test that the kitchen sink sum statistics adds to the previous state."""
     hass.config.units = US_CUSTOMARY_SYSTEM
 
@@ -108,7 +108,7 @@ async def test_demo_statistics_growth(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("recorder_mock", "mock_history")
 async def test_statistics_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -128,7 +128,7 @@ async def test_statistics_issues(
 @pytest.mark.freeze_time("2023-10-21")
 @pytest.mark.usefixtures("mock_history")
 async def test_issues_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -221,7 +221,7 @@ async def test_issues_created(
                 "breaks_in_ha_version": None,
                 "created": "2023-10-21T00:00:00+00:00",
                 "dismissed_version": None,
-                "domain": "homeassistant",
+                "domain": "smarthub",
                 "is_fixable": False,
                 "issue_domain": DOMAIN,
                 "issue_id": ANY,
@@ -336,7 +336,7 @@ async def test_issues_created(
                 "breaks_in_ha_version": None,
                 "created": "2023-10-21T00:00:00+00:00",
                 "dismissed_version": None,
-                "domain": "homeassistant",
+                "domain": "smarthub",
                 "is_fixable": False,
                 "issue_domain": DOMAIN,
                 "issue_id": ANY,
@@ -351,7 +351,7 @@ async def test_issues_created(
 
 
 async def test_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we can call the service."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})

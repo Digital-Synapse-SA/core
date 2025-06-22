@@ -11,19 +11,19 @@ from unittest.mock import MagicMock
 from bleak.exc import BleakError
 import pytest
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     DOMAIN,
     BluetoothChange,
     BluetoothScanningMode,
     BluetoothServiceInfoBleak,
 )
-from homeassistant.components.bluetooth.active_update_coordinator import (
+from smarthub.components.bluetooth.active_update_coordinator import (
     ActiveBluetoothDataUpdateCoordinator,
 )
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.helpers.debounce import Debouncer
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
-from homeassistant.setup import async_setup_component
+from smarthub.core import CoreState, SmartHub
+from smarthub.helpers.debounce import Debouncer
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.setup import async_setup_component
 
 from . import inject_bluetooth_service_info
 
@@ -60,7 +60,7 @@ class MyCoordinator(ActiveBluetoothDataUpdateCoordinator[dict[str, Any]]):
 
     def __init__(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         logger: logging.Logger,
         *,
         address: str,
@@ -98,7 +98,7 @@ class MyCoordinator(ActiveBluetoothDataUpdateCoordinator[dict[str, Any]]):
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_basic_usage(hass: HomeAssistant) -> None:
+async def test_basic_usage(hass: SmartHub) -> None:
     """Test basic usage of the ActiveBluetoothDataUpdateCoordinator."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
 
@@ -135,7 +135,7 @@ async def test_basic_usage(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_bleak_error_during_polling(hass: HomeAssistant) -> None:
+async def test_bleak_error_during_polling(hass: SmartHub) -> None:
     """Test bleak error during polling ActiveBluetoothDataUpdateCoordinator."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     poll_count = 0
@@ -185,7 +185,7 @@ async def test_bleak_error_during_polling(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_generic_exception_during_polling(hass: HomeAssistant) -> None:
+async def test_generic_exception_during_polling(hass: SmartHub) -> None:
     """Test generic exception during polling ActiveBluetoothDataUpdateCoordinator."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     poll_count = 0
@@ -235,7 +235,7 @@ async def test_generic_exception_during_polling(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_polling_debounce(hass: HomeAssistant) -> None:
+async def test_polling_debounce(hass: SmartHub) -> None:
     """Test basic usage of the ActiveBluetoothDataUpdateCoordinator."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     poll_count = 0
@@ -278,7 +278,7 @@ async def test_polling_debounce(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_polling_debounce_with_custom_debouncer(hass: HomeAssistant) -> None:
+async def test_polling_debounce_with_custom_debouncer(hass: SmartHub) -> None:
     """Test basic usage of the ActiveBluetoothDataUpdateCoordinator."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     poll_count = 0
@@ -324,7 +324,7 @@ async def test_polling_debounce_with_custom_debouncer(hass: HomeAssistant) -> No
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_polling_rejecting_the_first_time(hass: HomeAssistant) -> None:
+async def test_polling_rejecting_the_first_time(hass: SmartHub) -> None:
     """Test need_poll rejects the first time ActiveBluetoothDataUpdateCoordinator."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     attempt = 0
@@ -383,7 +383,7 @@ async def test_polling_rejecting_the_first_time(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_no_polling_after_stop_event(hass: HomeAssistant) -> None:
+async def test_no_polling_after_stop_event(hass: SmartHub) -> None:
     """Test we do not poll after the stop event."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     needs_poll_calls = 0

@@ -4,14 +4,14 @@ from unittest.mock import Mock
 
 from soco import SoCo
 
-from homeassistant.components.sonos.const import (
+from smarthub.components.sonos.const import (
     DOMAIN,
     SCAN_INTERVAL,
     SUB_FAIL_ISSUE_ID,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.util import dt as dt_util
 
 from .conftest import SonosMockEvent, SonosMockSubscribe
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_subscription_repair_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     soco: SoCo,
     zgs_discovery,

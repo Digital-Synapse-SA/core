@@ -1,8 +1,8 @@
 """Test the HTML5 setup."""
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -20,7 +20,7 @@ NOTIFY_CONF = {
 
 
 async def test_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test setup of a good config entry."""
@@ -32,7 +32,7 @@ async def test_setup_entry(
 
 
 async def test_setup_entry_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test setup of an imported config entry with deprecated YAML."""

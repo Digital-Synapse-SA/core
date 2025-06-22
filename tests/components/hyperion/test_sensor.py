@@ -11,15 +11,15 @@ from hyperion.const import (
     KEY_VISIBLE,
 )
 
-from homeassistant.components.hyperion import get_hyperion_device_id
-from homeassistant.components.hyperion.const import (
+from smarthub.components.hyperion import get_hyperion_device_id
+from smarthub.components.hyperion.const import (
     DOMAIN,
     HYPERION_MANUFACTURER_NAME,
     HYPERION_MODEL_NAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import slugify
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import slugify
 
 from . import (
     TEST_CONFIG_ENTRY_ID,
@@ -39,7 +39,7 @@ TEST_SENSOR_BASE_ENTITY_ID = "sensor.test_instance_1"
 TEST_VISIBLE_EFFECT_SENSOR_ID = "sensor.test_instance_1_visible_priority"
 
 
-async def test_sensor_has_correct_entities(hass: HomeAssistant) -> None:
+async def test_sensor_has_correct_entities(hass: SmartHub) -> None:
     """Test that the correct sensor entities are created."""
     client = create_mock_client()
     client.components = TEST_COMPONENTS
@@ -53,7 +53,7 @@ async def test_sensor_has_correct_entities(hass: HomeAssistant) -> None:
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_device_info(
         assert entity_id in entities_from_device
 
 
-async def test_visible_effect_state_changes(hass: HomeAssistant) -> None:
+async def test_visible_effect_state_changes(hass: SmartHub) -> None:
     """Verify that state changes are processed as expected for visible effect sensor."""
     client = create_mock_client()
     client.components = TEST_COMPONENTS

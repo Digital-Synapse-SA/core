@@ -1,2 +1,2 @@
-# This always raises HomeAssistantError
+# This always raises SmartHubError
 custom_validator_bad_1:

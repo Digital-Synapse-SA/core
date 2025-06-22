@@ -5,32 +5,32 @@ from unittest.mock import MagicMock
 from pyhap.const import HAP_REPR_AID, HAP_REPR_CHARS, HAP_REPR_IID, HAP_REPR_VALUE
 import pytest
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     ATTR_PRESET_MODE,
     ATTR_PRESET_MODES,
     DOMAIN as FAN_DOMAIN,
     FanEntityFeature,
 )
-from homeassistant.components.homekit import (
+from smarthub.components.homekit import (
     CONF_LINKED_HUMIDITY_SENSOR,
     CONF_LINKED_PM25_SENSOR,
     CONF_LINKED_TEMPERATURE_SENSOR,
 )
-from homeassistant.components.homekit.const import (
+from smarthub.components.homekit.const import (
     CONF_LINKED_FILTER_CHANGE_INDICATION,
     CONF_LINKED_FILTER_LIFE_LEVEL,
     THRESHOLD_FILTER_CHANGE_NEEDED,
 )
-from homeassistant.components.homekit.type_air_purifiers import (
+from smarthub.components.homekit.type_air_purifiers import (
     FILTER_CHANGE_FILTER,
     FILTER_OK,
     TARGET_STATE_AUTO,
     TARGET_STATE_MANUAL,
     AirPurifier,
 )
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
@@ -40,7 +40,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     UnitOfTemperature,
 )
-from homeassistant.core import Event, HomeAssistant
+from smarthub.core import Event, SmartHub
 
 from tests.common import async_mock_service
 
@@ -53,7 +53,7 @@ from tests.common import async_mock_service
     ],
 )
 async def test_fan_auto_manual(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     events: list[Event],
     auto_preset: str,
@@ -162,7 +162,7 @@ async def test_fan_auto_manual(
 
 
 async def test_presets_no_auto(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hk_driver,
     events: list[Event],
 ) -> None:
@@ -222,7 +222,7 @@ async def test_presets_no_auto(
 
 
 async def test_air_purifier_single_preset_mode(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test air purifier with a single preset mode."""
     entity_id = "fan.demo"
@@ -309,7 +309,7 @@ async def test_air_purifier_single_preset_mode(
 
 
 async def test_expose_linked_sensors(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test that linked sensors are exposed."""
     entity_id = "fan.demo"
@@ -531,7 +531,7 @@ async def test_expose_linked_sensors(
 
 
 async def test_filter_maintenance_linked_sensors(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test that a linked filter level and filter change indicator are exposed."""
     entity_id = "fan.demo"
@@ -628,7 +628,7 @@ async def test_filter_maintenance_linked_sensors(
 
 
 async def test_filter_maintenance_only_change_indicator_sensor(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test that a linked filter change indicator is exposed."""
     entity_id = "fan.demo"
@@ -671,7 +671,7 @@ async def test_filter_maintenance_only_change_indicator_sensor(
 
 
 async def test_filter_life_level_linked_sensors(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test that a linked filter life level sensor exposed."""
     entity_id = "fan.demo"

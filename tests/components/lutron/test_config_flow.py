@@ -6,11 +6,11 @@ from urllib.error import HTTPError
 
 import pytest
 
-from homeassistant.components.lutron.const import CONF_DEFAULT_DIMMER_LEVEL, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType, InvalidData
+from smarthub.components.lutron.const import CONF_DEFAULT_DIMMER_LEVEL, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType, InvalidData
 
 from tests.common import MockConfigEntry
 
@@ -21,7 +21,7 @@ MOCK_DATA_STEP = {
 }
 
 
-async def test_full_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_full_flow(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test success response."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -31,8 +31,8 @@ async def test_full_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> No
     assert result["step_id"] == "user"
 
     with (
-        patch("homeassistant.components.lutron.config_flow.Lutron.load_xml_db"),
-        patch("homeassistant.components.lutron.config_flow.Lutron.guid", "12345678901"),
+        patch("smarthub.components.lutron.config_flow.Lutron.load_xml_db"),
+        patch("smarthub.components.lutron.config_flow.Lutron.guid", "12345678901"),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -53,7 +53,7 @@ async def test_full_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> No
     ],
 )
 async def test_flow_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     raise_error: Exception,
     text_error: str,
@@ -67,7 +67,7 @@ async def test_flow_failure(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.lutron.config_flow.Lutron.load_xml_db",
+        "smarthub.components.lutron.config_flow.Lutron.load_xml_db",
         side_effect=raise_error,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -79,8 +79,8 @@ async def test_flow_failure(
     assert result["errors"] == {"base": text_error}
 
     with (
-        patch("homeassistant.components.lutron.config_flow.Lutron.load_xml_db"),
-        patch("homeassistant.components.lutron.config_flow.Lutron.guid", "12345678901"),
+        patch("smarthub.components.lutron.config_flow.Lutron.load_xml_db"),
+        patch("smarthub.components.lutron.config_flow.Lutron.guid", "12345678901"),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -94,7 +94,7 @@ async def test_flow_failure(
 
 
 async def test_flow_incorrect_guid(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test configuring flow with incorrect guid."""
     result = await hass.config_entries.flow.async_init(
@@ -105,8 +105,8 @@ async def test_flow_incorrect_guid(
     assert result["step_id"] == "user"
 
     with (
-        patch("homeassistant.components.lutron.config_flow.Lutron.load_xml_db"),
-        patch("homeassistant.components.lutron.config_flow.Lutron.guid", "12345"),
+        patch("smarthub.components.lutron.config_flow.Lutron.load_xml_db"),
+        patch("smarthub.components.lutron.config_flow.Lutron.guid", "12345"),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -117,8 +117,8 @@ async def test_flow_incorrect_guid(
         assert result["errors"] == {"base": "cannot_connect"}
 
     with (
-        patch("homeassistant.components.lutron.config_flow.Lutron.load_xml_db"),
-        patch("homeassistant.components.lutron.config_flow.Lutron.guid", "12345678901"),
+        patch("smarthub.components.lutron.config_flow.Lutron.load_xml_db"),
+        patch("smarthub.components.lutron.config_flow.Lutron.guid", "12345678901"),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -128,7 +128,7 @@ async def test_flow_incorrect_guid(
         assert result["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_flow_single_instance_allowed(hass: HomeAssistant) -> None:
+async def test_flow_single_instance_allowed(hass: SmartHub) -> None:
     """Test we abort user data set when entry is already configured."""
 
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_DATA_STEP, unique_id="12345678901")
@@ -148,7 +148,7 @@ MOCK_DATA_IMPORT = {
 }
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test options flow."""
 
     config_entry = MockConfigEntry(

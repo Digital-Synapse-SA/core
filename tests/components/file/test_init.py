@@ -2,9 +2,9 @@
 
 from unittest.mock import MagicMock, Mock, patch
 
-from homeassistant.components.file import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.file import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, get_fixture_path
 
@@ -12,7 +12,7 @@ from tests.common import MockConfigEntry, get_fixture_path
 @patch("os.path.isfile", Mock(return_value=True))
 @patch("os.access", Mock(return_value=True))
 async def test_migration_to_version_2(
-    hass: HomeAssistant, mock_is_allowed_path: MagicMock
+    hass: SmartHub, mock_is_allowed_path: MagicMock
 ) -> None:
     """Test the File sensor with JSON entries."""
     data = {
@@ -46,7 +46,7 @@ async def test_migration_to_version_2(
 @patch("os.path.isfile", Mock(return_value=True))
 @patch("os.access", Mock(return_value=True))
 async def test_migration_from_future_version(
-    hass: HomeAssistant, mock_is_allowed_path: MagicMock
+    hass: SmartHub, mock_is_allowed_path: MagicMock
 ) -> None:
     """Test the File sensor with JSON entries."""
     data = {

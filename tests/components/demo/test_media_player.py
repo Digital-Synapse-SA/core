@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_GROUP_MEMBERS,
     ATTR_INPUT_SOURCE,
     ATTR_MEDIA_CONTENT_ID,
@@ -27,7 +27,7 @@ from homeassistant.components.media_player import (
     RepeatMode,
     is_on,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_ENTITY_PICTURE,
     ATTR_SUPPORTED_FEATURES,
@@ -51,9 +51,9 @@ from homeassistant.const import (
     STATE_PLAYING,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import DATA_CLIENTSESSION, _make_key
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers.aiohttp_client import DATA_CLIENTSESSION, _make_key
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -64,7 +64,7 @@ TEST_ENTITY_ID = "media_player.walkman"
 def autouse_disable_platforms(disable_platforms):
     """Auto use the disable_platforms fixture."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.MEDIA_PLAYER],
     ):
         yield
@@ -74,13 +74,13 @@ def autouse_disable_platforms(disable_platforms):
 def media_player_media_seek_fixture():
     """Mock demo YouTube player media seek."""
     with patch(
-        "homeassistant.components.demo.media_player.DemoYoutubePlayer.media_seek",
+        "smarthub.components.demo.media_player.DemoYoutubePlayer.media_seek",
         autospec=True,
     ) as seek:
         yield seek
 
 
-async def test_source_select(hass: HomeAssistant) -> None:
+async def test_source_select(hass: SmartHub) -> None:
     """Test the input source service."""
     entity_id = "media_player.lounge_room"
 
@@ -111,7 +111,7 @@ async def test_source_select(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_INPUT_SOURCE) == "xbox"
 
 
-async def test_repeat_set(hass: HomeAssistant) -> None:
+async def test_repeat_set(hass: SmartHub) -> None:
     """Test the repeat set service."""
     entity_id = "media_player.walkman"
 
@@ -132,7 +132,7 @@ async def test_repeat_set(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_MEDIA_REPEAT) == RepeatMode.ALL
 
 
-async def test_clear_playlist(hass: HomeAssistant) -> None:
+async def test_clear_playlist(hass: SmartHub) -> None:
     """Test clear playlist."""
     assert await async_setup_component(
         hass, MP_DOMAIN, {"media_player": {"platform": "demo"}}
@@ -152,7 +152,7 @@ async def test_clear_playlist(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
 
-async def test_volume_services(hass: HomeAssistant) -> None:
+async def test_volume_services(hass: SmartHub) -> None:
     """Test the volume service."""
     assert await async_setup_component(
         hass, MP_DOMAIN, {"media_player": {"platform": "demo"}}
@@ -224,7 +224,7 @@ async def test_volume_services(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_MEDIA_VOLUME_MUTED) is True
 
 
-async def test_turning_off_and_on(hass: HomeAssistant) -> None:
+async def test_turning_off_and_on(hass: SmartHub) -> None:
     """Test turn_on and turn_off."""
     assert await async_setup_component(
         hass, MP_DOMAIN, {"media_player": {"platform": "demo"}}
@@ -265,7 +265,7 @@ async def test_turning_off_and_on(hass: HomeAssistant) -> None:
     assert not is_on(hass, TEST_ENTITY_ID)
 
 
-async def test_playing_pausing(hass: HomeAssistant) -> None:
+async def test_playing_pausing(hass: SmartHub) -> None:
     """Test media_pause."""
     assert await async_setup_component(
         hass, MP_DOMAIN, {"media_player": {"platform": "demo"}}
@@ -312,7 +312,7 @@ async def test_playing_pausing(hass: HomeAssistant) -> None:
     assert state.state == STATE_PLAYING
 
 
-async def test_prev_next_track(hass: HomeAssistant) -> None:
+async def test_prev_next_track(hass: SmartHub) -> None:
     """Test media_next_track and media_previous_track ."""
     assert await async_setup_component(
         hass, MP_DOMAIN, {"media_player": {"platform": "demo"}}
@@ -377,7 +377,7 @@ async def test_prev_next_track(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_MEDIA_EPISODE) == "1"
 
 
-async def test_play_media(hass: HomeAssistant) -> None:
+async def test_play_media(hass: SmartHub) -> None:
     """Test play_media ."""
     assert await async_setup_component(
         hass, MP_DOMAIN, {"media_player": {"platform": "demo"}}
@@ -427,7 +427,7 @@ async def test_play_media(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_MEDIA_CONTENT_ID) == "some_id"
 
 
-async def test_seek(hass: HomeAssistant, mock_media_seek) -> None:
+async def test_seek(hass: SmartHub, mock_media_seek) -> None:
     """Test seek."""
     assert await async_setup_component(
         hass, MP_DOMAIN, {"media_player": {"platform": "demo"}}
@@ -463,7 +463,7 @@ async def test_seek(hass: HomeAssistant, mock_media_seek) -> None:
     assert mock_media_seek.called
 
 
-async def test_stop(hass: HomeAssistant) -> None:
+async def test_stop(hass: SmartHub) -> None:
     """Test stop."""
     assert await async_setup_component(
         hass, MP_DOMAIN, {"media_player": {"platform": "demo"}}
@@ -484,7 +484,7 @@ async def test_stop(hass: HomeAssistant) -> None:
 
 
 async def test_media_image_proxy(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test the media server image proxy server ."""
     assert await async_setup_component(
@@ -529,7 +529,7 @@ async def test_media_image_proxy(
     assert await req.text() == fake_picture_data
 
 
-async def test_grouping(hass: HomeAssistant) -> None:
+async def test_grouping(hass: SmartHub) -> None:
     """Test the join/unjoin services."""
     walkman = "media_player.walkman"
     kitchen = "media_player.kitchen"

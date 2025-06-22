@@ -3,9 +3,9 @@
 import pytest
 import voluptuous as vol
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.device import (
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.device import (
     async_device_info_to_link_from_device_id,
     async_device_info_to_link_from_entity,
     async_entity_id_to_device_id,
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_entity_id_to_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -57,7 +57,7 @@ async def test_entity_id_to_device_id(
 
 
 async def test_device_info_to_link(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -113,7 +113,7 @@ async def test_device_info_to_link(
 
 
 async def test_remove_stale_device_links_keep_entity_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -190,7 +190,7 @@ async def test_remove_stale_device_links_keep_entity_device(
 
 
 async def test_remove_stale_devices_links_keep_current_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test cleanup works for device id."""

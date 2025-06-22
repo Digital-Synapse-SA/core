@@ -8,8 +8,8 @@ from unittest.mock import ANY, Mock, patch
 
 import pytest
 
-from homeassistant.components import automation, input_boolean, script
-from homeassistant.components.automation import (
+from smarthub.components import automation, input_boolean, script
+from smarthub.components.automation import (
     ATTR_SOURCE,
     DOMAIN,
     EVENT_AUTOMATION_RELOADED,
@@ -17,8 +17,8 @@ from homeassistant.components.automation import (
     SERVICE_TRIGGER,
     AutomationEntity,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_NAME,
     CONF_ID,
@@ -31,18 +31,18 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import (
+from smarthub.core import (
     Context,
     CoreState,
-    HomeAssistant,
+    SmartHub,
     ServiceCall,
     State,
     callback,
 )
-from homeassistant.exceptions import HomeAssistantError, Unauthorized
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.event import async_track_state_change_event
-from homeassistant.helpers.script import (
+from smarthub.exceptions import SmartHubError, Unauthorized
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.event import async_track_state_change_event
+from smarthub.helpers.script import (
     SCRIPT_MODE_CHOICES,
     SCRIPT_MODE_PARALLEL,
     SCRIPT_MODE_QUEUED,
@@ -50,8 +50,8 @@ from homeassistant.helpers.script import (
     SCRIPT_MODE_SINGLE,
     _async_stop_scripts_at_shutdown,
 )
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util, yaml as yaml_util
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util, yaml as yaml_util
 
 from tests.common import (
     MockConfigEntry,
@@ -68,13 +68,13 @@ from tests.typing import WebSocketGenerator
 
 
 @pytest.fixture
-def calls(hass: HomeAssistant) -> list[ServiceCall]:
+def calls(hass: SmartHub) -> list[ServiceCall]:
     """Track calls to a mock service."""
     return async_mock_service(hass, "test", "automation")
 
 
 async def test_service_data_not_a_dict(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, calls: list[ServiceCall]
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, calls: list[ServiceCall]
 ) -> None:
     """Test service data not dict."""
     with assert_setup_component(1, automation.DOMAIN):
@@ -96,7 +96,7 @@ async def test_service_data_not_a_dict(
 
 
 async def test_service_data_single_template(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test service data not dict."""
     with assert_setup_component(1, automation.DOMAIN):
@@ -121,7 +121,7 @@ async def test_service_data_single_template(
 
 
 async def test_service_specify_data(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test service data."""
     assert await async_setup_component(
@@ -145,7 +145,7 @@ async def test_service_specify_data(
 
     time = dt_util.utcnow()
 
-    with patch("homeassistant.helpers.script.utcnow", return_value=time):
+    with patch("smarthub.helpers.script.utcnow", return_value=time):
         hass.bus.async_fire("test_event")
         await hass.async_block_till_done()
 
@@ -157,7 +157,7 @@ async def test_service_specify_data(
 
 
 async def test_service_specify_entity_id(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test service data."""
     assert await async_setup_component(
@@ -178,7 +178,7 @@ async def test_service_specify_entity_id(
 
 
 async def test_service_specify_entity_id_list(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test service data."""
     assert await async_setup_component(
@@ -201,7 +201,7 @@ async def test_service_specify_entity_id_list(
     assert calls[0].data.get(ATTR_ENTITY_ID) == ["hello.world", "hello.world2"]
 
 
-async def test_two_triggers(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_two_triggers(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test triggers."""
     assert await async_setup_component(
         hass,
@@ -226,7 +226,7 @@ async def test_two_triggers(hass: HomeAssistant, calls: list[ServiceCall]) -> No
 
 
 async def test_trigger_service_ignoring_condition(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, calls: list[ServiceCall]
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, calls: list[ServiceCall]
 ) -> None:
     """Test triggers."""
     assert await async_setup_component(
@@ -279,7 +279,7 @@ async def test_trigger_service_ignoring_condition(
 
 
 async def test_two_conditions_with_and(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test two and conditions."""
     entity_id = "test.entity"
@@ -319,7 +319,7 @@ async def test_two_conditions_with_and(
 
 
 async def test_shorthand_conditions_template(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test shorthand nation form in conditions."""
     assert await async_setup_component(
@@ -346,7 +346,7 @@ async def test_shorthand_conditions_template(
 
 
 async def test_automation_list_setting(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Event is not a valid condition."""
     assert await async_setup_component(
@@ -376,7 +376,7 @@ async def test_automation_list_setting(
 
 
 async def test_automation_calling_two_actions(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test if we can call two actions from automation async definition."""
     assert await async_setup_component(
@@ -401,7 +401,7 @@ async def test_automation_calling_two_actions(
     assert calls[1].data["position"] == 1
 
 
-async def test_shared_context(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_shared_context(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test that the shared context is passed down the chain."""
     assert await async_setup_component(
         hass,
@@ -468,7 +468,7 @@ async def test_shared_context(hass: HomeAssistant, calls: list[ServiceCall]) -> 
     assert calls[0].context is second_trigger_context
 
 
-async def test_services(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_services(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test the automation services for turning entities on/off."""
     entity_id = "automation.hello"
 
@@ -551,7 +551,7 @@ async def test_services(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
 
 
 async def test_reload_config_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls: list[ServiceCall],
     hass_admin_user: MockUser,
     hass_read_only_user: MockUser,
@@ -586,7 +586,7 @@ async def test_reload_config_service(
     test_reload_event = async_capture_events(hass, EVENT_AUTOMATION_RELOADED)
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={
             automation.DOMAIN: {
@@ -634,7 +634,7 @@ async def test_reload_config_service(
 
 
 async def test_reload_config_when_invalid_config(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test the reload config service handling invalid config."""
     with assert_setup_component(1, automation.DOMAIN):
@@ -661,7 +661,7 @@ async def test_reload_config_when_invalid_config(
     assert calls[0].data.get("event") == "test_event"
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={automation.DOMAIN: "not valid"},
     ):
@@ -675,7 +675,7 @@ async def test_reload_config_when_invalid_config(
 
 
 async def test_reload_config_handles_load_fails(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test the reload config service."""
     assert await async_setup_component(
@@ -701,8 +701,8 @@ async def test_reload_config_handles_load_fails(
     assert calls[0].data.get("event") == "test_event"
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
-        side_effect=HomeAssistantError("bla"),
+        "smarthub.config.load_yaml_config_file",
+        side_effect=SmartHubError("bla"),
     ):
         await hass.services.async_call(automation.DOMAIN, SERVICE_RELOAD, blocking=True)
 
@@ -717,7 +717,7 @@ async def test_reload_config_handles_load_fails(
     "service", ["turn_off_stop", "turn_off_no_stop", "reload", "reload_single"]
 )
 async def test_automation_stops(
-    hass: HomeAssistant, calls: list[ServiceCall], service: str
+    hass: SmartHub, calls: list[ServiceCall], service: str
 ) -> None:
     """Test that turning off / reloading stops any running actions as appropriate."""
     entity_id = "automation.hello"
@@ -766,7 +766,7 @@ async def test_automation_stops(
     elif service == "reload":
         config[automation.DOMAIN]["alias"] = "goodbye"
         with patch(
-            "homeassistant.config.load_yaml_config_file",
+            "smarthub.config.load_yaml_config_file",
             autospec=True,
             return_value=config,
         ):
@@ -776,7 +776,7 @@ async def test_automation_stops(
     else:  # service == "reload_single"
         config[automation.DOMAIN]["alias"] = "goodbye"
         with patch(
-            "homeassistant.config.load_yaml_config_file",
+            "smarthub.config.load_yaml_config_file",
             autospec=True,
             return_value=config,
         ):
@@ -795,7 +795,7 @@ async def test_automation_stops(
 
 @pytest.mark.parametrize("extra_config", [{}, {"id": "sun"}])
 async def test_reload_unchanged_does_not_stop(
-    hass: HomeAssistant, calls: list[ServiceCall], extra_config: dict[str, str]
+    hass: SmartHub, calls: list[ServiceCall], extra_config: dict[str, str]
 ) -> None:
     """Test that reloading stops any running actions as appropriate."""
     test_entity = "test.entity"
@@ -828,7 +828,7 @@ async def test_reload_unchanged_does_not_stop(
     assert len(calls) == 0
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value=config,
     ):
@@ -841,7 +841,7 @@ async def test_reload_unchanged_does_not_stop(
 
 
 async def test_reload_single_unchanged_does_not_stop(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test that reloading stops any running actions as appropriate."""
     test_entity = "test.entity"
@@ -874,7 +874,7 @@ async def test_reload_single_unchanged_does_not_stop(
     assert len(calls) == 0
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value=config,
     ):
@@ -892,7 +892,7 @@ async def test_reload_single_unchanged_does_not_stop(
 
 
 async def test_reload_single_add_automation(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test that reloading a single automation."""
     config1 = {automation.DOMAIN: {}}
@@ -911,7 +911,7 @@ async def test_reload_single_add_automation(
     assert len(calls) == 0
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value=config2,
     ):
@@ -928,7 +928,7 @@ async def test_reload_single_add_automation(
 
 
 async def test_reload_single_parallel_calls(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test reloading single automations in parallel."""
     config1 = {automation.DOMAIN: {}}
@@ -970,7 +970,7 @@ async def test_reload_single_parallel_calls(
     # This tests the logic in the `ReloadServiceHelper` which avoids redundant
     # reloads of the same target automation.
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value=config2,
     ):
@@ -1043,7 +1043,7 @@ async def test_reload_single_parallel_calls(
 
 
 async def test_reload_single_remove_automation(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test that reloading a single automation."""
     config1 = {
@@ -1062,7 +1062,7 @@ async def test_reload_single_remove_automation(
     assert len(calls) == 1
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value=config2,
     ):
@@ -1079,11 +1079,11 @@ async def test_reload_single_remove_automation(
 
 
 async def test_reload_moved_automation_without_alias(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test that changing the order of automations without alias triggers reload."""
     with patch(
-        "homeassistant.components.automation.AutomationEntity", wraps=AutomationEntity
+        "smarthub.components.automation.AutomationEntity", wraps=AutomationEntity
     ) as automation_entity_init:
         config = {
             automation.DOMAIN: [
@@ -1113,7 +1113,7 @@ async def test_reload_moved_automation_without_alias(
         # Reverse the order of the automations
         config[automation.DOMAIN].reverse()
         with patch(
-            "homeassistant.config.load_yaml_config_file",
+            "smarthub.config.load_yaml_config_file",
             autospec=True,
             return_value=config,
         ):
@@ -1134,11 +1134,11 @@ async def test_reload_moved_automation_without_alias(
 
 
 async def test_reload_identical_automations_without_id(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test reloading of identical automations without id."""
     with patch(
-        "homeassistant.components.automation.AutomationEntity", wraps=AutomationEntity
+        "smarthub.components.automation.AutomationEntity", wraps=AutomationEntity
     ) as automation_entity_init:
         config = {
             automation.DOMAIN: [
@@ -1173,7 +1173,7 @@ async def test_reload_identical_automations_without_id(
 
         # Reload the automations without any change
         with patch(
-            "homeassistant.config.load_yaml_config_file",
+            "smarthub.config.load_yaml_config_file",
             autospec=True,
             return_value=config,
         ):
@@ -1196,7 +1196,7 @@ async def test_reload_identical_automations_without_id(
         del config[automation.DOMAIN][-1]
         del config[automation.DOMAIN][-1]
         with patch(
-            "homeassistant.config.load_yaml_config_file",
+            "smarthub.config.load_yaml_config_file",
             autospec=True,
             return_value=config,
         ):
@@ -1217,7 +1217,7 @@ async def test_reload_identical_automations_without_id(
         config[automation.DOMAIN].append(config[automation.DOMAIN][-1])
         config[automation.DOMAIN].append(config[automation.DOMAIN][-1])
         with patch(
-            "homeassistant.config.load_yaml_config_file",
+            "smarthub.config.load_yaml_config_file",
             autospec=True,
             return_value=config,
         ):
@@ -1309,11 +1309,11 @@ async def test_reload_identical_automations_without_id(
     ],
 )
 async def test_reload_unchanged_automation(
-    hass: HomeAssistant, calls: list[ServiceCall], automation_config: dict[str, Any]
+    hass: SmartHub, calls: list[ServiceCall], automation_config: dict[str, Any]
 ) -> None:
     """Test an unmodified automation is not reloaded."""
     with patch(
-        "homeassistant.components.automation.AutomationEntity", wraps=AutomationEntity
+        "smarthub.components.automation.AutomationEntity", wraps=AutomationEntity
     ) as automation_entity_init:
         config = {automation.DOMAIN: [automation_config]}
         assert await async_setup_component(hass, automation.DOMAIN, config)
@@ -1326,7 +1326,7 @@ async def test_reload_unchanged_automation(
 
         # Reload the automations without any change
         with patch(
-            "homeassistant.config.load_yaml_config_file",
+            "smarthub.config.load_yaml_config_file",
             autospec=True,
             return_value=config,
         ):
@@ -1344,11 +1344,11 @@ async def test_reload_unchanged_automation(
 
 @pytest.mark.parametrize("extra_config", [{}, {"id": "sun"}])
 async def test_reload_automation_when_blueprint_changes(
-    hass: HomeAssistant, calls: list[ServiceCall], extra_config: dict[str, str]
+    hass: SmartHub, calls: list[ServiceCall], extra_config: dict[str, str]
 ) -> None:
     """Test an automation is updated at reload if the blueprint has changed."""
     with patch(
-        "homeassistant.components.automation.AutomationEntity", wraps=AutomationEntity
+        "smarthub.components.automation.AutomationEntity", wraps=AutomationEntity
     ) as automation_entity_init:
         config = {
             automation.DOMAIN: [
@@ -1383,12 +1383,12 @@ async def test_reload_automation_when_blueprint_changes(
 
         with (
             patch(
-                "homeassistant.config.load_yaml_config_file",
+                "smarthub.config.load_yaml_config_file",
                 autospec=True,
                 return_value=config,
             ),
             patch(
-                "homeassistant.components.blueprint.models.yaml_util.load_yaml_dict",
+                "smarthub.components.blueprint.models.yaml_util.load_yaml_dict",
                 autospec=True,
                 return_value=blueprint_config,
             ),
@@ -1405,7 +1405,7 @@ async def test_reload_automation_when_blueprint_changes(
         assert len(calls) == 3
 
 
-async def test_automation_restore_state(hass: HomeAssistant) -> None:
+async def test_automation_restore_state(hass: SmartHub) -> None:
     """Ensure states are restored on startup."""
     time = dt_util.utcnow()
 
@@ -1460,7 +1460,7 @@ async def test_automation_restore_state(hass: HomeAssistant) -> None:
     assert len(calls) == 1
 
 
-async def test_initial_value_off(hass: HomeAssistant) -> None:
+async def test_initial_value_off(hass: SmartHub) -> None:
     """Test initial value off."""
     calls = async_mock_service(hass, "test", "automation")
 
@@ -1483,7 +1483,7 @@ async def test_initial_value_off(hass: HomeAssistant) -> None:
     assert len(calls) == 0
 
 
-async def test_initial_value_on(hass: HomeAssistant) -> None:
+async def test_initial_value_on(hass: SmartHub) -> None:
     """Test initial value on."""
     hass.set_state(CoreState.not_running)
     calls = async_mock_service(hass, "test", "automation")
@@ -1512,7 +1512,7 @@ async def test_initial_value_on(hass: HomeAssistant) -> None:
     assert len(calls) == 1
 
 
-async def test_initial_value_off_but_restore_on(hass: HomeAssistant) -> None:
+async def test_initial_value_off_but_restore_on(hass: SmartHub) -> None:
     """Test initial value off and restored state is turned on."""
     hass.set_state(CoreState.not_running)
     calls = async_mock_service(hass, "test", "automation")
@@ -1538,7 +1538,7 @@ async def test_initial_value_off_but_restore_on(hass: HomeAssistant) -> None:
     assert len(calls) == 0
 
 
-async def test_initial_value_on_but_restore_off(hass: HomeAssistant) -> None:
+async def test_initial_value_on_but_restore_off(hass: SmartHub) -> None:
     """Test initial value on and restored state is turned off."""
     calls = async_mock_service(hass, "test", "automation")
     mock_restore_cache(hass, (State("automation.hello", STATE_OFF),))
@@ -1562,7 +1562,7 @@ async def test_initial_value_on_but_restore_off(hass: HomeAssistant) -> None:
     assert len(calls) == 1
 
 
-async def test_no_initial_value_and_restore_off(hass: HomeAssistant) -> None:
+async def test_no_initial_value_and_restore_off(hass: SmartHub) -> None:
     """Test initial value off and restored state is turned on."""
     calls = async_mock_service(hass, "test", "automation")
     mock_restore_cache(hass, (State("automation.hello", STATE_OFF),))
@@ -1586,7 +1586,7 @@ async def test_no_initial_value_and_restore_off(hass: HomeAssistant) -> None:
 
 
 async def test_automation_is_on_if_no_initial_state_or_restore(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test initial value is on when no initial state or restored state."""
     calls = async_mock_service(hass, "test", "automation")
@@ -1609,7 +1609,7 @@ async def test_automation_is_on_if_no_initial_state_or_restore(
     assert len(calls) == 1
 
 
-async def test_automation_not_trigger_on_bootstrap(hass: HomeAssistant) -> None:
+async def test_automation_not_trigger_on_bootstrap(hass: SmartHub) -> None:
     """Test if automation is not trigger on bootstrap."""
     hass.set_state(CoreState.not_running)
     calls = async_mock_service(hass, "test", "automation")
@@ -1692,7 +1692,7 @@ async def test_automation_not_trigger_on_bootstrap(hass: HomeAssistant) -> None:
     ],
 )
 async def test_automation_bad_config_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     hass_admin_user: MockUser,
@@ -1747,7 +1747,7 @@ async def test_automation_bad_config_validation(
 
     # Reloading the automation with fixed config should clear the issue
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={
             automation.DOMAIN: {
@@ -1771,7 +1771,7 @@ async def test_automation_bad_config_validation(
 
 
 async def test_automation_with_error_in_script(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -1799,7 +1799,7 @@ async def test_automation_with_error_in_script(
 
 
 async def test_automation_with_error_in_script_2(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test automation with an error in script."""
     assert await async_setup_component(
@@ -1820,7 +1820,7 @@ async def test_automation_with_error_in_script_2(
 
 
 async def test_automation_restore_last_triggered_with_initial_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Ensure last_triggered is restored, even when initial state is set."""
     time = dt_util.utcnow()
@@ -1875,7 +1875,7 @@ async def test_automation_restore_last_triggered_with_initial_state(
     assert state.attributes["last_triggered"] == time
 
 
-async def test_extraction_functions_not_setup(hass: HomeAssistant) -> None:
+async def test_extraction_functions_not_setup(hass: SmartHub) -> None:
     """Test extraction functions when automation is not setup."""
     assert automation.automations_with_area(hass, "area-in-both") == []
     assert automation.areas_in_automation(hass, "automation.test") == []
@@ -1891,7 +1891,7 @@ async def test_extraction_functions_not_setup(hass: HomeAssistant) -> None:
     assert automation.labels_in_automation(hass, "automation.test") == []
 
 
-async def test_extraction_functions_unknown_automation(hass: HomeAssistant) -> None:
+async def test_extraction_functions_unknown_automation(hass: SmartHub) -> None:
     """Test extraction functions for an unknown automation."""
     assert await async_setup_component(hass, DOMAIN, {})
     assert automation.areas_in_automation(hass, "automation.unknown") == []
@@ -1902,7 +1902,7 @@ async def test_extraction_functions_unknown_automation(hass: HomeAssistant) -> N
     assert automation.labels_in_automation(hass, "automation.unknown") == []
 
 
-async def test_extraction_functions_unavailable_automation(hass: HomeAssistant) -> None:
+async def test_extraction_functions_unavailable_automation(hass: SmartHub) -> None:
     """Test extraction functions for an unknown automation."""
     entity_id = "automation.test1"
     assert await async_setup_component(
@@ -1932,7 +1932,7 @@ async def test_extraction_functions_unavailable_automation(hass: HomeAssistant) 
 
 
 async def test_extraction_functions(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test extraction functions."""
     config_entry = MockConfigEntry(domain="fake_integration", data={})
@@ -1956,7 +1956,7 @@ async def test_extraction_functions(
         connections={(dr.CONNECTION_NETWORK_MAC, "00:00:00:00:00:04")},
     )
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await async_setup_component(hass, "calendar", {"calendar": {"platform": "demo"}})
     # Ensure the calendar entities are setup before attaching triggers
     await hass.async_block_till_done()
@@ -2232,7 +2232,7 @@ async def test_extraction_functions(
     assert automation.blueprint_in_automation(hass, "automation.test3") is None
 
 
-async def test_logbook_humanify_automation_triggered_event(hass: HomeAssistant) -> None:
+async def test_logbook_humanify_automation_triggered_event(hass: SmartHub) -> None:
     """Test humanifying Automation Trigger event."""
     hass.config.components.add("recorder")
     await async_setup_component(hass, automation.DOMAIN, {})
@@ -2269,7 +2269,7 @@ async def test_logbook_humanify_automation_triggered_event(hass: HomeAssistant) 
 
 
 async def test_automation_variables(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test automation variables."""
     calls = async_mock_service(hass, "test", "automation")
@@ -2352,7 +2352,7 @@ async def test_automation_variables(
 
 
 async def test_automation_trigger_variables(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test automation trigger variables."""
     calls = async_mock_service(hass, "test", "automation")
@@ -2420,7 +2420,7 @@ async def test_automation_trigger_variables(
 
 
 async def test_automation_bad_trigger_variables(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test automation trigger variables accessing hass is rejected."""
     calls = async_mock_service(hass, "test", "automation")
@@ -2450,7 +2450,7 @@ async def test_automation_bad_trigger_variables(
 
 
 async def test_automation_this_var_always(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test automation always has reference to this, even with no variable or trigger variables configured."""
     calls = async_mock_service(hass, "test", "automation")
@@ -2481,7 +2481,7 @@ async def test_automation_this_var_always(
 
 
 async def test_blueprint_automation(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test blueprint automation."""
     assert await async_setup_component(
@@ -2516,7 +2516,7 @@ async def test_blueprint_automation(
 
 
 async def test_blueprint_automation_legacy_schema(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test blueprint automation where the blueprint is using legacy schema."""
     assert await async_setup_component(
@@ -2576,7 +2576,7 @@ async def test_blueprint_automation_legacy_schema(
     ],
 )
 async def test_blueprint_automation_override(
-    hass: HomeAssistant, calls: list[ServiceCall], blueprint: str, override: dict
+    hass: SmartHub, calls: list[ServiceCall], blueprint: str, override: dict
 ) -> None:
     """Test blueprint automation where the automation config overrides the blueprint."""
     assert await async_setup_component(
@@ -2647,7 +2647,7 @@ async def test_blueprint_automation_override(
     ],
 )
 async def test_blueprint_automation_bad_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     blueprint_inputs,
@@ -2685,13 +2685,13 @@ async def test_blueprint_automation_bad_config(
 
 
 async def test_blueprint_automation_fails_substitution(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test blueprint automation with bad inputs."""
     with patch(
-        "homeassistant.components.blueprint.models.BlueprintInputs.async_substitute",
+        "smarthub.components.blueprint.models.BlueprintInputs.async_substitute",
         side_effect=yaml_util.UndefinedSubstitution("blah"),
     ):
         assert await async_setup_component(
@@ -2729,7 +2729,7 @@ async def test_blueprint_automation_fails_substitution(
     }
 
 
-async def test_trigger_service(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_trigger_service(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test the automation trigger service."""
     assert await async_setup_component(
         hass,
@@ -2760,7 +2760,7 @@ async def test_trigger_service(hass: HomeAssistant, calls: list[ServiceCall]) ->
 
 
 async def test_trigger_condition_implicit_id(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test triggers."""
     assert await async_setup_component(
@@ -2812,7 +2812,7 @@ async def test_trigger_condition_implicit_id(
 
 
 async def test_trigger_condition_explicit_id(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test triggers."""
     assert await async_setup_component(
@@ -2877,7 +2877,7 @@ async def test_trigger_condition_explicit_id(
 )
 @pytest.mark.parametrize("wait_for_stop_scripts_after_shutdown", [True])
 async def test_recursive_automation_starting_script(
-    hass: HomeAssistant,
+    hass: SmartHub,
     automation_mode,
     automation_runs,
     script_mode,
@@ -2903,7 +2903,7 @@ async def test_recursive_automation_starting_script(
         stop_scripts_at_shutdown_called.set()
 
     with patch(
-        "homeassistant.helpers.script._async_stop_scripts_at_shutdown",
+        "smarthub.helpers.script._async_stop_scripts_at_shutdown",
         wraps=mock_stop_scripts_at_shutdown,
     ):
         assert await async_setup_component(
@@ -2977,7 +2977,7 @@ async def test_recursive_automation_starting_script(
 
         # Trigger 1st stage script shutdown
         hass.set_state(CoreState.stopping)
-        hass.bus.async_fire("homeassistant_stop")
+        hass.bus.async_fire("smarthub_stop")
         await asyncio.wait_for(stop_scripts_at_shutdown_called.wait(), 10)
 
         # Trigger 2nd stage script shutdown
@@ -2993,12 +2993,12 @@ async def test_recursive_automation_starting_script(
 )
 @pytest.mark.parametrize("wait_for_stop_scripts_after_shutdown", [True])
 async def test_recursive_automation(
-    hass: HomeAssistant, automation_mode, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, automation_mode, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test automation triggering itself.
 
     - Illegal recursion detection should not be triggered
-    - Home Assistant should not hang on shut down
+    - SmartHub should not hang on shut down
     """
     stop_scripts_at_shutdown_called = asyncio.Event()
     real_stop_scripts_at_shutdown = _async_stop_scripts_at_shutdown
@@ -3008,7 +3008,7 @@ async def test_recursive_automation(
         stop_scripts_at_shutdown_called.set()
 
     with patch(
-        "homeassistant.helpers.script._async_stop_scripts_at_shutdown",
+        "smarthub.helpers.script._async_stop_scripts_at_shutdown",
         wraps=stop_scripts_at_shutdown,
     ):
         assert await async_setup_component(
@@ -3041,7 +3041,7 @@ async def test_recursive_automation(
 
         # Trigger 1st stage script shutdown
         hass.set_state(CoreState.stopping)
-        hass.bus.async_fire("homeassistant_stop")
+        hass.bus.async_fire("smarthub_stop")
         await asyncio.wait_for(stop_scripts_at_shutdown_called.wait(), 1)
 
         # Trigger 2nd stage script shutdown
@@ -3053,14 +3053,14 @@ async def test_recursive_automation(
 
 @pytest.mark.parametrize("wait_for_stop_scripts_after_shutdown", [True])
 async def test_recursive_automation_restart_mode(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test automation restarting itself.
 
     The automation is an infinite loop since it keeps restarting itself
 
     - Illegal recursion detection should not be triggered
-    - Home Assistant should not hang on shut down
+    - SmartHub should not hang on shut down
     """
     stop_scripts_at_shutdown_called = asyncio.Event()
     real_stop_scripts_at_shutdown = _async_stop_scripts_at_shutdown
@@ -3070,7 +3070,7 @@ async def test_recursive_automation_restart_mode(
         stop_scripts_at_shutdown_called.set()
 
     with patch(
-        "homeassistant.helpers.script._async_stop_scripts_at_shutdown",
+        "smarthub.helpers.script._async_stop_scripts_at_shutdown",
         wraps=stop_scripts_at_shutdown,
     ):
         assert await async_setup_component(
@@ -3103,7 +3103,7 @@ async def test_recursive_automation_restart_mode(
 
         # Trigger 1st stage script shutdown
         hass.set_state(CoreState.stopping)
-        hass.bus.async_fire("homeassistant_stop")
+        hass.bus.async_fire("smarthub_stop")
         await asyncio.wait_for(stop_scripts_at_shutdown_called.wait(), 1)
 
         # Trigger 2nd stage script shutdown
@@ -3114,7 +3114,7 @@ async def test_recursive_automation_restart_mode(
 
 
 async def test_websocket_config(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test config command."""
     config = {
@@ -3151,7 +3151,7 @@ async def test_websocket_config(
     assert msg["error"]["code"] == "not_found"
 
 
-async def test_automation_turns_off_other_automation(hass: HomeAssistant) -> None:
+async def test_automation_turns_off_other_automation(hass: SmartHub) -> None:
     """Test an automation that turns off another automation."""
     hass.set_state(CoreState.not_running)
     calls = async_mock_service(hass, "persistent_notification", "create")
@@ -3230,7 +3230,7 @@ async def test_automation_turns_off_other_automation(hass: HomeAssistant) -> Non
 
 
 async def test_two_automations_call_restart_script_same_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test two automations that call a restart mode script at the same."""
     hass.states.async_set("binary_sensor.presence", "off")
@@ -3310,7 +3310,7 @@ async def test_two_automations_call_restart_script_same_time(
 
 
 async def test_two_automation_call_restart_script_right_after_each_other(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test two automations call a restart script right after each other."""
 
@@ -3379,7 +3379,7 @@ async def test_two_automation_call_restart_script_right_after_each_other(
 
 
 async def test_action_backward_compatibility(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test we can still use old-style automations.
 
@@ -3455,7 +3455,7 @@ async def test_action_backward_compatibility(
     ],
 )
 async def test_invalid_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     message: str,
     caplog: pytest.LogCaptureFixture,
@@ -3475,7 +3475,7 @@ async def test_invalid_configuration(
     ["trigger", "platform"],
 )
 async def test_valid_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     trigger_key: str,
 ) -> None:
     """Test for valid automation configurations."""

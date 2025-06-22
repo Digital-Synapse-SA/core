@@ -7,17 +7,17 @@ from aiohttp import ClientError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TOGGLE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ERROR_BAD_REQUEST, ERROR_TOO_MANY_REQUESTS
 
@@ -28,7 +28,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 def switch_only() -> Generator[None]:
     """Enable only the switch platform."""
     with patch(
-        "homeassistant.components.habitica.PLATFORMS",
+        "smarthub.components.habitica.PLATFORMS",
         [Platform.SWITCH],
     ):
         yield
@@ -36,7 +36,7 @@ def switch_only() -> Generator[None]:
 
 @pytest.mark.usefixtures("habitica")
 async def test_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
@@ -61,7 +61,7 @@ async def test_switch(
     ],
 )
 async def test_turn_on_off_toggle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     service_call: str,
     habitica: AsyncMock,
@@ -95,13 +95,13 @@ async def test_turn_on_off_toggle(
 @pytest.mark.parametrize(
     ("raise_exception", "expected_exception"),
     [
-        (ERROR_TOO_MANY_REQUESTS, HomeAssistantError),
-        (ERROR_BAD_REQUEST, HomeAssistantError),
-        (ClientError, HomeAssistantError),
+        (ERROR_TOO_MANY_REQUESTS, SmartHubError),
+        (ERROR_BAD_REQUEST, SmartHubError),
+        (ClientError, SmartHubError),
     ],
 )
 async def test_turn_on_off_toggle_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     service_call: str,
     habitica: AsyncMock,

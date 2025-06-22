@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.filter.const import (
+from smarthub.components.filter.const import (
     CONF_FILTER_NAME,
     CONF_FILTER_PRECISION,
     CONF_FILTER_RADIUS,
@@ -21,10 +21,10 @@ from homeassistant.components.filter.const import (
     DOMAIN,
     FILTER_NAME_OUTLIER,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
-from homeassistant.core import HomeAssistant, State
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_ENTITY_ID, CONF_NAME
+from smarthub.core import SmartHub, State
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 
@@ -45,7 +45,7 @@ def values_fixture() -> list[State]:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Automatically patch setup_entry."""
     with patch(
-        "homeassistant.components.filter.async_setup_entry",
+        "smarthub.components.filter.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -70,9 +70,9 @@ async def get_config_to_integration_load() -> dict[str, Any]:
 
 @pytest.fixture(name="loaded_entry")
 async def load_integration(
-    hass: HomeAssistant, get_config: dict[str, Any], values: list[State]
+    hass: SmartHub, get_config: dict[str, Any], values: list[State]
 ) -> MockConfigEntry:
-    """Set up the Filter integration in Home Assistant."""
+    """Set up the Filter integration in SmartHub."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,

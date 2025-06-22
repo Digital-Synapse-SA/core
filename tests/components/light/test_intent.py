@@ -1,15 +1,15 @@
 """Tests for the light intents."""
 
-from homeassistant.components import light
-from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES, ColorMode, intent
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.intent import async_handle
+from smarthub.components import light
+from smarthub.components.light import ATTR_SUPPORTED_COLOR_MODES, ColorMode, intent
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.helpers.intent import async_handle
 
 from tests.common import async_mock_service
 
 
-async def test_intent_set_color(hass: HomeAssistant) -> None:
+async def test_intent_set_color(hass: SmartHub) -> None:
     """Test the set color intent."""
     hass.states.async_set(
         "light.hello_2", "off", {ATTR_SUPPORTED_COLOR_MODES: [ColorMode.HS]}
@@ -34,7 +34,7 @@ async def test_intent_set_color(hass: HomeAssistant) -> None:
     assert call.data.get(light.ATTR_RGB_COLOR) == (0, 0, 255)
 
 
-async def test_intent_set_color_and_brightness(hass: HomeAssistant) -> None:
+async def test_intent_set_color_and_brightness(hass: SmartHub) -> None:
     """Test the set color intent."""
     hass.states.async_set(
         "light.hello_2", "off", {ATTR_SUPPORTED_COLOR_MODES: [ColorMode.HS]}
@@ -64,7 +64,7 @@ async def test_intent_set_color_and_brightness(hass: HomeAssistant) -> None:
     assert call.data.get(light.ATTR_BRIGHTNESS_PCT) == 20
 
 
-async def test_intent_set_temperature(hass: HomeAssistant) -> None:
+async def test_intent_set_temperature(hass: SmartHub) -> None:
     """Test setting the color temperature in kevin via intent."""
     hass.states.async_set(
         "light.test", "off", {ATTR_SUPPORTED_COLOR_MODES: [ColorMode.COLOR_TEMP]}

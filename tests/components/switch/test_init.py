@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant import core
-from homeassistant.components import switch
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub import core
+from smarthub.components import switch
+from smarthub.const import CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import common
 from .common import MockSwitch
@@ -16,7 +16,7 @@ from tests.common import MockUser, setup_test_component_platform
 
 @pytest.fixture(autouse=True)
 def entities(
-    hass: HomeAssistant, mock_switch_entities: list[MockSwitch]
+    hass: SmartHub, mock_switch_entities: list[MockSwitch]
 ) -> list[MockSwitch]:
     """Initialize the test switch."""
     setup_test_component_platform(hass, switch.DOMAIN, mock_switch_entities)
@@ -24,7 +24,7 @@ def entities(
 
 
 @pytest.mark.usefixtures("enable_custom_integrations")
-async def test_methods(hass: HomeAssistant, entities: list[MockSwitch]) -> None:
+async def test_methods(hass: SmartHub, entities: list[MockSwitch]) -> None:
     """Test is_on, turn_on, turn_off methods."""
     switch_1, switch_2, switch_3 = entities
     assert await async_setup_component(
@@ -58,7 +58,7 @@ async def test_methods(hass: HomeAssistant, entities: list[MockSwitch]) -> None:
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_switch_context(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entities,
     hass_admin_user: MockUser,
 ) -> None:

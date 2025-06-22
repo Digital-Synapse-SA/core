@@ -7,10 +7,10 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.fjaraskupan.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.fjaraskupan.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import COOKER_SERVICE_INFO
 
@@ -20,15 +20,15 @@ def fixture_mock_setup_entry() -> Generator[AsyncMock]:
     """Fixture for config entry."""
 
     with patch(
-        "homeassistant.components.fjaraskupan.async_setup_entry", return_value=True
+        "smarthub.components.fjaraskupan.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
-async def test_configure(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_configure(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     with patch(
-        "homeassistant.components.fjaraskupan.config_flow.async_discovered_service_info",
+        "smarthub.components.fjaraskupan.config_flow.async_discovered_service_info",
         return_value=[COOKER_SERVICE_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -46,11 +46,11 @@ async def test_configure(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> No
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_scan_no_devices(hass: HomeAssistant) -> None:
+async def test_scan_no_devices(hass: SmartHub) -> None:
     """Test we get the form."""
 
     with patch(
-        "homeassistant.components.fjaraskupan.config_flow.async_discovered_service_info",
+        "smarthub.components.fjaraskupan.config_flow.async_discovered_service_info",
         return_value=[],
     ):
         result = await hass.config_entries.flow.async_init(

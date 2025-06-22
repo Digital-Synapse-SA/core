@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock
 
 from skyboxremote import SkyBoxConnectionError
 
-from homeassistant.components.sky_remote.const import DEFAULT_PORT, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.sky_remote.const import DEFAULT_PORT, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_mock_entry
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_remote_control,
     device_registry: dr.DeviceRegistry,
@@ -33,7 +33,7 @@ async def test_setup_entry(
 
 
 async def test_setup_unconnectable_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_remote_control,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_setup_unconnectable_entry(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_remote_control
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_remote_control
 ) -> None:
     """Test unload an entry."""
     await setup_mock_entry(hass, mock_config_entry)

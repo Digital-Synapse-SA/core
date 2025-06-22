@@ -7,13 +7,13 @@ from unittest.mock import patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import calendar, todo
-from homeassistant.components.homeassistant.exposed_entities import async_expose_entity
-from homeassistant.components.intent import async_register_timer_handler
-from homeassistant.components.script.config import ScriptConfig
-from homeassistant.core import Context, HomeAssistant, State, SupportsResponse
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub.components import calendar, todo
+from smarthub.components.smarthub.exposed_entities import async_expose_entity
+from smarthub.components.intent import async_register_timer_handler
+from smarthub.components.script.config import ScriptConfig
+from smarthub.core import Context, SmartHub, State, SupportsResponse
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     area_registry as ar,
     config_validation as cv,
     device_registry as dr,
@@ -23,9 +23,9 @@ from homeassistant.helpers import (
     llm,
     selector,
 )
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.json import JsonObjectType
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.json import JsonObjectType
 
 from tests.common import MockConfigEntry, async_mock_service
 
@@ -54,14 +54,14 @@ class MyAPI(llm.API):
 
 
 async def test_get_api_no_existing(
-    hass: HomeAssistant, llm_context: llm.LLMContext
+    hass: SmartHub, llm_context: llm.LLMContext
 ) -> None:
     """Test getting an llm api where no config exists."""
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await llm.async_get_api(hass, "non-existing", llm_context)
 
 
-async def test_register_api(hass: HomeAssistant, llm_context: llm.LLMContext) -> None:
+async def test_register_api(hass: SmartHub, llm_context: llm.LLMContext) -> None:
     """Test registering an llm api."""
 
     api = MyAPI(hass=hass, id="test", name="Test")
@@ -71,21 +71,21 @@ async def test_register_api(hass: HomeAssistant, llm_context: llm.LLMContext) ->
     assert instance.api is api
     assert api in llm.async_get_apis(hass)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         llm.async_register_api(hass, api)
 
 
-async def test_unregister_api(hass: HomeAssistant, llm_context: llm.LLMContext) -> None:
+async def test_unregister_api(hass: SmartHub, llm_context: llm.LLMContext) -> None:
     """Test unregistering an llm api."""
 
     unreg = llm.async_register_api(hass, MyAPI(hass=hass, id="test", name="Test"))
     assert await llm.async_get_api(hass, "test", llm_context)
     unreg()
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         assert await llm.async_get_api(hass, "test", llm_context)
 
 
-async def test_reregister_api(hass: HomeAssistant, llm_context: llm.LLMContext) -> None:
+async def test_reregister_api(hass: SmartHub, llm_context: llm.LLMContext) -> None:
     """Test unregistering an llm api then re-registering with the same id."""
 
     unreg = llm.async_register_api(hass, MyAPI(hass=hass, id="test", name="Test"))
@@ -96,7 +96,7 @@ async def test_reregister_api(hass: HomeAssistant, llm_context: llm.LLMContext) 
 
 
 async def test_unregister_twice(
-    hass: HomeAssistant, llm_context: llm.LLMContext
+    hass: SmartHub, llm_context: llm.LLMContext
 ) -> None:
     """Test unregistering an llm api twice."""
 
@@ -109,7 +109,7 @@ async def test_unregister_twice(
         unreg()
 
 
-async def test_multiple_apis(hass: HomeAssistant, llm_context: llm.LLMContext) -> None:
+async def test_multiple_apis(hass: SmartHub, llm_context: llm.LLMContext) -> None:
     """Test registering multiple APIs."""
 
     unreg1 = llm.async_register_api(hass, MyAPI(hass=hass, id="test-1", name="Test 1"))
@@ -122,32 +122,32 @@ async def test_multiple_apis(hass: HomeAssistant, llm_context: llm.LLMContext) -
     # Unregister and verify only one is left
     unreg1()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         assert await llm.async_get_api(hass, "test-1", llm_context)
 
     assert await llm.async_get_api(hass, "test-2", llm_context)
 
 
 async def test_call_tool_no_existing(
-    hass: HomeAssistant, llm_context: llm.LLMContext
+    hass: SmartHub, llm_context: llm.LLMContext
 ) -> None:
     """Test calling an llm tool where no config exists."""
     instance = await llm.async_get_api(hass, "assist", llm_context)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await instance.async_call_tool(
             llm.ToolInput("test_tool", {}),
         )
 
 
 async def test_assist_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     area_registry: ar.AreaRegistry,
     floor_registry: fr.FloorRegistry,
 ) -> None:
     """Test Assist API."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     entity_registry.async_get_or_create(
         "light",
@@ -198,7 +198,7 @@ async def test_assist_api(
     assert len(api.tools) == 2
     tool = api.tools[0]
     assert tool.name == "test_intent"
-    assert tool.description == "Execute Home Assistant test_intent intent"
+    assert tool.description == "Execute SmartHub test_intent intent"
     assert tool.parameters == vol.Schema(
         {
             vol.Optional("area"): cv.string,
@@ -223,7 +223,7 @@ async def test_assist_api(
     )
 
     with patch(
-        "homeassistant.helpers.intent.async_handle", return_value=intent_response
+        "smarthub.helpers.intent.async_handle", return_value=intent_response
     ) as mock_intent_handle:
         response = await api.async_call_tool(tool_input)
 
@@ -280,7 +280,7 @@ async def test_assist_api(
     llm_context.device_id = device.id
 
     with patch(
-        "homeassistant.helpers.intent.async_handle", return_value=intent_response
+        "smarthub.helpers.intent.async_handle", return_value=intent_response
     ) as mock_intent_handle:
         response = await api.async_call_tool(tool_input)
 
@@ -326,10 +326,10 @@ async def test_assist_api(
 
 
 async def test_assist_api_get_timer_tools(
-    hass: HomeAssistant, llm_context: llm.LLMContext
+    hass: SmartHub, llm_context: llm.LLMContext
 ) -> None:
     """Test getting timer tools with Assist API."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "intent", {})
     api = await llm.async_get_api(hass, "assist", llm_context)
 
@@ -344,10 +344,10 @@ async def test_assist_api_get_timer_tools(
 
 
 async def test_assist_api_tools(
-    hass: HomeAssistant, llm_context: llm.LLMContext
+    hass: SmartHub, llm_context: llm.LLMContext
 ) -> None:
     """Test getting timer tools with Assist API."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "intent", {})
 
     llm_context.device_id = "test_device"
@@ -378,7 +378,7 @@ async def test_assist_api_tools(
 
 
 async def test_assist_api_description(
-    hass: HomeAssistant, llm_context: llm.LLMContext
+    hass: SmartHub, llm_context: llm.LLMContext
 ) -> None:
     """Test intent description with Assist API."""
 
@@ -397,14 +397,14 @@ async def test_assist_api_description(
 
 
 async def test_assist_api_prompt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     area_registry: ar.AreaRegistry,
     floor_registry: fr.FloorRegistry,
 ) -> None:
     """Test prompt for the assist API."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "intent", {})
     context = Context()
     llm_context = llm.LLMContext(
@@ -417,7 +417,7 @@ async def test_assist_api_prompt(
     api = await llm.async_get_api(hass, "assist", llm_context)
     assert api.api_prompt == (
         "Only if the user wants to control a device, tell them to expose entities to their "
-        "voice assistant in Home Assistant."
+        "voice assistant in SmartHub."
     )
 
     # Expose entities
@@ -659,7 +659,7 @@ async def test_assist_api_prompt(
   areas: Test Area 2
 """
     first_part_prompt = (
-        "When controlling Home Assistant always call the intent tools. "
+        "When controlling SmartHub always call the intent tools. "
         "Use HassTurnOn to lock and HassTurnOff to unlock a lock. "
         "When controlling a device, prefer passing just name and domain. "
         "When controlling an area, prefer passing just area name and domain."
@@ -745,13 +745,13 @@ For general knowledge questions not about the home: Answer truthfully from inter
 
 
 async def test_script_tool(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     area_registry: ar.AreaRegistry,
     floor_registry: fr.FloorRegistry,
 ) -> None:
     """Test ScriptTool for the assist API."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "intent", {})
     context = Context()
     llm_context = llm.LLMContext(
@@ -850,7 +850,7 @@ async def test_script_tool(
     )
 
     with patch(
-        "homeassistant.core.ServiceRegistry.async_call",
+        "smarthub.core.ServiceRegistry.async_call",
         side_effect=hass.services.async_call,
     ) as mock_service_call:
         response = await api.async_call_tool(tool_input)
@@ -882,7 +882,7 @@ async def test_script_tool(
     )
 
     with patch(
-        "homeassistant.core.ServiceRegistry.async_call",
+        "smarthub.core.ServiceRegistry.async_call",
         side_effect=hass.services.async_call,
     ) as mock_service_call:
         response = await api.async_call_tool(tool_input)
@@ -920,7 +920,7 @@ async def test_script_tool(
     }
 
     with patch(
-        "homeassistant.helpers.entity_component.EntityComponent.async_prepare_reload",
+        "smarthub.helpers.entity_component.EntityComponent.async_prepare_reload",
         return_value=config,
     ):
         await hass.services.async_call("script", "reload", blocking=True)
@@ -950,9 +950,9 @@ async def test_script_tool(
     }
 
 
-async def test_script_tool_name(hass: HomeAssistant) -> None:
+async def test_script_tool_name(hass: SmartHub) -> None:
     """Test that script tool name is not started with a digit."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     context = Context()
     llm_context = llm.LLMContext(
         platform="test_platform",
@@ -990,7 +990,7 @@ async def test_script_tool_name(hass: HomeAssistant) -> None:
 
 
 async def test_selector_serializer(
-    hass: HomeAssistant, llm_context: llm.LLMContext
+    hass: SmartHub, llm_context: llm.LLMContext
 ) -> None:
     """Test serialization of Selectors in Open API format."""
     api = await llm.async_get_api(hass, "assist", llm_context)
@@ -1225,9 +1225,9 @@ async def test_selector_serializer(
     }
 
 
-async def test_calendar_get_events_tool(hass: HomeAssistant) -> None:
+async def test_calendar_get_events_tool(hass: SmartHub) -> None:
     """Test the calendar get events tool."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     hass.states.async_set(
         "calendar.test_calendar", "on", {"friendly_name": "Mock Calendar Name"}
     )
@@ -1258,7 +1258,7 @@ async def test_calendar_get_events_tool(hass: HomeAssistant) -> None:
                     {
                         "start": "2025-09-17",
                         "end": "2025-09-18",
-                        "summary": "Home Assistant 12th birthday",
+                        "summary": "SmartHub 12th birthday",
                         "description": "",
                     },
                     {
@@ -1281,7 +1281,7 @@ async def test_calendar_get_events_tool(hass: HomeAssistant) -> None:
         },
     )
     now = dt_util.now()
-    with patch("homeassistant.util.dt.now", return_value=now):
+    with patch("smarthub.util.dt.now", return_value=now):
         response = await api.async_call_tool(tool_input)
 
     assert len(calls) == 1
@@ -1300,7 +1300,7 @@ async def test_calendar_get_events_tool(hass: HomeAssistant) -> None:
             {
                 "start": "2025-09-17",
                 "end": "2025-09-18",
-                "summary": "Home Assistant 12th birthday",
+                "summary": "SmartHub 12th birthday",
                 "description": "",
                 "all_day": True,
             },
@@ -1314,7 +1314,7 @@ async def test_calendar_get_events_tool(hass: HomeAssistant) -> None:
     }
 
     tool_input.tool_args["range"] = "week"
-    with patch("homeassistant.util.dt.now", return_value=now):
+    with patch("smarthub.util.dt.now", return_value=now):
         response = await api.async_call_tool(tool_input)
 
     assert len(calls) == 2
@@ -1326,9 +1326,9 @@ async def test_calendar_get_events_tool(hass: HomeAssistant) -> None:
     }
 
 
-async def test_todo_get_items_tool(hass: HomeAssistant) -> None:
+async def test_todo_get_items_tool(hass: SmartHub) -> None:
     """Test the todo get items tool."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "todo", {})
     hass.states.async_set(
         "todo.test_list", "0", {"friendly_name": "Mock Todo List Name"}
@@ -1437,9 +1437,9 @@ async def test_todo_get_items_tool(hass: HomeAssistant) -> None:
     }
 
 
-async def test_no_tools_exposed(hass: HomeAssistant) -> None:
+async def test_no_tools_exposed(hass: SmartHub) -> None:
     """Test that tools are not exposed when no entities are exposed."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     context = Context()
     llm_context = llm.LLMContext(
         platform="test_platform",
@@ -1452,7 +1452,7 @@ async def test_no_tools_exposed(hass: HomeAssistant) -> None:
     assert api.tools == []
 
 
-async def test_merged_api(hass: HomeAssistant, llm_context: llm.LLMContext) -> None:
+async def test_merged_api(hass: SmartHub, llm_context: llm.LLMContext) -> None:
     """Test an API instance that merges multiple llm apis."""
 
     class MyTool(llm.Tool):
@@ -1461,7 +1461,7 @@ async def test_merged_api(hass: HomeAssistant, llm_context: llm.LLMContext) -> N
             self.description = description
 
         async def async_call(
-            self, hass: HomeAssistant, tool_input: llm.ToolInput, _: llm.LLMContext
+            self, hass: SmartHub, tool_input: llm.ToolInput, _: llm.LLMContext
         ) -> JsonObjectType:
             return {"result": {tool_input.tool_name: tool_input.tool_args}}
 

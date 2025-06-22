@@ -8,12 +8,12 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.shelly.const import UPDATE_PERIOD_MULTIPLIER
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.shelly.const import UPDATE_PERIOD_MULTIPLIER
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import SmartHub, State
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import (
     init_integration,
@@ -30,7 +30,7 @@ SENSOR_BLOCK_ID = 3
 
 
 async def test_block_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -54,7 +54,7 @@ async def test_block_binary_sensor(
 
 
 async def test_block_binary_sensor_extra_state_attr(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -79,7 +79,7 @@ async def test_block_binary_sensor_extra_state_attr(
 
 
 async def test_block_rest_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -104,7 +104,7 @@ async def test_block_rest_binary_sensor(
 
 
 async def test_block_rest_binary_sensor_connected_battery_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -137,7 +137,7 @@ async def test_block_rest_binary_sensor_connected_battery_devices(
 
 
 async def test_block_sleeping_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -167,7 +167,7 @@ async def test_block_sleeping_binary_sensor(
 
 
 async def test_block_restored_sleeping_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -201,7 +201,7 @@ async def test_block_restored_sleeping_binary_sensor(
 
 
 async def test_block_restored_sleeping_binary_sensor_no_last_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -234,7 +234,7 @@ async def test_block_restored_sleeping_binary_sensor_no_last_state(
 
 
 async def test_rpc_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -259,7 +259,7 @@ async def test_rpc_binary_sensor(
 
 
 async def test_rpc_binary_sensor_removal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -278,7 +278,7 @@ async def test_rpc_binary_sensor_removal(
 
 
 async def test_rpc_sleeping_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -320,7 +320,7 @@ async def test_rpc_sleeping_binary_sensor(
 
 
 async def test_rpc_restored_sleeping_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -356,7 +356,7 @@ async def test_rpc_restored_sleeping_binary_sensor(
 
 
 async def test_rpc_restored_sleeping_binary_sensor_no_last_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -402,7 +402,7 @@ async def test_rpc_restored_sleeping_binary_sensor_no_last_state(
     ],
 )
 async def test_rpc_device_virtual_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -437,7 +437,7 @@ async def test_rpc_device_virtual_binary_sensor(
 
 
 async def test_rpc_remove_virtual_binary_sensor_when_mode_toggle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
     mock_rpc_device: Mock,
@@ -470,7 +470,7 @@ async def test_rpc_remove_virtual_binary_sensor_when_mode_toggle(
 
 
 async def test_rpc_remove_virtual_binary_sensor_when_orphaned(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
     mock_rpc_device: Mock,
@@ -494,7 +494,7 @@ async def test_rpc_remove_virtual_binary_sensor_when_orphaned(
 
 
 async def test_blu_trv_binary_sensor_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     entity_registry: EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -513,7 +513,7 @@ async def test_blu_trv_binary_sensor_entity(
 
 
 async def test_rpc_flood_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     snapshot: SnapshotAssertion,

@@ -2,11 +2,11 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.emoncms.const import CONF_ONLY_INCLUDE_FEEDID, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.emoncms.const import CONF_ONLY_INCLUDE_FEEDID, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_URL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 from .conftest import EMONCMS_FAILURE, SENSOR_NAME
@@ -20,7 +20,7 @@ USER_INPUT = {
 
 
 async def test_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     emoncms_client: AsyncMock,
 ) -> None:
@@ -57,7 +57,7 @@ CONFIG_ENTRY = {
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     emoncms_client: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -79,7 +79,7 @@ async def test_options_flow(
 
 
 async def test_options_flow_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     emoncms_client: AsyncMock,
     config_entry: MockConfigEntry,
@@ -96,7 +96,7 @@ async def test_options_flow_failure(
 
 
 async def test_unique_id_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     emoncms_client: AsyncMock,
     config_entry_unique_id: MockConfigEntry,

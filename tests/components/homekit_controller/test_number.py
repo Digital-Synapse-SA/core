@@ -6,8 +6,8 @@ from aiohomekit.model import Accessory
 from aiohomekit.model.characteristics import CharacteristicsTypes
 from aiohomekit.model.services import Service, ServicesTypes
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import Helper, setup_test_component
 
@@ -34,7 +34,7 @@ def create_switch_with_spray_level(accessory: Accessory) -> Service:
 
 
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:
@@ -55,7 +55,7 @@ async def test_migrate_unique_id(
 
 
 async def test_read_number(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test a switch service that has a sensor characteristic is correctly handled."""
     helper = await setup_test_component(
@@ -85,7 +85,7 @@ async def test_read_number(
 
 
 async def test_write_number(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test a switch service that has a sensor characteristic is correctly handled."""
     helper = await setup_test_component(

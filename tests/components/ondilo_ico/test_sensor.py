@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, patch
 from ondilo import OndiloError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -16,21 +16,21 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ondilo_client: MagicMock,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test that I can get all pools data when no error."""
-    with patch("homeassistant.components.ondilo_ico.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.ondilo_ico.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry, mock_ondilo_client)
 
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
 
 async def test_no_ico_for_one_pool(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ondilo_client: MagicMock,
     config_entry: MockConfigEntry,
     two_pools: list[dict[str, Any]],
@@ -53,7 +53,7 @@ async def test_no_ico_for_one_pool(
 
 
 async def test_error_retrieving_ico(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ondilo_client: MagicMock,
     config_entry: MockConfigEntry,
     pool1: dict[str, Any],
@@ -69,7 +69,7 @@ async def test_error_retrieving_ico(
 
 
 async def test_error_retrieving_measures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ondilo_client: MagicMock,
     config_entry: MockConfigEntry,
     pool1: dict[str, Any],

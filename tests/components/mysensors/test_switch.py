@@ -7,13 +7,13 @@ from unittest.mock import MagicMock, call
 
 from mysensors.sensor import Sensor
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import ATTR_BATTERY_LEVEL
-from homeassistant.core import HomeAssistant
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import ATTR_BATTERY_LEVEL
+from smarthub.core import SmartHub
 
 
 async def test_relay_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     relay_node: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,

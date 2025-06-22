@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -14,8 +14,8 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration, update_property_listeners
 
@@ -37,14 +37,14 @@ SWITCH_ENTITIES = [
 
 @pytest.mark.usefixtures("mock_federwiege")
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the Smarla entities."""
     with (
-        patch("homeassistant.components.smarla.PLATFORMS", [Platform.SWITCH]),
+        patch("smarthub.components.smarla.PLATFORMS", [Platform.SWITCH]),
     ):
         assert await setup_integration(hass, mock_config_entry)
 
@@ -62,7 +62,7 @@ async def test_entities(
 )
 @pytest.mark.parametrize("entity_info", SWITCH_ENTITIES)
 async def test_switch_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_federwiege: MagicMock,
     entity_info: dict[str, str],
@@ -90,7 +90,7 @@ async def test_switch_action(
 
 @pytest.mark.parametrize("entity_info", SWITCH_ENTITIES)
 async def test_switch_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_federwiege: MagicMock,
     entity_info: dict[str, str],

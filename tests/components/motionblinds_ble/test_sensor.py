@@ -12,12 +12,12 @@ from motionblindsble.const import (
 from motionblindsble.device import MotionDevice
 import pytest
 
-from homeassistant.components.motionblinds_ble.const import (
+from smarthub.components.motionblinds_ble.const import (
     ATTR_BATTERY,
     ATTR_SIGNAL_STRENGTH,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -88,7 +88,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motion_device: Mock,
     name: str,

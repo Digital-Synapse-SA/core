@@ -6,11 +6,11 @@ from freezegun.api import FrozenDateTimeFactory
 from pysmlight import Info, Radio
 import pytest
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.smlight.const import DOMAIN, SCAN_INTERVAL
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.smlight.const import DOMAIN, SCAN_INTERVAL
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import setup_integration
 
@@ -41,7 +41,7 @@ MOCK_ROUTER = Info(MAC="AA:BB:CC:DD:EE:FF", radios=[Radio(zb_type=1)])
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     entity_registry: er.EntityRegistry,
     method: str,
@@ -76,7 +76,7 @@ async def test_buttons(
 
 @pytest.mark.parametrize("entity_id", ["zigbee_flash_mode", "reconnect_zigbee_router"])
 async def test_disabled_by_default_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
@@ -96,7 +96,7 @@ async def test_disabled_by_default_buttons(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_zigbee2_router_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
@@ -118,7 +118,7 @@ async def test_zigbee2_router_button(
 
 
 async def test_remove_router_reconnect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,

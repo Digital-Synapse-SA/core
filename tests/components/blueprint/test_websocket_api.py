@@ -7,9 +7,9 @@ from unittest.mock import Mock, patch
 import pytest
 import yaml
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.yaml import UndefinedSubstitution, parse_yaml
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.yaml import UndefinedSubstitution, parse_yaml
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 from tests.typing import WebSocketGenerator
@@ -29,7 +29,7 @@ def script_config() -> dict[str, Any]:
 
 @pytest.fixture(autouse=True)
 async def setup_bp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     automation_config: dict[str, Any],
     script_config: dict[str, Any],
 ) -> None:
@@ -42,7 +42,7 @@ async def setup_bp(
 
 
 async def test_list_blueprints(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test listing blueprints."""
     client = await hass_ws_client(hass)
@@ -86,7 +86,7 @@ async def test_list_blueprints(
 
 
 async def test_list_blueprints_non_existing_domain(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test listing blueprints."""
     client = await hass_ws_client(hass)
@@ -100,7 +100,7 @@ async def test_list_blueprints_non_existing_domain(
 
 
 async def test_import_blueprint(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -110,7 +110,7 @@ async def test_import_blueprint(
     ).read_text(encoding="utf8")
 
     aioclient_mock.get(
-        "https://raw.githubusercontent.com/balloob/home-assistant-config/main/blueprints/automation/motion_light.yaml",
+        "https://raw.githubusercontent.com/balloob/smart-hub-config/main/blueprints/automation/motion_light.yaml",
         text=raw_data,
     )
 
@@ -118,7 +118,7 @@ async def test_import_blueprint(
     await client.send_json_auto_id(
         {
             "type": "blueprint/import",
-            "url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml",
+            "url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml",
         }
     )
 
@@ -137,7 +137,7 @@ async def test_import_blueprint(
                     "a_number": {"selector": {"number": {"mode": "box", "step": 1.0}}},
                 },
                 "name": "Call service based on event",
-                "source_url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml",
+                "source_url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml",
             },
         },
         "validation_errors": None,
@@ -147,7 +147,7 @@ async def test_import_blueprint(
 
 @pytest.mark.usefixtures("setup_bp")
 async def test_import_blueprint_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -157,7 +157,7 @@ async def test_import_blueprint_update(
     ).read_text(encoding="utf8")
 
     aioclient_mock.get(
-        "https://raw.githubusercontent.com/in_folder/home-assistant-config/main/blueprints/automation/in_folder_blueprint.yaml",
+        "https://raw.githubusercontent.com/in_folder/smart-hub-config/main/blueprints/automation/in_folder_blueprint.yaml",
         text=raw_data,
     )
 
@@ -165,7 +165,7 @@ async def test_import_blueprint_update(
     await client.send_json_auto_id(
         {
             "type": "blueprint/import",
-            "url": "https://github.com/in_folder/home-assistant-config/blob/main/blueprints/automation/in_folder_blueprint.yaml",
+            "url": "https://github.com/in_folder/smart-hub-config/blob/main/blueprints/automation/in_folder_blueprint.yaml",
         }
     )
 
@@ -180,7 +180,7 @@ async def test_import_blueprint_update(
                 "domain": "automation",
                 "input": {"action": None, "trigger": None},
                 "name": "In Folder Blueprint",
-                "source_url": "https://github.com/in_folder/home-assistant-config/blob/main/blueprints/automation/in_folder_blueprint.yaml",
+                "source_url": "https://github.com/in_folder/smart-hub-config/blob/main/blueprints/automation/in_folder_blueprint.yaml",
             }
         },
         "validation_errors": None,
@@ -189,7 +189,7 @@ async def test_import_blueprint_update(
 
 
 async def test_save_blueprint(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test saving blueprints."""
@@ -205,7 +205,7 @@ async def test_save_blueprint(
                 "path": "test_save",
                 "yaml": raw_data,
                 "domain": "automation",
-                "source_url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml",
+                "source_url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml",
             }
         )
 
@@ -223,7 +223,7 @@ async def test_save_blueprint(
             " input:\n    trigger_event:\n      selector:\n        text: {}\n   "
             " service_to_call:\n    a_number:\n      selector:\n        number:\n      "
             "    mode: box\n          step: 1.0\n  source_url:"
-            " https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml\ntriggers:\n"
+            " https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml\ntriggers:\n"
             "  trigger: event\n  event_type: !input 'trigger_event'\nactions:\n "
             " service: !input 'service_to_call'\n  entity_id: light.kitchen\n"
             # c dumper will not quote the value after !input
@@ -231,7 +231,7 @@ async def test_save_blueprint(
             " input:\n    trigger_event:\n      selector:\n        text: {}\n   "
             " service_to_call:\n    a_number:\n      selector:\n        number:\n      "
             "    mode: box\n          step: 1.0\n  source_url:"
-            " https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml\ntriggers:\n"
+            " https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml\ntriggers:\n"
             "  trigger: event\n  event_type: !input trigger_event\nactions:\n  service:"
             " !input service_to_call\n  entity_id: light.kitchen\n"
         )
@@ -240,7 +240,7 @@ async def test_save_blueprint(
 
 
 async def test_save_existing_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test saving blueprints."""
@@ -252,7 +252,7 @@ async def test_save_existing_file(
             "path": "test_event_service",
             "yaml": 'blueprint: {name: "name", domain: "automation"}',
             "domain": "automation",
-            "source_url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml",
+            "source_url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml",
         }
     )
 
@@ -263,7 +263,7 @@ async def test_save_existing_file(
 
 
 async def test_save_existing_file_override(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test saving blueprints."""
@@ -276,7 +276,7 @@ async def test_save_existing_file_override(
                 "path": "test_event_service",
                 "yaml": 'blueprint: {name: "name", domain: "automation"}',
                 "domain": "automation",
-                "source_url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/test_event_service.yaml",
+                "source_url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/test_event_service.yaml",
                 "allow_override": True,
             }
         )
@@ -289,14 +289,14 @@ async def test_save_existing_file_override(
         "blueprint": {
             "name": "name",
             "domain": "automation",
-            "source_url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/test_event_service.yaml",
+            "source_url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/test_event_service.yaml",
             "input": {},
         }
     }
 
 
 async def test_save_file_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test saving blueprints with OS error."""
@@ -308,7 +308,7 @@ async def test_save_file_error(
                 "path": "test_save",
                 "yaml": "raw_data",
                 "domain": "automation",
-                "source_url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml",
+                "source_url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml",
             }
         )
 
@@ -318,7 +318,7 @@ async def test_save_file_error(
 
 
 async def test_save_invalid_blueprint(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test saving invalid blueprints."""
@@ -330,7 +330,7 @@ async def test_save_invalid_blueprint(
             "path": "test_wrong",
             "yaml": "wrong_blueprint",
             "domain": "automation",
-            "source_url": "https://github.com/balloob/home-assistant-config/blob/main/blueprints/automation/motion_light.yaml",
+            "source_url": "https://github.com/balloob/smart-hub-config/blob/main/blueprints/automation/motion_light.yaml",
         }
     )
 
@@ -344,7 +344,7 @@ async def test_save_invalid_blueprint(
 
 
 async def test_delete_blueprint(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test deleting blueprints."""
@@ -366,7 +366,7 @@ async def test_delete_blueprint(
 
 
 async def test_delete_non_exist_file_blueprint(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test deleting non existing blueprints."""
@@ -403,7 +403,7 @@ async def test_delete_non_exist_file_blueprint(
     ],
 )
 async def test_delete_blueprint_in_use_by_automation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test deleting a blueprint which is in use."""
@@ -446,7 +446,7 @@ async def test_delete_blueprint_in_use_by_automation(
     ],
 )
 async def test_delete_blueprint_in_use_by_script(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test deleting a blueprint which is in use."""
@@ -473,7 +473,7 @@ async def test_delete_blueprint_in_use_by_script(
 
 
 async def test_substituting_blueprint_inputs(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test substituting blueprint inputs."""
     client = await hass_ws_client(hass)
@@ -506,7 +506,7 @@ async def test_substituting_blueprint_inputs(
 
 
 async def test_substituting_blueprint_inputs_unknown_domain(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test substituting blueprint inputs."""
     client = await hass_ws_client(hass)
@@ -533,7 +533,7 @@ async def test_substituting_blueprint_inputs_unknown_domain(
 
 
 async def test_substituting_blueprint_inputs_incomplete_input(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test substituting blueprint inputs."""
     client = await hass_ws_client(hass)
@@ -559,12 +559,12 @@ async def test_substituting_blueprint_inputs_incomplete_input(
 
 
 async def test_substituting_blueprint_inputs_incomplete_input_2(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test substituting blueprint inputs."""
     client = await hass_ws_client(hass)
     with patch(
-        "homeassistant.components.blueprint.models.BlueprintInputs.async_substitute",
+        "smarthub.components.blueprint.models.BlueprintInputs.async_substitute",
         side_effect=UndefinedSubstitution("blah"),
     ):
         await client.send_json_auto_id(

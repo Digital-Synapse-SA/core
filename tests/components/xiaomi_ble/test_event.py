@@ -2,10 +2,10 @@
 
 import pytest
 
-from homeassistant.components.event import ATTR_EVENT_TYPE
-from homeassistant.components.xiaomi_ble.const import DOMAIN
-from homeassistant.const import ATTR_FRIENDLY_NAME, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.event import ATTR_EVENT_TYPE
+from smarthub.components.xiaomi_ble.const import DOMAIN
+from smarthub.const import ATTR_FRIENDLY_NAME, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import make_advertisement
 
@@ -144,7 +144,7 @@ from tests.components.bluetooth import (
     ],
 )
 async def test_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac_address: str,
     advertisement: BluetoothServiceInfoBleak,
     bind_key: str | None,
@@ -203,7 +203,7 @@ async def test_events(
     await hass.async_block_till_done()
 
 
-async def test_xiaomi_fingerprint(hass: HomeAssistant) -> None:
+async def test_xiaomi_fingerprint(hass: SmartHub) -> None:
     """Make sure that fingerprint reader events are correctly mapped."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -246,7 +246,7 @@ async def test_xiaomi_fingerprint(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_xiaomi_lock(hass: HomeAssistant) -> None:
+async def test_xiaomi_lock(hass: SmartHub) -> None:
     """Make sure that lock events are correctly mapped."""
     entry = MockConfigEntry(
         domain=DOMAIN,

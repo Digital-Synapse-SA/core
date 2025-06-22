@@ -1,6 +1,6 @@
 """Enforce that the integration implements entry unloading.
 
-https://developers.home-assistant.io/docs/core/integration-quality-scale/rules/config-entry-unloading/
+https://developers.smart-hub.io/docs/core/integration-quality-scale/rules/config-entry-unloading/
 """
 
 import ast

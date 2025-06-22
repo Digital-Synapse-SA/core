@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, PropertyMock
 import blebox_uniapi
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_HVAC_ACTION,
     ATTR_HVAC_MODE,
@@ -19,15 +19,15 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     ATTR_TEMPERATURE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import async_setup_entity, mock_feature
 
@@ -79,7 +79,7 @@ def thermobox_fixture():
 
 
 async def test_init(
-    saunabox, hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    saunabox, hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test default state."""
 
@@ -115,7 +115,7 @@ async def test_init(
     assert device.sw_version == "1.23"
 
 
-async def test_update(saunabox, hass: HomeAssistant, config) -> None:
+async def test_update(saunabox, hass: SmartHub, config) -> None:
     """Test updating."""
 
     feature_mock, entity_id = saunabox
@@ -135,7 +135,7 @@ async def test_update(saunabox, hass: HomeAssistant, config) -> None:
     assert state.state == HVACMode.OFF
 
 
-async def test_on_when_below_desired(saunabox, hass: HomeAssistant) -> None:
+async def test_on_when_below_desired(saunabox, hass: SmartHub) -> None:
     """Test when temperature is below desired."""
 
     feature_mock, entity_id = saunabox
@@ -170,7 +170,7 @@ async def test_on_when_below_desired(saunabox, hass: HomeAssistant) -> None:
     assert state.state == HVACMode.HEAT
 
 
-async def test_on_when_above_desired(saunabox, hass: HomeAssistant) -> None:
+async def test_on_when_above_desired(saunabox, hass: SmartHub) -> None:
     """Test when temperature is below desired."""
 
     feature_mock, entity_id = saunabox
@@ -206,7 +206,7 @@ async def test_on_when_above_desired(saunabox, hass: HomeAssistant) -> None:
     assert state.state == HVACMode.HEAT
 
 
-async def test_off(saunabox, hass: HomeAssistant) -> None:
+async def test_off(saunabox, hass: SmartHub) -> None:
     """Test turning off."""
 
     feature_mock, entity_id = saunabox
@@ -241,7 +241,7 @@ async def test_off(saunabox, hass: HomeAssistant) -> None:
     assert state.state == HVACMode.OFF
 
 
-async def test_set_thermo(saunabox, hass: HomeAssistant) -> None:
+async def test_set_thermo(saunabox, hass: SmartHub) -> None:
     """Test setting thermostat."""
 
     feature_mock, entity_id = saunabox
@@ -276,7 +276,7 @@ async def test_set_thermo(saunabox, hass: HomeAssistant) -> None:
 
 
 async def test_update_failure(
-    saunabox, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    saunabox, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that update failures are logged."""
 
@@ -290,7 +290,7 @@ async def test_update_failure(
 
 
 async def test_reding_hvac_actions(
-    saunabox, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    saunabox, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test hvac action for given device(mock) state."""
 
@@ -318,7 +318,7 @@ async def test_reding_hvac_actions(
 
 
 async def test_thermo_off(
-    thermobox, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    thermobox, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test hvac action off fir given device state."""
     caplog.set_level(logging.ERROR)

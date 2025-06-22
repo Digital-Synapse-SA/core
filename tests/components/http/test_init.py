@@ -1,4 +1,4 @@
-"""The tests for the Home Assistant HTTP component."""
+"""The tests for the SmartHub HTTP component."""
 
 import asyncio
 from collections.abc import Callable
@@ -11,16 +11,16 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.auth.providers.homeassistant import HassAuthProvider
-from homeassistant.components import cloud, http
-from homeassistant.components.cloud import CloudNotAvailable
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.http import KEY_HASS
-from homeassistant.helpers.network import NoURLAvailableError
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.ssl import server_context_intermediate, server_context_modern
+from smarthub.auth.providers.smarthub import HassAuthProvider
+from smarthub.components import cloud, http
+from smarthub.components.cloud import CloudNotAvailable
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.http import KEY_HASS
+from smarthub.helpers.network import NoURLAvailableError
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.ssl import server_context_intermediate, server_context_modern
 
 from tests.common import async_call_logger_set_level, async_fire_time_changed
 from tests.typing import ClientSessionGenerator
@@ -52,20 +52,20 @@ def _setup_empty_ssl_pem_files(tmp_path: Path) -> tuple[Path, Path, Path]:
 def mock_stack():
     """Mock extract stack."""
     with patch(
-        "homeassistant.components.http.extract_stack",
+        "smarthub.components.http.extract_stack",
         return_value=[
             Mock(
-                filename="/home/paulus/core/homeassistant/core.py",
+                filename="/home/paulus/core/smarthub/core.py",
                 lineno="23",
                 line="do_something()",
             ),
             Mock(
-                filename="/home/paulus/core/homeassistant/components/hue/light.py",
+                filename="/home/paulus/core/smarthub/components/hue/light.py",
                 lineno="23",
                 line="self.light.is_on",
             ),
             Mock(
-                filename="/home/paulus/core/homeassistant/components/http/__init__.py",
+                filename="/home/paulus/core/smarthub/components/http/__init__.py",
                 lineno="157",
                 line="base_url",
             ),
@@ -74,7 +74,7 @@ def mock_stack():
         yield
 
 
-class TestView(http.HomeAssistantView):
+class TestView(http.SmartHubView):
     """Test the HTTP views."""
 
     name = "test"
@@ -86,7 +86,7 @@ class TestView(http.HomeAssistantView):
 
 
 async def test_registering_view_while_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     unused_tcp_port_factory: Callable[[], int],
 ) -> None:
@@ -102,8 +102,8 @@ async def test_registering_view_while_running(
     hass.http.register_view(TestView)
 
 
-async def test_homeassistant_assigned_to_app(hass: HomeAssistant) -> None:
-    """Test HomeAssistant instance is assigned to HomeAssistantApp."""
+async def test_smarthub_assigned_to_app(hass: SmartHub) -> None:
+    """Test SmartHub instance is assigned to SmartHubApp."""
     assert await async_setup_component(hass, "api", {"http": {}})
     await hass.async_start()
     assert hass.http.app[KEY_HASS] == hass
@@ -112,7 +112,7 @@ async def test_homeassistant_assigned_to_app(hass: HomeAssistant) -> None:
 
 
 async def test_not_log_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
     local_auth: HassAuthProvider,
@@ -132,7 +132,7 @@ async def test_not_log_password(
     assert "some-pass" not in logs
 
 
-async def test_proxy_config(hass: HomeAssistant) -> None:
+async def test_proxy_config(hass: SmartHub) -> None:
     """Test use_x_forwarded_for must config together with trusted_proxies."""
     assert (
         await async_setup_component(
@@ -149,7 +149,7 @@ async def test_proxy_config(hass: HomeAssistant) -> None:
     )
 
 
-async def test_proxy_config_only_use_xff(hass: HomeAssistant) -> None:
+async def test_proxy_config_only_use_xff(hass: SmartHub) -> None:
     """Test use_x_forwarded_for must config together with trusted_proxies."""
     assert (
         await async_setup_component(
@@ -159,7 +159,7 @@ async def test_proxy_config_only_use_xff(hass: HomeAssistant) -> None:
     )
 
 
-async def test_proxy_config_only_trust_proxies(hass: HomeAssistant) -> None:
+async def test_proxy_config_only_trust_proxies(hass: SmartHub) -> None:
     """Test use_x_forwarded_for must config together with trusted_proxies."""
     assert (
         await async_setup_component(
@@ -169,7 +169,7 @@ async def test_proxy_config_only_trust_proxies(hass: HomeAssistant) -> None:
     )
 
 
-async def test_ssl_profile_defaults_modern(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_ssl_profile_defaults_modern(hass: SmartHub, tmp_path: Path) -> None:
     """Test default ssl profile."""
 
     cert_path, key_path, _ = await hass.async_add_executor_job(
@@ -179,7 +179,7 @@ async def test_ssl_profile_defaults_modern(hass: HomeAssistant, tmp_path: Path) 
     with (
         patch("ssl.SSLContext.load_cert_chain"),
         patch(
-            "homeassistant.util.ssl.server_context_modern",
+            "smarthub.util.ssl.server_context_modern",
             side_effect=server_context_modern,
         ) as mock_context,
     ):
@@ -198,7 +198,7 @@ async def test_ssl_profile_defaults_modern(hass: HomeAssistant, tmp_path: Path) 
 
 
 async def test_ssl_profile_change_intermediate(
-    hass: HomeAssistant, tmp_path: Path
+    hass: SmartHub, tmp_path: Path
 ) -> None:
     """Test setting ssl profile to intermediate."""
 
@@ -209,7 +209,7 @@ async def test_ssl_profile_change_intermediate(
     with (
         patch("ssl.SSLContext.load_cert_chain"),
         patch(
-            "homeassistant.util.ssl.server_context_intermediate",
+            "smarthub.util.ssl.server_context_intermediate",
             side_effect=server_context_intermediate,
         ) as mock_context,
     ):
@@ -233,7 +233,7 @@ async def test_ssl_profile_change_intermediate(
     assert len(mock_context.mock_calls) == 1
 
 
-async def test_ssl_profile_change_modern(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_ssl_profile_change_modern(hass: SmartHub, tmp_path: Path) -> None:
     """Test setting ssl profile to modern."""
 
     cert_path, key_path, _ = await hass.async_add_executor_job(
@@ -243,7 +243,7 @@ async def test_ssl_profile_change_modern(hass: HomeAssistant, tmp_path: Path) ->
     with (
         patch("ssl.SSLContext.load_cert_chain"),
         patch(
-            "homeassistant.util.ssl.server_context_modern",
+            "smarthub.util.ssl.server_context_modern",
             side_effect=server_context_modern,
         ) as mock_context,
     ):
@@ -267,7 +267,7 @@ async def test_ssl_profile_change_modern(hass: HomeAssistant, tmp_path: Path) ->
     assert len(mock_context.mock_calls) == 1
 
 
-async def test_peer_cert(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_peer_cert(hass: SmartHub, tmp_path: Path) -> None:
     """Test required peer cert."""
     cert_path, key_path, peer_cert_path = await hass.async_add_executor_job(
         _setup_empty_ssl_pem_files, tmp_path
@@ -277,7 +277,7 @@ async def test_peer_cert(hass: HomeAssistant, tmp_path: Path) -> None:
         patch("ssl.SSLContext.load_cert_chain"),
         patch("ssl.SSLContext.load_verify_locations") as mock_load_verify_locations,
         patch(
-            "homeassistant.util.ssl.server_context_modern",
+            "smarthub.util.ssl.server_context_modern",
             side_effect=server_context_modern,
         ) as mock_context,
     ):
@@ -304,7 +304,7 @@ async def test_peer_cert(hass: HomeAssistant, tmp_path: Path) -> None:
 
 
 async def test_emergency_ssl_certificate_when_invalid(
-    hass: HomeAssistant, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test http can startup with an emergency self signed cert when the current one is broken."""
 
@@ -327,7 +327,7 @@ async def test_emergency_ssl_certificate_when_invalid(
     await hass.async_start()
     await hass.async_block_till_done()
     assert (
-        "Home Assistant is running in recovery mode with an emergency self signed ssl certificate because the configured SSL certificate was not usable"
+        "SmartHub is running in recovery mode with an emergency self signed ssl certificate because the configured SSL certificate was not usable"
         in caplog.text
     )
 
@@ -335,7 +335,7 @@ async def test_emergency_ssl_certificate_when_invalid(
 
 
 async def test_emergency_ssl_certificate_not_used_when_not_recovery_mode(
-    hass: HomeAssistant, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test an emergency cert is only used in recovery mode."""
 
@@ -352,7 +352,7 @@ async def test_emergency_ssl_certificate_not_used_when_not_recovery_mode(
 
 
 async def test_emergency_ssl_certificate_when_invalid_get_url_fails(
-    hass: HomeAssistant, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test http falls back to no ssl when an emergency cert cannot be created when the configured one is broken.
 
@@ -364,7 +364,7 @@ async def test_emergency_ssl_certificate_when_invalid_get_url_fails(
     hass.config.recovery_mode = True
 
     with patch(
-        "homeassistant.components.http.get_url", side_effect=NoURLAvailableError
+        "smarthub.components.http.get_url", side_effect=NoURLAvailableError
     ) as mock_get_url:
         assert (
             await async_setup_component(
@@ -381,7 +381,7 @@ async def test_emergency_ssl_certificate_when_invalid_get_url_fails(
 
     assert len(mock_get_url.mock_calls) == 1
     assert (
-        "Home Assistant is running in recovery mode with an emergency self signed ssl certificate because the configured SSL certificate was not usable"
+        "SmartHub is running in recovery mode with an emergency self signed ssl certificate because the configured SSL certificate was not usable"
         in caplog.text
     )
 
@@ -389,7 +389,7 @@ async def test_emergency_ssl_certificate_when_invalid_get_url_fails(
 
 
 async def test_invalid_ssl_and_cannot_create_emergency_cert(
-    hass: HomeAssistant, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test http falls back to no ssl when an emergency cert cannot be created when the configured one is broken."""
 
@@ -399,7 +399,7 @@ async def test_invalid_ssl_and_cannot_create_emergency_cert(
     hass.config.recovery_mode = True
 
     with patch(
-        "homeassistant.components.http.x509.CertificateBuilder", side_effect=OSError
+        "smarthub.components.http.x509.CertificateBuilder", side_effect=OSError
     ) as mock_builder:
         assert (
             await async_setup_component(
@@ -420,7 +420,7 @@ async def test_invalid_ssl_and_cannot_create_emergency_cert(
 
 
 async def test_invalid_ssl_and_cannot_create_emergency_cert_with_ssl_peer_cert(
-    hass: HomeAssistant, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test http falls back to no ssl when an emergency cert cannot be created when the configured one is broken.
 
@@ -436,7 +436,7 @@ async def test_invalid_ssl_and_cannot_create_emergency_cert_with_ssl_peer_cert(
     hass.config.recovery_mode = True
 
     with patch(
-        "homeassistant.components.http.x509.CertificateBuilder", side_effect=OSError
+        "smarthub.components.http.x509.CertificateBuilder", side_effect=OSError
     ) as mock_builder:
         assert (
             await async_setup_component(
@@ -458,17 +458,17 @@ async def test_invalid_ssl_and_cannot_create_emergency_cert_with_ssl_peer_cert(
     assert len(mock_builder.mock_calls) == 1
 
 
-async def test_cors_defaults(hass: HomeAssistant) -> None:
+async def test_cors_defaults(hass: SmartHub) -> None:
     """Test the CORS default settings."""
-    with patch("homeassistant.components.http.setup_cors") as mock_setup:
+    with patch("smarthub.components.http.setup_cors") as mock_setup:
         assert await async_setup_component(hass, "http", {})
 
     assert len(mock_setup.mock_calls) == 1
-    assert mock_setup.mock_calls[0][1][1] == ["https://cast.home-assistant.io"]
+    assert mock_setup.mock_calls[0][1][1] == ["https://cast.smart-hub.io"]
 
 
 async def test_storing_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     unused_tcp_port_factory: Callable[[], int],
 ) -> None:
@@ -493,7 +493,7 @@ async def test_storing_config(
 
 
 async def test_logging(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -523,7 +523,7 @@ async def test_logging(
 
 
 async def test_register_static_paths(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -541,7 +541,7 @@ async def test_register_static_paths(
 
 
 async def test_ssl_issue_if_no_urls_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -557,7 +557,7 @@ async def test_ssl_issue_if_no_urls_configured(
     with (
         patch("ssl.SSLContext.load_cert_chain"),
         patch(
-            "homeassistant.util.ssl.server_context_modern",
+            "smarthub.util.ssl.server_context_modern",
             side_effect=server_context_modern,
         ),
     ):
@@ -573,7 +573,7 @@ async def test_ssl_issue_if_no_urls_configured(
 
 
 async def test_ssl_issue_if_using_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -589,7 +589,7 @@ async def test_ssl_issue_if_using_cloud(
         patch("ssl.SSLContext.load_cert_chain"),
         patch.object(cloud, "async_remote_ui_url", return_value="https://example.com"),
         patch(
-            "homeassistant.util.ssl.server_context_modern",
+            "smarthub.util.ssl.server_context_modern",
             side_effect=server_context_modern,
         ),
     ):
@@ -608,7 +608,7 @@ async def test_ssl_issue_if_using_cloud(
 
 
 async def test_ssl_issue_if_not_connected_to_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -623,11 +623,11 @@ async def test_ssl_issue_if_not_connected_to_cloud(
     with (
         patch("ssl.SSLContext.load_cert_chain"),
         patch(
-            "homeassistant.util.ssl.server_context_modern",
+            "smarthub.util.ssl.server_context_modern",
             side_effect=server_context_modern,
         ),
         patch(
-            "homeassistant.components.cloud.async_remote_ui_url",
+            "smarthub.components.cloud.async_remote_ui_url",
             side_effect=CloudNotAvailable,
         ),
     ):
@@ -651,7 +651,7 @@ async def test_ssl_issue_if_not_connected_to_cloud(
     ],
 )
 async def test_ssl_issue_urls_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     issue_registry: ir.IssueRegistry,
     external_url: str | None,
@@ -669,7 +669,7 @@ async def test_ssl_issue_urls_configured(
     with (
         patch("ssl.SSLContext.load_cert_chain"),
         patch(
-            "homeassistant.util.ssl.server_context_modern",
+            "smarthub.util.ssl.server_context_modern",
             side_effect=server_context_modern,
         ),
     ):

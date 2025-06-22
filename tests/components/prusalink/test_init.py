@@ -7,13 +7,13 @@ from httpx import ConnectError
 from pyprusalink.types import InvalidAuth, PrusaLinkError
 import pytest
 
-from homeassistant.components.prusalink import DOMAIN
-from homeassistant.components.prusalink.config_flow import ConfigFlow
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import CONF_API_KEY, CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.util.dt import utcnow
+from smarthub.components.prusalink import DOMAIN
+from smarthub.components.prusalink.config_flow import ConfigFlow
+from smarthub.config_entries import ConfigEntry, ConfigEntryState
+from smarthub.const import CONF_API_KEY, CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -21,7 +21,7 @@ pytestmark = pytest.mark.usefixtures("mock_api")
 
 
 async def test_unloading(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: ConfigEntry,
 ) -> None:
     """Test unloading prusalink."""
@@ -42,7 +42,7 @@ async def test_unloading(
     [InvalidAuth, PrusaLinkError, ConnectError("All connection attempts failed")],
 )
 async def test_failed_update(
-    hass: HomeAssistant, mock_config_entry: ConfigEntry, exception
+    hass: SmartHub, mock_config_entry: ConfigEntry, exception
 ) -> None:
     """Test failed update marks prusalink unavailable."""
     assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -50,19 +50,19 @@ async def test_failed_update(
 
     with (
         patch(
-            "homeassistant.components.prusalink.PrusaLink.get_version",
+            "smarthub.components.prusalink.PrusaLink.get_version",
             side_effect=exception,
         ),
         patch(
-            "homeassistant.components.prusalink.PrusaLink.get_status",
+            "smarthub.components.prusalink.PrusaLink.get_status",
             side_effect=exception,
         ),
         patch(
-            "homeassistant.components.prusalink.PrusaLink.get_legacy_printer",
+            "smarthub.components.prusalink.PrusaLink.get_legacy_printer",
             side_effect=exception,
         ),
         patch(
-            "homeassistant.components.prusalink.PrusaLink.get_job",
+            "smarthub.components.prusalink.PrusaLink.get_job",
             side_effect=exception,
         ),
     ):
@@ -74,7 +74,7 @@ async def test_failed_update(
 
 
 async def test_migration_from_1_1_to_1_2(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test migrating from version 1 to 2."""
     data = {
@@ -105,7 +105,7 @@ async def test_migration_from_1_1_to_1_2(
 
 
 async def test_migration_from_1_1_to_1_2_outdated_firmware(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test migrating from version 1.1 to 1.2."""
     entry = MockConfigEntry(
@@ -140,7 +140,7 @@ async def test_migration_from_1_1_to_1_2_outdated_firmware(
 
 
 async def test_migration_fails_on_future_version(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: SmartHub, issue_registry: ir.IssueRegistry
 ) -> None:
     """Test migrating fails on a version higher than the current one."""
     entry = MockConfigEntry(

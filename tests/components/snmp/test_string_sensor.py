@@ -5,10 +5,10 @@ from unittest.mock import patch
 from pysnmp.proto.rfc1902 import OctetString
 import pytest
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(autouse=True)
@@ -16,13 +16,13 @@ def hlapi_mock():
     """Mock out 3rd party API."""
     mock_data = OctetString("98F")
     with patch(
-        "homeassistant.components.snmp.sensor.getCmd",
+        "smarthub.components.snmp.sensor.getCmd",
         return_value=(None, None, None, [[mock_data]]),
     ):
         yield
 
 
-async def test_basic_config(hass: HomeAssistant) -> None:
+async def test_basic_config(hass: SmartHub) -> None:
     """Test basic entity configuration."""
 
     config = {
@@ -42,7 +42,7 @@ async def test_basic_config(hass: HomeAssistant) -> None:
 
 
 async def test_entity_config(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test entity configuration."""
 

@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from thermopro_ble import ThermoProDevice
 
-from homeassistant.components.thermopro.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import now
+from smarthub.components.thermopro.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.util.dt import now
 
 from tests.common import MockConfigEntry
 
@@ -32,7 +32,7 @@ def mock_thermoprodevice(
 ) -> ThermoProDevice:
     """Return downstream library mock."""
     monkeypatch.setattr(
-        "homeassistant.components.thermopro.button.ThermoProDevice",
+        "smarthub.components.thermopro.button.ThermoProDevice",
         MagicMock(return_value=dummy_thermoprodevice),
     )
     return dummy_thermoprodevice
@@ -43,7 +43,7 @@ def mock_now(monkeypatch: pytest.MonkeyPatch) -> datetime:
     """Return fixed datetime for comparison."""
     fixed_now = now()
     monkeypatch.setattr(
-        "homeassistant.components.thermopro.button.now",
+        "smarthub.components.thermopro.button.now",
         MagicMock(return_value=fixed_now),
     )
     return fixed_now
@@ -51,7 +51,7 @@ def mock_now(monkeypatch: pytest.MonkeyPatch) -> datetime:
 
 @pytest.fixture
 async def setup_thermopro(
-    hass: HomeAssistant, mock_thermoprodevice: ThermoProDevice
+    hass: SmartHub, mock_thermoprodevice: ThermoProDevice
 ) -> None:
     """Set up the Thermopro integration."""
     entry = MockConfigEntry(

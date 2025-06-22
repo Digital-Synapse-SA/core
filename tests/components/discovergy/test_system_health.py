@@ -5,17 +5,17 @@ import asyncio
 from aiohttp import ClientError
 from pydiscovergy.const import API_BASE
 
-from homeassistant.components.discovergy.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.loader import async_get_integration
-from homeassistant.setup import async_setup_component
+from smarthub.components.discovergy.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.loader import async_get_integration
+from smarthub.setup import async_setup_component
 
 from tests.common import get_system_health_info
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_discovergy_system_health(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test Discovergy system health."""
     aioclient_mock.get(API_BASE, text="")
@@ -35,7 +35,7 @@ async def test_discovergy_system_health(
 
 
 async def test_discovergy_system_health_fail(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test Discovergy system health."""
     aioclient_mock.get(API_BASE, exc=ClientError)

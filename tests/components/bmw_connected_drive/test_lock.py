@@ -9,12 +9,12 @@ import pytest
 import respx
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import (
     REMOTE_SERVICE_EXC_REASON,
@@ -31,7 +31,7 @@ from tests.components.recorder.common import async_wait_recording_done
 @pytest.mark.usefixtures("bmw_fixture")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entity_state_attrs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -39,7 +39,7 @@ async def test_entity_state_attrs(
 
     # Setup component
     with patch(
-        "homeassistant.components.bmw_connected_drive.PLATFORMS", [Platform.LOCK]
+        "smarthub.components.bmw_connected_drive.PLATFORMS", [Platform.LOCK]
     ):
         mock_config_entry = await setup_mocked_integration(hass)
 
@@ -61,7 +61,7 @@ async def test_entity_state_attrs(
     ],
 )
 async def test_service_call_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     new_value: str,
     old_value: str,
@@ -106,7 +106,7 @@ async def test_service_call_success(
     ],
 )
 async def test_service_call_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     service: str,
     monkeypatch: pytest.MonkeyPatch,
@@ -127,7 +127,7 @@ async def test_service_call_fail(
     )
 
     # Test
-    with pytest.raises(HomeAssistantError, match=REMOTE_SERVICE_EXC_TRANSLATION):
+    with pytest.raises(SmartHubError, match=REMOTE_SERVICE_EXC_TRANSLATION):
         await hass.services.async_call(
             "lock",
             service,

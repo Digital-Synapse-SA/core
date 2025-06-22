@@ -9,12 +9,12 @@ from unittest.mock import patch
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components import wake_word
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState, ConfigFlow
-from homeassistant.const import EntityCategory, Platform
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.setup import async_setup_component
+from smarthub.components import wake_word
+from smarthub.config_entries import ConfigEntry, ConfigEntryState, ConfigFlow
+from smarthub.const import EntityCategory, Platform
+from smarthub.core import SmartHub, State
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.setup import async_setup_component
 
 from .common import mock_wake_word_entity_platform
 
@@ -88,7 +88,7 @@ class WakeWordFlow(ConfigFlow):
 
 
 @pytest.fixture(autouse=True)
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -98,7 +98,7 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
 
 @pytest.fixture(name="setup")
 async def setup_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
 ) -> MockProviderEntity:
     """Set up the test environment."""
@@ -109,12 +109,12 @@ async def setup_fixture(
 
 
 async def mock_config_entry_setup(
-    hass: HomeAssistant, tmp_path: Path, mock_provider_entity: MockProviderEntity
+    hass: SmartHub, tmp_path: Path, mock_provider_entity: MockProviderEntity
 ) -> MockConfigEntry:
     """Set up a test provider via config entry."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -123,7 +123,7 @@ async def mock_config_entry_setup(
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Unload up test config entry."""
         await hass.config_entries.async_forward_entry_unload(
@@ -141,7 +141,7 @@ async def mock_config_entry_setup(
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -161,7 +161,7 @@ async def mock_config_entry_setup(
 
 
 async def test_config_entry_unload(
-    hass: HomeAssistant, tmp_path: Path, mock_provider_entity: MockProviderEntity
+    hass: SmartHub, tmp_path: Path, mock_provider_entity: MockProviderEntity
 ) -> None:
     """Test we can unload config entry."""
     config_entry = await mock_config_entry_setup(hass, tmp_path, mock_provider_entity)
@@ -179,7 +179,7 @@ async def test_config_entry_unload(
     ],
 )
 async def test_detected_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     setup: MockProviderEntity,
     wake_word_id: str | None,
@@ -207,7 +207,7 @@ async def test_detected_entity(
 
 
 async def test_not_detected_entity(
-    hass: HomeAssistant, setup: MockProviderEntity
+    hass: SmartHub, setup: MockProviderEntity
 ) -> None:
     """Test unsuccessful detection through entity."""
 
@@ -226,7 +226,7 @@ async def test_not_detected_entity(
     assert state == setup.state
 
 
-async def test_default_engine_none(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_default_engine_none(hass: SmartHub, tmp_path: Path) -> None:
     """Test async_default_entity."""
     assert await async_setup_component(hass, wake_word.DOMAIN, {wake_word.DOMAIN: {}})
     await hass.async_block_till_done()
@@ -235,7 +235,7 @@ async def test_default_engine_none(hass: HomeAssistant, tmp_path: Path) -> None:
 
 
 async def test_default_engine_entity(
-    hass: HomeAssistant, tmp_path: Path, mock_provider_entity: MockProviderEntity
+    hass: SmartHub, tmp_path: Path, mock_provider_entity: MockProviderEntity
 ) -> None:
     """Test async_default_entity."""
     await mock_config_entry_setup(hass, tmp_path, mock_provider_entity)
@@ -244,7 +244,7 @@ async def test_default_engine_entity(
 
 
 async def test_get_engine_entity(
-    hass: HomeAssistant, tmp_path: Path, mock_provider_entity: MockProviderEntity
+    hass: SmartHub, tmp_path: Path, mock_provider_entity: MockProviderEntity
 ) -> None:
     """Test async_get_speech_to_text_engine."""
     await mock_config_entry_setup(hass, tmp_path, mock_provider_entity)
@@ -256,7 +256,7 @@ async def test_get_engine_entity(
 
 
 async def test_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     mock_provider_entity: MockProviderEntity,
 ) -> None:
@@ -275,14 +275,14 @@ async def test_restore_state(
 
 
 async def test_entity_attributes(
-    hass: HomeAssistant, mock_provider_entity: MockProviderEntity
+    hass: SmartHub, mock_provider_entity: MockProviderEntity
 ) -> None:
     """Test that the provider entity attributes match expectations."""
     assert mock_provider_entity.entity_category == EntityCategory.DIAGNOSTIC
 
 
 async def test_list_wake_words(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup: MockProviderEntity,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -308,7 +308,7 @@ async def test_list_wake_words(
 
 
 async def test_list_wake_words_unknown_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup: MockProviderEntity,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -329,7 +329,7 @@ async def test_list_wake_words_unknown_entity(
 
 
 async def test_list_wake_words_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup: MockProviderEntity,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -338,7 +338,7 @@ async def test_list_wake_words_timeout(
 
     with (
         patch.object(setup, "get_supported_wake_words", partial(asyncio.sleep, 1)),
-        patch("homeassistant.components.wake_word.TIMEOUT_FETCH_WAKE_WORDS", 0),
+        patch("smarthub.components.wake_word.TIMEOUT_FETCH_WAKE_WORDS", 0),
     ):
         await client.send_json(
             {

@@ -16,16 +16,16 @@ from uiprotect.data import (
 )
 from uiprotect.exceptions import NvrError
 
-from homeassistant.components.media_player import BrowseError, MediaClass
-from homeassistant.components.media_source import MediaSourceItem
-from homeassistant.components.unifiprotect.const import DOMAIN
-from homeassistant.components.unifiprotect.media_source import (
+from smarthub.components.media_player import BrowseError, MediaClass
+from smarthub.components.media_source import MediaSourceItem
+from smarthub.components.unifiprotect.const import DOMAIN
+from smarthub.components.unifiprotect.media_source import (
     ProtectMediaSource,
     async_get_media_source,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .conftest import MockUFPFixture
 from .utils import init_entry
@@ -33,7 +33,7 @@ from .utils import init_entry
 from tests.common import MockConfigEntry
 
 
-async def test_get_media_source(hass: HomeAssistant) -> None:
+async def test_get_media_source(hass: SmartHub) -> None:
     """Test the async_get_media_source function and ProtectMediaSource constructor."""
     source = await async_get_media_source(hass)
     assert isinstance(source, ProtectMediaSource)
@@ -50,7 +50,7 @@ async def test_get_media_source(hass: HomeAssistant) -> None:
     ],
 )
 async def test_resolve_media_bad_identifier(
-    hass: HomeAssistant, ufp: MockUFPFixture, identifier: str
+    hass: SmartHub, ufp: MockUFPFixture, identifier: str
 ) -> None:
     """Test resolving bad identifiers."""
 
@@ -65,7 +65,7 @@ async def test_resolve_media_bad_identifier(
 
 
 async def test_resolve_media_thumbnail(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
 ) -> None:
     """Test resolving event thumbnails."""
 
@@ -97,7 +97,7 @@ async def test_resolve_media_thumbnail(
 
 
 async def test_resolve_media_event(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
 ) -> None:
     """Test resolving event clips."""
 
@@ -152,7 +152,7 @@ async def test_resolve_media_event(
     ],
 )
 async def test_browse_media_bad_identifier(
-    hass: HomeAssistant, ufp: MockUFPFixture, identifier: str
+    hass: SmartHub, ufp: MockUFPFixture, identifier: str
 ) -> None:
     """Test browsing media with bad identifiers."""
 
@@ -167,7 +167,7 @@ async def test_browse_media_bad_identifier(
 
 
 async def test_browse_media_event_ongoing(
-    hass: HomeAssistant, ufp: MockUFPFixture, fixed_now: datetime, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, fixed_now: datetime, doorbell: Camera
 ) -> None:
     """Test browsing event that is still ongoing."""
 
@@ -195,7 +195,7 @@ async def test_browse_media_event_ongoing(
 
 
 async def test_browse_media_root_multiple_consoles(
-    hass: HomeAssistant, ufp: MockUFPFixture, bootstrap: Bootstrap
+    hass: SmartHub, ufp: MockUFPFixture, bootstrap: Bootstrap
 ) -> None:
     """Test browsing root level media with multiple consoles."""
 
@@ -226,7 +226,7 @@ async def test_browse_media_root_multiple_consoles(
     api2.async_disconnect_ws = AsyncMock()
 
     with patch(
-        "homeassistant.components.unifiprotect.utils.ProtectApiClient"
+        "smarthub.components.unifiprotect.utils.ProtectApiClient"
     ) as mock_api:
         mock_config = MockConfigEntry(
             domain=DOMAIN,
@@ -261,7 +261,7 @@ async def test_browse_media_root_multiple_consoles(
 
 
 async def test_browse_media_root_multiple_consoles_only_one_media(
-    hass: HomeAssistant, ufp: MockUFPFixture, bootstrap: Bootstrap
+    hass: SmartHub, ufp: MockUFPFixture, bootstrap: Bootstrap
 ) -> None:
     """Test browsing root level media with multiple consoles."""
 
@@ -291,7 +291,7 @@ async def test_browse_media_root_multiple_consoles_only_one_media(
     api2.async_disconnect_ws = AsyncMock()
 
     with patch(
-        "homeassistant.components.unifiprotect.utils.ProtectApiClient"
+        "smarthub.components.unifiprotect.utils.ProtectApiClient"
     ) as mock_api:
         mock_config = MockConfigEntry(
             domain=DOMAIN,
@@ -325,7 +325,7 @@ async def test_browse_media_root_multiple_consoles_only_one_media(
 
 
 async def test_browse_media_root_single_console(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test browsing root level media with a single console."""
 
@@ -348,7 +348,7 @@ async def test_browse_media_root_single_console(
 
 
 async def test_browse_media_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -390,7 +390,7 @@ async def test_browse_media_camera(
 
 
 async def test_browse_media_camera_offline(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test browsing camera selector level media when camera is offline."""
 
@@ -415,7 +415,7 @@ async def test_browse_media_camera_offline(
 
 
 async def test_browse_media_event_type(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test browsing event type selector level media."""
 
@@ -476,7 +476,7 @@ TWO_MONTH_SIMPLE = (
 )
 @pytest.mark.freeze_time("2022-09-15 03:00:00-07:00")
 async def test_browse_media_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     start: datetime,
@@ -548,7 +548,7 @@ TWO_MONTH_TIMEZONE = (
 )
 @pytest.mark.freeze_time("2022-08-31 21:00:00-07:00")
 async def test_browse_media_time_timezone(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     start: datetime,
@@ -587,7 +587,7 @@ async def test_browse_media_time_timezone(
 
 
 async def test_browse_media_recent(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
 ) -> None:
     """Test browsing event selector level media for recent days."""
 
@@ -624,7 +624,7 @@ async def test_browse_media_recent(
 
 
 async def test_browse_media_recent_truncated(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
 ) -> None:
     """Test browsing event selector level media for recent days."""
     hass.config_entries.async_update_entry(ufp.entry, options={"max_media": 1})
@@ -882,7 +882,7 @@ async def test_browse_media_recent_truncated(
     ],
 )
 async def test_browse_media_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     fixed_now: datetime,
@@ -914,7 +914,7 @@ async def test_browse_media_event(
 
 
 async def test_browse_media_eventthumb(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
 ) -> None:
     """Test browsing specific event."""
 
@@ -947,7 +947,7 @@ async def test_browse_media_eventthumb(
 
 @pytest.mark.freeze_time("2022-09-15 03:00:00-07:00")
 async def test_browse_media_day(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test browsing day selector level media."""
 
@@ -975,7 +975,7 @@ async def test_browse_media_day(
 
 
 async def test_browse_media_browse_day(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
 ) -> None:
     """Test events for a specific day."""
 
@@ -1016,7 +1016,7 @@ async def test_browse_media_browse_day(
 
 
 async def test_browse_media_browse_whole_month(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
 ) -> None:
     """Test events for a specific day."""
 
@@ -1059,7 +1059,7 @@ async def test_browse_media_browse_whole_month(
 
 
 async def test_browse_media_browse_whole_month_december(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, fixed_now: datetime
 ) -> None:
     """Test events for a specific day."""
 

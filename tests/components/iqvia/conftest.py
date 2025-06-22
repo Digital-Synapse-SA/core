@@ -6,17 +6,17 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.iqvia.const import CONF_ZIP_CODE, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.json import JsonObjectType
+from smarthub.components.iqvia.const import CONF_ZIP_CODE, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.json import JsonObjectType
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any]
 ) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
@@ -81,7 +81,7 @@ def data_disease_index_fixture() -> JsonObjectType:
 
 @pytest.fixture(name="setup_iqvia")
 async def setup_iqvia_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     data_allergy_forecast: JsonObjectType,
     data_allergy_index: JsonObjectType,
@@ -102,7 +102,7 @@ async def setup_iqvia_fixture(
         patch("pyiqvia.asthma.Asthma.current", return_value=data_asthma_index),
         patch("pyiqvia.disease.Disease.extended", return_value=data_disease_forecast),
         patch("pyiqvia.disease.Disease.current", return_value=data_disease_index),
-        patch("homeassistant.components.iqvia.PLATFORMS", []),
+        patch("smarthub.components.iqvia.PLATFORMS", []),
     ):
         assert await async_setup_component(hass, DOMAIN, config)
         await hass.async_block_till_done()

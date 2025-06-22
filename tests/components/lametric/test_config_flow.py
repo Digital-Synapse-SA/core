@@ -13,14 +13,14 @@ from demetriek import (
 )
 import pytest
 
-from homeassistant.components.lametric.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_SSDP, SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_DEVICE, CONF_HOST, CONF_MAC
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.components.lametric.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_SSDP, SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_DEVICE, CONF_HOST, CONF_MAC
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_SERIAL,
     SsdpServiceInfo,
@@ -43,7 +43,7 @@ SSDP_DISCOVERY_INFO = SsdpServiceInfo(
 
 @pytest.mark.usefixtures("current_request_with_host", "mock_setup_entry")
 async def test_full_cloud_import_flow_multiple_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_lametric_cloud: MagicMock,
@@ -122,7 +122,7 @@ async def test_full_cloud_import_flow_multiple_devices(
 
 @pytest.mark.usefixtures("current_request_with_host", "mock_setup_entry")
 async def test_full_cloud_import_flow_single_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_lametric_cloud: MagicMock,
@@ -199,7 +199,7 @@ async def test_full_cloud_import_flow_single_device(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_full_manual(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Check a full flow manual entry."""
@@ -245,7 +245,7 @@ async def test_full_manual(
 
 @pytest.mark.usefixtures("current_request_with_host", "mock_setup_entry")
 async def test_full_ssdp_with_cloud_import(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_lametric_cloud: MagicMock,
@@ -316,7 +316,7 @@ async def test_full_ssdp_with_cloud_import(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_full_ssdp_manual_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Check a full flow triggered by SSDP, with manual API key entry."""
@@ -376,7 +376,7 @@ async def test_full_ssdp_manual_entry(
     ],
 )
 async def test_ssdp_abort_invalid_discovery(
-    hass: HomeAssistant, data: SsdpServiceInfo, reason: str
+    hass: SmartHub, data: SsdpServiceInfo, reason: str
 ) -> None:
     """Check a full flow triggered by SSDP, with manual API key entry."""
     result = await hass.config_entries.flow.async_init(
@@ -388,7 +388,7 @@ async def test_ssdp_abort_invalid_discovery(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_cloud_import_updates_existing_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_lametric_cloud: MagicMock,
@@ -444,7 +444,7 @@ async def test_cloud_import_updates_existing_entry(
 
 
 async def test_manual_updates_existing_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -477,7 +477,7 @@ async def test_manual_updates_existing_entry(
 
 
 async def test_discovery_updates_existing_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test discovery of existing device updates entry."""
     mock_config_entry.add_to_hass(hass)
@@ -497,7 +497,7 @@ async def test_discovery_updates_existing_entry(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_cloud_abort_no_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_lametric_cloud: MagicMock,
@@ -551,7 +551,7 @@ async def test_cloud_abort_no_devices(
     ],
 )
 async def test_manual_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     side_effect: Exception,
     reason: str,
@@ -611,7 +611,7 @@ async def test_manual_errors(
     ],
 )
 async def test_cloud_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_lametric_cloud: MagicMock,
@@ -684,7 +684,7 @@ async def test_cloud_errors(
 
 
 async def test_dhcp_discovery_updates_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test DHCP discovery updates config entries."""
@@ -710,7 +710,7 @@ async def test_dhcp_discovery_updates_entry(
 
 
 async def test_dhcp_unknown_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test unknown DHCP discovery aborts flow."""
@@ -732,7 +732,7 @@ async def test_dhcp_unknown_device(
 
 @pytest.mark.usefixtures("current_request_with_host", "mock_setup_entry")
 async def test_reauth_cloud_import(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_lametric_cloud: MagicMock,
@@ -785,7 +785,7 @@ async def test_reauth_cloud_import(
 
 @pytest.mark.usefixtures("current_request_with_host", "mock_setup_entry")
 async def test_reauth_cloud_abort_device_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     mock_lametric_cloud: MagicMock,
@@ -834,7 +834,7 @@ async def test_reauth_cloud_abort_device_not_found(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_reauth_manual(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -866,7 +866,7 @@ async def test_reauth_manual(
 @pytest.mark.usefixtures("mock_setup_entry")
 @pytest.mark.parametrize("device_fixture", ["device_sa5"])
 async def test_reauth_manual_sky(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

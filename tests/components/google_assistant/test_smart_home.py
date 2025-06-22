@@ -7,24 +7,24 @@ from unittest.mock import ANY, patch
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components.camera import CameraEntityFeature
-from homeassistant.components.climate import ATTR_MAX_TEMP, ATTR_MIN_TEMP, HVACMode
+from smarthub.components.camera import CameraEntityFeature
+from smarthub.components.climate import ATTR_MAX_TEMP, ATTR_MIN_TEMP, HVACMode
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.demo.binary_sensor import DemoBinarySensor
+from smarthub.components.demo.binary_sensor import DemoBinarySensor
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.demo.cover import DemoCover
+from smarthub.components.demo.cover import DemoCover
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.demo.light import LIGHT_EFFECT_LIST, DemoLight
+from smarthub.components.demo.light import LIGHT_EFFECT_LIST, DemoLight
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.demo.media_player import AbstractDemoPlayer
+from smarthub.components.demo.media_player import AbstractDemoPlayer
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.demo.switch import DemoSwitch
-from homeassistant.components.google_assistant import (
+from smarthub.components.demo.switch import DemoSwitch
+from smarthub.components.google_assistant import (
     EVENT_COMMAND_RECEIVED,
     EVENT_QUERY_RECEIVED,
     EVENT_SYNC_RECEIVED,
@@ -32,22 +32,22 @@ from homeassistant.components.google_assistant import (
     smart_home as sh,
     trait,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     EVENT_CALL_SERVICE,
     Platform,
     UnitOfTemperature,
     __version__,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.helpers import (
+from smarthub.core import SmartHub, State
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.helpers import (
     area_registry as ar,
     device_registry as dr,
     entity_platform,
     entity_registry as er,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from . import BASIC_CONFIG, MockConfig
 
@@ -60,7 +60,7 @@ REQ_ID = "ff36a3cc-ec34-11e6-b1a0-64510650abcf"
 async def light_only() -> None:
     """Enable only the light platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.LIGHT],
     ):
         yield
@@ -80,7 +80,7 @@ def registries(
     return ret
 
 
-async def test_async_handle_message(hass: HomeAssistant) -> None:
+async def test_async_handle_message(hass: SmartHub) -> None:
     """Test the async handle message method."""
     config = MockConfig(
         should_expose=lambda state: state.entity_id != "light.not_expose",
@@ -134,7 +134,7 @@ async def test_async_handle_message(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_sync_message(hass: HomeAssistant, registries) -> None:
+async def test_sync_message(hass: SmartHub, registries) -> None:
     """Test a sync message."""
     entity = registries.entity.async_get_or_create(
         "light",
@@ -265,7 +265,7 @@ async def test_sync_message(hass: HomeAssistant, registries) -> None:
 
 
 @pytest.mark.parametrize("area_on_device", [True, False])
-async def test_sync_in_area(area_on_device, hass: HomeAssistant, registries) -> None:
+async def test_sync_in_area(area_on_device, hass: SmartHub, registries) -> None:
     """Test a sync message where room hint comes from area."""
     entry = MockConfigEntry()
     entry.add_to_hass(hass)
@@ -387,7 +387,7 @@ async def test_sync_in_area(area_on_device, hass: HomeAssistant, registries) -> 
     assert events[0].data == {"request_id": REQ_ID, "source": "cloud"}
 
 
-async def test_query_message(hass: HomeAssistant) -> None:
+async def test_query_message(hass: SmartHub) -> None:
     """Test a sync message."""
     light = DemoLight(
         None,
@@ -497,10 +497,10 @@ async def test_query_message(hass: HomeAssistant) -> None:
     [(False, True, 20, 0.2), (True, ANY, ANY, ANY)],
 )
 async def test_execute(
-    hass: HomeAssistant, light_only, report_state, on, brightness, value
+    hass: SmartHub, light_only, report_state, on, brightness, value
 ) -> None:
     """Test an execute command."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await async_setup_component(hass, "light", {"light": {"platform": "demo"}})
     await hass.async_block_till_done()
 
@@ -645,12 +645,12 @@ async def test_execute(
     ("report_state", "on", "brightness", "value"), [(False, False, ANY, ANY)]
 )
 async def test_execute_times_out(
-    hass: HomeAssistant, light_only, report_state, on, brightness, value
+    hass: SmartHub, light_only, report_state, on, brightness, value
 ) -> None:
     """Test an execute command which times out."""
     orig_execute_limit = sh.EXECUTE_LIMIT
     sh.EXECUTE_LIMIT = 0.02  # Decrease timeout to 20ms
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await async_setup_component(hass, "light", {"light": {"platform": "demo"}})
     await hass.async_block_till_done()
 
@@ -805,7 +805,7 @@ async def test_execute_times_out(
     sh.EXECUTE_LIMIT = orig_execute_limit
 
 
-async def test_raising_error_trait(hass: HomeAssistant) -> None:
+async def test_raising_error_trait(hass: SmartHub) -> None:
     """Test raising an error while executing a trait command."""
     hass.states.async_set(
         "climate.bla",
@@ -878,7 +878,7 @@ async def test_raising_error_trait(hass: HomeAssistant) -> None:
     }
 
 
-async def test_serialize_input_boolean(hass: HomeAssistant) -> None:
+async def test_serialize_input_boolean(hass: SmartHub) -> None:
     """Test serializing an input boolean entity."""
     state = State("input_boolean.bla", "on")
     entity = sh.GoogleEntity(hass, BASIC_CONFIG, state)
@@ -893,7 +893,7 @@ async def test_serialize_input_boolean(hass: HomeAssistant) -> None:
     }
 
 
-async def test_unavailable_state_does_sync(hass: HomeAssistant) -> None:
+async def test_unavailable_state_does_sync(hass: SmartHub) -> None:
     """Test that an unavailable entity does sync over."""
     light = DemoLight(
         None,
@@ -991,7 +991,7 @@ async def test_unavailable_state_does_sync(hass: HomeAssistant) -> None:
     ],
 )
 async def test_device_class_switch(
-    hass: HomeAssistant, device_class, google_type
+    hass: SmartHub, device_class, google_type
 ) -> None:
     """Test that a cover entity syncs to the correct device type."""
     sensor = DemoSwitch(
@@ -1046,7 +1046,7 @@ async def test_device_class_switch(
     ],
 )
 async def test_device_class_binary_sensor(
-    hass: HomeAssistant, device_class, google_type
+    hass: SmartHub, device_class, google_type
 ) -> None:
     """Test that a binary entity syncs to the correct device type."""
     sensor = DemoBinarySensor(
@@ -1103,7 +1103,7 @@ async def test_device_class_binary_sensor(
     ],
 )
 async def test_device_class_cover(
-    hass: HomeAssistant, device_class, google_type
+    hass: SmartHub, device_class, google_type
 ) -> None:
     """Test that a cover entity syncs to the correct device type."""
     sensor = DemoCover(None, hass, "Demo Sensor", device_class=device_class)
@@ -1154,7 +1154,7 @@ async def test_device_class_cover(
     ],
 )
 async def test_device_media_player(
-    hass: HomeAssistant, device_class, google_type
+    hass: SmartHub, device_class, google_type
 ) -> None:
     """Test that a binary entity syncs to the correct device type."""
     sensor = AbstractDemoPlayer("Demo", device_class=device_class)
@@ -1196,7 +1196,7 @@ async def test_device_media_player(
     }
 
 
-async def test_query_disconnect(hass: HomeAssistant) -> None:
+async def test_query_disconnect(hass: SmartHub) -> None:
     """Test a disconnect message."""
     config = MockConfig(hass=hass)
     config.async_enable_report_state()
@@ -1214,7 +1214,7 @@ async def test_query_disconnect(hass: HomeAssistant) -> None:
     assert len(mock_disconnect.mock_calls) == 1
 
 
-async def test_trait_execute_adding_query_data(hass: HomeAssistant) -> None:
+async def test_trait_execute_adding_query_data(hass: SmartHub) -> None:
     """Test a trait execute influencing query data."""
     await async_process_ha_core_config(
         hass,
@@ -1227,7 +1227,7 @@ async def test_trait_execute_adding_query_data(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.camera.async_request_stream",
+        "smarthub.components.camera.async_request_stream",
         return_value="/api/streams/bla",
     ):
         result = await sh.async_handle_message(
@@ -1285,7 +1285,7 @@ async def test_trait_execute_adding_query_data(hass: HomeAssistant) -> None:
     }
 
 
-async def test_identify(hass: HomeAssistant) -> None:
+async def test_identify(hass: SmartHub) -> None:
     """Test identify message."""
     user_agent_id = "mock-user-id"
     proxy_device_id = user_agent_id
@@ -1306,7 +1306,7 @@ async def test_identify(hass: HomeAssistant) -> None:
                                     {
                                         "type": "TXT",
                                         "class": "IN",
-                                        "name": "devhome._home-assistant._tcp.local",
+                                        "name": "devhome._smart-hub._tcp.local",
                                         "ttl": 4500,
                                         "data": [
                                             "version=0.101.0.dev0",
@@ -1345,8 +1345,8 @@ async def test_identify(hass: HomeAssistant) -> None:
                 "isProxy": True,
                 "deviceInfo": {
                     "hwVersion": "UNKNOWN_HW_VERSION",
-                    "manufacturer": "Home Assistant",
-                    "model": "Home Assistant",
+                    "manufacturer": "SmartHub",
+                    "model": "SmartHub",
                     "swVersion": __version__,
                 },
             }
@@ -1354,7 +1354,7 @@ async def test_identify(hass: HomeAssistant) -> None:
     }
 
 
-async def test_reachable_devices(hass: HomeAssistant) -> None:
+async def test_reachable_devices(hass: SmartHub) -> None:
     """Test REACHABLE_DEVICES intent."""
     # Matching passed in device.
     hass.states.async_set("light.ceiling_lights", "on")
@@ -1441,7 +1441,7 @@ async def test_reachable_devices(hass: HomeAssistant) -> None:
 
 
 async def test_sync_message_recovery(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test a sync message recovers from bad entities."""
     light = DemoLight(
@@ -1506,7 +1506,7 @@ async def test_sync_message_recovery(
 
 
 async def test_query_recover(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that we recover if an entity raises during query."""
 
@@ -1565,7 +1565,7 @@ async def test_query_recover(
 
 
 async def test_proxy_selected(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that we handle proxy selected."""
 

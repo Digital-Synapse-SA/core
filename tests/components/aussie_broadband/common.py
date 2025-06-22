@@ -3,10 +3,10 @@
 from typing import Any
 from unittest.mock import patch
 
-from homeassistant.components.aussie_broadband.const import CONF_SERVICES, DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import UNDEFINED, UndefinedType
+from smarthub.components.aussie_broadband.const import CONF_SERVICES, DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import UNDEFINED, UndefinedType
 
 from tests.common import MockConfigEntry
 
@@ -38,7 +38,7 @@ FAKE_DATA = {
 
 
 async def setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     platforms: list[Platform] | UndefinedType = UNDEFINED,
     side_effect=None,
     usage: dict[str, Any] | UndefinedType = UNDEFINED,
@@ -56,7 +56,7 @@ async def setup_platform(
 
     with (
         patch(
-            "homeassistant.components.aussie_broadband.PLATFORMS",
+            "smarthub.components.aussie_broadband.PLATFORMS",
             [] if platforms is UNDEFINED else platforms,
         ),
         patch("aussiebb.asyncio.AussieBB.__init__", return_value=None),

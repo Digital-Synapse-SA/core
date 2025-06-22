@@ -1,10 +1,10 @@
 """Test the Bluetooth Adapters setup."""
 
-from homeassistant.components.bluetooth_adapters import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.bluetooth_adapters import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Ensure we can setup."""
     assert await async_setup_component(hass, DOMAIN, {})

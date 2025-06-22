@@ -5,8 +5,8 @@ from unittest.mock import patch
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import configure_integration
 from .mocks import HomeControlMock, HomeControlMockBinarySensor
@@ -16,7 +16,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -25,7 +25,7 @@ async def test_entry_diagnostics(
     gateway_1 = HomeControlMockBinarySensor()
     gateway_2 = HomeControlMock()
     with patch(
-        "homeassistant.components.devolo_home_control.HomeControl",
+        "smarthub.components.devolo_home_control.HomeControl",
         side_effect=[gateway_1, gateway_2],
     ):
         await hass.config_entries.async_setup(entry.entry_id)

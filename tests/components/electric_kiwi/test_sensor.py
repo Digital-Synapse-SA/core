@@ -7,18 +7,18 @@ import zoneinfo
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components.electric_kiwi.const import ATTRIBUTION
-from homeassistant.components.electric_kiwi.sensor import _check_and_move_time
-from homeassistant.components.sensor import (
+from smarthub.components.electric_kiwi.const import ATTRIBUTION
+from smarthub.components.electric_kiwi.sensor import _check_and_move_time
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ATTRIBUTION, ATTR_DEVICE_CLASS
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ATTRIBUTION, ATTR_DEVICE_CLASS
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
+from smarthub.util import dt as dt_util
 
 from . import init_integration
 
@@ -45,7 +45,7 @@ def restore_timezone():
     ],
 )
 async def test_hop_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     electrickiwi_api: Mock,
     ek_auth: AsyncMock,
@@ -104,7 +104,7 @@ async def test_hop_sensors(
     ],
 )
 async def test_account_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     electrickiwi_api: AsyncMock,
     ek_auth: AsyncMock,

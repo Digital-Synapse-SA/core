@@ -9,18 +9,18 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import media_source, websocket_api
-from homeassistant.components.media_source import const
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.setup import async_setup_component
+from smarthub.components import media_source, websocket_api
+from smarthub.components.media_source import const
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.setup import async_setup_component
 
 from tests.common import MockUser
 from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 @pytest.fixture
-async def temp_dir(hass: HomeAssistant) -> AsyncGenerator[str]:
+async def temp_dir(hass: SmartHub) -> AsyncGenerator[str]:
     """Return a temp dir."""
     with TemporaryDirectory() as tmpdirname:
         target_dir = Path(tmpdirname) / "another_subdir"
@@ -33,7 +33,7 @@ async def temp_dir(hass: HomeAssistant) -> AsyncGenerator[str]:
         yield str(target_dir)
 
 
-async def test_async_browse_media(hass: HomeAssistant) -> None:
+async def test_async_browse_media(hass: SmartHub) -> None:
     """Test browse media."""
     local_media = hass.config.path("media")
     await async_process_ha_core_config(
@@ -90,7 +90,7 @@ async def test_async_browse_media(hass: HomeAssistant) -> None:
 
 
 async def test_media_view(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test media view."""
     local_media = hass.config.path("media")
@@ -131,7 +131,7 @@ async def test_media_view(
 
 
 async def test_upload_view(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     temp_dir: str,
     tmp_path: Path,
@@ -246,7 +246,7 @@ async def test_upload_view(
 
 
 async def test_remove_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     temp_dir: str,
     hass_admin_user: MockUser,

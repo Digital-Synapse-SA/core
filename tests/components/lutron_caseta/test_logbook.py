@@ -1,6 +1,6 @@
 """The tests for lutron caseta logbook."""
 
-from homeassistant.components.lutron_caseta.const import (
+from smarthub.components.lutron_caseta.const import (
     ATTR_ACTION,
     ATTR_AREA_NAME,
     ATTR_BUTTON_NUMBER,
@@ -14,11 +14,11 @@ from homeassistant.components.lutron_caseta.const import (
     DOMAIN,
     LUTRON_CASETA_BUTTON_EVENT,
 )
-from homeassistant.components.lutron_caseta.models import LutronCasetaData
-from homeassistant.const import ATTR_DEVICE_ID, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.lutron_caseta.models import LutronCasetaData
+from smarthub.const import ATTR_DEVICE_ID, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import MockBridge, async_setup_integration
 
@@ -26,7 +26,7 @@ from tests.common import MockConfigEntry
 from tests.components.logbook.common import MockRow, mock_humanify
 
 
-async def test_humanify_lutron_caseta_button_event(hass: HomeAssistant) -> None:
+async def test_humanify_lutron_caseta_button_event(hass: SmartHub) -> None:
     """Test humanifying lutron_caseta_button_events."""
     hass.config.components.add("recorder")
     assert await async_setup_component(hass, "logbook", {})
@@ -79,7 +79,7 @@ async def test_humanify_lutron_caseta_button_event(hass: HomeAssistant) -> None:
 
 
 async def test_humanify_lutron_caseta_button_event_integration_not_loaded(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test humanifying lutron_caseta_button_events when the integration fails to load."""
     hass.config.components.add("recorder")
@@ -132,7 +132,7 @@ async def test_humanify_lutron_caseta_button_event_integration_not_loaded(
 
 
 async def test_humanify_lutron_caseta_button_event_ra3(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test humanifying lutron_caseta_button_events from an RA3 hub."""
     hass.config.components.add("recorder")
@@ -169,7 +169,7 @@ async def test_humanify_lutron_caseta_button_event_ra3(
 
 
 async def test_humanify_lutron_caseta_button_unknown_type(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test humanifying lutron_caseta_button_events with an unknown type."""
     hass.config.components.add("recorder")

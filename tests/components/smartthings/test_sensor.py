@@ -7,15 +7,15 @@ from pysmartthings.models import HealthStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import automation, script
-from homeassistant.components.automation import automations_with_entity
-from homeassistant.components.script import scripts_with_entity
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.smartthings.const import DOMAIN, MAIN
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation, script
+from smarthub.components.automation import automations_with_entity
+from smarthub.components.script import scripts_with_entity
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.smartthings.const import DOMAIN, MAIN
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from . import (
     setup_integration,
@@ -28,7 +28,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -42,7 +42,7 @@ async def test_all_entities(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -140,7 +140,7 @@ async def test_state_update(
     ],
 )
 async def test_create_issue_with_items(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -304,7 +304,7 @@ async def test_create_issue_with_items(
     ],
 )
 async def test_create_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -354,7 +354,7 @@ async def test_create_issue(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -381,7 +381,7 @@ async def test_availability(
 
 @pytest.mark.parametrize("device_fixture", ["da_ac_rac_000001"])
 async def test_availability_at_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unavailable_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

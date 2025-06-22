@@ -14,34 +14,34 @@ from iaqualink.systems.iaqua.device import (
 from iaqualink.systems.iaqua.system import IaquaSystem
 import pytest
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN
-from homeassistant.components.iaqualink.const import UPDATE_INTERVAL
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ASSUMED_STATE, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.climate import DOMAIN as CLIMATE_DOMAIN
+from smarthub.components.iaqualink.const import UPDATE_INTERVAL
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ASSUMED_STATE, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .conftest import get_aqualink_device, get_aqualink_system
 
 from tests.common import async_fire_time_changed
 
 
-async def _ffwd_next_update_interval(hass: HomeAssistant) -> None:
+async def _ffwd_next_update_interval(hass: SmartHub) -> None:
     now = dt_util.utcnow()
     async_fire_time_changed(hass, now + UPDATE_INTERVAL)
     await hass.async_block_till_done()
 
 
-async def test_setup_login_exception(hass: HomeAssistant, config_entry) -> None:
+async def test_setup_login_exception(hass: SmartHub, config_entry) -> None:
     """Test setup encountering a login exception."""
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.iaqualink.AqualinkClient.login",
+        "smarthub.components.iaqualink.AqualinkClient.login",
         side_effect=AqualinkServiceException,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -50,12 +50,12 @@ async def test_setup_login_exception(hass: HomeAssistant, config_entry) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_ERROR
 
 
-async def test_setup_login_timeout(hass: HomeAssistant, config_entry) -> None:
+async def test_setup_login_timeout(hass: SmartHub, config_entry) -> None:
     """Test setup encountering a timeout while logging in."""
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.iaqualink.AqualinkClient.login",
+        "smarthub.components.iaqualink.AqualinkClient.login",
         side_effect=TimeoutError,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -64,17 +64,17 @@ async def test_setup_login_timeout(hass: HomeAssistant, config_entry) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_setup_systems_exception(hass: HomeAssistant, config_entry) -> None:
+async def test_setup_systems_exception(hass: SmartHub, config_entry) -> None:
     """Test setup encountering an exception while retrieving systems."""
     config_entry.add_to_hass(hass)
 
     with (
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.login",
+            "smarthub.components.iaqualink.AqualinkClient.login",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.get_systems",
+            "smarthub.components.iaqualink.AqualinkClient.get_systems",
             side_effect=AqualinkServiceException,
         ),
     ):
@@ -84,17 +84,17 @@ async def test_setup_systems_exception(hass: HomeAssistant, config_entry) -> Non
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_setup_no_systems_recognized(hass: HomeAssistant, config_entry) -> None:
+async def test_setup_no_systems_recognized(hass: SmartHub, config_entry) -> None:
     """Test setup ending in no systems recognized."""
     config_entry.add_to_hass(hass)
 
     with (
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.login",
+            "smarthub.components.iaqualink.AqualinkClient.login",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.get_systems",
+            "smarthub.components.iaqualink.AqualinkClient.get_systems",
             return_value={},
         ),
     ):
@@ -105,7 +105,7 @@ async def test_setup_no_systems_recognized(hass: HomeAssistant, config_entry) ->
 
 
 async def test_setup_devices_exception(
-    hass: HomeAssistant, config_entry, client
+    hass: SmartHub, config_entry, client
 ) -> None:
     """Test setup encountering an exception while retrieving devices."""
     config_entry.add_to_hass(hass)
@@ -115,11 +115,11 @@ async def test_setup_devices_exception(
 
     with (
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.login",
+            "smarthub.components.iaqualink.AqualinkClient.login",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.get_systems",
+            "smarthub.components.iaqualink.AqualinkClient.get_systems",
             return_value=systems,
         ),
         patch.object(
@@ -135,7 +135,7 @@ async def test_setup_devices_exception(
 
 
 async def test_setup_all_good_no_recognized_devices(
-    hass: HomeAssistant, config_entry, client
+    hass: SmartHub, config_entry, client
 ) -> None:
     """Test setup ending in no devices recognized."""
     config_entry.add_to_hass(hass)
@@ -148,11 +148,11 @@ async def test_setup_all_good_no_recognized_devices(
 
     with (
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.login",
+            "smarthub.components.iaqualink.AqualinkClient.login",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.get_systems",
+            "smarthub.components.iaqualink.AqualinkClient.get_systems",
             return_value=systems,
         ),
         patch.object(
@@ -179,7 +179,7 @@ async def test_setup_all_good_no_recognized_devices(
 
 
 async def test_setup_all_good_all_device_types(
-    hass: HomeAssistant, config_entry, client
+    hass: SmartHub, config_entry, client
 ) -> None:
     """Test setup ending in one device of each type recognized."""
     config_entry.add_to_hass(hass)
@@ -200,11 +200,11 @@ async def test_setup_all_good_all_device_types(
 
     with (
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.login",
+            "smarthub.components.iaqualink.AqualinkClient.login",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.get_systems",
+            "smarthub.components.iaqualink.AqualinkClient.get_systems",
             return_value=systems,
         ),
     ):
@@ -226,7 +226,7 @@ async def test_setup_all_good_all_device_types(
 
 
 async def test_multiple_updates(
-    hass: HomeAssistant, config_entry, caplog: pytest.LogCaptureFixture, client
+    hass: SmartHub, config_entry, caplog: pytest.LogCaptureFixture, client
 ) -> None:
     """Test all possible results of online status transition after update."""
     config_entry.add_to_hass(hass)
@@ -240,11 +240,11 @@ async def test_multiple_updates(
 
     with (
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.login",
+            "smarthub.components.iaqualink.AqualinkClient.login",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.get_systems",
+            "smarthub.components.iaqualink.AqualinkClient.get_systems",
             return_value=systems,
         ),
     ):
@@ -335,7 +335,7 @@ async def test_multiple_updates(
 
 
 async def test_entity_assumed_and_available(
-    hass: HomeAssistant, config_entry, client
+    hass: SmartHub, config_entry, client
 ) -> None:
     """Test assumed_state and_available properties for all values of online."""
     config_entry.add_to_hass(hass)
@@ -352,11 +352,11 @@ async def test_entity_assumed_and_available(
 
     with (
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.login",
+            "smarthub.components.iaqualink.AqualinkClient.login",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.iaqualink.AqualinkClient.get_systems",
+            "smarthub.components.iaqualink.AqualinkClient.get_systems",
             return_value=systems,
         ),
     ):

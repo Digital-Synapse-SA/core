@@ -6,7 +6,7 @@ from kasa import Device, Module
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.siren import (
+from smarthub.components.siren import (
     ATTR_DURATION,
     ATTR_TONE,
     ATTR_VOLUME_LEVEL,
@@ -14,10 +14,10 @@ from homeassistant.components.siren import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import _mocked_device, setup_platform_for_device, snapshot_platform
 
@@ -27,7 +27,7 @@ ENTITY_ID = "siren.hub"
 
 
 @pytest.fixture
-async def mocked_hub(hass: HomeAssistant) -> Device:
+async def mocked_hub(hass: SmartHub) -> Device:
     """Return mocked tplink hub with an alarm module."""
 
     return _mocked_device(
@@ -38,7 +38,7 @@ async def mocked_hub(hass: HomeAssistant) -> Device:
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -54,7 +54,7 @@ async def test_states(
 
 
 async def test_turn_on_and_off(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mocked_hub: Device
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mocked_hub: Device
 ) -> None:
     """Test that turn_on and turn_off services work as expected."""
     await setup_platform_for_device(hass, mock_config_entry, Platform.SIREN, mocked_hub)
@@ -94,7 +94,7 @@ async def test_turn_on_and_off(
     ],
 )
 async def test_turn_on_with_volume(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mocked_hub: Device,
     max_volume: int,
@@ -123,7 +123,7 @@ async def test_turn_on_with_volume(
 
 
 async def test_turn_on_with_duration_and_sound(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mocked_hub: Device,
 ) -> None:
@@ -145,7 +145,7 @@ async def test_turn_on_with_duration_and_sound(
 
 @pytest.mark.parametrize(("duration"), [0, 301])
 async def test_turn_on_with_invalid_duration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mocked_hub: Device,
     duration: int,

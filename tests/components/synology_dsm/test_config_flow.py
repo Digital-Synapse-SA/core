@@ -14,15 +14,15 @@ from synology_dsm.exceptions import (
 )
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.synology_dsm.config_flow import CONF_OTP_CODE
-from homeassistant.components.synology_dsm.const import (
+from smarthub.components.synology_dsm.config_flow import CONF_OTP_CODE
+from smarthub.components.synology_dsm.const import (
     CONF_BACKUP_PATH,
     CONF_BACKUP_SHARE,
     CONF_SNAPSHOT_QUALITY,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_SSDP, SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_SSDP, SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
@@ -31,14 +31,14 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_SERIAL,
     SsdpServiceInfo,
 )
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .common import mock_dsm_information
 from .consts import (
@@ -60,7 +60,7 @@ from tests.common import MockConfigEntry
 @pytest.fixture(name="service")
 def mock_controller_service():
     """Mock a successful service."""
-    with patch("homeassistant.components.synology_dsm.config_flow.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.config_flow.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 
@@ -81,7 +81,7 @@ def mock_controller_service():
 @pytest.fixture(name="service_2sa")
 def mock_controller_service_2sa():
     """Mock a successful service with 2SA login."""
-    with patch("homeassistant.components.synology_dsm.config_flow.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.config_flow.SynologyDSM") as dsm:
         dsm.login = AsyncMock(
             side_effect=SynologyDSMLogin2SARequiredException(USERNAME)
         )
@@ -104,7 +104,7 @@ def mock_controller_service_2sa():
 @pytest.fixture(name="service_vdsm")
 def mock_controller_service_vdsm():
     """Mock a successful service."""
-    with patch("homeassistant.components.synology_dsm.config_flow.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.config_flow.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 
@@ -125,7 +125,7 @@ def mock_controller_service_vdsm():
 @pytest.fixture(name="service_with_filestation")
 def mock_controller_service_with_filestation():
     """Mock a successful service with filestation support."""
-    with patch("homeassistant.components.synology_dsm.config_flow.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.config_flow.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 
@@ -158,7 +158,7 @@ def mock_controller_service_with_filestation():
 @pytest.fixture(name="service_failed")
 def mock_controller_service_failed():
     """Mock a failed service."""
-    with patch("homeassistant.components.synology_dsm.config_flow.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.config_flow.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 
@@ -178,7 +178,7 @@ def mock_controller_service_failed():
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: MagicMock,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -190,7 +190,7 @@ async def test_user(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service,
     ):
         # test with all provided
@@ -213,7 +213,7 @@ async def test_user(
 
     service.information.serial = SERIAL_2
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service,
     ):
         # test without port + False SSL
@@ -236,11 +236,11 @@ async def test_user(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_user_2sa(
-    hass: HomeAssistant, service_2sa: MagicMock, snapshot: SnapshotAssertion
+    hass: SmartHub, service_2sa: MagicMock, snapshot: SnapshotAssertion
 ) -> None:
     """Test user with 2sa authentication config."""
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service_2sa,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -267,7 +267,7 @@ async def test_user_2sa(
     service_2sa.device_token = DEVICE_TOKEN
 
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service_2sa,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -282,11 +282,11 @@ async def test_user_2sa(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_user_vdsm(
-    hass: HomeAssistant, service_vdsm: MagicMock, snapshot: SnapshotAssertion
+    hass: SmartHub, service_vdsm: MagicMock, snapshot: SnapshotAssertion
 ) -> None:
     """Test user config."""
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service_vdsm,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -296,7 +296,7 @@ async def test_user_vdsm(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service_vdsm,
     ):
         # test with all provided
@@ -320,13 +320,13 @@ async def test_user_vdsm(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_user_with_filestation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_with_filestation: MagicMock,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test user config."""
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service_with_filestation,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -336,7 +336,7 @@ async def test_user_with_filestation(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service_with_filestation,
     ):
         # test with all provided
@@ -368,7 +368,7 @@ async def test_user_with_filestation(
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_reauth(hass: HomeAssistant, service: MagicMock) -> None:
+async def test_reauth(hass: SmartHub, service: MagicMock) -> None:
     """Test reauthentication."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -386,7 +386,7 @@ async def test_reauth(hass: HomeAssistant, service: MagicMock) -> None:
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -401,7 +401,7 @@ async def test_reauth(hass: HomeAssistant, service: MagicMock) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_reconfig_user(hass: HomeAssistant, service: MagicMock) -> None:
+async def test_reconfig_user(hass: SmartHub, service: MagicMock) -> None:
     """Test re-configuration of already existing entry by user."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -415,11 +415,11 @@ async def test_reconfig_user(hass: HomeAssistant, service: MagicMock) -> None:
 
     with (
         patch(
-            "homeassistant.config_entries.ConfigEntries.async_reload",
+            "smarthub.config_entries.ConfigEntries.async_reload",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+            "smarthub.components.synology_dsm.config_flow.SynologyDSM",
             return_value=service,
         ),
     ):
@@ -433,7 +433,7 @@ async def test_reconfig_user(hass: HomeAssistant, service: MagicMock) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_login_failed(hass: HomeAssistant, service: MagicMock) -> None:
+async def test_login_failed(hass: SmartHub, service: MagicMock) -> None:
     """Test when we have errors during login."""
     service.return_value.login = Mock(
         side_effect=(SynologyDSMLoginInvalidException(USERNAME))
@@ -449,7 +449,7 @@ async def test_login_failed(hass: HomeAssistant, service: MagicMock) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_connection_failed(hass: HomeAssistant, service: MagicMock) -> None:
+async def test_connection_failed(hass: SmartHub, service: MagicMock) -> None:
     """Test when we have errors during connection."""
     service.return_value.login = Mock(
         side_effect=SynologyDSMRequestException(OSError("arg"))
@@ -466,7 +466,7 @@ async def test_connection_failed(hass: HomeAssistant, service: MagicMock) -> Non
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_unknown_failed(hass: HomeAssistant, service: MagicMock) -> None:
+async def test_unknown_failed(hass: SmartHub, service: MagicMock) -> None:
     """Test when we have an unknown error."""
     service.return_value.login = Mock(side_effect=SynologyDSMException(None, None))
 
@@ -482,11 +482,11 @@ async def test_unknown_failed(hass: HomeAssistant, service: MagicMock) -> None:
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_missing_data_after_login(
-    hass: HomeAssistant, service_failed: MagicMock
+    hass: SmartHub, service_failed: MagicMock
 ) -> None:
     """Test when we have errors during connection."""
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service_failed,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -500,7 +500,7 @@ async def test_missing_data_after_login(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_form_ssdp(
-    hass: HomeAssistant, service: MagicMock, snapshot: SnapshotAssertion
+    hass: SmartHub, service: MagicMock, snapshot: SnapshotAssertion
 ) -> None:
     """Test we can setup from ssdp."""
 
@@ -522,7 +522,7 @@ async def test_form_ssdp(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -536,7 +536,7 @@ async def test_form_ssdp(
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_reconfig_ssdp(hass: HomeAssistant, service: MagicMock) -> None:
+async def test_reconfig_ssdp(hass: SmartHub, service: MagicMock) -> None:
     """Test re-configuration of already existing entry by ssdp."""
 
     MockConfigEntry(
@@ -578,7 +578,7 @@ async def test_reconfig_ssdp(hass: HomeAssistant, service: MagicMock) -> None:
     ],
 )
 async def test_skip_reconfig_ssdp(
-    hass: HomeAssistant, current_host: str, new_host: str, service: MagicMock
+    hass: SmartHub, current_host: str, new_host: str, service: MagicMock
 ) -> None:
     """Test re-configuration of already existing entry by ssdp."""
 
@@ -612,7 +612,7 @@ async def test_skip_reconfig_ssdp(
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_existing_ssdp(hass: HomeAssistant, service: MagicMock) -> None:
+async def test_existing_ssdp(hass: SmartHub, service: MagicMock) -> None:
     """Test abort of already existing entry by ssdp."""
 
     MockConfigEntry(
@@ -645,15 +645,15 @@ async def test_existing_ssdp(hass: HomeAssistant, service: MagicMock) -> None:
 
 
 async def test_options_flow(
-    hass: HomeAssistant, service_with_filestation: MagicMock
+    hass: SmartHub, service_with_filestation: MagicMock
 ) -> None:
     """Test config flow options."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=service_with_filestation,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         config_entry = MockConfigEntry(
             domain=DOMAIN,
@@ -694,7 +694,7 @@ async def test_options_flow(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_discovered_via_zeroconf(
-    hass: HomeAssistant, service: MagicMock, snapshot: SnapshotAssertion
+    hass: SmartHub, service: MagicMock, snapshot: SnapshotAssertion
 ) -> None:
     """Test we can setup from zeroconf."""
 
@@ -718,7 +718,7 @@ async def test_discovered_via_zeroconf(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.synology_dsm.config_flow.SynologyDSM",
+        "smarthub.components.synology_dsm.config_flow.SynologyDSM",
         return_value=service,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -733,7 +733,7 @@ async def test_discovered_via_zeroconf(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_discovered_via_zeroconf_missing_mac(
-    hass: HomeAssistant, service: MagicMock
+    hass: SmartHub, service: MagicMock
 ) -> None:
     """Test we abort if the mac address is missing."""
 

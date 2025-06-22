@@ -7,11 +7,11 @@ from unittest.mock import patch
 import aiolifx_effects
 import pytest
 
-from homeassistant.components import lifx
-from homeassistant.components.lifx import DOMAIN
-from homeassistant.components.lifx.const import _ATTR_COLOR_TEMP, ATTR_POWER
-from homeassistant.components.lifx.light import ATTR_INFRARED, ATTR_ZONES
-from homeassistant.components.lifx.manager import (
+from smarthub.components import lifx
+from smarthub.components.lifx import DOMAIN
+from smarthub.components.lifx.const import _ATTR_COLOR_TEMP, ATTR_POWER
+from smarthub.components.lifx.light import ATTR_INFRARED, ATTR_ZONES
+from smarthub.components.lifx.manager import (
     ATTR_CLOUD_SATURATION_MAX,
     ATTR_CLOUD_SATURATION_MIN,
     ATTR_DIRECTION,
@@ -27,7 +27,7 @@ from homeassistant.components.lifx.manager import (
     SERVICE_EFFECT_SKY,
     SERVICE_PAINT_THEME,
 )
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_BRIGHTNESS_PCT,
     ATTR_COLOR_MODE,
@@ -43,18 +43,18 @@ from homeassistant.components.light import (
     SERVICE_TURN_ON,
     ColorMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_HOST,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     IP_ADDRESS,
@@ -82,12 +82,12 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 @pytest.fixture(autouse=True)
 def patch_lifx_state_settle_delay():
     """Set asyncio.sleep for state settles to zero."""
-    with patch("homeassistant.components.lifx.light.LIFX_STATE_SETTLE_DELAY", 0):
+    with patch("smarthub.components.lifx.light.LIFX_STATE_SETTLE_DELAY", 0):
         yield
 
 
 async def test_light_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -115,7 +115,7 @@ async def test_light_unique_id(
 
 
 async def test_light_unique_id_new_firmware(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -141,7 +141,7 @@ async def test_light_unique_id_new_firmware(
     assert device.identifiers == {(DOMAIN, SERIAL)}
 
 
-async def test_light_strip(hass: HomeAssistant) -> None:
+async def test_light_strip(hass: SmartHub) -> None:
     """Test a light strip."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -378,7 +378,7 @@ async def test_light_strip(hass: HomeAssistant) -> None:
     bulb.set_color_zones.reset_mock()
 
     bulb.set_color_zones = MockFailingLifxCommand(bulb)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             "set_state",
@@ -393,7 +393,7 @@ async def test_light_strip(hass: HomeAssistant) -> None:
     bulb.set_color_zones = MockLifxCommand(bulb)
     bulb.get_color_zones = MockFailingLifxCommand(bulb)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             "set_state",
@@ -410,7 +410,7 @@ async def test_light_strip(hass: HomeAssistant) -> None:
     )
     bulb.get_color = MockFailingLifxCommand(bulb)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             "set_state",
@@ -423,7 +423,7 @@ async def test_light_strip(hass: HomeAssistant) -> None:
         )
 
 
-async def test_extended_multizone_messages(hass: HomeAssistant) -> None:
+async def test_extended_multizone_messages(hass: SmartHub) -> None:
     """Test a light strip that supports extended multizone."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -634,7 +634,7 @@ async def test_extended_multizone_messages(hass: HomeAssistant) -> None:
 
     bulb.set_extended_color_zones = MockFailingLifxCommand(bulb)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             "set_state",
@@ -649,7 +649,7 @@ async def test_extended_multizone_messages(hass: HomeAssistant) -> None:
     bulb.set_extended_color_zones = MockLifxCommand(bulb)
     bulb.get_extended_color_zones = MockFailingLifxCommand(bulb)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             "set_state",
@@ -663,7 +663,7 @@ async def test_extended_multizone_messages(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_discovery")
-async def test_matrix_flame_morph_effects(hass: HomeAssistant) -> None:
+async def test_matrix_flame_morph_effects(hass: SmartHub) -> None:
     """Test the firmware flame and morph effects on a matrix device."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -817,7 +817,7 @@ async def test_matrix_flame_morph_effects(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_discovery")
-async def test_sky_effect(hass: HomeAssistant) -> None:
+async def test_sky_effect(hass: SmartHub) -> None:
     """Test the firmware sky effect on a ceiling device."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -948,7 +948,7 @@ async def test_sky_effect(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_discovery")
-async def test_lightstrip_move_effect(hass: HomeAssistant) -> None:
+async def test_lightstrip_move_effect(hass: SmartHub) -> None:
     """Test the firmware move effect on a light strip."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1047,7 +1047,7 @@ async def test_lightstrip_move_effect(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_discovery")
-async def test_paint_theme_service(hass: HomeAssistant) -> None:
+async def test_paint_theme_service(hass: SmartHub) -> None:
     """Test the firmware flame and morph effects on a matrix device."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1145,7 +1145,7 @@ async def test_paint_theme_service(hass: HomeAssistant) -> None:
 
 
 async def test_color_light_with_temp(
-    hass: HomeAssistant, mock_effect_conductor
+    hass: SmartHub, mock_effect_conductor
 ) -> None:
     """Test a color light with temp."""
     already_migrated_config_entry = MockConfigEntry(
@@ -1309,7 +1309,7 @@ async def test_color_light_with_temp(
     assert len(mock_effect_conductor.stop.mock_calls) == 2
 
 
-async def test_white_bulb(hass: HomeAssistant) -> None:
+async def test_white_bulb(hass: SmartHub) -> None:
     """Test a white bulb."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1370,7 +1370,7 @@ async def test_white_bulb(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_discovery")
 async def test_config_zoned_light_strip_fails(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test we handle failure to update zones."""
     already_migrated_config_entry = MockConfigEntry(
@@ -1413,7 +1413,7 @@ async def test_config_zoned_light_strip_fails(
 
 
 async def test_legacy_zoned_light_strip(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test we handle failure to update zones."""
     already_migrated_config_entry = MockConfigEntry(
@@ -1466,7 +1466,7 @@ async def test_legacy_zoned_light_strip(
 
 
 async def test_white_light_fails(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test we handle failure to power on off."""
     already_migrated_config_entry = MockConfigEntry(
@@ -1483,7 +1483,7 @@ async def test_white_light_fails(
         await hass.async_block_till_done()
         assert entity_registry.async_get(entity_id).unique_id == SERIAL
         assert hass.states.get(entity_id).state == STATE_OFF
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 LIGHT_DOMAIN, "turn_on", {ATTR_ENTITY_ID: entity_id}, blocking=True
             )
@@ -1493,7 +1493,7 @@ async def test_white_light_fails(
         bulb.set_power = MockLifxCommand(bulb)
         bulb.set_color = MockFailingLifxCommand(bulb)
 
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 LIGHT_DOMAIN,
                 "turn_on",
@@ -1504,7 +1504,7 @@ async def test_white_light_fails(
         bulb.set_color.reset_mock()
 
 
-async def test_brightness_bulb(hass: HomeAssistant) -> None:
+async def test_brightness_bulb(hass: SmartHub) -> None:
     """Test a brightness only bulb."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1553,7 +1553,7 @@ async def test_brightness_bulb(hass: HomeAssistant) -> None:
     bulb.set_color.reset_mock()
 
 
-async def test_transitions_brightness_only(hass: HomeAssistant) -> None:
+async def test_transitions_brightness_only(hass: SmartHub) -> None:
     """Test transitions with a brightness only device."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1622,7 +1622,7 @@ async def test_transitions_brightness_only(hass: HomeAssistant) -> None:
     assert len(bulb.get_color.calls) == 2
 
 
-async def test_transitions_color_bulb(hass: HomeAssistant) -> None:
+async def test_transitions_color_bulb(hass: SmartHub) -> None:
     """Test transitions with a color bulb."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1735,7 +1735,7 @@ async def test_transitions_color_bulb(hass: HomeAssistant) -> None:
     bulb.set_color.reset_mock()
 
 
-async def test_lifx_set_state_color(hass: HomeAssistant) -> None:
+async def test_lifx_set_state_color(hass: SmartHub) -> None:
     """Test lifx.set_state works with color names and RGB."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1815,7 +1815,7 @@ async def test_lifx_set_state_color(hass: HomeAssistant) -> None:
     bulb.set_color.reset_mock()
 
 
-async def test_lifx_set_state_kelvin(hass: HomeAssistant) -> None:
+async def test_lifx_set_state_kelvin(hass: SmartHub) -> None:
     """Test set_state works with kelvin parameter names."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1864,7 +1864,7 @@ async def test_lifx_set_state_kelvin(hass: HomeAssistant) -> None:
     bulb.set_color.reset_mock()
 
 
-async def test_infrared_color_bulb(hass: HomeAssistant) -> None:
+async def test_infrared_color_bulb(hass: SmartHub) -> None:
     """Test setting infrared with a color bulb."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1907,7 +1907,7 @@ async def test_infrared_color_bulb(hass: HomeAssistant) -> None:
     assert bulb.set_infrared.calls[0][0][0] == 25700
 
 
-async def test_color_bulb_is_actually_off(hass: HomeAssistant) -> None:
+async def test_color_bulb_is_actually_off(hass: SmartHub) -> None:
     """Test setting a color when we think a bulb is on but its actually off."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1960,7 +1960,7 @@ async def test_color_bulb_is_actually_off(hass: HomeAssistant) -> None:
     assert len(bulb.set_power.calls) == 1
 
 
-async def test_clean_bulb(hass: HomeAssistant) -> None:
+async def test_clean_bulb(hass: SmartHub) -> None:
     """Test setting HEV cycle state on Clean bulbs."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -1993,7 +1993,7 @@ async def test_clean_bulb(hass: HomeAssistant) -> None:
     bulb.set_hev_cycle.reset_mock()
 
 
-async def test_set_hev_cycle_state_fails_for_color_bulb(hass: HomeAssistant) -> None:
+async def test_set_hev_cycle_state_fails_for_color_bulb(hass: SmartHub) -> None:
     """Test that set_hev_cycle_state fails for a non-Clean bulb."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL
@@ -2013,7 +2013,7 @@ async def test_set_hev_cycle_state_fails_for_color_bulb(hass: HomeAssistant) -> 
     state = hass.states.get(entity_id)
     assert state.state == "off"
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             "set_hev_cycle_state",
@@ -2022,7 +2022,7 @@ async def test_set_hev_cycle_state_fails_for_color_bulb(hass: HomeAssistant) -> 
         )
 
 
-async def test_light_strip_zones_not_populated_yet(hass: HomeAssistant) -> None:
+async def test_light_strip_zones_not_populated_yet(hass: SmartHub) -> None:
     """Test a light strip were zones are not populated initially."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=SERIAL

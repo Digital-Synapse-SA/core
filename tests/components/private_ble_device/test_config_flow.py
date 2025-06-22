@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.private_ble_device import const
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub import config_entries
+from smarthub.components.private_ble_device import const
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResult, FlowResultType
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
 
 from tests.components.bluetooth import inject_bluetooth_service_info
 
@@ -21,7 +21,7 @@ def assert_form_error(result: FlowResult, key: str, value: str) -> None:
 
 
 @pytest.mark.usefixtures("mock_bluetooth_adapters")
-async def test_setup_user_no_bluetooth(hass: HomeAssistant) -> None:
+async def test_setup_user_no_bluetooth(hass: SmartHub) -> None:
     """Test setting up via user interaction when bluetooth is not enabled."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN,
@@ -32,7 +32,7 @@ async def test_setup_user_no_bluetooth(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_invalid_irk(hass: HomeAssistant) -> None:
+async def test_invalid_irk(hass: SmartHub) -> None:
     """Test invalid irk."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -46,7 +46,7 @@ async def test_invalid_irk(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_invalid_irk_base64(hass: HomeAssistant) -> None:
+async def test_invalid_irk_base64(hass: SmartHub) -> None:
     """Test invalid irk."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -60,7 +60,7 @@ async def test_invalid_irk_base64(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_invalid_irk_hex(hass: HomeAssistant) -> None:
+async def test_invalid_irk_hex(hass: SmartHub) -> None:
     """Test invalid irk."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -74,7 +74,7 @@ async def test_invalid_irk_hex(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_irk_not_found(hass: HomeAssistant) -> None:
+async def test_irk_not_found(hass: SmartHub) -> None:
     """Test irk not found."""
     result = await hass.config_entries.flow.async_init(
         const.DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -89,7 +89,7 @@ async def test_irk_not_found(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_flow_works(hass: HomeAssistant) -> None:
+async def test_flow_works(hass: SmartHub) -> None:
     """Test config flow works."""
 
     inject_bluetooth_service_info(
@@ -112,7 +112,7 @@ async def test_flow_works(hass: HomeAssistant) -> None:
 
     # Check you can finish the flow
     with patch(
-        "homeassistant.components.private_ble_device.async_setup_entry",
+        "smarthub.components.private_ble_device.async_setup_entry",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -127,7 +127,7 @@ async def test_flow_works(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_flow_works_by_base64(hass: HomeAssistant) -> None:
+async def test_flow_works_by_base64(hass: SmartHub) -> None:
     """Test config flow works."""
 
     inject_bluetooth_service_info(
@@ -150,7 +150,7 @@ async def test_flow_works_by_base64(hass: HomeAssistant) -> None:
 
     # Check you can finish the flow
     with patch(
-        "homeassistant.components.private_ble_device.async_setup_entry",
+        "smarthub.components.private_ble_device.async_setup_entry",
         return_value=True,
     ):
         result = await hass.config_entries.flow.async_configure(

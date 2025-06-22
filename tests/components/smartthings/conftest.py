@@ -16,20 +16,20 @@ from pysmartthings import (
 from pysmartthings.models import HealthStatus
 import pytest
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.smartthings import CONF_INSTALLED_APP_ID
-from homeassistant.components.smartthings.const import (
+from smarthub.components.smartthings import CONF_INSTALLED_APP_ID
+from smarthub.components.smartthings.const import (
     CONF_LOCATION_ID,
     CONF_REFRESH_TOKEN,
     DOMAIN,
     SCOPES,
 )
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_CLIENT_ID, CONF_CLIENT_SECRET
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_CLIENT_ID, CONF_CLIENT_SECRET
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -38,7 +38,7 @@ from tests.common import MockConfigEntry, load_fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.smartthings.async_setup_entry",
+        "smarthub.components.smartthings.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -51,7 +51,7 @@ def mock_expires_at() -> int:
 
 
 @pytest.fixture(autouse=True)
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -67,11 +67,11 @@ def mock_smartthings() -> Generator[AsyncMock]:
     """Mock a SmartThings client."""
     with (
         patch(
-            "homeassistant.components.smartthings.SmartThings",
+            "smarthub.components.smartthings.SmartThings",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.smartthings.config_flow.SmartThings",
+            "smarthub.components.smartthings.config_flow.SmartThings",
             new=mock_client,
         ),
     ):

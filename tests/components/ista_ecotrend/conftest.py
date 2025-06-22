@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from homeassistant.components.ista_ecotrend.const import DOMAIN
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.components.ista_ecotrend.const import DOMAIN
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
 
 from tests.common import MockConfigEntry
 
@@ -29,7 +29,7 @@ def mock_ista_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.ista_ecotrend.async_setup_entry", return_value=True
+        "smarthub.components.ista_ecotrend.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -40,15 +40,15 @@ def mock_ista() -> Generator[MagicMock]:
 
     with (
         patch(
-            "homeassistant.components.ista_ecotrend.PyEcotrendIsta",
+            "smarthub.components.ista_ecotrend.PyEcotrendIsta",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.ista_ecotrend.config_flow.PyEcotrendIsta",
+            "smarthub.components.ista_ecotrend.config_flow.PyEcotrendIsta",
             new=mock_client,
         ),
         patch(
-            "homeassistant.components.ista_ecotrend.coordinator.PyEcotrendIsta",
+            "smarthub.components.ista_ecotrend.coordinator.PyEcotrendIsta",
             new=mock_client,
         ),
     ):

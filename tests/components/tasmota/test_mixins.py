@@ -7,8 +7,8 @@ from unittest.mock import call
 from hatasmota.const import CONF_MAC
 from hatasmota.utils import config_get_state_online, get_topic_tele_will
 
-from homeassistant.components.tasmota.const import DEFAULT_PREFIX
-from homeassistant.core import HomeAssistant
+from smarthub.components.tasmota.const import DEFAULT_PREFIX
+from smarthub.core import SmartHub
 
 from .test_common import DEFAULT_CONFIG
 
@@ -17,7 +17,7 @@ from tests.typing import MqttMockHAClient, MqttMockPahoClient
 
 
 async def test_availability_poll_state_once(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
     mqtt_mock: MqttMockHAClient,
     setup_tasmota,

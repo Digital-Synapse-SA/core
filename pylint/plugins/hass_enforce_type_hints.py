@@ -12,7 +12,7 @@ from astroid.exceptions import NameInferenceError
 from pylint.checkers import BaseChecker
 from pylint.lint import PyLinter
 
-from homeassistant.const import Platform
+from smarthub.const import Platform
 
 if TYPE_CHECKING:
     # InferenceResult is available only from astroid >= 2.12.0
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from astroid.typing import InferenceResult
 
 _COMMON_ARGUMENTS: dict[str, list[str]] = {
-    "hass": ["HomeAssistant", "HomeAssistant | None"]
+    "hass": ["SmartHub", "SmartHub | None"]
 }
 _PLATFORMS: set[str] = {platform.value for platform in Platform}
 _KNOWN_GENERIC_TYPES: set[str] = {
@@ -95,7 +95,7 @@ _TYPE_HINT_MATCHERS.update(
 )
 
 
-_MODULE_REGEX: re.Pattern[str] = re.compile(r"^homeassistant\.components\.\w+(\.\w+)?$")
+_MODULE_REGEX: re.Pattern[str] = re.compile(r"^smarthub\.components\.\w+(\.\w+)?$")
 
 _METHOD_MATCH: list[TypeHintMatch] = [
     TypeHintMatch(
@@ -125,7 +125,7 @@ _TEST_FIXTURES: dict[str, list[str] | str] = {
     "entity_registry_enabled_by_default": "None",
     "event_loop": "AbstractEventLoop",
     "freezer": "FrozenDateTimeFactory",
-    "hass": "HomeAssistant",
+    "hass": "SmartHub",
     "hass_access_token": "str",
     "hass_admin_credential": "Credentials",
     "hass_admin_user": "MockUser",
@@ -182,7 +182,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="setup",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
             },
             return_type="bool",
@@ -192,7 +192,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_setup_entry",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigEntry",
             },
             return_type="bool",
@@ -201,7 +201,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_remove_entry",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigEntry",
             },
             return_type=None,
@@ -210,7 +210,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_unload_entry",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigEntry",
             },
             return_type="bool",
@@ -219,7 +219,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_migrate_entry",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigEntry",
             },
             return_type="bool",
@@ -228,7 +228,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_remove_config_entry_device",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigEntry",
                 2: "DeviceEntry",
             },
@@ -238,7 +238,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_reset_platform",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "str",
             },
             return_type=None,
@@ -249,7 +249,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="setup_platform",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
                 2: "AddEntitiesCallback",
                 3: "DiscoveryInfoType | None",
@@ -261,7 +261,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_setup_entry",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigEntry",
                 2: "AddConfigEntryEntitiesCallback",
             },
@@ -273,7 +273,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_auth_implementation",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "str",
                 2: "ClientCredential",
             },
@@ -283,7 +283,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_authorization_server",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
             },
             return_type="AuthorizationServer",
             mandatory=True,
@@ -293,7 +293,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_pre_backup",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
             },
             return_type=None,
             mandatory=True,
@@ -301,7 +301,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_post_backup",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
             },
             return_type=None,
             mandatory=True,
@@ -311,7 +311,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_media_browser_root_object",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "str",
             },
             return_type="list[BrowseMedia]",
@@ -320,7 +320,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_browse_media",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "MediaType | str",
                 2: "str",
                 3: "str",
@@ -331,7 +331,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_play_media",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "str",
                 2: "Chromecast",
                 3: "MediaType | str",
@@ -345,7 +345,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="_async_has_devices",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
             },
             return_type="bool",
             mandatory=True,
@@ -355,7 +355,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_validate_action_config",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
             },
             return_type="ConfigType",
@@ -364,7 +364,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_call_action_from_config",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
                 2: "TemplateVarsType",
                 3: "Context | None",
@@ -375,7 +375,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_action_capabilities",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
             },
             return_type="dict[str, Schema]",
@@ -384,7 +384,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_actions",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "str",
             },
             return_type=["list[dict[str, str]]", "list[dict[str, Any]]"],
@@ -395,7 +395,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_validate_condition_config",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
             },
             return_type="ConfigType",
@@ -404,7 +404,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_condition_from_config",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
             },
             return_type="ConditionCheckerType",
@@ -413,7 +413,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_condition_capabilities",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
             },
             return_type="dict[str, Schema]",
@@ -422,7 +422,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_conditions",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "str",
             },
             return_type=["list[dict[str, str]]", "list[dict[str, Any]]"],
@@ -433,7 +433,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="setup_scanner",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
                 2: "SeeCallback",
                 3: "DiscoveryInfoType | None",
@@ -444,7 +444,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_setup_scanner",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
                 2: "AsyncSeeCallback",
                 3: "DiscoveryInfoType | None",
@@ -455,7 +455,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="get_scanner",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
             },
             return_type=["DeviceScanner", None],
@@ -467,7 +467,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_validate_condition_config",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
             },
             return_type="ConfigType",
@@ -476,7 +476,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_attach_trigger",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
                 2: "TriggerActionType",
                 3: "TriggerInfo",
@@ -487,7 +487,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_trigger_capabilities",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
             },
             return_type="dict[str, Schema]",
@@ -496,7 +496,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_triggers",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "str",
             },
             return_type=["list[dict[str, str]]", "list[dict[str, Any]]"],
@@ -507,7 +507,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_config_entry_diagnostics",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigEntry",
             },
             return_type="Mapping[str, Any]",
@@ -516,7 +516,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="async_get_device_diagnostics",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigEntry",
                 2: "DeviceEntry",
             },
@@ -528,7 +528,7 @@ _FUNCTION_MATCH: dict[str, list[TypeHintMatch]] = {
         TypeHintMatch(
             function_name="get_service",
             arg_types={
-                0: "HomeAssistant",
+                0: "SmartHub",
                 1: "ConfigType",
                 2: "DiscoveryInfoType | None",
             },
@@ -983,7 +983,7 @@ _INHERITANCE_MATCH: dict[str, list[ClassTypeHintMatch]] = {
                 TypeHintMatch(
                     function_name="async_get_events",
                     arg_types={
-                        1: "HomeAssistant",
+                        1: "SmartHub",
                         2: "datetime",
                         3: "datetime",
                     },
@@ -3145,11 +3145,11 @@ def _is_valid_type(
     ):
         return True
 
-    # Name occurs when a namespace is not used, eg. "HomeAssistant"
+    # Name occurs when a namespace is not used, eg. "SmartHub"
     if isinstance(node, nodes.Name) and node.name == expected_type:
         return True
 
-    # Attribute occurs when a namespace is used, eg. "core.HomeAssistant"
+    # Attribute occurs when a namespace is used, eg. "core.SmartHub"
     return isinstance(node, nodes.Attribute) and (
         node.attrname == expected_type or node.as_string() == expected_type
     )
@@ -3233,8 +3233,8 @@ def _has_valid_annotations(
 def _get_module_platform(module_name: str) -> str | None:
     """Return the platform for the module name."""
     if not (module_match := _MODULE_REGEX.match(module_name)):
-        # Ensure `homeassistant.components.<component>`
-        # Or `homeassistant.components.<component>.<platform>`
+        # Ensure `smarthub.components.<component>`
+        # Or `smarthub.components.<component>.<platform>`
         return None
 
     platform = module_match.groups()[0]

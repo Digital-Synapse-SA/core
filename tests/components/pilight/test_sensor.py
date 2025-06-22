@@ -5,21 +5,21 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import pilight, sensor
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import pilight, sensor
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component, mock_component
 
 
 @pytest.fixture(autouse=True)
-def setup_comp(hass: HomeAssistant) -> None:
+def setup_comp(hass: SmartHub) -> None:
     """Initialize components."""
     mock_component(hass, "pilight")
 
 
 def fire_pilight_message(
-    hass: HomeAssistant, protocol: str, data: dict[str, Any]
+    hass: SmartHub, protocol: str, data: dict[str, Any]
 ) -> None:
     """Fire the fake Pilight message."""
     message = {pilight.CONF_PROTOCOL: protocol}
@@ -28,7 +28,7 @@ def fire_pilight_message(
     hass.bus.async_fire(pilight.EVENT, message)
 
 
-async def test_sensor_value_from_code(hass: HomeAssistant) -> None:
+async def test_sensor_value_from_code(hass: SmartHub) -> None:
     """Test the setting of value via pilight."""
     with assert_setup_component(1):
         assert await async_setup_component(
@@ -59,7 +59,7 @@ async def test_sensor_value_from_code(hass: HomeAssistant) -> None:
         assert state.state == "42"
 
 
-async def test_disregard_wrong_payload(hass: HomeAssistant) -> None:
+async def test_disregard_wrong_payload(hass: SmartHub) -> None:
     """Test omitting setting of value with wrong payload."""
     with assert_setup_component(1):
         assert await async_setup_component(
@@ -104,7 +104,7 @@ async def test_disregard_wrong_payload(hass: HomeAssistant) -> None:
 
 
 async def test_variable_missing(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Check if error message when variable missing."""
     caplog.set_level(logging.ERROR)

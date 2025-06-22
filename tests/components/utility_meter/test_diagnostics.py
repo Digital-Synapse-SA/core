@@ -6,10 +6,10 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.auth.models import Credentials
-from homeassistant.components.utility_meter.const import DOMAIN
-from homeassistant.components.utility_meter.sensor import ATTR_LAST_RESET
-from homeassistant.core import HomeAssistant, State
+from smarthub.auth.models import Credentials
+from smarthub.components.utility_meter.const import DOMAIN
+from smarthub.components.utility_meter.sensor import ATTR_LAST_RESET
+from smarthub.core import SmartHub, State
 
 from tests.common import (
     CLIENT_ID,
@@ -22,9 +22,9 @@ from tests.typing import ClientSessionGenerator
 
 
 async def generate_new_hass_access_token(
-    hass: HomeAssistant, hass_admin_user: MockUser, hass_admin_credential: Credentials
+    hass: SmartHub, hass_admin_user: MockUser, hass_admin_credential: Credentials
 ) -> str:
-    """Return an access token to access Home Assistant."""
+    """Return an access token to access SmartHub."""
     await hass.auth.async_link_user(hass_admin_user, hass_admin_credential)
 
     refresh_token = await hass.auth.async_create_refresh_token(
@@ -34,7 +34,7 @@ async def generate_new_hass_access_token(
 
 
 def _get_test_client_generator(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator, new_token: str
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator, new_token: str
 ):
     """Return a test client generator.""."""
 
@@ -49,7 +49,7 @@ def _get_test_client_generator(
 @freeze_time("2024-04-06 00:00:00+00:00")
 @pytest.mark.usefixtures("socket_enabled")
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     hass_admin_user: MockUser,
     hass_admin_credential: Credentials,

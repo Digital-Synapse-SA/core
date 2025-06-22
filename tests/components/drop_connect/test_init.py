@@ -1,8 +1,8 @@
 """Test DROP initialisation."""
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .common import (
     TEST_DATA_HUB,
@@ -15,7 +15,7 @@ from tests.common import async_fire_mqtt_message
 from tests.typing import MqttMockHAClient
 
 
-async def test_bad_json(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_bad_json(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test bad JSON."""
     entry = config_entry_hub()
     entry.add_to_hass(hass)
@@ -29,7 +29,7 @@ async def test_bad_json(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> Non
     assert hass.states.get(current_flow_sensor_name).state == STATE_UNKNOWN
 
 
-async def test_unload(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_unload(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test entity unload."""
     # Load the hub device
     entry = config_entry_hub()
@@ -56,7 +56,7 @@ async def test_unload(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
     assert hass.states.get(current_flow_sensor_name).state == STATE_UNAVAILABLE
 
 
-async def test_no_mqtt(hass: HomeAssistant) -> None:
+async def test_no_mqtt(hass: SmartHub) -> None:
     """Test no MQTT."""
     entry = config_entry_hub()
     entry.add_to_hass(hass)

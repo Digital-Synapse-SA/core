@@ -10,10 +10,10 @@ from pysensibo.model import PureAQI
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import async_fire_time_changed, snapshot_platform
 
@@ -24,7 +24,7 @@ from tests.common import async_fire_time_changed, snapshot_platform
     [[Platform.SENSOR]],
 )
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     mock_client: MagicMock,
     entity_registry: er.EntityRegistry,

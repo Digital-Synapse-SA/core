@@ -3,19 +3,19 @@
 import json
 from unittest.mock import patch
 
-from homeassistant.components.air_quality import DOMAIN as AIR_QUALITY_PLATFORM
-from homeassistant.components.gios.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.air_quality import DOMAIN as AIR_QUALITY_PLATFORM
+from smarthub.components.gios.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import STATIONS, init_integration
 
 from tests.common import MockConfigEntry, async_load_fixture
 
 
-async def test_async_setup_entry(hass: HomeAssistant) -> None:
+async def test_async_setup_entry(hass: SmartHub) -> None:
     """Test a successful setup entry."""
     await init_integration(hass)
 
@@ -25,7 +25,7 @@ async def test_async_setup_entry(hass: HomeAssistant) -> None:
     assert state.state == "4"
 
 
-async def test_config_not_ready(hass: HomeAssistant) -> None:
+async def test_config_not_ready(hass: SmartHub) -> None:
     """Test for setup failure if connection to GIOS is missing."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -35,7 +35,7 @@ async def test_config_not_ready(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.gios.coordinator.Gios._get_stations",
+        "smarthub.components.gios.coordinator.Gios._get_stations",
         side_effect=ConnectionError(),
     ):
         entry.add_to_hass(hass)
@@ -43,7 +43,7 @@ async def test_config_not_ready(hass: HomeAssistant) -> None:
         assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass)
 
@@ -58,7 +58,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
 
 
 async def test_migrate_device_and_config_entry(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test device_info identifiers and config entry migration."""
     config_entry = MockConfigEntry(
@@ -77,19 +77,19 @@ async def test_migrate_device_and_config_entry(
 
     with (
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_stations",
+            "smarthub.components.gios.coordinator.Gios._get_stations",
             return_value=STATIONS,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_station",
+            "smarthub.components.gios.coordinator.Gios._get_station",
             return_value=station,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_all_sensors",
+            "smarthub.components.gios.coordinator.Gios._get_all_sensors",
             return_value=sensors,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_indexes",
+            "smarthub.components.gios.coordinator.Gios._get_indexes",
             return_value=indexes,
         ),
     ):
@@ -109,7 +109,7 @@ async def test_migrate_device_and_config_entry(
 
 
 async def test_remove_air_quality_entities(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test remove air_quality entities from registry."""
     entity_registry.async_get_or_create(

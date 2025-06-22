@@ -2,10 +2,10 @@
 
 import pytest
 
-from homeassistant.components.bthome.const import DOMAIN
-from homeassistant.components.event import ATTR_EVENT_TYPE
-from homeassistant.const import ATTR_FRIENDLY_NAME, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.bthome.const import DOMAIN
+from smarthub.components.event import ATTR_EVENT_TYPE
+from smarthub.const import ATTR_FRIENDLY_NAME, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import make_bthome_v2_adv
 
@@ -57,7 +57,7 @@ from tests.components.bluetooth import (
     ],
 )
 async def test_v2_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac_address: str,
     advertisement: BluetoothServiceInfoBleak,
     bind_key: str | None,

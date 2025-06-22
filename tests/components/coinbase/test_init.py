@@ -2,15 +2,15 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.coinbase.const import (
+from smarthub.components.coinbase.const import (
     API_TYPE_VAULT,
     CONF_CURRENCIES,
     CONF_EXCHANGE_RATES,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     init_mock_coinbase,
@@ -26,7 +26,7 @@ from .const import (
 )
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test successful unload of entry."""
     with (
         patch(
@@ -55,7 +55,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
 
 
 async def test_option_updates(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test handling option updates."""
 
@@ -135,7 +135,7 @@ async def test_option_updates(
 
 
 async def test_ignore_vaults_wallets(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test vaults are ignored in wallet sensors."""
 

@@ -6,21 +6,21 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from reolink_aio.exceptions import InvalidParameterError, ReolinkError
 
-from homeassistant.components.siren import (
+from smarthub.components.siren import (
     ATTR_DURATION,
     ATTR_VOLUME_LEVEL,
     DOMAIN as SIREN_DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from .conftest import TEST_NVR_NAME
 
@@ -28,12 +28,12 @@ from tests.common import MockConfigEntry
 
 
 async def test_siren(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test siren entity."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SIREN]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SIREN]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -76,7 +76,7 @@ async def test_siren(
     [
         (
             AsyncMock(side_effect=ReolinkError("Test error")),
-            HomeAssistantError,
+            SmartHubError,
         ),
         (
             AsyncMock(side_effect=InvalidParameterError("Test error")),
@@ -85,7 +85,7 @@ async def test_siren(
     ],
 )
 async def test_siren_turn_on_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     attr: str,
@@ -93,7 +93,7 @@ async def test_siren_turn_on_errors(
     expected: Any,
 ) -> None:
     """Test errors when calling siren turn on service."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SIREN]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SIREN]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -114,12 +114,12 @@ async def test_siren_turn_on_errors(
 
 
 async def test_siren_turn_off_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test errors when calling siren turn off service."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SIREN]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SIREN]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -127,7 +127,7 @@ async def test_siren_turn_off_errors(
     entity_id = f"{Platform.SIREN}.{TEST_NVR_NAME}_siren"
 
     reolink_connect.set_siren.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SIREN_DOMAIN,
             SERVICE_TURN_OFF,

@@ -2,8 +2,8 @@
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import nws
-from homeassistant.core import HomeAssistant
+from smarthub.components import nws
+from smarthub.core import SmartHub
 
 from .const import NWS_CONFIG
 
@@ -13,7 +13,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
     mock_simple_nws,

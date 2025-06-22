@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, patch
 from aioambient.errors import AmbientError
 import pytest
 
-from homeassistant.components.ambient_station.const import CONF_APP_KEY, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.ambient_station.const import CONF_APP_KEY, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 @pytest.mark.parametrize(
@@ -20,7 +20,7 @@ from homeassistant.data_entry_flow import FlowResultType
     ],
 )
 async def test_create_entry(
-    hass: HomeAssistant, api, config, devices_response, errors, mock_aioambient
+    hass: SmartHub, api, config, devices_response, errors, mock_aioambient
 ) -> None:
     """Test creating an entry."""
     result = await hass.config_entries.flow.async_init(
@@ -50,7 +50,7 @@ async def test_create_entry(
 
 
 async def test_duplicate_error(
-    hass: HomeAssistant, config, config_entry, setup_config_entry
+    hass: SmartHub, config, config_entry, setup_config_entry
 ) -> None:
     """Test that errors are shown when duplicates are added."""
     result = await hass.config_entries.flow.async_init(

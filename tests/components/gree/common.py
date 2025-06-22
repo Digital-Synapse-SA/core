@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, Mock
 
 from greeclimate.discovery import Listener
 
-from homeassistant.components.gree.const import DISCOVERY_TIMEOUT, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.gree.const import DISCOVERY_TIMEOUT, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -91,7 +91,7 @@ def build_device_mock(name="fake-device-1", ipAddress="1.1.1.1", mac="aabbcc1122
     )
 
 
-async def async_setup_gree(hass: HomeAssistant) -> MockConfigEntry:
+async def async_setup_gree(hass: SmartHub) -> MockConfigEntry:
     """Set up the gree platform."""
     entry = MockConfigEntry(domain=DOMAIN)
     entry.add_to_hass(hass)

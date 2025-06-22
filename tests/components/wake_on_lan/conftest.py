@@ -8,10 +8,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from homeassistant.components.wake_on_lan.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_BROADCAST_ADDRESS, CONF_BROADCAST_PORT, CONF_MAC
-from homeassistant.core import HomeAssistant
+from smarthub.components.wake_on_lan.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_BROADCAST_ADDRESS, CONF_BROADCAST_PORT, CONF_MAC
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -34,7 +34,7 @@ def subprocess_call_return_value() -> int | None:
 @pytest.fixture(autouse=True)
 def mock_subprocess_call(subprocess_call_return_value: int) -> Generator[MagicMock]:
     """Mock magic packet."""
-    with patch("homeassistant.components.wake_on_lan.switch.sp.call") as mock_sp:
+    with patch("smarthub.components.wake_on_lan.switch.sp.call") as mock_sp:
         mock_sp.return_value = subprocess_call_return_value
         yield mock_sp
 
@@ -43,7 +43,7 @@ def mock_subprocess_call(subprocess_call_return_value: int) -> Generator[MagicMo
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Automatically path uuid generator."""
     with patch(
-        "homeassistant.components.wake_on_lan.async_setup_entry",
+        "smarthub.components.wake_on_lan.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -65,9 +65,9 @@ async def get_config_to_integration_load() -> dict[str, Any]:
 
 @pytest.fixture(name="loaded_entry")
 async def load_integration(
-    hass: HomeAssistant, get_config: dict[str, Any]
+    hass: SmartHub, get_config: dict[str, Any]
 ) -> MockConfigEntry:
-    """Set up the Statistics integration in Home Assistant."""
+    """Set up the Statistics integration in SmartHub."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         title=f"Wake on LAN {DEFAULT_MAC}",

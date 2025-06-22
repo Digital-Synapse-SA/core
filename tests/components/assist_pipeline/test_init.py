@@ -12,14 +12,14 @@ import hass_nabucasa
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import assist_pipeline, stt
-from homeassistant.components.assist_pipeline.const import (
+from smarthub.components import assist_pipeline, stt
+from smarthub.components.assist_pipeline.const import (
     BYTES_PER_CHUNK,
     CONF_DEBUG_RECORDING_DIR,
     DOMAIN,
 )
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import Context, SmartHub
+from smarthub.setup import async_setup_component
 
 from . import process_events
 from .conftest import (
@@ -37,7 +37,7 @@ from tests.typing import WebSocketGenerator
 def mock_chat_session_id() -> Generator[Mock]:
     """Mock the conversation ID of chat sessions."""
     with patch(
-        "homeassistant.helpers.chat_session.ulid_now", return_value="mock-ulid"
+        "smarthub.helpers.chat_session.ulid_now", return_value="mock-ulid"
     ) as mock_ulid_now:
         yield mock_ulid_now
 
@@ -50,7 +50,7 @@ def mock_tts_token() -> Generator[None]:
 
 
 async def test_pipeline_from_audio_stream_auto(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stt_provider_entity: MockSTTProviderEntity,
     init_components,
     snapshot: SnapshotAssertion,
@@ -68,7 +68,7 @@ async def test_pipeline_from_audio_stream_auto(
         yield b""
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         await assist_pipeline.async_pipeline_from_audio_stream(
             hass,
@@ -93,7 +93,7 @@ async def test_pipeline_from_audio_stream_auto(
 
 
 async def test_pipeline_from_audio_stream_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_stt_provider: MockSTTProvider,
     init_components,
@@ -116,7 +116,7 @@ async def test_pipeline_from_audio_stream_legacy(
     await client.send_json_auto_id(
         {
             "type": "assist_pipeline/pipeline/create",
-            "conversation_engine": "homeassistant",
+            "conversation_engine": "smarthub",
             "conversation_language": "en-US",
             "language": "en",
             "name": "test_name",
@@ -134,7 +134,7 @@ async def test_pipeline_from_audio_stream_legacy(
     pipeline_id = msg["result"]["id"]
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         # Use the created pipeline
         await assist_pipeline.async_pipeline_from_audio_stream(
@@ -161,7 +161,7 @@ async def test_pipeline_from_audio_stream_legacy(
 
 
 async def test_pipeline_from_audio_stream_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_stt_provider_entity: MockSTTProviderEntity,
     init_components,
@@ -184,7 +184,7 @@ async def test_pipeline_from_audio_stream_entity(
     await client.send_json_auto_id(
         {
             "type": "assist_pipeline/pipeline/create",
-            "conversation_engine": "homeassistant",
+            "conversation_engine": "smarthub",
             "conversation_language": "en-US",
             "language": "en",
             "name": "test_name",
@@ -202,7 +202,7 @@ async def test_pipeline_from_audio_stream_entity(
     pipeline_id = msg["result"]["id"]
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         # Use the created pipeline
         await assist_pipeline.async_pipeline_from_audio_stream(
@@ -229,7 +229,7 @@ async def test_pipeline_from_audio_stream_entity(
 
 
 async def test_pipeline_from_audio_stream_no_stt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_stt_provider: MockSTTProvider,
     init_components,
@@ -252,7 +252,7 @@ async def test_pipeline_from_audio_stream_no_stt(
     await client.send_json_auto_id(
         {
             "type": "assist_pipeline/pipeline/create",
-            "conversation_engine": "homeassistant",
+            "conversation_engine": "smarthub",
             "conversation_language": "en-US",
             "language": "en",
             "name": "test_name",
@@ -292,7 +292,7 @@ async def test_pipeline_from_audio_stream_no_stt(
 
 
 async def test_pipeline_from_audio_stream_unknown_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_stt_provider: MockSTTProvider,
     init_components,
@@ -331,7 +331,7 @@ async def test_pipeline_from_audio_stream_unknown_pipeline(
 
 
 async def test_pipeline_from_audio_stream_wake_word(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stt_provider_entity: MockSTTProviderEntity,
     mock_wake_word_provider_entity: MockWakeWordEntity,
     init_components,
@@ -369,7 +369,7 @@ async def test_pipeline_from_audio_stream_wake_word(
         yield b""
 
     with patch(
-        "homeassistant.components.tts.secrets.token_urlsafe", return_value="test_token"
+        "smarthub.components.tts.secrets.token_urlsafe", return_value="test_token"
     ):
         await assist_pipeline.async_pipeline_from_audio_stream(
             hass,
@@ -410,7 +410,7 @@ async def test_pipeline_from_audio_stream_wake_word(
 
 
 async def test_pipeline_save_audio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stt_provider: MockSTTProvider,
     mock_wake_word_provider_entity: MockWakeWordEntity,
     init_supporting_components,
@@ -489,7 +489,7 @@ async def test_pipeline_save_audio(
 
 
 async def test_pipeline_saved_audio_with_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stt_provider: MockSTTProvider,
     mock_wake_word_provider_entity: MockWakeWordEntity,
     init_supporting_components,
@@ -544,7 +544,7 @@ async def test_pipeline_saved_audio_with_device_id(
 
 
 async def test_pipeline_saved_audio_write_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stt_provider: MockSTTProvider,
     mock_wake_word_provider_entity: MockWakeWordEntity,
     init_supporting_components,
@@ -593,7 +593,7 @@ async def test_pipeline_saved_audio_write_error(
 
 
 async def test_pipeline_saved_audio_empty_queue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stt_provider: MockSTTProvider,
     mock_wake_word_provider_entity: MockWakeWordEntity,
     init_supporting_components,
@@ -634,7 +634,7 @@ async def test_pipeline_saved_audio_empty_queue(
             )
 
         with patch(
-            "homeassistant.components.assist_pipeline.pipeline._pipeline_debug_recording_thread_proc",
+            "smarthub.components.assist_pipeline.pipeline._pipeline_debug_recording_thread_proc",
             proc_wrapper,
         ):
             await assist_pipeline.async_pipeline_from_audio_stream(
@@ -656,7 +656,7 @@ async def test_pipeline_saved_audio_empty_queue(
 
 
 async def test_pipeline_from_audio_stream_with_cloud_auth_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stt_provider_entity: MockSTTProviderEntity,
     init_components,
     snapshot: SnapshotAssertion,

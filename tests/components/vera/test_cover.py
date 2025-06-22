@@ -4,13 +4,13 @@ from unittest.mock import MagicMock
 
 import pyvera as pv
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import ComponentFactory, new_simple_controller_config
 
 
 async def test_cover(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
     vera_device: pv.VeraCurtain = MagicMock(spec=pv.VeraCurtain)

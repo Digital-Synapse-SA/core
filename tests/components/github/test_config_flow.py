@@ -6,16 +6,16 @@ from aiogithubapi import GitHubException
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.github.config_flow import get_repositories
-from homeassistant.components.github.const import (
+from smarthub import config_entries
+from smarthub.components.github.config_flow import get_repositories
+from smarthub.components.github.const import (
     CONF_REPOSITORIES,
     DEFAULT_REPOSITORIES,
     DOMAIN,
 )
-from homeassistant.const import CONF_ACCESS_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType, UnknownFlow
+from smarthub.const import CONF_ACCESS_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType, UnknownFlow
 
 from .common import MOCK_ACCESS_TOKEN
 
@@ -24,7 +24,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_full_user_flow_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: None,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
@@ -88,7 +88,7 @@ async def test_full_user_flow_implementation(
 
 
 async def test_flow_with_registration_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test flow with registration failure of the device."""
@@ -105,7 +105,7 @@ async def test_flow_with_registration_failure(
 
 
 async def test_flow_with_activation_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -149,7 +149,7 @@ async def test_flow_with_activation_failure(
 
 
 async def test_flow_with_remove_while_activating(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
     """Test flow with user canceling while activating."""
@@ -187,7 +187,7 @@ async def test_flow_with_remove_while_activating(
 
 
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort if already configured."""
@@ -202,10 +202,10 @@ async def test_already_configured(
     assert result.get("reason") == "already_configured"
 
 
-async def test_starred_pagination_with_paginated_result(hass: HomeAssistant) -> None:
+async def test_starred_pagination_with_paginated_result(hass: SmartHub) -> None:
     """Test pagination of starred repositories with paginated result."""
     with patch(
-        "homeassistant.components.github.config_flow.GitHubAPI",
+        "smarthub.components.github.config_flow.GitHubAPI",
         return_value=MagicMock(
             user=MagicMock(
                 starred=AsyncMock(
@@ -213,7 +213,7 @@ async def test_starred_pagination_with_paginated_result(hass: HomeAssistant) -> 
                         is_last_page=False,
                         next_page_number=2,
                         last_page_number=2,
-                        data=[MagicMock(full_name="home-assistant/core")],
+                        data=[MagicMock(full_name="smart-hub/core")],
                     )
                 ),
                 repos=AsyncMock(
@@ -233,10 +233,10 @@ async def test_starred_pagination_with_paginated_result(hass: HomeAssistant) -> 
     assert repos[-1] == DEFAULT_REPOSITORIES[0]
 
 
-async def test_starred_pagination_with_no_starred(hass: HomeAssistant) -> None:
+async def test_starred_pagination_with_no_starred(hass: SmartHub) -> None:
     """Test pagination of starred repositories with no starred."""
     with patch(
-        "homeassistant.components.github.config_flow.GitHubAPI",
+        "smarthub.components.github.config_flow.GitHubAPI",
         return_value=MagicMock(
             user=MagicMock(
                 starred=AsyncMock(
@@ -260,10 +260,10 @@ async def test_starred_pagination_with_no_starred(hass: HomeAssistant) -> None:
     assert repos == DEFAULT_REPOSITORIES
 
 
-async def test_starred_pagination_with_exception(hass: HomeAssistant) -> None:
+async def test_starred_pagination_with_exception(hass: SmartHub) -> None:
     """Test pagination of starred repositories with exception."""
     with patch(
-        "homeassistant.components.github.config_flow.GitHubAPI",
+        "smarthub.components.github.config_flow.GitHubAPI",
         return_value=MagicMock(
             user=MagicMock(starred=AsyncMock(side_effect=GitHubException("Error")))
         ),
@@ -275,7 +275,7 @@ async def test_starred_pagination_with_exception(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: None,
 ) -> None:
@@ -284,7 +284,7 @@ async def test_options_flow(
     hass.config_entries.async_update_entry(
         mock_config_entry,
         options={
-            CONF_REPOSITORIES: ["homeassistant/core", "homeassistant/architecture"]
+            CONF_REPOSITORIES: ["smarthub/core", "smarthub/architecture"]
         },
     )
 
@@ -298,7 +298,7 @@ async def test_options_flow(
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input={CONF_REPOSITORIES: ["homeassistant/core"]},
+        user_input={CONF_REPOSITORIES: ["smarthub/core"]},
     )
 
-    assert "homeassistant/architecture" not in result["data"][CONF_REPOSITORIES]
+    assert "smarthub/architecture" not in result["data"][CONF_REPOSITORIES]

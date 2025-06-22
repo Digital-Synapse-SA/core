@@ -10,13 +10,13 @@ from wyoming.asr import Transcript
 from wyoming.info import Info, WakeModel, WakeProgram
 from wyoming.wake import Detection
 
-from homeassistant.components import wake_word
-from homeassistant.core import HomeAssistant
+from smarthub.components import wake_word
+from smarthub.core import SmartHub
 
 from . import TEST_ATTR, MockAsyncTcpClient
 
 
-async def test_support(hass: HomeAssistant, init_wyoming_wake_word) -> None:
+async def test_support(hass: SmartHub, init_wyoming_wake_word) -> None:
     """Test supported properties."""
     state = hass.states.get("wake_word.test_wake_word")
     assert state is not None
@@ -32,7 +32,7 @@ async def test_support(hass: HomeAssistant, init_wyoming_wake_word) -> None:
 
 
 async def test_streaming_audio(
-    hass: HomeAssistant, init_wyoming_wake_word, snapshot: SnapshotAssertion
+    hass: SmartHub, init_wyoming_wake_word, snapshot: SnapshotAssertion
 ) -> None:
     """Test streaming audio."""
     entity = wake_word.async_get_wake_word_detection_entity(
@@ -53,7 +53,7 @@ async def test_streaming_audio(
     ]
 
     with patch(
-        "homeassistant.components.wyoming.wake_word.AsyncTcpClient",
+        "smarthub.components.wyoming.wake_word.AsyncTcpClient",
         MockAsyncTcpClient(client_events),
     ):
         result = await entity.async_process_audio_stream(audio_stream(), None)
@@ -65,7 +65,7 @@ async def test_streaming_audio(
 
 
 async def test_streaming_audio_connection_lost(
-    hass: HomeAssistant, init_wyoming_wake_word
+    hass: SmartHub, init_wyoming_wake_word
 ) -> None:
     """Test streaming audio and losing connection."""
     entity = wake_word.async_get_wake_word_detection_entity(
@@ -79,7 +79,7 @@ async def test_streaming_audio_connection_lost(
         yield b"chunk", 1
 
     with patch(
-        "homeassistant.components.wyoming.wake_word.AsyncTcpClient",
+        "smarthub.components.wyoming.wake_word.AsyncTcpClient",
         MockAsyncTcpClient([None]),
     ):
         result = await entity.async_process_audio_stream(audio_stream(), None)
@@ -88,7 +88,7 @@ async def test_streaming_audio_connection_lost(
 
 
 async def test_streaming_audio_oserror(
-    hass: HomeAssistant, init_wyoming_wake_word
+    hass: SmartHub, init_wyoming_wake_word
 ) -> None:
     """Test streaming audio and error raising."""
     entity = wake_word.async_get_wake_word_detection_entity(
@@ -105,7 +105,7 @@ async def test_streaming_audio_oserror(
 
     with (
         patch(
-            "homeassistant.components.wyoming.wake_word.AsyncTcpClient",
+            "smarthub.components.wyoming.wake_word.AsyncTcpClient",
             mock_client,
         ),
         patch.object(mock_client, "read_event", side_effect=OSError("Boom!")),
@@ -116,7 +116,7 @@ async def test_streaming_audio_oserror(
 
 
 async def test_detect_message_with_wake_word(
-    hass: HomeAssistant, init_wyoming_wake_word
+    hass: SmartHub, init_wyoming_wake_word
 ) -> None:
     """Test that specifying a wake word id produces a Detect message with that id."""
     entity = wake_word.async_get_wake_word_detection_entity(
@@ -132,7 +132,7 @@ async def test_detect_message_with_wake_word(
     )
 
     with patch(
-        "homeassistant.components.wyoming.wake_word.AsyncTcpClient",
+        "smarthub.components.wyoming.wake_word.AsyncTcpClient",
         mock_client,
     ):
         result = await entity.async_process_audio_stream(audio_stream(), "my-wake-word")
@@ -142,7 +142,7 @@ async def test_detect_message_with_wake_word(
 
 
 async def test_detect_message_with_wrong_wake_word(
-    hass: HomeAssistant, init_wyoming_wake_word
+    hass: SmartHub, init_wyoming_wake_word
 ) -> None:
     """Test that specifying a wake word id filters invalid detections."""
     entity = wake_word.async_get_wake_word_detection_entity(
@@ -158,7 +158,7 @@ async def test_detect_message_with_wrong_wake_word(
     )
 
     with patch(
-        "homeassistant.components.wyoming.wake_word.AsyncTcpClient",
+        "smarthub.components.wyoming.wake_word.AsyncTcpClient",
         mock_client,
     ):
         result = await entity.async_process_audio_stream(audio_stream(), "my-wake-word")
@@ -167,7 +167,7 @@ async def test_detect_message_with_wrong_wake_word(
 
 
 async def test_dynamic_wake_word_info(
-    hass: HomeAssistant, init_wyoming_wake_word
+    hass: SmartHub, init_wyoming_wake_word
 ) -> None:
     """Test that supported wake words are loaded dynamically."""
     entity = wake_word.async_get_wake_word_detection_entity(
@@ -214,7 +214,7 @@ async def test_dynamic_wake_word_info(
 
     # Different Wyoming info will be fetched
     with patch(
-        "homeassistant.components.wyoming.wake_word.load_wyoming_info",
+        "smarthub.components.wyoming.wake_word.load_wyoming_info",
         return_value=new_info,
     ):
         assert (await entity.get_supported_wake_words()) == [

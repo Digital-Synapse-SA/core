@@ -2,8 +2,8 @@
 
 import pytest
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -15,7 +15,7 @@ def platforms() -> list[Platform]:
 
 
 async def test_binary_sensors(
-    hass: HomeAssistant, setup_entry: MockConfigEntry
+    hass: SmartHub, setup_entry: MockConfigEntry
 ) -> None:
     """Test binary sensors and check test values are correctly set."""
     assert len(hass.states.async_all("binary_sensor")) == 10

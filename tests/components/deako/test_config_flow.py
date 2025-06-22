@@ -4,16 +4,16 @@ from unittest.mock import MagicMock
 
 from pydeako.discover import DevicesNotFoundException
 
-from homeassistant.components.deako.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.deako.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     pydeako_discoverer_mock: MagicMock,
     mock_deako_setup: MagicMock,
 ) -> None:
@@ -35,7 +35,7 @@ async def test_found(
 
 
 async def test_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     pydeako_discoverer_mock: MagicMock,
     mock_deako_setup: MagicMock,
 ) -> None:
@@ -62,7 +62,7 @@ async def test_not_found(
 
 
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_deako_setup: MagicMock,
 ) -> None:

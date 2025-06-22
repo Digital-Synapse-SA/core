@@ -1,16 +1,16 @@
 """Tests for init methods."""
 
-from homeassistant.components.kulersky.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.kulersky.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 
 
 async def test_migrate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test migrate config entry from v1 to v2."""
 
@@ -46,7 +46,7 @@ async def test_migrate_entry(
 
 
 async def test_migrate_entry_no_devices_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test migrate config entry from v1 to v2."""
 

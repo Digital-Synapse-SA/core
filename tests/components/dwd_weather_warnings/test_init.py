@@ -2,18 +2,18 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.dwd_weather_warnings.const import (
+from smarthub.components.dwd_weather_warnings.const import (
     CONF_REGION_DEVICE_TRACKER,
     DOMAIN,
 )
-from homeassistant.components.dwd_weather_warnings.coordinator import (
+from smarthub.components.dwd_weather_warnings.coordinator import (
     DwdWeatherWarningsCoordinator,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE, STATE_HOME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.device_registry import DeviceEntryType
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_LATITUDE, ATTR_LONGITUDE, STATE_HOME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.device_registry import DeviceEntryType
 
 from . import init_integration
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_identifier_entry: MockConfigEntry,
     mock_dwdwfsapi: MagicMock,
 ) -> None:
@@ -38,7 +38,7 @@ async def test_load_unload_entry(
 
 
 async def test_removing_old_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_identifier_entry: MockConfigEntry,
     mock_dwdwfsapi: MagicMock,
     device_registry: dr.DeviceRegistry,
@@ -73,7 +73,7 @@ async def test_removing_old_device(
 
 
 async def test_load_invalid_registry_entry(
-    hass: HomeAssistant, mock_tracker_entry: MockConfigEntry
+    hass: SmartHub, mock_tracker_entry: MockConfigEntry
 ) -> None:
     """Test loading the integration with an invalid registry entry ID."""
     INVALID_DATA = mock_tracker_entry.data.copy()
@@ -86,7 +86,7 @@ async def test_load_invalid_registry_entry(
 
 
 async def test_load_missing_device_tracker(
-    hass: HomeAssistant, mock_tracker_entry: MockConfigEntry
+    hass: SmartHub, mock_tracker_entry: MockConfigEntry
 ) -> None:
     """Test loading the integration with a missing device tracker."""
     entry = await init_integration(hass, mock_tracker_entry)
@@ -94,7 +94,7 @@ async def test_load_missing_device_tracker(
 
 
 async def test_load_missing_required_attribute(
-    hass: HomeAssistant, mock_tracker_entry: MockConfigEntry
+    hass: SmartHub, mock_tracker_entry: MockConfigEntry
 ) -> None:
     """Test loading the integration with a device tracker missing a required attribute."""
     mock_tracker_entry.add_to_hass(hass)
@@ -110,7 +110,7 @@ async def test_load_missing_required_attribute(
 
 
 async def test_load_valid_device_tracker(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_tracker_entry: MockConfigEntry,
     mock_dwdwfsapi: MagicMock,

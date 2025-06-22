@@ -6,18 +6,18 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components.rest.const import DOMAIN
-from homeassistant.const import (
+from smarthub import config as hass_config
+from smarthub.components.rest.const import DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_PACKAGES,
     SERVICE_RELOAD,
     STATE_UNAVAILABLE,
     UnitOfInformation,
 )
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from tests.common import (
     assert_setup_component,
@@ -28,10 +28,10 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_setup_with_endpoint_timeout_with_recovery(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with an endpoint that times out that recovers."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     aioclient_mock.get("http://localhost", exc=TimeoutError())
     assert await async_setup_component(
@@ -127,7 +127,7 @@ async def test_setup_with_endpoint_timeout_with_recovery(
     )
 
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: ["sensor.sensor1"]},
         blocking=True,
@@ -139,12 +139,12 @@ async def test_setup_with_endpoint_timeout_with_recovery(
 
 
 async def test_setup_with_ssl_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test setup with an ssl error."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     aioclient_mock.get("https://localhost", exc=ssl.SSLError("ssl error"))
     assert await async_setup_component(
@@ -180,7 +180,7 @@ async def test_setup_with_ssl_error(
 
 
 async def test_setup_minimum_resource_template(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with minimum configuration (resource_template)."""
 
@@ -238,7 +238,7 @@ async def test_setup_minimum_resource_template(
     assert hass.states.get("binary_sensor.binary_sensor2").state == "off"
 
 
-async def test_reload(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_reload(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Verify we can reload."""
 
     aioclient_mock.get("http://localhost", text="")
@@ -287,7 +287,7 @@ async def test_reload(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) 
 
 
 async def test_reload_and_remove_all(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Verify we can reload and remove all."""
 
@@ -335,7 +335,7 @@ async def test_reload_and_remove_all(
 
 
 async def test_reload_fails_to_read_configuration(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Verify reload when configuration is missing or broken."""
 
@@ -380,7 +380,7 @@ async def test_reload_fails_to_read_configuration(
 
 
 async def test_multiple_rest_endpoints(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test multiple rest endpoints."""
 
@@ -455,7 +455,7 @@ async def test_multiple_rest_endpoints(
     assert hass.states.get("binary_sensor.binary_sensor").state == "on"
 
 
-async def test_empty_config(hass: HomeAssistant) -> None:
+async def test_empty_config(hass: SmartHub) -> None:
     """Test setup with empty configuration.
 
     For example (with rest.yaml an empty file):
@@ -469,7 +469,7 @@ async def test_empty_config(hass: HomeAssistant) -> None:
     assert_setup_component(0, DOMAIN)
 
 
-async def test_config_schema_via_packages(hass: HomeAssistant) -> None:
+async def test_config_schema_via_packages(hass: SmartHub) -> None:
     """Test configuration via packages."""
     packages = {
         "pack_dict": {"rest": {}},
@@ -486,7 +486,7 @@ async def test_config_schema_via_packages(hass: HomeAssistant) -> None:
 
 
 async def test_setup_minimum_payload_template(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with minimum configuration (payload_template)."""
 

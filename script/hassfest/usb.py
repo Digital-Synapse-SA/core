@@ -29,7 +29,7 @@ def generate_and_validate(integrations: dict[str, Integration]) -> str:
 
 def validate(integrations: dict[str, Integration], config: Config) -> None:
     """Validate usb file."""
-    usb_path = config.root / "homeassistant/generated/usb.py"
+    usb_path = config.root / "smarthub/generated/usb.py"
     config.cache["usb"] = content = generate_and_validate(integrations)
 
     if config.specific_integrations:
@@ -45,5 +45,5 @@ def validate(integrations: dict[str, Integration], config: Config) -> None:
 
 def generate(integrations: dict[str, Integration], config: Config) -> None:
     """Generate usb file."""
-    usb_path = config.root / "homeassistant/generated/usb.py"
+    usb_path = config.root / "smarthub/generated/usb.py"
     usb_path.write_text(f"{config.cache['usb']}")

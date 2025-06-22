@@ -5,9 +5,9 @@ from unittest.mock import patch
 from here_routing import HERERoutingError, HERERoutingUnauthorizedError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.here_travel_time.config_flow import DEFAULT_OPTIONS
-from homeassistant.components.here_travel_time.const import (
+from smarthub import config_entries
+from smarthub.components.here_travel_time.config_flow import DEFAULT_OPTIONS
+from smarthub.components.here_travel_time.const import (
     CONF_ARRIVAL_TIME,
     CONF_DEPARTURE_TIME,
     CONF_DESTINATION_ENTITY_ID,
@@ -23,9 +23,9 @@ from homeassistant.components.here_travel_time.const import (
     TRAVEL_MODE_CAR,
     TRAVEL_MODE_PUBLIC,
 )
-from homeassistant.const import CONF_API_KEY, CONF_MODE, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_API_KEY, CONF_MODE, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import (
     API_KEY,
@@ -43,7 +43,7 @@ from tests.common import MockConfigEntry
 def bypass_setup_fixture():
     """Prevent setup."""
     with patch(
-        "homeassistant.components.here_travel_time.async_setup_entry",
+        "smarthub.components.here_travel_time.async_setup_entry",
         return_value=True,
     ):
         yield
@@ -51,7 +51,7 @@ def bypass_setup_fixture():
 
 @pytest.fixture(name="user_step_result")
 async def user_step_result_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> config_entries.ConfigFlowResult:
     """Provide the result of a completed user step."""
     init_result = await hass.config_entries.flow.async_init(
@@ -71,7 +71,7 @@ async def user_step_result_fixture(
 
 @pytest.fixture(name="option_init_result")
 async def option_init_result_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> config_entries.ConfigFlowResult:
     """Provide the result of a completed options init step."""
     entry = MockConfigEntry(
@@ -101,7 +101,7 @@ async def option_init_result_fixture(
 
 @pytest.fixture(name="origin_step_result")
 async def origin_step_result_fixture(
-    hass: HomeAssistant, user_step_result: config_entries.ConfigFlowResult
+    hass: SmartHub, user_step_result: config_entries.ConfigFlowResult
 ) -> config_entries.ConfigFlowResult:
     """Provide the result of a completed origin by coordinates step."""
     origin_menu_result = await hass.config_entries.flow.async_configure(
@@ -125,7 +125,7 @@ async def origin_step_result_fixture(
     [["origin_coordinates", "origin_entity"]],
 )
 @pytest.mark.usefixtures("valid_response")
-async def test_step_user(hass: HomeAssistant, menu_options) -> None:
+async def test_step_user(hass: SmartHub, menu_options) -> None:
     """Test the user step."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -149,7 +149,7 @@ async def test_step_user(hass: HomeAssistant, menu_options) -> None:
 
 @pytest.mark.usefixtures("valid_response")
 async def test_step_origin_coordinates(
-    hass: HomeAssistant, user_step_result: config_entries.ConfigFlowResult
+    hass: SmartHub, user_step_result: config_entries.ConfigFlowResult
 ) -> None:
     """Test the origin coordinates step."""
     menu_result = await hass.config_entries.flow.async_configure(
@@ -172,7 +172,7 @@ async def test_step_origin_coordinates(
 
 @pytest.mark.usefixtures("valid_response")
 async def test_step_origin_entity(
-    hass: HomeAssistant, user_step_result: config_entries.ConfigFlowResult
+    hass: SmartHub, user_step_result: config_entries.ConfigFlowResult
 ) -> None:
     """Test the origin coordinates step."""
     menu_result = await hass.config_entries.flow.async_configure(
@@ -189,7 +189,7 @@ async def test_step_origin_entity(
 
 @pytest.mark.usefixtures("valid_response")
 async def test_step_destination_coordinates(
-    hass: HomeAssistant, origin_step_result: config_entries.ConfigFlowResult
+    hass: SmartHub, origin_step_result: config_entries.ConfigFlowResult
 ) -> None:
     """Test the origin coordinates step."""
     menu_result = await hass.config_entries.flow.async_configure(
@@ -222,7 +222,7 @@ async def test_step_destination_coordinates(
 
 @pytest.mark.usefixtures("valid_response")
 async def test_step_destination_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     origin_step_result: config_entries.ConfigFlowResult,
 ) -> None:
     """Test the origin coordinates step."""
@@ -253,7 +253,7 @@ async def test_step_destination_entity(
 
 
 @pytest.mark.usefixtures("valid_response")
-async def test_reconfigure_destination_entity(hass: HomeAssistant) -> None:
+async def test_reconfigure_destination_entity(hass: SmartHub) -> None:
     """Test reconfigure flow when choosing a destination entity."""
     origin_entity_selector_result = await do_common_reconfiguration_steps(hass)
     menu_result = await hass.config_entries.flow.async_configure(
@@ -278,7 +278,7 @@ async def test_reconfigure_destination_entity(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("valid_response")
-async def test_reconfigure_destination_coordinates(hass: HomeAssistant) -> None:
+async def test_reconfigure_destination_coordinates(hass: SmartHub) -> None:
     """Test reconfigure flow when choosing destination coordinates."""
     origin_entity_selector_result = await do_common_reconfiguration_steps(hass)
     menu_result = await hass.config_entries.flow.async_configure(
@@ -310,7 +310,7 @@ async def test_reconfigure_destination_coordinates(hass: HomeAssistant) -> None:
     }
 
 
-async def do_common_reconfiguration_steps(hass: HomeAssistant) -> None:
+async def do_common_reconfiguration_steps(hass: SmartHub) -> None:
     """Walk through common flow steps for reconfiguring."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -345,7 +345,7 @@ async def do_common_reconfiguration_steps(hass: HomeAssistant) -> None:
     )
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -368,7 +368,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_unknown_error(hass: HomeAssistant) -> None:
+async def test_form_unknown_error(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -392,7 +392,7 @@ async def test_form_unknown_error(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("valid_response")
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test the options flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -422,7 +422,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("valid_response")
 async def test_options_flow_arrival_time_step(
-    hass: HomeAssistant, option_init_result: config_entries.ConfigFlowResult
+    hass: SmartHub, option_init_result: config_entries.ConfigFlowResult
 ) -> None:
     """Test the options flow arrival time type."""
     menu_result = await hass.config_entries.options.async_configure(
@@ -446,7 +446,7 @@ async def test_options_flow_arrival_time_step(
 
 @pytest.mark.usefixtures("valid_response")
 async def test_options_flow_departure_time_step(
-    hass: HomeAssistant, option_init_result: config_entries.ConfigFlowResult
+    hass: SmartHub, option_init_result: config_entries.ConfigFlowResult
 ) -> None:
     """Test the options flow departure time type."""
     menu_result = await hass.config_entries.options.async_configure(
@@ -470,7 +470,7 @@ async def test_options_flow_departure_time_step(
 
 @pytest.mark.usefixtures("valid_response")
 async def test_options_flow_no_time_step(
-    hass: HomeAssistant, option_init_result: config_entries.ConfigFlowResult
+    hass: SmartHub, option_init_result: config_entries.ConfigFlowResult
 ) -> None:
     """Test the options flow arrival time type."""
     menu_result = await hass.config_entries.options.async_configure(

@@ -5,22 +5,22 @@ from unittest.mock import AsyncMock, MagicMock
 from pylitterbot import LitterRobot4
 import pytest
 
-from homeassistant.components.update import (
+from smarthub.components.update import (
     ATTR_INSTALLED_VERSION,
     ATTR_LATEST_VERSION,
     DOMAIN as PLATFORM_DOMAIN,
     SERVICE_INSTALL,
     UpdateDeviceClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     STATE_OFF,
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import setup_integration
 
@@ -30,7 +30,7 @@ NEW_FIRMWARE = "ESP: 1.1.51 / PIC: 10512.2560.2.53 / TOF: 4.0.65.4"
 
 
 async def test_robot_with_no_update(
-    hass: HomeAssistant, mock_account_with_litterrobot_4: MagicMock
+    hass: SmartHub, mock_account_with_litterrobot_4: MagicMock
 ) -> None:
     """Tests the update entity was set up."""
     robot: LitterRobot4 = mock_account_with_litterrobot_4.robots[0]
@@ -53,7 +53,7 @@ async def test_robot_with_no_update(
 
 
 async def test_robot_with_update(
-    hass: HomeAssistant, mock_account_with_litterrobot_4: MagicMock
+    hass: SmartHub, mock_account_with_litterrobot_4: MagicMock
 ) -> None:
     """Tests the update entity was set up."""
     robot: LitterRobot4 = mock_account_with_litterrobot_4.robots[0]
@@ -71,7 +71,7 @@ async def test_robot_with_update(
 
     robot.update_firmware = AsyncMock(return_value=False)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             PLATFORM_DOMAIN,
             SERVICE_INSTALL,
@@ -90,7 +90,7 @@ async def test_robot_with_update(
 
 
 async def test_robot_with_update_already_in_progress(
-    hass: HomeAssistant, mock_account_with_litterrobot_4: MagicMock
+    hass: SmartHub, mock_account_with_litterrobot_4: MagicMock
 ) -> None:
     """Tests the update entity was set up."""
     robot: LitterRobot4 = mock_account_with_litterrobot_4.robots[0]

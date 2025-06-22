@@ -6,11 +6,11 @@ import aiohttp
 import pytest
 from sharkiq import AylaApi, SharkIqAuthError, SharkIqError
 
-from homeassistant import config_entries
-from homeassistant.components.sharkiq.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components.sharkiq.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from .const import (
     CONFIG,
@@ -24,7 +24,7 @@ from .const import (
 from tests.common import MockConfigEntry
 
 
-async def test_setup_success_no_region(hass: HomeAssistant) -> None:
+async def test_setup_success_no_region(hass: SmartHub) -> None:
     """Test reauth flow."""
     mock_config = MockConfigEntry(
         domain=DOMAIN, unique_id=UNIQUE_ID, data=CONFIG_NO_REGION
@@ -36,7 +36,7 @@ async def test_setup_success_no_region(hass: HomeAssistant) -> None:
     assert result is True
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -48,7 +48,7 @@ async def test_form(hass: HomeAssistant) -> None:
     with (
         patch("sharkiq.AylaApi.async_sign_in", return_value=True),
         patch(
-            "homeassistant.components.sharkiq.async_setup_entry",
+            "smarthub.components.sharkiq.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -78,7 +78,7 @@ async def test_form(hass: HomeAssistant) -> None:
         (SharkIqError, "unknown"),
     ],
 )
-async def test_form_error(hass: HomeAssistant, exc: Exception, base_error: str) -> None:
+async def test_form_error(hass: SmartHub, exc: Exception, base_error: str) -> None:
     """Test form errors."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -94,7 +94,7 @@ async def test_form_error(hass: HomeAssistant, exc: Exception, base_error: str) 
     assert result2["errors"].get("base") == base_error
 
 
-async def test_reauth_success(hass: HomeAssistant) -> None:
+async def test_reauth_success(hass: SmartHub) -> None:
     """Test reauth flow."""
     mock_config = MockConfigEntry(domain=DOMAIN, unique_id=UNIQUE_ID, data=CONFIG)
     mock_config.add_to_hass(hass)
@@ -120,7 +120,7 @@ async def test_reauth_success(hass: HomeAssistant) -> None:
     ],
 )
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: Exception,
     result_type: str,
     msg_field: str,

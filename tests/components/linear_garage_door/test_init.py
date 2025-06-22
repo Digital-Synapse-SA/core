@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock
 from linear_garage_door import InvalidLoginError
 import pytest
 
-from homeassistant.components.linear_garage_door.const import DOMAIN
-from homeassistant.config_entries import (
+from smarthub.components.linear_garage_door.const import DOMAIN
+from smarthub.config_entries import (
     SOURCE_IGNORE,
     ConfigEntryDisabler,
     ConfigEntryState,
 )
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
 
 from . import setup_integration
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test the unload entry."""
 
@@ -46,7 +46,7 @@ async def test_unload_entry(
     ],
 )
 async def test_setup_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_linear: AsyncMock,
     mock_config_entry: MockConfigEntry,
     side_effect: Exception,
@@ -61,7 +61,7 @@ async def test_setup_failure(
 
 
 async def test_repair_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_linear: AsyncMock,
     issue_registry: ir.IssueRegistry,
 ) -> None:

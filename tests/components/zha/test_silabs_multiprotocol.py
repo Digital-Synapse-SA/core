@@ -9,10 +9,10 @@ import pytest
 import zigpy.backups
 import zigpy.state
 
-from homeassistant.components import zha
-from homeassistant.components.zha import silabs_multiprotocol
-from homeassistant.components.zha.helpers import get_zha_data
-from homeassistant.core import HomeAssistant
+from smarthub.components import zha
+from smarthub.components.zha import silabs_multiprotocol
+from smarthub.components.zha.helpers import get_zha_data
+from smarthub.core import SmartHub
 
 if TYPE_CHECKING:
     from zigpy.application import ControllerApplication
@@ -21,11 +21,11 @@ if TYPE_CHECKING:
 @pytest.fixture(autouse=True)
 def required_platform_only():
     """Only set up the required and required base platforms to speed up tests."""
-    with patch("homeassistant.components.zha.PLATFORMS", ()):
+    with patch("smarthub.components.zha.PLATFORMS", ()):
         yield
 
 
-async def test_async_get_channel_active(hass: HomeAssistant, setup_zha) -> None:
+async def test_async_get_channel_active(hass: SmartHub, setup_zha) -> None:
     """Test reading channel with an active ZHA installation."""
     await setup_zha()
 
@@ -33,7 +33,7 @@ async def test_async_get_channel_active(hass: HomeAssistant, setup_zha) -> None:
 
 
 async def test_async_get_channel_missing(
-    hass: HomeAssistant, setup_zha, zigpy_app_controller: ControllerApplication
+    hass: SmartHub, setup_zha, zigpy_app_controller: ControllerApplication
 ) -> None:
     """Test reading channel with an inactive ZHA installation, no valid channel."""
     await setup_zha()
@@ -47,25 +47,25 @@ async def test_async_get_channel_missing(
     assert await silabs_multiprotocol.async_get_channel(hass) is None
 
 
-async def test_async_get_channel_no_zha(hass: HomeAssistant) -> None:
+async def test_async_get_channel_no_zha(hass: SmartHub) -> None:
     """Test reading channel with no ZHA config entries and no database."""
     assert await silabs_multiprotocol.async_get_channel(hass) is None
 
 
-async def test_async_using_multipan_active(hass: HomeAssistant, setup_zha) -> None:
+async def test_async_using_multipan_active(hass: SmartHub, setup_zha) -> None:
     """Test async_using_multipan with an active ZHA installation."""
     await setup_zha()
 
     assert await silabs_multiprotocol.async_using_multipan(hass) is False
 
 
-async def test_async_using_multipan_no_zha(hass: HomeAssistant) -> None:
+async def test_async_using_multipan_no_zha(hass: SmartHub) -> None:
     """Test async_using_multipan with no ZHA config entries and no database."""
     assert await silabs_multiprotocol.async_using_multipan(hass) is False
 
 
 async def test_change_channel(
-    hass: HomeAssistant, setup_zha, zigpy_app_controller: ControllerApplication
+    hass: SmartHub, setup_zha, zigpy_app_controller: ControllerApplication
 ) -> None:
     """Test changing the channel."""
     await setup_zha()
@@ -77,7 +77,7 @@ async def test_change_channel(
 
 
 async def test_change_channel_no_zha(
-    hass: HomeAssistant, zigpy_app_controller: ControllerApplication
+    hass: SmartHub, zigpy_app_controller: ControllerApplication
 ) -> None:
     """Test changing the channel with no ZHA config entries and no database."""
     task = await silabs_multiprotocol.async_change_channel(hass, 20)
@@ -88,7 +88,7 @@ async def test_change_channel_no_zha(
 
 @pytest.mark.parametrize(("delay", "sleep"), [(0, 0), (5, 0), (15, 15 - 10.27)])
 async def test_change_channel_delay(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_zha,
     zigpy_app_controller: ControllerApplication,
     delay: float,
@@ -98,7 +98,7 @@ async def test_change_channel_delay(
     await setup_zha()
 
     with patch(
-        "homeassistant.components.zha.silabs_multiprotocol.asyncio.sleep", autospec=True
+        "smarthub.components.zha.silabs_multiprotocol.asyncio.sleep", autospec=True
     ) as mock_sleep:
         task = await silabs_multiprotocol.async_change_channel(hass, 20, delay=delay)
         await task

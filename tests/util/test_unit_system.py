@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from homeassistant.components.sensor import DEVICE_CLASS_UNITS, SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.sensor import DEVICE_CLASS_UNITS, SensorDeviceClass
+from smarthub.const import (
     ACCUMULATED_PRECIPITATION,
     AREA,
     LENGTH,
@@ -24,10 +24,10 @@ from homeassistant.const import (
     UnitOfVolume,
     UnitOfVolumetricFlux,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util.unit_system import (  # pylint: disable=hass-deprecated-import
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.exceptions import SmartHubError
+from smarthub.util.unit_system import (  # pylint: disable=hass-deprecated-import
     _CONF_UNIT_SYSTEM_IMPERIAL,
     _CONF_UNIT_SYSTEM_METRIC,
     _CONF_UNIT_SYSTEM_US_CUSTOMARY,
@@ -198,7 +198,7 @@ def test_temperature_same_unit() -> None:
 
 def test_temperature_unknown_unit() -> None:
     """Test no conversion happens if unknown unit."""
-    with pytest.raises(HomeAssistantError, match="is not a recognized .* unit"):
+    with pytest.raises(SmartHubError, match="is not a recognized .* unit"):
         METRIC_SYSTEM.temperature(5, "abc")
 
 
@@ -219,7 +219,7 @@ def test_temperature_to_imperial() -> None:
 
 def test_length_unknown_unit() -> None:
     """Test length conversion with unknown from unit."""
-    with pytest.raises(HomeAssistantError, match="is not a recognized .* unit"):
+    with pytest.raises(SmartHubError, match="is not a recognized .* unit"):
         METRIC_SYSTEM.length(5, "fr")
 
 
@@ -241,7 +241,7 @@ def test_length_to_imperial() -> None:
 
 def test_wind_speed_unknown_unit() -> None:
     """Test wind_speed conversion with unknown from unit."""
-    with pytest.raises(HomeAssistantError, match="is not a recognized .* unit"):
+    with pytest.raises(SmartHubError, match="is not a recognized .* unit"):
         METRIC_SYSTEM.length(5, "turtles")
 
 
@@ -269,7 +269,7 @@ def test_pressure_same_unit() -> None:
 
 def test_pressure_unknown_unit() -> None:
     """Test no conversion happens if unknown unit."""
-    with pytest.raises(HomeAssistantError, match="is not a recognized .* unit"):
+    with pytest.raises(SmartHubError, match="is not a recognized .* unit"):
         METRIC_SYSTEM.pressure(5, "K")
 
 
@@ -301,7 +301,7 @@ def test_accumulated_precipitation_same_unit() -> None:
 
 def test_accumulated_precipitation_unknown_unit() -> None:
     """Test no conversion happens if unknown unit."""
-    with pytest.raises(HomeAssistantError, match="is not a recognized .* unit"):
+    with pytest.raises(SmartHubError, match="is not a recognized .* unit"):
         METRIC_SYSTEM.accumulated_precipitation(5, "K")
 
 
@@ -338,7 +338,7 @@ def test_area_same_unit() -> None:
 
 def test_area_unknown_unit() -> None:
     """Test no conversion happens if unknown unit."""
-    with pytest.raises(HomeAssistantError, match="is not a recognized .* unit"):
+    with pytest.raises(SmartHubError, match="is not a recognized .* unit"):
         METRIC_SYSTEM.area(5, "abc")
 
 
@@ -887,7 +887,7 @@ def test_imperial_converted_units(device_class: SensorDeviceClass) -> None:
 
 
 async def test_imperial_deprecated_log_warning(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test deprecated imperial unit system logs warning."""
     await async_process_ha_core_config(

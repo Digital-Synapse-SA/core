@@ -4,23 +4,23 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.const import STATE_OFF, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import STATE_OFF, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(autouse=True)
 def setup_binary_sensor_platform_only():
     """Only setup sensor platform."""
     with patch(
-        "homeassistant.components.prusalink.PLATFORMS", [Platform.BINARY_SENSOR]
+        "smarthub.components.prusalink.PLATFORMS", [Platform.BINARY_SENSOR]
     ):
         yield
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensors_no_job(
-    hass: HomeAssistant, mock_config_entry, mock_api
+    hass: SmartHub, mock_config_entry, mock_api
 ) -> None:
     """Test sensors while no job active."""
     assert await async_setup_component(hass, "prusalink", {})

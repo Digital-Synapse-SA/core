@@ -6,9 +6,9 @@ from aiohomekit.model import Accessory
 from aiohomekit.model.characteristics import CharacteristicsTypes
 from aiohomekit.model.services import ServicesTypes
 
-from homeassistant.components.alarm_control_panel import ATTR_CODE_ARM_REQUIRED
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.alarm_control_panel import ATTR_CODE_ARM_REQUIRED
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_test_component
 
@@ -32,7 +32,7 @@ def create_security_system_service(accessory: Accessory) -> None:
 
 
 async def test_switch_change_alarm_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a HomeKit alarm on and off again."""
     helper = await setup_test_component(
@@ -93,7 +93,7 @@ async def test_switch_change_alarm_state(
 
 
 async def test_switch_read_alarm_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit alarm accessory."""
     helper = await setup_test_component(
@@ -139,7 +139,7 @@ async def test_switch_read_alarm_state(
 
 
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:

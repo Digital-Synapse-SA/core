@@ -6,7 +6,7 @@ from aioswitcher.api.messages import SwitcherBaseResponse
 from aioswitcher.device import ShutterDirection
 import pytest
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
     DOMAIN as COVER_DOMAIN,
@@ -16,10 +16,10 @@ from homeassistant.components.cover import (
     SERVICE_STOP_COVER,
     CoverState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util import slugify
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.util import slugify
 
 from . import init_integration
 from .consts import (
@@ -92,7 +92,7 @@ ENTITY_ID3_2 = f"{COVER_DOMAIN}.{slugify(DEVICE3.name)}_cover_2"
 )
 @pytest.mark.parametrize("mock_bridge", [[DEVICE, DEVICE2, DEVICE3]], indirect=True)
 async def test_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge,
     mock_api,
     monkeypatch: pytest.MonkeyPatch,
@@ -115,7 +115,7 @@ async def test_cover(
 
     # Test set position
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_position"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_position"
     ) as mock_control_device:
         await hass.services.async_call(
             COVER_DOMAIN,
@@ -136,7 +136,7 @@ async def test_cover(
 
     # Test open
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_position"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_position"
     ) as mock_control_device:
         await hass.services.async_call(
             COVER_DOMAIN,
@@ -156,7 +156,7 @@ async def test_cover(
 
     # Test close
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_position"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_position"
     ) as mock_control_device:
         await hass.services.async_call(
             COVER_DOMAIN,
@@ -176,7 +176,7 @@ async def test_cover(
 
     # Test stop
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.stop_shutter"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.stop_shutter"
     ) as mock_control_device:
         await hass.services.async_call(
             COVER_DOMAIN,
@@ -215,7 +215,7 @@ async def test_cover(
 )
 @pytest.mark.parametrize("mock_bridge", [[DEVICE, DEVICE2, DEVICE3]], indirect=True)
 async def test_cover_control_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge,
     mock_api,
     device,
@@ -232,10 +232,10 @@ async def test_cover_control_fail(
 
     # Test exception during set position
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_position",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_position",
         side_effect=RuntimeError("fake error"),
     ) as mock_control_device:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 COVER_DOMAIN,
                 SERVICE_SET_COVER_POSITION,
@@ -257,10 +257,10 @@ async def test_cover_control_fail(
 
     # Test error response during set position
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_position",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_position",
         return_value=SwitcherBaseResponse(None),
     ) as mock_control_device:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 COVER_DOMAIN,
                 SERVICE_SET_COVER_POSITION,
@@ -276,7 +276,7 @@ async def test_cover_control_fail(
 
 @pytest.mark.parametrize("mock_bridge", [[DEVICE2, DEVICE3]], indirect=True)
 async def test_cover2_no_token(
-    hass: HomeAssistant, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test cover with token needed without token specified."""
     await init_integration(hass)

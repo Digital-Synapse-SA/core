@@ -5,10 +5,10 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, setup_platform
 from .const import COMMAND_OK
@@ -16,7 +16,7 @@ from .const import COMMAND_OK
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -37,7 +37,7 @@ async def test_button(
         ("homelink", "trigger_homelink"),
     ],
 )
-async def test_press(hass: HomeAssistant, name: str, func: str) -> None:
+async def test_press(hass: SmartHub, name: str, func: str) -> None:
     """Test pressing the API buttons."""
     await setup_platform(hass, [Platform.BUTTON])
 

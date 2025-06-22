@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.todo import (
+from smarthub.components.todo import (
     ATTR_DESCRIPTION,
     ATTR_DUE_DATE,
     ATTR_DUE_DATETIME,
@@ -17,8 +17,8 @@ from homeassistant.components.todo import (
     DOMAIN as TODO_DOMAIN,
     TodoServices,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import TEST_ENTITY
 
@@ -71,7 +71,7 @@ async def ws_move_item(
 
 
 @pytest.fixture(autouse=True)
-async def set_time_zone(hass: HomeAssistant) -> None:
+async def set_time_zone(hass: SmartHub) -> None:
     """Set the time zone for the tests that keesp UTC-6 all year round."""
     await hass.config.async_set_time_zone("America/Regina")
 
@@ -100,7 +100,7 @@ EXPECTED_ADD_ITEM = {
     ],
 )
 async def test_add_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_integration: None,
     ws_get_items: Callable[[], Awaitable[dict[str, str]]],
@@ -146,7 +146,7 @@ async def test_add_item(
     ],
 )
 async def test_remove_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ws_get_items: Callable[[], Awaitable[dict[str, str]]],
     item_data: dict[str, Any],
@@ -190,7 +190,7 @@ async def test_remove_item(
 
 
 async def test_bulk_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ws_get_items: Callable[[], Awaitable[dict[str, str]]],
 ) -> None:
@@ -260,7 +260,7 @@ EXPECTED_UPDATE_ITEM = {
     ],
 )
 async def test_update_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ws_get_items: Callable[[], Awaitable[dict[str, str]]],
     item_data: dict[str, Any],
@@ -384,7 +384,7 @@ async def test_update_item(
     ],
 )
 async def test_update_existing_field(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ws_get_items: Callable[[], Awaitable[dict[str, str]]],
     item_data: dict[str, Any],
@@ -433,7 +433,7 @@ async def test_update_existing_field(
 
 
 async def test_rename(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ws_get_items: Callable[[], Awaitable[dict[str, str]]],
 ) -> None:
@@ -507,7 +507,7 @@ async def test_rename(
     ],
 )
 async def test_move_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ws_get_items: Callable[[], Awaitable[dict[str, str]]],
     ws_move_item: Callable[[str, str | None], Awaitable[None]],
@@ -544,7 +544,7 @@ async def test_move_item(
 
 
 async def test_move_item_unknown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -568,7 +568,7 @@ async def test_move_item_unknown(
 
 
 async def test_move_item_previous_unknown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_ws_client: WebSocketGenerator,
     ws_get_items: Callable[[], Awaitable[dict[str, str]]],
@@ -611,7 +611,7 @@ async def test_move_item_previous_unknown(
             textwrap.dedent(
                 """\
                     BEGIN:VCALENDAR
-                    PRODID:-//homeassistant.io//local_todo 1.0//EN
+                    PRODID:-//smarthub.io//local_todo 1.0//EN
                     VERSION:2.0
                     BEGIN:VTODO
                     DTSTAMP:20231024T014011
@@ -631,7 +631,7 @@ async def test_move_item_previous_unknown(
             textwrap.dedent(
                 """\
                     BEGIN:VCALENDAR
-                    PRODID:-//homeassistant.io//local_todo 1.0//EN
+                    PRODID:-//smarthub.io//local_todo 1.0//EN
                     VERSION:2.0
                     BEGIN:VTODO
                     DTSTAMP:20231024T014011
@@ -651,7 +651,7 @@ async def test_move_item_previous_unknown(
             textwrap.dedent(
                 """\
                     BEGIN:VCALENDAR
-                    PRODID:-//homeassistant.io//local_todo 1.0//EN
+                    PRODID:-//smarthub.io//local_todo 1.0//EN
                     VERSION:2.0
                     BEGIN:VTODO
                     DTSTAMP:20231024T014011
@@ -672,7 +672,7 @@ async def test_move_item_previous_unknown(
             textwrap.dedent(
                 """\
                     BEGIN:VCALENDAR
-                    PRODID:-//homeassistant.io//local_todo 2.0//EN
+                    PRODID:-//smarthub.io//local_todo 2.0//EN
                     VERSION:2.0
                     BEGIN:VTODO
                     DTSTAMP:20231024T014011
@@ -693,7 +693,7 @@ async def test_move_item_previous_unknown(
             textwrap.dedent(
                 """\
                     BEGIN:VCALENDAR
-                    PRODID:-//homeassistant.io//local_todo 2.0//EN
+                    PRODID:-//smarthub.io//local_todo 2.0//EN
                     VERSION:2.0
                     BEGIN:VTODO
                     DTSTAMP:20231024T014011
@@ -723,7 +723,7 @@ async def test_move_item_previous_unknown(
     ),
 )
 async def test_parse_existing_ics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_integration: None,
     ws_get_items: Callable[[], Awaitable[dict[str, str]]],
@@ -741,7 +741,7 @@ async def test_parse_existing_ics(
 
 
 async def test_susbcribe(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_ws_client: WebSocketGenerator,
 ) -> None:

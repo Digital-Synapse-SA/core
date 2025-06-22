@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock, MagicMock
 from pyecotrend_ista import LoginError, ServerError
 import pytest
 
-from homeassistant.components.ista_ecotrend.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.ista_ecotrend.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_ista")
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -50,7 +50,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     ],
 )
 async def test_form_error_and_recover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_ista: MagicMock,
     side_effect: Exception,
@@ -93,7 +93,7 @@ async def test_form_error_and_recover(
 
 @pytest.mark.usefixtures("mock_ista")
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
 ) -> None:
     """Test reauth flow."""
@@ -132,7 +132,7 @@ async def test_reauth(
     ],
 )
 async def test_reauth_error_and_recover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
     mock_ista: MagicMock,
     side_effect: Exception,
@@ -180,7 +180,7 @@ async def test_reauth_error_and_recover(
 
 @pytest.mark.usefixtures("mock_ista")
 async def test_form_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort form login when entry is already configured."""
@@ -207,7 +207,7 @@ async def test_form_already_configured(
 
 
 @pytest.mark.usefixtures("mock_ista")
-async def test_flow_reauth_unique_id_mismatch(hass: HomeAssistant) -> None:
+async def test_flow_reauth_unique_id_mismatch(hass: SmartHub) -> None:
     """Test reauth flow unique id mismatch."""
 
     config_entry = MockConfigEntry(
@@ -242,7 +242,7 @@ async def test_flow_reauth_unique_id_mismatch(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_ista")
 async def test_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
 ) -> None:
     """Test reconfigure flow."""
@@ -281,7 +281,7 @@ async def test_reconfigure(
     ],
 )
 async def test_reconfigure_error_and_recover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
     mock_ista: MagicMock,
     side_effect: Exception,
@@ -328,7 +328,7 @@ async def test_reconfigure_error_and_recover(
 
 
 @pytest.mark.usefixtures("mock_ista")
-async def test_flow_reconfigure_unique_id_mismatch(hass: HomeAssistant) -> None:
+async def test_flow_reconfigure_unique_id_mismatch(hass: SmartHub) -> None:
     """Test reconfigure flow unique id mismatch."""
 
     config_entry = MockConfigEntry(

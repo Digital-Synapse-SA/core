@@ -7,16 +7,16 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.accuweather.const import UPDATE_INTERVAL_DAILY_FORECAST
-from homeassistant.components.weather import (
+from smarthub.components.accuweather.const import UPDATE_INTERVAL_DAILY_FORECAST
+from smarthub.components.weather import (
     ATTR_FORECAST_CONDITION,
     DOMAIN as WEATHER_DOMAIN,
     SERVICE_GET_FORECASTS,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import init_integration
 
@@ -25,19 +25,19 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_weather(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_accuweather_client: AsyncMock,
 ) -> None:
     """Test states of the weather without forecast."""
-    with patch("homeassistant.components.accuweather.PLATFORMS", [Platform.WEATHER]):
+    with patch("smarthub.components.accuweather.PLATFORMS", [Platform.WEATHER]):
         entry = await init_integration(hass)
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_accuweather_client: AsyncMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -73,17 +73,17 @@ async def test_availability(
 
 
 async def test_manual_update_entity(
-    hass: HomeAssistant, mock_accuweather_client: AsyncMock
+    hass: SmartHub, mock_accuweather_client: AsyncMock
 ) -> None:
-    """Test manual update entity via service homeassistant/update_entity."""
+    """Test manual update entity via service smarthub/update_entity."""
     await init_integration(hass)
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     assert mock_accuweather_client.async_get_current_conditions.call_count == 1
 
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: ["weather.home"]},
         blocking=True,
@@ -93,7 +93,7 @@ async def test_manual_update_entity(
 
 
 async def test_unsupported_condition_icon_data(
-    hass: HomeAssistant, mock_accuweather_client: AsyncMock
+    hass: SmartHub, mock_accuweather_client: AsyncMock
 ) -> None:
     """Test with unsupported condition icon data."""
     mock_accuweather_client.async_get_current_conditions.return_value["WeatherIcon"] = (
@@ -111,7 +111,7 @@ async def test_unsupported_condition_icon_data(
     [SERVICE_GET_FORECASTS],
 )
 async def test_forecast_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_accuweather_client: AsyncMock,
     service: str,
@@ -133,7 +133,7 @@ async def test_forecast_service(
 
 
 async def test_forecast_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,

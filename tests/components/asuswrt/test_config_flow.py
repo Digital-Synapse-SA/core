@@ -6,7 +6,7 @@ from unittest.mock import patch
 from pyasuswrt import AsusWrtError
 import pytest
 
-from homeassistant.components.asuswrt.const import (
+from smarthub.components.asuswrt.const import (
     CONF_DNSMASQ,
     CONF_INTERFACE,
     CONF_REQUIRE_IP,
@@ -19,9 +19,9 @@ from homeassistant.components.asuswrt.const import (
     PROTOCOL_SSH,
     PROTOCOL_TELNET,
 )
-from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.device_tracker import CONF_CONSIDER_HOME
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_BASE,
     CONF_HOST,
     CONF_MODE,
@@ -30,8 +30,8 @@ from homeassistant.const import (
     CONF_PROTOCOL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .common import ASUSWRT_BASE, HOST, ROUTER_MAC_ADDR
 
@@ -84,7 +84,7 @@ def mock_controller_patch_is_file():
 
 @pytest.mark.parametrize("unique_id", [{}, {"label_mac": ROUTER_MAC_ADDR}])
 async def test_user_legacy(
-    hass: HomeAssistant, connect_legacy, patch_setup_entry, unique_id
+    hass: SmartHub, connect_legacy, patch_setup_entry, unique_id
 ) -> None:
     """Test user config."""
     flow_result = await hass.config_entries.flow.async_init(
@@ -119,7 +119,7 @@ async def test_user_legacy(
 
 @pytest.mark.parametrize("unique_id", [None, ROUTER_MAC_ADDR])
 async def test_user_http(
-    hass: HomeAssistant, connect_http, patch_setup_entry, unique_id
+    hass: SmartHub, connect_http, patch_setup_entry, unique_id
 ) -> None:
     """Test user config http."""
     flow_result = await hass.config_entries.flow.async_init(
@@ -144,7 +144,7 @@ async def test_user_http(
 
 
 @pytest.mark.parametrize("config", [CONFIG_DATA_TELNET, CONFIG_DATA_HTTP])
-async def test_error_pwd_required(hass: HomeAssistant, config) -> None:
+async def test_error_pwd_required(hass: SmartHub, config) -> None:
     """Test we abort for missing password."""
     config_data = {k: v for k, v in config.items() if k != CONF_PASSWORD}
     result = await hass.config_entries.flow.async_init(
@@ -157,7 +157,7 @@ async def test_error_pwd_required(hass: HomeAssistant, config) -> None:
     assert result["errors"] == {CONF_BASE: "pwd_required"}
 
 
-async def test_error_no_password_ssh(hass: HomeAssistant) -> None:
+async def test_error_no_password_ssh(hass: SmartHub) -> None:
     """Test we abort for wrong password and ssh file combination."""
     config_data = {k: v for k, v in CONFIG_DATA_SSH.items() if k != CONF_PASSWORD}
     result = await hass.config_entries.flow.async_init(
@@ -170,7 +170,7 @@ async def test_error_no_password_ssh(hass: HomeAssistant) -> None:
     assert result["errors"] == {CONF_BASE: "pwd_or_ssh"}
 
 
-async def test_error_invalid_ssh(hass: HomeAssistant, patch_is_file) -> None:
+async def test_error_invalid_ssh(hass: SmartHub, patch_is_file) -> None:
     """Test we abort if invalid ssh file is provided."""
     config_data = {k: v for k, v in CONFIG_DATA_SSH.items() if k != CONF_PASSWORD}
     config_data[CONF_SSH_KEY] = SSH_KEY
@@ -191,7 +191,7 @@ async def test_error_invalid_ssh(hass: HomeAssistant, patch_is_file) -> None:
     assert result["errors"] == {CONF_BASE: "ssh_not_file"}
 
 
-async def test_error_invalid_host(hass: HomeAssistant, patch_get_host) -> None:
+async def test_error_invalid_host(hass: SmartHub, patch_get_host) -> None:
     """Test we abort if host name is invalid."""
     patch_get_host.side_effect = gaierror
     result = await hass.config_entries.flow.async_init(
@@ -204,7 +204,7 @@ async def test_error_invalid_host(hass: HomeAssistant, patch_get_host) -> None:
     assert result["errors"] == {CONF_BASE: "invalid_host"}
 
 
-async def test_abort_if_not_unique_id_setup(hass: HomeAssistant) -> None:
+async def test_abort_if_not_unique_id_setup(hass: SmartHub) -> None:
     """Test we abort if component without uniqueid is already setup."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -221,7 +221,7 @@ async def test_abort_if_not_unique_id_setup(hass: HomeAssistant) -> None:
 
 
 async def test_update_uniqueid_exist(
-    hass: HomeAssistant, connect_http, patch_setup_entry
+    hass: SmartHub, connect_http, patch_setup_entry
 ) -> None:
     """Test we update entry if uniqueid is already configured."""
     existing_entry = MockConfigEntry(
@@ -245,7 +245,7 @@ async def test_update_uniqueid_exist(
     assert not prev_entry
 
 
-async def test_abort_invalid_unique_id(hass: HomeAssistant, connect_legacy) -> None:
+async def test_abort_invalid_unique_id(hass: SmartHub, connect_legacy) -> None:
     """Test we abort if uniqueid not available."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -273,7 +273,7 @@ async def test_abort_invalid_unique_id(hass: HomeAssistant, connect_legacy) -> N
     ],
 )
 async def test_on_connect_legacy_failed(
-    hass: HomeAssistant, connect_legacy, side_effect, error
+    hass: SmartHub, connect_legacy, side_effect, error
 ) -> None:
     """Test when we have errors connecting the router with legacy library."""
     flow_result = await hass.config_entries.flow.async_init(
@@ -303,7 +303,7 @@ async def test_on_connect_legacy_failed(
     ],
 )
 async def test_on_connect_http_failed(
-    hass: HomeAssistant, connect_http, side_effect, error
+    hass: SmartHub, connect_http, side_effect, error
 ) -> None:
     """Test when we have errors connecting the router with http library."""
     flow_result = await hass.config_entries.flow.async_init(
@@ -323,7 +323,7 @@ async def test_on_connect_http_failed(
     assert result["errors"] == {CONF_BASE: error}
 
 
-async def test_options_flow_ap(hass: HomeAssistant, patch_setup_entry) -> None:
+async def test_options_flow_ap(hass: SmartHub, patch_setup_entry) -> None:
     """Test config flow options for ap mode."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -361,7 +361,7 @@ async def test_options_flow_ap(hass: HomeAssistant, patch_setup_entry) -> None:
     }
 
 
-async def test_options_flow_router(hass: HomeAssistant, patch_setup_entry) -> None:
+async def test_options_flow_router(hass: SmartHub, patch_setup_entry) -> None:
     """Test config flow options for router mode."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -396,7 +396,7 @@ async def test_options_flow_router(hass: HomeAssistant, patch_setup_entry) -> No
     }
 
 
-async def test_options_flow_http(hass: HomeAssistant, patch_setup_entry) -> None:
+async def test_options_flow_http(hass: SmartHub, patch_setup_entry) -> None:
     """Test config flow options for http mode."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

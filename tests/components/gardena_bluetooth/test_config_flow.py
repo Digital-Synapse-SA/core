@@ -6,9 +6,9 @@ from gardena_bluetooth.exceptions import CharacteristicNotFound
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import config_entries
-from homeassistant.components.gardena_bluetooth.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub import config_entries
+from smarthub.components.gardena_bluetooth.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import (
     MISSING_MANUFACTURER_DATA_SERVICE_INFO,
@@ -24,7 +24,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_user_selection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test we can select a device."""
@@ -52,7 +52,7 @@ async def test_user_selection(
 
 
 async def test_failed_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: Mock,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -81,7 +81,7 @@ async def test_failed_connect(
 
 
 async def test_no_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test missing device."""
@@ -97,7 +97,7 @@ async def test_no_devices(
 
 
 async def test_bluetooth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test bluetooth device discovery."""
@@ -118,7 +118,7 @@ async def test_bluetooth(
 
 
 async def test_bluetooth_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test bluetooth device discovery with invalid data."""

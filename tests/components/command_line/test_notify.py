@@ -10,13 +10,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import setup
-from homeassistant.components.command_line import DOMAIN
-from homeassistant.components.notify import DOMAIN as NOTIFY_DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub import setup
+from smarthub.components.command_line import DOMAIN
+from smarthub.components.notify import DOMAIN as NOTIFY_DOMAIN
+from smarthub.core import SmartHub
 
 
-async def test_setup_platform_yaml(hass: HomeAssistant) -> None:
+async def test_setup_platform_yaml(hass: SmartHub) -> None:
     """Test setting up the platform with platform yaml."""
     await setup.async_setup_component(
         hass,
@@ -50,13 +50,13 @@ async def test_setup_platform_yaml(hass: HomeAssistant) -> None:
     ],
 )
 async def test_setup_integration_yaml(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test sensor setup."""
     assert hass.services.has_service(NOTIFY_DOMAIN, "test2")
 
 
-async def test_bad_config(hass: HomeAssistant) -> None:
+async def test_bad_config(hass: SmartHub) -> None:
     """Test set up the platform with bad/missing configuration."""
     assert await setup.async_setup_component(
         hass,
@@ -71,7 +71,7 @@ async def test_bad_config(hass: HomeAssistant) -> None:
     assert not hass.services.has_service(NOTIFY_DOMAIN, "test")
 
 
-async def test_command_line_output(hass: HomeAssistant) -> None:
+async def test_command_line_output(hass: SmartHub) -> None:
     """Test the command line output."""
     with tempfile.TemporaryDirectory() as tempdirname:
         filename = os.path.join(tempdirname, "message.txt")
@@ -101,7 +101,7 @@ async def test_command_line_output(hass: HomeAssistant) -> None:
 
 
 async def test_command_line_output_single_command(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the command line output."""
 
@@ -130,7 +130,7 @@ async def test_command_line_output_single_command(
     assert "Running with message: test message" in caplog.text
 
 
-async def test_command_template(hass: HomeAssistant) -> None:
+async def test_command_template(hass: SmartHub) -> None:
     """Test the command line output using template as command."""
 
     with tempfile.TemporaryDirectory() as tempdirname:
@@ -162,7 +162,7 @@ async def test_command_template(hass: HomeAssistant) -> None:
 
 
 async def test_command_incorrect_template(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the command line output using template as command which isn't working."""
 
@@ -211,7 +211,7 @@ async def test_command_incorrect_template(
     ],
 )
 async def test_error_for_none_zero_exit_code(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, load_yaml_integration: None
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test if an error is logged for non zero exit codes."""
 
@@ -239,7 +239,7 @@ async def test_error_for_none_zero_exit_code(
     ],
 )
 async def test_timeout(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, load_yaml_integration: None
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test blocking is not forever."""
     await hass.services.async_call(
@@ -264,12 +264,12 @@ async def test_timeout(
     ],
 )
 async def test_subprocess_exceptions(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, load_yaml_integration: None
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test that notify subprocess exceptions are handled correctly."""
 
     with patch(
-        "homeassistant.components.command_line.notify.subprocess.Popen"
+        "smarthub.components.command_line.notify.subprocess.Popen"
     ) as check_output:
         check_output.return_value.__enter__ = check_output
         check_output.return_value.communicate.side_effect = [

@@ -14,17 +14,17 @@ from aiohomeconnect.model.error import (
 import aiohttp
 import pytest
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.home_connect.const import DOMAIN
-from homeassistant.components.home_connect.utils import bsh_key_to_translation_key
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.home_connect.const import DOMAIN
+from smarthub.components.home_connect.utils import bsh_key_to_translation_key
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 from script.hassfest.translations import RE_TRANSLATION_KEY
 
 from .conftest import (
@@ -40,7 +40,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_entry_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -57,7 +57,7 @@ async def test_entry_setup(
 
 @pytest.mark.parametrize("token_expiration_time", [12345])
 async def test_token_refresh_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     client: MagicMock,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -87,8 +87,8 @@ async def test_token_refresh_success(
 
     assert config_entry.state is ConfigEntryState.NOT_LOADED
     with (
-        patch("homeassistant.components.home_connect.PLATFORMS", platforms),
-        patch("homeassistant.components.home_connect.HomeConnectClient") as client_mock,
+        patch("smarthub.components.home_connect.PLATFORMS", platforms),
+        patch("smarthub.components.home_connect.HomeConnectClient") as client_mock,
     ):
         client_mock.side_effect = MagicMock(side_effect=init_side_effect)
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -137,7 +137,7 @@ async def test_token_refresh_success(
     ],
 )
 async def test_token_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -156,7 +156,7 @@ async def test_token_refresh_error(
 
     assert config_entry.state is ConfigEntryState.NOT_LOADED
     with patch(
-        "homeassistant.components.home_connect.HomeConnectClient", return_value=client
+        "smarthub.components.home_connect.HomeConnectClient", return_value=client
     ):
         assert not await integration_setup(client)
         await hass.async_block_till_done()
@@ -218,7 +218,7 @@ async def test_client_rate_limit_error(
 
     assert config_entry.state is ConfigEntryState.NOT_LOADED
     with patch(
-        "homeassistant.components.home_connect.coordinator.asyncio_sleep",
+        "smarthub.components.home_connect.coordinator.asyncio_sleep",
     ) as asyncio_sleep_mock:
         assert await integration_setup(client)
     assert config_entry.state is ConfigEntryState.LOADED
@@ -228,7 +228,7 @@ async def test_client_rate_limit_error(
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_required_program_or_at_least_an_option(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -261,7 +261,7 @@ async def test_required_program_or_at_least_an_option(
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_entity_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     config_entry_v1_1: MockConfigEntry,
@@ -319,7 +319,7 @@ async def test_entity_migration(
             config_entry=config_entry_v1_1,
         )
 
-    with patch("homeassistant.components.home_connect.PLATFORMS", platforms):
+    with patch("smarthub.components.home_connect.PLATFORMS", platforms):
         await hass.config_entries.async_setup(config_entry_v1_1.entry_id)
         await hass.async_block_till_done()
 
@@ -338,7 +338,7 @@ async def test_bsh_key_transformations() -> None:
 
 
 async def test_config_entry_unique_id_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_v1_2: MockConfigEntry,
 ) -> None:
     """Test that old config entries use the unique id obtained from the JWT subject."""

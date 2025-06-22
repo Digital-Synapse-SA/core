@@ -7,8 +7,8 @@ from aioflo.errors import RequestError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -16,7 +16,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 @pytest.mark.usefixtures("aioclient_mock_fixture")
 async def test_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
@@ -37,7 +37,7 @@ async def test_device(
 
 @pytest.mark.usefixtures("aioclient_mock_fixture")
 async def test_device_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,

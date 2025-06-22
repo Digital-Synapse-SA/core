@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_STEP,
@@ -15,10 +15,10 @@ from homeassistant.components.number import (
     SERVICE_SET_VALUE,
     NumberMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_MODE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, ATTR_MODE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.setup import async_setup_component
 
 ENTITY_VOLUME = "number.volume"
 ENTITY_PWM = "number.pwm_1"
@@ -30,14 +30,14 @@ ENTITY_SMALL_RANGE = "number.small_range"
 def number_only() -> Generator[None]:
     """Enable only the number platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.NUMBER],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_demo_number(hass: HomeAssistant, number_only: None) -> None:
+async def setup_demo_number(hass: SmartHub, number_only: None) -> None:
     """Initialize setup demo Number entity."""
     assert await async_setup_component(
         hass, NUMBER_DOMAIN, {"number": {"platform": "demo"}}
@@ -45,13 +45,13 @@ async def setup_demo_number(hass: HomeAssistant, number_only: None) -> None:
     await hass.async_block_till_done()
 
 
-def test_setup_params(hass: HomeAssistant) -> None:
+def test_setup_params(hass: SmartHub) -> None:
     """Test the initial parameters."""
     state = hass.states.get(ENTITY_VOLUME)
     assert state.state == "42.0"
 
 
-def test_default_setup_params(hass: HomeAssistant) -> None:
+def test_default_setup_params(hass: SmartHub) -> None:
     """Test the setup with default parameters."""
     state = hass.states.get(ENTITY_VOLUME)
     assert state.attributes.get(ATTR_MIN) == 0.0
@@ -78,7 +78,7 @@ def test_default_setup_params(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_MODE) == NumberMode.AUTO
 
 
-async def test_set_value_bad_attr(hass: HomeAssistant) -> None:
+async def test_set_value_bad_attr(hass: SmartHub) -> None:
     """Test setting the value without required attribute."""
     state = hass.states.get(ENTITY_VOLUME)
     assert state.state == "42.0"
@@ -96,7 +96,7 @@ async def test_set_value_bad_attr(hass: HomeAssistant) -> None:
     assert state.state == "42.0"
 
 
-async def test_set_value_bad_range(hass: HomeAssistant) -> None:
+async def test_set_value_bad_range(hass: SmartHub) -> None:
     """Test setting the value out of range."""
     state = hass.states.get(ENTITY_VOLUME)
     assert state.state == "42.0"
@@ -114,7 +114,7 @@ async def test_set_value_bad_range(hass: HomeAssistant) -> None:
     assert state.state == "42.0"
 
 
-async def test_set_set_value(hass: HomeAssistant) -> None:
+async def test_set_set_value(hass: SmartHub) -> None:
     """Test the setting of the value."""
     state = hass.states.get(ENTITY_VOLUME)
     assert state.state == "42.0"

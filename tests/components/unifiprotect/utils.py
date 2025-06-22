@@ -21,11 +21,11 @@ from uiprotect.data.bootstrap import ProtectDeviceRef
 from uiprotect.test_util.anonymize import random_hex
 from uiprotect.websocket import WebsocketState
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, split_entity_id
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity import EntityDescription
-from homeassistant.util import dt as dt_util
+from smarthub.const import Platform
+from smarthub.core import SmartHub, split_entity_id
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity import EntityDescription
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -58,7 +58,7 @@ def reset_objects(bootstrap: Bootstrap):
     bootstrap.chimes = {}
 
 
-async def time_changed(hass: HomeAssistant, seconds: int) -> None:
+async def time_changed(hass: SmartHub, seconds: int) -> None:
     """Trigger time changed."""
     next_update = dt_util.utcnow() + timedelta(seconds)
     async_fire_time_changed(hass, next_update)
@@ -66,7 +66,7 @@ async def time_changed(hass: HomeAssistant, seconds: int) -> None:
 
 
 async def enable_entity(
-    hass: HomeAssistant, entry_id: str, entity_id: str
+    hass: SmartHub, entry_id: str, entity_id: str
 ) -> er.RegistryEntry:
     """Enable a disabled entity."""
     entity_registry = er.async_get(hass)
@@ -80,7 +80,7 @@ async def enable_entity(
 
 
 def assert_entity_counts(
-    hass: HomeAssistant, platform: Platform, total: int, enabled: int
+    hass: SmartHub, platform: Platform, total: int, enabled: int
 ) -> None:
     """Assert entity counts for a given platform."""
 
@@ -164,7 +164,7 @@ def add_device(
 
 
 async def init_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     devices: Sequence[ProtectAdoptableDeviceModel],
     regenerate_ids: bool = True,
@@ -180,7 +180,7 @@ async def init_entry(
 
 
 async def remove_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     ufp_devices: list[ProtectAdoptableDeviceModel],
 ) -> None:
@@ -203,7 +203,7 @@ async def remove_entities(
 
 
 async def adopt_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     ufp_devices: list[ProtectAdoptableDeviceModel],
     fully_adopt: bool = False,

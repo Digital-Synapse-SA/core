@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from homeassistant.components.version.const import DEFAULT_CONFIGURATION
-from homeassistant.core import HomeAssistant
+from smarthub.components.version.const import DEFAULT_CONFIGURATION
+from smarthub.core import SmartHub
 
 from .common import setup_version_integration
 
 
-async def test_version_binary_sensor_local_source(hass: HomeAssistant) -> None:
+async def test_version_binary_sensor_local_source(hass: SmartHub) -> None:
     """Test the Version binary sensor with local source."""
     await setup_version_integration(hass)
 
@@ -16,7 +16,7 @@ async def test_version_binary_sensor_local_source(hass: HomeAssistant) -> None:
     assert not state
 
 
-async def test_version_binary_sensor(hass: HomeAssistant) -> None:
+async def test_version_binary_sensor(hass: SmartHub) -> None:
     """Test the Version binary sensor."""
     await setup_version_integration(hass, {**DEFAULT_CONFIGURATION, "source": "pypi"})
 

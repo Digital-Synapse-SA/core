@@ -5,8 +5,8 @@ from unittest.mock import MagicMock
 from demetriek import LaMetricConnectionError, LaMetricError
 import pytest
 
-from homeassistant.components.lametric.const import DOMAIN
-from homeassistant.components.number import (
+from smarthub.components.lametric.const import DOMAIN
+from smarthub.components.number import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_STEP,
@@ -14,7 +14,7 @@ from homeassistant.components.number import (
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
@@ -23,15 +23,15 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = pytest.mark.usefixtures("init_integration")
 
 
 async def test_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -81,7 +81,7 @@ async def test_brightness(
 
 
 async def test_volume(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -129,7 +129,7 @@ async def test_volume(
 
 
 async def test_number_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test error handling of the LaMetric numbers."""
@@ -140,7 +140,7 @@ async def test_number_error(
     assert state.state == "100"
 
     with pytest.raises(
-        HomeAssistantError, match="Invalid response from the LaMetric device"
+        SmartHubError, match="Invalid response from the LaMetric device"
     ):
         await hass.services.async_call(
             NUMBER_DOMAIN,
@@ -158,7 +158,7 @@ async def test_number_error(
 
 
 async def test_number_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test connection error handling of the LaMetric numbers."""
@@ -169,7 +169,7 @@ async def test_number_connection_error(
     assert state.state == "100"
 
     with pytest.raises(
-        HomeAssistantError, match="Error communicating with the LaMetric device"
+        SmartHubError, match="Error communicating with the LaMetric device"
     ):
         await hass.services.async_call(
             NUMBER_DOMAIN,
@@ -188,7 +188,7 @@ async def test_number_connection_error(
 
 @pytest.mark.parametrize("device_fixture", ["computer_powered"])
 async def test_computer_powered_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test Brightness is properly limited for computer powered devices."""

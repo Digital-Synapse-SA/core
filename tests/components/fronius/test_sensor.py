@@ -4,14 +4,14 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fronius.const import DOMAIN
-from homeassistant.components.fronius.coordinator import (
+from smarthub.components.fronius.const import DOMAIN
+from smarthub.components.fronius.coordinator import (
     FroniusInverterUpdateCoordinator,
     FroniusPowerFlowUpdateCoordinator,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import mock_responses, setup_fronius_integration
 
@@ -21,7 +21,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_symo_inverter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -74,7 +74,7 @@ async def test_symo_inverter(
 
 
 async def test_symo_logger(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test Fronius Symo logger entities."""
 
@@ -94,7 +94,7 @@ async def test_symo_logger(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_symo_meter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_symo_meter(
     ],
 )
 async def test_symo_meter_forged(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     location_code: int | None,
     expected_code: int | str,
@@ -190,7 +190,7 @@ async def test_symo_meter_forged(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_symo_power_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -255,7 +255,7 @@ async def test_symo_power_flow(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_gen24(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
     entity_registry: er.EntityRegistry,
@@ -294,7 +294,7 @@ async def test_gen24(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_gen24_storage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     device_registry: dr.DeviceRegistry,
     freezer: FrozenDateTimeFactory,
@@ -350,7 +350,7 @@ async def test_gen24_storage(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_primo_s0(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     device_registry: dr.DeviceRegistry,
     freezer: FrozenDateTimeFactory,

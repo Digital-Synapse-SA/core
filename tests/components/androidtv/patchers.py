@@ -7,7 +7,7 @@ from unittest.mock import patch
 from androidtv.adb_manager.adb_manager_async import DeviceAsync
 from androidtv.constants import CMD_DEVICE_PROPERTIES, CMD_MAC_ETH0, CMD_MAC_WLAN0
 
-from homeassistant.components.androidtv.const import (
+from smarthub.components.androidtv.const import (
     DEFAULT_ADB_SERVER_PORT,
     DEVICE_ANDROIDTV,
     DEVICE_FIRETV,
@@ -198,11 +198,11 @@ PATCH_SCREENCAP = patch(
     return_value=b"image",
 )
 PATCH_SETUP_ENTRY = patch(
-    "homeassistant.components.androidtv.async_setup_entry",
+    "smarthub.components.androidtv.async_setup_entry",
     return_value=True,
 )
-PATCH_ACCESS = patch("homeassistant.components.androidtv.os.access", return_value=True)
-PATCH_ISFILE = patch("homeassistant.components.androidtv.os.path.isfile", isfile)
+PATCH_ACCESS = patch("smarthub.components.androidtv.os.access", return_value=True)
+PATCH_ISFILE = patch("smarthub.components.androidtv.os.path.isfile", isfile)
 PATCH_LAUNCH_APP = patch("androidtv.basetv.basetv_async.BaseTVAsync.launch_app")
 PATCH_STOP_APP = patch("androidtv.basetv.basetv_async.BaseTVAsync.stop_app")
 

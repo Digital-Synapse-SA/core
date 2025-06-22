@@ -3,16 +3,16 @@
 from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock
 
-from homeassistant.components.wsdot.sensor import (
+from smarthub.components.wsdot.sensor import (
     CONF_API_KEY,
     CONF_ID,
     CONF_NAME,
     CONF_TRAVEL_TIMES,
     DOMAIN,
 )
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 config = {
     CONF_API_KEY: "foo",
@@ -21,7 +21,7 @@ config = {
 
 
 async def test_setup_with_config(
-    hass: HomeAssistant, mock_travel_time: AsyncMock
+    hass: SmartHub, mock_travel_time: AsyncMock
 ) -> None:
     """Test the platform setup with configuration."""
     assert await async_setup_component(

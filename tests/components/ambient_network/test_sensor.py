@@ -9,9 +9,9 @@ from freezegun import freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import setup_platform
 
@@ -26,7 +26,7 @@ from tests.common import async_fire_time_changed, snapshot_platform
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     open_api: OpenAPI,
     aioambient: AsyncMock,
     config_entry: ConfigEntry,
@@ -40,7 +40,7 @@ async def test_sensors(
 
 @pytest.mark.parametrize("config_entry", ["BB:BB:BB:BB:BB:BB"], indirect=True)
 async def test_sensors_with_no_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     open_api: OpenAPI,
     aioambient: AsyncMock,
     config_entry: ConfigEntry,
@@ -55,7 +55,7 @@ async def test_sensors_with_no_data(
 
 @pytest.mark.parametrize("config_entry", ["AA:AA:AA:AA:AA:AA"], indirect=True)
 async def test_sensors_disappearing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     open_api: OpenAPI,
     aioambient: AsyncMock,
     config_entry: ConfigEntry,

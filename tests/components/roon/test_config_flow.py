@@ -2,10 +2,10 @@
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.roon.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.roon.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -71,20 +71,20 @@ class RoonDiscoveryFailedMock(RoonDiscoveryMock):
         return []
 
 
-async def test_successful_discovery_and_auth(hass: HomeAssistant) -> None:
+async def test_successful_discovery_and_auth(hass: SmartHub) -> None:
     """Test when discovery and auth both work ok."""
 
     with (
         patch(
-            "homeassistant.components.roon.config_flow.RoonApi",
+            "smarthub.components.roon.config_flow.RoonApi",
             return_value=RoonApiMock(),
         ),
         patch(
-            "homeassistant.components.roon.config_flow.RoonDiscovery",
+            "smarthub.components.roon.config_flow.RoonDiscovery",
             return_value=RoonDiscoveryMock(),
         ),
         patch(
-            "homeassistant.components.roon.async_setup_entry",
+            "smarthub.components.roon.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -113,20 +113,20 @@ async def test_successful_discovery_and_auth(hass: HomeAssistant) -> None:
     }
 
 
-async def test_unsuccessful_discovery_user_form_and_auth(hass: HomeAssistant) -> None:
+async def test_unsuccessful_discovery_user_form_and_auth(hass: SmartHub) -> None:
     """Test unsuccessful discover, user adding the host via the form and then successful auth."""
 
     with (
         patch(
-            "homeassistant.components.roon.config_flow.RoonApi",
+            "smarthub.components.roon.config_flow.RoonApi",
             return_value=RoonApiMock(),
         ),
         patch(
-            "homeassistant.components.roon.config_flow.RoonDiscovery",
+            "smarthub.components.roon.config_flow.RoonDiscovery",
             return_value=RoonDiscoveryFailedMock(),
         ),
         patch(
-            "homeassistant.components.roon.async_setup_entry",
+            "smarthub.components.roon.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -158,7 +158,7 @@ async def test_unsuccessful_discovery_user_form_and_auth(hass: HomeAssistant) ->
     }
 
 
-async def test_duplicate_config(hass: HomeAssistant) -> None:
+async def test_duplicate_config(hass: SmartHub) -> None:
     """Test user adding the host via the form for host that is already configured."""
 
     CONFIG = {"host": "1.1.1.1"}
@@ -169,11 +169,11 @@ async def test_duplicate_config(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.roon.config_flow.RoonApi",
+            "smarthub.components.roon.config_flow.RoonApi",
             return_value=RoonApiMock(),
         ),
         patch(
-            "homeassistant.components.roon.config_flow.RoonDiscovery",
+            "smarthub.components.roon.config_flow.RoonDiscovery",
             return_value=RoonDiscoveryFailedMock(),
         ),
     ):
@@ -199,28 +199,28 @@ async def test_duplicate_config(hass: HomeAssistant) -> None:
         assert result2["reason"] == "already_configured"
 
 
-async def test_successful_discovery_no_auth(hass: HomeAssistant) -> None:
+async def test_successful_discovery_no_auth(hass: SmartHub) -> None:
     """Test successful discover, but failed auth."""
 
     with (
         patch(
-            "homeassistant.components.roon.config_flow.RoonApi",
+            "smarthub.components.roon.config_flow.RoonApi",
             return_value=RoonApiMockNoToken(),
         ),
         patch(
-            "homeassistant.components.roon.config_flow.RoonDiscovery",
+            "smarthub.components.roon.config_flow.RoonDiscovery",
             return_value=RoonDiscoveryMock(),
         ),
         patch(
-            "homeassistant.components.roon.config_flow.TIMEOUT",
+            "smarthub.components.roon.config_flow.TIMEOUT",
             0,
         ),
         patch(
-            "homeassistant.components.roon.config_flow.AUTHENTICATE_TIMEOUT",
+            "smarthub.components.roon.config_flow.AUTHENTICATE_TIMEOUT",
             0.01,
         ),
         patch(
-            "homeassistant.components.roon.async_setup_entry",
+            "smarthub.components.roon.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -242,20 +242,20 @@ async def test_successful_discovery_no_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_unexpected_exception(hass: HomeAssistant) -> None:
+async def test_unexpected_exception(hass: SmartHub) -> None:
     """Test successful discover, and unexpected exception during auth."""
 
     with (
         patch(
-            "homeassistant.components.roon.config_flow.RoonApi",
+            "smarthub.components.roon.config_flow.RoonApi",
             return_value=RoonApiMockException(),
         ),
         patch(
-            "homeassistant.components.roon.config_flow.RoonDiscovery",
+            "smarthub.components.roon.config_flow.RoonDiscovery",
             return_value=RoonDiscoveryMock(),
         ),
         patch(
-            "homeassistant.components.roon.async_setup_entry",
+            "smarthub.components.roon.async_setup_entry",
             return_value=True,
         ),
     ):

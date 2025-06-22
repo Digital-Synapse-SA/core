@@ -5,24 +5,24 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     UnitOfDataRate,
     UnitOfInformation,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import init_integration
 
 
 @pytest.mark.usefixtures("nzbget_api")
-async def test_sensors(hass: HomeAssistant, entity_registry: er.EntityRegistry) -> None:
+async def test_sensors(hass: SmartHub, entity_registry: er.EntityRegistry) -> None:
     """Test the creation and values of the sensors."""
     now = dt_util.utcnow().replace(microsecond=0)
-    with patch("homeassistant.components.nzbget.sensor.utcnow", return_value=now):
+    with patch("smarthub.components.nzbget.sensor.utcnow", return_value=now):
         entry = await init_integration(hass)
 
     uptime = now - timedelta(seconds=600)

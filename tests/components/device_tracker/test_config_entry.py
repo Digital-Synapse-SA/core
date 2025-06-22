@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.device_tracker import (
+from smarthub.components.device_tracker import (
     ATTR_HOST_NAME,
     ATTR_IP,
     ATTR_MAC,
@@ -13,15 +13,15 @@ from homeassistant.components.device_tracker import (
     DOMAIN,
     SourceType,
 )
-from homeassistant.components.device_tracker.config_entry import (
+from smarthub.components.device_tracker.config_entry import (
     CONNECTED_DEVICE_REGISTERED,
     BaseTrackerEntity,
     ScannerEntity,
     TrackerEntity,
 )
-from homeassistant.components.zone import ATTR_RADIUS
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState, ConfigFlow
-from homeassistant.const import (
+from smarthub.components.zone import ATTR_RADIUS
+from smarthub.config_entries import ConfigEntry, ConfigEntryState, ConfigFlow
+from smarthub.const import (
     ATTR_BATTERY_LEVEL,
     ATTR_GPS_ACCURACY,
     ATTR_LATITUDE,
@@ -31,11 +31,11 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.core import SmartHub, callback
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.dispatcher import async_dispatcher_connect
+from smarthub.helpers.entity import Entity
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from tests.common import (
     MockConfigEntry,
@@ -55,7 +55,7 @@ class MockFlow(ConfigFlow):
 
 
 @pytest.fixture(autouse=True)
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -64,11 +64,11 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
 
 
 @pytest.fixture(autouse=True)
-def mock_setup_integration(hass: HomeAssistant) -> None:
+def mock_setup_integration(hass: SmartHub) -> None:
     """Fixture to set up a mock integration."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -77,7 +77,7 @@ def mock_setup_integration(hass: HomeAssistant) -> None:
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
     ) -> bool:
         await hass.config_entries.async_unload_platforms(
@@ -97,7 +97,7 @@ def mock_setup_integration(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture(name="config_entry")
-def config_entry_fixture(hass: HomeAssistant) -> MockConfigEntry:
+def config_entry_fixture(hass: SmartHub) -> MockConfigEntry:
     """Return the config entry used for the tests."""
     config_entry = MockConfigEntry(domain=TEST_DOMAIN)
     config_entry.add_to_hass(hass)
@@ -105,14 +105,14 @@ def config_entry_fixture(hass: HomeAssistant) -> MockConfigEntry:
 
 
 async def create_mock_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entities: list[Entity],
 ) -> MockConfigEntry:
     """Create a device tracker platform with the specified entities."""
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -344,7 +344,7 @@ def scanner_entity_fixture(
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_id: str,
     tracker_entity: MockTrackerEntity,
@@ -442,7 +442,7 @@ async def test_load_unload_entry(
     ],
 )
 async def test_tracker_entity_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_id: str,
     tracker_entity: MockTrackerEntity,
@@ -477,7 +477,7 @@ async def test_tracker_entity_state(
     [("0.0.0.0", "ad:de:ef:be:ed:fe", "test.hostname.org")],
 )
 async def test_scanner_entity_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
     entity_id: str,
@@ -599,7 +599,7 @@ def test_base_tracker_entity() -> None:
     ("mac_address", "unique_id"), [(TEST_MAC_ADDRESS, f"{TEST_MAC_ADDRESS}_yo1")]
 )
 async def test_register_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -642,7 +642,7 @@ async def test_register_mac(
     ],
 )
 async def test_register_mac_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -681,7 +681,7 @@ async def test_register_mac_not_found(
     ("mac_address", "unique_id"), [(TEST_MAC_ADDRESS, f"{TEST_MAC_ADDRESS}_yo1")]
 )
 async def test_register_mac_ignored(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     scanner_entity: MockScannerEntity,
@@ -711,7 +711,7 @@ async def test_register_mac_ignored(
 
 
 async def test_connected_device_registered(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -773,7 +773,7 @@ async def test_connected_device_registered(
 
 
 async def test_entity_has_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:

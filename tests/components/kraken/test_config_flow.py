@@ -2,10 +2,10 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.kraken.const import CONF_TRACKED_ASSET_PAIRS, DOMAIN
-from homeassistant.const import CONF_SCAN_INTERVAL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.kraken.const import CONF_TRACKED_ASSET_PAIRS, DOMAIN
+from smarthub.const import CONF_SCAN_INTERVAL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import (
     MISSING_PAIR_TRADEABLE_ASSET_PAIR_RESPONSE,
@@ -16,10 +16,10 @@ from .const import (
 from tests.common import MockConfigEntry
 
 
-async def test_config_flow(hass: HomeAssistant) -> None:
+async def test_config_flow(hass: SmartHub) -> None:
     """Test we can finish a config flow."""
     with patch(
-        "homeassistant.components.kraken.async_setup_entry",
+        "smarthub.components.kraken.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -35,7 +35,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_already_configured(hass: HomeAssistant) -> None:
+async def test_already_configured(hass: SmartHub) -> None:
     """Test we cannot add a second config flow."""
     MockConfigEntry(domain=DOMAIN).add_to_hass(hass)
 
@@ -46,7 +46,7 @@ async def test_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test options for Kraken."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -66,7 +66,7 @@ async def test_options(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.kraken.config_flow.KrakenAPI.get_tradable_asset_pairs",
+            "smarthub.components.kraken.config_flow.KrakenAPI.get_tradable_asset_pairs",
             return_value=TRADEABLE_ASSET_PAIR_RESPONSE,
         ),
         patch(
@@ -100,7 +100,7 @@ async def test_options(hass: HomeAssistant) -> None:
         assert hass.states.get("sensor.xbt_usd_ask") is None
 
 
-async def test_deselect_removed_pair(hass: HomeAssistant) -> None:
+async def test_deselect_removed_pair(hass: SmartHub) -> None:
     """Test options for Kraken."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -115,7 +115,7 @@ async def test_deselect_removed_pair(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.kraken.config_flow.KrakenAPI.get_tradable_asset_pairs",
+            "smarthub.components.kraken.config_flow.KrakenAPI.get_tradable_asset_pairs",
             return_value=TRADEABLE_ASSET_PAIR_RESPONSE,
         ),
         patch(
@@ -132,7 +132,7 @@ async def test_deselect_removed_pair(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.kraken.config_flow.KrakenAPI.get_tradable_asset_pairs",
+            "smarthub.components.kraken.config_flow.KrakenAPI.get_tradable_asset_pairs",
             return_value=MISSING_PAIR_TRADEABLE_ASSET_PAIR_RESPONSE,
         ),
         patch(

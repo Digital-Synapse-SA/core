@@ -17,23 +17,23 @@ from aiohomeconnect.model import (
 from aiohomeconnect.model.error import HomeConnectApiError, HomeConnectError
 import pytest
 
-from homeassistant.components.automation import (
+from smarthub.components.automation import (
     DOMAIN as AUTOMATION_DOMAIN,
     automations_with_entity,
 )
-from homeassistant.components.home_connect.const import DOMAIN
-from homeassistant.components.script import DOMAIN as SCRIPT_DOMAIN, scripts_with_entity
-from homeassistant.components.time import DOMAIN as TIME_DOMAIN, SERVICE_SET_VALUE
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TIME, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub.components.home_connect.const import DOMAIN
+from smarthub.components.script import DOMAIN as SCRIPT_DOMAIN, scripts_with_entity
+from smarthub.components.time import DOMAIN as TIME_DOMAIN, SERVICE_SET_VALUE
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TIME, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.typing import ClientSessionGenerator
@@ -48,7 +48,7 @@ def platforms() -> list[str]:
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.parametrize("appliance", ["Oven"], indirect=True)
 async def test_paired_depaired_devices_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -110,7 +110,7 @@ async def test_paired_depaired_devices_flow(
     indirect=["appliance"],
 )
 async def test_connected_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -169,7 +169,7 @@ async def test_connected_devices(
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.parametrize("appliance", ["Oven"], indirect=True)
 async def test_time_entity_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -230,7 +230,7 @@ async def test_time_entity_availability(
     ],
 )
 async def test_time_entity_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -273,7 +273,7 @@ async def test_time_entity_functionality(
     ],
 )
 async def test_time_entity_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -299,7 +299,7 @@ async def test_time_entity_error(
         await getattr(client_with_exception, mock_attr)()
 
     with pytest.raises(
-        HomeAssistantError, match=r"Error.*assign.*value.*to.*setting.*"
+        SmartHubError, match=r"Error.*assign.*value.*to.*setting.*"
     ):
         await hass.services.async_call(
             TIME_DOMAIN,
@@ -316,7 +316,7 @@ async def test_time_entity_error(
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.parametrize("appliance", ["Oven"], indirect=True)
 async def test_create_alarm_clock_deprecation_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -394,7 +394,7 @@ async def test_create_alarm_clock_deprecation_issue(
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.parametrize("appliance", ["Oven"], indirect=True)
 async def test_alarm_clock_deprecation_issue_fix(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     issue_registry: ir.IssueRegistry,
     client: MagicMock,

@@ -11,17 +11,17 @@ from pyairvisual.cloud_api import (
 from pyairvisual.errors import AirVisualError
 import pytest
 
-from homeassistant.components.airvisual import (
+from smarthub.components.airvisual import (
     CONF_CITY,
     CONF_INTEGRATION_TYPE,
     DOMAIN,
     INTEGRATION_TYPE_GEOGRAPHY_COORDS,
     INTEGRATION_TYPE_GEOGRAPHY_NAME,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_SHOW_ON_MAP
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_SHOW_ON_MAP
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import (
     COORDS_CONFIG,
@@ -68,7 +68,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
     ],
 )
 async def test_create_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud_api,
     config,
     entry_title,
@@ -109,7 +109,7 @@ async def test_create_entry(
     assert result["data"] == {**config, CONF_INTEGRATION_TYPE: integration_type}
 
 
-async def test_duplicate_error(hass: HomeAssistant, config, setup_config_entry) -> None:
+async def test_duplicate_error(hass: SmartHub, config, setup_config_entry) -> None:
     """Test that errors are shown when duplicate entries are added."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -133,7 +133,7 @@ async def test_duplicate_error(hass: HomeAssistant, config, setup_config_entry) 
 
 
 async def test_options_flow(
-    hass: HomeAssistant, config_entry, setup_config_entry
+    hass: SmartHub, config_entry, setup_config_entry
 ) -> None:
     """Test config flow options."""
     result = await hass.config_entries.options.async_init(config_entry.entry_id)
@@ -148,7 +148,7 @@ async def test_options_flow(
 
 
 async def test_step_reauth(
-    hass: HomeAssistant, config_entry: MockConfigEntry, setup_config_entry
+    hass: SmartHub, config_entry: MockConfigEntry, setup_config_entry
 ) -> None:
     """Test that the reauth step works."""
     result = await config_entry.start_reauth_flow(hass)

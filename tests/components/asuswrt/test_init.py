@@ -1,17 +1,17 @@
 """Tests for the AsusWrt integration."""
 
-from homeassistant.components.asuswrt.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
+from smarthub.components.asuswrt.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub
 
 from .common import CONFIG_DATA_TELNET, ROUTER_MAC_ADDR
 
 from tests.common import MockConfigEntry
 
 
-async def test_disconnect_on_stop(hass: HomeAssistant, connect_legacy) -> None:
-    """Test we close the connection with the router when Home Assistants stops."""
+async def test_disconnect_on_stop(hass: SmartHub, connect_legacy) -> None:
+    """Test we close the connection with the router when SmartHubs stops."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data=CONFIG_DATA_TELNET,

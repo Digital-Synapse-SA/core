@@ -3,15 +3,15 @@
 from zigpy.profiles import zha
 from zigpy.zcl.clusters import general
 
-from homeassistant.components.zha.helpers import get_zha_gateway
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.zha.helpers import get_zha_gateway
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
 
 
 async def test_device_registry_via_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_zha,
     zigpy_device_mock,
     device_registry: dr.DeviceRegistry,

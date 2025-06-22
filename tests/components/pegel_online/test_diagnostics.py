@@ -5,8 +5,8 @@ from unittest.mock import patch
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.pegel_online.const import CONF_STATION, DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.pegel_online.const import CONF_STATION, DOMAIN
+from smarthub.core import SmartHub
 
 from . import PegelOnlineMock
 from .const import (
@@ -21,7 +21,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -32,7 +32,7 @@ async def test_entry_diagnostics(
         unique_id=MOCK_CONFIG_ENTRY_DATA_DRESDEN[CONF_STATION],
     )
     entry.add_to_hass(hass)
-    with patch("homeassistant.components.pegel_online.PegelOnline") as pegelonline:
+    with patch("smarthub.components.pegel_online.PegelOnline") as pegelonline:
         pegelonline.return_value = PegelOnlineMock(
             station_details=MOCK_STATION_DETAILS_DRESDEN,
             station_measurements=MOCK_STATION_MEASUREMENT_DRESDEN,

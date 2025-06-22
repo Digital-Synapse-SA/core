@@ -2,8 +2,8 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.kira import remote as kira
-from homeassistant.core import HomeAssistant
+from smarthub.components.kira import remote as kira
+from smarthub.core import SmartHub
 
 from tests.common import MockEntityPlatform
 
@@ -21,7 +21,7 @@ def add_entities(devices):
     DEVICES.extend(devices)
 
 
-def test_service_call(hass: HomeAssistant) -> None:
+def test_service_call(hass: SmartHub) -> None:
     """Test Kira's ability to send commands."""
     mock_kira = MagicMock()
     hass.data[kira.DOMAIN] = {kira.CONF_REMOTE: {}}

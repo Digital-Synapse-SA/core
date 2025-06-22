@@ -6,9 +6,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import chat_session
-from homeassistant.util import dt as dt_util, ulid as ulid_util
+from smarthub.core import SmartHub
+from smarthub.helpers import chat_session
+from smarthub.util import dt as dt_util, ulid as ulid_util
 
 from tests.common import async_fire_time_changed
 
@@ -16,7 +16,7 @@ from tests.common import async_fire_time_changed
 @pytest.fixture
 def mock_ulid() -> Generator[Mock]:
     """Mock the ulid library."""
-    with patch("homeassistant.helpers.chat_session.ulid_now") as mock_ulid_now:
+    with patch("smarthub.helpers.chat_session.ulid_now") as mock_ulid_now:
         mock_ulid_now.return_value = "mock-ulid"
         yield mock_ulid_now
 
@@ -31,7 +31,7 @@ def mock_ulid() -> Generator[Mock]:
     ],
 )
 async def test_conversation_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     start_id: str | None,
     given_id: str,
     mock_ulid: Mock,
@@ -41,7 +41,7 @@ async def test_conversation_id(
         assert session.conversation_id == given_id
 
 
-async def test_context_var(hass: HomeAssistant) -> None:
+async def test_context_var(hass: SmartHub) -> None:
     """Test context var."""
     with chat_session.async_get_chat_session(hass) as session:
         with chat_session.async_get_chat_session(
@@ -62,7 +62,7 @@ async def test_context_var(hass: HomeAssistant) -> None:
 
 
 async def test_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test cleanup of the chat session."""
     with chat_session.async_get_chat_session(hass) as session:

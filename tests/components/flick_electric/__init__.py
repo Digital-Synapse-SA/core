@@ -2,12 +2,12 @@
 
 from pyflick.types import FlickPrice
 
-from homeassistant.components.flick_electric.const import (
+from smarthub.components.flick_electric.const import (
     CONF_ACCOUNT_ID,
     CONF_SUPPLY_NODE_REF,
 )
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ CONF = {
 }
 
 
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
 

@@ -1,13 +1,13 @@
 """Test KNX switch."""
 
-from homeassistant.components.knx.const import (
+from smarthub.components.knx.const import (
     CONF_RESPOND_TO_READ,
     CONF_STATE_ADDRESS,
     KNX_ADDRESS,
 )
-from homeassistant.components.knx.schema import SwitchSchema
-from homeassistant.const import CONF_NAME, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant, State
+from smarthub.components.knx.schema import SwitchSchema
+from smarthub.const import CONF_NAME, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub, State
 
 from . import KnxEntityGenerator
 from .conftest import KNXTestKit
@@ -15,7 +15,7 @@ from .conftest import KNXTestKit
 from tests.common import mock_restore_cache
 
 
-async def test_switch_simple(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_switch_simple(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test simple KNX switch."""
     await knx.setup_integration(
         {
@@ -53,7 +53,7 @@ async def test_switch_simple(hass: HomeAssistant, knx: KNXTestKit) -> None:
     await knx.assert_telegram_count(0)
 
 
-async def test_switch_state(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_switch_state(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX switch with state_address."""
     _ADDRESS = "1/1/1"
     _STATE_ADDRESS = "2/2/2"
@@ -111,7 +111,7 @@ async def test_switch_state(hass: HomeAssistant, knx: KNXTestKit) -> None:
     await knx.assert_telegram_count(0)
 
 
-async def test_switch_restore_and_respond(hass: HomeAssistant, knx) -> None:
+async def test_switch_restore_and_respond(hass: SmartHub, knx) -> None:
     """Test restoring KNX switch state and respond to read."""
     _ADDRESS = "1/1/1"
     fake_state = State("switch.test", "on")
@@ -150,7 +150,7 @@ async def test_switch_restore_and_respond(hass: HomeAssistant, knx) -> None:
 
 
 async def test_switch_ui_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     create_ui_entity: KnxEntityGenerator,
 ) -> None:

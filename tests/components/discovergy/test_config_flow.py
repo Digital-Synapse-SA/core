@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock, patch
 from pydiscovergy.error import DiscovergyClientError, HTTPError, InvalidLogin
 import pytest
 
-from homeassistant.components.discovergy.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.discovergy.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant, discovergy: AsyncMock) -> None:
+async def test_form(hass: SmartHub, discovergy: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -23,7 +23,7 @@ async def test_form(hass: HomeAssistant, discovergy: AsyncMock) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.discovergy.async_setup_entry",
+        "smarthub.components.discovergy.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -45,7 +45,7 @@ async def test_form(hass: HomeAssistant, discovergy: AsyncMock) -> None:
 
 
 async def test_reauth(
-    hass: HomeAssistant, config_entry: MockConfigEntry, discovergy: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, discovergy: AsyncMock
 ) -> None:
     """Test reauth flow."""
     config_entry.add_to_hass(hass)
@@ -54,7 +54,7 @@ async def test_reauth(
     assert init_result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.discovergy.async_setup_entry",
+        "smarthub.components.discovergy.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         configure_result = await hass.config_entries.flow.async_configure(
@@ -81,7 +81,7 @@ async def test_reauth(
     ],
 )
 async def test_form_fail(
-    hass: HomeAssistant, discovergy: AsyncMock, error: Exception, message: str
+    hass: SmartHub, discovergy: AsyncMock, error: Exception, message: str
 ) -> None:
     """Test to handle exceptions."""
     discovergy.meters.side_effect = error
@@ -114,7 +114,7 @@ async def test_form_fail(
 
 
 async def test_reauth_unique_id_mismatch(
-    hass: HomeAssistant, config_entry: MockConfigEntry, discovergy: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, discovergy: AsyncMock
 ) -> None:
     """Test reauth flow with unique id mismatch."""
     config_entry.add_to_hass(hass)
@@ -124,7 +124,7 @@ async def test_reauth_unique_id_mismatch(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.discovergy.async_setup_entry",
+        "smarthub.components.discovergy.async_setup_entry",
         return_value=True,
     ):
         configure_result = await hass.config_entries.flow.async_configure(

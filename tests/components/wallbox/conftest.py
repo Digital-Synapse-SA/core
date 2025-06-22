@@ -2,15 +2,15 @@
 
 import pytest
 
-from homeassistant.components.wallbox.const import CONF_STATION, DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.wallbox.const import CONF_STATION, DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-def entry(hass: HomeAssistant) -> MockConfigEntry:
+def entry(hass: SmartHub) -> MockConfigEntry:
     """Return mock config entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,

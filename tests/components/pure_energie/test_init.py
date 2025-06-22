@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from gridnet import GridNetConnectionError
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
     "mock_pure_energie", ["pure_energie/device.json"], indirect=True
 )
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_pure_energie: AsyncMock,
 ) -> None:
@@ -35,12 +35,12 @@ async def test_load_unload_config_entry(
 
 
 @patch(
-    "homeassistant.components.pure_energie.coordinator.GridNet._request",
+    "smarthub.components.pure_energie.coordinator.GridNet._request",
     side_effect=GridNetConnectionError,
 )
 async def test_config_entry_not_ready(
     mock_request: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the Pure Energie configuration entry not ready."""

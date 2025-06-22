@@ -8,13 +8,13 @@ from nibe.heatpump import Model
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as PLATFORM_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
 
 from . import async_add_model
 
@@ -22,7 +22,7 @@ from . import async_add_model
 @pytest.fixture(autouse=True)
 async def fixture_single_platform():
     """Only allow this platform to load."""
-    with patch("homeassistant.components.nibe_heatpump.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.nibe_heatpump.PLATFORMS", [Platform.NUMBER]):
         yield
 
 
@@ -45,7 +45,7 @@ async def fixture_single_platform():
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     model: Model,
     entity_id: str,
     address: int,
@@ -75,7 +75,7 @@ async def test_update(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_set_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connection: AsyncMock,
     model: Model,
     entity_id: str,

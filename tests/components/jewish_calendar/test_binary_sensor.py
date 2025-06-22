@@ -6,11 +6,11 @@ from typing import Any
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.jewish_calendar.const import DOMAIN
-from homeassistant.const import CONF_PLATFORM, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.jewish_calendar.const import DOMAIN
+from smarthub.const import CONF_PLATFORM, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_fire_time_changed
 
@@ -107,7 +107,7 @@ MELACHA_PARAMS = [
 )
 @pytest.mark.usefixtures("setup_at_time")
 async def test_issur_melacha_sensor(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, results: dict[str, Any]
+    hass: SmartHub, freezer: FrozenDateTimeFactory, results: dict[str, Any]
 ) -> None:
     """Test Issur Melacha sensor output."""
     sensor_id = "binary_sensor.jewish_calendar_issur_melacha_in_effect"
@@ -130,7 +130,7 @@ async def test_issur_melacha_sensor(
 )
 @pytest.mark.usefixtures("setup_at_time")
 async def test_issur_melacha_sensor_update(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, results: list[str]
+    hass: SmartHub, freezer: FrozenDateTimeFactory, results: list[str]
 ) -> None:
     """Test Issur Melacha sensor output."""
     sensor_id = "binary_sensor.jewish_calendar_issur_melacha_in_effect"
@@ -143,7 +143,7 @@ async def test_issur_melacha_sensor_update(
 
 
 async def test_no_discovery_info(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup without discovery info."""
     assert BINARY_SENSOR_DOMAIN not in hass.config.components

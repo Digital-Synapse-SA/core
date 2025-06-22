@@ -20,12 +20,12 @@ import zoneinfo
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components import automation, calendar
-from homeassistant.components.calendar.trigger import EVENT_END, EVENT_START
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import automation, calendar
+from smarthub.components.calendar.trigger import EVENT_END, EVENT_START
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .conftest import MockCalendarEntity
 
@@ -55,7 +55,7 @@ TEST_UPDATE_INTERVAL = datetime.timedelta(minutes=7)
 class FakeSchedule:
     """Test fixture class for return events in a specific date range."""
 
-    def __init__(self, hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    def __init__(self, hass: SmartHub, freezer: FrozenDateTimeFactory) -> None:
         """Initialize FakeSchedule."""
         self.hass = hass
         self.freezer = freezer
@@ -84,7 +84,7 @@ class FakeSchedule:
 
 
 @pytest.fixture
-def fake_schedule(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> FakeSchedule:
+def fake_schedule(hass: SmartHub, freezer: FrozenDateTimeFactory) -> FakeSchedule:
     """Fixture that tests can use to make fake events."""
 
     # Setup start time for all tests
@@ -101,7 +101,7 @@ def mock_test_entity(test_entities: list[MockCalendarEntity]) -> MockCalendarEnt
 
 @pytest.fixture(name="setup_platform", autouse=True)
 async def mock_setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_integration: None,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -112,7 +112,7 @@ async def mock_setup_platform(
 
 @asynccontextmanager
 async def create_automation(
-    hass: HomeAssistant, event_type: str, offset=None
+    hass: SmartHub, event_type: str, offset=None
 ) -> AsyncIterator[None]:
     """Register an automation."""
     trigger_data = {
@@ -148,7 +148,7 @@ async def create_automation(
 
 
 @pytest.fixture
-def calls_data(hass: HomeAssistant) -> Callable[[], list[dict[str, Any]]]:
+def calls_data(hass: SmartHub) -> Callable[[], list[dict[str, Any]]]:
     """Fixture to return payload data for automation calls."""
     service_calls = async_mock_service(hass, "test", "automation")
 
@@ -162,14 +162,14 @@ def calls_data(hass: HomeAssistant) -> Callable[[], list[dict[str, Any]]]:
 def mock_update_interval() -> Generator[None]:
     """Fixture to override the update interval for refreshing events."""
     with patch(
-        "homeassistant.components.calendar.trigger.UPDATE_INTERVAL",
+        "smarthub.components.calendar.trigger.UPDATE_INTERVAL",
         new=TEST_UPDATE_INTERVAL,
     ):
         yield
 
 
 async def test_event_start_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -203,7 +203,7 @@ async def test_event_start_trigger(
     ],
 )
 async def test_event_start_trigger_with_offset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -236,7 +236,7 @@ async def test_event_start_trigger_with_offset(
 
 
 async def test_event_end_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -274,7 +274,7 @@ async def test_event_end_trigger(
     ],
 )
 async def test_event_end_trigger_with_offset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -307,7 +307,7 @@ async def test_event_end_trigger_with_offset(
 
 
 async def test_calendar_trigger_with_no_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
 ) -> None:
@@ -322,7 +322,7 @@ async def test_calendar_trigger_with_no_events(
 
 
 async def test_multiple_start_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -356,7 +356,7 @@ async def test_multiple_start_events(
 
 
 async def test_multiple_end_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -391,7 +391,7 @@ async def test_multiple_end_events(
 
 
 async def test_multiple_events_sharing_start_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -426,7 +426,7 @@ async def test_multiple_events_sharing_start_time(
 
 
 async def test_overlap_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -461,7 +461,7 @@ async def test_overlap_events(
 
 
 async def test_invalid_calendar_id(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test creating a trigger with an invalid calendar id."""
     assert await async_setup_component(
@@ -482,7 +482,7 @@ async def test_invalid_calendar_id(
 
 
 async def test_legacy_entity_type(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test creating a trigger with an invalid calendar id."""
     assert await async_setup_component(
@@ -503,7 +503,7 @@ async def test_legacy_entity_type(
 
 
 async def test_update_next_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -546,7 +546,7 @@ async def test_update_next_event(
 
 
 async def test_update_missed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -636,7 +636,7 @@ async def test_update_missed(
     ids=["basic", "more-fields", "all-day"],
 )
 async def test_event_payload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -661,7 +661,7 @@ async def test_event_payload(
 
 
 async def test_trigger_timestamp_window_edge(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -691,7 +691,7 @@ async def test_trigger_timestamp_window_edge(
 
 
 async def test_event_start_trigger_dst(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entity: MockCalendarEntity,
@@ -747,7 +747,7 @@ async def test_event_start_trigger_dst(
 
 
 async def test_config_entry_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entities: list[MockCalendarEntity],
@@ -787,7 +787,7 @@ async def test_config_entry_reload(
 
 
 async def test_config_entry_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     calls_data: Callable[[], list[dict[str, Any]]],
     fake_schedule: FakeSchedule,
     test_entities: list[MockCalendarEntity],

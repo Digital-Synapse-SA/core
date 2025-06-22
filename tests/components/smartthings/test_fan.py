@@ -7,15 +7,15 @@ from pysmartthings.models import HealthStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     ATTR_PRESET_MODE,
     DOMAIN as FAN_DOMAIN,
     SERVICE_SET_PERCENTAGE,
     SERVICE_SET_PRESET_MODE,
 )
-from homeassistant.components.smartthings import MAIN
-from homeassistant.const import (
+from smarthub.components.smartthings import MAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -23,8 +23,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration, snapshot_smartthings_entities, trigger_health_update
 
@@ -32,7 +32,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -53,7 +53,7 @@ async def test_all_entities(
     ],
 )
 async def test_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     action: str,
@@ -78,7 +78,7 @@ async def test_turn_on_off(
 
 @pytest.mark.parametrize("device_fixture", ["fake_fan"])
 async def test_set_percentage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -102,7 +102,7 @@ async def test_set_percentage(
 
 @pytest.mark.parametrize("device_fixture", ["fake_fan"])
 async def test_set_percentage_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -125,7 +125,7 @@ async def test_set_percentage_off(
 
 @pytest.mark.parametrize("device_fixture", ["fake_fan"])
 async def test_set_percentage_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -149,7 +149,7 @@ async def test_set_percentage_on(
 
 @pytest.mark.parametrize("device_fixture", ["fake_fan"])
 async def test_set_preset_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -173,7 +173,7 @@ async def test_set_preset_mode(
 
 @pytest.mark.parametrize("device_fixture", ["fake_fan"])
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -197,7 +197,7 @@ async def test_availability(
 
 @pytest.mark.parametrize("device_fixture", ["fake_fan"])
 async def test_availability_at_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unavailable_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

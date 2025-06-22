@@ -4,10 +4,10 @@ from unittest.mock import ANY, AsyncMock, MagicMock
 
 from zeroconf.asyncio import AsyncServiceInfo
 
-from homeassistant.components.thread import dataset_store, discovery
-from homeassistant.components.thread.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.thread import dataset_store, discovery
+from smarthub.components.thread.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import (
     DATASET_1,
@@ -21,7 +21,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_add_dataset(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can add a dataset."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -44,7 +44,7 @@ async def test_add_dataset(
 
 
 async def test_add_invalid_dataset(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test adding an invalid dataset."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -61,7 +61,7 @@ async def test_add_invalid_dataset(
 
 
 async def test_delete_dataset(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can delete a dataset."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -128,7 +128,7 @@ async def test_delete_dataset(
 
 
 async def test_list_get_dataset(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test list and get datasets."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -183,7 +183,7 @@ async def test_list_get_dataset(
                 "created": dataset_2.created.isoformat(),
                 "dataset_id": dataset_2.id,
                 "extended_pan_id": "1111111122222233",
-                "network_name": "HomeAssistant!",
+                "network_name": "SmartHub!",
                 "pan_id": "1234",
                 "preferred": False,
                 "preferred_border_agent_id": None,
@@ -221,7 +221,7 @@ async def test_list_get_dataset(
 
 
 async def test_set_preferred_border_agent(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test setting the preferred border agent ID."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -265,7 +265,7 @@ async def test_set_preferred_border_agent(
 
 
 async def test_set_preferred_dataset(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we set a dataset as default."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -299,7 +299,7 @@ async def test_set_preferred_dataset(
 
 
 async def test_set_preferred_dataset_wrong_id(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we set a dataset as default."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -315,7 +315,7 @@ async def test_set_preferred_dataset_wrong_id(
 
 
 async def test_discover_routers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_async_zeroconf: MagicMock,
 ) -> None:
@@ -353,10 +353,10 @@ async def test_discover_routers(
     assert msg == {
         "event": {
             "data": {
-                "instance_name": "HomeAssistant OpenThreadBorderRouter #0BBF",
+                "instance_name": "SmartHub OpenThreadBorderRouter #0BBF",
                 "addresses": ["192.168.0.115"],
                 "border_agent_id": "230c6a1ac57f6f4be262acf32e5ef52c",
-                "brand": "homeassistant",
+                "brand": "smarthub",
                 "extended_address": "aeeb2f594b570bbf",
                 "extended_pan_id": "e60fc7c186212ce5",
                 "model_name": "OpenThreadBorderRouter",
@@ -364,7 +364,7 @@ async def test_discover_routers(
                 "server": "core-silabs-multiprotocol.local.",
                 "thread_version": "1.3.0",
                 "unconfigured": None,
-                "vendor_name": "HomeAssistant",
+                "vendor_name": "SmartHub",
             },
             "key": "aeeb2f594b570bbf",
             "type": "router_discovered",

@@ -9,23 +9,23 @@ from mysensors.const_14 import SetReq
 from mysensors.sensor import Sensor
 import pytest
 
-from homeassistant.components.remote import (
+from smarthub.components.remote import (
     ATTR_COMMAND,
     DOMAIN as REMOTE_DOMAIN,
     SERVICE_LEARN_COMMAND,
     SERVICE_SEND_COMMAND,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_BATTERY_LEVEL,
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 async def test_ir_transceiver(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ir_transceiver: Sensor,
     receive_message: Callable[[str], None],
     transport_write: MagicMock,

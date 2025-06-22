@@ -2,15 +2,15 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_button_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_button_service_calls(
 
 
 async def test_button_service_calls_delay(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homeworks: MagicMock,
 ) -> None:

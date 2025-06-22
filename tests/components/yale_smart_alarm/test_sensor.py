@@ -6,13 +6,13 @@ from unittest.mock import Mock
 
 from yalesmartalarmclient import YaleSmartAlarmData
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_coordinator_setup_and_update_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_config_entry: tuple[MockConfigEntry, Mock],
     get_data: YaleSmartAlarmData,
 ) -> None:

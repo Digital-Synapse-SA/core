@@ -5,13 +5,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.config import YAML_CONFIG_FILE
-from homeassistant.scripts import check_config
+from smarthub.config import YAML_CONFIG_FILE
+from smarthub.scripts import check_config
 
 from tests.common import get_test_config_dir
 
 BASE_CONFIG = (
-    "homeassistant:\n"
+    "smarthub:\n"
     "  name: Home\n"
     "  latitude: -26.107361\n"
     "  longitude: 28.054500\n"
@@ -21,13 +21,13 @@ BASE_CONFIG = (
     "\n\n"
 )
 
-BAD_CORE_CONFIG = "homeassistant:\n  unit_system: bad\n\n\n"
+BAD_CORE_CONFIG = "smarthub:\n  unit_system: bad\n\n\n"
 
 
 @pytest.fixture(autouse=True)
 def reset_log_level():
     """Reset log level after each test case."""
-    logger = logging.getLogger("homeassistant.loader")
+    logger = logging.getLogger("smarthub.loader")
     orig_level = logger.level
     yield
     logger.setLevel(orig_level)
@@ -59,8 +59,8 @@ def normalize_yaml_files(check_dict):
 def test_bad_core_config() -> None:
     """Test a bad core config setup."""
     res = check_config.check(get_test_config_dir())
-    assert res["except"].keys() == {"homeassistant"}
-    assert res["except"]["homeassistant"][1] == {"unit_system": "bad"}
+    assert res["except"].keys() == {"smarthub"}
+    assert res["except"]["smarthub"][1] == {"unit_system": "bad"}
     assert res["warn"] == {}
 
 
@@ -69,7 +69,7 @@ def test_bad_core_config() -> None:
 def test_config_platform_valid() -> None:
     """Test a valid platform setup."""
     res = check_config.check(get_test_config_dir())
-    assert res["components"].keys() == {"homeassistant", "light"}
+    assert res["components"].keys() == {"smarthub", "light"}
     assert res["components"]["light"] == [{"platform": "demo"}]
     assert res["except"] == {}
     assert res["secret_cache"] == {}
@@ -83,12 +83,12 @@ def test_config_platform_valid() -> None:
     [
         (
             BASE_CONFIG + "beer:",
-            {"homeassistant"},
+            {"smarthub"},
             "Integration error: beer - Integration 'beer' not found.",
         ),
         (
             BASE_CONFIG + "light:\n  platform: beer",
-            {"homeassistant", "light"},
+            {"smarthub", "light"},
             (
                 "Platform error 'light' from integration 'beer' - "
                 "Integration 'beer' not found."
@@ -127,7 +127,7 @@ def test_secrets() -> None:
     res = check_config.check(get_test_config_dir(), True)
 
     assert res["except"] == {}
-    assert res["components"].keys() == {"homeassistant", "http"}
+    assert res["components"].keys() == {"smarthub", "http"}
     assert res["components"]["http"] == {
         "cors_allowed_origins": ["http://google.com"],
         "ip_ban_enabled": True,
@@ -157,11 +157,11 @@ def test_package_invalid() -> None:
     res = check_config.check(get_test_config_dir())
 
     assert res["except"] == {}
-    assert res["components"].keys() == {"homeassistant"}
+    assert res["components"].keys() == {"smarthub"}
     assert res["secret_cache"] == {}
     assert res["secrets"] == {}
-    assert res["warn"].keys() == {"homeassistant.packages.p1.group"}
-    assert res["warn"]["homeassistant.packages.p1.group"][1] == {"group": ["a"]}
+    assert res["warn"].keys() == {"smarthub.packages.p1.group"}
+    assert res["warn"]["smarthub.packages.p1.group"][1] == {"group": ["a"]}
     assert len(res["yaml_files"]) == 1
 
 

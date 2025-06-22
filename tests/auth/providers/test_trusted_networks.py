@@ -7,17 +7,17 @@ from hass_nabucasa import remote
 import pytest
 import voluptuous as vol
 
-from homeassistant import auth
-from homeassistant.auth import auth_store
-from homeassistant.auth.providers import trusted_networks as tn_auth
-from homeassistant.components.http import CONF_TRUSTED_PROXIES, CONF_USE_X_FORWARDED_FOR
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub import auth
+from smarthub.auth import auth_store
+from smarthub.auth.providers import trusted_networks as tn_auth
+from smarthub.components.http import CONF_TRUSTED_PROXIES, CONF_USE_X_FORWARDED_FOR
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture
-async def store(hass: HomeAssistant) -> auth_store.AuthStore:
+async def store(hass: SmartHub) -> auth_store.AuthStore:
     """Mock store."""
     store = auth_store.AuthStore(hass)
     await store.async_load()
@@ -26,7 +26,7 @@ async def store(hass: HomeAssistant) -> auth_store.AuthStore:
 
 @pytest.fixture
 def provider(
-    hass: HomeAssistant, store: auth_store.AuthStore
+    hass: SmartHub, store: auth_store.AuthStore
 ) -> tn_auth.TrustedNetworksAuthProvider:
     """Mock provider."""
     return tn_auth.TrustedNetworksAuthProvider(
@@ -48,7 +48,7 @@ def provider(
 
 @pytest.fixture
 def provider_with_user(
-    hass: HomeAssistant, store: auth_store.AuthStore
+    hass: SmartHub, store: auth_store.AuthStore
 ) -> tn_auth.TrustedNetworksAuthProvider:
     """Mock provider with trusted users config."""
     return tn_auth.TrustedNetworksAuthProvider(
@@ -76,7 +76,7 @@ def provider_with_user(
 
 @pytest.fixture
 def provider_bypass_login(
-    hass: HomeAssistant, store: auth_store.AuthStore
+    hass: SmartHub, store: auth_store.AuthStore
 ) -> tn_auth.TrustedNetworksAuthProvider:
     """Mock provider with allow_bypass_login config."""
     return tn_auth.TrustedNetworksAuthProvider(
@@ -99,7 +99,7 @@ def provider_bypass_login(
 
 @pytest.fixture
 def manager(
-    hass: HomeAssistant,
+    hass: SmartHub,
     store: auth_store.AuthStore,
     provider: tn_auth.TrustedNetworksAuthProvider,
 ) -> auth.AuthManager:
@@ -109,7 +109,7 @@ def manager(
 
 @pytest.fixture
 def manager_with_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     store: auth_store.AuthStore,
     provider_with_user: tn_auth.TrustedNetworksAuthProvider,
 ) -> auth.AuthManager:
@@ -124,7 +124,7 @@ def manager_with_user(
 
 @pytest.fixture
 def manager_bypass_login(
-    hass: HomeAssistant,
+    hass: SmartHub,
     store: auth_store.AuthStore,
     provider_bypass_login: tn_auth.TrustedNetworksAuthProvider,
 ) -> auth.AuthManager:
@@ -198,7 +198,7 @@ async def test_validate_access(provider: tn_auth.TrustedNetworksAuthProvider) ->
 
 
 async def test_validate_access_proxy(
-    hass: HomeAssistant, provider: tn_auth.TrustedNetworksAuthProvider
+    hass: SmartHub, provider: tn_auth.TrustedNetworksAuthProvider
 ) -> None:
     """Test validate access from trusted networks are blocked from proxy."""
 
@@ -223,7 +223,7 @@ async def test_validate_access_proxy(
 
 
 async def test_validate_access_cloud(
-    hass: HomeAssistant, provider: tn_auth.TrustedNetworksAuthProvider
+    hass: SmartHub, provider: tn_auth.TrustedNetworksAuthProvider
 ) -> None:
     """Test validate access from trusted networks are blocked from cloud."""
     await async_setup_component(

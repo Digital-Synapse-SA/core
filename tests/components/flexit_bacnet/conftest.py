@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock, patch
 from flexit_bacnet import FlexitBACnet
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.flexit_bacnet.const import DOMAIN
-from homeassistant.const import CONF_DEVICE_ID, CONF_IP_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.flexit_bacnet.const import DOMAIN
+from smarthub.const import CONF_DEVICE_ID, CONF_IP_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-async def flow_id(hass: HomeAssistant) -> str:
+async def flow_id(hass: SmartHub) -> str:
     """Return initial ID for user-initiated configuration flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -34,11 +34,11 @@ def mock_flexit_bacnet() -> Generator[AsyncMock]:
     flexit_bacnet = AsyncMock(spec=FlexitBACnet)
     with (
         patch(
-            "homeassistant.components.flexit_bacnet.config_flow.FlexitBACnet",
+            "smarthub.components.flexit_bacnet.config_flow.FlexitBACnet",
             return_value=flexit_bacnet,
         ),
         patch(
-            "homeassistant.components.flexit_bacnet.coordinator.FlexitBACnet",
+            "smarthub.components.flexit_bacnet.coordinator.FlexitBACnet",
             return_value=flexit_bacnet,
         ),
     ):
@@ -88,7 +88,7 @@ def mock_flexit_bacnet() -> Generator[AsyncMock]:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.flexit_bacnet.async_setup_entry", return_value=True
+        "smarthub.components.flexit_bacnet.async_setup_entry", return_value=True
     ) as setup_entry_mock:
         yield setup_entry_mock
 

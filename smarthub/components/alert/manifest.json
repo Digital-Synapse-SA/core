@@ -1,0 +1,9 @@
+{
+  "domain": "alert",
+  "name": "Alert",
+  "after_dependencies": ["notify"],
+  "codeowners": ["@smart-hub/core", "@frenck"],
+  "documentation": "https://www.smart-hub.io/integrations/alert",
+  "iot_class": "local_push",
+  "quality_scale": "internal"
+}

@@ -1,20 +1,20 @@
 """Tests for Broadlink switches."""
 
-from homeassistant.components.broadlink.const import DOMAIN
-from homeassistant.components.switch import (
+from smarthub.components.broadlink.const import DOMAIN
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import get_device
 
 
 async def test_switch_setup_works(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -38,7 +38,7 @@ async def test_switch_setup_works(
 
 
 async def test_switch_turn_off_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -74,7 +74,7 @@ async def test_switch_turn_off_turn_on(
 
 
 async def test_slots_switch_setup_works(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -99,7 +99,7 @@ async def test_slots_switch_setup_works(
 
 
 async def test_slots_switch_turn_off_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

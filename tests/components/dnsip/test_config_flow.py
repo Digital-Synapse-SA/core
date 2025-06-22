@@ -7,9 +7,9 @@ from unittest.mock import patch
 from aiodns.error import DNSError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.dnsip.config_flow import DATA_SCHEMA, DATA_SCHEMA_ADV
-from homeassistant.components.dnsip.const import (
+from smarthub import config_entries
+from smarthub.components.dnsip.config_flow import DATA_SCHEMA, DATA_SCHEMA_ADV
+from smarthub.components.dnsip.const import (
     CONF_HOSTNAME,
     CONF_IPV4,
     CONF_IPV6,
@@ -18,17 +18,17 @@ from homeassistant.components.dnsip.const import (
     CONF_RESOLVER_IPV6,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_NAME, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_NAME, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import RetrieveDNS
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -40,27 +40,27 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.dnsip.config_flow.aiodns.DNSResolver",
+            "smarthub.components.dnsip.config_flow.aiodns.DNSResolver",
             return_value=RetrieveDNS(),
         ),
         patch(
-            "homeassistant.components.dnsip.async_setup_entry",
+            "smarthub.components.dnsip.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
-                CONF_HOSTNAME: "home-assistant.io",
+                CONF_HOSTNAME: "smart-hub.io",
             },
         )
         await hass.async_block_till_done()
 
     assert result2["type"] is FlowResultType.CREATE_ENTRY
-    assert result2["title"] == "home-assistant.io"
+    assert result2["title"] == "smart-hub.io"
     assert result2["data"] == {
-        "hostname": "home-assistant.io",
-        "name": "home-assistant.io",
+        "hostname": "smart-hub.io",
+        "name": "smart-hub.io",
         "ipv4": True,
         "ipv6": True,
     }
@@ -73,7 +73,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_adv(hass: HomeAssistant) -> None:
+async def test_form_adv(hass: SmartHub) -> None:
     """Test we get the form with advanced options on."""
 
     result = await hass.config_entries.flow.async_init(
@@ -85,18 +85,18 @@ async def test_form_adv(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.dnsip.config_flow.aiodns.DNSResolver",
+            "smarthub.components.dnsip.config_flow.aiodns.DNSResolver",
             return_value=RetrieveDNS(),
         ),
         patch(
-            "homeassistant.components.dnsip.async_setup_entry",
+            "smarthub.components.dnsip.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
-                CONF_HOSTNAME: "home-assistant.io",
+                CONF_HOSTNAME: "smart-hub.io",
                 CONF_RESOLVER: "8.8.8.8",
                 CONF_RESOLVER_IPV6: "2620:119:53::53",
                 CONF_PORT: 53,
@@ -106,10 +106,10 @@ async def test_form_adv(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
     assert result2["type"] is FlowResultType.CREATE_ENTRY
-    assert result2["title"] == "home-assistant.io"
+    assert result2["title"] == "smart-hub.io"
     assert result2["data"] == {
-        "hostname": "home-assistant.io",
-        "name": "home-assistant.io",
+        "hostname": "smart-hub.io",
+        "name": "smart-hub.io",
         "ipv4": True,
         "ipv6": True,
     }
@@ -122,20 +122,20 @@ async def test_form_adv(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_error(hass: HomeAssistant) -> None:
+async def test_form_error(hass: SmartHub) -> None:
     """Test validate url fails."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.dnsip.config_flow.aiodns.DNSResolver",
+        "smarthub.components.dnsip.config_flow.aiodns.DNSResolver",
         side_effect=DNSError("Did not find"),
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
-                CONF_HOSTNAME: "home-assistant.io",
+                CONF_HOSTNAME: "smart-hub.io",
             },
         )
         await hass.async_block_till_done()
@@ -145,14 +145,14 @@ async def test_form_error(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_hostname"}
 
 
-async def test_flow_already_exist(hass: HomeAssistant) -> None:
+async def test_flow_already_exist(hass: SmartHub) -> None:
     """Test flow when unique id already exist."""
 
     MockConfigEntry(
         domain=DOMAIN,
         data={
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_IPV4: True,
             CONF_IPV6: True,
         },
@@ -162,7 +162,7 @@ async def test_flow_already_exist(hass: HomeAssistant) -> None:
             CONF_PORT: 53,
             CONF_PORT_IPV6: 53,
         },
-        unique_id="home-assistant.io",
+        unique_id="smart-hub.io",
     ).add_to_hass(hass)
 
     result = await hass.config_entries.flow.async_init(
@@ -172,18 +172,18 @@ async def test_flow_already_exist(hass: HomeAssistant) -> None:
     dns_mock = RetrieveDNS()
     with (
         patch(
-            "homeassistant.components.dnsip.async_setup_entry",
+            "smarthub.components.dnsip.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.dnsip.config_flow.aiodns.DNSResolver",
+            "smarthub.components.dnsip.config_flow.aiodns.DNSResolver",
             return_value=dns_mock,
         ),
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
-                CONF_HOSTNAME: "home-assistant.io",
+                CONF_HOSTNAME: "smart-hub.io",
             },
         )
         await hass.async_block_till_done()
@@ -192,14 +192,14 @@ async def test_flow_already_exist(hass: HomeAssistant) -> None:
     assert result2["reason"] == "already_configured"
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test options config flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id="12345",
         data={
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_IPV4: True,
             CONF_IPV6: False,
         },
@@ -213,7 +213,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.dnsip.config_flow.aiodns.DNSResolver",
+        "smarthub.components.dnsip.config_flow.aiodns.DNSResolver",
         return_value=RetrieveDNS(),
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -225,7 +225,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     assert result["step_id"] == "init"
 
     with patch(
-        "homeassistant.components.dnsip.config_flow.aiodns.DNSResolver",
+        "smarthub.components.dnsip.config_flow.aiodns.DNSResolver",
         return_value=RetrieveDNS(),
     ):
         result = await hass.config_entries.options.async_configure(
@@ -250,14 +250,14 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     assert entry.state is ConfigEntryState.LOADED
 
 
-async def test_options_flow_empty_return(hass: HomeAssistant) -> None:
+async def test_options_flow_empty_return(hass: SmartHub) -> None:
     """Test options config flow with empty return from user."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id="12345",
         data={
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_IPV4: True,
             CONF_IPV6: False,
         },
@@ -271,7 +271,7 @@ async def test_options_flow_empty_return(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.dnsip.config_flow.aiodns.DNSResolver",
+        "smarthub.components.dnsip.config_flow.aiodns.DNSResolver",
         return_value=RetrieveDNS(),
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -283,7 +283,7 @@ async def test_options_flow_empty_return(hass: HomeAssistant) -> None:
     assert result["step_id"] == "init"
 
     with patch(
-        "homeassistant.components.dnsip.config_flow.aiodns.DNSResolver",
+        "smarthub.components.dnsip.config_flow.aiodns.DNSResolver",
         return_value=RetrieveDNS(),
     ):
         result = await hass.config_entries.options.async_configure(
@@ -302,10 +302,10 @@ async def test_options_flow_empty_return(hass: HomeAssistant) -> None:
 
     entry = hass.config_entries.async_get_entry(entry.entry_id)
     assert entry.data == {
-        "hostname": "home-assistant.io",
+        "hostname": "smart-hub.io",
         "ipv4": True,
         "ipv6": False,
-        "name": "home-assistant.io",
+        "name": "smart-hub.io",
     }
     assert entry.options == {
         "resolver": "208.67.222.222",
@@ -319,8 +319,8 @@ async def test_options_flow_empty_return(hass: HomeAssistant) -> None:
     "p_input",
     [
         {
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_RESOLVER: "208.67.222.222",
             CONF_RESOLVER_IPV6: "2620:119:53::5",
             CONF_PORT: 53,
@@ -329,8 +329,8 @@ async def test_options_flow_empty_return(hass: HomeAssistant) -> None:
             CONF_IPV6: False,
         },
         {
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_RESOLVER: "208.67.222.222",
             CONF_RESOLVER_IPV6: "2620:119:53::5",
             CONF_PORT: 53,
@@ -340,7 +340,7 @@ async def test_options_flow_empty_return(hass: HomeAssistant) -> None:
         },
     ],
 )
-async def test_options_error(hass: HomeAssistant, p_input: dict[str, str]) -> None:
+async def test_options_error(hass: SmartHub, p_input: dict[str, str]) -> None:
     """Test validate url fails in options."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -350,7 +350,7 @@ async def test_options_error(hass: HomeAssistant, p_input: dict[str, str]) -> No
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.dnsip.async_setup_entry",
+        "smarthub.components.dnsip.async_setup_entry",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -359,7 +359,7 @@ async def test_options_error(hass: HomeAssistant, p_input: dict[str, str]) -> No
     result = await hass.config_entries.options.async_init(entry.entry_id)
 
     with patch(
-        "homeassistant.components.dnsip.config_flow.aiodns.DNSResolver",
+        "smarthub.components.dnsip.config_flow.aiodns.DNSResolver",
         side_effect=DNSError("Did not find"),
     ):
         result2 = await hass.config_entries.options.async_configure(

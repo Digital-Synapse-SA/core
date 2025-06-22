@@ -17,12 +17,12 @@ from samsungtvws.exceptions import (
 from websockets import frames
 from websockets.exceptions import ConnectionClosedError, WebSocketException
 
-from homeassistant import config_entries
-from homeassistant.components.samsungtv.config_flow import (
+from smarthub import config_entries
+from smarthub.components.samsungtv.config_flow import (
     SamsungTVConfigFlow,
     _strip_uuid,
 )
-from homeassistant.components.samsungtv.const import (
+from smarthub.components.samsungtv.const import (
     CONF_MANUFACTURER,
     CONF_SESSION_ID,
     CONF_SSDP_MAIN_TV_AGENT_LOCATION,
@@ -37,8 +37,8 @@ from homeassistant.components.samsungtv.const import (
     TIMEOUT_REQUEST,
     TIMEOUT_WEBSOCKET,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_METHOD,
@@ -47,17 +47,17 @@ from homeassistant.const import (
     CONF_PORT,
     CONF_TOKEN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import BaseServiceInfo, FlowResultType
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import BaseServiceInfo, FlowResultType
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_MANUFACTURER,
     SsdpServiceInfo,
 )
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
-from homeassistant.setup import async_setup_component
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.setup import async_setup_component
 
 from .const import (
     ENTRYDATA_ENCRYPTED_WEBSOCKET,
@@ -102,8 +102,8 @@ MOCK_DEVICE_INFO = {
 }
 
 AUTODETECT_LEGACY = {
-    "name": "HomeAssistant",
-    "description": "HomeAssistant",
+    "name": "SmartHub",
+    "description": "SmartHub",
     "id": "ha.component.samsung",
     "method": METHOD_LEGACY,
     "port": LEGACY_PORT,
@@ -112,7 +112,7 @@ AUTODETECT_LEGACY = {
 }
 AUTODETECT_WEBSOCKET_SSL = {
     "host": "10.20.43.21",
-    "name": "HomeAssistant",
+    "name": "SmartHub",
     "port": 8002,
     "timeout": TIMEOUT_REQUEST,
     "token": None,
@@ -128,7 +128,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 @pytest.mark.usefixtures("remote_legacy", "rest_api_failing")
-async def test_user_legacy(hass: HomeAssistant) -> None:
+async def test_user_legacy(hass: SmartHub) -> None:
     """Test starting a flow by user."""
     # show form
     result = await hass.config_entries.flow.async_init(
@@ -139,7 +139,7 @@ async def test_user_legacy(hass: HomeAssistant) -> None:
 
     # Wrong host allow to retry
     with patch(
-        "homeassistant.components.samsungtv.config_flow.socket.gethostbyname",
+        "smarthub.components.samsungtv.config_flow.socket.gethostbyname",
         side_effect=socket.gaierror("[Error -2] Name or Service not known"),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -165,11 +165,11 @@ async def test_user_legacy(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("rest_api_failing")
-async def test_user_legacy_does_not_ok_first_time(hass: HomeAssistant) -> None:
+async def test_user_legacy_does_not_ok_first_time(hass: SmartHub) -> None:
     """Test starting a flow by user."""
     # show form
     with patch(
-        "homeassistant.components.samsungtv.bridge.Remote",
+        "smarthub.components.samsungtv.bridge.Remote",
         side_effect=AccessDenied("Boom"),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -182,7 +182,7 @@ async def test_user_legacy_does_not_ok_first_time(hass: HomeAssistant) -> None:
             result["flow_id"], user_input=MOCK_USER_DATA
         )
 
-    with patch("homeassistant.components.samsungtv.bridge.Remote"):
+    with patch("smarthub.components.samsungtv.bridge.Remote"):
         # entry was added
         result3 = await hass.config_entries.flow.async_configure(
             result2["flow_id"], user_input={}
@@ -201,10 +201,10 @@ async def test_user_legacy_does_not_ok_first_time(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
-async def test_user_websocket(hass: HomeAssistant) -> None:
+async def test_user_websocket(hass: SmartHub) -> None:
     """Test starting a flow by user."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.Remote", side_effect=OSError("Boom")
+        "smarthub.components.samsungtv.bridge.Remote", side_effect=OSError("Boom")
     ):
         # show form
         result = await hass.config_entries.flow.async_init(
@@ -229,7 +229,7 @@ async def test_user_websocket(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api_non_ssl_only")
 async def test_user_encrypted_websocket(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test starting a flow from ssdp for a supported device populates the mac."""
     # show form
@@ -240,7 +240,7 @@ async def test_user_encrypted_websocket(
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.samsungtv.config_flow.SamsungTVEncryptedWSAsyncAuthenticator",
+        "smarthub.components.samsungtv.config_flow.SamsungTVEncryptedWSAsyncAuthenticator",
         autospec=True,
     ) as authenticator_mock:
         authenticator_mock.return_value.try_pin.side_effect = [
@@ -279,10 +279,10 @@ async def test_user_encrypted_websocket(
 
 
 @pytest.mark.usefixtures("rest_api_failing")
-async def test_user_legacy_missing_auth(hass: HomeAssistant) -> None:
+async def test_user_legacy_missing_auth(hass: SmartHub) -> None:
     """Test starting a flow by user with authentication."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.Remote",
+        "smarthub.components.samsungtv.bridge.Remote",
         side_effect=AccessDenied("Boom"),
     ):
         # legacy device missing authentication
@@ -294,7 +294,7 @@ async def test_user_legacy_missing_auth(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "auth_missing"}
 
     with patch(
-        "homeassistant.components.samsungtv.bridge.Remote",
+        "smarthub.components.samsungtv.bridge.Remote",
         side_effect=OSError,
     ):
         # legacy device fails to connect after auth failed
@@ -306,10 +306,10 @@ async def test_user_legacy_missing_auth(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("rest_api_failing")
-async def test_user_legacy_not_supported(hass: HomeAssistant) -> None:
+async def test_user_legacy_not_supported(hass: SmartHub) -> None:
     """Test starting a flow by user for not supported device."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.Remote",
+        "smarthub.components.samsungtv.bridge.Remote",
         side_effect=UnhandledResponse("Boom"),
     ):
         # legacy device not supported
@@ -321,15 +321,15 @@ async def test_user_legacy_not_supported(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("rest_api", "remote_encrypted_websocket_failing")
-async def test_user_websocket_not_supported(hass: HomeAssistant) -> None:
+async def test_user_websocket_not_supported(hass: SmartHub) -> None:
     """Test starting a flow by user for not supported device."""
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
             side_effect=WebSocketException("Boom"),
         ),
     ):
@@ -343,16 +343,16 @@ async def test_user_websocket_not_supported(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("rest_api", "remote_encrypted_websocket_failing")
 async def test_user_websocket_access_denied(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test starting a flow by user for not supported device."""
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
             side_effect=ConnectionClosedError(rcvd=None, sent=frames.Close(1002, "")),
         ),
     ):
@@ -366,15 +366,15 @@ async def test_user_websocket_access_denied(
 
 
 @pytest.mark.usefixtures("rest_api", "remote_encrypted_websocket_failing")
-async def test_user_websocket_auth_retry(hass: HomeAssistant) -> None:
+async def test_user_websocket_auth_retry(hass: SmartHub) -> None:
     """Test starting a flow by user for not supported device."""
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
             side_effect=UnauthorizedError,
         ),
     ):
@@ -387,11 +387,11 @@ async def test_user_websocket_auth_retry(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "auth_missing"}
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
         ),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -406,15 +406,15 @@ async def test_user_websocket_auth_retry(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("rest_api_failing")
-async def test_user_not_successful(hass: HomeAssistant) -> None:
+async def test_user_not_successful(hass: SmartHub) -> None:
     """Test starting a flow by user but no connection found."""
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
             side_effect=OSError("Boom"),
         ),
     ):
@@ -426,15 +426,15 @@ async def test_user_not_successful(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("rest_api_failing")
-async def test_user_not_successful_2(hass: HomeAssistant) -> None:
+async def test_user_not_successful_2(hass: SmartHub) -> None:
     """Test starting a flow by user but no connection found."""
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
             side_effect=ConnectionFailure("Boom"),
         ),
     ):
@@ -446,7 +446,7 @@ async def test_user_not_successful_2(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_legacy", "rest_api_failing")
-async def test_ssdp(hass: HomeAssistant) -> None:
+async def test_ssdp(hass: SmartHub) -> None:
     """Test starting a flow from discovery."""
     # confirm to add the entry
     result = await hass.config_entries.flow.async_init(
@@ -468,7 +468,7 @@ async def test_ssdp(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_legacy", "rest_api_failing")
-async def test_ssdp_no_manufacturer(hass: HomeAssistant) -> None:
+async def test_ssdp_no_manufacturer(hass: SmartHub) -> None:
     """Test starting a flow from discovery when the manufacturer data is missing."""
     ssdp_data = deepcopy(MOCK_SSDP_DATA)
     ssdp_data.upnp.pop(ATTR_UPNP_MANUFACTURER)
@@ -487,7 +487,7 @@ async def test_ssdp_no_manufacturer(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("remote_legacy", "rest_api_failing")
 async def test_ssdp_legacy_not_remote_control_receiver_udn(
-    hass: HomeAssistant, data: SsdpServiceInfo
+    hass: SmartHub, data: SsdpServiceInfo
 ) -> None:
     """Test we abort if the st is not usable for legacy discovery since it will have a different UDN."""
     result = await hass.config_entries.flow.async_init(
@@ -498,7 +498,7 @@ async def test_ssdp_legacy_not_remote_control_receiver_udn(
 
 
 @pytest.mark.usefixtures("remote_legacy", "rest_api_failing")
-async def test_ssdp_noprefix(hass: HomeAssistant) -> None:
+async def test_ssdp_noprefix(hass: SmartHub) -> None:
     """Test starting a flow from discovery when friendly name doesn't start with [TV]."""
     ssdp_data = deepcopy(MOCK_SSDP_DATA)
     ssdp_data.upnp[ATTR_UPNP_FRIENDLY_NAME] = ssdp_data.upnp[ATTR_UPNP_FRIENDLY_NAME][
@@ -526,10 +526,10 @@ async def test_ssdp_noprefix(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_websocket", "rest_api_failing")
-async def test_ssdp_legacy_missing_auth(hass: HomeAssistant) -> None:
+async def test_ssdp_legacy_missing_auth(hass: SmartHub) -> None:
     """Test starting a flow from discovery with authentication."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.Remote",
+        "smarthub.components.samsungtv.bridge.Remote",
         side_effect=AccessDenied("Boom"),
     ):
         # confirm to add the entry
@@ -547,7 +547,7 @@ async def test_ssdp_legacy_missing_auth(hass: HomeAssistant) -> None:
         assert result["step_id"] == "pairing"
         assert result["errors"] == {"base": "auth_missing"}
 
-    with patch("homeassistant.components.samsungtv.bridge.Remote"):
+    with patch("smarthub.components.samsungtv.bridge.Remote"):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], user_input={}
         )
@@ -561,10 +561,10 @@ async def test_ssdp_legacy_missing_auth(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_websocket", "rest_api_failing")
-async def test_ssdp_legacy_not_supported(hass: HomeAssistant) -> None:
+async def test_ssdp_legacy_not_supported(hass: SmartHub) -> None:
     """Test starting a flow from discovery for not supported device."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.SamsungTVLegacyBridge.async_try_connect",
+        "smarthub.components.samsungtv.bridge.SamsungTVLegacyBridge.async_try_connect",
         return_value=RESULT_NOT_SUPPORTED,
     ):
         # confirm to add the entry
@@ -579,7 +579,7 @@ async def test_ssdp_legacy_not_supported(hass: HomeAssistant) -> None:
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_ssdp_websocket_success_populates_mac_address_and_ssdp_location(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test starting a flow from ssdp for a supported device populates the mac."""
     result = await hass.config_entries.flow.async_init(
@@ -610,7 +610,7 @@ async def test_ssdp_websocket_success_populates_mac_address_and_ssdp_location(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_ssdp_websocket_success_populates_mac_address_and_main_tv_ssdp_location(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test starting a flow from ssdp for a supported device populates the mac."""
     result = await hass.config_entries.flow.async_init(
@@ -639,7 +639,7 @@ async def test_ssdp_websocket_success_populates_mac_address_and_main_tv_ssdp_loc
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api_non_ssl_only")
 async def test_ssdp_encrypted_websocket_success_populates_mac_address_and_ssdp_location(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test starting a flow from ssdp for a supported device populates the mac."""
     result = await hass.config_entries.flow.async_init(
@@ -651,7 +651,7 @@ async def test_ssdp_encrypted_websocket_success_populates_mac_address_and_ssdp_l
     assert result["step_id"] == "confirm"
 
     with patch(
-        "homeassistant.components.samsungtv.config_flow.SamsungTVEncryptedWSAsyncAuthenticator",
+        "smarthub.components.samsungtv.config_flow.SamsungTVEncryptedWSAsyncAuthenticator",
         autospec=True,
     ) as authenticator_mock:
         authenticator_mock.return_value.try_pin.side_effect = [
@@ -692,11 +692,11 @@ async def test_ssdp_encrypted_websocket_success_populates_mac_address_and_ssdp_l
 
 @pytest.mark.usefixtures("rest_api_non_ssl_only")
 async def test_ssdp_encrypted_websocket_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test starting a flow from ssdp for an unsupported device populates the mac."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.SamsungTVEncryptedWSAsyncRemote.start_listening",
+        "smarthub.components.samsungtv.bridge.SamsungTVEncryptedWSAsyncRemote.start_listening",
         side_effect=WebSocketException,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -709,19 +709,19 @@ async def test_ssdp_encrypted_websocket_not_supported(
 
 
 @pytest.mark.usefixtures("rest_api_failing")
-async def test_ssdp_websocket_cannot_connect(hass: HomeAssistant) -> None:
+async def test_ssdp_websocket_cannot_connect(hass: SmartHub) -> None:
     """Test starting a flow from discovery and we cannot connect."""
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVEncryptedWSAsyncRemote.start_listening",
+            "smarthub.components.samsungtv.bridge.SamsungTVEncryptedWSAsyncRemote.start_listening",
             side_effect=WebSocketException("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote",
         ) as remote_websocket,
         patch.object(remote_websocket, "open", side_effect=WebSocketException("Boom")),
     ):
@@ -734,7 +734,7 @@ async def test_ssdp_websocket_cannot_connect(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_legacy")
-async def test_ssdp_wrong_manufacturer(hass: HomeAssistant) -> None:
+async def test_ssdp_wrong_manufacturer(hass: SmartHub) -> None:
     """Test starting a flow from discovery."""
     ssdp_data = deepcopy(MOCK_SSDP_DATA)
     ssdp_data.upnp[ATTR_UPNP_MANUFACTURER] = ssdp_data.upnp[ATTR_UPNP_MANUFACTURER][7:]
@@ -749,19 +749,19 @@ async def test_ssdp_wrong_manufacturer(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_encrypted_websocket_failing")
-async def test_ssdp_not_successful(hass: HomeAssistant) -> None:
+async def test_ssdp_not_successful(hass: SmartHub) -> None:
     """Test starting a flow from discovery but no device found."""
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
             return_value=MOCK_DEVICE_INFO,
         ),
     ):
@@ -781,19 +781,19 @@ async def test_ssdp_not_successful(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_encrypted_websocket_failing")
-async def test_ssdp_not_successful_2(hass: HomeAssistant) -> None:
+async def test_ssdp_not_successful_2(hass: SmartHub) -> None:
     """Test starting a flow from discovery but no device found."""
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
             side_effect=ConnectionFailure("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
+            "smarthub.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
             return_value=MOCK_DEVICE_INFO,
         ),
     ):
@@ -813,10 +813,10 @@ async def test_ssdp_not_successful_2(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_legacy", "remote_encrypted_websocket_failing")
-async def test_ssdp_already_in_progress(hass: HomeAssistant) -> None:
+async def test_ssdp_already_in_progress(hass: SmartHub) -> None:
     """Test starting a flow from discovery twice."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
+        "smarthub.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
         return_value=MOCK_DEVICE_INFO,
     ):
         # confirm to add the entry
@@ -835,10 +835,10 @@ async def test_ssdp_already_in_progress(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_websocket", "remote_encrypted_websocket_failing")
-async def test_ssdp_already_configured(hass: HomeAssistant) -> None:
+async def test_ssdp_already_configured(hass: SmartHub) -> None:
     """Test starting a flow from discovery when already configured."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
+        "smarthub.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
         return_value=MOCK_DEVICE_INFO,
     ):
         # entry was added
@@ -865,7 +865,7 @@ async def test_ssdp_already_configured(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "remote_websocket", "rest_api_non_ssl_only", "remote_encrypted_websocket_failing"
 )
-async def test_dhcp_wireless(hass: HomeAssistant) -> None:
+async def test_dhcp_wireless(hass: SmartHub) -> None:
     """Test starting a flow from dhcp."""
     # confirm to add the entry
     result = await hass.config_entries.flow.async_init(
@@ -893,7 +893,7 @@ async def test_dhcp_wireless(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
-async def test_dhcp_wired(hass: HomeAssistant, rest_api: Mock) -> None:
+async def test_dhcp_wired(hass: SmartHub, rest_api: Mock) -> None:
     """Test starting a flow from dhcp."""
     # Even though it is named "wifiMac", it matches the mac of the wired connection
     rest_api.rest_device_info.return_value = await async_load_json_object_fixture(
@@ -959,7 +959,7 @@ async def test_dhcp_wired(hass: HomeAssistant, rest_api: Mock) -> None:
     ],
 )
 async def test_dhcp_zeroconf_already_in_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     source1: str,
     data1: BaseServiceInfo,
     source2: str,
@@ -999,7 +999,7 @@ async def test_dhcp_zeroconf_already_in_progress(
 @pytest.mark.usefixtures(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
-async def test_zeroconf(hass: HomeAssistant) -> None:
+async def test_zeroconf(hass: SmartHub) -> None:
     """Test starting a flow from zeroconf."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -1024,7 +1024,7 @@ async def test_zeroconf(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_websocket", "remote_encrypted_websocket_failing")
-async def test_zeroconf_ignores_soundbar(hass: HomeAssistant, rest_api: Mock) -> None:
+async def test_zeroconf_ignores_soundbar(hass: SmartHub, rest_api: Mock) -> None:
     """Test starting a flow from zeroconf where the device is actually a soundbar."""
     rest_api.rest_device_info.return_value = {
         "id": "uuid:be9554b9-c9fb-41f4-8920-22da015376a4",
@@ -1052,7 +1052,7 @@ async def test_zeroconf_ignores_soundbar(hass: HomeAssistant, rest_api: Mock) ->
     "remote_encrypted_websocket",
     "rest_api_failing",
 )
-async def test_zeroconf_no_device_info(hass: HomeAssistant) -> None:
+async def test_zeroconf_no_device_info(hass: SmartHub) -> None:
     """Test starting a flow from zeroconf where device_info returns None."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -1067,7 +1067,7 @@ async def test_zeroconf_no_device_info(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
-async def test_zeroconf_and_dhcp_same_time(hass: HomeAssistant) -> None:
+async def test_zeroconf_and_dhcp_same_time(hass: SmartHub) -> None:
     """Test starting a flow from zeroconf and dhcp."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -1089,18 +1089,18 @@ async def test_zeroconf_and_dhcp_same_time(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_encrypted_websocket_failing")
-async def test_autodetect_websocket(hass: HomeAssistant) -> None:
+async def test_autodetect_websocket(hass: SmartHub) -> None:
     """Test for send key with autodetection of protocol."""
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote"
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote"
         ) as remote_websocket,
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVAsyncRest",
+            "smarthub.components.samsungtv.bridge.SamsungTVAsyncRest",
         ) as rest_api_class,
     ):
         remote = Mock(SamsungTVWSAsyncRemote)
@@ -1139,19 +1139,19 @@ async def test_autodetect_websocket(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_encrypted_websocket_failing")
-async def test_websocket_no_mac(hass: HomeAssistant, mac_address: Mock) -> None:
+async def test_websocket_no_mac(hass: SmartHub, mac_address: Mock) -> None:
     """Test for send key with autodetection of protocol."""
     mac_address.return_value = "gg:ee:tt:mm:aa:cc"
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote"
+            "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote"
         ) as remote_websocket,
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVAsyncRest",
+            "smarthub.components.samsungtv.bridge.SamsungTVAsyncRest",
         ) as rest_api_class,
     ):
         remote = Mock(SamsungTVWSAsyncRemote)
@@ -1190,10 +1190,10 @@ async def test_websocket_no_mac(hass: HomeAssistant, mac_address: Mock) -> None:
 
 
 @pytest.mark.usefixtures("rest_api_failing")
-async def test_autodetect_auth_missing(hass: HomeAssistant) -> None:
+async def test_autodetect_auth_missing(hass: SmartHub) -> None:
     """Test for send key with autodetection of protocol."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.Remote",
+        "smarthub.components.samsungtv.bridge.Remote",
         side_effect=AccessDenied("Boom"),
     ) as remote:
         result = await hass.config_entries.flow.async_init(
@@ -1208,7 +1208,7 @@ async def test_autodetect_auth_missing(hass: HomeAssistant) -> None:
             call(AUTODETECT_LEGACY),
             call(AUTODETECT_LEGACY),
         ]
-    with patch("homeassistant.components.samsungtv.bridge.Remote", side_effect=OSError):
+    with patch("smarthub.components.samsungtv.bridge.Remote", side_effect=OSError):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {},
@@ -1219,10 +1219,10 @@ async def test_autodetect_auth_missing(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("rest_api_failing")
-async def test_autodetect_not_supported(hass: HomeAssistant) -> None:
+async def test_autodetect_not_supported(hass: SmartHub) -> None:
     """Test for send key with autodetection of protocol."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.Remote",
+        "smarthub.components.samsungtv.bridge.Remote",
         side_effect=[UnhandledResponse("Boom")],
     ) as remote:
         result = await hass.config_entries.flow.async_init(
@@ -1235,7 +1235,7 @@ async def test_autodetect_not_supported(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_legacy", "rest_api_failing")
-async def test_autodetect_legacy(hass: HomeAssistant) -> None:
+async def test_autodetect_legacy(hass: SmartHub) -> None:
     """Test for send key with autodetection of protocol."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}, data=MOCK_USER_DATA
@@ -1246,15 +1246,15 @@ async def test_autodetect_legacy(hass: HomeAssistant) -> None:
     assert result["data"][CONF_PORT] == LEGACY_PORT
 
 
-async def test_autodetect_none(hass: HomeAssistant) -> None:
+async def test_autodetect_none(hass: SmartHub) -> None:
     """Test for send key with autodetection of protocol."""
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote",
+            "smarthub.components.samsungtv.bridge.Remote",
             side_effect=OSError("Boom"),
         ) as remote,
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVAsyncRest.rest_device_info",
+            "smarthub.components.samsungtv.bridge.SamsungTVAsyncRest.rest_device_info",
             side_effect=ResponseError,
         ) as rest_device_info,
     ):
@@ -1273,7 +1273,7 @@ async def test_autodetect_none(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
-async def test_update_old_entry(hass: HomeAssistant) -> None:
+async def test_update_old_entry(hass: SmartHub) -> None:
     """Test update of old entry sets unique id."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRYDATA_LEGACY)
     entry.add_to_hass(hass)
@@ -1303,7 +1303,7 @@ async def test_update_old_entry(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("remote_websocket", "rest_api")
 async def test_update_missing_mac_unique_id_added_from_dhcp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing mac and unique id added."""
     # Incorrect MAC cleanup introduced in #110599, can be removed in 2026.3
@@ -1330,7 +1330,7 @@ async def test_update_missing_mac_unique_id_added_from_dhcp(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_incorrectly_formatted_mac_unique_id_added_from_dhcp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test incorrectly formatted mac is updated and unique id added."""
     entry_data = ENTRYDATA_LEGACY.copy()
@@ -1356,7 +1356,7 @@ async def test_update_incorrectly_formatted_mac_unique_id_added_from_dhcp(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_missing_mac_unique_id_added_from_zeroconf(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing mac and unique id added."""
     entry = MockConfigEntry(
@@ -1382,7 +1382,7 @@ async def test_update_missing_mac_unique_id_added_from_zeroconf(
 
 @pytest.mark.usefixtures("remote_legacy", "rest_api_failing")
 async def test_update_missing_model_added_from_ssdp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing model added via ssdp on legacy models."""
     entry = MockConfigEntry(
@@ -1409,7 +1409,7 @@ async def test_update_missing_model_added_from_ssdp(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_missing_mac_unique_id_ssdp_location_added_from_ssdp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing mac, ssdp_location, and unique id added via ssdp."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRYDATA_LEGACY, unique_id=None)
@@ -1438,7 +1438,7 @@ async def test_update_missing_mac_unique_id_ssdp_location_added_from_ssdp(
     "rest_api_failing",
 )
 async def test_update_zeroconf_discovery_preserved_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test zeroconf discovery preserves unique id."""
     entry = MockConfigEntry(
@@ -1463,7 +1463,7 @@ async def test_update_zeroconf_discovery_preserved_unique_id(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_missing_mac_unique_id_added_ssdp_location_updated_from_ssdp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing mac and unique id with outdated ssdp_location with the wrong st added via ssdp."""
     entry = MockConfigEntry(
@@ -1498,7 +1498,7 @@ async def test_update_missing_mac_unique_id_added_ssdp_location_updated_from_ssd
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_missing_mac_unique_id_added_ssdp_location_rendering_st_updated_from_ssdp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing mac and unique id with outdated ssdp_location with the correct st added via ssdp."""
     entry = MockConfigEntry(
@@ -1534,7 +1534,7 @@ async def test_update_missing_mac_unique_id_added_ssdp_location_rendering_st_upd
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_missing_mac_unique_id_added_ssdp_location_main_tv_agent_st_updated_from_ssdp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing mac and unique id with outdated ssdp_location with the correct st added via ssdp."""
     entry = MockConfigEntry(
@@ -1574,7 +1574,7 @@ async def test_update_missing_mac_unique_id_added_ssdp_location_main_tv_agent_st
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_ssdp_location_rendering_st_updated_from_ssdp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test with outdated ssdp_location with the correct st added via ssdp."""
     entry = MockConfigEntry(
@@ -1607,7 +1607,7 @@ async def test_update_ssdp_location_rendering_st_updated_from_ssdp(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_main_tv_ssdp_location_rendering_st_updated_from_ssdp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test with outdated ssdp_location with the correct st added via ssdp."""
     entry = MockConfigEntry(
@@ -1637,7 +1637,7 @@ async def test_update_main_tv_ssdp_location_rendering_st_updated_from_ssdp(
 
 @pytest.mark.usefixtures("remote_websocket", "rest_api")
 async def test_update_missing_mac_added_unique_id_preserved_from_zeroconf(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing mac and unique id added."""
     entry = MockConfigEntry(
@@ -1663,7 +1663,7 @@ async def test_update_missing_mac_added_unique_id_preserved_from_zeroconf(
 
 @pytest.mark.usefixtures("remote_legacy")
 async def test_update_legacy_missing_mac_from_dhcp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing mac added."""
     entry = MockConfigEntry(
@@ -1691,7 +1691,7 @@ async def test_update_legacy_missing_mac_from_dhcp(
 
 @pytest.mark.usefixtures("remote_legacy")
 async def test_update_legacy_missing_mac_from_dhcp_no_unique_id(
-    hass: HomeAssistant, rest_api: Mock, mock_setup_entry: AsyncMock
+    hass: SmartHub, rest_api: Mock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing mac added when there is no unique id."""
     rest_api.rest_device_info.side_effect = HttpApiError
@@ -1702,11 +1702,11 @@ async def test_update_legacy_missing_mac_from_dhcp_no_unique_id(
     entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.samsungtv.bridge.Remote.__enter__",
+            "smarthub.components.samsungtv.bridge.Remote.__enter__",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.samsungtv.bridge.SamsungTVEncryptedWSAsyncRemote.start_listening",
+            "smarthub.components.samsungtv.bridge.SamsungTVEncryptedWSAsyncRemote.start_listening",
             side_effect=WebSocketException("Boom"),
         ),
     ):
@@ -1730,7 +1730,7 @@ async def test_update_legacy_missing_mac_from_dhcp_no_unique_id(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_ssdp_location_unique_id_added_from_ssdp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing ssdp_location, and unique id added via ssdp."""
     entry = MockConfigEntry(
@@ -1760,7 +1760,7 @@ async def test_update_ssdp_location_unique_id_added_from_ssdp(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_ssdp_location_unique_id_added_from_ssdp_with_rendering_control_st(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test missing ssdp_location, and unique id added via ssdp with rendering control st."""
     entry = MockConfigEntry(
@@ -1790,7 +1790,7 @@ async def test_update_ssdp_location_unique_id_added_from_ssdp_with_rendering_con
 
 
 @pytest.mark.usefixtures("remote_legacy")
-async def test_form_reauth_legacy(hass: HomeAssistant) -> None:
+async def test_form_reauth_legacy(hass: SmartHub) -> None:
     """Test reauthenticate legacy."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRYDATA_LEGACY)
     entry.add_to_hass(hass)
@@ -1808,7 +1808,7 @@ async def test_form_reauth_legacy(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_websocket", "rest_api")
-async def test_form_reauth_websocket(hass: HomeAssistant) -> None:
+async def test_form_reauth_websocket(hass: SmartHub) -> None:
     """Test reauthenticate websocket."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRYDATA_WEBSOCKET)
     entry.add_to_hass(hass)
@@ -1830,7 +1830,7 @@ async def test_form_reauth_websocket(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("rest_api")
 async def test_form_reauth_websocket_cannot_connect(
-    hass: HomeAssistant, remote_websocket: Mock
+    hass: SmartHub, remote_websocket: Mock
 ) -> None:
     """Test reauthenticate websocket when we cannot connect on the first attempt."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRYDATA_WEBSOCKET)
@@ -1859,7 +1859,7 @@ async def test_form_reauth_websocket_cannot_connect(
     assert result3["reason"] == "reauth_successful"
 
 
-async def test_form_reauth_websocket_not_supported(hass: HomeAssistant) -> None:
+async def test_form_reauth_websocket_not_supported(hass: SmartHub) -> None:
     """Test reauthenticate websocket when the device is not supported."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRYDATA_WEBSOCKET)
     entry.add_to_hass(hass)
@@ -1868,7 +1868,7 @@ async def test_form_reauth_websocket_not_supported(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
+        "smarthub.components.samsungtv.bridge.SamsungTVWSAsyncRemote.open",
         side_effect=WebSocketException,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -1882,7 +1882,7 @@ async def test_form_reauth_websocket_not_supported(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
-async def test_form_reauth_encrypted(hass: HomeAssistant) -> None:
+async def test_form_reauth_encrypted(hass: SmartHub) -> None:
     """Test reauth flow for encrypted TVs."""
     encrypted_entry_data = deepcopy(ENTRYDATA_ENCRYPTED_WEBSOCKET)
     del encrypted_entry_data[CONF_TOKEN]
@@ -1897,7 +1897,7 @@ async def test_form_reauth_encrypted(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.samsungtv.config_flow.SamsungTVEncryptedWSAsyncAuthenticator",
+        "smarthub.components.samsungtv.config_flow.SamsungTVEncryptedWSAsyncAuthenticator",
         autospec=True,
     ) as authenticator_mock:
         authenticator_mock.return_value.try_pin.side_effect = [
@@ -1955,7 +1955,7 @@ async def test_form_reauth_encrypted(hass: HomeAssistant) -> None:
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_incorrect_udn_matching_upnp_udn_unique_id_added_from_ssdp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test updating the wrong udn from ssdp via upnp udn match."""
     entry = MockConfigEntry(
@@ -1983,7 +1983,7 @@ async def test_update_incorrect_udn_matching_upnp_udn_unique_id_added_from_ssdp(
     "remote_websocket", "rest_api", "remote_encrypted_websocket_failing"
 )
 async def test_update_incorrect_udn_matching_mac_unique_id_added_from_ssdp(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test updating the wrong udn from ssdp via mac match."""
     entry = MockConfigEntry(
@@ -2009,7 +2009,7 @@ async def test_update_incorrect_udn_matching_mac_unique_id_added_from_ssdp(
 
 @pytest.mark.usefixtures("remote_websocket")
 async def test_update_incorrect_udn_matching_mac_from_dhcp(
-    hass: HomeAssistant, rest_api: Mock, mock_setup_entry: AsyncMock
+    hass: SmartHub, rest_api: Mock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test that DHCP updates the wrong udn from ssdp via mac match."""
     entry = MockConfigEntry(
@@ -2043,7 +2043,7 @@ async def test_update_incorrect_udn_matching_mac_from_dhcp(
 
 @pytest.mark.usefixtures("remote_websocket")
 async def test_no_update_incorrect_udn_not_matching_mac_from_dhcp(
-    hass: HomeAssistant, rest_api: Mock, mock_setup_entry: AsyncMock
+    hass: SmartHub, rest_api: Mock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test that DHCP does not update the wrong udn from ssdp via host match."""
     entry = MockConfigEntry(
@@ -2076,10 +2076,10 @@ async def test_no_update_incorrect_udn_not_matching_mac_from_dhcp(
 
 
 @pytest.mark.usefixtures("remote_websocket", "remote_encrypted_websocket_failing")
-async def test_ssdp_update_mac(hass: HomeAssistant) -> None:
+async def test_ssdp_update_mac(hass: SmartHub) -> None:
     """Ensure that MAC address is correctly updated from SSDP."""
     with patch(
-        "homeassistant.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
+        "smarthub.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
         return_value=MOCK_DEVICE_INFO,
     ):
         # entry was added
@@ -2096,7 +2096,7 @@ async def test_ssdp_update_mac(hass: HomeAssistant) -> None:
     device_info = deepcopy(MOCK_DEVICE_INFO)
     device_info["device"]["wifiMac"] = "none"
     with patch(
-        "homeassistant.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
+        "smarthub.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
         return_value=device_info,
     ):
         # Updated
@@ -2113,7 +2113,7 @@ async def test_ssdp_update_mac(hass: HomeAssistant) -> None:
     device_info = deepcopy(MOCK_DEVICE_INFO)
     device_info["device"]["wifiMac"] = "aa:bb:cc:dd:ee:ff"
     with patch(
-        "homeassistant.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
+        "smarthub.components.samsungtv.bridge.SamsungTVWSBridge.async_device_info",
         return_value=device_info,
     ):
         # Updated

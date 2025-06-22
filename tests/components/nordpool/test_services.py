@@ -10,16 +10,16 @@ from pynordpool import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.nordpool.const import DOMAIN
-from homeassistant.components.nordpool.services import (
+from smarthub.components.nordpool.const import DOMAIN
+from smarthub.components.nordpool.services import (
     ATTR_AREAS,
     ATTR_CONFIG_ENTRY,
     ATTR_CURRENCY,
     SERVICE_GET_PRICES_FOR_DATE,
 )
-from homeassistant.const import ATTR_DATE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.const import ATTR_DATE
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from tests.common import MockConfigEntry
 
@@ -37,7 +37,7 @@ TEST_SERVICE_DATA_USE_DEFAULTS = {
 
 @pytest.mark.freeze_time("2024-11-05T18:00:00+00:00")
 async def test_service_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -79,7 +79,7 @@ async def test_service_call(
 )
 @pytest.mark.freeze_time("2024-11-05T18:00:00+00:00")
 async def test_service_call_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: MockConfigEntry,
     error: Exception,
     key: str,
@@ -90,7 +90,7 @@ async def test_service_call_failures(
 
     with (
         patch(
-            "homeassistant.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
+            "smarthub.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
             side_effect=error,
         ),
         pytest.raises(ServiceValidationError) as err,
@@ -107,7 +107,7 @@ async def test_service_call_failures(
 
 @pytest.mark.freeze_time("2024-11-05T18:00:00+00:00")
 async def test_empty_response_returns_empty_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -117,7 +117,7 @@ async def test_empty_response_returns_empty_list(
 
     with (
         patch(
-            "homeassistant.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
+            "smarthub.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
             side_effect=NordPoolEmptyResponseError,
         ),
     ):
@@ -134,7 +134,7 @@ async def test_empty_response_returns_empty_list(
 
 @pytest.mark.freeze_time("2024-11-05T18:00:00+00:00")
 async def test_service_call_config_entry_bad_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: MockConfigEntry,
 ) -> None:
     """Test get_prices_for_date service call when config entry bad state."""

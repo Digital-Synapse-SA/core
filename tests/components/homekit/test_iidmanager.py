@@ -3,20 +3,20 @@
 from typing import Any
 from uuid import UUID
 
-from homeassistant.components.homekit.const import DOMAIN
-from homeassistant.components.homekit.iidmanager import (
+from smarthub.components.homekit.const import DOMAIN
+from smarthub.components.homekit.iidmanager import (
     AccessoryIIDStorage,
     get_iid_storage_filename_for_entry_id,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util.json import json_loads
-from homeassistant.util.uuid import random_uuid_hex
+from smarthub.core import SmartHub
+from smarthub.util.json import json_loads
+from smarthub.util.uuid import random_uuid_hex
 
 from tests.common import MockConfigEntry, async_load_fixture
 
 
 async def test_iid_generation_and_restore(
-    hass: HomeAssistant, iid_storage, hass_storage: dict[str, Any]
+    hass: SmartHub, iid_storage, hass_storage: dict[str, Any]
 ) -> None:
     """Test generating iids and restoring them from storage."""
     entry = MockConfigEntry(domain=DOMAIN)
@@ -92,7 +92,7 @@ async def test_iid_generation_and_restore(
 
 
 async def test_iid_storage_filename(
-    hass: HomeAssistant, iid_storage, hass_storage: dict[str, Any]
+    hass: SmartHub, iid_storage, hass_storage: dict[str, Any]
 ) -> None:
     """Test iid storage uses the expected filename."""
     entry = MockConfigEntry(domain=DOMAIN)
@@ -105,7 +105,7 @@ async def test_iid_storage_filename(
 
 
 async def test_iid_migration_to_v2(
-    hass: HomeAssistant, iid_storage, hass_storage: dict[str, Any]
+    hass: SmartHub, iid_storage, hass_storage: dict[str, Any]
 ) -> None:
     """Test iid storage migration."""
     v1_iids = json_loads(await async_load_fixture(hass, "iids_v1", DOMAIN))
@@ -129,7 +129,7 @@ async def test_iid_migration_to_v2(
 
 
 async def test_iid_migration_to_v2_with_underscore(
-    hass: HomeAssistant, iid_storage, hass_storage: dict[str, Any]
+    hass: SmartHub, iid_storage, hass_storage: dict[str, Any]
 ) -> None:
     """Test iid storage migration with underscore."""
     v1_iids = json_loads(
@@ -157,7 +157,7 @@ async def test_iid_migration_to_v2_with_underscore(
 
 
 async def test_iid_generation_and_restore_v2(
-    hass: HomeAssistant, iid_storage, hass_storage: dict[str, Any]
+    hass: SmartHub, iid_storage, hass_storage: dict[str, Any]
 ) -> None:
     """Test generating iids and restoring them from storage."""
     entry = MockConfigEntry(domain=DOMAIN)

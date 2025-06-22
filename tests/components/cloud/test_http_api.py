@@ -22,22 +22,22 @@ from hass_nabucasa.remote import CertificateStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import system_health
-from homeassistant.components.alexa import errors as alexa_errors
+from smarthub.components import system_health
+from smarthub.components.alexa import errors as alexa_errors
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.alexa.entities import LightCapabilities
-from homeassistant.components.assist_pipeline.pipeline import STORAGE_KEY
-from homeassistant.components.cloud.const import DEFAULT_EXPOSED_DOMAINS, DOMAIN
-from homeassistant.components.cloud.http_api import validate_language_voice
-from homeassistant.components.google_assistant.helpers import GoogleEntity
-from homeassistant.components.homeassistant import exposed_entities
-from homeassistant.components.websocket_api import ERR_INVALID_FORMAT
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.location import LocationInfo
+from smarthub.components.alexa.entities import LightCapabilities
+from smarthub.components.assist_pipeline.pipeline import STORAGE_KEY
+from smarthub.components.cloud.const import DEFAULT_EXPOSED_DOMAINS, DOMAIN
+from smarthub.components.cloud.http_api import validate_language_voice
+from smarthub.components.google_assistant.helpers import GoogleEntity
+from smarthub.components.smarthub import exposed_entities
+from smarthub.components.websocket_api import ERR_INVALID_FORMAT
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.location import LocationInfo
 
 from tests.common import mock_platform
 from tests.components.google_assistant import MockConfig
@@ -47,11 +47,11 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 PIPELINE_DATA_LEGACY = {
     "items": [
         {
-            "conversation_engine": "homeassistant",
+            "conversation_engine": "smarthub",
             "conversation_language": "language_1",
             "id": "12345",
             "language": "language_1",
-            "name": "Home Assistant Cloud",
+            "name": "SmartHub Cloud",
             "stt_engine": "cloud",
             "stt_language": "language_1",
             "tts_engine": "cloud",
@@ -67,11 +67,11 @@ PIPELINE_DATA_LEGACY = {
 PIPELINE_DATA = {
     "items": [
         {
-            "conversation_engine": "homeassistant",
+            "conversation_engine": "smarthub",
             "conversation_language": "language_1",
             "id": "12345",
             "language": "language_1",
-            "name": "Home Assistant Cloud",
+            "name": "SmartHub Cloud",
             "stt_engine": "stt.home_assistant_cloud",
             "stt_language": "language_1",
             "tts_engine": "cloud",
@@ -91,7 +91,7 @@ PIPELINE_DATA_OTHER = {
             "conversation_language": "language_1",
             "id": "12345",
             "language": "language_1",
-            "name": "Home Assistant",
+            "name": "SmartHub",
             "stt_engine": "stt.other",
             "stt_language": "language_1",
             "tts_engine": "other",
@@ -108,9 +108,9 @@ SUBSCRIPTION_INFO_URL = "https://api-test.hass.io/payments/subscription_info"
 
 
 @pytest.fixture(name="setup_cloud")
-async def setup_cloud_fixture(hass: HomeAssistant, cloud: MagicMock) -> None:
+async def setup_cloud_fixture(hass: SmartHub, cloud: MagicMock) -> None:
     """Fixture that sets up cloud."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(
         hass,
         DOMAIN,
@@ -169,7 +169,7 @@ async def test_google_actions_sync_fails(
     "entity_id", ["stt.home_assistant_cloud", "tts.home_assistant_cloud"]
 )
 async def test_login_view_missing_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_cloud: None,
     entity_registry: er.EntityRegistry,
     hass_client: ClientSessionGenerator,
@@ -184,7 +184,7 @@ async def test_login_view_missing_entity(
 
     # We assume the user needs to login again for some reason.
     with patch(
-        "homeassistant.components.cloud.assist_pipeline.async_create_default_pipeline",
+        "smarthub.components.cloud.assist_pipeline.async_create_default_pipeline",
     ) as create_pipeline_mock:
         req = await cloud_client.post(
             "/api/cloud/login", json={"email": "my_username", "password": "my_password"}
@@ -198,7 +198,7 @@ async def test_login_view_missing_entity(
 
 @pytest.mark.parametrize("pipeline_data", [PIPELINE_DATA, PIPELINE_DATA_LEGACY])
 async def test_login_view_existing_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
@@ -212,14 +212,14 @@ async def test_login_view_existing_pipeline(
         "data": deepcopy(pipeline_data),
     }
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, DOMAIN, {"cloud": {}})
     await hass.async_block_till_done()
 
     cloud_client = await hass_client()
 
     with patch(
-        "homeassistant.components.cloud.assist_pipeline.async_create_default_pipeline",
+        "smarthub.components.cloud.assist_pipeline.async_create_default_pipeline",
     ) as create_pipeline_mock:
         req = await cloud_client.post(
             "/api/cloud/login", json={"email": "my_username", "password": "my_password"}
@@ -232,7 +232,7 @@ async def test_login_view_existing_pipeline(
 
 
 async def test_login_view_create_pipeline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
@@ -245,7 +245,7 @@ async def test_login_view_create_pipeline(
         "data": deepcopy(PIPELINE_DATA_OTHER),
     }
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "assist_pipeline", {})
     assert await async_setup_component(hass, DOMAIN, {"cloud": {}})
     await hass.async_block_till_done()
@@ -253,7 +253,7 @@ async def test_login_view_create_pipeline(
     cloud_client = await hass_client()
 
     with patch(
-        "homeassistant.components.cloud.assist_pipeline.async_create_default_pipeline",
+        "smarthub.components.cloud.assist_pipeline.async_create_default_pipeline",
         return_value=AsyncMock(id="12345"),
     ) as create_pipeline_mock:
         req = await cloud_client.post(
@@ -267,12 +267,12 @@ async def test_login_view_create_pipeline(
         hass,
         stt_engine_id="stt.home_assistant_cloud",
         tts_engine_id="tts.home_assistant_cloud",
-        pipeline_name="Home Assistant Cloud",
+        pipeline_name="SmartHub Cloud",
     )
 
 
 async def test_login_view_create_pipeline_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
@@ -285,7 +285,7 @@ async def test_login_view_create_pipeline_fail(
         "data": deepcopy(PIPELINE_DATA_OTHER),
     }
 
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "assist_pipeline", {})
     assert await async_setup_component(hass, DOMAIN, {"cloud": {}})
     await hass.async_block_till_done()
@@ -293,7 +293,7 @@ async def test_login_view_create_pipeline_fail(
     cloud_client = await hass_client()
 
     with patch(
-        "homeassistant.components.cloud.assist_pipeline.async_create_default_pipeline",
+        "smarthub.components.cloud.assist_pipeline.async_create_default_pipeline",
         return_value=None,
     ) as create_pipeline_mock:
         req = await cloud_client.post(
@@ -307,7 +307,7 @@ async def test_login_view_create_pipeline_fail(
         hass,
         stt_engine_id="stt.home_assistant_cloud",
         tts_engine_id="tts.home_assistant_cloud",
-        pipeline_name="Home Assistant Cloud",
+        pipeline_name="SmartHub Cloud",
     )
 
 
@@ -612,7 +612,7 @@ async def test_register_view_no_location(
     cloud_client = await hass_client()
     mock_cognito = cloud.auth
     with patch(
-        "homeassistant.components.cloud.http_api.async_detect_location_info",
+        "smarthub.components.cloud.http_api.async_detect_location_info",
         return_value=None,
     ):
         req = await cloud_client.post(
@@ -638,7 +638,7 @@ async def test_register_view_with_location(
     cloud_client = await hass_client()
     mock_cognito = cloud.auth
     with patch(
-        "homeassistant.components.cloud.http_api.async_detect_location_info",
+        "smarthub.components.cloud.http_api.async_detect_location_info",
         return_value=LocationInfo(
             country_code="XX",
             zip_code="12345",
@@ -871,7 +871,7 @@ async def test_resend_confirm_view_unknown_error(
 
 
 async def test_websocket_remove_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -890,7 +890,7 @@ async def test_websocket_remove_data(
 
 
 async def test_websocket_remove_data_logged_in(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -910,7 +910,7 @@ async def test_websocket_remove_data_logged_in(
 
 
 async def test_websocket_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -921,12 +921,12 @@ async def test_websocket_status(
 
     with (
         patch.dict(
-            "homeassistant.components.google_assistant.const.DOMAIN_TO_GOOGLE_TYPES",
+            "smarthub.components.google_assistant.const.DOMAIN_TO_GOOGLE_TYPES",
             {"light": None},
             clear=True,
         ),
         patch.dict(
-            "homeassistant.components.alexa.entities.ENTITY_ADAPTERS",
+            "smarthub.components.alexa.entities.ENTITY_ADAPTERS",
             {"switch": None},
             clear=True,
         ),
@@ -936,7 +936,7 @@ async def test_websocket_status(
 
     assert response["result"] == {
         "logged_in": True,
-        "email": "hello@home-assistant.io",
+        "email": "hello@smart-hub.io",
         "cloud": "connected",
         "cloud_last_disconnect_reason": None,
         "prefs": {
@@ -982,7 +982,7 @@ async def test_websocket_status(
 
 
 async def test_websocket_status_not_logged_in(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -1002,7 +1002,7 @@ async def test_websocket_status_not_logged_in(
 
 
 async def test_websocket_subscription_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     aioclient_mock: AiohttpClientMocker,
     cloud: MagicMock,
@@ -1021,7 +1021,7 @@ async def test_websocket_subscription_info(
 
 
 async def test_websocket_subscription_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     aioclient_mock: AiohttpClientMocker,
     cloud: MagicMock,
@@ -1039,7 +1039,7 @@ async def test_websocket_subscription_fail(
 
 
 async def test_websocket_subscription_not_logged_in(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -1060,7 +1060,7 @@ async def test_websocket_subscription_not_logged_in(
 
 
 async def test_websocket_update_preferences(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -1100,7 +1100,7 @@ async def test_websocket_update_preferences(
     ("language", "voice"), [("en-GB", "bad_voice"), ("bad_language", "RyanNeural")]
 )
 async def test_websocket_update_preferences_bad_voice(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -1124,7 +1124,7 @@ async def test_websocket_update_preferences_bad_voice(
 
 
 async def test_websocket_update_preferences_alexa_report_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
 ) -> None:
@@ -1133,16 +1133,16 @@ async def test_websocket_update_preferences_alexa_report_state(
 
     with (
         patch(
-            "homeassistant.components.cloud.alexa_config.CloudAlexaConfig.async_sync_entities"
+            "smarthub.components.cloud.alexa_config.CloudAlexaConfig.async_sync_entities"
         ),
         patch(
             (
-                "homeassistant.components.cloud.alexa_config.CloudAlexaConfig"
+                "smarthub.components.cloud.alexa_config.CloudAlexaConfig"
                 ".async_get_access_token"
             ),
         ),
         patch(
-            "homeassistant.components.cloud.alexa_config.CloudAlexaConfig.set_authorized"
+            "smarthub.components.cloud.alexa_config.CloudAlexaConfig.set_authorized"
         ) as set_authorized_mock,
     ):
         set_authorized_mock.assert_not_called()
@@ -1159,7 +1159,7 @@ async def test_websocket_update_preferences_alexa_report_state(
 
 
 async def test_websocket_update_preferences_require_relink(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
 ) -> None:
@@ -1169,13 +1169,13 @@ async def test_websocket_update_preferences_require_relink(
     with (
         patch(
             (
-                "homeassistant.components.cloud.alexa_config.CloudAlexaConfig"
+                "smarthub.components.cloud.alexa_config.CloudAlexaConfig"
                 ".async_get_access_token"
             ),
             side_effect=alexa_errors.RequireRelink,
         ),
         patch(
-            "homeassistant.components.cloud.alexa_config.CloudAlexaConfig.set_authorized"
+            "smarthub.components.cloud.alexa_config.CloudAlexaConfig.set_authorized"
         ) as set_authorized_mock,
     ):
         set_authorized_mock.assert_not_called()
@@ -1192,7 +1192,7 @@ async def test_websocket_update_preferences_require_relink(
 
 
 async def test_websocket_update_preferences_no_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
 ) -> None:
@@ -1202,13 +1202,13 @@ async def test_websocket_update_preferences_no_token(
     with (
         patch(
             (
-                "homeassistant.components.cloud.alexa_config.CloudAlexaConfig"
+                "smarthub.components.cloud.alexa_config.CloudAlexaConfig"
                 ".async_get_access_token"
             ),
             side_effect=alexa_errors.NoTokenAvailable,
         ),
         patch(
-            "homeassistant.components.cloud.alexa_config.CloudAlexaConfig.set_authorized"
+            "smarthub.components.cloud.alexa_config.CloudAlexaConfig.set_authorized"
         ) as set_authorized_mock,
     ):
         set_authorized_mock.assert_not_called()
@@ -1225,7 +1225,7 @@ async def test_websocket_update_preferences_no_token(
 
 
 async def test_enabling_webhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -1246,7 +1246,7 @@ async def test_enabling_webhook(
 
 
 async def test_disabling_webhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -1266,7 +1266,7 @@ async def test_disabling_webhook(
 
 
 async def test_enabling_remote(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -1294,7 +1294,7 @@ async def test_enabling_remote(
 
 
 async def test_enabling_remote_remote_activation_not_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     cloud: MagicMock,
     setup_cloud: None,
@@ -1323,7 +1323,7 @@ async def test_enabling_remote_remote_activation_not_allowed(
 
 
 async def test_list_google_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
@@ -1339,7 +1339,7 @@ async def test_list_google_entities(
         State("cover.garage", "open", {"device_class": "garage"}),
     )
     with patch(
-        "homeassistant.components.google_assistant.helpers.async_get_entities",
+        "smarthub.components.google_assistant.helpers.async_get_entities",
         return_value=[entity, entity2],
     ):
         await client.send_json_auto_id({"type": "cloud/google_assistant/entities"})
@@ -1367,7 +1367,7 @@ async def test_list_google_entities(
     )
 
     with patch(
-        "homeassistant.components.google_assistant.helpers.async_get_entities",
+        "smarthub.components.google_assistant.helpers.async_get_entities",
         return_value=[entity, entity2],
     ):
         await client.send_json_auto_id({"type": "cloud/google_assistant/entities"})
@@ -1388,7 +1388,7 @@ async def test_list_google_entities(
 
 
 async def test_get_google_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
@@ -1484,7 +1484,7 @@ async def test_get_google_entity(
 
 
 async def test_update_google_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
 ) -> None:
@@ -1504,7 +1504,7 @@ async def test_update_google_entity(
 
     await client.send_json_auto_id(
         {
-            "type": "homeassistant/expose_entity",
+            "type": "smarthub/expose_entity",
             "assistants": ["cloud.google_assistant"],
             "entity_ids": ["light.kitchen"],
             "should_expose": False,
@@ -1519,7 +1519,7 @@ async def test_update_google_entity(
 
 
 async def test_list_alexa_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
@@ -1530,7 +1530,7 @@ async def test_list_alexa_entities(
         hass, MagicMock(entity_config={}), State("light.kitchen", "on")
     )
     with patch(
-        "homeassistant.components.alexa.entities.async_get_entities",
+        "smarthub.components.alexa.entities.async_get_entities",
         return_value=[entity],
     ):
         await client.send_json_auto_id({"id": 5, "type": "cloud/alexa/entities"})
@@ -1547,12 +1547,12 @@ async def test_list_alexa_entities(
     with (
         patch(
             (
-                "homeassistant.components.cloud.alexa_config.CloudAlexaConfig"
+                "smarthub.components.cloud.alexa_config.CloudAlexaConfig"
                 ".async_get_access_token"
             ),
         ),
         patch(
-            "homeassistant.components.cloud.alexa_config.alexa_state_report.async_send_add_or_update_message"
+            "smarthub.components.cloud.alexa_config.alexa_state_report.async_send_add_or_update_message"
         ),
     ):
         # Add the entity to the entity registry
@@ -1562,7 +1562,7 @@ async def test_list_alexa_entities(
         await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.alexa.entities.async_get_entities",
+        "smarthub.components.alexa.entities.async_get_entities",
         return_value=[entity],
     ):
         await client.send_json_auto_id({"type": "cloud/alexa/entities"})
@@ -1578,7 +1578,7 @@ async def test_list_alexa_entities(
 
 
 async def test_get_alexa_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
@@ -1652,7 +1652,7 @@ async def test_get_alexa_entity(
 
 
 async def test_update_alexa_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
@@ -1665,7 +1665,7 @@ async def test_update_alexa_entity(
 
     await client.send_json_auto_id(
         {
-            "type": "homeassistant/expose_entity",
+            "type": "smarthub/expose_entity",
             "assistants": ["cloud.alexa"],
             "entity_ids": [entry.entity_id],
             "should_expose": False,
@@ -1680,7 +1680,7 @@ async def test_update_alexa_entity(
 
 
 async def test_sync_alexa_entities_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
 ) -> None:
@@ -1689,7 +1689,7 @@ async def test_sync_alexa_entities_timeout(
 
     with patch(
         (
-            "homeassistant.components.cloud.alexa_config.CloudAlexaConfig"
+            "smarthub.components.cloud.alexa_config.CloudAlexaConfig"
             ".async_sync_entities"
         ),
         side_effect=TimeoutError,
@@ -1702,7 +1702,7 @@ async def test_sync_alexa_entities_timeout(
 
 
 async def test_sync_alexa_entities_no_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
 ) -> None:
@@ -1711,7 +1711,7 @@ async def test_sync_alexa_entities_no_token(
 
     with patch(
         (
-            "homeassistant.components.cloud.alexa_config.CloudAlexaConfig"
+            "smarthub.components.cloud.alexa_config.CloudAlexaConfig"
             ".async_sync_entities"
         ),
         side_effect=alexa_errors.NoTokenAvailable,
@@ -1724,7 +1724,7 @@ async def test_sync_alexa_entities_no_token(
 
 
 async def test_enable_alexa_state_report_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
 ) -> None:
@@ -1733,7 +1733,7 @@ async def test_enable_alexa_state_report_fail(
 
     with patch(
         (
-            "homeassistant.components.cloud.alexa_config.CloudAlexaConfig"
+            "smarthub.components.cloud.alexa_config.CloudAlexaConfig"
             ".async_sync_entities"
         ),
         side_effect=alexa_errors.NoTokenAvailable,
@@ -1746,7 +1746,7 @@ async def test_enable_alexa_state_report_fail(
 
 
 async def test_tts_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_cloud: None,
 ) -> None:
@@ -1779,7 +1779,7 @@ async def test_tts_info(
     ],
 )
 async def test_api_calls_require_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_cloud: None,
     hass_client: ClientSessionGenerator,
     hass_read_only_access_token: str,
@@ -1794,19 +1794,19 @@ async def test_api_calls_require_admin(
 
 
 async def test_login_view_dispatch_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test dispatching event while logging in."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, DOMAIN, {"cloud": {}})
     await hass.async_block_till_done()
 
     cloud_client = await hass_client()
 
     with patch(
-        "homeassistant.components.cloud.http_api.async_dispatcher_send"
+        "smarthub.components.cloud.http_api.async_dispatcher_send"
     ) as async_dispatcher_send_mock:
         await cloud_client.post(
             "/api/cloud/login", json={"email": "my_username", "password": "my_password"}
@@ -1826,7 +1826,7 @@ async def test_logout_view_dispatch_event(
     cloud_client = await hass_client()
 
     with patch(
-        "homeassistant.components.cloud.http_api.async_dispatcher_send"
+        "smarthub.components.cloud.http_api.async_dispatcher_send"
     ) as async_dispatcher_send_mock:
         await cloud_client.post("/api/cloud/logout")
 
@@ -1835,9 +1835,9 @@ async def test_logout_view_dispatch_event(
     assert async_dispatcher_send_mock.mock_calls[0][1][2] == {"type": "logout"}
 
 
-@patch("homeassistant.components.cloud.helpers.FixedSizeQueueLogHandler.MAX_RECORDS", 3)
+@patch("smarthub.components.cloud.helpers.FixedSizeQueueLogHandler.MAX_RECORDS", 3)
 async def test_download_support_package(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     set_cloud_prefs: Callable[[dict[str, Any]], Coroutine[Any, Any, None]],
     hass_client: ClientSessionGenerator,
@@ -1857,9 +1857,9 @@ async def test_download_support_package(
     )
 
     def async_register_mock_platform(
-        hass: HomeAssistant, register: system_health.SystemHealthRegistration
+        hass: SmartHub, register: system_health.SystemHealthRegistration
     ) -> None:
-        async def mock_empty_info(hass: HomeAssistant) -> dict[str, Any]:
+        async def mock_empty_info(hass: SmartHub) -> dict[str, Any]:
             return {}
 
         register.async_register_info(mock_empty_info, "/config/mock_integration")
@@ -1915,16 +1915,16 @@ async def test_download_support_package(
     )
     logging.getLogger("hass_nabucasa.iot").info("Hass nabucasa log")
     logging.getLogger("snitun.utils.aiohttp_client").warning("Snitun log")
-    logging.getLogger("homeassistant.components.cloud.client").error("Cloud log")
+    logging.getLogger("smarthub.components.cloud.client").error("Cloud log")
     freezer.move_to(now)  # Reset time otherwise hass_client auth fails
 
     cloud_client = await hass_client()
     with (
         patch.object(hass.config, "config_dir", new="config"),
         patch(
-            "homeassistant.components.homeassistant.system_health.system_info.async_get_system_info",
+            "smarthub.components.smarthub.system_health.system_info.async_get_system_info",
             return_value={
-                "installation_type": "Home Assistant Core",
+                "installation_type": "SmartHub Core",
                 "version": "2025.2.0",
                 "dev": False,
                 "hassio": False,

@@ -1,6 +1,6 @@
 """Tests for the Switch as X Light platform."""
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
@@ -11,14 +11,14 @@ from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     ColorMode,
 )
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.switch_as_x.config_flow import SwitchAsXConfigFlowHandler
-from homeassistant.components.switch_as_x.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.switch_as_x.config_flow import SwitchAsXConfigFlowHandler
+from smarthub.components.switch_as_x.const import (
     CONF_INVERT,
     CONF_TARGET_DOMAIN,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_ENTITY_ID,
     SERVICE_TOGGLE,
     SERVICE_TURN_OFF,
@@ -27,13 +27,13 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
-async def test_default_state(hass: HomeAssistant) -> None:
+async def test_default_state(hass: SmartHub) -> None:
     """Test light switch default state."""
     config_entry = MockConfigEntry(
         data={},
@@ -64,7 +64,7 @@ async def test_default_state(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_COLOR_MODE) is None
 
 
-async def test_light_service_calls(hass: HomeAssistant) -> None:
+async def test_light_service_calls(hass: SmartHub) -> None:
     """Test service calls to light."""
     await async_setup_component(hass, "switch", {"switch": [{"platform": "demo"}]})
     await hass.async_block_till_done()
@@ -121,7 +121,7 @@ async def test_light_service_calls(hass: HomeAssistant) -> None:
     assert hass.states.get("light.decorative_lights").state == STATE_OFF
 
 
-async def test_switch_service_calls(hass: HomeAssistant) -> None:
+async def test_switch_service_calls(hass: SmartHub) -> None:
     """Test service calls to switch."""
     await async_setup_component(hass, "switch", {"switch": [{"platform": "demo"}]})
     await hass.async_block_till_done()
@@ -164,7 +164,7 @@ async def test_switch_service_calls(hass: HomeAssistant) -> None:
     assert hass.states.get("light.decorative_lights").state == STATE_ON
 
 
-async def test_light_service_calls_inverted(hass: HomeAssistant) -> None:
+async def test_light_service_calls_inverted(hass: SmartHub) -> None:
     """Test service calls to light."""
     await async_setup_component(hass, "switch", {"switch": [{"platform": "demo"}]})
     await hass.async_block_till_done()
@@ -221,7 +221,7 @@ async def test_light_service_calls_inverted(hass: HomeAssistant) -> None:
     assert hass.states.get("light.decorative_lights").state == STATE_OFF
 
 
-async def test_switch_service_calls_inverted(hass: HomeAssistant) -> None:
+async def test_switch_service_calls_inverted(hass: SmartHub) -> None:
     """Test service calls to switch."""
     await async_setup_component(hass, "switch", {"switch": [{"platform": "demo"}]})
     await hass.async_block_till_done()

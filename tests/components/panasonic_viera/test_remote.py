@@ -4,21 +4,21 @@ from unittest.mock import Mock, call
 
 from panasonic_viera import Keys, SOAPError
 
-from homeassistant.components.panasonic_viera.const import ATTR_UDN, DOMAIN
-from homeassistant.components.remote import (
+from smarthub.components.panasonic_viera.const import ATTR_UDN, DOMAIN
+from smarthub.components.remote import (
     ATTR_COMMAND,
     DOMAIN as REMOTE_DOMAIN,
     SERVICE_SEND_COMMAND,
 )
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
 
 from .conftest import MOCK_CONFIG_DATA, MOCK_DEVICE_INFO, MOCK_ENCRYPTION_DATA
 
 from tests.common import MockConfigEntry
 
 
-async def setup_panasonic_viera(hass: HomeAssistant) -> None:
+async def setup_panasonic_viera(hass: SmartHub) -> None:
     """Initialize integration for tests."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -32,7 +32,7 @@ async def setup_panasonic_viera(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_onoff(hass: HomeAssistant, mock_remote) -> None:
+async def test_onoff(hass: SmartHub, mock_remote) -> None:
     """Test the on/off service calls."""
 
     await setup_panasonic_viera(hass)
@@ -50,7 +50,7 @@ async def test_onoff(hass: HomeAssistant, mock_remote) -> None:
     assert mock_remote.send_key.call_args_list == [call(power), call(power)]
 
 
-async def test_send_command(hass: HomeAssistant, mock_remote) -> None:
+async def test_send_command(hass: SmartHub, mock_remote) -> None:
     """Test the send_command service call."""
 
     await setup_panasonic_viera(hass)

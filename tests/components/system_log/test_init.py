@@ -10,10 +10,10 @@ import traceback
 from typing import Any
 from unittest.mock import MagicMock, patch
 
-from homeassistant.components import system_log
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.setup import async_setup_component
+from smarthub.components import system_log
+from smarthub.core import SmartHub, callback
+from smarthub.helpers.typing import ConfigType
+from smarthub.setup import async_setup_component
 
 from tests.common import async_capture_events
 from tests.typing import WebSocketGenerator
@@ -91,12 +91,12 @@ class WatchLogErrorHandler(system_log.LogErrorHandler):
 
 
 async def async_setup_system_log(
-    hass: HomeAssistant, config: ConfigType
+    hass: SmartHub, config: ConfigType
 ) -> WatchLogErrorHandler:
     """Set up the system_log component."""
     WatchLogErrorHandler.instances = []
     with patch(
-        "homeassistant.components.system_log.LogErrorHandler", WatchLogErrorHandler
+        "smarthub.components.system_log.LogErrorHandler", WatchLogErrorHandler
     ):
         await async_setup_component(hass, system_log.DOMAIN, config)
         await hass.async_block_till_done()
@@ -106,7 +106,7 @@ async def async_setup_system_log(
 
 
 async def test_normal_logs(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that debug and info are not logged."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
@@ -120,7 +120,7 @@ async def test_normal_logs(
 
 
 async def test_exception(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that exceptions are logged and retrieved correctly."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
@@ -132,7 +132,7 @@ async def test_exception(
     assert_log(log, "exception message", "log message", "ERROR")
 
 
-async def test_warning(hass: HomeAssistant, hass_ws_client: WebSocketGenerator) -> None:
+async def test_warning(hass: SmartHub, hass_ws_client: WebSocketGenerator) -> None:
     """Test that warning are logged and retrieved correctly."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
     await hass.async_block_till_done()
@@ -143,7 +143,7 @@ async def test_warning(hass: HomeAssistant, hass_ws_client: WebSocketGenerator) 
 
 
 async def test_warning_good_format(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that warning with good format arguments are logged and retrieved correctly."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
@@ -156,7 +156,7 @@ async def test_warning_good_format(
 
 
 async def test_warning_missing_format_args(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that warning with missing format arguments are logged and retrieved correctly."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
@@ -168,7 +168,7 @@ async def test_warning_missing_format_args(
     assert_log(log, "", ["Warning message missing a format arg %s"], "WARNING")
 
 
-async def test_error(hass: HomeAssistant, hass_ws_client: WebSocketGenerator) -> None:
+async def test_error(hass: SmartHub, hass_ws_client: WebSocketGenerator) -> None:
     """Test that errors are logged and retrieved correctly."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
     await hass.async_block_till_done()
@@ -179,7 +179,7 @@ async def test_error(hass: HomeAssistant, hass_ws_client: WebSocketGenerator) ->
     assert_log(log, "", "Error message", "ERROR")
 
 
-async def test_config_not_fire_event(hass: HomeAssistant) -> None:
+async def test_config_not_fire_event(hass: SmartHub) -> None:
     """Test that errors are not posted as events with default config."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
     await hass.async_block_till_done()
@@ -198,7 +198,7 @@ async def test_config_not_fire_event(hass: HomeAssistant) -> None:
     assert len(events) == 0
 
 
-async def test_error_posted_as_event(hass: HomeAssistant) -> None:
+async def test_error_posted_as_event(hass: SmartHub) -> None:
     """Test that error are posted as events."""
     watcher = await async_setup_system_log(
         hass, {"system_log": {"max_entries": 2, "fire_event": True}}
@@ -217,7 +217,7 @@ async def test_error_posted_as_event(hass: HomeAssistant) -> None:
 
 
 async def test_critical(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that critical are logged and retrieved correctly."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
@@ -230,7 +230,7 @@ async def test_critical(
 
 
 async def test_remove_older_logs(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that older logs are rotated out."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
@@ -250,7 +250,7 @@ def log_msg(nr=2):
 
 
 async def test_dedupe_logs(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that duplicate log entries are dedupe."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
@@ -291,7 +291,7 @@ async def test_dedupe_logs(
 
 
 async def test_clear_logs(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the log can be cleared via a service call."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
@@ -304,7 +304,7 @@ async def test_clear_logs(
     await get_error_log(hass_ws_client)
 
 
-async def test_write_log(hass: HomeAssistant) -> None:
+async def test_write_log(hass: SmartHub) -> None:
     """Test that error propagates to logger."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
     await hass.async_block_till_done()
@@ -315,11 +315,11 @@ async def test_write_log(hass: HomeAssistant) -> None:
             system_log.DOMAIN, system_log.SERVICE_WRITE, {"message": "test_message"}
         )
         await hass.async_block_till_done()
-    mock_logging.assert_called_once_with("homeassistant.components.system_log.external")
+    mock_logging.assert_called_once_with("smarthub.components.system_log.external")
     assert logger.method_calls[0] == ("error", ("test_message",))
 
 
-async def test_write_choose_logger(hass: HomeAssistant) -> None:
+async def test_write_choose_logger(hass: SmartHub) -> None:
     """Test that correct logger is chosen."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
     await hass.async_block_till_done()
@@ -334,7 +334,7 @@ async def test_write_choose_logger(hass: HomeAssistant) -> None:
     mock_logging.assert_called_once_with("myLogger")
 
 
-async def test_write_choose_level(hass: HomeAssistant) -> None:
+async def test_write_choose_level(hass: SmartHub) -> None:
     """Test that correct logger is chosen."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
     await hass.async_block_till_done()
@@ -351,7 +351,7 @@ async def test_write_choose_level(hass: HomeAssistant) -> None:
 
 
 async def test_unknown_path(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test error logged from unknown path."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
@@ -372,7 +372,7 @@ def get_frame(path: str, previous_frame: MagicMock | None) -> MagicMock:
 
 
 async def async_log_error_from_test_path(
-    hass: HomeAssistant, path: str, watcher: WatchLogErrorHandler
+    hass: SmartHub, path: str, watcher: WatchLogErrorHandler
 ) -> None:
     """Log error while mocking the path."""
     call_path = "internal_path.py"
@@ -386,7 +386,7 @@ async def async_log_error_from_test_path(
             _LOGGER, "findCaller", MagicMock(return_value=(call_path, 0, None, None))
         ),
         patch(
-            "homeassistant.components.system_log.sys._getframe",
+            "smarthub.components.system_log.sys._getframe",
             return_value=logger_frame,
         ),
     ):
@@ -395,25 +395,25 @@ async def async_log_error_from_test_path(
         await wait_empty
 
 
-async def test_homeassistant_path(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+async def test_smarthub_path(
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
-    """Test error logged from Home Assistant path."""
+    """Test error logged from SmartHub path."""
 
     with patch(
-        "homeassistant.components.system_log.HOMEASSISTANT_PATH",
-        new=["venv_path/homeassistant"],
+        "smarthub.components.system_log.HOMEASSISTANT_PATH",
+        new=["venv_path/smarthub"],
     ):
         watcher = await async_setup_system_log(hass, BASIC_CONFIG)
         await async_log_error_from_test_path(
-            hass, "venv_path/homeassistant/component/component.py", watcher
+            hass, "venv_path/smarthub/component/component.py", watcher
         )
         log = (await get_error_log(hass_ws_client))[0]
     assert log["source"] == ["component/component.py", 5]
 
 
 async def test_config_path(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test error logged from config path."""
 
@@ -428,7 +428,7 @@ async def test_config_path(
 
 
 async def test_raise_during_log_capture(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that exceptions are logged and retrieved correctly."""
     await async_setup_component(hass, system_log.DOMAIN, BASIC_CONFIG)
@@ -440,7 +440,7 @@ async def test_raise_during_log_capture(
         def __repr__(self):
             in_system_log = False
             for stack in traceback.extract_stack():
-                if "homeassistant/components/system_log" in stack.filename:
+                if "smarthub/components/system_log" in stack.filename:
                     in_system_log = True
                     break
             if in_system_log:
@@ -455,11 +455,11 @@ async def test_raise_during_log_capture(
     assert_log(log, "", "Bad logger message: repr error", "ERROR")
 
 
-async def test__figure_out_source(hass: HomeAssistant) -> None:
+async def test__figure_out_source(hass: SmartHub) -> None:
     """Test that source is figured out correctly.
 
     We have to test this directly for exception tracebacks since
-    we cannot generate a trackback from a Home Assistant component
+    we cannot generate a trackback from a SmartHub component
     in a test because the test is not a component.
     """
     try:
@@ -485,7 +485,7 @@ async def test__figure_out_source(hass: HomeAssistant) -> None:
     assert entry.source == ("figure_out_source is False", 5)
 
 
-async def test_formatting_exception(hass: HomeAssistant) -> None:
+async def test_formatting_exception(hass: SmartHub) -> None:
     """Test that exceptions are formatted correctly."""
     try:
         raise ValueError("test")  # noqa: TRY301

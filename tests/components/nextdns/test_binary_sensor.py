@@ -6,10 +6,10 @@ from unittest.mock import patch
 from nextdns import ApiError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_ON, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.const import STATE_ON, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import init_integration, mock_nextdns
 
@@ -17,16 +17,16 @@ from tests.common import async_fire_time_changed, snapshot_platform
 
 
 async def test_binary_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test states of the binary sensors."""
-    with patch("homeassistant.components.nextdns.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.nextdns.PLATFORMS", [Platform.BINARY_SENSOR]):
         entry = await init_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_availability(hass: HomeAssistant) -> None:
+async def test_availability(hass: SmartHub) -> None:
     """Ensure that we mark the entities unavailable correctly when service causes an error."""
     await init_integration(hass)
 
@@ -37,7 +37,7 @@ async def test_availability(hass: HomeAssistant) -> None:
 
     future = utcnow() + timedelta(minutes=10)
     with patch(
-        "homeassistant.components.nextdns.NextDns.connection_status",
+        "smarthub.components.nextdns.NextDns.connection_status",
         side_effect=ApiError("API Error"),
     ):
         async_fire_time_changed(hass, future)

@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
-from homeassistant.components.homeassistant import SERVICE_UPDATE_ENTITY
-from homeassistant.components.rituals_perfume_genie.const import DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.smarthub import SERVICE_UPDATE_ENTITY
+from smarthub.components.rituals_perfume_genie.const import DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import (
     init_integration,
@@ -24,7 +24,7 @@ from .common import (
 
 
 async def test_switch_entity(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the creation and values of the Rituals Perfume Genie diffuser switch."""
     config_entry = mock_config_entry(unique_id="id_123_switch_test")
@@ -40,12 +40,12 @@ async def test_switch_entity(
     assert entry.unique_id == f"{diffuser.hublot}-is_on"
 
 
-async def test_switch_handle_coordinator_update(hass: HomeAssistant) -> None:
+async def test_switch_handle_coordinator_update(hass: SmartHub) -> None:
     """Test handling a coordinator update."""
     config_entry = mock_config_entry(unique_id="switch_handle_coordinator_update_test")
     diffuser = mock_diffuser_v1_battery_cartridge()
     await init_integration(hass, config_entry, [diffuser])
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["lot123v1"]
     diffuser.is_on = False
 
@@ -56,7 +56,7 @@ async def test_switch_handle_coordinator_update(hass: HomeAssistant) -> None:
     call_count_before_update = diffuser.update_data.call_count
 
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         SERVICE_UPDATE_ENTITY,
         {ATTR_ENTITY_ID: ["switch.genie"]},
         blocking=True,
@@ -71,7 +71,7 @@ async def test_switch_handle_coordinator_update(hass: HomeAssistant) -> None:
     assert diffuser.update_data.call_count == call_count_before_update + 1
 
 
-async def test_set_switch_state(hass: HomeAssistant) -> None:
+async def test_set_switch_state(hass: SmartHub) -> None:
     """Test changing the diffuser switch entity state."""
     config_entry = mock_config_entry(unique_id="id_123_switch_set_state_test")
     await init_integration(hass, config_entry, [mock_diffuser_v1_battery_cartridge()])

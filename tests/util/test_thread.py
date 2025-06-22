@@ -1,17 +1,17 @@
-"""Test Home Assistant thread utils."""
+"""Test SmartHub thread utils."""
 
 import asyncio
 from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.util import thread
-from homeassistant.util.async_ import run_callback_threadsafe
-from homeassistant.util.thread import ThreadWithException
+from smarthub.core import SmartHub
+from smarthub.util import thread
+from smarthub.util.async_ import run_callback_threadsafe
+from smarthub.util.thread import ThreadWithException
 
 
-async def test_thread_with_exception_invalid(hass: HomeAssistant) -> None:
+async def test_thread_with_exception_invalid(hass: SmartHub) -> None:
     """Test throwing an invalid thread exception."""
 
     finish_event = asyncio.Event()
@@ -28,7 +28,7 @@ async def test_thread_with_exception_invalid(hass: HomeAssistant) -> None:
     test_thread.join()
 
 
-async def test_thread_not_started(hass: HomeAssistant) -> None:
+async def test_thread_not_started(hass: SmartHub) -> None:
     """Test throwing when the thread is not started."""
 
     test_thread = ThreadWithException(target=lambda *_: None)
@@ -37,7 +37,7 @@ async def test_thread_not_started(hass: HomeAssistant) -> None:
         test_thread.raise_exc(TimeoutError)
 
 
-async def test_thread_fails_raise(hass: HomeAssistant) -> None:
+async def test_thread_fails_raise(hass: SmartHub) -> None:
     """Test throwing after already ended."""
 
     finish_event = asyncio.Event()
@@ -72,7 +72,7 @@ async def test_deadlock_safe_shutdown_no_threads() -> None:
         daemon_thread_mock,
     ]
 
-    with patch("homeassistant.util.threading.enumerate", return_value=mock_threads):
+    with patch("smarthub.util.threading.enumerate", return_value=mock_threads):
         thread.deadlock_safe_shutdown()
 
     assert not dead_thread_mock.join.called
@@ -101,7 +101,7 @@ async def test_deadlock_safe_shutdown() -> None:
         exception_thread_mock,
     ]
 
-    with patch("homeassistant.util.threading.enumerate", return_value=mock_threads):
+    with patch("smarthub.util.threading.enumerate", return_value=mock_threads):
         thread.deadlock_safe_shutdown()
 
     expected_timeout = thread.THREADING_SHUTDOWN_TIMEOUT / 2

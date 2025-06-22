@@ -14,10 +14,10 @@ from pytrafikverket import (
 )
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.trafikverket_train.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, SOURCE_USER, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.components.trafikverket_train.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, SOURCE_USER, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import ENTRY_CONFIG, OPTIONS_CONFIG
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, get_trains: list[TrainStopModel]
+    hass: SmartHub, get_trains: list[TrainStopModel]
 ) -> None:
     """Test unload an entry."""
     entry = MockConfigEntry(
@@ -41,10 +41,10 @@ async def test_unload_entry(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
             return_value=get_trains,
         ) as mock_tv_train,
     ):
@@ -60,7 +60,7 @@ async def test_unload_entry(
 
 
 async def test_auth_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_trains: list[TrainStopModel],
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -77,7 +77,7 @@ async def test_auth_failed(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
+        "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
         side_effect=InvalidAuthentication,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -91,7 +91,7 @@ async def test_auth_failed(
 
 
 async def test_no_stations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_trains: list[TrainStopModel],
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -108,7 +108,7 @@ async def test_no_stations(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
+        "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
         side_effect=NoTrainStationFound,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -118,7 +118,7 @@ async def test_no_stations(
 
 
 async def test_migrate_entity_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_trains: list[TrainStopModel],
     snapshot: SnapshotAssertion,
     entity_registry: EntityRegistry,
@@ -145,10 +145,10 @@ async def test_migrate_entity_unique_id(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
             return_value=get_trains,
         ),
     ):
@@ -162,7 +162,7 @@ async def test_migrate_entity_unique_id(
 
 
 async def test_migrate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_trains: list[TrainStopModel],
     get_train_stations: list[StationInfoModel],
 ) -> None:
@@ -181,14 +181,14 @@ async def test_migrate_entry(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_train_station_from_signature",
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_train_stations,
         ),
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_get_next_train_stops",
             return_value=get_trains,
         ),
     ):
@@ -213,7 +213,7 @@ async def test_migrate_entry(
 
 
 async def test_migrate_entry_from_future_version_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_trains: list[TrainStopModel],
 ) -> None:
     """Test migrate entry from future version fails."""
@@ -243,7 +243,7 @@ async def test_migrate_entry_from_future_version_fails(
         (Exception),
     ],
 )
-async def test_migrate_entry_fails(hass: HomeAssistant, side_effect: Exception) -> None:
+async def test_migrate_entry_fails(hass: SmartHub, side_effect: Exception) -> None:
     """Test migrate entry fails."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -258,7 +258,7 @@ async def test_migrate_entry_fails(hass: HomeAssistant, side_effect: Exception) 
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.config_flow.TrafikverketTrain.async_search_train_stations",
             side_effect=side_effect(),
         ),
     ):
@@ -269,7 +269,7 @@ async def test_migrate_entry_fails(hass: HomeAssistant, side_effect: Exception) 
 
 
 async def test_migrate_entry_fails_multiple_stations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_multiple_train_stations: list[StationInfoModel],
 ) -> None:
     """Test migrate entry fails on multiple stations found."""
@@ -287,7 +287,7 @@ async def test_migrate_entry_fails_multiple_stations(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
+            "smarthub.components.trafikverket_train.coordinator.TrafikverketTrain.async_search_train_stations",
             side_effect=get_multiple_train_stations,
         ),
     ):

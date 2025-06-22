@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from pyuptimerobot import UptimeRobotException
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import (
     MOCK_UPTIMEROBOT_ACCOUNT,
@@ -21,7 +21,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test config entry diagnostics."""
@@ -58,7 +58,7 @@ async def test_entry_diagnostics(
 
 
 async def test_entry_diagnostics_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test config entry diagnostics with exception."""

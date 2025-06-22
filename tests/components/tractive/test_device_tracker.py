@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.device_tracker import SourceType
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.device_tracker import SourceType
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_device_tracker(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_tractive_client: AsyncMock,
@@ -23,7 +23,7 @@ async def test_device_tracker(
 ) -> None:
     """Test states of the device_tracker."""
     with patch(
-        "homeassistant.components.tractive.PLATFORMS", [Platform.DEVICE_TRACKER]
+        "smarthub.components.tractive.PLATFORMS", [Platform.DEVICE_TRACKER]
     ):
         await init_integration(hass, mock_config_entry)
 
@@ -34,7 +34,7 @@ async def test_device_tracker(
 
 
 async def test_source_type_phone(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -62,7 +62,7 @@ async def test_source_type_phone(
 
 
 async def test_source_type_gps(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tractive_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

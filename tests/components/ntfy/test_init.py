@@ -10,15 +10,15 @@ from aiontfy.exceptions import (
 )
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_entry_setup_unload(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test integration setup and unload."""
 
@@ -51,7 +51,7 @@ async def test_entry_setup_unload(
     ],
 )
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_aiontfy: AsyncMock,
     exception: Exception,

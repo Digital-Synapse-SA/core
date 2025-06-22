@@ -9,17 +9,17 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from pytrafikverket import CameraInfoModel
 
-from homeassistant.components.camera import async_get_image
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.camera import async_get_image
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import async_fire_time_changed
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     freezer: FrozenDateTimeFactory,
     monkeypatch: pytest.MonkeyPatch,
@@ -34,7 +34,7 @@ async def test_camera(
     assert state1.attributes["type"] == "Road"
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         return_value=get_camera,
     ):
         aioclient_mock.get(
@@ -62,12 +62,12 @@ async def test_camera(
     )
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         return_value=get_camera,
     ):
         freezer.tick(timedelta(minutes=6))
         async_fire_time_changed(hass)
         await hass.async_block_till_done()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await async_get_image(hass, "camera.test_camera")

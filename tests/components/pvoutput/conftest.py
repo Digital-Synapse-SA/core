@@ -8,9 +8,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pvo import Status, System
 import pytest
 
-from homeassistant.components.pvoutput.const import CONF_SYSTEM_ID, DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
+from smarthub.components.pvoutput.const import CONF_SYSTEM_ID, DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -30,7 +30,7 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.pvoutput.async_setup_entry", return_value=True
+        "smarthub.components.pvoutput.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
@@ -40,10 +40,10 @@ def mock_pvoutput() -> Generator[MagicMock]:
     """Return a mocked PVOutput client."""
     with (
         patch(
-            "homeassistant.components.pvoutput.coordinator.PVOutput", autospec=True
+            "smarthub.components.pvoutput.coordinator.PVOutput", autospec=True
         ) as pvoutput_mock,
         patch(
-            "homeassistant.components.pvoutput.config_flow.PVOutput", new=pvoutput_mock
+            "smarthub.components.pvoutput.config_flow.PVOutput", new=pvoutput_mock
         ),
     ):
         pvoutput = pvoutput_mock.return_value
@@ -58,7 +58,7 @@ def mock_pvoutput() -> Generator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_pvoutput: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_pvoutput: MagicMock
 ) -> MockConfigEntry:
     """Set up the PVOutput integration for testing."""
     mock_config_entry.add_to_hass(hass)

@@ -1,16 +1,16 @@
 """Tests for the sensors provided by the Tailscale integration."""
 
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.components.tailscale.const import DOMAIN
-from homeassistant.const import ATTR_DEVICE_CLASS, ATTR_FRIENDLY_NAME, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.components.tailscale.const import DOMAIN
+from smarthub.const import ATTR_DEVICE_CLASS, ATTR_FRIENDLY_NAME, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_tailscale_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,

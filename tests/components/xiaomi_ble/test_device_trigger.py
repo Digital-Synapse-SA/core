@@ -2,14 +2,14 @@
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.components.bluetooth import DOMAIN as BLUETOOTH_DOMAIN
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.xiaomi_ble.const import CONF_SUBTYPE, DOMAIN
-from homeassistant.const import CONF_DEVICE_ID, CONF_DOMAIN, CONF_PLATFORM, CONF_TYPE
-from homeassistant.core import HomeAssistant, ServiceCall, callback
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.bluetooth import DOMAIN as BLUETOOTH_DOMAIN
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.xiaomi_ble.const import CONF_SUBTYPE, DOMAIN
+from smarthub.const import CONF_DEVICE_ID, CONF_DOMAIN, CONF_PLATFORM, CONF_TYPE
+from smarthub.core import SmartHub, ServiceCall, callback
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import make_advertisement
 
@@ -29,7 +29,7 @@ def get_device_id(mac: str) -> tuple[str, str]:
 
 
 async def _async_setup_xiaomi_device(
-    hass: HomeAssistant, mac: str, data: Any | None = None
+    hass: SmartHub, mac: str, data: Any | None = None
 ):
     config_entry = MockConfigEntry(domain=DOMAIN, unique_id=mac, data=data)
     config_entry.add_to_hass(hass)
@@ -40,7 +40,7 @@ async def _async_setup_xiaomi_device(
     return config_entry
 
 
-async def test_event_button_press(hass: HomeAssistant) -> None:
+async def test_event_button_press(hass: SmartHub) -> None:
     """Make sure that a button press event is fired."""
     mac = "54:EF:44:E3:9C:BC"
     data = {"bindkey": "5b51a7c91cde6707c9ef18dfda143a58"}
@@ -67,7 +67,7 @@ async def test_event_button_press(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_event_unlock_outside_the_door(hass: HomeAssistant) -> None:
+async def test_event_unlock_outside_the_door(hass: SmartHub) -> None:
     """Make sure that a unlock outside the door event is fired."""
     mac = "D7:1F:44:EB:8A:91"
     entry = await _async_setup_xiaomi_device(hass, mac)
@@ -93,7 +93,7 @@ async def test_event_unlock_outside_the_door(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_event_successful_fingerprint_match_the_door(hass: HomeAssistant) -> None:
+async def test_event_successful_fingerprint_match_the_door(hass: SmartHub) -> None:
     """Make sure that a successful fingerprint match event is fired."""
     mac = "D7:1F:44:EB:8A:91"
     entry = await _async_setup_xiaomi_device(hass, mac)
@@ -119,7 +119,7 @@ async def test_event_successful_fingerprint_match_the_door(hass: HomeAssistant) 
     await hass.async_block_till_done()
 
 
-async def test_event_motion_detected(hass: HomeAssistant) -> None:
+async def test_event_motion_detected(hass: SmartHub) -> None:
     """Make sure that a motion detected event is fired."""
     mac = "DE:70:E8:B2:39:0C"
     entry = await _async_setup_xiaomi_device(hass, mac)
@@ -142,7 +142,7 @@ async def test_event_motion_detected(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_event_dimmer_rotate(hass: HomeAssistant) -> None:
+async def test_event_dimmer_rotate(hass: SmartHub) -> None:
     """Make sure that a dimmer rotate event is fired."""
     mac = "F8:24:41:C5:98:8B"
     data = {"bindkey": "b853075158487ca39a5b5ea9"}
@@ -169,7 +169,7 @@ async def test_event_dimmer_rotate(hass: HomeAssistant) -> None:
 
 
 async def test_get_triggers_button(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we get the expected triggers from a Xiaomi BLE button sensor."""
     mac = "54:EF:44:E3:9C:BC"
@@ -210,7 +210,7 @@ async def test_get_triggers_button(
 
 
 async def test_get_triggers_double_button(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we get the expected triggers from a Xiaomi BLE switch with 2 buttons."""
     mac = "DC:ED:83:87:12:73"
@@ -251,7 +251,7 @@ async def test_get_triggers_double_button(
 
 
 async def test_get_triggers_lock(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we get the expected triggers from a Xiaomi BLE lock with fingerprint scanner."""
     mac = "98:0C:33:A3:04:3D"
@@ -293,7 +293,7 @@ async def test_get_triggers_lock(
 
 
 async def test_get_triggers_motion(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we get the expected triggers from a Xiaomi BLE motion sensor."""
     mac = "DE:70:E8:B2:39:0C"
@@ -330,7 +330,7 @@ async def test_get_triggers_motion(
 
 
 async def test_get_triggers_for_invalid_xiami_ble_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we don't get triggers for an device that does not emit events."""
     mac = "C4:7C:8D:6A:3E:7A"
@@ -362,7 +362,7 @@ async def test_get_triggers_for_invalid_xiami_ble_device(
 
 
 async def test_get_triggers_for_invalid_device_id(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we don't get triggers when using an invalid device_id."""
     mac = "DE:70:E8:B2:39:0C"
@@ -392,7 +392,7 @@ async def test_get_triggers_for_invalid_device_id(
 
 
 async def test_if_fires_on_button_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -455,7 +455,7 @@ async def test_if_fires_on_button_press(
 
 
 async def test_if_fires_on_double_button_long_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -518,7 +518,7 @@ async def test_if_fires_on_double_button_long_press(
 
 
 async def test_if_fires_on_motion_detected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
 ) -> None:
@@ -574,7 +574,7 @@ async def test_if_fires_on_motion_detected(
 
 
 async def test_automation_with_invalid_trigger_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -623,7 +623,7 @@ async def test_automation_with_invalid_trigger_type(
 
 
 async def test_automation_with_invalid_trigger_event_property(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -675,7 +675,7 @@ async def test_automation_with_invalid_trigger_event_property(
 
 
 async def test_triggers_for_invalid__model(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
 ) -> None:

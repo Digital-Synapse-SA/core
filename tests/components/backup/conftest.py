@@ -9,9 +9,9 @@ from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.backup import DOMAIN
-from homeassistant.components.backup.manager import NewBackup, WrittenBackup
-from homeassistant.core import HomeAssistant
+from smarthub.components.backup import DOMAIN
+from smarthub.components.backup.manager import NewBackup, WrittenBackup
+from smarthub.core import SmartHub
 
 from .common import TEST_BACKUP_PATH_ABC123, TEST_BACKUP_PATH_DEF456
 
@@ -19,10 +19,10 @@ from tests.common import get_fixture_path
 
 
 @pytest.fixture(name="instance_id", autouse=True)
-def instance_id_fixture(hass: HomeAssistant) -> Generator[None]:
+def instance_id_fixture(hass: SmartHub) -> Generator[None]:
     """Mock instance ID."""
     with patch(
-        "homeassistant.components.backup.manager.instance_id.async_get",
+        "smarthub.components.backup.manager.instance_id.async_get",
         return_value="our_uuid",
     ):
         yield
@@ -32,7 +32,7 @@ def instance_id_fixture(hass: HomeAssistant) -> Generator[None]:
 def mocked_json_bytes_fixture() -> Generator[Mock]:
     """Mock json_bytes."""
     with patch(
-        "homeassistant.components.backup.manager.json_bytes",
+        "smarthub.components.backup.manager.json_bytes",
         return_value=b"{}",  # Empty JSON
     ) as mocked_json_bytes:
         yield mocked_json_bytes
@@ -42,13 +42,13 @@ def mocked_json_bytes_fixture() -> Generator[Mock]:
 def mocked_tarfile_fixture() -> Generator[Mock]:
     """Mock tarfile."""
     with patch(
-        "homeassistant.components.backup.manager.SecureTarFile"
+        "smarthub.components.backup.manager.SecureTarFile"
     ) as mocked_tarfile:
         yield mocked_tarfile
 
 
 @pytest.fixture(name="path_glob")
-def path_glob_fixture(hass: HomeAssistant) -> Generator[MagicMock]:
+def path_glob_fixture(hass: SmartHub) -> Generator[MagicMock]:
     """Mock path glob."""
     with patch(
         "pathlib.Path.glob",
@@ -69,7 +69,7 @@ CONFIG_DIR = {
         Path("backups"),
         Path("tmp_backups"),
         Path("tts"),
-        Path("home-assistant_v2.db"),
+        Path("smart-hub_v2.db"),
     ],
     "/backups": [
         Path("backups/backup.tar"),
@@ -119,7 +119,7 @@ def mock_create_backup() -> Generator[AsyncMock]:
     fut: Future[MagicMock] = Future()
     fut.set_result(mock_written_backup)
     with patch(
-        "homeassistant.components.backup.CoreBackupReaderWriter.async_create_backup"
+        "smarthub.components.backup.CoreBackupReaderWriter.async_create_backup"
     ) as mock_create_backup:
         mock_create_backup.return_value = (NewBackup(backup_job_id="abc123"), fut)
         yield mock_create_backup
@@ -127,7 +127,7 @@ def mock_create_backup() -> Generator[AsyncMock]:
 
 @pytest.fixture(name="mock_backup_generation")
 def mock_backup_generation_fixture(
-    hass: HomeAssistant, mocked_json_bytes: Mock, mocked_tarfile: Mock
+    hass: SmartHub, mocked_json_bytes: Mock, mocked_tarfile: Mock
 ) -> Generator[None]:
     """Mock backup generator."""
 
@@ -156,7 +156,7 @@ def mock_backup_generation_fixture(
             MagicMock(),
         ),
         patch(
-            "homeassistant.components.backup.manager.HAVERSION",
+            "smarthub.components.backup.manager.HAVERSION",
             "2025.1.0",
         ),
     ):
@@ -166,10 +166,10 @@ def mock_backup_generation_fixture(
 @pytest.fixture
 def mock_backups() -> Generator[None]:
     """Fixture to setup test backups."""
-    from homeassistant.components.backup import backup as core_backup  # noqa: PLC0415
+    from smarthub.components.backup import backup as core_backup  # noqa: PLC0415
 
     class CoreLocalBackupAgent(core_backup.CoreLocalBackupAgent):
-        def __init__(self, hass: HomeAssistant) -> None:
+        def __init__(self, hass: SmartHub) -> None:
             super().__init__(hass)
             self._backup_dir = get_fixture_path("test_backups", DOMAIN)
 

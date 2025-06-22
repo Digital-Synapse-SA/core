@@ -7,16 +7,16 @@ from unittest.mock import AsyncMock, MagicMock
 from azure.eventhub.exceptions import EventHubError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.azure_event_hub.const import (
+from smarthub import config_entries
+from smarthub.components.azure_event_hub.const import (
     CONF_MAX_DELAY,
     CONF_SEND_INTERVAL,
     DOMAIN,
     STEP_CONN_STRING,
     STEP_SAS,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import (
     BASE_CONFIG_CS,
@@ -46,7 +46,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 )
 @pytest.mark.usefixtures("mock_from_connection_string")
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     step1_config: dict[str, Any],
     step_id: str,
@@ -76,7 +76,7 @@ async def test_form(
     mock_setup_entry.assert_called_once()
 
 
-async def test_import(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_import(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
 
     import_config = IMPORT_CONFIG.copy()
@@ -102,7 +102,7 @@ async def test_import(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     [config_entries.SOURCE_USER, config_entries.SOURCE_IMPORT],
     ids=["user", "import"],
 )
-async def test_single_instance(hass: HomeAssistant, source: str) -> None:
+async def test_single_instance(hass: SmartHub, source: str) -> None:
     """Test uniqueness of username."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -126,7 +126,7 @@ async def test_single_instance(hass: HomeAssistant, source: str) -> None:
     ids=["cannot_connect", "unknown"],
 )
 async def test_connection_error_sas(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_eventhub_properties: AsyncMock,
     side_effect: Exception,
     error_message: str,
@@ -155,7 +155,7 @@ async def test_connection_error_sas(
     ids=["cannot_connect", "unknown"],
 )
 async def test_connection_error_cs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_from_connection_string: MagicMock,
     side_effect: Exception,
     error_message: str,
@@ -179,7 +179,7 @@ async def test_connection_error_cs(
     assert result2["errors"] == {"base": error_message}
 
 
-async def test_options_flow(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def test_options_flow(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Test options flow."""
     result = await hass.config_entries.options.async_init(entry.entry_id)
 

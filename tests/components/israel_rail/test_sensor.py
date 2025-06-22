@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import goto_future, init_integration
 from .conftest import TRAINS, get_time
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_valid_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_israelrail: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -30,7 +30,7 @@ async def test_valid_config(
 
 
 async def test_update_train(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_israelrail: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -53,7 +53,7 @@ async def test_update_train(
 
 
 async def test_fail_query(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_israelrail: AsyncMock,
     mock_config_entry: MockConfigEntry,

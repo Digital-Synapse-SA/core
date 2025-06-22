@@ -7,16 +7,16 @@ from aioesphomeapi import (
     SensorState,
 )
 
-from homeassistant.components.esphome import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.esphome import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MockGenericDeviceEntryType
 
 
 async def test_migrate_entity_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
@@ -59,7 +59,7 @@ async def test_migrate_entity_unique_id(
 
 
 async def test_migrate_entity_unique_id_downgrade_upgrade(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,

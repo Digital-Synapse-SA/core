@@ -4,10 +4,10 @@ from unittest.mock import Mock, patch
 
 import aiohttp
 
-from homeassistant import config_entries
-from homeassistant.components.android_ip_webcam.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.android_ip_webcam.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .test_init import MOCK_CONFIG_DATA
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
-async def test_form(hass: HomeAssistant, aioclient_mock_fixture) -> None:
+async def test_form(hass: SmartHub, aioclient_mock_fixture) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -24,7 +24,7 @@ async def test_form(hass: HomeAssistant, aioclient_mock_fixture) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.android_ip_webcam.async_setup_entry",
+        "smarthub.components.android_ip_webcam.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -46,7 +46,7 @@ async def test_form(hass: HomeAssistant, aioclient_mock_fixture) -> None:
 
 
 async def test_device_already_configured(
-    hass: HomeAssistant, aioclient_mock_fixture
+    hass: SmartHub, aioclient_mock_fixture
 ) -> None:
     """Test aborting if the device is already configured."""
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG_DATA)
@@ -71,7 +71,7 @@ async def test_device_already_configured(
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we handle invalid auth error."""
     result = await hass.config_entries.flow.async_init(
@@ -92,7 +92,7 @@ async def test_form_invalid_auth(
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(

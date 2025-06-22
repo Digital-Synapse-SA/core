@@ -2,8 +2,8 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import (
     FAKE_DUAL_HEAD_RGBWW_BULB,
@@ -18,7 +18,7 @@ from . import (
 
 
 async def test_signal_strength(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test signal strength."""
     bulb, entry = await async_setup_integration(
@@ -43,7 +43,7 @@ async def test_signal_strength(
 
 
 async def test_power_monitoring(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test power monitoring."""
     socket = _mocked_wizlight(None, None, FAKE_SOCKET_WITH_POWER_MONITORING)

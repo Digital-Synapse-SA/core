@@ -1,16 +1,16 @@
 """Test config flow."""
 
-from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.mqtt import MqttServiceInfo
+from smarthub import config_entries
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.mqtt import MqttServiceInfo
 
 from tests.common import MockConfigEntry
 from tests.typing import MqttMockHAClient
 
 
 async def test_mqtt_abort_if_existing_entry(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Check MQTT flow aborts when an entry already exist."""
     MockConfigEntry(domain="tasmota").add_to_hass(hass)
@@ -24,7 +24,7 @@ async def test_mqtt_abort_if_existing_entry(
 
 
 async def test_mqtt_abort_invalid_topic(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Check MQTT flow aborts if discovery topic is invalid."""
     discovery_info = MqttServiceInfo(
@@ -87,7 +87,7 @@ async def test_mqtt_abort_invalid_topic(
     assert result["type"] is FlowResultType.FORM
 
 
-async def test_mqtt_setup(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_mqtt_setup(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test we can finish a config flow through MQTT with custom prefix."""
     discovery_info = MqttServiceInfo(
         topic="tasmota/discovery/DC4F220848A2/config",
@@ -117,7 +117,7 @@ async def test_mqtt_setup(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> N
     assert result["result"].data == {"discovery_prefix": "tasmota/discovery"}
 
 
-async def test_user_setup(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_user_setup(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test we can finish a config flow."""
     result = await hass.config_entries.flow.async_init(
         "tasmota", context={"source": config_entries.SOURCE_USER}
@@ -133,7 +133,7 @@ async def test_user_setup(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> N
 
 
 async def test_user_setup_advanced(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test we can finish a config flow."""
     result = await hass.config_entries.flow.async_init(
@@ -153,7 +153,7 @@ async def test_user_setup_advanced(
 
 
 async def test_user_setup_advanced_strip_wildcard(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test we can finish a config flow."""
     result = await hass.config_entries.flow.async_init(
@@ -173,7 +173,7 @@ async def test_user_setup_advanced_strip_wildcard(
 
 
 async def test_user_setup_invalid_topic_prefix(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test abort on invalid discovery topic."""
     result = await hass.config_entries.flow.async_init(
@@ -191,7 +191,7 @@ async def test_user_setup_invalid_topic_prefix(
 
 
 async def test_user_single_instance(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test we only allow a single config flow."""
     MockConfigEntry(domain="tasmota").add_to_hass(hass)

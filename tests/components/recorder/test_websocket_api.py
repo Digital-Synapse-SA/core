@@ -13,15 +13,15 @@ from freezegun import freeze_time
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.db_schema import Statistics, StatisticsShortTerm
-from homeassistant.components.recorder.models import (
+from smarthub.components import recorder
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.db_schema import Statistics, StatisticsShortTerm
+from smarthub.components.recorder.models import (
     StatisticData,
     StatisticMeanType,
     StatisticMetaData,
 )
-from homeassistant.components.recorder.statistics import (
+from smarthub.components.recorder.statistics import (
     DEG_TO_RAD,
     RAD_TO_DEG,
     async_add_external_statistics,
@@ -31,15 +31,15 @@ from homeassistant.components.recorder.statistics import (
     get_short_term_statistics_run_cache,
     list_statistic_ids,
 )
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.components.recorder.websocket_api import UNIT_SCHEMA
-from homeassistant.components.sensor import UNIT_CONVERTERS
-from homeassistant.const import DEGREE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import recorder as recorder_helper
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
+from smarthub.components.recorder.util import session_scope
+from smarthub.components.recorder.websocket_api import UNIT_SCHEMA
+from smarthub.components.sensor import UNIT_CONVERTERS
+from smarthub.const import DEGREE
+from smarthub.core import SmartHub
+from smarthub.helpers import recorder as recorder_helper
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from .common import (
     async_recorder_block_till_done,
@@ -179,7 +179,7 @@ def test_converters_align_with_sensor() -> None:
 
 
 async def test_statistics_during_period(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test statistics_during_period."""
     now = get_start_time(dt_util.utcnow())
@@ -261,7 +261,7 @@ async def test_statistics_during_period(
 @pytest.mark.usefixtures("recorder_mock")
 @pytest.mark.parametrize("offset", [0, 1, 2])
 async def test_statistic_during_period(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     offset: int,
 ) -> None:
@@ -720,7 +720,7 @@ def _circular_mean_approx(
     ],
 )
 async def test_statistic_during_period_circular_mean(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     offset: int,
     step_size: float,
@@ -1068,7 +1068,7 @@ async def test_statistic_during_period_circular_mean(
 
 @pytest.mark.freeze_time(datetime.datetime(2022, 10, 21, 7, 25, tzinfo=datetime.UTC))
 async def test_statistic_during_period_hole(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test statistic_during_period when there are holes in the data."""
     now = dt_util.utcnow()
@@ -1220,7 +1220,7 @@ async def test_statistic_during_period_hole(
 @pytest.mark.freeze_time(datetime.datetime(2022, 10, 21, 7, 25, tzinfo=datetime.UTC))
 @pytest.mark.usefixtures("recorder_mock")
 async def test_statistic_during_period_hole_circular_mean(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test statistic_during_period when there are holes in the data."""
     now = dt_util.utcnow()
@@ -1379,7 +1379,7 @@ async def test_statistic_during_period_hole_circular_mean(
 )
 async def test_statistic_during_period_partial_overlap(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     frozen_time: datetime.datetime,
@@ -1766,7 +1766,7 @@ async def test_statistic_during_period_partial_overlap(
 )
 async def test_statistic_during_period_calendar(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     calendar_period,
     start_time,
@@ -1777,7 +1777,7 @@ async def test_statistic_during_period_calendar(
 
     # Try requesting data for the current hour
     with patch(
-        "homeassistant.components.recorder.websocket_api.statistic_during_period",
+        "smarthub.components.recorder.websocket_api.statistic_during_period",
         return_value={},
     ) as statistic_during_period:
         await client.send_json_auto_id(
@@ -1822,7 +1822,7 @@ async def test_statistic_during_period_calendar(
 )
 async def test_statistics_during_period_unit_conversion(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     attributes,
     state,
@@ -1909,7 +1909,7 @@ async def test_statistics_during_period_unit_conversion(
 )
 async def test_sum_statistics_during_period_unit_conversion(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     attributes,
     state,
@@ -1999,7 +1999,7 @@ async def test_sum_statistics_during_period_unit_conversion(
 )
 async def test_statistics_during_period_invalid_unit_conversion(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     custom_units,
 ) -> None:
@@ -2040,7 +2040,7 @@ async def test_statistics_during_period_invalid_unit_conversion(
 
 
 async def test_statistics_during_period_in_the_past(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test statistics_during_period in the past."""
     await hass.config.async_set_time_zone("UTC")
@@ -2152,7 +2152,7 @@ async def test_statistics_during_period_in_the_past(
 
 
 async def test_statistics_during_period_bad_start_time(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test statistics_during_period."""
     client = await hass_ws_client()
@@ -2170,7 +2170,7 @@ async def test_statistics_during_period_bad_start_time(
 
 
 async def test_statistics_during_period_bad_end_time(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test statistics_during_period."""
     now = dt_util.utcnow()
@@ -2191,7 +2191,7 @@ async def test_statistics_during_period_bad_end_time(
 
 
 async def test_statistics_during_period_no_statistic_ids(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test statistics_during_period without passing statistic_ids."""
     now = dt_util.utcnow()
@@ -2211,7 +2211,7 @@ async def test_statistics_during_period_no_statistic_ids(
 
 
 async def test_statistics_during_period_empty_statistic_ids(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test statistics_during_period with passing an empty list of statistic_ids."""
     now = dt_util.utcnow()
@@ -2292,7 +2292,7 @@ async def test_statistics_during_period_empty_statistic_ids(
 )
 async def test_list_statistic_ids(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     units,
     attributes,
@@ -2470,7 +2470,7 @@ async def test_list_statistic_ids(
 )
 async def test_list_statistic_ids_unit_change(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     attributes,
     attributes2,
@@ -2542,7 +2542,7 @@ async def test_list_statistic_ids_unit_change(
 
 
 async def test_validate_statistics(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test validate_statistics can be called."""
 
@@ -2558,7 +2558,7 @@ async def test_validate_statistics(
 
 
 async def test_update_statistics_issues(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test update_statistics_issues can be called."""
 
@@ -2570,7 +2570,7 @@ async def test_update_statistics_issues(
 
 
 async def test_clear_statistics(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test removing statistics."""
     now = get_start_time(dt_util.utcnow())
@@ -2690,7 +2690,7 @@ async def test_clear_statistics(
 
 
 async def test_clear_statistics_time_out(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test removing statistics with time-out error."""
     client = await hass_ws_client()
@@ -2719,7 +2719,7 @@ async def test_clear_statistics_time_out(
 )
 async def test_update_statistics_metadata(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     new_unit,
     new_unit_class,
@@ -2816,7 +2816,7 @@ async def test_update_statistics_metadata(
 
 
 async def test_update_statistics_metadata_time_out(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test update statistics metadata with time-out error."""
     client = await hass_ws_client()
@@ -2841,7 +2841,7 @@ async def test_update_statistics_metadata_time_out(
 
 
 async def test_change_statistics_unit(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test change unit of recorded statistics."""
     now = get_start_time(dt_util.utcnow())
@@ -2989,7 +2989,7 @@ async def test_change_statistics_unit(
 
 async def test_change_statistics_unit_errors(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -3100,7 +3100,7 @@ async def test_change_statistics_unit_errors(
 
 
 async def test_recorder_info(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test getting recorder status."""
     client = await hass_ws_client()
@@ -3125,14 +3125,14 @@ async def test_recorder_info(
 @pytest.mark.parametrize(
     ("db_url", "db_in_default_location"),
     [
-        ("sqlite:///{config_dir}/home-assistant_v2.db", True),
+        ("sqlite:///{config_dir}/smart-hub_v2.db", True),
         ("sqlite:///{config_dir}/custom.db", False),
-        ("mysql://root:root_password@127.0.0.1:3316/homeassistant-test", False),
+        ("mysql://root:root_password@127.0.0.1:3316/smarthub-test", False),
     ],
 )
 async def test_recorder_info_default_url(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     db_url: str,
     db_in_default_location: bool,
@@ -3161,7 +3161,7 @@ async def test_recorder_info_default_url(
 
 
 async def test_recorder_info_no_recorder(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test getting recorder status when recorder is not present."""
     client = await hass_ws_client()
@@ -3173,14 +3173,14 @@ async def test_recorder_info_no_recorder(
 
 
 async def test_recorder_info_bad_recorder_config(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test getting recorder status when recorder is not started."""
     config = {recorder.CONF_DB_URL: "sqlite://no_file", recorder.CONF_DB_RETRY_WAIT: 0}
 
     client = await hass_ws_client()
 
-    with patch("homeassistant.components.recorder.migration._migrate_schema"):
+    with patch("smarthub.components.recorder.migration._migrate_schema"):
         recorder_helper.async_initialize_recorder(hass)
         assert not await async_setup_component(
             hass, recorder.DOMAIN, {recorder.DOMAIN: config}
@@ -3199,7 +3199,7 @@ async def test_recorder_info_bad_recorder_config(
 
 
 async def test_recorder_info_wait_database_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     async_test_recorder: RecorderInstanceContextManager,
 ) -> None:
@@ -3224,7 +3224,7 @@ async def test_recorder_info_wait_database_connect(
 
 
 async def test_recorder_info_migration_queue_exhausted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     async_test_recorder: RecorderInstanceContextManager,
     instrument_migration: InstrumentedMigration,
@@ -3234,7 +3234,7 @@ async def test_recorder_info_migration_queue_exhausted(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.create_engine",
+            "smarthub.components.recorder.core.create_engine",
             new=create_engine_test,
         ),
         patch.object(recorder.core, "MAX_QUEUE_BACKLOG_MIN_VALUE", 1),
@@ -3281,7 +3281,7 @@ async def test_recorder_info_migration_queue_exhausted(
 
 
 async def test_backup_start_no_recorder(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_supervisor_access_token: str,
 ) -> None:
@@ -3315,7 +3315,7 @@ async def test_backup_start_no_recorder(
 )
 async def test_get_statistics_metadata(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     units,
     attributes,
@@ -3474,7 +3474,7 @@ async def test_get_statistics_metadata(
 )
 async def test_import_statistics(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     source,
@@ -3690,7 +3690,7 @@ async def test_import_statistics(
 )
 async def test_adjust_sum_statistics_energy(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     source,
@@ -3885,7 +3885,7 @@ async def test_adjust_sum_statistics_energy(
 )
 async def test_adjust_sum_statistics_gas(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     source,
@@ -4091,7 +4091,7 @@ async def test_adjust_sum_statistics_gas(
 )
 async def test_adjust_sum_statistics_errors(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     state_unit,
@@ -4260,7 +4260,7 @@ async def test_adjust_sum_statistics_errors(
 
 async def test_import_statistics_with_last_reset(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

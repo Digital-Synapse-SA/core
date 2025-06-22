@@ -4,16 +4,16 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.trend import async_setup_entry
-from homeassistant.components.trend.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.trend import async_setup_entry
+from smarthub.components.trend.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -32,7 +32,7 @@ async def test_form(hass: HomeAssistant) -> None:
 
     # test step 2 of config flow: settings of trend sensor
     with patch(
-        "homeassistant.components.trend.async_setup_entry", wraps=async_setup_entry
+        "smarthub.components.trend.async_setup_entry", wraps=async_setup_entry
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -52,7 +52,7 @@ async def test_form(hass: HomeAssistant) -> None:
     }
 
 
-async def test_options(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_options(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test options flow."""
     config_entry.add_to_hass(hass)
 

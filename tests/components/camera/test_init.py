@@ -10,33 +10,33 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from webrtc_models import RTCIceCandidateInit
 
-from homeassistant.components import camera
-from homeassistant.components.camera import (
+from smarthub.components import camera
+from smarthub.components.camera import (
     Camera,
     CameraWebRTCProvider,
     WebRTCAnswer,
     WebRTCSendMessage,
     async_register_webrtc_provider,
 )
-from homeassistant.components.camera.const import (
+from smarthub.components.camera.const import (
     DOMAIN,
     PREF_ORIENTATION,
     PREF_PRELOAD_STREAM,
     StreamType,
 )
-from homeassistant.components.camera.helper import get_camera_from_entity_id
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.const import (
+from smarthub.components.camera.helper import get_camera_from_entity_id
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.const import (
     ATTR_ENTITY_ID,
     EVENT_HOMEASSISTANT_STARTED,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub, callback
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er, issue_registry as ir
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .common import EMPTY_8_6_JPEG, STREAM_SOURCE, mock_turbo_jpeg
 
@@ -50,7 +50,7 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 @pytest.fixture(name="image_mock_url")
-async def image_mock_url_fixture(hass: HomeAssistant) -> None:
+async def image_mock_url_fixture(hass: SmartHub) -> None:
     """Fixture for get_image tests."""
     await async_setup_component(
         hass, camera.DOMAIN, {camera.DOMAIN: {"platform": "demo"}}
@@ -59,11 +59,11 @@ async def image_mock_url_fixture(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("image_mock_url")
-async def test_get_image_from_camera(hass: HomeAssistant) -> None:
+async def test_get_image_from_camera(hass: SmartHub) -> None:
     """Grab an image from camera entity."""
 
     with patch(
-        "homeassistant.components.demo.camera.Path.read_bytes",
+        "smarthub.components.demo.camera.Path.read_bytes",
         autospec=True,
         return_value=b"Test",
     ) as mock_camera:
@@ -74,7 +74,7 @@ async def test_get_image_from_camera(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("image_mock_url")
-async def test_get_image_from_camera_with_width_height(hass: HomeAssistant) -> None:
+async def test_get_image_from_camera_with_width_height(hass: SmartHub) -> None:
     """Grab an image from camera entity with width and height."""
 
     turbo_jpeg = mock_turbo_jpeg(
@@ -82,11 +82,11 @@ async def test_get_image_from_camera_with_width_height(hass: HomeAssistant) -> N
     )
     with (
         patch(
-            "homeassistant.components.camera.img_util.TurboJPEGSingleton.instance",
+            "smarthub.components.camera.img_util.TurboJPEGSingleton.instance",
             return_value=turbo_jpeg,
         ),
         patch(
-            "homeassistant.components.demo.camera.Path.read_bytes",
+            "smarthub.components.demo.camera.Path.read_bytes",
             autospec=True,
             return_value=b"Test",
         ) as mock_camera,
@@ -101,7 +101,7 @@ async def test_get_image_from_camera_with_width_height(hass: HomeAssistant) -> N
 
 @pytest.mark.usefixtures("image_mock_url")
 async def test_get_image_from_camera_with_width_height_scaled(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Grab an image from camera entity with width and height and scale it."""
 
@@ -110,11 +110,11 @@ async def test_get_image_from_camera_with_width_height_scaled(
     )
     with (
         patch(
-            "homeassistant.components.camera.img_util.TurboJPEGSingleton.instance",
+            "smarthub.components.camera.img_util.TurboJPEGSingleton.instance",
             return_value=turbo_jpeg,
         ),
         patch(
-            "homeassistant.components.demo.camera.Path.read_bytes",
+            "smarthub.components.demo.camera.Path.read_bytes",
             autospec=True,
             return_value=b"Valid jpeg",
         ) as mock_camera,
@@ -129,7 +129,7 @@ async def test_get_image_from_camera_with_width_height_scaled(
 
 
 @pytest.mark.usefixtures("image_mock_url")
-async def test_get_image_from_camera_not_jpeg(hass: HomeAssistant) -> None:
+async def test_get_image_from_camera_not_jpeg(hass: SmartHub) -> None:
     """Grab an image from camera entity that we cannot scale."""
 
     turbo_jpeg = mock_turbo_jpeg(
@@ -137,11 +137,11 @@ async def test_get_image_from_camera_not_jpeg(hass: HomeAssistant) -> None:
     )
     with (
         patch(
-            "homeassistant.components.camera.img_util.TurboJPEGSingleton.instance",
+            "smarthub.components.camera.img_util.TurboJPEGSingleton.instance",
             return_value=turbo_jpeg,
         ),
         patch(
-            "homeassistant.components.demo.camera.Path.read_bytes",
+            "smarthub.components.demo.camera.Path.read_bytes",
             autospec=True,
             return_value=b"png",
         ) as mock_camera,
@@ -157,7 +157,7 @@ async def test_get_image_from_camera_not_jpeg(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_camera")
 async def test_get_stream_source_from_camera(
-    hass: HomeAssistant, mock_stream_source: AsyncMock
+    hass: SmartHub, mock_stream_source: AsyncMock
 ) -> None:
     """Fetch stream source from camera entity."""
 
@@ -168,40 +168,40 @@ async def test_get_stream_source_from_camera(
 
 
 @pytest.mark.usefixtures("image_mock_url")
-async def test_get_image_without_exists_camera(hass: HomeAssistant) -> None:
+async def test_get_image_without_exists_camera(hass: SmartHub) -> None:
     """Try to get image without exists camera."""
     with (
         patch(
-            "homeassistant.helpers.entity_component.EntityComponent.get_entity",
+            "smarthub.helpers.entity_component.EntityComponent.get_entity",
             return_value=None,
         ),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await camera.async_get_image(hass, "camera.demo_camera")
 
 
 @pytest.mark.usefixtures("image_mock_url")
-async def test_get_image_with_timeout(hass: HomeAssistant) -> None:
+async def test_get_image_with_timeout(hass: SmartHub) -> None:
     """Try to get image with timeout."""
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.async_camera_image",
+            "smarthub.components.demo.camera.DemoCamera.async_camera_image",
             side_effect=TimeoutError,
         ),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await camera.async_get_image(hass, "camera.demo_camera")
 
 
 @pytest.mark.usefixtures("image_mock_url")
-async def test_get_image_fails(hass: HomeAssistant) -> None:
+async def test_get_image_fails(hass: SmartHub) -> None:
     """Try to get image with timeout."""
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.async_camera_image",
+            "smarthub.components.demo.camera.DemoCamera.async_camera_image",
             return_value=None,
         ),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await camera.async_get_image(hass, "camera.demo_camera")
 
@@ -233,7 +233,7 @@ async def test_get_image_fails(hass: HomeAssistant) -> None:
     ],
 )
 async def test_snapshot_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     filename_template: str,
     expected_filename: str,
     expected_issues: list,
@@ -244,9 +244,9 @@ async def test_snapshot_service(
     mopen = mock_open()
 
     with (
-        patch("homeassistant.components.camera.open", mopen, create=True),
+        patch("smarthub.components.camera.open", mopen, create=True),
         patch(
-            "homeassistant.components.camera.os.makedirs",
+            "smarthub.components.camera.os.makedirs",
         ),
         patch.object(hass.config, "is_allowed_path", return_value=True),
     ):
@@ -274,17 +274,17 @@ async def test_snapshot_service(
 
 
 @pytest.mark.usefixtures("mock_camera")
-async def test_snapshot_service_not_allowed_path(hass: HomeAssistant) -> None:
+async def test_snapshot_service_not_allowed_path(hass: SmartHub) -> None:
     """Test snapshot service with a not allowed path."""
     mopen = mock_open()
 
     with (
-        patch("homeassistant.components.camera.open", mopen, create=True),
+        patch("smarthub.components.camera.open", mopen, create=True),
         patch(
-            "homeassistant.components.camera.os.makedirs",
+            "smarthub.components.camera.os.makedirs",
         ),
         pytest.raises(
-            HomeAssistantError,
+            SmartHubError,
             match="Cannot write `/test/snapshot.jpg`, no access to path",
         ),
     ):
@@ -303,21 +303,21 @@ async def test_snapshot_service_not_allowed_path(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     ("target", "side_effect"),
     [
-        ("homeassistant.components.camera.os.makedirs", OSError),
+        ("smarthub.components.camera.os.makedirs", OSError),
         (
-            "homeassistant.components.demo.camera.DemoCamera.async_camera_image",
+            "smarthub.components.demo.camera.DemoCamera.async_camera_image",
             TimeoutError,
         ),
     ],
 )
 async def test_snapshot_service_error(
-    hass: HomeAssistant, target: str, side_effect: Exception
+    hass: SmartHub, target: str, side_effect: Exception
 ) -> None:
     """Test snapshot service with error."""
     with (
         patch.object(hass.config, "is_allowed_path", return_value=True),
         patch(target, side_effect=side_effect),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             camera.DOMAIN,
@@ -332,7 +332,7 @@ async def test_snapshot_service_error(
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream")
 async def test_websocket_stream_no_source(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test camera/stream websocket command with camera with no source."""
     await async_setup_component(hass, "camera", {})
@@ -352,18 +352,18 @@ async def test_websocket_stream_no_source(
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream")
 async def test_websocket_camera_stream(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test camera/stream websocket command."""
     await async_setup_component(hass, "camera", {})
 
     with (
         patch(
-            "homeassistant.components.camera.Stream.endpoint_url",
+            "smarthub.components.camera.Stream.endpoint_url",
             return_value="http://home.assistant/playlist.m3u8",
         ) as mock_stream_view_url,
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value="http://example.com",
         ),
     ):
@@ -384,7 +384,7 @@ async def test_websocket_camera_stream(
 
 @pytest.mark.usefixtures("mock_camera")
 async def test_websocket_get_prefs(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get camera preferences websocket command."""
     await async_setup_component(hass, "camera", {})
@@ -402,7 +402,7 @@ async def test_websocket_get_prefs(
 
 @pytest.mark.usefixtures("mock_camera")
 async def test_websocket_update_preload_prefs(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test updating camera preferences."""
 
@@ -440,12 +440,12 @@ async def test_websocket_update_preload_prefs(
 
 @pytest.mark.usefixtures("mock_camera")
 async def test_websocket_update_orientation_prefs(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test updating camera preferences."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     client = await hass_ws_client(hass)
 
@@ -497,13 +497,13 @@ async def test_websocket_update_orientation_prefs(
 
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream")
-async def test_play_stream_service_no_source(hass: HomeAssistant) -> None:
+async def test_play_stream_service_no_source(hass: SmartHub) -> None:
     """Test camera play_stream service."""
     data = {
         ATTR_ENTITY_ID: "camera.demo_camera",
         camera.ATTR_MEDIA_PLAYER: "media_player.test",
     }
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         # Call service
         await hass.services.async_call(
             camera.DOMAIN, camera.SERVICE_PLAY_STREAM, data, blocking=True
@@ -511,7 +511,7 @@ async def test_play_stream_service_no_source(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream")
-async def test_handle_play_stream_service(hass: HomeAssistant) -> None:
+async def test_handle_play_stream_service(hass: SmartHub) -> None:
     """Test camera play_stream service."""
     await async_process_ha_core_config(
         hass,
@@ -520,10 +520,10 @@ async def test_handle_play_stream_service(hass: HomeAssistant) -> None:
     await async_setup_component(hass, "media_player", {})
     with (
         patch(
-            "homeassistant.components.camera.Stream.endpoint_url",
+            "smarthub.components.camera.Stream.endpoint_url",
         ) as mock_request_stream,
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value="http://example.com",
         ),
     ):
@@ -543,19 +543,19 @@ async def test_handle_play_stream_service(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_stream")
-async def test_no_preload_stream(hass: HomeAssistant) -> None:
+async def test_no_preload_stream(hass: SmartHub) -> None:
     """Test camera preload preference."""
     demo_settings = camera.DynamicStreamSettings()
     with (
         patch(
-            "homeassistant.components.camera.Stream.endpoint_url",
+            "smarthub.components.camera.Stream.endpoint_url",
         ) as mock_request_stream,
         patch(
-            "homeassistant.components.camera.prefs.CameraPreferences.get_dynamic_stream_settings",
+            "smarthub.components.camera.prefs.CameraPreferences.get_dynamic_stream_settings",
             return_value=demo_settings,
         ),
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             new_callable=PropertyMock,
         ) as mock_stream_source,
     ):
@@ -567,17 +567,17 @@ async def test_no_preload_stream(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_stream")
-async def test_preload_stream(hass: HomeAssistant) -> None:
+async def test_preload_stream(hass: SmartHub) -> None:
     """Test camera preload preference."""
     demo_settings = camera.DynamicStreamSettings(preload_stream=True)
     with (
-        patch("homeassistant.components.camera.create_stream") as mock_create_stream,
+        patch("smarthub.components.camera.create_stream") as mock_create_stream,
         patch(
-            "homeassistant.components.camera.prefs.CameraPreferences.get_dynamic_stream_settings",
+            "smarthub.components.camera.prefs.CameraPreferences.get_dynamic_stream_settings",
             return_value=demo_settings,
         ),
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value="http://example.com",
         ),
     ):
@@ -592,11 +592,11 @@ async def test_preload_stream(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_camera")
-async def test_record_service_invalid_path(hass: HomeAssistant) -> None:
+async def test_record_service_invalid_path(hass: SmartHub) -> None:
     """Test record service with invalid path."""
     with (
         patch.object(hass.config, "is_allowed_path", return_value=False),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         # Call service
         await hass.services.async_call(
@@ -633,7 +633,7 @@ async def test_record_service_invalid_path(hass: HomeAssistant) -> None:
     ],
 )
 async def test_record_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     filename_template: str,
     expected_filename: str,
     expected_issues: list,
@@ -643,11 +643,11 @@ async def test_record_service(
     """Test record service."""
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value="http://example.com",
         ),
         patch(
-            "homeassistant.components.stream.Stream.async_record",
+            "smarthub.components.stream.Stream.async_record",
             autospec=True,
         ) as mock_record,
     ):
@@ -683,7 +683,7 @@ async def test_camera_proxy_stream(hass_client: ClientSessionGenerator) -> None:
         assert response.status == HTTPStatus.OK
 
     with patch(
-        "homeassistant.components.demo.camera.DemoCamera.handle_async_mjpeg_stream",
+        "smarthub.components.demo.camera.DemoCamera.handle_async_mjpeg_stream",
         return_value=None,
     ):
         async with await client.get(
@@ -693,7 +693,7 @@ async def test_camera_proxy_stream(hass_client: ClientSessionGenerator) -> None:
 
 
 @pytest.mark.usefixtures("mock_camera")
-async def test_state_streaming(hass: HomeAssistant) -> None:
+async def test_state_streaming(hass: SmartHub) -> None:
     """Camera state."""
     demo_camera = hass.states.get("camera.demo_camera")
     assert demo_camera is not None
@@ -702,22 +702,22 @@ async def test_state_streaming(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream")
 async def test_stream_unavailable(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Camera state."""
     await async_setup_component(hass, "camera", {})
 
     with (
         patch(
-            "homeassistant.components.camera.Stream.endpoint_url",
+            "smarthub.components.camera.Stream.endpoint_url",
             return_value="http://home.assistant/playlist.m3u8",
         ),
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value="http://example.com",
         ),
         patch(
-            "homeassistant.components.camera.Stream.set_update_callback",
+            "smarthub.components.camera.Stream.set_update_callback",
         ) as mock_update_callback,
     ):
         # Request playlist through WebSocket. We just want to create the stream
@@ -732,7 +732,7 @@ async def test_stream_unavailable(
     # Simulate the stream going unavailable
     callback = mock_update_callback.call_args.args[0]
     with patch(
-        "homeassistant.components.camera.Stream.available", new_callable=lambda: False
+        "smarthub.components.camera.Stream.available", new_callable=lambda: False
     ):
         callback()
         await hass.async_block_till_done()
@@ -743,7 +743,7 @@ async def test_stream_unavailable(
 
     # Simulate stream becomes available
     with patch(
-        "homeassistant.components.camera.Stream.available", new_callable=lambda: True
+        "smarthub.components.camera.Stream.available", new_callable=lambda: True
     ):
         callback()
         await hass.async_block_till_done()
@@ -755,7 +755,7 @@ async def test_stream_unavailable(
 
 @pytest.mark.usefixtures("mock_camera")
 async def test_use_stream_for_stills(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test that the component can grab images from stream."""
 
@@ -763,11 +763,11 @@ async def test_use_stream_for_stills(
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value=None,
         ) as mock_stream_source,
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.use_stream_for_stills",
+            "smarthub.components.demo.camera.DemoCamera.use_stream_for_stills",
             return_value=True,
         ),
     ):
@@ -784,12 +784,12 @@ async def test_use_stream_for_stills(
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value="rtsp://some_source",
         ) as mock_stream_source,
-        patch("homeassistant.components.camera.create_stream") as mock_create_stream,
+        patch("smarthub.components.camera.create_stream") as mock_create_stream,
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.use_stream_for_stills",
+            "smarthub.components.demo.camera.DemoCamera.use_stream_for_stills",
             return_value=True,
         ),
     ):
@@ -835,7 +835,7 @@ def test_deprecated_state_constants(
 
 
 def test_deprecated_supported_features_ints(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test deprecated supported features ints."""
 
@@ -859,7 +859,7 @@ def test_deprecated_supported_features_ints(
 
 
 @pytest.mark.usefixtures("mock_camera")
-async def test_entity_picture_url_changes_on_token_update(hass: HomeAssistant) -> None:
+async def test_entity_picture_url_changes_on_token_update(hass: SmartHub) -> None:
     """Test the token is rotated and entity entity picture cache is cleared."""
     await async_setup_component(hass, "camera", {})
     await hass.async_block_till_done()
@@ -877,7 +877,7 @@ async def test_entity_picture_url_changes_on_token_update(hass: HomeAssistant) -
     assert "token=" in new_entity_picture
 
 
-async def _register_test_webrtc_provider(hass: HomeAssistant) -> Callable[[], None]:
+async def _register_test_webrtc_provider(hass: SmartHub) -> Callable[[], None]:
     class SomeTestProvider(CameraWebRTCProvider):
         """Test provider."""
 
@@ -913,7 +913,7 @@ async def _register_test_webrtc_provider(hass: HomeAssistant) -> Callable[[], No
 
 
 async def _test_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_id: str,
     expected_stream_types: set[StreamType],
@@ -950,7 +950,7 @@ async def _test_capabilities(
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream_source")
 async def test_camera_capabilities_hls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test HLS camera capabilities."""
@@ -965,7 +965,7 @@ async def test_camera_capabilities_hls(
 
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_camera_capabilities_webrtc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test WebRTC camera capabilities."""
@@ -977,7 +977,7 @@ async def test_camera_capabilities_webrtc(
 
 @pytest.mark.usefixtures("mock_test_webrtc_cameras", "register_test_provider")
 async def test_webrtc_provider_not_added_for_native_webrtc(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that a WebRTC provider is not added to a camera when the camera has native WebRTC support."""
     camera_obj = get_camera_from_entity_id(hass, "camera.async")
@@ -988,7 +988,7 @@ async def test_webrtc_provider_not_added_for_native_webrtc(
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream_source")
 async def test_camera_capabilities_changing_non_native_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test WebRTC camera capabilities."""
@@ -1015,7 +1015,7 @@ async def test_camera_capabilities_changing_non_native_support(
 
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_camera_capabilities_changing_native_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
     """Test WebRTC camera capabilities."""
@@ -1035,7 +1035,7 @@ async def test_camera_capabilities_changing_native_support(
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream_source")
 async def test_snapshot_service_webrtc_provider(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test snapshot service with the webrtc provider."""
     await async_setup_component(hass, "camera", {})
@@ -1046,7 +1046,7 @@ async def test_snapshot_service_webrtc_provider(
 
     with (
         patch.object(camera_obj, "use_stream_for_stills", return_value=True),
-        patch("homeassistant.components.camera.open"),
+        patch("smarthub.components.camera.open"),
         patch.object(
             camera_obj._webrtc_provider,
             "async_get_image",
@@ -1054,7 +1054,7 @@ async def test_snapshot_service_webrtc_provider(
         ) as webrtc_get_image_mock,
         patch.object(camera_obj, "stream", AsyncMock()) as stream_mock,
         patch(
-            "homeassistant.components.camera.os.makedirs",
+            "smarthub.components.camera.os.makedirs",
         ),
         patch.object(hass.config, "is_allowed_path", return_value=True),
     ):

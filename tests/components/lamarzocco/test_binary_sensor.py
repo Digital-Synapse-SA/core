@@ -9,9 +9,9 @@ from pylamarzocco.exceptions import RequestNotSuccessful
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import async_init_integration
 
@@ -22,7 +22,7 @@ pytestmark = pytest.mark.usefixtures("mock_websocket_terminated")
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -30,7 +30,7 @@ async def test_binary_sensors(
     """Test the La Marzocco binary sensors."""
 
     with patch(
-        "homeassistant.components.lamarzocco.PLATFORMS", [Platform.BINARY_SENSOR]
+        "smarthub.components.lamarzocco.PLATFORMS", [Platform.BINARY_SENSOR]
     ):
         await async_init_integration(hass, mock_config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
@@ -40,14 +40,14 @@ async def test_binary_sensors(
 def mock_websocket_terminated() -> Generator[bool]:
     """Mock websocket terminated."""
     with patch(
-        "homeassistant.components.lamarzocco.coordinator.LaMarzoccoUpdateCoordinator.websocket_terminated",
+        "smarthub.components.lamarzocco.coordinator.LaMarzoccoUpdateCoordinator.websocket_terminated",
         new=False,
     ) as mock_websocket_terminated:
         yield mock_websocket_terminated
 
 
 async def test_brew_active_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -63,7 +63,7 @@ async def test_brew_active_unavailable(
 
 
 async def test_sensor_going_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

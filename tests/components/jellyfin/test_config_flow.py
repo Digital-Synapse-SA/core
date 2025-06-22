@@ -5,15 +5,15 @@ from unittest.mock import MagicMock
 import pytest
 from voluptuous.error import Invalid
 
-from homeassistant import config_entries
-from homeassistant.components.jellyfin.const import (
+from smarthub import config_entries
+from smarthub.components.jellyfin.const import (
     CONF_AUDIO_CODEC,
     CONF_CLIENT_DEVICE_ID,
     DOMAIN,
 )
-from homeassistant.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import async_load_json_fixture
 from .const import REAUTH_INPUT, TEST_PASSWORD, TEST_URL, TEST_USERNAME, USER_INPUT
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_abort_if_existing_entry(hass: HomeAssistant) -> None:
+async def test_abort_if_existing_entry(hass: SmartHub) -> None:
     """Check flow abort when an entry already exist."""
     MockConfigEntry(domain=DOMAIN).add_to_hass(hass)
 
@@ -35,7 +35,7 @@ async def test_abort_if_existing_entry(hass: HomeAssistant) -> None:
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
     mock_client_device_id: MagicMock,
@@ -71,7 +71,7 @@ async def test_form(
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
     mock_client_device_id: MagicMock,
@@ -100,7 +100,7 @@ async def test_form_cannot_connect(
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
     mock_client_device_id: MagicMock,
@@ -130,7 +130,7 @@ async def test_form_invalid_auth(
 
 
 async def test_form_exception(
-    hass: HomeAssistant, mock_jellyfin: MagicMock, mock_client: MagicMock
+    hass: SmartHub, mock_jellyfin: MagicMock, mock_client: MagicMock
 ) -> None:
     """Test configuration with an unexpected exception."""
     result = await hass.config_entries.flow.async_init(
@@ -154,7 +154,7 @@ async def test_form_exception(
 
 
 async def test_form_persists_device_id_on_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
     mock_client_device_id: MagicMock,
@@ -202,7 +202,7 @@ async def test_form_persists_device_id_on_error(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
@@ -245,7 +245,7 @@ async def test_reauth(
 
 
 async def test_reauth_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
@@ -305,7 +305,7 @@ async def test_reauth_cannot_connect(
 
 
 async def test_reauth_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
@@ -359,7 +359,7 @@ async def test_reauth_invalid(
 
 
 async def test_reauth_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
@@ -415,7 +415,7 @@ async def test_reauth_exception(
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
@@ -450,7 +450,7 @@ async def test_options_flow(
     [("aac"), ("wma"), ("vorbis"), ("mp3")],
 )
 async def test_setting_codec(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,

@@ -2,20 +2,20 @@
 
 import pytest
 
-from homeassistant.components.met.const import (
+from smarthub.components.met.const import (
     DEFAULT_HOME_LATITUDE,
     DEFAULT_HOME_LONGITUDE,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.helpers import device_registry as dr
 
 from . import init_integration
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass)
 
@@ -30,7 +30,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
 
 
 async def test_fail_default_home_entry(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test abort setup of default home location."""
     await async_process_ha_core_config(
@@ -53,7 +53,7 @@ async def test_fail_default_home_entry(
 
 
 async def test_removing_incorrect_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
     mock_weather,

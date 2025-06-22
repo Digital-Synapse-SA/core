@@ -45,7 +45,7 @@ def linter_fixture() -> UnittestLinter:
 def type_hint_checker_fixture(hass_enforce_type_hints, linter) -> BaseChecker:
     """Fixture to provide a requests mocker."""
     type_hint_checker = hass_enforce_type_hints.HassTypeHintChecker(linter)
-    type_hint_checker.module = "homeassistant.components.pylint_test"
+    type_hint_checker.module = "smarthub.components.pylint_test"
     return type_hint_checker
 
 
@@ -62,7 +62,7 @@ def hass_imports_fixture() -> ModuleType:
 def imports_checker_fixture(hass_imports, linter) -> BaseChecker:
     """Fixture to provide a requests mocker."""
     type_hint_checker = hass_imports.HassImportsFormatChecker(linter)
-    type_hint_checker.module = "homeassistant.components.pylint_test"
+    type_hint_checker.module = "smarthub.components.pylint_test"
     return type_hint_checker
 
 
@@ -79,7 +79,7 @@ def hass_enforce_super_call_fixture() -> ModuleType:
 def super_call_checker_fixture(hass_enforce_super_call, linter) -> BaseChecker:
     """Fixture to provide a requests mocker."""
     super_call_checker = hass_enforce_super_call.HassEnforceSuperCallChecker(linter)
-    super_call_checker.module = "homeassistant.components.pylint_test"
+    super_call_checker.module = "smarthub.components.pylint_test"
     return super_call_checker
 
 
@@ -100,7 +100,7 @@ def enforce_sorted_platforms_checker_fixture(
     enforce_sorted_platforms_checker = (
         hass_enforce_sorted_platforms.HassEnforceSortedPlatformsChecker(linter)
     )
-    enforce_sorted_platforms_checker.module = "homeassistant.components.pylint_test"
+    enforce_sorted_platforms_checker.module = "smarthub.components.pylint_test"
     return enforce_sorted_platforms_checker
 
 
@@ -119,7 +119,7 @@ def enforce_class_module_fixture(hass_enforce_class_module, linter) -> BaseCheck
     enforce_class_module_checker = hass_enforce_class_module.HassEnforceClassModule(
         linter
     )
-    enforce_class_module_checker.module = "homeassistant.components.pylint_test"
+    enforce_class_module_checker.module = "smarthub.components.pylint_test"
     return enforce_class_module_checker
 
 
@@ -136,5 +136,5 @@ def hass_decorator_fixture() -> ModuleType:
 def decorator_checker_fixture(hass_decorator, linter) -> BaseChecker:
     """Fixture to provide a pylint checker."""
     type_hint_checker = hass_decorator.HassDecoratorChecker(linter)
-    type_hint_checker.module = "homeassistant.components.pylint_test"
+    type_hint_checker.module = "smarthub.components.pylint_test"
     return type_hint_checker

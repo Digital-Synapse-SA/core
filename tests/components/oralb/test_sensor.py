@@ -5,14 +5,14 @@ import time
 
 import pytest
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
     async_address_present,
 )
-from homeassistant.components.oralb.const import DOMAIN
-from homeassistant.const import ATTR_ASSUMED_STATE, ATTR_FRIENDLY_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.oralb.const import DOMAIN
+from smarthub.const import ATTR_ASSUMED_STATE, ATTR_FRIENDLY_NAME
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import (
     ORALB_IO_SERIES_4_SERVICE_INFO,
@@ -30,7 +30,7 @@ from tests.components.bluetooth import (
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test setting up creates the sensors."""
     start_monotonic = time.monotonic()
     entry = MockConfigEntry(
@@ -81,7 +81,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_sensors_io_series_4(hass: HomeAssistant) -> None:
+async def test_sensors_io_series_4(hass: SmartHub) -> None:
     """Test setting up creates the sensors with an io series 4."""
     start_monotonic = time.monotonic()
 
@@ -141,7 +141,7 @@ async def test_sensors_io_series_4(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_sensors_battery(hass: HomeAssistant) -> None:
+async def test_sensors_battery(hass: SmartHub) -> None:
     """Test receiving battery percentage."""
     entry = MockConfigEntry(
         domain=DOMAIN,

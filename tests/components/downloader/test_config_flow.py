@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.downloader.const import CONF_DOWNLOAD_DIR, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.downloader.const import CONF_DOWNLOAD_DIR, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 CONFIG = {CONF_DOWNLOAD_DIR: "download_dir"}
 
 
-async def test_user_form(hass: HomeAssistant) -> None:
+async def test_user_form(hass: SmartHub) -> None:
     """Test the full user configuration flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -36,7 +36,7 @@ async def test_user_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.downloader.async_setup_entry", return_value=True
+            "smarthub.components.downloader.async_setup_entry", return_value=True
         ),
         patch(
             "os.path.isdir",
@@ -55,7 +55,7 @@ async def test_user_form(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("source", [SOURCE_USER])
 async def test_single_instance_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     source: str,
 ) -> None:
     """Test we abort if already setup."""

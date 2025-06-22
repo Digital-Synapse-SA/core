@@ -15,9 +15,9 @@ from scapy.error import Scapy_Exception
 from scapy.layers.dhcp import DHCP
 from scapy.layers.l2 import Ether
 
-from homeassistant import config_entries
-from homeassistant.components import dhcp
-from homeassistant.components.device_tracker import (
+from smarthub import config_entries
+from smarthub.components import dhcp
+from smarthub.components.device_tracker import (
     ATTR_HOST_NAME,
     ATTR_IP,
     ATTR_MAC,
@@ -25,21 +25,21 @@ from homeassistant.components.device_tracker import (
     CONNECTED_DEVICE_REGISTERED,
     SourceType,
 )
-from homeassistant.components.dhcp.const import DOMAIN
-from homeassistant.components.dhcp.models import DHCPData
-from homeassistant.const import (
+from smarthub.components.dhcp.const import DOMAIN
+from smarthub.components.dhcp.models import DHCPData
+from smarthub.const import (
     EVENT_HOMEASSISTANT_STARTED,
     EVENT_HOMEASSISTANT_STOP,
     STATE_HOME,
     STATE_NOT_HOME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.discovery_flow import DiscoveryKey
-from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.discovery_flow import DiscoveryKey
+from smarthub.helpers.dispatcher import async_dispatcher_send
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -146,7 +146,7 @@ RAW_DHCP_REQUEST_WITHOUT_HOSTNAME = (
 
 
 async def _async_get_handle_dhcp_packet(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration_matchers: dhcp.DhcpMatchers,
     address_data: dict | None = None,
 ) -> Callable[[Any], Awaitable[None]]:
@@ -173,7 +173,7 @@ async def _async_get_handle_dhcp_packet(
 
 
 async def test_dhcp_start_using_multiple_interfaces(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test start using multiple interfaces."""
 
@@ -210,7 +210,7 @@ async def test_dhcp_start_using_multiple_interfaces(
     with (
         patch("aiodhcpwatcher.async_start") as mock_start,
         patch(
-            "homeassistant.components.dhcp.network.async_get_adapters",
+            "smarthub.components.dhcp.network.async_get_adapters",
             return_value=_generate_mock_adapters(),
         ),
     ):
@@ -219,7 +219,7 @@ async def test_dhcp_start_using_multiple_interfaces(
     mock_start.assert_called_with(dhcp_watcher._async_process_dhcp_request, [1, 2])
 
 
-async def test_dhcp_match_hostname_and_macaddress(hass: HomeAssistant) -> None:
+async def test_dhcp_match_hostname_and_macaddress(hass: SmartHub) -> None:
     """Test matching based on hostname and macaddress."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "hostname": "connect", "macaddress": "B8B7F1*"}]
@@ -247,7 +247,7 @@ async def test_dhcp_match_hostname_and_macaddress(hass: HomeAssistant) -> None:
     )
 
 
-async def test_dhcp_renewal_match_hostname_and_macaddress(hass: HomeAssistant) -> None:
+async def test_dhcp_renewal_match_hostname_and_macaddress(hass: SmartHub) -> None:
     """Test renewal matching based on hostname and macaddress."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "hostname": "irobot-*", "macaddress": "501479*"}]
@@ -277,7 +277,7 @@ async def test_dhcp_renewal_match_hostname_and_macaddress(hass: HomeAssistant) -
 
 
 async def test_registered_devices(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test discovery flows are created for registered devices."""
     integration_matchers = dhcp.async_index_integration_matchers(
@@ -326,7 +326,7 @@ async def test_registered_devices(
     )
 
 
-async def test_dhcp_match_hostname(hass: HomeAssistant) -> None:
+async def test_dhcp_match_hostname(hass: SmartHub) -> None:
     """Test matching based on hostname only."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "hostname": "connect"}]
@@ -353,7 +353,7 @@ async def test_dhcp_match_hostname(hass: HomeAssistant) -> None:
     )
 
 
-async def test_dhcp_match_macaddress(hass: HomeAssistant) -> None:
+async def test_dhcp_match_macaddress(hass: SmartHub) -> None:
     """Test matching based on macaddress only."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "macaddress": "B8B7F1*"}]
@@ -380,7 +380,7 @@ async def test_dhcp_match_macaddress(hass: HomeAssistant) -> None:
     )
 
 
-async def test_dhcp_multiple_match_only_one_flow(hass: HomeAssistant) -> None:
+async def test_dhcp_multiple_match_only_one_flow(hass: SmartHub) -> None:
     """Test matching the domain multiple times only generates one flow."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [
@@ -410,7 +410,7 @@ async def test_dhcp_multiple_match_only_one_flow(hass: HomeAssistant) -> None:
     )
 
 
-async def test_dhcp_match_macaddress_without_hostname(hass: HomeAssistant) -> None:
+async def test_dhcp_match_macaddress_without_hostname(hass: SmartHub) -> None:
     """Test matching based on macaddress only."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "macaddress": "606BBD*"}]
@@ -437,7 +437,7 @@ async def test_dhcp_match_macaddress_without_hostname(hass: HomeAssistant) -> No
     )
 
 
-async def test_dhcp_nomatch(hass: HomeAssistant) -> None:
+async def test_dhcp_nomatch(hass: SmartHub) -> None:
     """Test not matching based on macaddress only."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "macaddress": "ABC123*"}]
@@ -454,7 +454,7 @@ async def test_dhcp_nomatch(hass: HomeAssistant) -> None:
     assert len(mock_init.mock_calls) == 0
 
 
-async def test_dhcp_nomatch_hostname(hass: HomeAssistant) -> None:
+async def test_dhcp_nomatch_hostname(hass: SmartHub) -> None:
     """Test not matching based on hostname only."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "hostname": "nomatch*"}]
@@ -471,7 +471,7 @@ async def test_dhcp_nomatch_hostname(hass: HomeAssistant) -> None:
     assert len(mock_init.mock_calls) == 0
 
 
-async def test_dhcp_nomatch_non_dhcp_packet(hass: HomeAssistant) -> None:
+async def test_dhcp_nomatch_non_dhcp_packet(hass: SmartHub) -> None:
     """Test matching does not throw on a non-dhcp packet."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "hostname": "nomatch*"}]
@@ -488,7 +488,7 @@ async def test_dhcp_nomatch_non_dhcp_packet(hass: HomeAssistant) -> None:
     assert len(mock_init.mock_calls) == 0
 
 
-async def test_dhcp_nomatch_non_dhcp_request_packet(hass: HomeAssistant) -> None:
+async def test_dhcp_nomatch_non_dhcp_request_packet(hass: SmartHub) -> None:
     """Test nothing happens with the wrong message-type."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "hostname": "nomatch*"}]
@@ -514,7 +514,7 @@ async def test_dhcp_nomatch_non_dhcp_request_packet(hass: HomeAssistant) -> None
     assert len(mock_init.mock_calls) == 0
 
 
-async def test_dhcp_invalid_hostname(hass: HomeAssistant) -> None:
+async def test_dhcp_invalid_hostname(hass: SmartHub) -> None:
     """Test we ignore invalid hostnames."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "hostname": "nomatch*"}]
@@ -540,7 +540,7 @@ async def test_dhcp_invalid_hostname(hass: HomeAssistant) -> None:
     assert len(mock_init.mock_calls) == 0
 
 
-async def test_dhcp_missing_hostname(hass: HomeAssistant) -> None:
+async def test_dhcp_missing_hostname(hass: SmartHub) -> None:
     """Test we ignore missing hostnames."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "hostname": "nomatch*"}]
@@ -566,7 +566,7 @@ async def test_dhcp_missing_hostname(hass: HomeAssistant) -> None:
     assert len(mock_init.mock_calls) == 0
 
 
-async def test_dhcp_invalid_option(hass: HomeAssistant) -> None:
+async def test_dhcp_invalid_option(hass: SmartHub) -> None:
     """Test we ignore invalid hostname option."""
     integration_matchers = dhcp.async_index_integration_matchers(
         [{"domain": "mock-domain", "hostname": "nomatch*"}]
@@ -592,7 +592,7 @@ async def test_dhcp_invalid_option(hass: HomeAssistant) -> None:
     assert len(mock_init.mock_calls) == 0
 
 
-async def test_setup_and_stop(hass: HomeAssistant) -> None:
+async def test_setup_and_stop(hass: SmartHub) -> None:
     """Test we can setup and stop."""
 
     assert await async_setup_component(
@@ -608,7 +608,7 @@ async def test_setup_and_stop(hass: HomeAssistant) -> None:
             "resolve_iface",
         ) as resolve_iface_call,
         patch("scapy.arch.common.compile_filter"),
-        patch("homeassistant.components.dhcp.DiscoverHosts.async_discover"),
+        patch("smarthub.components.dhcp.DiscoverHosts.async_discover"),
     ):
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
         await hass.async_block_till_done()
@@ -620,7 +620,7 @@ async def test_setup_and_stop(hass: HomeAssistant) -> None:
 
 
 async def test_setup_fails_as_root(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle sniff setup failing as root."""
 
@@ -640,7 +640,7 @@ async def test_setup_fails_as_root(
             "resolve_iface",
             side_effect=Scapy_Exception,
         ),
-        patch("homeassistant.components.dhcp.DiscoverHosts.async_discover"),
+        patch("smarthub.components.dhcp.DiscoverHosts.async_discover"),
     ):
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
         await hass.async_block_till_done()
@@ -652,7 +652,7 @@ async def test_setup_fails_as_root(
 
 
 async def test_setup_fails_non_root(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle sniff setup failing as non-root."""
 
@@ -671,7 +671,7 @@ async def test_setup_fails_non_root(
             "resolve_iface",
             side_effect=Scapy_Exception,
         ),
-        patch("homeassistant.components.dhcp.DiscoverHosts.async_discover"),
+        patch("smarthub.components.dhcp.DiscoverHosts.async_discover"),
     ):
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
         await hass.async_block_till_done()
@@ -682,7 +682,7 @@ async def test_setup_fails_non_root(
 
 
 async def test_setup_fails_with_broken_libpcap(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we abort if libpcap is missing or broken."""
 
@@ -702,7 +702,7 @@ async def test_setup_fails_with_broken_libpcap(
             interfaces,
             "resolve_iface",
         ) as resolve_iface_call,
-        patch("homeassistant.components.dhcp.DiscoverHosts.async_discover"),
+        patch("smarthub.components.dhcp.DiscoverHosts.async_discover"),
     ):
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
         await hass.async_block_till_done()
@@ -718,7 +718,7 @@ async def test_setup_fails_with_broken_libpcap(
 
 
 def _make_device_tracker_watcher(
-    hass: HomeAssistant, matchers: list[dhcp.DHCPMatcher]
+    hass: SmartHub, matchers: list[dhcp.DHCPMatcher]
 ) -> dhcp.DeviceTrackerWatcher:
     return dhcp.DeviceTrackerWatcher(
         hass,
@@ -731,7 +731,7 @@ def _make_device_tracker_watcher(
 
 
 def _make_device_tracker_registered_watcher(
-    hass: HomeAssistant, matchers: list[dhcp.DHCPMatcher]
+    hass: SmartHub, matchers: list[dhcp.DHCPMatcher]
 ) -> dhcp.DeviceTrackerRegisteredWatcher:
     return dhcp.DeviceTrackerRegisteredWatcher(
         hass,
@@ -744,7 +744,7 @@ def _make_device_tracker_registered_watcher(
 
 
 def _make_network_watcher(
-    hass: HomeAssistant, matchers: list[dhcp.DHCPMatcher]
+    hass: SmartHub, matchers: list[dhcp.DHCPMatcher]
 ) -> dhcp.NetworkWatcher:
     return dhcp.NetworkWatcher(
         hass,
@@ -757,7 +757,7 @@ def _make_network_watcher(
 
 
 async def test_device_tracker_hostname_and_macaddress_exists_before_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test matching based on hostname and macaddress before start."""
     hass.states.async_set(
@@ -800,7 +800,7 @@ async def test_device_tracker_hostname_and_macaddress_exists_before_start(
     )
 
 
-async def test_device_tracker_registered(hass: HomeAssistant) -> None:
+async def test_device_tracker_registered(hass: SmartHub) -> None:
     """Test matching based on hostname and macaddress when registered."""
     with patch.object(hass.config_entries.flow, "async_init") as mock_init:
         device_tracker_watcher = _make_device_tracker_registered_watcher(
@@ -837,7 +837,7 @@ async def test_device_tracker_registered(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_device_tracker_registered_hostname_none(hass: HomeAssistant) -> None:
+async def test_device_tracker_registered_hostname_none(hass: SmartHub) -> None:
     """Test handle None hostname."""
     with patch.object(hass.config_entries.flow, "async_init") as mock_init:
         device_tracker_watcher = _make_device_tracker_watcher(
@@ -865,7 +865,7 @@ async def test_device_tracker_registered_hostname_none(hass: HomeAssistant) -> N
 
 
 async def test_device_tracker_hostname_and_macaddress_after_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test matching based on hostname and macaddress after start."""
 
@@ -910,7 +910,7 @@ async def test_device_tracker_hostname_and_macaddress_after_start(
 
 
 async def test_device_tracker_hostname_and_macaddress_after_start_not_home(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test matching based on hostname and macaddress after start but not home."""
 
@@ -945,7 +945,7 @@ async def test_device_tracker_hostname_and_macaddress_after_start_not_home(
 
 
 async def test_device_tracker_hostname_and_macaddress_after_start_not_router(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test matching based on hostname and macaddress after start but not router."""
 
@@ -974,7 +974,7 @@ async def test_device_tracker_hostname_and_macaddress_after_start_not_router(
 
 
 async def test_device_tracker_hostname_and_macaddress_after_start_hostname_missing(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test matching based on hostname and macaddress after start but missing hostname."""
 
@@ -1002,7 +1002,7 @@ async def test_device_tracker_hostname_and_macaddress_after_start_hostname_missi
 
 
 async def test_device_tracker_invalid_ip_address(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test an invalid ip address."""
 
@@ -1031,7 +1031,7 @@ async def test_device_tracker_invalid_ip_address(
 
 
 async def test_device_tracker_ignore_self_assigned_ips_before_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test matching ignores self assigned ip address."""
     hass.states.async_set(
@@ -1064,12 +1064,12 @@ async def test_device_tracker_ignore_self_assigned_ips_before_start(
     assert len(mock_init.mock_calls) == 0
 
 
-async def test_aiodiscover_finds_new_hosts(hass: HomeAssistant) -> None:
+async def test_aiodiscover_finds_new_hosts(hass: SmartHub) -> None:
     """Test aiodiscover finds new host."""
     with (
         patch.object(hass.config_entries.flow, "async_init") as mock_init,
         patch(
-            "homeassistant.components.dhcp.DiscoverHosts.async_discover",
+            "smarthub.components.dhcp.DiscoverHosts.async_discover",
             return_value=[
                 {
                     dhcp.DISCOVERY_IP_ADDRESS: "192.168.210.56",
@@ -1108,7 +1108,7 @@ async def test_aiodiscover_finds_new_hosts(hass: HomeAssistant) -> None:
 
 
 async def test_aiodiscover_does_not_call_again_on_shorter_hostname(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Verify longer hostnames generate a new flow but shorter ones do not.
 
@@ -1119,7 +1119,7 @@ async def test_aiodiscover_does_not_call_again_on_shorter_hostname(
     with (
         patch.object(hass.config_entries.flow, "async_init") as mock_init,
         patch(
-            "homeassistant.components.dhcp.DiscoverHosts.async_discover",
+            "smarthub.components.dhcp.DiscoverHosts.async_discover",
             return_value=[
                 {
                     dhcp.DISCOVERY_IP_ADDRESS: "192.168.210.56",
@@ -1177,12 +1177,12 @@ async def test_aiodiscover_does_not_call_again_on_shorter_hostname(
     )
 
 
-async def test_aiodiscover_finds_new_hosts_after_interval(hass: HomeAssistant) -> None:
+async def test_aiodiscover_finds_new_hosts_after_interval(hass: SmartHub) -> None:
     """Test aiodiscover finds new host after interval."""
     with (
         patch.object(hass.config_entries.flow, "async_init") as mock_init,
         patch(
-            "homeassistant.components.dhcp.DiscoverHosts.async_discover",
+            "smarthub.components.dhcp.DiscoverHosts.async_discover",
             return_value=[],
         ),
     ):
@@ -1205,7 +1205,7 @@ async def test_aiodiscover_finds_new_hosts_after_interval(hass: HomeAssistant) -
     with (
         patch.object(hass.config_entries.flow, "async_init") as mock_init,
         patch(
-            "homeassistant.components.dhcp.DiscoverHosts.async_discover",
+            "smarthub.components.dhcp.DiscoverHosts.async_discover",
             return_value=[
                 {
                     dhcp.DISCOVERY_IP_ADDRESS: "192.168.210.56",
@@ -1270,7 +1270,7 @@ async def test_aiodiscover_finds_new_hosts_after_interval(hass: HomeAssistant) -
     ],
 )
 async def test_dhcp_rediscover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_domain: str,
     entry_discovery_keys: dict[str, tuple[DiscoveryKey, ...]],
     entry_source: str,
@@ -1361,7 +1361,7 @@ async def test_dhcp_rediscover(
     ],
 )
 async def test_dhcp_rediscover_no_match(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_domain: str,
     entry_discovery_keys: dict[str, tuple[DiscoveryKey, ...]],
     entry_source: str,
@@ -1423,7 +1423,7 @@ async def test_dhcp_rediscover_no_match(
     [
         (
             "DhcpServiceInfo",
-            "homeassistant.helpers.service_info.dhcp.DhcpServiceInfo",
+            "smarthub.helpers.service_info.dhcp.DhcpServiceInfo",
             DhcpServiceInfo,
         ),
     ],

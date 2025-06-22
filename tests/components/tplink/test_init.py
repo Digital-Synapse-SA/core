@@ -20,16 +20,16 @@ from kasa import (
 from kasa.iot import IotStrip
 import pytest
 
-from homeassistant.components import tplink
-from homeassistant.components.tplink.const import (
+from smarthub.components import tplink
+from smarthub.components.tplink.const import (
     CONF_AES_KEYS,
     CONF_CONNECTION_PARAMETERS,
     CONF_CREDENTIALS_HASH,
     CONF_DEVICE_CONFIG,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     CONF_ALIAS,
     CONF_AUTHENTICATION,
     CONF_HOST,
@@ -40,10 +40,10 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     _mocked_device,
@@ -77,13 +77,13 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_configuring_tplink_causes_discovery(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test that specifying empty config does discovery."""
     with (
-        patch("homeassistant.components.tplink.Discover.discover") as discover,
-        patch("homeassistant.components.tplink.Discover.discover_single"),
-        patch("homeassistant.components.tplink.Device.connect"),
+        patch("smarthub.components.tplink.Discover.discover") as discover,
+        patch("smarthub.components.tplink.Discover.discover_single"),
+        patch("smarthub.components.tplink.Device.connect"),
     ):
         discover.return_value = {MagicMock(): MagicMock()}
         await async_setup_component(hass, tplink.DOMAIN, {tplink.DOMAIN: {}})
@@ -103,7 +103,7 @@ async def test_configuring_tplink_causes_discovery(
         assert len(discover.mock_calls) == call_count * 3
 
 
-async def test_config_entry_reload(hass: HomeAssistant) -> None:
+async def test_config_entry_reload(hass: SmartHub) -> None:
     """Test that a config entry can be reloaded."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -118,7 +118,7 @@ async def test_config_entry_reload(hass: HomeAssistant) -> None:
         assert already_migrated_config_entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_config_entry_retry(hass: HomeAssistant) -> None:
+async def test_config_entry_retry(hass: SmartHub) -> None:
     """Test that a config entry can be retried."""
     already_migrated_config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: IP_ADDRESS}, unique_id=MAC_ADDRESS
@@ -135,7 +135,7 @@ async def test_config_entry_retry(hass: HomeAssistant) -> None:
 
 
 async def test_dimmer_switch_unique_id_fix_original_entity_still_exists(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test no migration happens if the original entity id still exists."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=MAC_ADDRESS)
@@ -178,7 +178,7 @@ async def test_dimmer_switch_unique_id_fix_original_entity_still_exists(
 
 
 async def test_config_entry_wrong_mac_Address(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test config entry enters setup retry when mac address mismatches."""
     mismatched_mac = f"{MAC_ADDRESS[:-1]}0"
@@ -198,7 +198,7 @@ async def test_config_entry_wrong_mac_Address(
 
 
 async def test_config_entry_device_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -216,7 +216,7 @@ async def test_config_entry_device_config(
 
 
 async def test_config_entry_with_stored_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
 ) -> None:
@@ -237,7 +237,7 @@ async def test_config_entry_with_stored_credentials(
     mock_config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.tplink.async_create_clientsession",
+            "smarthub.components.tplink.async_create_clientsession",
             return_value="Foo",
         ),
         override_side_effect(mock_discovery["discover"], lambda *_, **__: {}),
@@ -253,7 +253,7 @@ async def test_config_entry_with_stored_credentials(
 
 
 async def test_config_entry_conn_params_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
     caplog: pytest.LogCaptureFixture,
@@ -287,7 +287,7 @@ async def test_config_entry_conn_params_invalid(
     ids=["invalid-auth", "unknown-error"],
 )
 async def test_config_entry_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_discovery: AsyncMock,
     mock_connect: AsyncMock,
     error_type,
@@ -312,7 +312,7 @@ async def test_config_entry_errors(
     )
 
 
-async def test_plug_auth_fails(hass: HomeAssistant) -> None:
+async def test_plug_auth_fails(hass: SmartHub) -> None:
     """Test a smart plug auth failure."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.1"}, unique_id=MAC_ADDRESS
@@ -344,7 +344,7 @@ async def test_plug_auth_fails(hass: HomeAssistant) -> None:
 
 
 async def test_update_attrs_fails_in_init(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -378,7 +378,7 @@ async def test_update_attrs_fails_in_init(
 
 
 async def test_update_attrs_fails_on_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
@@ -430,7 +430,7 @@ async def test_update_attrs_fails_on_update(
 
 
 async def test_feature_no_category(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -491,7 +491,7 @@ async def test_feature_no_category(
     ],
 )
 async def test_unlink_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
     device_id,
@@ -545,7 +545,7 @@ async def test_unlink_devices(
     }
     assert device_entries[0].identifiers == set(test_identifiers)
 
-    with patch("homeassistant.components.tplink.CONF_CONFIG_ENTRY_MINOR_VERSION", 3):
+    with patch("smarthub.components.tplink.CONF_CONFIG_ENTRY_MINOR_VERSION", 3):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
@@ -562,7 +562,7 @@ async def test_unlink_devices(
 
 
 async def test_move_credentials_hash(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test credentials hash moved to parent.
@@ -593,9 +593,9 @@ async def test_move_credentials_hash(
         return _mocked_device(device_config=config, credentials_hash="theNewHash")
 
     with (
-        patch("homeassistant.components.tplink.Device.connect", new=_connect),
-        patch("homeassistant.components.tplink.PLATFORMS", []),
-        patch("homeassistant.components.tplink.CONF_CONFIG_ENTRY_MINOR_VERSION", 4),
+        patch("smarthub.components.tplink.Device.connect", new=_connect),
+        patch("smarthub.components.tplink.PLATFORMS", []),
+        patch("smarthub.components.tplink.CONF_CONFIG_ENTRY_MINOR_VERSION", 4),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
@@ -610,7 +610,7 @@ async def test_move_credentials_hash(
 
 
 async def test_move_credentials_hash_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test credentials hash moved to parent.
 
@@ -635,11 +635,11 @@ async def test_move_credentials_hash_auth_error(
 
     with (
         patch(
-            "homeassistant.components.tplink.Device.connect",
+            "smarthub.components.tplink.Device.connect",
             side_effect=AuthenticationError,
         ),
-        patch("homeassistant.components.tplink.PLATFORMS", []),
-        patch("homeassistant.components.tplink.CONF_CONFIG_ENTRY_MINOR_VERSION", 4),
+        patch("smarthub.components.tplink.PLATFORMS", []),
+        patch("smarthub.components.tplink.CONF_CONFIG_ENTRY_MINOR_VERSION", 4),
     ):
         entry.add_to_hass(hass)
         await hass.config_entries.async_setup(entry.entry_id)
@@ -653,7 +653,7 @@ async def test_move_credentials_hash_auth_error(
 
 
 async def test_move_credentials_hash_other_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test credentials hash moved to parent.
 
@@ -678,10 +678,10 @@ async def test_move_credentials_hash_other_error(
 
     with (
         patch(
-            "homeassistant.components.tplink.Device.connect", side_effect=KasaException
+            "smarthub.components.tplink.Device.connect", side_effect=KasaException
         ),
-        patch("homeassistant.components.tplink.PLATFORMS", []),
-        patch("homeassistant.components.tplink.CONF_CONFIG_ENTRY_MINOR_VERSION", 4),
+        patch("smarthub.components.tplink.PLATFORMS", []),
+        patch("smarthub.components.tplink.CONF_CONFIG_ENTRY_MINOR_VERSION", 4),
     ):
         entry.add_to_hass(hass)
         await hass.config_entries.async_setup(entry.entry_id)
@@ -695,7 +695,7 @@ async def test_move_credentials_hash_other_error(
 
 
 async def test_credentials_hash(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test credentials_hash used to call connect."""
     entry_data = {
@@ -715,8 +715,8 @@ async def test_credentials_hash(
         return _mocked_device(device_config=config, credentials_hash="theHash")
 
     with (
-        patch("homeassistant.components.tplink.PLATFORMS", []),
-        patch("homeassistant.components.tplink.Device.connect", new=_connect),
+        patch("smarthub.components.tplink.PLATFORMS", []),
+        patch("smarthub.components.tplink.Device.connect", new=_connect),
     ):
         entry.add_to_hass(hass)
         await hass.config_entries.async_setup(entry.entry_id)
@@ -728,7 +728,7 @@ async def test_credentials_hash(
 
 
 async def test_credentials_hash_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test credentials_hash is deleted after an auth failure."""
     entry_data = {
@@ -744,13 +744,13 @@ async def test_credentials_hash_auth_error(
     )
 
     with (
-        patch("homeassistant.components.tplink.PLATFORMS", []),
+        patch("smarthub.components.tplink.PLATFORMS", []),
         patch(
-            "homeassistant.components.tplink.async_create_clientsession",
+            "smarthub.components.tplink.async_create_clientsession",
             return_value="Foo",
         ),
         patch(
-            "homeassistant.components.tplink.Device.connect",
+            "smarthub.components.tplink.Device.connect",
             side_effect=AuthenticationError,
         ) as connect_mock,
     ):
@@ -780,7 +780,7 @@ async def test_credentials_hash_auth_error(
     ],
 )
 async def test_migrate_remove_device_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_connect: AsyncMock,
     caplog: pytest.LogCaptureFixture,
     device_config: DeviceConfig,
@@ -825,13 +825,13 @@ async def test_migrate_remove_device_config(
         return _mocked_device(device_config=config, credentials_hash=credentials_hash)
 
     with (
-        patch("homeassistant.components.tplink.Device.connect", new=_connect),
-        patch("homeassistant.components.tplink.PLATFORMS", []),
+        patch("smarthub.components.tplink.Device.connect", new=_connect),
+        patch("smarthub.components.tplink.PLATFORMS", []),
         patch(
-            "homeassistant.components.tplink.async_create_clientsession",
+            "smarthub.components.tplink.async_create_clientsession",
             return_value="Foo",
         ),
-        patch("homeassistant.components.tplink.CONF_CONFIG_ENTRY_MINOR_VERSION", 5),
+        patch("smarthub.components.tplink.CONF_CONFIG_ENTRY_MINOR_VERSION", 5),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
@@ -866,7 +866,7 @@ async def test_migrate_remove_device_config(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_automatic_feature_device_addition_and_removal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_connect: AsyncMock,
     mock_discovery: AsyncMock,
@@ -1022,7 +1022,7 @@ async def test_automatic_feature_device_addition_and_removal(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_automatic_module_device_addition_and_removal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
     mock_connect: AsyncMock,
     mock_discovery: AsyncMock,
@@ -1162,7 +1162,7 @@ async def test_automatic_module_device_addition_and_removal(
 
 
 async def test_automatic_device_addition_does_not_remove_disabled_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_camera_config_entry: MockConfigEntry,
     mock_connect: AsyncMock,
     mock_discovery: AsyncMock,

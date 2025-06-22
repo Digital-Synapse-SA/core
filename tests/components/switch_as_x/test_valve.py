@@ -1,14 +1,14 @@
 """Tests for the Switch as X Valve platform."""
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.switch_as_x.config_flow import SwitchAsXConfigFlowHandler
-from homeassistant.components.switch_as_x.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.switch_as_x.config_flow import SwitchAsXConfigFlowHandler
+from smarthub.components.switch_as_x.const import (
     CONF_INVERT,
     CONF_TARGET_DOMAIN,
     DOMAIN,
 )
-from homeassistant.components.valve import DOMAIN as VALVE_DOMAIN, ValveState
-from homeassistant.const import (
+from smarthub.components.valve import DOMAIN as VALVE_DOMAIN, ValveState
+from smarthub.const import (
     CONF_ENTITY_ID,
     SERVICE_CLOSE_VALVE,
     SERVICE_OPEN_VALVE,
@@ -19,13 +19,13 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
-async def test_default_state(hass: HomeAssistant) -> None:
+async def test_default_state(hass: SmartHub) -> None:
     """Test valve switch default state."""
     config_entry = MockConfigEntry(
         data={},
@@ -49,7 +49,7 @@ async def test_default_state(hass: HomeAssistant) -> None:
     assert state.attributes["supported_features"] == 3
 
 
-async def test_service_calls(hass: HomeAssistant) -> None:
+async def test_service_calls(hass: SmartHub) -> None:
     """Test service calls to valve."""
     await async_setup_component(hass, "switch", {"switch": [{"platform": "demo"}]})
     await hass.async_block_till_done()
@@ -132,7 +132,7 @@ async def test_service_calls(hass: HomeAssistant) -> None:
     assert hass.states.get("valve.decorative_lights").state == ValveState.OPEN
 
 
-async def test_service_calls_inverted(hass: HomeAssistant) -> None:
+async def test_service_calls_inverted(hass: SmartHub) -> None:
     """Test service calls to valve."""
     await async_setup_component(hass, "switch", {"switch": [{"platform": "demo"}]})
     await hass.async_block_till_done()

@@ -1,6 +1,6 @@
 """Tests for the Elmax component."""
 
-from homeassistant.components.elmax.const import (
+from smarthub.components.elmax.const import (
     CONF_ELMAX_MODE,
     CONF_ELMAX_MODE_DIRECT,
     CONF_ELMAX_MODE_DIRECT_HOST,
@@ -11,7 +11,7 @@ from homeassistant.components.elmax.const import (
     CONF_ELMAX_PANEL_PIN,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -38,7 +38,7 @@ MOCK_DIRECT_CERT = load_fixture("direct/cert.pem", "elmax")
 MOCK_DIRECT_FOLLOW_MDNS = True
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
     """Mock integration setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,

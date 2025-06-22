@@ -13,15 +13,15 @@ from unittest.mock import patch
 from freezegun import freeze_time
 import pytest
 
-from homeassistant import config as hass_config
-from homeassistant.components.recorder import Recorder, history
-from homeassistant.components.sensor import (
+from smarthub import config as hass_config
+from smarthub.components.recorder import Recorder, history
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.components.statistics import DOMAIN
-from homeassistant.components.statistics.sensor import (
+from smarthub.components.statistics import DOMAIN
+from smarthub.components.statistics.sensor import (
     CONF_KEEP_LAST_SAMPLE,
     CONF_PERCENTILE,
     CONF_PRECISION,
@@ -30,7 +30,7 @@ from homeassistant.components.statistics.sensor import (
     STAT_MEAN,
     StatisticsSensor,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITY_ID,
@@ -42,10 +42,10 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed, get_fixture_path
 from tests.components.recorder.common import async_wait_recording_done
@@ -56,7 +56,7 @@ VALUES_NUMERIC_LINEAR = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test configuration defined unique_id."""
     assert await async_setup_component(
@@ -83,7 +83,7 @@ async def test_unique_id(
     assert entity_id == "sensor.test"
 
 
-async def test_sensor_defaults_numeric(hass: HomeAssistant) -> None:
+async def test_sensor_defaults_numeric(hass: SmartHub) -> None:
     """Test the general behavior of the sensor, with numeric source sensor."""
     assert await async_setup_component(
         hass,
@@ -198,7 +198,7 @@ async def test_sensor_defaults_numeric(hass: HomeAssistant) -> None:
     ],
 )
 async def test_sensor_loaded_from_config_entry(
-    hass: HomeAssistant, loaded_entry: MockConfigEntry
+    hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test the sensor loaded from a config entry."""
 
@@ -212,7 +212,7 @@ async def test_sensor_loaded_from_config_entry(
     assert "age_coverage_ratio" not in state.attributes
 
 
-async def test_sensor_defaults_binary(hass: HomeAssistant) -> None:
+async def test_sensor_defaults_binary(hass: SmartHub) -> None:
     """Test the general behavior of the sensor, with binary source sensor."""
     assert await async_setup_component(
         hass,
@@ -249,7 +249,7 @@ async def test_sensor_defaults_binary(hass: HomeAssistant) -> None:
     assert "age_coverage_ratio" not in state.attributes
 
 
-async def test_sensor_state_reported(hass: HomeAssistant) -> None:
+async def test_sensor_state_reported(hass: SmartHub) -> None:
     """Test the behavior of the sensor with a sequence of identical values.
 
     Forced updates no longer make a difference, since the statistics are now reacting not
@@ -306,7 +306,7 @@ async def test_sensor_state_reported(hass: HomeAssistant) -> None:
     assert state_force.attributes.get("buffer_usage_ratio") == round(9 / 20, 2)
 
 
-async def test_sampling_boundaries_given(hass: HomeAssistant) -> None:
+async def test_sampling_boundaries_given(hass: SmartHub) -> None:
     """Test if either sampling_size or max_age are given."""
     assert await async_setup_component(
         hass,
@@ -363,7 +363,7 @@ async def test_sampling_boundaries_given(hass: HomeAssistant) -> None:
     assert state is not None
 
 
-async def test_keep_last_value_given(hass: HomeAssistant) -> None:
+async def test_keep_last_value_given(hass: SmartHub) -> None:
     """Test if either sampling_size or max_age are given."""
     assert await async_setup_component(
         hass,
@@ -424,7 +424,7 @@ async def test_keep_last_value_given(hass: HomeAssistant) -> None:
     assert state is not None
 
 
-async def test_sampling_size_reduced(hass: HomeAssistant) -> None:
+async def test_sampling_size_reduced(hass: SmartHub) -> None:
     """Test limited buffer size."""
     assert await async_setup_component(
         hass,
@@ -458,7 +458,7 @@ async def test_sampling_size_reduced(hass: HomeAssistant) -> None:
     assert state.attributes.get("buffer_usage_ratio") == round(5 / 5, 2)
 
 
-async def test_sampling_size_1(hass: HomeAssistant) -> None:
+async def test_sampling_size_1(hass: SmartHub) -> None:
     """Test validity of stats requiring only one sample."""
     assert await async_setup_component(
         hass,
@@ -492,7 +492,7 @@ async def test_sampling_size_1(hass: HomeAssistant) -> None:
     assert state.attributes.get("buffer_usage_ratio") == round(1 / 1, 2)
 
 
-async def test_age_limit_expiry(hass: HomeAssistant) -> None:
+async def test_age_limit_expiry(hass: SmartHub) -> None:
     """Test that values are removed with given max age."""
     now = dt_util.utcnow()
     current_time = datetime(now.year + 1, 8, 2, 12, 23, tzinfo=dt_util.UTC)
@@ -578,7 +578,7 @@ async def test_age_limit_expiry(hass: HomeAssistant) -> None:
         assert state.attributes.get("age_coverage_ratio") == 0
 
 
-async def test_age_limit_expiry_with_keep_last_sample(hass: HomeAssistant) -> None:
+async def test_age_limit_expiry_with_keep_last_sample(hass: SmartHub) -> None:
     """Test that values are removed with given max age."""
     now = dt_util.utcnow()
     current_time = datetime(now.year + 1, 8, 2, 12, 23, tzinfo=dt_util.UTC)
@@ -696,7 +696,7 @@ async def test_age_limit_expiry_with_keep_last_sample(hass: HomeAssistant) -> No
         assert state.attributes.get("age_coverage_ratio") == 0
 
 
-async def test_precision(hass: HomeAssistant) -> None:
+async def test_precision(hass: SmartHub) -> None:
     """Test correct results with precision set."""
     assert await async_setup_component(
         hass,
@@ -741,7 +741,7 @@ async def test_precision(hass: HomeAssistant) -> None:
     assert state.state == str(round(mean, 3))
 
 
-async def test_percentile(hass: HomeAssistant) -> None:
+async def test_percentile(hass: SmartHub) -> None:
     """Test correct results for percentile characteristic."""
     assert await async_setup_component(
         hass,
@@ -795,7 +795,7 @@ async def test_percentile(hass: HomeAssistant) -> None:
     assert state.state == str(2.72)
 
 
-async def test_device_class(hass: HomeAssistant) -> None:
+async def test_device_class(hass: SmartHub) -> None:
     """Test device class, which depends on the source entity."""
     assert await async_setup_component(
         hass,
@@ -874,7 +874,7 @@ async def test_device_class(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) is None
 
 
-async def test_state_class(hass: HomeAssistant) -> None:
+async def test_state_class(hass: SmartHub) -> None:
     """Test state class, which depends on the characteristic configured."""
     assert await async_setup_component(
         hass,
@@ -941,7 +941,7 @@ async def test_state_class(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_STATE_CLASS) is SensorStateClass.MEASUREMENT
 
 
-async def test_unitless_source_sensor(hass: HomeAssistant) -> None:
+async def test_unitless_source_sensor(hass: SmartHub) -> None:
     """Statistics for a unitless source sensor should never have a unit."""
     assert await async_setup_component(
         hass,
@@ -1012,7 +1012,7 @@ async def test_unitless_source_sensor(hass: HomeAssistant) -> None:
     assert state and state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == "%"
 
 
-async def test_state_characteristics(hass: HomeAssistant) -> None:
+async def test_state_characteristics(hass: SmartHub) -> None:
     """Test configured state characteristic for value and unit."""
     now = dt_util.utcnow()
     current_time = datetime(now.year + 1, 8, 2, 12, 23, 42, tzinfo=dt_util.UTC)
@@ -1444,7 +1444,7 @@ async def test_state_characteristics(hass: HomeAssistant) -> None:
             )
 
 
-async def test_state_characteristic_mean_circular(hass: HomeAssistant) -> None:
+async def test_state_characteristic_mean_circular(hass: SmartHub) -> None:
     """Test the mean_circular state characteristic using angle data."""
     values_angular = [0, 10, 90.5, 180, 269.5, 350]
 
@@ -1481,7 +1481,7 @@ async def test_state_characteristic_mean_circular(hass: HomeAssistant) -> None:
     )
 
 
-async def test_invalid_state_characteristic(hass: HomeAssistant) -> None:
+async def test_invalid_state_characteristic(hass: SmartHub) -> None:
     """Test the detection of wrong state_characteristics selected."""
     assert await async_setup_component(
         hass,
@@ -1521,7 +1521,7 @@ async def test_invalid_state_characteristic(hass: HomeAssistant) -> None:
 
 
 async def test_initialize_from_database(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test initializing the statistics from the recorder database."""
     # enable and pre-fill the recorder
@@ -1565,7 +1565,7 @@ async def test_initialize_from_database(
     datetime(dt_util.utcnow().year + 1, 8, 2, 12, 23, 42, tzinfo=dt_util.UTC)
 )
 async def test_initialize_from_database_with_maxage(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test initializing the statistics from the database."""
     current_time = dt_util.utcnow()
@@ -1623,7 +1623,7 @@ async def test_initialize_from_database_with_maxage(
     ) + timedelta(hours=1)
 
 
-async def test_reload(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_reload(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Verify we can reload statistics sensors."""
 
     await async_setup_component(
@@ -1666,7 +1666,7 @@ async def test_reload(recorder_mock: Recorder, hass: HomeAssistant) -> None:
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -1712,7 +1712,7 @@ async def test_device_id(
     assert statistics_entity.device_id == source_entity.device_id
 
 
-async def test_update_before_load(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_update_before_load(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Verify that updates happening before reloading from the database are handled correctly."""
 
     current_time = dt_util.utcnow()
@@ -1750,7 +1750,7 @@ async def test_update_before_load(recorder_mock: Recorder, hass: HomeAssistant) 
 
         # create the statistics component, get filled from database
         with patch(
-            "homeassistant.components.statistics.sensor.history.state_changes_during_period",
+            "smarthub.components.statistics.sensor.history.state_changes_during_period",
             mock_state_changes_during_period,
         ):
             assert await async_setup_component(
@@ -1785,7 +1785,7 @@ async def test_update_before_load(recorder_mock: Recorder, hass: HomeAssistant) 
     assert float(hass.states.get("sensor.test").state) == pytest.approx(4.5)
 
 
-async def test_average_linear_unevenly_timed(hass: HomeAssistant) -> None:
+async def test_average_linear_unevenly_timed(hass: SmartHub) -> None:
     """Test the average_linear state characteristic with unevenly distributed values.
 
     This also implicitly tests the correct timing of repeating values.
@@ -1833,7 +1833,7 @@ async def test_average_linear_unevenly_timed(hass: HomeAssistant) -> None:
         )
 
 
-async def test_sensor_unit_gets_removed(hass: HomeAssistant) -> None:
+async def test_sensor_unit_gets_removed(hass: SmartHub) -> None:
     """Test when input lose its unit of measurement."""
     assert await async_setup_component(
         hass,
@@ -1907,7 +1907,7 @@ async def test_sensor_unit_gets_removed(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
 
-async def test_sensor_device_class_gets_removed(hass: HomeAssistant) -> None:
+async def test_sensor_device_class_gets_removed(hass: SmartHub) -> None:
     """Test when device class gets removed."""
     assert await async_setup_component(
         hass,
@@ -1980,7 +1980,7 @@ async def test_sensor_device_class_gets_removed(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
 
-async def test_not_valid_device_class(hass: HomeAssistant) -> None:
+async def test_not_valid_device_class(hass: SmartHub) -> None:
     """Test when not valid device class."""
     assert await async_setup_component(
         hass,
@@ -2033,7 +2033,7 @@ async def test_not_valid_device_class(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
 
-async def test_attributes_remains(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_attributes_remains(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test attributes are always present."""
     for value in VALUES_NUMERIC:
         hass.states.async_set(

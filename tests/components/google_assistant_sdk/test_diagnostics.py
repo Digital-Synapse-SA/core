@@ -4,8 +4,8 @@ from freezegun import freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.google_assistant_sdk.const import CONF_LANGUAGE_CODE
-from homeassistant.core import HomeAssistant
+from smarthub.components.google_assistant_sdk.const import CONF_LANGUAGE_CODE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -20,7 +20,7 @@ def freeze_the_time():
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

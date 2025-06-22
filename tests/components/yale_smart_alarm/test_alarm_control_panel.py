@@ -10,17 +10,17 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from yalesmartalarmclient import YaleSmartAlarmData
 
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components.alarm_control_panel import (
     DOMAIN as ALARM_CONTROL_PANEL_DOMAIN,
     SERVICE_ALARM_ARM_AWAY,
     SERVICE_ALARM_ARM_HOME,
     SERVICE_ALARM_DISARM,
     AlarmControlPanelState,
 )
-from homeassistant.const import ATTR_CODE, ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_CODE, ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_platform
 
@@ -30,7 +30,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
     [[Platform.ALARM_CONTROL_PANEL]],
 )
 async def test_alarm_control_panel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_config_entry: tuple[MockConfigEntry, Mock],
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -45,7 +45,7 @@ async def test_alarm_control_panel(
     [[Platform.ALARM_CONTROL_PANEL]],
 )
 async def test_alarm_control_panel_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_data: YaleSmartAlarmData,
     load_config_entry: tuple[MockConfigEntry, Mock],
 ) -> None:
@@ -92,7 +92,7 @@ async def test_alarm_control_panel_service_calls(
     client.disarm = Mock(side_effect=ConnectionError("no connection"))
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Could not set alarm for test-username: no connection",
     ):
         await hass.services.async_call(
@@ -108,7 +108,7 @@ async def test_alarm_control_panel_service_calls(
     client.disarm = Mock(return_value=False)
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Could not change alarm, check system ready for arming",
     ):
         await hass.services.async_call(
@@ -127,7 +127,7 @@ async def test_alarm_control_panel_service_calls(
     [[Platform.ALARM_CONTROL_PANEL]],
 )
 async def test_alarm_control_panel_not_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_data: YaleSmartAlarmData,
     load_config_entry: tuple[MockConfigEntry, Mock],
     freezer: FrozenDateTimeFactory,

@@ -1,0 +1,11 @@
+{
+  "domain": "elevenlabs",
+  "name": "ElevenLabs",
+  "codeowners": ["@sorgfresser"],
+  "config_flow": true,
+  "documentation": "https://www.smart-hub.io/integrations/elevenlabs",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "loggers": ["elevenlabs"],
+  "requirements": ["elevenlabs==1.9.0"]
+}

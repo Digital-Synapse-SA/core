@@ -4,22 +4,22 @@ from unittest.mock import patch
 
 from pyaehw4a1 import exceptions
 
-from homeassistant import config_entries
-from homeassistant.components import hisense_aehw4a1
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components import hisense_aehw4a1
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 
-async def test_creating_entry_sets_up_climate_discovery(hass: HomeAssistant) -> None:
+async def test_creating_entry_sets_up_climate_discovery(hass: SmartHub) -> None:
     """Test setting up Hisense AEH-W4A1 loads the climate component."""
     with (
         patch(
-            "homeassistant.components.hisense_aehw4a1.config_flow.AehW4a1.discovery",
+            "smarthub.components.hisense_aehw4a1.config_flow.AehW4a1.discovery",
             return_value=["1.2.3.4"],
         ),
         patch(
-            "homeassistant.components.hisense_aehw4a1.climate.async_setup_entry",
+            "smarthub.components.hisense_aehw4a1.climate.async_setup_entry",
             return_value=True,
         ) as mock_setup,
     ):
@@ -38,15 +38,15 @@ async def test_creating_entry_sets_up_climate_discovery(hass: HomeAssistant) -> 
     assert len(mock_setup.mock_calls) == 1
 
 
-async def test_configuring_hisense_w4a1_create_entry(hass: HomeAssistant) -> None:
+async def test_configuring_hisense_w4a1_create_entry(hass: SmartHub) -> None:
     """Test that specifying config will create an entry."""
     with (
         patch(
-            "homeassistant.components.hisense_aehw4a1.config_flow.AehW4a1.check",
+            "smarthub.components.hisense_aehw4a1.config_flow.AehW4a1.check",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.hisense_aehw4a1.async_setup_entry",
+            "smarthub.components.hisense_aehw4a1.async_setup_entry",
             return_value=True,
         ) as mock_setup,
     ):
@@ -61,16 +61,16 @@ async def test_configuring_hisense_w4a1_create_entry(hass: HomeAssistant) -> Non
 
 
 async def test_configuring_hisense_w4a1_not_creates_entry_for_device_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that specifying config will not create an entry."""
     with (
         patch(
-            "homeassistant.components.hisense_aehw4a1.config_flow.AehW4a1.check",
+            "smarthub.components.hisense_aehw4a1.config_flow.AehW4a1.check",
             side_effect=exceptions.ConnectionError,
         ),
         patch(
-            "homeassistant.components.hisense_aehw4a1.async_setup_entry",
+            "smarthub.components.hisense_aehw4a1.async_setup_entry",
             return_value=True,
         ) as mock_setup,
     ):
@@ -85,11 +85,11 @@ async def test_configuring_hisense_w4a1_not_creates_entry_for_device_not_found(
 
 
 async def test_configuring_hisense_w4a1_not_creates_entry_for_empty_import(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that specifying config will not create an entry."""
     with patch(
-        "homeassistant.components.hisense_aehw4a1.async_setup_entry",
+        "smarthub.components.hisense_aehw4a1.async_setup_entry",
         return_value=True,
     ) as mock_setup:
         await async_setup_component(hass, hisense_aehw4a1.DOMAIN, {})

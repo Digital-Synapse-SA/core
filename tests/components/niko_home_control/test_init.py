@@ -2,17 +2,17 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.niko_home_control.const import DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.components.niko_home_control.const import DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_migrate_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_setup_entry: AsyncMock
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_setup_entry: AsyncMock
 ) -> None:
     """Validate that the unique_id is migrated to the new unique_id."""
     config_entry = MockConfigEntry(

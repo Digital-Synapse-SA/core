@@ -4,20 +4,20 @@ from unittest.mock import ANY, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import cast
-from homeassistant.components.cast.home_assistant_cast import CAST_USER_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components import cast
+from smarthub.components.cast.home_assistant_cast import CAST_USER_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry, get_schema_suggested_value
 
 
-async def test_creating_entry_sets_up_media_player(hass: HomeAssistant) -> None:
+async def test_creating_entry_sets_up_media_player(hass: SmartHub) -> None:
     """Test setting up Cast loads the media player."""
     with (
         patch(
-            "homeassistant.components.cast.media_player.async_setup_entry",
+            "smarthub.components.cast.media_player.async_setup_entry",
             return_value=True,
         ) as mock_setup,
         patch("pychromecast.discovery.discover_chromecasts", return_value=(True, None)),
@@ -47,7 +47,7 @@ async def test_creating_entry_sets_up_media_player(hass: HomeAssistant) -> None:
         config_entries.SOURCE_ZEROCONF,
     ],
 )
-async def test_single_instance(hass: HomeAssistant, source) -> None:
+async def test_single_instance(hass: SmartHub, source) -> None:
     """Test we only allow a single config flow."""
     MockConfigEntry(domain="cast").add_to_hass(hass)
     await hass.async_block_till_done()
@@ -59,7 +59,7 @@ async def test_single_instance(hass: HomeAssistant, source) -> None:
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_user_setup(hass: HomeAssistant) -> None:
+async def test_user_setup(hass: SmartHub) -> None:
     """Test we can finish a config flow."""
     result = await hass.config_entries.flow.async_init(
         "cast", context={"source": config_entries.SOURCE_USER}
@@ -75,11 +75,11 @@ async def test_user_setup(hass: HomeAssistant) -> None:
         "ignore_cec": [],
         "known_hosts": [],
         "uuid": [],
-        "user_id": users[0].id,  # Home Assistant cast user
+        "user_id": users[0].id,  # SmartHub cast user
     }
 
 
-async def test_user_setup_options(hass: HomeAssistant) -> None:
+async def test_user_setup_options(hass: SmartHub) -> None:
     """Test we can finish a config flow."""
     result = await hass.config_entries.flow.async_init(
         "cast", context={"source": config_entries.SOURCE_USER}
@@ -97,11 +97,11 @@ async def test_user_setup_options(hass: HomeAssistant) -> None:
         "ignore_cec": [],
         "known_hosts": ["192.168.0.1", "192.168.0.2"],
         "uuid": [],
-        "user_id": users[0].id,  # Home Assistant cast user
+        "user_id": users[0].id,  # SmartHub cast user
     }
 
 
-async def test_zeroconf_setup(hass: HomeAssistant) -> None:
+async def test_zeroconf_setup(hass: SmartHub) -> None:
     """Test we can finish a config flow through zeroconf."""
     result = await hass.config_entries.flow.async_init(
         "cast", context={"source": config_entries.SOURCE_ZEROCONF}
@@ -117,14 +117,14 @@ async def test_zeroconf_setup(hass: HomeAssistant) -> None:
         "ignore_cec": [],
         "known_hosts": [],
         "uuid": [],
-        "user_id": users[0].id,  # Home Assistant cast user
+        "user_id": users[0].id,  # SmartHub cast user
     }
 
 
-async def test_zeroconf_setup_onboarding(hass: HomeAssistant) -> None:
+async def test_zeroconf_setup_onboarding(hass: SmartHub) -> None:
     """Test we automatically finish a config flow through zeroconf during onboarding."""
     with patch(
-        "homeassistant.components.onboarding.async_is_onboarded", return_value=False
+        "smarthub.components.onboarding.async_is_onboarded", return_value=False
     ):
         result = await hass.config_entries.flow.async_init(
             "cast", context={"source": config_entries.SOURCE_ZEROCONF}
@@ -137,7 +137,7 @@ async def test_zeroconf_setup_onboarding(hass: HomeAssistant) -> None:
         "ignore_cec": [],
         "known_hosts": [],
         "uuid": [],
-        "user_id": users[0].id,  # Home Assistant cast user
+        "user_id": users[0].id,  # SmartHub cast user
     }
 
 
@@ -168,7 +168,7 @@ async def test_zeroconf_setup_onboarding(hass: HomeAssistant) -> None:
     ],
 )
 async def test_option_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     parameter: str,
     initial: list[str],
     suggested: str | list[str],
@@ -267,7 +267,7 @@ async def test_option_flow(
     assert dict(config_entry.data) == expected_data
 
 
-async def test_known_hosts(hass: HomeAssistant, castbrowser_mock) -> None:
+async def test_known_hosts(hass: SmartHub, castbrowser_mock) -> None:
     """Test known hosts is passed to pychromecasts."""
     result = await hass.config_entries.flow.async_init(
         "cast", context={"source": config_entries.SOURCE_USER}

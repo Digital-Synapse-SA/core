@@ -8,8 +8,8 @@ from unittest.mock import patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import vultr as base_vultr
-from homeassistant.components.vultr import (
+from smarthub.components import vultr as base_vultr
+from smarthub.components.vultr import (
     ATTR_ALLOWED_BANDWIDTH,
     ATTR_AUTO_BACKUPS,
     ATTR_COST_PER_MONTH,
@@ -19,8 +19,8 @@ from homeassistant.components.vultr import (
     CONF_SUBSCRIPTION,
     switch as vultr,
 )
-from homeassistant.const import CONF_NAME, CONF_PLATFORM
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_NAME, CONF_PLATFORM
+from smarthub.core import SmartHub
 
 from tests.common import load_fixture
 
@@ -32,7 +32,7 @@ CONFIGS = [
 
 
 @pytest.fixture(name="hass_devices")
-def load_hass_devices(hass: HomeAssistant):
+def load_hass_devices(hass: SmartHub):
     """Load a valid config."""
     hass_devices = []
 
@@ -50,7 +50,7 @@ def load_hass_devices(hass: HomeAssistant):
 
 
 @pytest.mark.usefixtures("valid_config")
-def test_switch(hass: HomeAssistant, hass_devices: list[vultr.VultrSwitch]) -> None:
+def test_switch(hass: SmartHub, hass_devices: list[vultr.VultrSwitch]) -> None:
     """Test successful instance."""
 
     assert len(hass_devices) == 3
@@ -97,7 +97,7 @@ def test_switch(hass: HomeAssistant, hass_devices: list[vultr.VultrSwitch]) -> N
 
 
 @pytest.mark.usefixtures("valid_config")
-def test_turn_on(hass: HomeAssistant, hass_devices: list[vultr.VultrSwitch]) -> None:
+def test_turn_on(hass: SmartHub, hass_devices: list[vultr.VultrSwitch]) -> None:
     """Test turning a subscription on."""
     with (
         patch(
@@ -116,7 +116,7 @@ def test_turn_on(hass: HomeAssistant, hass_devices: list[vultr.VultrSwitch]) -> 
 
 
 @pytest.mark.usefixtures("valid_config")
-def test_turn_off(hass: HomeAssistant, hass_devices: list[vultr.VultrSwitch]) -> None:
+def test_turn_off(hass: SmartHub, hass_devices: list[vultr.VultrSwitch]) -> None:
     """Test turning a subscription off."""
     with (
         patch(
@@ -141,7 +141,7 @@ def test_invalid_switch_config() -> None:
 
 
 @pytest.mark.usefixtures("valid_config")
-def test_invalid_switches(hass: HomeAssistant) -> None:
+def test_invalid_switches(hass: SmartHub) -> None:
     """Test the VultrSwitch fails."""
     hass_devices = []
 

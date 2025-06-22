@@ -5,9 +5,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.jvc_projector.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.jvc_projector.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_PORT
+from smarthub.core import SmartHub
 
 from . import MOCK_HOST, MOCK_MAC, MOCK_MODEL, MOCK_PASSWORD, MOCK_PORT
 
@@ -19,7 +19,7 @@ def fixture_mock_device(
     request: pytest.FixtureRequest,
 ) -> Generator[MagicMock]:
     """Return a mocked JVC Projector device."""
-    target = "homeassistant.components.jvc_projector.JvcProjector"
+    target = "smarthub.components.jvc_projector.JvcProjector"
     if hasattr(request, "param"):
         target = request.param
 
@@ -50,7 +50,7 @@ def fixture_mock_config_entry() -> MockConfigEntry:
 
 @pytest.fixture(name="mock_integration")
 async def fixture_mock_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> MockConfigEntry:
     """Return a mock ConfigEntry setup for the integration."""

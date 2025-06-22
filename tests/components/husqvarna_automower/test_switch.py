@@ -11,22 +11,22 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.husqvarna_automower.const import (
+from smarthub.components.husqvarna_automower.const import (
     DOMAIN,
     EXECUTION_TIME_DELAY,
 )
-from homeassistant.components.husqvarna_automower.coordinator import SCAN_INTERVAL
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.husqvarna_automower.coordinator import SCAN_INTERVAL
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TOGGLE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 from .const import TEST_MOWER_ID
@@ -44,7 +44,7 @@ TEST_ZONE_ID = "AAAAAAAA-BBBB-CCCC-DDDD-123456789101"
 
 
 async def test_switch_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -75,7 +75,7 @@ async def test_switch_states(
     ],
 )
 async def test_switch_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioautomower_command: str,
     service: str,
     mock_automower_client: AsyncMock,
@@ -94,7 +94,7 @@ async def test_switch_commands(
 
     mocked_method.side_effect = ApiError("Test error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Failed to send command: Test error",
     ):
         await hass.services.async_call(
@@ -115,7 +115,7 @@ async def test_switch_commands(
     ],
 )
 async def test_stay_out_zone_switch_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     boolean: bool,
     excepted_state: str,
@@ -150,7 +150,7 @@ async def test_stay_out_zone_switch_commands(
 
     mocked_method.side_effect = ApiError("Test error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Failed to send command: Test error",
     ):
         await hass.services.async_call(
@@ -171,7 +171,7 @@ async def test_stay_out_zone_switch_commands(
     ],
 )
 async def test_work_area_switch_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     boolean: bool,
     excepted_state: str,
@@ -208,7 +208,7 @@ async def test_work_area_switch_commands(
 
     mocked_method.enabled.side_effect = ApiError("Test error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Failed to send command: Test error",
     ):
         await hass.services.async_call(
@@ -221,7 +221,7 @@ async def test_work_area_switch_commands(
 
 
 async def test_add_stay_out_zone(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -263,7 +263,7 @@ async def test_add_stay_out_zone(
 
 
 async def test_switch_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -271,7 +271,7 @@ async def test_switch_snapshot(
 ) -> None:
     """Snapshot tests of the switches."""
     with patch(
-        "homeassistant.components.husqvarna_automower.PLATFORMS",
+        "smarthub.components.husqvarna_automower.PLATFORMS",
         [Platform.SWITCH],
     ):
         await setup_integration(hass, mock_config_entry)

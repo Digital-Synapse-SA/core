@@ -5,19 +5,19 @@ import time
 
 import pytest
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
 )
-from homeassistant.components.ibeacon.const import (
+from smarthub.components.ibeacon.const import (
     ATTR_SOURCE,
     CONF_ALLOW_NAMELESS_UUIDS,
     DOMAIN,
     UPDATE_INTERVAL,
 )
-from homeassistant.const import STATE_HOME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
-from homeassistant.util import dt as dt_util
+from smarthub.const import STATE_HOME
+from smarthub.core import SmartHub
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.util import dt as dt_util
 
 from . import (
     BLUECHARM_BEACON_SERVICE_INFO,
@@ -44,7 +44,7 @@ def mock_bluetooth(enable_bluetooth: None) -> None:
     """Auto mock bluetooth."""
 
 
-async def test_many_groups_same_address_ignored(hass: HomeAssistant) -> None:
+async def test_many_groups_same_address_ignored(hass: SmartHub) -> None:
     """Test the different uuid, major, minor from many addresses removes all associated entities."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -79,7 +79,7 @@ async def test_many_groups_same_address_ignored(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.bluecharm_177999_8105_estimated_distance") is None
 
 
-async def test_ignore_not_ibeacons(hass: HomeAssistant) -> None:
+async def test_ignore_not_ibeacons(hass: SmartHub) -> None:
     """Test we ignore non-ibeacon data."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -100,7 +100,7 @@ async def test_ignore_not_ibeacons(hass: HomeAssistant) -> None:
     assert len(hass.states.async_entity_ids()) == before_entity_count
 
 
-async def test_ignore_no_name_but_create_if_set_later(hass: HomeAssistant) -> None:
+async def test_ignore_no_name_but_create_if_set_later(hass: SmartHub) -> None:
     """Test we ignore devices with no name but create it if it set set later."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -134,7 +134,7 @@ async def test_ignore_no_name_but_create_if_set_later(hass: HomeAssistant) -> No
     assert len(hass.states.async_entity_ids()) > before_entity_count
 
 
-async def test_ignore_default_name(hass: HomeAssistant) -> None:
+async def test_ignore_default_name(hass: SmartHub) -> None:
     """Test we ignore devices with default name."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -156,7 +156,7 @@ async def test_ignore_default_name(hass: HomeAssistant) -> None:
     assert len(hass.states.async_entity_ids()) == before_entity_count
 
 
-async def test_default_name_allowlisted(hass: HomeAssistant) -> None:
+async def test_default_name_allowlisted(hass: SmartHub) -> None:
     """Test we do NOT ignore beacons with default device name but allowlisted UUID."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -179,7 +179,7 @@ async def test_default_name_allowlisted(hass: HomeAssistant) -> None:
     assert len(hass.states.async_entity_ids()) > before_entity_count
 
 
-async def test_default_name_allowlisted_restore(hass: HomeAssistant) -> None:
+async def test_default_name_allowlisted_restore(hass: SmartHub) -> None:
     """Test that ignored nameless iBeacons are restored when allowlist entry is added."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -210,7 +210,7 @@ async def test_default_name_allowlisted_restore(hass: HomeAssistant) -> None:
     assert len(hass.states.async_entity_ids()) > before_entity_count
 
 
-async def test_default_name_allowlisted_restore_late(hass: HomeAssistant) -> None:
+async def test_default_name_allowlisted_restore_late(hass: SmartHub) -> None:
     """Test that allowlisting an ignored but no longer advertised nameless iBeacon has no effect."""
     start_monotonic = time.monotonic()
 
@@ -259,7 +259,7 @@ async def test_default_name_allowlisted_restore_late(hass: HomeAssistant) -> Non
     assert len(hass.states.async_entity_ids()) == before_entity_count
 
 
-async def test_rotating_major_minor_and_mac_with_name(hass: HomeAssistant) -> None:
+async def test_rotating_major_minor_and_mac_with_name(hass: SmartHub) -> None:
     """Test the different uuid, major, minor from many addresses removes all associated entities."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -294,7 +294,7 @@ async def test_rotating_major_minor_and_mac_with_name(hass: HomeAssistant) -> No
     assert len(hass.states.async_entity_ids("device_tracker")) == before_entity_count
 
 
-async def test_rotating_major_minor_and_mac_no_name(hass: HomeAssistant) -> None:
+async def test_rotating_major_minor_and_mac_no_name(hass: SmartHub) -> None:
     """Test no-name devices with different uuid, major, minor from many addresses removes all associated entities."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -330,7 +330,7 @@ async def test_rotating_major_minor_and_mac_no_name(hass: HomeAssistant) -> None
 
 
 async def test_ignore_transient_devices_unless_we_see_them_a_few_times(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we ignore transient devices unless we see them a few times."""
     entry = MockConfigEntry(
@@ -377,7 +377,7 @@ async def test_ignore_transient_devices_unless_we_see_them_a_few_times(
     assert hass.states.get("device_tracker.s6da7c9389bd5452cc_cccc").state == STATE_HOME
 
 
-async def test_changing_source_attribute(hass: HomeAssistant) -> None:
+async def test_changing_source_attribute(hass: SmartHub) -> None:
     """Test update of the source attribute."""
     entry = MockConfigEntry(
         domain=DOMAIN,

@@ -8,14 +8,14 @@ from discovery30303 import AIODiscovery30303
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components import steamist
-from homeassistant.components.steamist.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components import steamist
+from smarthub.components.steamist.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from . import (
     DEFAULT_ENTRY_DATA,
@@ -36,13 +36,13 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 def mock_single_broadcast_address():
     """Mock network's async_async_get_ipv4_broadcast_addresses."""
     with patch(
-        "homeassistant.components.network.async_get_ipv4_broadcast_addresses",
+        "smarthub.components.network.async_get_ipv4_broadcast_addresses",
         return_value={"10.255.255.255"},
     ):
         yield
 
 
-async def test_config_entry_reload(hass: HomeAssistant) -> None:
+async def test_config_entry_reload(hass: SmartHub) -> None:
     """Test that a config entry can be reloaded."""
     _, config_entry = await _async_setup_entry_with_status(
         hass, MOCK_ASYNC_GET_STATUS_ACTIVE
@@ -52,7 +52,7 @@ async def test_config_entry_reload(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_config_entry_retry_later(hass: HomeAssistant) -> None:
+async def test_config_entry_retry_later(hass: SmartHub) -> None:
     """Test that a config entry retry on connection error."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -60,7 +60,7 @@ async def test_config_entry_retry_later(hass: HomeAssistant) -> None:
     )
     config_entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.steamist.Steamist.async_get_status",
+        "smarthub.components.steamist.Steamist.async_get_status",
         side_effect=TimeoutError,
     ):
         await async_setup_component(hass, steamist.DOMAIN, {steamist.DOMAIN: {}})
@@ -69,7 +69,7 @@ async def test_config_entry_retry_later(hass: HomeAssistant) -> None:
 
 
 async def test_config_entry_fills_unique_id_with_directed_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test that the unique id is added if its missing via directed (not broadcast) discovery."""
@@ -96,7 +96,7 @@ async def test_config_entry_fills_unique_id_with_directed_discovery(
     with (
         _patch_status(MOCK_ASYNC_GET_STATUS_ACTIVE),
         patch(
-            "homeassistant.components.steamist.discovery.AIODiscovery30303",
+            "smarthub.components.steamist.discovery.AIODiscovery30303",
             return_value=mock_aio_discovery,
         ),
     ):
@@ -118,7 +118,7 @@ async def test_config_entry_fills_unique_id_with_directed_discovery(
 
 @pytest.mark.usefixtures("mock_single_broadcast_address")
 async def test_discovery_happens_at_interval(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test that discovery happens at interval."""
     config_entry = MockConfigEntry(
@@ -129,7 +129,7 @@ async def test_discovery_happens_at_interval(
     mock_aio_discovery.async_scan = AsyncMock()
     with (
         patch(
-            "homeassistant.components.steamist.discovery.AIODiscovery30303",
+            "smarthub.components.steamist.discovery.AIODiscovery30303",
             return_value=mock_aio_discovery,
         ),
         _patch_status(MOCK_ASYNC_GET_STATUS_ACTIVE),

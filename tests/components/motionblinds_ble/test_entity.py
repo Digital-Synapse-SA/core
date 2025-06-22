@@ -4,19 +4,19 @@ from unittest.mock import Mock
 
 import pytest
 
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.motionblinds_ble.const import (
+from smarthub.components.motionblinds_ble.const import (
     ATTR_CONNECT,
     ATTR_DISCONNECT,
     ATTR_FAVORITE,
     ATTR_SPEED,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import setup_integration
 
@@ -34,14 +34,14 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_entity_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motion_device: Mock,
     name: str,
     platform: Platform,
     entity: str,
 ) -> None:
-    """Test updating entity using homeassistant.update_entity."""
+    """Test updating entity using smarthub.update_entity."""
 
     await async_setup_component(hass, HA_DOMAIN, {})
     await setup_integration(hass, mock_config_entry)

@@ -23,9 +23,9 @@ from pymodbus.pdu import ExceptionResponse
 import pytest
 import voluptuous as vol
 
-from homeassistant import config as hass_config
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.modbus.const import (
+from smarthub import config as hass_config
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.modbus.const import (
     ATTR_ADDRESS,
     ATTR_HUB,
     ATTR_SLAVE,
@@ -73,7 +73,7 @@ from homeassistant.components.modbus.const import (
     UDP,
     DataType,
 )
-from homeassistant.components.modbus.validators import (
+from smarthub.components.modbus.validators import (
     check_config,
     duplicate_fan_mode_validator,
     duplicate_swing_mode_validator,
@@ -82,8 +82,8 @@ from homeassistant.components.modbus.validators import (
     register_int_list_validator,
     struct_validator,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import (
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import (
     ATTR_STATE,
     CONF_ADDRESS,
     CONF_BINARY_SENSORS,
@@ -105,9 +105,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .conftest import (
     TEST_ENTITY_NAME,
@@ -123,7 +123,7 @@ from tests.common import async_fire_time_changed, get_fixture_path
 
 @pytest.fixture(name="mock_modbus_with_pymodbus")
 async def mock_modbus_with_pymodbus_fixture(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, do_config, mock_pymodbus
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, do_config, mock_pymodbus
 ):
     """Load integration modbus using mocked pymodbus."""
     caplog.clear()
@@ -413,7 +413,7 @@ async def test_exception_struct_validator(do_config) -> None:
         ],
     ],
 )
-async def test_check_config(hass: HomeAssistant, do_config) -> None:
+async def test_check_config(hass: SmartHub, do_config) -> None:
     """Test duplicate modbus validator."""
     check_config(hass, do_config)
     assert len(do_config) == 1
@@ -445,7 +445,7 @@ async def test_check_config(hass: HomeAssistant, do_config) -> None:
         ],
     ],
 )
-async def test_check_config_sensor(hass: HomeAssistant, do_config) -> None:
+async def test_check_config_sensor(hass: SmartHub, do_config) -> None:
     """Test duplicate entity validator."""
     check_config(hass, do_config)
     assert len(do_config[0][CONF_SENSORS]) == 1
@@ -477,7 +477,7 @@ async def test_check_config_sensor(hass: HomeAssistant, do_config) -> None:
         ],
     ],
 )
-async def test_check_config_climate(hass: HomeAssistant, do_config) -> None:
+async def test_check_config_climate(hass: SmartHub, do_config) -> None:
     """Test duplicate entity validator."""
     check_config(hass, do_config)
     assert len(do_config[0][CONF_CLIMATES]) == 1
@@ -549,7 +549,7 @@ async def test_duplicate_swing_mode_validator(do_config) -> None:
         ],
     ],
 )
-async def test_no_duplicate_names(hass: HomeAssistant, do_config) -> None:
+async def test_no_duplicate_names(hass: SmartHub, do_config) -> None:
     """Test duplicate entity validator."""
     check_config(hass, do_config)
     assert len(do_config[0][CONF_SENSORS]) == 1
@@ -753,7 +753,7 @@ async def test_no_duplicate_names(hass: HomeAssistant, do_config) -> None:
     ],
 )
 async def test_config_modbus(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, mock_modbus_with_pymodbus
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, mock_modbus_with_pymodbus
 ) -> None:
     """Run configuration test for modbus."""
 
@@ -830,7 +830,7 @@ SERVICE = "service"
     ],
 )
 async def test_pb_service_write(
-    hass: HomeAssistant,
+    hass: SmartHub,
     do_write,
     do_return,
     do_slave,
@@ -877,7 +877,7 @@ async def test_pb_service_write(
 
 @pytest.fixture(name="mock_modbus_read_pymodbus")
 async def mock_modbus_read_pymodbus_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     do_group,
     do_type,
     do_scan_interval,
@@ -945,7 +945,7 @@ async def mock_modbus_read_pymodbus_fixture(
     ],
 )
 async def test_pb_read(
-    hass: HomeAssistant,
+    hass: SmartHub,
     do_domain,
     do_expect_state,
     do_expect_value,
@@ -968,7 +968,7 @@ async def test_pb_read(
 
 
 async def test_pymodbus_constructor_fail(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Run test for failing pymodbus constructor."""
     config = {
@@ -988,7 +988,7 @@ async def test_pymodbus_constructor_fail(
         ]
     }
     with mock.patch(
-        "homeassistant.components.modbus.modbus.AsyncModbusTcpClient", autospec=True
+        "smarthub.components.modbus.modbus.AsyncModbusTcpClient", autospec=True
     ) as mock_pb:
         caplog.set_level(logging.ERROR)
         mock_pb.side_effect = ModbusException("test no class")
@@ -1001,7 +1001,7 @@ async def test_pymodbus_constructor_fail(
 
 
 async def test_pymodbus_close_fail(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, mock_pymodbus
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, mock_pymodbus
 ) -> None:
     """Run test for failing pymodbus close."""
     config = {
@@ -1028,7 +1028,7 @@ async def test_pymodbus_close_fail(
 
 
 async def test_pymodbus_connect_fail(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, mock_pymodbus
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, mock_pymodbus
 ) -> None:
     """Run test for failing pymodbus constructor."""
     config = {
@@ -1054,7 +1054,7 @@ async def test_pymodbus_connect_fail(
 
 
 async def test_delay(
-    hass: HomeAssistant, mock_pymodbus, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_pymodbus, freezer: FrozenDateTimeFactory
 ) -> None:
     """Run test for startup delay."""
 
@@ -1128,7 +1128,7 @@ async def test_delay(
     ],
 )
 async def test_shutdown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_pymodbus,
     mock_modbus_with_pymodbus,
@@ -1142,7 +1142,7 @@ async def test_shutdown(
 
 
 @pytest.mark.parametrize("do_config", [{}])
-async def test_write_no_client(hass: HomeAssistant, mock_modbus) -> None:
+async def test_write_no_client(hass: SmartHub, mock_modbus) -> None:
     """Run test for service stop and write without client."""
 
     await mock_modbus.reset()
@@ -1164,7 +1164,7 @@ async def test_write_no_client(hass: HomeAssistant, mock_modbus) -> None:
 
 @pytest.mark.parametrize("do_config", [{}])
 async def test_integration_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_modbus,
 ) -> None:
@@ -1226,7 +1226,7 @@ async def test_integration_reload(
 
 @pytest.mark.parametrize("do_config", [{}])
 async def test_integration_reload_failed(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, mock_modbus
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, mock_modbus
 ) -> None:
     """Run test for integration connect failure on reload."""
     caplog.set_level(logging.DEBUG)
@@ -1246,7 +1246,7 @@ async def test_integration_reload_failed(
 
 @pytest.mark.parametrize("do_config", [{}])
 async def test_integration_setup_failed(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, mock_modbus
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, mock_modbus
 ) -> None:
     """Run test for integration setup on reload."""
     with mock.patch.object(
@@ -1261,7 +1261,7 @@ async def test_integration_setup_failed(
         await hass.async_block_till_done()
 
 
-async def test_no_entities(hass: HomeAssistant) -> None:
+async def test_no_entities(hass: SmartHub) -> None:
     """Run test for failing pymodbus constructor."""
     config = {
         DOMAIN: [
@@ -1317,7 +1317,7 @@ async def test_no_entities(hass: HomeAssistant) -> None:
     ],
 )
 async def test_check_default_slave(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_modbus,
     do_config,
     mock_do_cycle,

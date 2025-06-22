@@ -1,0 +1,9 @@
+{
+  "domain": "device_tracker",
+  "name": "Device Tracker",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["zone"],
+  "documentation": "https://www.smart-hub.io/integrations/device_tracker",
+  "integration_type": "entity",
+  "quality_scale": "internal"
+}

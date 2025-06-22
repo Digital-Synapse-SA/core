@@ -2,9 +2,9 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 VALID_CONFIG = {
     "sensor": {
@@ -31,7 +31,7 @@ def get_departuresMock(_stop_id, route, destination, api_key):
 
 
 @patch("TransportNSW.TransportNSW.get_departures", side_effect=get_departuresMock)
-async def test_transportnsw_config(mocked_get_departures, hass: HomeAssistant) -> None:
+async def test_transportnsw_config(mocked_get_departures, hass: SmartHub) -> None:
     """Test minimal TransportNSW configuration."""
     assert await async_setup_component(hass, "sensor", VALID_CONFIG)
     await hass.async_block_till_done()
@@ -64,7 +64,7 @@ def get_departuresMock_notFound(_stop_id, route, destination, api_key):
     "TransportNSW.TransportNSW.get_departures", side_effect=get_departuresMock_notFound
 )
 async def test_transportnsw_config_not_found(
-    mocked_get_departures_not_found, hass: HomeAssistant
+    mocked_get_departures_not_found, hass: SmartHub
 ) -> None:
     """Test minimal TransportNSW configuration."""
     assert await async_setup_component(hass, "sensor", VALID_CONFIG)

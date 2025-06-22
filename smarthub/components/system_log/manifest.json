@@ -1,0 +1,8 @@
+{
+  "domain": "system_log",
+  "name": "System Log",
+  "codeowners": [],
+  "documentation": "https://www.smart-hub.io/integrations/system_log",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

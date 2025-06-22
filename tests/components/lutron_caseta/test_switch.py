@@ -1,13 +1,13 @@
 """Tests for the Lutron Caseta integration."""
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import MockBridge, async_setup_integration
 
 
 async def test_switch_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a light unique id."""
     await async_setup_integration(hass, MockBridge)

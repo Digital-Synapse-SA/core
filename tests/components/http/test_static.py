@@ -6,18 +6,18 @@ from pathlib import Path
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant.components.http import StaticPathConfig
-from homeassistant.components.http.static import CachingStaticResource
-from homeassistant.const import EVENT_HOMEASSISTANT_START
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.http import KEY_ALLOW_CONFIGURED_CORS
-from homeassistant.setup import async_setup_component
+from smarthub.components.http import StaticPathConfig
+from smarthub.components.http.static import CachingStaticResource
+from smarthub.const import EVENT_HOMEASSISTANT_START
+from smarthub.core import SmartHub
+from smarthub.helpers.http import KEY_ALLOW_CONFIGURED_CORS
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
 
 @pytest.fixture(autouse=True)
-async def http(hass: HomeAssistant) -> None:
+async def http(hass: SmartHub) -> None:
     """Ensure http is set up."""
     assert await async_setup_component(hass, "http", {})
     hass.bus.async_fire(EVENT_HOMEASSISTANT_START)
@@ -25,13 +25,13 @@ async def http(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-async def mock_http_client(hass: HomeAssistant, aiohttp_client: ClientSessionGenerator):
-    """Start the Home Assistant HTTP component."""
+async def mock_http_client(hass: SmartHub, aiohttp_client: ClientSessionGenerator):
+    """Start the SmartHub HTTP component."""
     return await aiohttp_client(hass.http.app, server_kwargs={"skip_url_asserts": True})
 
 
 async def test_static_resource_show_index(
-    hass: HomeAssistant, mock_http_client: TestClient, tmp_path: Path
+    hass: SmartHub, mock_http_client: TestClient, tmp_path: Path
 ) -> None:
     """Test static resource will return a directory index."""
     app = hass.http.app
@@ -46,7 +46,7 @@ async def test_static_resource_show_index(
 
 
 async def test_async_register_static_paths(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test registering multiple static paths."""
     assert await async_setup_component(hass, "frontend", {})

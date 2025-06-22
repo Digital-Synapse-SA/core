@@ -7,10 +7,10 @@ from unittest.mock import call, patch
 
 import pytest
 
-from homeassistant import loader, setup
-from homeassistant.core import HomeAssistant
-from homeassistant.loader import async_get_integration
-from homeassistant.requirements import (
+from smarthub import loader, setup
+from smarthub.core import SmartHub
+from smarthub.loader import async_get_integration
+from smarthub.requirements import (
     CONSTRAINT_FILE,
     RequirementsNotFound,
     _async_get_manager,
@@ -29,14 +29,14 @@ def env_without_wheel_links():
     return env
 
 
-async def test_requirement_installed_in_venv(hass: HomeAssistant) -> None:
+async def test_requirement_installed_in_venv(hass: SmartHub) -> None:
     """Test requirement installed in virtual environment."""
     with (
         patch("os.path.dirname", return_value="ha_package_path"),
-        patch("homeassistant.util.package.is_virtual_env", return_value=True),
-        patch("homeassistant.util.package.is_docker_env", return_value=False),
+        patch("smarthub.util.package.is_virtual_env", return_value=True),
+        patch("smarthub.util.package.is_docker_env", return_value=False),
         patch(
-            "homeassistant.util.package.install_package", return_value=True
+            "smarthub.util.package.install_package", return_value=True
         ) as mock_install,
         patch.dict(os.environ, env_without_wheel_links(), clear=True),
     ):
@@ -51,14 +51,14 @@ async def test_requirement_installed_in_venv(hass: HomeAssistant) -> None:
         )
 
 
-async def test_requirement_installed_in_deps(hass: HomeAssistant) -> None:
+async def test_requirement_installed_in_deps(hass: SmartHub) -> None:
     """Test requirement installed in deps directory."""
     with (
         patch("os.path.dirname", return_value="ha_package_path"),
-        patch("homeassistant.util.package.is_virtual_env", return_value=False),
-        patch("homeassistant.util.package.is_docker_env", return_value=False),
+        patch("smarthub.util.package.is_virtual_env", return_value=False),
+        patch("smarthub.util.package.is_docker_env", return_value=False),
         patch(
-            "homeassistant.util.package.install_package", return_value=True
+            "smarthub.util.package.install_package", return_value=True
         ) as mock_install,
         patch.dict(os.environ, env_without_wheel_links(), clear=True),
     ):
@@ -74,29 +74,29 @@ async def test_requirement_installed_in_deps(hass: HomeAssistant) -> None:
         )
 
 
-async def test_install_existing_package(hass: HomeAssistant) -> None:
+async def test_install_existing_package(hass: SmartHub) -> None:
     """Test an install attempt on an existing package."""
     with patch(
-        "homeassistant.util.package.install_package", return_value=True
+        "smarthub.util.package.install_package", return_value=True
     ) as mock_inst:
         await async_process_requirements(hass, "test_component", ["hello==1.0.0"])
 
     assert len(mock_inst.mock_calls) == 1
 
     with (
-        patch("homeassistant.util.package.is_installed", return_value=True),
-        patch("homeassistant.util.package.install_package") as mock_inst,
+        patch("smarthub.util.package.is_installed", return_value=True),
+        patch("smarthub.util.package.install_package") as mock_inst,
     ):
         await async_process_requirements(hass, "test_component", ["hello==1.0.0"])
 
     assert len(mock_inst.mock_calls) == 0
 
 
-async def test_install_missing_package(hass: HomeAssistant) -> None:
+async def test_install_missing_package(hass: SmartHub) -> None:
     """Test an install attempt on an existing package."""
     with (
         patch(
-            "homeassistant.util.package.install_package", return_value=False
+            "smarthub.util.package.install_package", return_value=False
         ) as mock_inst,
         pytest.raises(RequirementsNotFound),
     ):
@@ -106,11 +106,11 @@ async def test_install_missing_package(hass: HomeAssistant) -> None:
 
 
 async def test_install_skipped_package(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test an install attempt on a dependency that should be skipped."""
     with patch(
-        "homeassistant.util.package.install_package", return_value=True
+        "smarthub.util.package.install_package", return_value=True
     ) as mock_inst:
         hass.config.skip_pip_packages = ["hello"]
         with caplog.at_level(logging.WARNING):
@@ -124,7 +124,7 @@ async def test_install_skipped_package(
     assert mock_inst.mock_calls[0].args[0] == "not_skipped==1.2.3"
 
 
-async def test_get_integration_with_requirements(hass: HomeAssistant) -> None:
+async def test_get_integration_with_requirements(hass: SmartHub) -> None:
     """Check getting an integration with loaded requirements."""
     hass.config.skip_pip = False
     mock_integration(
@@ -148,10 +148,10 @@ async def test_get_integration_with_requirements(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.util.package.is_installed", return_value=False
+            "smarthub.util.package.is_installed", return_value=False
         ) as mock_is_installed,
         patch(
-            "homeassistant.util.package.install_package", return_value=True
+            "smarthub.util.package.install_package", return_value=True
         ) as mock_inst,
     ):
         integration = await async_get_integration_with_requirements(
@@ -175,7 +175,7 @@ async def test_get_integration_with_requirements(hass: HomeAssistant) -> None:
     ]
 
 
-async def test_get_integration_with_requirements_cache(hass: HomeAssistant) -> None:
+async def test_get_integration_with_requirements_cache(hass: SmartHub) -> None:
     """Check getting an integration with loaded requirements considers cache.
 
     We want to make sure that we do not check requirements for dependencies
@@ -212,13 +212,13 @@ async def test_get_integration_with_requirements_cache(hass: HomeAssistant) -> N
 
     with (
         patch(
-            "homeassistant.util.package.is_installed", return_value=False
+            "smarthub.util.package.is_installed", return_value=False
         ) as mock_is_installed,
         patch(
-            "homeassistant.util.package.install_package", return_value=True
+            "smarthub.util.package.install_package", return_value=True
         ) as mock_inst,
         patch(
-            "homeassistant.requirements.async_get_integration",
+            "smarthub.requirements.async_get_integration",
             wraps=async_get_integration,
         ) as mock_async_get_integration,
     ):
@@ -284,7 +284,7 @@ async def test_get_integration_with_requirements_cache(hass: HomeAssistant) -> N
 
 
 async def test_get_integration_with_requirements_concurrency(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that we don't install the same requirement concurrently."""
     hass.config.skip_pip = False
@@ -314,7 +314,7 @@ async def test_get_integration_with_requirements_concurrency(
 
 
 async def test_get_integration_with_requirements_pip_install_fails_two_passes(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Check getting an integration with loaded requirements and the pip install fails two passes."""
     hass.config.skip_pip = False
@@ -346,10 +346,10 @@ async def test_get_integration_with_requirements_pip_install_fails_two_passes(
     with (
         pytest.raises(RequirementsNotFound),
         patch(
-            "homeassistant.util.package.is_installed", return_value=False
+            "smarthub.util.package.is_installed", return_value=False
         ) as mock_is_installed,
         patch(
-            "homeassistant.util.package.install_package",
+            "smarthub.util.package.install_package",
             side_effect=_mock_install_package,
         ) as mock_inst,
     ):
@@ -379,10 +379,10 @@ async def test_get_integration_with_requirements_pip_install_fails_two_passes(
     with (
         pytest.raises(RequirementsNotFound),
         patch(
-            "homeassistant.util.package.is_installed", return_value=False
+            "smarthub.util.package.is_installed", return_value=False
         ) as mock_is_installed,
         patch(
-            "homeassistant.util.package.install_package",
+            "smarthub.util.package.install_package",
             side_effect=_mock_install_package,
         ) as mock_inst,
     ):
@@ -400,10 +400,10 @@ async def test_get_integration_with_requirements_pip_install_fails_two_passes(
     with (
         pytest.raises(RequirementsNotFound),
         patch(
-            "homeassistant.util.package.is_installed", return_value=False
+            "smarthub.util.package.is_installed", return_value=False
         ) as mock_is_installed,
         patch(
-            "homeassistant.util.package.install_package",
+            "smarthub.util.package.install_package",
             side_effect=_mock_install_package,
         ) as mock_inst,
     ):
@@ -432,10 +432,10 @@ async def test_get_integration_with_requirements_pip_install_fails_two_passes(
 
     with (
         patch(
-            "homeassistant.util.package.is_installed", return_value=False
+            "smarthub.util.package.is_installed", return_value=False
         ) as mock_is_installed,
         patch(
-            "homeassistant.util.package.install_package", return_value=True
+            "smarthub.util.package.install_package", return_value=True
         ) as mock_inst,
     ):
         integration = await async_get_integration_with_requirements(
@@ -457,7 +457,7 @@ async def test_get_integration_with_requirements_pip_install_fails_two_passes(
     ]
 
 
-async def test_get_integration_with_missing_dependencies(hass: HomeAssistant) -> None:
+async def test_get_integration_with_missing_dependencies(hass: SmartHub) -> None:
     """Check getting an integration with missing dependencies."""
     hass.config.skip_pip = False
     mock_integration(
@@ -488,7 +488,7 @@ async def test_get_integration_with_missing_dependencies(hass: HomeAssistant) ->
 
 
 async def test_get_built_in_integration_with_missing_after_dependencies(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Check getting a built_in integration with missing after_dependencies results in exception."""
     hass.config.skip_pip = False
@@ -505,7 +505,7 @@ async def test_get_built_in_integration_with_missing_after_dependencies(
 
 
 async def test_get_custom_integration_with_missing_after_dependencies(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Check getting a custom integration with missing after_dependencies."""
     hass.config.skip_pip = False
@@ -524,15 +524,15 @@ async def test_get_custom_integration_with_missing_after_dependencies(
     assert integration.domain == "test_custom_component"
 
 
-async def test_install_with_wheels_index(hass: HomeAssistant) -> None:
+async def test_install_with_wheels_index(hass: SmartHub) -> None:
     """Test an install attempt with wheels index URL."""
     hass.config.skip_pip = False
     mock_integration(hass, MockModule("comp", requirements=["hello==1.0.0"]))
 
     with (
-        patch("homeassistant.util.package.is_installed", return_value=False),
-        patch("homeassistant.util.package.is_docker_env", return_value=True),
-        patch("homeassistant.util.package.install_package") as mock_inst,
+        patch("smarthub.util.package.is_installed", return_value=False),
+        patch("smarthub.util.package.is_docker_env", return_value=True),
+        patch("smarthub.util.package.install_package") as mock_inst,
         patch.dict(os.environ, {"WHEELS_LINKS": "https://wheels.hass.io/test"}),
         patch(
             "os.path.dirname",
@@ -549,15 +549,15 @@ async def test_install_with_wheels_index(hass: HomeAssistant) -> None:
         )
 
 
-async def test_install_on_docker(hass: HomeAssistant) -> None:
+async def test_install_on_docker(hass: SmartHub) -> None:
     """Test an install attempt on an docker system env."""
     hass.config.skip_pip = False
     mock_integration(hass, MockModule("comp", requirements=["hello==1.0.0"]))
 
     with (
-        patch("homeassistant.util.package.is_installed", return_value=False),
-        patch("homeassistant.util.package.is_docker_env", return_value=True),
-        patch("homeassistant.util.package.install_package") as mock_inst,
+        patch("smarthub.util.package.is_installed", return_value=False),
+        patch("smarthub.util.package.is_docker_env", return_value=True),
+        patch("smarthub.util.package.install_package") as mock_inst,
         patch("os.path.dirname") as mock_dir,
         patch.dict(os.environ, env_without_wheel_links(), clear=True),
     ):
@@ -572,7 +572,7 @@ async def test_install_on_docker(hass: HomeAssistant) -> None:
         )
 
 
-async def test_discovery_requirements_mqtt(hass: HomeAssistant) -> None:
+async def test_discovery_requirements_mqtt(hass: SmartHub) -> None:
     """Test that we load discovery requirements."""
     hass.config.skip_pip = False
     mqtt = await loader.async_get_integration(hass, "mqtt")
@@ -581,7 +581,7 @@ async def test_discovery_requirements_mqtt(hass: HomeAssistant) -> None:
         hass, MockModule("mqtt_comp", partial_manifest={"mqtt": ["foo/discovery"]})
     )
     with patch(
-        "homeassistant.requirements.RequirementsManager.async_process_requirements",
+        "smarthub.requirements.RequirementsManager.async_process_requirements",
     ) as mock_process:
         await async_get_integration_with_requirements(hass, "mqtt_comp")
 
@@ -590,7 +590,7 @@ async def test_discovery_requirements_mqtt(hass: HomeAssistant) -> None:
     assert mock_process.mock_calls[0][1][1] == mqtt.requirements
 
 
-async def test_discovery_requirements_ssdp(hass: HomeAssistant) -> None:
+async def test_discovery_requirements_ssdp(hass: SmartHub) -> None:
     """Test that we load discovery requirements."""
     hass.config.skip_pip = False
     ssdp = await loader.async_get_integration(hass, "ssdp")
@@ -599,7 +599,7 @@ async def test_discovery_requirements_ssdp(hass: HomeAssistant) -> None:
         hass, MockModule("ssdp_comp", partial_manifest={"ssdp": [{"st": "roku:ecp"}]})
     )
     with patch(
-        "homeassistant.requirements.RequirementsManager.async_process_requirements",
+        "smarthub.requirements.RequirementsManager.async_process_requirements",
     ) as mock_process:
         await async_get_integration_with_requirements(hass, "ssdp_comp")
 
@@ -616,7 +616,7 @@ async def test_discovery_requirements_ssdp(hass: HomeAssistant) -> None:
     [{"zeroconf": ["_googlecast._tcp.local."]}, {"homekit": {"models": ["LIFX"]}}],
 )
 async def test_discovery_requirements_zeroconf(
-    hass: HomeAssistant, partial_manifest
+    hass: SmartHub, partial_manifest
 ) -> None:
     """Test that we load discovery requirements."""
     hass.config.skip_pip = False
@@ -628,7 +628,7 @@ async def test_discovery_requirements_zeroconf(
     )
 
     with patch(
-        "homeassistant.requirements.RequirementsManager.async_process_requirements",
+        "smarthub.requirements.RequirementsManager.async_process_requirements",
     ) as mock_process:
         await async_get_integration_with_requirements(hass, "comp")
 
@@ -636,7 +636,7 @@ async def test_discovery_requirements_zeroconf(
     assert mock_process.mock_calls[0][1][1] == zeroconf.requirements
 
 
-async def test_discovery_requirements_dhcp(hass: HomeAssistant) -> None:
+async def test_discovery_requirements_dhcp(hass: SmartHub) -> None:
     """Test that we load dhcp discovery requirements."""
     hass.config.skip_pip = False
     dhcp = await loader.async_get_integration(hass, "dhcp")
@@ -651,7 +651,7 @@ async def test_discovery_requirements_dhcp(hass: HomeAssistant) -> None:
         ),
     )
     with patch(
-        "homeassistant.requirements.RequirementsManager.async_process_requirements",
+        "smarthub.requirements.RequirementsManager.async_process_requirements",
     ) as mock_process:
         await async_get_integration_with_requirements(hass, "comp")
 

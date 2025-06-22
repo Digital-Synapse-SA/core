@@ -23,10 +23,10 @@ from google_nest_sdm.exceptions import (
 )
 import pytest
 
-from homeassistant.components.nest import DOMAIN
-from homeassistant.components.nest.const import OAUTH2_TOKEN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.nest import DOMAIN
+from smarthub.components.nest.const import OAUTH2_TOKEN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .common import (
     PROJECT_ID,
@@ -53,7 +53,7 @@ def error_caplog(
     caplog: pytest.LogCaptureFixture,
 ) -> Generator[pytest.LogCaptureFixture]:
     """Fixture to capture nest init error messages."""
-    with caplog.at_level(logging.ERROR, logger="homeassistant.components.nest"):
+    with caplog.at_level(logging.ERROR, logger="smarthub.components.nest"):
         yield caplog
 
 
@@ -62,12 +62,12 @@ def warning_caplog(
     caplog: pytest.LogCaptureFixture,
 ) -> Generator[pytest.LogCaptureFixture]:
     """Fixture to capture nest init warning messages."""
-    with caplog.at_level(logging.WARNING, logger="homeassistant.components.nest"):
+    with caplog.at_level(logging.WARNING, logger="smarthub.components.nest"):
         yield caplog
 
 
 async def test_setup_success(
-    hass: HomeAssistant, error_caplog: pytest.LogCaptureFixture, setup_platform
+    hass: SmartHub, error_caplog: pytest.LogCaptureFixture, setup_platform
 ) -> None:
     """Test successful setup."""
     await setup_platform()
@@ -80,7 +80,7 @@ async def test_setup_success(
 
 @pytest.mark.parametrize("nest_test_config", [(TEST_CONFIG_NEW_SUBSCRIPTION)])
 async def test_setup_success_new_subscription_format(
-    hass: HomeAssistant, error_caplog: pytest.LogCaptureFixture, setup_platform
+    hass: SmartHub, error_caplog: pytest.LogCaptureFixture, setup_platform
 ) -> None:
     """Test successful setup."""
     await setup_platform()
@@ -93,7 +93,7 @@ async def test_setup_success_new_subscription_format(
 
 @pytest.mark.parametrize("subscriber_id", [("invalid-subscriber-format")])
 async def test_setup_configuration_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     subscriber_id,
     setup_base_platform,
@@ -112,7 +112,7 @@ async def test_setup_configuration_failure(
 
 @pytest.mark.parametrize("subscriber_side_effect", [SubscriberException()])
 async def test_setup_subscriber_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     setup_base_platform,
 ) -> None:
@@ -126,12 +126,12 @@ async def test_setup_subscriber_failure(
 
 
 async def test_setup_device_manager_failure(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, setup_base_platform
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, setup_base_platform
 ) -> None:
     """Test device manager api failure."""
     with (
         patch(
-            "homeassistant.components.nest.api.GoogleNestSubscriber.async_get_device_manager",
+            "smarthub.components.nest.api.GoogleNestSubscriber.async_get_device_manager",
             side_effect=ApiException(),
         ),
     ):
@@ -169,7 +169,7 @@ async def test_setup_device_manager_failure(
     ],
 )
 async def test_expired_token_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_base_platform: PlatformSetup,
     aioclient_mock: AiohttpClientMocker,
     token_response_args: dict,
@@ -195,7 +195,7 @@ async def test_expired_token_refresh_error(
 
 @pytest.mark.parametrize("subscriber_side_effect", [AuthException()])
 async def test_subscriber_auth_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     setup_base_platform,
 ) -> None:
@@ -213,7 +213,7 @@ async def test_subscriber_auth_failure(
 
 @pytest.mark.parametrize("subscriber_side_effect", [(ConfigurationException())])
 async def test_subscriber_configuration_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     error_caplog: pytest.LogCaptureFixture,
     setup_base_platform,
 ) -> None:
@@ -226,7 +226,7 @@ async def test_subscriber_configuration_failure(
     assert entries[0].state is ConfigEntryState.SETUP_ERROR
 
 
-async def test_unload_entry(hass: HomeAssistant, setup_platform) -> None:
+async def test_unload_entry(hass: SmartHub, setup_platform) -> None:
     """Test successful unload of a ConfigEntry."""
     await setup_platform()
 
@@ -240,7 +240,7 @@ async def test_unload_entry(hass: HomeAssistant, setup_platform) -> None:
 
 
 async def test_remove_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_base_platform: PlatformSetup,
     aioclient_mock: AiohttpClientMocker,
     subscriber: AsyncMock,
@@ -274,11 +274,11 @@ async def test_remove_entry(
 
 
 async def test_home_assistant_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     subscriber: AsyncMock,
 ) -> None:
-    """Test successful subscriber shutdown when HomeAssistant stops."""
+    """Test successful subscriber shutdown when SmartHub stops."""
     await setup_platform()
 
     entries = hass.config_entries.async_entries(DOMAIN)
@@ -292,7 +292,7 @@ async def test_home_assistant_stop(
 
 
 async def test_remove_entry_delete_subscriber_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_base_platform: PlatformSetup,
     aioclient_mock: AiohttpClientMocker,
     subscriber: AsyncMock,
@@ -324,7 +324,7 @@ async def test_remove_entry_delete_subscriber_failure(
 
 @pytest.mark.parametrize("config_entry_unique_id", [DOMAIN, None])
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     error_caplog,
     setup_platform,
     config_entry,

@@ -11,19 +11,19 @@ from hyperion.const import (
     KEY_STATE,
 )
 
-from homeassistant.components.hyperion import get_hyperion_device_id
-from homeassistant.components.hyperion.const import (
+from smarthub.components.hyperion import get_hyperion_device_id
+from smarthub.components.hyperion.const import (
     DOMAIN,
     HYPERION_MANUFACTURER_NAME,
     HYPERION_MODEL_NAME,
     TYPE_HYPERION_COMPONENT_SWITCH_BASE,
 )
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util, slugify
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util, slugify
 
 from . import (
     TEST_CONFIG_ENTRY_ID,
@@ -53,7 +53,7 @@ TEST_SWITCH_COMPONENT_BASE_ENTITY_ID = "switch.test_instance_1_component"
 TEST_SWITCH_COMPONENT_ALL_ENTITY_ID = f"{TEST_SWITCH_COMPONENT_BASE_ENTITY_ID}_all"
 
 
-async def test_switch_turn_on_off(hass: HomeAssistant) -> None:
+async def test_switch_turn_on_off(hass: SmartHub) -> None:
     """Test turning the light on."""
     client = create_mock_client()
     client.async_send_set_component = AsyncMock(return_value=True)
@@ -122,7 +122,7 @@ async def test_switch_turn_on_off(hass: HomeAssistant) -> None:
     assert entity_state.state == "on"
 
 
-async def test_switch_has_correct_entities(hass: HomeAssistant) -> None:
+async def test_switch_has_correct_entities(hass: SmartHub) -> None:
     """Test that the correct switch entities are created."""
     client = create_mock_client()
     client.components = TEST_COMPONENTS
@@ -146,7 +146,7 @@ async def test_switch_has_correct_entities(hass: HomeAssistant) -> None:
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -188,7 +188,7 @@ async def test_device_info(
 
 
 async def test_switches_can_be_enabled(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Verify switches can be enabled."""
     client = create_mock_client()
@@ -207,7 +207,7 @@ async def test_switches_can_be_enabled(
         assert not entity_state
 
         with patch(
-            "homeassistant.components.hyperion.client.HyperionClient",
+            "smarthub.components.hyperion.client.HyperionClient",
             return_value=client,
         ):
             updated_entry = entity_registry.async_update_entity(

@@ -4,9 +4,9 @@ from unittest.mock import MagicMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.homee.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.homee.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import build_mock_node, setup_integration
 from .conftest import HOMEE_ID
@@ -20,7 +20,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def setup_mock_homee(
-    hass: HomeAssistant, mock_homee: MagicMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_homee: MagicMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Set up the number platform."""
     mock_homee.nodes = [
@@ -33,7 +33,7 @@ async def setup_mock_homee(
 
 
 async def test_diagnostics_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -48,7 +48,7 @@ async def test_diagnostics_config_entry(
 
 
 async def test_diagnostics_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -69,7 +69,7 @@ async def test_diagnostics_device(
 
 
 async def test_diagnostics_homee_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,

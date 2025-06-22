@@ -2,14 +2,14 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.components import hue
-from homeassistant.components.hue import bridge
-from homeassistant.components.hue.const import (
+from smarthub.components import hue
+from smarthub.components.hue import bridge
+from smarthub.components.hue.const import (
     CONF_ALLOW_HUE_GROUPS,
     CONF_ALLOW_UNREACHABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util.json import JsonArrayType
+from smarthub.core import SmartHub
+from smarthub.util.json import JsonArrayType
 
 from .conftest import setup_bridge, setup_component
 
@@ -49,7 +49,7 @@ SCENE_RESPONSE = {
 }
 
 
-async def test_hue_activate_scene(hass: HomeAssistant, mock_api_v1: Mock) -> None:
+async def test_hue_activate_scene(hass: SmartHub, mock_api_v1: Mock) -> None:
     """Test successful hue_activate_scene."""
     config_entry = MockConfigEntry(
         domain=hue.DOMAIN,
@@ -85,7 +85,7 @@ async def test_hue_activate_scene(hass: HomeAssistant, mock_api_v1: Mock) -> Non
 
 
 async def test_hue_activate_scene_transition(
-    hass: HomeAssistant, mock_api_v1: Mock
+    hass: SmartHub, mock_api_v1: Mock
 ) -> None:
     """Test successful hue_activate_scene with transition."""
     config_entry = MockConfigEntry(
@@ -122,7 +122,7 @@ async def test_hue_activate_scene_transition(
 
 
 async def test_hue_activate_scene_group_not_found(
-    hass: HomeAssistant, mock_api_v1: Mock
+    hass: SmartHub, mock_api_v1: Mock
 ) -> None:
     """Test failed hue_activate_scene due to missing group."""
     config_entry = MockConfigEntry(
@@ -154,7 +154,7 @@ async def test_hue_activate_scene_group_not_found(
 
 
 async def test_hue_activate_scene_scene_not_found(
-    hass: HomeAssistant, mock_api_v1: Mock
+    hass: SmartHub, mock_api_v1: Mock
 ) -> None:
     """Test failed hue_activate_scene due to missing scene."""
     config_entry = MockConfigEntry(
@@ -186,7 +186,7 @@ async def test_hue_activate_scene_scene_not_found(
 
 
 async def test_hue_multi_bridge_activate_scene_all_respond(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge_v1: Mock,
     mock_bridge_v2: Mock,
     mock_config_entry_v1: MockConfigEntry,
@@ -223,7 +223,7 @@ async def test_hue_multi_bridge_activate_scene_all_respond(
 
 
 async def test_hue_multi_bridge_activate_scene_one_responds(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge_v1: Mock,
     mock_bridge_v2: Mock,
     mock_config_entry_v1: MockConfigEntry,
@@ -259,7 +259,7 @@ async def test_hue_multi_bridge_activate_scene_one_responds(
 
 
 async def test_hue_multi_bridge_activate_scene_zero_responds(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge_v1: Mock,
     mock_bridge_v2: Mock,
     mock_config_entry_v1: MockConfigEntry,

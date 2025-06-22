@@ -2,9 +2,9 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.recorder import Recorder
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .test_common import mock_get_homes
 
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 async def test_entry_diagnostics(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry,
 ) -> None:

@@ -4,17 +4,17 @@ import pytest
 from requests.exceptions import RequestException
 import requests_mock
 
-from homeassistant.components.qbittorrent.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.qbittorrent.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_PASSWORD,
     CONF_SOURCE,
     CONF_URL,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -34,7 +34,7 @@ YAML_IMPORT = {
 }
 
 
-async def test_flow_user(hass: HomeAssistant, mock_api: requests_mock.Mocker) -> None:
+async def test_flow_user(hass: SmartHub, mock_api: requests_mock.Mocker) -> None:
     """Test the user flow."""
     # Open flow as USER with no input
     result = await hass.config_entries.flow.async_init(
@@ -93,7 +93,7 @@ async def test_flow_user(hass: HomeAssistant, mock_api: requests_mock.Mocker) ->
     }
 
 
-async def test_flow_user_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_user_already_configured(hass: SmartHub) -> None:
     """Test user initialized flow with duplicate server."""
     entry = MockConfigEntry(domain=DOMAIN, data=USER_INPUT)
     entry.add_to_hass(hass)

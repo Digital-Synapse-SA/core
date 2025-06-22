@@ -4,13 +4,13 @@ from kasa import Feature
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.tplink.button import BUTTON_DESCRIPTIONS
-from homeassistant.components.tplink.const import DOMAIN
-from homeassistant.components.tplink.entity import EXCLUDED_FEATURES
-from homeassistant.const import ATTR_ENTITY_ID, CONF_HOST, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.tplink.button import BUTTON_DESCRIPTIONS
+from smarthub.components.tplink.const import DOMAIN
+from smarthub.components.tplink.entity import EXCLUDED_FEATURES
+from smarthub.const import ATTR_ENTITY_ID, CONF_HOST, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
@@ -33,7 +33,7 @@ from tests.common import MockConfigEntry
 
 @pytest.fixture
 def create_deprecated_button_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ):
@@ -57,7 +57,7 @@ def create_deprecated_button_entities(
 
 @pytest.fixture
 def create_deprecated_child_button_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ):
@@ -91,7 +91,7 @@ def mocked_feature_button() -> Feature:
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -113,7 +113,7 @@ async def test_states(
 
 
 async def test_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mocked_feature_button: Feature,
@@ -134,7 +134,7 @@ async def test_button(
 
 
 async def test_button_children(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
@@ -170,7 +170,7 @@ async def test_button_children(
 
 
 async def test_button_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mocked_feature_button: Feature,
@@ -198,7 +198,7 @@ async def test_button_press(
 
 
 async def test_button_not_exists_with_deprecation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mocked_feature_button: Feature,
 ) -> None:
@@ -230,7 +230,7 @@ async def test_button_not_exists_with_deprecation(
     ],
 )
 async def test_button_exists_with_deprecation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     issue_registry: ir.IssueRegistry,
     mocked_feature_button: Feature,

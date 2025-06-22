@@ -2,9 +2,9 @@
 
 import pytest
 
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.state import async_reproduce_state
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, State
+from smarthub.helpers.state import async_reproduce_state
+from smarthub.setup import async_setup_component
 
 VALID_TEXT1 = "Test text"
 VALID_TEXT2 = "LoremIpsum"
@@ -13,7 +13,7 @@ INVALID_TEXT2 = "Short"
 
 
 async def test_reproducing_states(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reproducing Input text states."""
 

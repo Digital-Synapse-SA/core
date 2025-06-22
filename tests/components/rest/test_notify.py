@@ -4,18 +4,18 @@ from unittest.mock import patch
 
 import respx
 
-from homeassistant import config as hass_config
-from homeassistant.components import notify
-from homeassistant.components.rest import DOMAIN
-from homeassistant.const import SERVICE_RELOAD
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub import config as hass_config
+from smarthub.components import notify
+from smarthub.components.rest import DOMAIN
+from smarthub.const import SERVICE_RELOAD
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import get_fixture_path
 
 
 @respx.mock
-async def test_reload_notify(hass: HomeAssistant) -> None:
+async def test_reload_notify(hass: SmartHub) -> None:
     """Verify we can reload the notify service."""
     respx.get("http://localhost") % 200
 

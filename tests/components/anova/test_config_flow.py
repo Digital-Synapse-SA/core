@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 from anova_wifi import AnovaApi, InvalidLogin
 
-from homeassistant import config_entries
-from homeassistant.components.anova.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.anova.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import CONF_INPUT
 
 
-async def test_flow_user(hass: HomeAssistant, anova_api: AnovaApi) -> None:
+async def test_flow_user(hass: SmartHub, anova_api: AnovaApi) -> None:
     """Test user initialized flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -30,10 +30,10 @@ async def test_flow_user(hass: HomeAssistant, anova_api: AnovaApi) -> None:
     }
 
 
-async def test_flow_wrong_login(hass: HomeAssistant) -> None:
+async def test_flow_wrong_login(hass: SmartHub) -> None:
     """Test incorrect login throwing error."""
     with patch(
-        "homeassistant.components.anova.config_flow.AnovaApi.authenticate",
+        "smarthub.components.anova.config_flow.AnovaApi.authenticate",
         side_effect=InvalidLogin,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -48,10 +48,10 @@ async def test_flow_wrong_login(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_flow_unknown_error(hass: HomeAssistant) -> None:
+async def test_flow_unknown_error(hass: SmartHub) -> None:
     """Test unknown error throwing error."""
     with patch(
-        "homeassistant.components.anova.config_flow.AnovaApi.authenticate",
+        "smarthub.components.anova.config_flow.AnovaApi.authenticate",
         side_effect=Exception(),
     ):
         result = await hass.config_entries.flow.async_init(

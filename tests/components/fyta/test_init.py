@@ -10,15 +10,15 @@ from fyta_cli.fyta_exceptions import (
 )
 import pytest
 
-from homeassistant.components.fyta.const import CONF_EXPIRATION, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.fyta.const import CONF_EXPIRATION, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_ACCESS_TOKEN,
     CONF_PASSWORD,
     CONF_USERNAME,
     Platform,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import setup_platform
 from .const import ACCESS_TOKEN, EXPIRATION, EXPIRATION_OLD, PASSWORD, USERNAME
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_fyta_connector: AsyncMock,
 ) -> None:
@@ -42,7 +42,7 @@ async def test_load_unload(
 
 
 async def test_refresh_expired_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_fyta_connector: AsyncMock,
 ) -> None:
@@ -66,7 +66,7 @@ async def test_refresh_expired_token(
     ],
 )
 async def test_invalid_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     mock_config_entry: MockConfigEntry,
     mock_fyta_connector: AsyncMock,
@@ -85,7 +85,7 @@ async def test_invalid_credentials(
 
 
 async def test_raise_config_entry_not_ready_when_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_fyta_connector: AsyncMock,
 ) -> None:
@@ -102,7 +102,7 @@ async def test_raise_config_entry_not_ready_when_offline(
 
 
 async def test_raise_config_entry_not_ready_when_offline_and_expired(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_fyta_connector: AsyncMock,
 ) -> None:
@@ -122,7 +122,7 @@ async def test_raise_config_entry_not_ready_when_offline_and_expired(
 
 
 async def test_migrate_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fyta_connector: AsyncMock,
 ) -> None:
     """Test successful migration of entry data."""

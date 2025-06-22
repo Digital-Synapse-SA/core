@@ -7,11 +7,11 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.rainbird.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_MAC
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.rainbird.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_MAC
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .conftest import (
     CONFIG_ENTRY_DATA,
@@ -31,7 +31,7 @@ from tests.test_util.aiohttp import AiohttpClientMockResponse
 
 
 async def test_init_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test successful setup and unload."""
@@ -93,7 +93,7 @@ async def test_init_success(
     ],
 )
 async def test_communication_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     config_entry_state: list[ConfigEntryState],
     config_flow_steps: list[str],
@@ -117,7 +117,7 @@ async def test_communication_failure(
     ids=["config_entry"],
 )
 async def test_fix_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     responses: list[AiohttpClientMockResponse],
     config_entry: MockConfigEntry,
 ) -> None:
@@ -172,7 +172,7 @@ async def test_fix_unique_id(
     ids=["service_unavailable", "not_found", "unexpected_response_format"],
 )
 async def test_fix_unique_id_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     initial_response: AiohttpClientMockResponse,
     responses: list[AiohttpClientMockResponse],
     expected_warning: str,
@@ -196,7 +196,7 @@ async def test_fix_unique_id_failure(
     [(MAC_ADDRESS_UNIQUE_ID)],
 )
 async def test_fix_unique_id_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     responses: list[AiohttpClientMockResponse],
     caplog: pytest.LogCaptureFixture,
@@ -299,7 +299,7 @@ async def test_fix_unique_id_duplicate(
     ),
 )
 async def test_fix_entity_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_unique_id: str,
     device_identifier: str,
@@ -406,7 +406,7 @@ async def test_fix_entity_unique_ids(
     ],
 )
 async def test_fix_duplicate_device_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
     entry1_updates: dict[str, Any],

@@ -10,10 +10,10 @@ from matter_server.common.helpers.util import create_attribute_path_from_attribu
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -24,7 +24,7 @@ from .common import (
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_switches(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_switches(
 
 @pytest.mark.parametrize("node_fixture", ["on_off_plugin_unit"])
 async def test_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -69,7 +69,7 @@ async def test_turn_on(
 
 @pytest.mark.parametrize("node_fixture", ["on_off_plugin_unit"])
 async def test_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -96,7 +96,7 @@ async def test_turn_off(
 
 
 @pytest.mark.parametrize("node_fixture", ["switch_unit"])
-async def test_switch_unit(hass: HomeAssistant, matter_node: MatterNode) -> None:
+async def test_switch_unit(hass: SmartHub, matter_node: MatterNode) -> None:
     """Test if a switch entity is discovered from any (non-light) OnOf cluster device."""
     # A switch entity should be discovered as fallback for ANY Matter device (endpoint)
     # that has the OnOff cluster and does not fall into an explicit discovery schema
@@ -108,7 +108,7 @@ async def test_switch_unit(hass: HomeAssistant, matter_node: MatterNode) -> None
 
 
 @pytest.mark.parametrize("node_fixture", ["room_airconditioner"])
-async def test_power_switch(hass: HomeAssistant, matter_node: MatterNode) -> None:
+async def test_power_switch(hass: SmartHub, matter_node: MatterNode) -> None:
     """Test if a Power switch entity is created for a device that supports that."""
     state = hass.states.get("switch.room_airconditioner_power")
     assert state
@@ -118,7 +118,7 @@ async def test_power_switch(hass: HomeAssistant, matter_node: MatterNode) -> Non
 
 @pytest.mark.parametrize("node_fixture", ["eve_thermo"])
 async def test_numeric_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -172,15 +172,15 @@ async def test_numeric_switch(
 
 @pytest.mark.parametrize("node_fixture", ["on_off_plugin_unit"])
 async def test_matter_exception_on_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
-    """Test if a MatterError gets converted to HomeAssistantError by using a switch fixture."""
+    """Test if a MatterError gets converted to SmartHubError by using a switch fixture."""
     state = hass.states.get("switch.mock_onoffpluginunit")
     assert state
     matter_client.send_device_command.side_effect = MatterError("Boom")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "switch",
             "turn_on",
@@ -193,7 +193,7 @@ async def test_matter_exception_on_command(
 
 @pytest.mark.parametrize("node_fixture", ["silabs_evse_charging"])
 async def test_evse_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

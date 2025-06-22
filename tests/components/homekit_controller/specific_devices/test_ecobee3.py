@@ -1,6 +1,6 @@
 """Regression tests for Ecobee 3.
 
-https://github.com/home-assistant/core/issues/15336
+https://github.com/smart-hub/core/issues/15336
 """
 
 from typing import Any
@@ -9,12 +9,12 @@ from unittest import mock
 from aiohomekit import AccessoryNotFoundError
 from aiohomekit.testing import FakePairing
 
-from homeassistant.components.climate import ClimateEntityFeature
-from homeassistant.components.sensor import SensorStateClass
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.climate import ClimateEntityFeature
+from smarthub.components.sensor import SensorStateClass
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import UnitOfTemperature
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from ..common import (
     HUB_TEST_ACCESSORY_ID,
@@ -28,7 +28,7 @@ from ..common import (
 )
 
 
-async def test_ecobee3_setup(hass: HomeAssistant) -> None:
+async def test_ecobee3_setup(hass: SmartHub) -> None:
     """Test that a Ecbobee 3 can be correctly setup in HA."""
     accessories = await setup_accessories_from_file(hass, "ecobee3.json")
     await setup_test_accessories(hass, accessories)
@@ -141,7 +141,7 @@ async def test_ecobee3_setup(hass: HomeAssistant) -> None:
 
 
 async def test_ecobee3_setup_from_cache(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -178,7 +178,7 @@ async def test_ecobee3_setup_from_cache(
 
 
 async def test_ecobee3_setup_connection_failure(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that Ecbobee can be correctly setup from its cached entity map."""
     accessories = await setup_accessories_from_file(hass, "ecobee3.json")
@@ -219,7 +219,7 @@ async def test_ecobee3_setup_connection_failure(
 
 
 async def test_ecobee3_add_sensors_at_runtime(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that new sensors are automatically added."""
 
@@ -256,7 +256,7 @@ async def test_ecobee3_add_sensors_at_runtime(
 
 
 async def test_ecobee3_remove_sensors_at_runtime(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that sensors are automatically removed."""
 
@@ -319,7 +319,7 @@ async def test_ecobee3_remove_sensors_at_runtime(
 
 
 async def test_ecobee3_services_and_chars_removed(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test handling removal of some services and chars."""
 

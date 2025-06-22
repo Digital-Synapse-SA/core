@@ -5,15 +5,15 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.alexa import smart_home
-from homeassistant.const import EntityCategory, UnitOfTemperature, __version__
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.alexa import smart_home
+from smarthub.const import EntityCategory, UnitOfTemperature, __version__
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .test_common import get_default_config, get_new_request
 
 
-async def test_unsupported_domain(hass: HomeAssistant) -> None:
+async def test_unsupported_domain(hass: SmartHub) -> None:
     """Discovery ignores entities of unknown domains."""
     request = get_new_request("Alexa.Discovery", "Discover")
 
@@ -28,7 +28,7 @@ async def test_unsupported_domain(hass: HomeAssistant) -> None:
 
 
 async def test_categorized_hidden_entities(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Discovery ignores hidden and categorized entities."""
     request = get_new_request("Alexa.Discovery", "Discover")
@@ -76,7 +76,7 @@ async def test_categorized_hidden_entities(
     assert not msg["payload"]["endpoints"]
 
 
-async def test_serialize_discovery(hass: HomeAssistant) -> None:
+async def test_serialize_discovery(hass: SmartHub) -> None:
     """Test we can serialize a discovery."""
     request = get_new_request("Alexa.Discovery", "Discover")
 
@@ -89,7 +89,7 @@ async def test_serialize_discovery(hass: HomeAssistant) -> None:
     endpoint = msg["payload"]["endpoints"][0]
 
     assert endpoint["additionalAttributes"] == {
-        "manufacturer": "Home Assistant",
+        "manufacturer": "SmartHub",
         "model": "switch",
         "softwareVersion": __version__,
         "customIdentifier": "mock-user-id-switch.bla",
@@ -97,7 +97,7 @@ async def test_serialize_discovery(hass: HomeAssistant) -> None:
 
 
 async def test_serialize_discovery_partly_fails(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can partly serialize a discovery."""
 
@@ -135,7 +135,7 @@ async def test_serialize_discovery_partly_fails(
 
     # Simulate fetching the interfaces fails for fan entity
     with patch(
-        "homeassistant.components.alexa.entities.FanCapabilities.interfaces",
+        "smarthub.components.alexa.entities.FanCapabilities.interfaces",
         side_effect=TypeError(),
     ):
         msg = await _mock_discovery()
@@ -154,7 +154,7 @@ async def test_serialize_discovery_partly_fails(
 
     # Simulate serializing properties fails for sensor entity
     with patch(
-        "homeassistant.components.alexa.entities.SensorCapabilities.default_display_categories",
+        "smarthub.components.alexa.entities.SensorCapabilities.default_display_categories",
         side_effect=ValueError(),
     ):
         msg = await _mock_discovery()
@@ -173,7 +173,7 @@ async def test_serialize_discovery_partly_fails(
 
 
 async def test_serialize_discovery_recovers(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we handle an interface raising unexpectedly during serialize discovery."""
     request = get_new_request("Alexa.Discovery", "Discover")
@@ -181,7 +181,7 @@ async def test_serialize_discovery_recovers(
     hass.states.async_set("switch.bla", "on", {"friendly_name": "Boop Woz"})
 
     with patch(
-        "homeassistant.components.alexa.capabilities.AlexaPowerController.serialize_discovery",
+        "smarthub.components.alexa.capabilities.AlexaPowerController.serialize_discovery",
         side_effect=TypeError,
     ):
         msg = await smart_home.async_handle_message(

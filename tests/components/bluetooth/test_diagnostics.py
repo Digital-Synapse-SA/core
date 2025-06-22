@@ -6,14 +6,14 @@ from bleak.backends.scanner import AdvertisementData, BLEDevice
 from bluetooth_adapters import DEFAULT_ADDRESS
 import pytest
 
-from homeassistant.components import bluetooth
-from homeassistant.components.bluetooth import (
+from smarthub.components import bluetooth
+from smarthub.components.bluetooth import (
     MONOTONIC_TIME,
     BaseHaRemoteScanner,
     HaBluetoothConnector,
     HaScanner,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import (
     FakeScannerMixin,
@@ -43,10 +43,10 @@ class FakeHaScanner(FakeScannerMixin, HaScanner):
         }
 
 
-@patch("homeassistant.components.bluetooth.HaScanner", FakeHaScanner)
+@patch("smarthub.components.bluetooth.HaScanner", FakeHaScanner)
 @pytest.mark.usefixtures("enable_bluetooth", "two_adapters")
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_bleak_scanner_start: MagicMock,
 ) -> None:
@@ -59,11 +59,11 @@ async def test_diagnostics(
 
     with (
         patch(
-            "homeassistant.components.bluetooth.diagnostics.platform.system",
+            "smarthub.components.bluetooth.diagnostics.platform.system",
             return_value="Linux",
         ),
         patch(
-            "homeassistant.components.bluetooth.diagnostics.get_dbus_managed_objects",
+            "smarthub.components.bluetooth.diagnostics.get_dbus_managed_objects",
             return_value={
                 "org.bluez": {
                     "/org/bluez/hci0": {
@@ -156,7 +156,7 @@ async def test_diagnostics(
                         "passive_scan": False,
                         "product": "Bluetooth Adapter 5.0",
                         "product_id": "aa01",
-                        "sw_version": "homeassistant",
+                        "sw_version": "smarthub",
                         "vendor_id": "cc01",
                     },
                     "hci1": {
@@ -167,7 +167,7 @@ async def test_diagnostics(
                         "passive_scan": True,
                         "product": "Bluetooth Adapter 5.0",
                         "product_id": "aa01",
-                        "sw_version": "homeassistant",
+                        "sw_version": "smarthub",
                         "vendor_id": "cc01",
                     },
                 },
@@ -252,12 +252,12 @@ async def test_diagnostics(
         )
 
 
-@patch("homeassistant.components.bluetooth.HaScanner", FakeHaScanner)
+@patch("smarthub.components.bluetooth.HaScanner", FakeHaScanner)
 @pytest.mark.usefixtures(
     "macos_adapter", "mock_bleak_scanner_start", "mock_bluetooth_adapters"
 )
 async def test_diagnostics_macos(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test diagnostics for macos."""
     # Normally we do not want to patch our classes, but since bleak will import
@@ -272,11 +272,11 @@ async def test_diagnostics_macos(
 
     with (
         patch(
-            "homeassistant.components.bluetooth.diagnostics.platform.system",
+            "smarthub.components.bluetooth.diagnostics.platform.system",
             return_value="Darwin",
         ),
         patch(
-            "homeassistant.components.bluetooth.diagnostics.get_dbus_managed_objects",
+            "smarthub.components.bluetooth.diagnostics.get_dbus_managed_objects",
             return_value={},
         ),
     ):
@@ -439,7 +439,7 @@ async def test_diagnostics_macos(
         }
 
 
-@patch("homeassistant.components.bluetooth.HaScanner", FakeHaScanner)
+@patch("smarthub.components.bluetooth.HaScanner", FakeHaScanner)
 @pytest.mark.usefixtures(
     "enable_bluetooth",
     "one_adapter",
@@ -447,7 +447,7 @@ async def test_diagnostics_macos(
     "mock_bluetooth_adapters",
 )
 async def test_diagnostics_remote_adapter(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test diagnostics for remote adapter."""
     manager = _get_manager()
@@ -475,11 +475,11 @@ async def test_diagnostics_remote_adapter(
 
     with (
         patch(
-            "homeassistant.components.bluetooth.diagnostics.platform.system",
+            "smarthub.components.bluetooth.diagnostics.platform.system",
             return_value="Linux",
         ),
         patch(
-            "homeassistant.components.bluetooth.diagnostics.get_dbus_managed_objects",
+            "smarthub.components.bluetooth.diagnostics.get_dbus_managed_objects",
             return_value={},
         ),
     ):

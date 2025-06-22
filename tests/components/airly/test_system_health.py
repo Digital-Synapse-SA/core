@@ -4,9 +4,9 @@ import asyncio
 
 from aiohttp import ClientError
 
-from homeassistant.components.airly.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.airly.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import init_integration
 
@@ -15,7 +15,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_airly_system_health(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test Airly system health."""
     aioclient_mock.get("https://airapi.airly.eu/v2/", text="")
@@ -36,7 +36,7 @@ async def test_airly_system_health(
 
 
 async def test_airly_system_health_fail(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test Airly system health."""
     aioclient_mock.get("https://airapi.airly.eu/v2/", exc=ClientError)

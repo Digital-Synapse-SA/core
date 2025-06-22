@@ -23,7 +23,7 @@
 
 ## Type of change
 <!--
-  What type of change does your PR introduce to Home Assistant?
+  What type of change does your PR introduce to SmartHub?
   NOTE: Please, check only 1! box!
   If your PR requires multiple boxes to be checked, you'll most likely need to
   split it into multiple PRs. This makes things easier and faster to code review.
@@ -62,12 +62,12 @@
 - [ ] There is no commented out code in this PR.
 - [ ] I have followed the [development checklist][dev-checklist]
 - [ ] I have followed the [perfect PR recommendations][perfect-pr]
-- [ ] The code has been formatted using Ruff (`ruff format homeassistant tests`)
+- [ ] The code has been formatted using Ruff (`ruff format smarthub tests`)
 - [ ] Tests have been added to verify that the new code works.
 
 If user exposed functionality or configuration variables are added/changed:
 
-- [ ] Documentation added/updated for [www.home-assistant.io][docs-repository]
+- [ ] Documentation added/updated for [www.smart-hub.io][docs-repository]
 
 If the code communicates with devices, web services, or third-party tools:
 
@@ -98,15 +98,15 @@ To help with the load of incoming pull requests:
 
 - [ ] I have reviewed two other [open pull requests][prs] in this repository.
 
-[prs]: https://github.com/home-assistant/core/pulls?q=is%3Aopen+is%3Apr+-author%3A%40me+-draft%3Atrue+-label%3Awaiting-for-upstream+sort%3Acreated-desc+review%3Anone+-status%3Afailure
+[prs]: https://github.com/smart-hub/core/pulls?q=is%3Aopen+is%3Apr+-author%3A%40me+-draft%3Atrue+-label%3Awaiting-for-upstream+sort%3Acreated-desc+review%3Anone+-status%3Afailure
 
 <!--
   Thank you for contributing <3
 
   Below, some useful links you could explore:
 -->
-[dev-checklist]: https://developers.home-assistant.io/docs/development_checklist/
-[manifest-docs]: https://developers.home-assistant.io/docs/creating_integration_manifest/
-[quality-scale]: https://developers.home-assistant.io/docs/integration_quality_scale_index/
-[docs-repository]: https://github.com/home-assistant/home-assistant.io
-[perfect-pr]: https://developers.home-assistant.io/docs/review-process/#creating-the-perfect-pr
+[dev-checklist]: https://developers.smart-hub.io/docs/development_checklist/
+[manifest-docs]: https://developers.smart-hub.io/docs/creating_integration_manifest/
+[quality-scale]: https://developers.smart-hub.io/docs/integration_quality_scale_index/
+[docs-repository]: https://github.com/smart-hub/smart-hub.io
+[perfect-pr]: https://developers.smart-hub.io/docs/review-process/#creating-the-perfect-pr

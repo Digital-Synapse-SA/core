@@ -2,14 +2,14 @@
 
 from homematicip.async_home import AsyncHome
 
-from homeassistant.components.alarm_control_panel import AlarmControlPanelState
-from homeassistant.core import HomeAssistant
+from smarthub.components.alarm_control_panel import AlarmControlPanelState
+from smarthub.core import SmartHub
 
 from .helper import HomeFactory, get_and_check_entity_basics
 
 
 async def _async_manipulate_security_zones(
-    hass: HomeAssistant,
+    hass: SmartHub,
     home: AsyncHome,
     internal_active: bool = False,
     external_active: bool = False,
@@ -35,7 +35,7 @@ async def _async_manipulate_security_zones(
 
 
 async def test_hmip_alarm_control_panel(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipAlarmControlPanel."""
     entity_id = "alarm_control_panel.hmip_alarm_control_panel"

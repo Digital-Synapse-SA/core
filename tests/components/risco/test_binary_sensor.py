@@ -6,12 +6,12 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
-from homeassistant.components.risco import CannotConnectError, UnauthorizedError
-from homeassistant.components.risco.const import DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.components.risco import CannotConnectError, UnauthorizedError
+from smarthub.components.risco.const import DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 from .util import TEST_SITE_NAME, TEST_SITE_UUID, system_mock
 
@@ -25,7 +25,7 @@ SECOND_ARMED_ENTITY_ID = SECOND_ENTITY_ID + "_armed"
 
 @pytest.mark.parametrize("exception", [CannotConnectError, UnauthorizedError])
 async def test_error_on_login(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     login_with_error,
     cloud_config_entry,
@@ -38,7 +38,7 @@ async def test_error_on_login(
 
 
 async def test_cloud_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     two_zone_cloud,
@@ -62,7 +62,7 @@ async def test_cloud_setup(
 
 
 async def _check_cloud_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zones: dict[int, Any],
     triggered: bool,
     entity_id: str,
@@ -82,7 +82,7 @@ async def _check_cloud_state(
 
 
 async def test_cloud_states(
-    hass: HomeAssistant, two_zone_cloud, setup_risco_cloud
+    hass: SmartHub, two_zone_cloud, setup_risco_cloud
 ) -> None:
     """Test the various alarm states."""
     await _check_cloud_state(hass, two_zone_cloud, True, FIRST_ENTITY_ID, 0)
@@ -93,7 +93,7 @@ async def test_cloud_states(
 
 @pytest.mark.parametrize("exception", [CannotConnectError, UnauthorizedError])
 async def test_error_on_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     connect_with_error,
     local_config_entry,
@@ -108,7 +108,7 @@ async def test_error_on_connect(
 
 
 async def test_local_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     two_zone_local,
@@ -138,7 +138,7 @@ async def test_local_setup(
 
 
 async def _check_local_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zones: dict[int, Any],
     entity_property: str,
     value: bool,
@@ -162,12 +162,12 @@ async def _check_local_state(
 @pytest.fixture
 def mock_zone_handler():
     """Create a mock for add_zone_handler."""
-    with patch("homeassistant.components.risco.RiscoLocal.add_zone_handler") as mock:
+    with patch("smarthub.components.risco.RiscoLocal.add_zone_handler") as mock:
         yield mock
 
 
 async def test_local_states(
-    hass: HomeAssistant, two_zone_local, mock_zone_handler, setup_risco_local
+    hass: SmartHub, two_zone_local, mock_zone_handler, setup_risco_local
 ) -> None:
     """Test the various zone states."""
     callback = mock_zone_handler.call_args.args[0]
@@ -189,7 +189,7 @@ async def test_local_states(
 
 
 async def test_alarmed_local_states(
-    hass: HomeAssistant, two_zone_local, mock_zone_handler, setup_risco_local
+    hass: SmartHub, two_zone_local, mock_zone_handler, setup_risco_local
 ) -> None:
     """Test the various zone alarmed states."""
     callback = mock_zone_handler.call_args.args[0]
@@ -211,7 +211,7 @@ async def test_alarmed_local_states(
 
 
 async def test_armed_local_states(
-    hass: HomeAssistant, two_zone_local, mock_zone_handler, setup_risco_local
+    hass: SmartHub, two_zone_local, mock_zone_handler, setup_risco_local
 ) -> None:
     """Test the various zone armed states."""
     callback = mock_zone_handler.call_args.args[0]
@@ -233,7 +233,7 @@ async def test_armed_local_states(
 
 
 async def _check_system_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     system: MagicMock,
     entity_property: str,
     value: bool,
@@ -257,7 +257,7 @@ async def _check_system_state(
 @pytest.fixture
 def mock_system_handler():
     """Create a mock for add_system_handler."""
-    with patch("homeassistant.components.risco.RiscoLocal.add_system_handler") as mock:
+    with patch("smarthub.components.risco.RiscoLocal.add_system_handler") as mock:
         yield mock
 
 
@@ -270,15 +270,15 @@ def system_only_local():
             system, "name", new_callable=PropertyMock(return_value=TEST_SITE_NAME)
         ),
         patch(
-            "homeassistant.components.risco.RiscoLocal.zones",
+            "smarthub.components.risco.RiscoLocal.zones",
             new_callable=PropertyMock(return_value={}),
         ),
         patch(
-            "homeassistant.components.risco.RiscoLocal.partitions",
+            "smarthub.components.risco.RiscoLocal.partitions",
             new_callable=PropertyMock(return_value={}),
         ),
         patch(
-            "homeassistant.components.risco.RiscoLocal.system",
+            "smarthub.components.risco.RiscoLocal.system",
             new_callable=PropertyMock(return_value=system),
         ),
     ):
@@ -286,7 +286,7 @@ def system_only_local():
 
 
 async def test_system_states(
-    hass: HomeAssistant, system_only_local, mock_system_handler, setup_risco_local
+    hass: SmartHub, system_only_local, mock_system_handler, setup_risco_local
 ) -> None:
     """Test the various zone states."""
     callback = mock_system_handler.call_args.args[0]

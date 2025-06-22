@@ -6,12 +6,12 @@ from freezegun.api import FrozenDateTimeFactory
 from pyhaversion.exceptions import HaVersionException
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import MOCK_VERSION, mock_get_version_update, setup_version_integration
 
 
-async def test_version_sensor(hass: HomeAssistant) -> None:
+async def test_version_sensor(hass: SmartHub) -> None:
     """Test the Version sensor with different sources."""
     await setup_version_integration(hass)
 
@@ -22,7 +22,7 @@ async def test_version_sensor(hass: HomeAssistant) -> None:
 
 
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:

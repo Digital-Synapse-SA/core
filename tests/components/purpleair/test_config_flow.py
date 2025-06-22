@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, patch
 from aiopurpleair.errors import InvalidApiKeyError, PurpleAirError
 import pytest
 
-from homeassistant.components.purpleair.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.purpleair.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
 
 from .conftest import TEST_API_KEY, TEST_SENSOR_INDEX1, TEST_SENSOR_INDEX2
 
@@ -36,7 +36,7 @@ TEST_LONGITUDE = -0.2416796
     ],
 )
 async def test_create_entry_by_coordinates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     api,
     check_api_key_errors,
     check_api_key_mock,
@@ -106,7 +106,7 @@ async def test_create_entry_by_coordinates(
 
 
 async def test_duplicate_error(
-    hass: HomeAssistant, config_entry, setup_config_entry
+    hass: SmartHub, config_entry, setup_config_entry
 ) -> None:
     """Test that the proper error is shown when adding a duplicate config entry."""
     result = await hass.config_entries.flow.async_init(
@@ -125,7 +125,7 @@ async def test_duplicate_error(
     ],
 )
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aiopurpleair,
     check_api_key_errors,
     check_api_key_mock,
@@ -166,7 +166,7 @@ async def test_reauth(
     ],
 )
 async def test_options_add_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aiopurpleair,
     config_entry,
     get_nearby_sensors_errors,
@@ -231,7 +231,7 @@ async def test_options_add_sensor(
 
 
 async def test_options_add_sensor_duplicate(
-    hass: HomeAssistant, config_entry, setup_config_entry
+    hass: SmartHub, config_entry, setup_config_entry
 ) -> None:
     """Test adding a duplicate sensor via the options flow."""
     result = await hass.config_entries.options.async_init(config_entry.entry_id)
@@ -269,7 +269,7 @@ async def test_options_add_sensor_duplicate(
 
 
 async def test_options_remove_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry,
     setup_config_entry,
@@ -305,7 +305,7 @@ async def test_options_remove_sensor(
 
 
 async def test_options_settings(
-    hass: HomeAssistant, config_entry, setup_config_entry
+    hass: SmartHub, config_entry, setup_config_entry
 ) -> None:
     """Test setting settings via the options flow."""
     result = await hass.config_entries.options.async_init(config_entry.entry_id)

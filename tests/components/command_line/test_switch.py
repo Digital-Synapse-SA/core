@@ -12,15 +12,15 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant import setup
-from homeassistant.components.command_line import DOMAIN
-from homeassistant.components.command_line.switch import CommandSwitch
-from homeassistant.components.homeassistant import (
+from smarthub import setup
+from smarthub.components.command_line import DOMAIN
+from smarthub.components.command_line.switch import CommandSwitch
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN, SCAN_INTERVAL
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN, SCAN_INTERVAL
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -28,16 +28,16 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import mock_asyncio_subprocess_run
 
 from tests.common import async_fire_time_changed
 
 
-async def test_setup_platform_yaml(hass: HomeAssistant) -> None:
+async def test_setup_platform_yaml(hass: SmartHub) -> None:
     """Test setting up the platform with platform yaml."""
     await setup.async_setup_component(
         hass,
@@ -55,7 +55,7 @@ async def test_setup_platform_yaml(hass: HomeAssistant) -> None:
     assert len(hass.states.async_all()) == 0
 
 
-async def test_state_integration_yaml(hass: HomeAssistant) -> None:
+async def test_state_integration_yaml(hass: SmartHub) -> None:
     """Test with none state."""
     with tempfile.TemporaryDirectory() as tempdirname:
         path = os.path.join(tempdirname, "switch_status")
@@ -103,7 +103,7 @@ async def test_state_integration_yaml(hass: HomeAssistant) -> None:
         assert entity_state.state == STATE_OFF
 
 
-async def test_state_value(hass: HomeAssistant) -> None:
+async def test_state_value(hass: SmartHub) -> None:
     """Test with state value."""
     with tempfile.TemporaryDirectory() as tempdirname:
         path = os.path.join(tempdirname, "switch_status")
@@ -158,7 +158,7 @@ async def test_state_value(hass: HomeAssistant) -> None:
         assert entity_state.attributes.get("icon") == "mdi:off"
 
 
-async def test_state_json_value(hass: HomeAssistant) -> None:
+async def test_state_json_value(hass: SmartHub) -> None:
     """Test with state JSON value."""
     with tempfile.TemporaryDirectory() as tempdirname:
         path = os.path.join(tempdirname, "switch_status")
@@ -217,7 +217,7 @@ async def test_state_json_value(hass: HomeAssistant) -> None:
         assert entity_state.attributes.get("icon") == "mdi:off"
 
 
-async def test_state_code(hass: HomeAssistant) -> None:
+async def test_state_code(hass: SmartHub) -> None:
     """Test with state code."""
     with tempfile.TemporaryDirectory() as tempdirname:
         path = os.path.join(tempdirname, "switch_status")
@@ -267,7 +267,7 @@ async def test_state_code(hass: HomeAssistant) -> None:
 
 
 async def test_assumed_state_should_be_true_if_command_state_is_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test with state value."""
 
@@ -294,7 +294,7 @@ async def test_assumed_state_should_be_true_if_command_state_is_none(
 
 
 async def test_assumed_state_should_absent_if_command_state_present(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test with state value."""
 
@@ -321,7 +321,7 @@ async def test_assumed_state_should_absent_if_command_state_present(
     assert "assumed_state" not in entity_state.attributes
 
 
-async def test_name_is_set_correctly(hass: HomeAssistant) -> None:
+async def test_name_is_set_correctly(hass: SmartHub) -> None:
     """Test that name is set correctly."""
     await setup.async_setup_component(
         hass,
@@ -346,7 +346,7 @@ async def test_name_is_set_correctly(hass: HomeAssistant) -> None:
 
 
 async def test_switch_command_state_fail(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant
+    caplog: pytest.LogCaptureFixture, hass: SmartHub
 ) -> None:
     """Test that switch failures are handled correctly."""
     await setup.async_setup_component(
@@ -390,7 +390,7 @@ async def test_switch_command_state_fail(
 
 
 async def test_switch_command_state_code_exceptions(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant
+    caplog: pytest.LogCaptureFixture, hass: SmartHub
 ) -> None:
     """Test that switch state code exceptions are handled correctly."""
 
@@ -426,7 +426,7 @@ async def test_switch_command_state_code_exceptions(
 
 
 async def test_switch_command_state_value_exceptions(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant
+    caplog: pytest.LogCaptureFixture, hass: SmartHub
 ) -> None:
     """Test that switch state value exceptions are handled correctly."""
 
@@ -463,7 +463,7 @@ async def test_switch_command_state_value_exceptions(
 
 
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test unique_id option and if it only creates one switch per id."""
     await setup.async_setup_component(
@@ -510,7 +510,7 @@ async def test_unique_id(
 
 
 async def test_command_failure(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant
+    caplog: pytest.LogCaptureFixture, hass: SmartHub
 ) -> None:
     """Test command failure."""
 
@@ -536,7 +536,7 @@ async def test_command_failure(
     assert "return code 33" in caplog.text
 
 
-async def test_templating(hass: HomeAssistant) -> None:
+async def test_templating(hass: SmartHub) -> None:
     """Test with templating."""
     with tempfile.TemporaryDirectory() as tempdirname:
         path = os.path.join(tempdirname, "switch_status")
@@ -601,7 +601,7 @@ async def test_templating(hass: HomeAssistant) -> None:
 
 
 async def test_updating_to_often(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test handling updating when command already running."""
 
@@ -619,7 +619,7 @@ async def test_updating_to_often(
             await wait_till_event.wait()
 
     with patch(
-        "homeassistant.components.command_line.switch.CommandSwitch",
+        "smarthub.components.command_line.switch.CommandSwitch",
         side_effect=MockCommandSwitch,
     ):
         await setup.async_setup_component(
@@ -673,9 +673,9 @@ async def test_updating_to_often(
 
 
 async def test_updating_manually(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """Test handling manual updating using homeassistant udate_entity service."""
+    """Test handling manual updating using smarthub udate_entity service."""
     await setup.async_setup_component(hass, HA_DOMAIN, {})
     called = []
 
@@ -687,7 +687,7 @@ async def test_updating_manually(
             called.append(1)
 
     with patch(
-        "homeassistant.components.command_line.switch.CommandSwitch",
+        "smarthub.components.command_line.switch.CommandSwitch",
         side_effect=MockCommandSwitch,
     ):
         await setup.async_setup_component(
@@ -745,7 +745,7 @@ async def test_updating_manually(
     ],
 )
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_yaml_integration: None,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -806,7 +806,7 @@ async def test_availability(
     ],
 )
 async def test_availability_blocks_value_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_yaml_integration: None,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,

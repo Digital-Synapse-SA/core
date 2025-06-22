@@ -1,11 +1,11 @@
 """The tests for the panel_custom component."""
 
-from homeassistant import setup
-from homeassistant.components import frontend, panel_custom
-from homeassistant.core import HomeAssistant
+from smarthub import setup
+from smarthub.components import frontend, panel_custom
+from smarthub.core import SmartHub
 
 
-async def test_webcomponent_custom_path_not_found(hass: HomeAssistant) -> None:
+async def test_webcomponent_custom_path_not_found(hass: SmartHub) -> None:
     """Test if a web component is found in config panels dir."""
     filename = "mock.file"
 
@@ -29,7 +29,7 @@ async def test_webcomponent_custom_path_not_found(hass: HomeAssistant) -> None:
     assert "nice_url" not in panels
 
 
-async def test_js_webcomponent(hass: HomeAssistant) -> None:
+async def test_js_webcomponent(hass: SmartHub) -> None:
     """Test if a web component is found in config panels dir."""
     config = {
         "panel_custom": {
@@ -68,7 +68,7 @@ async def test_js_webcomponent(hass: HomeAssistant) -> None:
     assert panel.sidebar_title == "Sidebar Title"
 
 
-async def test_module_webcomponent(hass: HomeAssistant) -> None:
+async def test_module_webcomponent(hass: SmartHub) -> None:
     """Test if a js module is found in config panels dir."""
     config = {
         "panel_custom": {
@@ -109,7 +109,7 @@ async def test_module_webcomponent(hass: HomeAssistant) -> None:
     assert panel.sidebar_title == "Sidebar Title"
 
 
-async def test_latest_and_es5_build(hass: HomeAssistant) -> None:
+async def test_latest_and_es5_build(hass: SmartHub) -> None:
     """Test specifying an es5 and latest build."""
     config = {
         "panel_custom": {
@@ -141,7 +141,7 @@ async def test_latest_and_es5_build(hass: HomeAssistant) -> None:
     assert panel.frontend_url_path == "nice_url"
 
 
-async def test_url_path_conflict(hass: HomeAssistant) -> None:
+async def test_url_path_conflict(hass: SmartHub) -> None:
     """Test config with overlapping url path."""
     assert await setup.async_setup_component(
         hass,
@@ -155,7 +155,7 @@ async def test_url_path_conflict(hass: HomeAssistant) -> None:
     )
 
 
-async def test_register_config_panel(hass: HomeAssistant) -> None:
+async def test_register_config_panel(hass: SmartHub) -> None:
     """Test setting up a custom config panel for an integration."""
     result = await setup.async_setup_component(hass, "panel_custom", {})
     assert result

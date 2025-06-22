@@ -11,10 +11,10 @@ from bluecurrent_api.exceptions import (
 )
 import pytest
 
-from homeassistant.components.blue_current import async_setup_entry
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import (
+from smarthub.components.blue_current import async_setup_entry
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import (
     ConfigEntryAuthFailed,
     ConfigEntryNotReady,
     IntegrationError,
@@ -26,15 +26,15 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test load and unload entry."""
     with (
-        patch("homeassistant.components.blue_current.Client.validate_api_token"),
-        patch("homeassistant.components.blue_current.Client.wait_for_charge_points"),
-        patch("homeassistant.components.blue_current.Client.disconnect"),
+        patch("smarthub.components.blue_current.Client.validate_api_token"),
+        patch("smarthub.components.blue_current.Client.wait_for_charge_points"),
+        patch("smarthub.components.blue_current.Client.disconnect"),
         patch(
-            "homeassistant.components.blue_current.Client.connect",
+            "smarthub.components.blue_current.Client.connect",
             lambda self, on_data, on_open: hass.loop.create_future(),
         ),
     ):
@@ -56,7 +56,7 @@ async def test_load_unload_entry(
     ],
 )
 async def test_config_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     api_error: BlueCurrentException,
     config_error: IntegrationError,
@@ -66,7 +66,7 @@ async def test_config_exceptions(
 
     with (
         patch(
-            "homeassistant.components.blue_current.Client.validate_api_token",
+            "smarthub.components.blue_current.Client.validate_api_token",
             side_effect=api_error,
         ),
         pytest.raises(config_error),
@@ -75,11 +75,11 @@ async def test_config_exceptions(
 
 
 async def test_connect_websocket_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test reconnect when connect throws a WebsocketError."""
 
-    with patch("homeassistant.components.blue_current.DELAY", 0):
+    with patch("smarthub.components.blue_current.DELAY", 0):
         mock_client, started_loop, future_container = await init_integration(
             hass, config_entry
         )
@@ -90,7 +90,7 @@ async def test_connect_websocket_error(
 
 
 async def test_connect_request_limit_reached_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test reconnect when connect throws a RequestLimitReached."""
 

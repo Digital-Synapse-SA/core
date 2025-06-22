@@ -5,9 +5,9 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_OFF, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_OFF, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     TEST_DATA_ALERT,
@@ -96,7 +96,7 @@ from tests.typing import MqttMockHAClient
     ],
 )
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -109,7 +109,7 @@ async def test_sensors(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.drop_connect.PLATFORMS", [Platform.BINARY_SENSOR]
+        "smarthub.components.drop_connect.PLATFORMS", [Platform.BINARY_SENSOR]
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()

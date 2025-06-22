@@ -11,9 +11,9 @@ from peco import (
 )
 import pytest
 
-from homeassistant.components.peco.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.peco.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -23,7 +23,7 @@ INVALID_COUNTY_DATA = {"county": "INVALID"}
 METER_DATA = {"county": "BUCKS", "phone_number": "1234567890"}
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test the unload entry."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY_DATA)
     config_entry.add_to_hass(hass)
@@ -67,7 +67,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
         "bucks_customers_served",
     ],
 )
-async def test_update_timeout(hass: HomeAssistant, sensor) -> None:
+async def test_update_timeout(hass: SmartHub, sensor) -> None:
     """Test if it raises an error when there is a timeout."""
 
     config_entry = MockConfigEntry(domain=DOMAIN, data=COUNTY_ENTRY_DATA)
@@ -93,7 +93,7 @@ async def test_update_timeout(hass: HomeAssistant, sensor) -> None:
         "total_customers_served",
     ],
 )
-async def test_total_update_timeout(hass: HomeAssistant, sensor) -> None:
+async def test_total_update_timeout(hass: SmartHub, sensor) -> None:
     """Test if it raises an error when there is a timeout."""
 
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY_DATA)
@@ -118,7 +118,7 @@ async def test_total_update_timeout(hass: HomeAssistant, sensor) -> None:
         "bucks_customers_served",
     ],
 )
-async def test_http_error(hass: HomeAssistant, sensor: str) -> None:
+async def test_http_error(hass: SmartHub, sensor: str) -> None:
     """Test if it raises an error when an abnormal status code is returned."""
 
     config_entry = MockConfigEntry(domain=DOMAIN, data=COUNTY_ENTRY_DATA)
@@ -144,7 +144,7 @@ async def test_http_error(hass: HomeAssistant, sensor: str) -> None:
         "bucks_customers_served",
     ],
 )
-async def test_bad_json(hass: HomeAssistant, sensor: str) -> None:
+async def test_bad_json(hass: SmartHub, sensor: str) -> None:
     """Test if it raises an error when abnormal JSON is returned."""
 
     config_entry = MockConfigEntry(domain=DOMAIN, data=COUNTY_ENTRY_DATA)
@@ -161,7 +161,7 @@ async def test_bad_json(hass: HomeAssistant, sensor: str) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_unresponsive_meter_error(hass: HomeAssistant) -> None:
+async def test_unresponsive_meter_error(hass: SmartHub) -> None:
     """Test if it raises an error when the meter will not respond."""
 
     config_entry = MockConfigEntry(domain=DOMAIN, data=METER_DATA)
@@ -195,7 +195,7 @@ async def test_unresponsive_meter_error(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_meter_http_error(hass: HomeAssistant) -> None:
+async def test_meter_http_error(hass: SmartHub) -> None:
     """Test if it raises an error when there is an HTTP error."""
 
     config_entry = MockConfigEntry(domain=DOMAIN, data=METER_DATA)
@@ -229,7 +229,7 @@ async def test_meter_http_error(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_meter_bad_json(hass: HomeAssistant) -> None:
+async def test_meter_bad_json(hass: SmartHub) -> None:
     """Test if it raises an error when there is bad JSON."""
 
     config_entry = MockConfigEntry(domain=DOMAIN, data=METER_DATA)
@@ -263,7 +263,7 @@ async def test_meter_bad_json(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_meter_timeout(hass: HomeAssistant) -> None:
+async def test_meter_timeout(hass: SmartHub) -> None:
     """Test if it raises an error when there is a timeout."""
 
     config_entry = MockConfigEntry(domain=DOMAIN, data=METER_DATA)
@@ -297,7 +297,7 @@ async def test_meter_timeout(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_meter_data(hass: HomeAssistant) -> None:
+async def test_meter_data(hass: SmartHub) -> None:
     """Test if the meter returns the value successfully."""
 
     config_entry = MockConfigEntry(domain=DOMAIN, data=METER_DATA)

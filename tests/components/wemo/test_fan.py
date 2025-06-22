@@ -4,20 +4,20 @@ import pytest
 from pywemo.exceptions import ActionException
 from pywemo.ouimeaux_device.humidifier import DesiredHumidity, FanMode
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     DOMAIN as FAN_DOMAIN,
     SERVICE_SET_PERCENTAGE,
 )
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.wemo import fan
-from homeassistant.components.wemo.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_ON, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.wemo import fan
+from smarthub.components.wemo.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_ON, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import entity_test_helpers
 from .conftest import async_create_wemo_entity
@@ -44,7 +44,7 @@ test_async_update_locked_callback_and_update = (
 
 
 async def test_fan_registry_state_callback(
-    hass: HomeAssistant, pywemo_registry, pywemo_device, wemo_entity
+    hass: SmartHub, pywemo_registry, pywemo_device, wemo_entity
 ) -> None:
     """Verify that the fan receives state updates from the registry."""
     # On state.
@@ -61,7 +61,7 @@ async def test_fan_registry_state_callback(
 
 
 async def test_fan_update_entity(
-    hass: HomeAssistant, pywemo_registry, pywemo_device, wemo_entity
+    hass: SmartHub, pywemo_registry, pywemo_device, wemo_entity
 ) -> None:
     """Verify that the fan performs state updates."""
     await async_setup_component(hass, HA_DOMAIN, {})
@@ -88,7 +88,7 @@ async def test_fan_update_entity(
 
 
 async def test_available_after_update(
-    hass: HomeAssistant, pywemo_registry, pywemo_device, wemo_entity
+    hass: SmartHub, pywemo_registry, pywemo_device, wemo_entity
 ) -> None:
     """Test the availability when an On call fails and after an update."""
     pywemo_device.set_state.side_effect = ActionException
@@ -98,13 +98,13 @@ async def test_available_after_update(
     )
 
 
-async def test_turn_off_state(hass: HomeAssistant, wemo_entity) -> None:
+async def test_turn_off_state(hass: SmartHub, wemo_entity) -> None:
     """Test that the device state is updated after turning off."""
     await entity_test_helpers.test_turn_off_state(hass, wemo_entity, FAN_DOMAIN)
 
 
 async def test_fan_reset_filter_service(
-    hass: HomeAssistant, pywemo_device, wemo_entity
+    hass: SmartHub, pywemo_device, wemo_entity
 ) -> None:
     """Verify that SERVICE_RESET_FILTER_LIFE is registered and works."""
     await hass.services.async_call(
@@ -128,7 +128,7 @@ async def test_fan_reset_filter_service(
     ],
 )
 async def test_fan_set_humidity_service(
-    hass: HomeAssistant, pywemo_device, wemo_entity, test_input, expected
+    hass: SmartHub, pywemo_device, wemo_entity, test_input, expected
 ) -> None:
     """Verify that SERVICE_SET_HUMIDITY is registered and works."""
     await hass.services.async_call(
@@ -155,7 +155,7 @@ async def test_fan_set_humidity_service(
     ],
 )
 async def test_fan_set_percentage(
-    hass: HomeAssistant, pywemo_device, wemo_entity, percentage, expected_fan_mode
+    hass: SmartHub, pywemo_device, wemo_entity, percentage, expected_fan_mode
 ) -> None:
     """Verify set_percentage works properly through the entire range of FanModes."""
     await hass.services.async_call(
@@ -167,7 +167,7 @@ async def test_fan_set_percentage(
     pywemo_device.set_state.assert_called_with(expected_fan_mode)
 
 
-async def test_fan_mode_high_initially(hass: HomeAssistant, pywemo_device) -> None:
+async def test_fan_mode_high_initially(hass: SmartHub, pywemo_device) -> None:
     """Verify the FanMode is set to High when turned on."""
     pywemo_device.fan_mode = FanMode.Off
     wemo_entity = await async_create_wemo_entity(hass, pywemo_device, "")

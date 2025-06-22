@@ -13,7 +13,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.mealie.const import (
+from smarthub.components.mealie.const import (
     ATTR_CONFIG_ENTRY_ID,
     ATTR_END_DATE,
     ATTR_ENTRY_TYPE,
@@ -25,16 +25,16 @@ from homeassistant.components.mealie.const import (
     ATTR_URL,
     DOMAIN,
 )
-from homeassistant.components.mealie.services import (
+from smarthub.components.mealie.services import (
     SERVICE_GET_MEALPLAN,
     SERVICE_GET_RECIPE,
     SERVICE_IMPORT_RECIPE,
     SERVICE_SET_MEALPLAN,
     SERVICE_SET_RANDOM_MEALPLAN,
 )
-from homeassistant.const import ATTR_DATE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.const import ATTR_DATE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from . import setup_integration
 
@@ -42,7 +42,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_service_mealplan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -131,7 +131,7 @@ async def test_service_mealplan(
 
 
 async def test_service_recipe(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -151,7 +151,7 @@ async def test_service_recipe(
 
 
 async def test_service_import_recipe(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -192,7 +192,7 @@ async def test_service_import_recipe(
 
 
 async def test_service_set_random_mealplan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -259,7 +259,7 @@ async def test_service_set_random_mealplan(
     ],
 )
 async def test_service_set_mealplan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -313,7 +313,7 @@ async def test_service_set_mealplan(
             {},
             "get_mealplans",
             MealieConnectionError,
-            HomeAssistantError,
+            SmartHubError,
             "Error connecting to Mealie instance",
         ),
         (
@@ -321,7 +321,7 @@ async def test_service_set_mealplan(
             {ATTR_RECIPE_ID: "recipe_id"},
             "get_recipe",
             MealieConnectionError,
-            HomeAssistantError,
+            SmartHubError,
             "Error connecting to Mealie instance",
         ),
         (
@@ -337,7 +337,7 @@ async def test_service_set_mealplan(
             {ATTR_URL: "http://example.com"},
             "import_recipe",
             MealieConnectionError,
-            HomeAssistantError,
+            SmartHubError,
             "Error connecting to Mealie instance",
         ),
         (
@@ -353,7 +353,7 @@ async def test_service_set_mealplan(
             {ATTR_DATE: "2023-10-21", ATTR_ENTRY_TYPE: "lunch"},
             "random_mealplan",
             MealieConnectionError,
-            HomeAssistantError,
+            SmartHubError,
             "Error connecting to Mealie instance",
         ),
         (
@@ -365,13 +365,13 @@ async def test_service_set_mealplan(
             },
             "set_mealplan",
             MealieConnectionError,
-            HomeAssistantError,
+            SmartHubError,
             "Error connecting to Mealie instance",
         ),
     ],
 )
 async def test_services_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     service: str,
@@ -418,7 +418,7 @@ async def test_services_connection_error(
     ],
 )
 async def test_service_entry_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     service: str,

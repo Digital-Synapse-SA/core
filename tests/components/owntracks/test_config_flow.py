@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.owntracks import config_flow
-from homeassistant.components.owntracks.config_flow import CONF_CLOUDHOOK, CONF_SECRET
-from homeassistant.components.owntracks.const import DOMAIN
-from homeassistant.const import CONF_WEBHOOK_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components.owntracks import config_flow
+from smarthub.components.owntracks.config_flow import CONF_CLOUDHOOK, CONF_SECRET
+from smarthub.components.owntracks.const import DOMAIN
+from smarthub.const import CONF_WEBHOOK_ID
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -29,7 +29,7 @@ WEBHOOK_URL = f"{BASE_URL}/api/webhook/webhook_id"
 def mock_webhook_id():
     """Mock webhook_id."""
     with patch(
-        "homeassistant.components.webhook.async_generate_id", return_value=WEBHOOK_ID
+        "smarthub.components.webhook.async_generate_id", return_value=WEBHOOK_ID
     ):
         yield
 
@@ -45,13 +45,13 @@ def mock_secret():
 def mock_not_supports_encryption():
     """Mock non successful nacl import."""
     with patch(
-        "homeassistant.components.owntracks.config_flow.supports_encryption",
+        "smarthub.components.owntracks.config_flow.supports_encryption",
         return_value=False,
     ):
         yield
 
 
-async def init_config_flow(hass: HomeAssistant) -> config_flow.OwnTracksFlow:
+async def init_config_flow(hass: SmartHub) -> config_flow.OwnTracksFlow:
     """Init a configuration flow."""
     await async_process_ha_core_config(
         hass,
@@ -62,7 +62,7 @@ async def init_config_flow(hass: HomeAssistant) -> config_flow.OwnTracksFlow:
     return flow
 
 
-async def test_user(hass: HomeAssistant, webhook_id, secret) -> None:
+async def test_user(hass: SmartHub, webhook_id, secret) -> None:
     """Test user step."""
     flow = await init_config_flow(hass)
 
@@ -79,7 +79,7 @@ async def test_user(hass: HomeAssistant, webhook_id, secret) -> None:
     assert result["description_placeholders"][CONF_WEBHOOK_URL] == WEBHOOK_URL
 
 
-async def test_import_setup(hass: HomeAssistant) -> None:
+async def test_import_setup(hass: SmartHub) -> None:
     """Test that we don't automatically create a config entry."""
     await async_process_ha_core_config(
         hass,
@@ -92,7 +92,7 @@ async def test_import_setup(hass: HomeAssistant) -> None:
     assert not hass.config_entries.async_entries(DOMAIN)
 
 
-async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
+async def test_abort_if_already_setup(hass: SmartHub) -> None:
     """Test that we can't add more than one instance."""
     MockConfigEntry(domain=DOMAIN, data={}).add_to_hass(hass)
     assert hass.config_entries.async_entries(DOMAIN)
@@ -107,7 +107,7 @@ async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
 
 
 async def test_user_not_supports_encryption(
-    hass: HomeAssistant, not_supports_encryption
+    hass: SmartHub, not_supports_encryption
 ) -> None:
     """Test user step."""
     flow = await init_config_flow(hass)
@@ -120,7 +120,7 @@ async def test_user_not_supports_encryption(
     )
 
 
-async def test_unload(hass: HomeAssistant) -> None:
+async def test_unload(hass: SmartHub) -> None:
     """Test unloading a config flow."""
     await async_process_ha_core_config(
         hass,
@@ -128,7 +128,7 @@ async def test_unload(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.config_entries.ConfigEntries.async_forward_entry_setups"
+        "smarthub.config_entries.ConfigEntries.async_forward_entry_setups"
     ) as mock_forward:
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}, data={}
@@ -141,7 +141,7 @@ async def test_unload(hass: HomeAssistant) -> None:
     assert entry.data["webhook_id"] in hass.data["webhook"]
 
     with patch(
-        "homeassistant.config_entries.ConfigEntries.async_unload_platforms",
+        "smarthub.config_entries.ConfigEntries.async_unload_platforms",
         return_value=True,
     ) as mock_unload:
         assert await hass.config_entries.async_unload(entry.entry_id)
@@ -151,17 +151,17 @@ async def test_unload(hass: HomeAssistant) -> None:
     assert entry.data["webhook_id"] not in hass.data["webhook"]
 
 
-async def test_with_cloud_sub(hass: HomeAssistant) -> None:
+async def test_with_cloud_sub(hass: SmartHub) -> None:
     """Test creating a config flow while subscribed."""
     assert await async_setup_component(hass, "cloud", {})
 
     with (
         patch(
-            "homeassistant.components.cloud.async_active_subscription",
+            "smarthub.components.cloud.async_active_subscription",
             return_value=True,
         ),
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=True),
         patch(
             "hass_nabucasa.cloudhooks.Cloudhooks.async_create",
             return_value={"cloudhook_url": "https://hooks.nabu.casa/ABCD"},
@@ -180,17 +180,17 @@ async def test_with_cloud_sub(hass: HomeAssistant) -> None:
     )
 
 
-async def test_with_cloud_sub_not_connected(hass: HomeAssistant) -> None:
+async def test_with_cloud_sub_not_connected(hass: SmartHub) -> None:
     """Test creating a config flow while subscribed."""
     assert await async_setup_component(hass, "cloud", {})
 
     with (
         patch(
-            "homeassistant.components.cloud.async_active_subscription",
+            "smarthub.components.cloud.async_active_subscription",
             return_value=True,
         ),
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=False),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=False),
         patch(
             "hass_nabucasa.cloudhooks.Cloudhooks.async_create",
             return_value={"cloudhook_url": "https://hooks.nabu.casa/ABCD"},

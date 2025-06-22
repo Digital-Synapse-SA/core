@@ -6,13 +6,13 @@ from typing import Any
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.deconz.const import (
+from smarthub.components.deconz.const import (
     CONF_BRIDGE_ID,
     CONF_MASTER_GATEWAY,
     DOMAIN,
 )
-from homeassistant.components.deconz.deconz_event import CONF_DECONZ_EVENT
-from homeassistant.components.deconz.services import (
+from smarthub.components.deconz.deconz_event import CONF_DECONZ_EVENT
+from smarthub.components.deconz.services import (
     SERVICE_CONFIGURE_DEVICE,
     SERVICE_DATA,
     SERVICE_DEVICE_REFRESH,
@@ -20,9 +20,9 @@ from homeassistant.components.deconz.services import (
     SERVICE_FIELD,
     SERVICE_REMOVE_ORPHANED_ENTRIES,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .test_hub import BRIDGE_ID
 
@@ -32,7 +32,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_configure_service_with_field(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
 ) -> None:
     """Test that service invokes pydeconz with the correct path and data."""
@@ -63,7 +63,7 @@ async def test_configure_service_with_field(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_configure_service_with_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
 ) -> None:
     """Test that service invokes pydeconz with the correct path and data."""
@@ -92,7 +92,7 @@ async def test_configure_service_with_entity(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_configure_service_with_entity_and_field(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
 ) -> None:
     """Test that service invokes pydeconz with the correct path and data."""
@@ -111,7 +111,7 @@ async def test_configure_service_with_entity_and_field(
 
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_configure_service_with_faulty_bridgeid(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that service fails on a bad bridge id."""
     aioclient_mock.clear_requests()
@@ -129,7 +129,7 @@ async def test_configure_service_with_faulty_bridgeid(
 
 
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_configure_service_with_faulty_field(hass: HomeAssistant) -> None:
+async def test_configure_service_with_faulty_field(hass: SmartHub) -> None:
     """Test that service fails on a bad field."""
     data = {SERVICE_FIELD: "light/2", SERVICE_DATA: {}}
 
@@ -141,7 +141,7 @@ async def test_configure_service_with_faulty_field(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_configure_service_with_faulty_entity(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that service on a non existing entity."""
     aioclient_mock.clear_requests()
@@ -160,7 +160,7 @@ async def test_configure_service_with_faulty_entity(
 @pytest.mark.parametrize("config_entry_options", [{CONF_MASTER_GATEWAY: False}])
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_calling_service_with_no_master_gateway_fails(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that service call fails when no master gateway exist."""
     aioclient_mock.clear_requests()
@@ -178,7 +178,7 @@ async def test_calling_service_with_no_master_gateway_fails(
 
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_service_refresh_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     deconz_payload: dict[str, Any],
     mock_requests: Callable[[], None],
@@ -242,7 +242,7 @@ async def test_service_refresh_devices(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_service_refresh_devices_trigger_no_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     deconz_payload: dict[str, Any],
     mock_requests,
@@ -319,7 +319,7 @@ async def test_service_refresh_devices_trigger_no_state_update(
     ],
 )
 async def test_remove_orphaned_entries_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     config_entry_setup: MockConfigEntry,

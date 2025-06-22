@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.myuplink.const import (
+from smarthub import config_entries
+from smarthub.components.myuplink.const import (
     DOMAIN,
     OAUTH2_AUTHORIZE,
     OAUTH2_TOKEN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .const import CLIENT_ID, UNIQUE_ID
 
@@ -26,7 +26,7 @@ CURRENT_SCOPE = "WRITESYSTEM READSYSTEM offline_access"
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     access_token: str,
@@ -67,7 +67,7 @@ async def test_full_flow(
     )
 
     with patch(
-        f"homeassistant.components.{DOMAIN}.async_setup_entry", return_value=True
+        f"smarthub.components.{DOMAIN}.async_setup_entry", return_value=True
     ) as mock_setup:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
         await hass.async_block_till_done()
@@ -103,7 +103,7 @@ async def test_full_flow(
     ids=["reauth_only", "account_mismatch", "wrong_scope"],
 )
 async def test_flow_reauth_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     setup_credentials: None,
@@ -172,7 +172,7 @@ async def test_flow_reauth_abort(
     )
 
     with patch(
-        f"homeassistant.components.{DOMAIN}.async_setup_entry", return_value=True
+        f"smarthub.components.{DOMAIN}.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
         await hass.async_block_till_done()
@@ -201,7 +201,7 @@ async def test_flow_reauth_abort(
     ids=["reauth_only", "account_mismatch"],
 )
 async def test_flow_reconfigure_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     setup_credentials: None,
@@ -265,7 +265,7 @@ async def test_flow_reconfigure_abort(
     )
 
     with patch(
-        f"homeassistant.components.{DOMAIN}.async_setup_entry", return_value=True
+        f"smarthub.components.{DOMAIN}.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
         await hass.async_block_till_done()

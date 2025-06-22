@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock
 from aiomealie import About, MealieAuthenticationError, MealieConnectionError
 import pytest
 
-from homeassistant.components.mealie.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_TOKEN, CONF_HOST, CONF_VERIFY_SSL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.mealie.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_TOKEN, CONF_HOST, CONF_VERIFY_SSL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -52,7 +52,7 @@ async def test_full_flow(
     ],
 )
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     exception: Exception,
@@ -86,7 +86,7 @@ async def test_flow_errors(
 
 
 async def test_ingress_host(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -102,7 +102,7 @@ async def test_ingress_host(
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {
-            CONF_HOST: "http://homeassistant/hassio/ingress/db21ed7f_mealie",
+            CONF_HOST: "http://smarthub/hassio/ingress/db21ed7f_mealie",
             CONF_API_TOKEN: "token",
         },
     )
@@ -114,7 +114,7 @@ async def test_ingress_host(
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {CONF_HOST: "http://homeassistant:9001", CONF_API_TOKEN: "token"},
+        {CONF_HOST: "http://smarthub:9001", CONF_API_TOKEN: "token"},
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
 
@@ -128,7 +128,7 @@ async def test_ingress_host(
     ],
 )
 async def test_flow_version_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     version,
@@ -153,7 +153,7 @@ async def test_flow_version_error(
 
 
 async def test_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -178,7 +178,7 @@ async def test_duplicate(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -201,7 +201,7 @@ async def test_reauth_flow(
 
 
 async def test_reauth_flow_wrong_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -233,7 +233,7 @@ async def test_reauth_flow_wrong_account(
     ],
 )
 async def test_reauth_flow_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -268,7 +268,7 @@ async def test_reauth_flow_exceptions(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -297,7 +297,7 @@ async def test_reconfigure_flow(
 
 
 async def test_reconfigure_flow_wrong_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -329,7 +329,7 @@ async def test_reconfigure_flow_wrong_account(
     ],
 )
 async def test_reconfigure_flow_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mealie_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

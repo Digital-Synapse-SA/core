@@ -2,11 +2,11 @@
 
 import nextcord
 
-from homeassistant import config_entries
-from homeassistant.components.discord.const import DOMAIN
-from homeassistant.const import CONF_API_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.discord.const import DOMAIN
+from smarthub.const import CONF_API_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     CONF_DATA,
@@ -19,7 +19,7 @@ from . import (
 )
 
 
-async def test_flow_user(hass: HomeAssistant) -> None:
+async def test_flow_user(hass: SmartHub) -> None:
     """Test user initialized flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -35,7 +35,7 @@ async def test_flow_user(hass: HomeAssistant) -> None:
     assert result["data"] == CONF_DATA
 
 
-async def test_flow_user_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_user_already_configured(hass: SmartHub) -> None:
     """Test user initialized flow with duplicate server."""
     create_entry(hass)
     result = await hass.config_entries.flow.async_init(
@@ -51,7 +51,7 @@ async def test_flow_user_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_flow_user_invalid_auth(hass: HomeAssistant) -> None:
+async def test_flow_user_invalid_auth(hass: SmartHub) -> None:
     """Test user initialized flow with invalid token."""
     with patch_discord_login() as mock:
         mock.side_effect = nextcord.LoginFailure
@@ -74,7 +74,7 @@ async def test_flow_user_invalid_auth(hass: HomeAssistant) -> None:
     assert result["data"] == CONF_DATA
 
 
-async def test_flow_user_cannot_connect(hass: HomeAssistant) -> None:
+async def test_flow_user_cannot_connect(hass: SmartHub) -> None:
     """Test user initialized flow with unreachable server."""
     with patch_discord_login() as mock:
         mock.side_effect = mock_exception()
@@ -97,7 +97,7 @@ async def test_flow_user_cannot_connect(hass: HomeAssistant) -> None:
     assert result["data"] == CONF_DATA
 
 
-async def test_flow_user_unknown_error(hass: HomeAssistant) -> None:
+async def test_flow_user_unknown_error(hass: SmartHub) -> None:
     """Test user initialized flow with unreachable server."""
     with patch_discord_login() as mock:
         mock.side_effect = Exception
@@ -120,7 +120,7 @@ async def test_flow_user_unknown_error(hass: HomeAssistant) -> None:
     assert result["data"] == CONF_DATA
 
 
-async def test_flow_reauth(hass: HomeAssistant) -> None:
+async def test_flow_reauth(hass: SmartHub) -> None:
     """Test a reauth flow."""
     entry = create_entry(hass)
     result = await entry.start_reauth_flow(hass)

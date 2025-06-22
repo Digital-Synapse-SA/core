@@ -48,7 +48,7 @@ def test_enforce_sorted_platforms(
     code: str,
 ) -> None:
     """Good test cases."""
-    root_node = astroid.parse(code, "homeassistant.components.pylint_test")
+    root_node = astroid.parse(code, "smarthub.components.pylint_test")
     walker = ASTWalker(linter)
     walker.add_checker(enforce_sorted_platforms_checker)
 
@@ -65,7 +65,7 @@ def test_enforce_sorted_platforms_bad(
         """
     PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.BUTTON]
     """,
-        "homeassistant.components.pylint_test",
+        "smarthub.components.pylint_test",
     )
 
     with assert_adds_messages(
@@ -93,7 +93,7 @@ def test_enforce_sorted_platforms_bad_typed(
         """
     PLATFORMS: list[str] = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.BUTTON]
     """,
-        "homeassistant.components.pylint_test",
+        "smarthub.components.pylint_test",
     )
 
     with assert_adds_messages(

@@ -4,16 +4,16 @@ from __future__ import annotations
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.brottsplatskartan.const import CONF_AREA, DOMAIN
-from homeassistant.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.brottsplatskartan.const import CONF_AREA, DOMAIN
+from smarthub.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -38,7 +38,7 @@ async def test_form(hass: HomeAssistant) -> None:
     }
 
 
-async def test_form_location(hass: HomeAssistant) -> None:
+async def test_form_location(hass: SmartHub) -> None:
     """Test we get the form using location."""
 
     result = await hass.config_entries.flow.async_init(
@@ -68,7 +68,7 @@ async def test_form_location(hass: HomeAssistant) -> None:
     }
 
 
-async def test_form_area(hass: HomeAssistant) -> None:
+async def test_form_area(hass: SmartHub) -> None:
     """Test we get the form using area."""
 
     result = await hass.config_entries.flow.async_init(

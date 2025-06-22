@@ -6,26 +6,26 @@ from pyegps.exceptions import EgpsException
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HOME_ASSISTANT_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def _test_switch_on_off(
-    hass: HomeAssistant, entity_id: str, dev: MagicMock
+    hass: SmartHub, entity_id: str, dev: MagicMock
 ) -> None:
     """Call switch on/off service."""
     await hass.services.async_call(
@@ -47,11 +47,11 @@ async def _test_switch_on_off(
 
 
 async def _test_switch_on_exeception(
-    hass: HomeAssistant, entity_id: str, dev: MagicMock
+    hass: SmartHub, entity_id: str, dev: MagicMock
 ) -> None:
     """Call switch on service with USBError side effect."""
     dev.switch_on.side_effect = EgpsException
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             HOME_ASSISTANT_DOMAIN,
             SERVICE_TURN_ON,
@@ -62,11 +62,11 @@ async def _test_switch_on_exeception(
 
 
 async def _test_switch_off_exeception(
-    hass: HomeAssistant, entity_id: str, dev: MagicMock
+    hass: SmartHub, entity_id: str, dev: MagicMock
 ) -> None:
     """Call switch off service with USBError side effect."""
     dev.switch_off.side_effect = EgpsException
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
@@ -77,11 +77,11 @@ async def _test_switch_off_exeception(
 
 
 async def _test_switch_update_exception(
-    hass: HomeAssistant, entity_id: str, dev: MagicMock
+    hass: SmartHub, entity_id: str, dev: MagicMock
 ) -> None:
     """Call switch update with USBError side effect."""
     dev.get_status.side_effect = EgpsException
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_UPDATE_ENTITY,
@@ -101,7 +101,7 @@ async def _test_switch_update_exception(
     ],
 )
 async def test_switch_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     valid_config_entry: MockConfigEntry,
     mock_get_device: MagicMock,

@@ -1,12 +1,12 @@
 """Tests for the Cookidoo integration."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cookidoo_config_entry: MockConfigEntry,
 ) -> None:
     """Mock setup of the cookidoo integration."""

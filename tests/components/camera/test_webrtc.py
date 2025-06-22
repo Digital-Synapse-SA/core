@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from webrtc_models import RTCIceCandidate, RTCIceCandidateInit, RTCIceServer
 
-from homeassistant.components.camera import (
+from smarthub.components.camera import (
     DATA_ICE_SERVERS,
     Camera,
     CameraWebRTCProvider,
@@ -21,10 +21,10 @@ from homeassistant.components.camera import (
     async_register_webrtc_provider,
     get_camera_from_entity_id,
 )
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.setup import async_setup_component
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.core import SmartHub, callback
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.setup import async_setup_component
 
 from .common import STREAM_SOURCE, WEBRTC_ANSWER, SomeTestProvider
 
@@ -46,7 +46,7 @@ class Go2RTCProvider(SomeTestProvider):
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream_source")
 async def test_async_register_webrtc_provider(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test registering a WebRTC provider."""
     camera = get_camera_from_entity_id(hass, "camera.demo_camera")
@@ -85,7 +85,7 @@ async def test_async_register_webrtc_provider(
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream_source")
 async def test_async_register_webrtc_provider_twice(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_test_provider: SomeTestProvider,
 ) -> None:
     """Test registering a WebRTC provider twice should raise."""
@@ -94,7 +94,7 @@ async def test_async_register_webrtc_provider_twice(
 
 
 async def test_async_register_webrtc_provider_camera_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test registering a WebRTC provider when camera is not loaded."""
     with pytest.raises(ValueError, match="Unexpected state, camera not loaded"):
@@ -103,7 +103,7 @@ async def test_async_register_webrtc_provider_camera_not_loaded(
 
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_async_register_ice_server(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test registering an ICE server."""
     # Clear any existing ICE servers
@@ -186,7 +186,7 @@ async def test_async_register_ice_server(
 
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_ws_get_client_config(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get WebRTC client config."""
     await async_setup_component(hass, "camera", {})
@@ -205,8 +205,8 @@ async def test_ws_get_client_config(
             "iceServers": [
                 {
                     "urls": [
-                        "stun:stun.home-assistant.io:80",
-                        "stun:stun.home-assistant.io:3478",
+                        "stun:stun.smart-hub.io:80",
+                        "stun:stun.smart-hub.io:3478",
                     ]
                 },
             ],
@@ -238,8 +238,8 @@ async def test_ws_get_client_config(
             "iceServers": [
                 {
                     "urls": [
-                        "stun:stun.home-assistant.io:80",
-                        "stun:stun.home-assistant.io:3478",
+                        "stun:stun.smart-hub.io:80",
+                        "stun:stun.smart-hub.io:3478",
                     ]
                 },
                 {
@@ -254,7 +254,7 @@ async def test_ws_get_client_config(
 
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_ws_get_client_config_custom_config(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get WebRTC client config."""
     await async_process_ha_core_config(
@@ -280,7 +280,7 @@ async def test_ws_get_client_config_custom_config(
 
 @pytest.mark.usefixtures("mock_camera")
 async def test_ws_get_client_config_no_rtc_camera(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get WebRTC client config."""
     await async_setup_component(hass, "camera", {})
@@ -309,7 +309,7 @@ async def provide_webrtc_answer(stream_source: str, offer: str, stream_id: str) 
 
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_websocket_webrtc_offer(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test initiating a WebRTC stream with offer and answer."""
     client = await hass_ws_client(hass)
@@ -356,7 +356,7 @@ async def test_websocket_webrtc_offer(
 )
 @pytest.mark.usefixtures("mock_stream_source", "mock_camera")
 async def test_websocket_webrtc_offer_webrtc_provider_deprecated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     register_test_provider: SomeTestProvider,
 ) -> None:
@@ -390,7 +390,7 @@ async def test_websocket_webrtc_offer_webrtc_provider_deprecated(
 )
 @pytest.mark.usefixtures("mock_stream_source", "mock_camera")
 async def test_websocket_webrtc_offer_webrtc_provider(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     register_test_provider: SomeTestProvider,
     message: WebRTCMessage,
@@ -407,7 +407,7 @@ async def test_websocket_webrtc_offer_webrtc_provider(
 
 
 async def _test_websocket_webrtc_offer_webrtc_provider(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     register_test_provider: SomeTestProvider,
     message: WebRTCMessage,
@@ -467,7 +467,7 @@ async def _test_websocket_webrtc_offer_webrtc_provider(
 
 
 async def test_websocket_webrtc_offer_invalid_entity(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test WebRTC with a camera entity that does not exist."""
     await async_setup_component(hass, "camera", {})
@@ -491,7 +491,7 @@ async def test_websocket_webrtc_offer_invalid_entity(
 
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_websocket_webrtc_offer_missing_offer(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test WebRTC stream with missing required fields."""
     client = await hass_ws_client(hass)
@@ -510,7 +510,7 @@ async def test_websocket_webrtc_offer_missing_offer(
 
 @pytest.mark.usefixtures("mock_camera")
 async def test_websocket_webrtc_offer_invalid_stream_type(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test WebRTC initiating for a camera with a different stream_type."""
     client = await hass_ws_client(hass)
@@ -535,7 +535,7 @@ async def test_websocket_webrtc_offer_invalid_stream_type(
 async def mock_hls_stream_source_fixture() -> AsyncGenerator[AsyncMock]:
     """Fixture to create an HLS stream source."""
     with patch(
-        "homeassistant.components.camera.Camera.stream_source",
+        "smarthub.components.camera.Camera.stream_source",
         return_value=HLS_STREAM_SOURCE,
     ) as mock_hls_stream_source:
         yield mock_hls_stream_source
@@ -561,7 +561,7 @@ async def mock_hls_stream_source_fixture() -> AsyncGenerator[AsyncMock]:
 )
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_ws_webrtc_candidate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     frontend_candidate: dict[str, Any],
     expected_candidate: RTCIceCandidateInit,
@@ -611,14 +611,14 @@ async def test_ws_webrtc_candidate(
 )
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_ws_webrtc_candidate_invalid_candidate_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     message: dict,
     expected_error_msg: str,
 ) -> None:
     """Test ws WebRTC candidate command for a camera with a different stream_type."""
     client = await hass_ws_client(hass)
-    with patch("homeassistant.components.camera.Camera.async_on_webrtc_candidate"):
+    with patch("smarthub.components.camera.Camera.async_on_webrtc_candidate"):
         await client.send_json_auto_id(
             {
                 "type": "camera/webrtc/candidate",
@@ -639,7 +639,7 @@ async def test_ws_webrtc_candidate_invalid_candidate_message(
 
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_ws_webrtc_candidate_not_supported(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test ws webrtc candidate command is raising if not supported."""
     client = await hass_ws_client(hass)
@@ -662,7 +662,7 @@ async def test_ws_webrtc_candidate_not_supported(
 
 @pytest.mark.usefixtures("mock_camera", "mock_stream_source")
 async def test_ws_webrtc_candidate_webrtc_provider(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     register_test_provider: SomeTestProvider,
 ) -> None:
@@ -690,7 +690,7 @@ async def test_ws_webrtc_candidate_webrtc_provider(
 
 
 async def test_ws_webrtc_candidate_invalid_entity(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test ws WebRTC candidate command with a camera entity that does not exist."""
     await async_setup_component(hass, "camera", {})
@@ -715,7 +715,7 @@ async def test_ws_webrtc_candidate_invalid_entity(
 
 @pytest.mark.usefixtures("mock_test_webrtc_cameras")
 async def test_ws_webrtc_canidate_missing_candidate(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test ws WebRTC candidate command with missing required fields."""
     client = await hass_ws_client(hass)
@@ -735,7 +735,7 @@ async def test_ws_webrtc_canidate_missing_candidate(
 
 @pytest.mark.usefixtures("mock_camera")
 async def test_ws_webrtc_candidate_invalid_stream_type(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test ws WebRTC candidate command for a camera with a different stream_type."""
     client = await hass_ws_client(hass)
@@ -757,7 +757,7 @@ async def test_ws_webrtc_candidate_invalid_stream_type(
     }
 
 
-async def test_webrtc_provider_optional_interface(hass: HomeAssistant) -> None:
+async def test_webrtc_provider_optional_interface(hass: SmartHub) -> None:
     """Test optional interface for WebRTC provider."""
 
     class OnlyRequiredInterfaceProvider(CameraWebRTCProvider):

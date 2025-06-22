@@ -9,16 +9,16 @@ from monzopy import InvalidMonzoAPIResponseError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.monzo.const import DOMAIN
-from homeassistant.components.monzo.sensor import (
+from smarthub.components.monzo.const import DOMAIN
+from smarthub.components.monzo.sensor import (
     ACCOUNT_SENSORS,
     POT_SENSORS,
     MonzoSensorEntityDescription,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 from .conftest import TEST_ACCOUNTS, TEST_POTS
@@ -34,7 +34,7 @@ EXPECTED_VALUE_GETTERS = {
 
 
 async def async_get_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     acc_id: str,
     description: MonzoSensorEntityDescription,
 ) -> str | None:
@@ -62,7 +62,7 @@ def async_assert_state_equals(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_default_enabled_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     monzo: AsyncMock,
     polling_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -85,7 +85,7 @@ async def test_sensor_default_enabled_entities(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_unavailable_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     basic_monzo: AsyncMock,
     polling_config_entry: MockConfigEntry,
     hass_client_no_auth: ClientSessionGenerator,
@@ -104,7 +104,7 @@ async def test_unavailable_entity(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     monzo: AsyncMock,
@@ -119,7 +119,7 @@ async def test_all_entities(
 
 
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     monzo: AsyncMock,
     polling_config_entry: MockConfigEntry,

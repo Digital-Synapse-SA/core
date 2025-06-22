@@ -7,16 +7,16 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.deconz.const import (
+from smarthub.components.deconz.const import (
     CONF_ALLOW_CLIP_SENSOR,
     CONF_ALLOW_NEW_DEVICES,
     CONF_MASTER_GATEWAY,
     DOMAIN,
 )
-from homeassistant.components.deconz.services import SERVICE_DEVICE_REFRESH
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.deconz.services import SERVICE_DEVICE_REFRESH
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType, WebsocketDataType
 
@@ -327,7 +327,7 @@ TEST_DATA = [
 @pytest.mark.parametrize("config_entry_options", [{CONF_ALLOW_CLIP_SENSOR: True}])
 @pytest.mark.parametrize(("sensor_payload", "expected"), TEST_DATA)
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     sensor_ws_data: WebsocketDataType,
@@ -335,7 +335,7 @@ async def test_binary_sensors(
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test successful creation of binary sensor entities."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.BINARY_SENSOR]):
         config_entry = await config_entry_factory()
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -359,7 +359,7 @@ async def test_binary_sensors(
 )
 @pytest.mark.parametrize("config_entry_options", [{CONF_ALLOW_CLIP_SENSOR: False}])
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_not_allow_clip_sensor(hass: HomeAssistant) -> None:
+async def test_not_allow_clip_sensor(hass: SmartHub) -> None:
     """Test that CLIP sensors are not allowed."""
     assert len(hass.states.async_all()) == 0
 
@@ -398,7 +398,7 @@ async def test_not_allow_clip_sensor(hass: HomeAssistant) -> None:
 )
 @pytest.mark.parametrize("config_entry_options", [{CONF_ALLOW_CLIP_SENSOR: True}])
 async def test_allow_clip_sensor(
-    hass: HomeAssistant, config_entry_setup: MockConfigEntry
+    hass: SmartHub, config_entry_setup: MockConfigEntry
 ) -> None:
     """Test that CLIP sensors can be allowed."""
 
@@ -432,7 +432,7 @@ async def test_allow_clip_sensor(
 
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_add_new_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sensor_ws_data: WebsocketDataType,
 ) -> None:
     """Test that adding a new binary sensor works."""
@@ -458,7 +458,7 @@ async def test_add_new_binary_sensor(
     "config_entry_options", [{CONF_MASTER_GATEWAY: True, CONF_ALLOW_NEW_DEVICES: False}]
 )
 async def test_add_new_binary_sensor_ignored_load_entities_on_service_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_setup: MockConfigEntry,
     deconz_payload: dict[str, Any],
@@ -503,7 +503,7 @@ async def test_add_new_binary_sensor_ignored_load_entities_on_service_call(
     "config_entry_options", [{CONF_MASTER_GATEWAY: True, CONF_ALLOW_NEW_DEVICES: False}]
 )
 async def test_add_new_binary_sensor_ignored_load_entities_on_options_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_setup: MockConfigEntry,
     deconz_payload: dict[str, Any],

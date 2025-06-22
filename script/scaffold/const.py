@@ -2,5 +2,5 @@
 
 from pathlib import Path
 
-COMPONENT_DIR = Path("homeassistant/components")
+COMPONENT_DIR = Path("smarthub/components")
 TESTS_DIR = Path("tests/components")

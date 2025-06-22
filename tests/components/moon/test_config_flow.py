@@ -2,16 +2,16 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.moon.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.moon.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MagicMock,
 ) -> None:
     """Test the full user configuration flow."""
@@ -33,7 +33,7 @@ async def test_full_user_flow(
 
 
 async def test_single_instance_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort if already setup."""

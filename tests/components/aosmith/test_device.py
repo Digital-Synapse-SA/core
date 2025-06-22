@@ -2,15 +2,15 @@
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.aosmith.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.aosmith.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 
 
 async def test_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,

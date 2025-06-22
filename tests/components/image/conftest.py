@@ -4,17 +4,17 @@ from collections.abc import Generator
 
 import pytest
 
-from homeassistant.components import image
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import (
+from smarthub.components import image
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_platform import (
     AddConfigEntryEntitiesCallback,
     AddEntitiesCallback,
 )
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -125,7 +125,7 @@ class MockImageConfigEntry:
 
     async def async_setup_entry(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -144,7 +144,7 @@ class MockImagePlatform:
 
     async def async_setup_platform(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         config: ConfigType,
         async_add_entities: AddEntitiesCallback,
         discovery_info: DiscoveryInfoType | None = None,
@@ -154,7 +154,7 @@ class MockImagePlatform:
 
 
 @pytest.fixture(name="config_flow")
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
 
     class MockFlow(ConfigFlow):
@@ -168,12 +168,12 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
 
 @pytest.fixture(name="mock_image_config_entry")
 async def mock_image_config_entry_fixture(
-    hass: HomeAssistant, config_flow: None
+    hass: SmartHub, config_flow: None
 ) -> ConfigEntry:
     """Initialize a mock image config_entry."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -182,7 +182,7 @@ async def mock_image_config_entry_fixture(
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Unload test config entry."""
         await hass.config_entries.async_unload_platforms(config_entry, [Platform.IMAGE])
@@ -212,7 +212,7 @@ async def mock_image_config_entry_fixture(
 
 
 @pytest.fixture(name="mock_image_platform")
-async def mock_image_platform_fixture(hass: HomeAssistant) -> None:
+async def mock_image_platform_fixture(hass: SmartHub) -> None:
     """Initialize a mock image platform."""
     mock_integration(hass, MockModule(domain="test"))
     mock_platform(hass, "test.image", MockImagePlatform([MockImageEntity(hass)]))

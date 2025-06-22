@@ -4,7 +4,7 @@ All containing methods are legacy helpers that should not be used by new
 components. Instead call the service directly.
 """
 
-from homeassistant.components.device_tracker import (
+from smarthub.components.device_tracker import (
     ATTR_ATTRIBUTES,
     ATTR_BATTERY,
     ATTR_DEV_ID,
@@ -19,9 +19,9 @@ from homeassistant.components.device_tracker import (
     ScannerEntity,
     SourceType,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.typing import ConfigType, GPSType
-from homeassistant.loader import bind_hass
+from smarthub.core import SmartHub, callback
+from smarthub.helpers.typing import ConfigType, GPSType
+from smarthub.loader import bind_hass
 
 from tests.common import MockPlatform, mock_platform
 
@@ -29,7 +29,7 @@ from tests.common import MockPlatform, mock_platform
 @callback
 @bind_hass
 def async_see(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac: str | None = None,
     dev_id: str | None = None,
     host_name: str | None = None,
@@ -139,12 +139,12 @@ class MockScanner(DeviceScanner):
 
 
 def mock_legacy_device_tracker_setup(
-    hass: HomeAssistant, legacy_device_scanner: MockScanner
+    hass: SmartHub, legacy_device_scanner: MockScanner
 ) -> None:
     """Mock legacy device tracker platform setup."""
 
     async def _async_get_scanner(
-        hass: HomeAssistant, config: ConfigType
+        hass: SmartHub, config: ConfigType
     ) -> MockScanner:
         """Return the test scanner."""
         return legacy_device_scanner

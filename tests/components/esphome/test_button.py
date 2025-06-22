@@ -4,13 +4,13 @@ from unittest.mock import call
 
 from aioesphomeapi import APIClient, ButtonInfo
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 
 async def test_button_generic_entity(
-    hass: HomeAssistant, mock_client: APIClient, mock_esphome_device
+    hass: SmartHub, mock_client: APIClient, mock_esphome_device
 ) -> None:
     """Test a generic button entity."""
     entity_info = [

@@ -9,10 +9,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.husqvarna_automower.coordinator import SCAN_INTERVAL
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.husqvarna_automower.coordinator import SCAN_INTERVAL
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 from .const import TEST_MOWER_ID
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 
 async def test_sensor_unknown_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -43,7 +43,7 @@ async def test_sensor_unknown_states(
 
 
 async def test_cutting_blade_usage_time_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -60,7 +60,7 @@ async def test_cutting_blade_usage_time_sensor(
     datetime.datetime(2023, 6, 5, tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"))
 )
 async def test_next_start_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -82,7 +82,7 @@ async def test_next_start_sensor(
 
 
 async def test_work_area_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -138,7 +138,7 @@ async def test_work_area_sensor(
     ],
 )
 async def test_statistics_not_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     sensor_to_test: str,
@@ -154,7 +154,7 @@ async def test_statistics_not_available(
 
 
 async def test_error_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -182,7 +182,7 @@ async def test_error_sensor(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -190,7 +190,7 @@ async def test_sensor_snapshot(
 ) -> None:
     """Snapshot test of the sensors."""
     with patch(
-        "homeassistant.components.husqvarna_automower.PLATFORMS",
+        "smarthub.components.husqvarna_automower.PLATFORMS",
         [Platform.SENSOR],
     ):
         await setup_integration(hass, mock_config_entry)

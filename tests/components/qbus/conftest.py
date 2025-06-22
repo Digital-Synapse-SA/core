@@ -4,10 +4,10 @@ import json
 
 import pytest
 
-from homeassistant.components.qbus.const import CONF_SERIAL_NUMBER, DOMAIN
-from homeassistant.const import CONF_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.util.json import JsonObjectType
+from smarthub.components.qbus.const import CONF_SERIAL_NUMBER, DOMAIN
+from smarthub.const import CONF_ID
+from smarthub.core import SmartHub
+from smarthub.util.json import JsonObjectType
 
 from .const import FIXTURE_PAYLOAD_CONFIG, TOPIC_CONFIG
 
@@ -19,7 +19,7 @@ from tests.common import (
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Return the default mocked config entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -41,7 +41,7 @@ def payload_config() -> JsonObjectType:
 
 @pytest.fixture
 async def setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     payload_config: JsonObjectType,
 ) -> None:

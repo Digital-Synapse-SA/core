@@ -8,13 +8,13 @@ import pytest
 from requests.exceptions import ReadTimeout
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fritz.const import DOMAIN
-from homeassistant.components.image import DOMAIN as IMAGE_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components.fritz.const import DOMAIN
+from smarthub.components.image import DOMAIN as IMAGE_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from .const import MOCK_FB_SERVICES, MOCK_USER_DATA
 
@@ -90,7 +90,7 @@ GUEST_WIFI_DISABLED: dict[str, dict] = {
     ],
 )
 async def test_image_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -101,7 +101,7 @@ async def test_image_entity(
 
     # setup component with image platform only
     with patch(
-        "homeassistant.components.fritz.PLATFORMS",
+        "smarthub.components.fritz.PLATFORMS",
         [Platform.IMAGE],
     ):
         entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
@@ -140,7 +140,7 @@ async def test_image_entity(
 
 @pytest.mark.parametrize(("fc_data"), [({**MOCK_FB_SERVICES, **GUEST_WIFI_ENABLED})])
 async def test_image_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
     fc_class_mock,
@@ -150,7 +150,7 @@ async def test_image_update(
 
     # setup component with image platform only
     with patch(
-        "homeassistant.components.fritz.PLATFORMS",
+        "smarthub.components.fritz.PLATFORMS",
         [Platform.IMAGE],
     ):
         entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
@@ -178,7 +178,7 @@ async def test_image_update(
 
 @pytest.mark.parametrize(("fc_data"), [({**MOCK_FB_SERVICES, **GUEST_WIFI_ENABLED})])
 async def test_image_update_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fc_class_mock,
     fh_class_mock,
 ) -> None:
@@ -186,7 +186,7 @@ async def test_image_update_unavailable(
 
     # setup component with image platform only
     with patch(
-        "homeassistant.components.fritz.PLATFORMS",
+        "smarthub.components.fritz.PLATFORMS",
         [Platform.IMAGE],
     ):
         entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)

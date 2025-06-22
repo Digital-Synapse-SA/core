@@ -6,17 +6,17 @@ from nextdns import ApiError, InvalidApiKeyError
 import pytest
 from tenacity import RetryError
 
-from homeassistant.components.nextdns.const import CONF_PROFILE_ID, DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import CONF_API_KEY, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.nextdns.const import CONF_PROFILE_ID, DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import CONF_API_KEY, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import init_integration
 
 from tests.common import MockConfigEntry
 
 
-async def test_async_setup_entry(hass: HomeAssistant) -> None:
+async def test_async_setup_entry(hass: SmartHub) -> None:
     """Test a successful setup entry."""
     await init_integration(hass)
 
@@ -29,7 +29,7 @@ async def test_async_setup_entry(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     "exc", [ApiError("API Error"), RetryError("Retry Error"), TimeoutError]
 )
-async def test_config_not_ready(hass: HomeAssistant, exc: Exception) -> None:
+async def test_config_not_ready(hass: SmartHub, exc: Exception) -> None:
     """Test for setup failure if the connection to the service fails."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -39,7 +39,7 @@ async def test_config_not_ready(hass: HomeAssistant, exc: Exception) -> None:
     )
 
     with patch(
-        "homeassistant.components.nextdns.NextDns.get_profiles",
+        "smarthub.components.nextdns.NextDns.get_profiles",
         side_effect=exc,
     ):
         entry.add_to_hass(hass)
@@ -47,7 +47,7 @@ async def test_config_not_ready(hass: HomeAssistant, exc: Exception) -> None:
         assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass)
 
@@ -61,7 +61,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
     assert not hass.data.get(DOMAIN)
 
 
-async def test_config_auth_failed(hass: HomeAssistant) -> None:
+async def test_config_auth_failed(hass: SmartHub) -> None:
     """Test for setup failure if the auth fails."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -72,7 +72,7 @@ async def test_config_auth_failed(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.nextdns.NextDns.get_profiles",
+        "smarthub.components.nextdns.NextDns.get_profiles",
         side_effect=InvalidApiKeyError,
     ):
         await hass.config_entries.async_setup(entry.entry_id)

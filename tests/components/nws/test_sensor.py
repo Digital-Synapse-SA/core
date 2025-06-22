@@ -2,14 +2,14 @@
 
 import pytest
 
-from homeassistant.components.nws.const import ATTRIBUTION, DOMAIN
-from homeassistant.components.nws.sensor import SENSOR_TYPES
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import ATTR_ATTRIBUTION, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import slugify
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
+from smarthub.components.nws.const import ATTRIBUTION, DOMAIN
+from smarthub.components.nws.sensor import SENSOR_TYPES
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import ATTR_ATTRIBUTION, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import slugify
+from smarthub.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from .const import (
     EXPECTED_FORECAST_IMPERIAL,
@@ -35,7 +35,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_imperial_metric(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     units,
     result_observation,
@@ -74,7 +74,7 @@ async def test_imperial_metric(
 
 @pytest.mark.parametrize("values", [NONE_OBSERVATION, None])
 async def test_none_values(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_simple_nws,
     no_weather,

@@ -3,25 +3,25 @@
 from copy import deepcopy
 from unittest.mock import patch
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from .conftest import FAKE_QUERY_RESPONSE
 
 from tests.common import MockConfigEntry
 
 
-async def test_sensor(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_sensor(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test sensor states and attributes."""
 
     # Setup component
     with (
         patch(
-            "homeassistant.components.squeezebox.PLATFORMS",
+            "smarthub.components.squeezebox.PLATFORMS",
             [Platform.SENSOR],
         ),
         patch(
-            "homeassistant.components.squeezebox.Server.async_query",
+            "smarthub.components.squeezebox.Server.async_query",
             return_value=deepcopy(FAKE_QUERY_RESPONSE),
         ),
     ):

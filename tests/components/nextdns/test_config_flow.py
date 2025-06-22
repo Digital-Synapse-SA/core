@@ -6,16 +6,16 @@ from nextdns import ApiError, InvalidApiKeyError
 import pytest
 from tenacity import RetryError
 
-from homeassistant.components.nextdns.const import CONF_PROFILE_ID, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_PROFILE_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.nextdns.const import CONF_PROFILE_ID, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_PROFILE_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import PROFILES, init_integration, mock_nextdns
 
 
-async def test_form_create_entry(hass: HomeAssistant) -> None:
+async def test_form_create_entry(hass: SmartHub) -> None:
     """Test that the user step works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -26,11 +26,11 @@ async def test_form_create_entry(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nextdns.NextDns.get_profiles",
+            "smarthub.components.nextdns.NextDns.get_profiles",
             return_value=PROFILES,
         ),
         patch(
-            "homeassistant.components.nextdns.async_setup_entry", return_value=True
+            "smarthub.components.nextdns.async_setup_entry", return_value=True
         ) as mock_setup_entry,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -64,11 +64,11 @@ async def test_form_create_entry(hass: HomeAssistant) -> None:
     ],
 )
 async def test_form_errors(
-    hass: HomeAssistant, exc: Exception, base_error: str
+    hass: SmartHub, exc: Exception, base_error: str
 ) -> None:
     """Test we handle errors."""
     with patch(
-        "homeassistant.components.nextdns.NextDns.get_profiles", side_effect=exc
+        "smarthub.components.nextdns.NextDns.get_profiles", side_effect=exc
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -79,7 +79,7 @@ async def test_form_errors(
     assert result["errors"] == {"base": base_error}
 
 
-async def test_form_already_configured(hass: HomeAssistant) -> None:
+async def test_form_already_configured(hass: SmartHub) -> None:
     """Test that errors are shown when duplicates are added."""
     await init_integration(hass)
 
@@ -88,7 +88,7 @@ async def test_form_already_configured(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nextdns.NextDns.get_profiles", return_value=PROFILES
+        "smarthub.components.nextdns.NextDns.get_profiles", return_value=PROFILES
     ):
         await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -103,7 +103,7 @@ async def test_form_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_reauth_successful(hass: HomeAssistant) -> None:
+async def test_reauth_successful(hass: SmartHub) -> None:
     """Test starting a reauthentication flow."""
     entry = await init_integration(hass)
 
@@ -113,7 +113,7 @@ async def test_reauth_successful(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nextdns.NextDns.get_profiles",
+            "smarthub.components.nextdns.NextDns.get_profiles",
             return_value=PROFILES,
         ),
         mock_nextdns(),
@@ -139,7 +139,7 @@ async def test_reauth_successful(hass: HomeAssistant) -> None:
     ],
 )
 async def test_reauth_errors(
-    hass: HomeAssistant, exc: Exception, base_error: str
+    hass: SmartHub, exc: Exception, base_error: str
 ) -> None:
     """Test reauthentication flow with errors."""
     entry = await init_integration(hass)
@@ -149,7 +149,7 @@ async def test_reauth_errors(
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.nextdns.NextDns.get_profiles", side_effect=exc
+        "smarthub.components.nextdns.NextDns.get_profiles", side_effect=exc
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],

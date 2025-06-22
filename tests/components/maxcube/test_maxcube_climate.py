@@ -13,7 +13,7 @@ from maxcube.thermostat import MaxThermostat
 from maxcube.wallthermostat import MaxWallThermostat
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_HVAC_ACTION,
     ATTR_HVAC_MODE,
@@ -37,23 +37,23 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.maxcube.climate import (
+from smarthub.components.maxcube.climate import (
     MAX_TEMPERATURE,
     MIN_TEMPERATURE,
     OFF_TEMPERATURE,
     ON_TEMPERATURE,
     PRESET_ON,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     ATTR_SUPPORTED_FEATURES,
     ATTR_TEMPERATURE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import utcnow
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import utcnow
 
 from tests.common import async_fire_time_changed
 
@@ -63,7 +63,7 @@ VALVE_POSITION = "valve_position"
 
 
 async def test_setup_thermostat(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, cube: MaxCube
+    hass: SmartHub, entity_registry: er.EntityRegistry, cube: MaxCube
 ) -> None:
     """Test a successful setup of a thermostat device."""
     assert entity_registry.async_is_registered(ENTITY_ID)
@@ -103,7 +103,7 @@ async def test_setup_thermostat(
 
 
 async def test_setup_wallthermostat(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, cube: MaxCube
+    hass: SmartHub, entity_registry: er.EntityRegistry, cube: MaxCube
 ) -> None:
     """Test a successful setup of a wall thermostat device."""
     assert entity_registry.async_is_registered(WALL_ENTITY_ID)
@@ -122,7 +122,7 @@ async def test_setup_wallthermostat(
 
 
 async def test_thermostat_set_hvac_mode_off(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Turn off thermostat."""
     await hass.services.async_call(
@@ -153,7 +153,7 @@ async def test_thermostat_set_hvac_mode_off(
 
 
 async def test_thermostat_set_hvac_mode_heat(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set hvac mode to heat."""
     await hass.services.async_call(
@@ -176,7 +176,7 @@ async def test_thermostat_set_hvac_mode_heat(
 
 
 async def test_thermostat_set_invalid_hvac_mode(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set hvac mode to heat."""
     with pytest.raises(ServiceValidationError):
@@ -190,7 +190,7 @@ async def test_thermostat_set_invalid_hvac_mode(
 
 
 async def test_thermostat_set_temperature(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set hvac mode to heat."""
     await hass.services.async_call(
@@ -213,7 +213,7 @@ async def test_thermostat_set_temperature(
 
 
 async def test_thermostat_set_no_temperature(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set hvac mode to heat."""
     with pytest.raises(ServiceValidationError):
@@ -231,7 +231,7 @@ async def test_thermostat_set_no_temperature(
 
 
 async def test_thermostat_set_preset_on(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set preset mode to on."""
     await hass.services.async_call(
@@ -257,7 +257,7 @@ async def test_thermostat_set_preset_on(
 
 
 async def test_thermostat_set_preset_comfort(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set preset mode to comfort."""
     await hass.services.async_call(
@@ -282,7 +282,7 @@ async def test_thermostat_set_preset_comfort(
 
 
 async def test_thermostat_set_preset_eco(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set preset mode to eco."""
     await hass.services.async_call(
@@ -307,7 +307,7 @@ async def test_thermostat_set_preset_eco(
 
 
 async def test_thermostat_set_preset_away(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set preset mode to away."""
     await hass.services.async_call(
@@ -332,7 +332,7 @@ async def test_thermostat_set_preset_away(
 
 
 async def test_thermostat_set_preset_boost(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set preset mode to boost."""
     await hass.services.async_call(
@@ -357,7 +357,7 @@ async def test_thermostat_set_preset_boost(
 
 
 async def test_thermostat_set_preset_none(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set preset mode to boost."""
     await hass.services.async_call(
@@ -372,7 +372,7 @@ async def test_thermostat_set_preset_none(
 
 
 async def test_thermostat_set_invalid_preset(
-    hass: HomeAssistant, cube: MaxCube, thermostat: MaxThermostat
+    hass: SmartHub, cube: MaxCube, thermostat: MaxThermostat
 ) -> None:
     """Set hvac mode to heat."""
     with pytest.raises(ServiceValidationError):
@@ -386,7 +386,7 @@ async def test_thermostat_set_invalid_preset(
 
 
 async def test_wallthermostat_set_hvac_mode_heat(
-    hass: HomeAssistant, cube: MaxCube, wallthermostat: MaxWallThermostat
+    hass: SmartHub, cube: MaxCube, wallthermostat: MaxWallThermostat
 ) -> None:
     """Set wall thermostat hvac mode to heat."""
     await hass.services.async_call(
@@ -409,7 +409,7 @@ async def test_wallthermostat_set_hvac_mode_heat(
 
 
 async def test_wallthermostat_set_hvac_mode_auto(
-    hass: HomeAssistant, cube: MaxCube, wallthermostat: MaxWallThermostat
+    hass: SmartHub, cube: MaxCube, wallthermostat: MaxWallThermostat
 ) -> None:
     """Set wall thermostat hvac mode to auto."""
     await hass.services.async_call(

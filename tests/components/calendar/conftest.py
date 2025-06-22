@@ -8,12 +8,12 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.calendar import DOMAIN, CalendarEntity, CalendarEvent
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.util import dt as dt_util
+from smarthub.components.calendar import DOMAIN, CalendarEntity, CalendarEvent
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -28,7 +28,7 @@ TEST_DOMAIN = "test"
 
 
 @pytest.fixture
-async def set_time_zone(hass: HomeAssistant) -> None:
+async def set_time_zone(hass: SmartHub) -> None:
     """Set the time zone for the tests."""
     # Set our timezone to CST/Regina so we can check calculations
     # This keeps UTC-6 all year round
@@ -75,7 +75,7 @@ class MockCalendarEntity(CalendarEntity):
 
     async def async_get_events(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         start_date: datetime.datetime,
         end_date: datetime.datetime,
     ) -> list[CalendarEvent]:
@@ -92,7 +92,7 @@ class MockCalendarEntity(CalendarEntity):
 
 
 @pytest.fixture
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -101,7 +101,7 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
 
 
 @pytest.fixture(name="config_entry")
-async def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+async def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Create a mock config entry."""
     config_entry = MockConfigEntry(domain=TEST_DOMAIN)
     config_entry.add_to_hass(hass)
@@ -110,14 +110,14 @@ async def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 @pytest.fixture
 def mock_setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     test_entities: list[CalendarEntity],
 ) -> None:
     """Fixture to set up a mock integration."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -126,7 +126,7 @@ def mock_setup_integration(
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
     ) -> bool:
         await hass.config_entries.async_unload_platforms(
@@ -145,7 +145,7 @@ def mock_setup_integration(
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:

@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.bmw_connected_drive import DEFAULT_OPTIONS
-from homeassistant.components.bmw_connected_drive.const import CONF_READ_ONLY, DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.bmw_connected_drive import DEFAULT_OPTIONS
+from smarthub.components.bmw_connected_drive.const import CONF_READ_ONLY, DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import BIMMER_CONNECTED_VEHICLE_PATCH, FIXTURE_CONFIG_ENTRY
 
@@ -33,7 +33,7 @@ VEHICLE_NAME_SLUG = "i3_rex"
     ],
 )
 async def test_migrate_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     options: dict,
 ) -> None:
     """Test successful migration of options."""
@@ -53,7 +53,7 @@ async def test_migrate_options(
 
 
 @pytest.mark.usefixtures("bmw_fixture")
-async def test_migrate_options_from_data(hass: HomeAssistant) -> None:
+async def test_migrate_options_from_data(hass: SmartHub) -> None:
     """Test successful migration of options."""
 
     config_entry = deepcopy(FIXTURE_CONFIG_ENTRY)
@@ -134,7 +134,7 @@ async def test_migrate_options_from_data(hass: HomeAssistant) -> None:
     ],
 )
 async def test_migrate_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entitydata: dict,
     old_unique_id: str,
     new_unique_id: str,
@@ -181,7 +181,7 @@ async def test_migrate_unique_ids(
     ],
 )
 async def test_dont_migrate_unique_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entitydata: dict,
     old_unique_id: str,
     new_unique_id: str,
@@ -228,7 +228,7 @@ async def test_dont_migrate_unique_ids(
 
 @pytest.mark.usefixtures("bmw_fixture")
 async def test_remove_stale_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test remove stale device registry entries."""

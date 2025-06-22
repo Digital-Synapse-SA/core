@@ -3,8 +3,8 @@
 from aioesphomeapi import APIClient, BinarySensorInfo, BinarySensorState
 import pytest
 
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .conftest import MockESPHomeDeviceType, MockGenericDeviceEntryType
 
@@ -13,7 +13,7 @@ from .conftest import MockESPHomeDeviceType, MockGenericDeviceEntryType
     "binary_state", [(True, STATE_ON), (False, STATE_OFF), (None, STATE_UNKNOWN)]
 )
 async def test_binary_sensor_generic_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     binary_state: tuple[bool, str],
     mock_generic_device_entry: MockGenericDeviceEntryType,
@@ -42,7 +42,7 @@ async def test_binary_sensor_generic_entity(
 
 
 async def test_status_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -70,7 +70,7 @@ async def test_status_binary_sensor(
 
 
 async def test_binary_sensor_missing_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -97,7 +97,7 @@ async def test_binary_sensor_missing_state(
 
 
 async def test_binary_sensor_has_state_false(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:

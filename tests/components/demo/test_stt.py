@@ -5,26 +5,26 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.demo import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.components.demo import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.typing import ClientSessionGenerator
 
 
 @pytest.fixture
-async def stt_only(hass: HomeAssistant) -> None:
+async def stt_only(hass: SmartHub) -> None:
     """Enable only the stt platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.STT],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_config_entry(hass: HomeAssistant, stt_only) -> None:
+async def setup_config_entry(hass: SmartHub, stt_only) -> None:
     """Set up demo component from config entry."""
     config_entry = MockConfigEntry(domain=DOMAIN)
     config_entry.add_to_hass(hass)
@@ -97,7 +97,7 @@ async def test_demo_speech(hass_client: ClientSessionGenerator) -> None:
 
 @pytest.mark.usefixtures("setup_config_entry")
 async def test_config_entry_demo_speech(
-    hass_client: ClientSessionGenerator, hass: HomeAssistant
+    hass_client: ClientSessionGenerator, hass: SmartHub
 ) -> None:
     """Test retrieve settings from demo provider from config entry."""
     client = await hass_client()

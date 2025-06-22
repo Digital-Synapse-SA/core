@@ -6,22 +6,22 @@ from unittest.mock import AsyncMock, PropertyMock
 import blebox_uniapi
 import pytest
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_EFFECT,
     ATTR_RGBW_COLOR,
     ATTR_SUPPORTED_COLOR_MODES,
     ColorMode,
 )
-from homeassistant.const import (
+from smarthub.const import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import async_setup_entity, mock_feature
 
@@ -52,7 +52,7 @@ def dimmer_fixture():
 
 
 async def test_dimmer_init(
-    dimmer, hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    dimmer, hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test cover default state."""
 
@@ -78,7 +78,7 @@ async def test_dimmer_init(
     assert device.sw_version == "1.23"
 
 
-async def test_dimmer_update(dimmer, hass: HomeAssistant) -> None:
+async def test_dimmer_update(dimmer, hass: SmartHub) -> None:
     """Test light updating."""
 
     feature_mock, entity_id = dimmer
@@ -94,7 +94,7 @@ async def test_dimmer_update(dimmer, hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_dimmer_on(dimmer, hass: HomeAssistant) -> None:
+async def test_dimmer_on(dimmer, hass: SmartHub) -> None:
     """Test light on."""
 
     feature_mock, entity_id = dimmer
@@ -129,7 +129,7 @@ async def test_dimmer_on(dimmer, hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_BRIGHTNESS] == 254
 
 
-async def test_dimmer_on_with_brightness(dimmer, hass: HomeAssistant) -> None:
+async def test_dimmer_on_with_brightness(dimmer, hass: SmartHub) -> None:
     """Test light on with a brightness value."""
 
     feature_mock, entity_id = dimmer
@@ -170,7 +170,7 @@ async def test_dimmer_on_with_brightness(dimmer, hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_dimmer_off(dimmer, hass: HomeAssistant) -> None:
+async def test_dimmer_off(dimmer, hass: SmartHub) -> None:
     """Test light off."""
 
     feature_mock, entity_id = dimmer
@@ -226,7 +226,7 @@ def wlightboxs_fixture():
 
 
 async def test_wlightbox_s_init(
-    wlightbox_s, hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    wlightbox_s, hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test cover default state."""
 
@@ -252,7 +252,7 @@ async def test_wlightbox_s_init(
     assert device.sw_version == "1.23"
 
 
-async def test_wlightbox_s_update(wlightbox_s, hass: HomeAssistant) -> None:
+async def test_wlightbox_s_update(wlightbox_s, hass: SmartHub) -> None:
     """Test light updating."""
 
     feature_mock, entity_id = wlightbox_s
@@ -270,7 +270,7 @@ async def test_wlightbox_s_update(wlightbox_s, hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_BRIGHTNESS] == 0xAB
 
 
-async def test_wlightbox_s_on(wlightbox_s, hass: HomeAssistant) -> None:
+async def test_wlightbox_s_on(wlightbox_s, hass: SmartHub) -> None:
     """Test light on."""
 
     feature_mock, entity_id = wlightbox_s
@@ -330,7 +330,7 @@ def wlightbox_fixture():
 
 
 async def test_wlightbox_init(
-    wlightbox, hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    wlightbox, hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test cover default state."""
 
@@ -357,7 +357,7 @@ async def test_wlightbox_init(
     assert device.sw_version == "1.23"
 
 
-async def test_wlightbox_update(wlightbox, hass: HomeAssistant) -> None:
+async def test_wlightbox_update(wlightbox, hass: SmartHub) -> None:
     """Test light updating."""
 
     feature_mock, entity_id = wlightbox
@@ -375,7 +375,7 @@ async def test_wlightbox_update(wlightbox, hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_wlightbox_on_rgbw(wlightbox, hass: HomeAssistant) -> None:
+async def test_wlightbox_on_rgbw(wlightbox, hass: SmartHub) -> None:
     """Test light on."""
 
     feature_mock, entity_id = wlightbox
@@ -425,7 +425,7 @@ async def test_wlightbox_on_rgbw(wlightbox, hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_RGBW_COLOR] == (0xC1, 0xD2, 0xF3, 0xC7)
 
 
-async def test_wlightbox_on_to_last_color(wlightbox, hass: HomeAssistant) -> None:
+async def test_wlightbox_on_to_last_color(wlightbox, hass: SmartHub) -> None:
     """Test light on."""
 
     feature_mock, entity_id = wlightbox
@@ -461,7 +461,7 @@ async def test_wlightbox_on_to_last_color(wlightbox, hass: HomeAssistant) -> Non
     assert state.state == STATE_ON
 
 
-async def test_wlightbox_off(wlightbox, hass: HomeAssistant) -> None:
+async def test_wlightbox_off(wlightbox, hass: SmartHub) -> None:
     """Test light off."""
 
     feature_mock, entity_id = wlightbox
@@ -497,7 +497,7 @@ async def test_wlightbox_off(wlightbox, hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("feature", ALL_LIGHT_FIXTURES, indirect=["feature"])
 async def test_update_failure(
-    feature, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    feature, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that update failures are logged."""
 
@@ -512,7 +512,7 @@ async def test_update_failure(
 
 @pytest.mark.parametrize("feature", ALL_LIGHT_FIXTURES, indirect=["feature"])
 async def test_turn_on_failure(
-    feature, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    feature, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that turn_on failures are logged."""
 
@@ -536,7 +536,7 @@ async def test_turn_on_failure(
     )
 
 
-async def test_wlightbox_on_effect(wlightbox, hass: HomeAssistant) -> None:
+async def test_wlightbox_on_effect(wlightbox, hass: SmartHub) -> None:
     """Test light on."""
 
     feature_mock, entity_id = wlightbox

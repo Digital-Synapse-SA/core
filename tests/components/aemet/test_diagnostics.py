@@ -6,8 +6,8 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.aemet.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.aemet.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
@@ -17,7 +17,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.freeze_time("2024-02-23T18:00:00+00:00")
 async def test_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -27,7 +27,7 @@ async def test_config_entry_diagnostics(
     config_entry = hass.config_entries.async_entries(DOMAIN)[0]
 
     with patch(
-        "homeassistant.components.aemet.AEMET.raw_data",
+        "smarthub.components.aemet.AEMET.raw_data",
         return_value={},
     ):
         result = await get_diagnostics_for_config_entry(hass, hass_client, config_entry)

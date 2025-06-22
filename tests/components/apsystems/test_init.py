@@ -7,9 +7,9 @@ from APsystemsEZ1 import InverterReturnedError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.apsystems.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.apsystems.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -20,7 +20,7 @@ SCAN_INTERVAL = datetime.timedelta(seconds=12)
 
 @pytest.mark.usefixtures("mock_apsystems")
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test load and unload entry."""
@@ -33,7 +33,7 @@ async def test_load_unload_entry(
 
 
 async def test_setup_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_apsystems: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -45,7 +45,7 @@ async def test_setup_failed(
 
 
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_apsystems: AsyncMock,
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,

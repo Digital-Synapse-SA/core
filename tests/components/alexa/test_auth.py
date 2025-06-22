@@ -1,8 +1,8 @@
 """Test Alexa auth endpoints."""
 
-from homeassistant.components.alexa.auth import Auth
-from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
-from homeassistant.core import HomeAssistant
+from smarthub.components.alexa.auth import Auth
+from smarthub.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
+from smarthub.core import SmartHub
 
 from .test_common import TEST_TOKEN_URL
 
@@ -10,7 +10,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def run_auth_get_access_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     expires_in: int,
     client_id: str,
@@ -34,7 +34,7 @@ async def run_auth_get_access_token(
 
 
 async def test_auth_get_access_token_expired(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the auth get access token function."""
     client_id = "client123"
@@ -70,7 +70,7 @@ async def test_auth_get_access_token_expired(
 
 
 async def test_auth_get_access_token_not_expired(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the auth get access token function."""
     client_id = "client123"

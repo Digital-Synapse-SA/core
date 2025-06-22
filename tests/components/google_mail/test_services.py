@@ -6,16 +6,16 @@ from aiohttp.client_exceptions import ClientResponseError
 from google.auth.exceptions import RefreshError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.google_mail import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub import config_entries
+from smarthub.components.google_mail import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import BUILD, SENSOR, TOKEN, ComponentSetup
 
 
 async def test_set_vacation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
 ) -> None:
     """Test service call set vacation."""
@@ -68,14 +68,14 @@ async def test_set_vacation(
     ],
 )
 async def test_reauth_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     side_effect,
 ) -> None:
     """Test reauth is triggered after a refresh error during service call."""
     await setup_integration()
 
-    with patch(TOKEN, side_effect=side_effect), pytest.raises(HomeAssistantError):
+    with patch(TOKEN, side_effect=side_effect), pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             "set_vacation",

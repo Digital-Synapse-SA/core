@@ -2,9 +2,9 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.ws66i.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.ws66i.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .test_media_player import (
     MOCK_CONFIG,
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 ZONE_1_ID = "media_player.zone_11"
 
 
-async def test_cannot_connect(hass: HomeAssistant) -> None:
+async def test_cannot_connect(hass: SmartHub) -> None:
     """Test connection error."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data=MOCK_CONFIG, options=MOCK_OPTIONS
@@ -26,7 +26,7 @@ async def test_cannot_connect(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.ws66i.get_ws66i",
+        "smarthub.components.ws66i.get_ws66i",
         new=lambda *a: MockWs66i(fail_open=True),
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
@@ -36,7 +36,7 @@ async def test_cannot_connect(hass: HomeAssistant) -> None:
         assert hass.states.get(ZONE_1_ID) is None
 
 
-async def test_cannot_connect_2(hass: HomeAssistant) -> None:
+async def test_cannot_connect_2(hass: SmartHub) -> None:
     """Test connection error pt 2."""
     # Another way to test same case as test_cannot_connect
     ws66i = MockWs66i()
@@ -47,7 +47,7 @@ async def test_cannot_connect_2(hass: HomeAssistant) -> None:
 
     with patch.object(MockWs66i, "open", side_effect=ConnectionError):
         with patch(
-            "homeassistant.components.ws66i.get_ws66i",
+            "smarthub.components.ws66i.get_ws66i",
             new=lambda *a: ws66i,
         ):
             await hass.config_entries.async_setup(config_entry.entry_id)
@@ -57,7 +57,7 @@ async def test_cannot_connect_2(hass: HomeAssistant) -> None:
         assert hass.states.get(ZONE_1_ID) is None
 
 
-async def test_unload_config_entry(hass: HomeAssistant) -> None:
+async def test_unload_config_entry(hass: SmartHub) -> None:
     """Test unloading config entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data=MOCK_CONFIG, options=MOCK_OPTIONS
@@ -65,7 +65,7 @@ async def test_unload_config_entry(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.ws66i.get_ws66i",
+        "smarthub.components.ws66i.get_ws66i",
         new=lambda *a: MockWs66i(),
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

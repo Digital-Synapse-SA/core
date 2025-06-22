@@ -6,9 +6,9 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.wmspro.const import DOMAIN
-from homeassistant.components.wmspro.cover import SCAN_INTERVAL
-from homeassistant.const import (
+from smarthub.components.wmspro.const import DOMAIN
+from smarthub.components.wmspro.cover import SCAN_INTERVAL
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
@@ -18,8 +18,8 @@ from homeassistant.const import (
     STATE_OPEN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_config_entry
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_cover_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_configuration_prod_awning_dimmer: AsyncMock,
@@ -47,7 +47,7 @@ async def test_cover_device(
 
 
 async def test_cover_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_configuration_prod_awning_dimmer: AsyncMock,
@@ -89,7 +89,7 @@ async def test_cover_update(
     ],
 )
 async def test_cover_open_and_close(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_configuration: AsyncMock,
@@ -167,7 +167,7 @@ async def test_cover_open_and_close(
     ],
 )
 async def test_cover_open_to_pos(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_configuration: AsyncMock,
@@ -226,7 +226,7 @@ async def test_cover_open_to_pos(
     ],
 )
 async def test_cover_open_and_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_hub_ping: AsyncMock,
     mock_hub_configuration: AsyncMock,

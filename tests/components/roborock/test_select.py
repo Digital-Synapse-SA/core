@@ -6,11 +6,11 @@ from unittest.mock import patch
 import pytest
 from roborock.exceptions import RoborockException
 
-from homeassistant.components.roborock import DOMAIN
-from homeassistant.const import SERVICE_SELECT_OPTION, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components.roborock import DOMAIN
+from smarthub.const import SERVICE_SELECT_OPTION, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from .mock_data import MULTI_MAP_LIST, PROP
 
@@ -32,7 +32,7 @@ def platforms() -> list[Platform]:
     ],
 )
 async def test_update_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
     entity_id: str,
@@ -42,7 +42,7 @@ async def test_update_success(
     # Ensure that the entity exist, as these test can pass even if there is no entity.
     assert hass.states.get(entity_id) is not None
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.send_message"
+        "smarthub.components.roborock.coordinator.RoborockLocalClientV1.send_message"
     ) as mock_send_message:
         await hass.services.async_call(
             "select",
@@ -55,17 +55,17 @@ async def test_update_success(
 
 
 async def test_update_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
 ) -> None:
-    """Test that changing a value will raise a homeassistanterror when it fails."""
+    """Test that changing a value will raise a smarthuberror when it fails."""
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.send_message",
+            "smarthub.components.roborock.coordinator.RoborockLocalClientV1.send_message",
             side_effect=RoborockException(),
         ),
-        pytest.raises(HomeAssistantError, match="Error while calling SET_MOP_MOD"),
+        pytest.raises(SmartHubError, match="Error while calling SET_MOP_MOD"),
     ):
         await hass.services.async_call(
             "select",
@@ -77,7 +77,7 @@ async def test_update_failure(
 
 
 async def test_none_map_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     mock_roborock_entry: MockConfigEntry,
 ) -> None:
@@ -86,7 +86,7 @@ async def test_none_map_select(
     # Set map status to None so that current map is never set
     prop.status.map_status = None
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
+        "smarthub.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
         return_value=prop,
     ):
         await async_setup_component(hass, DOMAIN, {})
@@ -95,7 +95,7 @@ async def test_none_map_select(
 
 
 async def test_selected_map_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     mock_roborock_entry: MockConfigEntry,
 ) -> None:
@@ -106,7 +106,7 @@ async def test_selected_map_name(
 
 
 async def test_selected_map_without_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture_v1_only,
     mock_roborock_entry: MockConfigEntry,
 ) -> None:
@@ -114,7 +114,7 @@ async def test_selected_map_without_name(
     map_list = copy.deepcopy(MULTI_MAP_LIST)
     map_list.map_info[0].name = ""
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.get_multi_maps_list",
+        "smarthub.components.roborock.coordinator.RoborockLocalClientV1.get_multi_maps_list",
         return_value=map_list,
     ):
         await async_setup_component(hass, DOMAIN, {})

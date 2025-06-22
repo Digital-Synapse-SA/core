@@ -23,7 +23,7 @@ from habiticalib import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.habitica.const import (
+from smarthub.components.habitica.const import (
     ATTR_ADD_CHECKLIST_ITEM,
     ATTR_ALIAS,
     ATTR_CLEAR_DATE,
@@ -76,11 +76,11 @@ from homeassistant.components.habitica.const import (
     SERVICE_UPDATE_REWARD,
     SERVICE_UPDATE_TODO,
 )
-from homeassistant.components.todo import ATTR_RENAME
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_DATE, ATTR_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.components.todo import ATTR_RENAME
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_DATE, ATTR_NAME
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from .conftest import (
     ERROR_BAD_REQUEST,
@@ -99,7 +99,7 @@ RATE_LIMIT_EXCEPTION_MSG = "Rate limit exceeded, try again in 5 seconds"
 def services_only() -> Generator[None]:
     """Enable only services."""
     with patch(
-        "homeassistant.components.habitica.PLATFORMS",
+        "smarthub.components.habitica.PLATFORMS",
         [],
     ):
         yield
@@ -107,7 +107,7 @@ def services_only() -> Generator[None]:
 
 @pytest.fixture(autouse=True)
 async def load_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     services_only: Generator,
@@ -206,7 +206,7 @@ def uuid_mock() -> Generator[None]:
     ],
 )
 async def test_cast_skill(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -250,7 +250,7 @@ async def test_cast_skill(
                 ATTR_SKILL: "smash",
             },
             ERROR_TOO_MANY_REQUESTS,
-            HomeAssistantError,
+            SmartHubError,
             RATE_LIMIT_EXCEPTION_MSG,
         ),
         (
@@ -277,7 +277,7 @@ async def test_cast_skill(
                 ATTR_SKILL: "smash",
             },
             ERROR_BAD_REQUEST,
-            HomeAssistantError,
+            SmartHubError,
             REQUEST_EXCEPTION_MSG,
         ),
         (
@@ -286,13 +286,13 @@ async def test_cast_skill(
                 ATTR_SKILL: "smash",
             },
             ClientError,
-            HomeAssistantError,
+            SmartHubError,
             "Unable to connect to Habitica: ",
         ),
     ],
 )
 async def test_cast_skill_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -317,14 +317,14 @@ async def test_cast_skill_exceptions(
 
 
 async def test_get_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test Habitica config entry exceptions."""
 
     with pytest.raises(
         ServiceValidationError,
-        match="The selected character is not configured in Home Assistant",
+        match="The selected character is not configured in SmartHub",
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -342,7 +342,7 @@ async def test_get_config_entry(
 
     with pytest.raises(
         ServiceValidationError,
-        match="The selected character is currently not loaded or disabled in Home Assistant",
+        match="The selected character is currently not loaded or disabled in SmartHub",
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -369,7 +369,7 @@ async def test_get_config_entry(
     ],
 )
 async def test_handle_quests(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service: str,
@@ -396,7 +396,7 @@ async def test_handle_quests(
     [
         (
             ERROR_TOO_MANY_REQUESTS,
-            HomeAssistantError,
+            SmartHubError,
             RATE_LIMIT_EXCEPTION_MSG,
         ),
         (
@@ -411,12 +411,12 @@ async def test_handle_quests(
         ),
         (
             ERROR_BAD_REQUEST,
-            HomeAssistantError,
+            SmartHubError,
             REQUEST_EXCEPTION_MSG,
         ),
         (
             ClientError,
-            HomeAssistantError,
+            SmartHubError,
             "Unable to connect to Habitica: ",
         ),
     ],
@@ -433,7 +433,7 @@ async def test_handle_quests(
     ],
 )
 async def test_handle_quests_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     raise_exception: Exception,
@@ -521,7 +521,7 @@ async def test_handle_quests_exceptions(
     ],
 )
 async def test_score_task(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service: str,
@@ -567,7 +567,7 @@ async def test_score_task(
                 ATTR_DIRECTION: "up",
             },
             ERROR_TOO_MANY_REQUESTS,
-            HomeAssistantError,
+            SmartHubError,
             RATE_LIMIT_EXCEPTION_MSG,
         ),
         (
@@ -576,7 +576,7 @@ async def test_score_task(
                 ATTR_DIRECTION: "up",
             },
             ERROR_BAD_REQUEST,
-            HomeAssistantError,
+            SmartHubError,
             REQUEST_EXCEPTION_MSG,
         ),
         (
@@ -585,7 +585,7 @@ async def test_score_task(
                 ATTR_DIRECTION: "up",
             },
             ClientError,
-            HomeAssistantError,
+            SmartHubError,
             "Unable to connect to Habitica: ",
         ),
         (
@@ -594,13 +594,13 @@ async def test_score_task(
                 ATTR_DIRECTION: "up",
             },
             ERROR_NOT_AUTHORIZED,
-            HomeAssistantError,
+            SmartHubError,
             "Unable to buy reward, not enough gold. Your character has 137.63 GP, but the reward costs 10.00 GP",
         ),
     ],
 )
 async def test_score_task_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -731,7 +731,7 @@ async def test_score_task_exceptions(
     ],
 )
 async def test_transformation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -789,7 +789,7 @@ async def test_transformation(
             },
             ERROR_BAD_REQUEST,
             None,
-            HomeAssistantError,
+            SmartHubError,
             REQUEST_EXCEPTION_MSG,
         ),
         (
@@ -799,7 +799,7 @@ async def test_transformation(
             },
             None,
             ERROR_TOO_MANY_REQUESTS,
-            HomeAssistantError,
+            SmartHubError,
             RATE_LIMIT_EXCEPTION_MSG,
         ),
         (
@@ -819,7 +819,7 @@ async def test_transformation(
             },
             None,
             ERROR_BAD_REQUEST,
-            HomeAssistantError,
+            SmartHubError,
             REQUEST_EXCEPTION_MSG,
         ),
         (
@@ -829,7 +829,7 @@ async def test_transformation(
             },
             None,
             ClientError,
-            HomeAssistantError,
+            SmartHubError,
             "Unable to connect to Habitica: ",
         ),
         (
@@ -839,13 +839,13 @@ async def test_transformation(
             },
             ClientError,
             None,
-            HomeAssistantError,
+            SmartHubError,
             "Unable to connect to Habitica: ",
         ),
     ],
 )
 async def test_transformation_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -890,7 +890,7 @@ async def test_transformation_exceptions(
         {ATTR_TASK: ["alias_zahnseide_benutzen"]},
         {ATTR_TAG: ["Training", "Gesundheit + Wohlbefinden"]},
         {ATTR_KEYWORD: "gewohnheit"},
-        {ATTR_TAG: ["Home Assistant"]},
+        {ATTR_TAG: ["SmartHub"]},
     ],
     ids=[
         "all_tasks",
@@ -914,7 +914,7 @@ async def test_transformation_exceptions(
 )
 @pytest.mark.usefixtures("habitica")
 async def test_get_tasks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     service_data: dict[str, Any],
@@ -940,17 +940,17 @@ async def test_get_tasks(
     [
         (
             ERROR_TOO_MANY_REQUESTS,
-            HomeAssistantError,
+            SmartHubError,
             RATE_LIMIT_EXCEPTION_MSG,
         ),
         (
             ERROR_BAD_REQUEST,
-            HomeAssistantError,
+            SmartHubError,
             REQUEST_EXCEPTION_MSG,
         ),
         (
             ClientError,
-            HomeAssistantError,
+            SmartHubError,
             "Unable to connect to Habitica: ",
         ),
     ],
@@ -966,7 +966,7 @@ async def test_get_tasks(
 )
 @pytest.mark.usefixtures("habitica")
 async def test_update_task_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     exception: Exception,
@@ -996,17 +996,17 @@ async def test_update_task_exceptions(
     [
         (
             ERROR_TOO_MANY_REQUESTS,
-            HomeAssistantError,
+            SmartHubError,
             RATE_LIMIT_EXCEPTION_MSG,
         ),
         (
             ERROR_BAD_REQUEST,
-            HomeAssistantError,
+            SmartHubError,
             REQUEST_EXCEPTION_MSG,
         ),
         (
             ClientError,
-            HomeAssistantError,
+            SmartHubError,
             "Unable to connect to Habitica: ",
         ),
     ],
@@ -1022,7 +1022,7 @@ async def test_update_task_exceptions(
 )
 @pytest.mark.usefixtures("habitica")
 async def test_create_task_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     exception: Exception,
@@ -1048,7 +1048,7 @@ async def test_create_task_exceptions(
 
 @pytest.mark.usefixtures("habitica")
 async def test_task_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
 ) -> None:
@@ -1101,7 +1101,7 @@ async def test_task_not_found(
     ],
 )
 async def test_update_reward(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -1160,7 +1160,7 @@ async def test_update_reward(
     ],
 )
 async def test_create_reward(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -1242,7 +1242,7 @@ async def test_create_reward(
     ],
 )
 async def test_update_habit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -1326,7 +1326,7 @@ async def test_update_habit(
     ],
 )
 async def test_create_habit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -1502,7 +1502,7 @@ async def test_create_habit(
 )
 @pytest.mark.usefixtures("mock_uuid4")
 async def test_update_todo(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -1600,7 +1600,7 @@ async def test_update_todo(
 )
 @pytest.mark.usefixtures("mock_uuid4")
 async def test_create_todo(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -1820,7 +1820,7 @@ async def test_create_todo(
 @pytest.mark.usefixtures("mock_uuid4")
 @freeze_time("2025-02-25T22:00:00.000Z")
 async def test_update_daily(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -1998,7 +1998,7 @@ async def test_update_daily(
 @pytest.mark.usefixtures("mock_uuid4")
 @freeze_time("2025-02-25T22:00:00.000Z")
 async def test_create_daily(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -2039,7 +2039,7 @@ async def test_create_daily(
 @pytest.mark.usefixtures("mock_uuid4")
 @freeze_time("2025-02-25T22:00:00.000Z")
 async def test_update_daily_service_validation_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     service_data: dict[str, Any],
@@ -2062,7 +2062,7 @@ async def test_update_daily_service_validation_errors(
 
 
 async def test_tags(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
 ) -> None:
@@ -2091,7 +2091,7 @@ async def test_tags(
 
 
 async def test_create_new_tag(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
 ) -> None:
@@ -2104,13 +2104,13 @@ async def test_create_new_tag(
         service_data={
             ATTR_CONFIG_ENTRY: config_entry.entry_id,
             ATTR_TASK: task_id,
-            ATTR_TAG: ["Home Assistant"],
+            ATTR_TAG: ["SmartHub"],
         },
         return_response=True,
         blocking=True,
     )
 
-    habitica.create_tag.assert_awaited_with("Home Assistant")
+    habitica.create_tag.assert_awaited_with("SmartHub")
 
     call_args = habitica.update_task.call_args[0]
     assert call_args[0] == UUID(task_id)
@@ -2126,23 +2126,23 @@ async def test_create_new_tag(
     [
         (
             ERROR_TOO_MANY_REQUESTS,
-            HomeAssistantError,
+            SmartHubError,
             RATE_LIMIT_EXCEPTION_MSG,
         ),
         (
             ERROR_BAD_REQUEST,
-            HomeAssistantError,
+            SmartHubError,
             REQUEST_EXCEPTION_MSG,
         ),
         (
             ClientError,
-            HomeAssistantError,
+            SmartHubError,
             "Unable to connect to Habitica: ",
         ),
     ],
 )
 async def test_create_new_tag_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     exception: Exception,
@@ -2160,7 +2160,7 @@ async def test_create_new_tag_exception(
             service_data={
                 ATTR_CONFIG_ENTRY: config_entry.entry_id,
                 ATTR_TASK: task_id,
-                ATTR_TAG: ["Home Assistant"],
+                ATTR_TAG: ["SmartHub"],
             },
             return_response=True,
             blocking=True,
@@ -2168,7 +2168,7 @@ async def test_create_new_tag_exception(
 
 
 async def test_remove_tags(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
 ) -> None:

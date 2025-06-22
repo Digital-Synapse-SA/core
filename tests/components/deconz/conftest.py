@@ -10,10 +10,10 @@ from unittest.mock import patch
 from pydeconz.websocket import Signal
 import pytest
 
-from homeassistant.components.deconz.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_HOST, CONF_PORT, CONTENT_TYPE_JSON
-from homeassistant.core import HomeAssistant
+from smarthub.components.deconz.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_HOST, CONF_PORT, CONTENT_TYPE_JSON
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.components.light.conftest import mock_light_profiles  # noqa: F401
@@ -204,7 +204,7 @@ def fixture_sensor_data() -> dict[str, Any]:
 
 @pytest.fixture(name="config_entry_factory")
 async def fixture_config_entry_factory(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_requests: Callable[[str], None],
 ) -> ConfigEntryFactoryType:

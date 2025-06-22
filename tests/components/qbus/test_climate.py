@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, call
 
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_HVAC_ACTION,
     ATTR_PRESET_MODE,
@@ -16,12 +16,12 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.qbus.climate import STATE_REQUEST_DELAY
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers.entity_platform import EntityPlatform
-from homeassistant.util import dt as dt_util
+from smarthub.components.qbus.climate import STATE_REQUEST_DELAY
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers.entity_platform import EntityPlatform
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_mqtt_message, async_fire_time_changed
 from tests.typing import MqttMockHAClient
@@ -53,7 +53,7 @@ _CLIMATE_ENTITY_ID = "climate.living_th"
 
 
 async def test_climate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     setup_integration: None,
 ) -> None:
@@ -155,7 +155,7 @@ async def test_climate(
 
 
 async def test_climate_when_invalid_state_received(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     setup_integration: None,
 ) -> None:
@@ -182,7 +182,7 @@ async def test_climate_when_invalid_state_received(
 
 
 async def test_climate_with_fast_subsequent_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     setup_integration: None,
 ) -> None:
@@ -199,7 +199,7 @@ async def test_climate_with_fast_subsequent_changes(
 
 
 async def test_climate_with_unknown_preset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     setup_integration: None,
 ) -> None:
@@ -218,7 +218,7 @@ async def test_climate_with_unknown_preset(
 
 
 def _wait_and_assert_state_request(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     mqtt_mock.reset_mock()
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(STATE_REQUEST_DELAY))

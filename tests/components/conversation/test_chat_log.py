@@ -9,7 +9,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 import voluptuous as vol
 
-from homeassistant.components.conversation import (
+from smarthub.components.conversation import (
     AssistantContent,
     ConversationInput,
     ConverseError,
@@ -17,17 +17,17 @@ from homeassistant.components.conversation import (
     UserContent,
     async_get_chat_log,
 )
-from homeassistant.components.conversation.chat_log import DATA_CHAT_LOGS
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import chat_session, llm
-from homeassistant.util import dt as dt_util
+from smarthub.components.conversation.chat_log import DATA_CHAT_LOGS
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import chat_session, llm
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
 
 @pytest.fixture
-def mock_conversation_input(hass: HomeAssistant) -> ConversationInput:
+def mock_conversation_input(hass: SmartHub) -> ConversationInput:
     """Return a conversation input instance."""
     return ConversationInput(
         text="Hello",
@@ -42,13 +42,13 @@ def mock_conversation_input(hass: HomeAssistant) -> ConversationInput:
 @pytest.fixture
 def mock_ulid() -> Generator[Mock]:
     """Mock the ulid library."""
-    with patch("homeassistant.helpers.chat_session.ulid_now") as mock_ulid_now:
+    with patch("smarthub.helpers.chat_session.ulid_now") as mock_ulid_now:
         mock_ulid_now.return_value = "mock-ulid"
         yield mock_ulid_now
 
 
 async def test_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
 ) -> None:
     """Test cleanup of the chat log."""
@@ -81,7 +81,7 @@ async def test_cleanup(
 
 
 async def test_default_content(
-    hass: HomeAssistant, mock_conversation_input: ConversationInput
+    hass: SmartHub, mock_conversation_input: ConversationInput
 ) -> None:
     """Test filtering of messages."""
     with (
@@ -98,7 +98,7 @@ async def test_default_content(
 
 
 async def test_llm_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
 ) -> None:
     """Test when we reference an LLM API."""
@@ -117,7 +117,7 @@ async def test_llm_api(
 
 
 async def test_unknown_llm_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -138,7 +138,7 @@ async def test_unknown_llm_api(
 
 
 async def test_multiple_llm_apis(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
 ) -> None:
     """Test when we reference an LLM API."""
@@ -179,7 +179,7 @@ async def test_multiple_llm_apis(
 
 
 async def test_template_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -200,7 +200,7 @@ async def test_template_error(
 
 
 async def test_template_variables(
-    hass: HomeAssistant, mock_conversation_input: ConversationInput
+    hass: SmartHub, mock_conversation_input: ConversationInput
 ) -> None:
     """Test that template variables work."""
     mock_user = Mock()
@@ -211,7 +211,7 @@ async def test_template_variables(
     with (
         chat_session.async_get_chat_session(hass) as session,
         async_get_chat_log(hass, session, mock_conversation_input) as chat_log,
-        patch("homeassistant.auth.AuthManager.async_get_user", return_value=mock_user),
+        patch("smarthub.auth.AuthManager.async_get_user", return_value=mock_user),
     ):
         await chat_log.async_provide_llm_data(
             mock_conversation_input.as_llm_context("test"),
@@ -231,7 +231,7 @@ async def test_template_variables(
 
 
 async def test_extra_systen_prompt(
-    hass: HomeAssistant, mock_conversation_input: ConversationInput
+    hass: SmartHub, mock_conversation_input: ConversationInput
 ) -> None:
     """Test that extra system prompt works."""
     extra_system_prompt = "Garage door cover.garage_door has been left open for 30 minutes. We asked the user if they want to close it."
@@ -329,7 +329,7 @@ async def test_extra_systen_prompt(
     ],
 )
 async def test_tool_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
     prerun_tool_tasks: tuple[str],
 ) -> None:
@@ -344,7 +344,7 @@ async def test_tool_call(
     mock_tool.async_call.return_value = "Test response"
 
     with patch(
-        "homeassistant.helpers.llm.AssistAPI._async_get_tools", return_value=[]
+        "smarthub.helpers.llm.AssistAPI._async_get_tools", return_value=[]
     ) as mock_get_tools:
         mock_get_tools.return_value = [mock_tool]
 
@@ -407,7 +407,7 @@ async def test_tool_call(
 
 
 async def test_tool_call_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
 ) -> None:
     """Test using the session tool calling API."""
@@ -418,11 +418,11 @@ async def test_tool_call_exception(
     mock_tool.parameters = vol.Schema(
         {vol.Optional("param1", description="Test parameters"): str}
     )
-    mock_tool.async_call.side_effect = HomeAssistantError("Test error")
+    mock_tool.async_call.side_effect = SmartHubError("Test error")
 
     with (
         patch(
-            "homeassistant.helpers.llm.AssistAPI._async_get_tools", return_value=[]
+            "smarthub.helpers.llm.AssistAPI._async_get_tools", return_value=[]
         ) as mock_get_tools,
         chat_session.async_get_chat_session(hass) as session,
         async_get_chat_log(hass, session, mock_conversation_input) as chat_log,
@@ -453,7 +453,7 @@ async def test_tool_call_exception(
     assert result == ToolResultContent(
         agent_id=mock_conversation_input.agent_id,
         tool_call_id="mock-tool-call-id",
-        tool_result={"error": "HomeAssistantError", "error_text": "Test error"},
+        tool_result={"error": "SmartHubError", "error_text": "Test error"},
         tool_name="test_tool",
     )
 
@@ -542,7 +542,7 @@ async def test_tool_call_exception(
     ],
 )
 async def test_add_delta_content_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
     snapshot: SnapshotAssertion,
     deltas: list[dict],
@@ -557,7 +557,7 @@ async def test_add_delta_content_stream(
     )
 
     async def tool_call(
-        hass: HomeAssistant, tool_input: llm.ToolInput, llm_context: llm.LLMContext
+        hass: SmartHub, tool_input: llm.ToolInput, llm_context: llm.LLMContext
     ) -> str:
         """Call the tool."""
         return tool_input.tool_args["param1"]
@@ -575,7 +575,7 @@ async def test_add_delta_content_stream(
 
     with (
         patch(
-            "homeassistant.helpers.llm.AssistAPI._async_get_tools", return_value=[]
+            "smarthub.helpers.llm.AssistAPI._async_get_tools", return_value=[]
         ) as mock_get_tools,
         chat_session.async_get_chat_session(hass) as session,
         async_get_chat_log(
@@ -610,7 +610,7 @@ async def test_add_delta_content_stream(
 
 
 async def test_add_delta_content_stream_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
 ) -> None:
     """Test streaming deltas error handling."""
@@ -658,7 +658,7 @@ async def test_add_delta_content_stream_errors(
 
 
 async def test_chat_log_reuse(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
 ) -> None:
     """Test that we can reuse a chat log."""
@@ -681,7 +681,7 @@ async def test_chat_log_reuse(
 
 
 async def test_chat_log_continue_conversation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_conversation_input: ConversationInput,
 ) -> None:
     """Test continue conversation."""

@@ -5,9 +5,9 @@ from unittest.mock import patch
 from alarmdecoder.util import NoDeviceError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.alarmdecoder import config_flow
-from homeassistant.components.alarmdecoder.const import (
+from smarthub import config_entries
+from smarthub.components.alarmdecoder import config_flow
+from smarthub.components.alarmdecoder.const import (
     CONF_ALT_NIGHT_MODE,
     CONF_AUTO_BYPASS,
     CONF_CODE_ARM_REQUIRED,
@@ -28,10 +28,10 @@ from homeassistant.components.alarmdecoder.const import (
     PROTOCOL_SERIAL,
     PROTOCOL_SOCKET,
 )
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.const import CONF_HOST, CONF_PORT, CONF_PROTOCOL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.const import CONF_HOST, CONF_PORT, CONF_PROTOCOL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -57,7 +57,7 @@ from tests.common import MockConfigEntry
         ),
     ],
 )
-async def test_setups(hass: HomeAssistant, protocol, connection, title) -> None:
+async def test_setups(hass: SmartHub, protocol, connection, title) -> None:
     """Test flow for setting up the available AlarmDecoder protocols."""
 
     result = await hass.config_entries.flow.async_init(
@@ -76,10 +76,10 @@ async def test_setups(hass: HomeAssistant, protocol, connection, title) -> None:
     assert result["step_id"] == "protocol"
 
     with (
-        patch("homeassistant.components.alarmdecoder.config_flow.AdExt.open"),
-        patch("homeassistant.components.alarmdecoder.config_flow.AdExt.close"),
+        patch("smarthub.components.alarmdecoder.config_flow.AdExt.open"),
+        patch("smarthub.components.alarmdecoder.config_flow.AdExt.close"),
         patch(
-            "homeassistant.components.alarmdecoder.async_setup_entry",
+            "smarthub.components.alarmdecoder.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -97,7 +97,7 @@ async def test_setups(hass: HomeAssistant, protocol, connection, title) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_setup_connection_error(hass: HomeAssistant) -> None:
+async def test_setup_connection_error(hass: SmartHub) -> None:
     """Test flow for setup with a connection error."""
 
     port = 1001
@@ -122,10 +122,10 @@ async def test_setup_connection_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.alarmdecoder.config_flow.AdExt.open",
+            "smarthub.components.alarmdecoder.config_flow.AdExt.open",
             side_effect=NoDeviceError,
         ),
-        patch("homeassistant.components.alarmdecoder.config_flow.AdExt.close"),
+        patch("smarthub.components.alarmdecoder.config_flow.AdExt.close"),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], connection_settings
@@ -135,10 +135,10 @@ async def test_setup_connection_error(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.alarmdecoder.config_flow.AdExt.open",
+            "smarthub.components.alarmdecoder.config_flow.AdExt.open",
             side_effect=Exception,
         ),
-        patch("homeassistant.components.alarmdecoder.config_flow.AdExt.close"),
+        patch("smarthub.components.alarmdecoder.config_flow.AdExt.close"),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], connection_settings
@@ -147,7 +147,7 @@ async def test_setup_connection_error(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "unknown"}
 
 
-async def test_options_arm_flow(hass: HomeAssistant) -> None:
+async def test_options_arm_flow(hass: SmartHub) -> None:
     """Test arm options flow."""
     user_input = {
         CONF_ALT_NIGHT_MODE: True,
@@ -174,7 +174,7 @@ async def test_options_arm_flow(hass: HomeAssistant) -> None:
     assert result["step_id"] == "arm_settings"
 
     with patch(
-        "homeassistant.components.alarmdecoder.async_setup_entry", return_value=True
+        "smarthub.components.alarmdecoder.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.options.async_configure(
             result["flow_id"],
@@ -188,7 +188,7 @@ async def test_options_arm_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_options_zone_flow(hass: HomeAssistant) -> None:
+async def test_options_zone_flow(hass: SmartHub) -> None:
     """Test options flow for adding/deleting zones."""
     zone_number = "2"
     zone_settings = {
@@ -220,7 +220,7 @@ async def test_options_zone_flow(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.alarmdecoder.async_setup_entry", return_value=True
+        "smarthub.components.alarmdecoder.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.options.async_configure(
             result["flow_id"],
@@ -253,7 +253,7 @@ async def test_options_zone_flow(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.alarmdecoder.async_setup_entry", return_value=True
+        "smarthub.components.alarmdecoder.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.options.async_configure(
             result["flow_id"],
@@ -267,7 +267,7 @@ async def test_options_zone_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_options_zone_flow_validation(hass: HomeAssistant) -> None:
+async def test_options_zone_flow_validation(hass: SmartHub) -> None:
     """Test input validation for zone options flow."""
     zone_number = "2"
     zone_settings = {
@@ -375,7 +375,7 @@ async def test_options_zone_flow_validation(hass: HomeAssistant) -> None:
 
     # All valid settings
     with patch(
-        "homeassistant.components.alarmdecoder.async_setup_entry", return_value=True
+        "smarthub.components.alarmdecoder.async_setup_entry", return_value=True
     ):
         result = await hass.config_entries.options.async_configure(
             result["flow_id"],
@@ -422,7 +422,7 @@ async def test_options_zone_flow_validation(hass: HomeAssistant) -> None:
         ),
     ],
 )
-async def test_one_device_allowed(hass: HomeAssistant, protocol, connection) -> None:
+async def test_one_device_allowed(hass: SmartHub, protocol, connection) -> None:
     """Test that only one AlarmDecoder device is allowed."""
     flow = config_flow.AlarmDecoderFlowHandler()
     flow.hass = hass

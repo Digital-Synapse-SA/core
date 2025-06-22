@@ -5,16 +5,16 @@ import logging
 import pytest
 import voluptuous_serialize
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.device_automation.exceptions import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.device_automation.exceptions import (
     InvalidDeviceAutomationConfig,
 )
-from homeassistant.components.knx import DOMAIN, device_trigger
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import config_validation as cv, device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.knx import DOMAIN, device_trigger
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import config_validation as cv, device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .conftest import KNXTestKit
 
@@ -22,7 +22,7 @@ from tests.common import async_get_device_automations
 
 
 async def test_if_fires_on_telegram(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
     knx: KNXTestKit,
@@ -115,7 +115,7 @@ async def test_if_fires_on_telegram(
 
 
 async def test_default_if_fires_on_telegram(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
     knx: KNXTestKit,
@@ -199,7 +199,7 @@ async def test_default_if_fires_on_telegram(
 
 
 async def test_remove_device_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
     knx: KNXTestKit,
@@ -251,7 +251,7 @@ async def test_remove_device_trigger(
 
 
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     knx: KNXTestKit,
 ) -> None:
@@ -274,7 +274,7 @@ async def test_get_triggers(
 
 
 async def test_get_trigger_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     knx: KNXTestKit,
 ) -> None:
@@ -355,7 +355,7 @@ async def test_get_trigger_capabilities(
 
 
 async def test_invalid_device_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     knx: KNXTestKit,
     caplog: pytest.LogCaptureFixture,
@@ -399,7 +399,7 @@ async def test_invalid_device_trigger(
 
 
 async def test_invalid_trigger_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     knx: KNXTestKit,
 ) -> None:

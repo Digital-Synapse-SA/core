@@ -27,7 +27,7 @@ def generate_and_validate(integrations: dict[str, Integration]) -> str:
 
 def validate(integrations: dict[str, Integration], config: Config) -> None:
     """Validate MQTT file."""
-    mqtt_path = config.root / "homeassistant/generated/mqtt.py"
+    mqtt_path = config.root / "smarthub/generated/mqtt.py"
     config.cache["mqtt"] = content = generate_and_validate(integrations)
 
     if config.specific_integrations:
@@ -43,5 +43,5 @@ def validate(integrations: dict[str, Integration], config: Config) -> None:
 
 def generate(integrations: dict[str, Integration], config: Config) -> None:
     """Generate MQTT file."""
-    mqtt_path = config.root / "homeassistant/generated/mqtt.py"
+    mqtt_path = config.root / "smarthub/generated/mqtt.py"
     mqtt_path.write_text(f"{config.cache['mqtt']}")

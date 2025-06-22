@@ -8,22 +8,22 @@ from aiohttp import web
 from aioimmich.exceptions import ImmichError
 import pytest
 
-from homeassistant.components.immich.const import DOMAIN
-from homeassistant.components.immich.media_source import (
+from smarthub.components.immich.const import DOMAIN
+from smarthub.components.immich.media_source import (
     ImmichMediaSource,
     ImmichMediaView,
     async_get_media_source,
 )
-from homeassistant.components.media_player import MediaClass
-from homeassistant.components.media_source import (
+from smarthub.components.media_player import MediaClass
+from smarthub.components.media_source import (
     BrowseError,
     BrowseMedia,
     MediaSourceItem,
     Unresolvable,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.aiohttp import MockRequest, MockStreamReaderChunked
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.aiohttp import MockRequest, MockStreamReaderChunked
 
 from . import setup_integration
 from .const import MOCK_ALBUM_WITHOUT_ASSETS
@@ -31,7 +31,7 @@ from .const import MOCK_ALBUM_WITHOUT_ASSETS
 from tests.common import MockConfigEntry
 
 
-async def test_get_media_source(hass: HomeAssistant) -> None:
+async def test_get_media_source(hass: SmartHub) -> None:
     """Test the async_get_media_source."""
     assert await async_setup_component(hass, "media_source", {})
 
@@ -55,7 +55,7 @@ async def test_get_media_source(hass: HomeAssistant) -> None:
     ],
 )
 async def test_resolve_media_bad_identifier(
-    hass: HomeAssistant, identifier: str, exception_msg: str
+    hass: SmartHub, identifier: str, exception_msg: str
 ) -> None:
     """Test resolve_media with bad identifiers."""
     assert await async_setup_component(hass, "media_source", {})
@@ -87,7 +87,7 @@ async def test_resolve_media_bad_identifier(
     ],
 )
 async def test_resolve_media_success(
-    hass: HomeAssistant, identifier: str, url: str, mime_type: str
+    hass: SmartHub, identifier: str, url: str, mime_type: str
 ) -> None:
     """Test successful resolving an item."""
     assert await async_setup_component(hass, "media_source", {})
@@ -100,7 +100,7 @@ async def test_resolve_media_success(
     assert result.mime_type == mime_type
 
 
-async def test_browse_media_unconfigured(hass: HomeAssistant) -> None:
+async def test_browse_media_unconfigured(hass: SmartHub) -> None:
     """Test browse_media without any devices being configured."""
     assert await async_setup_component(hass, "media_source", {})
 
@@ -113,14 +113,14 @@ async def test_browse_media_unconfigured(hass: HomeAssistant) -> None:
 
 
 async def test_browse_media_get_root(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_immich: Mock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test browse_media returning root media sources."""
     assert await async_setup_component(hass, "media_source", {})
 
-    with patch("homeassistant.components.immich.PLATFORMS", []):
+    with patch("smarthub.components.immich.PLATFORMS", []):
         await setup_integration(hass, mock_config_entry)
 
     source = await async_get_media_source(hass)
@@ -153,14 +153,14 @@ async def test_browse_media_get_root(
 
 
 async def test_browse_media_get_albums(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_immich: Mock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test browse_media returning albums."""
     assert await async_setup_component(hass, "media_source", {})
 
-    with patch("homeassistant.components.immich.PLATFORMS", []):
+    with patch("smarthub.components.immich.PLATFORMS", []):
         await setup_integration(hass, mock_config_entry)
 
     source = await async_get_media_source(hass)
@@ -182,14 +182,14 @@ async def test_browse_media_get_albums(
 
 
 async def test_browse_media_get_albums_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_immich: Mock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test browse_media with unknown album."""
     assert await async_setup_component(hass, "media_source", {})
 
-    with patch("homeassistant.components.immich.PLATFORMS", []):
+    with patch("smarthub.components.immich.PLATFORMS", []):
         await setup_integration(hass, mock_config_entry)
 
     # exception in get_albums()
@@ -213,14 +213,14 @@ async def test_browse_media_get_albums_error(
 
 
 async def test_browse_media_get_album_items_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_immich: Mock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test browse_media returning albums."""
     assert await async_setup_component(hass, "media_source", {})
 
-    with patch("homeassistant.components.immich.PLATFORMS", []):
+    with patch("smarthub.components.immich.PLATFORMS", []):
         await setup_integration(hass, mock_config_entry)
 
     source = await async_get_media_source(hass)
@@ -262,14 +262,14 @@ async def test_browse_media_get_album_items_error(
 
 
 async def test_browse_media_get_album_items(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_immich: Mock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test browse_media returning albums."""
     assert await async_setup_component(hass, "media_source", {})
 
-    with patch("homeassistant.components.immich.PLATFORMS", []):
+    with patch("smarthub.components.immich.PLATFORMS", []):
         await setup_integration(hass, mock_config_entry)
 
     source = await async_get_media_source(hass)
@@ -320,7 +320,7 @@ async def test_browse_media_get_album_items(
 
 
 async def test_media_view(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
     mock_immich: Mock,
     mock_config_entry: MockConfigEntry,
@@ -335,7 +335,7 @@ async def test_media_view(
 
     # setup immich
     assert await async_setup_component(hass, "media_source", {})
-    with patch("homeassistant.components.immich.PLATFORMS", []):
+    with patch("smarthub.components.immich.PLATFORMS", []):
         await setup_integration(hass, mock_config_entry)
 
     # wrong url (without mime type)

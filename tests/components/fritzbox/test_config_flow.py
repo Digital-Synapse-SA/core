@@ -9,12 +9,12 @@ from pyfritzhome import LoginError
 import pytest
 from requests.exceptions import HTTPError
 
-from homeassistant.components.fritzbox.const import DOMAIN
-from homeassistant.config_entries import SOURCE_SSDP, SOURCE_USER
-from homeassistant.const import CONF_DEVICES, CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.components.fritzbox.const import DOMAIN
+from smarthub.config_entries import SOURCE_SSDP, SOURCE_USER
+from smarthub.const import CONF_DEVICES, CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_UDN,
     SsdpServiceInfo,
@@ -60,13 +60,13 @@ MOCK_SSDP_DATA = {
 def fritz_fixture() -> Mock:
     """Patch libraries."""
     with (
-        patch("homeassistant.components.fritzbox.async_setup_entry"),
-        patch("homeassistant.components.fritzbox.config_flow.Fritzhome") as fritz,
+        patch("smarthub.components.fritzbox.async_setup_entry"),
+        patch("smarthub.components.fritzbox.config_flow.Fritzhome") as fritz,
     ):
         yield fritz
 
 
-async def test_user(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_user(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a flow by user."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -85,7 +85,7 @@ async def test_user(hass: HomeAssistant, fritz: Mock) -> None:
     assert not result["result"].unique_id
 
 
-async def test_user_auth_failed(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_user_auth_failed(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a flow by user with authentication failure."""
     fritz().login.side_effect = [LoginError("Boom"), mock.DEFAULT]
 
@@ -97,7 +97,7 @@ async def test_user_auth_failed(hass: HomeAssistant, fritz: Mock) -> None:
     assert result["errors"]["base"] == "invalid_auth"
 
 
-async def test_user_not_successful(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_user_not_successful(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a flow by user but no connection found."""
     fritz().login.side_effect = OSError("Boom")
 
@@ -108,7 +108,7 @@ async def test_user_not_successful(hass: HomeAssistant, fritz: Mock) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_user_already_configured(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_user_already_configured(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a flow by user when already configured."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=MOCK_USER_DATA
@@ -123,7 +123,7 @@ async def test_user_already_configured(hass: HomeAssistant, fritz: Mock) -> None
     assert result["reason"] == "already_configured"
 
 
-async def test_reauth_success(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_reauth_success(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a reauthentication flow."""
     mock_config = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
     mock_config.add_to_hass(hass)
@@ -145,7 +145,7 @@ async def test_reauth_success(hass: HomeAssistant, fritz: Mock) -> None:
     assert mock_config.data[CONF_PASSWORD] == "other_fake_password"
 
 
-async def test_reauth_auth_failed(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_reauth_auth_failed(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a reauthentication flow with authentication failure."""
     fritz().login.side_effect = LoginError("Boom")
 
@@ -168,7 +168,7 @@ async def test_reauth_auth_failed(hass: HomeAssistant, fritz: Mock) -> None:
     assert result["errors"]["base"] == "invalid_auth"
 
 
-async def test_reauth_not_successful(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_reauth_not_successful(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a reauthentication flow but no connection found."""
     fritz().login.side_effect = OSError("Boom")
 
@@ -190,7 +190,7 @@ async def test_reauth_not_successful(hass: HomeAssistant, fritz: Mock) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_reconfigure_success(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_reconfigure_success(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a reconfigure flow."""
     mock_config = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
     mock_config.add_to_hass(hass)
@@ -217,7 +217,7 @@ async def test_reconfigure_success(hass: HomeAssistant, fritz: Mock) -> None:
     assert mock_config.data[CONF_PASSWORD] == "fake_pass"
 
 
-async def test_reconfigure_failed(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_reconfigure_failed(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a reconfigure flow with failure."""
     fritz().login.side_effect = [OSError("Boom"), None]
 
@@ -265,7 +265,7 @@ async def test_reconfigure_failed(hass: HomeAssistant, fritz: Mock) -> None:
     ],
 )
 async def test_ssdp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fritz: Mock,
     test_data: SsdpServiceInfo,
     expected_result: str,
@@ -293,7 +293,7 @@ async def test_ssdp(
     assert result["result"].unique_id == "only-a-test"
 
 
-async def test_ssdp_no_friendly_name(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_ssdp_no_friendly_name(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a flow from discovery without friendly name."""
     MOCK_NO_NAME = dataclasses.replace(MOCK_SSDP_DATA["ip4_valid"])
     MOCK_NO_NAME.upnp = MOCK_NO_NAME.upnp.copy()
@@ -316,7 +316,7 @@ async def test_ssdp_no_friendly_name(hass: HomeAssistant, fritz: Mock) -> None:
     assert result["result"].unique_id == "only-a-test"
 
 
-async def test_ssdp_auth_failed(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_ssdp_auth_failed(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a flow from discovery with authentication failure."""
     fritz().login.side_effect = LoginError("Boom")
 
@@ -336,7 +336,7 @@ async def test_ssdp_auth_failed(hass: HomeAssistant, fritz: Mock) -> None:
     assert result["errors"]["base"] == "invalid_auth"
 
 
-async def test_ssdp_not_successful(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_ssdp_not_successful(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a flow from discovery but no device found."""
     fritz().login.side_effect = OSError("Boom")
 
@@ -354,7 +354,7 @@ async def test_ssdp_not_successful(hass: HomeAssistant, fritz: Mock) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_ssdp_not_supported(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_ssdp_not_supported(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a flow from discovery with unsupported device."""
     fritz().get_device_elements.side_effect = HTTPError("Boom")
 
@@ -373,7 +373,7 @@ async def test_ssdp_not_supported(hass: HomeAssistant, fritz: Mock) -> None:
 
 
 async def test_ssdp_already_in_progress_unique_id(
-    hass: HomeAssistant, fritz: Mock
+    hass: SmartHub, fritz: Mock
 ) -> None:
     """Test starting a flow from discovery twice."""
     result = await hass.config_entries.flow.async_init(
@@ -389,7 +389,7 @@ async def test_ssdp_already_in_progress_unique_id(
     assert result["reason"] == "already_in_progress"
 
 
-async def test_ssdp_already_in_progress_host(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_ssdp_already_in_progress_host(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a flow from discovery twice."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_SSDP}, data=MOCK_SSDP_DATA["ip4_valid"]
@@ -407,7 +407,7 @@ async def test_ssdp_already_in_progress_host(hass: HomeAssistant, fritz: Mock) -
     assert result["reason"] == "already_in_progress"
 
 
-async def test_ssdp_already_configured(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_ssdp_already_configured(hass: SmartHub, fritz: Mock) -> None:
     """Test starting a flow from discovery when already configured."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=MOCK_USER_DATA

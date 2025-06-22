@@ -7,12 +7,12 @@ from datetime import timedelta
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.components.schedule.const import ATTR_NEXT_EVENT, DOMAIN
-from homeassistant.const import ATTR_EDITABLE, ATTR_FRIENDLY_NAME, ATTR_ICON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.components.schedule.const import ATTR_NEXT_EVENT, DOMAIN
+from smarthub.const import ATTR_EDITABLE, ATTR_FRIENDLY_NAME, ATTR_ICON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 from tests.components.recorder.common import async_wait_recording_done
@@ -20,7 +20,7 @@ from tests.components.recorder.common import async_wait_recording_done
 
 @pytest.mark.usefixtures("recorder_mock", "enable_custom_integrations")
 async def test_exclude_attributes(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test attributes to be excluded."""
     freezer.move_to("2024-08-02 06:30:00-07:00")  # Before Friday event

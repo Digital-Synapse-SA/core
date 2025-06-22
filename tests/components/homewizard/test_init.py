@@ -8,15 +8,15 @@ from freezegun.api import FrozenDateTimeFactory
 from homewizard_energy.errors import DisabledError, UnauthorizedError
 import pytest
 
-from homeassistant.components.homewizard.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.homewizard.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_load_unload_v1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homewizardenergy: MagicMock,
 ) -> None:
@@ -39,7 +39,7 @@ async def test_load_unload_v1(
 
 
 async def test_load_unload_v2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_v2: MockConfigEntry,
     mock_homewizardenergy_v2: MagicMock,
 ) -> None:
@@ -58,7 +58,7 @@ async def test_load_unload_v2(
 
 
 async def test_load_failed_host_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homewizardenergy: MagicMock,
 ) -> None:
@@ -72,7 +72,7 @@ async def test_load_failed_host_unavailable(
 
 
 async def test_load_detect_api_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homewizardenergy: MagicMock,
 ) -> None:
@@ -97,7 +97,7 @@ async def test_load_detect_api_disabled(
 
 
 async def test_load_detect_invalid_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_v2: MockConfigEntry,
     mock_homewizardenergy_v2: MagicMock,
 ) -> None:
@@ -123,7 +123,7 @@ async def test_load_detect_invalid_token(
 
 @pytest.mark.usefixtures("mock_homewizardenergy")
 async def test_load_removes_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test setup removes reauth flow when API is enabled."""
@@ -148,7 +148,7 @@ async def test_load_removes_reauth_flow(
 
 @pytest.mark.usefixtures("mock_homewizardenergy")
 async def test_disablederror_reloads_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homewizardenergy: MagicMock,
     freezer: FrozenDateTimeFactory,

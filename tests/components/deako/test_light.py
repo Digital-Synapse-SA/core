@@ -5,16 +5,16 @@ from unittest.mock import MagicMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import ATTR_BRIGHTNESS, DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.light import ATTR_BRIGHTNESS, DOMAIN as LIGHT_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_light_setup_with_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     pydeako_deako_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -35,7 +35,7 @@ async def test_light_setup_with_device(
 
 
 async def test_light_initial_props(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     pydeako_deako_mock: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -62,7 +62,7 @@ async def test_light_initial_props(
 
 
 async def test_dimmable_light_props(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     pydeako_deako_mock: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -90,7 +90,7 @@ async def test_dimmable_light_props(
 
 
 async def test_light_power_change_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     pydeako_deako_mock: MagicMock,
 ) -> None:
@@ -120,7 +120,7 @@ async def test_light_power_change_on(
 
 
 async def test_light_power_change_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     pydeako_deako_mock: MagicMock,
 ) -> None:
@@ -158,7 +158,7 @@ async def test_light_power_change_off(
     ],
 )
 async def test_light_brightness_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     pydeako_deako_mock: MagicMock,
     dim_input: int,

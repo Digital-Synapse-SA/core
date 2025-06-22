@@ -5,12 +5,12 @@ from typing import Any
 
 from aiohttp.test_utils import TestClient
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 
 async def test_sending_location(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:
@@ -82,7 +82,7 @@ async def test_sending_location(
 
 
 async def test_restoring_location(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_registrations: tuple[dict[str, Any], dict[str, Any]],
     webhook_client: TestClient,
 ) -> None:

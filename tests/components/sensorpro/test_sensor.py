@@ -1,9 +1,9 @@
 """Test the SensorPro sensors."""
 
-from homeassistant.components.sensor import ATTR_STATE_CLASS
-from homeassistant.components.sensorpro.const import DOMAIN
-from homeassistant.const import ATTR_FRIENDLY_NAME, ATTR_UNIT_OF_MEASUREMENT
-from homeassistant.core import HomeAssistant
+from smarthub.components.sensor import ATTR_STATE_CLASS
+from smarthub.components.sensorpro.const import DOMAIN
+from smarthub.const import ATTR_FRIENDLY_NAME, ATTR_UNIT_OF_MEASUREMENT
+from smarthub.core import SmartHub
 
 from . import SENSORPRO_SERVICE_INFO
 
@@ -11,7 +11,7 @@ from tests.common import MockConfigEntry
 from tests.components.bluetooth import inject_bluetooth_service_info
 
 
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: SmartHub) -> None:
     """Test setting up creates the sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,

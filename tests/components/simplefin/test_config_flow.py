@@ -11,12 +11,12 @@ from simplefin4py.exceptions import (
     SimpleFinPaymentRequiredError,
 )
 
-from homeassistant.components.simplefin import CONF_ACCESS_URL
-from homeassistant.components.simplefin.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.simplefin import CONF_ACCESS_URL
+from smarthub.components.simplefin.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import entity_registry as er
 
 from .conftest import MOCK_ACCESS_URL
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_successful_claim(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_simplefin_client: AsyncMock,
 ) -> None:
@@ -45,7 +45,7 @@ async def test_successful_claim(
 
 
 async def test_already_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     mock_simplefin_client: AsyncMock,
@@ -66,7 +66,7 @@ async def test_already_setup(
 
 
 async def test_access_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_simplefin_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -93,7 +93,7 @@ async def test_access_url(
     ],
 )
 async def test_access_url_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_simplefin_client: AsyncMock,
     side_effect: Exception,
     error_key: str,
@@ -133,7 +133,7 @@ async def test_access_url_errors(
     ],
 )
 async def test_claim_token_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_simplefin_client: AsyncMock,
     side_effect: Exception,
     error_key: str,

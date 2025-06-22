@@ -7,14 +7,14 @@ from unittest.mock import Mock
 
 from uiprotect.data import Camera, Event, EventType, ModelType, SmartDetectObjectType
 
-from homeassistant.components.unifiprotect.const import (
+from smarthub.components.unifiprotect.const import (
     ATTR_EVENT_ID,
     DEFAULT_ATTRIBUTION,
 )
-from homeassistant.components.unifiprotect.event import EVENT_DESCRIPTIONS
-from homeassistant.const import ATTR_ATTRIBUTION, Platform
-from homeassistant.core import Event as HAEvent, HomeAssistant, callback
-from homeassistant.helpers.event import async_track_state_change_event
+from smarthub.components.unifiprotect.event import EVENT_DESCRIPTIONS
+from smarthub.const import ATTR_ATTRIBUTION, Platform
+from smarthub.core import Event as HAEvent, SmartHub, callback
+from smarthub.helpers.event import async_track_state_change_event
 
 from .utils import (
     MockUFPFixture,
@@ -27,7 +27,7 @@ from .utils import (
 
 
 async def test_camera_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, unadopted_camera: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, unadopted_camera: Camera
 ) -> None:
     """Test removing and re-adding a camera device."""
 
@@ -41,7 +41,7 @@ async def test_camera_remove(
 
 
 async def test_doorbell_ring(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -155,7 +155,7 @@ async def test_doorbell_ring(
 
 
 async def test_doorbell_nfc_scanned(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -230,7 +230,7 @@ async def test_doorbell_nfc_scanned(
 
 
 async def test_doorbell_nfc_scanned_ulpusr_deactivated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -306,7 +306,7 @@ async def test_doorbell_nfc_scanned_ulpusr_deactivated(
 
 
 async def test_doorbell_nfc_scanned_no_ulpusr(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -374,7 +374,7 @@ async def test_doorbell_nfc_scanned_no_ulpusr(
 
 
 async def test_doorbell_nfc_scanned_no_keyring(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -435,7 +435,7 @@ async def test_doorbell_nfc_scanned_no_keyring(
 
 
 async def test_doorbell_fingerprint_identified(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -503,7 +503,7 @@ async def test_doorbell_fingerprint_identified(
 
 
 async def test_doorbell_fingerprint_identified_user_deactivated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -572,7 +572,7 @@ async def test_doorbell_fingerprint_identified_user_deactivated(
 
 
 async def test_doorbell_fingerprint_identified_no_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -633,7 +633,7 @@ async def test_doorbell_fingerprint_identified_no_user(
 
 
 async def test_doorbell_fingerprint_not_identified(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,

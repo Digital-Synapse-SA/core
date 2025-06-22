@@ -5,24 +5,24 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from homeassistant.components import camera
-from homeassistant.components.alexa import smart_home, state_report
-from homeassistant.components.climate import ClimateEntityFeature
-from homeassistant.components.cover import CoverDeviceClass, CoverEntityFeature
-from homeassistant.components.media_player import MediaPlayerEntityFeature
-from homeassistant.components.vacuum import VacuumEntityFeature
-from homeassistant.components.valve import SERVICE_STOP_VALVE, ValveEntityFeature
-from homeassistant.const import (
+from smarthub.components import camera
+from smarthub.components.alexa import smart_home, state_report
+from smarthub.components.climate import ClimateEntityFeature
+from smarthub.components.cover import CoverDeviceClass, CoverEntityFeature
+from smarthub.components.media_player import MediaPlayerEntityFeature
+from smarthub.components.vacuum import VacuumEntityFeature
+from smarthub.components.valve import SERVICE_STOP_VALVE, ValveEntityFeature
+from smarthub.const import (
     SERVICE_CLOSE_VALVE,
     SERVICE_OPEN_VALVE,
     STATE_UNKNOWN,
     UnitOfTemperature,
 )
-from homeassistant.core import Context, Event, HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.helpers import entityfilter
-from homeassistant.setup import async_setup_component
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
+from smarthub.core import Context, Event, SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.helpers import entityfilter
+from smarthub.setup import async_setup_component
+from smarthub.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from .test_common import (
     MockConfig,
@@ -41,15 +41,15 @@ from tests.typing import ClientSessionGenerator
 
 
 @pytest.fixture
-def events(hass: HomeAssistant) -> list[Event]:
+def events(hass: SmartHub) -> list[Event]:
     """Fixture that catches alexa events."""
     return async_capture_events(hass, smart_home.EVENT_ALEXA_SMART_HOME)
 
 
 @pytest.fixture
-async def mock_camera(hass: HomeAssistant) -> None:
+async def mock_camera(hass: SmartHub) -> None:
     """Initialize a demo camera platform."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(
         hass, "camera", {camera.DOMAIN: {"platform": "demo"}}
     )
@@ -57,13 +57,13 @@ async def mock_camera(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-async def mock_stream(hass: HomeAssistant) -> None:
+async def mock_stream(hass: SmartHub) -> None:
     """Initialize a demo camera platform with streaming."""
     assert await async_setup_component(hass, "stream", {"stream": {}})
     await hass.async_block_till_done()
 
 
-def test_create_api_message_defaults(hass: HomeAssistant) -> None:
+def test_create_api_message_defaults(hass: SmartHub) -> None:
     """Create an API message response of a request with defaults."""
     request = get_new_request("Alexa.PowerController", "TurnOn", "switch#xy")
     directive_header = request["directive"]["header"]
@@ -111,7 +111,7 @@ def test_create_api_message_special() -> None:
     assert "endpoint" not in msg
 
 
-async def test_wrong_version(hass: HomeAssistant) -> None:
+async def test_wrong_version(hass: SmartHub) -> None:
     """Test with wrong version."""
     msg = get_new_request("Alexa.PowerController", "TurnOn")
     msg["directive"]["header"]["payloadVersion"] = "2"
@@ -121,7 +121,7 @@ async def test_wrong_version(hass: HomeAssistant) -> None:
 
 
 async def discovery_test(
-    device, hass: HomeAssistant, expected_endpoints: int = 1
+    device, hass: SmartHub, expected_endpoints: int = 1
 ) -> dict[str, Any] | list[dict[str, Any]] | None:
     """Test alexa discovery request."""
     request = get_new_request("Alexa.Discovery", "Discover")
@@ -171,7 +171,7 @@ def assert_endpoint_capabilities(endpoint, *interfaces):
 
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
-async def test_switch(hass: HomeAssistant, events: list[Event]) -> None:
+async def test_switch(hass: SmartHub, events: list[Event]) -> None:
     """Test switch discovery."""
     device = ("switch.test", "on", {"friendly_name": "Test switch"})
     appliance = await discovery_test(device, hass)
@@ -203,7 +203,7 @@ async def test_switch(hass: HomeAssistant, events: list[Event]) -> None:
     assert {"name": "detectionState"} in properties["supported"]
 
 
-async def test_outlet(hass: HomeAssistant, events: list[Event]) -> None:
+async def test_outlet(hass: SmartHub, events: list[Event]) -> None:
     """Test switch with device class outlet discovery."""
     device = (
         "switch.test",
@@ -225,7 +225,7 @@ async def test_outlet(hass: HomeAssistant, events: list[Event]) -> None:
 
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
-async def test_light(hass: HomeAssistant) -> None:
+async def test_light(hass: SmartHub) -> None:
     """Test light discovery."""
     device = ("light.test_1", "on", {"friendly_name": "Test light 1"})
     appliance = await discovery_test(device, hass)
@@ -242,7 +242,7 @@ async def test_light(hass: HomeAssistant) -> None:
     )
 
 
-async def test_dimmable_light(hass: HomeAssistant) -> None:
+async def test_dimmable_light(hass: SmartHub) -> None:
     """Test dimmable light discovery."""
     device = (
         "light.test_2",
@@ -282,7 +282,7 @@ async def test_dimmable_light(hass: HomeAssistant) -> None:
     assert call.data["brightness_pct"] == 50
 
 
-async def test_dimmable_light_with_none_brightness(hass: HomeAssistant) -> None:
+async def test_dimmable_light_with_none_brightness(hass: SmartHub) -> None:
     """Test dimmable light discovery."""
     device = (
         "light.test_2",
@@ -327,7 +327,7 @@ async def test_dimmable_light_with_none_brightness(hass: HomeAssistant) -> None:
     [["color_temp", "hs"], ["color_temp", "rgb"], ["color_temp", "xy"]],
 )
 async def test_color_light(
-    hass: HomeAssistant, supported_color_modes: list[str]
+    hass: SmartHub, supported_color_modes: list[str]
 ) -> None:
     """Test color light discovery."""
     device = (
@@ -360,7 +360,7 @@ async def test_color_light(
     # tests
 
 
-async def test_color_light_turned_off(hass: HomeAssistant) -> None:
+async def test_color_light_turned_off(hass: SmartHub) -> None:
     """Test color light discovery with turned off light."""
     device = (
         "light.test_off",
@@ -410,7 +410,7 @@ async def test_color_light_turned_off(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
-async def test_script(hass: HomeAssistant) -> None:
+async def test_script(hass: SmartHub) -> None:
     """Test script discovery."""
     device = ("script.test", "off", {"friendly_name": "Test script"})
     appliance = await discovery_test(device, hass)
@@ -431,7 +431,7 @@ async def test_script(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
-async def test_input_boolean(hass: HomeAssistant) -> None:
+async def test_input_boolean(hass: SmartHub) -> None:
     """Test input boolean discovery."""
     device = ("input_boolean.test", "off", {"friendly_name": "Test input boolean"})
     appliance = await discovery_test(device, hass)
@@ -468,7 +468,7 @@ async def test_input_boolean(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
-async def test_scene(hass: HomeAssistant) -> None:
+async def test_scene(hass: SmartHub) -> None:
     """Test scene discovery."""
     device = ("scene.test", "off", {"friendly_name": "Test scene"})
     appliance = await discovery_test(device, hass)
@@ -489,7 +489,7 @@ async def test_scene(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
-async def test_fan(hass: HomeAssistant) -> None:
+async def test_fan(hass: SmartHub) -> None:
     """Test fan discovery."""
     device = ("fan.test_1", "off", {"friendly_name": "Test fan 1"})
     appliance = await discovery_test(device, hass)
@@ -535,7 +535,7 @@ async def test_fan(hass: HomeAssistant) -> None:
     )
 
 
-async def test_fan2(hass: HomeAssistant) -> None:
+async def test_fan2(hass: SmartHub) -> None:
     """Test fan discovery with percentage_step."""
 
     # Test fan discovery with percentage_step
@@ -569,7 +569,7 @@ async def test_fan2(hass: HomeAssistant) -> None:
     assert "configuration" not in power_capability
 
 
-async def test_variable_fan(hass: HomeAssistant) -> None:
+async def test_variable_fan(hass: SmartHub) -> None:
     """Test fan discovery.
 
     This one has variable speed.
@@ -668,7 +668,7 @@ async def test_variable_fan(hass: HomeAssistant) -> None:
 
 
 async def test_variable_fan_no_current_speed(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test fan discovery.
 
@@ -723,7 +723,7 @@ async def test_variable_fan_no_current_speed(
     caplog.clear()
 
 
-async def test_oscillating_fan(hass: HomeAssistant) -> None:
+async def test_oscillating_fan(hass: SmartHub) -> None:
     """Test oscillating fan with ToggleController."""
     device = (
         "fan.test_3",
@@ -781,7 +781,7 @@ async def test_oscillating_fan(hass: HomeAssistant) -> None:
     assert not call.data["oscillating"]
 
 
-async def test_direction_fan(hass: HomeAssistant) -> None:
+async def test_direction_fan(hass: SmartHub) -> None:
     """Test fan direction with modeController."""
     device = (
         "fan.test_4",
@@ -888,7 +888,7 @@ async def test_direction_fan(hass: HomeAssistant) -> None:
 
 
 async def test_preset_mode_fan(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test fan discovery.
 
@@ -973,7 +973,7 @@ async def test_preset_mode_fan(
 
 
 async def test_single_preset_mode_fan(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test fan discovery.
 
@@ -1048,7 +1048,7 @@ async def test_single_preset_mode_fan(
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
 async def test_humidifier(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test humidifier controller."""
     device = (
@@ -1120,7 +1120,7 @@ async def test_humidifier(
     assert call.data["humidity"] == 33
 
 
-async def test_humidifier_without_modes(hass: HomeAssistant) -> None:
+async def test_humidifier_without_modes(hass: SmartHub) -> None:
     """Test humidifier discovery without modes."""
 
     device = (
@@ -1152,7 +1152,7 @@ async def test_humidifier_without_modes(hass: HomeAssistant) -> None:
     assert "configuration" not in power_capability
 
 
-async def test_humidifier_with_modes(hass: HomeAssistant) -> None:
+async def test_humidifier_with_modes(hass: SmartHub) -> None:
     """Test humidifier discovery with modes."""
 
     device = (
@@ -1187,7 +1187,7 @@ async def test_humidifier_with_modes(hass: HomeAssistant) -> None:
     assert "configuration" not in power_capability
 
 
-async def test_lock(hass: HomeAssistant) -> None:
+async def test_lock(hass: SmartHub) -> None:
     """Test lock discovery."""
     device = ("lock.test", "off", {"friendly_name": "Test lock"})
     appliance = await discovery_test(device, hass)
@@ -1219,7 +1219,7 @@ async def test_lock(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
-async def test_media_player(hass: HomeAssistant) -> None:
+async def test_media_player(hass: SmartHub) -> None:
     """Test media player discovery."""
     device = (
         "media_player.test",
@@ -1381,7 +1381,7 @@ async def test_media_player(hass: HomeAssistant) -> None:
     )
 
 
-async def test_media_player_power(hass: HomeAssistant) -> None:
+async def test_media_player_power(hass: SmartHub) -> None:
     """Test media player discovery with mapped on/off."""
     device = (
         "media_player.test",
@@ -1427,7 +1427,7 @@ async def test_media_player_power(hass: HomeAssistant) -> None:
     )
 
 
-async def test_media_player_inputs(hass: HomeAssistant) -> None:
+async def test_media_player_inputs(hass: SmartHub) -> None:
     """Test media player discovery with source list inputs."""
     device = (
         "media_player.test",
@@ -1533,7 +1533,7 @@ async def test_media_player_inputs(hass: HomeAssistant) -> None:
     assert call.data["source"] == "tv"
 
 
-async def test_media_player_no_supported_inputs(hass: HomeAssistant) -> None:
+async def test_media_player_no_supported_inputs(hass: SmartHub) -> None:
     """Test media player discovery with no supported inputs."""
     device = (
         "media_player.test_no_inputs",
@@ -1568,7 +1568,7 @@ async def test_media_player_no_supported_inputs(hass: HomeAssistant) -> None:
     )
 
 
-async def test_media_player_speaker(hass: HomeAssistant) -> None:
+async def test_media_player_speaker(hass: SmartHub) -> None:
     """Test media player with speaker interface."""
     device = (
         "media_player.test_speaker",
@@ -1645,7 +1645,7 @@ async def test_media_player_speaker(hass: HomeAssistant) -> None:
     )
 
 
-async def test_media_player_step_speaker(hass: HomeAssistant) -> None:
+async def test_media_player_step_speaker(hass: SmartHub) -> None:
     """Test media player with step speaker interface."""
     device = (
         "media_player.test_step_speaker",
@@ -1714,7 +1714,7 @@ async def test_media_player_step_speaker(hass: HomeAssistant) -> None:
     )
 
 
-async def test_media_player_seek(hass: HomeAssistant) -> None:
+async def test_media_player_seek(hass: SmartHub) -> None:
     """Test media player seek capability."""
     device = (
         "media_player.test_seek",
@@ -1801,7 +1801,7 @@ async def test_media_player_seek(hass: HomeAssistant) -> None:
     assert {"name": "positionMilliseconds", "value": 600000} in properties
 
 
-async def test_media_player_seek_error(hass: HomeAssistant) -> None:
+async def test_media_player_seek_error(hass: SmartHub) -> None:
     """Test media player seek capability for media_position Error."""
     device = (
         "media_player.test_seek",
@@ -1827,7 +1827,7 @@ async def test_media_player_seek_error(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
-async def test_alert(hass: HomeAssistant) -> None:
+async def test_alert(hass: SmartHub) -> None:
     """Test alert discovery."""
     device = ("alert.test", "off", {"friendly_name": "Test alert"})
     appliance = await discovery_test(device, hass)
@@ -1845,7 +1845,7 @@ async def test_alert(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
-async def test_automation(hass: HomeAssistant) -> None:
+async def test_automation(hass: SmartHub) -> None:
     """Test automation discovery."""
     device = ("automation.test", "off", {"friendly_name": "Test automation"})
     appliance = await discovery_test(device, hass)
@@ -1867,7 +1867,7 @@ async def test_automation(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2022-04-19 07:53:05")
-async def test_group(hass: HomeAssistant) -> None:
+async def test_group(hass: SmartHub) -> None:
     """Test group discovery."""
     device = ("group.test", "off", {"friendly_name": "Test group"})
     appliance = await discovery_test(device, hass)
@@ -1881,8 +1881,8 @@ async def test_group(hass: HomeAssistant) -> None:
 
     await assert_power_controller_works(
         "group#test",
-        "homeassistant.turn_on",
-        "homeassistant.turn_off",
+        "smarthub.turn_on",
+        "smarthub.turn_off",
         hass,
         "2022-04-19T07:53:05Z",
     )
@@ -1967,7 +1967,7 @@ async def test_group(hass: HomeAssistant) -> None:
     ],
 )
 async def test_cover_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     position: int,
     position_attr_in_service_call: int | None,
     supported_features: CoverEntityFeature,
@@ -2176,7 +2176,7 @@ async def test_cover_position(
     ],
 )
 async def test_valve_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     position: int,
     position_attr_in_service_call: int | None,
     supported_features: CoverEntityFeature,
@@ -2284,7 +2284,7 @@ async def test_valve_position(
 
 
 async def test_cover_position_range(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test cover discovery and position range using rangeController.
 
@@ -2401,7 +2401,7 @@ async def test_cover_position_range(
 
 
 async def test_valve_position_range(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test valve discovery and position range using rangeController.
 
@@ -2549,7 +2549,7 @@ async def test_valve_position_range(
     ],
 )
 async def test_stop_valve(
-    hass: HomeAssistant, supported_features: ValveEntityFeature, state_controller: str
+    hass: SmartHub, supported_features: ValveEntityFeature, state_controller: str
 ) -> None:
     """Test stop valve ToggleController."""
     device = (
@@ -2603,7 +2603,7 @@ async def test_stop_valve(
 
 
 async def assert_percentage_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     adjustments,
     namespace,
     name,
@@ -2625,7 +2625,7 @@ async def assert_percentage_changes(
 
 
 async def assert_range_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     adjustments: list[tuple[int | str, int, bool]],
     namespace: str,
     name: str,
@@ -2651,7 +2651,7 @@ async def assert_range_changes(
             assert call.data[changed_parameter] == result_range
 
 
-async def test_temp_sensor(hass: HomeAssistant) -> None:
+async def test_temp_sensor(hass: SmartHub) -> None:
     """Test temperature sensor discovery."""
     device = (
         "sensor.test_temp",
@@ -2683,7 +2683,7 @@ async def test_temp_sensor(hass: HomeAssistant) -> None:
     )
 
 
-async def test_contact_sensor(hass: HomeAssistant) -> None:
+async def test_contact_sensor(hass: SmartHub) -> None:
     """Test contact sensor discovery."""
     device = (
         "binary_sensor.test_contact",
@@ -2712,7 +2712,7 @@ async def test_contact_sensor(hass: HomeAssistant) -> None:
     properties.assert_equal("Alexa.EndpointHealth", "connectivity", {"value": "OK"})
 
 
-async def test_forced_contact_sensor(hass: HomeAssistant) -> None:
+async def test_forced_contact_sensor(hass: SmartHub) -> None:
     """Test contact sensor discovery with specified display_category."""
     device = (
         "binary_sensor.test_contact_forced",
@@ -2741,7 +2741,7 @@ async def test_forced_contact_sensor(hass: HomeAssistant) -> None:
     properties.assert_equal("Alexa.EndpointHealth", "connectivity", {"value": "OK"})
 
 
-async def test_motion_sensor(hass: HomeAssistant) -> None:
+async def test_motion_sensor(hass: SmartHub) -> None:
     """Test motion sensor discovery."""
     device = (
         "binary_sensor.test_motion",
@@ -2768,7 +2768,7 @@ async def test_motion_sensor(hass: HomeAssistant) -> None:
     properties.assert_equal("Alexa.MotionSensor", "detectionState", "DETECTED")
 
 
-async def test_forced_motion_sensor(hass: HomeAssistant) -> None:
+async def test_forced_motion_sensor(hass: SmartHub) -> None:
     """Test motion sensor discovery with specified display_category."""
     device = (
         "binary_sensor.test_motion_forced",
@@ -2827,7 +2827,7 @@ async def test_forced_motion_sensor(hass: HomeAssistant) -> None:
     ],
 )
 async def test_doorbell_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: tuple[str, str, dict[str, Any]],
     endpoint_id: str,
     friendly_name: str,
@@ -2849,7 +2849,7 @@ async def test_doorbell_event(
     assert doorbell_capability["proactivelyReported"] is True
 
 
-async def test_unknown_sensor(hass: HomeAssistant) -> None:
+async def test_unknown_sensor(hass: SmartHub) -> None:
     """Test sensors of unknown quantities are not discovered."""
     device = (
         "sensor.test_sickness",
@@ -2859,7 +2859,7 @@ async def test_unknown_sensor(hass: HomeAssistant) -> None:
     await discovery_test(device, hass, expected_endpoints=0)
 
 
-async def test_thermostat(hass: HomeAssistant) -> None:
+async def test_thermostat(hass: SmartHub) -> None:
     """Test thermostat discovery."""
     hass.config.units = US_CUSTOMARY_SYSTEM
     device = (
@@ -3130,7 +3130,7 @@ async def test_thermostat(hass: HomeAssistant) -> None:
     assert call.data["preset_mode"] == "eco"
 
 
-async def test_onoff_thermostat(hass: HomeAssistant) -> None:
+async def test_onoff_thermostat(hass: SmartHub) -> None:
     """Test onoff thermostat discovery."""
     on_off_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE
@@ -3260,7 +3260,7 @@ async def test_onoff_thermostat(hass: HomeAssistant) -> None:
     )
 
 
-async def test_water_heater(hass: HomeAssistant) -> None:
+async def test_water_heater(hass: SmartHub) -> None:
     """Test water_heater discovery."""
     hass.config.units = US_CUSTOMARY_SYSTEM
     device = (
@@ -3435,7 +3435,7 @@ async def test_water_heater(hass: HomeAssistant) -> None:
     assert call.data["operation_mode"] == "off"
 
 
-async def test_no_current_target_temp_adjusting_temp(hass: HomeAssistant) -> None:
+async def test_no_current_target_temp_adjusting_temp(hass: SmartHub) -> None:
     """Test thermostat adjusting temp with no initial target temperature."""
     hass.config.units = US_CUSTOMARY_SYSTEM
     device = (
@@ -3504,7 +3504,7 @@ async def test_no_current_target_temp_adjusting_temp(hass: HomeAssistant) -> Non
     )
 
 
-async def test_thermostat_dual(hass: HomeAssistant) -> None:
+async def test_thermostat_dual(hass: SmartHub) -> None:
     """Test thermostat discovery with auto mode, with upper and lower target temperatures."""
     hass.config.units = US_CUSTOMARY_SYSTEM
     device = (
@@ -3601,7 +3601,7 @@ async def test_thermostat_dual(hass: HomeAssistant) -> None:
     assert msg["event"]["payload"]["type"] == "TEMPERATURE_VALUE_OUT_OF_RANGE"
 
 
-async def test_exclude_filters(hass: HomeAssistant) -> None:
+async def test_exclude_filters(hass: SmartHub) -> None:
     """Test exclusion filters."""
     request = get_new_request("Alexa.Discovery", "Discover")
 
@@ -3628,7 +3628,7 @@ async def test_exclude_filters(hass: HomeAssistant) -> None:
     assert len(msg["payload"]["endpoints"]) == 1
 
 
-async def test_include_filters(hass: HomeAssistant) -> None:
+async def test_include_filters(hass: SmartHub) -> None:
     """Test inclusion filters."""
     request = get_new_request("Alexa.Discovery", "Discover")
 
@@ -3659,7 +3659,7 @@ async def test_include_filters(hass: HomeAssistant) -> None:
     assert len(msg["payload"]["endpoints"]) == 3
 
 
-async def test_never_exposed_entities(hass: HomeAssistant) -> None:
+async def test_never_exposed_entities(hass: SmartHub) -> None:
     """Test never exposed locks do not get discovered."""
     request = get_new_request("Alexa.Discovery", "Discover")
 
@@ -3684,7 +3684,7 @@ async def test_never_exposed_entities(hass: HomeAssistant) -> None:
     assert len(msg["payload"]["endpoints"]) == 1
 
 
-async def test_api_entity_not_exists(hass: HomeAssistant) -> None:
+async def test_api_entity_not_exists(hass: SmartHub) -> None:
     """Test api turn on process without entity."""
     request = get_new_request("Alexa.PowerController", "TurnOn", "switch#test")
 
@@ -3702,7 +3702,7 @@ async def test_api_entity_not_exists(hass: HomeAssistant) -> None:
     assert msg["payload"]["type"] == "NO_SUCH_ENDPOINT"
 
 
-async def test_api_function_not_implemented(hass: HomeAssistant) -> None:
+async def test_api_function_not_implemented(hass: SmartHub) -> None:
     """Test api call that is not implemented to us."""
     request = get_new_request("Alexa.HAHAAH", "Sweet")
     msg = await smart_home.async_handle_message(hass, get_default_config(hass), request)
@@ -3715,7 +3715,7 @@ async def test_api_function_not_implemented(hass: HomeAssistant) -> None:
     assert msg["payload"]["type"] == "INTERNAL_ERROR"
 
 
-async def test_api_accept_grant(hass: HomeAssistant) -> None:
+async def test_api_accept_grant(hass: SmartHub) -> None:
     """Test api AcceptGrant process."""
     request = get_new_request("Alexa.Authorization", "AcceptGrant")
 
@@ -3738,7 +3738,7 @@ async def test_api_accept_grant(hass: HomeAssistant) -> None:
     assert msg["header"]["name"] == "AcceptGrant.Response"
 
 
-async def test_entity_config(hass: HomeAssistant) -> None:
+async def test_entity_config(hass: SmartHub) -> None:
     """Test that we can configure things via entity config."""
     request = get_new_request("Alexa.Discovery", "Discover")
 
@@ -3766,7 +3766,7 @@ async def test_entity_config(hass: HomeAssistant) -> None:
     assert appliance["endpointId"] == "light#test_1"
     assert appliance["displayCategories"][0] == "SWITCH"
     assert appliance["friendlyName"] == "Config name"
-    assert appliance["description"] == "Config description via Home Assistant"
+    assert appliance["description"] == "Config description via SmartHub"
     assert_endpoint_capabilities(
         appliance, "Alexa.PowerController", "Alexa.EndpointHealth", "Alexa"
     )
@@ -3775,10 +3775,10 @@ async def test_entity_config(hass: HomeAssistant) -> None:
     assert scene["endpointId"] == "scene#test_1"
     assert scene["displayCategories"][0] == "SCENE_TRIGGER"
     assert scene["friendlyName"] == "Test 1"
-    assert scene["description"] == "Config description via Home Assistant (Scene)"
+    assert scene["description"] == "Config description via SmartHub (Scene)"
 
 
-async def test_logging_request(hass: HomeAssistant, events: list[Event]) -> None:
+async def test_logging_request(hass: SmartHub, events: list[Event]) -> None:
     """Test that we log requests."""
     context = Context()
     request = get_new_request("Alexa.Discovery", "Discover")
@@ -3801,7 +3801,7 @@ async def test_logging_request(hass: HomeAssistant, events: list[Event]) -> None
 
 
 async def test_logging_request_with_entity(
-    hass: HomeAssistant, events: list[Event]
+    hass: SmartHub, events: list[Event]
 ) -> None:
     """Test that we log requests."""
     context = Context()
@@ -3826,7 +3826,7 @@ async def test_logging_request_with_entity(
     assert event.context == context
 
 
-async def test_disabled(hass: HomeAssistant) -> None:
+async def test_disabled(hass: SmartHub) -> None:
     """When enabled=False, everything fails."""
     hass.states.async_set("switch.test", "on", {"friendly_name": "Test switch"})
     request = get_new_request("Alexa.PowerController", "TurnOn", "switch#test")
@@ -3839,7 +3839,7 @@ async def test_disabled(hass: HomeAssistant) -> None:
         )
 
 
-async def test_endpoint_good_health(hass: HomeAssistant) -> None:
+async def test_endpoint_good_health(hass: SmartHub) -> None:
     """Test endpoint health reporting."""
     device = (
         "binary_sensor.test_contact",
@@ -3851,7 +3851,7 @@ async def test_endpoint_good_health(hass: HomeAssistant) -> None:
     properties.assert_equal("Alexa.EndpointHealth", "connectivity", {"value": "OK"})
 
 
-async def test_endpoint_bad_health(hass: HomeAssistant) -> None:
+async def test_endpoint_bad_health(hass: SmartHub) -> None:
     """Test endpoint health reporting."""
     device = (
         "binary_sensor.test_contact",
@@ -3865,7 +3865,7 @@ async def test_endpoint_bad_health(hass: HomeAssistant) -> None:
     )
 
 
-async def test_alarm_control_panel_disarmed(hass: HomeAssistant) -> None:
+async def test_alarm_control_panel_disarmed(hass: SmartHub) -> None:
     """Test alarm_control_panel discovery."""
     device = (
         "alarm_control_panel.test_1",
@@ -3937,7 +3937,7 @@ async def test_alarm_control_panel_disarmed(hass: HomeAssistant) -> None:
     properties.assert_equal("Alexa.SecurityPanelController", "armState", "ARMED_NIGHT")
 
 
-async def test_alarm_control_panel_armed(hass: HomeAssistant) -> None:
+async def test_alarm_control_panel_armed(hass: SmartHub) -> None:
     """Test alarm_control_panel discovery."""
     device = (
         "alarm_control_panel.test_2",
@@ -3985,7 +3985,7 @@ async def test_alarm_control_panel_armed(hass: HomeAssistant) -> None:
     assert msg["event"]["payload"]["type"] == "AUTHORIZATION_REQUIRED"
 
 
-async def test_alarm_control_panel_code_arm_required(hass: HomeAssistant) -> None:
+async def test_alarm_control_panel_code_arm_required(hass: SmartHub) -> None:
     """Test alarm_control_panel with code_arm_required not in discovery."""
     device = (
         "alarm_control_panel.test_3",
@@ -3999,7 +3999,7 @@ async def test_alarm_control_panel_code_arm_required(hass: HomeAssistant) -> Non
     await discovery_test(device, hass, expected_endpoints=0)
 
 
-async def test_alarm_control_panel_disarm_required(hass: HomeAssistant) -> None:
+async def test_alarm_control_panel_disarm_required(hass: SmartHub) -> None:
     """Test alarm_control_panel disarm required."""
     device = (
         "alarm_control_panel.test_4",
@@ -4051,7 +4051,7 @@ async def test_alarm_control_panel_disarm_required(hass: HomeAssistant) -> None:
     properties.assert_equal("Alexa.SecurityPanelController", "armState", "ARMED_AWAY")
 
 
-async def test_alarm_control_panel_change_arm_type(hass: HomeAssistant) -> None:
+async def test_alarm_control_panel_change_arm_type(hass: SmartHub) -> None:
     """Test alarm_control_panel change arm type."""
     device = (
         "alarm_control_panel.test_5",
@@ -4101,7 +4101,7 @@ async def test_alarm_control_panel_change_arm_type(hass: HomeAssistant) -> None:
     properties.assert_equal("Alexa.SecurityPanelController", "armState", "ARMED_AWAY")
 
 
-async def test_range_unsupported_domain(hass: HomeAssistant) -> None:
+async def test_range_unsupported_domain(hass: SmartHub) -> None:
     """Test rangeController with unsupported domain."""
     device = ("switch.test", "on", {"friendly_name": "Test switch"})
     await discovery_test(device, hass)
@@ -4122,7 +4122,7 @@ async def test_range_unsupported_domain(hass: HomeAssistant) -> None:
     assert msg["payload"]["type"] == "INVALID_DIRECTIVE"
 
 
-async def test_mode_unsupported_domain(hass: HomeAssistant) -> None:
+async def test_mode_unsupported_domain(hass: SmartHub) -> None:
     """Test modeController with unsupported domain."""
     device = ("switch.test", "on", {"friendly_name": "Test switch"})
     await discovery_test(device, hass)
@@ -4143,7 +4143,7 @@ async def test_mode_unsupported_domain(hass: HomeAssistant) -> None:
     assert msg["payload"]["type"] == "INVALID_DIRECTIVE"
 
 
-async def test_cover_garage_door(hass: HomeAssistant) -> None:
+async def test_cover_garage_door(hass: SmartHub) -> None:
     """Test garage door cover discovery."""
     device = (
         "cover.test_garage_door",
@@ -4165,7 +4165,7 @@ async def test_cover_garage_door(hass: HomeAssistant) -> None:
     )
 
 
-async def test_cover_gate(hass: HomeAssistant) -> None:
+async def test_cover_gate(hass: SmartHub) -> None:
     """Test gate cover discovery."""
     device = (
         "cover.test_gate",
@@ -4187,7 +4187,7 @@ async def test_cover_gate(hass: HomeAssistant) -> None:
     )
 
 
-async def test_cover_position_mode(hass: HomeAssistant) -> None:
+async def test_cover_position_mode(hass: SmartHub) -> None:
     """Test cover discovery and position using modeController."""
     device = (
         "cover.test_mode",
@@ -4328,7 +4328,7 @@ async def test_cover_position_mode(hass: HomeAssistant) -> None:
     assert properties["value"] == "position.custom"
 
 
-async def test_valve_position_mode(hass: HomeAssistant) -> None:
+async def test_valve_position_mode(hass: SmartHub) -> None:
     """Test valve discovery and position using modeController."""
     device = (
         "valve.test_mode",
@@ -4459,7 +4459,7 @@ async def test_valve_position_mode(hass: HomeAssistant) -> None:
     assert properties["value"] == "state.open"
 
 
-async def test_image_processing(hass: HomeAssistant) -> None:
+async def test_image_processing(hass: SmartHub) -> None:
     """Test image_processing discovery as event detection."""
     device = (
         "image_processing.test_face",
@@ -4482,7 +4482,7 @@ async def test_image_processing(hass: HomeAssistant) -> None:
     )
 
 
-async def test_motion_sensor_event_detection(hass: HomeAssistant) -> None:
+async def test_motion_sensor_event_detection(hass: SmartHub) -> None:
     """Test motion sensor with EventDetectionSensor discovery."""
     device = (
         "binary_sensor.test_motion_camera_event",
@@ -4513,7 +4513,7 @@ async def test_motion_sensor_event_detection(hass: HomeAssistant) -> None:
     assert {"name": "humanPresenceDetectionState"} in properties["supported"]
 
 
-async def test_presence_sensor(hass: HomeAssistant) -> None:
+async def test_presence_sensor(hass: SmartHub) -> None:
     """Test presence sensor."""
     device = (
         "binary_sensor.test_presence_sensor",
@@ -4638,7 +4638,7 @@ async def test_presence_sensor(hass: HomeAssistant) -> None:
     ],
 )
 async def test_cover_tilt_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     tilt_position: int,
     tilt_position_attr_in_service_call: int | None,
     supported_features: CoverEntityFeature,
@@ -4711,7 +4711,7 @@ async def test_cover_tilt_position(
     assert properties["value"] == tilt_position
 
 
-async def test_cover_tilt_position_range(hass: HomeAssistant) -> None:
+async def test_cover_tilt_position_range(hass: SmartHub) -> None:
     """Test cover discovery and tilt position range using rangeController.
 
     Also tests and invalid tilt position being handled correctly.
@@ -4802,7 +4802,7 @@ async def test_cover_tilt_position_range(hass: HomeAssistant) -> None:
     ids=["no_stop", "stop_cover", "stop_cover_tilt", "stop_cover_and_stop_cover_tilt"],
 )
 async def test_cover_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supported_stop_features: CoverEntityFeature,
     cover_stop_calls: int,
     cover_stop_tilt_calls: int,
@@ -4851,7 +4851,7 @@ async def test_cover_stop(
     assert len(calls_stop_tilt) == cover_stop_tilt_calls
 
 
-async def test_cover_semantics_position_and_tilt(hass: HomeAssistant) -> None:
+async def test_cover_semantics_position_and_tilt(hass: SmartHub) -> None:
     """Test cover discovery and semantics with position and tilt support."""
     device = (
         "cover.test_semantics",
@@ -4952,7 +4952,7 @@ async def test_cover_semantics_position_and_tilt(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("domain", ["input_number", "number"])
-async def test_input_number(hass: HomeAssistant, domain: str) -> None:
+async def test_input_number(hass: SmartHub, domain: str) -> None:
     """Test input_number and number discovery."""
     device = (
         f"{domain}.test_slider",
@@ -5038,7 +5038,7 @@ async def test_input_number(hass: HomeAssistant, domain: str) -> None:
 
 
 @pytest.mark.parametrize("domain", ["input_number", "number"])
-async def test_input_number_float(hass: HomeAssistant, domain: str) -> None:
+async def test_input_number_float(hass: SmartHub, domain: str) -> None:
     """Test input_number and number discovery."""
     device = (
         f"{domain}.test_slider_float",
@@ -5129,7 +5129,7 @@ async def test_input_number_float(hass: HomeAssistant, domain: str) -> None:
     )
 
 
-async def test_media_player_eq_modes(hass: HomeAssistant) -> None:
+async def test_media_player_eq_modes(hass: SmartHub) -> None:
     """Test media player discovery with sound mode list."""
     device = (
         "media_player.test",
@@ -5177,7 +5177,7 @@ async def test_media_player_eq_modes(hass: HomeAssistant) -> None:
         assert call.data["sound_mode"] == mode.lower()
 
 
-async def test_media_player_sound_mode_list_unsupported(hass: HomeAssistant) -> None:
+async def test_media_player_sound_mode_list_unsupported(hass: SmartHub) -> None:
     """Test EqualizerController with unsupported sound modes."""
     device = (
         "media_player.test",
@@ -5199,7 +5199,7 @@ async def test_media_player_sound_mode_list_unsupported(hass: HomeAssistant) -> 
     )
 
 
-async def test_media_player_eq_bands_not_supported(hass: HomeAssistant) -> None:
+async def test_media_player_eq_bands_not_supported(hass: SmartHub) -> None:
     """Test EqualizerController bands directive not supported."""
     device = (
         "media_player.test_bands",
@@ -5265,7 +5265,7 @@ async def test_media_player_eq_bands_not_supported(hass: HomeAssistant) -> None:
     assert msg["payload"]["type"] == "INVALID_DIRECTIVE"
 
 
-async def test_timer_hold(hass: HomeAssistant) -> None:
+async def test_timer_hold(hass: SmartHub) -> None:
     """Test timer hold."""
     device = (
         "timer.laundry",
@@ -5292,7 +5292,7 @@ async def test_timer_hold(hass: HomeAssistant) -> None:
     )
 
 
-async def test_timer_resume(hass: HomeAssistant) -> None:
+async def test_timer_resume(hass: SmartHub) -> None:
     """Test timer resume."""
     device = (
         "timer.laundry",
@@ -5309,7 +5309,7 @@ async def test_timer_resume(hass: HomeAssistant) -> None:
     )
 
 
-async def test_timer_start(hass: HomeAssistant) -> None:
+async def test_timer_start(hass: SmartHub) -> None:
     """Test timer start."""
     device = (
         "timer.laundry",
@@ -5326,7 +5326,7 @@ async def test_timer_start(hass: HomeAssistant) -> None:
     )
 
 
-async def test_timer_cancel(hass: HomeAssistant) -> None:
+async def test_timer_cancel(hass: SmartHub) -> None:
     """Test timer cancel."""
     device = (
         "timer.laundry",
@@ -5343,7 +5343,7 @@ async def test_timer_cancel(hass: HomeAssistant) -> None:
     )
 
 
-async def test_vacuum_discovery(hass: HomeAssistant) -> None:
+async def test_vacuum_discovery(hass: SmartHub) -> None:
     """Test vacuum discovery."""
     device = (
         "vacuum.test_1",
@@ -5384,7 +5384,7 @@ async def test_vacuum_discovery(hass: HomeAssistant) -> None:
     )
 
 
-async def test_vacuum_fan_speed(hass: HomeAssistant) -> None:
+async def test_vacuum_fan_speed(hass: SmartHub) -> None:
     """Test vacuum fan speed with rangeController."""
     device = (
         "vacuum.test_2",
@@ -5513,7 +5513,7 @@ async def test_vacuum_fan_speed(hass: HomeAssistant) -> None:
     )
 
 
-async def test_vacuum_pause(hass: HomeAssistant) -> None:
+async def test_vacuum_pause(hass: SmartHub) -> None:
     """Test vacuum pause with TimeHoldController."""
     device = (
         "vacuum.test_3",
@@ -5551,7 +5551,7 @@ async def test_vacuum_pause(hass: HomeAssistant) -> None:
     )
 
 
-async def test_vacuum_resume(hass: HomeAssistant) -> None:
+async def test_vacuum_resume(hass: SmartHub) -> None:
     """Test vacuum resume with TimeHoldController."""
     device = (
         "vacuum.test_4",
@@ -5579,7 +5579,7 @@ async def test_vacuum_resume(hass: HomeAssistant) -> None:
     )
 
 
-async def test_vacuum_discovery_no_turn_on(hass: HomeAssistant) -> None:
+async def test_vacuum_discovery_no_turn_on(hass: SmartHub) -> None:
     """Test vacuum discovery for vacuums without turn_on."""
     device = (
         "vacuum.test_5",
@@ -5609,7 +5609,7 @@ async def test_vacuum_discovery_no_turn_on(hass: HomeAssistant) -> None:
     )
 
 
-async def test_vacuum_discovery_no_turn_off(hass: HomeAssistant) -> None:
+async def test_vacuum_discovery_no_turn_off(hass: SmartHub) -> None:
     """Test vacuum discovery for vacuums without turn_off."""
     device = (
         "vacuum.test_6",
@@ -5640,7 +5640,7 @@ async def test_vacuum_discovery_no_turn_off(hass: HomeAssistant) -> None:
     )
 
 
-async def test_vacuum_discovery_no_turn_on_or_off(hass: HomeAssistant) -> None:
+async def test_vacuum_discovery_no_turn_on_or_off(hass: SmartHub) -> None:
     """Test vacuum discovery vacuums without on or off."""
     device = (
         "vacuum.test_7",
@@ -5670,7 +5670,7 @@ async def test_vacuum_discovery_no_turn_on_or_off(hass: HomeAssistant) -> None:
     )
 
 
-async def test_camera_discovery(hass: HomeAssistant, mock_stream: None) -> None:
+async def test_camera_discovery(hass: SmartHub, mock_stream: None) -> None:
     """Test camera discovery."""
     device = (
         "camera.test",
@@ -5680,7 +5680,7 @@ async def test_camera_discovery(hass: HomeAssistant, mock_stream: None) -> None:
 
     hass.config.components.add("cloud")
     with patch(
-        "homeassistant.components.cloud.async_remote_ui_url",
+        "smarthub.components.cloud.async_remote_ui_url",
         return_value="https://example.nabu.casa",
     ):
         appliance = await discovery_test(device, hass)
@@ -5700,7 +5700,7 @@ async def test_camera_discovery(hass: HomeAssistant, mock_stream: None) -> None:
     assert "AAC" in configuration["audioCodecs"]
 
 
-async def test_camera_discovery_without_stream(hass: HomeAssistant) -> None:
+async def test_camera_discovery_without_stream(hass: SmartHub) -> None:
     """Test camera discovery without stream integration."""
     device = (
         "camera.test",
@@ -5710,7 +5710,7 @@ async def test_camera_discovery_without_stream(hass: HomeAssistant) -> None:
 
     hass.config.components.add("cloud")
     with patch(
-        "homeassistant.components.cloud.async_remote_ui_url",
+        "smarthub.components.cloud.async_remote_ui_url",
         return_value="https://example.nabu.casa",
     ):
         appliance = await discovery_test(device, hass)
@@ -5729,7 +5729,7 @@ async def test_camera_discovery_without_stream(hass: HomeAssistant) -> None:
     ],
 )
 async def test_camera_hass_urls(
-    hass: HomeAssistant, mock_stream: None, url: str, result: int
+    hass: SmartHub, mock_stream: None, url: str, result: int
 ) -> None:
     """Test camera discovery with unsupported urls."""
     device = (
@@ -5744,7 +5744,7 @@ async def test_camera_hass_urls(
 
 
 async def test_initialize_camera_stream(
-    hass: HomeAssistant, mock_camera: None, mock_stream: None
+    hass: SmartHub, mock_camera: None, mock_stream: None
 ) -> None:
     """Test InitializeCameraStreams handler."""
     request = get_new_request(
@@ -5756,7 +5756,7 @@ async def test_initialize_camera_stream(
     )
 
     with patch(
-        "homeassistant.components.demo.camera.DemoCamera.stream_source",
+        "smarthub.components.demo.camera.DemoCamera.stream_source",
         return_value="rtsp://example.local",
     ):
         msg = await smart_home.async_handle_message(
@@ -5787,7 +5787,7 @@ async def test_initialize_camera_stream(
     "domain",
     ["button", "input_button"],
 )
-async def test_button(hass: HomeAssistant, domain: str) -> None:
+async def test_button(hass: SmartHub, domain: str) -> None:
     """Test button discovery."""
     device = (
         f"{domain}.ring_doorbell",
@@ -5834,7 +5834,7 @@ async def test_button(hass: HomeAssistant, domain: str) -> None:
     )
 
 
-async def test_api_message_sets_authorized(hass: HomeAssistant) -> None:
+async def test_api_message_sets_authorized(hass: SmartHub) -> None:
     """Test an incoming API messages sets the authorized flag."""
     msg = get_new_request("Alexa.PowerController", "TurnOn", "switch#xy")
     async_mock_service(hass, "switch", "turn_on")
@@ -5846,7 +5846,7 @@ async def test_api_message_sets_authorized(hass: HomeAssistant) -> None:
 
 
 async def test_alexa_config(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test all methods of the AlexaConfig class."""
     config = {

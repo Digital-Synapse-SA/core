@@ -1,14 +1,14 @@
 """Provide common tests tools for conversation."""
 
-from homeassistant.components import conversation
-from homeassistant.core import HomeAssistant
+from smarthub.components import conversation
+from smarthub.core import SmartHub
 
 from . import MockAgent
 
 from tests.common import MockConfigEntry
 
 
-def mock_conversation_agent_fixture_helper(hass: HomeAssistant) -> MockAgent:
+def mock_conversation_agent_fixture_helper(hass: SmartHub) -> MockAgent:
     """Mock agent."""
     entry = MockConfigEntry(entry_id="mock-entry")
     entry.add_to_hass(hass)

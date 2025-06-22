@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.humidifier import (
+from smarthub.components.humidifier import (
     ATTR_HUMIDITY,
     DOMAIN,
     MODE_ECO,
@@ -13,8 +13,8 @@ from homeassistant.components.humidifier import (
     HumidifierEntity,
     HumidifierEntityFeature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from tests.common import MockConfigEntry, MockEntity, setup_test_component_platform
 
@@ -28,7 +28,7 @@ class MockHumidifierEntity(MockEntity, HumidifierEntity):
         return 0
 
 
-async def test_sync_turn_on(hass: HomeAssistant) -> None:
+async def test_sync_turn_on(hass: SmartHub) -> None:
     """Test if async turn_on calls sync turn_on."""
     humidifier = MockHumidifierEntity()
     humidifier.hass = hass
@@ -39,7 +39,7 @@ async def test_sync_turn_on(hass: HomeAssistant) -> None:
     assert humidifier.turn_on.called
 
 
-async def test_sync_turn_off(hass: HomeAssistant) -> None:
+async def test_sync_turn_off(hass: SmartHub) -> None:
     """Test if async turn_off calls sync turn_off."""
     humidifier = MockHumidifierEntity()
     humidifier.hass = hass
@@ -51,7 +51,7 @@ async def test_sync_turn_off(hass: HomeAssistant) -> None:
 
 
 async def test_humidity_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_test_integration: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

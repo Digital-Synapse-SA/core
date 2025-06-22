@@ -5,12 +5,12 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.switchbee.config_flow import SwitchBeeError
-from homeassistant.components.switchbee.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.switchbee.config_flow import SwitchBeeError
+from smarthub.components.switchbee.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import MOCK_FAILED_TO_LOGIN_MSG, MOCK_INVALID_TOKEN_MGS
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry, async_load_fixture
 
 
 @pytest.mark.parametrize("test_cucode_in_coordinator_data", [False, True])
-async def test_form(hass: HomeAssistant, test_cucode_in_coordinator_data) -> None:
+async def test_form(hass: SmartHub, test_cucode_in_coordinator_data) -> None:
     """Test we get the form."""
 
     coordinator_data = json.loads(
@@ -40,7 +40,7 @@ async def test_form(hass: HomeAssistant, test_cucode_in_coordinator_data) -> Non
             return_value=coordinator_data,
         ),
         patch(
-            "homeassistant.components.switchbee.async_setup_entry",
+            "smarthub.components.switchbee.async_setup_entry",
             return_value=True,
         ),
         patch(
@@ -67,7 +67,7 @@ async def test_form(hass: HomeAssistant, test_cucode_in_coordinator_data) -> Non
     }
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -90,7 +90,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
 
     result = await hass.config_entries.flow.async_init(
@@ -114,7 +114,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_unknown_error(hass: HomeAssistant) -> None:
+async def test_form_unknown_error(hass: SmartHub) -> None:
     """Test we handle an unknown error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -137,7 +137,7 @@ async def test_form_unknown_error(hass: HomeAssistant) -> None:
     assert form_result["errors"] == {"base": "unknown"}
 
 
-async def test_form_entry_exists(hass: HomeAssistant) -> None:
+async def test_form_entry_exists(hass: SmartHub) -> None:
     """Test we handle an already existing entry."""
 
     coordinator_data = json.loads(
@@ -161,7 +161,7 @@ async def test_form_entry_exists(hass: HomeAssistant) -> None:
     with (
         patch("switchbee.api.polling.CentralUnitPolling._login", return_value=None),
         patch(
-            "homeassistant.components.switchbee.async_setup_entry",
+            "smarthub.components.switchbee.async_setup_entry",
             return_value=True,
         ),
         patch(

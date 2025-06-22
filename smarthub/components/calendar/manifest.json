@@ -1,0 +1,9 @@
+{
+  "domain": "calendar",
+  "name": "Calendar",
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["http"],
+  "documentation": "https://www.smart-hub.io/integrations/calendar",
+  "integration_type": "entity",
+  "quality_scale": "internal"
+}

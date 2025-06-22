@@ -14,15 +14,15 @@ from freezegun import freeze_time
 from google_nest_sdm.event import EventMessage
 import pytest
 
-from homeassistant.components import camera
-from homeassistant.components.camera import CameraState, StreamType
-from homeassistant.components.nest.const import DOMAIN
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.const import ATTR_FRIENDLY_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components import camera
+from smarthub.components.camera import CameraState, StreamType
+from smarthub.components.nest.const import DOMAIN
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.const import ATTR_FRIENDLY_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from .common import DEVICE_ID, CreateDevice, PlatformSetup
 from .conftest import FakeAuth
@@ -150,11 +150,11 @@ def make_stream_url_response(
 
 
 @pytest.fixture
-async def mock_create_stream(hass: HomeAssistant) -> Generator[AsyncMock]:
+async def mock_create_stream(hass: SmartHub) -> Generator[AsyncMock]:
     """Fixture to mock out the create stream call."""
     assert await async_setup_component(hass, "stream", {})
     with patch(
-        "homeassistant.components.camera.create_stream", autospec=True
+        "smarthub.components.camera.create_stream", autospec=True
     ) as mock_stream:
         mock_stream.return_value.endpoint_url.return_value = (
             "http://home.assistant/playlist.m3u8"
@@ -166,7 +166,7 @@ async def mock_create_stream(hass: HomeAssistant) -> Generator[AsyncMock]:
 
 
 async def async_get_image(
-    hass: HomeAssistant, width: int | None = None, height: int | None = None
+    hass: SmartHub, width: int | None = None, height: int | None = None
 ) -> bytes:
     """Get the camera image."""
     image = await camera.async_get_image(
@@ -190,21 +190,21 @@ async def async_frontend_stream_types(
     return msg["result"].get("frontend_stream_types")
 
 
-async def fire_alarm(hass: HomeAssistant, point_in_time: datetime.datetime) -> None:
+async def fire_alarm(hass: SmartHub, point_in_time: datetime.datetime) -> None:
     """Fire an alarm and wait for callbacks to run."""
     with freeze_time(point_in_time):
         async_fire_time_changed(hass, point_in_time)
         await hass.async_block_till_done()
 
 
-async def test_no_devices(hass: HomeAssistant, setup_platform: PlatformSetup) -> None:
+async def test_no_devices(hass: SmartHub, setup_platform: PlatformSetup) -> None:
     """Test configuration that returns no devices."""
     await setup_platform()
     assert len(hass.states.async_all()) == 0
 
 
 async def test_ineligible_device(
-    hass: HomeAssistant, setup_platform: PlatformSetup, create_device: CreateDevice
+    hass: SmartHub, setup_platform: PlatformSetup, create_device: CreateDevice
 ) -> None:
     """Test configuration with devices that do not support cameras."""
     create_device.create(
@@ -220,7 +220,7 @@ async def test_ineligible_device(
 
 
 async def test_camera_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     setup_platform: PlatformSetup,
@@ -246,7 +246,7 @@ async def test_camera_device(
 
 
 async def test_camera_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     camera_device: None,
     auth: FakeAuth,
@@ -272,7 +272,7 @@ async def test_camera_stream(
 
 
 async def test_camera_ws_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform,
     camera_device,
     hass_ws_client: WebSocketGenerator,
@@ -309,7 +309,7 @@ async def test_camera_ws_stream(
 
 
 async def test_camera_ws_stream_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform,
     camera_device,
     hass_ws_client: WebSocketGenerator,
@@ -342,7 +342,7 @@ async def test_camera_ws_stream_failure(
 
 
 async def test_camera_stream_missing_trait(
-    hass: HomeAssistant, setup_platform, create_device
+    hass: SmartHub, setup_platform, create_device
 ) -> None:
     """Test that cameras missing a live stream are not supported."""
     create_device.create(
@@ -364,7 +364,7 @@ async def test_camera_stream_missing_trait(
 
 
 async def test_refresh_expired_stream_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     auth: FakeAuth,
     camera_device: None,
@@ -392,7 +392,7 @@ async def test_refresh_expired_stream_token(
 
     # Request a stream for the camera entity to exercise nest cam + camera interaction
     # and shutdown on url expiration
-    with patch("homeassistant.components.camera.create_stream") as create_stream:
+    with patch("smarthub.components.camera.create_stream") as create_stream:
         create_stream.return_value.start = AsyncMock()
         hls_url = await camera.async_request_stream(hass, "camera.my_camera", fmt="hls")
         assert hls_url.startswith("/api/hls/")  # Includes access token
@@ -414,7 +414,7 @@ async def test_refresh_expired_stream_token(
     assert stream_source == "rtsp://some/url?auth=g.2.streamingToken"
 
     # HLS stream is not re-created, just the source is updated
-    with patch("homeassistant.components.camera.create_stream") as create_stream:
+    with patch("smarthub.components.camera.create_stream") as create_stream:
         hls_url1 = await camera.async_request_stream(
             hass, "camera.my_camera", fmt="hls"
         )
@@ -433,7 +433,7 @@ async def test_refresh_expired_stream_token(
     assert stream_source == "rtsp://some/url?auth=g.3.streamingToken"
 
     # HLS stream is still not re-created
-    with patch("homeassistant.components.camera.create_stream") as create_stream:
+    with patch("smarthub.components.camera.create_stream") as create_stream:
         hls_url2 = await camera.async_request_stream(
             hass, "camera.my_camera", fmt="hls"
         )
@@ -441,7 +441,7 @@ async def test_refresh_expired_stream_token(
 
 
 async def test_stream_response_already_expired(
-    hass: HomeAssistant,
+    hass: SmartHub,
     auth: FakeAuth,
     setup_platform: PlatformSetup,
     camera_device: None,
@@ -473,7 +473,7 @@ async def test_stream_response_already_expired(
 
 
 async def test_extending_stream_already_expired(
-    hass: HomeAssistant,
+    hass: SmartHub,
     auth: FakeAuth,
     setup_platform: PlatformSetup,
     camera_device: None,
@@ -517,7 +517,7 @@ async def test_extending_stream_already_expired(
 
 
 async def test_camera_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     auth: FakeAuth,
     camera_device: None,
     setup_platform: PlatformSetup,
@@ -545,7 +545,7 @@ async def test_camera_removed(
 
 
 async def test_camera_remove_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     auth: FakeAuth,
     camera_device: None,
     setup_platform: PlatformSetup,
@@ -575,7 +575,7 @@ async def test_camera_remove_failure(
 
 
 async def test_refresh_expired_stream_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     auth: FakeAuth,
     setup_platform: PlatformSetup,
     camera_device: None,
@@ -600,7 +600,7 @@ async def test_refresh_expired_stream_failure(
     assert cam.state == CameraState.STREAMING
 
     # Request an HLS stream
-    with patch("homeassistant.components.camera.create_stream") as create_stream:
+    with patch("smarthub.components.camera.create_stream") as create_stream:
         create_stream.return_value.start = AsyncMock()
         create_stream.return_value.stop = AsyncMock()
         hls_url = await camera.async_request_stream(hass, "camera.my_camera", fmt="hls")
@@ -620,7 +620,7 @@ async def test_refresh_expired_stream_failure(
     assert stream_source == "rtsp://some/url?auth=g.2.streamingToken"
 
     # Requesting an HLS stream will create an entirely new stream
-    with patch("homeassistant.components.camera.create_stream") as create_stream:
+    with patch("smarthub.components.camera.create_stream") as create_stream:
         create_stream.return_value.start = AsyncMock()
         # The HLS stream endpoint was invalidated, with a new auth token
         hls_url2 = await camera.async_request_stream(
@@ -633,7 +633,7 @@ async def test_refresh_expired_stream_failure(
 
 @pytest.mark.usefixtures("webrtc_camera_device")
 async def test_camera_web_rtc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     auth,
     hass_ws_client: WebSocketGenerator,
     setup_platform,
@@ -698,7 +698,7 @@ async def test_camera_web_rtc(
 
 @pytest.mark.usefixtures("auth", "camera_device")
 async def test_camera_web_rtc_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_platform,
 ) -> None:
@@ -734,7 +734,7 @@ async def test_camera_web_rtc_unsupported(
 
 @pytest.mark.usefixtures("webrtc_camera_device")
 async def test_camera_web_rtc_offer_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     auth,
     hass_ws_client: WebSocketGenerator,
     setup_platform,
@@ -783,7 +783,7 @@ async def test_camera_web_rtc_offer_failure(
 
 @pytest.mark.usefixtures("mock_create_stream")
 async def test_camera_multiple_streams(
-    hass: HomeAssistant,
+    hass: SmartHub,
     auth,
     hass_ws_client: WebSocketGenerator,
     create_device,
@@ -868,7 +868,7 @@ async def test_camera_multiple_streams(
 
 @pytest.mark.usefixtures("webrtc_camera_device")
 async def test_webrtc_refresh_expired_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_platform: PlatformSetup,
     hass_ws_client: WebSocketGenerator,
     auth: FakeAuth,

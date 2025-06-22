@@ -1,11 +1,11 @@
 """Test pi_hole config flow."""
 
-from homeassistant.components import pi_hole
-from homeassistant.components.pi_hole.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components import pi_hole
+from smarthub.components.pi_hole.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     CONFIG_DATA_DEFAULTS,
@@ -24,7 +24,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_flow_user_with_api_key(hass: HomeAssistant) -> None:
+async def test_flow_user_with_api_key(hass: SmartHub) -> None:
     """Test user initialized flow with api key needed."""
     mocked_hole = _create_mocked_hole(has_data=False)
     with _patch_config_flow_hole(mocked_hole), _patch_setup_hole() as mock_setup:
@@ -72,7 +72,7 @@ async def test_flow_user_with_api_key(hass: HomeAssistant) -> None:
         assert result["reason"] == "already_configured"
 
 
-async def test_flow_user_without_api_key(hass: HomeAssistant) -> None:
+async def test_flow_user_without_api_key(hass: SmartHub) -> None:
     """Test user initialized flow without api key needed."""
     mocked_hole = _create_mocked_hole()
     with _patch_config_flow_hole(mocked_hole), _patch_setup_hole() as mock_setup:
@@ -94,7 +94,7 @@ async def test_flow_user_without_api_key(hass: HomeAssistant) -> None:
         mock_setup.assert_called_once()
 
 
-async def test_flow_user_invalid(hass: HomeAssistant) -> None:
+async def test_flow_user_invalid(hass: SmartHub) -> None:
     """Test user initialized flow with invalid server."""
     mocked_hole = _create_mocked_hole(raise_exception=True)
     with _patch_config_flow_hole(mocked_hole):
@@ -106,7 +106,7 @@ async def test_flow_user_invalid(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_flow_reauth(hass: HomeAssistant) -> None:
+async def test_flow_reauth(hass: SmartHub) -> None:
     """Test reauth flow."""
     mocked_hole = _create_mocked_hole(has_data=False)
     entry = MockConfigEntry(domain=pi_hole.DOMAIN, data=CONFIG_DATA_DEFAULTS)

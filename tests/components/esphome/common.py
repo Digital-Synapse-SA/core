@@ -2,16 +2,16 @@
 
 from datetime import datetime
 
-from homeassistant.components import assist_satellite
-from homeassistant.components.assist_satellite import AssistSatelliteEntity
-from homeassistant.components.esphome import DOMAIN
-from homeassistant.components.esphome.assist_satellite import EsphomeAssistSatellite
-from homeassistant.components.esphome.coordinator import REFRESH_INTERVAL
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import EntityComponent
-from homeassistant.util import dt as dt_util
+from smarthub.components import assist_satellite
+from smarthub.components.assist_satellite import AssistSatelliteEntity
+from smarthub.components.esphome import DOMAIN
+from smarthub.components.esphome.assist_satellite import EsphomeAssistSatellite
+from smarthub.components.esphome.coordinator import REFRESH_INTERVAL
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import EntityComponent
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
@@ -19,7 +19,7 @@ from tests.common import async_fire_time_changed
 class MockDashboardRefresh:
     """Mock dashboard refresh."""
 
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self, hass: SmartHub) -> None:
         """Initialize the mock dashboard refresh."""
         self.hass = hass
         self.last_time: datetime | None = None
@@ -34,7 +34,7 @@ class MockDashboardRefresh:
 
 
 def get_satellite_entity(
-    hass: HomeAssistant, mac_address: str
+    hass: SmartHub, mac_address: str
 ) -> EsphomeAssistSatellite | None:
     """Get the satellite entity for a device."""
     ent_reg = er.async_get(hass)

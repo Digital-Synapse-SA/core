@@ -2,18 +2,18 @@
 
 import pytest
 
-from homeassistant.components import media_source
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import media_source
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(autouse=True)
-async def setup_media_source(hass: HomeAssistant) -> None:
+async def setup_media_source(hass: SmartHub) -> None:
     """Set up media source."""
     assert await async_setup_component(hass, "media_source", {})
 
 
-async def test_browsing(hass: HomeAssistant, mock_image_platform) -> None:
+async def test_browsing(hass: SmartHub, mock_image_platform) -> None:
     """Test browsing image media source."""
     item = await media_source.async_browse_media(hass, "media-source://image")
     assert item is not None
@@ -22,7 +22,7 @@ async def test_browsing(hass: HomeAssistant, mock_image_platform) -> None:
     assert item.children[0].media_content_type == "image/jpeg"
 
 
-async def test_resolving(hass: HomeAssistant, mock_image_platform) -> None:
+async def test_resolving(hass: SmartHub, mock_image_platform) -> None:
     """Test resolving."""
     item = await media_source.async_resolve_media(
         hass, "media-source://image/image.test", None
@@ -33,7 +33,7 @@ async def test_resolving(hass: HomeAssistant, mock_image_platform) -> None:
 
 
 async def test_resolving_non_existing_camera(
-    hass: HomeAssistant, mock_image_platform
+    hass: SmartHub, mock_image_platform
 ) -> None:
     """Test resolving."""
     with pytest.raises(

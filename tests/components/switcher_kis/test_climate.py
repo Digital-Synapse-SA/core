@@ -11,7 +11,7 @@ from aioswitcher.device import (
 )
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_FAN_MODE,
     ATTR_HVAC_MODE,
     ATTR_SWING_MODE,
@@ -24,10 +24,10 @@ from homeassistant.components.climate import (
     SERVICE_SET_TEMPERATURE,
     HVACMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.util import slugify
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.util import slugify
 
 from . import init_integration
 from .consts import DUMMY_THERMOSTAT_DEVICE as DEVICE
@@ -37,7 +37,7 @@ ENTITY_ID = f"{CLIMATE_DOMAIN}.{slugify(DEVICE.name)}"
 
 @pytest.mark.parametrize("mock_bridge", [[DEVICE]], indirect=True)
 async def test_climate_hvac_mode(
-    hass: HomeAssistant, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test climate hvac mode service."""
     await init_integration(hass)
@@ -49,7 +49,7 @@ async def test_climate_hvac_mode(
 
     # Test set hvac mode heat
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
     ) as mock_control_device:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -71,7 +71,7 @@ async def test_climate_hvac_mode(
 
     # Test set hvac mode off
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
     ) as mock_control_device:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -92,7 +92,7 @@ async def test_climate_hvac_mode(
 
 @pytest.mark.parametrize("mock_bridge", [[DEVICE]], indirect=True)
 async def test_climate_temperature(
-    hass: HomeAssistant, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test climate temperature service."""
     await init_integration(hass)
@@ -108,7 +108,7 @@ async def test_climate_temperature(
 
     # Test set target temperature
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
     ) as mock_control_device:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -128,7 +128,7 @@ async def test_climate_temperature(
 
     # Test set target temperature - incorrect params
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
     ) as mock_control_device:
         with pytest.raises(ServiceValidationError):
             await hass.services.async_call(
@@ -148,7 +148,7 @@ async def test_climate_temperature(
 
 @pytest.mark.parametrize("mock_bridge", [[DEVICE]], indirect=True)
 async def test_climate_fan_level(
-    hass: HomeAssistant, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test climate fan level service."""
     await init_integration(hass)
@@ -160,7 +160,7 @@ async def test_climate_fan_level(
 
     # Test set fan level to high
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
     ) as mock_control_device:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -183,7 +183,7 @@ async def test_climate_fan_level(
 
 @pytest.mark.parametrize("mock_bridge", [[DEVICE]], indirect=True)
 async def test_climate_swing(
-    hass: HomeAssistant, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test climate swing service."""
     await init_integration(hass)
@@ -195,7 +195,7 @@ async def test_climate_swing(
 
     # Test set swing mode on
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
     ) as mock_control_device:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -218,7 +218,7 @@ async def test_climate_swing(
 
     # Test set swing mode off
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
     ) as mock_control_device:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
@@ -238,7 +238,7 @@ async def test_climate_swing(
 
 
 @pytest.mark.parametrize("mock_bridge", [[DEVICE]], indirect=True)
-async def test_control_device_fail(hass: HomeAssistant, mock_bridge, mock_api) -> None:
+async def test_control_device_fail(hass: SmartHub, mock_bridge, mock_api) -> None:
     """Test control device fail."""
     await init_integration(hass)
     assert mock_bridge
@@ -249,10 +249,10 @@ async def test_control_device_fail(hass: HomeAssistant, mock_bridge, mock_api) -
 
     # Test exception during set hvac mode
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
         side_effect=RuntimeError("fake error"),
     ) as mock_control_device:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 CLIMATE_DOMAIN,
                 SERVICE_SET_HVAC_MODE,
@@ -276,10 +276,10 @@ async def test_control_device_fail(hass: HomeAssistant, mock_bridge, mock_api) -
 
     # Test error response during turn on
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_breeze_device",
         return_value=SwitcherBaseResponse(None),
     ) as mock_control_device:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 CLIMATE_DOMAIN,
                 SERVICE_SET_HVAC_MODE,
@@ -297,7 +297,7 @@ async def test_control_device_fail(hass: HomeAssistant, mock_bridge, mock_api) -
 
 @pytest.mark.parametrize("mock_bridge", [[DEVICE]], indirect=True)
 async def test_bad_update_discard(
-    hass: HomeAssistant, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test that a bad update from device is discarded."""
     await init_integration(hass)
@@ -320,7 +320,7 @@ async def test_bad_update_discard(
 
 @pytest.mark.parametrize("mock_bridge", [[DEVICE]], indirect=True)
 async def test_climate_control_errors(
-    hass: HomeAssistant, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test control with settings not supported by device."""
     await init_integration(hass)
@@ -332,7 +332,7 @@ async def test_climate_control_errors(
     await hass.async_block_till_done()
 
     # Test exception when trying set temperature
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,

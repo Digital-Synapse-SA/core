@@ -1,12 +1,12 @@
 """Test ecovacs constants."""
 
-from homeassistant.components.ecovacs.const import (
+from smarthub.components.ecovacs.const import (
     CONF_CONTINENT,
     CONF_OVERRIDE_MQTT_URL,
     CONF_OVERRIDE_REST_URL,
     CONF_VERIFY_MQTT_CERTIFICATE,
 )
-from homeassistant.const import CONF_COUNTRY, CONF_PASSWORD, CONF_USERNAME
+from smarthub.const import CONF_COUNTRY, CONF_PASSWORD, CONF_USERNAME
 
 VALID_ENTRY_DATA_CLOUD = {
     CONF_USERNAME: "username@cloud",

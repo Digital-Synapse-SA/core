@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import mock_dsm_information
 
@@ -15,13 +15,13 @@ from .common import mock_dsm_information
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.synology_dsm.async_setup_entry", return_value=True
+        "smarthub.components.synology_dsm.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
 
 @pytest.fixture
-async def setup_media_source(hass: HomeAssistant) -> None:
+async def setup_media_source(hass: SmartHub) -> None:
     """Set up media source."""
     assert await async_setup_component(hass, "media_source", {})
 
@@ -29,7 +29,7 @@ async def setup_media_source(hass: HomeAssistant) -> None:
 @pytest.fixture(name="mock_dsm")
 def fixture_dsm():
     """Set up SynologyDSM API fixture."""
-    with patch("homeassistant.components.synology_dsm.common.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.common.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 

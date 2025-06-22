@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from unittest.mock import Mock, patch
 
-from homeassistant.components.local_file.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.local_file.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def test_unload_entry(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
+async def test_unload_entry(hass: SmartHub, loaded_entry: MockConfigEntry) -> None:
     """Test unload an entry."""
 
     assert loaded_entry.state is ConfigEntryState.LOADED
@@ -21,7 +21,7 @@ async def test_unload_entry(hass: HomeAssistant, loaded_entry: MockConfigEntry) 
 
 
 async def test_file_not_readable_during_startup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_config: dict[str, str],
 ) -> None:
     """Test a warning is shown setup when file is not readable."""
@@ -37,7 +37,7 @@ async def test_file_not_readable_during_startup(
         patch("os.path.isfile", Mock(return_value=True)),
         patch("os.access", Mock(return_value=False)),
         patch(
-            "homeassistant.components.local_file.camera.mimetypes.guess_type",
+            "smarthub.components.local_file.camera.mimetypes.guess_type",
             Mock(return_value=(None, None)),
         ),
     ):

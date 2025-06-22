@@ -9,14 +9,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 from twentemilieu import WasteType
 
-from homeassistant.components.twentemilieu.const import (
+from smarthub.components.twentemilieu.const import (
     CONF_HOUSE_LETTER,
     CONF_HOUSE_NUMBER,
     CONF_POST_CODE,
     DOMAIN,
 )
-from homeassistant.const import CONF_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_ID
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -41,7 +41,7 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[None]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.twentemilieu.async_setup_entry", return_value=True
+        "smarthub.components.twentemilieu.async_setup_entry", return_value=True
     ):
         yield
 
@@ -51,11 +51,11 @@ def mock_twentemilieu() -> Generator[MagicMock]:
     """Return a mocked Twente Milieu client."""
     with (
         patch(
-            "homeassistant.components.twentemilieu.coordinator.TwenteMilieu",
+            "smarthub.components.twentemilieu.coordinator.TwenteMilieu",
             autospec=True,
         ) as twentemilieu_mock,
         patch(
-            "homeassistant.components.twentemilieu.config_flow.TwenteMilieu",
+            "smarthub.components.twentemilieu.config_flow.TwenteMilieu",
             new=twentemilieu_mock,
         ),
     ):
@@ -73,7 +73,7 @@ def mock_twentemilieu() -> Generator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twentemilieu: MagicMock,
 ) -> MockConfigEntry:

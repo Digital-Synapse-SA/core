@@ -5,13 +5,13 @@ from datetime import timedelta
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.switcher_kis.const import DOMAIN, MAX_UPDATE_INTERVAL_SEC
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util, slugify
+from smarthub.components.switcher_kis.const import DOMAIN, MAX_UPDATE_INTERVAL_SEC
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util, slugify
 
 from . import init_integration
 from .consts import DUMMY_DEVICE_ID1, DUMMY_DEVICE_ID4, DUMMY_SWITCHER_DEVICES
@@ -21,7 +21,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_update_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
@@ -71,7 +71,7 @@ async def test_update_fail(
         assert state.state != STATE_UNAVAILABLE
 
 
-async def test_entry_unload(hass: HomeAssistant, mock_bridge) -> None:
+async def test_entry_unload(hass: SmartHub, mock_bridge) -> None:
     """Test entry unload."""
     entry = await init_integration(hass)
     assert mock_bridge
@@ -87,7 +87,7 @@ async def test_entry_unload(hass: HomeAssistant, mock_bridge) -> None:
 
 
 async def test_remove_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,

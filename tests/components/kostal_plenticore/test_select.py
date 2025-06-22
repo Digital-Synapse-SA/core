@@ -2,15 +2,15 @@
 
 from pykoplenti import SettingsData
 
-from homeassistant.components.kostal_plenticore.coordinator import Plenticore
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.kostal_plenticore.coordinator import Plenticore
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_select_battery_charging_usage_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_plenticore: Plenticore,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -49,7 +49,7 @@ async def test_select_battery_charging_usage_available(
 
 
 async def test_select_battery_charging_usage_not_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_plenticore: Plenticore,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,

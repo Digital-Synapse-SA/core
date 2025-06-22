@@ -4,12 +4,12 @@ from http import HTTPStatus
 
 import pytest
 
-from homeassistant.components.rainbird import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.rainbird import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .conftest import (
     ACK_ECHO,
@@ -40,7 +40,7 @@ def platforms() -> list[str]:
 
 @pytest.fixture(autouse=True)
 async def setup_config_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> list[Platform]:
     """Fixture to setup the config entry."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -52,7 +52,7 @@ async def setup_config_entry(
     [EMPTY_STATIONS_RESPONSE],
 )
 async def test_no_zones(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test case where listing stations returns no stations."""
 
@@ -65,7 +65,7 @@ async def test_no_zones(
     [ZONE_5_ON_RESPONSE],
 )
 async def test_zones(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test switch platform with fake data that creates 7 zones with one enabled."""
@@ -114,7 +114,7 @@ async def test_zones(
 
 
 async def test_switch_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     responses: list[AiohttpClientMockResponse],
 ) -> None:
@@ -153,7 +153,7 @@ async def test_switch_on(
     ],
 )
 async def test_switch_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     responses: list[AiohttpClientMockResponse],
     start_state: str,
@@ -184,7 +184,7 @@ async def test_switch_off(
 
 
 async def test_irrigation_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     responses: list[AiohttpClientMockResponse],
     api_responses: list[str],
@@ -237,7 +237,7 @@ async def test_irrigation_service(
     ],
 )
 async def test_yaml_imported_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     responses: list[AiohttpClientMockResponse],
 ) -> None:
     """Test a config entry that was previously imported from yaml."""
@@ -257,7 +257,7 @@ async def test_yaml_imported_config(
     ],
 )
 async def test_switch_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     responses: list[AiohttpClientMockResponse],
     status: HTTPStatus,
@@ -268,12 +268,12 @@ async def test_switch_error(
     aioclient_mock.mock_calls.clear()
     responses.append(mock_response_error(status=status))
 
-    with pytest.raises(HomeAssistantError, match=expected_msg):
+    with pytest.raises(SmartHubError, match=expected_msg):
         await switch_common.async_turn_on(hass, "switch.rain_bird_sprinkler_3")
 
     responses.append(mock_response_error(status=status))
 
-    with pytest.raises(HomeAssistantError, match=expected_msg):
+    with pytest.raises(SmartHubError, match=expected_msg):
         await switch_common.async_turn_off(hass, "switch.rain_bird_sprinkler_3")
 
 
@@ -284,7 +284,7 @@ async def test_switch_error(
     ],
 )
 async def test_no_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     responses: list[AiohttpClientMockResponse],
     entity_registry: er.EntityRegistry,

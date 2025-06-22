@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.devolo_home_control.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
+from smarthub import config_entries
+from smarthub.components.devolo_home_control.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResult, FlowResultType
 
 from .const import (
     DISCOVERY_INFO,
@@ -18,7 +18,7 @@ from .const import (
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -32,7 +32,7 @@ async def test_form(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("credentials_valid", [False])
-async def test_form_invalid_credentials_user(hass: HomeAssistant) -> None:
+async def test_form_invalid_credentials_user(hass: SmartHub) -> None:
     """Test if we get the error message on invalid credentials."""
 
     result = await hass.config_entries.flow.async_init(
@@ -50,10 +50,10 @@ async def test_form_invalid_credentials_user(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_already_configured(hass: HomeAssistant) -> None:
+async def test_form_already_configured(hass: SmartHub) -> None:
     """Test if we get the error message on already configured."""
     with patch(
-        "homeassistant.components.devolo_home_control.Mydevolo.uuid",
+        "smarthub.components.devolo_home_control.Mydevolo.uuid",
         return_value="123456",
     ):
         MockConfigEntry(domain=DOMAIN, unique_id="123456", data={}).add_to_hass(hass)
@@ -66,7 +66,7 @@ async def test_form_already_configured(hass: HomeAssistant) -> None:
         assert result["reason"] == "already_configured"
 
 
-async def test_form_zeroconf(hass: HomeAssistant) -> None:
+async def test_form_zeroconf(hass: SmartHub) -> None:
     """Test that the zeroconf confirmation form is served."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -81,7 +81,7 @@ async def test_form_zeroconf(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("credentials_valid", [False])
-async def test_form_invalid_credentials_zeroconf(hass: HomeAssistant) -> None:
+async def test_form_invalid_credentials_zeroconf(hass: SmartHub) -> None:
     """Test if we get the error message on invalid credentials."""
 
     result = await hass.config_entries.flow.async_init(
@@ -101,7 +101,7 @@ async def test_form_invalid_credentials_zeroconf(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_zeroconf_wrong_device(hass: HomeAssistant) -> None:
+async def test_zeroconf_wrong_device(hass: SmartHub) -> None:
     """Test that the zeroconf ignores wrong devices."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -122,7 +122,7 @@ async def test_zeroconf_wrong_device(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.ABORT
 
 
-async def test_form_reauth(hass: HomeAssistant) -> None:
+async def test_form_reauth(hass: SmartHub) -> None:
     """Test that the reauth confirmation form is served."""
     mock_config = MockConfigEntry(
         domain=DOMAIN,
@@ -139,11 +139,11 @@ async def test_form_reauth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.devolo_home_control.async_setup_entry",
+            "smarthub.components.devolo_home_control.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.devolo_home_control.Mydevolo.uuid",
+            "smarthub.components.devolo_home_control.Mydevolo.uuid",
             return_value="123456",
         ),
     ):
@@ -158,7 +158,7 @@ async def test_form_reauth(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("credentials_valid", [False])
-async def test_form_invalid_credentials_reauth(hass: HomeAssistant) -> None:
+async def test_form_invalid_credentials_reauth(hass: SmartHub) -> None:
     """Test if we get the error message on invalid credentials."""
     mock_config = MockConfigEntry(
         domain=DOMAIN,
@@ -179,7 +179,7 @@ async def test_form_invalid_credentials_reauth(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_uuid_change_reauth(hass: HomeAssistant) -> None:
+async def test_form_uuid_change_reauth(hass: SmartHub) -> None:
     """Test that the reauth confirmation form is served."""
     mock_config = MockConfigEntry(
         domain=DOMAIN,
@@ -197,11 +197,11 @@ async def test_form_uuid_change_reauth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.devolo_home_control.async_setup_entry",
+            "smarthub.components.devolo_home_control.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.devolo_home_control.Mydevolo.uuid",
+            "smarthub.components.devolo_home_control.Mydevolo.uuid",
             return_value="789123",
         ),
     ):
@@ -215,15 +215,15 @@ async def test_form_uuid_change_reauth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "reauth_failed"}
 
 
-async def _setup(hass: HomeAssistant, result: FlowResult) -> None:
+async def _setup(hass: SmartHub, result: FlowResult) -> None:
     """Finish configuration steps."""
     with (
         patch(
-            "homeassistant.components.devolo_home_control.async_setup_entry",
+            "smarthub.components.devolo_home_control.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.devolo_home_control.Mydevolo.uuid",
+            "smarthub.components.devolo_home_control.Mydevolo.uuid",
             return_value="123456",
         ),
     ):

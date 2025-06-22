@@ -2,11 +2,11 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
-from homeassistant.components.vodafone_station.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.device_tracker import CONF_CONSIDER_HOME
+from smarthub.components.vodafone_station.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_reload_config_entry_with_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -36,7 +36,7 @@ async def test_reload_config_entry_with_options(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

@@ -1,15 +1,15 @@
 """Tests for JustNimbus initialization."""
 
-from homeassistant.components.justnimbus.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.justnimbus.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .conftest import FIXTURE_OLD_USER_INPUT, FIXTURE_UNIQUE_ID
 
 from tests.common import MockConfigEntry
 
 
-async def test_config_entry_reauth_at_setup(hass: HomeAssistant) -> None:
+async def test_config_entry_reauth_at_setup(hass: SmartHub) -> None:
     """Test that setting up with old config results in reauth."""
     mock_config = MockConfigEntry(
         domain=DOMAIN, unique_id=FIXTURE_UNIQUE_ID, data=FIXTURE_OLD_USER_INPUT

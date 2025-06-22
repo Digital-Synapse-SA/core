@@ -1,16 +1,16 @@
 """Test the init file of IFTTT."""
 
-from homeassistant import config_entries
-from homeassistant.components import ifttt
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components import ifttt
+from smarthub.core import SmartHub, callback
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.typing import ClientSessionGenerator
 
 
 async def test_config_flow_registers_webhook(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test setting up IFTTT and sending webhook."""
     await async_process_ha_core_config(

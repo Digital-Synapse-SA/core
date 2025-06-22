@@ -5,15 +5,15 @@ import urllib
 
 import pytest
 
-from homeassistant.components.feedreader.const import (
+from smarthub.components.feedreader.const import (
     CONF_MAX_ENTRIES,
     DEFAULT_MAX_ENTRIES,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import create_mock_entry
 from .const import FEED_TITLE, URL, VALID_CONFIG_DEFAULT
@@ -24,7 +24,7 @@ def feedparser_fixture(feed_one_event: bytes) -> Mock:
     """Patch libraries."""
     with (
         patch(
-            "homeassistant.components.feedreader.config_flow.feedparser.http.get",
+            "smarthub.components.feedreader.config_flow.feedparser.http.get",
             return_value=feed_one_event,
         ) as feedparser,
     ):
@@ -35,12 +35,12 @@ def feedparser_fixture(feed_one_event: bytes) -> Mock:
 def setup_entry_fixture(feed_one_event: bytes) -> Mock:
     """Patch libraries."""
     with (
-        patch("homeassistant.components.feedreader.async_setup_entry") as setup_entry,
+        patch("smarthub.components.feedreader.async_setup_entry") as setup_entry,
     ):
         yield setup_entry
 
 
-async def test_user(hass: HomeAssistant, feedparser, setup_entry) -> None:
+async def test_user(hass: SmartHub, feedparser, setup_entry) -> None:
     """Test starting a flow by user."""
     # init user flow
     result = await hass.config_entries.flow.async_init(
@@ -60,7 +60,7 @@ async def test_user(hass: HomeAssistant, feedparser, setup_entry) -> None:
 
 
 async def test_user_errors(
-    hass: HomeAssistant, feedparser, setup_entry, feed_one_event
+    hass: SmartHub, feedparser, setup_entry, feed_one_event
 ) -> None:
     """Test starting a flow by user which results in an URL error."""
     # init user flow
@@ -92,7 +92,7 @@ async def test_user_errors(
     assert result["options"][CONF_MAX_ENTRIES] == DEFAULT_MAX_ENTRIES
 
 
-async def test_reconfigure(hass: HomeAssistant, feedparser) -> None:
+async def test_reconfigure(hass: SmartHub, feedparser) -> None:
     """Test starting a reconfigure flow."""
     entry = create_mock_entry(VALID_CONFIG_DEFAULT)
     entry.add_to_hass(hass)
@@ -106,7 +106,7 @@ async def test_reconfigure(hass: HomeAssistant, feedparser) -> None:
 
     # success
     with patch(
-        "homeassistant.config_entries.ConfigEntries.async_reload"
+        "smarthub.config_entries.ConfigEntries.async_reload"
     ) as mock_async_reload:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -125,7 +125,7 @@ async def test_reconfigure(hass: HomeAssistant, feedparser) -> None:
 
 
 async def test_reconfigure_errors(
-    hass: HomeAssistant, feedparser, setup_entry, feed_one_event
+    hass: SmartHub, feedparser, setup_entry, feed_one_event
 ) -> None:
     """Test starting a reconfigure flow by user which results in an URL error."""
     entry = create_mock_entry(VALID_CONFIG_DEFAULT)
@@ -167,7 +167,7 @@ async def test_reconfigure_errors(
     }
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test options flow."""
     entry = create_mock_entry(VALID_CONFIG_DEFAULT)
     entry.add_to_hass(hass)
@@ -194,7 +194,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     ],
 )
 async def test_feed_htmlentities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     feedparser,
     setup_entry,
     fixture_name,
@@ -203,7 +203,7 @@ async def test_feed_htmlentities(
 ) -> None:
     """Test starting a flow by user from a feed with HTML Entities in the title."""
     with patch(
-        "homeassistant.components.feedreader.config_flow.feedparser.http.get",
+        "smarthub.components.feedreader.config_flow.feedparser.http.get",
         side_effect=[request.getfixturevalue(fixture_name)],
     ):
         # init user flow

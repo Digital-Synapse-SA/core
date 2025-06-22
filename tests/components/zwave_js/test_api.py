@@ -37,8 +37,8 @@ from zwave_js_server.model.node import Node
 from zwave_js_server.model.node.firmware import NodeFirmwareUpdateData
 from zwave_js_server.model.value import ConfigurationValue, get_value_id_str
 
-from homeassistant.components.websocket_api import ERR_INVALID_FORMAT, ERR_NOT_FOUND
-from homeassistant.components.zwave_js.api import (
+from smarthub.components.websocket_api import ERR_INVALID_FORMAT, ERR_NOT_FOUND
+from smarthub.components.zwave_js.api import (
     APPLICATION_VERSION,
     AREA_ID,
     CLIENT_SIDE_AUTH,
@@ -86,7 +86,7 @@ from homeassistant.components.zwave_js.api import (
     VALUE_SIZE,
     VERSION,
 )
-from homeassistant.components.zwave_js.const import (
+from smarthub.components.zwave_js.const import (
     ATTR_COMMAND_CLASS,
     ATTR_ENDPOINT,
     ATTR_METHOD_NAME,
@@ -96,10 +96,10 @@ from homeassistant.components.zwave_js.const import (
     CONF_INSTALLER_MODE,
     DOMAIN,
 )
-from homeassistant.components.zwave_js.helpers import get_device_id
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.zwave_js.helpers import get_device_id
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, MockUser
 from tests.typing import ClientSessionGenerator, WebSocketGenerator
@@ -113,7 +113,7 @@ def platforms() -> list[str]:
     return []
 
 
-def get_device(hass: HomeAssistant, node):
+def get_device(hass: SmartHub, node):
     """Get device ID for a node."""
     dev_reg = dr.async_get(hass)
     device_id = get_device_id(node.client.driver, node)
@@ -121,7 +121,7 @@ def get_device(hass: HomeAssistant, node):
 
 
 async def test_no_driver(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     controller_state,
@@ -146,7 +146,7 @@ async def test_no_driver(
 
 
 async def test_network_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     multisensor_6,
     controller_state,
@@ -272,7 +272,7 @@ async def test_network_status(
 
 
 async def test_subscribe_node_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     multisensor_6_state,
     client,
@@ -343,7 +343,7 @@ async def test_subscribe_node_status(
 
 
 async def test_node_status(
-    hass: HomeAssistant, multisensor_6, integration, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, multisensor_6, integration, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the node status websocket command."""
     entry = integration
@@ -401,7 +401,7 @@ async def test_node_status(
 
 
 async def test_node_metadata(
-    hass: HomeAssistant,
+    hass: SmartHub,
     wallmote_central_scene,
     integration,
     hass_ws_client: WebSocketGenerator,
@@ -482,7 +482,7 @@ async def test_node_metadata(
 
 
 async def test_node_alerts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     wallmote_central_scene,
     integration,
@@ -601,7 +601,7 @@ async def test_node_alerts(
 
 
 async def test_add_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     nortek_thermostat,
     nortek_thermostat_added_event,
     integration,
@@ -1098,7 +1098,7 @@ async def test_add_node(
 
 
 async def test_grant_security_classes(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the grant_security_classes websocket command."""
     entry = integration
@@ -1145,7 +1145,7 @@ async def test_grant_security_classes(
 
 
 async def test_validate_dsk_and_enter_pin(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the validate_dsk_and_enter_pin websocket command."""
     entry = integration
@@ -1190,7 +1190,7 @@ async def test_validate_dsk_and_enter_pin(
 
 
 async def test_provision_smart_start_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     integration,
     client,
@@ -1365,7 +1365,7 @@ async def test_provision_smart_start_node(
 
 
 async def test_unprovision_smart_start_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     integration,
     client,
@@ -1541,7 +1541,7 @@ async def test_unprovision_smart_start_node(
 
 
 async def test_get_provisioning_entries(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test get_provisioning_entries websocket command."""
     entry = integration
@@ -1602,7 +1602,7 @@ async def test_get_provisioning_entries(
 
 
 async def test_parse_qr_code_string(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test parse_qr_code_string websocket command."""
     entry = integration
@@ -1662,7 +1662,7 @@ async def test_parse_qr_code_string(
 
     # Test FailedZWaveCommand is caught
     with patch(
-        "homeassistant.components.zwave_js.api.async_parse_qr_code_string",
+        "smarthub.components.zwave_js.api.async_parse_qr_code_string",
         side_effect=FailedZWaveCommand("failed_command", 1, "error message"),
     ):
         await ws_client.send_json(
@@ -1700,7 +1700,7 @@ async def test_parse_qr_code_string(
 
 
 async def test_try_parse_dsk_from_qr_code_string(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test try_parse_dsk_from_qr_code_string websocket command."""
     entry = integration
@@ -1729,7 +1729,7 @@ async def test_try_parse_dsk_from_qr_code_string(
 
     # Test FailedZWaveCommand is caught
     with patch(
-        "homeassistant.components.zwave_js.api.async_try_parse_dsk_from_qr_code_string",
+        "smarthub.components.zwave_js.api.async_try_parse_dsk_from_qr_code_string",
         side_effect=FailedZWaveCommand("failed_command", 1, "error message"),
     ):
         await ws_client.send_json(
@@ -1767,7 +1767,7 @@ async def test_try_parse_dsk_from_qr_code_string(
 
 
 async def test_supports_feature(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test supports_feature websocket command."""
     entry = integration
@@ -1790,7 +1790,7 @@ async def test_supports_feature(
 
 
 async def test_cancel_inclusion_exclusion(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test cancelling the inclusion and exclusion process."""
     entry = integration
@@ -1870,7 +1870,7 @@ async def test_cancel_inclusion_exclusion(
 
 
 async def test_remove_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     integration,
     client,
@@ -1980,7 +1980,7 @@ async def test_remove_node(
 
 
 async def test_replace_failed_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     nortek_thermostat,
     integration,
@@ -2347,7 +2347,7 @@ async def test_replace_failed_node(
 
 
 async def test_remove_failed_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     nortek_thermostat,
     integration,
@@ -2433,7 +2433,7 @@ async def test_remove_failed_node(
 
 
 async def test_begin_rebuilding_routes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration,
     client,
     hass_ws_client: WebSocketGenerator,
@@ -2492,7 +2492,7 @@ async def test_begin_rebuilding_routes(
 
 
 async def test_subscribe_rebuild_routes_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration,
     client,
     nortek_thermostat,
@@ -2546,7 +2546,7 @@ async def test_subscribe_rebuild_routes_progress(
 
 
 async def test_subscribe_rebuild_routes_progress_initial_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration,
     client,
     nortek_thermostat,
@@ -2583,7 +2583,7 @@ async def test_subscribe_rebuild_routes_progress_initial_value(
 
 
 async def test_stop_rebuilding_routes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration,
     client,
     hass_ws_client: WebSocketGenerator,
@@ -2642,7 +2642,7 @@ async def test_stop_rebuilding_routes(
 
 
 async def test_rebuild_node_routes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     integration,
     client,
@@ -2703,7 +2703,7 @@ async def test_rebuild_node_routes(
 
 
 async def test_refresh_node_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     integration,
@@ -2831,7 +2831,7 @@ async def test_refresh_node_info(
 
 
 async def test_refresh_node_values(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     integration,
@@ -2908,7 +2908,7 @@ async def test_refresh_node_values(
 
 
 async def test_refresh_node_cc_values(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     client,
     integration,
@@ -3003,7 +3003,7 @@ async def test_refresh_node_cc_values(
 
 
 async def test_set_config_parameter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     client,
     hass_ws_client: WebSocketGenerator,
@@ -3117,7 +3117,7 @@ async def test_set_config_parameter(
     client.async_send_command_no_wait.reset_mock()
 
     with patch(
-        "homeassistant.components.zwave_js.api.async_set_config_parameter",
+        "smarthub.components.zwave_js.api.async_set_config_parameter",
     ) as set_param_mock:
         set_param_mock.side_effect = InvalidNewValue("test")
         await ws_client.send_json(
@@ -3193,7 +3193,7 @@ async def test_set_config_parameter(
 
     # Test FailedZWaveCommand is caught
     with patch(
-        "homeassistant.components.zwave_js.api.async_set_config_parameter",
+        "smarthub.components.zwave_js.api.async_set_config_parameter",
         side_effect=FailedZWaveCommand("failed_command", 1, "error message"),
     ):
         await ws_client.send_json(
@@ -3234,7 +3234,7 @@ async def test_set_config_parameter(
 
 
 async def test_get_config_parameters(
-    hass: HomeAssistant, multisensor_6, integration, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, multisensor_6, integration, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the get config parameters websocket command."""
     entry = integration
@@ -3307,7 +3307,7 @@ async def test_get_config_parameters(
 
 
 async def test_set_raw_config_parameter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     integration,
@@ -3385,7 +3385,7 @@ async def test_set_raw_config_parameter(
 
 
 async def test_get_raw_config_parameter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     integration,
     client,
@@ -3485,7 +3485,7 @@ async def test_get_raw_config_parameter(
     [({"target": "1"}, {"firmware_target": 1}), ({}, {})],
 )
 async def test_firmware_upload_view(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     integration,
     hass_client: ClientSessionGenerator,
@@ -3498,14 +3498,14 @@ async def test_firmware_upload_view(
     device = get_device(hass, multisensor_6)
     with (
         patch(
-            "homeassistant.components.zwave_js.api.update_firmware",
+            "smarthub.components.zwave_js.api.update_firmware",
         ) as mock_node_cmd,
         patch(
-            "homeassistant.components.zwave_js.api.driver_firmware_update_otw",
+            "smarthub.components.zwave_js.api.driver_firmware_update_otw",
         ) as mock_controller_cmd,
         patch.dict(
-            "homeassistant.components.zwave_js.api.USER_AGENT",
-            {"HomeAssistant": "0.0.0"},
+            "smarthub.components.zwave_js.api.USER_AGENT",
+            {"SmartHub": "0.0.0"},
         ),
     ):
         data = {"file": firmware_file}
@@ -3524,13 +3524,13 @@ async def test_firmware_upload_view(
         mock_controller_cmd.assert_not_called()
         assert mock_node_cmd.call_args[0][1:3] == (multisensor_6, [update_data])
         assert mock_node_cmd.call_args[1] == {
-            "additional_user_agent_components": {"HomeAssistant": "0.0.0"},
+            "additional_user_agent_components": {"SmartHub": "0.0.0"},
         }
         assert json.loads(await resp.text()) is None
 
 
 async def test_firmware_upload_view_controller(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     integration,
     hass_client: ClientSessionGenerator,
@@ -3541,14 +3541,14 @@ async def test_firmware_upload_view_controller(
     device = get_device(hass, client.driver.controller.nodes[1])
     with (
         patch(
-            "homeassistant.components.zwave_js.api.update_firmware",
+            "smarthub.components.zwave_js.api.update_firmware",
         ) as mock_node_cmd,
         patch(
-            "homeassistant.components.zwave_js.api.driver_firmware_update_otw",
+            "smarthub.components.zwave_js.api.driver_firmware_update_otw",
         ) as mock_controller_cmd,
         patch.dict(
-            "homeassistant.components.zwave_js.api.USER_AGENT",
-            {"HomeAssistant": "0.0.0"},
+            "smarthub.components.zwave_js.api.USER_AGENT",
+            {"SmartHub": "0.0.0"},
         ),
     ):
         resp = await hass_client.post(
@@ -3562,13 +3562,13 @@ async def test_firmware_upload_view_controller(
             ),
         )
         assert mock_controller_cmd.call_args[1] == {
-            "additional_user_agent_components": {"HomeAssistant": "0.0.0"},
+            "additional_user_agent_components": {"SmartHub": "0.0.0"},
         }
         assert json.loads(await resp.text()) is None
 
 
 async def test_firmware_upload_view_failed_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     integration,
     hass_client: ClientSessionGenerator,
@@ -3578,7 +3578,7 @@ async def test_firmware_upload_view_failed_command(
     client = await hass_client()
     device = get_device(hass, multisensor_6)
     with patch(
-        "homeassistant.components.zwave_js.api.update_firmware",
+        "smarthub.components.zwave_js.api.update_firmware",
         side_effect=FailedCommand("test", "test"),
     ):
         resp = await client.post(
@@ -3589,7 +3589,7 @@ async def test_firmware_upload_view_failed_command(
 
 
 async def test_firmware_upload_view_invalid_payload(
-    hass: HomeAssistant, multisensor_6, integration, hass_client: ClientSessionGenerator
+    hass: SmartHub, multisensor_6, integration, hass_client: ClientSessionGenerator
 ) -> None:
     """Test an invalid payload for the HTTP firmware upload view."""
     device = get_device(hass, multisensor_6)
@@ -3602,7 +3602,7 @@ async def test_firmware_upload_view_invalid_payload(
 
 
 async def test_firmware_upload_view_no_driver(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     integration,
@@ -3624,7 +3624,7 @@ async def test_firmware_upload_view_no_driver(
     [("post", "/api/zwave_js/firmware/upload/{}")],
 )
 async def test_node_view_non_admin_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     integration,
     hass_client: ClientSessionGenerator,
@@ -3648,7 +3648,7 @@ async def test_node_view_non_admin_user(
     ],
 )
 async def test_view_unloaded_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     integration,
     hass_client: ClientSessionGenerator,
@@ -3677,7 +3677,7 @@ async def test_view_invalid_device_id(
 
 
 async def test_subscribe_log_updates(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the subscribe_log_updates websocket command."""
     entry = integration
@@ -3782,7 +3782,7 @@ async def test_subscribe_log_updates(
 
 
 async def test_update_log_config(
-    hass: HomeAssistant, client, integration, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, client, integration, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that update_log_config WS API call and schema validation works."""
     entry = integration
@@ -3940,7 +3940,7 @@ async def test_update_log_config(
 
 
 async def test_get_log_config(
-    hass: HomeAssistant, client, integration, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, client, integration, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the get_log_config WS API call works."""
     entry = integration
@@ -3983,7 +3983,7 @@ async def test_get_log_config(
 
 
 async def test_data_collection(
-    hass: HomeAssistant, client, integration, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, client, integration, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the data collection WS API commands work."""
     entry = integration
@@ -4026,7 +4026,7 @@ async def test_data_collection(
     assert len(client.async_send_command.call_args_list) == 1
     args = client.async_send_command.call_args_list[0][0][0]
     assert args["command"] == "driver.enable_statistics"
-    assert args["applicationName"] == "Home Assistant"
+    assert args["applicationName"] == "SmartHub"
 
     client.async_send_command.reset_mock()
 
@@ -4119,7 +4119,7 @@ async def test_data_collection(
 
 
 async def test_abort_firmware_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     integration,
@@ -4194,7 +4194,7 @@ async def test_abort_firmware_update(
 
 
 async def test_is_node_firmware_update_in_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     integration,
@@ -4258,7 +4258,7 @@ async def test_is_node_firmware_update_in_progress(
 
 
 async def test_subscribe_firmware_update_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     integration,
     client,
@@ -4336,7 +4336,7 @@ async def test_subscribe_firmware_update_status(
 
 
 async def test_subscribe_firmware_update_status_initial_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     client,
     integration,
@@ -4392,7 +4392,7 @@ async def test_subscribe_firmware_update_status_initial_value(
 
 
 async def test_subscribe_controller_firmware_update_status(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the subscribe_firmware_update_status websocket command for a node."""
     ws_client = await hass_ws_client(hass)
@@ -4458,7 +4458,7 @@ async def test_subscribe_controller_firmware_update_status(
 
 
 async def test_subscribe_controller_firmware_update_status_initial_value(
-    hass: HomeAssistant, client, integration, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, client, integration, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test subscribe_firmware_update_status cmd with in progress update for node."""
     ws_client = await hass_ws_client(hass)
@@ -4507,7 +4507,7 @@ async def test_subscribe_controller_firmware_update_status_initial_value(
 
 
 async def test_subscribe_firmware_update_status_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     client,
     integration,
@@ -4548,7 +4548,7 @@ async def test_subscribe_firmware_update_status_failures(
 
 
 async def test_get_node_firmware_update_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     multisensor_6,
     integration,
@@ -4637,7 +4637,7 @@ async def test_get_node_firmware_update_capabilities(
 
 
 async def test_is_any_ota_firmware_update_in_progress(
-    hass: HomeAssistant, client, integration, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, client, integration, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the is_any_ota_firmware_update_in_progress WS API call works."""
     entry = integration
@@ -4708,7 +4708,7 @@ async def test_is_any_ota_firmware_update_in_progress(
 
 
 async def test_check_for_config_updates(
-    hass: HomeAssistant, client, integration, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, client, integration, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the check_for_config_updates WS API call works."""
     entry = integration
@@ -4783,7 +4783,7 @@ async def test_check_for_config_updates(
 
 
 async def test_install_config_update(
-    hass: HomeAssistant, client, integration, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, client, integration, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the install_config_update WS API call works."""
     entry = integration
@@ -4850,7 +4850,7 @@ async def test_install_config_update(
 
 
 async def test_subscribe_controller_statistics(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the subscribe_controller_statistics command."""
     entry = integration
@@ -4949,7 +4949,7 @@ async def test_subscribe_controller_statistics(
 
 
 async def test_subscribe_node_statistics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6,
     wallmote_central_scene,
     zen_31,
@@ -5096,7 +5096,7 @@ async def test_subscribe_node_statistics(
 
 
 async def test_hard_reset_controller(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
@@ -5191,7 +5191,7 @@ async def test_hard_reset_controller(
     client.async_send_command.side_effect = async_send_command_no_driver_ready
 
     with patch(
-        "homeassistant.components.zwave_js.api.DRIVER_READY_TIMEOUT",
+        "smarthub.components.zwave_js.api.DRIVER_READY_TIMEOUT",
         new=0,
     ):
         await ws_client.send_json_auto_id(
@@ -5263,7 +5263,7 @@ async def test_hard_reset_controller(
 
 
 async def test_node_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     multisensor_6: Node,
     integration: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
@@ -5321,7 +5321,7 @@ async def test_node_capabilities(
 
 
 async def test_invoke_cc_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints: Node,
     integration: MockConfigEntry,
@@ -5422,7 +5422,7 @@ async def test_invoke_cc_api(
 async def test_get_integration_settings(
     config: dict[str, Any],
     installer_mode: bool,
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -5447,7 +5447,7 @@ async def test_get_integration_settings(
 
 
 async def test_backup_nvm(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration,
     client,
     hass_ws_client: WebSocketGenerator,
@@ -5563,7 +5563,7 @@ async def test_backup_nvm(
 
 
 async def test_restore_nvm(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration,
     client,
     hass_ws_client: WebSocketGenerator,
@@ -5706,7 +5706,7 @@ async def test_restore_nvm(
     client.async_send_command.side_effect = async_send_command_no_driver_ready
 
     with patch(
-        "homeassistant.components.zwave_js.api.DRIVER_READY_TIMEOUT",
+        "smarthub.components.zwave_js.api.DRIVER_READY_TIMEOUT",
         new=0,
     ):
         # Send the subscription request
@@ -5792,7 +5792,7 @@ async def test_restore_nvm(
 
 
 async def test_cancel_secure_bootstrap_s2(
-    hass: HomeAssistant, client, integration, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, client, integration, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that the cancel_secure_bootstrap_s2 WS API call works."""
     entry = integration
@@ -5858,7 +5858,7 @@ async def test_cancel_secure_bootstrap_s2(
 
 
 async def test_subscribe_s2_inclusion(
-    hass: HomeAssistant, integration, client, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, integration, client, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the subscribe_s2_inclusion websocket command."""
     entry = integration
@@ -5934,7 +5934,7 @@ async def test_subscribe_s2_inclusion(
 
 
 async def test_lookup_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: MockConfigEntry,
     client: MagicMock,
     hass_ws_client: WebSocketGenerator,
@@ -6058,7 +6058,7 @@ async def test_lookup_device(
 
 
 async def test_subscribe_new_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration,
     client,
     hass_ws_client: WebSocketGenerator,

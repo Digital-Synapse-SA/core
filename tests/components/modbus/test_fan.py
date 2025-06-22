@@ -3,9 +3,9 @@
 from pymodbus.exceptions import ModbusException
 import pytest
 
-from homeassistant.components.fan import DOMAIN as FAN_DOMAIN
-from homeassistant.components.homeassistant import SERVICE_UPDATE_ENTITY
-from homeassistant.components.modbus.const import (
+from smarthub.components.fan import DOMAIN as FAN_DOMAIN
+from smarthub.components.smarthub import SERVICE_UPDATE_ENTITY
+from smarthub.components.modbus.const import (
     CALL_TYPE_COIL,
     CALL_TYPE_DISCRETE,
     CALL_TYPE_REGISTER_HOLDING,
@@ -19,7 +19,7 @@ from homeassistant.components.modbus.const import (
     CONF_WRITE_TYPE,
     MODBUS_DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_ADDRESS,
     CONF_COMMAND_OFF,
@@ -34,8 +34,8 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant, State
-from homeassistant.setup import async_setup_component
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub, State
+from smarthub.setup import async_setup_component
 
 from .conftest import TEST_ENTITY_NAME, ReadResult
 
@@ -145,7 +145,7 @@ ENTITY_ID2 = f"{ENTITY_ID}_2"
         },
     ],
 )
-async def test_config_fan(hass: HomeAssistant, mock_modbus) -> None:
+async def test_config_fan(hass: SmartHub, mock_modbus) -> None:
     """Run configuration test for fan."""
     assert FAN_DOMAIN in hass.config.components
 
@@ -210,7 +210,7 @@ async def test_config_fan(hass: HomeAssistant, mock_modbus) -> None:
         ),
     ],
 )
-async def test_all_fan(hass: HomeAssistant, mock_do_cycle, expected) -> None:
+async def test_all_fan(hass: SmartHub, mock_do_cycle, expected) -> None:
     """Run test for given config."""
     assert hass.states.get(ENTITY_ID).state == expected
 
@@ -235,7 +235,7 @@ async def test_all_fan(hass: HomeAssistant, mock_do_cycle, expected) -> None:
     ],
 )
 async def test_restore_state_fan(
-    hass: HomeAssistant, mock_test_state, mock_modbus
+    hass: SmartHub, mock_test_state, mock_modbus
 ) -> None:
     """Run test for fan restore state."""
     assert hass.states.get(ENTITY_ID).state == STATE_ON
@@ -264,7 +264,7 @@ async def test_restore_state_fan(
     ],
 )
 async def test_fan_service_turn(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_modbus,
 ) -> None:
@@ -327,8 +327,8 @@ async def test_fan_service_turn(
         },
     ],
 )
-async def test_service_fan_update(hass: HomeAssistant, mock_modbus_ha) -> None:
-    """Run test for service homeassistant.update_entity."""
+async def test_service_fan_update(hass: SmartHub, mock_modbus_ha) -> None:
+    """Run test for service smarthub.update_entity."""
     await hass.services.async_call(
         HOMEASSISTANT_DOMAIN,
         SERVICE_UPDATE_ENTITY,
@@ -347,7 +347,7 @@ async def test_service_fan_update(hass: HomeAssistant, mock_modbus_ha) -> None:
 
 
 async def test_no_discovery_info_fan(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup without discovery info."""
     assert FAN_DOMAIN not in hass.config.components

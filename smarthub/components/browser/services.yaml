@@ -1,0 +1,7 @@
+browse_url:
+  fields:
+    url:
+      required: true
+      example: "https://www.smart-hub.io"
+      selector:
+        text:

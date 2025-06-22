@@ -6,11 +6,11 @@ from unittest.mock import patch
 from aioairq import DeviceInfo as AirQDeviceInfo
 import pytest
 
-from homeassistant.components.airq import AirQCoordinator
-from homeassistant.components.airq.const import DOMAIN
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceInfo
+from smarthub.components.airq import AirQCoordinator
+from smarthub.components.airq.const import DOMAIN
+from smarthub.const import CONF_IP_ADDRESS, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import DeviceInfo
 
 from tests.common import MockConfigEntry
 
@@ -40,7 +40,7 @@ STATUS_WARMUP = {
 
 
 async def test_logging_in_coordinator_first_update_data(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that the first AirQCoordinator._async_update_data call logs necessary setup.
 
@@ -79,7 +79,7 @@ async def test_logging_in_coordinator_first_update_data(
 
 
 async def test_logging_in_coordinator_subsequent_update_data(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that the second AirQCoordinator._async_update_data call has nothing to log.
 
@@ -110,7 +110,7 @@ async def test_logging_in_coordinator_subsequent_update_data(
 
 
 async def test_logging_when_warming_up_sensor_present(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that warming up sensors are logged."""
     caplog.set_level(logging.DEBUG)

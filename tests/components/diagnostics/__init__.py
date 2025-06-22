@@ -3,17 +3,17 @@
 from http import HTTPStatus
 from typing import cast
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.setup import async_setup_component
-from homeassistant.util.json import JsonObjectType
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import DeviceEntry
+from smarthub.setup import async_setup_component
+from smarthub.util.json import JsonObjectType
 
 from tests.typing import ClientSessionGenerator
 
 
 async def _get_diagnostics_for_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: ConfigEntry,
 ) -> JsonObjectType:
@@ -30,7 +30,7 @@ async def _get_diagnostics_for_config_entry(
 
 
 async def get_diagnostics_for_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: ConfigEntry,
 ) -> JsonObjectType:
@@ -40,7 +40,7 @@ async def get_diagnostics_for_config_entry(
 
 
 async def _get_diagnostics_for_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: ConfigEntry,
     device: DeviceEntry,
@@ -57,7 +57,7 @@ async def _get_diagnostics_for_device(
 
 
 async def get_diagnostics_for_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: ConfigEntry,
     device: DeviceEntry,

@@ -10,26 +10,26 @@ import voluptuous_serialize
 from zwave_js_server.const import CommandClass
 from zwave_js_server.event import Event
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.device_automation.exceptions import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.device_automation.exceptions import (
     InvalidDeviceAutomationConfig,
 )
-from homeassistant.components.zwave_js import DOMAIN, device_condition
-from homeassistant.components.zwave_js.helpers import (
+from smarthub.components.zwave_js import DOMAIN, device_condition
+from smarthub.components.zwave_js.helpers import (
     get_device_id,
     get_zwave_value_from_config,
 )
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import config_validation as cv, device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import config_validation as cv, device_registry as dr
+from smarthub.setup import async_setup_component
 
 from tests.common import async_get_device_automations
 
 
 async def test_get_conditions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     lock_schlage_be469,
     integration,
@@ -89,7 +89,7 @@ async def test_get_conditions(
 
 
 async def test_node_status_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     lock_schlage_be469,
     integration,
@@ -254,7 +254,7 @@ async def test_node_status_state(
 
 
 async def test_config_parameter_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     lock_schlage_be469,
     integration,
@@ -374,7 +374,7 @@ async def test_config_parameter_state(
 
 
 async def test_value_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     lock_schlage_be469,
     integration,
@@ -426,7 +426,7 @@ async def test_value_state(
 
 
 async def test_get_condition_capabilities_node_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     lock_schlage_be469,
     integration,
@@ -466,7 +466,7 @@ async def test_get_condition_capabilities_node_status(
 
 
 async def test_get_condition_capabilities_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     lock_schlage_be469,
     integration,
@@ -518,7 +518,7 @@ async def test_get_condition_capabilities_value(
 
 
 async def test_get_condition_capabilities_config_parameter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus,
     integration,
@@ -604,7 +604,7 @@ async def test_get_condition_capabilities_config_parameter(
 
 
 async def test_failure_scenarios(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     hank_binary_switch,
     integration,
@@ -616,18 +616,18 @@ async def test_failure_scenarios(
     )
     assert device
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await device_condition.async_condition_from_config(
             hass, {"type": "failed.test", "device_id": device.id}
         )
 
     with (
         patch(
-            "homeassistant.components.zwave_js.device_condition.async_get_node_from_device_id",
+            "smarthub.components.zwave_js.device_condition.async_get_node_from_device_id",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.zwave_js.device_condition.get_zwave_value_from_config",
+            "smarthub.components.zwave_js.device_condition.get_zwave_value_from_config",
             return_value=None,
         ),
     ):
@@ -681,7 +681,7 @@ async def test_failure_scenarios(
 
 
 async def test_get_value_from_config_failure(
-    hass: HomeAssistant, client, hank_binary_switch, integration
+    hass: SmartHub, client, hank_binary_switch, integration
 ) -> None:
     """Test get_value_from_config invalid value ID."""
     with pytest.raises(vol.Invalid):

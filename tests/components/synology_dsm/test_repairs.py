@@ -7,13 +7,13 @@ from unittest.mock import AsyncMock, MagicMock, Mock, patch
 import pytest
 from synology_dsm.api.file_station.models import SynoFileSharedFolder
 
-from homeassistant.components.repairs import DOMAIN as REPAIRS_DOMAIN
-from homeassistant.components.synology_dsm.const import (
+from smarthub.components.repairs import DOMAIN as REPAIRS_DOMAIN
+from smarthub.components.synology_dsm.const import (
     CONF_BACKUP_PATH,
     CONF_BACKUP_SHARE,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
@@ -21,9 +21,9 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from .common import mock_dsm_information
 from .consts import HOST, MACS, PASSWORD, PORT, USE_SSL, USERNAME
@@ -36,7 +36,7 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 @pytest.fixture
 def mock_dsm_with_filestation():
     """Mock a successful service with filestation support."""
-    with patch("homeassistant.components.synology_dsm.common.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.common.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 
@@ -68,16 +68,16 @@ def mock_dsm_with_filestation():
 
 @pytest.fixture
 async def setup_dsm_with_filestation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dsm_with_filestation: MagicMock,
 ):
     """Mock setup of synology dsm config entry."""
     with (
         patch(
-            "homeassistant.components.synology_dsm.common.SynologyDSM",
+            "smarthub.components.synology_dsm.common.SynologyDSM",
             return_value=mock_dsm_with_filestation,
         ),
-        patch("homeassistant.components.synology_dsm.PLATFORMS", return_value=[]),
+        patch("smarthub.components.synology_dsm.PLATFORMS", return_value=[]),
     ):
         entry = MockConfigEntry(
             domain=DOMAIN,
@@ -104,7 +104,7 @@ async def setup_dsm_with_filestation(
 
 
 async def test_create_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_with_filestation: MagicMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -123,7 +123,7 @@ async def test_create_issue(
 
 
 async def test_missing_backup_ignore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_with_filestation: MagicMock,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
@@ -145,7 +145,7 @@ async def test_missing_backup_ignore(
 
     flow_id = data["flow_id"]
     assert data["description_placeholders"] == {
-        "docs_url": "https://www.home-assistant.io/integrations/synology_dsm/#backup-location"
+        "docs_url": "https://www.smart-hub.io/integrations/synology_dsm/#backup-location"
     }
     assert data["step_id"] == "init"
     assert data["menu_options"] == ["confirm", "ignore"]
@@ -167,7 +167,7 @@ async def test_missing_backup_ignore(
 
 
 async def test_missing_backup_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_with_filestation: MagicMock,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
@@ -193,7 +193,7 @@ async def test_missing_backup_success(
 
     flow_id = data["flow_id"]
     assert data["description_placeholders"] == {
-        "docs_url": "https://www.home-assistant.io/integrations/synology_dsm/#backup-location"
+        "docs_url": "https://www.smart-hub.io/integrations/synology_dsm/#backup-location"
     }
     assert data["step_id"] == "init"
     assert data["menu_options"] == ["confirm", "ignore"]
@@ -219,7 +219,7 @@ async def test_missing_backup_success(
 
 
 async def test_missing_backup_no_shares(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_with_filestation: MagicMock,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
@@ -239,7 +239,7 @@ async def test_missing_backup_no_shares(
 
     flow_id = data["flow_id"]
     assert data["description_placeholders"] == {
-        "docs_url": "https://www.home-assistant.io/integrations/synology_dsm/#backup-location"
+        "docs_url": "https://www.smart-hub.io/integrations/synology_dsm/#backup-location"
     }
     assert data["step_id"] == "init"
     assert data["menu_options"] == ["confirm", "ignore"]
@@ -260,7 +260,7 @@ async def test_missing_backup_no_shares(
     ["component.synology_dsm.issues.other_issue.title"],
 )
 async def test_other_fixable_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_dsm_with_filestation: MagicMock,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,

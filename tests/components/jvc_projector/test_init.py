@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock
 
 from jvcprojector import JvcProjectorAuthError, JvcProjectorConnectError
 
-from homeassistant.components.jvc_projector.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.jvc_projector.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import MOCK_MAC
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_init(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_device: AsyncMock,
     mock_integration: MockConfigEntry,
@@ -27,7 +27,7 @@ async def test_init(
 
 
 async def test_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: AsyncMock,
     mock_integration: MockConfigEntry,
 ) -> None:
@@ -40,7 +40,7 @@ async def test_unload_config_entry(
 
 
 async def test_config_entry_connect_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -55,7 +55,7 @@ async def test_config_entry_connect_error(
 
 
 async def test_config_entry_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

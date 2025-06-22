@@ -2,17 +2,17 @@
 
 import requests_mock
 
-from homeassistant.components.tado import CONF_REFRESH_TOKEN, DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.tado import CONF_REFRESH_TOKEN, DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 
 
 async def async_init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     skip_setup: bool = False,
 ):
-    """Set up the tado integration in Home Assistant."""
+    """Set up the tado integration in SmartHub."""
 
     token_fixture = "token.json"
     devices_fixture = "devices.json"

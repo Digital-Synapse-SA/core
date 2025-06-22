@@ -9,18 +9,18 @@ from unittest.mock import MagicMock, call
 from bleak import BleakError
 import pytest
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     DOMAIN,
     BluetoothScanningMode,
     BluetoothServiceInfoBleak,
 )
-from homeassistant.components.bluetooth.active_update_processor import (
+from smarthub.components.bluetooth.active_update_processor import (
     ActiveBluetoothProcessorCoordinator,
 )
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.helpers.debounce import Debouncer
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
-from homeassistant.setup import async_setup_component
+from smarthub.core import CoreState, SmartHub
+from smarthub.helpers.debounce import Debouncer
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.setup import async_setup_component
 
 from . import inject_bluetooth_service_info
 
@@ -50,7 +50,7 @@ GENERIC_BLUETOOTH_SERVICE_INFO_2 = BluetoothServiceInfo(
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_basic_usage(hass: HomeAssistant) -> None:
+async def test_basic_usage(hass: SmartHub) -> None:
     """Test basic usage of the ActiveBluetoothProcessorCoordinator."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
 
@@ -96,7 +96,7 @@ async def test_basic_usage(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_poll_can_be_skipped(hass: HomeAssistant) -> None:
+async def test_poll_can_be_skipped(hass: SmartHub) -> None:
     """Test need_poll callback works and can skip a poll if its not needed."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
 
@@ -153,7 +153,7 @@ async def test_poll_can_be_skipped(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
 async def test_bleak_error_and_recover(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test bleak error handling and recovery."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -215,7 +215,7 @@ async def test_bleak_error_and_recover(
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_poll_failure_and_recover(hass: HomeAssistant) -> None:
+async def test_poll_failure_and_recover(hass: SmartHub) -> None:
     """Test error handling and recovery."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
 
@@ -271,7 +271,7 @@ async def test_poll_failure_and_recover(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_second_poll_needed(hass: HomeAssistant) -> None:
+async def test_second_poll_needed(hass: SmartHub) -> None:
     """If a poll is queued, by the time it starts it may no longer be needed."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
 
@@ -319,7 +319,7 @@ async def test_second_poll_needed(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_rate_limit(hass: HomeAssistant) -> None:
+async def test_rate_limit(hass: SmartHub) -> None:
     """Test error handling and recovery."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
 
@@ -368,7 +368,7 @@ async def test_rate_limit(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bleak_scanner_start", "mock_bluetooth_adapters")
-async def test_no_polling_after_stop_event(hass: HomeAssistant) -> None:
+async def test_no_polling_after_stop_event(hass: SmartHub) -> None:
     """Test we do not poll after the stop event."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     needs_poll_calls = 0

@@ -1,12 +1,12 @@
-"""Test the Home Assistant analytics init module."""
+"""Test the SmartHub analytics init module."""
 
 from __future__ import annotations
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.analytics_insights.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.analytics_insights.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_analytics_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

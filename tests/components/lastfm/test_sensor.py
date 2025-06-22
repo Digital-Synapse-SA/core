@@ -3,7 +3,7 @@
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .conftest import ComponentSetup
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

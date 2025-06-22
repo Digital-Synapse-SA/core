@@ -10,7 +10,7 @@ from google.api_core.exceptions import (
 )
 import pytest
 
-from homeassistant.components.google_travel_time.const import (
+from smarthub.components.google_travel_time.const import (
     ARRIVAL_TIME,
     CONF_ARRIVAL_TIME,
     CONF_AVOID,
@@ -28,10 +28,10 @@ from homeassistant.components.google_travel_time.const import (
     DOMAIN,
     UNITS_IMPERIAL,
 )
-from homeassistant.config_entries import SOURCE_USER, ConfigFlowResult
-from homeassistant.const import CONF_API_KEY, CONF_LANGUAGE, CONF_MODE, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER, ConfigFlowResult
+from smarthub.const import CONF_API_KEY, CONF_LANGUAGE, CONF_MODE, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import DEFAULT_OPTIONS, MOCK_CONFIG, RECONFIGURE_CONFIG
 
@@ -39,17 +39,17 @@ from tests.common import MockConfigEntry
 
 
 async def assert_common_reconfigure_steps(
-    hass: HomeAssistant, reconfigure_result: ConfigFlowResult
+    hass: SmartHub, reconfigure_result: ConfigFlowResult
 ) -> None:
     """Step through and assert the happy case reconfigure flow."""
     client_mock = AsyncMock()
     with (
         patch(
-            "homeassistant.components.google_travel_time.helpers.RoutesAsyncClient",
+            "smarthub.components.google_travel_time.helpers.RoutesAsyncClient",
             return_value=client_mock,
         ),
         patch(
-            "homeassistant.components.google_travel_time.sensor.RoutesAsyncClient",
+            "smarthub.components.google_travel_time.sensor.RoutesAsyncClient",
             return_value=client_mock,
         ),
     ):
@@ -67,7 +67,7 @@ async def assert_common_reconfigure_steps(
 
 
 async def assert_common_create_steps(
-    hass: HomeAssistant, result: ConfigFlowResult
+    hass: SmartHub, result: ConfigFlowResult
 ) -> None:
     """Step through and assert the happy case create flow."""
     result = await hass.config_entries.flow.async_configure(
@@ -85,7 +85,7 @@ async def assert_common_create_steps(
 
 
 @pytest.mark.usefixtures("routes_mock", "mock_setup_entry")
-async def test_minimum_fields(hass: HomeAssistant) -> None:
+async def test_minimum_fields(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -112,7 +112,7 @@ async def test_minimum_fields(hass: HomeAssistant) -> None:
     ],
 )
 async def test_errors(
-    hass: HomeAssistant, routes_mock: AsyncMock, exception: Exception, error: str
+    hass: SmartHub, routes_mock: AsyncMock, exception: Exception, error: str
 ) -> None:
     """Test errors in the flow."""
     routes_mock.compute_routes.side_effect = exception
@@ -139,7 +139,7 @@ async def test_errors(
     [(MOCK_CONFIG, DEFAULT_OPTIONS)],
 )
 @pytest.mark.usefixtures("routes_mock", "mock_setup_entry")
-async def test_reconfigure(hass: HomeAssistant, mock_config: MockConfigEntry) -> None:
+async def test_reconfigure(hass: SmartHub, mock_config: MockConfigEntry) -> None:
     """Test reconfigure flow."""
     result = await mock_config.start_reconfigure_flow(hass)
     assert result["type"] is FlowResultType.FORM
@@ -162,7 +162,7 @@ async def test_reconfigure(hass: HomeAssistant, mock_config: MockConfigEntry) ->
     ],
 )
 async def test_reconfigure_invalid_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config: MockConfigEntry,
     routes_mock: AsyncMock,
     exception: Exception,
@@ -194,7 +194,7 @@ async def test_reconfigure_invalid_config_entry(
     [(MOCK_CONFIG, DEFAULT_OPTIONS)],
 )
 @pytest.mark.usefixtures("routes_mock")
-async def test_options_flow(hass: HomeAssistant, mock_config: MockConfigEntry) -> None:
+async def test_options_flow(hass: SmartHub, mock_config: MockConfigEntry) -> None:
     """Test options flow."""
     result = await hass.config_entries.options.async_init(mock_config.entry_id)
 
@@ -246,7 +246,7 @@ async def test_options_flow(hass: HomeAssistant, mock_config: MockConfigEntry) -
 )
 @pytest.mark.usefixtures("routes_mock")
 async def test_options_flow_departure_time(
-    hass: HomeAssistant, mock_config: MockConfigEntry
+    hass: SmartHub, mock_config: MockConfigEntry
 ) -> None:
     """Test options flow with departure time."""
     result = await hass.config_entries.options.async_init(mock_config.entry_id)
@@ -316,7 +316,7 @@ async def test_options_flow_departure_time(
 )
 @pytest.mark.usefixtures("routes_mock")
 async def test_reset_departure_time(
-    hass: HomeAssistant, mock_config: MockConfigEntry
+    hass: SmartHub, mock_config: MockConfigEntry
 ) -> None:
     """Test resetting departure time."""
     result = await hass.config_entries.options.async_init(mock_config.entry_id)
@@ -364,7 +364,7 @@ async def test_reset_departure_time(
 )
 @pytest.mark.usefixtures("routes_mock")
 async def test_reset_arrival_time(
-    hass: HomeAssistant, mock_config: MockConfigEntry
+    hass: SmartHub, mock_config: MockConfigEntry
 ) -> None:
     """Test resetting arrival time."""
     result = await hass.config_entries.options.async_init(mock_config.entry_id)
@@ -410,7 +410,7 @@ async def test_reset_arrival_time(
 )
 @pytest.mark.usefixtures("routes_mock")
 async def test_reset_options_flow_fields(
-    hass: HomeAssistant, mock_config: MockConfigEntry
+    hass: SmartHub, mock_config: MockConfigEntry
 ) -> None:
     """Test resetting options flow fields that are not time related to None."""
     result = await hass.config_entries.options.async_init(mock_config.entry_id)
@@ -442,7 +442,7 @@ async def test_reset_options_flow_fields(
     [(MOCK_CONFIG, DEFAULT_OPTIONS)],
 )
 @pytest.mark.usefixtures("routes_mock", "mock_setup_entry")
-async def test_dupe(hass: HomeAssistant, mock_config: MockConfigEntry) -> None:
+async def test_dupe(hass: SmartHub, mock_config: MockConfigEntry) -> None:
     """Test setting up the same entry data twice is OK."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}

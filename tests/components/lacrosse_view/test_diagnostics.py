@@ -5,8 +5,8 @@ from unittest.mock import patch
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.lacrosse_view.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.lacrosse_view.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import MOCK_ENTRY_DATA, TEST_SENSOR
 
@@ -16,7 +16,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:

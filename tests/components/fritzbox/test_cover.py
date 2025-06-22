@@ -5,10 +5,10 @@ from unittest.mock import Mock, call, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import ATTR_POSITION, DOMAIN as COVER_DOMAIN
-from homeassistant.components.fritzbox.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.cover import ATTR_POSITION, DOMAIN as COVER_DOMAIN
+from smarthub.components.fritzbox.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_DEVICES,
     SERVICE_CLOSE_COVER,
@@ -18,9 +18,9 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import (
     FritzDeviceCoverMock,
@@ -36,14 +36,14 @@ ENTITY_ID = f"{COVER_DOMAIN}.{CONF_FAKE_NAME}"
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     fritz: Mock,
 ) -> None:
     """Test setup of platform."""
     device = FritzDeviceCoverMock()
-    with patch("homeassistant.components.fritzbox.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.fritzbox.PLATFORMS", [Platform.COVER]):
         entry = await setup_config_entry(
             hass, MOCK_CONFIG[DOMAIN][CONF_DEVICES][0], ENTITY_ID, device, fritz
         )
@@ -52,7 +52,7 @@ async def test_setup(
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_unknown_position(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_unknown_position(hass: SmartHub, fritz: Mock) -> None:
     """Test cover with unknown position."""
     device = FritzDeviceCoverUnknownPositionMock()
     await setup_config_entry(
@@ -64,7 +64,7 @@ async def test_unknown_position(hass: HomeAssistant, fritz: Mock) -> None:
     assert state.state == STATE_UNKNOWN
 
 
-async def test_open_cover(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_open_cover(hass: SmartHub, fritz: Mock) -> None:
     """Test opening the cover."""
     device = FritzDeviceCoverMock()
     await setup_config_entry(
@@ -77,7 +77,7 @@ async def test_open_cover(hass: HomeAssistant, fritz: Mock) -> None:
     assert device.set_blind_open.call_count == 1
 
 
-async def test_close_cover(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_close_cover(hass: SmartHub, fritz: Mock) -> None:
     """Test closing the device."""
     device = FritzDeviceCoverMock()
     await setup_config_entry(
@@ -90,7 +90,7 @@ async def test_close_cover(hass: HomeAssistant, fritz: Mock) -> None:
     assert device.set_blind_close.call_count == 1
 
 
-async def test_set_position_cover(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_set_position_cover(hass: SmartHub, fritz: Mock) -> None:
     """Test stopping the device."""
     device = FritzDeviceCoverMock()
     await setup_config_entry(
@@ -106,7 +106,7 @@ async def test_set_position_cover(hass: HomeAssistant, fritz: Mock) -> None:
     assert device.set_level_percentage.call_args_list == [call(50, True)]
 
 
-async def test_stop_cover(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_stop_cover(hass: SmartHub, fritz: Mock) -> None:
     """Test stopping the device."""
     device = FritzDeviceCoverMock()
     await setup_config_entry(
@@ -119,7 +119,7 @@ async def test_stop_cover(hass: HomeAssistant, fritz: Mock) -> None:
     assert device.set_blind_stop.call_count == 1
 
 
-async def test_discover_new_device(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_discover_new_device(hass: SmartHub, fritz: Mock) -> None:
     """Test adding new discovered devices during runtime."""
     device = FritzDeviceCoverMock()
     await setup_config_entry(

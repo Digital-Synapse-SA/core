@@ -8,9 +8,9 @@ from unittest.mock import AsyncMock, Mock, patch
 from aioridwell.model import EventState, RidwellPickup, RidwellPickupEvent
 import pytest
 
-from homeassistant.components.ridwell.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.ridwell.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -59,7 +59,7 @@ def client_fixture(account: Mock) -> Mock:
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any]
 ) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
@@ -86,11 +86,11 @@ def mock_aioridwell_fixture(client: Mock, config: dict[str, Any]) -> Generator[N
     """Define a fixture to patch aioridwell."""
     with (
         patch(
-            "homeassistant.components.ridwell.config_flow.async_get_client",
+            "smarthub.components.ridwell.config_flow.async_get_client",
             return_value=client,
         ),
         patch(
-            "homeassistant.components.ridwell.coordinator.async_get_client",
+            "smarthub.components.ridwell.coordinator.async_get_client",
             return_value=client,
         ),
     ):
@@ -99,7 +99,7 @@ def mock_aioridwell_fixture(client: Mock, config: dict[str, Any]) -> Generator[N
 
 @pytest.fixture(name="setup_config_entry")
 async def setup_config_entry_fixture(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_aioridwell: None
+    hass: SmartHub, config_entry: MockConfigEntry, mock_aioridwell: None
 ) -> None:
     """Define a fixture to set up ridwell."""
     assert await hass.config_entries.async_setup(config_entry.entry_id)

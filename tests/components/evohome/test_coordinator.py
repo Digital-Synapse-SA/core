@@ -9,18 +9,18 @@ from evohomeasync2 import EvohomeClient
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.evohome import EvoData
-from homeassistant.components.evohome.const import DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import UpdateFailed
+from smarthub.components.evohome import EvoData
+from smarthub.components.evohome.const import DOMAIN
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers.update_coordinator import UpdateFailed
 
 from tests.common import async_fire_time_changed
 
 
 @pytest.mark.parametrize("install", ["minimal"])
 async def test_setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, str],
     evohome: EvohomeClient,
     freezer: FrozenDateTimeFactory,
@@ -35,7 +35,7 @@ async def test_setup_platform(
     assert state is not None and state.state != STATE_UNAVAILABLE
 
     with patch(
-        "homeassistant.components.evohome.coordinator.EvoDataUpdateCoordinator._async_update_data",
+        "smarthub.components.evohome.coordinator.EvoDataUpdateCoordinator._async_update_data",
         side_effect=UpdateFailed,
     ):
         freezer.tick(update_interval)

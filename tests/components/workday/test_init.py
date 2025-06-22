@@ -7,14 +7,14 @@ from datetime import datetime
 from freezegun.api import FrozenDateTimeFactory
 from holidays.utils import country_holidays
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import UTC
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.util.dt import UTC
 
 from . import TEST_CONFIG_EXAMPLE_1, TEST_CONFIG_WITH_PROVINCE, init_integration
 
 
-async def test_load_unload_entry(hass: HomeAssistant) -> None:
+async def test_load_unload_entry(hass: SmartHub) -> None:
     """Test load and unload entry."""
     entry = await init_integration(hass, TEST_CONFIG_EXAMPLE_1)
 
@@ -29,7 +29,7 @@ async def test_load_unload_entry(hass: HomeAssistant) -> None:
 
 
 async def test_update_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test options update and config entry is reloaded."""

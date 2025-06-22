@@ -13,12 +13,12 @@ from yalesmartalarmclient import (
     YaleSmartAlarmData,
 )
 
-from homeassistant.components.alarm_control_panel import AlarmControlPanelState
-from homeassistant.components.yale_smart_alarm.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.alarm_control_panel import AlarmControlPanelState
+from smarthub.components.yale_smart_alarm.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .conftest import ENTRY_CONFIG, OPTIONS_CONFIG
 
@@ -35,7 +35,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
     ],
 )
 async def test_coordinator_setup_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_data: YaleSmartAlarmData,
     p_error: Exception,
 ) -> None:
@@ -55,7 +55,7 @@ async def test_coordinator_setup_errors(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
+        "smarthub.components.yale_smart_alarm.coordinator.YaleSmartAlarmClient",
         autospec=True,
     ) as mock_client_class:
         mock_client_class.side_effect = p_error
@@ -67,7 +67,7 @@ async def test_coordinator_setup_errors(
 
 
 async def test_coordinator_setup_and_update_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_config_entry: tuple[MockConfigEntry, Mock],
     get_data: YaleSmartAlarmData,
 ) -> None:

@@ -14,21 +14,21 @@ import zigpy.zcl
 from zigpy.zcl.clusters import general, security
 import zigpy.zcl.foundation as zcl_f
 
-from homeassistant.components.siren import (
+from smarthub.components.siren import (
     ATTR_DURATION,
     ATTR_TONE,
     ATTR_VOLUME_LEVEL,
     DOMAIN as SIREN_DOMAIN,
 )
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .common import find_entity_id
 
@@ -39,7 +39,7 @@ from tests.common import async_fire_time_changed
 def siren_platform_only():
     """Only set up the siren and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.DEVICE_TRACKER,
             Platform.NUMBER,
@@ -51,7 +51,7 @@ def siren_platform_only():
         yield
 
 
-async def test_siren(hass: HomeAssistant, setup_zha, zigpy_device_mock) -> None:
+async def test_siren(hass: SmartHub, setup_zha, zigpy_device_mock) -> None:
     """Test zha siren platform."""
 
     await setup_zha()

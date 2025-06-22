@@ -10,18 +10,18 @@ from aiovodafone import (
 )
 import pytest
 
-from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
-from homeassistant.components.vodafone_station.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.device_tracker import CONF_CONSIDER_HOME
+from smarthub.components.vodafone_station.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -62,7 +62,7 @@ async def test_user(
     ],
 )
 async def test_exception_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_setup_entry: AsyncMock,
     side_effect: Exception,
@@ -112,7 +112,7 @@ async def test_exception_connection(
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -137,7 +137,7 @@ async def test_duplicate_entry(
 
 
 async def test_reauth_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -169,7 +169,7 @@ async def test_reauth_successful(
     ],
 )
 async def test_reauth_not_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -209,7 +209,7 @@ async def test_reauth_not_successful(
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -231,7 +231,7 @@ async def test_options_flow(
 
 
 async def test_reconfigure_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -274,7 +274,7 @@ async def test_reconfigure_successful(
     ],
 )
 async def test_reconfigure_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vodafone_station_router: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

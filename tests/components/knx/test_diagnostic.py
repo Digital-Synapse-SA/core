@@ -6,7 +6,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from xknx.io import DEFAULT_MCAST_GRP, DEFAULT_MCAST_PORT
 
-from homeassistant.components.knx.const import (
+from smarthub.components.knx.const import (
     CONF_KNX_AUTOMATIC,
     CONF_KNX_CONNECTION_TYPE,
     CONF_KNX_DEFAULT_RATE_LIMIT,
@@ -23,7 +23,7 @@ from homeassistant.components.knx.const import (
     DEFAULT_ROUTING_IA,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .conftest import KNXTestKit
 
@@ -35,7 +35,7 @@ from tests.typing import ClientSessionGenerator
 @pytest.mark.parametrize("hass_config", [{}])
 @pytest.mark.usefixtures("mock_hass_config")
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_config_entry: MockConfigEntry,
     knx: KNXTestKit,
@@ -55,7 +55,7 @@ async def test_diagnostics(
 @pytest.mark.parametrize("hass_config", [{"knx": {"wrong_key": {}}}])
 @pytest.mark.usefixtures("mock_hass_config")
 async def test_diagnostic_config_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_config_entry: MockConfigEntry,
     knx: KNXTestKit,
@@ -76,7 +76,7 @@ async def test_diagnostic_config_error(
 @pytest.mark.parametrize("hass_config", [{}])
 @pytest.mark.usefixtures("mock_hass_config")
 async def test_diagnostic_redact(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_storage: dict[str, Any],
     snapshot: SnapshotAssertion,
@@ -112,7 +112,7 @@ async def test_diagnostic_redact(
 @pytest.mark.parametrize("hass_config", [{}])
 @pytest.mark.usefixtures("mock_hass_config")
 async def test_diagnostics_project(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_config_entry: MockConfigEntry,
     knx: KNXTestKit,

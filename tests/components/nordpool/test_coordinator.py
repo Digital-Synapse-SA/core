@@ -15,10 +15,10 @@ from pynordpool import (
 )
 import pytest
 
-from homeassistant.components.nordpool.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.nordpool.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import ENTRY_CONFIG
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.freeze_time("2024-11-05T10:00:00+00:00")
 async def test_coordinator(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_client: NordPoolClient,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
@@ -48,7 +48,7 @@ async def test_coordinator(
 
     with (
         patch(
-            "homeassistant.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
+            "smarthub.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
             side_effect=NordPoolError("error"),
         ) as mock_data,
     ):
@@ -61,7 +61,7 @@ async def test_coordinator(
 
     with (
         patch(
-            "homeassistant.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
+            "smarthub.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
             side_effect=NordPoolAuthenticationError("Authentication error"),
         ) as mock_data,
     ):
@@ -76,7 +76,7 @@ async def test_coordinator(
 
     with (
         patch(
-            "homeassistant.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
+            "smarthub.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
             side_effect=NordPoolEmptyResponseError("Empty response"),
         ) as mock_data,
     ):
@@ -92,7 +92,7 @@ async def test_coordinator(
 
     with (
         patch(
-            "homeassistant.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
+            "smarthub.components.nordpool.coordinator.NordPoolClient.async_get_delivery_period",
             side_effect=NordPoolResponseError("Response error"),
         ) as mock_data,
     ):

@@ -6,12 +6,12 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from homeassistant.components.risco import CannotConnectError, UnauthorizedError
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import SERVICE_TURN_OFF, SERVICE_TURN_ON, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.components.risco import CannotConnectError, UnauthorizedError
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import SERVICE_TURN_OFF, SERVICE_TURN_ON, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 FIRST_ENTITY_ID = "switch.zone_0_bypassed"
 SECOND_ENTITY_ID = "switch.zone_1_bypassed"
@@ -19,7 +19,7 @@ SECOND_ENTITY_ID = "switch.zone_1_bypassed"
 
 @pytest.mark.parametrize("exception", [CannotConnectError, UnauthorizedError])
 async def test_error_on_login(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     login_with_error,
     cloud_config_entry,
@@ -32,7 +32,7 @@ async def test_error_on_login(
 
 
 async def test_cloud_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     two_zone_cloud,
     setup_risco_cloud,
@@ -43,7 +43,7 @@ async def test_cloud_setup(
 
 
 async def _check_cloud_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zones: dict[int, Any],
     bypassed: bool,
     entity_id: str,
@@ -63,7 +63,7 @@ async def _check_cloud_state(
 
 
 async def test_cloud_states(
-    hass: HomeAssistant, two_zone_cloud, setup_risco_cloud
+    hass: SmartHub, two_zone_cloud, setup_risco_cloud
 ) -> None:
     """Test the various alarm states."""
     await _check_cloud_state(hass, two_zone_cloud, True, FIRST_ENTITY_ID, 0)
@@ -73,10 +73,10 @@ async def test_cloud_states(
 
 
 async def test_cloud_bypass(
-    hass: HomeAssistant, two_zone_cloud, setup_risco_cloud
+    hass: SmartHub, two_zone_cloud, setup_risco_cloud
 ) -> None:
     """Test bypassing a zone."""
-    with patch("homeassistant.components.risco.RiscoCloud.bypass_zone") as mock:
+    with patch("smarthub.components.risco.RiscoCloud.bypass_zone") as mock:
         data = {"entity_id": FIRST_ENTITY_ID}
 
         await hass.services.async_call(
@@ -87,10 +87,10 @@ async def test_cloud_bypass(
 
 
 async def test_cloud_unbypass(
-    hass: HomeAssistant, two_zone_cloud, setup_risco_cloud
+    hass: SmartHub, two_zone_cloud, setup_risco_cloud
 ) -> None:
     """Test unbypassing a zone."""
-    with patch("homeassistant.components.risco.RiscoCloud.bypass_zone") as mock:
+    with patch("smarthub.components.risco.RiscoCloud.bypass_zone") as mock:
         data = {"entity_id": FIRST_ENTITY_ID}
 
         await hass.services.async_call(
@@ -102,7 +102,7 @@ async def test_cloud_unbypass(
 
 @pytest.mark.parametrize("exception", [CannotConnectError, UnauthorizedError])
 async def test_error_on_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     connect_with_error,
     local_config_entry,
@@ -115,7 +115,7 @@ async def test_error_on_connect(
 
 
 async def test_local_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     two_zone_local,
     setup_risco_local,
@@ -126,7 +126,7 @@ async def test_local_setup(
 
 
 async def _check_local_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zones: dict[int, Any],
     bypassed: bool,
     entity_id: str,
@@ -149,12 +149,12 @@ async def _check_local_state(
 @pytest.fixture
 def mock_zone_handler():
     """Create a mock for add_zone_handler."""
-    with patch("homeassistant.components.risco.RiscoLocal.add_zone_handler") as mock:
+    with patch("smarthub.components.risco.RiscoLocal.add_zone_handler") as mock:
         yield mock
 
 
 async def test_local_states(
-    hass: HomeAssistant, two_zone_local, mock_zone_handler, setup_risco_local
+    hass: SmartHub, two_zone_local, mock_zone_handler, setup_risco_local
 ) -> None:
     """Test the various alarm states."""
     callback = mock_zone_handler.call_args.args[0]
@@ -168,7 +168,7 @@ async def test_local_states(
 
 
 async def test_local_bypass(
-    hass: HomeAssistant, two_zone_local, setup_risco_local
+    hass: SmartHub, two_zone_local, setup_risco_local
 ) -> None:
     """Test bypassing a zone."""
     with patch.object(two_zone_local[0], "bypass") as mock:
@@ -182,7 +182,7 @@ async def test_local_bypass(
 
 
 async def test_local_unbypass(
-    hass: HomeAssistant, two_zone_local, setup_risco_local
+    hass: SmartHub, two_zone_local, setup_risco_local
 ) -> None:
     """Test unbypassing a zone."""
     with patch.object(two_zone_local[0], "bypass") as mock:

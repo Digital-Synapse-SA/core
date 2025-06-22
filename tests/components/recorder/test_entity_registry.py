@@ -6,14 +6,14 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder import Recorder, history
-from homeassistant.components.recorder.db_schema import StatesMeta
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import recorder
+from smarthub.components.recorder import Recorder, history
+from smarthub.components.recorder.db_schema import StatesMeta
+from smarthub.components.recorder.util import session_scope
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .common import (
     ForceReturnConnectionToPool,
@@ -27,7 +27,7 @@ from tests.typing import RecorderInstanceContextManager
 
 
 def _count_entity_id_in_states_meta(
-    hass: HomeAssistant, session: Session, entity_id: str
+    hass: SmartHub, session: Session, entity_id: str
 ) -> int:
     return len(
         list(
@@ -51,7 +51,7 @@ def setup_recorder(recorder_mock: Recorder) -> recorder.Recorder:
 
 
 async def test_rename_entity_without_collision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -102,7 +102,7 @@ async def test_rename_entity_without_collision(
 
 
 async def test_rename_entity_on_mocked_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -197,7 +197,7 @@ async def test_rename_entity_on_mocked_platform(
 
 
 async def test_rename_entity_collision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -262,7 +262,7 @@ async def test_rename_entity_collision(
 
 
 async def test_rename_entity_collision_without_states_meta_safeguard(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

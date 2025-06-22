@@ -6,11 +6,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import instance_id
+from smarthub.core import SmartHub
+from smarthub.helpers import instance_id
 
 
-async def test_get_id_empty(hass: HomeAssistant, hass_storage: dict[str, Any]) -> None:
+async def test_get_id_empty(hass: SmartHub, hass_storage: dict[str, Any]) -> None:
     """Get unique ID."""
     uuid = await instance_id.async_get(hass)
     assert uuid is not None
@@ -19,7 +19,7 @@ async def test_get_id_empty(hass: HomeAssistant, hass_storage: dict[str, Any]) -
 
 
 async def test_get_id_load_fail(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Migrate existing file with error."""
     hass_storage["core.uuid"] = None  # Invalid, will make store.async_load raise
@@ -38,11 +38,11 @@ async def test_get_id_load_fail(
 
 
 async def test_get_id_migrate(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Migrate existing file."""
     with (
-        patch("homeassistant.util.json.load_json", return_value={"uuid": "1234"}),
+        patch("smarthub.util.json.load_json", return_value={"uuid": "1234"}),
         patch("os.path.isfile", return_value=True),
         patch("os.remove") as mock_remove,
     ):
@@ -58,12 +58,12 @@ async def test_get_id_migrate(
 
 
 async def test_get_id_migrate_fail(
-    hass: HomeAssistant, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
+    hass: SmartHub, hass_storage: dict[str, Any], caplog: pytest.LogCaptureFixture
 ) -> None:
     """Migrate existing file with error."""
     with (
         patch(
-            "homeassistant.util.json.load_json",
+            "smarthub.util.json.load_json",
             side_effect=JSONDecodeError("test_error", "test", 1),
         ),
         patch("os.path.isfile", return_value=True),

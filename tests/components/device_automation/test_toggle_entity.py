@@ -4,12 +4,12 @@ from datetime import timedelta
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import automation
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -20,7 +20,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 async def test_if_fires_on_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -136,7 +136,7 @@ async def test_if_fires_on_state_change(
 
 @pytest.mark.parametrize("trigger", ["turned_off", "changed_states"])
 async def test_if_fires_on_state_change_with_for(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],

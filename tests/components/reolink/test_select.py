@@ -7,18 +7,18 @@ import pytest
 from reolink_aio.api import Chime
 from reolink_aio.exceptions import InvalidParameterError, ReolinkError
 
-from homeassistant.components.reolink import DEVICE_UPDATE_INTERVAL
-from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.reolink import DEVICE_UPDATE_INTERVAL
+from smarthub.components.select import DOMAIN as SELECT_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_SELECT_OPTION,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from .conftest import TEST_NVR_NAME
 
@@ -26,14 +26,14 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_floodlight_mode_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test select entity with floodlight_mode."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SELECT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -50,7 +50,7 @@ async def test_floodlight_mode_select(
     reolink_connect.set_whiteled.assert_called_once()
 
     reolink_connect.set_whiteled.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
@@ -78,14 +78,14 @@ async def test_floodlight_mode_select(
 
 
 async def test_play_quick_reply_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test select play_quick_reply_message entity."""
     reolink_connect.quick_reply_dict.return_value = {0: "off", 1: "test message"}
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SELECT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -105,13 +105,13 @@ async def test_play_quick_reply_message(
 
 
 async def test_host_scene_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test host select entity with scene mode."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SELECT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -128,7 +128,7 @@ async def test_host_scene_select(
     reolink_connect.baichuan.set_scene.assert_called_once()
 
     reolink_connect.baichuan.set_scene.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
@@ -157,7 +157,7 @@ async def test_host_scene_select(
 
 
 async def test_chime_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
@@ -165,7 +165,7 @@ async def test_chime_select(
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test chime select entity."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.SELECT]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -185,7 +185,7 @@ async def test_chime_select(
     test_chime.set_tone.assert_called_once()
 
     test_chime.set_tone.side_effect = ReolinkError("Test error")
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,

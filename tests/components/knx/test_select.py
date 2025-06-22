@@ -2,24 +2,24 @@
 
 import pytest
 
-from homeassistant.components.knx.const import (
+from smarthub.components.knx.const import (
     CONF_PAYLOAD_LENGTH,
     CONF_RESPOND_TO_READ,
     CONF_STATE_ADDRESS,
     CONF_SYNC_STATE,
     KNX_ADDRESS,
 )
-from homeassistant.components.knx.schema import SelectSchema
-from homeassistant.const import CONF_NAME, CONF_PAYLOAD, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.components.knx.schema import SelectSchema
+from smarthub.const import CONF_NAME, CONF_PAYLOAD, STATE_UNKNOWN
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import ServiceValidationError
 
 from .conftest import KNXTestKit
 
 from tests.common import mock_restore_cache
 
 
-async def test_select_dpt_2_simple(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_select_dpt_2_simple(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test simple KNX select."""
     _options = [
         {CONF_PAYLOAD: 0b00, SelectSchema.CONF_OPTION: "No control"},
@@ -88,7 +88,7 @@ async def test_select_dpt_2_simple(hass: HomeAssistant, knx: KNXTestKit) -> None
     await knx.assert_no_telegram()
 
 
-async def test_select_dpt_2_restore(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_select_dpt_2_restore(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX select with passive_address and respond_to_read restoring state."""
     _options = [
         {CONF_PAYLOAD: 0b00, SelectSchema.CONF_OPTION: "No control"},
@@ -126,7 +126,7 @@ async def test_select_dpt_2_restore(hass: HomeAssistant, knx: KNXTestKit) -> Non
 
 
 async def test_select_dpt_20_103_all_options(
-    hass: HomeAssistant, knx: KNXTestKit
+    hass: SmartHub, knx: KNXTestKit
 ) -> None:
     """Test KNX select with state_address, passive_address and respond_to_read."""
     _options = [

@@ -7,12 +7,12 @@ from freezegun.api import FrozenDateTimeFactory
 from python_opensky import StatesResponse
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.opensky.const import (
+from smarthub.components.opensky.const import (
     DOMAIN,
     EVENT_OPENSKY_ENTRY,
     EVENT_OPENSKY_EXIT,
 )
-from homeassistant.core import Event, HomeAssistant
+from smarthub.core import Event, SmartHub
 
 from . import setup_integration
 
@@ -24,7 +24,7 @@ from tests.common import (
 
 
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     opensky_client: AsyncMock,
@@ -45,7 +45,7 @@ async def test_sensor(
 
 
 async def test_sensor_altitude(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry_altitude: MockConfigEntry,
     opensky_client: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -58,7 +58,7 @@ async def test_sensor_altitude(
 
 
 async def test_sensor_updating(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     opensky_client: AsyncMock,
     freezer: FrozenDateTimeFactory,

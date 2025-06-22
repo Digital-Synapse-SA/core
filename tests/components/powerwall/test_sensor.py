@@ -7,9 +7,9 @@ import pytest
 from tesla_powerwall import MetersAggregatesResponse
 from tesla_powerwall.error import MissingAttributeError
 
-from homeassistant.components.powerwall.const import DOMAIN
-from homeassistant.components.sensor import ATTR_STATE_CLASS
-from homeassistant.const import (
+from smarthub.components.powerwall.const import DOMAIN
+from smarthub.components.sensor import ATTR_STATE_CLASS
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -17,9 +17,9 @@ from homeassistant.const import (
     PERCENTAGE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .mocks import MOCK_GATEWAY_DIN, _mock_powerwall_with_fixtures
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_sensors(hass: HomeAssistant, device_registry: dr.DeviceRegistry) -> None:
+async def test_sensors(hass: SmartHub, device_registry: dr.DeviceRegistry) -> None:
     """Test creation of the sensors."""
 
     mock_powerwall = await _mock_powerwall_with_fixtures(hass)
@@ -36,11 +36,11 @@ async def test_sensors(hass: HomeAssistant, device_registry: dr.DeviceRegistry) 
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -194,7 +194,7 @@ async def test_sensors(hass: HomeAssistant, device_registry: dr.DeviceRegistry) 
     )
 
 
-async def test_sensor_backup_reserve_unavailable(hass: HomeAssistant) -> None:
+async def test_sensor_backup_reserve_unavailable(hass: SmartHub) -> None:
     """Confirm that backup reserve sensor is not added if data is unavailable from the device."""
 
     mock_powerwall = await _mock_powerwall_with_fixtures(hass)
@@ -206,11 +206,11 @@ async def test_sensor_backup_reserve_unavailable(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -220,7 +220,7 @@ async def test_sensor_backup_reserve_unavailable(hass: HomeAssistant) -> None:
     assert state is None
 
 
-async def test_sensors_with_empty_meters(hass: HomeAssistant) -> None:
+async def test_sensors_with_empty_meters(hass: SmartHub) -> None:
     """Test creation of the sensors with empty meters."""
 
     mock_powerwall = await _mock_powerwall_with_fixtures(hass, empty_meters=True)
@@ -229,11 +229,11 @@ async def test_sensors_with_empty_meters(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -244,7 +244,7 @@ async def test_sensors_with_empty_meters(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_unique_id_migrate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -271,11 +271,11 @@ async def test_unique_id_migrate(
 
     with (
         patch(
-            "homeassistant.components.powerwall.config_flow.Powerwall",
+            "smarthub.components.powerwall.config_flow.Powerwall",
             return_value=mock_powerwall,
         ),
         patch(
-            "homeassistant.components.powerwall.Powerwall", return_value=mock_powerwall
+            "smarthub.components.powerwall.Powerwall", return_value=mock_powerwall
         ),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)

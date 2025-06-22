@@ -4,9 +4,9 @@ from unittest.mock import Mock
 
 import aiohttp
 
-from homeassistant.components.android_ip_webcam.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.android_ip_webcam.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -21,7 +21,7 @@ MOCK_CONFIG_DATA = {
 
 
 async def test_successful_config_entry(
-    hass: HomeAssistant, aioclient_mock_fixture
+    hass: SmartHub, aioclient_mock_fixture
 ) -> None:
     """Test settings up integration from config entry."""
 
@@ -34,7 +34,7 @@ async def test_successful_config_entry(
 
 
 async def test_setup_failed_connection_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test integration failed due to connection error."""
 
@@ -51,7 +51,7 @@ async def test_setup_failed_connection_error(
 
 
 async def test_setup_failed_invalid_auth(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test integration failed due to invalid auth."""
 
@@ -67,7 +67,7 @@ async def test_setup_failed_invalid_auth(
     assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_unload_entry(hass: HomeAssistant, aioclient_mock_fixture) -> None:
+async def test_unload_entry(hass: SmartHub, aioclient_mock_fixture) -> None:
     """Test removing integration."""
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG_DATA)
     entry.add_to_hass(hass)

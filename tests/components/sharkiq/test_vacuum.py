@@ -13,10 +13,10 @@ import pytest
 from sharkiq import AylaApi, SharkIqAuthError, SharkIqNotAuthedError, SharkIqVacuum
 from voluptuous.error import MultipleInvalid
 
-from homeassistant import exceptions
-from homeassistant.components.homeassistant import SERVICE_UPDATE_ENTITY
-from homeassistant.components.sharkiq import DOMAIN
-from homeassistant.components.sharkiq.vacuum import (
+from smarthub import exceptions
+from smarthub.components.smarthub import SERVICE_UPDATE_ENTITY
+from smarthub.components.sharkiq import DOMAIN
+from smarthub.components.sharkiq.vacuum import (
     ATTR_ERROR_CODE,
     ATTR_ERROR_MSG,
     ATTR_LOW_LIGHT,
@@ -25,7 +25,7 @@ from homeassistant.components.sharkiq.vacuum import (
     FAN_SPEEDS_MAP,
     SERVICE_CLEAN_ROOM,
 )
-from homeassistant.components.vacuum import (
+from smarthub.components.vacuum import (
     ATTR_BATTERY_LEVEL,
     ATTR_FAN_SPEED,
     ATTR_FAN_SPEED_LIST,
@@ -38,14 +38,14 @@ from homeassistant.components.vacuum import (
     VacuumActivity,
     VacuumEntityFeature,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .const import (
     CONFIG,
@@ -138,7 +138,7 @@ class MockShark(SharkIqVacuum):
 
 @pytest.fixture(autouse=True)
 @patch("sharkiq.ayla_api.AylaApi", MockAyla)
-async def setup_integration(hass: HomeAssistant) -> None:
+async def setup_integration(hass: SmartHub) -> None:
     """Build the mock integration."""
     entry = MockConfigEntry(
         domain=DOMAIN, unique_id=TEST_USERNAME, data=CONFIG, entry_id=ENTRY_ID
@@ -149,7 +149,7 @@ async def setup_integration(hass: HomeAssistant) -> None:
 
 
 async def test_simple_properties(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that simple properties work as intended."""
     state = hass.states.get(VAC_ENTITY_ID)
@@ -176,7 +176,7 @@ async def test_simple_properties(
     ],
 )
 async def test_initial_attributes(
-    hass: HomeAssistant, attribute: str, target_value: Any
+    hass: SmartHub, attribute: str, target_value: Any
 ) -> None:
     """Test initial config attributes."""
     state = hass.states.get(VAC_ENTITY_ID)
@@ -193,7 +193,7 @@ async def test_initial_attributes(
     ],
 )
 async def test_cleaning_states(
-    hass: HomeAssistant, service: str, target_state: str
+    hass: SmartHub, service: str, target_state: str
 ) -> None:
     """Test cleaning states."""
     service_data = {ATTR_ENTITY_ID: VAC_ENTITY_ID}
@@ -203,7 +203,7 @@ async def test_cleaning_states(
 
 
 @pytest.mark.parametrize("fan_speed", list(FAN_SPEEDS_MAP))
-async def test_fan_speed(hass: HomeAssistant, fan_speed: str) -> None:
+async def test_fan_speed(hass: SmartHub, fan_speed: str) -> None:
     """Test setting fan speeds."""
     service_data = {ATTR_ENTITY_ID: VAC_ENTITY_ID, ATTR_FAN_SPEED: fan_speed}
     await hass.services.async_call(
@@ -223,7 +223,7 @@ async def test_fan_speed(hass: HomeAssistant, fan_speed: str) -> None:
     ],
 )
 async def test_device_properties(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     device_property: str,
     target_value: str,
@@ -242,7 +242,7 @@ async def test_device_properties(
     ],
 )
 async def test_clean_room_error(
-    hass: HomeAssistant, room_list: list, exception: Exception
+    hass: SmartHub, room_list: list, exception: Exception
 ) -> None:
     """Test clean_room errors."""
     data = {ATTR_ENTITY_ID: VAC_ENTITY_ID, ATTR_ROOMS: room_list}
@@ -251,7 +251,7 @@ async def test_clean_room_error(
         await hass.services.async_call(DOMAIN, SERVICE_CLEAN_ROOM, data, blocking=True)
 
 
-async def test_locate(hass: HomeAssistant) -> None:
+async def test_locate(hass: SmartHub) -> None:
     """Test that the locate command works."""
     with patch.object(SharkIqVacuum, "async_find_device") as mock_locate:
         data = {ATTR_ENTITY_ID: VAC_ENTITY_ID}
@@ -263,7 +263,7 @@ async def test_locate(hass: HomeAssistant) -> None:
     ("room_list"),
     [(ROOM_LIST), (["Kitchen"])],
 )
-async def test_clean_room(hass: HomeAssistant, room_list: list) -> None:
+async def test_clean_room(hass: SmartHub, room_list: list) -> None:
     """Test that the clean_room command works."""
     with patch.object(SharkIqVacuum, "async_clean_rooms") as mock_clean_room:
         data = {ATTR_ENTITY_ID: VAC_ENTITY_ID, ATTR_ROOMS: room_list}
@@ -282,19 +282,19 @@ async def test_clean_room(hass: HomeAssistant, room_list: list) -> None:
 )
 @patch("sharkiq.ayla_api.AylaApi", MockAyla)
 async def test_coordinator_updates(
-    hass: HomeAssistant, side_effect: Exception | None, success: bool
+    hass: SmartHub, side_effect: Exception | None, success: bool
 ) -> None:
     """Test the update coordinator update functions."""
     coordinator = hass.data[DOMAIN][ENTRY_ID]
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     with patch.object(
         MockShark, "async_update", side_effect=side_effect
     ) as mock_update:
         data = {ATTR_ENTITY_ID: [VAC_ENTITY_ID]}
         await hass.services.async_call(
-            "homeassistant", SERVICE_UPDATE_ENTITY, data, blocking=True
+            "smarthub", SERVICE_UPDATE_ENTITY, data, blocking=True
         )
         assert coordinator.last_update_success == success
         mock_update.assert_called_once()

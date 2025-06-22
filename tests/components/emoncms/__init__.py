@@ -1,11 +1,11 @@
 """Tests for the emoncms component."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def setup_integration(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, entry: MockConfigEntry) -> None:
     """Set up the integration."""
     entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)

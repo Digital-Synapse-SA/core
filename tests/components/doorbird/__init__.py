@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, MagicMock, Mock
 import aiohttp
 from doorbirdpy import DoorBird, DoorBirdScheduleEntry
 
-from homeassistant import config_entries
-from homeassistant.components.doorbird.const import API_URL
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components.doorbird.const import API_URL
+from smarthub.const import (
     CONF_HOST,
     CONF_NAME,
     CONF_PASSWORD,

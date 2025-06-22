@@ -16,8 +16,8 @@ from aioesphomeapi import (
 )
 import pytest
 
-from homeassistant.components.esphome import DOMAIN
-from homeassistant.const import (
+from smarthub.components.esphome import DOMAIN
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     ATTR_RESTORED,
     EVENT_HOMEASSISTANT_STOP,
@@ -26,15 +26,15 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.event import async_track_state_change_event
+from smarthub.core import Event, EventStateChangedData, SmartHub, callback
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.event import async_track_state_change_event
 
 from .conftest import MockESPHomeDevice, MockESPHomeDeviceType
 
 
 async def test_entities_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_client: APIClient,
     hass_storage: dict[str, Any],
@@ -123,7 +123,7 @@ async def test_entities_removed(
 
 
 async def test_entities_removed_after_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_client: APIClient,
     hass_storage: dict[str, Any],
@@ -250,7 +250,7 @@ async def test_entities_removed_after_reload(
 
 
 async def test_entities_for_entire_platform_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_client: APIClient,
     hass_storage: dict[str, Any],
@@ -310,7 +310,7 @@ async def test_entities_for_entire_platform_removed(
 
 
 async def test_entity_info_object_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:
@@ -334,7 +334,7 @@ async def test_entity_info_object_ids(
 
 
 async def test_deep_sleep_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     hass_storage: dict[str, Any],
     mock_esphome_device: MockESPHomeDeviceType,
@@ -440,7 +440,7 @@ async def test_deep_sleep_device(
 
 
 async def test_esphome_device_without_friendly_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     hass_storage: dict[str, Any],
     mock_esphome_device: MockESPHomeDeviceType,
@@ -470,7 +470,7 @@ async def test_esphome_device_without_friendly_name(
 
 
 async def test_entity_without_name_device_with_friendly_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     hass_storage: dict[str, Any],
     mock_esphome_device: MockESPHomeDeviceType,
@@ -503,7 +503,7 @@ async def test_entity_without_name_device_with_friendly_name(
 
 @pytest.mark.usefixtures("hass_storage")
 async def test_entity_id_preserved_on_upgrade(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     entity_registry: er.EntityRegistry,
@@ -544,7 +544,7 @@ async def test_entity_id_preserved_on_upgrade(
 
 @pytest.mark.usefixtures("hass_storage")
 async def test_entity_id_preserved_on_upgrade_old_format_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
     entity_registry: er.EntityRegistry,
@@ -584,7 +584,7 @@ async def test_entity_id_preserved_on_upgrade_old_format_entity_id(
 
 
 async def test_entity_id_preserved_on_upgrade_when_in_storage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     hass_storage: dict[str, Any],
     mock_esphome_device: MockESPHomeDeviceType,
@@ -643,7 +643,7 @@ async def test_entity_id_preserved_on_upgrade_when_in_storage(
 
 
 async def test_deep_sleep_added_after_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:

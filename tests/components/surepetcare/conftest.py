@@ -5,9 +5,9 @@ from unittest.mock import patch
 import pytest
 from surepy import MESTART_RESOURCE
 
-from homeassistant.components.surepetcare.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.surepetcare.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from . import MOCK_API_DATA
 
@@ -32,7 +32,7 @@ async def surepetcare():
 
 
 @pytest.fixture
-async def mock_config_entry_setup(hass: HomeAssistant) -> MockConfigEntry:
+async def mock_config_entry_setup(hass: SmartHub) -> MockConfigEntry:
     """Help setting up a mocked config entry."""
     data = {
         CONF_USERNAME: "test-username",

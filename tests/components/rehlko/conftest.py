@@ -1,4 +1,4 @@
-"""Module for testing the Rehlko integration in Home Assistant."""
+"""Module for testing the Rehlko integration in SmartHub."""
 
 from collections.abc import Generator
 from typing import Any
@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.rehlko import CONF_REFRESH_TOKEN, DOMAIN
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
+from smarthub.components.rehlko import CONF_REFRESH_TOKEN, DOMAIN
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_json_value_fixture
 
@@ -22,7 +22,7 @@ TEST_REFRESH_TOKEN = "my_refresh_token"
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.rehlko.async_setup_entry",
+        "smarthub.components.rehlko.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -74,8 +74,8 @@ async def mock_rehlko(
 ):
     """Mock Rehlko instance."""
     with (
-        patch("homeassistant.components.rehlko.AioKem", autospec=True) as mock_kem,
-        patch("homeassistant.components.rehlko.config_flow.AioKem", new=mock_kem),
+        patch("smarthub.components.rehlko.AioKem", autospec=True) as mock_kem,
+        patch("smarthub.components.rehlko.config_flow.AioKem", new=mock_kem),
     ):
         client = mock_kem.return_value
         client.get_homes = AsyncMock(return_value=homes)
@@ -90,7 +90,7 @@ async def mock_rehlko(
 
 @pytest.fixture
 async def load_rehlko_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rehlko: Mock,
     rehlko_config_entry: MockConfigEntry,
 ) -> None:

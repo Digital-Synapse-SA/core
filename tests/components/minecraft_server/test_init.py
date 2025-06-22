@@ -5,13 +5,13 @@ from unittest.mock import patch
 from mcstatus import JavaServer
 import pytest
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.minecraft_server.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ADDRESS, CONF_HOST, CONF_NAME, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.minecraft_server.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_ADDRESS, CONF_HOST, CONF_NAME, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .const import (
     TEST_ADDRESS,
@@ -55,7 +55,7 @@ def v1_mock_config_entry() -> MockConfigEntry:
     )
 
 
-def create_v1_mock_device_entry(hass: HomeAssistant, config_entry_id: str) -> str:
+def create_v1_mock_device_entry(hass: SmartHub, config_entry_id: str) -> str:
     """Create mock device entry with version 1."""
     device_registry = dr.async_get(hass)
     device_entry_v1 = device_registry.async_get_or_create(
@@ -71,7 +71,7 @@ def create_v1_mock_device_entry(hass: HomeAssistant, config_entry_id: str) -> st
 
 
 def create_v1_mock_sensor_entity_entries(
-    hass: HomeAssistant, config_entry_id: str, device_entry_id: str
+    hass: SmartHub, config_entry_id: str, device_entry_id: str
 ) -> list[dict]:
     """Create mock sensor entity entries with version 1."""
     sensor_entity_id_key_mapping_list = []
@@ -96,7 +96,7 @@ def create_v1_mock_sensor_entity_entries(
 
 
 def create_v1_mock_binary_sensor_entity_entry(
-    hass: HomeAssistant, config_entry_id: str, device_entry_id: str
+    hass: SmartHub, config_entry_id: str, device_entry_id: str
 ) -> dict:
     """Create mock binary sensor entity entry with version 1."""
     config_entry = hass.config_entries.async_get_entry(config_entry_id)
@@ -117,18 +117,18 @@ def create_v1_mock_binary_sensor_entity_entry(
 
 
 async def test_setup_and_unload_entry(
-    hass: HomeAssistant, java_mock_config_entry: MockConfigEntry
+    hass: SmartHub, java_mock_config_entry: MockConfigEntry
 ) -> None:
     """Test successful entry setup and unload."""
     java_mock_config_entry.add_to_hass(hass)
 
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_lookup",
+            "smarthub.components.minecraft_server.api.JavaServer.async_lookup",
             return_value=JavaServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_status",
+            "smarthub.components.minecraft_server.api.JavaServer.async_status",
             return_value=TEST_JAVA_STATUS_RESPONSE,
         ),
     ):
@@ -143,13 +143,13 @@ async def test_setup_and_unload_entry(
 
 
 async def test_setup_entry_lookup_failure(
-    hass: HomeAssistant, java_mock_config_entry: MockConfigEntry
+    hass: SmartHub, java_mock_config_entry: MockConfigEntry
 ) -> None:
     """Test lookup failure in entry setup."""
     java_mock_config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.minecraft_server.api.JavaServer.async_lookup",
+        "smarthub.components.minecraft_server.api.JavaServer.async_lookup",
         side_effect=ValueError,
     ):
         assert not await hass.config_entries.async_setup(
@@ -161,13 +161,13 @@ async def test_setup_entry_lookup_failure(
 
 
 async def test_setup_entry_init_failure(
-    hass: HomeAssistant, java_mock_config_entry: MockConfigEntry
+    hass: SmartHub, java_mock_config_entry: MockConfigEntry
 ) -> None:
     """Test init failure in entry setup."""
     java_mock_config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.minecraft_server.api.MinecraftServer.async_initialize",
+        "smarthub.components.minecraft_server.api.MinecraftServer.async_initialize",
         side_effect=None,
     ):
         assert not await hass.config_entries.async_setup(
@@ -179,18 +179,18 @@ async def test_setup_entry_init_failure(
 
 
 async def test_setup_entry_not_ready(
-    hass: HomeAssistant, java_mock_config_entry: MockConfigEntry
+    hass: SmartHub, java_mock_config_entry: MockConfigEntry
 ) -> None:
     """Test entry setup not ready."""
     java_mock_config_entry.add_to_hass(hass)
 
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_lookup",
+            "smarthub.components.minecraft_server.api.JavaServer.async_lookup",
             return_value=JavaServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_status",
+            "smarthub.components.minecraft_server.api.JavaServer.async_status",
             return_value=OSError,
         ),
     ):
@@ -203,7 +203,7 @@ async def test_setup_entry_not_ready(
 
 
 async def test_entry_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     v1_mock_config_entry: MockConfigEntry,
@@ -222,7 +222,7 @@ async def test_entry_migration(
     # Trigger migration.
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_lookup",
+            "smarthub.components.minecraft_server.api.JavaServer.async_lookup",
             side_effect=[
                 ValueError,  # async_migrate_entry
                 JavaServer(host=TEST_HOST, port=TEST_PORT),  # async_migrate_entry
@@ -230,7 +230,7 @@ async def test_entry_migration(
             ],
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_status",
+            "smarthub.components.minecraft_server.api.JavaServer.async_status",
             return_value=TEST_JAVA_STATUS_RESPONSE,
         ),
     ):
@@ -271,7 +271,7 @@ async def test_entry_migration(
 
 
 async def test_entry_migration_host_only(
-    hass: HomeAssistant, v1_mock_config_entry: MockConfigEntry
+    hass: SmartHub, v1_mock_config_entry: MockConfigEntry
 ) -> None:
     """Test entry migration from version 1 to 3, where host alone is sufficient for the connection to the server."""
     v1_mock_config_entry.add_to_hass(hass)
@@ -287,11 +287,11 @@ async def test_entry_migration_host_only(
     # Trigger migration.
     with (
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_lookup",
+            "smarthub.components.minecraft_server.api.JavaServer.async_lookup",
             return_value=JavaServer(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            "homeassistant.components.minecraft_server.api.JavaServer.async_status",
+            "smarthub.components.minecraft_server.api.JavaServer.async_status",
             return_value=TEST_JAVA_STATUS_RESPONSE,
         ),
     ):
@@ -309,7 +309,7 @@ async def test_entry_migration_host_only(
 
 
 async def test_entry_migration_v3_failure(
-    hass: HomeAssistant, v1_mock_config_entry: MockConfigEntry
+    hass: SmartHub, v1_mock_config_entry: MockConfigEntry
 ) -> None:
     """Test failed entry migration from version 2 to 3."""
     v1_mock_config_entry.add_to_hass(hass)
@@ -324,7 +324,7 @@ async def test_entry_migration_v3_failure(
 
     # Trigger migration.
     with patch(
-        "homeassistant.components.minecraft_server.api.JavaServer.async_lookup",
+        "smarthub.components.minecraft_server.api.JavaServer.async_lookup",
         side_effect=[
             ValueError,  # async_migrate_entry
             ValueError,  # async_migrate_entry

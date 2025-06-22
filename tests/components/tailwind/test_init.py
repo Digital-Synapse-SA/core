@@ -4,15 +4,15 @@ from unittest.mock import MagicMock
 
 from gotailwind import TailwindAuthenticationError, TailwindConnectionError
 
-from homeassistant.components.tailwind.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.tailwind.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tailwind: MagicMock,
 ) -> None:
@@ -32,7 +32,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tailwind: MagicMock,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_config_entry_authentication_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tailwind: MagicMock,
 ) -> None:

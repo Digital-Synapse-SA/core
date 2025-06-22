@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.components.sun import DOMAIN
-from homeassistant.components.sun.entity import (
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.components.sun import DOMAIN
+from smarthub.components.sun.entity import (
     STATE_ATTR_AZIMUTH,
     STATE_ATTR_ELEVATION,
     STATE_ATTR_NEXT_DAWN,
@@ -18,16 +18,16 @@ from homeassistant.components.sun.entity import (
     STATE_ATTR_NEXT_SETTING,
     STATE_ATTR_RISING,
 )
-from homeassistant.const import ATTR_FRIENDLY_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_FRIENDLY_NAME
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 from tests.components.recorder.common import async_wait_recording_done
 
 
-async def test_exclude_attributes(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_exclude_attributes(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test sun attributes to be excluded."""
     now = dt_util.utcnow()
     await async_setup_component(hass, DOMAIN, {})

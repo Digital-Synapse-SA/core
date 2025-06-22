@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from ohme import ChargerMode
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -15,21 +15,21 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_selects(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
 ) -> None:
     """Test the Ohme selects."""
-    with patch("homeassistant.components.ohme.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.ohme.PLATFORMS", [Platform.SELECT]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_select_option(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
 ) -> None:
@@ -58,7 +58,7 @@ async def test_select_option(
 
 
 async def test_select_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
 ) -> None:

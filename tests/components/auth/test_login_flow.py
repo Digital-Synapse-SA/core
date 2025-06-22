@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import BASE_CONFIG, async_setup_auth
 
@@ -42,11 +42,11 @@ _TRUSTED_NETWORKS_CONFIG = {
             [{"name": "Example", "type": "insecure_example", "id": None}],
         ),
         (
-            [{"type": "homeassistant"}],
+            [{"type": "smarthub"}],
             [
                 {
-                    "name": "Home Assistant Local",
-                    "type": "homeassistant",
+                    "name": "SmartHub Local",
+                    "type": "smarthub",
                     "id": None,
                 }
             ],
@@ -54,7 +54,7 @@ _TRUSTED_NETWORKS_CONFIG = {
     ],
 )
 async def test_fetch_auth_providers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     provider_configs: list[dict[str, Any]],
     expected: list[dict[str, Any]],
@@ -86,7 +86,7 @@ async def test_fetch_auth_providers(
     ],
 )
 async def test_fetch_auth_providers_trusted_network(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     expected: list[dict[str, Any]],
     ip: str,
@@ -101,12 +101,12 @@ async def test_fetch_auth_providers_trusted_network(
 
 
 async def test_fetch_auth_providers_onboarding(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test fetching auth providers."""
     client = await async_setup_auth(hass, aiohttp_client)
     with patch(
-        "homeassistant.components.onboarding.async_is_user_onboarded",
+        "smarthub.components.onboarding.async_is_user_onboarded",
         return_value=False,
     ):
         resp = await client.get("/auth/providers")
@@ -118,7 +118,7 @@ async def test_fetch_auth_providers_onboarding(
 
 
 async def test_cannot_get_flows_in_progress(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test we cannot get flows in progress."""
     client = await async_setup_auth(hass, aiohttp_client, [])
@@ -127,7 +127,7 @@ async def test_cannot_get_flows_in_progress(
 
 
 async def test_invalid_username_password(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test we cannot get flows in progress."""
     client = await async_setup_auth(hass, aiohttp_client)
@@ -144,7 +144,7 @@ async def test_invalid_username_password(
 
     # Incorrect username
     with patch(
-        "homeassistant.components.auth.login_flow.process_wrong_login"
+        "smarthub.components.auth.login_flow.process_wrong_login"
     ) as mock_process_wrong_login:
         resp = await client.post(
             f"/auth/login_flow/{step['flow_id']}",
@@ -164,7 +164,7 @@ async def test_invalid_username_password(
 
     # Incorrect password
     with patch(
-        "homeassistant.components.auth.login_flow.process_wrong_login"
+        "smarthub.components.auth.login_flow.process_wrong_login"
     ) as mock_process_wrong_login:
         resp = await client.post(
             f"/auth/login_flow/{step['flow_id']}",
@@ -184,7 +184,7 @@ async def test_invalid_username_password(
 
     # Incorrect username and invalid redirect URI fails on wrong login
     with patch(
-        "homeassistant.components.auth.login_flow.process_wrong_login"
+        "smarthub.components.auth.login_flow.process_wrong_login"
     ) as mock_process_wrong_login:
         resp = await client.post(
             f"/auth/login_flow/{step['flow_id']}",
@@ -204,7 +204,7 @@ async def test_invalid_username_password(
 
 
 async def test_invalid_redirect_uri(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test invalid redirect URI."""
     client = await async_setup_auth(hass, aiohttp_client)
@@ -221,11 +221,11 @@ async def test_invalid_redirect_uri(
 
     with (
         patch(
-            "homeassistant.components.auth.indieauth.fetch_redirect_uris",
+            "smarthub.components.auth.indieauth.fetch_redirect_uris",
             return_value=[],
         ),
         patch(
-            "homeassistant.components.http.ban.process_wrong_login"
+            "smarthub.components.http.ban.process_wrong_login"
         ) as mock_process_wrong_login,
     ):
         resp = await client.post(
@@ -245,7 +245,7 @@ async def test_invalid_redirect_uri(
 
 
 async def test_login_exist_user(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test logging in with exist user."""
     client = await async_setup_auth(hass, aiohttp_client, setup_api=True)
@@ -266,7 +266,7 @@ async def test_login_exist_user(
     step = await resp.json()
 
     with patch(
-        "homeassistant.components.auth.login_flow.process_success_login"
+        "smarthub.components.auth.login_flow.process_success_login"
     ) as mock_process_success_login:
         resp = await client.post(
             f"/auth/login_flow/{step['flow_id']}",
@@ -285,7 +285,7 @@ async def test_login_exist_user(
 
 
 async def test_login_local_only_user(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test logging in with local only user."""
     client = await async_setup_auth(hass, aiohttp_client, setup_api=True)
@@ -307,7 +307,7 @@ async def test_login_local_only_user(
     step = await resp.json()
 
     with patch(
-        "homeassistant.components.auth.login_flow.async_user_not_allowed_do_auth",
+        "smarthub.components.auth.login_flow.async_user_not_allowed_do_auth",
         return_value="User is local only",
     ) as mock_not_allowed_do_auth:
         resp = await client.post(
@@ -325,7 +325,7 @@ async def test_login_local_only_user(
 
 
 async def test_login_exist_user_ip_changes(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test logging in and the ip address changes results in an rejection."""
     client = await async_setup_auth(hass, aiohttp_client, setup_api=True)
@@ -372,7 +372,7 @@ async def test_login_exist_user_ip_changes(
 
 
 async def test_well_known_auth_info(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test logging in and the ip address changes results in an rejection."""
     client = await async_setup_auth(hass, aiohttp_client, setup_api=True)
@@ -385,5 +385,5 @@ async def test_well_known_auth_info(
         "token_endpoint": "/auth/token",
         "revocation_endpoint": "/auth/revoke",
         "response_types_supported": ["code"],
-        "service_documentation": "https://developers.home-assistant.io/docs/auth_api",
+        "service_documentation": "https://developers.smart-hub.io/docs/auth_api",
     }

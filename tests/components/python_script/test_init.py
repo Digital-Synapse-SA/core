@@ -5,16 +5,16 @@ from unittest.mock import mock_open, patch
 
 import pytest
 
-from homeassistant.components.python_script import DOMAIN, FOLDER, execute
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers.service import async_get_all_descriptions
-from homeassistant.setup import async_setup_component
+from smarthub.components.python_script import DOMAIN, FOLDER, execute
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers.service import async_get_all_descriptions
+from smarthub.setup import async_setup_component
 
 from tests.common import patch_yaml_files
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test we can discover scripts."""
     scripts = [
         "/some/config/dir/python_scripts/hello.py",
@@ -22,10 +22,10 @@ async def test_setup(hass: HomeAssistant) -> None:
     ]
     with (
         patch(
-            "homeassistant.components.python_script.os.path.isdir", return_value=True
+            "smarthub.components.python_script.os.path.isdir", return_value=True
         ),
         patch(
-            "homeassistant.components.python_script.glob.iglob", return_value=scripts
+            "smarthub.components.python_script.glob.iglob", return_value=scripts
         ),
     ):
         res = await async_setup_component(hass, "python_script", {})
@@ -36,11 +36,11 @@ async def test_setup(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.python_script.open",
+            "smarthub.components.python_script.open",
             mock_open(read_data="fake source"),
             create=True,
         ),
-        patch("homeassistant.components.python_script.execute") as mock_ex,
+        patch("smarthub.components.python_script.execute") as mock_ex,
     ):
         await hass.services.async_call(
             "python_script", "hello", {"some": "data"}, blocking=True
@@ -56,11 +56,11 @@ async def test_setup(hass: HomeAssistant) -> None:
 
 
 async def test_setup_fails_on_no_dir(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we fail setup when no dir found."""
     with patch(
-        "homeassistant.components.python_script.os.path.isdir", return_value=False
+        "smarthub.components.python_script.os.path.isdir", return_value=False
     ):
         res = await async_setup_component(hass, "python_script", {})
 
@@ -69,7 +69,7 @@ async def test_setup_fails_on_no_dir(
 
 
 async def test_execute_with_data(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test executing a script."""
     caplog.set_level(logging.WARNING)
@@ -87,7 +87,7 @@ hass.states.set('test.entity', data.get('name', 'not set'))
 
 
 async def test_execute_warns_print(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test print triggers warning."""
     caplog.set_level(logging.WARNING)
@@ -102,7 +102,7 @@ print("This triggers warning.")
 
 
 async def test_execute_logging(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test logging works."""
     caplog.set_level(logging.INFO)
@@ -117,7 +117,7 @@ logger.info('Logging from inside script')
 
 
 async def test_execute_compile_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test compile error logs error."""
     caplog.set_level(logging.ERROR)
@@ -132,7 +132,7 @@ this is not valid Python
 
 
 async def test_execute_runtime_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test compile error logs error."""
     caplog.set_level(logging.ERROR)
@@ -146,7 +146,7 @@ raise Exception('boom')
     assert "Error executing script" in caplog.text
 
 
-async def test_execute_runtime_error_with_response(hass: HomeAssistant) -> None:
+async def test_execute_runtime_error_with_response(hass: SmartHub) -> None:
     """Test compile error logs error."""
     source = """
 raise Exception('boom')
@@ -155,12 +155,12 @@ raise Exception('boom')
     task = hass.async_add_executor_job(execute, hass, "test.py", source, {}, True)
     await hass.async_block_till_done(wait_background_tasks=True)
 
-    assert type(task.exception()) is HomeAssistantError
+    assert type(task.exception()) is SmartHubError
     assert "Error executing script (Exception): boom" in str(task.exception())
 
 
 async def test_accessing_async_methods(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test compile error logs error."""
     caplog.set_level(logging.ERROR)
@@ -174,7 +174,7 @@ hass.async_stop()
     assert "Not allowed to access async methods" in caplog.text
 
 
-async def test_accessing_async_methods_with_response(hass: HomeAssistant) -> None:
+async def test_accessing_async_methods_with_response(hass: SmartHub) -> None:
     """Test compile error logs error."""
     source = """
 hass.async_stop()
@@ -188,7 +188,7 @@ hass.async_stop()
 
 
 async def test_using_complex_structures(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that dicts and lists work."""
     caplog.set_level(logging.INFO)
@@ -205,13 +205,13 @@ logger.info('Logging from inside script: %s %s' % (mydict["a"], mylist[2]))
 
 
 async def test_accessing_forbidden_methods(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test compile error logs error."""
     caplog.set_level(logging.ERROR)
 
     for source, name in {
-        "hass.stop()": "HomeAssistant.stop",
+        "hass.stop()": "SmartHub.stop",
         "dt_util.set_default_time_zone()": "module.set_default_time_zone",
         "datetime.non_existing": "module.non_existing",
         "time.tzset()": "TimeWrapper.tzset",
@@ -222,10 +222,10 @@ async def test_accessing_forbidden_methods(
         assert f"Not allowed to access {name}" in caplog.text
 
 
-async def test_accessing_forbidden_methods_with_response(hass: HomeAssistant) -> None:
+async def test_accessing_forbidden_methods_with_response(hass: SmartHub) -> None:
     """Test compile error logs error."""
     for source, name in {
-        "hass.stop()": "HomeAssistant.stop",
+        "hass.stop()": "SmartHub.stop",
         "dt_util.set_default_time_zone()": "module.set_default_time_zone",
         "datetime.non_existing": "module.non_existing",
         "time.tzset()": "TimeWrapper.tzset",
@@ -237,7 +237,7 @@ async def test_accessing_forbidden_methods_with_response(hass: HomeAssistant) ->
         assert f"Not allowed to access {name}" in str(task.exception())
 
 
-async def test_iterating(hass: HomeAssistant) -> None:
+async def test_iterating(hass: SmartHub) -> None:
     """Test compile error logs error."""
     source = """
 for i in [1, 2]:
@@ -251,7 +251,7 @@ for i in [1, 2]:
     assert hass.states.is_state("hello.2", "world")
 
 
-async def test_using_enumerate(hass: HomeAssistant) -> None:
+async def test_using_enumerate(hass: SmartHub) -> None:
     """Test that enumerate is accepted and executed."""
     source = """
 for index, value in enumerate(["earth", "mars"]):
@@ -266,7 +266,7 @@ for index, value in enumerate(["earth", "mars"]):
 
 
 async def test_unpacking_sequence(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test compile error logs error."""
     caplog.set_level(logging.ERROR)
@@ -290,7 +290,7 @@ hass.states.set('hello.ab_list', '{}'.format(ab_list))
 
 
 async def test_execute_sorted(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test sorted() function."""
     caplog.set_level(logging.ERROR)
@@ -312,7 +312,7 @@ hass.states.set('hello.c', a[2])
 
 
 async def test_exposed_modules(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test datetime and time modules exposed."""
     caplog.set_level(logging.ERROR)
@@ -336,7 +336,7 @@ hass.states.set('module.datetime',
 
 
 async def test_execute_functions(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test functions defined in script can call one another."""
     caplog.set_level(logging.ERROR)
@@ -359,7 +359,7 @@ b()
     assert caplog.text == ""
 
 
-async def test_reload(hass: HomeAssistant) -> None:
+async def test_reload(hass: SmartHub) -> None:
     """Test we can re-discover scripts."""
     scripts = [
         "/some/config/dir/python_scripts/hello.py",
@@ -367,10 +367,10 @@ async def test_reload(hass: HomeAssistant) -> None:
     ]
     with (
         patch(
-            "homeassistant.components.python_script.os.path.isdir", return_value=True
+            "smarthub.components.python_script.os.path.isdir", return_value=True
         ),
         patch(
-            "homeassistant.components.python_script.glob.iglob", return_value=scripts
+            "smarthub.components.python_script.glob.iglob", return_value=scripts
         ),
     ):
         res = await async_setup_component(hass, "python_script", {})
@@ -386,10 +386,10 @@ async def test_reload(hass: HomeAssistant) -> None:
     ]
     with (
         patch(
-            "homeassistant.components.python_script.os.path.isdir", return_value=True
+            "smarthub.components.python_script.os.path.isdir", return_value=True
         ),
         patch(
-            "homeassistant.components.python_script.glob.iglob", return_value=scripts
+            "smarthub.components.python_script.glob.iglob", return_value=scripts
         ),
     ):
         await hass.services.async_call("python_script", "reload", {}, blocking=True)
@@ -400,7 +400,7 @@ async def test_reload(hass: HomeAssistant) -> None:
     assert hass.services.has_service("python_script", "reload")
 
 
-async def test_service_descriptions(hass: HomeAssistant) -> None:
+async def test_service_descriptions(hass: SmartHub) -> None:
     """Test that service descriptions are loaded and reloaded correctly."""
     # Test 1: no user-provided services.yaml file
     scripts1 = [
@@ -423,13 +423,13 @@ async def test_service_descriptions(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.python_script.os.path.isdir", return_value=True
+            "smarthub.components.python_script.os.path.isdir", return_value=True
         ),
         patch(
-            "homeassistant.components.python_script.glob.iglob", return_value=scripts1
+            "smarthub.components.python_script.glob.iglob", return_value=scripts1
         ),
         patch(
-            "homeassistant.components.python_script.os.path.exists", return_value=True
+            "smarthub.components.python_script.os.path.exists", return_value=True
         ),
         patch_yaml_files(
             services_yaml1,
@@ -477,13 +477,13 @@ async def test_service_descriptions(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.python_script.os.path.isdir", return_value=True
+            "smarthub.components.python_script.os.path.isdir", return_value=True
         ),
         patch(
-            "homeassistant.components.python_script.glob.iglob", return_value=scripts2
+            "smarthub.components.python_script.glob.iglob", return_value=scripts2
         ),
         patch(
-            "homeassistant.components.python_script.os.path.exists", return_value=True
+            "smarthub.components.python_script.os.path.exists", return_value=True
         ),
         patch_yaml_files(
             services_yaml2,
@@ -506,7 +506,7 @@ async def test_service_descriptions(hass: HomeAssistant) -> None:
 
 
 async def test_sleep_warns_one(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test time.sleep warns once."""
     caplog.set_level(logging.WARNING)
@@ -515,7 +515,7 @@ time.sleep(2)
 time.sleep(5)
 """
 
-    with patch("homeassistant.components.python_script.time.sleep"):
+    with patch("smarthub.components.python_script.time.sleep"):
         hass.async_add_executor_job(execute, hass, "test.py", source, {})
         await hass.async_block_till_done(wait_background_tasks=True)
 
@@ -523,7 +523,7 @@ time.sleep(5)
 
 
 async def test_execute_with_output(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test executing a script with a return value."""
     caplog.set_level(logging.WARNING)
@@ -533,10 +533,10 @@ async def test_execute_with_output(
     ]
     with (
         patch(
-            "homeassistant.components.python_script.os.path.isdir", return_value=True
+            "smarthub.components.python_script.os.path.isdir", return_value=True
         ),
         patch(
-            "homeassistant.components.python_script.glob.iglob", return_value=scripts
+            "smarthub.components.python_script.glob.iglob", return_value=scripts
         ),
     ):
         await async_setup_component(hass, "python_script", {})
@@ -546,7 +546,7 @@ output = {"result": f"hello {data.get('name', 'World')}"}
     """
 
     with patch(
-        "homeassistant.components.python_script.open",
+        "smarthub.components.python_script.open",
         mock_open(read_data=source),
         create=True,
     ):
@@ -567,7 +567,7 @@ output = {"result": f"hello {data.get('name', 'World')}"}
 
 
 async def test_execute_no_output(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test executing a script without a return value."""
     caplog.set_level(logging.WARNING)
@@ -577,10 +577,10 @@ async def test_execute_no_output(
     ]
     with (
         patch(
-            "homeassistant.components.python_script.os.path.isdir", return_value=True
+            "smarthub.components.python_script.os.path.isdir", return_value=True
         ),
         patch(
-            "homeassistant.components.python_script.glob.iglob", return_value=scripts
+            "smarthub.components.python_script.glob.iglob", return_value=scripts
         ),
     ):
         await async_setup_component(hass, "python_script", {})
@@ -590,7 +590,7 @@ no_output = {"result": f"hello {data.get('name', 'World')}"}
     """
 
     with patch(
-        "homeassistant.components.python_script.open",
+        "smarthub.components.python_script.open",
         mock_open(read_data=source),
         create=True,
     ):
@@ -609,17 +609,17 @@ no_output = {"result": f"hello {data.get('name', 'World')}"}
     assert caplog.text == ""
 
 
-async def test_execute_wrong_output_type(hass: HomeAssistant) -> None:
+async def test_execute_wrong_output_type(hass: SmartHub) -> None:
     """Test executing a script without a return value."""
     scripts = [
         "/some/config/dir/python_scripts/hello.py",
     ]
     with (
         patch(
-            "homeassistant.components.python_script.os.path.isdir", return_value=True
+            "smarthub.components.python_script.os.path.isdir", return_value=True
         ),
         patch(
-            "homeassistant.components.python_script.glob.iglob", return_value=scripts
+            "smarthub.components.python_script.glob.iglob", return_value=scripts
         ),
     ):
         await async_setup_component(hass, "python_script", {})
@@ -630,7 +630,7 @@ output = f"hello {data.get('name', 'World')}"
 
     with (
         patch(
-            "homeassistant.components.python_script.open",
+            "smarthub.components.python_script.open",
             mock_open(read_data=source),
             create=True,
         ),
@@ -645,7 +645,7 @@ output = f"hello {data.get('name', 'World')}"
         )
 
 
-async def test_augmented_assignment_operations(hass: HomeAssistant) -> None:
+async def test_augmented_assignment_operations(hass: SmartHub) -> None:
     """Test that augmented assignment operations work."""
     source = """
 a = 10
@@ -682,7 +682,7 @@ hass.states.set('hello.c', c)
     ],
 )
 async def test_prohibited_augmented_assignment_operations(
-    hass: HomeAssistant, case: str, error: str, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, case: str, error: str, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that prohibited augmented assignment operations raise an error."""
     hass.async_add_executor_job(execute, hass, "aug_assign_prohibited.py", case, {})
@@ -691,7 +691,7 @@ async def test_prohibited_augmented_assignment_operations(
 
 
 async def test_import_allow_strptime(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test calling datetime.datetime.strptime works."""
     source = """
@@ -705,7 +705,7 @@ logger.info(f'Date {test_date}')
 
 
 async def test_no_other_imports_allowed(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test imports are not allowed."""
     source = "import sys"

@@ -6,10 +6,10 @@ from pysmlight import Info, Sensors
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.smlight.const import DOMAIN
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.smlight.const import DOMAIN
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .conftest import setup_integration
 
@@ -35,7 +35,7 @@ def platforms() -> list[Platform]:
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.freeze_time("2024-07-01 00:00:00+00:00")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
@@ -48,7 +48,7 @@ async def test_sensors(
 
 
 async def test_disabled_by_default_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_disabled_by_default_sensors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_zigbee_uptime_disconnected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
 ) -> None:
@@ -81,7 +81,7 @@ async def test_zigbee_uptime_disconnected(
 
 
 async def test_zigbee2_temp_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
 ) -> None:
@@ -95,7 +95,7 @@ async def test_zigbee2_temp_sensor(
 
 
 async def test_zigbee_type_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
 ) -> None:

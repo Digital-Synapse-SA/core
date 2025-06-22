@@ -5,16 +5,16 @@ from unittest.mock import MagicMock, patch
 from pylitterbot.exceptions import LitterRobotException, LitterRobotLoginException
 import pytest
 
-from homeassistant.components.vacuum import (
+from smarthub.components.vacuum import (
     DOMAIN as VACUUM_DOMAIN,
     SERVICE_START,
     VacuumActivity,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import CONFIG, DOMAIN, VACUUM_ENTITY_ID
 from .conftest import setup_integration
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
 
 
-async def test_unload_entry(hass: HomeAssistant, mock_account: MagicMock) -> None:
+async def test_unload_entry(hass: SmartHub, mock_account: MagicMock) -> None:
     """Test being able to unload an entry."""
     entry = await setup_integration(hass, mock_account, VACUUM_DOMAIN)
 
@@ -50,7 +50,7 @@ async def test_unload_entry(hass: HomeAssistant, mock_account: MagicMock) -> Non
     ],
 )
 async def test_entry_not_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: LitterRobotException,
     expected_state: ConfigEntryState,
 ) -> None:
@@ -62,7 +62,7 @@ async def test_entry_not_setup(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.litterrobot.coordinator.Account.connect",
+        "smarthub.components.litterrobot.coordinator.Account.connect",
         side_effect=side_effect,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -70,7 +70,7 @@ async def test_entry_not_setup(
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,

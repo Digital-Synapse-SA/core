@@ -2,8 +2,8 @@
 
 import pytest
 
-from homeassistant.components.gdacs.const import CONF_CATEGORIES, DOMAIN
-from homeassistant.const import (
+from smarthub.components.gdacs.const import CONF_CATEGORIES, DOMAIN
+from smarthub.const import (
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_RADIUS,

@@ -10,9 +10,9 @@ from psutil import NoSuchProcess, Process
 from psutil._common import sdiskpart, sdiskusage, shwtemp, snetio, snicaddr, sswap
 import pytest
 
-from homeassistant.components.systemmonitor.const import DOMAIN
-from homeassistant.components.systemmonitor.coordinator import VirtualMemory
-from homeassistant.core import HomeAssistant
+from smarthub.components.systemmonitor.const import DOMAIN
+from smarthub.components.systemmonitor.coordinator import VirtualMemory
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -45,7 +45,7 @@ class MockProcess(Process):
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setup entry."""
     with patch(
-        "homeassistant.components.systemmonitor.async_setup_entry",
+        "smarthub.components.systemmonitor.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -73,7 +73,7 @@ def mock_config_entry() -> MockConfigEntry:
 
 @pytest.fixture
 async def mock_added_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_psutil: Mock,
     mock_os: Mock,
     mock_config_entry: MockConfigEntry,
@@ -98,7 +98,7 @@ def mock_process() -> list[MockProcess]:
 def mock_psutil(mock_process: list[MockProcess]) -> Generator:
     """Mock psutil."""
     with patch(
-        "homeassistant.components.systemmonitor.ha_psutil.PsutilWrapper",
+        "smarthub.components.systemmonitor.ha_psutil.PsutilWrapper",
     ) as psutil_wrapper:
         _wrapper = psutil_wrapper.return_value
         _wrapper.psutil = NonCallableMock()
@@ -194,8 +194,8 @@ def mock_os() -> Generator:
         return path != "/etc/hosts"
 
     with (
-        patch("homeassistant.components.systemmonitor.coordinator.os") as mock_os,
-        patch("homeassistant.components.systemmonitor.util.os") as mock_os_util,
+        patch("smarthub.components.systemmonitor.coordinator.os") as mock_os,
+        patch("smarthub.components.systemmonitor.util.os") as mock_os_util,
     ):
         mock_os_util.name = "nt"
         mock_os.getloadavg.return_value = (1, 2, 3)

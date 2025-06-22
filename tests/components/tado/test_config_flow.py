@@ -7,18 +7,18 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from PyTado.http import DeviceActivationStatus
 import pytest
 
-from homeassistant.components.tado.config_flow import TadoException
-from homeassistant.components.tado.const import (
+from smarthub.components.tado.config_flow import TadoException
+from smarthub.components.tado.const import (
     CONF_FALLBACK,
     CONF_REFRESH_TOKEN,
     CONST_OVERLAY_TADO_DEFAULT,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_HOMEKIT, SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import (
+from smarthub.config_entries import SOURCE_HOMEKIT, SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tado_api: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -59,7 +59,7 @@ async def test_full_flow(
 
 
 async def test_full_flow_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tado_api: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -109,7 +109,7 @@ async def test_full_flow_reauth(
 
 
 async def test_auth_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tado_api: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -140,7 +140,7 @@ async def test_auth_timeout(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_no_homes(hass: HomeAssistant, mock_tado_api: MagicMock) -> None:
+async def test_no_homes(hass: SmartHub, mock_tado_api: MagicMock) -> None:
     """Test the full flow of the config flow."""
     mock_tado_api.get_me.return_value["homes"] = []
 
@@ -156,11 +156,11 @@ async def test_no_homes(hass: HomeAssistant, mock_tado_api: MagicMock) -> None:
     assert result["reason"] == "no_homes"
 
 
-async def test_tado_creation(hass: HomeAssistant) -> None:
+async def test_tado_creation(hass: SmartHub) -> None:
     """Test we handle Form Exceptions."""
 
     with patch(
-        "homeassistant.components.tado.config_flow.Tado",
+        "smarthub.components.tado.config_flow.Tado",
         side_effect=TadoException("Test exception"),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -178,7 +178,7 @@ async def test_tado_creation(hass: HomeAssistant) -> None:
     ],
 )
 async def test_wait_for_login_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tado_api: MagicMock,
     exception: Exception,
     error: str,
@@ -195,7 +195,7 @@ async def test_wait_for_login_exception(
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tado_api: MagicMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -218,7 +218,7 @@ async def test_options_flow(
     assert result["data"] == {CONF_FALLBACK: CONST_OVERLAY_TADO_DEFAULT}
 
 
-async def test_homekit(hass: HomeAssistant, mock_tado_api: MagicMock) -> None:
+async def test_homekit(hass: SmartHub, mock_tado_api: MagicMock) -> None:
     """Test that we abort from homekit if tado is already setup."""
 
     result = await hass.config_entries.flow.async_init(
@@ -244,7 +244,7 @@ async def test_homekit(hass: HomeAssistant, mock_tado_api: MagicMock) -> None:
 
 
 async def test_homekit_already_setup(
-    hass: HomeAssistant, mock_tado_api: MagicMock
+    hass: SmartHub, mock_tado_api: MagicMock
 ) -> None:
     """Test that we abort from homekit if tado is already setup."""
 

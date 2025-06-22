@@ -8,18 +8,18 @@ import pytest
 from reolink_aio.exceptions import ReolinkError
 from reolink_aio.typings import VOD_trigger
 
-from homeassistant.components.media_source import (
+from smarthub.components.media_source import (
     DOMAIN as MEDIA_SOURCE_DOMAIN,
     URI_SCHEME,
     Unresolvable,
     async_browse_media,
     async_resolve_media,
 )
-from homeassistant.components.reolink.config_flow import DEFAULT_PROTOCOL
-from homeassistant.components.reolink.const import CONF_BC_PORT, CONF_USE_HTTPS, DOMAIN
-from homeassistant.components.reolink.media_source import VOD_SPLIT_TIME
-from homeassistant.components.stream import DOMAIN as MEDIA_STREAM_DOMAIN
-from homeassistant.const import (
+from smarthub.components.reolink.config_flow import DEFAULT_PROTOCOL
+from smarthub.components.reolink.const import CONF_BC_PORT, CONF_USE_HTTPS, DOMAIN
+from smarthub.components.reolink.media_source import VOD_SPLIT_TIME
+from smarthub.components.stream import DOMAIN as MEDIA_STREAM_DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
@@ -27,10 +27,10 @@ from homeassistant.const import (
     CONF_USERNAME,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.device_registry import format_mac
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.device_registry import format_mac
+from smarthub.setup import async_setup_component
 
 from .conftest import (
     TEST_BC_PORT,
@@ -70,14 +70,14 @@ TEST_URL2 = "http:test_url&token=test"
 
 
 @pytest.fixture(autouse=True)
-async def setup_component(hass: HomeAssistant) -> None:
+async def setup_component(hass: SmartHub) -> None:
     """Set up component."""
     assert await async_setup_component(hass, MEDIA_SOURCE_DOMAIN, {})
     assert await async_setup_component(hass, MEDIA_STREAM_DOMAIN, {})
 
 
 async def test_platform_loads_before_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
 ) -> None:
     """Test that the platform can be loaded before the config entry."""
@@ -88,7 +88,7 @@ async def test_platform_loads_before_config_entry(
 
 
 async def test_resolve(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_connect: MagicMock,
     config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -131,7 +131,7 @@ async def test_resolve(
 
 
 async def test_browsing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_connect: MagicMock,
     config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -143,7 +143,7 @@ async def test_browsing(
     reolink_connect.model = "Reolink TrackMix PoE"
     reolink_connect.is_nvr = False
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.CAMERA]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.CAMERA]):
         assert await hass.config_entries.async_setup(entry_id) is True
     await hass.async_block_till_done()
 
@@ -278,14 +278,14 @@ async def test_browsing(
 
 
 async def test_browsing_h265_encoding(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_connect: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test browsing a Reolink camera with h265 stream encoding."""
     entry_id = config_entry.entry_id
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.CAMERA]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.CAMERA]):
         assert await hass.config_entries.async_setup(entry_id) is True
     await hass.async_block_till_done()
 
@@ -329,7 +329,7 @@ async def test_browsing_h265_encoding(
 
 
 async def test_browsing_rec_playback_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_connect: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -343,7 +343,7 @@ async def test_browsing_rec_playback_unsupported(
 
     reolink_connect.supported = test_supported
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.CAMERA]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.CAMERA]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -359,12 +359,12 @@ async def test_browsing_rec_playback_unsupported(
 
 
 async def test_browsing_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_connect: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test browsing a Reolink camera errors."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.CAMERA]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.CAMERA]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -376,12 +376,12 @@ async def test_browsing_errors(
 
 
 async def test_browsing_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     reolink_connect: MagicMock,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test browsing a Reolink camera integration which is not loaded."""
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.CAMERA]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.CAMERA]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 

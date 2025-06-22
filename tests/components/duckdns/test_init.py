@@ -5,11 +5,11 @@ import logging
 
 import pytest
 
-from homeassistant.components import duckdns
-from homeassistant.components.duckdns import async_track_time_interval_backoff
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components import duckdns
+from smarthub.components.duckdns import async_track_time_interval_backoff
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from tests.common import async_fire_time_changed
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 INTERVAL = duckdns.INTERVAL
 
 
-async def async_set_txt(hass: HomeAssistant, txt: str | None) -> None:
+async def async_set_txt(hass: SmartHub, txt: str | None) -> None:
     """Set the txt record. Pass in None to remove it.
 
     This is a legacy helper method. Do not use it for new tests.
@@ -32,7 +32,7 @@ async def async_set_txt(hass: HomeAssistant, txt: str | None) -> None:
 
 @pytest.fixture
 async def setup_duckdns(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Fixture that sets up DuckDNS."""
     aioclient_mock.get(
@@ -44,7 +44,7 @@ async def setup_duckdns(
     )
 
 
-async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_setup(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Test setup works if update passes."""
     aioclient_mock.get(
         duckdns.UPDATE_URL, params={"domains": DOMAIN, "token": TOKEN}, text="OK"
@@ -65,7 +65,7 @@ async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -
 
 
 async def test_setup_backoff(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup fails if first update fails."""
     aioclient_mock.get(
@@ -100,7 +100,7 @@ async def test_setup_backoff(
 
 
 async def test_service_set_txt(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, setup_duckdns
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, setup_duckdns
 ) -> None:
     """Test set txt service call."""
     # Empty the fixture mock requests
@@ -118,7 +118,7 @@ async def test_service_set_txt(
 
 
 async def test_service_clear_txt(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, setup_duckdns
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, setup_duckdns
 ) -> None:
     """Test clear txt service call."""
     # Empty the fixture mock requests
@@ -135,7 +135,7 @@ async def test_service_clear_txt(
     assert aioclient_mock.call_count == 1
 
 
-async def test_async_track_time_interval_backoff(hass: HomeAssistant) -> None:
+async def test_async_track_time_interval_backoff(hass: SmartHub) -> None:
     """Test setup fails if first update fails."""
     ret_val = False
     call_count = 0

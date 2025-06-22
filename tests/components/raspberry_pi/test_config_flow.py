@@ -2,19 +2,19 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.raspberry_pi.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.raspberry_pi.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry, MockModule, mock_integration
 
 
-async def test_config_flow(hass: HomeAssistant) -> None:
+async def test_config_flow(hass: SmartHub) -> None:
     """Test the config flow."""
     mock_integration(hass, MockModule("hassio"))
 
     with patch(
-        "homeassistant.components.raspberry_pi.async_setup_entry",
+        "smarthub.components.raspberry_pi.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -33,7 +33,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     assert config_entry.title == "Raspberry Pi"
 
 
-async def test_config_flow_single_entry(hass: HomeAssistant) -> None:
+async def test_config_flow_single_entry(hass: SmartHub) -> None:
     """Test only a single entry is allowed."""
     mock_integration(hass, MockModule("hassio"))
 
@@ -47,7 +47,7 @@ async def test_config_flow_single_entry(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.raspberry_pi.async_setup_entry",
+        "smarthub.components.raspberry_pi.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(

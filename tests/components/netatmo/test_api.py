@@ -2,9 +2,9 @@
 
 from pyatmo.const import ALL_SCOPES
 
-from homeassistant.components import cloud
-from homeassistant.components.netatmo import api
-from homeassistant.components.netatmo.const import API_SCOPES_EXCLUDED_FROM_CLOUD
+from smarthub.components import cloud
+from smarthub.components.netatmo import api
+from smarthub.components.netatmo.const import API_SCOPES_EXCLUDED_FROM_CLOUD
 
 
 async def test_get_api_scopes_cloud() -> None:

@@ -5,13 +5,13 @@ import re
 
 import requests_mock
 
-from homeassistant.components.sigfox.sensor import (
+from smarthub.components.sigfox.sensor import (
     API_URL,
     CONF_API_LOGIN,
     CONF_API_PASSWORD,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 TEST_API_LOGIN = "foo"
 TEST_API_PASSWORD = "ebcd1234"
@@ -33,7 +33,7 @@ VALID_MESSAGE = """
 """
 
 
-async def test_invalid_credentials(hass: HomeAssistant) -> None:
+async def test_invalid_credentials(hass: SmartHub) -> None:
     """Test for invalid credentials."""
     with requests_mock.Mocker() as mock_req:
         url = re.compile(API_URL + "devicetypes")
@@ -43,7 +43,7 @@ async def test_invalid_credentials(hass: HomeAssistant) -> None:
     assert len(hass.states.async_entity_ids()) == 0
 
 
-async def test_valid_credentials(hass: HomeAssistant) -> None:
+async def test_valid_credentials(hass: SmartHub) -> None:
     """Test for valid credentials."""
     with requests_mock.Mocker() as mock_req:
         url1 = re.compile(API_URL + "devicetypes")

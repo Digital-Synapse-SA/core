@@ -4,14 +4,14 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 from canary.model import SensorType
 
-from homeassistant.components.canary.const import (
+from smarthub.components.canary.const import (
     CONF_FFMPEG_ARGUMENTS,
     DEFAULT_FFMPEG_ARGUMENTS,
     DEFAULT_TIMEOUT,
     DOMAIN,
 )
-from homeassistant.const import CONF_PASSWORD, CONF_TIMEOUT, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_PASSWORD, CONF_TIMEOUT, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -39,17 +39,17 @@ YAML_CONFIG = {
 
 def _patch_async_setup_entry(return_value=True):
     return patch(
-        "homeassistant.components.canary.async_setup_entry",
+        "smarthub.components.canary.async_setup_entry",
         return_value=return_value,
     )
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     *,
     skip_entry_setup: bool = False,
 ) -> MockConfigEntry:
-    """Set up the Canary integration in Home Assistant."""
+    """Set up the Canary integration in SmartHub."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRY_CONFIG, options=ENTRY_OPTIONS)
     entry.add_to_hass(hass)
 

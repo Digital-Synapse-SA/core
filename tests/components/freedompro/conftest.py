@@ -9,8 +9,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.freedompro.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.freedompro.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .const import DEVICES, DEVICES_STATE
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.freedompro.async_setup_entry", return_value=True
+        "smarthub.components.freedompro.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -31,14 +31,14 @@ def mock_freedompro():
     """Mock freedompro get_list and get_states."""
     with (
         patch(
-            "homeassistant.components.freedompro.coordinator.get_list",
+            "smarthub.components.freedompro.coordinator.get_list",
             return_value={
                 "state": True,
                 "devices": DEVICES,
             },
         ),
         patch(
-            "homeassistant.components.freedompro.coordinator.get_states",
+            "smarthub.components.freedompro.coordinator.get_states",
             return_value=DEVICES_STATE,
         ),
     ):
@@ -46,8 +46,8 @@ def mock_freedompro():
 
 
 @pytest.fixture
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the Freedompro integration in Home Assistant."""
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
+    """Set up the Freedompro integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Feedompro",
@@ -65,8 +65,8 @@ async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
 
 
 @pytest.fixture
-async def init_integration_no_state(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the Freedompro integration in Home Assistant without state."""
+async def init_integration_no_state(hass: SmartHub) -> MockConfigEntry:
+    """Set up the Freedompro integration in SmartHub without state."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Feedompro",
@@ -78,14 +78,14 @@ async def init_integration_no_state(hass: HomeAssistant) -> MockConfigEntry:
 
     with (
         patch(
-            "homeassistant.components.freedompro.coordinator.get_list",
+            "smarthub.components.freedompro.coordinator.get_list",
             return_value={
                 "state": True,
                 "devices": DEVICES,
             },
         ),
         patch(
-            "homeassistant.components.freedompro.coordinator.get_states",
+            "smarthub.components.freedompro.coordinator.get_states",
             return_value=[],
         ),
     ):

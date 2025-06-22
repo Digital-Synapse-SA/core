@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 from aiosyncthing.exceptions import UnauthorizedError
 
-from homeassistant import config_entries
-from homeassistant.components.syncthing.const import DOMAIN
-from homeassistant.const import CONF_NAME, CONF_TOKEN, CONF_URL, CONF_VERIFY_SSL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.syncthing.const import DOMAIN
+from smarthub.const import CONF_NAME, CONF_TOKEN, CONF_URL, CONF_VERIFY_SSL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -25,7 +25,7 @@ MOCK_ENTRY = {
 }
 
 
-async def test_show_setup_form(hass: HomeAssistant) -> None:
+async def test_show_setup_form(hass: SmartHub) -> None:
     """Test that the setup form is served."""
 
     result = await hass.config_entries.flow.async_init(
@@ -36,12 +36,12 @@ async def test_show_setup_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_flow_successful(hass: HomeAssistant) -> None:
+async def test_flow_successful(hass: SmartHub) -> None:
     """Test with required fields only."""
     with (
         patch("aiosyncthing.system.System.status", return_value={"myID": "server-id"}),
         patch(
-            "homeassistant.components.syncthing.async_setup_entry",
+            "smarthub.components.syncthing.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -64,7 +64,7 @@ async def test_flow_successful(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_flow_already_configured(hass: HomeAssistant) -> None:
+async def test_flow_already_configured(hass: SmartHub) -> None:
     """Test name is already configured."""
 
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_ENTRY, unique_id="server-id")
@@ -81,7 +81,7 @@ async def test_flow_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_flow_invalid_auth(hass: HomeAssistant) -> None:
+async def test_flow_invalid_auth(hass: SmartHub) -> None:
     """Test invalid auth."""
 
     with patch("aiosyncthing.system.System.status", side_effect=UnauthorizedError):
@@ -95,7 +95,7 @@ async def test_flow_invalid_auth(hass: HomeAssistant) -> None:
         assert result["errors"]["token"] == "invalid_auth"
 
 
-async def test_flow_cannot_connect(hass: HomeAssistant) -> None:
+async def test_flow_cannot_connect(hass: SmartHub) -> None:
     """Test cannot connect."""
 
     with patch("aiosyncthing.system.System.status", side_effect=Exception):

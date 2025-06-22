@@ -5,15 +5,15 @@ from unittest.mock import MagicMock
 import pytest
 from requests.exceptions import ConnectTimeout, HTTPError
 
-from homeassistant.components.rova.const import (
+from smarthub.components.rova.const import (
     CONF_HOUSE_NUMBER,
     CONF_HOUSE_NUMBER_SUFFIX,
     CONF_ZIP_CODE,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -22,7 +22,7 @@ HOUSE_NUMBER = "10"
 HOUSE_NUMBER_SUFFIX = "a"
 
 
-async def test_user(hass: HomeAssistant, mock_rova: MagicMock) -> None:
+async def test_user(hass: SmartHub, mock_rova: MagicMock) -> None:
     """Test user config."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -50,7 +50,7 @@ async def test_user(hass: HomeAssistant, mock_rova: MagicMock) -> None:
 
 
 async def test_error_if_not_rova_area(
-    hass: HomeAssistant, mock_rova: MagicMock
+    hass: SmartHub, mock_rova: MagicMock
 ) -> None:
     """Test we raise errors if rova does not collect at the given address."""
     result = await hass.config_entries.flow.async_init(
@@ -93,7 +93,7 @@ async def test_error_if_not_rova_area(
     }
 
 
-async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
+async def test_abort_if_already_setup(hass: SmartHub) -> None:
     """Test we abort if rova is already setup."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -126,7 +126,7 @@ async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
     ],
 )
 async def test_abort_if_api_throws_exception(
-    hass: HomeAssistant, exception: Exception, error: str, mock_rova: MagicMock
+    hass: SmartHub, exception: Exception, error: str, mock_rova: MagicMock
 ) -> None:
     """Test different exceptions for the Rova entity."""
     result = await hass.config_entries.flow.async_init(

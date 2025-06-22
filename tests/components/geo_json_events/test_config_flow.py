@@ -2,17 +2,17 @@
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.geo_json_events.const import DOMAIN
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components.geo_json_events.const import DOMAIN
+from smarthub.const import (
     CONF_LATITUDE,
     CONF_LOCATION,
     CONF_LONGITUDE,
     CONF_RADIUS,
     CONF_URL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import URL
 
@@ -22,7 +22,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_duplicate_error_user(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test that errors are shown when duplicates are added."""
     config_entry.add_to_hass(hass)
@@ -48,7 +48,7 @@ async def test_duplicate_error_user(
     assert result["reason"] == "already_configured"
 
 
-async def test_step_user(hass: HomeAssistant) -> None:
+async def test_step_user(hass: SmartHub) -> None:
     """Test that the user step works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}

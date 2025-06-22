@@ -11,8 +11,8 @@ from elevenlabs.core import ApiError
 from elevenlabs.types import GetVoicesResponse, VoiceSettings
 import pytest
 
-from homeassistant.components import tts
-from homeassistant.components.elevenlabs.const import (
+from smarthub.components import tts
+from smarthub.components.elevenlabs.const import (
     ATTR_MODEL,
     CONF_MODEL,
     CONF_OPTIMIZE_LATENCY,
@@ -28,14 +28,14 @@ from homeassistant.components.elevenlabs.const import (
     DEFAULT_USE_SPEAKER_BOOST,
     DOMAIN,
 )
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_MEDIA_CONTENT_ID,
     DOMAIN as DOMAIN_MP,
     SERVICE_PLAY_MEDIA,
 )
-from homeassistant.const import ATTR_ENTITY_ID, CONF_API_KEY
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.core_config import async_process_ha_core_config
+from smarthub.const import ATTR_ENTITY_ID, CONF_API_KEY
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.core_config import async_process_ha_core_config
 
 from .const import MOCK_MODELS, MOCK_VOICES
 
@@ -55,13 +55,13 @@ def mock_tts_cache_dir_autouse(mock_tts_cache_dir: Path) -> None:
 
 
 @pytest.fixture
-async def calls(hass: HomeAssistant) -> list[ServiceCall]:
+async def calls(hass: SmartHub) -> list[ServiceCall]:
     """Mock media player calls."""
     return async_mock_service(hass, DOMAIN_MP, SERVICE_PLAY_MEDIA)
 
 
 @pytest.fixture(autouse=True)
-async def setup_internal_url(hass: HomeAssistant) -> None:
+async def setup_internal_url(hass: SmartHub) -> None:
     """Set up internal url."""
     await async_process_ha_core_config(
         hass, {"internal_url": "http://example.local:8123"}
@@ -82,7 +82,7 @@ def mock_latency():
 
 @pytest.fixture(name="setup")
 async def setup_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_data: dict[str, Any],
     config_options: dict[str, Any],
     config_options_voice: dict[str, Any],
@@ -126,7 +126,7 @@ def config_options_voice_fixture(mock_similarity, mock_latency) -> dict[str, Any
 
 
 async def mock_config_entry_setup(
-    hass: HomeAssistant, config_data: dict[str, Any], config_options: dict[str, Any]
+    hass: SmartHub, config_data: dict[str, Any], config_options: dict[str, Any]
 ) -> None:
     """Mock config entry setup."""
     default_config_data = {
@@ -146,7 +146,7 @@ async def mock_config_entry_setup(
     client_mock.voices.get_all.return_value = GetVoicesResponse(voices=MOCK_VOICES)
     client_mock.models.get_all.return_value = MOCK_MODELS
     with patch(
-        "homeassistant.components.elevenlabs.AsyncElevenLabs", return_value=client_mock
+        "smarthub.components.elevenlabs.AsyncElevenLabs", return_value=client_mock
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
 
@@ -209,7 +209,7 @@ async def mock_config_entry_setup(
 )
 async def test_tts_service_speak(
     setup: AsyncMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     calls: list[ServiceCall],
     tts_service: str,
@@ -279,7 +279,7 @@ async def test_tts_service_speak(
 )
 async def test_tts_service_speak_lang_config(
     setup: AsyncMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     calls: list[ServiceCall],
     tts_service: str,
@@ -329,7 +329,7 @@ async def test_tts_service_speak_lang_config(
 )
 async def test_tts_service_speak_error(
     setup: AsyncMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     calls: list[ServiceCall],
     tts_service: str,
@@ -390,7 +390,7 @@ async def test_tts_service_speak_error(
 )
 async def test_tts_service_speak_voice_settings(
     setup: AsyncMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     calls: list[ServiceCall],
     tts_service: str,
@@ -449,7 +449,7 @@ async def test_tts_service_speak_voice_settings(
 )
 async def test_tts_service_speak_without_options(
     setup: AsyncMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     calls: list[ServiceCall],
     tts_service: str,

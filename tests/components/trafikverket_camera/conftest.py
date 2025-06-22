@@ -8,10 +8,10 @@ from unittest.mock import patch
 import pytest
 from pytrafikverket import CameraInfoModel
 
-from homeassistant.components.trafikverket_camera.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.trafikverket_camera.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import ENTRY_CONFIG
 
@@ -21,11 +21,11 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 @pytest.fixture(name="load_int")
 async def load_integration_from_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     get_camera: CameraInfoModel,
 ) -> MockConfigEntry:
-    """Set up the Trafikverket Camera integration in Home Assistant."""
+    """Set up the Trafikverket Camera integration in SmartHub."""
     aioclient_mock.get(
         "https://www.testurl.com/test_photo.jpg?type=fullsize", content=b"0123456789"
     )
@@ -43,7 +43,7 @@ async def load_integration_from_entry(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         return_value=get_camera,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

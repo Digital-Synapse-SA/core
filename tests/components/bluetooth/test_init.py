@@ -13,8 +13,8 @@ from habluetooth import scanner, set_manager
 from habluetooth.wrappers import HaBleakScannerWrapper
 import pytest
 
-from homeassistant.components import bluetooth
-from homeassistant.components.bluetooth import (
+from smarthub.components import bluetooth
+from smarthub.components.bluetooth import (
     BluetoothChange,
     BluetoothScanningMode,
     BluetoothServiceInfo,
@@ -23,7 +23,7 @@ from homeassistant.components.bluetooth import (
     async_rediscover_address,
     async_track_unavailable,
 )
-from homeassistant.components.bluetooth.const import (
+from smarthub.components.bluetooth.const import (
     BLUETOOTH_DISCOVERY_COOLDOWN_SECONDS,
     CONF_PASSIVE,
     CONF_SOURCE,
@@ -35,8 +35,8 @@ from homeassistant.components.bluetooth.const import (
     SOURCE_LOCAL,
     UNAVAILABLE_TRACK_SECONDS,
 )
-from homeassistant.components.bluetooth.manager import HomeAssistantBluetoothManager
-from homeassistant.components.bluetooth.match import (
+from smarthub.components.bluetooth.manager import SmartHubBluetoothManager
+from smarthub.components.bluetooth.match import (
     ADDRESS,
     CONNECTABLE,
     LOCAL_NAME,
@@ -44,12 +44,12 @@ from homeassistant.components.bluetooth.match import (
     SERVICE_DATA_UUID,
     SERVICE_UUID,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STARTED, EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STARTED, EVENT_HOMEASSISTANT_STOP
+from smarthub.core import SmartHub, callback
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     FakeRemoteScanner,
@@ -70,7 +70,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_setup_and_stop(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test we and setup and stop the scanner."""
     mock_bt = [
@@ -78,7 +78,7 @@ async def test_setup_and_stop(
     ]
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
         patch.object(hass.config_entries.flow, "async_init"),
@@ -96,7 +96,7 @@ async def test_setup_and_stop(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_setup_and_stop_passive(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test we and setup and stop the scanner the passive scanner."""
     entry = MockConfigEntry(
@@ -145,7 +145,7 @@ async def test_setup_and_stop_passive(
 
 
 async def test_setup_and_stop_old_bluez(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bleak_scanner_start: MagicMock,
     one_adapter_old_bluez: None,
 ) -> None:
@@ -196,7 +196,7 @@ async def test_setup_and_stop_old_bluez(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_setup_and_stop_no_bluetooth(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we fail gracefully when bluetooth is not available."""
     mock_bt = [
@@ -208,10 +208,10 @@ async def test_setup_and_stop_no_bluetooth(
             side_effect=BleakError,
         ) as mock_ha_bleak_scanner,
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
-        patch("homeassistant.components.bluetooth.discovery_flow.async_create_flow"),
+        patch("smarthub.components.bluetooth.discovery_flow.async_create_flow"),
     ):
         await async_setup_with_one_adapter(hass)
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
@@ -225,7 +225,7 @@ async def test_setup_and_stop_no_bluetooth(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_setup_and_stop_broken_bluetooth(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we fail gracefully when bluetooth/dbus is broken."""
     mock_bt = []
@@ -235,7 +235,7 @@ async def test_setup_and_stop_broken_bluetooth(
             side_effect=BleakError,
         ),
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
     ):
@@ -251,7 +251,7 @@ async def test_setup_and_stop_broken_bluetooth(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_setup_and_stop_broken_bluetooth_hanging(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we fail gracefully when bluetooth/dbus is hanging."""
     mock_bt = []
@@ -266,7 +266,7 @@ async def test_setup_and_stop_broken_bluetooth_hanging(
             side_effect=_mock_hang,
         ),
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
     ):
@@ -281,7 +281,7 @@ async def test_setup_and_stop_broken_bluetooth_hanging(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_setup_and_retry_adapter_not_yet_available(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we retry if the adapter is not yet available."""
     mock_bt = []
@@ -291,7 +291,7 @@ async def test_setup_and_retry_adapter_not_yet_available(
             side_effect=BleakError,
         ),
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
     ):
@@ -321,7 +321,7 @@ async def test_setup_and_retry_adapter_not_yet_available(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_no_race_during_manual_reload_in_retry_state(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can successfully reload when the entry is in a retry state."""
     mock_bt = []
@@ -331,7 +331,7 @@ async def test_no_race_during_manual_reload_in_retry_state(
             side_effect=BleakError,
         ),
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
     ):
@@ -362,7 +362,7 @@ async def test_no_race_during_manual_reload_in_retry_state(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_calling_async_discovered_devices_no_bluetooth(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we fail gracefully when asking for discovered devices and there is no blueooth."""
     mock_bt = []
@@ -372,7 +372,7 @@ async def test_calling_async_discovered_devices_no_bluetooth(
             side_effect=FileNotFoundError,
         ),
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
     ):
@@ -389,7 +389,7 @@ async def test_calling_async_discovered_devices_no_bluetooth(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_discovery_match_by_service_uuid(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery match by service_uuid."""
     mock_bt = [
@@ -397,7 +397,7 @@ async def test_discovery_match_by_service_uuid(
     ]
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
@@ -444,7 +444,7 @@ async def test_discovery_match_by_service_uuid(
 @pytest.mark.usefixtures("mock_bluetooth_adapters")
 async def test_discovery_match_by_service_uuid_and_short_local_name(
     mock_async_get_bluetooth: AsyncMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bleak_scanner_start: MagicMock,
 ) -> None:
     """Test bluetooth discovery match by service_uuid and short local name."""
@@ -487,7 +487,7 @@ def _domains_from_mock_config_flow(mock_config_flow: Mock) -> list[str]:
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_discovery_match_by_service_uuid_connectable(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery match by service_uuid and the ble device is connectable."""
     mock_bt = [
@@ -499,7 +499,7 @@ async def test_discovery_match_by_service_uuid_connectable(
     ]
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
@@ -539,7 +539,7 @@ async def test_discovery_match_by_service_uuid_connectable(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_discovery_match_by_service_uuid_not_connectable(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery match by service_uuid and the ble device is not connectable."""
     mock_bt = [
@@ -551,7 +551,7 @@ async def test_discovery_match_by_service_uuid_not_connectable(
     ]
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
@@ -589,7 +589,7 @@ async def test_discovery_match_by_service_uuid_not_connectable(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_discovery_match_by_name_connectable_false(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery match by name and the integration will take non-connectable devices."""
     mock_bt = [
@@ -601,7 +601,7 @@ async def test_discovery_match_by_name_connectable_false(
     ]
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
@@ -668,12 +668,12 @@ async def test_discovery_match_by_name_connectable_false(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_discovery_match_by_local_name(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery match by local_name."""
     mock_bt = [{"domain": "switchbot", "local_name": "wohand"}]
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -707,7 +707,7 @@ async def test_discovery_match_by_local_name(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_discovery_match_by_manufacturer_id_and_manufacturer_data_start(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery match by manufacturer_id and manufacturer_data_start."""
     mock_bt = [
@@ -718,7 +718,7 @@ async def test_discovery_match_by_manufacturer_id_and_manufacturer_data_start(
         }
     ]
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -784,7 +784,7 @@ async def test_discovery_match_by_manufacturer_id_and_manufacturer_data_start(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_discovery_match_by_service_data_uuid_then_others(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery match by service_data_uuid and then other fields."""
     mock_bt = [
@@ -802,7 +802,7 @@ async def test_discovery_match_by_service_data_uuid_then_others(
         },
     ]
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -939,7 +939,7 @@ async def test_discovery_match_by_service_data_uuid_then_others(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_discovery_match_by_service_data_uuid_when_format_changes(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery match by service_data_uuid when format changes."""
     mock_bt = [
@@ -953,7 +953,7 @@ async def test_discovery_match_by_service_data_uuid_when_format_changes(
         },
     ]
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1023,7 +1023,7 @@ async def test_discovery_match_by_service_data_uuid_when_format_changes(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_discovery_match_by_service_data_uuid_bthome(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery match by service_data_uuid for bthome."""
     mock_bt = [
@@ -1033,7 +1033,7 @@ async def test_discovery_match_by_service_data_uuid_bthome(
         },
     ]
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1066,7 +1066,7 @@ async def test_discovery_match_by_service_data_uuid_bthome(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_discovery_match_first_by_service_uuid_and_then_manufacturer_id(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery matches twice for service_uuid and then manufacturer_id."""
     mock_bt = [
@@ -1080,7 +1080,7 @@ async def test_discovery_match_first_by_service_uuid_and_then_manufacturer_id(
         },
     ]
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1131,7 +1131,7 @@ async def test_discovery_match_first_by_service_uuid_and_then_manufacturer_id(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_rediscovery(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test bluetooth discovery can be re-enabled for a given domain."""
     mock_bt = [
@@ -1139,7 +1139,7 @@ async def test_rediscovery(
     ]
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_config_flow,
@@ -1179,14 +1179,14 @@ async def test_rediscovery(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_async_discovered_device_api(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test the async_discovered_device API."""
     mock_bt = []
     set_manager(None)
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
         patch(
@@ -1286,7 +1286,7 @@ async def test_async_discovered_device_api(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callbacks(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback."""
     mock_bt = []
@@ -1301,7 +1301,7 @@ async def test_register_callbacks(
 
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
         patch.object(hass.config_entries.flow, "async_init"),
@@ -1368,7 +1368,7 @@ async def test_register_callbacks(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callbacks_raises_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bleak_scanner_start: MagicMock,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -1386,7 +1386,7 @@ async def test_register_callbacks_raises_exception(
 
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
         patch.object(hass.config_entries.flow, "async_init"),
@@ -1433,7 +1433,7 @@ async def test_register_callbacks_raises_exception(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_address(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by address."""
     mock_bt = []
@@ -1448,7 +1448,7 @@ async def test_register_callback_by_address(
             raise ValueError
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1525,7 +1525,7 @@ async def test_register_callback_by_address(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_address_connectable_only(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by address connectable only."""
     mock_bt = []
@@ -1545,7 +1545,7 @@ async def test_register_callback_by_address_connectable_only(
         non_connectable_callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1605,7 +1605,7 @@ async def test_register_callback_by_address_connectable_only(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_manufacturer_id(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by manufacturer_id."""
     mock_bt = []
@@ -1618,7 +1618,7 @@ async def test_register_callback_by_manufacturer_id(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1661,7 +1661,7 @@ async def test_register_callback_by_manufacturer_id(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_connectable(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by connectable."""
     mock_bt = []
@@ -1674,7 +1674,7 @@ async def test_register_callback_by_connectable(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1717,7 +1717,7 @@ async def test_register_callback_by_connectable(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_not_filtering_wanted_apple_devices(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test filtering noisy apple devices."""
     mock_bt = []
@@ -1730,7 +1730,7 @@ async def test_not_filtering_wanted_apple_devices(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1778,7 +1778,7 @@ async def test_not_filtering_wanted_apple_devices(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_filtering_noisy_apple_devices(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test filtering noisy apple devices."""
     mock_bt = []
@@ -1791,7 +1791,7 @@ async def test_filtering_noisy_apple_devices(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1829,7 +1829,7 @@ async def test_filtering_noisy_apple_devices(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_address_connectable_manufacturer_id(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by address, manufacturer_id, and connectable."""
     mock_bt = []
@@ -1842,7 +1842,7 @@ async def test_register_callback_by_address_connectable_manufacturer_id(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1884,7 +1884,7 @@ async def test_register_callback_by_address_connectable_manufacturer_id(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_manufacturer_id_and_address(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by manufacturer_id and address."""
     mock_bt = []
@@ -1897,7 +1897,7 @@ async def test_register_callback_by_manufacturer_id_and_address(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -1950,7 +1950,7 @@ async def test_register_callback_by_manufacturer_id_and_address(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_service_uuid_and_address(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by service_uuid and address."""
     mock_bt = []
@@ -1963,7 +1963,7 @@ async def test_register_callback_by_service_uuid_and_address(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2024,7 +2024,7 @@ async def test_register_callback_by_service_uuid_and_address(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_service_data_uuid_and_address(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by service_data_uuid and address."""
     mock_bt = []
@@ -2037,7 +2037,7 @@ async def test_register_callback_by_service_data_uuid_and_address(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2098,7 +2098,7 @@ async def test_register_callback_by_service_data_uuid_and_address(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_local_name(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by local_name."""
     mock_bt = []
@@ -2111,7 +2111,7 @@ async def test_register_callback_by_local_name(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2162,7 +2162,7 @@ async def test_register_callback_by_local_name(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_local_name_overly_broad(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by local_name that is too broad."""
     mock_bt = []
@@ -2173,7 +2173,7 @@ async def test_register_callback_by_local_name_overly_broad(
         """Fake subscriber for the BleakScanner."""
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2188,7 +2188,7 @@ async def test_register_callback_by_local_name_overly_broad(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_by_service_data_uuid(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by service_data_uuid."""
     mock_bt = []
@@ -2201,7 +2201,7 @@ async def test_register_callback_by_service_data_uuid(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2244,7 +2244,7 @@ async def test_register_callback_by_service_data_uuid(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_register_callback_survives_reload(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test registering a callback by address survives bluetooth being reloaded."""
     mock_bt = []
@@ -2257,7 +2257,7 @@ async def test_register_callback_survives_reload(
         callbacks.append((service_info, change))
 
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=mock_bt
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=mock_bt
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2308,7 +2308,7 @@ async def test_register_callback_survives_reload(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_process_advertisements_bail_on_good_advertisement(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test as soon as we see a 'good' advertisement we return it."""
     done = asyncio.Future()
@@ -2348,7 +2348,7 @@ async def test_process_advertisements_bail_on_good_advertisement(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_process_advertisements_ignore_bad_advertisement(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Check that we ignore bad advertisements."""
     done = asyncio.Event()
@@ -2403,7 +2403,7 @@ async def test_process_advertisements_ignore_bad_advertisement(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_process_advertisements_timeout(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test we timeout if no advertisements at all."""
 
@@ -2418,11 +2418,11 @@ async def test_process_advertisements_timeout(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_wrapped_instance_with_filter(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test consumers can use the wrapped instance with a filter as if it was normal BleakScanner."""
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=[]
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=[]
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2491,11 +2491,11 @@ async def test_wrapped_instance_with_filter(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_wrapped_instance_with_service_uuids(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test consumers can use the wrapped instance with a service_uuids list as if it was normal BleakScanner."""
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=[]
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=[]
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2548,14 +2548,14 @@ async def test_wrapped_instance_with_service_uuids(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_wrapped_instance_with_service_uuids_with_coro_callback(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test consumers can use the wrapped instance with a service_uuids list as if it was normal BleakScanner.
 
     Verify that coro callbacks are supported.
     """
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=[]
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=[]
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2608,12 +2608,12 @@ async def test_wrapped_instance_with_service_uuids_with_coro_callback(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_wrapped_instance_with_broken_callbacks(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test broken callbacks do not cause the scanner to fail."""
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth", return_value=[]
+            "smarthub.components.bluetooth.async_get_bluetooth", return_value=[]
         ),
         patch.object(hass.config_entries.flow, "async_init"),
     ):
@@ -2656,11 +2656,11 @@ async def test_wrapped_instance_with_broken_callbacks(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_wrapped_instance_changes_uuids(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test consumers can use the wrapped instance can change the uuids later."""
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=[]
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=[]
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2712,11 +2712,11 @@ async def test_wrapped_instance_changes_uuids(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_wrapped_instance_changes_filters(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test consumers can use the wrapped instance can change the filter later."""
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=[]
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=[]
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2769,13 +2769,13 @@ async def test_wrapped_instance_changes_filters(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_wrapped_instance_unsupported_filter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bleak_scanner_start: MagicMock,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test we want when their filter is ineffective."""
     with patch(
-        "homeassistant.components.bluetooth.async_get_bluetooth", return_value=[]
+        "smarthub.components.bluetooth.async_get_bluetooth", return_value=[]
     ):
         await async_setup_with_default_adapter(hass)
 
@@ -2795,14 +2795,14 @@ async def test_wrapped_instance_unsupported_filter(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_async_ble_device_from_address(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test the async_ble_device_from_address api."""
     set_manager(None)
     mock_bt = []
     with (
         patch(
-            "homeassistant.components.bluetooth.async_get_bluetooth",
+            "smarthub.components.bluetooth.async_get_bluetooth",
             return_value=mock_bt,
         ),
         patch(
@@ -2853,7 +2853,7 @@ async def test_async_ble_device_from_address(
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_can_unsetup_bluetooth_single_adapter_macos(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test we can setup and unsetup bluetooth."""
     entry = MockConfigEntry(domain=bluetooth.DOMAIN, data={}, unique_id=DEFAULT_ADDRESS)
@@ -2869,7 +2869,7 @@ async def test_can_unsetup_bluetooth_single_adapter_macos(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_default_address_config_entries_removed_linux(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bleak_scanner_start: MagicMock,
 ) -> None:
     """Test default address entries are removed on linux."""
@@ -2882,7 +2882,7 @@ async def test_default_address_config_entries_removed_linux(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_can_unsetup_bluetooth_single_adapter_linux(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test we can setup and unsetup bluetooth."""
     entry = MockConfigEntry(
@@ -2900,7 +2900,7 @@ async def test_can_unsetup_bluetooth_single_adapter_linux(
 
 @pytest.mark.usefixtures("two_adapters")
 async def test_can_unsetup_bluetooth_multiple_adapters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bleak_scanner_start: MagicMock,
 ) -> None:
     """Test we can setup and unsetup bluetooth with multiple adapters."""
@@ -2930,7 +2930,7 @@ async def test_can_unsetup_bluetooth_multiple_adapters(
 
 @pytest.mark.usefixtures("enable_bluetooth", "two_adapters")
 async def test_three_adapters_one_missing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bleak_scanner_start: MagicMock,
 ) -> None:
     """Test three adapters but one is missing results in a retry on setup."""
@@ -2944,7 +2944,7 @@ async def test_three_adapters_one_missing(
 
 
 @pytest.mark.usefixtures("one_adapter")
-async def test_auto_detect_bluetooth_adapters_linux(hass: HomeAssistant) -> None:
+async def test_auto_detect_bluetooth_adapters_linux(hass: SmartHub) -> None:
     """Test we auto detect bluetooth adapters on linux."""
     assert await async_setup_component(hass, bluetooth.DOMAIN, {})
     await hass.async_block_till_done()
@@ -2954,7 +2954,7 @@ async def test_auto_detect_bluetooth_adapters_linux(hass: HomeAssistant) -> None
 
 @pytest.mark.usefixtures("two_adapters")
 async def test_auto_detect_bluetooth_adapters_linux_multiple(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we auto detect bluetooth adapters on linux with multiple adapters."""
     assert await async_setup_component(hass, bluetooth.DOMAIN, {})
@@ -2964,7 +2964,7 @@ async def test_auto_detect_bluetooth_adapters_linux_multiple(
 
 
 async def test_auto_detect_bluetooth_adapters_skips_crashed(
-    hass: HomeAssistant, crashed_adapter: None
+    hass: SmartHub, crashed_adapter: None
 ) -> None:
     """Test we skip crashed adapters on linux."""
     assert await async_setup_component(hass, bluetooth.DOMAIN, {})
@@ -2974,7 +2974,7 @@ async def test_auto_detect_bluetooth_adapters_skips_crashed(
 
 
 async def test_auto_detect_bluetooth_adapters_linux_none_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we auto detect bluetooth adapters on linux with no adapters found."""
     with (
@@ -2991,7 +2991,7 @@ async def test_auto_detect_bluetooth_adapters_linux_none_found(
     assert len(hass.config_entries.flow.async_progress(bluetooth.DOMAIN)) == 0
 
 
-async def test_auto_detect_bluetooth_adapters_macos(hass: HomeAssistant) -> None:
+async def test_auto_detect_bluetooth_adapters_macos(hass: SmartHub) -> None:
     """Test we auto detect bluetooth adapters on macos."""
     with patch("bluetooth_adapters.systems.platform.system", return_value="Darwin"):
         assert await async_setup_component(hass, bluetooth.DOMAIN, {})
@@ -3000,7 +3000,7 @@ async def test_auto_detect_bluetooth_adapters_macos(hass: HomeAssistant) -> None
     assert len(hass.config_entries.flow.async_progress(bluetooth.DOMAIN)) == 1
 
 
-async def test_no_auto_detect_bluetooth_adapters_windows(hass: HomeAssistant) -> None:
+async def test_no_auto_detect_bluetooth_adapters_windows(hass: SmartHub) -> None:
     """Test we auto detect bluetooth adapters on windows."""
     with patch(
         "bluetooth_adapters.systems.platform.system",
@@ -3014,7 +3014,7 @@ async def test_no_auto_detect_bluetooth_adapters_windows(hass: HomeAssistant) ->
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_getting_the_scanner_returns_the_wrapped_instance(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test getting the scanner returns the wrapped instance."""
     scanner = bluetooth.async_get_scanner(hass)
@@ -3022,7 +3022,7 @@ async def test_getting_the_scanner_returns_the_wrapped_instance(
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_scanner_count_connectable(hass: HomeAssistant) -> None:
+async def test_scanner_count_connectable(hass: SmartHub) -> None:
     """Test getting the connectable scanner count."""
     scanner = FakeScanner("any", "any")
     cancel = bluetooth.async_register_scanner(hass, scanner)
@@ -3031,7 +3031,7 @@ async def test_scanner_count_connectable(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_scanner_remove(hass: HomeAssistant) -> None:
+async def test_scanner_remove(hass: SmartHub) -> None:
     """Test permanently removing a scanner."""
     scanner = FakeScanner("any", "any")
     cancel = bluetooth.async_register_scanner(hass, scanner)
@@ -3043,12 +3043,12 @@ async def test_scanner_remove(hass: HomeAssistant) -> None:
     )
     cancel()
     bluetooth.async_remove_scanner(hass, scanner.source)
-    manager: HomeAssistantBluetoothManager = _get_manager()
+    manager: SmartHubBluetoothManager = _get_manager()
     assert not manager.storage.async_get_advertisement_history(scanner.source)
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_scanner_count(hass: HomeAssistant) -> None:
+async def test_scanner_count(hass: SmartHub) -> None:
     """Test getting the connectable and non-connectable scanner count."""
     scanner = FakeScanner("any", "any")
     cancel = bluetooth.async_register_scanner(hass, scanner)
@@ -3058,7 +3058,7 @@ async def test_scanner_count(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("macos_adapter")
 async def test_migrate_single_entry_macos(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test we can migrate a single entry on MacOS."""
     entry = MockConfigEntry(domain=bluetooth.DOMAIN, data={})
@@ -3070,7 +3070,7 @@ async def test_migrate_single_entry_macos(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_migrate_single_entry_linux(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test we can migrate a single entry on Linux."""
     entry = MockConfigEntry(domain=bluetooth.DOMAIN, data={})
@@ -3082,7 +3082,7 @@ async def test_migrate_single_entry_linux(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_discover_new_usb_adapters(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test we can discover new usb adapters."""
     entry = MockConfigEntry(
@@ -3098,7 +3098,7 @@ async def test_discover_new_usb_adapters(
         return lambda: None
 
     with patch(
-        "homeassistant.components.bluetooth.usb.async_register_scan_request_callback",
+        "smarthub.components.bluetooth.usb.async_register_scan_request_callback",
         _async_register_scan_request_callback,
     ):
         assert await async_setup_component(hass, bluetooth.DOMAIN, {})
@@ -3119,14 +3119,14 @@ async def test_discover_new_usb_adapters(
                     "address": "00:00:00:00:00:01",
                     "hw_version": "usb:v1D6Bp0246d053F",
                     "passive_scan": False,
-                    "sw_version": "homeassistant",
+                    "sw_version": "smarthub",
                     "manufacturer": "ACME",
                 },
                 "hci1": {
                     "address": "00:00:00:00:00:02",
                     "hw_version": "usb:v1D6Bp0246d053F",
                     "passive_scan": False,
-                    "sw_version": "homeassistant",
+                    "sw_version": "smarthub",
                     "manufacturer": "ACME",
                 },
             },
@@ -3143,7 +3143,7 @@ async def test_discover_new_usb_adapters(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_discover_new_usb_adapters_with_firmware_fallback_delay(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test we can discover new usb adapters with a firmware fallback delay."""
     entry = MockConfigEntry(
@@ -3159,7 +3159,7 @@ async def test_discover_new_usb_adapters_with_firmware_fallback_delay(
         return lambda: None
 
     with patch(
-        "homeassistant.components.bluetooth.usb.async_register_scan_request_callback",
+        "smarthub.components.bluetooth.usb.async_register_scan_request_callback",
         _async_register_scan_request_callback,
     ):
         assert await async_setup_component(hass, bluetooth.DOMAIN, {})
@@ -3195,14 +3195,14 @@ async def test_discover_new_usb_adapters_with_firmware_fallback_delay(
                     "address": "00:00:00:00:00:01",
                     "hw_version": "usb:v1D6Bp0246d053F",
                     "passive_scan": False,
-                    "sw_version": "homeassistant",
+                    "sw_version": "smarthub",
                     "manufacturer": "ACME",
                 },
                 "hci1": {
                     "address": "00:00:00:00:00:02",
                     "hw_version": "usb:v1D6Bp0246d053F",
                     "passive_scan": False,
-                    "sw_version": "homeassistant",
+                    "sw_version": "smarthub",
                     "manufacturer": "ACME",
                 },
             },
@@ -3223,7 +3223,7 @@ async def test_discover_new_usb_adapters_with_firmware_fallback_delay(
 
 @pytest.mark.usefixtures("no_adapters")
 async def test_issue_outdated_haos_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bleak_scanner_start: MagicMock,
     operating_system_85: None,
     issue_registry: ir.IssueRegistry,
@@ -3240,7 +3240,7 @@ async def test_issue_outdated_haos_removed(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_haos_9_or_later(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bleak_scanner_start: MagicMock,
     operating_system_90: None,
     issue_registry: ir.IssueRegistry,
@@ -3260,7 +3260,7 @@ async def test_haos_9_or_later(
 
 @pytest.mark.usefixtures("one_adapter")
 async def test_title_updated_if_mac_address(
-    hass: HomeAssistant, mock_bleak_scanner_start: MagicMock
+    hass: SmartHub, mock_bleak_scanner_start: MagicMock
 ) -> None:
     """Test the title is updated if it is the mac address."""
     entry = MockConfigEntry(
@@ -3274,7 +3274,7 @@ async def test_title_updated_if_mac_address(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_cleanup_orphened_remote_scanner_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the remote scanner config entries get cleaned up when orphened."""
     connector = (
@@ -3304,7 +3304,7 @@ async def test_cleanup_orphened_remote_scanner_config_entry(
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_fix_incorrect_mac_remote_scanner_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the remote scanner config entries can replace a incorrect mac."""
     source_entry = MockConfigEntry(domain="test")

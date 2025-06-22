@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pybalboa.enums import HeatMode, LowHighRange
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import init_integration
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 @pytest.fixture(name="integration")
-async def integration_fixture(hass: HomeAssistant) -> MockConfigEntry:
+async def integration_fixture(hass: SmartHub) -> MockConfigEntry:
     """Set up the balboa integration."""
     return await init_integration(hass)
 
@@ -26,7 +26,7 @@ async def integration_fixture(hass: HomeAssistant) -> MockConfigEntry:
 def client_fixture() -> Generator[MagicMock]:
     """Mock balboa spa client."""
     with patch(
-        "homeassistant.components.balboa.SpaClient", autospec=True
+        "smarthub.components.balboa.SpaClient", autospec=True
     ) as mock_balboa:
         client = mock_balboa.return_value
         callback: list[Callable] = []

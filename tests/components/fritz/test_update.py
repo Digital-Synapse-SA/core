@@ -5,10 +5,10 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fritz.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.fritz.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .const import (
     MOCK_FB_SERVICES,
@@ -31,7 +31,7 @@ AVAILABLE_UPDATE = {
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_update_entities_initialized(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     fc_class_mock,
     fh_class_mock,
@@ -42,7 +42,7 @@ async def test_update_entities_initialized(
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
     entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.fritz.PLATFORMS", [Platform.UPDATE]):
+    with patch("smarthub.components.fritz.PLATFORMS", [Platform.UPDATE]):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
@@ -51,7 +51,7 @@ async def test_update_entities_initialized(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_update_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     fc_class_mock,
     fh_class_mock,
@@ -64,7 +64,7 @@ async def test_update_available(
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
     entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.fritz.PLATFORMS", [Platform.UPDATE]):
+    with patch("smarthub.components.fritz.PLATFORMS", [Platform.UPDATE]):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
@@ -73,7 +73,7 @@ async def test_update_available(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_available_update_can_be_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     fc_class_mock,
     fh_class_mock,
@@ -85,10 +85,10 @@ async def test_available_update_can_be_installed(
 
     with (
         patch(
-            "homeassistant.components.fritz.coordinator.FritzBoxTools.async_trigger_firmware_update",
+            "smarthub.components.fritz.coordinator.FritzBoxTools.async_trigger_firmware_update",
             return_value=True,
         ) as mocked_update_call,
-        patch("homeassistant.components.fritz.PLATFORMS", [Platform.UPDATE]),
+        patch("smarthub.components.fritz.PLATFORMS", [Platform.UPDATE]),
     ):
         entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
         entry.add_to_hass(hass)

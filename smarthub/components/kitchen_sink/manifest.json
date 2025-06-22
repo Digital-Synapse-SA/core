@@ -1,0 +1,10 @@
+{
+  "domain": "kitchen_sink",
+  "name": "Everything but the Kitchen Sink",
+  "after_dependencies": ["recorder"],
+  "codeowners": ["@smart-hub/core"],
+  "documentation": "https://www.smart-hub.io/integrations/kitchen_sink",
+  "iot_class": "calculated",
+  "quality_scale": "internal",
+  "single_config_entry": true
+}

@@ -5,15 +5,15 @@ from unittest.mock import patch
 
 from total_connect_client import ArmingState, ResultCode, ZoneStatus, ZoneType
 
-from homeassistant.components.totalconnect.const import (
+from smarthub.components.totalconnect.const import (
     AUTO_BYPASS,
     CODE_REQUIRED,
     CONF_USERCODES,
     DOMAIN,
 )
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -395,18 +395,18 @@ RESPONSE_GET_ZONE_DETAILS_SUCCESS = {
 }
 
 TOTALCONNECT_REQUEST = (
-    "homeassistant.components.totalconnect.TotalConnectClient.request"
+    "smarthub.components.totalconnect.TotalConnectClient.request"
 )
 TOTALCONNECT_GET_CONFIG = (
-    "homeassistant.components.totalconnect.TotalConnectClient._get_configuration"
+    "smarthub.components.totalconnect.TotalConnectClient._get_configuration"
 )
 TOTALCONNECT_REQUEST_TOKEN = (
-    "homeassistant.components.totalconnect.TotalConnectClient._request_token"
+    "smarthub.components.totalconnect.TotalConnectClient._request_token"
 )
 
 
 async def setup_platform(
-    hass: HomeAssistant, platform: Any, code_required: bool = False
+    hass: SmartHub, platform: Any, code_required: bool = False
 ) -> MockConfigEntry:
     """Set up the TotalConnect platform."""
     # first set up a config entry and add it to hass
@@ -429,7 +429,7 @@ async def setup_platform(
     ]
 
     with (
-        patch("homeassistant.components.totalconnect.PLATFORMS", [platform]),
+        patch("smarthub.components.totalconnect.PLATFORMS", [platform]),
         patch(
             TOTALCONNECT_REQUEST,
             side_effect=responses,
@@ -444,7 +444,7 @@ async def setup_platform(
     return mock_entry
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
     """Set up the TotalConnect integration."""
     # first set up a config entry and add it to hass
     mock_entry = MockConfigEntry(domain=DOMAIN, data=CONFIG_DATA, options=OPTIONS_DATA)

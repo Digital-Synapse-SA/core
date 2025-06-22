@@ -2,16 +2,16 @@
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .helper import HomeFactory, get_and_check_entity_basics
 
 
 async def test_hmip_garage_door_controller_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     default_mock_hap_factory: HomeFactory,
 ) -> None:

@@ -4,7 +4,7 @@ All containing methods are legacy helpers that should not be used by new
 components. Instead call the service directly.
 """
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_DIRECTION,
     ATTR_OSCILLATING,
     ATTR_PERCENTAGE,
@@ -19,19 +19,19 @@ from homeassistant.components.fan import (
     SERVICE_SET_PRESET_MODE,
     FanEntity,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ENTITY_MATCH_ALL,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockEntity
 
 
 async def async_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id=ENTITY_MATCH_ALL,
     percentage: int | None = None,
     preset_mode: str | None = None,
@@ -51,7 +51,7 @@ async def async_turn_on(
     await hass.async_block_till_done()
 
 
-async def async_turn_off(hass: HomeAssistant, entity_id=ENTITY_MATCH_ALL) -> None:
+async def async_turn_off(hass: SmartHub, entity_id=ENTITY_MATCH_ALL) -> None:
     """Turn all or specified fan off."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
 
@@ -60,7 +60,7 @@ async def async_turn_off(hass: HomeAssistant, entity_id=ENTITY_MATCH_ALL) -> Non
 
 
 async def async_oscillate(
-    hass: HomeAssistant, entity_id=ENTITY_MATCH_ALL, should_oscillate: bool = True
+    hass: SmartHub, entity_id=ENTITY_MATCH_ALL, should_oscillate: bool = True
 ) -> None:
     """Set oscillation on all or specified fan."""
     data = {
@@ -77,7 +77,7 @@ async def async_oscillate(
 
 
 async def async_set_preset_mode(
-    hass: HomeAssistant, entity_id=ENTITY_MATCH_ALL, preset_mode: str | None = None
+    hass: SmartHub, entity_id=ENTITY_MATCH_ALL, preset_mode: str | None = None
 ) -> None:
     """Set preset mode for all or specified fan."""
     data = {
@@ -91,7 +91,7 @@ async def async_set_preset_mode(
 
 
 async def async_set_percentage(
-    hass: HomeAssistant, entity_id=ENTITY_MATCH_ALL, percentage: int | None = None
+    hass: SmartHub, entity_id=ENTITY_MATCH_ALL, percentage: int | None = None
 ) -> None:
     """Set percentage for all or specified fan."""
     data = {
@@ -105,7 +105,7 @@ async def async_set_percentage(
 
 
 async def async_increase_speed(
-    hass: HomeAssistant, entity_id=ENTITY_MATCH_ALL, percentage_step: int | None = None
+    hass: SmartHub, entity_id=ENTITY_MATCH_ALL, percentage_step: int | None = None
 ) -> None:
     """Increase speed for all or specified fan."""
     data = {
@@ -122,7 +122,7 @@ async def async_increase_speed(
 
 
 async def async_decrease_speed(
-    hass: HomeAssistant, entity_id=ENTITY_MATCH_ALL, percentage_step: int | None = None
+    hass: SmartHub, entity_id=ENTITY_MATCH_ALL, percentage_step: int | None = None
 ) -> None:
     """Decrease speed for all or specified fan."""
     data = {
@@ -139,7 +139,7 @@ async def async_decrease_speed(
 
 
 async def async_set_direction(
-    hass: HomeAssistant, entity_id=ENTITY_MATCH_ALL, direction: str | None = None
+    hass: SmartHub, entity_id=ENTITY_MATCH_ALL, direction: str | None = None
 ) -> None:
     """Set direction for all or specified fan."""
     data = {

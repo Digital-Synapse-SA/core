@@ -2,8 +2,8 @@
 
 import pytest
 
-from homeassistant.components.pglab.const import DISCOVERY_TOPIC, DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.pglab.const import DISCOVERY_TOPIC, DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, mock_device_registry, mock_registry
 
@@ -11,19 +11,19 @@ CONF_DISCOVERY_PREFIX = "discovery_prefix"
 
 
 @pytest.fixture
-def device_reg(hass: HomeAssistant):
+def device_reg(hass: SmartHub):
     """Return an empty, loaded, registry."""
     return mock_device_registry(hass)
 
 
 @pytest.fixture
-def entity_reg(hass: HomeAssistant):
+def entity_reg(hass: SmartHub):
     """Return an empty, loaded, registry."""
     return mock_registry(hass)
 
 
 @pytest.fixture
-async def setup_pglab(hass: HomeAssistant):
+async def setup_pglab(hass: SmartHub):
     """Set up PG LAB Electronics."""
     hass.config.components.add("pglab")
 

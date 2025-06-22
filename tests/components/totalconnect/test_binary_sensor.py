@@ -4,13 +4,13 @@ from unittest.mock import patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import (
+from smarthub.components.binary_sensor import (
     DOMAIN as BINARY_SENSOR,
     BinarySensorDeviceClass,
 )
-from homeassistant.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import RESPONSE_DISARMED, ZONE_NORMAL, setup_platform
 
@@ -25,7 +25,7 @@ PANEL_POWER_ID = "binary_sensor.test_power"
 
 
 async def test_entity_registry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, entity_registry: er.EntityRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test the binary sensor is registered in entity registry."""
     entry = await setup_platform(hass, BINARY_SENSOR)
@@ -33,11 +33,11 @@ async def test_entity_registry(
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_state_and_attributes(hass: HomeAssistant) -> None:
+async def test_state_and_attributes(hass: SmartHub) -> None:
     """Test the binary sensor attributes are correct."""
 
     with patch(
-        "homeassistant.components.totalconnect.TotalConnectClient.request",
+        "smarthub.components.totalconnect.TotalConnectClient.request",
         return_value=RESPONSE_DISARMED,
     ):
         await setup_platform(hass, BINARY_SENSOR)

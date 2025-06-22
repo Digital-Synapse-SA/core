@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.buienradar.const import DOMAIN
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.buienradar.const import DOMAIN
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -16,7 +16,7 @@ TEST_LONGITUDE = 5.4002156
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_config_flow_setup_(hass: HomeAssistant) -> None:
+async def test_config_flow_setup_(hass: SmartHub) -> None:
     """Test setup of camera."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -39,7 +39,7 @@ async def test_config_flow_setup_(hass: HomeAssistant) -> None:
     }
 
 
-async def test_config_flow_already_configured_weather(hass: HomeAssistant) -> None:
+async def test_config_flow_already_configured_weather(hass: SmartHub) -> None:
     """Test already configured."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -68,7 +68,7 @@ async def test_config_flow_already_configured_weather(hass: HomeAssistant) -> No
     assert result["reason"] == "already_configured"
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test options flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,

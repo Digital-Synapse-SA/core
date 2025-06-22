@@ -2,15 +2,15 @@
 
 from unittest.mock import Mock
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
 
 from . import MockSchlageConfigEntry
 
 
 async def test_beeper_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lock: Mock,
     mock_added_config_entry: MockSchlageConfigEntry,
 ) -> None:
@@ -38,7 +38,7 @@ async def test_beeper_services(
 
 
 async def test_lock_and_leave_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lock: Mock,
     mock_added_config_entry: MockSchlageConfigEntry,
 ) -> None:

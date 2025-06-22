@@ -7,8 +7,8 @@ from pysmartthings.models import HealthStatus
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.smartthings import MAIN
-from homeassistant.components.water_heater import (
+from smarthub.components.smartthings import MAIN
+from smarthub.components.water_heater import (
     ATTR_AWAY_MODE,
     ATTR_CURRENT_TEMPERATURE,
     ATTR_OPERATION_LIST,
@@ -25,7 +25,7 @@ from homeassistant.components.water_heater import (
     STATE_PERFORMANCE,
     WaterHeaterEntityFeature,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     ATTR_TEMPERATURE,
@@ -36,8 +36,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import (
     setup_integration,
@@ -50,7 +50,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -75,7 +75,7 @@ async def test_all_entities(
     ],
 )
 async def test_set_operation_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     operation_mode: str,
@@ -104,7 +104,7 @@ async def test_set_operation_mode(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_set_operation_mode_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -130,7 +130,7 @@ async def test_set_operation_mode_off(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000001_sub"])
 async def test_set_operation_mode_from_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -167,7 +167,7 @@ async def test_set_operation_mode_from_off(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_set_operation_to_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -200,7 +200,7 @@ async def test_set_operation_to_off(
     ],
 )
 async def test_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     service: str,
@@ -227,7 +227,7 @@ async def test_turn_on_off(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -261,7 +261,7 @@ async def test_set_temperature(
     ],
 )
 async def test_away_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     on: bool,
@@ -290,7 +290,7 @@ async def test_away_mode(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_operation_list_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -328,7 +328,7 @@ async def test_operation_list_update(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_current_operation_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -351,7 +351,7 @@ async def test_current_operation_update(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_switch_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -389,7 +389,7 @@ async def test_switch_update(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_current_temperature_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -418,7 +418,7 @@ async def test_current_temperature_update(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_target_temperature_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -452,7 +452,7 @@ async def test_target_temperature_update(
     ],
 )
 async def test_target_temperature_bound_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     attribute: Attribute,
@@ -483,7 +483,7 @@ async def test_target_temperature_bound_update(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_away_mode_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -512,7 +512,7 @@ async def test_away_mode_update(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -536,7 +536,7 @@ async def test_availability(
 
 @pytest.mark.parametrize("device_fixture", ["da_sac_ehs_000002_sub"])
 async def test_availability_at_start(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unavailable_device: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

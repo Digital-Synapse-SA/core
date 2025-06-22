@@ -8,10 +8,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 import voluptuous as vol
 
-from homeassistant import config_entries
-from homeassistant.components.time_date.const import CONF_DISPLAY_OPTIONS, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.time_date.const import CONF_DISPLAY_OPTIONS, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.typing import WebSocketGenerator
@@ -19,7 +19,7 @@ from tests.typing import WebSocketGenerator
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the forms."""
 
     result = await hass.config_entries.flow.async_init(
@@ -38,7 +38,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
 
 
 async def test_user_flow_does_not_allow_beat(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the forms."""
 
@@ -54,7 +54,7 @@ async def test_user_flow_does_not_allow_beat(
         )
 
 
-async def test_single_instance(hass: HomeAssistant) -> None:
+async def test_single_instance(hass: SmartHub) -> None:
     """Test we get the forms."""
 
     entry = MockConfigEntry(
@@ -75,7 +75,7 @@ async def test_single_instance(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_timezone_not_set(hass: HomeAssistant) -> None:
+async def test_timezone_not_set(hass: SmartHub) -> None:
     """Test time zone not set."""
     hass.config.time_zone = None
 
@@ -93,7 +93,7 @@ async def test_timezone_not_set(hass: HomeAssistant) -> None:
 
 
 async def test_config_flow_preview(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
 ) -> None:

@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.sonos.const import DATA_SONOS_DISCOVERY_MANAGER
-from homeassistant.components.sonos.switch import (
+from smarthub.components.sonos.const import DATA_SONOS_DISCOVERY_MANAGER
+from smarthub.components.sonos.switch import (
     ATTR_DURATION,
     ATTR_ID,
     ATTR_INCLUDE_LINKED_ZONES,
@@ -15,9 +15,9 @@ from homeassistant.components.sonos.switch import (
     ATTR_RECURRENCE,
     ATTR_VOLUME,
 )
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TIME,
     SERVICE_TURN_OFF,
@@ -25,9 +25,9 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .conftest import MockSoCo, SonosMockEvent
 
@@ -35,7 +35,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_entity_registry(
-    hass: HomeAssistant, async_autosetup_sonos, entity_registry: er.EntityRegistry
+    hass: SmartHub, async_autosetup_sonos, entity_registry: er.EntityRegistry
 ) -> None:
     """Test sonos device with alarm registered in the device registry."""
     assert "media_player.zone_a" in entity_registry.entities
@@ -50,7 +50,7 @@ async def test_entity_registry(
 
 
 async def test_switch_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_autosetup_sonos,
     soco,
     fire_zgs_event,
@@ -150,7 +150,7 @@ async def test_switch_attributes(
     ],
 )
 async def test_switch_alarm_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_sonos,
     soco: MockSoCo,
     service: str,
@@ -170,7 +170,7 @@ async def test_switch_alarm_turn_on(
 
 
 async def test_alarm_create_delete(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_sonos,
     soco,
     alarm_clock,

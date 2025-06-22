@@ -6,16 +6,16 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     DOMAIN as FAN_DOMAIN,
     SERVICE_SET_PERCENTAGE,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ConfigEntryFactoryType, WebsocketDataType
 
@@ -46,7 +46,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
     ],
 )
 async def test_fans(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     aioclient_mock: AiohttpClientMocker,
@@ -55,7 +55,7 @@ async def test_fans(
     light_ws_data: WebsocketDataType,
 ) -> None:
     """Test that all supported fan entities are created."""
-    with patch("homeassistant.components.deconz.PLATFORMS", [Platform.FAN]):
+    with patch("smarthub.components.deconz.PLATFORMS", [Platform.FAN]):
         config_entry = await config_entry_factory()
 
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)

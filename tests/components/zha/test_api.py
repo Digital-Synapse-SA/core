@@ -10,9 +10,9 @@ from zha.application.const import RadioType
 import zigpy.backups
 import zigpy.state
 
-from homeassistant.components.zha import api
-from homeassistant.components.zha.helpers import get_zha_gateway_proxy
-from homeassistant.core import HomeAssistant
+from smarthub.components.zha import api
+from smarthub.components.zha.helpers import get_zha_gateway_proxy
+from smarthub.core import SmartHub
 
 if TYPE_CHECKING:
     from zigpy.application import ControllerApplication
@@ -21,12 +21,12 @@ if TYPE_CHECKING:
 @pytest.fixture(autouse=True)
 def required_platform_only():
     """Only set up the required and required base platforms to speed up tests."""
-    with patch("homeassistant.components.zha.PLATFORMS", ()):
+    with patch("smarthub.components.zha.PLATFORMS", ()):
         yield
 
 
 async def test_async_get_network_settings_active(
-    hass: HomeAssistant, setup_zha
+    hass: SmartHub, setup_zha
 ) -> None:
     """Test reading settings with an active ZHA installation."""
     await setup_zha()
@@ -36,7 +36,7 @@ async def test_async_get_network_settings_active(
 
 
 async def test_async_get_network_settings_inactive(
-    hass: HomeAssistant, setup_zha, zigpy_app_controller: ControllerApplication
+    hass: SmartHub, setup_zha, zigpy_app_controller: ControllerApplication
 ) -> None:
     """Test reading settings with an inactive ZHA installation."""
     await setup_zha()
@@ -53,7 +53,7 @@ async def test_async_get_network_settings_inactive(
     controller.new = AsyncMock(return_value=zigpy_app_controller)
 
     with patch.dict(
-        "homeassistant.components.zha.api.RadioType._member_map_",
+        "smarthub.components.zha.api.RadioType._member_map_",
         ezsp=MagicMock(controller=controller, description="EZSP"),
     ):
         settings = await api.async_get_network_settings(hass)
@@ -63,7 +63,7 @@ async def test_async_get_network_settings_inactive(
 
 
 async def test_async_get_network_settings_missing(
-    hass: HomeAssistant, setup_zha, zigpy_app_controller: ControllerApplication
+    hass: SmartHub, setup_zha, zigpy_app_controller: ControllerApplication
 ) -> None:
     """Test reading settings with an inactive ZHA installation, no valid channel."""
     await setup_zha()
@@ -80,13 +80,13 @@ async def test_async_get_network_settings_missing(
     assert settings is None
 
 
-async def test_async_get_network_settings_failure(hass: HomeAssistant) -> None:
+async def test_async_get_network_settings_failure(hass: SmartHub) -> None:
     """Test reading settings with no ZHA config entries and no database."""
     with pytest.raises(ValueError):
         await api.async_get_network_settings(hass)
 
 
-async def test_async_get_radio_type_active(hass: HomeAssistant, setup_zha) -> None:
+async def test_async_get_radio_type_active(hass: SmartHub, setup_zha) -> None:
     """Test reading the radio type with an active ZHA installation."""
     await setup_zha()
 
@@ -94,7 +94,7 @@ async def test_async_get_radio_type_active(hass: HomeAssistant, setup_zha) -> No
     assert radio_type == RadioType.ezsp
 
 
-async def test_async_get_radio_path_active(hass: HomeAssistant, setup_zha) -> None:
+async def test_async_get_radio_path_active(hass: SmartHub, setup_zha) -> None:
     """Test reading the radio path with an active ZHA installation."""
     await setup_zha()
 
@@ -103,7 +103,7 @@ async def test_async_get_radio_path_active(hass: HomeAssistant, setup_zha) -> No
 
 
 async def test_change_channel(
-    hass: HomeAssistant, setup_zha, zigpy_app_controller: ControllerApplication
+    hass: SmartHub, setup_zha, zigpy_app_controller: ControllerApplication
 ) -> None:
     """Test changing the channel."""
     await setup_zha()
@@ -113,7 +113,7 @@ async def test_change_channel(
 
 
 async def test_change_channel_auto(
-    hass: HomeAssistant, setup_zha, zigpy_app_controller: ControllerApplication
+    hass: SmartHub, setup_zha, zigpy_app_controller: ControllerApplication
 ) -> None:
     """Test changing the channel automatically using an energy scan."""
     await setup_zha()

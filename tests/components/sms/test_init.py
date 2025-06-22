@@ -2,10 +2,10 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_DEVICE
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import issue_registry as ir
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_DEVICE
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import issue_registry as ir
 
 from tests.common import MockConfigEntry
 
@@ -18,18 +18,18 @@ from tests.common import MockConfigEntry
     },
 )
 async def test_repair_issue_is_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test repair issue is created."""
-    from homeassistant.components.sms import (  # noqa: PLC0415
+    from smarthub.components.sms import (  # noqa: PLC0415
         DEPRECATED_ISSUE_ID,
         DOMAIN,
     )
 
     with (
-        patch("homeassistant.components.sms.create_sms_gateway", autospec=True),
-        patch("homeassistant.components.sms.PLATFORMS", []),
+        patch("smarthub.components.sms.create_sms_gateway", autospec=True),
+        patch("smarthub.components.sms.PLATFORMS", []),
     ):
         config_entry = MockConfigEntry(
             title="test",

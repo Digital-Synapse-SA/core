@@ -1,15 +1,15 @@
 """Pandora media player tests."""
 
-from homeassistant.components.media_player import DOMAIN as PLATFORM_DOMAIN
-from homeassistant.components.pandora import DOMAIN
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.media_player import DOMAIN as PLATFORM_DOMAIN
+from smarthub.components.pandora import DOMAIN
+from smarthub.const import CONF_PLATFORM
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 
 async def test_repair_issue_is_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test repair issue is created."""

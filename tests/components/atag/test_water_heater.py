@@ -2,14 +2,14 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.atag import DOMAIN
-from homeassistant.components.water_heater import (
+from smarthub.components.atag import DOMAIN
+from smarthub.components.water_heater import (
     DOMAIN as WATER_HEATER_DOMAIN,
     SERVICE_SET_TEMPERATURE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import UID, init_integration
 
@@ -19,7 +19,7 @@ WATER_HEATER_ID = f"{Platform.WATER_HEATER}.{DOMAIN}"
 
 
 async def test_water_heater(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -33,7 +33,7 @@ async def test_water_heater(
 
 
 async def test_setting_target_temperature(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setting the water heater device."""
     await init_integration(hass, aioclient_mock)

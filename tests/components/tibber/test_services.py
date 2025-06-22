@@ -6,10 +6,10 @@ from unittest.mock import MagicMock
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.tibber.const import DOMAIN
-from homeassistant.components.tibber.services import PRICE_SERVICE_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.components.tibber.const import DOMAIN
+from smarthub.components.tibber.services import PRICE_SERVICE_NAME
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 START_TIME = dt.datetime.fromtimestamp(1615766400).replace(tzinfo=dt.UTC)
 
@@ -69,7 +69,7 @@ def generate_mock_home_data():
 )
 async def test_get_prices(
     mock_tibber_setup: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     data,
 ) -> None:
@@ -114,7 +114,7 @@ async def test_get_prices(
 
 async def test_get_prices_start_tomorrow(
     mock_tibber_setup: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test get_prices with start date tomorrow."""
@@ -173,7 +173,7 @@ async def test_get_prices_start_tomorrow(
 )
 async def test_get_prices_with_timezones(
     mock_tibber_setup: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     start_time: str,
 ) -> None:
@@ -238,7 +238,7 @@ async def test_get_prices_with_timezones(
 )
 async def test_get_prices_with_wrong_timezones(
     mock_tibber_setup: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     start_time: str,
 ) -> None:
@@ -262,7 +262,7 @@ async def test_get_prices_with_wrong_timezones(
 
 async def test_get_prices_invalid_input(
     mock_tibber_setup: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test get_prices with invalid input."""
 

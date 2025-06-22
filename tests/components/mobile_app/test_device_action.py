@@ -1,14 +1,14 @@
 """The tests for Mobile App device actions."""
 
-from homeassistant.components import automation, device_automation
-from homeassistant.components.mobile_app import DATA_DEVICES, DOMAIN, util
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation, device_automation
+from smarthub.components.mobile_app import DATA_DEVICES, DOMAIN, util
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_get_device_automations, patch
 
 
-async def test_get_actions(hass: HomeAssistant, push_registration) -> None:
+async def test_get_actions(hass: SmartHub, push_registration) -> None:
     """Test we get the expected actions from a mobile_app."""
     webhook_id = push_registration["webhook_id"]
     device_id = hass.data[DOMAIN][DATA_DEVICES][webhook_id].id
@@ -25,7 +25,7 @@ async def test_get_actions(hass: HomeAssistant, push_registration) -> None:
     assert "extra_fields" in capabilitites
 
 
-async def test_action(hass: HomeAssistant, push_registration) -> None:
+async def test_action(hass: SmartHub, push_registration) -> None:
     """Test for turn_on and turn_off actions."""
     webhook_id = push_registration["webhook_id"]
 
@@ -59,7 +59,7 @@ async def test_action(hass: HomeAssistant, push_registration) -> None:
     assert hass.services.has_service("notify", service_name)
 
     with patch(
-        "homeassistant.components.mobile_app.notify.MobileAppNotificationService.async_send_message"
+        "smarthub.components.mobile_app.notify.MobileAppNotificationService.async_send_message"
     ) as mock_send_message:
         hass.bus.async_fire("test_notify")
         await hass.async_block_till_done()

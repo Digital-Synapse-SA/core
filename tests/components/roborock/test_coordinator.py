@@ -7,15 +7,15 @@ from unittest.mock import patch
 import pytest
 from roborock.exceptions import RoborockException
 
-from homeassistant.components.roborock.const import (
+from smarthub.components.roborock.const import (
     V1_CLOUD_IN_CLEANING_INTERVAL,
     V1_CLOUD_NOT_CLEANING_INTERVAL,
     V1_LOCAL_IN_CLEANING_INTERVAL,
     V1_LOCAL_NOT_CLEANING_INTERVAL,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .mock_data import PROP
 
@@ -36,7 +36,7 @@ def platforms() -> list[Platform]:
     ],
 )
 async def test_dynamic_cloud_scan_interval(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_roborock_entry: MockConfigEntry,
     bypass_api_fixture_v1_only,
     interval: timedelta,
@@ -48,11 +48,11 @@ async def test_dynamic_cloud_scan_interval(
     with (
         # Force the system to use the cloud api.
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.ping",
+            "smarthub.components.roborock.coordinator.RoborockLocalClientV1.ping",
             side_effect=RoborockException(),
         ),
         patch(
-            "homeassistant.components.roborock.RoborockMqttClientV1.get_prop",
+            "smarthub.components.roborock.RoborockMqttClientV1.get_prop",
             return_value=prop,
         ),
     ):
@@ -61,7 +61,7 @@ async def test_dynamic_cloud_scan_interval(
     prop = copy.deepcopy(prop)
     prop.status.battery = 20
     with patch(
-        "homeassistant.components.roborock.RoborockMqttClientV1.get_prop",
+        "smarthub.components.roborock.RoborockMqttClientV1.get_prop",
         return_value=prop,
     ):
         async_fire_time_changed(
@@ -81,7 +81,7 @@ async def test_dynamic_cloud_scan_interval(
     ],
 )
 async def test_dynamic_local_scan_interval(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_roborock_entry: MockConfigEntry,
     bypass_api_fixture_v1_only,
     interval: timedelta,
@@ -92,7 +92,7 @@ async def test_dynamic_local_scan_interval(
     prop.status.in_cleaning = in_cleaning
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
+            "smarthub.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
             return_value=prop,
         ),
     ):
@@ -101,7 +101,7 @@ async def test_dynamic_local_scan_interval(
     prop = copy.deepcopy(prop)
     prop.status.battery = 20
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
+        "smarthub.components.roborock.coordinator.RoborockLocalClientV1.get_prop",
         return_value=prop,
     ):
         async_fire_time_changed(

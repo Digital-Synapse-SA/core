@@ -4,8 +4,8 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.const import CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_USERNAME
+from smarthub.core import SmartHub
 
 from .const import VALID_ENTRY_DATA_CLOUD, VALID_ENTRY_DATA_SELF_HOSTED
 
@@ -20,7 +20,7 @@ from tests.typing import ClientSessionGenerator
     ids=lambda data: data[CONF_USERNAME],
 )
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     init_integration: MockConfigEntry,
     snapshot: SnapshotAssertion,

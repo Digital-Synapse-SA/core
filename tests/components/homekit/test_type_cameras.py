@@ -7,12 +7,12 @@ from uuid import UUID
 
 import pytest
 
-from homeassistant.components import camera, ffmpeg
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.components.camera.img_util import TurboJPEGSingleton
-from homeassistant.components.event import EventDeviceClass
-from homeassistant.components.homekit.accessories import HomeBridge
-from homeassistant.components.homekit.const import (
+from smarthub.components import camera, ffmpeg
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.components.camera.img_util import TurboJPEGSingleton
+from smarthub.components.event import EventDeviceClass
+from smarthub.components.homekit.accessories import HomeBridge
+from smarthub.components.homekit.const import (
     AUDIO_CODEC_COPY,
     CHAR_MOTION_DETECTED,
     CHAR_PROGRAMMABLE_SWITCH_EVENT,
@@ -30,19 +30,19 @@ from homeassistant.components.homekit.const import (
     VIDEO_CODEC_H264_OMX,
     VIDEO_CODEC_H264_V4L2M2M,
 )
-from homeassistant.components.homekit.type_cameras import Camera
-from homeassistant.components.homekit.type_switches import Switch
-from homeassistant.const import (
+from smarthub.components.homekit.type_cameras import Camera
+from smarthub.components.homekit.type_switches import Switch
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.components.camera.common import mock_turbo_jpeg
 
@@ -54,12 +54,12 @@ PID_THAT_WILL_NEVER_BE_ALIVE = 2147483647
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant) -> None:
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub) -> None:
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
-async def _async_start_streaming(hass: HomeAssistant, acc: Camera) -> None:
+async def _async_start_streaming(hass: SmartHub, acc: Camera) -> None:
     """Start streaming a camera."""
     acc.set_selected_stream_configuration(MOCK_START_STREAM_TLV)
     await hass.async_block_till_done()
@@ -67,7 +67,7 @@ async def _async_start_streaming(hass: HomeAssistant, acc: Camera) -> None:
     await hass.async_block_till_done()
 
 
-async def _async_setup_endpoints(hass: HomeAssistant, acc: Camera) -> None:
+async def _async_setup_endpoints(hass: SmartHub, acc: Camera) -> None:
     """Set camera endpoints."""
     acc.set_endpoints(MOCK_END_POINTS_TLV)
     acc.run()
@@ -75,7 +75,7 @@ async def _async_setup_endpoints(hass: HomeAssistant, acc: Camera) -> None:
 
 
 async def _async_reconfigure_stream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     acc: Camera,
     session_info: dict[str, Any],
     stream_config: dict[str, Any],
@@ -86,7 +86,7 @@ async def _async_reconfigure_stream(
     await hass.async_block_till_done()
 
 
-async def _async_stop_all_streams(hass: HomeAssistant, acc: Camera) -> None:
+async def _async_stop_all_streams(hass: SmartHub, acc: Camera) -> None:
     """Stop all camera streams."""
     await acc.stop()
     acc.run()
@@ -94,7 +94,7 @@ async def _async_stop_all_streams(hass: HomeAssistant, acc: Camera) -> None:
 
 
 async def _async_stop_stream(
-    hass: HomeAssistant, acc: Camera, session_info: dict[str, Any]
+    hass: SmartHub, acc: Camera, session_info: dict[str, Any]
 ) -> None:
     """Stop a camera stream."""
     await acc.stop_stream(session_info)
@@ -146,7 +146,7 @@ def _get_failing_mock_ffmpeg():
     return ffmpeg
 
 
-async def test_camera_stream_source_configured(hass: HomeAssistant, run_driver) -> None:
+async def test_camera_stream_source_configured(hass: SmartHub, run_driver) -> None:
     """Test a camera that can stream with a configured source."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
     await async_setup_component(
@@ -189,11 +189,11 @@ async def test_camera_stream_source_configured(hass: HomeAssistant, run_driver) 
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.homekit.type_cameras.HAFFmpeg",
+            "smarthub.components.homekit.type_cameras.HAFFmpeg",
             return_value=working_ffmpeg,
         ),
     ):
@@ -227,11 +227,11 @@ async def test_camera_stream_source_configured(hass: HomeAssistant, run_driver) 
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value="rtsp://example.local",
         ),
         patch(
-            "homeassistant.components.homekit.type_cameras.HAFFmpeg",
+            "smarthub.components.homekit.type_cameras.HAFFmpeg",
             return_value=working_ffmpeg,
         ),
     ):
@@ -266,7 +266,7 @@ async def test_camera_stream_source_configured(hass: HomeAssistant, run_driver) 
 
 
 async def test_camera_stream_source_configured_with_failing_ffmpeg(
-    hass: HomeAssistant, run_driver
+    hass: SmartHub, run_driver
 ) -> None:
     """Test a camera that can stream with a configured source with ffmpeg failing."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
@@ -308,11 +308,11 @@ async def test_camera_stream_source_configured_with_failing_ffmpeg(
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value="rtsp://example.local",
         ),
         patch(
-            "homeassistant.components.homekit.type_cameras.HAFFmpeg",
+            "smarthub.components.homekit.type_cameras.HAFFmpeg",
             return_value=_get_failing_mock_ffmpeg(),
         ),
     ):
@@ -322,7 +322,7 @@ async def test_camera_stream_source_configured_with_failing_ffmpeg(
         await _async_stop_all_streams(hass, acc)
 
 
-async def test_camera_stream_source_found(hass: HomeAssistant, run_driver) -> None:
+async def test_camera_stream_source_found(hass: SmartHub, run_driver) -> None:
     """Test a camera that can stream and we get the source from the entity."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
     await async_setup_component(
@@ -353,11 +353,11 @@ async def test_camera_stream_source_found(hass: HomeAssistant, run_driver) -> No
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value="rtsp://example.local",
         ),
         patch(
-            "homeassistant.components.homekit.type_cameras.HAFFmpeg",
+            "smarthub.components.homekit.type_cameras.HAFFmpeg",
             return_value=working_ffmpeg,
         ),
     ):
@@ -387,11 +387,11 @@ async def test_camera_stream_source_found(hass: HomeAssistant, run_driver) -> No
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value="rtsp://example2.local",
         ),
         patch(
-            "homeassistant.components.homekit.type_cameras.HAFFmpeg",
+            "smarthub.components.homekit.type_cameras.HAFFmpeg",
             return_value=working_ffmpeg,
         ),
     ):
@@ -408,7 +408,7 @@ async def test_camera_stream_source_found(hass: HomeAssistant, run_driver) -> No
     )
 
 
-async def test_camera_stream_source_fails(hass: HomeAssistant, run_driver) -> None:
+async def test_camera_stream_source_fails(hass: SmartHub, run_driver) -> None:
     """Test a camera that can stream and we cannot get the source from the entity."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
     await async_setup_component(
@@ -437,11 +437,11 @@ async def test_camera_stream_source_fails(hass: HomeAssistant, run_driver) -> No
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             side_effect=OSError,
         ),
         patch(
-            "homeassistant.components.homekit.type_cameras.HAFFmpeg",
+            "smarthub.components.homekit.type_cameras.HAFFmpeg",
             return_value=_get_working_mock_ffmpeg(),
         ),
     ):
@@ -449,7 +449,7 @@ async def test_camera_stream_source_fails(hass: HomeAssistant, run_driver) -> No
         await _async_stop_all_streams(hass, acc)
 
 
-async def test_camera_with_no_stream(hass: HomeAssistant, run_driver) -> None:
+async def test_camera_with_no_stream(hass: SmartHub, run_driver) -> None:
     """Test a camera that cannot stream."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
     await async_setup_component(hass, camera.DOMAIN, {camera.DOMAIN: {}})
@@ -475,14 +475,14 @@ async def test_camera_with_no_stream(hass: HomeAssistant, run_driver) -> None:
     await _async_start_streaming(hass, acc)
     await _async_stop_all_streams(hass, acc)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         assert await acc.async_get_snapshot(
             {"aid": 2, "image-width": 300, "image-height": 200}
         )
 
 
 async def test_camera_stream_source_configured_and_copy_codec(
-    hass: HomeAssistant, run_driver
+    hass: SmartHub, run_driver
 ) -> None:
     """Test a camera that can stream with a configured source."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
@@ -523,11 +523,11 @@ async def test_camera_stream_source_configured_and_copy_codec(
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.homekit.type_cameras.HAFFmpeg",
+            "smarthub.components.homekit.type_cameras.HAFFmpeg",
             return_value=working_ffmpeg,
         ),
     ):
@@ -557,7 +557,7 @@ async def test_camera_stream_source_configured_and_copy_codec(
 
 
 async def test_camera_stream_source_configured_and_override_profile_names(
-    hass: HomeAssistant, run_driver
+    hass: SmartHub, run_driver
 ) -> None:
     """Test a camera that can stream with a configured source over overridden profile names."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
@@ -599,11 +599,11 @@ async def test_camera_stream_source_configured_and_override_profile_names(
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.homekit.type_cameras.HAFFmpeg",
+            "smarthub.components.homekit.type_cameras.HAFFmpeg",
             return_value=working_ffmpeg,
         ),
     ):
@@ -633,7 +633,7 @@ async def test_camera_stream_source_configured_and_override_profile_names(
 
 
 async def test_camera_streaming_fails_after_starting_ffmpeg(
-    hass: HomeAssistant, run_driver
+    hass: SmartHub, run_driver
 ) -> None:
     """Test a camera that can stream with a configured source."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
@@ -674,11 +674,11 @@ async def test_camera_streaming_fails_after_starting_ffmpeg(
 
     with (
         patch(
-            "homeassistant.components.demo.camera.DemoCamera.stream_source",
+            "smarthub.components.demo.camera.DemoCamera.stream_source",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.homekit.type_cameras.HAFFmpeg",
+            "smarthub.components.homekit.type_cameras.HAFFmpeg",
             return_value=ffmpeg_with_invalid_pid,
         ),
     ):
@@ -710,7 +710,7 @@ async def test_camera_streaming_fails_after_starting_ffmpeg(
 
 
 async def test_camera_with_linked_motion_sensor(
-    hass: HomeAssistant, run_driver
+    hass: SmartHub, run_driver
 ) -> None:
     """Test a camera with a linked motion sensor can update."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
@@ -803,7 +803,7 @@ async def test_camera_with_linked_motion_sensor(
     assert char.value is True
 
 
-async def test_camera_with_linked_motion_event(hass: HomeAssistant, run_driver) -> None:
+async def test_camera_with_linked_motion_event(hass: SmartHub, run_driver) -> None:
     """Test a camera with a linked motion event entity can update."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
     await async_setup_component(
@@ -947,7 +947,7 @@ async def test_camera_with_linked_motion_event(hass: HomeAssistant, run_driver) 
 
 
 async def test_camera_with_a_missing_linked_motion_sensor(
-    hass: HomeAssistant, run_driver
+    hass: SmartHub, run_driver
 ) -> None:
     """Test a camera with a configured linked motion sensor that is missing."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
@@ -979,7 +979,7 @@ async def test_camera_with_a_missing_linked_motion_sensor(
 
 
 async def test_camera_with_linked_doorbell_sensor(
-    hass: HomeAssistant, run_driver
+    hass: SmartHub, run_driver
 ) -> None:
     """Test a camera with a linked doorbell sensor can update."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
@@ -1095,7 +1095,7 @@ async def test_camera_with_linked_doorbell_sensor(
 
 
 async def test_camera_with_linked_doorbell_event(
-    hass: HomeAssistant, run_driver
+    hass: SmartHub, run_driver
 ) -> None:
     """Test a camera with a linked doorbell event can update."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})
@@ -1241,7 +1241,7 @@ async def test_camera_with_linked_doorbell_event(
 
 
 async def test_camera_with_a_missing_linked_doorbell_sensor(
-    hass: HomeAssistant, run_driver
+    hass: SmartHub, run_driver
 ) -> None:
     """Test a camera with a configured linked doorbell sensor that is missing."""
     await async_setup_component(hass, ffmpeg.DOMAIN, {ffmpeg.DOMAIN: {}})

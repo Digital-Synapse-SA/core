@@ -10,7 +10,7 @@ from airtouch5py.packets.zone_status import (
 )
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
     DOMAIN as COVER_DOMAIN,
@@ -19,9 +19,9 @@ from homeassistant.components.cover import (
     SERVICE_SET_COVER_POSITION,
     CoverState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -31,7 +31,7 @@ COVER_ENTITY_ID = "cover.zone_1_damper"
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_airtouch5_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -39,14 +39,14 @@ async def test_all_entities(
 ) -> None:
     """Test all entities."""
 
-    with patch("homeassistant.components.airtouch5.PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.airtouch5.PLATFORMS", [Platform.COVER]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_cover_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airtouch5_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_cover_actions(
 
 
 async def test_cover_callbacks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airtouch5_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock
 from pyHomee import HomeeAuthFailedException, HomeeConnectionFailedException
 import pytest
 
-from homeassistant.components.homee.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.homee.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import HOMEE_ID, HOMEE_IP, HOMEE_NAME, NEW_HOMEE_IP, TESTPASS, TESTUSER
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("mock_homee", "mock_config_entry", "mock_setup_entry")
 async def test_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the complete config flow."""
     result = await hass.config_entries.flow.async_init(
@@ -67,7 +67,7 @@ async def test_config_flow(
     ],
 )
 async def test_config_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: AsyncMock,
     side_eff: Exception,
     error: dict[str, str],
@@ -108,7 +108,7 @@ async def test_config_flow_errors(
 
 @pytest.mark.usefixtures("mock_homee")
 async def test_flow_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test config flow aborts when already configured."""
@@ -134,7 +134,7 @@ async def test_flow_already_configured(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_reconfigure_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: AsyncMock,
 ) -> None:
@@ -182,7 +182,7 @@ async def test_reconfigure_success(
     ],
 )
 async def test_reconfigure_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: AsyncMock,
     side_eff: Exception,
@@ -228,7 +228,7 @@ async def test_reconfigure_errors(
 
 
 async def test_reconfigure_wrong_uid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homee: AsyncMock,
 ) -> None:

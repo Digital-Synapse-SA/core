@@ -5,10 +5,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import setup
-from homeassistant.components import zone
-from homeassistant.components.zone import DOMAIN
-from homeassistant.const import (
+from smarthub import setup
+from smarthub.components import zone
+from smarthub.components.zone import DOMAIN
+from smarthub.const import (
     ATTR_EDITABLE,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
@@ -16,16 +16,16 @@ from homeassistant.const import (
     ATTR_PERSONS,
     SERVICE_RELOAD,
 )
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import Unauthorized
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import Unauthorized
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, MockUser
 from tests.typing import WebSocketGenerator
 
 
 @pytest.fixture
-def storage_setup(hass: HomeAssistant, hass_storage: dict[str, Any]):
+def storage_setup(hass: SmartHub, hass_storage: dict[str, Any]):
     """Storage setup."""
 
     async def _storage(items=None, config=None):
@@ -60,7 +60,7 @@ def storage_setup(hass: HomeAssistant, hass_storage: dict[str, Any]):
     return _storage
 
 
-async def test_setup_no_zones_still_adds_home_zone(hass: HomeAssistant) -> None:
+async def test_setup_no_zones_still_adds_home_zone(hass: SmartHub) -> None:
     """Test if no config is passed in we still get the home zone."""
     assert await setup.async_setup_component(hass, zone.DOMAIN, {"zone": None})
     assert len(hass.states.async_entity_ids("zone")) == 1
@@ -71,7 +71,7 @@ async def test_setup_no_zones_still_adds_home_zone(hass: HomeAssistant) -> None:
     assert not state.attributes.get("passive", False)
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test a successful setup."""
     info = {
         "name": "Test Zone",
@@ -91,7 +91,7 @@ async def test_setup(hass: HomeAssistant) -> None:
     assert info["passive"] == state.attributes["passive"]
 
 
-async def test_setup_zone_skips_home_zone(hass: HomeAssistant) -> None:
+async def test_setup_zone_skips_home_zone(hass: SmartHub) -> None:
     """Test that zone named Home should override hass home zone."""
     info = {"name": "Home", "latitude": 1.1, "longitude": -2.2}
     assert await setup.async_setup_component(hass, zone.DOMAIN, {"zone": info})
@@ -101,14 +101,14 @@ async def test_setup_zone_skips_home_zone(hass: HomeAssistant) -> None:
     assert info["name"] == state.name
 
 
-async def test_setup_name_can_be_same_on_multiple_zones(hass: HomeAssistant) -> None:
+async def test_setup_name_can_be_same_on_multiple_zones(hass: SmartHub) -> None:
     """Test that zone named Home should override hass home zone."""
     info = {"name": "Test Zone", "latitude": 1.1, "longitude": -2.2}
     assert await setup.async_setup_component(hass, zone.DOMAIN, {"zone": [info, info]})
     assert len(hass.states.async_entity_ids("zone")) == 3
 
 
-async def test_active_zone_skips_passive_zones(hass: HomeAssistant) -> None:
+async def test_active_zone_skips_passive_zones(hass: SmartHub) -> None:
     """Test active and passive zones."""
     assert await setup.async_setup_component(
         hass,
@@ -130,7 +130,7 @@ async def test_active_zone_skips_passive_zones(hass: HomeAssistant) -> None:
     assert active is None
 
 
-async def test_active_zone_skips_passive_zones_2(hass: HomeAssistant) -> None:
+async def test_active_zone_skips_passive_zones_2(hass: SmartHub) -> None:
     """Test active and passive zones."""
     assert await setup.async_setup_component(
         hass,
@@ -152,7 +152,7 @@ async def test_active_zone_skips_passive_zones_2(hass: HomeAssistant) -> None:
 
 
 async def test_active_zone_prefers_smaller_zone_if_same_distance(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test zone size preferences."""
     latitude = 32.880600
@@ -183,7 +183,7 @@ async def test_active_zone_prefers_smaller_zone_if_same_distance(
 
 
 async def test_active_zone_prefers_smaller_zone_if_same_distance_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test zone size preferences."""
     latitude = 32.880600
@@ -207,7 +207,7 @@ async def test_active_zone_prefers_smaller_zone_if_same_distance_2(
     assert active.entity_id == "zone.smallest_zone"
 
 
-async def test_in_zone_works_for_passive_zones(hass: HomeAssistant) -> None:
+async def test_in_zone_works_for_passive_zones(hass: SmartHub) -> None:
     """Test working in passive zones."""
     latitude = 32.880600
     longitude = -117.237561
@@ -231,7 +231,7 @@ async def test_in_zone_works_for_passive_zones(hass: HomeAssistant) -> None:
 
 
 async def test_async_active_zone_with_non_zero_radius(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test async_active_zone with a non-zero radius."""
     latitude = 32.880600
@@ -270,7 +270,7 @@ async def test_async_active_zone_with_non_zero_radius(
     assert active.entity_id == "zone.small_zone"
 
 
-async def test_core_config_update(hass: HomeAssistant) -> None:
+async def test_core_config_update(hass: SmartHub) -> None:
     """Test updating core config will update home zone."""
     assert await setup.async_setup_component(hass, "zone", {})
 
@@ -290,7 +290,7 @@ async def test_core_config_update(hass: HomeAssistant) -> None:
 
 
 async def test_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_admin_user: MockUser,
     hass_read_only_user: MockUser,
@@ -325,7 +325,7 @@ async def test_reload(
     assert len(entity_registry.entities) == 0
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={
             DOMAIN: [
@@ -364,7 +364,7 @@ async def test_reload(
     assert state_3.attributes["longitude"] == 6
 
 
-async def test_load_from_storage(hass: HomeAssistant, storage_setup) -> None:
+async def test_load_from_storage(hass: SmartHub, storage_setup) -> None:
     """Test set up from storage."""
     assert await storage_setup()
     state = hass.states.get(f"{DOMAIN}.from_storage")
@@ -373,7 +373,7 @@ async def test_load_from_storage(hass: HomeAssistant, storage_setup) -> None:
     assert state.attributes.get(ATTR_EDITABLE)
 
 
-async def test_editable_state_attribute(hass: HomeAssistant, storage_setup) -> None:
+async def test_editable_state_attribute(hass: SmartHub, storage_setup) -> None:
     """Test editable attribute."""
     assert await storage_setup(
         config={DOMAIN: [{"name": "yaml option", "latitude": 3, "longitude": 4}]}
@@ -390,7 +390,7 @@ async def test_editable_state_attribute(hass: HomeAssistant, storage_setup) -> N
 
 
 async def test_ws_list(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, storage_setup
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, storage_setup
 ) -> None:
     """Test listing via WS."""
     assert await storage_setup(
@@ -414,7 +414,7 @@ async def test_ws_list(
 
 
 async def test_ws_delete(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     storage_setup,
@@ -443,7 +443,7 @@ async def test_ws_delete(
 
 
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     storage_setup,
@@ -492,7 +492,7 @@ async def test_update(
 
 
 async def test_ws_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     entity_registry: er.EntityRegistry,
     storage_setup,
@@ -529,7 +529,7 @@ async def test_ws_create(
     assert state.attributes["passive"] is True
 
 
-async def test_import_config_entry(hass: HomeAssistant) -> None:
+async def test_import_config_entry(hass: SmartHub) -> None:
     """Test we import config entry and then delete it."""
     entry = MockConfigEntry(
         domain="zone",
@@ -556,12 +556,12 @@ async def test_import_config_entry(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_ICON] == "mdi:from-config-entry"
 
 
-async def test_zone_empty_setup(hass: HomeAssistant) -> None:
+async def test_zone_empty_setup(hass: SmartHub) -> None:
     """Set up zone with empty config."""
     assert await setup.async_setup_component(hass, DOMAIN, {"zone": {}})
 
 
-async def test_unavailable_zone(hass: HomeAssistant) -> None:
+async def test_unavailable_zone(hass: SmartHub) -> None:
     """Test active zone with unavailable zones."""
     assert await setup.async_setup_component(hass, DOMAIN, {"zone": {}})
     hass.states.async_set("zone.bla", "unavailable", {"restored": True})
@@ -571,7 +571,7 @@ async def test_unavailable_zone(hass: HomeAssistant) -> None:
     assert zone.in_zone(hass.states.get("zone.bla"), 0, 0) is False
 
 
-async def test_state(hass: HomeAssistant) -> None:
+async def test_state(hass: SmartHub) -> None:
     """Test the state of a zone."""
     info = {
         "name": "Test Zone",

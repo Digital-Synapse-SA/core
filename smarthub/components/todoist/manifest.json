@@ -1,0 +1,10 @@
+{
+  "domain": "todoist",
+  "name": "Todoist",
+  "codeowners": ["@boralyl"],
+  "config_flow": true,
+  "documentation": "https://www.smart-hub.io/integrations/todoist",
+  "iot_class": "cloud_polling",
+  "loggers": ["todoist"],
+  "requirements": ["todoist-api-python==2.1.7"]
+}

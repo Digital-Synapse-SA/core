@@ -8,8 +8,8 @@ from pyipma.observation import Observation
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ipma.const import MIN_TIME_BETWEEN_UPDATES
-from homeassistant.components.weather import (
+from smarthub.components.ipma.const import MIN_TIME_BETWEEN_UPDATES
+from smarthub.components.weather import (
     ATTR_WEATHER_HUMIDITY,
     ATTR_WEATHER_PRESSURE,
     ATTR_WEATHER_TEMPERATURE,
@@ -18,8 +18,8 @@ from homeassistant.components.weather import (
     DOMAIN as WEATHER_DOMAIN,
     SERVICE_GET_FORECASTS,
 )
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from . import MockLocation
 
@@ -53,7 +53,7 @@ class MockBadLocation(MockLocation):
         return []
 
 
-async def test_setup_config_flow(hass: HomeAssistant) -> None:
+async def test_setup_config_flow(hass: SmartHub) -> None:
     """Test for successfully setting up the IPMA platform."""
     with patch(
         "pyipma.location.Location.get",
@@ -76,7 +76,7 @@ async def test_setup_config_flow(hass: HomeAssistant) -> None:
     assert state.attributes.get("friendly_name") == "HomeTown"
 
 
-async def test_failed_get_observation_forecast(hass: HomeAssistant) -> None:
+async def test_failed_get_observation_forecast(hass: SmartHub) -> None:
     """Test for successfully setting up the IPMA platform."""
     with patch(
         "pyipma.location.Location.get",
@@ -104,7 +104,7 @@ async def test_failed_get_observation_forecast(hass: HomeAssistant) -> None:
     [SERVICE_GET_FORECASTS],
 )
 async def test_forecast_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     service: str,
 ) -> None:
@@ -146,7 +146,7 @@ async def test_forecast_service(
 
 @pytest.mark.parametrize("forecast_type", ["daily", "hourly"])
 async def test_forecast_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,

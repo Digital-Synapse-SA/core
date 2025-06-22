@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock
 
 from pyblu.errors import PlayerUnreachableError
 
-from homeassistant.components.bluesound.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.bluesound.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .conftest import PlayerMocks
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_user_flow_success(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, player_mocks: PlayerMocks
+    hass: SmartHub, mock_setup_entry: AsyncMock, player_mocks: PlayerMocks
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -44,7 +44,7 @@ async def test_user_flow_success(
 
 
 async def test_user_flow_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     player_mocks: PlayerMocks,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -87,7 +87,7 @@ async def test_user_flow_cannot_connect(
 
 
 async def test_user_flow_aleady_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     player_mocks: PlayerMocks,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -115,7 +115,7 @@ async def test_user_flow_aleady_configured(
 
 
 async def test_zeroconf_flow_success(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, player_mocks: PlayerMocks
+    hass: SmartHub, mock_setup_entry: AsyncMock, player_mocks: PlayerMocks
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -151,7 +151,7 @@ async def test_zeroconf_flow_success(
 
 
 async def test_zeroconf_flow_cannot_connect(
-    hass: HomeAssistant, player_mocks: PlayerMocks
+    hass: SmartHub, player_mocks: PlayerMocks
 ) -> None:
     """Test we handle cannot connect error."""
     player_mocks.player_data.player.sync_status.side_effect = PlayerUnreachableError(
@@ -178,7 +178,7 @@ async def test_zeroconf_flow_cannot_connect(
 
 
 async def test_zeroconf_flow_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     player_mocks: PlayerMocks,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -206,7 +206,7 @@ async def test_zeroconf_flow_already_configured(
     player_mocks.player_data_for_already_configured.player.sync_status.assert_called_once()
 
 
-async def test_zeroconf_flow_no_ipv4_address(hass: HomeAssistant) -> None:
+async def test_zeroconf_flow_no_ipv4_address(hass: SmartHub) -> None:
     """Test abort flow when no ipv4 address is found in zeroconf data."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,

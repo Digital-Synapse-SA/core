@@ -6,11 +6,11 @@ from datetime import timedelta
 
 from freezegun import freeze_time
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import PERCENTAGE, SIGNAL_STRENGTH_DECIBELS_MILLIWATT
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.const import PERCENTAGE, SIGNAL_STRENGTH_DECIBELS_MILLIWATT
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .conftest import (
     mock_config_entry,
@@ -23,7 +23,7 @@ from .conftest import (
 from tests.common import async_fire_time_changed
 
 
-async def test_battery_sensor(hass: HomeAssistant) -> None:
+async def test_battery_sensor(hass: SmartHub) -> None:
     """Test the battery sensor."""
 
     entry = mock_config_entry(hass)
@@ -45,7 +45,7 @@ async def test_battery_sensor(hass: HomeAssistant) -> None:
         assert battery_sensor.attributes["state_class"] == SensorStateClass.MEASUREMENT
 
 
-async def test_minutes_remaining_sensor(hass: HomeAssistant) -> None:
+async def test_minutes_remaining_sensor(hass: SmartHub) -> None:
     """Test the minutes remaining sensor."""
 
     now = dt_util.utcnow()
@@ -88,7 +88,7 @@ async def test_minutes_remaining_sensor(hass: HomeAssistant) -> None:
         assert minutes_remaining_sensor.state == end_time.isoformat(timespec="seconds")
 
 
-async def test_schedule_next_cycle_sensor(hass: HomeAssistant) -> None:
+async def test_schedule_next_cycle_sensor(hass: SmartHub) -> None:
     """Test the frequency next_cycle sensor."""
 
     now = dt_util.utcnow()
@@ -131,7 +131,7 @@ async def test_schedule_next_cycle_sensor(hass: HomeAssistant) -> None:
 
 
 async def test_rssi_sensor(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the rssi sensor."""
 

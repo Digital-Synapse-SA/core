@@ -7,15 +7,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from wled import WLEDConnectionError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.parametrize("device_fixture", ["rgb_websocket"])
 async def test_load_unload_config_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_wled: AsyncMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_wled: AsyncMock
 ) -> None:
     """Test the WLED configuration entry unloading."""
     connection_connected = asyncio.Future()
@@ -46,11 +46,11 @@ async def test_load_unload_config_entry(
 
 
 @patch(
-    "homeassistant.components.wled.coordinator.WLED.request",
+    "smarthub.components.wled.coordinator.WLED.request",
     side_effect=WLEDConnectionError,
 )
 async def test_config_entry_not_ready(
-    mock_request: MagicMock, hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    mock_request: MagicMock, hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test the WLED configuration entry not ready."""
     mock_config_entry.add_to_hass(hass)
@@ -62,7 +62,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_setting_unique_id(
-    hass: HomeAssistant, init_integration: MockConfigEntry
+    hass: SmartHub, init_integration: MockConfigEntry
 ) -> None:
     """Test we set unique ID if not set yet."""
     assert init_integration.runtime_data

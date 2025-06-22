@@ -8,20 +8,20 @@ import pytest
 from pytradfri.const import ATTR_REACHABLE_STATE
 from pytradfri.device import Device
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     DOMAIN as COVER_DOMAIN,
     CoverState,
 )
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from .common import CommandStore, setup_integration
 
 
 @pytest.mark.parametrize("device", ["blind"], indirect=True)
 async def test_cover_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
 ) -> None:
@@ -56,7 +56,7 @@ async def test_cover_available(
     ],
 )
 async def test_cover_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
     service: str,

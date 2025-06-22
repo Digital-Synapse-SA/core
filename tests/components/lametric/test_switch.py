@@ -5,13 +5,13 @@ from unittest.mock import MagicMock
 from demetriek import LaMetricConnectionError, LaMetricError
 import pytest
 
-from homeassistant.components.lametric.const import DOMAIN, SCAN_INTERVAL
-from homeassistant.components.switch import (
+from smarthub.components.lametric.const import DOMAIN, SCAN_INTERVAL
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
@@ -19,10 +19,10 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     EntityCategory,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
@@ -30,7 +30,7 @@ pytestmark = pytest.mark.usefixtures("init_integration")
 
 
 async def test_bluetooth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -94,7 +94,7 @@ async def test_bluetooth(
 
 
 async def test_switch_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test error handling of the LaMetric switches."""
@@ -105,7 +105,7 @@ async def test_switch_error(
     assert state.state == STATE_OFF
 
     with pytest.raises(
-        HomeAssistantError, match="Invalid response from the LaMetric device"
+        SmartHubError, match="Invalid response from the LaMetric device"
     ):
         await hass.services.async_call(
             SWITCH_DOMAIN,
@@ -122,7 +122,7 @@ async def test_switch_error(
 
 
 async def test_switch_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test connection error handling of the LaMetric switches."""
@@ -133,7 +133,7 @@ async def test_switch_connection_error(
     assert state.state == STATE_OFF
 
     with pytest.raises(
-        HomeAssistantError, match="Error communicating with the LaMetric device"
+        SmartHubError, match="Error communicating with the LaMetric device"
     ):
         await hass.services.async_call(
             SWITCH_DOMAIN,

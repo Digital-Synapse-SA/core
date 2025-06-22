@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 from tests.typing import ClientSessionGenerator
@@ -17,17 +17,17 @@ def mock_all(
     aioclient_mock: AiohttpClientMocker, supervisor_is_connected: AsyncMock
 ) -> None:
     """Mock all setup requests."""
-    aioclient_mock.post("http://127.0.0.1/homeassistant/options", json={"result": "ok"})
+    aioclient_mock.post("http://127.0.0.1/smarthub/options", json={"result": "ok"})
     aioclient_mock.post("http://127.0.0.1/supervisor/options", json={"result": "ok"})
     aioclient_mock.get(
-        "http://127.0.0.1/homeassistant/info",
+        "http://127.0.0.1/smarthub/info",
         json={"result": "ok", "data": {"last_version": "10.0"}},
     )
 
 
 @pytest.mark.usefixtures("hassio_env")
 async def test_hassio_addon_panel_startup(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test startup and panel setup after event."""
     aioclient_mock.get(
@@ -56,7 +56,7 @@ async def test_hassio_addon_panel_startup(
     assert aioclient_mock.call_count == 0
 
     with patch(
-        "homeassistant.components.hassio.addon_panel._register_panel",
+        "smarthub.components.hassio.addon_panel._register_panel",
     ) as mock_panel:
         await async_setup_component(hass, "hassio", {})
         await hass.async_block_till_done()
@@ -72,7 +72,7 @@ async def test_hassio_addon_panel_startup(
 
 @pytest.mark.usefixtures("hassio_env")
 async def test_hassio_addon_panel_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -103,7 +103,7 @@ async def test_hassio_addon_panel_api(
     assert aioclient_mock.call_count == 0
 
     with patch(
-        "homeassistant.components.hassio.addon_panel._register_panel",
+        "smarthub.components.hassio.addon_panel._register_panel",
     ) as mock_panel:
         await async_setup_component(hass, "hassio", {})
         await hass.async_block_till_done()

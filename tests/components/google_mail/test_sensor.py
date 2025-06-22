@@ -7,12 +7,12 @@ from google.auth.exceptions import RefreshError
 from httplib2 import Response
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.google_mail.const import DOMAIN
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import ATTR_DEVICE_CLASS, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub import config_entries
+from smarthub.components.google_mail.const import DOMAIN
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import ATTR_DEVICE_CLASS, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .conftest import SENSOR, TOKEN, ComponentSetup
 
@@ -28,7 +28,7 @@ from tests.common import async_fire_time_changed, async_load_fixture
     ],
 )
 async def test_sensors(
-    hass: HomeAssistant, setup_integration: ComponentSetup, fixture: str, result: str
+    hass: SmartHub, setup_integration: ComponentSetup, fixture: str, result: str
 ) -> None:
     """Test we get sensor data."""
     await setup_integration()
@@ -56,7 +56,7 @@ async def test_sensors(
 
 
 async def test_sensor_reauth_trigger(
-    hass: HomeAssistant, setup_integration: ComponentSetup
+    hass: SmartHub, setup_integration: ComponentSetup
 ) -> None:
     """Test reauth is triggered after a refresh error."""
     await setup_integration()

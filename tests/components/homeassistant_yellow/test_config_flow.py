@@ -1,40 +1,40 @@
-"""Test the Home Assistant Yellow config flow."""
+"""Test the SmartHub Yellow config flow."""
 
 from collections.abc import Generator
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.hassio import (
+from smarthub.components.hassio import (
     DOMAIN as HASSIO_DOMAIN,
     AddonInfo,
     AddonState,
 )
-from homeassistant.components.homeassistant_hardware.firmware_config_flow import (
+from smarthub.components.smarthub_hardware.firmware_config_flow import (
     STEP_PICK_FIRMWARE_ZIGBEE,
 )
-from homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon import (
+from smarthub.components.smarthub_hardware.silabs_multiprotocol_addon import (
     CONF_DISABLE_MULTI_PAN,
     get_flasher_addon_manager,
     get_multiprotocol_addon_manager,
 )
-from homeassistant.components.homeassistant_hardware.util import (
+from smarthub.components.smarthub_hardware.util import (
     ApplicationType,
     FirmwareInfo,
 )
-from homeassistant.components.homeassistant_yellow.const import DOMAIN, RADIO_DEVICE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub.components.smarthub_yellow.const import DOMAIN, RADIO_DEVICE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, MockModule, mock_integration
 
 
 @pytest.fixture(autouse=True)
-def config_flow_handler(hass: HomeAssistant) -> Generator[None]:
+def config_flow_handler(hass: SmartHub) -> Generator[None]:
     """Fixture for a test config flow."""
     with patch(
-        "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.WaitingAddonManager.async_wait_until_addon_state"
+        "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.WaitingAddonManager.async_wait_until_addon_state"
     ):
         yield
 
@@ -43,7 +43,7 @@ def config_flow_handler(hass: HomeAssistant) -> Generator[None]:
 def mock_get_supervisor_client(supervisor_client: AsyncMock) -> Generator[None]:
     """Mock get_supervisor_client method."""
     with patch(
-        "homeassistant.components.homeassistant_yellow.config_flow.get_supervisor_client",
+        "smarthub.components.smarthub_yellow.config_flow.get_supervisor_client",
         return_value=supervisor_client,
     ):
         yield
@@ -53,7 +53,7 @@ def mock_get_supervisor_client(supervisor_client: AsyncMock) -> Generator[None]:
 def mock_get_yellow_settings():
     """Mock getting yellow settings."""
     with patch(
-        "homeassistant.components.homeassistant_yellow.config_flow.async_get_yellow_settings",
+        "smarthub.components.smarthub_yellow.config_flow.async_get_yellow_settings",
         return_value={"disk_led": True, "heartbeat_led": True, "power_led": True},
     ) as get_yellow_settings:
         yield get_yellow_settings
@@ -63,7 +63,7 @@ def mock_get_yellow_settings():
 def mock_set_yellow_settings():
     """Mock setting yellow settings."""
     with patch(
-        "homeassistant.components.homeassistant_yellow.config_flow.async_set_yellow_settings",
+        "smarthub.components.smarthub_yellow.config_flow.async_set_yellow_settings",
     ) as set_yellow_settings:
         yield set_yellow_settings
 
@@ -74,18 +74,18 @@ def mock_reboot_host(supervisor_client: AsyncMock) -> AsyncMock:
     return supervisor_client.host.reboot
 
 
-async def test_config_flow(hass: HomeAssistant) -> None:
+async def test_config_flow(hass: SmartHub) -> None:
     """Test the config flow."""
     mock_integration(hass, MockModule("hassio"))
     await async_setup_component(hass, HASSIO_DOMAIN, {})
 
     with (
         patch(
-            "homeassistant.components.homeassistant_yellow.async_setup_entry",
+            "smarthub.components.smarthub_yellow.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.homeassistant_hardware.firmware_config_flow.probe_silabs_firmware_info",
+            "smarthub.components.smarthub_hardware.firmware_config_flow.probe_silabs_firmware_info",
             return_value=FirmwareInfo(
                 device=RADIO_DEVICE,
                 firmware_type=ApplicationType.EZSP,
@@ -100,7 +100,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         )
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["title"] == "Home Assistant Yellow"
+    assert result["title"] == "SmartHub Yellow"
     assert result["data"] == {"firmware": "ezsp", "firmware_version": None}
     assert result["options"] == {}
     assert len(mock_setup_entry.mock_calls) == 1
@@ -108,10 +108,10 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     config_entry = hass.config_entries.async_entries(DOMAIN)[0]
     assert config_entry.data == {"firmware": "ezsp", "firmware_version": None}
     assert config_entry.options == {}
-    assert config_entry.title == "Home Assistant Yellow"
+    assert config_entry.title == "SmartHub Yellow"
 
 
-async def test_config_flow_single_entry(hass: HomeAssistant) -> None:
+async def test_config_flow_single_entry(hass: SmartHub) -> None:
     """Test only a single entry is allowed."""
     mock_integration(hass, MockModule("hassio"))
     await async_setup_component(hass, HASSIO_DOMAIN, {})
@@ -121,14 +121,14 @@ async def test_config_flow_single_entry(hass: HomeAssistant) -> None:
         data={"firmware": ApplicationType.EZSP},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.homeassistant_yellow.async_setup_entry",
+        "smarthub.components.smarthub_yellow.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -145,7 +145,7 @@ async def test_config_flow_single_entry(hass: HomeAssistant) -> None:
     [("reboot_now", 1), ("reboot_later", 0)],
 )
 async def test_option_flow_led_settings(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_yellow_settings: AsyncMock,
     set_yellow_settings: AsyncMock,
     reboot_host: AsyncMock,
@@ -161,7 +161,7 @@ async def test_option_flow_led_settings(
         data={"firmware": ApplicationType.EZSP},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
@@ -196,7 +196,7 @@ async def test_option_flow_led_settings(
 
 
 async def test_option_flow_led_settings_unchanged(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_yellow_settings,
     set_yellow_settings,
 ) -> None:
@@ -209,7 +209,7 @@ async def test_option_flow_led_settings_unchanged(
         data={"firmware": ApplicationType.EZSP},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
@@ -233,7 +233,7 @@ async def test_option_flow_led_settings_unchanged(
     set_yellow_settings.assert_not_called()
 
 
-async def test_option_flow_led_settings_fail_1(hass: HomeAssistant) -> None:
+async def test_option_flow_led_settings_fail_1(hass: SmartHub) -> None:
     """Test updating LED settings."""
     mock_integration(hass, MockModule("hassio"))
     await async_setup_component(hass, HASSIO_DOMAIN, {})
@@ -243,7 +243,7 @@ async def test_option_flow_led_settings_fail_1(hass: HomeAssistant) -> None:
         data={"firmware": ApplicationType.EZSP},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
@@ -254,7 +254,7 @@ async def test_option_flow_led_settings_fail_1(hass: HomeAssistant) -> None:
     assert result["step_id"] == "main_menu"
 
     with patch(
-        "homeassistant.components.homeassistant_yellow.config_flow.async_get_yellow_settings",
+        "smarthub.components.smarthub_yellow.config_flow.async_get_yellow_settings",
         side_effect=TimeoutError,
     ):
         result = await hass.config_entries.options.async_configure(
@@ -266,7 +266,7 @@ async def test_option_flow_led_settings_fail_1(hass: HomeAssistant) -> None:
 
 
 async def test_option_flow_led_settings_fail_2(
-    hass: HomeAssistant, get_yellow_settings
+    hass: SmartHub, get_yellow_settings
 ) -> None:
     """Test updating LED settings."""
     mock_integration(hass, MockModule("hassio"))
@@ -277,7 +277,7 @@ async def test_option_flow_led_settings_fail_2(
         data={"firmware": ApplicationType.EZSP},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
@@ -294,7 +294,7 @@ async def test_option_flow_led_settings_fail_2(
     assert result["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.homeassistant_yellow.config_flow.async_set_yellow_settings",
+        "smarthub.components.smarthub_yellow.config_flow.async_set_yellow_settings",
         side_effect=TimeoutError,
     ):
         result = await hass.config_entries.options.async_configure(
@@ -305,7 +305,7 @@ async def test_option_flow_led_settings_fail_2(
     assert result["reason"] == "write_hw_settings_error"
 
 
-async def test_firmware_options_flow(hass: HomeAssistant) -> None:
+async def test_firmware_options_flow(hass: SmartHub) -> None:
     """Test the firmware options flow for Yellow."""
     mock_integration(hass, MockModule("hassio"))
     await async_setup_component(hass, HASSIO_DOMAIN, {})
@@ -314,7 +314,7 @@ async def test_firmware_options_flow(hass: HomeAssistant) -> None:
         data={"firmware": ApplicationType.SPINEL},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
@@ -334,19 +334,19 @@ async def test_firmware_options_flow(hass: HomeAssistant) -> None:
 
     assert result["step_id"] == "pick_firmware"
     assert result["description_placeholders"]["firmware_type"] == "spinel"
-    assert result["description_placeholders"]["model"] == "Home Assistant Yellow"
+    assert result["description_placeholders"]["model"] == "SmartHub Yellow"
 
     async def mock_async_step_pick_firmware_zigbee(self, data):
         return await self.async_step_confirm_zigbee(user_input={})
 
     with (
         patch(
-            "homeassistant.components.homeassistant_hardware.firmware_config_flow.BaseFirmwareOptionsFlow.async_step_pick_firmware_zigbee",
+            "smarthub.components.smarthub_hardware.firmware_config_flow.BaseFirmwareOptionsFlow.async_step_pick_firmware_zigbee",
             autospec=True,
             side_effect=mock_async_step_pick_firmware_zigbee,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.firmware_config_flow.probe_silabs_firmware_info",
+            "smarthub.components.smarthub_hardware.firmware_config_flow.probe_silabs_firmware_info",
             return_value=FirmwareInfo(
                 device=RADIO_DEVICE,
                 firmware_type=ApplicationType.EZSP,
@@ -371,7 +371,7 @@ async def test_firmware_options_flow(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("supervisor_client")
-async def test_options_flow_multipan_uninstall(hass: HomeAssistant) -> None:
+async def test_options_flow_multipan_uninstall(hass: SmartHub) -> None:
     """Test options flow for when multi-PAN firmware is installed."""
     mock_integration(hass, MockModule("hassio"))
     await async_setup_component(hass, HASSIO_DOMAIN, {})
@@ -380,7 +380,7 @@ async def test_options_flow_multipan_uninstall(hass: HomeAssistant) -> None:
         data={"firmware": ApplicationType.CPC},
         domain=DOMAIN,
         options={},
-        title="Home Assistant Yellow",
+        title="SmartHub Yellow",
         version=1,
         minor_version=2,
     )
@@ -409,15 +409,15 @@ async def test_options_flow_multipan_uninstall(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.get_multiprotocol_addon_manager",
+            "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.get_multiprotocol_addon_manager",
             return_value=mock_multipan_manager,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.get_flasher_addon_manager",
+            "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.get_flasher_addon_manager",
             return_value=mock_flasher_manager,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.silabs_multiprotocol_addon.is_hassio",
+            "smarthub.components.smarthub_hardware.silabs_multiprotocol_addon.is_hassio",
             return_value=True,
         ),
     ):

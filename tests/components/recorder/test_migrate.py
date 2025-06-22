@@ -20,17 +20,17 @@ from sqlalchemy.exc import (
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from homeassistant.components import persistent_notification as pn, recorder
-from homeassistant.components.recorder import db_schema, migration
-from homeassistant.components.recorder.db_schema import (
+from smarthub.components import persistent_notification as pn, recorder
+from smarthub.components.recorder import db_schema, migration
+from smarthub.components.recorder.db_schema import (
     SCHEMA_VERSION,
     Events,
     RecorderRuns,
     States,
 )
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.core import HomeAssistant, State
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder.util import session_scope
+from smarthub.core import SmartHub, State
+from smarthub.util import dt as dt_util
 
 from .common import async_wait_recorder, async_wait_recording_done, create_engine_test
 from .conftest import InstrumentedMigration
@@ -46,7 +46,7 @@ async def mock_recorder_before_hass(
     """Set up recorder."""
 
 
-def _get_native_states(hass: HomeAssistant, entity_id: str) -> list[State]:
+def _get_native_states(hass: SmartHub, entity_id: str) -> list[State]:
     with session_scope(hass=hass, read_only=True) as session:
         instance = recorder.get_instance(hass)
         metadata_id = instance.states_meta_manager.get(entity_id, session, True)
@@ -58,22 +58,22 @@ def _get_native_states(hass: HomeAssistant, entity_id: str) -> list[State]:
 
 
 async def test_schema_update_calls(
-    hass: HomeAssistant, async_setup_recorder_instance: RecorderInstanceGenerator
+    hass: SmartHub, async_setup_recorder_instance: RecorderInstanceGenerator
 ) -> None:
     """Test that schema migrations occur in correct order."""
     assert recorder.util.async_migration_in_progress(hass) is False
 
     with (
         patch(
-            "homeassistant.components.recorder.core.create_engine",
+            "smarthub.components.recorder.core.create_engine",
             new=create_engine_test,
         ),
         patch(
-            "homeassistant.components.recorder.migration._apply_update",
+            "smarthub.components.recorder.migration._apply_update",
             wraps=migration._apply_update,
         ) as update,
         patch(
-            "homeassistant.components.recorder.migration._migrate_schema",
+            "smarthub.components.recorder.migration._migrate_schema",
             wraps=migration._migrate_schema,
         ) as migrate_schema,
     ):
@@ -123,7 +123,7 @@ async def test_schema_update_calls(
 
 
 async def test_migration_in_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_db_url: str,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     instrument_migration: InstrumentedMigration,
@@ -141,7 +141,7 @@ async def test_migration_in_progress(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.create_engine",
+            "smarthub.components.recorder.core.create_engine",
             new=create_engine_test,
         ),
     ):
@@ -172,7 +172,7 @@ async def test_migration_in_progress(
     ],
 )
 async def test_database_migration_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     func_to_patch: str,
     expected_setup_result: bool,
@@ -184,19 +184,19 @@ async def test_database_migration_failed(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.create_engine",
+            "smarthub.components.recorder.core.create_engine",
             new=create_engine_test,
         ),
         patch(
-            f"homeassistant.components.recorder.migration.{func_to_patch}",
+            f"smarthub.components.recorder.migration.{func_to_patch}",
             side_effect=ValueError,
         ),
         patch(
-            "homeassistant.components.persistent_notification.create",
+            "smarthub.components.persistent_notification.create",
             side_effect=pn.create,
         ) as mock_create,
         patch(
-            "homeassistant.components.persistent_notification.dismiss",
+            "smarthub.components.persistent_notification.dismiss",
             side_effect=pn.dismiss,
         ) as mock_dismiss,
     ):
@@ -224,17 +224,17 @@ async def test_database_migration_failed(
     ),
     [
         # Test error handling in _update_states_table_with_foreign_key_options
-        (11, "homeassistant.components.recorder.migration.DropConstraint", False, 1, 0),
+        (11, "smarthub.components.recorder.migration.DropConstraint", False, 1, 0),
         # Test error handling in _modify_columns
         (12, "sqlalchemy.engine.base.Connection.execute", False, 1, 0),
         # Test error handling in _drop_foreign_key_constraints
-        (46, "homeassistant.components.recorder.migration.DropConstraint", False, 2, 1),
+        (46, "smarthub.components.recorder.migration.DropConstraint", False, 2, 1),
     ],
 )
 @pytest.mark.skip_on_db_engine(["sqlite"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_database_migration_failed_non_sqlite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     instrument_migration: InstrumentedMigration,
     patch_version: int,
@@ -249,15 +249,15 @@ async def test_database_migration_failed_non_sqlite(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.create_engine",
+            "smarthub.components.recorder.core.create_engine",
             new=create_engine_test,
         ),
         patch(
-            "homeassistant.components.persistent_notification.create",
+            "smarthub.components.persistent_notification.create",
             side_effect=pn.create,
         ) as mock_create,
         patch(
-            "homeassistant.components.persistent_notification.dismiss",
+            "smarthub.components.persistent_notification.dismiss",
             side_effect=pn.dismiss,
         ) as mock_dismiss,
     ):
@@ -295,7 +295,7 @@ async def test_database_migration_failed_non_sqlite(
 @pytest.mark.skip_on_db_engine(["mysql", "postgresql"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_live_database_migration_encounters_corruption(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_db_url: str,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
@@ -314,18 +314,18 @@ async def test_live_database_migration_encounters_corruption(
 
     with (
         patch(
-            "homeassistant.components.recorder.migration._schema_is_current",
+            "smarthub.components.recorder.migration._schema_is_current",
             side_effect=[False],
         ),
         patch(
-            "homeassistant.components.recorder.migration.migrate_schema_live",
+            "smarthub.components.recorder.migration.migrate_schema_live",
             side_effect=sqlite3_exception,
         ),
         patch(
-            "homeassistant.components.recorder.core.move_away_broken_database"
+            "smarthub.components.recorder.core.move_away_broken_database"
         ) as move_away,
         patch(
-            "homeassistant.components.recorder.core.Recorder._setup_run",
+            "smarthub.components.recorder.core.Recorder._setup_run",
             autospec=True,
             wraps=recorder.Recorder._setup_run,
         ) as setup_run,
@@ -343,7 +343,7 @@ async def test_live_database_migration_encounters_corruption(
 @pytest.mark.skip_on_db_engine(["mysql", "postgresql"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_non_live_database_migration_encounters_corruption(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_db_url: str,
     async_setup_recorder_instance: RecorderInstanceGenerator,
 ) -> None:
@@ -362,21 +362,21 @@ async def test_non_live_database_migration_encounters_corruption(
 
     with (
         patch(
-            "homeassistant.components.recorder.migration._schema_is_current",
+            "smarthub.components.recorder.migration._schema_is_current",
             side_effect=[False],
         ),
         patch(
-            "homeassistant.components.recorder.migration.migrate_schema_live",
+            "smarthub.components.recorder.migration.migrate_schema_live",
         ) as migrate_schema_live,
         patch(
-            "homeassistant.components.recorder.migration.migrate_schema_non_live",
+            "smarthub.components.recorder.migration.migrate_schema_non_live",
             side_effect=sqlite3_exception,
         ),
         patch(
-            "homeassistant.components.recorder.core.move_away_broken_database"
+            "smarthub.components.recorder.core.move_away_broken_database"
         ) as move_away,
         patch(
-            "homeassistant.components.recorder.core.Recorder._setup_run",
+            "smarthub.components.recorder.core.Recorder._setup_run",
             autospec=True,
             wraps=recorder.Recorder._setup_run,
         ) as setup_run,
@@ -406,7 +406,7 @@ async def test_non_live_database_migration_encounters_corruption(
     ],
 )
 async def test_database_migration_encounters_corruption_not_sqlite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     live_migration: bool,
     func_to_patch: str,
@@ -419,26 +419,26 @@ async def test_database_migration_encounters_corruption_not_sqlite(
 
     with (
         patch(
-            "homeassistant.components.recorder.migration._schema_is_current",
+            "smarthub.components.recorder.migration._schema_is_current",
             side_effect=[False],
         ),
         patch(
-            f"homeassistant.components.recorder.migration.{func_to_patch}",
+            f"smarthub.components.recorder.migration.{func_to_patch}",
             side_effect=DatabaseError("statement", {}, []),
         ),
         patch(
-            "homeassistant.components.recorder.core.move_away_broken_database"
+            "smarthub.components.recorder.core.move_away_broken_database"
         ) as move_away,
         patch(
-            "homeassistant.components.persistent_notification.create",
+            "smarthub.components.persistent_notification.create",
             side_effect=pn.create,
         ) as mock_create,
         patch(
-            "homeassistant.components.persistent_notification.dismiss",
+            "smarthub.components.persistent_notification.dismiss",
             side_effect=pn.dismiss,
         ) as mock_dismiss,
         patch(
-            "homeassistant.components.recorder.core.migration.live_migration",
+            "smarthub.components.recorder.core.migration.live_migration",
             return_value=live_migration,
         ),
     ):
@@ -458,7 +458,7 @@ async def test_database_migration_encounters_corruption_not_sqlite(
 
 
 async def test_events_during_migration_are_queued(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     instrument_migration: InstrumentedMigration,
 ) -> None:
@@ -468,7 +468,7 @@ async def test_events_during_migration_are_queued(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.create_engine",
+            "smarthub.components.recorder.core.create_engine",
             new=create_engine_test,
         ),
     ):
@@ -497,7 +497,7 @@ async def test_events_during_migration_are_queued(
 
 
 async def test_events_during_migration_queue_exhausted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     instrument_migration: InstrumentedMigration,
 ) -> None:
@@ -507,7 +507,7 @@ async def test_events_during_migration_queue_exhausted(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.create_engine",
+            "smarthub.components.recorder.core.create_engine",
             new=create_engine_test,
         ),
         patch.object(recorder.core, "MAX_QUEUE_BACKLOG_MIN_VALUE", 1),
@@ -559,7 +559,7 @@ async def test_events_during_migration_queue_exhausted(
     ],
 )
 async def test_schema_migrate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_db_url: str,
     async_setup_recorder_instance: RecorderInstanceGenerator,
     instrument_migration: InstrumentedMigration,
@@ -612,27 +612,27 @@ async def test_schema_migrate(
 
     with (
         patch(
-            "homeassistant.components.recorder.core.create_engine",
+            "smarthub.components.recorder.core.create_engine",
             new=_create_engine_test,
         ),
         patch(
-            "homeassistant.components.recorder.Recorder._setup_run",
+            "smarthub.components.recorder.Recorder._setup_run",
             side_effect=_mock_setup_run,
             autospec=True,
         ) as setup_run,
-        patch("homeassistant.components.recorder.util.time.sleep"),
+        patch("smarthub.components.recorder.util.time.sleep"),
         patch(
-            "homeassistant.components.recorder.migration._create_index",
+            "smarthub.components.recorder.migration._create_index",
             wraps=_sometimes_failing_create_index,
         ),
         patch(
-            "homeassistant.components.recorder.Recorder._process_state_changed_event_into_session",
+            "smarthub.components.recorder.Recorder._process_state_changed_event_into_session",
         ),
         patch(
-            "homeassistant.components.recorder.Recorder._process_non_state_changed_event_into_session",
+            "smarthub.components.recorder.Recorder._process_non_state_changed_event_into_session",
         ),
         patch(
-            "homeassistant.components.recorder.Recorder._pre_process_startup_events",
+            "smarthub.components.recorder.Recorder._pre_process_startup_events",
         ),
     ):
         await async_setup_recorder_instance(
@@ -654,7 +654,7 @@ async def test_schema_migrate(
         assert instrument_migration.apply_update_mock.called
 
 
-def test_invalid_update(hass: HomeAssistant) -> None:
+def test_invalid_update(hass: SmartHub) -> None:
     """Test that an invalid new version raises an exception."""
     with pytest.raises(ValueError):
         migration._apply_update(Mock(), hass, Mock(), Mock(), -1, 0)
@@ -734,7 +734,7 @@ def test_forgiving_drop_index(
 
         with (
             patch(
-                "homeassistant.components.recorder.migration.get_index_by_name",
+                "smarthub.components.recorder.migration.get_index_by_name",
                 return_value="ix_states_context_id_bin",
             ),
             patch.object(
@@ -749,7 +749,7 @@ def test_forgiving_drop_index(
         caplog.clear()
         with (
             patch(
-                "homeassistant.components.recorder.migration.get_index_by_name",
+                "smarthub.components.recorder.migration.get_index_by_name",
                 return_value="ix_states_context_id_bin",
             ),
             patch.object(
@@ -785,7 +785,7 @@ def test_forgiving_add_index_with_other_db_types(
     type(mocked_table).indexes = PropertyMock(return_value=[mocked_index])
 
     with patch(
-        "homeassistant.components.recorder.migration.Table", return_value=mocked_table
+        "smarthub.components.recorder.migration.Table", return_value=mocked_table
     ):
         migration._create_index(Mock(), Mock(), "states", "ix_states_context_id")
 
@@ -1266,7 +1266,7 @@ def test_drop_duplicated_foreign_key_constraints(recorder_db_url: str) -> None:
     inspector.get_foreign_keys = Mock(name="get_foreign_keys", return_value=[])
     with (
         patch(
-            "homeassistant.components.recorder.migration.sqlalchemy.inspect",
+            "smarthub.components.recorder.migration.sqlalchemy.inspect",
             return_value=inspector,
         ),
         Session(engine) as session,

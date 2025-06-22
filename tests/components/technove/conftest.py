@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from technove import Station as TechnoVEStation
 
-from homeassistant.components.technove.const import DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components.technove.const import DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -27,16 +27,16 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.technove.async_setup_entry", return_value=True
+        "smarthub.components.technove.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
 
 @pytest.fixture
 def mock_onboarding() -> Generator[MagicMock]:
-    """Mock that Home Assistant is currently onboarding."""
+    """Mock that SmartHub is currently onboarding."""
     with patch(
-        "homeassistant.components.onboarding.async_is_onboarded",
+        "smarthub.components.onboarding.async_is_onboarded",
         return_value=False,
     ) as mock_onboarding:
         yield mock_onboarding
@@ -53,10 +53,10 @@ def mock_technove(device_fixture: TechnoVEStation) -> Generator[MagicMock]:
     """Return a mocked TechnoVE client."""
     with (
         patch(
-            "homeassistant.components.technove.coordinator.TechnoVE", autospec=True
+            "smarthub.components.technove.coordinator.TechnoVE", autospec=True
         ) as technove_mock,
         patch(
-            "homeassistant.components.technove.config_flow.TechnoVE", new=technove_mock
+            "smarthub.components.technove.config_flow.TechnoVE", new=technove_mock
         ),
     ):
         technove = technove_mock.return_value
@@ -67,7 +67,7 @@ def mock_technove(device_fixture: TechnoVEStation) -> Generator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_technove: MagicMock,
 ) -> MockConfigEntry:

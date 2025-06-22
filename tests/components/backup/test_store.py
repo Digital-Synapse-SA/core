@@ -7,8 +7,8 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.backup.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.backup.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .common import setup_backup_integration
 
@@ -18,7 +18,7 @@ from tests.typing import WebSocketGenerator
 @pytest.fixture(autouse=True)
 def mock_delay_save() -> Generator[None]:
     """Mock the delay save constant."""
-    with patch("homeassistant.components.backup.store.STORE_DELAY_SAVE", 0):
+    with patch("smarthub.components.backup.store.STORE_DELAY_SAVE", 0):
         yield
 
 
@@ -305,7 +305,7 @@ def mock_delay_save() -> Generator[None]:
     ],
 )
 async def test_store_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,

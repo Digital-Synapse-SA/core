@@ -11,35 +11,35 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant import setup
-from homeassistant.components.command_line import DOMAIN
-from homeassistant.components.command_line.cover import CommandCover
-from homeassistant.components.cover import (
+from smarthub import setup
+from smarthub.components.command_line import DOMAIN
+from smarthub.components.command_line.cover import CommandCover
+from smarthub.components.cover import (
     DOMAIN as COVER_DOMAIN,
     SCAN_INTERVAL,
     CoverState,
 )
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
     SERVICE_STOP_COVER,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import mock_asyncio_subprocess_run
 
 from tests.common import async_fire_time_changed
 
 
-async def test_setup_platform_yaml(hass: HomeAssistant) -> None:
+async def test_setup_platform_yaml(hass: SmartHub) -> None:
     """Test setting up the platform with platform yaml."""
     await setup.async_setup_component(
         hass,
@@ -57,7 +57,7 @@ async def test_setup_platform_yaml(hass: HomeAssistant) -> None:
     assert len(hass.states.async_all()) == 0
 
 
-async def test_no_poll_when_cover_has_no_command_state(hass: HomeAssistant) -> None:
+async def test_no_poll_when_cover_has_no_command_state(hass: SmartHub) -> None:
     """Test that the cover does not polls when there's no state command."""
 
     with mock_asyncio_subprocess_run(b"50\n") as mock_subprocess_run:
@@ -91,7 +91,7 @@ async def test_no_poll_when_cover_has_no_command_state(hass: HomeAssistant) -> N
     ],
 )
 async def test_poll_when_cover_has_command_state(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test that the cover polls when there's a state  command."""
 
@@ -105,7 +105,7 @@ async def test_poll_when_cover_has_command_state(
         )
 
 
-async def test_state_value(hass: HomeAssistant) -> None:
+async def test_state_value(hass: SmartHub) -> None:
     """Test with state value."""
     with tempfile.TemporaryDirectory() as tempdirname:
         path = os.path.join(tempdirname, "cover_status")
@@ -180,7 +180,7 @@ async def test_state_value(hass: HomeAssistant) -> None:
     ],
 )
 async def test_move_cover_failure(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, load_yaml_integration: None
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test command failure."""
 
@@ -228,7 +228,7 @@ async def test_move_cover_failure(
     ],
 )
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, load_yaml_integration: None
+    hass: SmartHub, entity_registry: er.EntityRegistry, load_yaml_integration: None
 ) -> None:
     """Test unique_id option and if it only creates one cover per id."""
     assert len(hass.states.async_all()) == 2
@@ -241,7 +241,7 @@ async def test_unique_id(
 
 
 async def test_updating_to_often(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test handling updating when command already running."""
 
@@ -259,7 +259,7 @@ async def test_updating_to_often(
             await wait_till_event.wait()
 
     with patch(
-        "homeassistant.components.command_line.cover.CommandCover",
+        "smarthub.components.command_line.cover.CommandCover",
         side_effect=MockCommandCover,
     ):
         await setup.async_setup_component(
@@ -312,9 +312,9 @@ async def test_updating_to_often(
 
 
 async def test_updating_manually(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """Test handling manual updating using homeassistant udate_entity service."""
+    """Test handling manual updating using smarthub udate_entity service."""
     await setup.async_setup_component(hass, HA_DOMAIN, {})
     called = []
 
@@ -326,7 +326,7 @@ async def test_updating_manually(
             called.append(1)
 
     with patch(
-        "homeassistant.components.command_line.cover.CommandCover",
+        "smarthub.components.command_line.cover.CommandCover",
         side_effect=MockCommandCover,
     ):
         await setup.async_setup_component(
@@ -381,7 +381,7 @@ async def test_updating_manually(
     ],
 )
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_yaml_integration: None,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -422,7 +422,7 @@ async def test_availability(
     assert entity_state.attributes["icon"] == "mdi:off"
 
 
-async def test_icon_template(hass: HomeAssistant) -> None:
+async def test_icon_template(hass: SmartHub) -> None:
     """Test with state value."""
     with tempfile.TemporaryDirectory() as tempdirname:
         path = os.path.join(tempdirname, "cover_status_icon")
@@ -491,7 +491,7 @@ async def test_icon_template(hass: HomeAssistant) -> None:
     ],
 )
 async def test_availability_blocks_value_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_yaml_integration: None,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,

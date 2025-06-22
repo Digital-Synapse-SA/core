@@ -4,7 +4,7 @@ import ast
 
 import pytest
 
-from homeassistant.components.media_source import (
+from smarthub.components.media_source import (
     DOMAIN as MS_DOMAIN,
     URI_SCHEME,
     BrowseError,
@@ -12,14 +12,14 @@ from homeassistant.components.media_source import (
     async_browse_media,
     async_resolve_media,
 )
-from homeassistant.components.netatmo import DATA_CAMERAS, DATA_EVENTS, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.netatmo import DATA_CAMERAS, DATA_EVENTS, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import async_load_fixture
 
 
-async def test_async_browse_media(hass: HomeAssistant) -> None:
+async def test_async_browse_media(hass: SmartHub) -> None:
     """Test browse media."""
     assert await async_setup_component(hass, DOMAIN, {})
 

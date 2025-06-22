@@ -7,10 +7,10 @@ from nextdns import ApiError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import init_integration, mock_nextdns
 
@@ -19,12 +19,12 @@ from tests.common import async_fire_time_changed, snapshot_platform
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test states of sensors."""
-    with patch("homeassistant.components.nextdns.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.nextdns.PLATFORMS", [Platform.SENSOR]):
         entry = await init_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
@@ -32,7 +32,7 @@ async def test_sensor(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Ensure that we mark the entities unavailable correctly when service causes an error."""
@@ -66,23 +66,23 @@ async def test_availability(
     future = utcnow() + timedelta(minutes=10)
     with (
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_status",
+            "smarthub.components.nextdns.NextDns.get_analytics_status",
             side_effect=ApiError("API Error"),
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_dnssec",
+            "smarthub.components.nextdns.NextDns.get_analytics_dnssec",
             side_effect=ApiError("API Error"),
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_encryption",
+            "smarthub.components.nextdns.NextDns.get_analytics_encryption",
             side_effect=ApiError("API Error"),
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_ip_versions",
+            "smarthub.components.nextdns.NextDns.get_analytics_ip_versions",
             side_effect=ApiError("API Error"),
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_protocols",
+            "smarthub.components.nextdns.NextDns.get_analytics_protocols",
             side_effect=ApiError("API Error"),
         ),
     ):

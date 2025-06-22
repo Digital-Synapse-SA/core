@@ -5,9 +5,9 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import MODULE, setup_integration
 from .conftest import Fixture, MockPyViCare
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry, snapshot_platform
     ],
 )
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     fixture_type: str,
     fixture_data: str,
     snapshot: SnapshotAssertion,
@@ -47,7 +47,7 @@ async def test_all_entities(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_room_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,

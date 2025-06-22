@@ -5,12 +5,12 @@ from unittest.mock import patch
 
 from gios import ApiError
 
-from homeassistant.components.gios import config_flow
-from homeassistant.components.gios.const import CONF_STATION_ID, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.gios import config_flow
+from smarthub.components.gios.const import CONF_STATION_ID, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import STATIONS
 
@@ -22,10 +22,10 @@ CONFIG = {
 }
 
 
-async def test_show_form(hass: HomeAssistant) -> None:
+async def test_show_form(hass: SmartHub) -> None:
     """Test that the form is served with no input."""
     with patch(
-        "homeassistant.components.gios.coordinator.Gios._get_stations",
+        "smarthub.components.gios.coordinator.Gios._get_stations",
         return_value=STATIONS,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -36,10 +36,10 @@ async def test_show_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_form_with_api_error(hass: HomeAssistant) -> None:
+async def test_form_with_api_error(hass: SmartHub) -> None:
     """Test the form is aborted because of API error."""
     with patch(
-        "homeassistant.components.gios.coordinator.Gios._get_stations",
+        "smarthub.components.gios.coordinator.Gios._get_stations",
         side_effect=ApiError("error"),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -49,21 +49,21 @@ async def test_form_with_api_error(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.ABORT
 
 
-async def test_invalid_sensor_data(hass: HomeAssistant) -> None:
+async def test_invalid_sensor_data(hass: SmartHub) -> None:
     """Test that errors are shown when sensor data is invalid."""
     with (
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_stations",
+            "smarthub.components.gios.coordinator.Gios._get_stations",
             return_value=STATIONS,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_station",
+            "smarthub.components.gios.coordinator.Gios._get_station",
             return_value=json.loads(
                 await async_load_fixture(hass, "station.json", DOMAIN)
             ),
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_sensor",
+            "smarthub.components.gios.coordinator.Gios._get_sensor",
             return_value={},
         ),
     ):
@@ -76,15 +76,15 @@ async def test_invalid_sensor_data(hass: HomeAssistant) -> None:
         assert result["errors"] == {CONF_STATION_ID: "invalid_sensors_data"}
 
 
-async def test_cannot_connect(hass: HomeAssistant) -> None:
+async def test_cannot_connect(hass: SmartHub) -> None:
     """Test that errors are shown when cannot connect to GIOS server."""
     with (
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_stations",
+            "smarthub.components.gios.coordinator.Gios._get_stations",
             return_value=STATIONS,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._async_get",
+            "smarthub.components.gios.coordinator.Gios._async_get",
             side_effect=ApiError("error"),
         ),
     ):
@@ -99,27 +99,27 @@ async def test_cannot_connect(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_create_entry(hass: HomeAssistant) -> None:
+async def test_create_entry(hass: SmartHub) -> None:
     """Test that the user step works."""
     with (
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_stations",
+            "smarthub.components.gios.coordinator.Gios._get_stations",
             return_value=STATIONS,
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_station",
+            "smarthub.components.gios.coordinator.Gios._get_station",
             return_value=json.loads(
                 await async_load_fixture(hass, "station.json", DOMAIN)
             ),
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_all_sensors",
+            "smarthub.components.gios.coordinator.Gios._get_all_sensors",
             return_value=json.loads(
                 await async_load_fixture(hass, "sensors.json", DOMAIN)
             ),
         ),
         patch(
-            "homeassistant.components.gios.coordinator.Gios._get_indexes",
+            "smarthub.components.gios.coordinator.Gios._get_indexes",
             return_value=json.loads(
                 await async_load_fixture(hass, "indexes.json", DOMAIN)
             ),

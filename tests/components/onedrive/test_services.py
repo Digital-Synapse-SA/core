@@ -9,16 +9,16 @@ from unittest.mock import MagicMock, Mock, patch
 from onedrive_personal_sdk.exceptions import OneDriveException
 import pytest
 
-from homeassistant.components.onedrive.const import DOMAIN
-from homeassistant.components.onedrive.services import (
+from smarthub.components.onedrive.const import DOMAIN
+from smarthub.components.onedrive.services import (
     CONF_CONFIG_ENTRY_ID,
     CONF_DESTINATION_FOLDER,
     UPLOAD_SERVICE,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_FILENAME
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_FILENAME
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import setup_integration
 
@@ -46,16 +46,16 @@ def upload_file_fixture() -> MockUploadFile:
 
 @pytest.fixture(autouse=True)
 def mock_upload_file(
-    hass: HomeAssistant, upload_file: MockUploadFile
+    hass: SmartHub, upload_file: MockUploadFile
 ) -> Generator[None]:
     """Fixture that mocks out the file calls using the FakeFile fixture."""
     with (
         patch(
-            "homeassistant.components.onedrive.services.Path.read_bytes",
+            "smarthub.components.onedrive.services.Path.read_bytes",
             return_value=upload_file.content,
         ),
         patch(
-            "homeassistant.components.onedrive.services.Path.exists",
+            "smarthub.components.onedrive.services.Path.exists",
             return_value=upload_file.exists,
         ),
         patch.object(
@@ -71,7 +71,7 @@ def mock_upload_file(
 
 
 async def test_upload_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test service call to upload content."""
@@ -97,7 +97,7 @@ async def test_upload_service(
 
 
 async def test_upload_service_no_response(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test service call to upload content without response."""
@@ -120,12 +120,12 @@ async def test_upload_service_no_response(
 
 
 async def test_upload_service_config_entry_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test upload service call with a config entry that does not exist."""
     await setup_integration(hass, mock_config_entry)
-    with pytest.raises(HomeAssistantError, match="not found in registry"):
+    with pytest.raises(SmartHubError, match="not found in registry"):
         await hass.services.async_call(
             DOMAIN,
             UPLOAD_SERVICE,
@@ -140,7 +140,7 @@ async def test_upload_service_config_entry_not_found(
 
 
 async def test_config_entry_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test upload service call with a config entry that is not loaded."""
@@ -150,7 +150,7 @@ async def test_config_entry_not_loaded(
 
     assert mock_config_entry.state is ConfigEntryState.NOT_LOADED
 
-    with pytest.raises(HomeAssistantError, match="not found in registry"):
+    with pytest.raises(SmartHubError, match="not found in registry"):
         await hass.services.async_call(
             DOMAIN,
             UPLOAD_SERVICE,
@@ -166,13 +166,13 @@ async def test_config_entry_not_loaded(
 
 @pytest.mark.parametrize("upload_file", [MockUploadFile(is_allowed_path=False)])
 async def test_path_is_not_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test upload service call with a filename path that is not allowed."""
     await setup_integration(hass, mock_config_entry)
     with (
-        pytest.raises(HomeAssistantError, match="no access to path"),
+        pytest.raises(SmartHubError, match="no access to path"),
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -189,12 +189,12 @@ async def test_path_is_not_allowed(
 
 @pytest.mark.parametrize("upload_file", [MockUploadFile(exists=False)])
 async def test_filename_does_not_exist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test upload service call with a filename path that does not exist."""
     await setup_integration(hass, mock_config_entry)
-    with pytest.raises(HomeAssistantError, match="does not exist"):
+    with pytest.raises(SmartHubError, match="does not exist"):
         await hass.services.async_call(
             DOMAIN,
             UPLOAD_SERVICE,
@@ -209,7 +209,7 @@ async def test_filename_does_not_exist(
 
 
 async def test_upload_service_fails_upload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
 ) -> None:
@@ -217,7 +217,7 @@ async def test_upload_service_fails_upload(
     await setup_integration(hass, mock_config_entry)
     mock_onedrive_client.upload_file.side_effect = OneDriveException("error")
 
-    with pytest.raises(HomeAssistantError, match="Failed to upload"):
+    with pytest.raises(SmartHubError, match="Failed to upload"):
         await hass.services.async_call(
             DOMAIN,
             UPLOAD_SERVICE,
@@ -233,13 +233,13 @@ async def test_upload_service_fails_upload(
 
 @pytest.mark.parametrize("upload_file", [MockUploadFile(size=260 * 1024 * 1024)])
 async def test_upload_size_limit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test upload service call with a filename path that does not exist."""
     await setup_integration(hass, mock_config_entry)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape(f"`{TEST_FILENAME}` is too large (272629760 > 262144000)"),
     ):
         await hass.services.async_call(
@@ -256,7 +256,7 @@ async def test_upload_size_limit(
 
 
 async def test_create_album_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_onedrive_client: MagicMock,
 ) -> None:
@@ -266,7 +266,7 @@ async def test_create_album_failed(
 
     mock_onedrive_client.create_folder.side_effect = OneDriveException()
 
-    with pytest.raises(HomeAssistantError, match="Failed to create folder"):
+    with pytest.raises(SmartHubError, match="Failed to create folder"):
         await hass.services.async_call(
             DOMAIN,
             UPLOAD_SERVICE,

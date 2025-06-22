@@ -1,9 +1,9 @@
 """Make sure that existing VOCOlinc VP3 support isn't broken."""
 
-from homeassistant.components.sensor import SensorStateClass
-from homeassistant.const import UnitOfPower
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.sensor import SensorStateClass
+from smarthub.const import UnitOfPower
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from ..common import (
     HUB_TEST_ACCESSORY_ID,
@@ -16,7 +16,7 @@ from ..common import (
 
 
 async def test_vocolinc_vp3_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test that a VOCOlinc VP3 can be correctly setup in HA."""

@@ -6,22 +6,22 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import FailedZWaveCommand
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.components.zwave_js.helpers import ZwaveValueMatcher
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.zwave_js.helpers import ZwaveValueMatcher
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .common import SWITCH_ENTITY, replace_value_of_zwave_value
 
 
 async def test_switch(
-    hass: HomeAssistant, hank_binary_switch, integration, client
+    hass: SmartHub, hank_binary_switch, integration, client
 ) -> None:
     """Test the switch."""
     state = hass.states.get(SWITCH_ENTITY)
@@ -87,7 +87,7 @@ async def test_switch(
 
 
 async def test_barrier_signaling_switch(
-    hass: HomeAssistant, gdc_zw062, integration, client
+    hass: SmartHub, gdc_zw062, integration, client
 ) -> None:
     """Test barrier signaling state switch."""
     node = gdc_zw062
@@ -199,7 +199,7 @@ async def test_barrier_signaling_switch(
 
 
 async def test_switch_no_value(
-    hass: HomeAssistant, hank_binary_switch_state, integration, client
+    hass: SmartHub, hank_binary_switch_state, integration, client
 ) -> None:
     """Test the switch where primary value value is None."""
     node_state = replace_value_of_zwave_value(
@@ -223,7 +223,7 @@ async def test_switch_no_value(
 
 
 async def test_config_parameter_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hank_binary_switch,
     integration,
@@ -290,7 +290,7 @@ async def test_config_parameter_switch(
     client.async_send_command.side_effect = FailedZWaveCommand("test", 1, "test")
 
     # Test turning off error raises proper exception
-    with pytest.raises(HomeAssistantError) as err:
+    with pytest.raises(SmartHubError) as err:
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,

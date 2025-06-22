@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, PropertyMock
 import blebox_uniapi
 import pytest
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_CURRENT_TILT_POSITION,
     ATTR_POSITION,
@@ -15,7 +15,7 @@ from homeassistant.components.cover import (
     CoverEntityFeature,
     CoverState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_SUPPORTED_FEATURES,
     SERVICE_CLOSE_COVER,
@@ -27,8 +27,8 @@ from homeassistant.const import (
     SERVICE_STOP_COVER,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import async_setup_entity, mock_feature
 
@@ -99,7 +99,7 @@ def gate_fixture():
 
 
 async def test_init_gatecontroller(
-    gatecontroller, hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    gatecontroller, hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test gateController default state."""
 
@@ -130,7 +130,7 @@ async def test_init_gatecontroller(
 
 
 async def test_init_shutterbox(
-    shutterbox, hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    shutterbox, hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test gateBox default state."""
 
@@ -161,7 +161,7 @@ async def test_init_shutterbox(
 
 
 async def test_init_gatebox(
-    gatebox, hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    gatebox, hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test cover default state."""
 
@@ -194,7 +194,7 @@ async def test_init_gatebox(
 
 
 @pytest.mark.parametrize("feature", ALL_COVER_FIXTURES, indirect=["feature"])
-async def test_open(feature, hass: HomeAssistant) -> None:
+async def test_open(feature, hass: SmartHub) -> None:
     """Test cover opening."""
 
     feature_mock, entity_id = feature
@@ -222,7 +222,7 @@ async def test_open(feature, hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("feature", ALL_COVER_FIXTURES, indirect=["feature"])
-async def test_close(feature, hass: HomeAssistant) -> None:
+async def test_close(feature, hass: SmartHub) -> None:
     """Test cover closing."""
 
     feature_mock, entity_id = feature
@@ -260,7 +260,7 @@ def opening_to_stop_feature_mock(feature_mock):
 
 
 @pytest.mark.parametrize("feature", FIXTURES_SUPPORTING_STOP, indirect=["feature"])
-async def test_stop(feature, hass: HomeAssistant) -> None:
+async def test_stop(feature, hass: SmartHub) -> None:
     """Test cover stopping."""
 
     feature_mock, entity_id = feature
@@ -277,7 +277,7 @@ async def test_stop(feature, hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("feature", ALL_COVER_FIXTURES, indirect=["feature"])
-async def test_update(feature, hass: HomeAssistant) -> None:
+async def test_update(feature, hass: SmartHub) -> None:
     """Test cover updating."""
 
     feature_mock, entity_id = feature
@@ -298,7 +298,7 @@ async def test_update(feature, hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     "feature", ["gatecontroller", "shutterbox"], indirect=["feature"]
 )
-async def test_set_position(feature, hass: HomeAssistant) -> None:
+async def test_set_position(feature, hass: SmartHub) -> None:
     """Test cover position setting."""
 
     feature_mock, entity_id = feature
@@ -327,7 +327,7 @@ async def test_set_position(feature, hass: HomeAssistant) -> None:
     assert hass.states.get(entity_id).state == CoverState.OPENING
 
 
-async def test_unknown_position(shutterbox, hass: HomeAssistant) -> None:
+async def test_unknown_position(shutterbox, hass: SmartHub) -> None:
     """Test cover position setting."""
 
     feature_mock, entity_id = shutterbox
@@ -345,7 +345,7 @@ async def test_unknown_position(shutterbox, hass: HomeAssistant) -> None:
     assert ATTR_CURRENT_POSITION not in state.attributes
 
 
-async def test_with_stop(gatebox, hass: HomeAssistant) -> None:
+async def test_with_stop(gatebox, hass: SmartHub) -> None:
     """Test stop capability is available."""
 
     feature_mock, entity_id = gatebox
@@ -359,7 +359,7 @@ async def test_with_stop(gatebox, hass: HomeAssistant) -> None:
     assert supported_features & CoverEntityFeature.STOP
 
 
-async def test_with_no_stop(gatebox, hass: HomeAssistant) -> None:
+async def test_with_no_stop(gatebox, hass: SmartHub) -> None:
     """Test stop capability is not available."""
 
     feature_mock, entity_id = gatebox
@@ -375,7 +375,7 @@ async def test_with_no_stop(gatebox, hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("feature", ALL_COVER_FIXTURES, indirect=["feature"])
 async def test_update_failure(
-    feature, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    feature, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that update failures are logged."""
 
@@ -389,7 +389,7 @@ async def test_update_failure(
 
 
 @pytest.mark.parametrize("feature", ALL_COVER_FIXTURES, indirect=["feature"])
-async def test_opening_state(feature, hass: HomeAssistant) -> None:
+async def test_opening_state(feature, hass: SmartHub) -> None:
     """Test that entity properties work."""
 
     feature_mock, entity_id = feature
@@ -403,7 +403,7 @@ async def test_opening_state(feature, hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("feature", ALL_COVER_FIXTURES, indirect=["feature"])
-async def test_closing_state(feature, hass: HomeAssistant) -> None:
+async def test_closing_state(feature, hass: SmartHub) -> None:
     """Test that entity properties work."""
 
     feature_mock, entity_id = feature
@@ -417,7 +417,7 @@ async def test_closing_state(feature, hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("feature", ALL_COVER_FIXTURES, indirect=["feature"])
-async def test_closed_state(feature, hass: HomeAssistant) -> None:
+async def test_closed_state(feature, hass: SmartHub) -> None:
     """Test that entity properties work."""
 
     feature_mock, entity_id = feature
@@ -430,7 +430,7 @@ async def test_closed_state(feature, hass: HomeAssistant) -> None:
     assert hass.states.get(entity_id).state == CoverState.CLOSED
 
 
-async def test_tilt_position(shutterbox, hass: HomeAssistant) -> None:
+async def test_tilt_position(shutterbox, hass: SmartHub) -> None:
     """Test tilt capability is available."""
 
     feature_mock, entity_id = shutterbox
@@ -446,7 +446,7 @@ async def test_tilt_position(shutterbox, hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_TILT_POSITION] == 10
 
 
-async def test_set_tilt_position(shutterbox, hass: HomeAssistant) -> None:
+async def test_set_tilt_position(shutterbox, hass: SmartHub) -> None:
     """Test tilt position setting."""
 
     feature_mock, entity_id = shutterbox
@@ -474,7 +474,7 @@ async def test_set_tilt_position(shutterbox, hass: HomeAssistant) -> None:
     assert hass.states.get(entity_id).state == CoverState.OPENING
 
 
-async def test_open_tilt(shutterbox, hass: HomeAssistant) -> None:
+async def test_open_tilt(shutterbox, hass: SmartHub) -> None:
     """Test closing tilt."""
     feature_mock, entity_id = shutterbox
 
@@ -501,7 +501,7 @@ async def test_open_tilt(shutterbox, hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_TILT_POSITION] == 100  # inverted
 
 
-async def test_close_tilt(shutterbox, hass: HomeAssistant) -> None:
+async def test_close_tilt(shutterbox, hass: SmartHub) -> None:
     """Test closing tilt."""
     feature_mock, entity_id = shutterbox
 

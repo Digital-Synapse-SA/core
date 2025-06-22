@@ -7,20 +7,20 @@ from aiowaqi import WAQIAirQuality, WAQIError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.waqi.const import DOMAIN
-from homeassistant.components.waqi.sensor import SENSORS
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.waqi.const import DOMAIN
+from smarthub.components.waqi.sensor import SENSORS
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_load_fixture
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -45,7 +45,7 @@ async def test_sensor(
 
 
 async def test_updating_failed(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test failed update."""
     mock_config_entry.add_to_hass(hass)

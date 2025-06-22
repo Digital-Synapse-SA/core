@@ -7,7 +7,7 @@ import pytest
 from yeelight import BulbException, BulbType
 from yeelight.aio import KEY_CONNECTED
 
-from homeassistant.components.yeelight.const import (
+from smarthub.components.yeelight.const import (
     CONF_DETECTED_MODEL,
     CONF_NIGHTLIGHT_SWITCH,
     CONF_NIGHTLIGHT_SWITCH_TYPE,
@@ -15,8 +15,8 @@ from homeassistant.components.yeelight.const import (
     NIGHTLIGHT_SWITCH_TYPE_LIGHT,
     STATE_CHANGE_TIME,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_DEVICES,
     CONF_HOST,
     CONF_ID,
@@ -24,10 +24,10 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     CONFIG_ENTRY_DATA,
@@ -52,7 +52,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_ip_changes_fallback_discovery(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test Yeelight ip changes and we fallback to discovery."""
     config_entry = MockConfigEntry(
@@ -97,7 +97,7 @@ async def test_ip_changes_fallback_discovery(
     assert entity_registry.async_get(binary_sensor_entity_id) is not None
 
 
-async def test_ip_changes_id_missing_cannot_fallback(hass: HomeAssistant) -> None:
+async def test_ip_changes_id_missing_cannot_fallback(hass: SmartHub) -> None:
     """Test Yeelight ip changes and we fallback to discovery."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={CONF_HOST: "5.5.5.5"})
     config_entry.add_to_hass(hass)
@@ -113,7 +113,7 @@ async def test_ip_changes_id_missing_cannot_fallback(hass: HomeAssistant) -> Non
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_setup_discovery(hass: HomeAssistant) -> None:
+async def test_setup_discovery(hass: SmartHub) -> None:
     """Test setting up Yeelight by discovery."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: IP_ADDRESS, **CONFIG_ENTRY_DATA}
@@ -154,7 +154,7 @@ _ADAPTERS_WITH_MANUAL_CONFIG = [
 
 
 async def test_setup_discovery_with_manually_configured_network_adapter(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test setting up Yeelight by discovery with a manually configured network adapter."""
     config_entry = MockConfigEntry(
@@ -167,7 +167,7 @@ async def test_setup_discovery_with_manually_configured_network_adapter(
         _patch_discovery(),
         patch(f"{MODULE}.AsyncBulb", return_value=mocked_bulb),
         patch(
-            "homeassistant.components.zeroconf.network.async_get_adapters",
+            "smarthub.components.zeroconf.network.async_get_adapters",
             return_value=_ADAPTERS_WITH_MANUAL_CONFIG,
         ),
     ):
@@ -212,7 +212,7 @@ _ADAPTERS_WITH_MANUAL_CONFIG_ONE_FAILING = [
 
 
 async def test_setup_discovery_with_manually_configured_network_adapter_one_fails(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setting up Yeelight by discovery with a manually configured network adapter with one that fails to bind."""
     config_entry = MockConfigEntry(
@@ -225,7 +225,7 @@ async def test_setup_discovery_with_manually_configured_network_adapter_one_fail
         _patch_discovery(),
         patch(f"{MODULE}.AsyncBulb", return_value=mocked_bulb),
         patch(
-            "homeassistant.components.zeroconf.network.async_get_adapters",
+            "smarthub.components.zeroconf.network.async_get_adapters",
             return_value=_ADAPTERS_WITH_MANUAL_CONFIG_ONE_FAILING,
         ),
     ):
@@ -249,7 +249,7 @@ async def test_setup_discovery_with_manually_configured_network_adapter_one_fail
     assert f"Failed to setup listener for ('{FAIL_TO_BIND_IP}', 0)" in caplog.text
 
 
-async def test_setup_import(hass: HomeAssistant) -> None:
+async def test_setup_import(hass: SmartHub) -> None:
     """Test import from yaml."""
     mocked_bulb = _mocked_bulb()
     name = "yeelight"
@@ -279,7 +279,7 @@ async def test_setup_import(hass: HomeAssistant) -> None:
 
 
 async def test_unique_ids_device(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test Yeelight unique IDs from yeelight device IDs."""
     config_entry = MockConfigEntry(
@@ -305,7 +305,7 @@ async def test_unique_ids_device(
 
 
 async def test_unique_ids_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test Yeelight unique IDs from entry IDs."""
     config_entry = MockConfigEntry(
@@ -336,7 +336,7 @@ async def test_unique_ids_entry(
     )
 
 
-async def test_bulb_off_while_adding_in_ha(hass: HomeAssistant) -> None:
+async def test_bulb_off_while_adding_in_ha(hass: SmartHub) -> None:
     """Test Yeelight off while adding to ha, for example on HA start."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={**CONFIG_ENTRY_DATA, CONF_HOST: IP_ADDRESS}, unique_id=ID
@@ -370,7 +370,7 @@ async def test_bulb_off_while_adding_in_ha(hass: HomeAssistant) -> None:
 
 
 async def test_async_listen_error_late_discovery(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the async listen error."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=CONFIG_ENTRY_DATA)
@@ -397,7 +397,7 @@ async def test_async_listen_error_late_discovery(
 
 
 async def test_fail_to_fetch_initial_state(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test failing to fetch initial state results in a retry."""
     config_entry = MockConfigEntry(
@@ -427,7 +427,7 @@ async def test_fail_to_fetch_initial_state(
 
 
 async def test_unload_before_discovery(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test unloading before discovery."""
     config_entry = MockConfigEntry(domain=DOMAIN, data=CONFIG_ENTRY_DATA)
@@ -449,7 +449,7 @@ async def test_unload_before_discovery(
     assert config_entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_async_listen_error_has_host_with_id(hass: HomeAssistant) -> None:
+async def test_async_listen_error_has_host_with_id(hass: SmartHub) -> None:
     """Test the async listen error."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_ID: ID, CONF_HOST: "127.0.0.1"}
@@ -467,7 +467,7 @@ async def test_async_listen_error_has_host_with_id(hass: HomeAssistant) -> None:
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_async_listen_error_has_host_without_id(hass: HomeAssistant) -> None:
+async def test_async_listen_error_has_host_without_id(hass: SmartHub) -> None:
     """Test the async listen error but no id."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={CONF_HOST: "127.0.0.1"})
     config_entry.add_to_hass(hass)
@@ -483,7 +483,7 @@ async def test_async_listen_error_has_host_without_id(hass: HomeAssistant) -> No
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_async_setup_with_missing_id(hass: HomeAssistant) -> None:
+async def test_async_setup_with_missing_id(hass: SmartHub) -> None:
     """Test that setting adds the missing CONF_ID from unique_id."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -517,7 +517,7 @@ async def test_async_setup_with_missing_id(hass: HomeAssistant) -> None:
         assert config_entry.state is ConfigEntryState.LOADED
 
 
-async def test_async_setup_with_missing_unique_id(hass: HomeAssistant) -> None:
+async def test_async_setup_with_missing_unique_id(hass: SmartHub) -> None:
     """Test that setting adds the missing unique_id from CONF_ID."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -550,7 +550,7 @@ async def test_async_setup_with_missing_unique_id(hass: HomeAssistant) -> None:
         assert config_entry.state is ConfigEntryState.LOADED
 
 
-async def test_connection_dropped_resyncs_properties(hass: HomeAssistant) -> None:
+async def test_connection_dropped_resyncs_properties(hass: SmartHub) -> None:
     """Test handling a connection drop results in a property resync."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -584,7 +584,7 @@ async def test_connection_dropped_resyncs_properties(hass: HomeAssistant) -> Non
 
 
 async def test_oserror_on_first_update_results_in_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that an OSError on first update results in unavailable."""
     config_entry = MockConfigEntry(
@@ -611,7 +611,7 @@ async def test_oserror_on_first_update_results_in_unavailable(
 
 @pytest.mark.parametrize("exception", [BulbException, TimeoutError])
 async def test_non_oserror_exception_on_first_update(
-    hass: HomeAssistant, exception: Exception
+    hass: SmartHub, exception: Exception
 ) -> None:
     """Test that an exceptions other than OSError on first update do not result in unavailable.
 
@@ -639,7 +639,7 @@ async def test_non_oserror_exception_on_first_update(
     assert hass.states.get("light.test_name").state != STATE_UNAVAILABLE
 
 
-async def test_async_setup_with_discovery_not_working(hass: HomeAssistant) -> None:
+async def test_async_setup_with_discovery_not_working(hass: SmartHub) -> None:
     """Test we can setup even if discovery is broken."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -663,7 +663,7 @@ async def test_async_setup_with_discovery_not_working(hass: HomeAssistant) -> No
 
 
 async def test_async_setup_retries_with_wrong_device(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the config entry enters a retry state with the wrong device."""
     config_entry = MockConfigEntry(

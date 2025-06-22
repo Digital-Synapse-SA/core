@@ -8,13 +8,13 @@ from pyownet import protocol
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.onewire.const import DOMAIN
-from homeassistant.components.onewire.onewirehub import _DEVICE_SCAN_INTERVAL
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.onewire.const import DOMAIN
+from smarthub.components.onewire.onewirehub import _DEVICE_SCAN_INTERVAL
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import setup_owproxy_mock_devices
 from .const import MOCK_OWPROXY_DEVICES
@@ -25,7 +25,7 @@ from tests.typing import WebSocketGenerator
 
 @pytest.mark.usefixtures("owproxy_with_connerror")
 async def test_connect_failure(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test connection failure raises ConfigEntryNotReady."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -36,7 +36,7 @@ async def test_connect_failure(
 
 
 async def test_listing_failure(
-    hass: HomeAssistant, config_entry: MockConfigEntry, owproxy: MagicMock
+    hass: SmartHub, config_entry: MockConfigEntry, owproxy: MagicMock
 ) -> None:
     """Test listing failure raises ConfigEntryNotReady."""
     owproxy.return_value.dir.side_effect = protocol.OwnetError()
@@ -49,7 +49,7 @@ async def test_listing_failure(
 
 
 @pytest.mark.usefixtures("owproxy")
-async def test_unload_entry(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def test_unload_entry(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Test being able to unload an entry."""
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
@@ -64,7 +64,7 @@ async def test_unload_entry(hass: HomeAssistant, config_entry: MockConfigEntry) 
 
 
 async def test_update_options(
-    hass: HomeAssistant, config_entry: MockConfigEntry, owproxy: MagicMock
+    hass: SmartHub, config_entry: MockConfigEntry, owproxy: MagicMock
 ) -> None:
     """Test update options triggers reload."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -86,7 +86,7 @@ async def test_update_options(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     owproxy: MagicMock,
     device_registry: dr.DeviceRegistry,
@@ -106,7 +106,7 @@ async def test_registry(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_registry_delayed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     owproxy: MagicMock,
     device_registry: dr.DeviceRegistry,
@@ -129,9 +129,9 @@ async def test_registry_delayed(
     )
 
 
-@patch("homeassistant.components.onewire._PLATFORMS", [Platform.SENSOR])
+@patch("smarthub.components.onewire._PLATFORMS", [Platform.SENSOR])
 async def test_registry_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry: MockConfigEntry,
     owproxy: MagicMock,

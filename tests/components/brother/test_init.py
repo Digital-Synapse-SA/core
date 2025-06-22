@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, patch
 from brother import SnmpError
 import pytest
 
-from homeassistant.components.brother.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.brother.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import init_integration
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_async_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_brother_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -26,7 +26,7 @@ async def test_async_setup_entry(
 
 
 async def test_config_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_brother_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -40,11 +40,11 @@ async def test_config_not_ready(
 
 @pytest.mark.parametrize("exc", [(SnmpError("SNMP Error")), (ConnectionError)])
 async def test_error_on_init(
-    hass: HomeAssistant, exc: Exception, mock_config_entry: MockConfigEntry
+    hass: SmartHub, exc: Exception, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test for error on init."""
     with patch(
-        "homeassistant.components.brother.Brother.create",
+        "smarthub.components.brother.Brother.create",
         new=AsyncMock(side_effect=exc),
     ):
         await init_integration(hass, mock_config_entry)
@@ -53,7 +53,7 @@ async def test_error_on_init(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_brother_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

@@ -6,10 +6,10 @@ import pytest
 import roborock
 from roborock import RoborockException
 
-from homeassistant.components.button import SERVICE_PRESS
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.button import SERVICE_PRESS
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ def bypass_api_client_get_scenes_fixture(bypass_api_fixture) -> None:
     """Fixture to raise when getting scenes."""
     with (
         patch(
-            "homeassistant.components.roborock.RoborockApiClient.get_scenes",
+            "smarthub.components.roborock.RoborockApiClient.get_scenes",
             side_effect=RoborockException(),
         ),
     ):
@@ -44,7 +44,7 @@ def platforms() -> list[Platform]:
 @pytest.mark.freeze_time("2023-10-30 08:50:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_update_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
     entity_id: str,
@@ -53,7 +53,7 @@ async def test_update_success(
     # Ensure that the entity exist, as these test can pass even if there is no entity.
     assert hass.states.get(entity_id).state == "unknown"
     with patch(
-        "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.send_message"
+        "smarthub.components.roborock.coordinator.RoborockLocalClientV1.send_message"
     ) as mock_send_message:
         await hass.services.async_call(
             "button",
@@ -74,7 +74,7 @@ async def test_update_success(
 @pytest.mark.freeze_time("2023-10-30 08:50:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_update_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
     entity_id: str,
@@ -84,10 +84,10 @@ async def test_update_failure(
     assert hass.states.get(entity_id).state == "unknown"
     with (
         patch(
-            "homeassistant.components.roborock.coordinator.RoborockLocalClientV1.send_message",
+            "smarthub.components.roborock.coordinator.RoborockLocalClientV1.send_message",
             side_effect=roborock.exceptions.RoborockTimeout,
         ) as mock_send_message,
-        pytest.raises(HomeAssistantError, match="Error while calling RESET_CONSUMABLE"),
+        pytest.raises(SmartHubError, match="Error while calling RESET_CONSUMABLE"),
     ):
         await hass.services.async_call(
             "button",
@@ -108,7 +108,7 @@ async def test_update_failure(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_get_button_routines_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_client_get_scenes_fixture,
     setup_entry: MockConfigEntry,
     entity_id: str,
@@ -128,7 +128,7 @@ async def test_get_button_routines_failure(
 @pytest.mark.freeze_time("2023-10-30 08:50:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_press_routine_button_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
     entity_id: str,
@@ -136,7 +136,7 @@ async def test_press_routine_button_success(
 ) -> None:
     """Test pressing the button entities."""
     with patch(
-        "homeassistant.components.roborock.RoborockApiClient.execute_scene"
+        "smarthub.components.roborock.RoborockApiClient.execute_scene"
     ) as mock_execute_scene:
         await hass.services.async_call(
             "button",
@@ -157,7 +157,7 @@ async def test_press_routine_button_success(
 @pytest.mark.freeze_time("2023-10-30 08:50:00")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_press_routine_button_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
     entity_id: str,
@@ -166,10 +166,10 @@ async def test_press_routine_button_failure(
     """Test failure while pressing the button entity."""
     with (
         patch(
-            "homeassistant.components.roborock.RoborockApiClient.execute_scene",
+            "smarthub.components.roborock.RoborockApiClient.execute_scene",
             side_effect=RoborockException,
         ) as mock_execute_scene,
-        pytest.raises(HomeAssistantError, match="Error while calling execute_scene"),
+        pytest.raises(SmartHubError, match="Error while calling execute_scene"),
     ):
         await hass.services.async_call(
             "button",

@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.util.yaml import (
+from smarthub.util.yaml import (
     Input,
     UndefinedSubstitution,
     extract_inputs,

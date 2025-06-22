@@ -1,21 +1,21 @@
-"""Test the Home Assistant hardware firmware config flow failure cases."""
+"""Test the SmartHub hardware firmware config flow failure cases."""
 
 from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.hassio import AddonError, AddonInfo, AddonState
-from homeassistant.components.homeassistant_hardware.firmware_config_flow import (
+from smarthub.components.hassio import AddonError, AddonInfo, AddonState
+from smarthub.components.smarthub_hardware.firmware_config_flow import (
     STEP_PICK_FIRMWARE_THREAD,
     STEP_PICK_FIRMWARE_ZIGBEE,
 )
-from homeassistant.components.homeassistant_hardware.util import (
+from smarthub.components.smarthub_hardware.util import (
     ApplicationType,
     FirmwareInfo,
     OwningIntegration,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .test_config_flow import (
     TEST_DEVICE,
@@ -47,7 +47,7 @@ async def fixture_mock_supervisor_client(supervisor_client: AsyncMock):
 )
 @pytest.mark.usefixtures("addon_store_info")
 async def test_config_flow_cannot_probe_firmware(
-    next_step: str, hass: HomeAssistant
+    next_step: str, hass: SmartHub
 ) -> None:
     """Test failure case when firmware cannot be probed."""
 
@@ -74,7 +74,7 @@ async def test_config_flow_cannot_probe_firmware(
     ["test_firmware_domain"],
 )
 async def test_config_flow_zigbee_not_hassio_wrong_firmware(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test when the stick is used with a non-hassio setup but the firmware is bad."""
     result = await hass.config_entries.flow.async_init(
@@ -103,7 +103,7 @@ async def test_config_flow_zigbee_not_hassio_wrong_firmware(
     ["test_firmware_domain"],
 )
 async def test_config_flow_zigbee_flasher_addon_already_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test failure case when flasher addon is already running."""
     result = await hass.config_entries.flow.async_init(
@@ -140,7 +140,7 @@ async def test_config_flow_zigbee_flasher_addon_already_running(
     "ignore_translations_for_mock_domains",
     ["test_firmware_domain"],
 )
-async def test_config_flow_zigbee_flasher_addon_info_fails(hass: HomeAssistant) -> None:
+async def test_config_flow_zigbee_flasher_addon_info_fails(hass: SmartHub) -> None:
     """Test failure case when flasher addon cannot be installed."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -178,7 +178,7 @@ async def test_config_flow_zigbee_flasher_addon_info_fails(hass: HomeAssistant) 
     ["test_firmware_domain"],
 )
 async def test_config_flow_zigbee_flasher_addon_install_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test failure case when flasher addon cannot be installed."""
     result = await hass.config_entries.flow.async_init(
@@ -212,7 +212,7 @@ async def test_config_flow_zigbee_flasher_addon_install_fails(
     ["test_firmware_domain"],
 )
 async def test_config_flow_zigbee_flasher_addon_set_config_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test failure case when flasher addon cannot be configured."""
     result = await hass.config_entries.flow.async_init(
@@ -249,7 +249,7 @@ async def test_config_flow_zigbee_flasher_addon_set_config_fails(
     "ignore_translations_for_mock_domains",
     ["test_firmware_domain"],
 )
-async def test_config_flow_zigbee_flasher_run_fails(hass: HomeAssistant) -> None:
+async def test_config_flow_zigbee_flasher_run_fails(hass: SmartHub) -> None:
     """Test failure case when flasher addon fails to run."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -278,7 +278,7 @@ async def test_config_flow_zigbee_flasher_run_fails(hass: HomeAssistant) -> None
         assert result["reason"] == "addon_start_failed"
 
 
-async def test_config_flow_zigbee_flasher_uninstall_fails(hass: HomeAssistant) -> None:
+async def test_config_flow_zigbee_flasher_uninstall_fails(hass: SmartHub) -> None:
     """Test failure case when flasher addon uninstall fails."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -314,7 +314,7 @@ async def test_config_flow_zigbee_flasher_uninstall_fails(hass: HomeAssistant) -
     "ignore_translations_for_mock_domains",
     ["test_firmware_domain"],
 )
-async def test_config_flow_zigbee_confirmation_fails(hass: HomeAssistant) -> None:
+async def test_config_flow_zigbee_confirmation_fails(hass: SmartHub) -> None:
     """Test the config flow failing due to Zigbee firmware not being detected."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -350,7 +350,7 @@ async def test_config_flow_zigbee_confirmation_fails(hass: HomeAssistant) -> Non
     "ignore_translations_for_mock_domains",
     ["test_firmware_domain"],
 )
-async def test_config_flow_thread_not_hassio(hass: HomeAssistant) -> None:
+async def test_config_flow_thread_not_hassio(hass: SmartHub) -> None:
     """Test when the stick is used with a non-hassio setup and Thread is selected."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -377,7 +377,7 @@ async def test_config_flow_thread_not_hassio(hass: HomeAssistant) -> None:
     "ignore_translations_for_mock_domains",
     ["test_firmware_domain"],
 )
-async def test_config_flow_thread_addon_info_fails(hass: HomeAssistant) -> None:
+async def test_config_flow_thread_addon_info_fails(hass: SmartHub) -> None:
     """Test failure case when flasher addon cannot be installed."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -405,7 +405,7 @@ async def test_config_flow_thread_addon_info_fails(hass: HomeAssistant) -> None:
     "ignore_translations_for_mock_domains",
     ["test_firmware_domain"],
 )
-async def test_config_flow_thread_addon_already_running(hass: HomeAssistant) -> None:
+async def test_config_flow_thread_addon_already_running(hass: SmartHub) -> None:
     """Test failure case when the Thread addon is already running."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -444,7 +444,7 @@ async def test_config_flow_thread_addon_already_running(hass: HomeAssistant) -> 
     "ignore_translations_for_mock_domains",
     ["test_firmware_domain"],
 )
-async def test_config_flow_thread_addon_install_fails(hass: HomeAssistant) -> None:
+async def test_config_flow_thread_addon_install_fails(hass: SmartHub) -> None:
     """Test failure case when flasher addon cannot be installed."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -475,7 +475,7 @@ async def test_config_flow_thread_addon_install_fails(hass: HomeAssistant) -> No
     "ignore_translations_for_mock_domains",
     ["test_firmware_domain"],
 )
-async def test_config_flow_thread_addon_set_config_fails(hass: HomeAssistant) -> None:
+async def test_config_flow_thread_addon_set_config_fails(hass: SmartHub) -> None:
     """Test failure case when flasher addon cannot be configured."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -506,7 +506,7 @@ async def test_config_flow_thread_addon_set_config_fails(hass: HomeAssistant) ->
     "ignore_translations_for_mock_domains",
     ["test_firmware_domain"],
 )
-async def test_config_flow_thread_flasher_run_fails(hass: HomeAssistant) -> None:
+async def test_config_flow_thread_flasher_run_fails(hass: SmartHub) -> None:
     """Test failure case when flasher addon fails to run."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -534,7 +534,7 @@ async def test_config_flow_thread_flasher_run_fails(hass: HomeAssistant) -> None
         assert result["reason"] == "addon_start_failed"
 
 
-async def test_config_flow_thread_flasher_uninstall_fails(hass: HomeAssistant) -> None:
+async def test_config_flow_thread_flasher_uninstall_fails(hass: SmartHub) -> None:
     """Test failure case when flasher addon uninstall fails."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -571,7 +571,7 @@ async def test_config_flow_thread_flasher_uninstall_fails(hass: HomeAssistant) -
     "ignore_translations_for_mock_domains",
     ["test_firmware_domain"],
 )
-async def test_config_flow_thread_confirmation_fails(hass: HomeAssistant) -> None:
+async def test_config_flow_thread_confirmation_fails(hass: SmartHub) -> None:
     """Test the config flow failing due to OpenThread firmware not being detected."""
     result = await hass.config_entries.flow.async_init(
         TEST_DOMAIN, context={"source": "hardware"}
@@ -614,7 +614,7 @@ async def test_config_flow_thread_confirmation_fails(hass: HomeAssistant) -> Non
     ["test_firmware_domain"],
 )
 async def test_options_flow_zigbee_to_thread_zha_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the options flow migration failure, ZHA using the stick."""
     config_entry = MockConfigEntry(
@@ -633,7 +633,7 @@ async def test_options_flow_zigbee_to_thread_zha_configured(
 
     # Pretend ZHA is using the stick
     with patch(
-        "homeassistant.components.homeassistant_hardware.firmware_config_flow.guess_hardware_owners",
+        "smarthub.components.smarthub_hardware.firmware_config_flow.guess_hardware_owners",
         return_value=[
             FirmwareInfo(
                 device=TEST_DEVICE,
@@ -663,7 +663,7 @@ async def test_options_flow_zigbee_to_thread_zha_configured(
 )
 @pytest.mark.usefixtures("addon_store_info")
 async def test_options_flow_thread_to_zigbee_otbr_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the options flow migration failure, OTBR still using the stick."""
     config_entry = MockConfigEntry(

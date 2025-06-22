@@ -1,0 +1,10 @@
+{
+  "domain": "vultr",
+  "name": "Vultr",
+  "codeowners": [],
+  "documentation": "https://www.smart-hub.io/integrations/vultr",
+  "iot_class": "cloud_polling",
+  "loggers": ["vultr"],
+  "quality_scale": "legacy",
+  "requirements": ["vultr==0.1.2"]
+}

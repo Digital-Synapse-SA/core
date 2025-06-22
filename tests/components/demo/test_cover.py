@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_CURRENT_TILT_POSITION,
     ATTR_POSITION,
@@ -14,7 +14,7 @@ from homeassistant.components.cover import (
     DOMAIN as COVER_DOMAIN,
     CoverState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     SERVICE_CLOSE_COVER,
@@ -29,9 +29,9 @@ from homeassistant.const import (
     SERVICE_TOGGLE_COVER_TILT,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import assert_setup_component, async_fire_time_changed
 
@@ -43,21 +43,21 @@ ENTITY_COVER = "cover.living_room_window"
 def cover_only() -> Generator[None]:
     """Enable only the climate platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.COVER],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_comp(hass: HomeAssistant, cover_only: None) -> None:
+async def setup_comp(hass: SmartHub, cover_only: None) -> None:
     """Set up demo cover component."""
     with assert_setup_component(1, COVER_DOMAIN):
         await async_setup_component(hass, COVER_DOMAIN, CONFIG)
         await hass.async_block_till_done()
 
 
-async def test_supported_features(hass: HomeAssistant) -> None:
+async def test_supported_features(hass: SmartHub) -> None:
     """Test cover supported features."""
     state = hass.states.get("cover.garage_door")
     assert state.attributes[ATTR_SUPPORTED_FEATURES] == 3
@@ -69,7 +69,7 @@ async def test_supported_features(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_SUPPORTED_FEATURES] == 255
 
 
-async def test_close_cover(hass: HomeAssistant) -> None:
+async def test_close_cover(hass: SmartHub) -> None:
     """Test closing the cover."""
     state = hass.states.get(ENTITY_COVER)
     assert state.state == CoverState.OPEN
@@ -90,7 +90,7 @@ async def test_close_cover(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_POSITION] == 0
 
 
-async def test_open_cover(hass: HomeAssistant) -> None:
+async def test_open_cover(hass: SmartHub) -> None:
     """Test opening the cover."""
     state = hass.states.get(ENTITY_COVER)
     assert state.state == CoverState.OPEN
@@ -110,7 +110,7 @@ async def test_open_cover(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_POSITION] == 100
 
 
-async def test_toggle_cover(hass: HomeAssistant) -> None:
+async def test_toggle_cover(hass: SmartHub) -> None:
     """Test toggling the cover."""
     # Start open
     await hass.services.async_call(
@@ -150,7 +150,7 @@ async def test_toggle_cover(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_POSITION] == 100
 
 
-async def test_set_cover_position(hass: HomeAssistant) -> None:
+async def test_set_cover_position(hass: SmartHub) -> None:
     """Test moving the cover to a specific position."""
     state = hass.states.get(ENTITY_COVER)
     assert state.attributes[ATTR_CURRENT_POSITION] == 70
@@ -169,7 +169,7 @@ async def test_set_cover_position(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_POSITION] == 10
 
 
-async def test_stop_cover(hass: HomeAssistant) -> None:
+async def test_stop_cover(hass: SmartHub) -> None:
     """Test stopping the cover."""
     state = hass.states.get(ENTITY_COVER)
     assert state.attributes[ATTR_CURRENT_POSITION] == 70
@@ -188,7 +188,7 @@ async def test_stop_cover(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_POSITION] == 80
 
 
-async def test_close_cover_tilt(hass: HomeAssistant) -> None:
+async def test_close_cover_tilt(hass: SmartHub) -> None:
     """Test closing the cover tilt."""
     state = hass.states.get(ENTITY_COVER)
     assert state.attributes[ATTR_CURRENT_TILT_POSITION] == 50
@@ -207,7 +207,7 @@ async def test_close_cover_tilt(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_TILT_POSITION] == 0
 
 
-async def test_open_cover_tilt(hass: HomeAssistant) -> None:
+async def test_open_cover_tilt(hass: SmartHub) -> None:
     """Test opening the cover tilt."""
     state = hass.states.get(ENTITY_COVER)
     assert state.attributes[ATTR_CURRENT_TILT_POSITION] == 50
@@ -226,7 +226,7 @@ async def test_open_cover_tilt(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_TILT_POSITION] == 100
 
 
-async def test_toggle_cover_tilt(hass: HomeAssistant) -> None:
+async def test_toggle_cover_tilt(hass: SmartHub) -> None:
     """Test toggling the cover tilt."""
     # Start open
     await hass.services.async_call(
@@ -272,7 +272,7 @@ async def test_toggle_cover_tilt(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_TILT_POSITION] == 100
 
 
-async def test_set_cover_tilt_position(hass: HomeAssistant) -> None:
+async def test_set_cover_tilt_position(hass: SmartHub) -> None:
     """Test moving the cover til to a specific position."""
     state = hass.states.get(ENTITY_COVER)
     assert state.attributes[ATTR_CURRENT_TILT_POSITION] == 50
@@ -291,7 +291,7 @@ async def test_set_cover_tilt_position(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_CURRENT_TILT_POSITION] == 90
 
 
-async def test_stop_cover_tilt(hass: HomeAssistant) -> None:
+async def test_stop_cover_tilt(hass: SmartHub) -> None:
     """Test stopping the cover tilt."""
     state = hass.states.get(ENTITY_COVER)
     assert state.attributes[ATTR_CURRENT_TILT_POSITION] == 50

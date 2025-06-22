@@ -12,7 +12,7 @@ from lru import LRU
 import objgraph
 import pytest
 
-from homeassistant.components.profiler import (
+from smarthub.components.profiler import (
     _LRU_CACHE_WRAPPER_OBJECT,
     _SQLALCHEMY_LRU_OBJECT,
     CONF_ENABLED,
@@ -30,16 +30,16 @@ from homeassistant.components.profiler import (
     SERVICE_STOP_LOG_OBJECT_SOURCES,
     SERVICE_STOP_LOG_OBJECTS,
 )
-from homeassistant.components.profiler.const import DOMAIN
-from homeassistant.const import CONF_SCAN_INTERVAL, CONF_TYPE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util import dt as dt_util
+from smarthub.components.profiler.const import DOMAIN
+from smarthub.const import CONF_SCAN_INTERVAL, CONF_TYPE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_basic_usage(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_basic_usage(hass: SmartHub, tmp_path: Path) -> None:
     """Test we can setup and the service is registered."""
     test_dir = tmp_path / "profiles"
     test_dir.mkdir()
@@ -70,7 +70,7 @@ async def test_basic_usage(hass: HomeAssistant, tmp_path: Path) -> None:
     await hass.async_block_till_done()
 
 
-async def test_memory_usage(hass: HomeAssistant, tmp_path: Path) -> None:
+async def test_memory_usage(hass: SmartHub, tmp_path: Path) -> None:
     """Test we can setup and the service is registered."""
     test_dir = tmp_path / "profiles"
     test_dir.mkdir()
@@ -102,7 +102,7 @@ async def test_memory_usage(hass: HomeAssistant, tmp_path: Path) -> None:
 
 
 async def test_object_growth_logging(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -121,7 +121,7 @@ async def test_object_growth_logging(
         await hass.services.async_call(
             DOMAIN, SERVICE_START_LOG_OBJECTS, {CONF_SCAN_INTERVAL: 1}, blocking=True
         )
-        with pytest.raises(HomeAssistantError, match="Object logging already started"):
+        with pytest.raises(SmartHubError, match="Object logging already started"):
             await hass.services.async_call(
                 DOMAIN,
                 SERVICE_START_LOG_OBJECTS,
@@ -144,7 +144,7 @@ async def test_object_growth_logging(
     await hass.async_block_till_done(wait_background_tasks=True)
     assert "Growth" not in caplog.text
 
-    with pytest.raises(HomeAssistantError, match="Object logging not running"):
+    with pytest.raises(SmartHubError, match="Object logging not running"):
         await hass.services.async_call(
             DOMAIN, SERVICE_STOP_LOG_OBJECTS, {}, blocking=True
         )
@@ -165,7 +165,7 @@ async def test_object_growth_logging(
 
 
 async def test_dump_log_object(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can setup and the service is registered and logging works."""
 
@@ -202,7 +202,7 @@ async def test_dump_log_object(
 
 
 async def test_log_thread_frames(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can log thread frames."""
 
@@ -224,7 +224,7 @@ async def test_log_thread_frames(
 
 
 async def test_log_current_tasks(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can log current tasks."""
 
@@ -246,7 +246,7 @@ async def test_log_current_tasks(
 
 
 async def test_log_scheduled(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can log scheduled items in the event loop."""
 
@@ -271,7 +271,7 @@ async def test_log_scheduled(
     await hass.async_block_till_done()
 
 
-async def test_lru_stats(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_lru_stats(hass: SmartHub, caplog: pytest.LogCaptureFixture) -> None:
     """Test logging lru stats."""
 
     entry = MockConfigEntry(domain=DOMAIN)
@@ -315,7 +315,7 @@ async def test_lru_stats(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) 
 
 
 async def test_log_object_sources(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we can setup and the service and we can dump objects to the log."""
 
@@ -344,7 +344,7 @@ async def test_log_object_sources(
             {CONF_SCAN_INTERVAL: 10},
             blocking=True,
         )
-        with pytest.raises(HomeAssistantError, match="Object logging already started"):
+        with pytest.raises(SmartHubError, match="Object logging already started"):
             await hass.services.async_call(
                 DOMAIN,
                 SERVICE_START_LOG_OBJECT_SOURCES,
@@ -398,14 +398,14 @@ async def test_log_object_sources(
     assert "FakeObject" not in caplog.text
     assert "No new object growth found" not in caplog.text
 
-    with pytest.raises(HomeAssistantError, match="Object logging not running"):
+    with pytest.raises(SmartHubError, match="Object logging not running"):
         await hass.services.async_call(
             DOMAIN, SERVICE_STOP_LOG_OBJECT_SOURCES, {}, blocking=True
         )
 
 
 async def test_set_asyncio_debug(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setting asyncio debug."""
 

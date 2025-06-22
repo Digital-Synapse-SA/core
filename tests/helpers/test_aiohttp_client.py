@@ -7,12 +7,12 @@ import aiohttp
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant.components.mjpeg import (
+from smarthub.components.mjpeg import (
     CONF_MJPEG_URL,
     CONF_STILL_IMAGE_URL,
     DOMAIN as MJPEG_DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_AUTHENTICATION,
     CONF_PASSWORD,
     CONF_USERNAME,
@@ -20,10 +20,10 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_CLOSE,
     HTTP_BASIC_AUTHENTICATION,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import aiohttp_client as client
-from homeassistant.util.color import RGBColor
-from homeassistant.util.ssl import SSLCipherList
+from smarthub.core import SmartHub
+from smarthub.helpers import aiohttp_client as client
+from smarthub.util.color import RGBColor
+from smarthub.util.ssl import SSLCipherList
 
 from tests.common import (
     MockConfigEntry,
@@ -37,7 +37,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.fixture(name="camera_client")
 async def camera_client_fixture(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> TestClient:
     """Fixture to fetch camera streams."""
     mock_config_entry = MockConfigEntry(
@@ -59,7 +59,7 @@ async def camera_client_fixture(
     return await hass_client()
 
 
-async def test_get_clientsession_with_ssl(hass: HomeAssistant) -> None:
+async def test_get_clientsession_with_ssl(hass: SmartHub) -> None:
     """Test init clientsession with ssl."""
     client.async_get_clientsession(hass)
     verify_ssl = True
@@ -74,7 +74,7 @@ async def test_get_clientsession_with_ssl(hass: HomeAssistant) -> None:
     assert isinstance(connector, aiohttp.TCPConnector)
 
 
-async def test_get_clientsession_without_ssl(hass: HomeAssistant) -> None:
+async def test_get_clientsession_without_ssl(hass: SmartHub) -> None:
     """Test init clientsession without ssl."""
     client.async_get_clientsession(hass, verify_ssl=False)
     verify_ssl = False
@@ -119,7 +119,7 @@ async def test_get_clientsession_without_ssl(hass: HomeAssistant) -> None:
     ],
 )
 async def test_get_clientsession(
-    hass: HomeAssistant,
+    hass: SmartHub,
     verify_ssl: bool,
     expected_family: int,
     ssl_cipher: SSLCipherList,
@@ -138,7 +138,7 @@ async def test_get_clientsession(
     assert isinstance(connector, aiohttp.TCPConnector)
 
 
-async def test_create_clientsession_with_ssl_and_cookies(hass: HomeAssistant) -> None:
+async def test_create_clientsession_with_ssl_and_cookies(hass: SmartHub) -> None:
     """Test create clientsession with ssl."""
     session = client.async_create_clientsession(hass, cookies={"bla": True})
     assert isinstance(session, aiohttp.ClientSession)
@@ -153,7 +153,7 @@ async def test_create_clientsession_with_ssl_and_cookies(hass: HomeAssistant) ->
 
 
 async def test_create_clientsession_without_ssl_and_cookies(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test create clientsession without ssl."""
     session = client.async_create_clientsession(hass, False, cookies={"bla": True})
@@ -198,7 +198,7 @@ async def test_create_clientsession_without_ssl_and_cookies(
     ],
 )
 async def test_get_clientsession_cleanup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     verify_ssl: bool,
     expected_family: int,
     ssl_cipher: SSLCipherList,
@@ -224,7 +224,7 @@ async def test_get_clientsession_cleanup(
     assert connector.closed
 
 
-async def test_get_clientsession_patched_close(hass: HomeAssistant) -> None:
+async def test_get_clientsession_patched_close(hass: SmartHub) -> None:
     """Test closing clientsession does not work."""
 
     verify_ssl = True
@@ -250,25 +250,25 @@ async def test_get_clientsession_patched_close(hass: HomeAssistant) -> None:
 
 
 async def test_warning_close_session_integration(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test log warning message when closing the session from integration context."""
     with (
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value="await session.close()",
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=extract_stack_to_frame(
                 [
                     Mock(
-                        filename="/home/paulus/homeassistant/core.py",
+                        filename="/home/paulus/smarthub/core.py",
                         lineno="23",
                         line="do_something()",
                     ),
                     Mock(
-                        filename="/home/paulus/homeassistant/components/hue/light.py",
+                        filename="/home/paulus/smarthub/components/hue/light.py",
                         lineno="23",
                         line="await session.close()",
                     ),
@@ -284,29 +284,29 @@ async def test_warning_close_session_integration(
         session = client.async_get_clientsession(hass)
         await session.close()
     assert (
-        "Detected that integration 'hue' closes the Home Assistant aiohttp session at "
-        "homeassistant/components/hue/light.py, line 23: await session.close(). "
-        "Please create a bug report at https://github.com/home-assistant/core/issues?"
+        "Detected that integration 'hue' closes the SmartHub aiohttp session at "
+        "smarthub/components/hue/light.py, line 23: await session.close(). "
+        "Please create a bug report at https://github.com/smart-hub/core/issues?"
         "q=is%3Aopen+is%3Aissue+label%3A%22integration%3A+hue%22"
     ) in caplog.text
 
 
 async def test_warning_close_session_custom(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test log warning message when closing the session from custom context."""
     mock_integration(hass, MockModule("hue"), built_in=False)
     with (
         patch(
-            "homeassistant.helpers.frame.linecache.getline",
+            "smarthub.helpers.frame.linecache.getline",
             return_value="await session.close()",
         ),
         patch(
-            "homeassistant.helpers.frame.get_current_frame",
+            "smarthub.helpers.frame.get_current_frame",
             return_value=extract_stack_to_frame(
                 [
                     Mock(
-                        filename="/home/paulus/homeassistant/core.py",
+                        filename="/home/paulus/smarthub/core.py",
                         lineno="23",
                         line="do_something()",
                     ),
@@ -327,7 +327,7 @@ async def test_warning_close_session_custom(
         session = client.async_get_clientsession(hass)
         await session.close()
     assert (
-        "Detected that custom integration 'hue' closes the Home Assistant aiohttp "
+        "Detected that custom integration 'hue' closes the SmartHub aiohttp "
         "session at custom_components/hue/light.py, line 23: await session.close(). "
         "Please report it to the author of the 'hue' custom integration"
     ) in caplog.text
@@ -368,7 +368,7 @@ async def test_async_aiohttp_proxy_stream_client_err(
 
 
 async def test_sending_named_tuple(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test sending a named tuple in json."""
     resp = aioclient_mock.post("http://127.0.0.1/rgb", json={"rgb": RGBColor(4, 3, 2)})
@@ -379,7 +379,7 @@ async def test_sending_named_tuple(
     assert aioclient_mock.mock_calls[0][2]["rgb"] == RGBColor(4, 3, 2)
 
 
-async def test_client_session_immutable_headers(hass: HomeAssistant) -> None:
+async def test_client_session_immutable_headers(hass: SmartHub) -> None:
     """Test we can't mutate headers."""
     session = client.async_get_clientsession(hass)
 
@@ -393,7 +393,7 @@ async def test_client_session_immutable_headers(hass: HomeAssistant) -> None:
 @pytest.mark.usefixtures("disable_mock_zeroconf_resolver")
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_async_mdnsresolver(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test async_mdnsresolver."""
     resp = aioclient_mock.post("http://localhost/xyz", json={"x": 1})
@@ -403,7 +403,7 @@ async def test_async_mdnsresolver(
     assert await resp.json() == {"x": 1}
 
 
-async def test_resolver_is_singleton(hass: HomeAssistant) -> None:
+async def test_resolver_is_singleton(hass: SmartHub) -> None:
     """Test that the resolver is a singleton."""
     session = client.async_get_clientsession(hass)
     session2 = client.async_get_clientsession(hass)

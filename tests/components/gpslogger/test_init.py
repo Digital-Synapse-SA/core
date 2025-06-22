@@ -6,18 +6,18 @@ from unittest.mock import patch
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import gpslogger, zone
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
-from homeassistant.components.device_tracker.legacy import Device
-from homeassistant.components.gpslogger import DOMAIN, TRACKER_UPDATE
-from homeassistant.const import STATE_HOME, STATE_NOT_HOME
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.dispatcher import DATA_DISPATCHER
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components import gpslogger, zone
+from smarthub.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
+from smarthub.components.device_tracker.legacy import Device
+from smarthub.components.gpslogger import DOMAIN, TRACKER_UPDATE
+from smarthub.const import STATE_HOME, STATE_NOT_HOME
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.dispatcher import DATA_DISPATCHER
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -32,7 +32,7 @@ def mock_dev_track(mock_device_tracker_conf: list[Device]) -> None:
 
 @pytest.fixture
 async def gpslogger_client(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> TestClient:
     """Mock client for GPSLogger (unauthenticated)."""
 
@@ -40,12 +40,12 @@ async def gpslogger_client(
 
     await hass.async_block_till_done()
 
-    with patch("homeassistant.components.device_tracker.legacy.update_config"):
+    with patch("smarthub.components.device_tracker.legacy.update_config"):
         return await hass_client_no_auth()
 
 
 @pytest.fixture(autouse=True)
-async def setup_zones(hass: HomeAssistant) -> None:
+async def setup_zones(hass: SmartHub) -> None:
     """Set up Zone config in HA."""
     assert await async_setup_component(
         hass,
@@ -63,7 +63,7 @@ async def setup_zones(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-async def webhook_id(hass: HomeAssistant, gpslogger_client: TestClient) -> str:
+async def webhook_id(hass: SmartHub, gpslogger_client: TestClient) -> str:
     """Initialize the GPSLogger component and get the webhook_id."""
     await async_process_ha_core_config(
         hass,
@@ -82,7 +82,7 @@ async def webhook_id(hass: HomeAssistant, gpslogger_client: TestClient) -> str:
 
 
 async def test_missing_data(
-    hass: HomeAssistant, gpslogger_client: TestClient, webhook_id: str
+    hass: SmartHub, gpslogger_client: TestClient, webhook_id: str
 ) -> None:
     """Test missing data."""
     url = f"/api/webhook/{webhook_id}"
@@ -110,7 +110,7 @@ async def test_missing_data(
 
 
 async def test_enter_and_exit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     gpslogger_client: TestClient,
@@ -150,7 +150,7 @@ async def test_enter_and_exit(
 
 
 async def test_enter_with_attrs(
-    hass: HomeAssistant, gpslogger_client: TestClient, webhook_id: str
+    hass: SmartHub, gpslogger_client: TestClient, webhook_id: str
 ) -> None:
     """Test when additional attributes are present."""
     url = f"/api/webhook/{webhook_id}"
@@ -212,7 +212,7 @@ async def test_enter_with_attrs(
     reason="The device_tracker component does not support unloading yet."
 )
 async def test_load_unload_entry(
-    hass: HomeAssistant, gpslogger_client: TestClient, webhook_id: str
+    hass: SmartHub, gpslogger_client: TestClient, webhook_id: str
 ) -> None:
     """Test that the appropriate dispatch signals are added and removed."""
     url = f"/api/webhook/{webhook_id}"

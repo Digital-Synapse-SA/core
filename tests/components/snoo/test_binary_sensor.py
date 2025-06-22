@@ -2,14 +2,14 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.const import STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import async_init_integration, find_update_callback
 from .const import MOCK_SNOO_DATA
 
 
-async def test_binary_sensors(hass: HomeAssistant, bypass_api: AsyncMock) -> None:
+async def test_binary_sensors(hass: SmartHub, bypass_api: AsyncMock) -> None:
     """Test binary sensors and check test values are correctly set."""
     await async_init_integration(hass)
     assert len(hass.states.async_all("binary_sensor")) == 2

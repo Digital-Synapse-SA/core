@@ -6,12 +6,12 @@ from unittest.mock import patch
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant import config_entries
-from homeassistant.components.template import DOMAIN, async_setup_entry
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr
+from smarthub import config_entries
+from smarthub.components.template import DOMAIN, async_setup_entry
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry, get_schema_suggested_value
 from tests.typing import WebSocketGenerator
@@ -185,7 +185,7 @@ BINARY_SENSOR_OPTIONS = {
 )
 @pytest.mark.freeze_time("2024-07-09 00:00:00+00:00")
 async def test_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     template_type: str,
     state_template: dict[str, Any],
     template_state: str,
@@ -218,7 +218,7 @@ async def test_config_flow(
     assert result["step_id"] == template_type
 
     with patch(
-        "homeassistant.components.template.async_setup_entry", wraps=async_setup_entry
+        "smarthub.components.template.async_setup_entry", wraps=async_setup_entry
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -335,7 +335,7 @@ async def test_config_flow(
     ],
 )
 async def test_config_flow_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     template_type: str,
     state_template: dict[str, Any],
     extra_input: dict[str, Any],
@@ -371,7 +371,7 @@ async def test_config_flow_device(
     assert result["step_id"] == template_type
 
     with patch(
-        "homeassistant.components.template.async_setup_entry", wraps=async_setup_entry
+        "smarthub.components.template.async_setup_entry", wraps=async_setup_entry
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -555,7 +555,7 @@ async def test_config_flow_device(
 )
 @pytest.mark.freeze_time("2024-07-09 00:00:00+00:00")
 async def test_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     template_type: str,
     old_state_template: dict[str, Any],
     new_state_template: dict[str, Any],
@@ -682,7 +682,7 @@ async def test_options(
     ],
 )
 async def test_config_flow_preview(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     template_type: str,
     state_template: str,
@@ -832,7 +832,7 @@ EARLY_END_ERROR = "invalid template (TemplateSyntaxError: unexpected 'end of tem
     ],
 )
 async def test_config_flow_preview_bad_input(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     template_type: str,
     state_template: str,
@@ -899,7 +899,7 @@ async def test_config_flow_preview_bad_input(
     ],
 )
 async def test_config_flow_preview_template_startup_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     template_type: str,
     state_template: str,
@@ -977,7 +977,7 @@ async def test_config_flow_preview_template_startup_error(
     ],
 )
 async def test_config_flow_preview_template_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     template_type: str,
     state_template: str,
@@ -1056,7 +1056,7 @@ async def test_config_flow_preview_template_error(
     ],
 )
 async def test_config_flow_preview_bad_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     template_type: str,
     state_template: str,
@@ -1142,7 +1142,7 @@ async def test_config_flow_preview_bad_state(
     ],
 )
 async def test_option_flow_preview(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     template_type: str,
     old_state_template: str,
@@ -1212,7 +1212,7 @@ async def test_option_flow_preview(
 
 
 async def test_option_flow_sensor_preview_config_entry_removed(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test the option flow preview where the config entry is removed."""
     client = await hass_ws_client(hass)
@@ -1332,7 +1332,7 @@ async def test_option_flow_sensor_preview_config_entry_removed(
     ],
 )
 async def test_options_flow_change_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     template_type: str,
     state_template: dict[str, Any],
     extra_input: dict[str, Any],

@@ -7,9 +7,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 from rokuecp import Device as RokuDevice
 
-from homeassistant.components.roku.const import DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components.roku.const import DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 
@@ -34,13 +34,13 @@ def mock_config_entry() -> MockConfigEntry:
 @pytest.fixture
 def mock_setup_entry() -> Generator[None]:
     """Mock setting up a config entry."""
-    with patch("homeassistant.components.roku.async_setup_entry", return_value=True):
+    with patch("smarthub.components.roku.async_setup_entry", return_value=True):
         yield
 
 
 @pytest.fixture
 async def mock_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     request: pytest.FixtureRequest,
 ) -> RokuDevice:
     """Return the mocked roku device."""
@@ -56,7 +56,7 @@ def mock_roku_config_flow(mock_device: RokuDevice) -> Generator[MagicMock]:
     """Return a mocked Roku client."""
 
     with patch(
-        "homeassistant.components.roku.config_flow.Roku", autospec=True
+        "smarthub.components.roku.config_flow.Roku", autospec=True
     ) as roku_mock:
         client = roku_mock.return_value
         client.app_icon_url.side_effect = app_icon_url
@@ -69,7 +69,7 @@ def mock_roku(mock_device: RokuDevice) -> Generator[MagicMock]:
     """Return a mocked Roku client."""
 
     with patch(
-        "homeassistant.components.roku.coordinator.Roku", autospec=True
+        "smarthub.components.roku.coordinator.Roku", autospec=True
     ) as roku_mock:
         client = roku_mock.return_value
         client.app_icon_url.side_effect = app_icon_url
@@ -79,7 +79,7 @@ def mock_roku(mock_device: RokuDevice) -> Generator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_device: RokuDevice,
     mock_roku: MagicMock,

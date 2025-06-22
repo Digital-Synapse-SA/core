@@ -7,13 +7,13 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.rainbird import DOMAIN
-from homeassistant.components.rainbird.const import ATTR_DURATION
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
+from smarthub import config_entries
+from smarthub.components.rainbird import DOMAIN
+from smarthub.components.rainbird.const import ATTR_DURATION
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResult, FlowResultType
 
 from .conftest import (
     CONFIG_ENTRY_DATA,
@@ -50,13 +50,13 @@ async def mock_setup() -> AsyncGenerator[AsyncMock]:
     """Fixture for patching out integration setup."""
 
     with patch(
-        "homeassistant.components.rainbird.async_setup_entry",
+        "smarthub.components.rainbird.async_setup_entry",
         return_value=True,
     ) as mock_setup:
         yield mock_setup
 
 
-async def complete_flow(hass: HomeAssistant, password: str = PASSWORD) -> FlowResult:
+async def complete_flow(hass: SmartHub, password: str = PASSWORD) -> FlowResult:
     """Start the config flow and enter the host and password."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -94,7 +94,7 @@ async def complete_flow(hass: HomeAssistant, password: str = PASSWORD) -> FlowRe
     ],
 )
 async def test_controller_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup: Mock,
     expected_config_entry: dict[str, str],
     expected_unique_id: int | None,
@@ -151,7 +151,7 @@ async def test_controller_flow(
     ids=["with-serial", "with-mac-address", "zero-serial"],
 )
 async def test_multiple_config_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     responses: list[AiohttpClientMockResponse],
     config_flow_responses: list[AiohttpClientMockResponse],
@@ -226,7 +226,7 @@ async def test_multiple_config_entries(
     ],
 )
 async def test_duplicate_config_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     responses: list[AiohttpClientMockResponse],
     config_flow_responses: list[AiohttpClientMockResponse],
@@ -247,7 +247,7 @@ async def test_duplicate_config_entries(
 
 
 async def test_controller_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup: Mock,
     responses: list[AiohttpClientMockResponse],
     aioclient_mock: AiohttpClientMocker,
@@ -269,7 +269,7 @@ async def test_controller_cannot_connect(
 
 
 async def test_controller_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup: Mock,
     responses: list[AiohttpClientMockResponse],
     aioclient_mock: AiohttpClientMocker,
@@ -322,13 +322,13 @@ async def test_controller_invalid_auth(
 
 
 async def test_controller_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup: Mock,
 ) -> None:
     """Test an error talking to the controller."""
 
     with patch(
-        "homeassistant.components.rainbird.config_flow.asyncio.timeout",
+        "smarthub.components.rainbird.config_flow.asyncio.timeout",
         side_effect=TimeoutError,
     ):
         result = await complete_flow(hass)
@@ -359,7 +359,7 @@ async def test_controller_timeout(
     ],
 )
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup: Mock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -400,7 +400,7 @@ async def test_reauth_flow(
     assert len(mock_setup.mock_calls) == 1
 
 
-async def test_options_flow(hass: HomeAssistant, mock_setup: Mock) -> None:
+async def test_options_flow(hass: SmartHub, mock_setup: Mock) -> None:
     """Test config flow options."""
 
     # Setup config flow

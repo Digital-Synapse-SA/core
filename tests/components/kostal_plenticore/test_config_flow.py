@@ -6,11 +6,11 @@ from unittest.mock import ANY, AsyncMock, MagicMock, patch
 from pykoplenti import ApiClient, AuthenticationException, SettingsData
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.kostal_plenticore.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.kostal_plenticore.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -29,7 +29,7 @@ def mock_apiclient() -> ApiClient:
 def mock_apiclient_class(mock_apiclient) -> Generator[type[ApiClient]]:
     """Return a mocked ApiClient class."""
     with patch(
-        "homeassistant.components.kostal_plenticore.config_flow.ApiClient",
+        "smarthub.components.kostal_plenticore.config_flow.ApiClient",
         autospec=True,
     ) as mock_api_class:
         mock_api_class.return_value = mock_apiclient
@@ -37,7 +37,7 @@ def mock_apiclient_class(mock_apiclient) -> Generator[type[ApiClient]]:
 
 
 async def test_form_g1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_apiclient_class: type[ApiClient],
     mock_apiclient: ApiClient,
 ) -> None:
@@ -50,7 +50,7 @@ async def test_form_g1(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.kostal_plenticore.async_setup_entry",
+        "smarthub.components.kostal_plenticore.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         # mock of the context manager instance
@@ -103,7 +103,7 @@ async def test_form_g1(
 
 
 async def test_form_g2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_apiclient_class: type[ApiClient],
     mock_apiclient: ApiClient,
 ) -> None:
@@ -116,7 +116,7 @@ async def test_form_g2(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.kostal_plenticore.async_setup_entry",
+        "smarthub.components.kostal_plenticore.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         # mock of the context manager instance
@@ -169,7 +169,7 @@ async def test_form_g2(
 
 
 async def test_form_g2_with_service_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_apiclient_class: type[ApiClient],
     mock_apiclient: ApiClient,
 ) -> None:
@@ -182,7 +182,7 @@ async def test_form_g2_with_service_code(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.kostal_plenticore.async_setup_entry",
+        "smarthub.components.kostal_plenticore.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         # mock of the context manager instance
@@ -238,14 +238,14 @@ async def test_form_g2_with_service_code(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.kostal_plenticore.config_flow.ApiClient"
+        "smarthub.components.kostal_plenticore.config_flow.ApiClient"
     ) as mock_api_class:
         # mock of the context manager instance
         mock_api_ctx = MagicMock()
@@ -272,14 +272,14 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result["errors"] == {"password": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.kostal_plenticore.config_flow.ApiClient"
+        "smarthub.components.kostal_plenticore.config_flow.ApiClient"
     ) as mock_api_class:
         # mock of the context manager instance
         mock_api_ctx = MagicMock()
@@ -306,14 +306,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result["errors"] == {"host": "cannot_connect"}
 
 
-async def test_form_unexpected_error(hass: HomeAssistant) -> None:
+async def test_form_unexpected_error(hass: SmartHub) -> None:
     """Test we handle unexpected error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.kostal_plenticore.config_flow.ApiClient"
+        "smarthub.components.kostal_plenticore.config_flow.ApiClient"
     ) as mock_api_class:
         # mock of the context manager instance
         mock_api_ctx = MagicMock()
@@ -340,7 +340,7 @@ async def test_form_unexpected_error(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "unknown"}
 
 
-async def test_already_configured(hass: HomeAssistant) -> None:
+async def test_already_configured(hass: SmartHub) -> None:
     """Test we handle already configured error."""
     MockConfigEntry(
         domain="kostal_plenticore",
@@ -365,7 +365,7 @@ async def test_already_configured(hass: HomeAssistant) -> None:
 
 
 async def test_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_apiclient_class: type[ApiClient],
     mock_apiclient: ApiClient,
     mock_config_entry: MockConfigEntry,
@@ -425,14 +425,14 @@ async def test_reconfigure(
 
 
 async def test_reconfigure_invalid_auth(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we handle invalid auth while reconfiguring."""
     mock_config_entry.add_to_hass(hass)
     result = await mock_config_entry.start_reconfigure_flow(hass)
 
     with patch(
-        "homeassistant.components.kostal_plenticore.config_flow.ApiClient"
+        "smarthub.components.kostal_plenticore.config_flow.ApiClient"
     ) as mock_api_class:
         # mock of the context manager instance
         mock_api_ctx = MagicMock()
@@ -462,14 +462,14 @@ async def test_reconfigure_invalid_auth(
 
 
 async def test_reconfigure_cannot_connect(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we handle cannot connect error."""
     mock_config_entry.add_to_hass(hass)
     result = await mock_config_entry.start_reconfigure_flow(hass)
 
     with patch(
-        "homeassistant.components.kostal_plenticore.config_flow.ApiClient"
+        "smarthub.components.kostal_plenticore.config_flow.ApiClient"
     ) as mock_api_class:
         # mock of the context manager instance
         mock_api_ctx = MagicMock()
@@ -497,14 +497,14 @@ async def test_reconfigure_cannot_connect(
 
 
 async def test_reconfigure_unexpected_error(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we handle unexpected error."""
     mock_config_entry.add_to_hass(hass)
     result = await mock_config_entry.start_reconfigure_flow(hass)
 
     with patch(
-        "homeassistant.components.kostal_plenticore.config_flow.ApiClient"
+        "smarthub.components.kostal_plenticore.config_flow.ApiClient"
     ) as mock_api_class:
         # mock of the context manager instance
         mock_api_ctx = MagicMock()
@@ -532,7 +532,7 @@ async def test_reconfigure_unexpected_error(
 
 
 async def test_reconfigure_already_configured(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we handle already configured error."""
     mock_config_entry.add_to_hass(hass)

@@ -8,10 +8,10 @@ from aiohttp.client_exceptions import ClientError
 import pytest
 from yarl import URL
 
-from homeassistant.components.qwikswitch import DOMAIN
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.qwikswitch import DOMAIN
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.test_util.aiohttp import (
     AiohttpClientMocker,
@@ -55,7 +55,7 @@ EMPTY_PACKET = {"cmd": ""}
 
 
 async def test_binary_sensor_device(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, qs_devices
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, qs_devices
 ) -> None:
     """Test a binary sensor device."""
     config = {
@@ -96,7 +96,7 @@ async def test_binary_sensor_device(
 
 
 async def test_sensor_device(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, qs_devices
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, qs_devices
 ) -> None:
     """Test a sensor device."""
     config = {
@@ -132,7 +132,7 @@ async def test_sensor_device(
 
 
 async def test_switch_device(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, qs_devices
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, qs_devices
 ) -> None:
     """Test a switch device."""
 
@@ -196,7 +196,7 @@ async def test_switch_device(
 
 
 async def test_light_device(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, qs_devices
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, qs_devices
 ) -> None:
     """Test a light device."""
 
@@ -270,7 +270,7 @@ async def test_light_device(
 
 
 async def test_button(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, qs_devices
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, qs_devices
 ) -> None:
     """Test that buttons fire an event."""
 
@@ -298,7 +298,7 @@ async def test_button(
 
 
 async def test_failed_update_devices(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that code behaves correctly when unable to get the devices."""
 
@@ -313,7 +313,7 @@ async def test_failed_update_devices(
 
 
 async def test_single_invalid_sensor(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, qs_devices
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker, qs_devices
 ) -> None:
     """Test that a single misconfigured sensor doesn't block the others."""
 
@@ -340,7 +340,7 @@ async def test_single_invalid_sensor(
 
 
 async def test_non_binary_sensor_with_binary_args(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     qs_devices,
     caplog: pytest.LogCaptureFixture,
@@ -374,7 +374,7 @@ async def test_non_binary_sensor_with_binary_args(
 
 
 async def test_non_relay_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     qs_devices,
     caplog: pytest.LogCaptureFixture,
@@ -396,7 +396,7 @@ async def test_non_relay_switch(
 
 
 async def test_unknown_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     qs_devices,
     caplog: pytest.LogCaptureFixture,
@@ -421,7 +421,7 @@ async def test_unknown_device(
 
 
 async def test_no_discover_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,

@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ICON,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -17,16 +17,16 @@ from homeassistant.const import (
     UnitOfElectricCurrent,
     UnitOfInformation,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "mock_wled")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_sensors(
     mock_config_entry.add_to_hass(hass)
 
     test_time = datetime(2019, 11, 11, 9, 10, 32, tzinfo=dt_util.UTC)
-    with patch("homeassistant.components.wled.sensor.utcnow", return_value=test_time):
+    with patch("smarthub.components.wled.sensor.utcnow", return_value=test_time):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
 
@@ -134,7 +134,7 @@ async def test_sensors(
 )
 @pytest.mark.usefixtures("init_integration")
 async def test_disabled_by_default_sensors(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, entity_id: str
+    hass: SmartHub, entity_registry: er.EntityRegistry, entity_id: str
 ) -> None:
     """Test the disabled by default WLED sensors."""
     assert hass.states.get(entity_id) is None
@@ -155,7 +155,7 @@ async def test_disabled_by_default_sensors(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_no_wifi_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_wled: MagicMock,
     key: str,
@@ -175,7 +175,7 @@ async def test_no_wifi_support(
 
 
 async def test_no_current_measurement(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_wled: MagicMock,
 ) -> None:

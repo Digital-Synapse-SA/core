@@ -1,4 +1,4 @@
-"""Test Home Assistant Hardware firmware update entity."""
+"""Test SmartHub Hardware firmware update entity."""
 
 from __future__ import annotations
 
@@ -13,40 +13,40 @@ from ha_silabs_firmware_client import FirmwareManifest, FirmwareMetadata
 import pytest
 from yarl import URL
 
-from homeassistant.components.homeassistant_hardware.coordinator import (
+from smarthub.components.smarthub_hardware.coordinator import (
     FirmwareUpdateCoordinator,
 )
-from homeassistant.components.homeassistant_hardware.helpers import (
+from smarthub.components.smarthub_hardware.helpers import (
     async_notify_firmware_info,
     async_register_firmware_info_provider,
 )
-from homeassistant.components.homeassistant_hardware.update import (
+from smarthub.components.smarthub_hardware.update import (
     BaseFirmwareUpdateEntity,
     FirmwareUpdateEntityDescription,
     FirmwareUpdateExtraStoredData,
 )
-from homeassistant.components.homeassistant_hardware.util import (
+from smarthub.components.smarthub_hardware.util import (
     ApplicationType,
     FirmwareInfo,
     OwningIntegration,
 )
-from homeassistant.components.update import UpdateDeviceClass
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState, ConfigFlow
-from homeassistant.const import EVENT_STATE_CHANGED, EntityCategory, Platform
-from homeassistant.core import (
+from smarthub.components.update import UpdateDeviceClass
+from smarthub.config_entries import ConfigEntry, ConfigEntryState, ConfigFlow
+from smarthub.const import EVENT_STATE_CHANGED, EntityCategory, Platform
+from smarthub.core import (
     Event,
     EventStateChangedData,
-    HomeAssistant,
-    HomeAssistantError,
+    SmartHub,
+    SmartHubError,
     State,
     callback,
 )
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.aiohttp_client import async_get_clientsession
+from smarthub.helpers.device_registry import DeviceInfo
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -127,7 +127,7 @@ TEST_FIRMWARE_ENTITY_DESCRIPTIONS: dict[
 
 
 def _mock_async_create_update_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     session: aiohttp.ClientSession,
     async_add_entities: AddConfigEntryEntitiesCallback,
@@ -170,7 +170,7 @@ def _mock_async_create_update_entity(
 
 
 async def mock_async_setup_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> bool:
     """Set up test config entry."""
     await hass.config_entries.async_forward_entry_setups(
@@ -180,7 +180,7 @@ async def mock_async_setup_entry(
 
 
 async def mock_async_setup_update_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
@@ -242,11 +242,11 @@ class MockFirmwareUpdateEntity(BaseFirmwareUpdateEntity):
 
 @pytest.fixture(name="update_config_entry")
 async def mock_update_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> AsyncGenerator[ConfigEntry]:
-    """Set up a mock Home Assistant Hardware firmware update entity."""
-    await async_setup_component(hass, "homeassistant", {})
-    await async_setup_component(hass, "homeassistant_hardware", {})
+    """Set up a mock SmartHub Hardware firmware update entity."""
+    await async_setup_component(hass, "smarthub", {})
+    await async_setup_component(hass, "smarthub_hardware", {})
 
     mock_integration(
         hass,
@@ -276,7 +276,7 @@ async def mock_update_config_entry(
 
     with (
         patch(
-            "homeassistant.components.homeassistant_hardware.coordinator.FirmwareUpdateClient",
+            "smarthub.components.smarthub_hardware.coordinator.FirmwareUpdateClient",
             autospec=True,
         ) as mock_update_client,
         mock_config_flow(TEST_DOMAIN, ConfigFlow),
@@ -286,7 +286,7 @@ async def mock_update_config_entry(
 
 
 async def test_update_entity_installation(
-    hass: HomeAssistant, update_config_entry: ConfigEntry
+    hass: SmartHub, update_config_entry: ConfigEntry
 ) -> None:
     """Test the Hardware firmware update entity installation."""
 
@@ -337,7 +337,7 @@ async def test_update_entity_installation(
 
     # When we check for an update, one will be shown
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {"entity_id": TEST_UPDATE_ENTITY_ID},
         blocking=True,
@@ -371,15 +371,15 @@ async def test_update_entity_installation(
     # When we install it, the other integration is reloaded
     with (
         patch(
-            "homeassistant.components.homeassistant_hardware.update.parse_firmware_image",
+            "smarthub.components.smarthub_hardware.update.parse_firmware_image",
             return_value=mock_firmware,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.update.Flasher",
+            "smarthub.components.smarthub_hardware.update.Flasher",
             return_value=mock_flasher,
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.update.probe_silabs_firmware_info",
+            "smarthub.components.smarthub_hardware.update.probe_silabs_firmware_info",
             return_value=FirmwareInfo(
                 device=TEST_DEVICE,
                 firmware_type=ApplicationType.EZSP,
@@ -436,14 +436,14 @@ async def test_update_entity_installation(
 
 
 async def test_update_entity_installation_failure(
-    hass: HomeAssistant, update_config_entry: ConfigEntry
+    hass: SmartHub, update_config_entry: ConfigEntry
 ) -> None:
     """Test installation failing during flashing."""
     assert await hass.config_entries.async_setup(update_config_entry.entry_id)
     await hass.async_block_till_done()
 
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {"entity_id": TEST_UPDATE_ENTITY_ID},
         blocking=True,
@@ -463,14 +463,14 @@ async def test_update_entity_installation_failure(
 
     with (
         patch(
-            "homeassistant.components.homeassistant_hardware.update.parse_firmware_image",
+            "smarthub.components.smarthub_hardware.update.parse_firmware_image",
             return_value=Mock(),
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.update.Flasher",
+            "smarthub.components.smarthub_hardware.update.Flasher",
             return_value=mock_flasher,
         ),
-        pytest.raises(HomeAssistantError, match="Failed to flash firmware"),
+        pytest.raises(SmartHubError, match="Failed to flash firmware"),
     ):
         await hass.services.async_call(
             "update",
@@ -489,14 +489,14 @@ async def test_update_entity_installation_failure(
 
 
 async def test_update_entity_installation_probe_failure(
-    hass: HomeAssistant, update_config_entry: ConfigEntry
+    hass: SmartHub, update_config_entry: ConfigEntry
 ) -> None:
     """Test installation failing during post-flashing probing."""
     assert await hass.config_entries.async_setup(update_config_entry.entry_id)
     await hass.async_block_till_done()
 
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {"entity_id": TEST_UPDATE_ENTITY_ID},
         blocking=True,
@@ -511,19 +511,19 @@ async def test_update_entity_installation_probe_failure(
 
     with (
         patch(
-            "homeassistant.components.homeassistant_hardware.update.parse_firmware_image",
+            "smarthub.components.smarthub_hardware.update.parse_firmware_image",
             return_value=Mock(),
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.update.Flasher",
+            "smarthub.components.smarthub_hardware.update.Flasher",
             return_value=AsyncMock(),
         ),
         patch(
-            "homeassistant.components.homeassistant_hardware.update.probe_silabs_firmware_info",
+            "smarthub.components.smarthub_hardware.update.probe_silabs_firmware_info",
             return_value=None,
         ),
         pytest.raises(
-            HomeAssistantError, match="Failed to probe the firmware after flashing"
+            SmartHubError, match="Failed to probe the firmware after flashing"
         ),
     ):
         await hass.services.async_call(
@@ -543,7 +543,7 @@ async def test_update_entity_installation_probe_failure(
 
 
 async def test_update_entity_state_restoration(
-    hass: HomeAssistant, update_config_entry: ConfigEntry
+    hass: SmartHub, update_config_entry: ConfigEntry
 ) -> None:
     """Test the Hardware firmware update entity state restoration."""
 
@@ -574,7 +574,7 @@ async def test_update_entity_state_restoration(
 
 
 async def test_update_entity_firmware_missing_from_manifest(
-    hass: HomeAssistant, update_config_entry: ConfigEntry
+    hass: SmartHub, update_config_entry: ConfigEntry
 ) -> None:
     """Test the Hardware firmware update entity handles missing firmware."""
 
@@ -606,7 +606,7 @@ async def test_update_entity_firmware_missing_from_manifest(
 
 
 async def test_update_entity_graceful_firmware_type_callback_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     update_config_entry: ConfigEntry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

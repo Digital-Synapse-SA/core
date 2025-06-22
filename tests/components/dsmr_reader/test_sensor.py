@@ -1,19 +1,19 @@
 """Tests for DSMR Reader sensor."""
 
-from homeassistant.components.dsmr_reader.const import DOMAIN
-from homeassistant.components.dsmr_reader.definitions import (
+from smarthub.components.dsmr_reader.const import DOMAIN
+from smarthub.components.dsmr_reader.definitions import (
     DSMRReaderSensorEntityDescription,
 )
-from homeassistant.components.dsmr_reader.sensor import DSMRSensor
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.dsmr_reader.sensor import DSMRSensor
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_mqtt_message
 from tests.typing import MqttMockHAClient
 
 
 async def test_dsmr_sensor_mqtt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
 ) -> None:
     """Test the DSMRSensor class, via an emluated MQTT message."""

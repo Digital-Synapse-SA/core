@@ -12,11 +12,11 @@ from deebot_client.models import Credentials
 import pytest
 from sucks import EventEmitter
 
-from homeassistant.components.ecovacs import PLATFORMS
-from homeassistant.components.ecovacs.const import DOMAIN
-from homeassistant.components.ecovacs.controller import EcovacsController
-from homeassistant.const import CONF_USERNAME, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.components.ecovacs import PLATFORMS
+from smarthub.components.ecovacs.const import DOMAIN
+from smarthub.components.ecovacs.controller import EcovacsController
+from smarthub.const import CONF_USERNAME, Platform
+from smarthub.core import SmartHub
 
 from .const import VALID_ENTRY_DATA_CLOUD
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry, load_json_object_fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.ecovacs.async_setup_entry", return_value=True
+        "smarthub.components.ecovacs.async_setup_entry", return_value=True
     ) as async_setup_entry:
         yield async_setup_entry
 
@@ -59,11 +59,11 @@ def mock_authenticator(device_fixture: str) -> Generator[Mock]:
     """Mock the authenticator."""
     with (
         patch(
-            "homeassistant.components.ecovacs.controller.Authenticator",
+            "smarthub.components.ecovacs.controller.Authenticator",
             autospec=True,
         ) as mock,
         patch(
-            "homeassistant.components.ecovacs.config_flow.Authenticator",
+            "smarthub.components.ecovacs.config_flow.Authenticator",
             new=mock,
         ),
     ):
@@ -104,11 +104,11 @@ def mock_mqtt_client(mock_authenticator: Mock) -> Generator[Mock]:
     """Mock the MQTT client."""
     with (
         patch(
-            "homeassistant.components.ecovacs.controller.MqttClient",
+            "smarthub.components.ecovacs.controller.MqttClient",
             autospec=True,
         ) as mock,
         patch(
-            "homeassistant.components.ecovacs.config_flow.MqttClient",
+            "smarthub.components.ecovacs.config_flow.MqttClient",
             new=mock,
         ),
     ):
@@ -122,7 +122,7 @@ def mock_mqtt_client(mock_authenticator: Mock) -> Generator[Mock]:
 def mock_vacbot(device_fixture: str) -> Generator[Mock]:
     """Mock the legacy VacBot."""
     with patch(
-        "homeassistant.components.ecovacs.controller.VacBot",
+        "smarthub.components.ecovacs.controller.VacBot",
         autospec=True,
     ) as mock:
         vacbot = mock.return_value
@@ -158,7 +158,7 @@ def platforms() -> Platform | list[Platform]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_authenticator: Mock,
     mock_mqtt_client: Mock,
@@ -170,7 +170,7 @@ async def init_integration(
         platforms = [platforms]
 
     with patch(
-        "homeassistant.components.ecovacs.PLATFORMS",
+        "smarthub.components.ecovacs.PLATFORMS",
         platforms,
     ):
         mock_config_entry.add_to_hass(hass)

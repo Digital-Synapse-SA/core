@@ -6,10 +6,10 @@ import pytest
 from pytradfri.const import ATTR_REACHABLE_STATE
 from pytradfri.device import Device
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.tradfri.const import DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.tradfri.const import DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from .common import CommandStore, setup_integration
 
@@ -24,7 +24,7 @@ def outlet() -> str:
 
 @pytest.mark.parametrize("device", ["outlet"], indirect=True)
 async def test_switch_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
 ) -> None:
@@ -54,7 +54,7 @@ async def test_switch_available(
     ],
 )
 async def test_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
     service: str,

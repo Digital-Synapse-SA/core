@@ -5,13 +5,13 @@ from typing import Any
 
 from aioharmony.const import SendCommandDevice
 
-from homeassistant.components.harmony.const import (
+from smarthub.components.harmony.const import (
     DOMAIN,
     SERVICE_CHANGE_CHANNEL,
     SERVICE_SYNC,
 )
-from homeassistant.components.harmony.remote import ATTR_CHANNEL, ATTR_DELAY_SECS
-from homeassistant.components.remote import (
+from smarthub.components.harmony.remote import ATTR_CHANNEL, ATTR_DELAY_SECS
+from smarthub.components.remote import (
     ATTR_ACTIVITY,
     ATTR_COMMAND,
     ATTR_DEVICE,
@@ -23,7 +23,7 @@ from homeassistant.components.remote import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_HOST,
     CONF_NAME,
@@ -31,8 +31,8 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import utcnow
+from smarthub.core import SmartHub
+from smarthub.util import utcnow
 
 from .conftest import ACTIVITIES_TO_IDS, TV_DEVICE_ID, TV_DEVICE_NAME
 from .const import ENTITY_REMOTE, HUB_NAME
@@ -46,7 +46,7 @@ STOP_COMMAND = "Stop"
 async def test_connection_state_changes(
     harmony_client,
     mock_hc,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_write_config,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -85,7 +85,7 @@ async def test_connection_state_changes(
 
 
 async def test_remote_toggles(
-    mock_hc, hass: HomeAssistant, mock_write_config, mock_config_entry: MockConfigEntry
+    mock_hc, hass: SmartHub, mock_write_config, mock_config_entry: MockConfigEntry
 ) -> None:
     """Ensure calls to the remote also updates the switches."""
 
@@ -154,7 +154,7 @@ async def test_remote_toggles(
 async def test_async_send_command(
     mock_hc,
     harmony_client,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_write_config,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -289,7 +289,7 @@ async def test_async_send_command(
 async def test_async_send_command_custom_delay(
     mock_hc,
     harmony_client,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_write_config,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -336,7 +336,7 @@ async def test_async_send_command_custom_delay(
 async def test_change_channel(
     mock_hc,
     harmony_client,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_write_config,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -364,7 +364,7 @@ async def test_sync(
     mock_hc,
     harmony_client,
     mock_write_config,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the sync command."""
@@ -389,7 +389,7 @@ async def test_sync(
 
 
 async def _send_commands_and_wait(
-    hass: HomeAssistant, service_data: dict[str, Any]
+    hass: SmartHub, service_data: dict[str, Any]
 ) -> None:
     await hass.services.async_call(
         REMOTE_DOMAIN,

@@ -5,24 +5,24 @@ from datetime import timedelta
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.sensor import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     DOMAIN,
     SensorDeviceClass,
     SensorStateClass,
     device_trigger,
 )
-from homeassistant.components.sensor.const import NON_NUMERIC_DEVICE_CLASSES
-from homeassistant.components.sensor.device_trigger import ENTITY_TRIGGERS
-from homeassistant.const import CONF_PLATFORM, PERCENTAGE, STATE_UNKNOWN, EntityCategory
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_registry import RegistryEntryHider
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.json import load_json
+from smarthub.components.sensor.const import NON_NUMERIC_DEVICE_CLASSES
+from smarthub.components.sensor.device_trigger import ENTITY_TRIGGERS
+from smarthub.const import CONF_PLATFORM, PERCENTAGE, STATE_UNKNOWN, EntityCategory
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_registry import RegistryEntryHider
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.json import load_json
 
 from .common import UNITS_OF_MEASUREMENT, MockSensor
 
@@ -74,12 +74,12 @@ def test_matches_device_classes(device_class: SensorDeviceClass) -> None:
     schema_types = device_trigger.TRIGGER_SCHEMA.validators[0].schema["type"].container
     assert constant_value in schema_types
     # Ensure it is present in string.json
-    strings = load_json("homeassistant/components/sensor/strings.json")
+    strings = load_json("smarthub/components/sensor/strings.json")
     assert constant_value in strings["device_automation"]["trigger_type"]
 
 
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_sensor_entities: dict[str, MockSensor],
@@ -140,7 +140,7 @@ async def test_get_triggers(
     ],
 )
 async def test_get_triggers_hidden_auxiliary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hidden_by,
@@ -190,7 +190,7 @@ async def test_get_triggers_hidden_auxiliary(
     ],
 )
 async def test_get_triggers_no_unit_or_stateclass(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     state_class,
@@ -237,7 +237,7 @@ async def test_get_triggers_no_unit_or_stateclass(
     ],
 )
 async def test_get_trigger_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_sensor_entities: dict[str, MockSensor],
@@ -307,7 +307,7 @@ async def test_get_trigger_capabilities(
     ],
 )
 async def test_get_trigger_capabilities_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_sensor_entities: dict[str, MockSensor],
@@ -371,7 +371,7 @@ async def test_get_trigger_capabilities_legacy(
 
 
 async def test_get_trigger_capabilities_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test we get the expected capabilities from a sensor trigger."""
@@ -420,7 +420,7 @@ async def test_get_trigger_capabilities_none(
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_if_fires_not_on_above_below(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
@@ -459,7 +459,7 @@ async def test_if_fires_not_on_above_below(
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_if_fires_on_state_above(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -525,7 +525,7 @@ async def test_if_fires_on_state_above(
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_if_fires_on_state_below(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -591,7 +591,7 @@ async def test_if_fires_on_state_below(
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_if_fires_on_state_between(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -670,7 +670,7 @@ async def test_if_fires_on_state_between(
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_if_fires_on_state_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -736,7 +736,7 @@ async def test_if_fires_on_state_legacy(
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_if_fires_on_state_change_with_for(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],

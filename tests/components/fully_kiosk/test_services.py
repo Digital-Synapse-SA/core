@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.components.fully_kiosk.const import (
+from smarthub.components.fully_kiosk.const import (
     ATTR_APPLICATION,
     ATTR_KEY,
     ATTR_URL,
@@ -14,16 +14,16 @@ from homeassistant.components.fully_kiosk.const import (
     SERVICE_SET_CONFIG,
     SERVICE_START_APPLICATION,
 )
-from homeassistant.const import ATTR_DEVICE_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr
+from smarthub.const import ATTR_DEVICE_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 
 
 async def test_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,
@@ -119,7 +119,7 @@ async def test_services(
 
 
 async def test_service_unloaded_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,
@@ -133,7 +133,7 @@ async def test_service_unloaded_entry(
 
     assert device_entry
 
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             DOMAIN,
             SERVICE_LOAD_URL,
@@ -143,7 +143,7 @@ async def test_service_unloaded_entry(
     assert "Test device is not loaded" in str(excinfo)
     mock_fully_kiosk.loadUrl.assert_not_called()
 
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             DOMAIN,
             SERVICE_START_APPLICATION,
@@ -155,12 +155,12 @@ async def test_service_unloaded_entry(
 
 
 async def test_service_bad_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,
 ) -> None:
     """Test Fully Kiosk Browser service invocation with bad device id."""
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             DOMAIN,
             SERVICE_LOAD_URL,
@@ -172,7 +172,7 @@ async def test_service_bad_device_id(
 
 
 async def test_service_called_with_non_fkb_target_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_fully_kiosk: MagicMock,
     init_integration: MockConfigEntry,
@@ -192,7 +192,7 @@ async def test_service_called_with_non_fkb_target_devices(
         },
     )
 
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             DOMAIN,
             SERVICE_LOAD_URL,

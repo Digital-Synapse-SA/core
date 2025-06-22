@@ -4,14 +4,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.hunterdouglas_powerview.const import DOMAIN
-from homeassistant.const import CONF_API_VERSION, CONF_HOST, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.hunterdouglas_powerview.const import DOMAIN
+from smarthub.const import CONF_API_VERSION, CONF_HOST, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .const import DHCP_DATA, DISCOVERY_DATA, HOMEKIT_DATA, MOCK_SERIAL
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, async_load_json_object_fixture
 @pytest.mark.usefixtures("mock_hunterdouglas_hub")
 @pytest.mark.parametrize("api_version", [1, 2, 3])
 async def test_user_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MagicMock,
     api_version: int,
 ) -> None:
@@ -63,7 +63,7 @@ async def test_user_form(
 @pytest.mark.usefixtures("mock_hunterdouglas_hub")
 @pytest.mark.parametrize(("source", "discovery_info", "api_version"), DISCOVERY_DATA)
 async def test_form_homekit_and_dhcp_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MagicMock,
     source: str,
     discovery_info: DhcpServiceInfo,
@@ -77,7 +77,7 @@ async def test_form_homekit_and_dhcp_cannot_connect(
     ignored_config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.hunterdouglas_powerview.util.Hub.query_firmware",
+        "smarthub.components.hunterdouglas_powerview.util.Hub.query_firmware",
         side_effect=TimeoutError,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -110,7 +110,7 @@ async def test_form_homekit_and_dhcp_cannot_connect(
 @pytest.mark.usefixtures("mock_hunterdouglas_hub")
 @pytest.mark.parametrize(("source", "discovery_info", "api_version"), DISCOVERY_DATA)
 async def test_form_homekit_and_dhcp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MagicMock,
     source: str,
     discovery_info: DhcpServiceInfo | ZeroconfServiceInfo,
@@ -164,7 +164,7 @@ async def test_form_homekit_and_dhcp(
     ("dhcp_source", "dhcp_discovery", "dhcp_api_version"), DHCP_DATA
 )
 async def test_discovered_by_homekit_and_dhcp(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MagicMock,
     homekit_source: str,
     homekit_discovery: ZeroconfServiceInfo,
@@ -196,7 +196,7 @@ async def test_discovered_by_homekit_and_dhcp(
 @pytest.mark.usefixtures("mock_hunterdouglas_hub")
 @pytest.mark.parametrize("api_version", [1, 2, 3])
 async def test_form_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MagicMock,
     api_version: int,
 ) -> None:
@@ -207,7 +207,7 @@ async def test_form_cannot_connect(
 
     # Simulate a timeout error
     with patch(
-        "homeassistant.components.hunterdouglas_powerview.util.Hub.query_firmware",
+        "smarthub.components.hunterdouglas_powerview.util.Hub.query_firmware",
         side_effect=TimeoutError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -235,7 +235,7 @@ async def test_form_cannot_connect(
 @pytest.mark.usefixtures("mock_hunterdouglas_hub")
 @pytest.mark.parametrize("api_version", [1, 2, 3])
 async def test_form_no_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MagicMock,
     api_version: int,
 ) -> None:
@@ -246,11 +246,11 @@ async def test_form_no_data(
 
     with (
         patch(
-            "homeassistant.components.hunterdouglas_powerview.util.Hub.request_raw_data",
+            "smarthub.components.hunterdouglas_powerview.util.Hub.request_raw_data",
             return_value={},
         ),
         patch(
-            "homeassistant.components.hunterdouglas_powerview.util.Hub.request_home_data",
+            "smarthub.components.hunterdouglas_powerview.util.Hub.request_home_data",
             return_value={},
         ),
     ):
@@ -279,7 +279,7 @@ async def test_form_no_data(
 @pytest.mark.usefixtures("mock_hunterdouglas_hub")
 @pytest.mark.parametrize("api_version", [1, 2, 3])
 async def test_form_unknown_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MagicMock,
     api_version: int,
 ) -> None:
@@ -290,7 +290,7 @@ async def test_form_unknown_exception(
 
     # Simulate a transient error
     with patch(
-        "homeassistant.components.hunterdouglas_powerview.util.Hub.query_firmware",
+        "smarthub.components.hunterdouglas_powerview.util.Hub.query_firmware",
         side_effect=SyntaxError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -318,7 +318,7 @@ async def test_form_unknown_exception(
 @pytest.mark.usefixtures("mock_hunterdouglas_hub")
 @pytest.mark.parametrize("api_version", [3])  # only gen 3 present secondary hubs
 async def test_form_unsupported_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MagicMock,
     api_version: int,
 ) -> None:
@@ -329,7 +329,7 @@ async def test_form_unsupported_device(
 
     # Simulate a gen 3 secondary hub
     with patch(
-        "homeassistant.components.hunterdouglas_powerview.util.Hub.request_raw_data",
+        "smarthub.components.hunterdouglas_powerview.util.Hub.request_raw_data",
         return_value=await async_load_json_object_fixture(
             hass, "gen3/gateway/secondary.json", DOMAIN
         ),
@@ -359,7 +359,7 @@ async def test_form_unsupported_device(
 @pytest.mark.usefixtures("mock_hunterdouglas_hub")
 @pytest.mark.parametrize("api_version", [1, 2, 3])
 async def test_migrate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     api_version: int,
 ) -> None:

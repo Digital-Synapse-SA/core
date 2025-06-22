@@ -6,18 +6,18 @@ import httpx
 import pytest
 import respx
 
-from homeassistant.components.rest import DOMAIN
-from homeassistant.components.rest.switch import (
+from smarthub.components.rest import DOMAIN
+from smarthub.components.rest.switch import (
     CONF_BODY_OFF,
     CONF_BODY_ON,
     CONF_STATE_RESOURCE,
 )
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SCAN_INTERVAL,
     SwitchDeviceClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_ENTITY_PICTURE,
@@ -40,11 +40,11 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.trigger_template_entity import CONF_PICTURE
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.trigger_template_entity import CONF_PICTURE
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from tests.common import assert_setup_component, async_fire_time_changed
 
@@ -71,7 +71,7 @@ def http_success_code(request: pytest.FixtureRequest) -> HTTPStatus:
 
 
 async def test_setup_missing_config(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup with configuration missing required entries."""
     config = {SWITCH_DOMAIN: {CONF_PLATFORM: DOMAIN}}
@@ -85,7 +85,7 @@ async def test_setup_missing_config(
 
 
 async def test_setup_missing_schema(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup with resource missing schema."""
     config = {SWITCH_DOMAIN: {CONF_PLATFORM: DOMAIN, CONF_RESOURCE: "localhost"}}
@@ -100,7 +100,7 @@ async def test_setup_missing_schema(
 
 @respx.mock
 async def test_setup_failed_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test setup when connection error occurs."""
@@ -114,7 +114,7 @@ async def test_setup_failed_connect(
 
 @respx.mock
 async def test_setup_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test setup when connection timeout occurs."""
@@ -127,7 +127,7 @@ async def test_setup_timeout(
 
 
 @respx.mock
-async def test_setup_minimum(hass: HomeAssistant) -> None:
+async def test_setup_minimum(hass: SmartHub) -> None:
     """Test setup with minimum configuration."""
     route = respx.get(RESOURCE) % HTTPStatus.OK
     config = {SWITCH_DOMAIN: {CONF_PLATFORM: DOMAIN, CONF_RESOURCE: RESOURCE}}
@@ -138,7 +138,7 @@ async def test_setup_minimum(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_setup_query_params(hass: HomeAssistant) -> None:
+async def test_setup_query_params(hass: SmartHub) -> None:
     """Test setup with query params."""
     route = respx.get("http://localhost/?search=something") % HTTPStatus.OK
     config = {
@@ -156,7 +156,7 @@ async def test_setup_query_params(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test setup with valid configuration."""
     route = respx.get(RESOURCE) % HTTPStatus.OK
     config = {
@@ -176,7 +176,7 @@ async def test_setup(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_setup_with_state_resource(hass: HomeAssistant) -> None:
+async def test_setup_with_state_resource(hass: SmartHub) -> None:
     """Test setup with valid configuration."""
     respx.get(RESOURCE) % HTTPStatus.NOT_FOUND
     route = respx.get("http://localhost/state") % HTTPStatus.OK
@@ -198,7 +198,7 @@ async def test_setup_with_state_resource(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_setup_with_templated_headers_params(hass: HomeAssistant) -> None:
+async def test_setup_with_templated_headers_params(hass: SmartHub) -> None:
     """Test setup with valid configuration."""
     route = respx.get(RESOURCE) % HTTPStatus.OK
     config = {
@@ -231,7 +231,7 @@ async def test_setup_with_templated_headers_params(hass: HomeAssistant) -> None:
 # Tests for REST switch platform.
 
 
-async def _async_setup_test_switch(hass: HomeAssistant) -> None:
+async def _async_setup_test_switch(hass: SmartHub) -> None:
     respx.get(RESOURCE) % HTTPStatus.OK
 
     headers = {"Content-type": CONTENT_TYPE_JSON}
@@ -252,7 +252,7 @@ async def _async_setup_test_switch(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_name(hass: HomeAssistant) -> None:
+async def test_name(hass: SmartHub) -> None:
     """Test the name."""
     await _async_setup_test_switch(hass)
 
@@ -261,7 +261,7 @@ async def test_name(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_device_class(hass: HomeAssistant) -> None:
+async def test_device_class(hass: SmartHub) -> None:
     """Test the device class."""
     await _async_setup_test_switch(hass)
 
@@ -270,7 +270,7 @@ async def test_device_class(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_is_on_before_update(hass: HomeAssistant) -> None:
+async def test_is_on_before_update(hass: SmartHub) -> None:
     """Test is_on in initial state."""
     await _async_setup_test_switch(hass)
 
@@ -280,7 +280,7 @@ async def test_is_on_before_update(hass: HomeAssistant) -> None:
 
 @respx.mock
 async def test_turn_on_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     http_success_code: HTTPStatus,
 ) -> None:
     """Test turn_on."""
@@ -303,7 +303,7 @@ async def test_turn_on_success(
 
 
 @respx.mock
-async def test_turn_on_status_not_ok(hass: HomeAssistant) -> None:
+async def test_turn_on_status_not_ok(hass: SmartHub) -> None:
     """Test turn_on when error status returned."""
     await _async_setup_test_switch(hass)
 
@@ -323,7 +323,7 @@ async def test_turn_on_status_not_ok(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_turn_on_timeout(hass: HomeAssistant) -> None:
+async def test_turn_on_timeout(hass: SmartHub) -> None:
     """Test turn_on when timeout occurs."""
     await _async_setup_test_switch(hass)
 
@@ -341,7 +341,7 @@ async def test_turn_on_timeout(hass: HomeAssistant) -> None:
 
 @respx.mock
 async def test_turn_off_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     http_success_code: HTTPStatus,
 ) -> None:
     """Test turn_off."""
@@ -365,7 +365,7 @@ async def test_turn_off_success(
 
 
 @respx.mock
-async def test_turn_off_status_not_ok(hass: HomeAssistant) -> None:
+async def test_turn_off_status_not_ok(hass: SmartHub) -> None:
     """Test turn_off when error status returned."""
     await _async_setup_test_switch(hass)
 
@@ -386,7 +386,7 @@ async def test_turn_off_status_not_ok(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_turn_off_timeout(hass: HomeAssistant) -> None:
+async def test_turn_off_timeout(hass: SmartHub) -> None:
     """Test turn_off when timeout occurs."""
     await _async_setup_test_switch(hass)
 
@@ -403,7 +403,7 @@ async def test_turn_off_timeout(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_update_when_on(hass: HomeAssistant) -> None:
+async def test_update_when_on(hass: SmartHub) -> None:
     """Test update when switch is on."""
     await _async_setup_test_switch(hass)
 
@@ -415,7 +415,7 @@ async def test_update_when_on(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_update_when_off(hass: HomeAssistant) -> None:
+async def test_update_when_off(hass: SmartHub) -> None:
     """Test update when switch is off."""
     await _async_setup_test_switch(hass)
 
@@ -427,7 +427,7 @@ async def test_update_when_off(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_update_when_unknown(hass: HomeAssistant) -> None:
+async def test_update_when_unknown(hass: SmartHub) -> None:
     """Test update when unknown status returned."""
     await _async_setup_test_switch(hass)
 
@@ -439,7 +439,7 @@ async def test_update_when_unknown(hass: HomeAssistant) -> None:
 
 
 @respx.mock
-async def test_update_timeout(hass: HomeAssistant) -> None:
+async def test_update_timeout(hass: SmartHub) -> None:
     """Test update when timeout occurs."""
     await _async_setup_test_switch(hass)
 
@@ -452,7 +452,7 @@ async def test_update_timeout(hass: HomeAssistant) -> None:
 
 @respx.mock
 async def test_entity_config(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test entity configuration."""
 
@@ -487,7 +487,7 @@ async def test_entity_config(
 
 @respx.mock
 async def test_availability(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test entity configuration."""
 
@@ -513,7 +513,7 @@ async def test_availability(
             },
         },
     )
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await hass.async_block_till_done()
 
     state = hass.states.get("switch.rest_switch")
@@ -527,7 +527,7 @@ async def test_availability(
         json={"x": 1},
     )
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: ["switch.rest_switch"]},
         blocking=True,
@@ -545,7 +545,7 @@ async def test_availability(
         json={"beer": 0},
     )
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: ["switch.rest_switch"]},
         blocking=True,
@@ -561,7 +561,7 @@ async def test_availability(
 
 @respx.mock
 async def test_availability_blocks_is_on_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test availability blocks is_on_template from rendering."""
@@ -582,7 +582,7 @@ async def test_availability_blocks_is_on_template(
 
     assert await async_setup_component(hass, SWITCH_DOMAIN, config)
     await hass.async_block_till_done()
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await hass.async_block_till_done()
 
     assert error not in caplog.text
@@ -594,7 +594,7 @@ async def test_availability_blocks_is_on_template(
     respx.clear()
     respx.get("http://localhost").respond(status_code=HTTPStatus.OK, content="50")
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {ATTR_ENTITY_ID: ["switch.block_template"]},
         blocking=True,

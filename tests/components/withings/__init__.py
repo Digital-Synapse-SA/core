@@ -9,9 +9,9 @@ from aiohttp.test_utils import TestClient
 from aiowithings import Activity, Device, Goals, MeasurementGroup, SleepSummary, Workout
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.webhook import async_generate_url
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
+from smarthub.components.webhook import async_generate_url
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
 
 from tests.common import (
     MockConfigEntry,
@@ -30,7 +30,7 @@ class WebhookResponse:
 
 
 async def call_webhook(
-    hass: HomeAssistant, webhook_id: str, data: dict[str, Any], client: TestClient
+    hass: SmartHub, webhook_id: str, data: dict[str, Any], client: TestClient
 ) -> WebhookResponse:
     """Call the webhook."""
     webhook_url = async_generate_url(hass, webhook_id)
@@ -50,7 +50,7 @@ async def call_webhook(
 
 
 async def setup_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry, enable_webhooks: bool = True
+    hass: SmartHub, config_entry: MockConfigEntry, enable_webhooks: bool = True
 ) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
@@ -65,7 +65,7 @@ async def setup_integration(
 
 
 async def prepare_webhook_setup(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Prepare webhooks are registered by waiting a second."""
     freezer.tick(timedelta(seconds=1))

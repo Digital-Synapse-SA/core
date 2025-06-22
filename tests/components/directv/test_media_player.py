@@ -8,13 +8,13 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.directv.media_player import (
+from smarthub.components.directv.media_player import (
     ATTR_MEDIA_CURRENTLY_RECORDING,
     ATTR_MEDIA_RATING,
     ATTR_MEDIA_RECORDED,
     ATTR_MEDIA_START_TIME,
 )
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_MEDIA_ALBUM_NAME,
     ATTR_MEDIA_ARTIST,
@@ -33,7 +33,7 @@ from homeassistant.components.media_player import (
     MediaPlayerEntityFeature,
     MediaType,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_MEDIA_NEXT_TRACK,
     SERVICE_MEDIA_PAUSE,
@@ -47,9 +47,9 @@ from homeassistant.const import (
     STATE_PLAYING,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import setup_integration
 
@@ -70,38 +70,38 @@ def mock_now() -> datetime:
     return dt_util.utcnow()
 
 
-async def async_turn_on(hass: HomeAssistant, entity_id: str | None = None) -> None:
+async def async_turn_on(hass: SmartHub, entity_id: str | None = None) -> None:
     """Turn on specified media player or all."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
     await hass.services.async_call(MP_DOMAIN, SERVICE_TURN_ON, data)
 
 
-async def async_turn_off(hass: HomeAssistant, entity_id: str | None = None) -> None:
+async def async_turn_off(hass: SmartHub, entity_id: str | None = None) -> None:
     """Turn off specified media player or all."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
     await hass.services.async_call(MP_DOMAIN, SERVICE_TURN_OFF, data)
 
 
-async def async_media_pause(hass: HomeAssistant, entity_id: str | None = None) -> None:
+async def async_media_pause(hass: SmartHub, entity_id: str | None = None) -> None:
     """Send the media player the command for pause."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
     await hass.services.async_call(MP_DOMAIN, SERVICE_MEDIA_PAUSE, data)
 
 
-async def async_media_play(hass: HomeAssistant, entity_id: str | None = None) -> None:
+async def async_media_play(hass: SmartHub, entity_id: str | None = None) -> None:
     """Send the media player the command for play/pause."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
     await hass.services.async_call(MP_DOMAIN, SERVICE_MEDIA_PLAY, data)
 
 
-async def async_media_stop(hass: HomeAssistant, entity_id: str | None = None) -> None:
+async def async_media_stop(hass: SmartHub, entity_id: str | None = None) -> None:
     """Send the media player the command for stop."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
     await hass.services.async_call(MP_DOMAIN, SERVICE_MEDIA_STOP, data)
 
 
 async def async_media_next_track(
-    hass: HomeAssistant, entity_id: str | None = None
+    hass: SmartHub, entity_id: str | None = None
 ) -> None:
     """Send the media player the command for next track."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
@@ -109,7 +109,7 @@ async def async_media_next_track(
 
 
 async def async_media_previous_track(
-    hass: HomeAssistant, entity_id: str | None = None
+    hass: SmartHub, entity_id: str | None = None
 ) -> None:
     """Send the media player the command for prev track."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
@@ -117,7 +117,7 @@ async def async_media_previous_track(
 
 
 async def async_play_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     media_type: str,
     media_id: str,
     entity_id: str | None = None,
@@ -135,7 +135,7 @@ async def async_play_media(
     await hass.services.async_call(MP_DOMAIN, SERVICE_PLAY_MEDIA, data)
 
 
-async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_setup(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Test setup with basic config."""
     await setup_integration(hass, aioclient_mock)
     assert hass.states.get(MAIN_ENTITY_ID)
@@ -144,7 +144,7 @@ async def test_setup(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -
 
 
 async def test_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -165,7 +165,7 @@ async def test_unique_id(
 
 
 async def test_supported_features(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test supported features."""
     await setup_integration(hass, aioclient_mock)
@@ -198,7 +198,7 @@ async def test_supported_features(
 
 
 async def test_check_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_now: dt_util.dt.datetime,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -305,7 +305,7 @@ async def test_check_attributes(
 
 
 async def test_attributes_paused(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_now: dt_util.dt.datetime,
     freezer: FrozenDateTimeFactory,
     aioclient_mock: AiohttpClientMocker,
@@ -328,7 +328,7 @@ async def test_attributes_paused(
 
 
 async def test_main_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_now: dt_util.dt.datetime,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:

@@ -2,17 +2,17 @@
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.device_automation.exceptions import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.device_automation.exceptions import (
     InvalidDeviceAutomationConfig,
 )
-from homeassistant.components.lg_netcast import DOMAIN, device_trigger
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.lg_netcast import DOMAIN, device_trigger
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import ENTITY_ID, UNIQUE_ID, setup_lgnetcast
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry, async_get_device_automations
 
 
 async def test_get_triggers(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test we get the expected triggers."""
     await setup_lgnetcast(hass)
@@ -43,7 +43,7 @@ async def test_get_triggers(
 
 
 async def test_if_fires_on_turn_on_request(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -106,19 +106,19 @@ async def test_if_fires_on_turn_on_request(
 
 
 async def test_failure_scenarios(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test failure scenarios."""
     await setup_lgnetcast(hass)
 
     # Test wrong trigger platform type
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await device_trigger.async_attach_trigger(
             hass, {"type": "wrong.type", "device_id": "invalid_device_id"}, None, {}
         )
 
     # Test invalid device id
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await device_trigger.async_validate_trigger_config(
             hass,
             {

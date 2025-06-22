@@ -5,9 +5,9 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.rest_command import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.rest_command import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component
 
@@ -31,7 +31,7 @@ TEST_CONFIG = {
 
 @pytest.fixture(name="setup_component")
 async def mock_setup_component(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> ComponentSetup:
     """Set up the rest_command component."""
 

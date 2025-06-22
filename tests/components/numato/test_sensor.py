@@ -2,10 +2,10 @@
 
 import pytest
 
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import discovery
-from homeassistant.setup import async_setup_component
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import discovery
+from smarthub.setup import async_setup_component
 
 from .common import NUMATO_CFG, mockup_raise
 
@@ -15,7 +15,7 @@ MOCKUP_ENTITY_IDS = {
 
 
 async def test_failing_setups_no_entities(
-    hass: HomeAssistant, numato_fixture, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, numato_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """When port setup fails, no entity shall be created."""
     monkeypatch.setattr(numato_fixture.NumatoDeviceMock, "setup", mockup_raise)
@@ -26,7 +26,7 @@ async def test_failing_setups_no_entities(
 
 
 async def test_failing_sensor_update(
-    hass: HomeAssistant, numato_fixture, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, numato_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test condition when a sensor update fails."""
     monkeypatch.setattr(numato_fixture.NumatoDeviceMock, "adc_read", mockup_raise)
@@ -36,7 +36,7 @@ async def test_failing_sensor_update(
 
 
 async def test_sensor_setup_without_discovery_info(
-    hass: HomeAssistant, config, numato_fixture
+    hass: SmartHub, config, numato_fixture
 ) -> None:
     """Test handling of empty discovery_info."""
     numato_fixture.discover()

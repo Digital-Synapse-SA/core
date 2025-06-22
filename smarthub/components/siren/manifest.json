@@ -1,0 +1,8 @@
+{
+  "domain": "siren",
+  "name": "Siren",
+  "codeowners": ["@smart-hub/core", "@raman325"],
+  "documentation": "https://www.smart-hub.io/integrations/siren",
+  "integration_type": "entity",
+  "quality_scale": "internal"
+}

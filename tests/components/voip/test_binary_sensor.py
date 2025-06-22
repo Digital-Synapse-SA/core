@@ -4,20 +4,20 @@ from http import HTTPStatus
 
 import pytest
 
-from homeassistant.components.repairs import DOMAIN as REPAIRS_DOMAIN
-from homeassistant.components.voip import DOMAIN
-from homeassistant.components.voip.devices import VoIPDevice
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er, issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.repairs import DOMAIN as REPAIRS_DOMAIN
+from smarthub.components.voip import DOMAIN
+from smarthub.components.voip.devices import VoIPDevice
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er, issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_call_in_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     voip_device: VoIPDevice,
 ) -> None:
@@ -39,7 +39,7 @@ async def test_call_in_progress(
 
 @pytest.mark.usefixtures("voip_device")
 async def test_assist_in_progress_disabled_by_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -56,7 +56,7 @@ async def test_assist_in_progress_disabled_by_default(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_assist_in_progress_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     issue_registry: ir.IssueRegistry,
     voip_device: VoIPDevice,
@@ -88,7 +88,7 @@ async def test_assist_in_progress_issue(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_assist_in_progress_repair_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     entity_registry: er.EntityRegistry,
     issue_registry: ir.IssueRegistry,

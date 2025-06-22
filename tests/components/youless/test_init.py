@@ -1,14 +1,14 @@
 """Test the setup of the Youless integration."""
 
-from homeassistant import setup
-from homeassistant.components import youless
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub import setup
+from smarthub.components import youless
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import init_component
 
 
-async def test_async_setup_entry(hass: HomeAssistant) -> None:
+async def test_async_setup_entry(hass: SmartHub) -> None:
     """Check if the setup of the integration succeeds."""
 
     entry = await init_component(hass)

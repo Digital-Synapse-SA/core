@@ -6,8 +6,8 @@ from unittest.mock import PropertyMock
 import blebox_uniapi
 import pytest
 
-from homeassistant.const import ATTR_ICON
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ICON
+from smarthub.core import SmartHub
 
 from .conftest import async_setup_entity, mock_feature
 
@@ -42,7 +42,7 @@ def tv_lift_box_fixture(caplog: pytest.LogCaptureFixture):
 
 
 async def test_tvliftbox_init(
-    tvliftbox, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    tvliftbox, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test tvLiftBox initialisation."""
     caplog.set_level(logging.ERROR)
@@ -58,7 +58,7 @@ async def test_tvliftbox_init(
 
 @pytest.mark.parametrize("input", query_icon_matching)
 async def test_get_icon(
-    input, tvliftbox, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    input, tvliftbox, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test if proper icon is returned."""
     caplog.set_level(logging.ERROR)

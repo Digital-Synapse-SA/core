@@ -7,44 +7,44 @@ import pytest
 from zwave_js_server.event import Event
 from zwave_js_server.model.node import Node
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES, ColorMode
-from homeassistant.components.number import (
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.light import ATTR_SUPPORTED_COLOR_MODES, ColorMode
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.components.zwave_js.discovery import (
+from smarthub.components.zwave_js.discovery import (
     FirmwareVersionRange,
     ZWaveDiscoverySchema,
     ZWaveValueDiscoverySchema,
 )
-from homeassistant.components.zwave_js.discovery_data_template import (
+from smarthub.components.zwave_js.discovery_data_template import (
     DynamicCurrentTempClimateDataTemplate,
 )
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_UNKNOWN, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_UNKNOWN, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_aeon_smart_switch_6_state(
-    hass: HomeAssistant, client, aeon_smart_switch_6, integration
+    hass: SmartHub, client, aeon_smart_switch_6, integration
 ) -> None:
     """Test that Smart Switch 6 has a meter reset button."""
     state = hass.states.get("button.smart_switch_6_reset_accumulated_values")
     assert state
 
 
-async def test_iblinds_v2(hass: HomeAssistant, client, iblinds_v2, integration) -> None:
+async def test_iblinds_v2(hass: SmartHub, client, iblinds_v2, integration) -> None:
     """Test that an iBlinds v2.0 multilevel switch value is discovered as a cover."""
     node = iblinds_v2
     assert node.device_class.specific.label == "Unused"
@@ -57,7 +57,7 @@ async def test_iblinds_v2(hass: HomeAssistant, client, iblinds_v2, integration) 
 
 
 async def test_touchwand_glass9(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     touchwand_glass9: Node,
     integration: MockConfigEntry,
@@ -74,7 +74,7 @@ async def test_touchwand_glass9(
     assert state
 
 
-async def test_zvidar_state(hass: HomeAssistant, client, zvidar, integration) -> None:
+async def test_zvidar_state(hass: SmartHub, client, zvidar, integration) -> None:
     """Test that an ZVIDAR Z-CM-V01 multilevel switch value is discovered as a cover."""
     node = zvidar
     assert node.device_class.specific.label == "Unused"
@@ -86,7 +86,7 @@ async def test_zvidar_state(hass: HomeAssistant, client, zvidar, integration) ->
     assert state
 
 
-async def test_ge_12730(hass: HomeAssistant, client, ge_12730, integration) -> None:
+async def test_ge_12730(hass: SmartHub, client, ge_12730, integration) -> None:
     """Test GE 12730 Fan Controller v2.0 multilevel switch is discovered as a fan."""
     node = ge_12730
     assert node.device_class.specific.label == "Multilevel Power Switch"
@@ -99,7 +99,7 @@ async def test_ge_12730(hass: HomeAssistant, client, ge_12730, integration) -> N
 
 
 async def test_inovelli_lzw36(
-    hass: HomeAssistant, client, inovelli_lzw36, integration
+    hass: SmartHub, client, inovelli_lzw36, integration
 ) -> None:
     """Test LZW36 Fan Controller multilevel switch endpoint 2 is discovered as a fan."""
     node = inovelli_lzw36
@@ -113,7 +113,7 @@ async def test_inovelli_lzw36(
 
 
 async def test_vision_security_zl7432(
-    hass: HomeAssistant, client, vision_security_zl7432, integration
+    hass: SmartHub, client, vision_security_zl7432, integration
 ) -> None:
     """Test Vision Security ZL7432 is caught by the device specific discovery."""
     for entity_id in (
@@ -126,7 +126,7 @@ async def test_vision_security_zl7432(
 
 
 async def test_lock_popp_electric_strike_lock_control(
-    hass: HomeAssistant, client, lock_popp_electric_strike_lock_control, integration
+    hass: SmartHub, client, lock_popp_electric_strike_lock_control, integration
 ) -> None:
     """Test that the Popp Electric Strike Lock Control gets discovered correctly."""
     assert hass.states.get("lock.node_62") is not None
@@ -138,13 +138,13 @@ async def test_lock_popp_electric_strike_lock_control(
 
 
 async def test_fortrez_ssa3_siren(
-    hass: HomeAssistant, client, fortrezz_ssa3_siren, integration
+    hass: SmartHub, client, fortrezz_ssa3_siren, integration
 ) -> None:
     """Test Fortrezz SSA3 siren gets discovered correctly."""
     assert hass.states.get("select.siren_and_strobe_alarm") is not None
 
 
-async def test_firmware_version_range_exception(hass: HomeAssistant) -> None:
+async def test_firmware_version_range_exception(hass: SmartHub) -> None:
     """Test FirmwareVersionRange exception."""
     with pytest.raises(ValueError):
         ZWaveDiscoverySchema(
@@ -155,7 +155,7 @@ async def test_firmware_version_range_exception(hass: HomeAssistant) -> None:
 
 
 async def test_dynamic_climate_data_discovery_template_failure(
-    hass: HomeAssistant, multisensor_6
+    hass: SmartHub, multisensor_6
 ) -> None:
     """Test that initing a DynamicCurrentTempClimateDataTemplate with no data raises."""
     node = multisensor_6
@@ -166,7 +166,7 @@ async def test_dynamic_climate_data_discovery_template_failure(
 
 
 async def test_merten_507801(
-    hass: HomeAssistant, client, merten_507801, integration
+    hass: SmartHub, client, merten_507801, integration
 ) -> None:
     """Test that Merten 507801 multilevel switch value is discovered as a cover."""
     node = merten_507801
@@ -180,7 +180,7 @@ async def test_merten_507801(
 
 
 async def test_shelly_001p10_disabled_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client,
     shelly_qnsh_001P10_shutter,
@@ -211,7 +211,7 @@ async def test_shelly_001p10_disabled_entities(
 
 
 async def test_merten_507801_disabled_enitites(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client,
     merten_507801,
@@ -240,7 +240,7 @@ async def test_merten_507801_disabled_enitites(
 
 
 async def test_zooz_zen72(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
     switch_zooz_zen72: Node,
@@ -311,7 +311,7 @@ async def test_zooz_zen72(
 
 
 async def test_indicator_test(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -407,7 +407,7 @@ async def test_indicator_test(
 
 
 async def test_light_device_class_is_null(
-    hass: HomeAssistant, client, light_device_class_is_null, integration
+    hass: SmartHub, client, light_device_class_is_null, integration
 ) -> None:
     """Test that a Multilevel Switch CC value with a null device class is discovered as a light.
 
@@ -420,7 +420,7 @@ async def test_light_device_class_is_null(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_rediscovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     siren_neo_coolcam: Node,
     integration: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -461,7 +461,7 @@ async def test_rediscovery(
 
 
 async def test_aeotec_smart_switch_7(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     aeotec_smart_switch_7: Node,
     integration: MockConfigEntry,

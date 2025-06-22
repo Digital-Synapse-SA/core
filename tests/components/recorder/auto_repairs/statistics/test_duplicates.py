@@ -8,16 +8,16 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder import statistics
-from homeassistant.components.recorder.auto_repairs.statistics.duplicates import (
+from smarthub.components import recorder
+from smarthub.components.recorder import statistics
+from smarthub.components.recorder.auto_repairs.statistics.duplicates import (
     delete_statistics_duplicates,
     delete_statistics_meta_duplicates,
 )
-from homeassistant.components.recorder.statistics import async_add_external_statistics
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.recorder.statistics import async_add_external_statistics
+from smarthub.components.recorder.util import session_scope
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from ...common import async_wait_recording_done
 
@@ -34,7 +34,7 @@ async def mock_recorder_before_hass(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_delete_duplicates_no_duplicates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test removal of duplicated statistics."""
@@ -49,7 +49,7 @@ async def test_delete_duplicates_no_duplicates(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_duplicate_statistics_handle_integrity_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test the recorder does not blow up if statistics is duplicated."""
@@ -167,7 +167,7 @@ async def test_delete_metadata_duplicates(
         "unit_of_measurement": "%",
     }
 
-    def add_statistics_meta(hass: HomeAssistant) -> None:
+    def add_statistics_meta(hass: SmartHub) -> None:
         with session_scope(hass=hass) as session:
             session.add(
                 recorder.db_schema.StatisticsMeta.from_meta(external_energy_metadata_1)
@@ -179,7 +179,7 @@ async def test_delete_metadata_duplicates(
                 recorder.db_schema.StatisticsMeta.from_meta(external_co2_metadata)
             )
 
-    def get_statistics_meta(hass: HomeAssistant) -> list:
+    def get_statistics_meta(hass: SmartHub) -> list:
         with session_scope(hass=hass, read_only=True) as session:
             return list(session.query(recorder.db_schema.StatisticsMeta).all())
 
@@ -193,7 +193,7 @@ async def test_delete_metadata_duplicates(
             recorder.migration, "non_live_data_migration_needed", return_value=False
         ),
         patch(
-            "homeassistant.components.recorder.core.create_engine",
+            "smarthub.components.recorder.core.create_engine",
             new=_create_engine_28,
         ),
     ):
@@ -275,7 +275,7 @@ async def test_delete_metadata_duplicates_many(
         "unit_of_measurement": "%",
     }
 
-    def add_statistics_meta(hass: HomeAssistant) -> None:
+    def add_statistics_meta(hass: SmartHub) -> None:
         with session_scope(hass=hass) as session:
             session.add(
                 recorder.db_schema.StatisticsMeta.from_meta(external_energy_metadata_1)
@@ -299,7 +299,7 @@ async def test_delete_metadata_duplicates_many(
                 recorder.db_schema.StatisticsMeta.from_meta(external_co2_metadata)
             )
 
-    def get_statistics_meta(hass: HomeAssistant) -> list:
+    def get_statistics_meta(hass: SmartHub) -> list:
         with session_scope(hass=hass, read_only=True) as session:
             return list(session.query(recorder.db_schema.StatisticsMeta).all())
 
@@ -313,7 +313,7 @@ async def test_delete_metadata_duplicates_many(
             recorder.migration, "non_live_data_migration_needed", return_value=False
         ),
         patch(
-            "homeassistant.components.recorder.core.create_engine",
+            "smarthub.components.recorder.core.create_engine",
             new=_create_engine_28,
         ),
     ):
@@ -354,7 +354,7 @@ async def test_delete_metadata_duplicates_many(
 
 @pytest.mark.usefixtures("recorder_mock")
 async def test_delete_metadata_duplicates_no_duplicates(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test removal of duplicated statistics."""
     await async_wait_recording_done(hass)

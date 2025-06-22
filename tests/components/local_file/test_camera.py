@@ -6,22 +6,22 @@ from unittest.mock import Mock, mock_open, patch
 
 import pytest
 
-from homeassistant.components.local_file.const import (
+from smarthub.components.local_file.const import (
     DEFAULT_NAME,
     DOMAIN,
     SERVICE_UPDATE_FILE_PATH,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import ATTR_ENTITY_ID, CONF_FILE_PATH
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import ATTR_ENTITY_ID, CONF_FILE_PATH
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from tests.common import MockConfigEntry
 from tests.typing import ClientSessionGenerator
 
 
 async def test_loading_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     loaded_entry: MockConfigEntry,
 ) -> None:
@@ -30,7 +30,7 @@ async def test_loading_file(
     client = await hass_client()
 
     m_open = mock_open(read_data=b"hello")
-    with patch("homeassistant.components.local_file.camera.open", m_open, create=True):
+    with patch("smarthub.components.local_file.camera.open", m_open, create=True):
         resp = await client.get("/api/camera_proxy/camera.local_file")
 
     assert resp.status == HTTPStatus.OK
@@ -39,7 +39,7 @@ async def test_loading_file(
 
 
 async def test_file_not_readable_after_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     caplog: pytest.LogCaptureFixture,
     loaded_entry: MockConfigEntry,
@@ -49,7 +49,7 @@ async def test_file_not_readable_after_setup(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.local_file.camera.open", side_effect=FileNotFoundError
+        "smarthub.components.local_file.camera.open", side_effect=FileNotFoundError
     ):
         resp = await client.get("/api/camera_proxy/camera.local_file")
 
@@ -95,7 +95,7 @@ async def test_file_not_readable_after_setup(
     ],
 )
 async def test_camera_content_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config: dict[str, Any],
     url: str,
@@ -121,7 +121,7 @@ async def test_camera_content_type(
 
     image = "hello"
     m_open = mock_open(read_data=image.encode())
-    with patch("homeassistant.components.local_file.camera.open", m_open, create=True):
+    with patch("smarthub.components.local_file.camera.open", m_open, create=True):
         resp_1 = await client.get(url)
 
     assert resp_1.status == HTTPStatus.OK
@@ -140,7 +140,7 @@ async def test_camera_content_type(
     ],
 )
 async def test_update_file_path(
-    hass: HomeAssistant, loaded_entry: MockConfigEntry
+    hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test update_file_path service."""
     # Setup platform
@@ -159,7 +159,7 @@ async def test_update_file_path(
         patch("os.path.isfile", Mock(return_value=True)),
         patch("os.access", Mock(return_value=True)),
         patch(
-            "homeassistant.components.local_file.camera.mimetypes.guess_type",
+            "smarthub.components.local_file.camera.mimetypes.guess_type",
             Mock(return_value=(None, None)),
         ),
     ):
@@ -177,7 +177,7 @@ async def test_update_file_path(
         patch("os.path.isfile", Mock(return_value=True)),
         patch("os.access", Mock(return_value=True)),
         patch(
-            "homeassistant.components.local_file.camera.mimetypes.guess_type",
+            "smarthub.components.local_file.camera.mimetypes.guess_type",
             Mock(return_value=(None, None)),
         ),
     ):

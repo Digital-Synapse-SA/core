@@ -1,0 +1,10 @@
+{
+  "domain": "here_travel_time",
+  "name": "HERE Travel Time",
+  "codeowners": ["@eifinger"],
+  "config_flow": true,
+  "documentation": "https://www.smart-hub.io/integrations/here_travel_time",
+  "iot_class": "cloud_polling",
+  "loggers": ["here_routing", "here_transit", "smarthub.helpers.location"],
+  "requirements": ["here-routing==1.2.0", "here-transit==1.2.1"]
+}

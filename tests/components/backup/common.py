@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, cast
 from unittest.mock import AsyncMock, Mock, patch
 
-from homeassistant.components.backup import (
+from smarthub.components.backup import (
     DOMAIN,
     AddonInfo,
     AgentBackup,
@@ -16,11 +16,11 @@ from homeassistant.components.backup import (
     BackupNotFound,
     Folder,
 )
-from homeassistant.components.backup.backup import CoreLocalBackupAgent
-from homeassistant.components.backup.const import DATA_MANAGER
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.backup import async_initialize_backup
-from homeassistant.setup import async_setup_component
+from smarthub.components.backup.backup import CoreLocalBackupAgent
+from smarthub.components.backup.const import DATA_MANAGER
+from smarthub.core import SmartHub
+from smarthub.helpers.backup import async_initialize_backup
+from smarthub.setup import async_setup_component
 
 from tests.common import mock_platform
 
@@ -33,8 +33,8 @@ TEST_BACKUP_ABC123 = AgentBackup(
     date="1970-01-01T00:00:00.000Z",
     extra_metadata={"instance_id": "our_uuid", "with_automatic_settings": True},
     folders=[Folder.MEDIA, Folder.SHARE],
-    homeassistant_included=True,
-    homeassistant_version="2024.12.0",
+    smarthub_included=True,
+    smarthub_version="2024.12.0",
     name="Test",
     protected=False,
     size=0,
@@ -48,8 +48,8 @@ TEST_BACKUP_DEF456 = AgentBackup(
     date="1980-01-01T00:00:00.000Z",
     extra_metadata={"instance_id": "unknown_uuid", "with_automatic_settings": True},
     folders=[Folder.MEDIA, Folder.SHARE],
-    homeassistant_included=True,
-    homeassistant_version="2024.12.0",
+    smarthub_included=True,
+    smarthub_version="2024.12.0",
     name="Test 2",
     protected=False,
     size=1,
@@ -124,7 +124,7 @@ def mock_backup_agent(name: str, backups: list[AgentBackup] | None = None) -> Mo
 
 
 async def setup_backup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     with_hassio: bool = False,
     *,
     backups: dict[str, list[AgentBackup]] | None = None,
@@ -134,9 +134,9 @@ async def setup_backup_integration(
     backups = backups or {}
     async_initialize_backup(hass)
     with (
-        patch("homeassistant.components.backup.is_hassio", return_value=with_hassio),
+        patch("smarthub.components.backup.is_hassio", return_value=with_hassio),
         patch(
-            "homeassistant.components.backup.backup.is_hassio", return_value=with_hassio
+            "smarthub.components.backup.backup.is_hassio", return_value=with_hassio
         ),
     ):
         remote_agents = remote_agents or []
@@ -178,7 +178,7 @@ async def setup_backup_integration(
 
 
 async def setup_backup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     *,
     domain: str,
     platform: Any,

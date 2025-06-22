@@ -7,9 +7,9 @@ from bleak import BleakError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -31,7 +31,7 @@ pytestmark = pytest.mark.usefixtures("mock_automower_client")
     ],
 )
 async def test_setup_disconnect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: Mock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -71,7 +71,7 @@ async def test_setup_disconnect(
     ],
 )
 async def test_invalid_data_received(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: Mock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -103,7 +103,7 @@ async def test_invalid_data_received(
     ],
 )
 async def test_bleak_error_data_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: Mock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

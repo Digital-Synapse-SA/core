@@ -5,9 +5,9 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.heos.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.heos.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import MockHeos
 
@@ -20,7 +20,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     controller: MockHeos,
@@ -43,7 +43,7 @@ async def test_config_entry_diagnostics(
 
 @pytest.mark.usefixtures("controller")
 async def test_config_entry_diagnostics_error_getting_system(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     controller: MockHeos,
@@ -66,7 +66,7 @@ async def test_config_entry_diagnostics_error_getting_system(
 
 @pytest.mark.usefixtures("controller")
 async def test_device_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

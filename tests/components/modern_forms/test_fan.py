@@ -5,7 +5,7 @@ from unittest.mock import patch
 from aiomodernforms import ModernFormsConnectionError
 import pytest
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_DIRECTION,
     ATTR_PERCENTAGE,
     DIRECTION_FORWARD,
@@ -14,21 +14,21 @@ from homeassistant.components.fan import (
     SERVICE_SET_DIRECTION,
     SERVICE_SET_PERCENTAGE,
 )
-from homeassistant.components.modern_forms.const import (
+from smarthub.components.modern_forms.const import (
     ATTR_SLEEP_TIME,
     DOMAIN,
     SERVICE_CLEAR_FAN_SLEEP_TIMER,
     SERVICE_SET_FAN_SLEEP_TIMER,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -36,7 +36,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_fan_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -55,7 +55,7 @@ async def test_fan_state(
 
 
 async def test_change_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -89,7 +89,7 @@ async def test_change_state(
 
 
 async def test_sleep_timer_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -118,7 +118,7 @@ async def test_sleep_timer_services(
 
 
 async def test_change_direction(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -142,7 +142,7 @@ async def test_change_direction(
 
 
 async def test_set_percentage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -180,7 +180,7 @@ async def test_set_percentage(
 
 
 async def test_fan_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -192,7 +192,7 @@ async def test_fan_error(
     aioclient_mock.post("http://192.168.1.123:80/mf", text="", status=400)
 
     with patch(
-        "homeassistant.components.modern_forms.coordinator.ModernFormsDevice.update"
+        "smarthub.components.modern_forms.coordinator.ModernFormsDevice.update"
     ):
         await hass.services.async_call(
             FAN_DOMAIN,
@@ -207,17 +207,17 @@ async def test_fan_error(
 
 
 async def test_fan_connection_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test error handling of the Moder Forms fans."""
     await init_integration(hass, aioclient_mock)
 
     with (
         patch(
-            "homeassistant.components.modern_forms.coordinator.ModernFormsDevice.update"
+            "smarthub.components.modern_forms.coordinator.ModernFormsDevice.update"
         ),
         patch(
-            "homeassistant.components.modern_forms.coordinator.ModernFormsDevice.fan",
+            "smarthub.components.modern_forms.coordinator.ModernFormsDevice.fan",
             side_effect=ModernFormsConnectionError,
         ),
     ):

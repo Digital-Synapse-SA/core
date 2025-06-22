@@ -135,7 +135,7 @@ def get_config() -> Config:
         not parsed.integration_path
         and not (parsed.core_path / "requirements_all.txt").is_file()
     ):
-        raise RuntimeError("Run from Home Assistant root")
+        raise RuntimeError("Run from SmartHub root")
 
     if parsed.skip_plugins:
         parsed.plugins = set(parsed.plugins) - set(parsed.skip_plugins)

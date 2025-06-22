@@ -3,16 +3,16 @@
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.lutron_caseta import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.lutron_caseta import (
     ATTR_ACTION,
     ATTR_AREA_NAME,
     ATTR_DEVICE_NAME,
     ATTR_SERIAL,
     ATTR_TYPE,
 )
-from homeassistant.components.lutron_caseta.const import (
+from smarthub.components.lutron_caseta.const import (
     ATTR_BUTTON_TYPE,
     ATTR_LEAP_BUTTON_NUMBER,
     CONF_CA_CERTS,
@@ -21,9 +21,9 @@ from homeassistant.components.lutron_caseta.const import (
     DOMAIN,
     LUTRON_CASETA_BUTTON_EVENT,
 )
-from homeassistant.components.lutron_caseta.device_trigger import CONF_SUBTYPE
-from homeassistant.components.lutron_caseta.models import LutronCasetaData
-from homeassistant.const import (
+from smarthub.components.lutron_caseta.device_trigger import CONF_SUBTYPE
+from smarthub.components.lutron_caseta.models import LutronCasetaData
+from smarthub.const import (
     ATTR_DEVICE_ID,
     CONF_DEVICE_ID,
     CONF_DOMAIN,
@@ -31,9 +31,9 @@ from homeassistant.const import (
     CONF_PLATFORM,
     CONF_TYPE,
 )
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import MockBridge, async_setup_integration
 
@@ -96,7 +96,7 @@ MOCK_BUTTON_DEVICES = [
 ]
 
 
-async def _async_setup_lutron_with_picos(hass: HomeAssistant) -> str:
+async def _async_setup_lutron_with_picos(hass: SmartHub) -> str:
     """Setups a lutron bridge with picos."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -115,7 +115,7 @@ async def _async_setup_lutron_with_picos(hass: HomeAssistant) -> str:
     return config_entry.entry_id
 
 
-async def test_get_triggers(hass: HomeAssistant) -> None:
+async def test_get_triggers(hass: SmartHub) -> None:
     """Test we get the expected triggers from a lutron pico."""
     config_entry_id = await _async_setup_lutron_with_picos(hass)
     # Fetching the config entry runtime_data is a legacy pattern
@@ -157,7 +157,7 @@ async def test_get_triggers(hass: HomeAssistant) -> None:
 
 
 async def test_get_triggers_for_invalid_device_id(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test error raised for invalid lutron device_id."""
     config_entry_id = await _async_setup_lutron_with_picos(hass)
@@ -175,7 +175,7 @@ async def test_get_triggers_for_invalid_device_id(
 
 
 async def test_get_triggers_for_non_button_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test error raised for invalid lutron device_id."""
     config_entry_id = await _async_setup_lutron_with_picos(hass)
@@ -193,7 +193,7 @@ async def test_get_triggers_for_non_button_device(
 
 
 async def test_none_serial_keypad(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test serial assignment for keypads without serials."""
     config_entry_id = await _async_setup_lutron_with_picos(hass)
@@ -207,7 +207,7 @@ async def test_none_serial_keypad(
 
 
 async def test_if_fires_on_button_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -260,7 +260,7 @@ async def test_if_fires_on_button_event(
 
 
 async def test_if_fires_on_button_event_without_lip(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -311,7 +311,7 @@ async def test_if_fires_on_button_event_without_lip(
 
 
 async def test_validate_trigger_config_no_device(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test for no press with no device."""
 
@@ -351,7 +351,7 @@ async def test_validate_trigger_config_no_device(
 
 
 async def test_validate_trigger_config_unknown_device(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test for no press with an unknown device."""
 
@@ -403,7 +403,7 @@ async def test_validate_trigger_config_unknown_device(
 
 
 async def test_validate_trigger_invalid_triggers(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test for click_event with invalid triggers."""
     config_entry_id = await _async_setup_lutron_with_picos(hass)
@@ -443,7 +443,7 @@ async def test_validate_trigger_invalid_triggers(
 
 
 async def test_if_fires_on_button_event_late_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
 ) -> None:

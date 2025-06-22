@@ -2,14 +2,14 @@
 
 import pytest
 
-from homeassistant.components.google_travel_time.const import (
+from smarthub.components.google_travel_time.const import (
     ARRIVAL_TIME,
     CONF_TIME,
     CONF_TIME_TYPE,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .const import DEFAULT_OPTIONS, MOCK_CONFIG
 
@@ -28,7 +28,7 @@ from tests.common import MockConfigEntry
 )
 @pytest.mark.usefixtures("routes_mock", "mock_setup_entry")
 async def test_migrate_entry_v1_v2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     v1: str,
     v2: str | None,
 ) -> None:
@@ -56,7 +56,7 @@ async def test_migrate_entry_v1_v2(
 
 @pytest.mark.usefixtures("routes_mock", "mock_setup_entry")
 async def test_migrate_entry_v1_v2_invalid_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test successful migration of entry data."""

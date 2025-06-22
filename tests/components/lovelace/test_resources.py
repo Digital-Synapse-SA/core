@@ -7,9 +7,9 @@ import uuid
 
 import pytest
 
-from homeassistant.components.lovelace import dashboard, resources
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.lovelace import dashboard, resources
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import WebSocketGenerator
 
@@ -21,7 +21,7 @@ RESOURCE_EXAMPLES = [
 
 @pytest.mark.parametrize("list_cmd", ["lovelace/resources", "lovelace/resources/list"])
 async def test_yaml_resources(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, list_cmd: str
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, list_cmd: str
 ) -> None:
     """Test defining resources in configuration.yaml."""
     assert await async_setup_component(
@@ -39,11 +39,11 @@ async def test_yaml_resources(
 
 @pytest.mark.parametrize("list_cmd", ["lovelace/resources", "lovelace/resources/list"])
 async def test_yaml_resources_backwards(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, list_cmd: str
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, list_cmd: str
 ) -> None:
     """Test defining resources in YAML ll config (legacy)."""
     with patch(
-        "homeassistant.components.lovelace.dashboard.load_yaml_dict",
+        "smarthub.components.lovelace.dashboard.load_yaml_dict",
         return_value={"resources": RESOURCE_EXAMPLES},
     ):
         assert await async_setup_component(
@@ -61,7 +61,7 @@ async def test_yaml_resources_backwards(
 
 @pytest.mark.parametrize("list_cmd", ["lovelace/resources", "lovelace/resources/list"])
 async def test_storage_resources(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
     list_cmd: str,
@@ -86,7 +86,7 @@ async def test_storage_resources(
 
 @pytest.mark.parametrize("list_cmd", ["lovelace/resources", "lovelace/resources/list"])
 async def test_storage_resources_import(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
     list_cmd: str,
@@ -252,7 +252,7 @@ async def test_storage_resources_import(
 
 @pytest.mark.parametrize("list_cmd", ["lovelace/resources", "lovelace/resources/list"])
 async def test_storage_resources_import_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
     list_cmd: str,
@@ -280,7 +280,7 @@ async def test_storage_resources_import_invalid(
 
 @pytest.mark.parametrize("list_cmd", ["lovelace/resources", "lovelace/resources/list"])
 async def test_storage_resources_safe_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
     list_cmd: str,

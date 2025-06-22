@@ -7,9 +7,9 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_platform
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_iometer_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -32,7 +32,7 @@ async def test_binary_sensors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_connection_status_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_iometer_client: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -67,7 +67,7 @@ async def test_connection_status_sensors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_attachment_status_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_iometer_client: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -102,7 +102,7 @@ async def test_attachment_status_sensors(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_attachment_status_sensors_unkown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_iometer_client: AsyncMock,
     freezer: FrozenDateTimeFactory,

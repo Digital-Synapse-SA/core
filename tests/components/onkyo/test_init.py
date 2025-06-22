@@ -6,10 +6,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.onkyo import async_setup_entry
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from smarthub.components.onkyo import async_setup_entry
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import ConfigEntryNotReady
 
 from . import create_empty_config_entry, create_receiver_info, setup_integration
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test load and unload entry."""
@@ -34,7 +34,7 @@ async def test_load_unload_entry(
 
 
 async def test_update_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test update options."""
@@ -54,7 +54,7 @@ async def test_update_entry(
 
 
 async def test_no_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test update options."""
@@ -64,7 +64,7 @@ async def test_no_connection(
 
     with (
         patch(
-            "homeassistant.components.onkyo.async_interview",
+            "smarthub.components.onkyo.async_interview",
             return_value=None,
         ),
         pytest.raises(ConfigEntryNotReady),

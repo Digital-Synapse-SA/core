@@ -7,14 +7,14 @@ from gardena_bluetooth.const import Valve
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.valve import DOMAIN as VALVE_DOMAIN
-from homeassistant.const import (
+from smarthub.components.valve import DOMAIN as VALVE_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_VALVE,
     SERVICE_OPEN_VALVE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import setup_entry
 
@@ -35,7 +35,7 @@ def mock_switch_chars(mock_read_char_raw):
 
 
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_entry: MockConfigEntry,
     mock_client: Mock,
@@ -54,7 +54,7 @@ async def test_setup(
 
 
 async def test_switching(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry: MockConfigEntry,
     mock_client: Mock,
     mock_switch_chars: dict[str, bytes],

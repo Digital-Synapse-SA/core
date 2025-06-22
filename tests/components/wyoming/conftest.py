@@ -6,12 +6,12 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components import stt
-from homeassistant.components.wyoming import DOMAIN
-from homeassistant.components.wyoming.devices import SatelliteDevice
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import stt
+from smarthub.components.wyoming import DOMAIN
+from smarthub.components.wyoming.devices import SatelliteDevice
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import (
     HANDLE_INFO,
@@ -31,22 +31,22 @@ def mock_tts_cache_dir_autouse(mock_tts_cache_dir: Path) -> None:
 
 
 @pytest.fixture(autouse=True)
-async def init_components(hass: HomeAssistant):
+async def init_components(hass: SmartHub):
     """Set up required components."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
 
 @pytest.fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.wyoming.async_setup_entry", return_value=True
+        "smarthub.components.wyoming.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 @pytest.fixture
-def stt_config_entry(hass: HomeAssistant) -> ConfigEntry:
+def stt_config_entry(hass: SmartHub) -> ConfigEntry:
     """Create a config entry."""
     entry = MockConfigEntry(
         domain="wyoming",
@@ -61,7 +61,7 @@ def stt_config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 
 @pytest.fixture
-def tts_config_entry(hass: HomeAssistant) -> ConfigEntry:
+def tts_config_entry(hass: SmartHub) -> ConfigEntry:
     """Create a config entry."""
     entry = MockConfigEntry(
         domain="wyoming",
@@ -76,7 +76,7 @@ def tts_config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 
 @pytest.fixture
-def wake_word_config_entry(hass: HomeAssistant) -> ConfigEntry:
+def wake_word_config_entry(hass: SmartHub) -> ConfigEntry:
     """Create a config entry."""
     entry = MockConfigEntry(
         domain="wyoming",
@@ -91,7 +91,7 @@ def wake_word_config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 
 @pytest.fixture
-def intent_config_entry(hass: HomeAssistant) -> ConfigEntry:
+def intent_config_entry(hass: SmartHub) -> ConfigEntry:
     """Create a config entry."""
     entry = MockConfigEntry(
         domain="wyoming",
@@ -106,7 +106,7 @@ def intent_config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 
 @pytest.fixture
-def handle_config_entry(hass: HomeAssistant) -> ConfigEntry:
+def handle_config_entry(hass: SmartHub) -> ConfigEntry:
     """Create a config entry."""
     entry = MockConfigEntry(
         domain="wyoming",
@@ -122,11 +122,11 @@ def handle_config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 @pytest.fixture
 async def init_wyoming_stt(
-    hass: HomeAssistant, stt_config_entry: ConfigEntry
+    hass: SmartHub, stt_config_entry: ConfigEntry
 ) -> ConfigEntry:
     """Initialize Wyoming STT."""
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=STT_INFO,
     ):
         await hass.config_entries.async_setup(stt_config_entry.entry_id)
@@ -136,11 +136,11 @@ async def init_wyoming_stt(
 
 @pytest.fixture
 async def init_wyoming_tts(
-    hass: HomeAssistant, tts_config_entry: ConfigEntry
+    hass: SmartHub, tts_config_entry: ConfigEntry
 ) -> ConfigEntry:
     """Initialize Wyoming TTS."""
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=TTS_INFO,
     ):
         await hass.config_entries.async_setup(tts_config_entry.entry_id)
@@ -150,11 +150,11 @@ async def init_wyoming_tts(
 
 @pytest.fixture
 async def init_wyoming_wake_word(
-    hass: HomeAssistant, wake_word_config_entry: ConfigEntry
+    hass: SmartHub, wake_word_config_entry: ConfigEntry
 ) -> ConfigEntry:
     """Initialize Wyoming Wake Word."""
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=WAKE_WORD_INFO,
     ):
         await hass.config_entries.async_setup(wake_word_config_entry.entry_id)
@@ -164,11 +164,11 @@ async def init_wyoming_wake_word(
 
 @pytest.fixture
 async def init_wyoming_intent(
-    hass: HomeAssistant, intent_config_entry: ConfigEntry
+    hass: SmartHub, intent_config_entry: ConfigEntry
 ) -> ConfigEntry:
     """Initialize Wyoming intent recognizer."""
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=INTENT_INFO,
     ):
         await hass.config_entries.async_setup(intent_config_entry.entry_id)
@@ -178,11 +178,11 @@ async def init_wyoming_intent(
 
 @pytest.fixture
 async def init_wyoming_handle(
-    hass: HomeAssistant, handle_config_entry: ConfigEntry
+    hass: SmartHub, handle_config_entry: ConfigEntry
 ) -> ConfigEntry:
     """Initialize Wyoming intent handler."""
     with patch(
-        "homeassistant.components.wyoming.data.load_wyoming_info",
+        "smarthub.components.wyoming.data.load_wyoming_info",
         return_value=HANDLE_INFO,
     ):
         await hass.config_entries.async_setup(handle_config_entry.entry_id)
@@ -191,7 +191,7 @@ async def init_wyoming_handle(
 
 
 @pytest.fixture
-def metadata(hass: HomeAssistant) -> stt.SpeechMetadata:
+def metadata(hass: SmartHub) -> stt.SpeechMetadata:
     """Get default STT metadata."""
     return stt.SpeechMetadata(
         language=hass.config.language,
@@ -204,7 +204,7 @@ def metadata(hass: HomeAssistant) -> stt.SpeechMetadata:
 
 
 @pytest.fixture
-def satellite_config_entry(hass: HomeAssistant) -> ConfigEntry:
+def satellite_config_entry(hass: SmartHub) -> ConfigEntry:
     """Create a config entry."""
     entry = MockConfigEntry(
         domain="wyoming",
@@ -219,15 +219,15 @@ def satellite_config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 
 @pytest.fixture
-async def init_satellite(hass: HomeAssistant, satellite_config_entry: ConfigEntry):
+async def init_satellite(hass: SmartHub, satellite_config_entry: ConfigEntry):
     """Initialize Wyoming satellite."""
     with (
         patch(
-            "homeassistant.components.wyoming.data.load_wyoming_info",
+            "smarthub.components.wyoming.data.load_wyoming_info",
             return_value=SATELLITE_INFO,
         ),
         patch(
-            "homeassistant.components.wyoming.assist_satellite.WyomingAssistSatellite.run"
+            "smarthub.components.wyoming.assist_satellite.WyomingAssistSatellite.run"
         ) as _run_mock,
     ):
         # _run_mock: satellite task does not actually run
@@ -236,7 +236,7 @@ async def init_satellite(hass: HomeAssistant, satellite_config_entry: ConfigEntr
 
 @pytest.fixture
 async def satellite_device(
-    hass: HomeAssistant, init_satellite, satellite_config_entry: ConfigEntry
+    hass: SmartHub, init_satellite, satellite_config_entry: ConfigEntry
 ) -> SatelliteDevice:
     """Get a satellite device fixture."""
     return hass.data[DOMAIN][satellite_config_entry.entry_id].device

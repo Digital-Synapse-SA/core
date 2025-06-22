@@ -32,8 +32,8 @@ from aiohomeconnect.model.program import (
 from aiohomeconnect.model.setting import SettingConstraints
 import pytest
 
-from homeassistant.components.home_connect.const import DOMAIN
-from homeassistant.components.number import (
+from smarthub.components.home_connect.const import DOMAIN
+from smarthub.components.number import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_STEP,
@@ -43,11 +43,11 @@ from homeassistant.components.number import (
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -60,7 +60,7 @@ def platforms() -> list[str]:
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_paired_depaired_devices_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
@@ -134,7 +134,7 @@ async def test_paired_depaired_devices_flow(
     indirect=["appliance"],
 )
 async def test_connected_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -192,7 +192,7 @@ async def test_connected_devices(
 
 @pytest.mark.parametrize("appliance", ["FridgeFreezer"], indirect=True)
 async def test_number_entity_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -282,7 +282,7 @@ async def test_number_entity_availability(
     ],
 )
 async def test_number_entity_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -366,9 +366,9 @@ async def test_number_entity_functionality(
         ),
     ],
 )
-@patch("homeassistant.components.home_connect.entity.API_DEFAULT_RETRY_AFTER", new=0)
+@patch("smarthub.components.home_connect.entity.API_DEFAULT_RETRY_AFTER", new=0)
 async def test_fetch_constraints_after_rate_limit_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -443,7 +443,7 @@ async def test_fetch_constraints_after_rate_limit_error(
     ],
 )
 async def test_number_entity_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -474,7 +474,7 @@ async def test_number_entity_error(
         await getattr(client_with_exception, mock_attr)()
 
     with pytest.raises(
-        HomeAssistantError, match=r"Error.*assign.*value.*to.*setting.*"
+        SmartHubError, match=r"Error.*assign.*value.*to.*setting.*"
     ):
         await hass.services.async_call(
             NUMBER_DOMAIN,
@@ -523,7 +523,7 @@ async def test_number_entity_error(
     indirect=["appliance"],
 )
 async def test_options_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],

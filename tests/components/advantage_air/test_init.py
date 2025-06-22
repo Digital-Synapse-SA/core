@@ -4,13 +4,13 @@ from unittest.mock import AsyncMock
 
 from advantage_air import ApiError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import add_mock_config, patch_get
 
 
-async def test_async_setup_entry(hass: HomeAssistant, mock_get: AsyncMock) -> None:
+async def test_async_setup_entry(hass: SmartHub, mock_get: AsyncMock) -> None:
     """Test a successful setup entry and unload."""
 
     entry = await add_mock_config(hass)
@@ -21,7 +21,7 @@ async def test_async_setup_entry(hass: HomeAssistant, mock_get: AsyncMock) -> No
     assert entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_async_setup_entry_failure(hass: HomeAssistant) -> None:
+async def test_async_setup_entry_failure(hass: SmartHub) -> None:
     """Test a unsuccessful setup entry."""
 
     with patch_get(side_effect=ApiError):

@@ -9,9 +9,9 @@ import pytest
 from requests.exceptions import ConnectionError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_ON, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_ON, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -20,14 +20,14 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 @pytest.mark.usefixtures("mock_pterodactyl")
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test binary sensor."""
     with patch(
-        "homeassistant.components.pterodactyl._PLATFORMS", [Platform.BINARY_SENSOR]
+        "smarthub.components.pterodactyl._PLATFORMS", [Platform.BINARY_SENSOR]
     ):
         mock_config_entry = await setup_integration(hass, mock_config_entry)
 
@@ -39,7 +39,7 @@ async def test_binary_sensor(
 
 @pytest.mark.usefixtures("mock_pterodactyl")
 async def test_binary_sensor_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -62,7 +62,7 @@ async def test_binary_sensor_update(
 
 
 async def test_binary_sensor_update_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_pterodactyl: Generator[AsyncMock],
     freezer: FrozenDateTimeFactory,

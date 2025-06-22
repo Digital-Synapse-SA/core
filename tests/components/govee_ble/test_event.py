@@ -1,8 +1,8 @@
 """Test the Govee BLE events."""
 
-from homeassistant.components.govee_ble.const import CONF_DEVICE_TYPE, DOMAIN
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.govee_ble.const import CONF_DEVICE_TYPE, DOMAIN
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from . import (
     GV5121_MOTION_SERVICE_INFO,
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 from tests.components.bluetooth import inject_bluetooth_service_info
 
 
-async def test_motion_sensor(hass: HomeAssistant) -> None:
+async def test_motion_sensor(hass: SmartHub) -> None:
     """Test setting up creates the motion sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -48,7 +48,7 @@ async def test_motion_sensor(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_button(hass: HomeAssistant) -> None:
+async def test_button(hass: SmartHub) -> None:
     """Test setting up creates the buttons."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -77,7 +77,7 @@ async def test_button(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_vibration_sensor(hass: HomeAssistant) -> None:
+async def test_vibration_sensor(hass: SmartHub) -> None:
     """Test setting up creates the vibration sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,

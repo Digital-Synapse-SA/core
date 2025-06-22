@@ -7,9 +7,9 @@ from kaleidescape import Dispatcher
 from kaleidescape.device import Automation, Movie, Power, System
 import pytest
 
-from homeassistant.components.kaleidescape.const import DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components.kaleidescape.const import DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from . import MOCK_HOST, MOCK_SERIAL
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry
 def fixture_mock_device() -> Generator[MagicMock]:
     """Return a mocked Kaleidescape device."""
     with patch(
-        "homeassistant.components.kaleidescape.KaleidescapeDevice", autospec=True
+        "smarthub.components.kaleidescape.KaleidescapeDevice", autospec=True
     ) as mock:
         host = MOCK_HOST
 
@@ -63,7 +63,7 @@ def fixture_mock_config_entry() -> MockConfigEntry:
 
 @pytest.fixture(name="mock_integration")
 async def fixture_mock_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> MockConfigEntry:

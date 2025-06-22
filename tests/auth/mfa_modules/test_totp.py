@@ -3,17 +3,17 @@
 import asyncio
 from unittest.mock import patch
 
-from homeassistant import data_entry_flow
-from homeassistant.auth import auth_manager_from_config, models as auth_models
-from homeassistant.auth.mfa_modules import auth_mfa_module_from_config
-from homeassistant.core import HomeAssistant
+from smarthub import data_entry_flow
+from smarthub.auth import auth_manager_from_config, models as auth_models
+from smarthub.auth.mfa_modules import auth_mfa_module_from_config
+from smarthub.core import SmartHub
 
 from tests.common import MockUser
 
 MOCK_CODE = "123456"
 
 
-async def test_validating_mfa(hass: HomeAssistant) -> None:
+async def test_validating_mfa(hass: SmartHub) -> None:
     """Test validating mfa code."""
     totp_auth_module = await auth_mfa_module_from_config(hass, {"type": "totp"})
     await totp_auth_module.async_setup_user("test-user", {})
@@ -22,7 +22,7 @@ async def test_validating_mfa(hass: HomeAssistant) -> None:
         assert await totp_auth_module.async_validate("test-user", {"code": MOCK_CODE})
 
 
-async def test_validating_mfa_invalid_code(hass: HomeAssistant) -> None:
+async def test_validating_mfa_invalid_code(hass: SmartHub) -> None:
     """Test validating an invalid mfa code."""
     totp_auth_module = await auth_mfa_module_from_config(hass, {"type": "totp"})
     await totp_auth_module.async_setup_user("test-user", {})
@@ -34,7 +34,7 @@ async def test_validating_mfa_invalid_code(hass: HomeAssistant) -> None:
         )
 
 
-async def test_validating_mfa_invalid_user(hass: HomeAssistant) -> None:
+async def test_validating_mfa_invalid_user(hass: SmartHub) -> None:
     """Test validating an mfa code with invalid user."""
     totp_auth_module = await auth_mfa_module_from_config(hass, {"type": "totp"})
     await totp_auth_module.async_setup_user("test-user", {})
@@ -45,7 +45,7 @@ async def test_validating_mfa_invalid_user(hass: HomeAssistant) -> None:
     )
 
 
-async def test_setup_depose_user(hass: HomeAssistant) -> None:
+async def test_setup_depose_user(hass: SmartHub) -> None:
     """Test despose user."""
     totp_auth_module = await auth_mfa_module_from_config(hass, {"type": "totp"})
     result = await totp_auth_module.async_setup_user("test-user", {})
@@ -64,7 +64,7 @@ async def test_setup_depose_user(hass: HomeAssistant) -> None:
     assert len(totp_auth_module._users) == 1
 
 
-async def test_login_flow_validates_mfa(hass: HomeAssistant) -> None:
+async def test_login_flow_validates_mfa(hass: SmartHub) -> None:
     """Test login flow with mfa enabled."""
     hass.auth = await auth_manager_from_config(
         hass,
@@ -132,18 +132,18 @@ async def test_login_flow_validates_mfa(hass: HomeAssistant) -> None:
         assert result["data"].id == "mock-id"
 
 
-async def test_race_condition_in_data_loading(hass: HomeAssistant) -> None:
+async def test_race_condition_in_data_loading(hass: SmartHub) -> None:
     """Test race condition in the data loading."""
     counter = 0
 
     async def mock_load(_):
-        """Mock of homeassistant.helpers.storage.Store.async_load."""
+        """Mock of smarthub.helpers.storage.Store.async_load."""
         nonlocal counter
         counter += 1
         await asyncio.sleep(0)
 
     totp_auth_module = await auth_mfa_module_from_config(hass, {"type": "totp"})
-    with patch("homeassistant.helpers.storage.Store.async_load", new=mock_load):
+    with patch("smarthub.helpers.storage.Store.async_load", new=mock_load):
         task1 = totp_auth_module.async_validate("user", {"code": "value"})
         task2 = totp_auth_module.async_validate("user", {"code": "value"})
         results = await asyncio.gather(task1, task2, return_exceptions=True)

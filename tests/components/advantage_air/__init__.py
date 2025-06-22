@@ -2,9 +2,9 @@
 
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.components.advantage_air.const import DOMAIN
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.components.advantage_air.const import DOMAIN
+from smarthub.const import CONF_IP_ADDRESS, CONF_PORT
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -31,7 +31,7 @@ TEST_SET_THING_URL = (
 def patch_get(return_value=TEST_SYSTEM_DATA, side_effect=None):
     """Patch the Advantage Air async_get method."""
     return patch(
-        "homeassistant.components.advantage_air.advantage_air.async_get",
+        "smarthub.components.advantage_air.advantage_air.async_get",
         new=AsyncMock(return_value=return_value, side_effect=side_effect),
     )
 
@@ -39,12 +39,12 @@ def patch_get(return_value=TEST_SYSTEM_DATA, side_effect=None):
 def patch_update(return_value=True, side_effect=None):
     """Patch the Advantage Air async_set method."""
     return patch(
-        "homeassistant.components.advantage_air.advantage_air._endpoint.async_update",
+        "smarthub.components.advantage_air.advantage_air._endpoint.async_update",
         new=AsyncMock(return_value=return_value, side_effect=side_effect),
     )
 
 
-async def add_mock_config(hass: HomeAssistant) -> MockConfigEntry:
+async def add_mock_config(hass: SmartHub) -> MockConfigEntry:
     """Create a fake Advantage Air Config Entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,

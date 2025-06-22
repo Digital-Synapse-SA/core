@@ -3,10 +3,10 @@
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant.components import owntracks
-from homeassistant.components.device_tracker.legacy import Device
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import owntracks
+from smarthub.components.device_tracker.legacy import Device
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, mock_component
 from tests.typing import ClientSessionGenerator
@@ -44,9 +44,9 @@ def mock_dev_track(mock_device_tracker_conf: list[Device]) -> None:
 
 @pytest.fixture
 async def mock_client(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> TestClient:
-    """Start the Home Assistant HTTP component."""
+    """Start the SmartHub HTTP component."""
     mock_component(hass, "group")
     mock_component(hass, "zone")
     mock_component(hass, "device_tracker")

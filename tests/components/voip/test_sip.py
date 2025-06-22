@@ -4,13 +4,13 @@ import socket
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import voip
-from homeassistant.core import HomeAssistant
+from smarthub import config_entries
+from smarthub.components import voip
+from smarthub.core import SmartHub
 
 
 @pytest.mark.usefixtures("socket_enabled")
-async def test_create_sip_server(hass: HomeAssistant) -> None:
+async def test_create_sip_server(hass: SmartHub) -> None:
     """Tests starting/stopping SIP server."""
     result = await hass.config_entries.flow.async_init(
         voip.DOMAIN, context={"source": config_entries.SOURCE_USER}

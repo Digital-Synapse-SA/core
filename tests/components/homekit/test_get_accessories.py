@@ -4,11 +4,11 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components.climate import ClimateEntityFeature
-from homeassistant.components.cover import CoverEntityFeature
-from homeassistant.components.homekit import TYPE_AIR_PURIFIER
-from homeassistant.components.homekit.accessories import TYPES, get_accessory
-from homeassistant.components.homekit.const import (
+from smarthub.components.climate import ClimateEntityFeature
+from smarthub.components.cover import CoverEntityFeature
+from smarthub.components.homekit import TYPE_AIR_PURIFIER
+from smarthub.components.homekit.accessories import TYPES, get_accessory
+from smarthub.components.homekit.const import (
     ATTR_INTEGRATION,
     CONF_FEATURE_LIST,
     FEATURE_ON_OFF,
@@ -20,14 +20,14 @@ from homeassistant.components.homekit.const import (
     TYPE_SWITCH,
     TYPE_VALVE,
 )
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     MediaPlayerDeviceClass,
     MediaPlayerEntityFeature,
 )
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.components.switch import SwitchDeviceClass
-from homeassistant.components.vacuum import VacuumEntityFeature
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.components.switch import SwitchDeviceClass
+from smarthub.components.vacuum import VacuumEntityFeature
+from smarthub.const import (
     ATTR_CODE,
     ATTR_DEVICE_CLASS,
     ATTR_SUPPORTED_FEATURES,
@@ -39,7 +39,7 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     UnitOfTemperature,
 )
-from homeassistant.core import State
+from smarthub.core import State
 
 
 def test_not_supported(caplog: pytest.LogCaptureFixture) -> None:

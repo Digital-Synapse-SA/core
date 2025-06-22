@@ -14,10 +14,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder import get_instance
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.util import dt as dt_util
+from smarthub.components import recorder
+from smarthub.components.recorder import get_instance
+from smarthub.components.recorder.util import session_scope
+from smarthub.util import dt as dt_util
 
 from .common import (
     CREATE_ENGINE_TARGET,

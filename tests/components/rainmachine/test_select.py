@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.rainmachine import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.rainmachine import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_select_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     config: dict[str, Any],
@@ -24,8 +24,8 @@ async def test_select_entities(
 ) -> None:
     """Test select entities."""
     with (
-        patch("homeassistant.components.rainmachine.Client", return_value=client),
-        patch("homeassistant.components.rainmachine.PLATFORMS", [Platform.SELECT]),
+        patch("smarthub.components.rainmachine.Client", return_value=client),
+        patch("smarthub.components.rainmachine.PLATFORMS", [Platform.SELECT]),
     ):
         assert await async_setup_component(hass, DOMAIN, config)
         await hass.async_block_till_done()

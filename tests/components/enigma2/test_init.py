@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.enigma2.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.enigma2.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import TEST_REQUIRED
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry, async_load_json_object_fixture
 
 
 async def test_device_without_mac_address(
-    hass: HomeAssistant,
+    hass: SmartHub,
     openwebif_device_mock: AsyncMock,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_device_without_mac_address(
 
 
 @pytest.mark.usefixtures("openwebif_device_mock")
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test successful unload of entry."""
     entry = MockConfigEntry(domain=DOMAIN, data=TEST_REQUIRED, title="name")
     entry.add_to_hass(hass)

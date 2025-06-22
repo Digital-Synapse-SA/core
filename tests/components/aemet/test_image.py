@@ -2,13 +2,13 @@
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 
 async def test_aemet_create_images(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test creation of AEMET images."""

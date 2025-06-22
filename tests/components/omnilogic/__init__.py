@@ -2,28 +2,28 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.omnilogic.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.omnilogic.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from .const import TELEMETRY
 
 from tests.common import MockConfigEntry
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
     """Mock integration setup."""
     with (
         patch(
-            "homeassistant.components.omnilogic.OmniLogic.connect",
+            "smarthub.components.omnilogic.OmniLogic.connect",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.omnilogic.OmniLogic.get_telemetry_data",
+            "smarthub.components.omnilogic.OmniLogic.get_telemetry_data",
             return_value={},
         ),
         patch(
-            "homeassistant.components.omnilogic.coordinator.OmniLogicUpdateCoordinator._async_update_data",
+            "smarthub.components.omnilogic.coordinator.OmniLogicUpdateCoordinator._async_update_data",
             return_value=TELEMETRY,
         ),
     ):

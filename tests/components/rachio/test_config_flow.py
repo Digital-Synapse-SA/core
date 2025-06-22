@@ -3,16 +3,16 @@
 from ipaddress import ip_address
 from unittest.mock import MagicMock, patch
 
-from homeassistant import config_entries
-from homeassistant.components.rachio.const import (
+from smarthub import config_entries
+from smarthub.components.rachio.const import (
     CONF_CUSTOM_URL,
     CONF_MANUAL_RUN_MINS,
     DOMAIN,
 )
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import (
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
@@ -29,7 +29,7 @@ def _mock_rachio_return_value(get=None, info=None):
     return rachio_mock
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -45,11 +45,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.rachio.config_flow.Rachio",
+            "smarthub.components.rachio.config_flow.Rachio",
             return_value=rachio_mock,
         ),
         patch(
-            "homeassistant.components.rachio.async_setup_entry",
+            "smarthub.components.rachio.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -73,7 +73,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -84,7 +84,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
         info=({"status": 412}, {"error": "auth fail"}),
     )
     with patch(
-        "homeassistant.components.rachio.config_flow.Rachio", return_value=rachio_mock
+        "smarthub.components.rachio.config_flow.Rachio", return_value=rachio_mock
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -95,7 +95,7 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -106,7 +106,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
         info=({"status": 200}, {"id": "myid"}),
     )
     with patch(
-        "homeassistant.components.rachio.config_flow.Rachio", return_value=rachio_mock
+        "smarthub.components.rachio.config_flow.Rachio", return_value=rachio_mock
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -117,7 +117,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_homekit(hass: HomeAssistant) -> None:
+async def test_form_homekit(hass: SmartHub) -> None:
     """Test that we abort from homekit if rachio is already setup."""
 
     result = await hass.config_entries.flow.async_init(
@@ -162,7 +162,7 @@ async def test_form_homekit(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_form_homekit_ignored(hass: HomeAssistant) -> None:
+async def test_form_homekit_ignored(hass: SmartHub) -> None:
     """Test that we abort from homekit if rachio is ignored."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -188,7 +188,7 @@ async def test_form_homekit_ignored(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test option flow."""
     entry = MockConfigEntry(domain=DOMAIN, data={CONF_API_KEY: "api_key"})
     entry.add_to_hass(hass)

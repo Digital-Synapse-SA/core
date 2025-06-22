@@ -10,15 +10,15 @@ from whois.exceptions import (
     WhoisCommandFailed,
 )
 
-from homeassistant.components.whois.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.whois.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_whois: MagicMock,
 ) -> None:
@@ -42,7 +42,7 @@ async def test_load_unload_config_entry(
     [FailedParsingWhoisOutput, UnknownDateFormat, UnknownTld, WhoisCommandFailed],
 )
 async def test_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_whois: MagicMock,
     side_effect: Exception,

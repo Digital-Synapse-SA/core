@@ -7,23 +7,23 @@ from freezegun.api import FrozenDateTimeFactory
 from py_aosmith import AOSmithInvalidCredentialsException
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.aosmith.const import (
+from smarthub import config_entries
+from smarthub.components.aosmith.const import (
     DOMAIN,
     ENERGY_USAGE_INTERVAL,
     REGULAR_INTERVAL,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import FIXTURE_USER_INPUT
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -32,7 +32,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
+        "smarthub.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
         return_value=[],
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -55,7 +55,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     ],
 )
 async def test_form_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     exception: Exception,
     expected_error_key: str,
@@ -68,7 +68,7 @@ async def test_form_exception(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
+        "smarthub.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
         side_effect=exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -79,7 +79,7 @@ async def test_form_exception(
         assert result2["errors"] == {"base": expected_error_key}
 
     with patch(
-        "homeassistant.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
+        "smarthub.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
         return_value=[],
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -103,7 +103,7 @@ async def test_form_exception(
 )
 async def test_reauth_flow(
     freezer: FrozenDateTimeFactory,
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_client: MagicMock,
     api_method: str,
@@ -127,14 +127,14 @@ async def test_reauth_flow(
 
     with (
         patch(
-            "homeassistant.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
+            "smarthub.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
             return_value=[],
         ),
         patch(
-            "homeassistant.components.aosmith.config_flow.AOSmithAPIClient.get_energy_use_data",
+            "smarthub.components.aosmith.config_flow.AOSmithAPIClient.get_energy_use_data",
             return_value=[],
         ),
-        patch("homeassistant.components.aosmith.async_setup_entry", return_value=True),
+        patch("smarthub.components.aosmith.async_setup_entry", return_value=True),
     ):
         result2 = await hass.config_entries.flow.async_configure(
             flows[0]["flow_id"],
@@ -148,7 +148,7 @@ async def test_reauth_flow(
 
 async def test_reauth_flow_retry(
     freezer: FrozenDateTimeFactory,
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_integration: MockConfigEntry,
     mock_client: MagicMock,
 ) -> None:
@@ -170,7 +170,7 @@ async def test_reauth_flow_retry(
 
     # First attempt at reauth - authentication fails again
     with patch(
-        "homeassistant.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
+        "smarthub.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
         side_effect=AOSmithInvalidCredentialsException("Authentication error"),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -185,10 +185,10 @@ async def test_reauth_flow_retry(
     # Second attempt at reauth - authentication succeeds
     with (
         patch(
-            "homeassistant.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
+            "smarthub.components.aosmith.config_flow.AOSmithAPIClient.get_devices",
             return_value=[],
         ),
-        patch("homeassistant.components.aosmith.async_setup_entry", return_value=True),
+        patch("smarthub.components.aosmith.async_setup_entry", return_value=True),
     ):
         result3 = await hass.config_entries.flow.async_configure(
             flows[0]["flow_id"],

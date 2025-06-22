@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import Any
 from unittest.mock import Mock
 
-from homeassistant.components.fritzbox.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.fritzbox.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .const import (
     CONF_FAKE_AIN,
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 
 
 async def setup_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     data: dict[str, Any],
     unique_id: str = "any",
     device: Mock | None = None,

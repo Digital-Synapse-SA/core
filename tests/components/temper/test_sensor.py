@@ -3,14 +3,14 @@
 from datetime import timedelta
 from unittest.mock import Mock, patch
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
 
-async def test_temperature_readback(hass: HomeAssistant) -> None:
+async def test_temperature_readback(hass: SmartHub) -> None:
     """Test for reading sensors."""
     mock_temper_device = Mock()
     mock_temper_device.get_temperature.return_value = 12.3

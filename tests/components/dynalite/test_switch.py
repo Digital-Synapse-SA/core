@@ -5,8 +5,8 @@ from unittest.mock import Mock
 from dynalite_devices_lib.switch import DynalitePresetSwitchDevice
 import pytest
 
-from homeassistant.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant, State
+from smarthub.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub, State
 
 from .common import (
     ATTR_METHOD,
@@ -32,7 +32,7 @@ def mock_device():
     return mock_dev
 
 
-async def test_switch_setup(hass: HomeAssistant, mock_device) -> None:
+async def test_switch_setup(hass: SmartHub, mock_device) -> None:
     """Test a successful setup."""
     await create_entity_from_device(hass, mock_device)
     entity_state = hass.states.get("switch.name")
@@ -51,7 +51,7 @@ async def test_switch_setup(hass: HomeAssistant, mock_device) -> None:
 
 @pytest.mark.parametrize(("saved_state", "level"), [(STATE_ON, 1), (STATE_OFF, 0)])
 async def test_switch_restore_state(
-    hass: HomeAssistant, mock_device, saved_state, level
+    hass: SmartHub, mock_device, saved_state, level
 ) -> None:
     """Test restore from cache."""
     mock_restore_cache(

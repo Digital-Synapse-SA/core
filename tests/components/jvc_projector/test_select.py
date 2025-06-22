@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 from jvcprojector import const
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTIONS,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_FRIENDLY_NAME, ATTR_OPTION
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_FRIENDLY_NAME, ATTR_OPTION
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ INPUT_ENTITY_ID = "select.jvc_projector_input"
 
 
 async def test_input_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_device: MagicMock,
     mock_integration: MockConfigEntry,

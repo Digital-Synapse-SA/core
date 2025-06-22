@@ -1,11 +1,11 @@
 """Test the Rainforest Eagle diagnostics."""
 
-from homeassistant.components.diagnostics import REDACTED
-from homeassistant.components.rainforest_eagle.const import (
+from smarthub.components.diagnostics import REDACTED
+from smarthub.components.rainforest_eagle.const import (
     CONF_CLOUD_ID,
     CONF_INSTALL_CODE,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import MOCK_200_RESPONSE_WITHOUT_PRICE
 
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup_rainforest_200,
     config_entry_200,

@@ -2,15 +2,15 @@
 
 from unittest.mock import AsyncMock, MagicMock
 
-from homeassistant.components.mjpeg.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.mjpeg.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_mjpeg_requests: MagicMock,
 ) -> None:
@@ -29,7 +29,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_reload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_reload_entry: AsyncMock,
     init_integration: MockConfigEntry,
 ) -> None:

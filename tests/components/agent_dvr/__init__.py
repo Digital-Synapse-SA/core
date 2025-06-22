@@ -1,8 +1,8 @@
 """Tests for the agent_dvr component."""
 
-from homeassistant.components.agent_dvr.const import DOMAIN, SERVER_URL
-from homeassistant.const import CONF_HOST, CONF_PORT, CONTENT_TYPE_JSON
-from homeassistant.core import HomeAssistant
+from smarthub.components.agent_dvr.const import DOMAIN, SERVER_URL
+from smarthub.const import CONF_HOST, CONF_PORT, CONTENT_TYPE_JSON
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -14,8 +14,8 @@ CONF_DATA = {
 }
 
 
-def create_entry(hass: HomeAssistant):
-    """Add config entry in Home Assistant."""
+def create_entry(hass: SmartHub):
+    """Add config entry in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id="c0715bba-c2d0-48ef-9e3e-bc81c9ea4447",
@@ -26,11 +26,11 @@ def create_entry(hass: HomeAssistant):
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     skip_setup: bool = False,
 ) -> MockConfigEntry:
-    """Set up the Agent DVR integration in Home Assistant."""
+    """Set up the Agent DVR integration in SmartHub."""
 
     aioclient_mock.get(
         "http://example.local:8090/command.cgi?cmd=getStatus",

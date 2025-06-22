@@ -22,8 +22,8 @@ from unittest.mock import Mock, patch
 from aiohttp import web
 import pytest
 
-from homeassistant.components.stream.core import StreamOutput
-from homeassistant.components.stream.worker import StreamState
+from smarthub.components.stream.core import StreamOutput
+from smarthub.components.stream.worker import StreamState
 
 from .common import generate_h264_video, stream_teardown
 
@@ -67,7 +67,7 @@ def stream_worker_sync() -> Generator[WorkerSync]:
     """Patch StreamOutput to allow test to synchronize worker stream end."""
     sync = WorkerSync()
     with patch(
-        "homeassistant.components.stream.worker.StreamState.discontinuity",
+        "smarthub.components.stream.worker.StreamState.discontinuity",
         side_effect=sync.blocking_discontinuity,
         autospec=True,
     ):
@@ -152,25 +152,25 @@ def hls_sync():
     sync = HLSSync()
     with (
         patch(
-            "homeassistant.components.stream.core.StreamOutput.recv",
+            "smarthub.components.stream.core.StreamOutput.recv",
             side_effect=sync.recv,
             autospec=True,
         ),
         patch(
-            "homeassistant.components.stream.core.StreamOutput.part_recv",
+            "smarthub.components.stream.core.StreamOutput.part_recv",
             side_effect=sync.part_recv,
             autospec=True,
         ),
         patch(
-            "homeassistant.components.stream.hls.web.HTTPBadRequest",
+            "smarthub.components.stream.hls.web.HTTPBadRequest",
             side_effect=sync.bad_request,
         ),
         patch(
-            "homeassistant.components.stream.hls.web.HTTPNotFound",
+            "smarthub.components.stream.hls.web.HTTPNotFound",
             side_effect=sync.not_found,
         ),
         patch(
-            "homeassistant.components.stream.hls.web.Response",
+            "smarthub.components.stream.hls.web.Response",
             new=sync.response,
         ),
     ):
@@ -181,7 +181,7 @@ def hls_sync():
 def should_retry() -> Generator[Mock]:
     """Fixture to disable stream worker retries in tests by default."""
     with patch(
-        "homeassistant.components.stream._should_retry", return_value=False
+        "smarthub.components.stream._should_retry", return_value=False
     ) as mock_should_retry:
         yield mock_should_retry
 

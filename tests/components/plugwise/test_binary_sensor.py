@@ -4,9 +4,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_component import async_update_entity
 
 from tests.common import MockConfigEntry
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_anna_climate_binary_sensor_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smile_anna: MagicMock,
     init_integration: MockConfigEntry,
     entity_id: str,
@@ -38,7 +38,7 @@ async def test_anna_climate_binary_sensor_entities(
 @pytest.mark.parametrize("chosen_env", ["anna_heatpump_heating"], indirect=True)
 @pytest.mark.parametrize("cooling_present", [True], indirect=True)
 async def test_anna_climate_binary_sensor_change(
-    hass: HomeAssistant, mock_smile_anna: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_anna: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test change of climate related binary_sensor entities."""
     hass.states.async_set("binary_sensor.opentherm_dhw_state", STATE_ON, {})
@@ -56,7 +56,7 @@ async def test_anna_climate_binary_sensor_change(
 
 
 async def test_adam_climate_binary_sensor_change(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test of a climate related plugwise-notification binary_sensor."""
     state = hass.states.get("binary_sensor.adam_plugwise_notification")
@@ -73,7 +73,7 @@ async def test_adam_climate_binary_sensor_change(
     "gateway_id", ["03e65b16e4b247a29ae0d75a78cb492e"], indirect=True
 )
 async def test_p1_binary_sensor_entity(
-    hass: HomeAssistant, mock_smile_p1: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_p1: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test of a Smile P1 related plugwise-notification binary_sensor."""
     state = hass.states.get("binary_sensor.smile_p1_plugwise_notification")

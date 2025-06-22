@@ -16,17 +16,17 @@ from matter_server.client.exceptions import (
 from matter_server.common.errors import MatterError
 import pytest
 
-from homeassistant.components.hassio import HassioAPIError
-from homeassistant.components.matter.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryDisabler, ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub.components.hassio import HassioAPIError
+from smarthub.components.matter.const import DOMAIN
+from smarthub.config_entries import ConfigEntryDisabler, ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     device_registry as dr,
     entity_registry as er,
     issue_registry as ir,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from .common import create_node_from_fixture, setup_integration_with_node_fixture
 
@@ -37,7 +37,7 @@ from tests.typing import WebSocketGenerator
 @pytest.fixture(name="connect_timeout")
 def connect_timeout_fixture() -> Generator[int]:
     """Mock the connect timeout."""
-    with patch("homeassistant.components.matter.CONNECT_TIMEOUT", new=0) as timeout:
+    with patch("smarthub.components.matter.CONNECT_TIMEOUT", new=0) as timeout:
         yield timeout
 
 
@@ -45,13 +45,13 @@ def connect_timeout_fixture() -> Generator[int]:
 def listen_ready_timeout_fixture() -> Generator[int]:
     """Mock the listen ready timeout."""
     with patch(
-        "homeassistant.components.matter.LISTEN_READY_TIMEOUT", new=0
+        "smarthub.components.matter.LISTEN_READY_TIMEOUT", new=0
     ) as timeout:
         yield timeout
 
 
 async def test_entry_setup_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
 ) -> None:
     """Test the integration set up and unload."""
@@ -81,7 +81,7 @@ async def test_entry_setup_unload(
 
 
 async def test_home_assistant_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     integration: MockConfigEntry,
 ) -> None:
@@ -93,7 +93,7 @@ async def test_home_assistant_stop(
 
 @pytest.mark.parametrize("error", [CannotConnect(Exception("Boom")), Exception("Boom")])
 async def test_connect_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     error: Exception,
 ) -> None:
@@ -110,7 +110,7 @@ async def test_connect_failed(
 
 @pytest.mark.parametrize("expected_lingering_tasks", [True])
 async def test_set_default_fabric_label_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
 ) -> None:
     """Test failure during client connection."""
@@ -129,7 +129,7 @@ async def test_set_default_fabric_label_failed(
 
 
 async def test_connect_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     connect_timeout: int,
 ) -> None:
@@ -145,7 +145,7 @@ async def test_connect_timeout(
 
 @pytest.mark.parametrize("error", [MatterError("Boom"), Exception("Boom")])
 async def test_listen_failure_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     listen_ready_timeout: int,
     matter_client: MagicMock,
     error: Exception,
@@ -170,7 +170,7 @@ async def test_listen_failure_timeout(
 
 @pytest.mark.parametrize("error", [MatterError("Boom"), Exception("Boom")])
 async def test_listen_failure_config_entry_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     error: Exception,
 ) -> None:
@@ -204,7 +204,7 @@ async def test_listen_failure_config_entry_not_loaded(
 
 @pytest.mark.parametrize("error", [MatterError("Boom"), Exception("Boom")])
 async def test_listen_failure_config_entry_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     error: Exception,
 ) -> None:
@@ -236,7 +236,7 @@ async def test_listen_failure_config_entry_loaded(
 
 
 async def test_raise_addon_task_in_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_not_installed: AsyncMock,
     install_addon: AsyncMock,
     start_addon: AsyncMock,
@@ -286,7 +286,7 @@ async def test_raise_addon_task_in_progress(
 
 
 async def test_start_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_installed: AsyncMock,
     addon_info: AsyncMock,
     install_addon: AsyncMock,
@@ -314,7 +314,7 @@ async def test_start_addon(
 
 
 async def test_install_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_not_installed: AsyncMock,
     addon_store_info: AsyncMock,
     install_addon: AsyncMock,
@@ -343,7 +343,7 @@ async def test_install_addon(
 
 
 async def test_addon_info_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_installed: AsyncMock,
     addon_info: AsyncMock,
     install_addon: AsyncMock,
@@ -405,7 +405,7 @@ async def test_addon_info_failure(
     ],
 )
 async def test_update_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_installed: AsyncMock,
     addon_running: AsyncMock,
     addon_info: AsyncMock,
@@ -463,7 +463,7 @@ async def test_update_addon(
     ],
 )
 async def test_issue_registry_invalid_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     issue_registry: ir.IssueRegistry,
     connect_side_effect: Exception,
@@ -506,7 +506,7 @@ async def test_issue_registry_invalid_version(
     ],
 )
 async def test_stop_addon(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     addon_installed: AsyncMock,
     addon_running: AsyncMock,
@@ -545,7 +545,7 @@ async def test_stop_addon(
 
 
 async def test_remove_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_installed: AsyncMock,
     stop_addon: AsyncMock,
     create_backup: AsyncMock,
@@ -661,7 +661,7 @@ async def test_remove_entry(
 
 
 async def test_remove_config_entry_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     matter_client: MagicMock,
@@ -693,7 +693,7 @@ async def test_remove_config_entry_device(
 
 
 async def test_remove_config_entry_device_no_node(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     matter_client: MagicMock,
     integration: MockConfigEntry,

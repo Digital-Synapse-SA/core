@@ -9,12 +9,12 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from homeassistant.components import google_pubsub
-from homeassistant.components.google_pubsub import DateTimeJSONEncoder as victim
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import google_pubsub
+from smarthub.components.google_pubsub import DateTimeJSONEncoder as victim
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
-GOOGLE_PUBSUB_PATH = "homeassistant.components.google_pubsub"
+GOOGLE_PUBSUB_PATH = "smarthub.components.google_pubsub"
 
 
 @dataclass
@@ -69,7 +69,7 @@ def mock_json(monkeypatch: pytest.MonkeyPatch) -> None:
     )
 
 
-async def test_minimal_config(hass: HomeAssistant, mock_client) -> None:
+async def test_minimal_config(hass: SmartHub, mock_client) -> None:
     """Test the minimal config and defaults of component."""
     config = {
         google_pubsub.DOMAIN: {
@@ -87,7 +87,7 @@ async def test_minimal_config(hass: HomeAssistant, mock_client) -> None:
     )
 
 
-async def test_full_config(hass: HomeAssistant, mock_client) -> None:
+async def test_full_config(hass: SmartHub, mock_client) -> None:
     """Test the full config of the component."""
     config = {
         google_pubsub.DOMAIN: {
@@ -112,7 +112,7 @@ async def test_full_config(hass: HomeAssistant, mock_client) -> None:
     )
 
 
-async def _setup(hass: HomeAssistant, filter_config: dict[str, Any]) -> None:
+async def _setup(hass: SmartHub, filter_config: dict[str, Any]) -> None:
     """Shared set up for filtering tests."""
     config = {
         google_pubsub.DOMAIN: {
@@ -126,7 +126,7 @@ async def _setup(hass: HomeAssistant, filter_config: dict[str, Any]) -> None:
     await hass.async_block_till_done()
 
 
-async def test_allowlist(hass: HomeAssistant, mock_client) -> None:
+async def test_allowlist(hass: SmartHub, mock_client) -> None:
     """Test an allowlist only config."""
     await _setup(
         hass,
@@ -156,7 +156,7 @@ async def test_allowlist(hass: HomeAssistant, mock_client) -> None:
         publish_client.publish.reset_mock()
 
 
-async def test_denylist(hass: HomeAssistant, mock_client) -> None:
+async def test_denylist(hass: SmartHub, mock_client) -> None:
     """Test a denylist only config."""
     await _setup(
         hass,
@@ -186,7 +186,7 @@ async def test_denylist(hass: HomeAssistant, mock_client) -> None:
         publish_client.publish.reset_mock()
 
 
-async def test_filtered_allowlist(hass: HomeAssistant, mock_client) -> None:
+async def test_filtered_allowlist(hass: SmartHub, mock_client) -> None:
     """Test an allowlist config with a filtering denylist."""
     await _setup(
         hass,
@@ -217,7 +217,7 @@ async def test_filtered_allowlist(hass: HomeAssistant, mock_client) -> None:
         publish_client.publish.reset_mock()
 
 
-async def test_filtered_denylist(hass: HomeAssistant, mock_client) -> None:
+async def test_filtered_denylist(hass: SmartHub, mock_client) -> None:
     """Test a denylist config with a filtering allowlist."""
     await _setup(
         hass,

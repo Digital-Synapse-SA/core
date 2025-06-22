@@ -7,8 +7,8 @@ from collections import deque
 import multiprocessing
 from pathlib import Path
 
-from homeassistant.const import Platform
-from homeassistant.requirements import DISCOVERY_INTEGRATIONS
+from smarthub.const import Platform
+from smarthub.requirements import DISCOVERY_INTEGRATIONS
 
 from . import ast_parse_module
 from .model import Config, Integration
@@ -61,27 +61,27 @@ class ImportCollector(ast.NodeVisitor):
 
         # Exception: we will allow importing the sign path code.
         if (
-            node.module == "homeassistant.components.http.auth"
+            node.module == "smarthub.components.http.auth"
             and len(node.names) == 1
             and node.names[0].name == "async_sign_path"
         ):
             return
 
-        if node.module.startswith("homeassistant.components."):
-            # from homeassistant.components.alexa.smart_home import EVENT_ALEXA_SMART_HOME
-            # from homeassistant.components.logbook import bla
+        if node.module.startswith("smarthub.components."):
+            # from smarthub.components.alexa.smart_home import EVENT_ALEXA_SMART_HOME
+            # from smarthub.components.logbook import bla
             self._add_reference(node.module.split(".")[2])
 
-        elif node.module == "homeassistant.components":
-            # from homeassistant.components import sun
+        elif node.module == "smarthub.components":
+            # from smarthub.components import sun
             for name_node in node.names:
                 self._add_reference(name_node.name)
 
     def visit_Import(self, node: ast.Import) -> None:
         """Visit Import node."""
-        # import homeassistant.components.hue as hue
+        # import smarthub.components.hue as hue
         for name_node in node.names:
-            if name_node.name.startswith("homeassistant.components."):
+            if name_node.name.startswith("smarthub.components."):
                 self._add_reference(name_node.name.split(".")[2])
 
 
@@ -95,7 +95,7 @@ ALLOWED_USED_COMPONENTS = {
     "device_automation",
     "frontend",
     "group",
-    "homeassistant",
+    "smarthub",
     "input_boolean",
     "input_button",
     "input_datetime",
@@ -131,11 +131,11 @@ IGNORE_VIOLATIONS = {
     ("http", "network"),
     ("http", "cloud"),
     # This would be a circular dep
-    ("zha", "homeassistant_hardware"),
-    ("zha", "homeassistant_sky_connect"),
-    ("zha", "homeassistant_yellow"),
-    ("homeassistant_sky_connect", "zha"),
-    ("homeassistant_hardware", "zha"),
+    ("zha", "smarthub_hardware"),
+    ("zha", "smarthub_sky_connect"),
+    ("zha", "smarthub_yellow"),
+    ("smarthub_sky_connect", "zha"),
+    ("smarthub_hardware", "zha"),
     # This should become a helper method that integrations can submit data to
     ("websocket_api", "lovelace"),
     ("websocket_api", "shopping_list"),

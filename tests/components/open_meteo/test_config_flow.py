@@ -2,16 +2,16 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.open_meteo.const import DOMAIN
-from homeassistant.components.zone import ENTITY_ID_HOME
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_ZONE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.open_meteo.const import DOMAIN
+from smarthub.components.zone import ENTITY_ID_HOME
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_ZONE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def test_full_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: MagicMock,
 ) -> None:
     """Test the full user configuration flow."""

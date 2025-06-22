@@ -3,15 +3,15 @@
 from unittest import mock
 from unittest.mock import patch
 
-from homeassistant.components import datadog
-from homeassistant.const import EVENT_LOGBOOK_ENTRY, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import datadog
+from smarthub.const import EVENT_LOGBOOK_ENTRY, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component
 
 
-async def test_invalid_config(hass: HomeAssistant) -> None:
+async def test_invalid_config(hass: SmartHub) -> None:
     """Test invalid configuration."""
     with assert_setup_component(0):
         assert not await async_setup_component(
@@ -19,13 +19,13 @@ async def test_invalid_config(hass: HomeAssistant) -> None:
         )
 
 
-async def test_datadog_setup_full(hass: HomeAssistant) -> None:
+async def test_datadog_setup_full(hass: SmartHub) -> None:
     """Test setup with all data."""
     config = {datadog.DOMAIN: {"host": "host", "port": 123, "rate": 1, "prefix": "foo"}}
 
     with (
-        patch("homeassistant.components.datadog.initialize") as mock_init,
-        patch("homeassistant.components.datadog.statsd"),
+        patch("smarthub.components.datadog.initialize") as mock_init,
+        patch("smarthub.components.datadog.statsd"),
     ):
         assert await async_setup_component(hass, datadog.DOMAIN, config)
 
@@ -33,11 +33,11 @@ async def test_datadog_setup_full(hass: HomeAssistant) -> None:
         assert mock_init.call_args == mock.call(statsd_host="host", statsd_port=123)
 
 
-async def test_datadog_setup_defaults(hass: HomeAssistant) -> None:
+async def test_datadog_setup_defaults(hass: SmartHub) -> None:
     """Test setup with defaults."""
     with (
-        patch("homeassistant.components.datadog.initialize") as mock_init,
-        patch("homeassistant.components.datadog.statsd"),
+        patch("smarthub.components.datadog.initialize") as mock_init,
+        patch("smarthub.components.datadog.statsd"),
     ):
         assert await async_setup_component(
             hass,
@@ -55,11 +55,11 @@ async def test_datadog_setup_defaults(hass: HomeAssistant) -> None:
         assert mock_init.call_args == mock.call(statsd_host="host", statsd_port=8125)
 
 
-async def test_logbook_entry(hass: HomeAssistant) -> None:
+async def test_logbook_entry(hass: SmartHub) -> None:
     """Test event listener."""
     with (
-        patch("homeassistant.components.datadog.initialize"),
-        patch("homeassistant.components.datadog.statsd") as mock_statsd,
+        patch("smarthub.components.datadog.initialize"),
+        patch("smarthub.components.datadog.statsd") as mock_statsd,
     ):
         assert await async_setup_component(
             hass,
@@ -78,7 +78,7 @@ async def test_logbook_entry(hass: HomeAssistant) -> None:
 
         assert mock_statsd.event.call_count == 1
         assert mock_statsd.event.call_args == mock.call(
-            title="Home Assistant",
+            title="SmartHub",
             text=f"%%% \n **{event['name']}** {event['message']} \n %%%",
             tags=["entity:sensor.foo.bar", "domain:automation"],
         )
@@ -86,11 +86,11 @@ async def test_logbook_entry(hass: HomeAssistant) -> None:
         mock_statsd.event.reset_mock()
 
 
-async def test_state_changed(hass: HomeAssistant) -> None:
+async def test_state_changed(hass: SmartHub) -> None:
     """Test event listener."""
     with (
-        patch("homeassistant.components.datadog.initialize"),
-        patch("homeassistant.components.datadog.statsd") as mock_statsd,
+        patch("smarthub.components.datadog.initialize"),
+        patch("smarthub.components.datadog.statsd") as mock_statsd,
     ):
         assert await async_setup_component(
             hass,

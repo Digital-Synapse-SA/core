@@ -11,12 +11,12 @@ from bleak.backends.scanner import AdvertisementData
 from habluetooth.wrappers import HaBleakClientWrapper, HaBleakScannerWrapper
 import pytest
 
-from homeassistant.components.bluetooth import (
+from smarthub.components.bluetooth import (
     BaseHaRemoteScanner,
     BaseHaScanner,
     HaBluetoothConnector,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import (
     FakeScannerMixin,
@@ -30,7 +30,7 @@ from . import (
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_wrapped_bleak_scanner(hass: HomeAssistant) -> None:
+async def test_wrapped_bleak_scanner(hass: SmartHub) -> None:
     """Test wrapped bleak scanner dispatches calls as expected."""
     scanner = HaBleakScannerWrapper()
     switchbot_device = generate_ble_device("44:44:33:11:23:45", "wohand")
@@ -43,7 +43,7 @@ async def test_wrapped_bleak_scanner(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_wrapped_bleak_client_raises_device_missing(hass: HomeAssistant) -> None:
+async def test_wrapped_bleak_client_raises_device_missing(hass: SmartHub) -> None:
     """Test wrapped bleak client dispatches calls as expected."""
     switchbot_device = generate_ble_device("44:44:33:11:23:45", "wohand")
     client = HaBleakClientWrapper(switchbot_device)
@@ -57,7 +57,7 @@ async def test_wrapped_bleak_client_raises_device_missing(hass: HomeAssistant) -
 
 @pytest.mark.usefixtures("enable_bluetooth")
 async def test_wrapped_bleak_client_set_disconnected_callback_before_connected(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test wrapped bleak client can set a disconnected callback before connected."""
     switchbot_device = generate_ble_device("44:44:33:11:23:45", "wohand")
@@ -66,7 +66,7 @@ async def test_wrapped_bleak_client_set_disconnected_callback_before_connected(
 
 
 @pytest.mark.usefixtures("enable_bluetooth", "one_adapter")
-async def test_wrapped_bleak_client_local_adapter_only(hass: HomeAssistant) -> None:
+async def test_wrapped_bleak_client_local_adapter_only(hass: SmartHub) -> None:
     """Test wrapped bleak client with only a local adapter."""
     manager = _get_manager()
 
@@ -133,7 +133,7 @@ async def test_wrapped_bleak_client_local_adapter_only(hass: HomeAssistant) -> N
 
 @pytest.mark.usefixtures("enable_bluetooth", "one_adapter")
 async def test_wrapped_bleak_client_set_disconnected_callback_after_connected(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test wrapped bleak client can set a disconnected callback after connected."""
     manager = _get_manager()
@@ -224,7 +224,7 @@ async def test_wrapped_bleak_client_set_disconnected_callback_after_connected(
 
 @pytest.mark.usefixtures("enable_bluetooth", "one_adapter")
 async def test_ble_device_with_proxy_client_out_of_connections_no_scanners(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we switch to the next available proxy when one runs out of connections with no scanners."""
     manager = _get_manager()
@@ -263,7 +263,7 @@ async def test_ble_device_with_proxy_client_out_of_connections_no_scanners(
 
 @pytest.mark.usefixtures("enable_bluetooth", "one_adapter")
 async def test_ble_device_with_proxy_client_out_of_connections(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test handling all scanners are out of connection slots."""
     manager = _get_manager()
@@ -329,7 +329,7 @@ async def test_ble_device_with_proxy_client_out_of_connections(
 
 
 @pytest.mark.usefixtures("enable_bluetooth", "one_adapter")
-async def test_ble_device_with_proxy_clear_cache(hass: HomeAssistant) -> None:
+async def test_ble_device_with_proxy_clear_cache(hass: SmartHub) -> None:
     """Test we can clear cache on the proxy."""
     manager = _get_manager()
 
@@ -391,7 +391,7 @@ async def test_ble_device_with_proxy_clear_cache(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("enable_bluetooth", "one_adapter")
 async def test_ble_device_with_proxy_client_out_of_connections_uses_best_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we switch to the next available proxy when one runs out of connections."""
     manager = _get_manager()
@@ -499,7 +499,7 @@ async def test_ble_device_with_proxy_client_out_of_connections_uses_best_availab
 
 @pytest.mark.usefixtures("enable_bluetooth", "macos_adapter")
 async def test_ble_device_with_proxy_client_out_of_connections_uses_best_available_macos(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we switch to the next available proxy when one runs out of connections on MacOS."""
     manager = _get_manager()

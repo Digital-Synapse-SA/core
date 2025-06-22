@@ -10,7 +10,7 @@ from pylitterbot.exceptions import InvalidCommandException
 from pylitterbot.robot.litterrobot4 import HopperStatus
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import (
     CONFIG,
@@ -139,7 +139,7 @@ def mock_account_with_side_effects() -> MagicMock:
 
 
 async def setup_integration(
-    hass: HomeAssistant, mock_account: MagicMock, platform_domain: str | None = None
+    hass: SmartHub, mock_account: MagicMock, platform_domain: str | None = None
 ) -> MockConfigEntry:
     """Load a Litter-Robot platform with the provided coordinator."""
     entry = MockConfigEntry(
@@ -149,7 +149,7 @@ async def setup_integration(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.litterrobot.coordinator.Account",
+        "smarthub.components.litterrobot.coordinator.Account",
         return_value=mock_account,
     ):
         await hass.config_entries.async_setup(entry.entry_id)

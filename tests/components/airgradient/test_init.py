@@ -7,10 +7,10 @@ from airgradient import AirGradientError
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.airgradient.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.airgradient.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     airgradient_devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -34,7 +34,7 @@ async def test_device_info(
 
 
 async def test_new_firmware_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airgradient_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -59,7 +59,7 @@ async def test_new_firmware_version(
 
 
 async def test_setup_retry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airgradient_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

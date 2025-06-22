@@ -4,8 +4,8 @@ from google.maps.routing_v2 import Location, Waypoint
 from google.type import latlng_pb2
 import pytest
 
-from homeassistant.components.google_travel_time import helpers
-from homeassistant.core import HomeAssistant
+from smarthub.components.google_travel_time import helpers
+from smarthub.core import SmartHub
 
 
 @pytest.mark.parametrize(
@@ -38,7 +38,7 @@ from homeassistant.core import HomeAssistant
     ],
 )
 def test_convert_to_waypoint_coordinates(
-    hass: HomeAssistant, location: str, expected_result: Waypoint
+    hass: SmartHub, location: str, expected_result: Waypoint
 ) -> None:
     """Test convert_to_waypoint returns correct Waypoint for coordinates or address."""
     waypoint = helpers.convert_to_waypoint(hass, location)

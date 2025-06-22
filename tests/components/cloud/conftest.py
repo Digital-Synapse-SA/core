@@ -18,27 +18,27 @@ from hass_nabucasa.voice import Voice
 import jwt
 import pytest
 
-from homeassistant.components.cloud.client import CloudClient
-from homeassistant.components.cloud.const import DATA_CLOUD
-from homeassistant.components.cloud.prefs import (
+from smarthub.components.cloud.client import CloudClient
+from smarthub.components.cloud.const import DATA_CLOUD
+from smarthub.components.cloud.prefs import (
     PREF_ALEXA_DEFAULT_EXPOSE,
     PREF_GOOGLE_DEFAULT_EXPOSE,
     CloudPreferences,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from . import mock_cloud, mock_cloud_prefs
 
 
 @pytest.fixture(autouse=True)
-async def load_homeassistant(hass: HomeAssistant) -> None:
-    """Load the homeassistant integration.
+async def load_smarthub(hass: SmartHub) -> None:
+    """Load the smarthub integration.
 
     This is needed for the cloud integration to work.
     """
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
 
 @pytest.fixture(name="cloud")
@@ -48,7 +48,7 @@ async def cloud_fixture() -> AsyncGenerator[MagicMock]:
     See the real hass_nabucasa.Cloud class for how to configure the mock.
     """
     with patch(
-        "homeassistant.components.cloud.Cloud", autospec=True
+        "smarthub.components.cloud.Cloud", autospec=True
     ) as mock_cloud_class:
         mock_cloud = mock_cloud_class.return_value
 
@@ -157,7 +157,7 @@ async def cloud_fixture() -> AsyncGenerator[MagicMock]:
             """
             mock_cloud.id_token = jwt.encode(
                 {
-                    "email": "hello@home-assistant.io",
+                    "email": "hello@smart-hub.io",
                     "custom:sub-exp": "2018-01-03",
                     "cognito:username": "abcdefghjkl",
                 },
@@ -218,14 +218,14 @@ def mock_user_data() -> Generator[MagicMock]:
 
 
 @pytest.fixture
-async def mock_cloud_fixture(hass: HomeAssistant) -> CloudPreferences:
+async def mock_cloud_fixture(hass: SmartHub) -> CloudPreferences:
     """Fixture for cloud component."""
     await mock_cloud(hass)
     return mock_cloud_prefs(hass, {})
 
 
 @pytest.fixture
-async def cloud_prefs(hass: HomeAssistant) -> CloudPreferences:
+async def cloud_prefs(hass: SmartHub) -> CloudPreferences:
     """Fixture for cloud preferences."""
     cloud_prefs = CloudPreferences(hass)
     await cloud_prefs.async_initialize()
@@ -233,17 +233,17 @@ async def cloud_prefs(hass: HomeAssistant) -> CloudPreferences:
 
 
 @pytest.fixture
-async def mock_cloud_setup(hass: HomeAssistant) -> None:
+async def mock_cloud_setup(hass: SmartHub) -> None:
     """Set up the cloud."""
     await mock_cloud(hass)
 
 
 @pytest.fixture
-def mock_cloud_login(hass: HomeAssistant, mock_cloud_setup: None) -> Generator[None]:
+def mock_cloud_login(hass: SmartHub, mock_cloud_setup: None) -> Generator[None]:
     """Mock cloud is logged in."""
     hass.data[DATA_CLOUD].id_token = jwt.encode(
         {
-            "email": "hello@home-assistant.io",
+            "email": "hello@smart-hub.io",
             "custom:sub-exp": "2300-01-03",
             "cognito:username": "abcdefghjkl",
         },
@@ -264,11 +264,11 @@ def mock_auth_fixture() -> Generator[None]:
 
 
 @pytest.fixture
-def mock_expired_cloud_login(hass: HomeAssistant, mock_cloud_setup: None) -> None:
+def mock_expired_cloud_login(hass: SmartHub, mock_cloud_setup: None) -> None:
     """Mock cloud is logged in."""
     hass.data[DATA_CLOUD].id_token = jwt.encode(
         {
-            "email": "hello@home-assistant.io",
+            "email": "hello@smart-hub.io",
             "custom:sub-exp": "2018-01-01",
             "cognito:username": "abcdefghjkl",
         },

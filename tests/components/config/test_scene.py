@@ -7,17 +7,17 @@ from unittest.mock import ANY, patch
 
 import pytest
 
-from homeassistant.components import config
-from homeassistant.components.config import scene
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import config
+from smarthub.components.config import scene
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
 
 @pytest.fixture
-async def setup_scene(hass: HomeAssistant, scene_config: dict[str, Any]) -> None:
+async def setup_scene(hass: SmartHub, scene_config: dict[str, Any]) -> None:
     """Set up scene integration."""
     assert await async_setup_component(hass, "scene", {"scene": scene_config})
     await hass.async_block_till_done()
@@ -26,7 +26,7 @@ async def setup_scene(hass: HomeAssistant, scene_config: dict[str, Any]) -> None
 @pytest.mark.parametrize("scene_config", [{}])
 @pytest.mark.usefixtures("setup_scene")
 async def test_create_scene(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_config_store: dict[str, Any],
 ) -> None:
@@ -73,7 +73,7 @@ async def test_create_scene(
 @pytest.mark.parametrize("scene_config", [{}])
 @pytest.mark.usefixtures("setup_scene")
 async def test_update_scene(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_config_store: dict[str, Any],
 ) -> None:
@@ -121,7 +121,7 @@ async def test_update_scene(
 @pytest.mark.parametrize("scene_config", [{}])
 @pytest.mark.usefixtures("setup_scene")
 async def test_bad_formatted_scene(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_config_store: dict[str, Any],
 ) -> None:
@@ -187,7 +187,7 @@ async def test_bad_formatted_scene(
 )
 @pytest.mark.usefixtures("setup_scene")
 async def test_delete_scene(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     entity_registry: er.EntityRegistry,
     hass_config_store: dict[str, Any],
@@ -230,7 +230,7 @@ async def test_delete_scene(
 @pytest.mark.parametrize("scene_config", [{}])
 @pytest.mark.usefixtures("setup_scene")
 async def test_api_calls_require_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_read_only_access_token: str,
     hass_config_store: dict[str, Any],

@@ -5,11 +5,11 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from homeassistant.components import http, image_processing as ip
-from homeassistant.const import ATTR_ENTITY_PICTURE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components import http, image_processing as ip
+from smarthub.const import ATTR_ENTITY_PICTURE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from . import common
 
@@ -18,9 +18,9 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant):
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub):
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
 @pytest.fixture
@@ -32,14 +32,14 @@ def aiohttp_unused_port_factory(
     return unused_tcp_port_factory
 
 
-def get_url(hass: HomeAssistant) -> str:
+def get_url(hass: SmartHub) -> str:
     """Return camera url."""
     state = hass.states.get("camera.demo_camera")
     return f"{hass.config.internal_url}{state.attributes.get(ATTR_ENTITY_PICTURE)}"
 
 
 async def setup_image_processing(
-    hass: HomeAssistant, aiohttp_unused_port_factory: Callable[[], int]
+    hass: SmartHub, aiohttp_unused_port_factory: Callable[[], int]
 ) -> None:
     """Set up things to be run when tests are started."""
     await async_setup_component(
@@ -54,7 +54,7 @@ async def setup_image_processing(
     await hass.async_block_till_done()
 
 
-async def setup_image_processing_face(hass: HomeAssistant) -> None:
+async def setup_image_processing_face(hass: SmartHub) -> None:
     """Set up things to be run when tests are started."""
     config = {ip.DOMAIN: {"platform": "demo"}, "camera": {"platform": "demo"}}
 
@@ -64,7 +64,7 @@ async def setup_image_processing_face(hass: HomeAssistant) -> None:
     return async_capture_events(hass, "image_processing.detect_face")
 
 
-async def test_setup_component(hass: HomeAssistant) -> None:
+async def test_setup_component(hass: SmartHub) -> None:
     """Set up demo platform on image_process component."""
     config = {ip.DOMAIN: {"platform": "demo"}}
 
@@ -73,7 +73,7 @@ async def test_setup_component(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
 
-async def test_setup_component_with_service(hass: HomeAssistant) -> None:
+async def test_setup_component_with_service(hass: SmartHub) -> None:
     """Set up demo platform on image_process component test service."""
     config = {ip.DOMAIN: {"platform": "demo"}}
 
@@ -85,13 +85,13 @@ async def test_setup_component_with_service(hass: HomeAssistant) -> None:
 
 
 @patch(
-    "homeassistant.components.demo.camera.Path.read_bytes",
+    "smarthub.components.demo.camera.Path.read_bytes",
     return_value=b"Test",
 )
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_get_image_from_camera(
     mock_camera_read,
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_unused_port_factory: Callable[[], int],
 ) -> None:
     """Grab an image from camera entity."""
@@ -108,13 +108,13 @@ async def test_get_image_from_camera(
 
 
 @patch(
-    "homeassistant.components.image_processing.async_get_image",
-    side_effect=HomeAssistantError(),
+    "smarthub.components.image_processing.async_get_image",
+    side_effect=SmartHubError(),
 )
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_get_image_without_exists_camera(
     mock_image,
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_unused_port_factory: Callable[[], int],
 ) -> None:
     """Try to get image without exists camera."""
@@ -132,7 +132,7 @@ async def test_get_image_without_exists_camera(
 
 
 async def test_face_event_call(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set up and scan a picture and test faces from event."""
     face_events = await setup_image_processing_face(hass)
@@ -158,11 +158,11 @@ async def test_face_event_call(
 
 
 @patch(
-    "homeassistant.components.demo.image_processing.DemoImageProcessingFace.confidence",
+    "smarthub.components.demo.image_processing.DemoImageProcessingFace.confidence",
     new_callable=PropertyMock(return_value=None),
 )
 async def test_face_event_call_no_confidence(
-    mock_config, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    mock_config, hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set up and scan a picture and test faces from event."""
     face_events = await setup_image_processing_face(hass)
@@ -189,7 +189,7 @@ async def test_face_event_call_no_confidence(
 
 @pytest.mark.usefixtures("enable_custom_integrations")
 async def test_update_missing_camera(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_unused_port_factory: Callable[[], int],
     caplog: pytest.LogCaptureFixture,
 ) -> None:

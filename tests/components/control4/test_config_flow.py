@@ -6,16 +6,16 @@ from pyControl4.account import C4Account
 from pyControl4.director import C4Director
 from pyControl4.error_handling import Unauthorized
 
-from homeassistant import config_entries
-from homeassistant.components.control4.const import DEFAULT_SCAN_INTERVAL, DOMAIN
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components.control4.const import DEFAULT_SCAN_INTERVAL, DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_SCAN_INTERVAL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -41,7 +41,7 @@ def _get_mock_c4_director():
     return c4_director_mock
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -54,15 +54,15 @@ async def test_form(hass: HomeAssistant) -> None:
     c4_director = _get_mock_c4_director()
     with (
         patch(
-            "homeassistant.components.control4.config_flow.C4Account",
+            "smarthub.components.control4.config_flow.C4Account",
             return_value=c4_account,
         ),
         patch(
-            "homeassistant.components.control4.config_flow.C4Director",
+            "smarthub.components.control4.config_flow.C4Director",
             return_value=c4_director,
         ),
         patch(
-            "homeassistant.components.control4.async_setup_entry",
+            "smarthub.components.control4.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -87,14 +87,14 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.control4.config_flow.C4Account",
+        "smarthub.components.control4.config_flow.C4Account",
         side_effect=Unauthorized("message"),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -110,14 +110,14 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_unexpected_exception(hass: HomeAssistant) -> None:
+async def test_form_unexpected_exception(hass: SmartHub) -> None:
     """Test we handle an unexpected exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.control4.config_flow.C4Account",
+        "smarthub.components.control4.config_flow.C4Account",
         side_effect=ValueError("message"),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -133,7 +133,7 @@ async def test_form_unexpected_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -141,11 +141,11 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.control4.config_flow.Control4Validator.authenticate",
+            "smarthub.components.control4.config_flow.Control4Validator.authenticate",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.control4.config_flow.C4Director",
+            "smarthub.components.control4.config_flow.C4Director",
             side_effect=Unauthorized("message"),
         ),
     ):
@@ -162,7 +162,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_option_flow(hass: HomeAssistant) -> None:
+async def test_option_flow(hass: SmartHub) -> None:
     """Test config flow options."""
     entry = MockConfigEntry(domain=DOMAIN, data={}, options=None)
     entry.add_to_hass(hass)
@@ -182,7 +182,7 @@ async def test_option_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_option_flow_defaults(hass: HomeAssistant) -> None:
+async def test_option_flow_defaults(hass: SmartHub) -> None:
     """Test config flow options."""
     entry = MockConfigEntry(domain=DOMAIN, data={}, options=None)
     entry.add_to_hass(hass)

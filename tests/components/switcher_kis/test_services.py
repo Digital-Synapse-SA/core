@@ -6,19 +6,19 @@ from aioswitcher.api import Command
 from aioswitcher.device import DeviceState
 import pytest
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.switcher_kis.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.switcher_kis.const import (
     CONF_AUTO_OFF,
     CONF_TIMER_MINUTES,
     DOMAIN,
     SERVICE_SET_AUTO_OFF_NAME,
     SERVICE_TURN_ON_WITH_TIMER_NAME,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.config_validation import time_period_str
-from homeassistant.util import slugify
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.config_validation import time_period_str
+from smarthub.util import slugify
 
 from . import init_integration
 from .consts import (
@@ -31,7 +31,7 @@ from .consts import (
 
 @pytest.mark.parametrize("mock_bridge", [[DUMMY_WATER_HEATER_DEVICE]], indirect=True)
 async def test_turn_on_with_timer_service(
-    hass: HomeAssistant, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_bridge, mock_api, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test the turn on with timer service."""
     await init_integration(hass)
@@ -49,7 +49,7 @@ async def test_turn_on_with_timer_service(
     assert state.state == STATE_OFF
 
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.control_device"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.control_device"
     ) as mock_control_device:
         await hass.services.async_call(
             DOMAIN,
@@ -70,7 +70,7 @@ async def test_turn_on_with_timer_service(
 
 
 @pytest.mark.parametrize("mock_bridge", [[DUMMY_WATER_HEATER_DEVICE]], indirect=True)
-async def test_set_auto_off_service(hass: HomeAssistant, mock_bridge, mock_api) -> None:
+async def test_set_auto_off_service(hass: SmartHub, mock_bridge, mock_api) -> None:
     """Test the set auto off service."""
     await init_integration(hass)
     assert mock_bridge
@@ -79,7 +79,7 @@ async def test_set_auto_off_service(hass: HomeAssistant, mock_bridge, mock_api) 
     entity_id = f"{SWITCH_DOMAIN}.{slugify(device.name)}"
 
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_auto_shutdown"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_auto_shutdown"
     ) as mock_set_auto_shutdown:
         await hass.services.async_call(
             DOMAIN,
@@ -96,7 +96,7 @@ async def test_set_auto_off_service(hass: HomeAssistant, mock_bridge, mock_api) 
 
 @pytest.mark.parametrize("mock_bridge", [[DUMMY_WATER_HEATER_DEVICE]], indirect=True)
 async def test_set_auto_off_service_fail(
-    hass: HomeAssistant, mock_bridge, mock_api
+    hass: SmartHub, mock_bridge, mock_api
 ) -> None:
     """Test set auto off service failed."""
     await init_integration(hass)
@@ -106,10 +106,10 @@ async def test_set_auto_off_service_fail(
     entity_id = f"{SWITCH_DOMAIN}.{slugify(device.name)}"
 
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_auto_shutdown",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_auto_shutdown",
         return_value=None,
     ) as mock_set_auto_shutdown:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 DOMAIN,
                 SERVICE_SET_AUTO_OFF_NAME,
@@ -127,7 +127,7 @@ async def test_set_auto_off_service_fail(
 
 @pytest.mark.parametrize("mock_bridge", [[DUMMY_PLUG_DEVICE]], indirect=True)
 async def test_plug_unsupported_services(
-    hass: HomeAssistant, mock_bridge, mock_api, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, mock_bridge, mock_api, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test plug device unsupported services."""
     await init_integration(hass)

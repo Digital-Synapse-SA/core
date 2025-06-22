@@ -6,11 +6,11 @@ from pypalazzetti.exceptions import CommunicationError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -20,21 +20,21 @@ ENTITY_ID = "button.stove_silent"
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_palazzetti_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.palazzetti.PLATFORMS", [Platform.BUTTON]):
+    with patch("smarthub.components.palazzetti.PLATFORMS", [Platform.BUTTON]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_async_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_palazzetti_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -51,7 +51,7 @@ async def test_async_press(
 
 
 async def test_async_press_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_palazzetti_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -60,7 +60,7 @@ async def test_async_press_error(
 
     mock_palazzetti_client.set_fan_silent.side_effect = CommunicationError()
     error_message = "Could not connect to the device"
-    with pytest.raises(HomeAssistantError, match=error_message):
+    with pytest.raises(SmartHubError, match=error_message):
         await hass.services.async_call(
             BUTTON_DOMAIN,
             SERVICE_PRESS,

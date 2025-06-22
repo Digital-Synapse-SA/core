@@ -5,14 +5,14 @@ from __future__ import annotations
 import pytest
 from pytrafikverket import CameraInfoModel
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_ON
+from smarthub.core import SmartHub
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     get_camera: CameraInfoModel,
 ) -> None:

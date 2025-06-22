@@ -5,12 +5,12 @@ from unittest.mock import patch
 
 from aiohttp import ClientConnectionError, ClientResponseError
 
-from homeassistant import config_entries
-from homeassistant.components.nightscout.const import DOMAIN
-from homeassistant.components.nightscout.utils import hash_from_url
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.nightscout.const import DOMAIN
+from smarthub.components.nightscout.utils import hash_from_url
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import GLUCOSE_READINGS, SERVER_STATUS, SERVER_STATUS_STATUS_ONLY
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 CONFIG = {CONF_URL: "https://some.url:1234"}
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the user initiated form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -45,14 +45,14 @@ async def test_form(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_user_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nightscout.NightscoutAPI.get_server_status",
+        "smarthub.components.nightscout.NightscoutAPI.get_server_status",
         side_effect=ClientConnectionError(),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -64,7 +64,7 @@ async def test_user_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_user_form_api_key_required(hass: HomeAssistant) -> None:
+async def test_user_form_api_key_required(hass: SmartHub) -> None:
     """Test we handle an unauthorized error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -72,11 +72,11 @@ async def test_user_form_api_key_required(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nightscout.NightscoutAPI.get_server_status",
+            "smarthub.components.nightscout.NightscoutAPI.get_server_status",
             return_value=SERVER_STATUS_STATUS_ONLY,
         ),
         patch(
-            "homeassistant.components.nightscout.NightscoutAPI.get_sgvs",
+            "smarthub.components.nightscout.NightscoutAPI.get_sgvs",
             side_effect=ClientResponseError(None, None, status=HTTPStatus.UNAUTHORIZED),
         ),
     ):
@@ -89,14 +89,14 @@ async def test_user_form_api_key_required(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_user_form_unexpected_exception(hass: HomeAssistant) -> None:
+async def test_user_form_unexpected_exception(hass: SmartHub) -> None:
     """Test we handle unexpected exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nightscout.NightscoutAPI.get_server_status",
+        "smarthub.components.nightscout.NightscoutAPI.get_server_status",
         side_effect=Exception(),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -108,7 +108,7 @@ async def test_user_form_unexpected_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_user_form_duplicate(hass: HomeAssistant) -> None:
+async def test_user_form_duplicate(hass: SmartHub) -> None:
     """Test duplicate entries."""
     with _patch_glucose_readings(), _patch_server_status():
         unique_id = hash_from_url(CONFIG[CONF_URL])
@@ -126,20 +126,20 @@ async def test_user_form_duplicate(hass: HomeAssistant) -> None:
 
 def _patch_async_setup_entry():
     return patch(
-        "homeassistant.components.nightscout.async_setup_entry",
+        "smarthub.components.nightscout.async_setup_entry",
         return_value=True,
     )
 
 
 def _patch_glucose_readings():
     return patch(
-        "homeassistant.components.nightscout.NightscoutAPI.get_sgvs",
+        "smarthub.components.nightscout.NightscoutAPI.get_sgvs",
         return_value=GLUCOSE_READINGS,
     )
 
 
 def _patch_server_status():
     return patch(
-        "homeassistant.components.nightscout.NightscoutAPI.get_server_status",
+        "smarthub.components.nightscout.NightscoutAPI.get_server_status",
         return_value=SERVER_STATUS,
     )

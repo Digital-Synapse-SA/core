@@ -26,7 +26,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.heos.const import (
+from smarthub.components.heos.const import (
     ATTR_DESTINATION_POSITION,
     ATTR_QUEUE_IDS,
     DOMAIN,
@@ -37,7 +37,7 @@ from homeassistant.components.heos.const import (
     SERVICE_MOVE_QUEUE_ITEM,
     SERVICE_REMOVE_FROM_QUEUE,
 )
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_GROUP_MEMBERS,
     ATTR_INPUT_SOURCE,
     ATTR_INPUT_SOURCE_LIST,
@@ -60,8 +60,8 @@ from homeassistant.components.media_player import (
     MediaType,
     RepeatMode,
 )
-from homeassistant.components.media_source import DOMAIN as MS_DOMAIN
-from homeassistant.const import (
+from smarthub.components.media_source import DOMAIN as MS_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_MEDIA_NEXT_TRACK,
     SERVICE_MEDIA_PAUSE,
@@ -76,9 +76,9 @@ from homeassistant.const import (
     STATE_PLAYING,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import MockHeos
 
@@ -88,7 +88,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_state_attributes(
-    hass: HomeAssistant, config_entry: MockConfigEntry, snapshot: SnapshotAssertion
+    hass: SmartHub, config_entry: MockConfigEntry, snapshot: SnapshotAssertion
 ) -> None:
     """Tests the state attributes."""
     config_entry.add_to_hass(hass)
@@ -106,7 +106,7 @@ async def test_state_attributes(
 
 
 async def test_updates_from_signals(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Tests dispatched signals update player."""
     config_entry.add_to_hass(hass)
@@ -151,7 +151,7 @@ async def test_updates_from_signals(
 
 
 async def test_updates_from_connection_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     caplog: pytest.LogCaptureFixture,
@@ -194,7 +194,7 @@ async def test_updates_from_connection_event(
 
 
 async def test_updates_from_sources_updated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     freezer: FrozenDateTimeFactory,
@@ -220,7 +220,7 @@ async def test_updates_from_sources_updated(
 
 
 async def test_updates_from_players_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     change_data: PlayerUpdateResult,
@@ -244,7 +244,7 @@ async def test_updates_from_players_changed(
 
 
 async def test_updates_from_players_changed_new_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     config_entry: MockConfigEntry,
@@ -282,7 +282,7 @@ async def test_updates_from_players_changed_new_ids(
 
 
 async def test_updates_from_user_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     freezer: FrozenDateTimeFactory,
@@ -308,7 +308,7 @@ async def test_updates_from_user_changed(
 
 
 async def test_updates_from_groups_changed(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test player updates from changes to groups."""
     config_entry.add_to_hass(hass)
@@ -348,7 +348,7 @@ async def test_updates_from_groups_changed(
 
 
 async def test_clear_playlist(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the clear playlist service."""
     config_entry.add_to_hass(hass)
@@ -363,14 +363,14 @@ async def test_clear_playlist(
 
 
 async def test_clear_playlist_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test error raised when clear playlist fails."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.player_clear_queue.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError, match=re.escape("Unable to clear playlist: Failure (1)")
+        SmartHubError, match=re.escape("Unable to clear playlist: Failure (1)")
     ):
         await hass.services.async_call(
             MEDIA_PLAYER_DOMAIN,
@@ -382,7 +382,7 @@ async def test_clear_playlist_error(
 
 
 async def test_pause(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the pause service."""
     config_entry.add_to_hass(hass)
@@ -397,14 +397,14 @@ async def test_pause(
 
 
 async def test_pause_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the pause service raises error."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.player_set_play_state.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError, match=re.escape("Unable to pause: Failure (1)")
+        SmartHubError, match=re.escape("Unable to pause: Failure (1)")
     ):
         await hass.services.async_call(
             MEDIA_PLAYER_DOMAIN,
@@ -416,7 +416,7 @@ async def test_pause_error(
 
 
 async def test_play(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the play service."""
     config_entry.add_to_hass(hass)
@@ -431,14 +431,14 @@ async def test_play(
 
 
 async def test_play_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the play service raises error."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.player_set_play_state.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError, match=re.escape("Unable to play: Failure (1)")
+        SmartHubError, match=re.escape("Unable to play: Failure (1)")
     ):
         await hass.services.async_call(
             MEDIA_PLAYER_DOMAIN,
@@ -450,7 +450,7 @@ async def test_play_error(
 
 
 async def test_previous_track(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the previous track service."""
     config_entry.add_to_hass(hass)
@@ -465,14 +465,14 @@ async def test_previous_track(
 
 
 async def test_previous_track_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the previous track service raises error."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.player_play_previous.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to move to previous track: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -485,7 +485,7 @@ async def test_previous_track_error(
 
 
 async def test_next_track(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the next track service."""
     config_entry.add_to_hass(hass)
@@ -500,14 +500,14 @@ async def test_next_track(
 
 
 async def test_next_track_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the next track service raises error."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.player_play_next.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to move to next track: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -520,7 +520,7 @@ async def test_next_track_error(
 
 
 async def test_stop(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the stop service."""
     config_entry.add_to_hass(hass)
@@ -535,14 +535,14 @@ async def test_stop(
 
 
 async def test_stop_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the stop service raises error."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.player_set_play_state.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to stop: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -555,7 +555,7 @@ async def test_stop_error(
 
 
 async def test_volume_mute(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the volume mute service."""
     config_entry.add_to_hass(hass)
@@ -570,14 +570,14 @@ async def test_volume_mute(
 
 
 async def test_volume_mute_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the volume mute service raises error."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.player_set_mute.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to set mute: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -590,7 +590,7 @@ async def test_volume_mute_error(
 
 
 async def test_shuffle_set(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the shuffle set service."""
     config_entry.add_to_hass(hass)
@@ -606,7 +606,7 @@ async def test_shuffle_set(
 
 
 async def test_shuffle_set_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the shuffle set service raises error."""
     config_entry.add_to_hass(hass)
@@ -614,7 +614,7 @@ async def test_shuffle_set_error(
     player = controller.players[1]
     controller.player_set_play_mode.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to set shuffle: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -627,7 +627,7 @@ async def test_shuffle_set_error(
 
 
 async def test_repeat_set(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the repeat set service."""
     config_entry.add_to_hass(hass)
@@ -645,7 +645,7 @@ async def test_repeat_set(
 
 
 async def test_repeat_set_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the repeat set service raises error."""
     config_entry.add_to_hass(hass)
@@ -653,7 +653,7 @@ async def test_repeat_set_error(
     player = controller.players[1]
     controller.player_set_play_mode.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to set repeat: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -671,7 +671,7 @@ async def test_repeat_set_error(
 
 
 async def test_volume_set(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the volume set service."""
     config_entry.add_to_hass(hass)
@@ -686,14 +686,14 @@ async def test_volume_set(
 
 
 async def test_volume_set_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the volume set service raises error."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.player_set_volume.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to set volume level: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -706,7 +706,7 @@ async def test_volume_set_error(
 
 
 async def test_group_volume_set(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the group volume set service."""
     config_entry.add_to_hass(hass)
@@ -721,14 +721,14 @@ async def test_group_volume_set(
 
 
 async def test_group_volume_set_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the group volume set service errors."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.set_group_volume.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to set group volume level: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -741,7 +741,7 @@ async def test_group_volume_set_error(
 
 
 async def test_group_volume_set_not_grouped_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the group volume set service when not grouped raises error."""
     config_entry.add_to_hass(hass)
@@ -762,7 +762,7 @@ async def test_group_volume_set_not_grouped_error(
 
 
 async def test_group_volume_down(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the group volume down service."""
     config_entry.add_to_hass(hass)
@@ -777,7 +777,7 @@ async def test_group_volume_down(
 
 
 async def test_group_volume_up(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the group volume up service."""
     config_entry.add_to_hass(hass)
@@ -795,7 +795,7 @@ async def test_group_volume_up(
     "service", [SERVICE_GROUP_VOLUME_DOWN, SERVICE_GROUP_VOLUME_UP]
 )
 async def test_group_volume_down_up_ungrouped_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     service: str,
@@ -820,7 +820,7 @@ async def test_group_volume_down_up_ungrouped_raises(
 
 
 async def test_select_favorite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     favorites: dict[int, MediaItem],
@@ -851,7 +851,7 @@ async def test_select_favorite(
 
 
 async def test_select_radio_favorite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     favorites: dict[int, MediaItem],
@@ -883,7 +883,7 @@ async def test_select_radio_favorite(
 
 
 async def test_select_radio_favorite_command_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     favorites: dict[int, MediaItem],
@@ -895,7 +895,7 @@ async def test_select_radio_favorite_command_error(
     favorite = favorites[2]
     controller.play_preset_station.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to select source: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -918,7 +918,7 @@ async def test_select_radio_favorite_command_error(
     ],
 )
 async def test_select_input_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     input_sources: list[MediaItem],
@@ -961,7 +961,7 @@ async def test_select_input_source(
 
 
 async def test_select_input_unknown_raises(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Tests selecting an unknown input raises error."""
     config_entry.add_to_hass(hass)
@@ -979,7 +979,7 @@ async def test_select_input_unknown_raises(
 
 
 async def test_select_input_command_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     input_sources: list[MediaItem],
@@ -990,7 +990,7 @@ async def test_select_input_command_error(
     input_source = input_sources[0]
     controller.play_media.side_effect = CommandFailedError("", "Failure", 1)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to select source: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -1008,7 +1008,7 @@ async def test_select_input_command_error(
 
 
 async def test_unload_config_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test the player is set unavailable when the config entry is unloaded."""
     config_entry.add_to_hass(hass)
@@ -1021,7 +1021,7 @@ async def test_unload_config_entry(
 
 @pytest.mark.parametrize("media_type", [MediaType.URL, MediaType.MUSIC])
 async def test_play_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     media_type: MediaType,
@@ -1045,7 +1045,7 @@ async def test_play_media(
 
 @pytest.mark.parametrize("media_type", [MediaType.URL, MediaType.MUSIC])
 async def test_play_media_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     media_type: MediaType,
@@ -1056,7 +1056,7 @@ async def test_play_media_error(
     controller.play_url.side_effect = CommandFailedError("", "Failure", 1)
     url = "http://news/podcast.mp3"
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to play media: Failure (1)"),
     ):
         await hass.services.async_call(
@@ -1076,7 +1076,7 @@ async def test_play_media_error(
     ("content_id", "expected_index"), [("1", 1), ("Quick Select 2", 2)]
 )
 async def test_play_media_quick_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     content_id: str,
@@ -1099,13 +1099,13 @@ async def test_play_media_quick_select(
 
 
 async def test_play_media_quick_select_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the play media service with invalid quick_select raises."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to play media: Invalid quick select 'Invalid'"),
     ):
         await hass.services.async_call(
@@ -1130,7 +1130,7 @@ async def test_play_media_quick_select_error(
     ],
 )
 async def test_play_media_playlist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     playlists: list[MediaItem],
@@ -1158,13 +1158,13 @@ async def test_play_media_playlist(
 
 
 async def test_play_media_playlist_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the play media service with an invalid playlist name."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to play media: Invalid playlist 'Invalid'"),
     ):
         await hass.services.async_call(
@@ -1184,7 +1184,7 @@ async def test_play_media_playlist_error(
     ("content_id", "expected_index"), [("1", 1), ("Classical MPR (Classical Music)", 2)]
 )
 async def test_play_media_favorite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     content_id: str,
@@ -1207,13 +1207,13 @@ async def test_play_media_favorite(
 
 
 async def test_play_media_favorite_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the play media service with an invalid favorite raises."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to play media: Invalid favorite 'Invalid'"),
     ):
         await hass.services.async_call(
@@ -1230,13 +1230,13 @@ async def test_play_media_favorite_error(
 
 
 async def test_play_media_invalid_type(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test the play media service with an invalid type."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to play media: Unsupported media type 'Other'"),
     ):
         await hass.services.async_call(
@@ -1252,7 +1252,7 @@ async def test_play_media_invalid_type(
 
 
 async def test_play_media_media_uri(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     playlist: MediaItem,
@@ -1276,7 +1276,7 @@ async def test_play_media_media_uri(
 
 
 async def test_play_media_media_uri_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
 ) -> None:
@@ -1286,7 +1286,7 @@ async def test_play_media_media_uri_invalid(
     media_id = "heos://media/1/music_service?name=Pandora&available=False&image_url="
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape(f"Unable to play media: Invalid media id '{media_id}'"),
     ):
         await hass.services.async_call(
@@ -1303,7 +1303,7 @@ async def test_play_media_media_uri_invalid(
 
 
 async def test_play_media_music_source_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
 ) -> None:
@@ -1326,7 +1326,7 @@ async def test_play_media_music_source_url(
 
 
 async def test_play_media_queue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
 ) -> None:
@@ -1348,13 +1348,13 @@ async def test_play_media_queue(
 
 
 async def test_play_media_queue_invalid(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the play media service with an invalid queue id."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to play media: Invalid queue id 'Invalid'"),
     ):
         await hass.services.async_call(
@@ -1371,7 +1371,7 @@ async def test_play_media_queue_invalid(
 
 
 async def test_browse_media_root(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     music_sources: dict[int, MediaMusicSource],
@@ -1399,7 +1399,7 @@ async def test_browse_media_root(
 
 
 async def test_browse_media_root_no_media_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     music_sources: dict[int, MediaMusicSource],
@@ -1425,7 +1425,7 @@ async def test_browse_media_root_no_media_source(
 
 
 async def test_browse_media_root_source_error_continues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     hass_ws_client: WebSocketGenerator,
@@ -1452,7 +1452,7 @@ async def test_browse_media_root_source_error_continues(
 
 
 async def test_browse_media_heos_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     hass_ws_client: WebSocketGenerator,
@@ -1480,7 +1480,7 @@ async def test_browse_media_heos_media(
 
 
 async def test_browse_media_heos_media_error_returns_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     hass_ws_client: WebSocketGenerator,
@@ -1509,7 +1509,7 @@ async def test_browse_media_heos_media_error_returns_empty(
 
 
 async def test_browse_media_media_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
     snapshot: SnapshotAssertion,
@@ -1535,7 +1535,7 @@ async def test_browse_media_media_source(
 
 
 async def test_browse_media_invalid_content_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -1566,7 +1566,7 @@ async def test_browse_media_invalid_content_id(
     ],
 )
 async def test_media_player_join_group(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     members: list[str],
@@ -1588,14 +1588,14 @@ async def test_media_player_join_group(
 
 
 async def test_media_player_join_group_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test grouping of media players through the join service raises error."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.set_group.side_effect = HeosError("error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to join players: error"),
     ):
         await hass.services.async_call(
@@ -1610,7 +1610,7 @@ async def test_media_player_join_group_error(
 
 
 async def test_media_player_group_members(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     caplog: pytest.LogCaptureFixture,
@@ -1629,7 +1629,7 @@ async def test_media_player_group_members(
 
 
 async def test_media_player_group_members_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     caplog: pytest.LogCaptureFixture,
@@ -1650,7 +1650,7 @@ async def test_media_player_group_members_error(
     [("media_player.test_player", [1]), ("media_player.test_player_2", [1])],
 )
 async def test_media_player_unjoin_group(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     entity_id: str,
@@ -1671,14 +1671,14 @@ async def test_media_player_unjoin_group(
 
 
 async def test_media_player_unjoin_group_error(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test ungrouping of media players through the unjoin service error raises."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.set_group.side_effect = HeosError("error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to unjoin player: error"),
     ):
         await hass.services.async_call(
@@ -1692,7 +1692,7 @@ async def test_media_player_unjoin_group_error(
 
 
 async def test_media_player_group_fails_when_entity_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     entity_registry: er.EntityRegistry,
@@ -1719,7 +1719,7 @@ async def test_media_player_group_fails_when_entity_removed(
 
 
 async def test_media_player_group_fails_wrong_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     entity_registry: er.EntityRegistry,
@@ -1750,7 +1750,7 @@ async def test_media_player_group_fails_wrong_integration(
 
 
 async def test_get_queue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     controller: MockHeos,
     queue: list[QueueItem],
@@ -1774,7 +1774,7 @@ async def test_get_queue(
 
 
 async def test_remove_from_queue(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the get queue service."""
     config_entry.add_to_hass(hass)
@@ -1789,7 +1789,7 @@ async def test_remove_from_queue(
 
 
 async def test_move_queue_item_queue(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test the move queue service."""
     config_entry.add_to_hass(hass)
@@ -1808,14 +1808,14 @@ async def test_move_queue_item_queue(
 
 
 async def test_move_queue_item_queue_error_raises(
-    hass: HomeAssistant, config_entry: MockConfigEntry, controller: MockHeos
+    hass: SmartHub, config_entry: MockConfigEntry, controller: MockHeos
 ) -> None:
     """Test move queue raises error when failed."""
     config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(config_entry.entry_id)
     controller.player_move_queue_item.side_effect = HeosError("error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=re.escape("Unable to move queue item: error"),
     ):
         await hass.services.async_call(

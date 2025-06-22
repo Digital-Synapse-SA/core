@@ -9,11 +9,11 @@ import pytest
 from ring_doorbell import Ring
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ring.binary_sensor import RingEvent
-from homeassistant.components.ring.coordinator import RingEventListener
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.ring.binary_sensor import RingEvent
+from smarthub.components.ring.coordinator import RingEventListener
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import MockConfigEntry, setup_platform
 from .device_mocks import FRONT_DOOR_DEVICE_ID, INGRESS_DEVICE_ID
@@ -22,7 +22,7 @@ from tests.common import snapshot_platform
 
 
 async def test_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Mock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -60,7 +60,7 @@ async def test_states(
     ],
 )
 async def test_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_ring_client: Ring,
     mock_ring_event_listener_class: RingEventListener,
     freezer: FrozenDateTimeFactory,

@@ -7,14 +7,14 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -24,7 +24,7 @@ SCAN_INTERVAL = datetime.timedelta(seconds=30)
 
 
 async def test_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_apsystems: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -60,9 +60,9 @@ async def test_number(
 
 
 @pytest.mark.usefixtures("mock_apsystems")
-@patch("homeassistant.components.apsystems.PLATFORMS", [Platform.NUMBER])
+@patch("smarthub.components.apsystems.PLATFORMS", [Platform.NUMBER])
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,

@@ -8,17 +8,17 @@ from unittest.mock import AsyncMock, Mock, patch
 from loqedAPI import loqed
 import pytest
 
-from homeassistant.components.loqed import DOMAIN
-from homeassistant.components.loqed.const import CONF_CLOUDHOOK_URL
-from homeassistant.const import CONF_API_TOKEN, CONF_NAME, CONF_WEBHOOK_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.loqed import DOMAIN
+from smarthub.components.loqed.const import CONF_CLOUDHOOK_URL
+from smarthub.const import CONF_API_TOKEN, CONF_NAME, CONF_WEBHOOK_ID
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_load_fixture
 
 
 @pytest.fixture(name="config_entry")
-async def config_entry_fixture(hass: HomeAssistant) -> MockConfigEntry:
+async def config_entry_fixture(hass: SmartHub) -> MockConfigEntry:
     """Mock config entry."""
 
     config = await async_load_fixture(hass, "integration_config.json", DOMAIN)
@@ -41,7 +41,7 @@ async def config_entry_fixture(hass: HomeAssistant) -> MockConfigEntry:
 
 
 @pytest.fixture(name="cloud_config_entry")
-async def cloud_config_entry_fixture(hass: HomeAssistant) -> MockConfigEntry:
+async def cloud_config_entry_fixture(hass: SmartHub) -> MockConfigEntry:
     """Mock config entry."""
 
     config = await async_load_fixture(hass, "integration_config.json", DOMAIN)
@@ -68,7 +68,7 @@ async def cloud_config_entry_fixture(hass: HomeAssistant) -> MockConfigEntry:
 
 
 @pytest.fixture(name="lock")
-async def lock_fixture(hass: HomeAssistant) -> loqed.Lock:
+async def lock_fixture(hass: SmartHub) -> loqed.Lock:
     """Set up a mock implementation of a Lock."""
     webhooks_fixture = json.loads(
         await async_load_fixture(hass, "get_all_webhooks.json", DOMAIN)
@@ -84,7 +84,7 @@ async def lock_fixture(hass: HomeAssistant) -> loqed.Lock:
 
 @pytest.fixture(name="integration")
 async def integration_fixture(
-    hass: HomeAssistant, config_entry: MockConfigEntry, lock: loqed.Lock
+    hass: SmartHub, config_entry: MockConfigEntry, lock: loqed.Lock
 ) -> AsyncGenerator[MockConfigEntry]:
     """Set up the loqed integration with a config entry."""
     config: dict[str, Any] = {DOMAIN: {CONF_API_TOKEN: ""}}

@@ -7,16 +7,16 @@ from unittest.mock import Mock
 
 from uiprotect.data import Camera, Event, EventType, ModelType
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.components.unifiprotect.binary_sensor import EVENT_SENSORS
-from homeassistant.components.unifiprotect.const import (
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.components.unifiprotect.binary_sensor import EVENT_SENSORS
+from smarthub.components.unifiprotect.const import (
     ATTR_EVENT_ID,
     ATTR_EVENT_SCORE,
     DEFAULT_ATTRIBUTION,
 )
-from homeassistant.const import ATTR_ATTRIBUTION, ATTR_FRIENDLY_NAME, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ATTRIBUTION, ATTR_FRIENDLY_NAME, STATE_ON, Platform
+from smarthub.core import SmartHub
 
 from .utils import MockUFPFixture, ids_from_device_description, init_entry
 
@@ -25,7 +25,7 @@ from tests.components.recorder.common import async_wait_recording_done
 
 async def test_exclude_attributes(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,

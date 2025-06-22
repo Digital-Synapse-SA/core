@@ -5,16 +5,16 @@ from unittest.mock import patch
 from homematicip.base.enums import LockState as HomematicLockState, MotorState
 import pytest
 
-from homeassistant.components.lock import LockEntityFeature, LockState
-from homeassistant.const import ATTR_SUPPORTED_FEATURES
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.lock import LockEntityFeature, LockState
+from smarthub.const import ATTR_SUPPORTED_FEATURES
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .helper import HomeFactory, async_manipulate_test_data, get_and_check_entity_basics
 
 
 async def test_hmip_doorlockdrive(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipDoorLockDrive."""
     entity_id = "lock.haustuer"
@@ -72,7 +72,7 @@ async def test_hmip_doorlockdrive(
 
 
 async def test_hmip_doorlockdrive_handle_errors(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipDoorLockDrive."""
     entity_id = "lock.haustuer"
@@ -93,7 +93,7 @@ async def test_hmip_doorlockdrive_handle_errors(
             hass, mock_hap, entity_id, entity_name, device_model
         )
 
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 "lock",
                 "open",
@@ -101,7 +101,7 @@ async def test_hmip_doorlockdrive_handle_errors(
                 blocking=True,
             )
 
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 "lock",
                 "lock",
@@ -109,7 +109,7 @@ async def test_hmip_doorlockdrive_handle_errors(
                 blocking=True,
             )
 
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 "lock",
                 "unlock",

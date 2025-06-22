@@ -9,8 +9,8 @@ from letpot.exceptions import (
 )
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.freeze_time("2025-01-31 00:00:00")
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
     mock_device_client: MagicMock,
@@ -42,7 +42,7 @@ async def test_load_unload_config_entry(
 
 @pytest.mark.freeze_time("2025-02-15 00:00:00")
 async def test_refresh_authentication_on_load(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
     mock_device_client: MagicMock,
@@ -61,7 +61,7 @@ async def test_refresh_authentication_on_load(
 
 @pytest.mark.freeze_time("2025-03-01 00:00:00")
 async def test_refresh_token_error_aborts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
 ) -> None:
@@ -83,7 +83,7 @@ async def test_refresh_token_error_aborts(
     ],
 )
 async def test_get_devices_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
     mock_device_client: MagicMock,
@@ -101,7 +101,7 @@ async def test_get_devices_exceptions(
 
 
 async def test_device_subscribe_authentication_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
     mock_device_client: MagicMock,
@@ -117,7 +117,7 @@ async def test_device_subscribe_authentication_exception(
 
 
 async def test_device_refresh_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: MagicMock,
     mock_device_client: MagicMock,

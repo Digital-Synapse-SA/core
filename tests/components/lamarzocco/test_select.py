@@ -12,15 +12,15 @@ from pylamarzocco.exceptions import RequestNotSuccessful
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 pytest.mark.usefixtures("init_integration")
 
@@ -28,7 +28,7 @@ pytest.mark.usefixtures("init_integration")
 @pytest.mark.usefixtures("init_integration")
 @pytest.mark.parametrize("device_fixture", [ModelName.LINEA_MICRA])
 async def test_steam_boiler_level(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_lamarzocco: MagicMock,
     snapshot: SnapshotAssertion,
@@ -67,7 +67,7 @@ async def test_steam_boiler_level(
     [ModelName.GS3_AV, ModelName.GS3_MP, ModelName.LINEA_MINI],
 )
 async def test_steam_boiler_level_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
 ) -> None:
     """Ensure the La Marzocco Steam Level Select is not created for non-Micra models."""
@@ -83,7 +83,7 @@ async def test_steam_boiler_level_none(
     [ModelName.LINEA_MICRA, ModelName.GS3_AV, ModelName.LINEA_MINI],
 )
 async def test_pre_brew_infusion_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_lamarzocco: MagicMock,
     snapshot: SnapshotAssertion,
@@ -123,7 +123,7 @@ async def test_pre_brew_infusion_select(
     [ModelName.GS3_MP],
 )
 async def test_pre_brew_infusion_select_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
 ) -> None:
     """Ensure GS3 MP has no prebrew models."""
@@ -135,7 +135,7 @@ async def test_pre_brew_infusion_select_none(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_smart_standby_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_lamarzocco: MagicMock,
     snapshot: SnapshotAssertion,
@@ -170,7 +170,7 @@ async def test_smart_standby_mode(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_select_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
 ) -> None:
     """Test select errors."""
@@ -182,7 +182,7 @@ async def test_select_errors(
     mock_lamarzocco.set_pre_extraction_mode.side_effect = RequestNotSuccessful("Boom")
 
     # Test setting invalid option
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,

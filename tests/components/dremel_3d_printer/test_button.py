@@ -4,12 +4,12 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.dremel_3d_printer.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.dremel_3d_printer.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry
 )
 @pytest.mark.usefixtures("connection", "entity_registry_enabled_by_default")
 async def test_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     button: str,
     function: str,
@@ -33,7 +33,7 @@ async def test_buttons(
     await hass.config_entries.async_setup(config_entry.entry_id)
     assert await async_setup_component(hass, DOMAIN, {})
     with patch(
-        f"homeassistant.components.dremel_3d_printer.Dremel3DPrinter.{function}_print"
+        f"smarthub.components.dremel_3d_printer.Dremel3DPrinter.{function}_print"
     ) as mock:
         await hass.services.async_call(
             BUTTON_DOMAIN,
@@ -45,10 +45,10 @@ async def test_buttons(
 
     with (
         patch(
-            f"homeassistant.components.dremel_3d_printer.Dremel3DPrinter.{function}_print",
+            f"smarthub.components.dremel_3d_printer.Dremel3DPrinter.{function}_print",
             side_effect=RuntimeError,
         ) as mock,
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             BUTTON_DOMAIN,

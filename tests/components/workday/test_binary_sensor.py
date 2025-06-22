@@ -1,4 +1,4 @@
-"""Tests the Home Assistant workday binary sensor."""
+"""Tests the SmartHub workday binary sensor."""
 
 from datetime import date, datetime, timedelta, timezone
 from typing import Any
@@ -7,19 +7,19 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.workday.binary_sensor import SERVICE_CHECK_DATE
-from homeassistant.components.workday.const import (
+from smarthub.components.workday.binary_sensor import SERVICE_CHECK_DATE
+from smarthub.components.workday.const import (
     DEFAULT_EXCLUDES,
     DEFAULT_NAME,
     DEFAULT_OFFSET,
     DEFAULT_WORKDAYS,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.dt import UTC
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.dt import UTC
 
 from . import (
     TEST_CONFIG_ADD_REMOVE_DATE_RANGE,
@@ -72,7 +72,7 @@ from tests.common import async_fire_time_changed
     ],
 )
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     expected_state: str,
     expected_state_weekend: str,
@@ -102,7 +102,7 @@ async def test_setup(
     assert state.state == expected_state_weekend
 
 
-async def test_setup_with_invalid_province_from_yaml(hass: HomeAssistant) -> None:
+async def test_setup_with_invalid_province_from_yaml(hass: SmartHub) -> None:
     """Test setup invalid province with import."""
     await async_setup_component(
         hass,
@@ -122,7 +122,7 @@ async def test_setup_with_invalid_province_from_yaml(hass: HomeAssistant) -> Non
 
 
 async def test_setup_with_working_holiday(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test setup from various configs."""
@@ -142,7 +142,7 @@ async def test_setup_with_working_holiday(
     ],
 )
 async def test_setup_add_holiday(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_setup_add_holiday(
     "time_zone", ["Asia/Tokyo", "Europe/Berlin", "America/Chicago", "US/Hawaii"]
 )
 async def test_setup_no_country_weekend(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     time_zone: str,
 ) -> None:
@@ -186,7 +186,7 @@ async def test_setup_no_country_weekend(
     "time_zone", ["Asia/Tokyo", "Europe/Berlin", "America/Chicago", "US/Hawaii"]
 )
 async def test_setup_no_country_weekday(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     time_zone: str,
 ) -> None:
@@ -210,7 +210,7 @@ async def test_setup_no_country_weekday(
 
 
 async def test_setup_remove_holiday(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test setup from various configs."""
@@ -223,7 +223,7 @@ async def test_setup_remove_holiday(
 
 
 async def test_setup_remove_holiday_named(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test setup from various configs."""
@@ -236,7 +236,7 @@ async def test_setup_remove_holiday_named(
 
 
 async def test_setup_day_after_tomorrow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test setup from various configs."""
@@ -249,7 +249,7 @@ async def test_setup_day_after_tomorrow(
 
 
 async def test_setup_faulty_country(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -264,7 +264,7 @@ async def test_setup_faulty_country(
 
 
 async def test_setup_faulty_province(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -279,7 +279,7 @@ async def test_setup_faulty_province(
 
 
 async def test_setup_incorrect_add_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -297,7 +297,7 @@ async def test_setup_incorrect_add_remove(
 
 
 async def test_setup_incorrect_add_holiday_ranges(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -315,7 +315,7 @@ async def test_setup_incorrect_add_holiday_ranges(
 
 
 async def test_setup_incorrect_remove_holiday_ranges(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -333,7 +333,7 @@ async def test_setup_incorrect_remove_holiday_ranges(
 
 
 async def test_setup_date_range(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test setup with date range."""
@@ -347,7 +347,7 @@ async def test_setup_date_range(
 
 
 async def test_check_date_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test check date service with response data."""
@@ -395,7 +395,7 @@ async def test_check_date_service(
 
 
 async def test_language_difference_english_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test handling difference in English language naming."""
@@ -404,7 +404,7 @@ async def test_language_difference_english_language(
 
 
 async def test_language_difference_no_change_other_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test skipping if no difference in language naming."""
@@ -417,7 +417,7 @@ async def test_language_difference_no_change_other_language(
     [(TEST_OPTIONAL_CATEGORY, "off"), (TEST_NO_OPTIONAL_CATEGORY, "on")],
 )
 async def test_optional_category(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, Any],
     end_state: str,
     freezer: FrozenDateTimeFactory,
@@ -433,7 +433,7 @@ async def test_optional_category(
 
 
 async def test_only_repairs_for_current_next_year(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     issue_registry: ir.IssueRegistry,
     snapshot: SnapshotAssertion,
@@ -464,7 +464,7 @@ async def test_only_repairs_for_current_next_year(
 
 
 async def test_missing_language(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test when language exist but is empty."""
@@ -487,7 +487,7 @@ async def test_missing_language(
 
 
 async def test_incorrect_english_variant(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test when language exist but is empty."""

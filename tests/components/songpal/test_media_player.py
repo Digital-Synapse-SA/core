@@ -15,17 +15,17 @@ from songpal import (
 )
 from songpal.notification import SettingChange
 
-from homeassistant.components import media_player, songpal
-from homeassistant.components.media_player import MediaPlayerEntityFeature
-from homeassistant.components.songpal.const import (
+from smarthub.components import media_player, songpal
+from smarthub.components.media_player import MediaPlayerEntityFeature
+from smarthub.components.songpal.const import (
     ERROR_REQUEST_RETRY,
     SET_SOUND_SETTING,
 )
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from . import (
     CONF_DATA,
@@ -55,12 +55,12 @@ SUPPORT_SONGPAL = (
 )
 
 
-def _get_attributes(hass: HomeAssistant) -> dict[str, Any]:
+def _get_attributes(hass: SmartHub) -> dict[str, Any]:
     state = hass.states.get(ENTITY_ID)
     return state.as_dict()["attributes"]
 
 
-async def _call(hass: HomeAssistant, service: str, **argv: Any) -> None:
+async def _call(hass: SmartHub, service: str, **argv: Any) -> None:
     await hass.services.async_call(
         media_player.DOMAIN,
         service,
@@ -69,7 +69,7 @@ async def _call(hass: HomeAssistant, service: str, **argv: Any) -> None:
     )
 
 
-async def test_setup_platform(hass: HomeAssistant) -> None:
+async def test_setup_platform(hass: SmartHub) -> None:
     """Test the legacy setup platform."""
     mocked_device = _create_mocked_device(throw_exception=True)
     with _patch_media_player_device(mocked_device):
@@ -95,7 +95,7 @@ async def test_setup_platform(hass: HomeAssistant) -> None:
 
 
 async def test_setup_failed(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test failed to set up the entity."""
     mocked_device = _create_mocked_device(throw_exception=True)
@@ -124,7 +124,7 @@ async def test_setup_failed(
 
 
 async def test_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -161,7 +161,7 @@ async def test_state(
 
 
 async def test_state_nosoundmode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -198,7 +198,7 @@ async def test_state_nosoundmode(
 
 
 async def test_state_wireless(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -237,7 +237,7 @@ async def test_state_wireless(
 
 
 async def test_state_both(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -277,7 +277,7 @@ async def test_state_both(
     assert entity.unique_id == MAC
 
 
-async def test_services(hass: HomeAssistant) -> None:
+async def test_services(hass: SmartHub) -> None:
     """Test services."""
     mocked_device = _create_mocked_device()
     entry = MockConfigEntry(domain=songpal.DOMAIN, data=CONF_DATA)
@@ -359,7 +359,7 @@ async def test_services(hass: HomeAssistant) -> None:
     mocked_device.set_sound_settings.assert_called_with("soundField", "sound_mode1")
 
 
-async def test_websocket_events(hass: HomeAssistant) -> None:
+async def test_websocket_events(hass: SmartHub) -> None:
     """Test websocket events."""
     mocked_device = _create_mocked_device()
     entry = MockConfigEntry(domain=songpal.DOMAIN, data=CONF_DATA)
@@ -407,7 +407,7 @@ async def test_websocket_events(hass: HomeAssistant) -> None:
 
 
 async def test_disconnected(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test disconnected behavior."""
     mocked_device = _create_mocked_device()
@@ -428,7 +428,7 @@ async def test_disconnected(
         side_effect=[SongpalException(""), SongpalException(""), _assert_state]
     )
     notification_callbacks = mocked_device.notification_callbacks
-    with patch("homeassistant.components.songpal.media_player.INITIAL_RETRY_DELAY", 0):
+    with patch("smarthub.components.songpal.media_player.INITIAL_RETRY_DELAY", 0):
         await notification_callbacks[ConnectChange](connect_change)
     warning_records = [x for x in caplog.records if x.levelno == logging.WARNING]
     assert len(warning_records) == 2
@@ -444,7 +444,7 @@ async def test_disconnected(
     ("error_code", "swallow"), [(ERROR_REQUEST_RETRY, True), (1234, False)]
 )
 async def test_error_swallowing(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, service, error_code, swallow
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, service, error_code, swallow
 ) -> None:
     """Test swallowing specific errors on turn_on and turn_off."""
     mocked_device = _create_mocked_device()

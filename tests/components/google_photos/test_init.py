@@ -7,9 +7,9 @@ from aiohttp import ClientError
 from google_photos_library_api.exceptions import GooglePhotosApiError
 import pytest
 
-from homeassistant.components.google_photos.const import OAUTH2_TOKEN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.google_photos.const import OAUTH2_TOKEN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -17,7 +17,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 @pytest.mark.usefixtures("setup_integration")
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test successful setup and unload."""
@@ -66,7 +66,7 @@ def mock_refresh_token(
 @pytest.mark.usefixtures("refresh_token", "setup_integration")
 @pytest.mark.parametrize("expires_at", [time.time() - 3600], ids=["expired"])
 async def test_expired_token_refresh_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test expired token is refreshed."""
@@ -101,7 +101,7 @@ async def test_expired_token_refresh_success(
     ids=["unauthorized", "internal_server_error", "client_error"],
 )
 async def test_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     expected_state: ConfigEntryState,
 ) -> None:
@@ -113,7 +113,7 @@ async def test_expired_token_refresh_failure(
 @pytest.mark.usefixtures("setup_integration")
 @pytest.mark.parametrize("api_error", [GooglePhotosApiError("some error")])
 async def test_coordinator_init_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test init failure to load albums."""

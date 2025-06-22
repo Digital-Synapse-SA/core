@@ -5,40 +5,40 @@ from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.core import Context, HomeAssistant, ServiceCall, callback
-from homeassistant.helpers.trigger import (
+from smarthub.core import Context, SmartHub, ServiceCall, callback
+from smarthub.helpers.trigger import (
     DATA_PLUGGABLE_ACTIONS,
     PluggableAction,
     _async_get_trigger_platform,
     async_initialize_triggers,
     async_validate_trigger_config,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 
-async def test_bad_trigger_platform(hass: HomeAssistant) -> None:
+async def test_bad_trigger_platform(hass: SmartHub) -> None:
     """Test bad trigger platform."""
     with pytest.raises(vol.Invalid) as ex:
         await async_validate_trigger_config(hass, [{"platform": "not_a_platform"}])
     assert "Invalid trigger 'not_a_platform' specified" in str(ex)
 
 
-async def test_trigger_subtype(hass: HomeAssistant) -> None:
+async def test_trigger_subtype(hass: SmartHub) -> None:
     """Test trigger subtypes."""
     with patch(
-        "homeassistant.helpers.trigger.async_get_integration",
+        "smarthub.helpers.trigger.async_get_integration",
         return_value=MagicMock(async_get_platform=AsyncMock()),
     ) as integration_mock:
         await _async_get_trigger_platform(hass, {"platform": "test.subtype"})
         assert integration_mock.call_args == call(hass, "test")
 
 
-async def test_trigger_variables(hass: HomeAssistant) -> None:
+async def test_trigger_variables(hass: SmartHub) -> None:
     """Test trigger variables."""
 
 
 async def test_if_fires_on_event(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test the firing of events."""
     assert await async_setup_component(
@@ -69,7 +69,7 @@ async def test_if_fires_on_event(
 
 
 async def test_if_disabled_trigger_not_firing(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test disabled triggers don't fire."""
     assert await async_setup_component(
@@ -105,7 +105,7 @@ async def test_if_disabled_trigger_not_firing(
 
 
 async def test_trigger_enabled_templates(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test triggers enabled by template."""
     assert await async_setup_component(
@@ -160,7 +160,7 @@ async def test_trigger_enabled_templates(
 
 
 async def test_nested_trigger_list(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test triggers within nested list."""
 
@@ -224,7 +224,7 @@ async def test_nested_trigger_list(
 
 
 async def test_trigger_enabled_template_limited(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -255,7 +255,7 @@ async def test_trigger_enabled_template_limited(
 
 
 async def test_trigger_alias(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -291,7 +291,7 @@ async def test_trigger_alias(
 
 
 async def test_async_initialize_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -352,7 +352,7 @@ async def test_async_initialize_triggers(
 
 
 async def test_pluggable_action(
-    hass: HomeAssistant, service_calls: list[ServiceCall]
+    hass: SmartHub, service_calls: list[ServiceCall]
 ) -> None:
     """Test normal behavior of pluggable actions."""
     update_1 = MagicMock()

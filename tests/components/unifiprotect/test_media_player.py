@@ -8,12 +8,12 @@ import pytest
 from uiprotect.data import Camera
 from uiprotect.exceptions import StreamError
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_MEDIA_CONTENT_TYPE,
     ATTR_MEDIA_VOLUME_LEVEL,
 )
-from homeassistant.components.unifiprotect.const import DEFAULT_ATTRIBUTION
-from homeassistant.const import (
+from smarthub.components.unifiprotect.const import DEFAULT_ATTRIBUTION
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
@@ -21,9 +21,9 @@ from homeassistant.const import (
     STATE_PLAYING,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from .utils import (
     MockUFPFixture,
@@ -35,7 +35,7 @@ from .utils import (
 
 
 async def test_media_player_camera_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera
 ) -> None:
     """Test removing and re-adding a light device."""
 
@@ -48,7 +48,7 @@ async def test_media_player_camera_remove(
 
 
 async def test_media_player_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -78,7 +78,7 @@ async def test_media_player_setup(
 
 
 async def test_media_player_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -106,7 +106,7 @@ async def test_media_player_update(
 
 
 async def test_media_player_set_volume(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -130,7 +130,7 @@ async def test_media_player_set_volume(
 
 
 async def test_media_player_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -163,7 +163,7 @@ async def test_media_player_stop(
 
 
 async def test_media_player_play(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -200,7 +200,7 @@ async def test_media_player_play(
 
 
 async def test_media_player_play_media_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -220,7 +220,7 @@ async def test_media_player_play_media_source(
     doorbell.wait_until_audio_completes = AsyncMock()
 
     with patch(
-        "homeassistant.components.media_source.async_resolve_media",
+        "smarthub.components.media_source.async_resolve_media",
         return_value=Mock(url="http://example.com/test.mp3"),
     ):
         await hass.services.async_call(
@@ -241,7 +241,7 @@ async def test_media_player_play_media_source(
 
 
 async def test_media_player_play_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -254,7 +254,7 @@ async def test_media_player_play_invalid(
     doorbell.__pydantic_fields__["play_audio"] = Mock(final=False, frozen=False)
     doorbell.play_audio = AsyncMock()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "media_player",
             "play_media",
@@ -270,7 +270,7 @@ async def test_media_player_play_invalid(
 
 
 async def test_media_player_play_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -287,7 +287,7 @@ async def test_media_player_play_error(
     doorbell.play_audio = AsyncMock(side_effect=StreamError)
     doorbell.wait_until_audio_completes = AsyncMock()
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "media_player",
             "play_media",

@@ -5,14 +5,14 @@ from collections.abc import Callable
 from typing import Any
 from unittest.mock import patch
 
-from homeassistant.components.lutron_caseta import DOMAIN
-from homeassistant.components.lutron_caseta.const import (
+from smarthub.components.lutron_caseta import DOMAIN
+from smarthub.components.lutron_caseta.const import (
     CONF_CA_CERTS,
     CONF_CERTFILE,
     CONF_KEYFILE,
 )
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -320,7 +320,7 @@ def make_mock_entry() -> MockConfigEntry:
 
 
 async def async_setup_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge: MockBridge,
     config_entry_id: str | None = None,
     can_connect: bool = True,
@@ -346,7 +346,7 @@ async def async_setup_integration(
         )
 
     with patch(
-        "homeassistant.components.lutron_caseta.Smartbridge.create_tls",
+        "smarthub.components.lutron_caseta.Smartbridge.create_tls",
         create_tls_factory,
     ):
         await hass.config_entries.async_setup(config_entry_id)

@@ -7,9 +7,9 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from wled import Device as WLEDDevice, WLEDConnectionError, WLEDError
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.wled.const import DOMAIN, SCAN_INTERVAL
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.components.wled.const import DOMAIN, SCAN_INTERVAL
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -17,9 +17,9 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import async_fire_time_changed, async_load_json_object_fixture
 
@@ -56,7 +56,7 @@ pytestmark = pytest.mark.usefixtures("init_integration")
     ],
 )
 async def test_switch_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -102,7 +102,7 @@ async def test_switch_state(
 
     # Test invalid response, not becoming unavailable
     method_mock.side_effect = WLEDError
-    with pytest.raises(HomeAssistantError, match="Invalid response from WLED API"):
+    with pytest.raises(SmartHubError, match="Invalid response from WLED API"):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -116,7 +116,7 @@ async def test_switch_state(
 
     # Test connection error, leading to becoming unavailable
     method_mock.side_effect = WLEDConnectionError
-    with pytest.raises(HomeAssistantError, match="Error communicating with WLED API"):
+    with pytest.raises(SmartHubError, match="Error communicating with WLED API"):
         await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
@@ -131,7 +131,7 @@ async def test_switch_state(
 
 @pytest.mark.parametrize("device_fixture", ["rgb_single_segment"])
 async def test_switch_dynamically_handle_segments(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_wled: MagicMock,
 ) -> None:

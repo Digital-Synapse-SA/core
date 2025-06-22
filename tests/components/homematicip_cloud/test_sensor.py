@@ -2,7 +2,7 @@
 
 from homematicip.base.enums import ValveState
 
-from homeassistant.components.homematicip_cloud.entity import (
+from smarthub.components.homematicip_cloud.entity import (
     ATTR_CONFIG_PENDING,
     ATTR_DEVICE_OVERHEATED,
     ATTR_DEVICE_OVERLOADED,
@@ -11,8 +11,8 @@ from homeassistant.components.homematicip_cloud.entity import (
     ATTR_RSSI_DEVICE,
     ATTR_RSSI_PEER,
 )
-from homeassistant.components.homematicip_cloud.hap import HomematicipHAP
-from homeassistant.components.homematicip_cloud.sensor import (
+from smarthub.components.homematicip_cloud.hap import HomematicipHAP
+from smarthub.components.homematicip_cloud.sensor import (
     ATTR_CURRENT_ILLUMINATION,
     ATTR_HIGHEST_ILLUMINATION,
     ATTR_LEFT_COUNTER,
@@ -22,8 +22,8 @@ from homeassistant.components.homematicip_cloud.sensor import (
     ATTR_WIND_DIRECTION,
     ATTR_WIND_DIRECTION_VARIATION,
 )
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
-from homeassistant.const import (
+from smarthub.components.sensor import ATTR_STATE_CLASS, SensorStateClass
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     LIGHT_LUX,
     PERCENTAGE,
@@ -33,13 +33,13 @@ from homeassistant.const import (
     UnitOfSpeed,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .helper import HomeFactory, async_manipulate_test_data, get_and_check_entity_basics
 
 
 async def test_hmip_accesspoint_status(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipSwitch."""
     entity_id = "sensor.home_control_access_point_duty_cycle"
@@ -58,7 +58,7 @@ async def test_hmip_accesspoint_status(
 
 
 async def test_hmip_heating_thermostat(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipHeatingThermostat."""
     entity_id = "sensor.heizkorperthermostat_heating"
@@ -94,7 +94,7 @@ async def test_hmip_heating_thermostat(
 
 
 async def test_hmip_humidity_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipHumiditySensor."""
     entity_id = "sensor.bwth_1_humidity"
@@ -119,7 +119,7 @@ async def test_hmip_humidity_sensor(
 
 
 async def test_hmip_temperature_sensor1(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipTemperatureSensor."""
     entity_id = "sensor.bwth_1_temperature"
@@ -146,7 +146,7 @@ async def test_hmip_temperature_sensor1(
 
 
 async def test_hmip_temperature_sensor2(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipTemperatureSensor."""
     entity_id = "sensor.heizkorperthermostat_temperature"
@@ -173,7 +173,7 @@ async def test_hmip_temperature_sensor2(
 
 
 async def test_hmip_temperature_sensor3(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipTemperatureSensor."""
     entity_id = "sensor.raumbediengerat_analog_temperature"
@@ -200,7 +200,7 @@ async def test_hmip_temperature_sensor3(
 
 
 async def test_hmip_thermostat_evo_heating(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipHeatingThermostat for HmIP-eTRV-E."""
     entity_id = "sensor.thermostat_evo_heating"
@@ -222,7 +222,7 @@ async def test_hmip_thermostat_evo_heating(
 
 
 async def test_hmip_thermostat_evo_temperature(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipTemperatureSensor."""
     entity_id = "sensor.thermostat_evo_temperature"
@@ -248,7 +248,7 @@ async def test_hmip_thermostat_evo_temperature(
 
 
 async def test_hmip_power_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipPowerSensor."""
     entity_id = "sensor.flur_oben_power"
@@ -287,7 +287,7 @@ async def test_hmip_power_sensor(
 
 
 async def test_hmip_illuminance_sensor1(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipIlluminanceSensor."""
     entity_id = "sensor.wettersensor_illuminance"
@@ -309,7 +309,7 @@ async def test_hmip_illuminance_sensor1(
 
 
 async def test_hmip_illuminance_sensor2(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipIlluminanceSensor."""
     entity_id = "sensor.lichtsensor_nord_illuminance"
@@ -334,7 +334,7 @@ async def test_hmip_illuminance_sensor2(
 
 
 async def test_hmip_windspeed_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipWindspeedSensor."""
     entity_id = "sensor.wettersensor_pro_windspeed"
@@ -386,7 +386,7 @@ async def test_hmip_windspeed_sensor(
 
 
 async def test_hmip_today_rain_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipTodayRainSensor."""
     entity_id = "sensor.weather_sensor_plus_today_rain"
@@ -409,7 +409,7 @@ async def test_hmip_today_rain_sensor(
 
 
 async def test_hmip_temperature_external_sensor_channel_1(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipTemperatureDifferenceSensor Channel 1 HmIP-STE2-PCB."""
     entity_id = "sensor.ste2_channel_1_temperature"
@@ -434,7 +434,7 @@ async def test_hmip_temperature_external_sensor_channel_1(
 
 
 async def test_hmip_temperature_external_sensor_channel_2(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipTemperatureDifferenceSensor Channel 2 HmIP-STE2-PCB."""
     entity_id = "sensor.ste2_channel_2_temperature"
@@ -459,7 +459,7 @@ async def test_hmip_temperature_external_sensor_channel_2(
 
 
 async def test_hmip_temperature_external_sensor_delta(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipTemperatureDifferenceSensor Delta HmIP-STE2-PCB."""
     entity_id = "sensor.ste2_delta_temperature"
@@ -486,7 +486,7 @@ async def test_hmip_temperature_external_sensor_delta(
 
 
 async def test_hmip_passage_detector_delta_counter(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test HomematicipPassageDetectorDeltaCounter."""
     entity_id = "sensor.spdr_1"
@@ -509,7 +509,7 @@ async def test_hmip_passage_detector_delta_counter(
 
 
 async def test_hmip_floor_terminal_block_mechanic_channel_1_valve_position(
-    hass: HomeAssistant, default_mock_hap_factory: HomematicipHAP
+    hass: SmartHub, default_mock_hap_factory: HomematicipHAP
 ) -> None:
     """Test HomematicipFloorTerminalBlockMechanicChannelValve Channel 1 HmIP-FALMOT-C12."""
     entity_id = "sensor.heizkreislauf_1_og_bad_r"
@@ -550,7 +550,7 @@ async def test_hmip_floor_terminal_block_mechanic_channel_1_valve_position(
 
 
 async def test_hmip_esi_iec_current_power_consumption(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test ESI-IEC currentPowerConsumption Sensor."""
     entity_id = "sensor.esi_iec_currentPowerConsumption"
@@ -568,7 +568,7 @@ async def test_hmip_esi_iec_current_power_consumption(
 
 
 async def test_hmip_esi_iec_energy_counter_usage_high_tariff(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test ESI-IEC ENERGY_COUNTER_USAGE_HIGH_TARIFF."""
     entity_id = "sensor.esi_iec_energy_counter_usage_high_tariff"
@@ -586,7 +586,7 @@ async def test_hmip_esi_iec_energy_counter_usage_high_tariff(
 
 
 async def test_hmip_esi_iec_energy_counter_usage_low_tariff(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test ESI-IEC ENERGY_COUNTER_USAGE_LOW_TARIFF."""
     entity_id = "sensor.esi_iec_energy_counter_usage_low_tariff"
@@ -604,7 +604,7 @@ async def test_hmip_esi_iec_energy_counter_usage_low_tariff(
 
 
 async def test_hmip_esi_iec_energy_counter_input_single_tariff(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test ESI-IEC ENERGY_COUNTER_INPUT_SINGLE_TARIFF."""
     entity_id = "sensor.esi_iec_energy_counter_input_single_tariff"
@@ -622,7 +622,7 @@ async def test_hmip_esi_iec_energy_counter_input_single_tariff(
 
 
 async def test_hmip_esi_iec_unknown_channel(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test devices are loaded partially."""
     not_existing_entity_id = "sensor.esi_iec2_energy_counter_input_single_tariff"
@@ -637,7 +637,7 @@ async def test_hmip_esi_iec_unknown_channel(
 
 
 async def test_hmip_esi_gas_current_gas_flow(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test ESI-IEC CurrentGasFlow."""
     entity_id = "sensor.esi_gas_currentgasflow"
@@ -655,7 +655,7 @@ async def test_hmip_esi_gas_current_gas_flow(
 
 
 async def test_hmip_esi_gas_gas_volume(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test ESI-IEC GasVolume."""
     entity_id = "sensor.esi_gas_gasvolume"
@@ -673,7 +673,7 @@ async def test_hmip_esi_gas_gas_volume(
 
 
 async def test_hmip_esi_led_current_power_consumption(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test ESI-IEC currentPowerConsumption Sensor."""
     entity_id = "sensor.esi_led_currentPowerConsumption"
@@ -691,7 +691,7 @@ async def test_hmip_esi_led_current_power_consumption(
 
 
 async def test_hmip_esi_led_energy_counter_usage_high_tariff(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test ESI-IEC ENERGY_COUNTER_USAGE_HIGH_TARIFF."""
     entity_id = "sensor.esi_led_energy_counter_usage_high_tariff"
@@ -709,7 +709,7 @@ async def test_hmip_esi_led_energy_counter_usage_high_tariff(
 
 
 async def test_hmip_absolute_humidity_sensor(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test absolute humidity sensor (vaporAmount)."""
     entity_id = "sensor.elvshctv_absolute_humidity"
@@ -727,7 +727,7 @@ async def test_hmip_absolute_humidity_sensor(
 
 
 async def test_hmip_absolute_humidity_sensor_invalid_value(
-    hass: HomeAssistant, default_mock_hap_factory: HomeFactory
+    hass: SmartHub, default_mock_hap_factory: HomeFactory
 ) -> None:
     """Test absolute humidity sensor with invalid value for vaporAmount."""
     entity_id = "sensor.elvshctv_absolute_humidity"

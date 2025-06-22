@@ -2,16 +2,16 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.abode import ATTR_DEVICE_ID
-from homeassistant.components.cover import DOMAIN as COVER_DOMAIN, CoverState
-from homeassistant.const import (
+from smarthub.components.abode import ATTR_DEVICE_ID
+from smarthub.components.cover import DOMAIN as COVER_DOMAIN, CoverState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_platform
 
@@ -19,7 +19,7 @@ DEVICE_ID = "cover.garage_door"
 
 
 async def test_entity_registry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests that the devices are registered in the entity registry."""
     await setup_platform(hass, COVER_DOMAIN)
@@ -28,7 +28,7 @@ async def test_entity_registry(
     assert entry.unique_id == "61cbz3b542d2o33ed2fz02721bda3324"
 
 
-async def test_attributes(hass: HomeAssistant) -> None:
+async def test_attributes(hass: SmartHub) -> None:
     """Test the cover attributes are correct."""
     await setup_platform(hass, COVER_DOMAIN)
 
@@ -41,7 +41,7 @@ async def test_attributes(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_FRIENDLY_NAME) == "Garage Door"
 
 
-async def test_open(hass: HomeAssistant) -> None:
+async def test_open(hass: SmartHub) -> None:
     """Test the cover can be opened."""
     await setup_platform(hass, COVER_DOMAIN)
 
@@ -53,7 +53,7 @@ async def test_open(hass: HomeAssistant) -> None:
         mock_open.assert_called_once()
 
 
-async def test_close(hass: HomeAssistant) -> None:
+async def test_close(hass: SmartHub) -> None:
     """Test the cover can be closed."""
     await setup_platform(hass, COVER_DOMAIN)
 

@@ -7,10 +7,10 @@ from unittest.mock import MagicMock
 from matter_server.common.models import EventType
 import pytest
 
-from homeassistant.components.matter.adapter import get_clean_name
-from homeassistant.components.matter.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.matter.adapter import get_clean_name
+from smarthub.components.matter.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .common import create_node_from_fixture
 
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_device_registry_single_node_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     name: str,
 ) -> None:
@@ -54,7 +54,7 @@ async def test_device_registry_single_node_device(
 @pytest.mark.usefixtures("matter_node")
 @pytest.mark.parametrize("node_fixture", ["on_off_plugin_unit"])
 async def test_device_registry_single_node_device_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test additional device with different attribute values."""
@@ -77,7 +77,7 @@ async def test_device_registry_single_node_device_alt(
 @pytest.mark.skip("Waiting for a new test fixture")
 @pytest.mark.parametrize("node_fixture", ["fake_bridge_two_light"])
 async def test_device_registry_bridge(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test bridge devices are set up correctly with via_device."""
@@ -122,7 +122,7 @@ async def test_device_registry_bridge(
 
 @pytest.mark.usefixtures("integration")
 async def test_node_added_subscription(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
 ) -> None:
     """Test subscription to new devices work."""
@@ -148,7 +148,7 @@ async def test_node_added_subscription(
 @pytest.mark.usefixtures("matter_node")
 @pytest.mark.parametrize("node_fixture", ["air_purifier"])
 async def test_device_registry_single_node_composed_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test that a composed device within a standalone node only creates one HA device entry."""
@@ -157,7 +157,7 @@ async def test_device_registry_single_node_composed_device(
 
 @pytest.mark.usefixtures("matter_node")
 @pytest.mark.parametrize("node_fixture", ["multi_endpoint_light"])
-async def test_multi_endpoint_name(hass: HomeAssistant) -> None:
+async def test_multi_endpoint_name(hass: SmartHub) -> None:
     """Test that the entity name gets postfixed if the device has multiple primary endpoints."""
     entity_state = hass.states.get("light.inovelli_light_1")
     assert entity_state
@@ -182,7 +182,7 @@ async def test_get_clean_name() -> None:
 
 
 async def test_bad_node_not_crash_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

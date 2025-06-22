@@ -11,7 +11,7 @@ from iottycloud.verbs import (
     STATUS_STATIONATRY,
 )
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_POSITION,
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
@@ -20,11 +20,11 @@ from homeassistant.components.cover import (
     SERVICE_STOP_COVER,
     CoverState,
 )
-from homeassistant.components.iotty.const import DOMAIN
-from homeassistant.components.iotty.coordinator import UPDATE_INTERVAL
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.components.iotty.const import DOMAIN
+from smarthub.components.iotty.coordinator import UPDATE_INTERVAL
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .conftest import test_sh_one_added
 
@@ -32,7 +32,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_open_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twoshutters,
@@ -73,7 +73,7 @@ async def test_open_ok(
 
 
 async def test_close_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twoshutters,
@@ -114,7 +114,7 @@ async def test_close_ok(
 
 
 async def test_stop_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twoshutters,
@@ -155,7 +155,7 @@ async def test_stop_ok(
 
 
 async def test_set_position_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twoshutters,
@@ -196,7 +196,7 @@ async def test_set_position_ok(
 
 
 async def test_devices_insertion_ok(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     local_oauth_impl: ClientSession,
     mock_get_devices_twoshutters,

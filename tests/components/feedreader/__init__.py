@@ -3,9 +3,9 @@
 from typing import Any
 from unittest.mock import patch
 
-from homeassistant.components.feedreader.const import CONF_MAX_ENTRIES, DOMAIN
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
+from smarthub.components.feedreader.const import CONF_MAX_ENTRIES, DOMAIN
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -22,7 +22,7 @@ def create_mock_entry(
 
 
 async def async_setup_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     data: dict[str, Any],
     return_value: bytes | None = None,
     side_effect: bytes | None = None,
@@ -31,7 +31,7 @@ async def async_setup_config_entry(
     entry = create_mock_entry(data)
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.feedreader.coordinator.feedparser.http.get",
+        "smarthub.components.feedreader.coordinator.feedparser.http.get",
     ) as feedparser:
         if return_value:
             feedparser.return_value = return_value

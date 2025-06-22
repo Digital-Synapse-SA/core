@@ -8,10 +8,10 @@ from mcp.types import CallToolResult, ListToolsResult, TextContent, Tool
 import pytest
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import llm
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import llm
 
 from .conftest import TEST_API_NAME
 
@@ -65,7 +65,7 @@ def create_llm_context() -> llm.LLMContext:
 
 
 async def test_init(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_mcp_client: Mock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_mcp_client: Mock
 ) -> None:
     """Test the integration is initialized and can be unloaded cleanly."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -85,7 +85,7 @@ async def test_init(
     ],
 )
 async def test_mcp_server_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_mcp_client: Mock,
     side_effect: Exception,
@@ -98,7 +98,7 @@ async def test_mcp_server_failure(
 
 
 async def test_mcp_server_authentication_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     credential: None,
     config_entry_with_auth: MockConfigEntry,
     mock_mcp_client: Mock,
@@ -117,7 +117,7 @@ async def test_mcp_server_authentication_failure(
 
 
 async def test_list_tools_failure(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_mcp_client: Mock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_mcp_client: Mock
 ) -> None:
     """Test the integration fails to load if the first data fetch returns an error."""
     mock_mcp_client.return_value.list_tools.side_effect = httpx.HTTPStatusError(
@@ -129,7 +129,7 @@ async def test_list_tools_failure(
 
 
 async def test_llm_get_api_tools(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_mcp_client: Mock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_mcp_client: Mock
 ) -> None:
     """Test MCP tools are returned as LLM API tools."""
     mock_mcp_client.return_value.list_tools.return_value = ListToolsResult(
@@ -167,7 +167,7 @@ async def test_llm_get_api_tools(
 
 
 async def test_call_tool(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_mcp_client: Mock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_mcp_client: Mock
 ) -> None:
     """Test calling an MCP Tool through the LLM API."""
     mock_mcp_client.return_value.list_tools.return_value = ListToolsResult(
@@ -202,7 +202,7 @@ async def test_call_tool(
 
 
 async def test_call_tool_fails(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_mcp_client: Mock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_mcp_client: Mock
 ) -> None:
     """Test handling an MCP Tool call failure."""
     mock_mcp_client.return_value.list_tools.return_value = ListToolsResult(
@@ -225,7 +225,7 @@ async def test_call_tool_fails(
         "Server error", request=None, response=httpx.Response(500)
     )
     with pytest.raises(
-        HomeAssistantError, match="Error when calling tool: Server error"
+        SmartHubError, match="Error when calling tool: Server error"
     ):
         await tool.async_call(
             hass,
@@ -237,15 +237,15 @@ async def test_call_tool_fails(
 
 
 async def test_convert_tool_schema_fails(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_mcp_client: Mock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_mcp_client: Mock
 ) -> None:
-    """Test a failure converting an MCP tool schema to a Home Assistant schema."""
+    """Test a failure converting an MCP tool schema to a SmartHub schema."""
     mock_mcp_client.return_value.list_tools.return_value = ListToolsResult(
         tools=[SEARCH_MEMORY_TOOL]
     )
 
     with patch(
-        "homeassistant.components.mcp.coordinator.convert_to_voluptuous",
+        "smarthub.components.mcp.coordinator.convert_to_voluptuous",
         side_effect=ValueError,
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

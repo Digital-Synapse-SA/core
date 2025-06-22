@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, PropertyMock
 import blebox_uniapi
 import pytest
 
-from homeassistant.components.switch import SwitchDeviceClass
-from homeassistant.const import (
+from smarthub.components.switch import SwitchDeviceClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -15,8 +15,8 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .conftest import (
     async_setup_entities,
@@ -46,7 +46,7 @@ def switchbox_fixture():
 
 
 async def test_switchbox_init(
-    switchbox, hass: HomeAssistant, device_registry: dr.DeviceRegistry, config
+    switchbox, hass: SmartHub, device_registry: dr.DeviceRegistry, config
 ) -> None:
     """Test switch default state."""
 
@@ -72,7 +72,7 @@ async def test_switchbox_init(
     assert device.sw_version == "1.23"
 
 
-async def test_switchbox_update_when_off(switchbox, hass: HomeAssistant) -> None:
+async def test_switchbox_update_when_off(switchbox, hass: SmartHub) -> None:
     """Test switch updating when off."""
 
     feature_mock, entity_id = switchbox
@@ -87,7 +87,7 @@ async def test_switchbox_update_when_off(switchbox, hass: HomeAssistant) -> None
     assert state.state == STATE_OFF
 
 
-async def test_switchbox_update_when_on(switchbox, hass: HomeAssistant) -> None:
+async def test_switchbox_update_when_on(switchbox, hass: SmartHub) -> None:
     """Test switch updating when on."""
 
     feature_mock, entity_id = switchbox
@@ -102,7 +102,7 @@ async def test_switchbox_update_when_on(switchbox, hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_switchbox_on(switchbox, hass: HomeAssistant) -> None:
+async def test_switchbox_on(switchbox, hass: SmartHub) -> None:
     """Test turning switch on."""
 
     feature_mock, entity_id = switchbox
@@ -130,7 +130,7 @@ async def test_switchbox_on(switchbox, hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
 
-async def test_switchbox_off(switchbox, hass: HomeAssistant) -> None:
+async def test_switchbox_off(switchbox, hass: SmartHub) -> None:
     """Test turning switch off."""
 
     feature_mock, entity_id = switchbox
@@ -192,7 +192,7 @@ def switchbox_d_fixture():
 
 
 async def test_switchbox_d_init(
-    switchbox_d, hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    switchbox_d, hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test switch default state."""
 
@@ -235,7 +235,7 @@ async def test_switchbox_d_init(
     assert device.sw_version == "1.23"
 
 
-async def test_switchbox_d_update_when_off(switchbox_d, hass: HomeAssistant) -> None:
+async def test_switchbox_d_update_when_off(switchbox_d, hass: SmartHub) -> None:
     """Test switch updating when off."""
 
     feature_mocks, entity_ids = switchbox_d
@@ -253,7 +253,7 @@ async def test_switchbox_d_update_when_off(switchbox_d, hass: HomeAssistant) -> 
 
 
 async def test_switchbox_d_update_when_second_off(
-    switchbox_d, hass: HomeAssistant
+    switchbox_d, hass: SmartHub
 ) -> None:
     """Test switch updating when off."""
 
@@ -271,7 +271,7 @@ async def test_switchbox_d_update_when_second_off(
     assert hass.states.get(entity_ids[1]).state == STATE_OFF
 
 
-async def test_switchbox_d_turn_first_on(switchbox_d, hass: HomeAssistant) -> None:
+async def test_switchbox_d_turn_first_on(switchbox_d, hass: SmartHub) -> None:
     """Test turning switch on."""
 
     feature_mocks, entity_ids = switchbox_d
@@ -300,7 +300,7 @@ async def test_switchbox_d_turn_first_on(switchbox_d, hass: HomeAssistant) -> No
     assert hass.states.get(entity_ids[1]).state == STATE_OFF
 
 
-async def test_switchbox_d_second_on(switchbox_d, hass: HomeAssistant) -> None:
+async def test_switchbox_d_second_on(switchbox_d, hass: SmartHub) -> None:
     """Test turning switch on."""
 
     feature_mocks, entity_ids = switchbox_d
@@ -329,7 +329,7 @@ async def test_switchbox_d_second_on(switchbox_d, hass: HomeAssistant) -> None:
     assert hass.states.get(entity_ids[1]).state == STATE_ON
 
 
-async def test_switchbox_d_first_off(switchbox_d, hass: HomeAssistant) -> None:
+async def test_switchbox_d_first_off(switchbox_d, hass: SmartHub) -> None:
     """Test turning switch on."""
 
     feature_mocks, entity_ids = switchbox_d
@@ -358,7 +358,7 @@ async def test_switchbox_d_first_off(switchbox_d, hass: HomeAssistant) -> None:
     assert hass.states.get(entity_ids[1]).state == STATE_ON
 
 
-async def test_switchbox_d_second_off(switchbox_d, hass: HomeAssistant) -> None:
+async def test_switchbox_d_second_off(switchbox_d, hass: SmartHub) -> None:
     """Test turning switch on."""
 
     feature_mocks, entity_ids = switchbox_d
@@ -391,7 +391,7 @@ ALL_SWITCH_FIXTURES = ["switchbox", "switchbox_d"]
 
 @pytest.mark.parametrize("feature", ALL_SWITCH_FIXTURES, indirect=["feature"])
 async def test_update_failure(
-    feature, hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    feature, hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that update failures are logged."""
 

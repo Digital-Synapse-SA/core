@@ -8,16 +8,16 @@ import httpx
 import pytest
 import respx
 
-from homeassistant import config_entries
-from homeassistant.components.mcp.const import (
+from smarthub import config_entries
+from smarthub.components.mcp.const import (
     CONF_AUTHORIZATION_URL,
     CONF_TOKEN_URL,
     DOMAIN,
 )
-from homeassistant.const import CONF_TOKEN, CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.const import CONF_TOKEN, CONF_URL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .conftest import (
     AUTH_DOMAIN,
@@ -56,7 +56,7 @@ OAUTH_TOKEN_PAYLOAD = {
 }
 
 
-def encode_state(hass: HomeAssistant, flow_id: str) -> str:
+def encode_state(hass: SmartHub, flow_id: str) -> str:
     """Encode the OAuth JWT."""
     return config_entry_oauth2_flow._encode_jwt(
         hass,
@@ -68,7 +68,7 @@ def encode_state(hass: HomeAssistant, flow_id: str) -> str:
 
 
 async def test_form(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_mcp_client: Mock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_mcp_client: Mock
 ) -> None:
     """Test the complete configuration flow."""
     result = await hass.config_entries.flow.async_init(
@@ -113,7 +113,7 @@ async def test_form(
     ],
 )
 async def test_form_mcp_client_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mcp_client: Mock,
     side_effect: Exception,
@@ -163,7 +163,7 @@ async def test_form_mcp_client_error(
     ],
 )
 async def test_input_form_validation_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mcp_client: Mock,
     user_input: dict[str, Any],
@@ -200,7 +200,7 @@ async def test_input_form_validation_error(
 
 
 async def test_unique_url(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_mcp_client: Mock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_mcp_client: Mock
 ) -> None:
     """Test that the same url cannot be configured twice."""
     config_entry = MockConfigEntry(
@@ -232,7 +232,7 @@ async def test_unique_url(
 
 
 async def test_server_missing_capbilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mcp_client: Mock,
 ) -> None:
@@ -258,7 +258,7 @@ async def test_server_missing_capbilities(
 
 @respx.mock
 async def test_oauth_discovery_flow_without_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mcp_client: Mock,
 ) -> None:
@@ -289,7 +289,7 @@ async def test_oauth_discovery_flow_without_credentials(
 
 
 async def perform_oauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_client_no_auth: ClientSessionGenerator,
     result: config_entries.ConfigFlowResult,
@@ -358,7 +358,7 @@ async def perform_oauth_flow(
 @pytest.mark.usefixtures("current_request_with_host")
 @respx.mock
 async def test_authentication_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mcp_client: Mock,
     credential: None,
@@ -446,7 +446,7 @@ async def test_authentication_flow(
 @pytest.mark.usefixtures("current_request_with_host")
 @respx.mock
 async def test_oauth_discovery_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mcp_client: Mock,
     credential: None,
@@ -492,7 +492,7 @@ async def test_oauth_discovery_failure(
 @pytest.mark.usefixtures("current_request_with_host")
 @respx.mock
 async def test_authentication_flow_server_failure_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mcp_client: Mock,
     credential: None,
@@ -549,7 +549,7 @@ async def test_authentication_flow_server_failure_abort(
 @pytest.mark.usefixtures("current_request_with_host")
 @respx.mock
 async def test_authentication_flow_server_missing_tool_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mcp_client: Mock,
     credential: None,
@@ -609,7 +609,7 @@ async def test_authentication_flow_server_missing_tool_capabilities(
 @pytest.mark.usefixtures("current_request_with_host")
 @respx.mock
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_mcp_client: Mock,
     credential: None,

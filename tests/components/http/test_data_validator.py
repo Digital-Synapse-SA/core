@@ -6,9 +6,9 @@ from unittest.mock import Mock
 from aiohttp import web
 import voluptuous as vol
 
-from homeassistant.components.http import KEY_HASS, HomeAssistantView
-from homeassistant.components.http.data_validator import RequestDataValidator
-from homeassistant.helpers.http import KEY_ALLOW_CONFIGURED_CORS
+from smarthub.components.http import KEY_HASS, SmartHubView
+from smarthub.components.http.data_validator import RequestDataValidator
+from smarthub.helpers.http import KEY_ALLOW_CONFIGURED_CORS
 
 from tests.typing import ClientSessionGenerator
 
@@ -19,7 +19,7 @@ async def get_client(aiohttp_client, validator):
     app[KEY_HASS] = Mock(is_stopping=False)
     app[KEY_ALLOW_CONFIGURED_CORS] = lambda _: None
 
-    class TestView(HomeAssistantView):
+    class TestView(SmartHubView):
         url = "/"
         name = "test"
         requires_auth = False

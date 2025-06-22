@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from energyzero import Electricity, Gas
 import pytest
 
-from homeassistant.components.energyzero.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.energyzero.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_json_object_fixture
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry, async_load_json_object_fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.energyzero.async_setup_entry", return_value=True
+        "smarthub.components.energyzero.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
@@ -34,10 +34,10 @@ def mock_config_entry() -> MockConfigEntry:
 
 
 @pytest.fixture
-async def mock_energyzero(hass: HomeAssistant) -> AsyncGenerator[MagicMock]:
+async def mock_energyzero(hass: SmartHub) -> AsyncGenerator[MagicMock]:
     """Return a mocked EnergyZero client."""
     with patch(
-        "homeassistant.components.energyzero.coordinator.EnergyZero", autospec=True
+        "smarthub.components.energyzero.coordinator.EnergyZero", autospec=True
     ) as energyzero_mock:
         client = energyzero_mock.return_value
         client.energy_prices.return_value = Electricity.from_dict(
@@ -51,7 +51,7 @@ async def mock_energyzero(hass: HomeAssistant) -> AsyncGenerator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_energyzero: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_energyzero: MagicMock
 ) -> MockConfigEntry:
     """Set up the EnergyZero integration for testing."""
     mock_config_entry.add_to_hass(hass)

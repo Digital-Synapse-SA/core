@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock, MagicMock
 from azure.core.exceptions import ClientAuthenticationError, ResourceNotFoundError
 import pytest
 
-from homeassistant.components.azure_storage.const import (
+from smarthub.components.azure_storage.const import (
     CONF_ACCOUNT_NAME,
     CONF_CONTAINER_NAME,
     CONF_STORAGE_ACCOUNT_KEY,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER, ConfigFlowResult
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER, ConfigFlowResult
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 from .const import USER_INPUT
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def __async_start_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> ConfigFlowResult:
     """Initialize the  config flow."""
 
@@ -39,7 +39,7 @@ async def __async_start_flow(
 
 
 async def test_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -68,7 +68,7 @@ async def test_flow(
     ],
 )
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     mock_setup_entry: AsyncMock,
     exception: Exception,
@@ -102,7 +102,7 @@ async def test_flow_errors(
 
 
 async def test_abort_if_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort if the account is already configured."""
@@ -115,7 +115,7 @@ async def test_abort_if_already_configured(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -140,7 +140,7 @@ async def test_reauth_flow(
 
 
 async def test_reauth_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_client: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -175,7 +175,7 @@ async def test_reauth_flow_errors(
 
 
 async def test_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

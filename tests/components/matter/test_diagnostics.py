@@ -11,10 +11,10 @@ from matter_server.common.helpers.util import dataclass_from_dict
 from matter_server.common.models import ServerDiagnostics
 import pytest
 
-from homeassistant.components.matter.const import DOMAIN
-from homeassistant.components.matter.diagnostics import redact_matter_attributes
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.matter.const import DOMAIN
+from smarthub.components.matter.diagnostics import redact_matter_attributes
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry, load_fixture
 from tests.components.diagnostics import (
@@ -57,7 +57,7 @@ async def test_matter_attribute_redact(device_diagnostics: dict[str, Any]) -> No
 
 
 async def test_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     matter_client: MagicMock,
     integration: MockConfigEntry,
@@ -76,7 +76,7 @@ async def test_config_entry_diagnostics(
 
 @pytest.mark.parametrize("node_fixture", ["device_diagnostics"])
 async def test_device_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     device_registry: dr.DeviceRegistry,
     matter_client: MagicMock,

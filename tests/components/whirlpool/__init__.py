@@ -4,18 +4,18 @@ from unittest.mock import MagicMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.whirlpool.const import CONF_BRAND, DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.components.whirlpool.const import CONF_BRAND, DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from tests.common import MockConfigEntry
 
 
 async def init_integration(
-    hass: HomeAssistant, region: str = "EU", brand: str = "Whirlpool"
+    hass: SmartHub, region: str = "EU", brand: str = "Whirlpool"
 ) -> MockConfigEntry:
-    """Set up the Whirlpool integration in Home Assistant."""
+    """Set up the Whirlpool integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={
@@ -30,9 +30,9 @@ async def init_integration(
 
 
 async def init_integration_with_entry(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> MockConfigEntry:
-    """Set up the Whirlpool integration in Home Assistant."""
+    """Set up the Whirlpool integration in SmartHub."""
     entry.add_to_hass(hass)
     await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
@@ -40,7 +40,7 @@ async def init_integration_with_entry(
 
 
 def snapshot_whirlpool_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     snapshot: SnapshotAssertion,
     platform: Platform,
@@ -54,7 +54,7 @@ def snapshot_whirlpool_entities(
 
 
 async def trigger_attr_callback(
-    hass: HomeAssistant, mock_api_instance: MagicMock
+    hass: SmartHub, mock_api_instance: MagicMock
 ) -> None:
     """Simulate an update trigger from the API."""
 

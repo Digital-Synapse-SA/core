@@ -7,10 +7,10 @@ import pytest
 from RFXtrx import ControlEvent
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.rfxtrx import get_rfx_object
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.rfxtrx import get_rfx_object
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import setup_rfx_test_cfg
 
@@ -19,14 +19,14 @@ from .conftest import setup_rfx_test_cfg
 def required_platforms_only():
     """Only set up the required platform and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.rfxtrx.PLATFORMS",
+        "smarthub.components.rfxtrx.PLATFORMS",
         (Platform.EVENT,),
     ):
         yield
 
 
 async def test_control_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     rfxtrx,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -54,7 +54,7 @@ async def test_control_event(
 
 
 async def test_status_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     rfxtrx,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -78,7 +78,7 @@ async def test_status_event(
 
 
 async def test_invalid_event_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     rfxtrx,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -105,7 +105,7 @@ async def test_invalid_event_type(
 
 
 async def test_ignoring_lighting4(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, rfxtrx
+    hass: SmartHub, entity_registry: er.EntityRegistry, rfxtrx
 ) -> None:
     """Test with 1 sensor."""
     entry = await setup_rfx_test_cfg(

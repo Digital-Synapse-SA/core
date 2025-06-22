@@ -1,16 +1,16 @@
 """Test KNX sensor."""
 
-from homeassistant.components.knx.const import CONF_STATE_ADDRESS, CONF_SYNC_STATE
-from homeassistant.components.knx.schema import SensorSchema
-from homeassistant.const import CONF_NAME, CONF_TYPE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.knx.const import CONF_STATE_ADDRESS, CONF_SYNC_STATE
+from smarthub.components.knx.schema import SensorSchema
+from smarthub.const import CONF_NAME, CONF_TYPE, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .conftest import KNXTestKit
 
 from tests.common import async_capture_events
 
 
-async def test_sensor(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_sensor(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test simple KNX sensor."""
 
     await knx.setup_integration(
@@ -41,7 +41,7 @@ async def test_sensor(hass: HomeAssistant, knx: KNXTestKit) -> None:
     await knx.assert_no_telegram()
 
 
-async def test_always_callback(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_always_callback(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX sensor with always_callback."""
 
     await knx.setup_integration(

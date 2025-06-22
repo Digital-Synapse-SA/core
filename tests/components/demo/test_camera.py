@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.camera import (
+from smarthub.components.camera import (
     DOMAIN as CAMERA_DOMAIN,
     SERVICE_DISABLE_MOTION,
     SERVICE_ENABLE_MOTION,
@@ -14,11 +14,11 @@ from homeassistant.components.camera import (
     CameraState,
     async_get_image,
 )
-from homeassistant.components.demo import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.components.demo import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 ENTITY_CAMERA = "camera.demo_camera"
 
@@ -27,14 +27,14 @@ ENTITY_CAMERA = "camera.demo_camera"
 def camera_only() -> Generator[None]:
     """Enable only the button platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.CAMERA],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def demo_camera(hass: HomeAssistant, camera_only: None) -> None:
+async def demo_camera(hass: SmartHub, camera_only: None) -> None:
     """Initialize a demo camera platform."""
     assert await async_setup_component(
         hass, CAMERA_DOMAIN, {CAMERA_DOMAIN: {"platform": DOMAIN}}
@@ -42,20 +42,20 @@ async def demo_camera(hass: HomeAssistant, camera_only: None) -> None:
     await hass.async_block_till_done()
 
 
-async def test_init_state_is_streaming(hass: HomeAssistant) -> None:
+async def test_init_state_is_streaming(hass: SmartHub) -> None:
     """Demo camera initialize as streaming."""
     state = hass.states.get(ENTITY_CAMERA)
     assert state.state == CameraState.STREAMING
 
     with patch(
-        "homeassistant.components.demo.camera.Path.read_bytes", return_value=b"ON"
+        "smarthub.components.demo.camera.Path.read_bytes", return_value=b"ON"
     ) as mock_read_bytes:
         image = await async_get_image(hass, ENTITY_CAMERA)
         assert mock_read_bytes.call_count == 1
         assert image.content == b"ON"
 
 
-async def test_turn_on_state_back_to_streaming(hass: HomeAssistant) -> None:
+async def test_turn_on_state_back_to_streaming(hass: SmartHub) -> None:
     """After turn on state back to streaming."""
     state = hass.states.get(ENTITY_CAMERA)
     assert state.state == CameraState.STREAMING
@@ -75,18 +75,18 @@ async def test_turn_on_state_back_to_streaming(hass: HomeAssistant) -> None:
     assert state.state == CameraState.STREAMING
 
 
-async def test_turn_off_image(hass: HomeAssistant) -> None:
+async def test_turn_off_image(hass: SmartHub) -> None:
     """After turn off, Demo camera raise error."""
     await hass.services.async_call(
         CAMERA_DOMAIN, SERVICE_TURN_OFF, {ATTR_ENTITY_ID: ENTITY_CAMERA}, blocking=True
     )
 
-    with pytest.raises(HomeAssistantError) as error:
+    with pytest.raises(SmartHubError) as error:
         await async_get_image(hass, ENTITY_CAMERA)
     assert error.value.args[0] == "Camera is off"
 
 
-async def test_turn_off_invalid_camera(hass: HomeAssistant) -> None:
+async def test_turn_off_invalid_camera(hass: SmartHub) -> None:
     """Turn off non-exist camera should quietly fail."""
     state = hass.states.get(ENTITY_CAMERA)
     assert state.state == CameraState.STREAMING
@@ -102,7 +102,7 @@ async def test_turn_off_invalid_camera(hass: HomeAssistant) -> None:
     assert state.state == CameraState.STREAMING
 
 
-async def test_motion_detection(hass: HomeAssistant) -> None:
+async def test_motion_detection(hass: SmartHub) -> None:
     """Test motion detection services."""
 
     # Fetch state and check motion detection attribute

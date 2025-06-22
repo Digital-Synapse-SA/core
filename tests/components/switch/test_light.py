@@ -2,13 +2,13 @@
 
 import pytest
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_COLOR_MODE,
     ATTR_SUPPORTED_COLOR_MODES,
     ColorMode,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import common as switch_common
 
@@ -16,12 +16,12 @@ from tests.components.light import common
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant):
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub):
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
-async def test_default_state(hass: HomeAssistant) -> None:
+async def test_default_state(hass: SmartHub) -> None:
     """Test light switch default state."""
     await async_setup_component(
         hass,
@@ -49,7 +49,7 @@ async def test_default_state(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_COLOR_MODE) is None
 
 
-async def test_light_service_calls(hass: HomeAssistant) -> None:
+async def test_light_service_calls(hass: SmartHub) -> None:
     """Test service calls to light."""
     await async_setup_component(hass, "switch", {"switch": [{"platform": "demo"}]})
     await async_setup_component(
@@ -82,7 +82,7 @@ async def test_light_service_calls(hass: HomeAssistant) -> None:
     assert hass.states.get("light.light_switch").state == "off"
 
 
-async def test_switch_service_calls(hass: HomeAssistant) -> None:
+async def test_switch_service_calls(hass: SmartHub) -> None:
     """Test service calls to switch."""
     await async_setup_component(hass, "switch", {"switch": [{"platform": "demo"}]})
     await async_setup_component(

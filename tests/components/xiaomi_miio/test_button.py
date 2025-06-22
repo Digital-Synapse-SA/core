@@ -4,13 +4,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.xiaomi_miio.const import (
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.xiaomi_miio.const import (
     CONF_FLOW_TYPE,
     DOMAIN,
     MODELS_VACUUM,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_DEVICE,
     CONF_HOST,
@@ -19,8 +19,8 @@ from homeassistant.const import (
     CONF_TOKEN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import TEST_MAC
 
@@ -28,25 +28,25 @@ from tests.common import MockConfigEntry
 
 
 @pytest.fixture(autouse=True)
-async def setup_test(hass: HomeAssistant):
+async def setup_test(hass: SmartHub):
     """Initialize test xiaomi_miio for button entity."""
 
     mock_vacuum = MagicMock()
 
     with (
         patch(
-            "homeassistant.components.xiaomi_miio.get_platforms",
+            "smarthub.components.xiaomi_miio.get_platforms",
             return_value=[
                 Platform.BUTTON,
             ],
         ),
-        patch("homeassistant.components.xiaomi_miio.RoborockVacuum") as mock_vacuum_cls,
+        patch("smarthub.components.xiaomi_miio.RoborockVacuum") as mock_vacuum_cls,
     ):
         mock_vacuum_cls.return_value = mock_vacuum
         yield mock_vacuum
 
 
-async def test_vacuum_button_params(hass: HomeAssistant) -> None:
+async def test_vacuum_button_params(hass: SmartHub) -> None:
     """Test the initial parameters of a vacuum button."""
 
     entity_id = await setup_component(hass, "test_vacuum")
@@ -57,7 +57,7 @@ async def test_vacuum_button_params(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2023-06-28 00:00:00+00:00")
-async def test_vacuum_button_press(hass: HomeAssistant) -> None:
+async def test_vacuum_button_press(hass: SmartHub) -> None:
     """Test pressing a vacuum button."""
 
     entity_id = await setup_component(hass, "test_vacuum")
@@ -79,7 +79,7 @@ async def test_vacuum_button_press(hass: HomeAssistant) -> None:
     assert state.state == pressed_at.isoformat()
 
 
-async def setup_component(hass: HomeAssistant, entity_name: str) -> str:
+async def setup_component(hass: SmartHub, entity_name: str) -> str:
     """Set up vacuum component."""
     entity_id = f"{BUTTON_DOMAIN}.{entity_name}"
 

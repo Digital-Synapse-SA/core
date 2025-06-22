@@ -5,20 +5,20 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import RESPONSE_OK, assert_entities, setup_platform
 
 
 async def test_switches(
-    hass: HomeAssistant, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
+    hass: SmartHub, snapshot: SnapshotAssertion, entity_registry: er.EntityRegistry
 ) -> None:
     """Tests that the switch entities are correct."""
 
@@ -28,7 +28,7 @@ async def test_switches(
 
     entity_id = "switch.test_charge"
     with patch(
-        "homeassistant.components.tessie.switch.start_charging",
+        "smarthub.components.tessie.switch.start_charging",
     ) as mock_start_charging:
         # Test Switch On
         await hass.services.async_call(
@@ -41,7 +41,7 @@ async def test_switches(
     assert hass.states.get(entity_id) == snapshot(name=SERVICE_TURN_ON)
 
     with patch(
-        "homeassistant.components.tessie.switch.stop_charging",
+        "smarthub.components.tessie.switch.stop_charging",
     ) as mock_stop_charging:
         # Test Switch Off
         await hass.services.async_call(
@@ -72,7 +72,7 @@ async def test_switches(
     ],
 )
 async def test_switch_services(
-    hass: HomeAssistant, name: str, on: str, off: str
+    hass: SmartHub, name: str, on: str, off: str
 ) -> None:
     """Tests that the switch service calls work."""
 

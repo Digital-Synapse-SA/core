@@ -2,10 +2,10 @@
 
 import pytest
 
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.state import async_reproduce_state
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.state import async_reproduce_state
+from smarthub.setup import async_setup_component
 
 VALID_OPTION1 = "Option A"
 VALID_OPTION2 = "Option B"
@@ -20,7 +20,7 @@ ENTITY = "input_select.test_select"
 
 
 async def test_reproducing_states(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test reproducing Input select states."""
 
@@ -62,7 +62,7 @@ async def test_reproducing_states(
     assert hass.states.get(ENTITY).state == VALID_OPTION3
 
     # Test setting state to invalid state
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await async_reproduce_state(hass, [State(ENTITY, INVALID_OPTION)])
 
     # The entity state should be unchanged

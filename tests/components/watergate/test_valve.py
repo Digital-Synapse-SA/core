@@ -4,9 +4,9 @@ from collections.abc import Generator
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.valve import DOMAIN as VALVE_DOMAIN, ValveState
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_CLOSE_VALVE, SERVICE_OPEN_VALVE
-from homeassistant.core import HomeAssistant
+from smarthub.components.valve import DOMAIN as VALVE_DOMAIN, ValveState
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_CLOSE_VALVE, SERVICE_OPEN_VALVE
+from smarthub.core import SmartHub
 
 from . import init_integration
 
@@ -14,7 +14,7 @@ from tests.common import AsyncMock, MockConfigEntry
 
 
 async def test_change_valve_state_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_watergate_client: Generator[AsyncMock],
     mock_entry: MockConfigEntry,
@@ -31,7 +31,7 @@ async def test_change_valve_state_snapshot(
 
 
 async def test_change_valve_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_watergate_client: Generator[AsyncMock],
     mock_entry: MockConfigEntry,
 ) -> None:

@@ -1,10 +1,10 @@
 """Tests for the diagnostics data provided by the AndroidTV integration."""
 
-from homeassistant.components.androidtv.diagnostics import TO_REDACT
-from homeassistant.components.diagnostics import async_redact_data
-from homeassistant.components.media_player import DOMAIN as MP_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.androidtv.diagnostics import TO_REDACT
+from smarthub.components.diagnostics import async_redact_data
+from smarthub.components.media_player import DOMAIN as MP_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import patchers
 from .common import CONFIG_ANDROID_DEFAULT, SHELL_RESPONSE_OFF, setup_mock_entry
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test diagnostics."""

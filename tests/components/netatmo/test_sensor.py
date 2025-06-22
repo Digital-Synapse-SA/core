@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.netatmo import sensor
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.netatmo import sensor
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import selected_platforms, snapshot_platform_entities
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     netatmo_auth: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -34,7 +34,7 @@ async def test_entity(
 
 
 async def test_indoor_sensor(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test indoor sensor setup."""
     with selected_platforms([Platform.SENSOR]):
@@ -51,7 +51,7 @@ async def test_indoor_sensor(
 
 
 async def test_weather_sensor(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test weather sensor unreachable."""
     with selected_platforms([Platform.SENSOR]):
@@ -65,7 +65,7 @@ async def test_weather_sensor(
 
 
 async def test_public_weather_sensor(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test public weather sensor setup."""
     with selected_platforms([Platform.SENSOR]):
@@ -215,7 +215,7 @@ async def test_process_health(health: int, expected: str) -> None:
     ],
 )
 async def test_weather_sensor_enabling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,
     uid: str,
@@ -244,7 +244,7 @@ async def test_weather_sensor_enabling(
 
 
 async def test_climate_battery_sensor(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test climate device battery sensor."""
     with selected_platforms([Platform.CLIMATE, Platform.SENSOR]):

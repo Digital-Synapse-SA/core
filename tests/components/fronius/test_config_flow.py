@@ -5,12 +5,12 @@ from unittest.mock import patch
 from pyfronius import FroniusError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.fronius.const import DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.fronius.const import DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import mock_responses
 
@@ -22,7 +22,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 def no_setup():
     """Disable setting up the whole integration in config_flow tests."""
     with patch(
-        "homeassistant.components.fronius.async_setup_entry",
+        "smarthub.components.fronius.async_setup_entry",
         return_value=True,
     ):
         yield
@@ -44,7 +44,7 @@ MOCK_DHCP_DATA = DhcpServiceInfo(
 )
 
 
-async def assert_finish_flow_with_logger(hass: HomeAssistant, flow_id: str) -> None:
+async def assert_finish_flow_with_logger(hass: SmartHub, flow_id: str) -> None:
     """Assert finishing the flow with a logger device."""
     with patch(
         "pyfronius.Fronius.current_logger_info",
@@ -68,7 +68,7 @@ async def assert_finish_flow_with_logger(hass: HomeAssistant, flow_id: str) -> N
 
 
 async def assert_abort_flow_with_logger(
-    hass: HomeAssistant, flow_id: str, reason: str
+    hass: SmartHub, flow_id: str, reason: str
 ) -> config_entries.ConfigFlowResult:
     """Assert the flow was aborted when a logger device responded."""
     with patch(
@@ -88,7 +88,7 @@ async def assert_abort_flow_with_logger(
     return result
 
 
-async def test_form_with_logger(hass: HomeAssistant) -> None:
+async def test_form_with_logger(hass: SmartHub) -> None:
     """Test the basic flow with a logger device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -98,7 +98,7 @@ async def test_form_with_logger(hass: HomeAssistant) -> None:
     await assert_finish_flow_with_logger(hass, result["flow_id"])
 
 
-async def test_form_with_inverter(hass: HomeAssistant) -> None:
+async def test_form_with_inverter(hass: SmartHub) -> None:
     """Test the basic flow with a Gen24 device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -141,7 +141,7 @@ async def test_form_with_inverter(hass: HomeAssistant) -> None:
     ],
 )
 async def test_form_cannot_connect(
-    hass: HomeAssistant, inverter_side_effect: type[FroniusError] | None
+    hass: SmartHub, inverter_side_effect: type[FroniusError] | None
 ) -> None:
     """Test we handle cannot connect error."""
     INVERTER_INFO_NONE: dict[str, list] = {"inverters": []}
@@ -172,7 +172,7 @@ async def test_form_cannot_connect(
     await assert_finish_flow_with_logger(hass, result2["flow_id"])
 
 
-async def test_form_unexpected(hass: HomeAssistant) -> None:
+async def test_form_unexpected(hass: SmartHub) -> None:
     """Test we handle unexpected error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -194,7 +194,7 @@ async def test_form_unexpected(hass: HomeAssistant) -> None:
     await assert_finish_flow_with_logger(hass, result2["flow_id"])
 
 
-async def test_form_already_existing(hass: HomeAssistant) -> None:
+async def test_form_already_existing(hass: SmartHub) -> None:
     """Test existing entry."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -212,7 +212,7 @@ async def test_form_already_existing(hass: HomeAssistant) -> None:
 
 
 async def test_config_flow_already_configured(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test existing entry doesn't get updated by config flow."""
     old_host = "http://10.1.0.1"
@@ -255,10 +255,10 @@ async def test_config_flow_already_configured(
     }
 
 
-async def test_dhcp(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_dhcp(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Test starting a flow from discovery."""
     with (
-        patch("homeassistant.components.fronius.config_flow.DHCP_REQUEST_DELAY", 0),
+        patch("smarthub.components.fronius.config_flow.DHCP_REQUEST_DELAY", 0),
         patch(
             "pyfronius.Fronius.current_logger_info",
             return_value=LOGGER_INFO_RETURN_VALUE,
@@ -283,7 +283,7 @@ async def test_dhcp(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) ->
 
 
 async def test_dhcp_already_configured(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test starting a flow from discovery."""
     entry = MockConfigEntry(
@@ -304,11 +304,11 @@ async def test_dhcp_already_configured(
 
 
 async def test_dhcp_invalid(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test starting a flow from discovery."""
     with (
-        patch("homeassistant.components.fronius.config_flow.DHCP_REQUEST_DELAY", 0),
+        patch("smarthub.components.fronius.config_flow.DHCP_REQUEST_DELAY", 0),
         patch(
             "pyfronius.Fronius.current_logger_info",
             side_effect=FroniusError,
@@ -325,7 +325,7 @@ async def test_dhcp_invalid(
     assert result["reason"] == "invalid_host"
 
 
-async def test_reconfigure(hass: HomeAssistant) -> None:
+async def test_reconfigure(hass: SmartHub) -> None:
     """Test reconfiguring an entry."""
     old_host = "http://10.1.0.1"
     new_host = "http://10.1.0.2"
@@ -369,7 +369,7 @@ async def test_reconfigure(hass: HomeAssistant) -> None:
     }
 
 
-async def test_reconfigure_cannot_connect(hass: HomeAssistant) -> None:
+async def test_reconfigure_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -408,7 +408,7 @@ async def test_reconfigure_cannot_connect(hass: HomeAssistant) -> None:
     )
 
 
-async def test_reconfigure_unexpected(hass: HomeAssistant) -> None:
+async def test_reconfigure_unexpected(hass: SmartHub) -> None:
     """Test we handle unexpected error."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -441,7 +441,7 @@ async def test_reconfigure_unexpected(hass: HomeAssistant) -> None:
     )
 
 
-async def test_reconfigure_to_different_device(hass: HomeAssistant) -> None:
+async def test_reconfigure_to_different_device(hass: SmartHub) -> None:
     """Test reconfiguring an entry to a different device."""
     entry = MockConfigEntry(
         domain=DOMAIN,

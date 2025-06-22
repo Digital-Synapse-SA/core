@@ -7,11 +7,11 @@ from matter_server.client.models.node import MatterNode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceNotSupported
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceNotSupported
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .common import (
     set_node_attribute,
@@ -22,7 +22,7 @@ from .common import (
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_vacuum(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -32,13 +32,13 @@ async def test_vacuum(
 
 @pytest.mark.parametrize("node_fixture", ["vacuum_cleaner"])
 async def test_vacuum_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
     """Test vacuum entity actions."""
     # Fetch translations
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     entity_id = "vacuum.mock_vacuum"
     state = hass.states.get(entity_id)
     assert state
@@ -136,7 +136,7 @@ async def test_vacuum_actions(
 
 @pytest.mark.parametrize("node_fixture", ["vacuum_cleaner"])
 async def test_vacuum_updates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

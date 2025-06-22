@@ -11,50 +11,50 @@ BASE = """
 # https://github.com/blog/2392-introducing-code-owners
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
-# Home Assistant Core
-.core_files.yaml @home-assistant/core
-.git-blame-ignore-revs @home-assistant/core
-.gitattributes @home-assistant/core
-.gitignore @home-assistant/core
-.hadolint.yaml @home-assistant/core
-.pre-commit-config.yaml @home-assistant/core
-.prettierignore @home-assistant/core
-.yamllint @home-assistant/core
-pyproject.toml @home-assistant/core
-requirements_test.txt @home-assistant/core
-/.devcontainer/ @home-assistant/core
-/.github/ @home-assistant/core
-/.vscode/ @home-assistant/core
-/homeassistant/*.py @home-assistant/core
-/homeassistant/auth/ @home-assistant/core
-/homeassistant/backports/ @home-assistant/core
-/homeassistant/helpers/ @home-assistant/core
-/homeassistant/scripts/ @home-assistant/core
-/homeassistant/util/ @home-assistant/core
-/pylint/ @home-assistant/core
-/script/ @home-assistant/core
+# SmartHub Core
+.core_files.yaml @smart-hub/core
+.git-blame-ignore-revs @smart-hub/core
+.gitattributes @smart-hub/core
+.gitignore @smart-hub/core
+.hadolint.yaml @smart-hub/core
+.pre-commit-config.yaml @smart-hub/core
+.prettierignore @smart-hub/core
+.yamllint @smart-hub/core
+pyproject.toml @smart-hub/core
+requirements_test.txt @smart-hub/core
+/.devcontainer/ @smart-hub/core
+/.github/ @smart-hub/core
+/.vscode/ @smart-hub/core
+/smarthub/*.py @smart-hub/core
+/smarthub/auth/ @smart-hub/core
+/smarthub/backports/ @smart-hub/core
+/smarthub/helpers/ @smart-hub/core
+/smarthub/scripts/ @smart-hub/core
+/smarthub/util/ @smart-hub/core
+/pylint/ @smart-hub/core
+/script/ @smart-hub/core
 
-# Home Assistant Supervisor
-.dockerignore @home-assistant/supervisor
-build.json @home-assistant/supervisor
-/machine/ @home-assistant/supervisor
-/rootfs/ @home-assistant/supervisor
-/Dockerfile @home-assistant/supervisor
+# SmartHub Supervisor
+.dockerignore @smart-hub/supervisor
+build.json @smart-hub/supervisor
+/machine/ @smart-hub/supervisor
+/rootfs/ @smart-hub/supervisor
+/Dockerfile @smart-hub/supervisor
 
 # Other code
-/homeassistant/scripts/check_config.py @kellerza
+/smarthub/scripts/check_config.py @kellerza
 
 # Integrations
 """.strip()
 
 INDIVIDUAL_FILES = """
 # Individual files
-/homeassistant/components/demo/weather.py @fabaff
+/smarthub/components/demo/weather.py @fabaff
 """
 
 REMOVE_CODEOWNERS = """
 # Remove codeowners from files
-/homeassistant/components/*/translations/
+/smarthub/components/*/translations/
 """
 
 
@@ -79,7 +79,7 @@ def generate_and_validate(integrations: dict[str, Integration], config: Config) 
                     "codeowners", "Code owners need to be valid GitHub handles."
                 )
 
-        parts.append(f"/homeassistant/components/{domain}/ {' '.join(codeowners)}")
+        parts.append(f"/smarthub/components/{domain}/ {' '.join(codeowners)}")
 
         if (config.root / "tests/components" / domain / "__init__.py").exists():
             parts.append(f"/tests/components/{domain}/ {' '.join(codeowners)}")

@@ -8,11 +8,11 @@ from aioairzone.const import API_DATA, API_SYSTEMS
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.airzone.coordinator import SCAN_INTERVAL
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.components.airzone.coordinator import SCAN_INTERVAL
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from .util import (
     HVAC_DHW_MOCK,
@@ -29,13 +29,13 @@ from tests.common import async_fire_time_changed, snapshot_platform
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.airzone.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.airzone.PLATFORMS", [Platform.SENSOR]):
         yield
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_airzone_create_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -50,7 +50,7 @@ async def test_airzone_create_sensors(
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_airzone_sensors_availability(hass: HomeAssistant) -> None:
+async def test_airzone_sensors_availability(hass: SmartHub) -> None:
     """Test sensors availability."""
 
     await async_init_integration(hass)
@@ -60,23 +60,23 @@ async def test_airzone_sensors_availability(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_dhw",
+            "smarthub.components.airzone.AirzoneLocalApi.get_dhw",
             return_value=HVAC_DHW_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_hvac",
+            "smarthub.components.airzone.AirzoneLocalApi.get_hvac",
             return_value=HVAC_MOCK_UNAVAILABLE_ZONE,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_hvac_systems",
+            "smarthub.components.airzone.AirzoneLocalApi.get_hvac_systems",
             return_value=HVAC_SYSTEMS_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_version",
+            "smarthub.components.airzone.AirzoneLocalApi.get_version",
             return_value=HVAC_VERSION_MOCK,
         ),
         patch(
-            "homeassistant.components.airzone.AirzoneLocalApi.get_webserver",
+            "smarthub.components.airzone.AirzoneLocalApi.get_webserver",
             return_value=HVAC_WEBSERVER_MOCK,
         ),
     ):

@@ -4,29 +4,29 @@ from unittest.mock import AsyncMock, MagicMock
 
 from serial import SerialException
 
-from homeassistant import config_entries
-from homeassistant.components.opentherm_gw.const import (
+from smarthub import config_entries
+from smarthub.components.opentherm_gw.const import (
     CONF_FLOOR_TEMP,
     CONF_READ_PRECISION,
     CONF_SET_PRECISION,
     CONF_TEMPORARY_OVRD_MODE,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_DEVICE,
     CONF_ID,
     CONF_NAME,
     PRECISION_HALVES,
     PRECISION_TENTHS,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_form_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pyotgw: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -55,7 +55,7 @@ async def test_form_user(
 
 
 async def test_form_duplicate_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pyotgw: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -92,7 +92,7 @@ async def test_form_duplicate_entries(
 
 
 async def test_form_connection_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pyotgw: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -115,7 +115,7 @@ async def test_form_connection_timeout(
 
 
 async def test_form_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pyotgw: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -136,7 +136,7 @@ async def test_form_connection_error(
 
 
 async def test_options_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_pyotgw: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:

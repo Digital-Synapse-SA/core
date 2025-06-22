@@ -4,20 +4,20 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries, data_entry_flow
-from homeassistant.components.html5.const import (
+from smarthub import config_entries, data_entry_flow
+from smarthub.components.html5.const import (
     ATTR_VAPID_EMAIL,
     ATTR_VAPID_PRV_KEY,
     ATTR_VAPID_PUB_KEY,
     DOMAIN,
 )
-from homeassistant.components.html5.issues import (
+from smarthub.components.html5.issues import (
     FAILED_IMPORT_TRANSLATION_KEY,
     SUCCESSFUL_IMPORT_TRANSLATION_KEY,
 )
-from homeassistant.const import CONF_NAME
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import issue_registry as ir
+from smarthub.const import CONF_NAME
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import issue_registry as ir
 
 MOCK_CONF = {
     ATTR_VAPID_EMAIL: "test@example.com",
@@ -26,11 +26,11 @@ MOCK_CONF = {
 MOCK_CONF_PUB_KEY = "BIUtPN7Rq_8U7RBEqClZrfZ5dR9zPCfvxYPtLpWtRVZTJEc7lzv2dhzDU6Aw1m29Ao0-UA1Uq6XO9Df8KALBKqA"
 
 
-async def test_step_user_success(hass: HomeAssistant) -> None:
+async def test_step_user_success(hass: SmartHub) -> None:
     """Test a successful user config flow."""
 
     with patch(
-        "homeassistant.components.html5.async_setup_entry",
+        "smarthub.components.html5.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -52,11 +52,11 @@ async def test_step_user_success(hass: HomeAssistant) -> None:
         assert mock_setup_entry.call_count == 1
 
 
-async def test_step_user_success_generate(hass: HomeAssistant) -> None:
+async def test_step_user_success_generate(hass: SmartHub) -> None:
     """Test a successful user config flow, generating a key pair."""
 
     with patch(
-        "homeassistant.components.html5.async_setup_entry",
+        "smarthub.components.html5.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         conf = {ATTR_VAPID_EMAIL: MOCK_CONF[ATTR_VAPID_EMAIL]}
@@ -72,11 +72,11 @@ async def test_step_user_success_generate(hass: HomeAssistant) -> None:
         assert mock_setup_entry.call_count == 1
 
 
-async def test_step_user_new_form(hass: HomeAssistant) -> None:
+async def test_step_user_new_form(hass: SmartHub) -> None:
     """Test new user input."""
 
     with patch(
-        "homeassistant.components.html5.async_setup_entry",
+        "smarthub.components.html5.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_init(
@@ -102,12 +102,12 @@ async def test_step_user_new_form(hass: HomeAssistant) -> None:
     ],
 )
 async def test_step_user_form_invalid_key(
-    hass: HomeAssistant, key: str, value: str
+    hass: SmartHub, key: str, value: str
 ) -> None:
     """Test invalid user input."""
 
     with patch(
-        "homeassistant.components.html5.async_setup_entry",
+        "smarthub.components.html5.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         bad_conf = MOCK_CONF.copy()
@@ -130,14 +130,14 @@ async def test_step_user_form_invalid_key(
 
 
 async def test_step_import_good(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test valid import input."""
 
     with (
         patch(
-            "homeassistant.components.html5.async_setup_entry",
+            "smarthub.components.html5.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -175,13 +175,13 @@ async def test_step_import_good(
     ],
 )
 async def test_step_import_bad(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry, key: str, value: str
+    hass: SmartHub, issue_registry: ir.IssueRegistry, key: str, value: str
 ) -> None:
     """Test invalid import input."""
 
     with (
         patch(
-            "homeassistant.components.html5.async_setup_entry",
+            "smarthub.components.html5.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):

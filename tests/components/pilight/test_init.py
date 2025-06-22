@@ -8,10 +8,10 @@ from unittest.mock import patch
 import pytest
 from voluptuous import MultipleInvalid
 
-from homeassistant.components import pilight
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import pilight
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     assert_setup_component,
@@ -48,7 +48,7 @@ class PilightDaemonSim:
         _LOGGER.error("PilightDaemonSim payload: %s", call)
 
     def start(self):
-        """Handle homeassistant.start callback.
+        """Handle smarthub.start callback.
 
         Also sends one test message after start up
         """
@@ -59,7 +59,7 @@ class PilightDaemonSim:
             self.called = True
 
     def stop(self):
-        """Handle homeassistant.stop callback."""
+        """Handle smarthub.stop callback."""
         _LOGGER.error("PilightDaemonSim stop")
 
     def set_callback(self, function):
@@ -68,8 +68,8 @@ class PilightDaemonSim:
         _LOGGER.error("PilightDaemonSim callback: %s", function)
 
 
-@patch("homeassistant.components.pilight._LOGGER.error")
-async def test_connection_failed_error(mock_error, hass: HomeAssistant) -> None:
+@patch("smarthub.components.pilight._LOGGER.error")
+async def test_connection_failed_error(mock_error, hass: SmartHub) -> None:
     """Try to connect at 127.0.0.1:5001 with socket error."""
     with (
         assert_setup_component(4),
@@ -84,8 +84,8 @@ async def test_connection_failed_error(mock_error, hass: HomeAssistant) -> None:
         assert mock_error.call_count == 1
 
 
-@patch("homeassistant.components.pilight._LOGGER.error")
-async def test_connection_timeout_error(mock_error, hass: HomeAssistant) -> None:
+@patch("smarthub.components.pilight._LOGGER.error")
+async def test_connection_timeout_error(mock_error, hass: SmartHub) -> None:
     """Try to connect at 127.0.0.1:5001 with socket timeout."""
     with (
         assert_setup_component(4),
@@ -101,7 +101,7 @@ async def test_connection_timeout_error(mock_error, hass: HomeAssistant) -> None
 
 
 @patch("pilight.pilight.Client", PilightDaemonSim)
-async def test_send_code_no_protocol(hass: HomeAssistant) -> None:
+async def test_send_code_no_protocol(hass: SmartHub) -> None:
     """Try to send data without protocol information, should give error."""
     with assert_setup_component(4):
         assert await async_setup_component(hass, pilight.DOMAIN, {pilight.DOMAIN: {}})
@@ -117,10 +117,10 @@ async def test_send_code_no_protocol(hass: HomeAssistant) -> None:
         assert "required key not provided @ data['protocol']" in str(excinfo.value)
 
 
-@patch("homeassistant.components.pilight._LOGGER.error")
-@patch("homeassistant.components.pilight._LOGGER", _LOGGER)
+@patch("smarthub.components.pilight._LOGGER.error")
+@patch("smarthub.components.pilight._LOGGER", _LOGGER)
 @patch("pilight.pilight.Client", PilightDaemonSim)
-async def test_send_code(mock_pilight_error, hass: HomeAssistant) -> None:
+async def test_send_code(mock_pilight_error, hass: SmartHub) -> None:
     """Try to send proper data."""
     with assert_setup_component(4):
         assert await async_setup_component(hass, pilight.DOMAIN, {pilight.DOMAIN: {}})
@@ -140,8 +140,8 @@ async def test_send_code(mock_pilight_error, hass: HomeAssistant) -> None:
 
 
 @patch("pilight.pilight.Client", PilightDaemonSim)
-@patch("homeassistant.components.pilight._LOGGER.error")
-async def test_send_code_fail(mock_pilight_error, hass: HomeAssistant) -> None:
+@patch("smarthub.components.pilight._LOGGER.error")
+async def test_send_code_fail(mock_pilight_error, hass: SmartHub) -> None:
     """Check IOError exception error message."""
     with (
         assert_setup_component(4),
@@ -162,10 +162,10 @@ async def test_send_code_fail(mock_pilight_error, hass: HomeAssistant) -> None:
         assert "Pilight send failed" in str(error_log_call)
 
 
-@patch("homeassistant.components.pilight._LOGGER.error")
-@patch("homeassistant.components.pilight._LOGGER", _LOGGER)
+@patch("smarthub.components.pilight._LOGGER.error")
+@patch("smarthub.components.pilight._LOGGER", _LOGGER)
 @patch("pilight.pilight.Client", PilightDaemonSim)
-async def test_send_code_delay(mock_pilight_error, hass: HomeAssistant) -> None:
+async def test_send_code_delay(mock_pilight_error, hass: SmartHub) -> None:
     """Try to send proper data with delay afterwards."""
     with assert_setup_component(4):
         assert await async_setup_component(
@@ -204,10 +204,10 @@ async def test_send_code_delay(mock_pilight_error, hass: HomeAssistant) -> None:
         assert str(service_data2) in str(error_log_call)
 
 
-@patch("homeassistant.components.pilight._LOGGER.error")
-@patch("homeassistant.components.pilight._LOGGER", _LOGGER)
+@patch("smarthub.components.pilight._LOGGER.error")
+@patch("smarthub.components.pilight._LOGGER", _LOGGER)
 @patch("pilight.pilight.Client", PilightDaemonSim)
-async def test_start_stop(mock_pilight_error, hass: HomeAssistant) -> None:
+async def test_start_stop(mock_pilight_error, hass: SmartHub) -> None:
     """Check correct startup and stop of pilight daemon."""
     with assert_setup_component(4):
         assert await async_setup_component(hass, pilight.DOMAIN, {pilight.DOMAIN: {}})
@@ -229,7 +229,7 @@ async def test_start_stop(mock_pilight_error, hass: HomeAssistant) -> None:
 
 
 @patch("pilight.pilight.Client", PilightDaemonSim)
-async def test_receive_code(hass: HomeAssistant) -> None:
+async def test_receive_code(hass: SmartHub) -> None:
     """Check if code receiving via pilight daemon works."""
     events = async_capture_events(hass, pilight.EVENT)
     with assert_setup_component(4):
@@ -250,7 +250,7 @@ async def test_receive_code(hass: HomeAssistant) -> None:
 
 
 @patch("pilight.pilight.Client", PilightDaemonSim)
-async def test_whitelist_exact_match(hass: HomeAssistant) -> None:
+async def test_whitelist_exact_match(hass: SmartHub) -> None:
     """Check whitelist filter with matched data."""
     events = async_capture_events(hass, pilight.EVENT)
     with assert_setup_component(4):
@@ -279,7 +279,7 @@ async def test_whitelist_exact_match(hass: HomeAssistant) -> None:
 
 
 @patch("pilight.pilight.Client", PilightDaemonSim)
-async def test_whitelist_partial_match(hass: HomeAssistant) -> None:
+async def test_whitelist_partial_match(hass: SmartHub) -> None:
     """Check whitelist filter with partially matched data, should work."""
     events = async_capture_events(hass, pilight.EVENT)
     with assert_setup_component(4):
@@ -306,7 +306,7 @@ async def test_whitelist_partial_match(hass: HomeAssistant) -> None:
 
 
 @patch("pilight.pilight.Client", PilightDaemonSim)
-async def test_whitelist_or_match(hass: HomeAssistant) -> None:
+async def test_whitelist_or_match(hass: SmartHub) -> None:
     """Check whitelist filter with several subsection, should work."""
     events = async_capture_events(hass, pilight.EVENT)
 
@@ -337,7 +337,7 @@ async def test_whitelist_or_match(hass: HomeAssistant) -> None:
 
 
 @patch("pilight.pilight.Client", PilightDaemonSim)
-async def test_whitelist_no_match(hass: HomeAssistant) -> None:
+async def test_whitelist_no_match(hass: SmartHub) -> None:
     """Check whitelist filter with unmatched data, should not work."""
     events = async_capture_events(hass, pilight.EVENT)
 
@@ -356,7 +356,7 @@ async def test_whitelist_no_match(hass: HomeAssistant) -> None:
         assert len(events) == 0
 
 
-async def test_call_rate_delay_throttle_enabled(hass: HomeAssistant) -> None:
+async def test_call_rate_delay_throttle_enabled(hass: SmartHub) -> None:
     """Test that throttling actually work."""
     runs = []
     delay = 5.0
@@ -381,7 +381,7 @@ async def test_call_rate_delay_throttle_enabled(hass: HomeAssistant) -> None:
         assert runs == exp
 
 
-def test_call_rate_delay_throttle_disabled(hass: HomeAssistant) -> None:
+def test_call_rate_delay_throttle_disabled(hass: SmartHub) -> None:
     """Test that the limiter is a noop if no delay set."""
     runs = []
 

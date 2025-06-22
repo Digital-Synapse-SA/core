@@ -11,7 +11,7 @@ import prometheus_client
 from prometheus_client.utils import floatToGoString
 import pytest
 
-from homeassistant.components import (
+from smarthub.components import (
     alarm_control_panel,
     binary_sensor,
     climate,
@@ -31,8 +31,8 @@ from homeassistant.components import (
     switch,
     update,
 )
-from homeassistant.components.alarm_control_panel import AlarmControlPanelState
-from homeassistant.components.climate import (
+from smarthub.components.alarm_control_panel import AlarmControlPanelState
+from smarthub.components.climate import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
     ATTR_FAN_MODES,
@@ -42,7 +42,7 @@ from homeassistant.components.climate import (
     ATTR_TARGET_TEMP_HIGH,
     ATTR_TARGET_TEMP_LOW,
 )
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_DIRECTION,
     ATTR_OSCILLATING,
     ATTR_PERCENTAGE,
@@ -51,10 +51,10 @@ from homeassistant.components.fan import (
     DIRECTION_FORWARD,
     DIRECTION_REVERSE,
 )
-from homeassistant.components.humidifier import ATTR_AVAILABLE_MODES
-from homeassistant.components.lock import LockState
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.humidifier import ATTR_AVAILABLE_MODES
+from smarthub.components.lock import LockState
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_BATTERY_LEVEL,
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
@@ -78,18 +78,18 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.typing import ClientSessionGenerator
 
-PROMETHEUS_PATH = "homeassistant.components.prometheus"
+PROMETHEUS_PATH = "smarthub.components.prometheus"
 
 
 class EntityMetric:
-    """Represents a Prometheus metric for a Home Assistant entity."""
+    """Represents a Prometheus metric for a SmartHub entity."""
 
     metric_name: str
     labels: dict[str, str]
@@ -172,13 +172,13 @@ def test_entity_metric_generates_metric_name_string_without_value() -> None:
     domain = "sensor"
     object_id = "outside_temperature"
     entity_metric = EntityMetric(
-        metric_name="homeassistant_sensor_temperature_celsius",
+        metric_name="smarthub_sensor_temperature_celsius",
         domain=domain,
         friendly_name="Outside Temperature",
         entity=f"{domain}.{object_id}",
     )
     assert entity_metric._metric_name_string == (
-        "homeassistant_sensor_temperature_celsius{"
+        "smarthub_sensor_temperature_celsius{"
         'domain="sensor",'
         'entity="sensor.outside_temperature",'
         'friendly_name="Outside Temperature"}'
@@ -190,13 +190,13 @@ def test_entity_metric_generates_metric_string_with_value() -> None:
     domain = "sensor"
     object_id = "outside_temperature"
     entity_metric = EntityMetric(
-        metric_name="homeassistant_sensor_temperature_celsius",
+        metric_name="smarthub_sensor_temperature_celsius",
         domain=domain,
         friendly_name="Outside Temperature",
         entity=f"{domain}.{object_id}",
     ).withValue(17.2)
     assert entity_metric._metric_string == (
-        "homeassistant_sensor_temperature_celsius{"
+        "smarthub_sensor_temperature_celsius{"
         'domain="sensor",'
         'entity="sensor.outside_temperature",'
         'friendly_name="Outside Temperature"}'
@@ -209,7 +209,7 @@ def test_entity_metric_raises_exception_without_required_labels() -> None:
     domain = "sensor"
     object_id = "outside_temperature"
     test_kwargs = {
-        "metric_name": "homeassistant_sensor_temperature_celsius",
+        "metric_name": "smarthub_sensor_temperature_celsius",
         "domain": domain,
         "friendly_name": "Outside Temperature",
         "entity": f"{domain}.{object_id}",
@@ -230,7 +230,7 @@ def test_entity_metric_raises_exception_if_required_label_is_empty_string() -> N
     domain = "sensor"
     object_id = "outside_temperature"
     test_kwargs = {
-        "metric_name": "homeassistant_sensor_temperature_celsius",
+        "metric_name": "smarthub_sensor_temperature_celsius",
         "domain": domain,
         "friendly_name": "Outside Temperature",
         "entity": f"{domain}.{object_id}",
@@ -252,7 +252,7 @@ def test_entity_metric_generates_alphabetically_ordered_labels() -> None:
     object_id = "outside_temperature"
 
     static_metric_string = (
-        "homeassistant_sensor_temperature_celsius{"
+        "smarthub_sensor_temperature_celsius{"
         'domain="sensor",'
         'entity="sensor.outside_temperature",'
         'friendly_name="Outside Temperature",'
@@ -262,7 +262,7 @@ def test_entity_metric_generates_alphabetically_ordered_labels() -> None:
     )
 
     ordered_entity_metric = EntityMetric(
-        metric_name="homeassistant_sensor_temperature_celsius",
+        metric_name="smarthub_sensor_temperature_celsius",
         domain=domain,
         entity=f"{domain}.{object_id}",
         friendly_name="Outside Temperature",
@@ -271,7 +271,7 @@ def test_entity_metric_generates_alphabetically_ordered_labels() -> None:
     assert ordered_entity_metric._metric_string == static_metric_string
 
     unordered_entity_metric = EntityMetric(
-        metric_name="homeassistant_sensor_temperature_celsius",
+        metric_name="smarthub_sensor_temperature_celsius",
         zed_label="foo",
         entity=f"{domain}.{object_id}",
         friendly_name="Outside Temperature",
@@ -334,14 +334,14 @@ def test_entity_metric_generates_metric_string_with_non_required_labels() -> Non
     )
 
     foo_entity_metric = EntityMetric(
-        metric_name="homeassistant_sensor_temperature_celsius",
+        metric_name="smarthub_sensor_temperature_celsius",
         domain="sensor",
         friendly_name="Outside Temperature",
         entity="sensor.outside_temperature",
         foo="bar",
     ).withValue(17.2)
     assert foo_entity_metric._metric_string == (
-        "homeassistant_sensor_temperature_celsius{"
+        "smarthub_sensor_temperature_celsius{"
         'domain="sensor",'
         'entity="sensor.outside_temperature",'
         'foo="bar",'
@@ -354,7 +354,7 @@ def test_entity_metric_generates_metric_string_with_non_required_labels() -> Non
 def test_entity_metric_assert_helpers() -> None:
     """Test using EntityMetric for both assert_in_metrics and assert_not_in_metrics."""
     temp_metric = (
-        "homeassistant_sensor_temperature_celsius{"
+        "smarthub_sensor_temperature_celsius{"
         'domain="sensor",'
         'entity="sensor.outside_temperature",'
         'foo="bar",'
@@ -385,7 +385,7 @@ def test_entity_metric_assert_helpers() -> None:
     assert excluded_cover_metric not in metrics
     # now check for actual metrics
     temp_entity_metric = EntityMetric(
-        metric_name="homeassistant_sensor_temperature_celsius",
+        metric_name="smarthub_sensor_temperature_celsius",
         domain="sensor",
         friendly_name="Outside Temperature",
         entity="sensor.outside_temperature",
@@ -418,7 +418,7 @@ def test_entity_metric_assert_helpers() -> None:
 def test_entity_metric_with_value_assert_helpers() -> None:
     """Test using EntityMetricWithValue helpers, which is only assert_in_metrics."""
     temp_metric = (
-        "homeassistant_sensor_temperature_celsius{"
+        "smarthub_sensor_temperature_celsius{"
         'domain="sensor",'
         'entity="sensor.outside_temperature",'
         'foo="bar",'
@@ -440,7 +440,7 @@ def test_entity_metric_with_value_assert_helpers() -> None:
         climate_metric,
     ]
     temp_entity_metric = EntityMetric(
-        metric_name="homeassistant_sensor_temperature_celsius",
+        metric_name="smarthub_sensor_temperature_celsius",
         domain="sensor",
         friendly_name="Outside Temperature",
         entity="sensor.outside_temperature",
@@ -462,7 +462,7 @@ def test_entity_metric_with_value_assert_helpers() -> None:
 
 @pytest.fixture(name="client")
 async def setup_prometheus_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     namespace: str,
 ):
@@ -499,7 +499,7 @@ async def generate_latest_metrics(client):
 
 @pytest.mark.parametrize("namespace", [""])
 async def test_setup_enumeration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     entity_registry: er.EntityRegistry,
     namespace: str,
@@ -525,7 +525,7 @@ async def test_setup_enumeration(
     client = await hass_client()
     body = await generate_latest_metrics(client)
     EntityMetric(
-        metric_name="homeassistant_sensor_temperature_celsius",
+        metric_name="smarthub_sensor_temperature_celsius",
         domain="sensor",
         friendly_name="Outside Temperature",
         entity="sensor.outside_temperature",
@@ -572,7 +572,7 @@ async def test_view_default_namespace(
     )
 
     EntityMetric(
-        metric_name="homeassistant_sensor_temperature_celsius",
+        metric_name="smarthub_sensor_temperature_celsius",
         domain="sensor",
         friendly_name="Outside Temperature",
         entity="sensor.outside_temperature",
@@ -1252,7 +1252,7 @@ async def test_update(
 
 @pytest.mark.parametrize("namespace", [""])
 async def test_renaming_entity_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client: ClientSessionGenerator,
     sensor_entities: dict[str, er.RegistryEntry],
@@ -1390,7 +1390,7 @@ async def test_renaming_entity_name(
 
 @pytest.mark.parametrize("namespace", [""])
 async def test_renaming_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client: ClientSessionGenerator,
     sensor_entities: dict[str, er.RegistryEntry],
@@ -1477,7 +1477,7 @@ async def test_renaming_entity_id(
 
 @pytest.mark.parametrize("namespace", [""])
 async def test_deleting_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client: ClientSessionGenerator,
     sensor_entities: dict[str, er.RegistryEntry],
@@ -1564,7 +1564,7 @@ async def test_deleting_entity(
 
 @pytest.mark.parametrize("namespace", [""])
 async def test_disabling_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client: ClientSessionGenerator,
     sensor_entities: dict[str, er.RegistryEntry],
@@ -1667,7 +1667,7 @@ async def test_disabling_entity(
 @pytest.mark.parametrize("namespace", [""])
 @pytest.mark.parametrize("unavailable_state", [STATE_UNAVAILABLE, STATE_UNKNOWN])
 async def test_entity_becomes_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client: ClientSessionGenerator,
     sensor_entities: dict[str, er.RegistryEntry],
@@ -1838,7 +1838,7 @@ async def test_entity_becomes_unavailable(
 
 @pytest.fixture(name="sensor_entities")
 async def sensor_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate sensor entities."""
     data = {}
@@ -1984,7 +1984,7 @@ async def sensor_fixture(
 
 @pytest.fixture(name="climate_entities")
 async def climate_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry | dict[str, Any]]:
     """Simulate climate entities."""
     data = {}
@@ -2056,7 +2056,7 @@ async def climate_fixture(
 
 @pytest.fixture(name="humidifier_entities")
 async def humidifier_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry | dict[str, Any]]:
     """Simulate humidifier entities."""
     data = {}
@@ -2112,7 +2112,7 @@ async def humidifier_fixture(
 
 @pytest.fixture(name="lock_entities")
 async def lock_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate lock entities."""
     data = {}
@@ -2142,7 +2142,7 @@ async def lock_fixture(
 
 @pytest.fixture(name="cover_entities")
 async def cover_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate cover entities."""
     data = {}
@@ -2216,7 +2216,7 @@ async def cover_fixture(
 
 @pytest.fixture(name="input_number_entities")
 async def input_number_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate input_number entities."""
     data = {}
@@ -2267,7 +2267,7 @@ async def input_number_fixture(
 
 @pytest.fixture(name="number_entities")
 async def number_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate number entities."""
     data = {}
@@ -2307,7 +2307,7 @@ async def number_fixture(
 
 @pytest.fixture(name="input_boolean_entities")
 async def input_boolean_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate input_boolean entities."""
     data = {}
@@ -2337,7 +2337,7 @@ async def input_boolean_fixture(
 
 @pytest.fixture(name="binary_sensor_entities")
 async def binary_sensor_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate binary_sensor entities."""
     data = {}
@@ -2367,7 +2367,7 @@ async def binary_sensor_fixture(
 
 @pytest.fixture(name="light_entities")
 async def light_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate light entities."""
     data = {}
@@ -2434,7 +2434,7 @@ async def light_fixture(
 
 @pytest.fixture(name="switch_entities")
 async def switch_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry | dict[str, Any]]:
     """Simulate switch entities."""
     data = {}
@@ -2468,7 +2468,7 @@ async def switch_fixture(
 
 @pytest.fixture(name="fan_entities")
 async def fan_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate fan entities."""
     data = {}
@@ -2508,7 +2508,7 @@ async def fan_fixture(
 
 @pytest.fixture(name="alarm_control_panel_entities")
 async def alarm_control_panel_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate alarm control panel entities."""
     data = {}
@@ -2538,7 +2538,7 @@ async def alarm_control_panel_fixture(
 
 @pytest.fixture(name="person_entities")
 async def person_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate person entities."""
     data = {}
@@ -2568,7 +2568,7 @@ async def person_fixture(
 
 @pytest.fixture(name="device_tracker_entities")
 async def device_tracker_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate device_tracker entities."""
     data = {}
@@ -2598,7 +2598,7 @@ async def device_tracker_fixture(
 
 @pytest.fixture(name="counter_entities")
 async def counter_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate counter entities."""
     data = {}
@@ -2617,7 +2617,7 @@ async def counter_fixture(
 
 @pytest.fixture(name="update_entities")
 async def update_fixture(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> dict[str, er.RegistryEntry]:
     """Simulate update entities."""
     data = {}
@@ -2646,7 +2646,7 @@ async def update_fixture(
 
 
 def set_state_with_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: er.RegistryEntry,
     state,
     additional_attributes=None,
@@ -2682,14 +2682,14 @@ def mock_client_fixture():
         yield counter_client
 
 
-async def test_minimal_config(hass: HomeAssistant, mock_client: mock.MagicMock) -> None:
+async def test_minimal_config(hass: SmartHub, mock_client: mock.MagicMock) -> None:
     """Test the minimal config and defaults of component."""
     config = {prometheus.DOMAIN: {}}
     assert await async_setup_component(hass, prometheus.DOMAIN, config)
     await hass.async_block_till_done()
 
 
-async def test_full_config(hass: HomeAssistant, mock_client: mock.MagicMock) -> None:
+async def test_full_config(hass: SmartHub, mock_client: mock.MagicMock) -> None:
     """Test the full config of component."""
     config = {
         prometheus.DOMAIN: {
@@ -2714,14 +2714,14 @@ async def test_full_config(hass: HomeAssistant, mock_client: mock.MagicMock) -> 
     await hass.async_block_till_done()
 
 
-async def _setup(hass: HomeAssistant, filter_config):
+async def _setup(hass: SmartHub, filter_config):
     """Shared set up for filtering tests."""
     config = {prometheus.DOMAIN: {"filter": filter_config}}
     assert await async_setup_component(hass, prometheus.DOMAIN, config)
     await hass.async_block_till_done()
 
 
-async def test_allowlist(hass: HomeAssistant, mock_client: mock.MagicMock) -> None:
+async def test_allowlist(hass: SmartHub, mock_client: mock.MagicMock) -> None:
     """Test an allowlist only config."""
     await _setup(
         hass,
@@ -2750,7 +2750,7 @@ async def test_allowlist(hass: HomeAssistant, mock_client: mock.MagicMock) -> No
         mock_client.labels.reset_mock()
 
 
-async def test_denylist(hass: HomeAssistant, mock_client: mock.MagicMock) -> None:
+async def test_denylist(hass: SmartHub, mock_client: mock.MagicMock) -> None:
     """Test a denylist only config."""
     await _setup(
         hass,
@@ -2780,7 +2780,7 @@ async def test_denylist(hass: HomeAssistant, mock_client: mock.MagicMock) -> Non
 
 
 async def test_filtered_denylist(
-    hass: HomeAssistant, mock_client: mock.MagicMock
+    hass: SmartHub, mock_client: mock.MagicMock
 ) -> None:
     """Test a denylist config with a filtering allowlist."""
     await _setup(

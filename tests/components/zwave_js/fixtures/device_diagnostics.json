@@ -1,6 +1,6 @@
 {
   "home_assistant": {
-    "installation_type": "Home Assistant OS",
+    "installation_type": "SmartHub OS",
     "version": "2023.10.5",
     "dev": false,
     "hassio": true,
@@ -12,7 +12,7 @@
     "os_name": "Linux",
     "os_version": "6.1.56",
     "supervisor": "2023.10.1",
-    "host_os": "Home Assistant OS 11.0",
+    "host_os": "SmartHub OS 11.0",
     "docker_version": "24.0.6",
     "chassis": "embedded",
     "run_as_root": true
@@ -26,10 +26,10 @@
   "integration_manifest": {
     "domain": "zwave_js",
     "name": "Z-Wave",
-    "codeowners": ["@home-assistant/z-wave"],
+    "codeowners": ["@smart-hub/z-wave"],
     "config_flow": true,
     "dependencies": ["http", "repairs", "usb", "websocket_api"],
-    "documentation": "https://www.home-assistant.io/integrations/zwave_js",
+    "documentation": "https://www.smart-hub.io/integrations/zwave_js",
     "integration_type": "hub",
     "iot_class": "local_push",
     "loggers": ["zwave_js_server"],

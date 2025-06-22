@@ -2,10 +2,10 @@
 
 import requests_mock
 
-from homeassistant import config_entries
-from homeassistant.components.starline import config_flow
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.starline import config_flow
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 TEST_APP_ID = "666"
 TEST_APP_SECRET = "appsecret"
@@ -18,7 +18,7 @@ TEST_APP_USERNAME = "sluser"
 TEST_APP_PASSWORD = "slpassword"
 
 
-async def test_flow_works(hass: HomeAssistant) -> None:
+async def test_flow_works(hass: SmartHub) -> None:
     """Test that config flow works."""
     with requests_mock.Mocker() as mock:
         mock.get(
@@ -70,7 +70,7 @@ async def test_flow_works(hass: HomeAssistant) -> None:
         assert result["title"] == f"Application {TEST_APP_ID}"
 
 
-async def test_step_auth_app_code_falls(hass: HomeAssistant) -> None:
+async def test_step_auth_app_code_falls(hass: SmartHub) -> None:
     """Test config flow works when app auth code fails."""
     with requests_mock.Mocker() as mock:
         mock.get(
@@ -89,7 +89,7 @@ async def test_step_auth_app_code_falls(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "error_auth_app"}
 
 
-async def test_step_auth_app_token_falls(hass: HomeAssistant) -> None:
+async def test_step_auth_app_token_falls(hass: SmartHub) -> None:
     """Test config flow works when app auth token fails."""
     with requests_mock.Mocker() as mock:
         mock.get(
@@ -112,7 +112,7 @@ async def test_step_auth_app_token_falls(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "error_auth_app"}
 
 
-async def test_step_auth_user_falls(hass: HomeAssistant) -> None:
+async def test_step_auth_user_falls(hass: SmartHub) -> None:
     """Test config flow works when user fails."""
     with requests_mock.Mocker() as mock:
         mock.post("https://id.starline.ru/apiV3/user/login/", text='{"state": 0}')

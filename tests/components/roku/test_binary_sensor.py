@@ -5,11 +5,11 @@ from unittest.mock import MagicMock
 import pytest
 from rokuecp import Device as RokuDevice
 
-from homeassistant.components.binary_sensor import STATE_OFF, STATE_ON
-from homeassistant.components.roku.const import DOMAIN
-from homeassistant.const import ATTR_DEVICE_CLASS, ATTR_FRIENDLY_NAME, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.binary_sensor import STATE_OFF, STATE_ON
+from smarthub.components.roku.const import DOMAIN
+from smarthub.const import ATTR_DEVICE_CLASS, ATTR_FRIENDLY_NAME, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import UPNP_SERIAL
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_roku_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
@@ -82,7 +82,7 @@ async def test_roku_binary_sensors(
 
 @pytest.mark.parametrize("mock_device", ["roku/rokutv-7820x.json"], indirect=True)
 async def test_rokutv_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,

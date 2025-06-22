@@ -10,8 +10,8 @@ import pytest
 import requests.exceptions
 import requests_mock
 
-from homeassistant.components.plex import config_flow
-from homeassistant.components.plex.const import (
+from smarthub.components.plex import config_flow
+from smarthub.components.plex.const import (
     AUTOMATIC_SETUP_STRING,
     CONF_IGNORE_NEW_SHARED_USERS,
     CONF_IGNORE_PLEX_WEB_CLIENTS,
@@ -24,12 +24,12 @@ from homeassistant.components.plex.const import (
     PLEX_SERVER_CONFIG,
     SERVERS,
 )
-from homeassistant.config_entries import (
+from smarthub.config_entries import (
     SOURCE_INTEGRATION_DISCOVERY,
     SOURCE_USER,
     ConfigEntryState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_HOST,
     CONF_PORT,
     CONF_SSL,
@@ -38,8 +38,8 @@ from homeassistant.const import (
     CONF_VERIFY_SSL,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import DEFAULT_OPTIONS, MOCK_SERVERS, MOCK_TOKEN, PLEX_DIRECT_URL
 from .mock_classes import MockGDM
@@ -49,7 +49,7 @@ from tests.typing import ClientSessionGenerator
 
 
 @pytest.mark.usefixtures("current_request_with_host")
-async def test_bad_credentials(hass: HomeAssistant) -> None:
+async def test_bad_credentials(hass: SmartHub) -> None:
     """Test when provided credentials are rejected."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -80,7 +80,7 @@ async def test_bad_credentials(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("current_request_with_host")
-async def test_bad_hostname(hass: HomeAssistant, mock_plex_calls) -> None:
+async def test_bad_hostname(hass: SmartHub, mock_plex_calls) -> None:
     """Test when an invalid address is provided."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -112,7 +112,7 @@ async def test_bad_hostname(hass: HomeAssistant, mock_plex_calls) -> None:
 
 
 @pytest.mark.usefixtures("current_request_with_host")
-async def test_unknown_exception(hass: HomeAssistant) -> None:
+async def test_unknown_exception(hass: SmartHub) -> None:
     """Test when an unknown exception is encountered."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -140,7 +140,7 @@ async def test_unknown_exception(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_no_servers_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_plex_calls,
     requests_mock: requests_mock.Mocker,
     empty_payload,
@@ -174,7 +174,7 @@ async def test_no_servers_found(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_single_available_server(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_plex_calls,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -216,7 +216,7 @@ async def test_single_available_server(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_multiple_servers_with_selection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_plex_calls,
     requests_mock: requests_mock.Mocker,
     plextv_resources_two_servers,
@@ -273,7 +273,7 @@ async def test_multiple_servers_with_selection(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_adding_last_unconfigured_server(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_plex_calls,
     requests_mock: requests_mock.Mocker,
     plextv_resources_two_servers,
@@ -330,7 +330,7 @@ async def test_adding_last_unconfigured_server(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_all_available_servers_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry,
     requests_mock: requests_mock.Mocker,
     plextv_account,
@@ -376,7 +376,7 @@ async def test_all_available_servers_configured(
         assert result["reason"] == "all_configured"
 
 
-async def test_option_flow(hass: HomeAssistant, entry, mock_plex_server) -> None:
+async def test_option_flow(hass: SmartHub, entry, mock_plex_server) -> None:
     """Test config options flow selection."""
     assert len(hass.config_entries.async_entries(DOMAIN)) == 1
     assert entry.state is ConfigEntryState.LOADED
@@ -409,7 +409,7 @@ async def test_option_flow(hass: HomeAssistant, entry, mock_plex_server) -> None
 
 
 async def test_missing_option_flow(
-    hass: HomeAssistant, entry, mock_plex_server
+    hass: SmartHub, entry, mock_plex_server
 ) -> None:
     """Test config options flow selection when no options stored."""
     assert len(hass.config_entries.async_entries(DOMAIN)) == 1
@@ -443,7 +443,7 @@ async def test_missing_option_flow(
 
 
 async def test_option_flow_new_users_available(
-    hass: HomeAssistant, entry, setup_plex_server
+    hass: SmartHub, entry, setup_plex_server
 ) -> None:
     """Test config options multiselect defaults when new Plex users are seen."""
     OPTIONS_OWNER_ONLY = copy.deepcopy(DEFAULT_OPTIONS)
@@ -476,7 +476,7 @@ async def test_option_flow_new_users_available(
 
 
 @pytest.mark.usefixtures("current_request_with_host")
-async def test_external_timed_out(hass: HomeAssistant) -> None:
+async def test_external_timed_out(hass: SmartHub) -> None:
     """Test when external flow times out."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -503,7 +503,7 @@ async def test_external_timed_out(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_callback_view(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
 ) -> None:
     """Test callback view."""
@@ -530,7 +530,7 @@ async def test_callback_view(
 
 
 @pytest.mark.usefixtures("current_request_with_host")
-async def test_manual_config(hass: HomeAssistant, mock_plex_calls) -> None:
+async def test_manual_config(hass: SmartHub, mock_plex_calls) -> None:
     """Test creating via manual configuration."""
 
     class WrongCertValidaitionException(requests.exceptions.SSLError):
@@ -633,7 +633,7 @@ async def test_manual_config(hass: HomeAssistant, mock_plex_calls) -> None:
     assert result["errors"]["base"] == "ssl_error"
 
     with patch(
-        "homeassistant.components.plex.PlexServer.connect",
+        "smarthub.components.plex.PlexServer.connect",
         side_effect=requests.exceptions.SSLError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -645,8 +645,8 @@ async def test_manual_config(hass: HomeAssistant, mock_plex_calls) -> None:
     assert result["errors"]["base"] == "ssl_error"
 
     with (
-        patch("homeassistant.components.plex.PlexWebsocket", autospec=True),
-        patch("homeassistant.components.plex.GDM", return_value=MockGDM(disabled=True)),
+        patch("smarthub.components.plex.PlexWebsocket", autospec=True),
+        patch("smarthub.components.plex.GDM", return_value=MockGDM(disabled=True)),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], user_input=MANUAL_SERVER
@@ -663,7 +663,7 @@ async def test_manual_config(hass: HomeAssistant, mock_plex_calls) -> None:
 
 
 async def test_manual_config_with_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_plex_calls,
     requests_mock: requests_mock.Mocker,
     empty_library,
@@ -687,8 +687,8 @@ async def test_manual_config_with_token(
     assert result["step_id"] == "manual_setup"
 
     with (
-        patch("homeassistant.components.plex.GDM", return_value=MockGDM(disabled=True)),
-        patch("homeassistant.components.plex.PlexWebsocket", autospec=True),
+        patch("smarthub.components.plex.GDM", return_value=MockGDM(disabled=True)),
+        patch("smarthub.components.plex.PlexWebsocket", autospec=True),
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], user_input={CONF_TOKEN: MOCK_TOKEN}
@@ -710,11 +710,11 @@ async def test_manual_config_with_token(
     await hass.async_block_till_done()
 
 
-async def test_integration_discovery(hass: HomeAssistant) -> None:
+async def test_integration_discovery(hass: SmartHub) -> None:
     """Test integration self-discovery."""
     mock_gdm = MockGDM()
 
-    with patch("homeassistant.components.plex.config_flow.GDM", return_value=mock_gdm):
+    with patch("smarthub.components.plex.config_flow.GDM", return_value=mock_gdm):
         await config_flow.async_discover(hass)
         await hass.async_block_till_done(wait_background_tasks=True)
 
@@ -735,7 +735,7 @@ async def test_integration_discovery(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
     mock_plex_calls: None,
     mock_setup_entry: AsyncMock,
@@ -775,7 +775,7 @@ async def test_reauth(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_multiple_servers_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry: MockConfigEntry,
     mock_plex_calls: None,
     requests_mock: requests_mock.Mocker,
@@ -821,7 +821,7 @@ async def test_reauth_multiple_servers_available(
     mock_setup_entry.assert_called_once()
 
 
-async def test_client_request_missing(hass: HomeAssistant) -> None:
+async def test_client_request_missing(hass: SmartHub) -> None:
     """Test when client headers are not set properly."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -840,7 +840,7 @@ async def test_client_request_missing(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("current_request_with_host")
-async def test_client_header_issues(hass: HomeAssistant) -> None:
+async def test_client_header_issues(hass: SmartHub) -> None:
     """Test when client headers are not set properly."""
 
     class MockRequest:
@@ -856,7 +856,7 @@ async def test_client_header_issues(hass: HomeAssistant) -> None:
         patch("plexauth.PlexAuth.initiate_auth"),
         patch("plexauth.PlexAuth.token", return_value=None),
         patch(
-            "homeassistant.helpers.http.current_request.get",
+            "smarthub.helpers.http.current_request.get",
             return_value=MockRequest(),
         ),
         pytest.raises(

@@ -2,13 +2,13 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def setup_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_ondilo_client: MagicMock
+    hass: SmartHub, config_entry: MockConfigEntry, mock_ondilo_client: MagicMock
 ) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)

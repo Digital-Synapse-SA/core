@@ -1,14 +1,14 @@
 """Test DoorBird buttons."""
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .conftest import DoorbirdMockerType
 
 
 async def test_relay_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     doorbird_mocker: DoorbirdMockerType,
 ) -> None:
     """Test pressing a relay button."""
@@ -23,7 +23,7 @@ async def test_relay_button(
 
 
 async def test_ir_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     doorbird_mocker: DoorbirdMockerType,
 ) -> None:
     """Test pressing the IR button."""
@@ -38,7 +38,7 @@ async def test_ir_button(
 
 
 async def test_reset_favorites_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     doorbird_mocker: DoorbirdMockerType,
 ) -> None:
     """Test pressing the reset favorites button."""

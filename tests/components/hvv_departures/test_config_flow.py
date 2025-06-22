@@ -5,16 +5,16 @@ from unittest.mock import patch
 
 from pygti.exceptions import CannotConnect, InvalidAuth
 
-from homeassistant.components.hvv_departures.const import (
+from smarthub.components.hvv_departures.const import (
     CONF_FILTER,
     CONF_REAL_TIME,
     CONF_STATION,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_OFFSET, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_OFFSET, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -28,24 +28,24 @@ FIXTURE_OPTIONS = json.loads(load_fixture("hvv_departures/options.json"))
 FIXTURE_DEPARTURE_LIST = json.loads(load_fixture("hvv_departures/departure_list.json"))
 
 
-async def test_user_flow(hass: HomeAssistant) -> None:
+async def test_user_flow(hass: SmartHub) -> None:
     """Test that config flow works."""
 
     with (
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.init",
+            "smarthub.components.hvv_departures.hub.GTI.init",
             return_value=FIXTURE_INIT,
         ),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.checkName",
+            "smarthub.components.hvv_departures.hub.GTI.checkName",
             return_value=FIXTURE_CHECK_NAME,
         ),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.stationInformation",
+            "smarthub.components.hvv_departures.hub.GTI.stationInformation",
             return_value=FIXTURE_STATION_INFORMATION,
         ),
         patch(
-            "homeassistant.components.hvv_departures.async_setup_entry",
+            "smarthub.components.hvv_departures.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -96,20 +96,20 @@ async def test_user_flow(hass: HomeAssistant) -> None:
         }
 
 
-async def test_user_flow_no_results(hass: HomeAssistant) -> None:
+async def test_user_flow_no_results(hass: SmartHub) -> None:
     """Test that config flow works when there are no results."""
 
     with (
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.init",
+            "smarthub.components.hvv_departures.hub.GTI.init",
             return_value=FIXTURE_INIT,
         ),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.checkName",
+            "smarthub.components.hvv_departures.hub.GTI.checkName",
             return_value={"returnCode": "OK", "results": []},
         ),
         patch(
-            "homeassistant.components.hvv_departures.async_setup_entry",
+            "smarthub.components.hvv_departures.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -137,11 +137,11 @@ async def test_user_flow_no_results(hass: HomeAssistant) -> None:
         assert result_station["errors"]["base"] == "no_results"
 
 
-async def test_user_flow_invalid_auth(hass: HomeAssistant) -> None:
+async def test_user_flow_invalid_auth(hass: SmartHub) -> None:
     """Test that config flow handles invalid auth."""
 
     with patch(
-        "homeassistant.components.hvv_departures.hub.GTI.init",
+        "smarthub.components.hvv_departures.hub.GTI.init",
         side_effect=InvalidAuth(
             "ERROR_TEXT",
             "Bei der Verarbeitung der Anfrage ist ein technisches Problem aufgetreten.",  # codespell:ignore ist
@@ -163,11 +163,11 @@ async def test_user_flow_invalid_auth(hass: HomeAssistant) -> None:
         assert result_user["errors"] == {"base": "invalid_auth"}
 
 
-async def test_user_flow_cannot_connect(hass: HomeAssistant) -> None:
+async def test_user_flow_cannot_connect(hass: SmartHub) -> None:
     """Test that config flow handles connection errors."""
 
     with patch(
-        "homeassistant.components.hvv_departures.hub.GTI.init",
+        "smarthub.components.hvv_departures.hub.GTI.init",
         side_effect=CannotConnect(),
     ):
         # step: user
@@ -185,16 +185,16 @@ async def test_user_flow_cannot_connect(hass: HomeAssistant) -> None:
         assert result_user["errors"] == {"base": "cannot_connect"}
 
 
-async def test_user_flow_station(hass: HomeAssistant) -> None:
+async def test_user_flow_station(hass: SmartHub) -> None:
     """Test that config flow handles empty data on step station."""
 
     with (
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.init",
+            "smarthub.components.hvv_departures.hub.GTI.init",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.checkName",
+            "smarthub.components.hvv_departures.hub.GTI.checkName",
             return_value={"returnCode": "OK", "results": []},
         ),
     ):
@@ -221,16 +221,16 @@ async def test_user_flow_station(hass: HomeAssistant) -> None:
         assert result_station["step_id"] == "station"
 
 
-async def test_user_flow_station_select(hass: HomeAssistant) -> None:
+async def test_user_flow_station_select(hass: SmartHub) -> None:
     """Test that config flow handles empty data on step station_select."""
 
     with (
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.init",
+            "smarthub.components.hvv_departures.hub.GTI.init",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.checkName",
+            "smarthub.components.hvv_departures.hub.GTI.checkName",
             return_value=FIXTURE_CHECK_NAME,
         ),
     ):
@@ -259,7 +259,7 @@ async def test_user_flow_station_select(hass: HomeAssistant) -> None:
         assert result_station_select["step_id"] == "station_select"
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test that options flow works."""
 
     config_entry = MockConfigEntry(
@@ -274,13 +274,13 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.hvv_departures.PLATFORMS", new=[]),
+        patch("smarthub.components.hvv_departures.PLATFORMS", new=[]),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.init",
+            "smarthub.components.hvv_departures.hub.GTI.init",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.departureList",
+            "smarthub.components.hvv_departures.hub.GTI.departureList",
             return_value=FIXTURE_DEPARTURE_LIST,
         ),
     ):
@@ -312,7 +312,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
         }
 
 
-async def test_options_flow_invalid_auth(hass: HomeAssistant) -> None:
+async def test_options_flow_invalid_auth(hass: SmartHub) -> None:
     """Test that options flow works."""
 
     config_entry = MockConfigEntry(
@@ -327,12 +327,12 @@ async def test_options_flow_invalid_auth(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.hvv_departures.PLATFORMS", new=[]),
+        patch("smarthub.components.hvv_departures.PLATFORMS", new=[]),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.init", return_value=True
+            "smarthub.components.hvv_departures.hub.GTI.init", return_value=True
         ),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.departureList",
+            "smarthub.components.hvv_departures.hub.GTI.departureList",
             return_value=FIXTURE_DEPARTURE_LIST,
         ),
     ):
@@ -340,7 +340,7 @@ async def test_options_flow_invalid_auth(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.hvv_departures.hub.GTI.departureList",
+        "smarthub.components.hvv_departures.hub.GTI.departureList",
         side_effect=InvalidAuth(
             "ERROR_TEXT",
             "Bei der Verarbeitung der Anfrage ist ein technisches Problem aufgetreten.",  # codespell:ignore ist
@@ -355,7 +355,7 @@ async def test_options_flow_invalid_auth(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_options_flow_cannot_connect(hass: HomeAssistant) -> None:
+async def test_options_flow_cannot_connect(hass: SmartHub) -> None:
     """Test that options flow works."""
 
     config_entry = MockConfigEntry(
@@ -370,12 +370,12 @@ async def test_options_flow_cannot_connect(hass: HomeAssistant) -> None:
     config_entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.hvv_departures.PLATFORMS", new=[]),
+        patch("smarthub.components.hvv_departures.PLATFORMS", new=[]),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.init", return_value=True
+            "smarthub.components.hvv_departures.hub.GTI.init", return_value=True
         ),
         patch(
-            "homeassistant.components.hvv_departures.hub.GTI.departureList",
+            "smarthub.components.hvv_departures.hub.GTI.departureList",
             return_value=FIXTURE_DEPARTURE_LIST,
         ),
     ):
@@ -383,7 +383,7 @@ async def test_options_flow_cannot_connect(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.hvv_departures.hub.GTI.departureList",
+        "smarthub.components.hvv_departures.hub.GTI.departureList",
         side_effect=CannotConnect(),
     ):
         result = await hass.config_entries.options.async_init(config_entry.entry_id)

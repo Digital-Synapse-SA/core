@@ -6,9 +6,9 @@ from unittest.mock import patch
 from aiohttp import ClientSession
 import pytest
 
-from homeassistant.components import media_source
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import media_source
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import TEST_IMAGE
 
@@ -16,13 +16,13 @@ from tests.typing import ClientSessionGenerator
 
 
 @pytest.fixture(autouse=True)
-async def setup_media_source(hass: HomeAssistant) -> None:
+async def setup_media_source(hass: SmartHub) -> None:
     """Set up media source."""
     assert await async_setup_component(hass, "media_source", {})
 
 
 async def __upload_test_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> str:
     with (
@@ -44,7 +44,7 @@ async def __upload_test_image(
 
 
 async def test_browsing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test browsing image media source."""
@@ -69,7 +69,7 @@ async def test_browsing(
 
 
 async def test_resolving(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test resolving."""
     image_id = await __upload_test_image(hass, hass_client)

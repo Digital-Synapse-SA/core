@@ -3,16 +3,16 @@
 from unittest.mock import MagicMock
 from urllib.error import HTTPError
 
-from homeassistant.components.nextbus.coordinator import NextBusHTTPError
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.nextbus.coordinator import NextBusHTTPError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import assert_setup_sensor
 from .const import CONFIG_BASIC
 
 
 async def test_setup_retry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nextbus: MagicMock,
     mock_nextbus_lists: MagicMock,
     mock_nextbus_predictions: MagicMock,

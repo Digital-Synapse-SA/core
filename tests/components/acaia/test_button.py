@@ -6,15 +6,15 @@ from unittest.mock import MagicMock, patch
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.const import (
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -28,7 +28,7 @@ BUTTONS = (
 
 
 async def test_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_scale: MagicMock,
@@ -36,13 +36,13 @@ async def test_buttons(
 ) -> None:
     """Test the acaia buttons."""
 
-    with patch("homeassistant.components.acaia.PLATFORMS", [Platform.BUTTON]):
+    with patch("smarthub.components.acaia.PLATFORMS", [Platform.BUTTON]):
         await setup_integration(hass, mock_config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_button_presses(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_scale: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_button_presses(
 
 
 async def test_buttons_unavailable_on_disconnected_scale(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_scale: MagicMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

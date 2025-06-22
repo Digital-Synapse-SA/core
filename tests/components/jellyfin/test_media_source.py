@@ -5,16 +5,16 @@ from unittest.mock import MagicMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.jellyfin.const import DOMAIN
-from homeassistant.components.media_player import BrowseError
-from homeassistant.components.media_source import (
+from smarthub.components.jellyfin.const import DOMAIN
+from smarthub.components.media_player import BrowseError
+from smarthub.components.media_source import (
     DOMAIN as MEDIA_SOURCE_DOMAIN,
     URI_SCHEME,
     async_browse_media,
     async_resolve_media,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import load_json_fixture
 
@@ -22,13 +22,13 @@ from tests.common import MockConfigEntry
 
 
 @pytest.fixture(autouse=True)
-async def setup_component(hass: HomeAssistant) -> None:
+async def setup_component(hass: SmartHub) -> None:
     """Set up component."""
     assert await async_setup_component(hass, MEDIA_SOURCE_DOMAIN, {})
 
 
 async def test_resolve(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,
@@ -80,7 +80,7 @@ async def test_resolve(
     [("aac"), ("wma"), ("vorbis"), ("mp3")],
 )
 async def test_audio_codec_resolve(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,
@@ -112,7 +112,7 @@ async def test_audio_codec_resolve(
 
 
 async def test_root(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,
@@ -130,7 +130,7 @@ async def test_root(
 
 
 async def test_tv_library(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,
@@ -195,7 +195,7 @@ async def test_tv_library(
 
 
 async def test_movie_library(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,
@@ -234,7 +234,7 @@ async def test_movie_library(
 
 
 async def test_music_library(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,
@@ -337,7 +337,7 @@ async def test_music_library(
 
 
 async def test_browse_unsupported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     init_integration: MockConfigEntry,
     mock_jellyfin: MagicMock,

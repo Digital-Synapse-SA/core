@@ -8,15 +8,15 @@ import pytest
 from pytest_unordered import unordered
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.event import (
+from smarthub.components.event import (
     ATTR_EVENT_TYPE,
     ATTR_EVENT_TYPES,
     DOMAIN as EVENT_DOMAIN,
     EventDeviceClass,
 )
-from homeassistant.const import ATTR_DEVICE_CLASS, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.const import ATTR_DEVICE_CLASS, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import init_integration, inject_rpc_device_event, register_entity
 
@@ -24,7 +24,7 @@ DEVICE_BLOCK_ID = 4
 
 
 async def test_rpc_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -66,7 +66,7 @@ async def test_rpc_button(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_rpc_script_1_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -123,7 +123,7 @@ async def test_rpc_script_1_event(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_rpc_script_2_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -138,7 +138,7 @@ async def test_rpc_script_2_event(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_rpc_script_ble_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -152,7 +152,7 @@ async def test_rpc_script_ble_event(
 
 
 async def test_rpc_event_removal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -169,7 +169,7 @@ async def test_rpc_event_removal(
 
 
 async def test_block_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     monkeypatch: pytest.MonkeyPatch,
     mock_block_device: Mock,
     entity_registry: EntityRegistry,
@@ -202,7 +202,7 @@ async def test_block_event(
 
 
 async def test_block_event_shix3_1(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device event for SHIX3-1."""
     monkeypatch.setitem(mock_block_device.shelly, "num_outputs", 1)

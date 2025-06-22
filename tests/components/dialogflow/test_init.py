@@ -6,12 +6,12 @@ import json
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import dialogflow, intent_script
-from homeassistant.core import HomeAssistant, ServiceCall, callback
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components import dialogflow, intent_script
+from smarthub.core import SmartHub, ServiceCall, callback
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -24,7 +24,7 @@ CONTEXT_NAME = "78a5db95-b7d6-4d50-9c9b-2fc73a5e34c3_id_dialog_context"
 
 
 @pytest.fixture
-async def calls(hass: HomeAssistant, fixture) -> list[ServiceCall]:
+async def calls(hass: SmartHub, fixture) -> list[ServiceCall]:
     """Return a list of Dialogflow calls triggered."""
     calls: list[ServiceCall] = []
 
@@ -39,8 +39,8 @@ async def calls(hass: HomeAssistant, fixture) -> list[ServiceCall]:
 
 
 @pytest.fixture
-async def fixture(hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator):
-    """Initialize a Home Assistant server for testing this module."""
+async def fixture(hass: SmartHub, hass_client_no_auth: ClientSessionGenerator):
+    """Initialize a SmartHub server for testing this module."""
     await async_setup_component(hass, dialogflow.DOMAIN, {"dialogflow": {}})
     await async_setup_component(
         hass,
@@ -285,7 +285,7 @@ async def test_intent_request_with_parameters_but_empty_v2(fixture) -> None:
     assert text == "You told us your sign is ."
 
 
-async def test_intent_request_without_slots_v1(hass: HomeAssistant, fixture) -> None:
+async def test_intent_request_without_slots_v1(hass: SmartHub, fixture) -> None:
     """Test a request without slots."""
     mock_client, webhook_id = fixture
     data = Data.v1
@@ -315,7 +315,7 @@ async def test_intent_request_without_slots_v1(hass: HomeAssistant, fixture) -> 
     assert text == "You are both home, you silly"
 
 
-async def test_intent_request_without_slots_v2(hass: HomeAssistant, fixture) -> None:
+async def test_intent_request_without_slots_v2(hass: SmartHub, fixture) -> None:
     """Test a request without slots."""
     mock_client, webhook_id = fixture
     data = Data.v2
@@ -431,7 +431,7 @@ async def test_intent_with_unknown_action_v1(fixture) -> None:
     )
     assert response.status == HTTPStatus.OK
     text = (await response.json()).get("speech")
-    assert text == "This intent is not yet configured within Home Assistant."
+    assert text == "This intent is not yet configured within SmartHub."
 
 
 async def test_intent_with_unknown_action_v2(fixture) -> None:
@@ -444,4 +444,4 @@ async def test_intent_with_unknown_action_v2(fixture) -> None:
     )
     assert response.status == HTTPStatus.OK
     text = (await response.json()).get("fulfillmentText")
-    assert text == "This intent is not yet configured within Home Assistant."
+    assert text == "This intent is not yet configured within SmartHub."

@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 from freezegun import freeze_time
 
-from homeassistant.components.gdacs import DEFAULT_SCAN_INTERVAL
-from homeassistant.components.gdacs.const import CONF_CATEGORIES, DOMAIN
-from homeassistant.components.gdacs.sensor import (
+from smarthub.components.gdacs import DEFAULT_SCAN_INTERVAL
+from smarthub.components.gdacs.const import CONF_CATEGORIES, DOMAIN
+from smarthub.components.gdacs.sensor import (
     ATTR_CREATED,
     ATTR_LAST_UPDATE,
     ATTR_LAST_UPDATE_SUCCESSFUL,
@@ -14,7 +14,7 @@ from homeassistant.components.gdacs.sensor import (
     ATTR_STATUS,
     ATTR_UPDATED,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_LATITUDE,
     CONF_LONGITUDE,
@@ -22,15 +22,15 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     EVENT_HOMEASSISTANT_START,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import _generate_mock_feed_entry
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test the general setup of the integration."""
     # Set up some mock feed entries for this test.
     mock_entry_1 = _generate_mock_feed_entry(

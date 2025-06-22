@@ -6,10 +6,10 @@ from http import HTTPStatus
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant.components import alexa
-from homeassistant.components.alexa import const
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.setup import async_setup_component
+from smarthub.components import alexa
+from smarthub.components.alexa import const
+from smarthub.core import SmartHub, callback
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -24,10 +24,10 @@ NPR_NEWS_MP3_URL = "https://pd.npr.org/anon.npr-mp3/npr/news/newscast.mp3"
 
 @pytest.fixture
 async def alexa_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> TestClient:
-    """Initialize a Home Assistant server for testing this module."""
+    """Initialize a SmartHub server for testing this module."""
 
     @callback
     def mock_service(call):
@@ -40,7 +40,7 @@ async def alexa_client(
         alexa.DOMAIN,
         {
             # Key is here to verify we allow other keys in config too
-            "homeassistant": {},
+            "smarthub": {},
             "alexa": {
                 "flash_briefings": {
                     "password": "pass/abc",

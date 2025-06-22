@@ -18,7 +18,7 @@ from aiohomeconnect.model.error import HomeConnectApiError, TooManyRequestsError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.home_connect.const import (
+from smarthub.components.home_connect.const import (
     BSH_DOOR_STATE_CLOSED,
     BSH_DOOR_STATE_LOCKED,
     BSH_DOOR_STATE_OPEN,
@@ -27,11 +27,11 @@ from homeassistant.components.home_connect.const import (
     BSH_EVENT_PRESENT_STATE_PRESENT,
     DOMAIN,
 )
-from homeassistant.components.home_connect.coordinator import HomeConnectError
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.home_connect.coordinator import HomeConnectError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -90,7 +90,7 @@ def platforms() -> list[str]:
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_paired_depaired_devices_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -151,7 +151,7 @@ async def test_paired_depaired_devices_flow(
     indirect=["appliance"],
 )
 async def test_connected_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -210,7 +210,7 @@ async def test_connected_devices(
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.parametrize("appliance", [TEST_HC_APP], indirect=True)
 async def test_sensor_entity_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -307,7 +307,7 @@ ENTITY_ID_STATES = {
     ),
 )
 async def test_program_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -380,7 +380,7 @@ async def test_program_sensors(
     ],
 )
 async def test_program_sensor_edge_case(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -454,7 +454,7 @@ ENTITY_ID_EDGE_CASE_STATES = [
 
 @pytest.mark.parametrize("appliance", [TEST_HC_APP], indirect=True)
 async def test_remaining_prog_time_edge_cases(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     client: MagicMock,
     config_entry: MockConfigEntry,
@@ -603,7 +603,7 @@ async def test_remaining_prog_time_edge_cases(
     indirect=["appliance"],
 )
 async def test_sensors_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -672,7 +672,7 @@ async def test_sensors_states(
     indirect=["appliance"],
 )
 async def test_sensor_unit_fetching(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -738,7 +738,7 @@ async def test_sensor_unit_fetching(
     indirect=["appliance"],
 )
 async def test_sensor_unit_fetching_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -788,7 +788,7 @@ async def test_sensor_unit_fetching_error(
     indirect=["appliance"],
 )
 async def test_sensor_unit_fetching_after_rate_limit_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],

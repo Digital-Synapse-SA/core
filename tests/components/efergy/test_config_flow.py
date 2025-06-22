@@ -4,20 +4,20 @@ from unittest.mock import patch
 
 from pyefergy import exceptions
 
-from homeassistant.components.efergy.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.efergy.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import CONF_DATA, HID, _patch_efergy, _patch_efergy_status, create_entry
 
 
 def _patch_setup():
-    return patch("homeassistant.components.efergy.async_setup_entry")
+    return patch("smarthub.components.efergy.async_setup_entry")
 
 
-async def test_flow_user(hass: HomeAssistant) -> None:
+async def test_flow_user(hass: SmartHub) -> None:
     """Test user initialized flow."""
     with _patch_efergy(), _patch_setup():
         result = await hass.config_entries.flow.async_init(
@@ -37,7 +37,7 @@ async def test_flow_user(hass: HomeAssistant) -> None:
         assert result["result"].unique_id == HID
 
 
-async def test_flow_user_cannot_connect(hass: HomeAssistant) -> None:
+async def test_flow_user_cannot_connect(hass: SmartHub) -> None:
     """Test user initialized flow with unreachable service."""
     with _patch_efergy_status() as efergymock:
         efergymock.side_effect = exceptions.ConnectError
@@ -49,7 +49,7 @@ async def test_flow_user_cannot_connect(hass: HomeAssistant) -> None:
         assert result["errors"]["base"] == "cannot_connect"
 
 
-async def test_flow_user_invalid_auth(hass: HomeAssistant) -> None:
+async def test_flow_user_invalid_auth(hass: SmartHub) -> None:
     """Test user initialized flow with invalid authentication."""
     with _patch_efergy_status() as efergymock:
         efergymock.side_effect = exceptions.InvalidAuth
@@ -61,7 +61,7 @@ async def test_flow_user_invalid_auth(hass: HomeAssistant) -> None:
         assert result["errors"]["base"] == "invalid_auth"
 
 
-async def test_flow_user_unknown(hass: HomeAssistant) -> None:
+async def test_flow_user_unknown(hass: SmartHub) -> None:
     """Test user initialized flow with unknown error."""
     with _patch_efergy_status() as efergymock:
         efergymock.side_effect = Exception
@@ -73,7 +73,7 @@ async def test_flow_user_unknown(hass: HomeAssistant) -> None:
         assert result["errors"]["base"] == "unknown"
 
 
-async def test_flow_reauth(hass: HomeAssistant) -> None:
+async def test_flow_reauth(hass: SmartHub) -> None:
     """Test reauth step."""
     entry = create_entry(hass)
     result = await entry.start_reauth_flow(hass)

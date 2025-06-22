@@ -1,23 +1,23 @@
-"""Test the Home Assistant Cloud config flow."""
+"""Test the SmartHub Cloud config flow."""
 
 from unittest.mock import patch
 
-from homeassistant.components.go2rtc.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.go2rtc.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_config_flow(hass: HomeAssistant) -> None:
+async def test_config_flow(hass: SmartHub) -> None:
     """Test create cloud entry."""
 
     with (
         patch(
-            "homeassistant.components.go2rtc.async_setup", return_value=True
+            "smarthub.components.go2rtc.async_setup", return_value=True
         ) as mock_setup,
         patch(
-            "homeassistant.components.go2rtc.async_setup_entry",
+            "smarthub.components.go2rtc.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -33,7 +33,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_multiple_entries(hass: HomeAssistant) -> None:
+async def test_multiple_entries(hass: SmartHub) -> None:
     """Test creating multiple cloud entries."""
     config_entry = MockConfigEntry(domain=DOMAIN)
     config_entry.add_to_hass(hass)

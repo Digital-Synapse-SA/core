@@ -8,13 +8,13 @@ from aiohomeconnect.const import OAUTH2_AUTHORIZE, OAUTH2_TOKEN
 from aiohomeconnect.model import HomeAppliance
 import pytest
 
-from homeassistant import config_entries, setup
-from homeassistant.components.home_connect.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow, device_registry as dr
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries, setup
+from smarthub.components.home_connect.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow, device_registry as dr
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .conftest import FAKE_ACCESS_TOKEN, FAKE_REFRESH_TOKEN
 
@@ -61,7 +61,7 @@ DHCP_DISCOVERY = (
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -102,7 +102,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.home_connect.async_setup_entry", return_value=True
+        "smarthub.components.home_connect.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
         await hass.async_block_till_done()
@@ -113,7 +113,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_prevent_reconfiguring_same_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,
@@ -165,7 +165,7 @@ async def test_prevent_reconfiguring_same_account(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,
@@ -203,7 +203,7 @@ async def test_reauth_flow(
     )
 
     with patch(
-        "homeassistant.components.home_connect.async_setup_entry", return_value=True
+        "smarthub.components.home_connect.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
         await hass.async_block_till_done()
@@ -219,7 +219,7 @@ async def test_reauth_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth_flow_with_different_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,
@@ -269,7 +269,7 @@ async def test_reauth_flow_with_different_account(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_zeroconf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -319,7 +319,7 @@ async def test_zeroconf_flow(
     )
 
     with patch(
-        "homeassistant.components.home_connect.async_setup_entry", return_value=True
+        "smarthub.components.home_connect.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
         await hass.async_block_till_done()
@@ -330,7 +330,7 @@ async def test_zeroconf_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_zeroconf_flow_already_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,
@@ -350,7 +350,7 @@ async def test_zeroconf_flow_already_setup(
 @pytest.mark.usefixtures("current_request_with_host")
 @pytest.mark.parametrize("dhcp_discovery", DHCP_DISCOVERY)
 async def test_dhcp_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     dhcp_discovery: DhcpServiceInfo,
@@ -399,7 +399,7 @@ async def test_dhcp_flow(
     )
 
     with patch(
-        "homeassistant.components.home_connect.async_setup_entry", return_value=True
+        "smarthub.components.home_connect.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
         await hass.async_block_till_done()
@@ -410,7 +410,7 @@ async def test_dhcp_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_dhcp_flow_already_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test DHCP discovery with already setup device."""
@@ -447,7 +447,7 @@ async def test_dhcp_flow_already_setup(
     indirect=["appliance"],
 )
 async def test_dhcp_flow_complete_device_information(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     client: MagicMock,
     config_entry: MockConfigEntry,

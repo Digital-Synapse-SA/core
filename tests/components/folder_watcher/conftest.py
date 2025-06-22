@@ -9,9 +9,9 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.folder_watcher.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
+from smarthub.components.folder_watcher.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -20,16 +20,16 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[None]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.folder_watcher.async_setup_entry", return_value=True
+        "smarthub.components.folder_watcher.async_setup_entry", return_value=True
     ):
         yield
 
 
 @pytest.fixture
 async def load_int(
-    hass: HomeAssistant, tmp_path: Path, freezer: FrozenDateTimeFactory
+    hass: SmartHub, tmp_path: Path, freezer: FrozenDateTimeFactory
 ) -> MockConfigEntry:
-    """Set up the Folder watcher integration in Home Assistant."""
+    """Set up the Folder watcher integration in SmartHub."""
     freezer.move_to("2022-04-19 10:31:02+00:00")
     path = tmp_path.as_posix()
     hass.config.allowlist_external_dirs = {path}

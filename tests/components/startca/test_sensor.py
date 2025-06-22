@@ -2,17 +2,17 @@
 
 from http import HTTPStatus
 
-from homeassistant.components.startca.sensor import StartcaData
-from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, PERCENTAGE, UnitOfInformation
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.setup import async_setup_component
+from smarthub.components.startca.sensor import StartcaData
+from smarthub.const import ATTR_UNIT_OF_MEASUREMENT, PERCENTAGE, UnitOfInformation
+from smarthub.core import SmartHub
+from smarthub.helpers.aiohttp_client import async_get_clientsession
+from smarthub.setup import async_setup_component
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_capped_setup(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the default setup."""
     config = {
@@ -110,7 +110,7 @@ async def test_capped_setup(
 
 
 async def test_unlimited_setup(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the default setup."""
     config = {
@@ -201,7 +201,7 @@ async def test_unlimited_setup(
 
 
 async def test_bad_return_code(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test handling a return code that isn't HTTP OK."""
     aioclient_mock.get(
@@ -216,7 +216,7 @@ async def test_bad_return_code(
 
 
 async def test_bad_json_decode(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test decoding invalid json result."""
     aioclient_mock.get(

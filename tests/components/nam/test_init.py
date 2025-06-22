@@ -4,19 +4,19 @@ from unittest.mock import patch
 
 from nettigo_air_monitor import ApiError, AuthFailedError
 
-from homeassistant.components.air_quality import DOMAIN as AIR_QUALITY_PLATFORM
-from homeassistant.components.nam.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.air_quality import DOMAIN as AIR_QUALITY_PLATFORM
+from smarthub.components.nam.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
 from tests.common import MockConfigEntry
 
 
-async def test_async_setup_entry(hass: HomeAssistant) -> None:
+async def test_async_setup_entry(hass: SmartHub) -> None:
     """Test a successful setup entry."""
     await init_integration(hass)
 
@@ -26,7 +26,7 @@ async def test_async_setup_entry(hass: HomeAssistant) -> None:
     assert state.state == "11.03"
 
 
-async def test_config_not_ready(hass: HomeAssistant) -> None:
+async def test_config_not_ready(hass: SmartHub) -> None:
     """Test for setup failure if the connection to the device fails."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -37,14 +37,14 @@ async def test_config_not_ready(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.nam.NettigoAirMonitor.initialize",
+        "smarthub.components.nam.NettigoAirMonitor.initialize",
         side_effect=ApiError("API Error"),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
         assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_config_not_ready_while_checking_credentials(hass: HomeAssistant) -> None:
+async def test_config_not_ready_while_checking_credentials(hass: SmartHub) -> None:
     """Test for setup failure if the connection fails while checking credentials."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -55,9 +55,9 @@ async def test_config_not_ready_while_checking_credentials(hass: HomeAssistant) 
     entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.nam.NettigoAirMonitor.initialize"),
+        patch("smarthub.components.nam.NettigoAirMonitor.initialize"),
         patch(
-            "homeassistant.components.nam.NettigoAirMonitor.async_check_credentials",
+            "smarthub.components.nam.NettigoAirMonitor.async_check_credentials",
             side_effect=ApiError("API Error"),
         ),
     ):
@@ -65,7 +65,7 @@ async def test_config_not_ready_while_checking_credentials(hass: HomeAssistant) 
         assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_config_auth_failed(hass: HomeAssistant) -> None:
+async def test_config_auth_failed(hass: SmartHub) -> None:
     """Test for setup failure if the auth fails."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -76,14 +76,14 @@ async def test_config_auth_failed(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.nam.NettigoAirMonitor.async_check_credentials",
+        "smarthub.components.nam.NettigoAirMonitor.async_check_credentials",
         side_effect=AuthFailedError("Authorization has failed"),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
         assert entry.state is ConfigEntryState.SETUP_ERROR
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass)
 
@@ -98,7 +98,7 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
 
 
 async def test_remove_air_quality_entities(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test remove air_quality entities from registry."""
     entity_registry.async_get_or_create(

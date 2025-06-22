@@ -2,17 +2,17 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.geniushub import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import CONF_MAC, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.geniushub import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import CONF_MAC, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_cloud_unique_id_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_geniushub_cloud: AsyncMock,
 ) -> None:

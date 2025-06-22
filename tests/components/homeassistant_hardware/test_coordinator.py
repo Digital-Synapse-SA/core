@@ -1,4 +1,4 @@
-"""Test firmware update coordinator for Home Assistant Hardware."""
+"""Test firmware update coordinator for SmartHub Hardware."""
 
 from unittest.mock import AsyncMock, Mock, call, patch
 
@@ -6,16 +6,16 @@ from ha_silabs_firmware_client import FirmwareManifest, ManifestMissing
 import pytest
 from yarl import URL
 
-from homeassistant.components.homeassistant_hardware.coordinator import (
+from smarthub.components.smarthub_hardware.coordinator import (
     FirmwareUpdateCoordinator,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers.aiohttp_client import async_get_clientsession
+from smarthub.util import dt as dt_util
 
 
 async def test_firmware_update_coordinator_fetching(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the firmware update coordinator loads manifests."""
     session = async_get_clientsession(hass)
@@ -31,7 +31,7 @@ async def test_firmware_update_coordinator_fetching(
     mock_client.async_update_data = AsyncMock(side_effect=[ManifestMissing(), manifest])
 
     with patch(
-        "homeassistant.components.homeassistant_hardware.coordinator.FirmwareUpdateClient",
+        "smarthub.components.smarthub_hardware.coordinator.FirmwareUpdateClient",
         return_value=mock_client,
     ):
         coordinator = FirmwareUpdateCoordinator(

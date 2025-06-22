@@ -8,12 +8,12 @@ from unittest.mock import patch
 import pytest
 import requests
 
-from homeassistant import config_entries
-from homeassistant.components.picnic import const
-from homeassistant.components.picnic.const import DOMAIN
-from homeassistant.components.picnic.sensor import SENSOR_TYPES
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components.picnic import const
+from smarthub.components.picnic.const import DOMAIN
+from smarthub.components.picnic.sensor import SENSOR_TYPES
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     CONF_ACCESS_TOKEN,
     CONF_COUNTRY_CODE,
     CURRENCY_EURO,
@@ -21,8 +21,8 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -105,7 +105,7 @@ class TestPicnicSensor(unittest.IsolatedAsyncioTestCase):
         self.entity_registry = er.async_get(self.hass)
 
         # Patch the api client
-        self.picnic_patcher = patch("homeassistant.components.picnic.PicnicAPI")
+        self.picnic_patcher = patch("smarthub.components.picnic.PicnicAPI")
         self.picnic_mock = self.picnic_patcher.start()
         self.picnic_mock().session.auth_token = "3q29fpwhulzes"
 

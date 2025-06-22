@@ -12,10 +12,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from voluptuous import Invalid
 
-from homeassistant.auth.const import GROUP_ID_ADMIN
-from homeassistant.components import frontend, hassio
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.hassio import (
+from smarthub.auth.const import GROUP_ID_ADMIN
+from smarthub.components import frontend, hassio
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.hassio import (
     ADDONS_COORDINATOR,
     DOMAIN,
     get_core_info,
@@ -23,18 +23,18 @@ from homeassistant.components.hassio import (
     hostname_from_addon_slug,
     is_hassio as deprecated_is_hassio,
 )
-from homeassistant.components.hassio.config import STORAGE_KEY
-from homeassistant.components.hassio.const import (
+from smarthub.components.hassio.config import STORAGE_KEY
+from smarthub.components.hassio.const import (
     HASSIO_UPDATE_INTERVAL,
     REQUEST_REFRESH_DELAY,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, issue_registry as ir
-from homeassistant.helpers.hassio import is_hassio
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, issue_registry as ir
+from smarthub.helpers.hassio import is_hassio
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -74,7 +74,7 @@ def mock_all(
     resolution_info: AsyncMock,
 ) -> None:
     """Mock all setup requests."""
-    aioclient_mock.post("http://127.0.0.1/homeassistant/options", json={"result": "ok"})
+    aioclient_mock.post("http://127.0.0.1/smarthub/options", json={"result": "ok"})
     aioclient_mock.post("http://127.0.0.1/supervisor/options", json={"result": "ok"})
     aioclient_mock.get(
         "http://127.0.0.1/info",
@@ -82,7 +82,7 @@ def mock_all(
             "result": "ok",
             "data": {
                 "supervisor": "222",
-                "homeassistant": "0.110.0",
+                "smarthub": "0.110.0",
                 "hassos": "1.2.3",
             },
         },
@@ -222,7 +222,7 @@ def mock_all(
 
 
 async def test_setup_api_ping(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -238,7 +238,7 @@ async def test_setup_api_ping(
 
 
 async def test_setup_api_panel(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with API ping."""
     assert await async_setup_component(hass, "frontend", {})
@@ -267,7 +267,7 @@ async def test_setup_api_panel(
 
 
 async def test_setup_api_push_api_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -286,7 +286,7 @@ async def test_setup_api_push_api_data(
 
 
 async def test_setup_api_push_api_data_server_host(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -307,7 +307,7 @@ async def test_setup_api_push_api_data_server_host(
 
 
 async def test_setup_api_push_api_data_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_storage: dict[str, Any],
     supervisor_client: AsyncMock,
@@ -315,7 +315,7 @@ async def test_setup_api_push_api_data_default(
     """Test setup with API push default data."""
     with (
         patch.dict(os.environ, MOCK_ENVIRON),
-        patch("homeassistant.components.hassio.config.STORE_DELAY_SAVE", 0),
+        patch("smarthub.components.hassio.config.STORE_DELAY_SAVE", 0),
     ):
         result = await async_setup_component(hass, "hassio", {"http": {}, "hassio": {}})
         await hass.async_block_till_done()
@@ -341,7 +341,7 @@ async def test_setup_api_push_api_data_default(
 
 
 async def test_setup_adds_admin_group_to_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -365,7 +365,7 @@ async def test_setup_adds_admin_group_to_user(
 
 
 async def test_setup_migrate_user_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -388,7 +388,7 @@ async def test_setup_migrate_user_name(
 
 
 async def test_setup_api_existing_hassio_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hass_storage: dict[str, Any],
     supervisor_client: AsyncMock,
@@ -409,7 +409,7 @@ async def test_setup_api_existing_hassio_user(
 
 
 async def test_setup_core_push_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -424,7 +424,7 @@ async def test_setup_core_push_config(
     assert aioclient_mock.call_count + len(supervisor_client.mock_calls) == 18
     assert aioclient_mock.mock_calls[1][2]["timezone"] == "testzone"
 
-    with patch("homeassistant.util.dt.set_default_time_zone"):
+    with patch("smarthub.util.dt.set_default_time_zone"):
         await hass.config.async_update(time_zone="America/New_York", country="US")
     await hass.async_block_till_done()
     assert aioclient_mock.mock_calls[-1][2]["timezone"] == "America/New_York"
@@ -432,7 +432,7 @@ async def test_setup_core_push_config(
 
 
 async def test_setup_hassio_no_additional_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     supervisor_client: AsyncMock,
 ) -> None:
@@ -449,7 +449,7 @@ async def test_setup_hassio_no_additional_data(
     assert aioclient_mock.mock_calls[-1][3]["Authorization"] == "Bearer 123456"
 
 
-async def test_fail_setup_without_environ_var(hass: HomeAssistant) -> None:
+async def test_fail_setup_without_environ_var(hass: SmartHub) -> None:
     """Fail setup if no environ variable set."""
     with patch.dict(os.environ, {}, clear=True):
         result = await async_setup_component(hass, "hassio", {})
@@ -457,7 +457,7 @@ async def test_fail_setup_without_environ_var(hass: HomeAssistant) -> None:
 
 
 async def test_warn_when_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     supervisor_is_connected: AsyncMock,
 ) -> None:
@@ -472,7 +472,7 @@ async def test_warn_when_cannot_connect(
 
 
 @pytest.mark.usefixtures("hassio_env")
-async def test_service_register(hass: HomeAssistant) -> None:
+async def test_service_register(hass: SmartHub) -> None:
     """Check if service will be setup."""
     assert await async_setup_component(hass, "hassio", {})
     assert hass.services.has_service("hassio", "addon_start")
@@ -490,7 +490,7 @@ async def test_service_register(hass: HomeAssistant) -> None:
 
 @pytest.mark.freeze_time("2021-11-13 11:48:00")
 async def test_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
     supervisor_client: AsyncMock,
@@ -541,7 +541,7 @@ async def test_service_calls(
         "hassio",
         "backup_partial",
         {
-            "homeassistant": True,
+            "smarthub": True,
             "addons": ["test"],
             "folders": ["ssl"],
             "password": "123456",
@@ -552,7 +552,7 @@ async def test_service_calls(
     assert aioclient_mock.call_count + len(supervisor_client.mock_calls) == 26
     assert aioclient_mock.mock_calls[-1][2] == {
         "name": "2021-11-13 03:48:00",
-        "homeassistant": True,
+        "smarthub": True,
         "addons": ["test"],
         "folders": ["ssl"],
         "password": "123456",
@@ -566,7 +566,7 @@ async def test_service_calls(
         "restore_partial",
         {
             "slug": "test",
-            "homeassistant": False,
+            "smarthub": False,
             "addons": ["test"],
             "folders": ["ssl"],
             "password": "123456",
@@ -578,7 +578,7 @@ async def test_service_calls(
     assert aioclient_mock.mock_calls[-1][2] == {
         "addons": ["test"],
         "folders": ["ssl"],
-        "homeassistant": False,
+        "smarthub": False,
         "password": "123456",
     }
 
@@ -588,7 +588,7 @@ async def test_service_calls(
         {
             "name": "backup_name",
             "location": "backup_share",
-            "homeassistant_exclude_database": True,
+            "smarthub_exclude_database": True,
         },
     )
     await hass.async_block_till_done()
@@ -597,7 +597,7 @@ async def test_service_calls(
     assert aioclient_mock.mock_calls[-1][2] == {
         "name": "backup_name",
         "location": "backup_share",
-        "homeassistant_exclude_database": True,
+        "smarthub_exclude_database": True,
     }
 
     await hass.services.async_call(
@@ -636,7 +636,7 @@ async def test_service_calls(
 
 
 async def test_invalid_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     supervisor_is_connected: AsyncMock,
 ) -> None:
@@ -657,7 +657,7 @@ async def test_invalid_service_calls(
 
 
 async def test_addon_service_call_with_complex_slug(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     supervisor_is_connected: AsyncMock,
 ) -> None:
@@ -683,7 +683,7 @@ async def test_addon_service_call_with_complex_slug(
     with (
         patch.dict(os.environ, MOCK_ENVIRON),
         patch(
-            "homeassistant.components.hassio.HassIO.get_supervisor_info",
+            "smarthub.components.hassio.HassIO.get_supervisor_info",
             return_value=supervisor_mock_data,
         ),
     ):
@@ -695,31 +695,31 @@ async def test_addon_service_call_with_complex_slug(
 
 @pytest.mark.usefixtures("hassio_env")
 async def test_service_calls_core(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     supervisor_client: AsyncMock,
 ) -> None:
     """Call core service and check the API calls behind that."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "hassio", {})
 
-    aioclient_mock.post("http://127.0.0.1/homeassistant/restart", json={"result": "ok"})
-    aioclient_mock.post("http://127.0.0.1/homeassistant/stop", json={"result": "ok"})
+    aioclient_mock.post("http://127.0.0.1/smarthub/restart", json={"result": "ok"})
+    aioclient_mock.post("http://127.0.0.1/smarthub/stop", json={"result": "ok"})
 
-    await hass.services.async_call("homeassistant", "stop")
+    await hass.services.async_call("smarthub", "stop")
     await hass.async_block_till_done()
 
     assert aioclient_mock.call_count + len(supervisor_client.mock_calls) == 6
 
-    await hass.services.async_call("homeassistant", "check_config")
+    await hass.services.async_call("smarthub", "check_config")
     await hass.async_block_till_done()
 
     assert aioclient_mock.call_count + len(supervisor_client.mock_calls) == 6
 
     with patch(
-        "homeassistant.config.async_check_ha_config_file", return_value=None
+        "smarthub.config.async_check_ha_config_file", return_value=None
     ) as mock_check_config:
-        await hass.services.async_call("homeassistant", "restart")
+        await hass.services.async_call("smarthub", "restart")
         await hass.async_block_till_done()
         assert mock_check_config.called
 
@@ -727,7 +727,7 @@ async def test_service_calls_core(
 
 
 @pytest.mark.usefixtures("addon_installed")
-async def test_entry_load_and_unload(hass: HomeAssistant) -> None:
+async def test_entry_load_and_unload(hass: SmartHub) -> None:
     """Test loading and unloading config entry."""
     with patch.dict(os.environ, MOCK_ENVIRON):
         config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
@@ -744,7 +744,7 @@ async def test_entry_load_and_unload(hass: HomeAssistant) -> None:
     assert ADDONS_COORDINATOR not in hass.data
 
 
-async def test_migration_off_hassio(hass: HomeAssistant) -> None:
+async def test_migration_off_hassio(hass: SmartHub) -> None:
     """Test that when a user moves instance off Hass.io, config entry gets cleaned up."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
     config_entry.add_to_hass(hass)
@@ -755,7 +755,7 @@ async def test_migration_off_hassio(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("addon_installed")
 async def test_device_registry_calls(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test device registry entries for hassio."""
     supervisor_mock_data = {
@@ -773,7 +773,7 @@ async def test_device_registry_calls(
                 "version": "1.0.0",
                 "version_latest": "1.0.0",
                 "repository": "test",
-                "url": "https://github.com/home-assistant/addons/test",
+                "url": "https://github.com/smart-hub/addons/test",
             },
             {
                 "name": "test2",
@@ -799,11 +799,11 @@ async def test_device_registry_calls(
     with (
         patch.dict(os.environ, MOCK_ENVIRON),
         patch(
-            "homeassistant.components.hassio.HassIO.get_supervisor_info",
+            "smarthub.components.hassio.HassIO.get_supervisor_info",
             return_value=supervisor_mock_data,
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_os_info",
+            "smarthub.components.hassio.HassIO.get_os_info",
             return_value=os_mock_data,
         ),
     ):
@@ -835,11 +835,11 @@ async def test_device_registry_calls(
     # Test that when addon is removed, next update will remove the add-on and subsequent updates won't
     with (
         patch(
-            "homeassistant.components.hassio.HassIO.get_supervisor_info",
+            "smarthub.components.hassio.HassIO.get_supervisor_info",
             return_value=supervisor_mock_data,
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_os_info",
+            "smarthub.components.hassio.HassIO.get_os_info",
             return_value=os_mock_data,
         ),
     ):
@@ -885,18 +885,18 @@ async def test_device_registry_calls(
     # a new device
     with (
         patch(
-            "homeassistant.components.hassio.HassIO.get_supervisor_info",
+            "smarthub.components.hassio.HassIO.get_supervisor_info",
             return_value=supervisor_mock_data,
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_os_info",
+            "smarthub.components.hassio.HassIO.get_os_info",
             return_value=os_mock_data,
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_info",
+            "smarthub.components.hassio.HassIO.get_info",
             return_value={
                 "supervisor": "222",
-                "homeassistant": "0.110.0",
+                "smarthub": "0.110.0",
                 "hassos": None,
             },
         ),
@@ -908,10 +908,10 @@ async def test_device_registry_calls(
 
 @pytest.mark.usefixtures("addon_installed")
 async def test_coordinator_updates(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, supervisor_client: AsyncMock
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, supervisor_client: AsyncMock
 ) -> None:
     """Test coordinator updates."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     with patch.dict(os.environ, MOCK_ENVIRON):
         config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
         config_entry.add_to_hass(hass)
@@ -928,7 +928,7 @@ async def test_coordinator_updates(
     supervisor_client.refresh_updates.assert_not_called()
 
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {
             "entity_id": [
@@ -950,7 +950,7 @@ async def test_coordinator_updates(
     supervisor_client.refresh_updates.reset_mock()
     supervisor_client.refresh_updates.side_effect = SupervisorError("Unknown")
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {
             "entity_id": [
@@ -971,12 +971,12 @@ async def test_coordinator_updates(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "addon_installed")
 async def test_coordinator_updates_stats_entities_enabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     supervisor_client: AsyncMock,
 ) -> None:
     """Test coordinator updates with stats entities enabled."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     with patch.dict(os.environ, MOCK_ENVIRON):
         config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
         config_entry.add_to_hass(hass)
@@ -999,7 +999,7 @@ async def test_coordinator_updates_stats_entities_enabled(
     supervisor_client.refresh_updates.assert_not_called()
 
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {
             "entity_id": [
@@ -1020,7 +1020,7 @@ async def test_coordinator_updates_stats_entities_enabled(
     supervisor_client.refresh_updates.reset_mock()
     supervisor_client.refresh_updates.side_effect = SupervisorError("Unknown")
     await hass.services.async_call(
-        "homeassistant",
+        "smarthub",
         "update_entity",
         {
             "entity_id": [
@@ -1042,7 +1042,7 @@ async def test_coordinator_updates_stats_entities_enabled(
 @pytest.mark.parametrize(
     ("extra_os_info", "integration"),
     [
-        ({"board": "green"}, "homeassistant_green"),
+        ({"board": "green"}, "smarthub_green"),
         ({"board": "odroid-c2"}, "hardkernel"),
         ({"board": "odroid-c4"}, "hardkernel"),
         ({"board": "odroid-n2"}, "hardkernel"),
@@ -1052,11 +1052,11 @@ async def test_coordinator_updates_stats_entities_enabled(
         ({"board": "rpi3-64"}, "raspberry_pi"),
         ({"board": "rpi4"}, "raspberry_pi"),
         ({"board": "rpi4-64"}, "raspberry_pi"),
-        ({"board": "yellow"}, "homeassistant_yellow"),
+        ({"board": "yellow"}, "smarthub_yellow"),
     ],
 )
 async def test_setup_hardware_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     supervisor_client: AsyncMock,
     integration,
@@ -1066,7 +1066,7 @@ async def test_setup_hardware_integration(
     with (
         patch.dict(os.environ, MOCK_ENVIRON),
         patch(
-            f"homeassistant.components.{integration}.async_setup_entry",
+            f"smarthub.components.{integration}.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -1088,7 +1088,7 @@ def test_hostname_from_addon_slug() -> None:
 
 
 def test_deprecated_function_is_hassio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test calling deprecated_is_hassio function will create log entry."""
@@ -1096,15 +1096,15 @@ def test_deprecated_function_is_hassio(
     deprecated_is_hassio(hass)
     assert caplog.record_tuples == [
         (
-            "homeassistant.components.hassio",
+            "smarthub.components.hassio",
             logging.WARNING,
-            "is_hassio is a deprecated function which will be removed in HA Core 2025.11. Use homeassistant.helpers.hassio.is_hassio instead",
+            "is_hassio is a deprecated function which will be removed in HA Core 2025.11. Use smarthub.helpers.hassio.is_hassio instead",
         )
     ]
 
 
 def test_deprecated_function_get_supervisor_ip(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test calling get_supervisor_ip function will create log entry."""
@@ -1112,9 +1112,9 @@ def test_deprecated_function_get_supervisor_ip(
     get_supervisor_ip()
     assert caplog.record_tuples == [
         (
-            "homeassistant.helpers.hassio",
+            "smarthub.helpers.hassio",
             logging.WARNING,
-            "get_supervisor_ip is a deprecated function which will be removed in HA Core 2025.11. Use homeassistant.helpers.hassio.get_supervisor_ip instead",
+            "get_supervisor_ip is a deprecated function which will be removed in HA Core 2025.11. Use smarthub.helpers.hassio.get_supervisor_ip instead",
         )
     ]
 
@@ -1124,7 +1124,7 @@ def test_deprecated_function_get_supervisor_ip(
     [
         (
             "HassioServiceInfo",
-            "homeassistant.helpers.service_info.hassio.HassioServiceInfo",
+            "smarthub.helpers.service_info.hassio.HassioServiceInfo",
             HassioServiceInfo,
         ),
     ],
@@ -1161,7 +1161,7 @@ def test_deprecated_constants(
     ["armv7"],
 )
 async def test_deprecated_installation_issue_os_armv7(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     freezer: FrozenDateTimeFactory,
     board: str,
@@ -1171,25 +1171,25 @@ async def test_deprecated_installation_issue_os_armv7(
     with (
         patch.dict(os.environ, MOCK_ENVIRON),
         patch(
-            "homeassistant.components.homeassistant.async_get_system_info",
+            "smarthub.components.smarthub.async_get_system_info",
             return_value={
-                "installation_type": "Home Assistant OS",
+                "installation_type": "SmartHub OS",
                 "arch": "armv7",
             },
         ),
         patch(
-            "homeassistant.components.hassio._is_32_bit",
+            "smarthub.components.hassio._is_32_bit",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.hassio.get_os_info", return_value={"board": board}
+            "smarthub.components.hassio.get_os_info", return_value={"board": board}
         ),
         patch(
-            "homeassistant.components.hassio.get_info", return_value={"hassos": True}
+            "smarthub.components.hassio.get_info", return_value={"hassos": True}
         ),
-        patch("homeassistant.components.hardware.async_setup", return_value=True),
+        patch("smarthub.components.hardware.async_setup", return_value=True),
     ):
-        assert await async_setup_component(hass, "homeassistant", {})
+        assert await async_setup_component(hass, "smarthub", {})
         config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
         config_entry.add_to_hass(hass)
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -1198,7 +1198,7 @@ async def test_deprecated_installation_issue_os_armv7(
         async_fire_time_changed(hass)
         await hass.async_block_till_done()
         await hass.services.async_call(
-            "homeassistant",
+            "smarthub",
             "update_entity",
             {
                 "entity_id": [
@@ -1213,11 +1213,11 @@ async def test_deprecated_installation_issue_os_armv7(
         await hass.async_block_till_done()
 
     assert len(issue_registry.issues) == 1
-    issue = issue_registry.async_get_issue("homeassistant", issue_id)
-    assert issue.domain == "homeassistant"
+    issue = issue_registry.async_get_issue("smarthub", issue_id)
+    assert issue.domain == "smarthub"
     assert issue.severity == ir.IssueSeverity.WARNING
     assert issue.translation_placeholders == {
-        "installation_guide": "https://www.home-assistant.io/installation/",
+        "installation_guide": "https://www.smart-hub.io/installation/",
     }
 
 
@@ -1230,7 +1230,7 @@ async def test_deprecated_installation_issue_os_armv7(
     ],
 )
 async def test_deprecated_installation_issue_32bit_os(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     freezer: FrozenDateTimeFactory,
     arch: str,
@@ -1239,26 +1239,26 @@ async def test_deprecated_installation_issue_32bit_os(
     with (
         patch.dict(os.environ, MOCK_ENVIRON),
         patch(
-            "homeassistant.components.homeassistant.async_get_system_info",
+            "smarthub.components.smarthub.async_get_system_info",
             return_value={
-                "installation_type": "Home Assistant OS",
+                "installation_type": "SmartHub OS",
                 "arch": arch,
             },
         ),
         patch(
-            "homeassistant.components.hassio._is_32_bit",
+            "smarthub.components.hassio._is_32_bit",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.hassio.get_os_info",
+            "smarthub.components.hassio.get_os_info",
             return_value={"board": "rpi3-64"},
         ),
         patch(
-            "homeassistant.components.hassio.get_info", return_value={"hassos": True}
+            "smarthub.components.hassio.get_info", return_value={"hassos": True}
         ),
-        patch("homeassistant.components.hardware.async_setup", return_value=True),
+        patch("smarthub.components.hardware.async_setup", return_value=True),
     ):
-        assert await async_setup_component(hass, "homeassistant", {})
+        assert await async_setup_component(hass, "smarthub", {})
         config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
         config_entry.add_to_hass(hass)
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -1267,7 +1267,7 @@ async def test_deprecated_installation_issue_32bit_os(
         async_fire_time_changed(hass)
         await hass.async_block_till_done()
         await hass.services.async_call(
-            "homeassistant",
+            "smarthub",
             "update_entity",
             {
                 "entity_id": [
@@ -1282,8 +1282,8 @@ async def test_deprecated_installation_issue_32bit_os(
         await hass.async_block_till_done()
 
     assert len(issue_registry.issues) == 1
-    issue = issue_registry.async_get_issue("homeassistant", "deprecated_architecture")
-    assert issue.domain == "homeassistant"
+    issue = issue_registry.async_get_issue("smarthub", "deprecated_architecture")
+    assert issue.domain == "smarthub"
     assert issue.severity == ir.IssueSeverity.WARNING
     assert issue.translation_placeholders == {"installation_type": "OS", "arch": arch}
 
@@ -1297,7 +1297,7 @@ async def test_deprecated_installation_issue_32bit_os(
     ],
 )
 async def test_deprecated_installation_issue_32bit_supervised(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     freezer: FrozenDateTimeFactory,
     arch: str,
@@ -1306,26 +1306,26 @@ async def test_deprecated_installation_issue_32bit_supervised(
     with (
         patch.dict(os.environ, MOCK_ENVIRON),
         patch(
-            "homeassistant.components.homeassistant.async_get_system_info",
+            "smarthub.components.smarthub.async_get_system_info",
             return_value={
-                "installation_type": "Home Assistant Supervised",
+                "installation_type": "SmartHub Supervised",
                 "arch": arch,
             },
         ),
         patch(
-            "homeassistant.components.hassio._is_32_bit",
+            "smarthub.components.hassio._is_32_bit",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.hassio.get_os_info",
+            "smarthub.components.hassio.get_os_info",
             return_value={"board": "rpi3-64"},
         ),
         patch(
-            "homeassistant.components.hassio.get_info", return_value={"hassos": None}
+            "smarthub.components.hassio.get_info", return_value={"hassos": None}
         ),
-        patch("homeassistant.components.hardware.async_setup", return_value=True),
+        patch("smarthub.components.hardware.async_setup", return_value=True),
     ):
-        assert await async_setup_component(hass, "homeassistant", {})
+        assert await async_setup_component(hass, "smarthub", {})
         config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
         config_entry.add_to_hass(hass)
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -1334,7 +1334,7 @@ async def test_deprecated_installation_issue_32bit_supervised(
         async_fire_time_changed(hass)
         await hass.async_block_till_done()
         await hass.services.async_call(
-            "homeassistant",
+            "smarthub",
             "update_entity",
             {
                 "entity_id": [
@@ -1350,9 +1350,9 @@ async def test_deprecated_installation_issue_32bit_supervised(
 
     assert len(issue_registry.issues) == 1
     issue = issue_registry.async_get_issue(
-        "homeassistant", "deprecated_method_architecture"
+        "smarthub", "deprecated_method_architecture"
     )
-    assert issue.domain == "homeassistant"
+    assert issue.domain == "smarthub"
     assert issue.severity == ir.IssueSeverity.WARNING
     assert issue.translation_placeholders == {
         "installation_type": "Supervised",
@@ -1368,7 +1368,7 @@ async def test_deprecated_installation_issue_32bit_supervised(
     ],
 )
 async def test_deprecated_installation_issue_64bit_supervised(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     freezer: FrozenDateTimeFactory,
     arch: str,
@@ -1377,26 +1377,26 @@ async def test_deprecated_installation_issue_64bit_supervised(
     with (
         patch.dict(os.environ, MOCK_ENVIRON),
         patch(
-            "homeassistant.components.homeassistant.async_get_system_info",
+            "smarthub.components.smarthub.async_get_system_info",
             return_value={
-                "installation_type": "Home Assistant Supervised",
+                "installation_type": "SmartHub Supervised",
                 "arch": arch,
             },
         ),
         patch(
-            "homeassistant.components.hassio._is_32_bit",
+            "smarthub.components.hassio._is_32_bit",
             return_value=False,
         ),
         patch(
-            "homeassistant.components.hassio.get_os_info",
+            "smarthub.components.hassio.get_os_info",
             return_value={"board": "generic-x86-64"},
         ),
         patch(
-            "homeassistant.components.hassio.get_info", return_value={"hassos": None}
+            "smarthub.components.hassio.get_info", return_value={"hassos": None}
         ),
-        patch("homeassistant.components.hardware.async_setup", return_value=True),
+        patch("smarthub.components.hardware.async_setup", return_value=True),
     ):
-        assert await async_setup_component(hass, "homeassistant", {})
+        assert await async_setup_component(hass, "smarthub", {})
         config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
         config_entry.add_to_hass(hass)
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -1405,7 +1405,7 @@ async def test_deprecated_installation_issue_64bit_supervised(
         async_fire_time_changed(hass)
         await hass.async_block_till_done()
         await hass.services.async_call(
-            "homeassistant",
+            "smarthub",
             "update_entity",
             {
                 "entity_id": [
@@ -1420,8 +1420,8 @@ async def test_deprecated_installation_issue_64bit_supervised(
         await hass.async_block_till_done()
 
     assert len(issue_registry.issues) == 1
-    issue = issue_registry.async_get_issue("homeassistant", "deprecated_method")
-    assert issue.domain == "homeassistant"
+    issue = issue_registry.async_get_issue("smarthub", "deprecated_method")
+    assert issue.domain == "smarthub"
     assert issue.severity == ir.IssueSeverity.WARNING
     assert issue.translation_placeholders == {
         "installation_type": "Supervised",
@@ -1436,7 +1436,7 @@ async def test_deprecated_installation_issue_64bit_supervised(
     ],
 )
 async def test_deprecated_installation_issue_supported_board(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
     freezer: FrozenDateTimeFactory,
     board: str,
@@ -1446,24 +1446,24 @@ async def test_deprecated_installation_issue_supported_board(
     with (
         patch.dict(os.environ, MOCK_ENVIRON),
         patch(
-            "homeassistant.components.homeassistant.async_get_system_info",
+            "smarthub.components.smarthub.async_get_system_info",
             return_value={
-                "installation_type": "Home Assistant OS",
+                "installation_type": "SmartHub OS",
                 "arch": "aarch64",
             },
         ),
         patch(
-            "homeassistant.components.hassio._is_32_bit",
+            "smarthub.components.hassio._is_32_bit",
             return_value=False,
         ),
         patch(
-            "homeassistant.components.hassio.get_os_info", return_value={"board": board}
+            "smarthub.components.hassio.get_os_info", return_value={"board": board}
         ),
         patch(
-            "homeassistant.components.hassio.get_info", return_value={"hassos": True}
+            "smarthub.components.hassio.get_info", return_value={"hassos": True}
         ),
     ):
-        assert await async_setup_component(hass, "homeassistant", {})
+        assert await async_setup_component(hass, "smarthub", {})
         config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
         config_entry.add_to_hass(hass)
         assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -1472,7 +1472,7 @@ async def test_deprecated_installation_issue_supported_board(
         async_fire_time_changed(hass)
         await hass.async_block_till_done()
         await hass.services.async_call(
-            "homeassistant",
+            "smarthub",
             "update_entity",
             {
                 "entity_id": [

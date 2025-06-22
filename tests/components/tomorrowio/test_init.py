@@ -4,15 +4,15 @@ from datetime import timedelta
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.tomorrowio.config_flow import (
+from smarthub.components.tomorrowio.config_flow import (
     _get_config_schema,
     _get_unique_id,
 )
-from homeassistant.components.tomorrowio.const import CONF_TIMESTEP, DOMAIN
-from homeassistant.components.weather import DOMAIN as WEATHER_DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_NAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.tomorrowio.const import CONF_TIMESTEP, DOMAIN
+from smarthub.components.weather import DOMAIN as WEATHER_DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_NAME
+from smarthub.core import SmartHub
 
 from .const import MIN_CONFIG
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 NEW_NAME = "New Name"
 
 
-async def test_load_and_unload(hass: HomeAssistant) -> None:
+async def test_load_and_unload(hass: SmartHub) -> None:
     """Test loading and unloading entry."""
     data = _get_config_schema(hass, SOURCE_USER)(MIN_CONFIG)
     data[CONF_NAME] = "test"
@@ -43,7 +43,7 @@ async def test_load_and_unload(hass: HomeAssistant) -> None:
 
 
 async def test_update_intervals(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, tomorrowio_config_entry_update
+    hass: SmartHub, freezer: FrozenDateTimeFactory, tomorrowio_config_entry_update
 ) -> None:
     """Test coordinator update intervals."""
     data = _get_config_schema(hass, SOURCE_USER)(MIN_CONFIG)

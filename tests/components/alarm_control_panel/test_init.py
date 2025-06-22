@@ -4,13 +4,13 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import alarm_control_panel
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components import alarm_control_panel
+from smarthub.components.alarm_control_panel import (
     DOMAIN,
     AlarmControlPanelEntityFeature,
     CodeFormat,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_CODE,
     SERVICE_ALARM_ARM_AWAY,
     SERVICE_ALARM_ARM_CUSTOM_BYPASS,
@@ -20,10 +20,10 @@ from homeassistant.const import (
     SERVICE_ALARM_DISARM,
     SERVICE_ALARM_TRIGGER,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.typing import UNDEFINED, UndefinedType
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.typing import UNDEFINED, UndefinedType
 
 from . import help_async_setup_entry_init, help_async_unload_entry
 from .conftest import MockAlarmControlPanel
@@ -37,7 +37,7 @@ from tests.common import (
 
 
 async def help_test_async_alarm_control_panel_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     service: str,
     code: str | None | UndefinedType = UNDEFINED,
@@ -54,7 +54,7 @@ async def help_test_async_alarm_control_panel_service(
 
 
 async def test_set_mock_alarm_control_panel_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_alarm_control_panel_entity: MockAlarmControlPanel,
 ) -> None:
@@ -85,7 +85,7 @@ async def test_set_mock_alarm_control_panel_options(
 
 
 async def test_default_code_option_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_alarm_control_panel_entity: MockAlarmControlPanel,
 ) -> None:
@@ -113,7 +113,7 @@ async def test_default_code_option_update(
     [(CodeFormat.TEXT, AlarmControlPanelEntityFeature.ARM_AWAY)],
 )
 async def test_alarm_control_panel_arm_with_code(
-    hass: HomeAssistant, mock_alarm_control_panel_entity: MockAlarmControlPanel
+    hass: SmartHub, mock_alarm_control_panel_entity: MockAlarmControlPanel
 ) -> None:
     """Test alarm control panel entity with open service."""
     state = hass.states.get(mock_alarm_control_panel_entity.entity_id)
@@ -145,7 +145,7 @@ async def test_alarm_control_panel_arm_with_code(
     [(CodeFormat.NUMBER, False)],
 )
 async def test_alarm_control_panel_with_no_code(
-    hass: HomeAssistant, mock_alarm_control_panel_entity: MockAlarmControlPanel
+    hass: SmartHub, mock_alarm_control_panel_entity: MockAlarmControlPanel
 ) -> None:
     """Test alarm control panel entity without code."""
     await help_test_async_alarm_control_panel_service(
@@ -183,7 +183,7 @@ async def test_alarm_control_panel_with_no_code(
     [(CodeFormat.NUMBER, True)],
 )
 async def test_alarm_control_panel_with_default_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_alarm_control_panel_entity: MockAlarmControlPanel,
 ) -> None:
@@ -222,7 +222,7 @@ async def test_alarm_control_panel_with_default_code(
 
 
 async def test_alarm_control_panel_not_log_deprecated_state_warning(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_alarm_control_panel_entity: MockAlarmControlPanel,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -237,7 +237,7 @@ async def test_alarm_control_panel_not_log_deprecated_state_warning(
 
 @pytest.mark.usefixtures("mock_as_custom_component")
 async def test_alarm_control_panel_log_deprecated_state_warning_using_state_prop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     code_format: CodeFormat | None,
     supported_features: AlarmControlPanelEntityFeature,
     code_arm_required: bool,
@@ -292,14 +292,14 @@ async def test_alarm_control_panel_log_deprecated_state_warning_using_state_prop
         "test_init.test_alarm_control_panel_log_deprecated_state_warning_using"
         "_state_prop.<locals>.MockLegacyAlarmControlPanel'>) should implement"
         " the 'alarm_state' property and return its state using the AlarmControlPanelState"
-        " enum. This will stop working in Home Assistant 2025.11, please report it to"
+        " enum. This will stop working in SmartHub 2025.11, please report it to"
         " the author of the 'test' custom integration" in caplog.text
     )
 
 
 @pytest.mark.usefixtures("mock_as_custom_component")
 async def test_alarm_control_panel_log_deprecated_state_warning_using_attr_state_attr(
-    hass: HomeAssistant,
+    hass: SmartHub,
     code_format: CodeFormat | None,
     supported_features: AlarmControlPanelEntityFeature,
     code_arm_required: bool,
@@ -363,7 +363,7 @@ async def test_alarm_control_panel_log_deprecated_state_warning_using_attr_state
         "test_alarm_control_panel_log_deprecated_state_warning_using_attr_state_attr."
         "<locals>.MockLegacyAlarmControlPanel'>) should implement the 'alarm_state' property"
         " and return its state using the AlarmControlPanelState enum. "
-        "This will stop working in Home Assistant 2025.11, please report "
+        "This will stop working in SmartHub 2025.11, please report "
         "it to the author of the 'test' custom integration" in caplog.text
     )
     caplog.clear()
@@ -379,7 +379,7 @@ async def test_alarm_control_panel_log_deprecated_state_warning_using_attr_state
 
 @pytest.mark.usefixtures("mock_as_custom_component")
 async def test_alarm_control_panel_deprecated_state_does_not_break_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     code_format: CodeFormat | None,
     supported_features: AlarmControlPanelEntityFeature,
     code_arm_required: bool,

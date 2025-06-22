@@ -7,8 +7,8 @@ from aiocomelit.const import COVER, WATT
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.comelit.const import SCAN_INTERVAL
-from homeassistant.components.cover import (
+from smarthub.components.comelit.const import SCAN_INTERVAL
+from smarthub.components.cover import (
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
@@ -18,9 +18,9 @@ from homeassistant.components.cover import (
     STATE_OPEN,
     STATE_OPENING,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -30,14 +30,14 @@ ENTITY_ID = "cover.cover0"
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.comelit.BRIDGE_PLATFORMS", [Platform.COVER]):
+    with patch("smarthub.components.comelit.BRIDGE_PLATFORMS", [Platform.COVER]):
         await setup_integration(hass, mock_serial_bridge_config_entry)
 
     await snapshot_platform(
@@ -49,7 +49,7 @@ async def test_all_entities(
 
 
 async def test_cover_open(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
@@ -99,7 +99,7 @@ async def test_cover_open(
 
 
 async def test_cover_close(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -137,7 +137,7 @@ async def test_cover_close(
 
 
 async def test_cover_stop_if_stopped(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,
 ) -> None:
@@ -163,7 +163,7 @@ async def test_cover_stop_if_stopped(
 
 
 async def test_cover_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_serial_bridge: AsyncMock,
     mock_serial_bridge_config_entry: MockConfigEntry,

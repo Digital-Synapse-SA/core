@@ -7,9 +7,9 @@ from freezegun import freeze_time
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.integration.const import DOMAIN
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import (
+from smarthub.components.integration.const import DOMAIN
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     STATE_UNAVAILABLE,
@@ -21,14 +21,14 @@ from homeassistant.const import (
     UnitOfTime,
     UnitOfVolumeFlowRate,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import (
+from smarthub.core import SmartHub, State
+from smarthub.helpers import (
     condition,
     device_registry as dr,
     entity_registry as er,
 )
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -53,7 +53,7 @@ DEFAULT_MAX_SUB_INTERVAL = {"minutes": 1}
     ],
 )
 async def test_initial_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     unit_of_measurement: str,
     device_class: SensorDeviceClass,
     unit_time: str,
@@ -86,7 +86,7 @@ async def test_initial_state(
 
 
 @pytest.mark.parametrize("method", ["trapezoidal", "left", "right"])
-async def test_state(hass: HomeAssistant, method) -> None:
+async def test_state(hass: SmartHub, method) -> None:
     """Test integration sensor state."""
     config = {
         "sensor": {
@@ -203,7 +203,7 @@ async def test_state(hass: HomeAssistant, method) -> None:
     )
 
 
-async def test_restore_state(hass: HomeAssistant) -> None:
+async def test_restore_state(hass: SmartHub) -> None:
     """Test integration sensor state is restored correctly."""
     mock_restore_cache_with_extra_data(
         hass,
@@ -259,7 +259,7 @@ async def test_restore_state(hass: HomeAssistant) -> None:
         },
     ],
 )
-async def test_restore_state_failed(hass: HomeAssistant, extra_attributes) -> None:
+async def test_restore_state_failed(hass: SmartHub, extra_attributes) -> None:
     """Test integration sensor state is restored correctly."""
     mock_restore_cache_with_extra_data(
         hass,
@@ -308,7 +308,7 @@ async def test_restore_state_failed(hass: HomeAssistant, extra_attributes) -> No
     ],
 )
 async def test_trapezoidal(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sequence: tuple[tuple[float, float, float], ...],
     force_update: bool,
 ) -> None:
@@ -360,7 +360,7 @@ async def test_trapezoidal(
     ],
 )
 async def test_left(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sequence: tuple[tuple[float, float, float], ...],
     force_update: bool,
 ) -> None:
@@ -415,7 +415,7 @@ async def test_left(
     ],
 )
 async def test_right(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sequence: tuple[tuple[float, float, float], ...],
     force_update: bool,
 ) -> None:
@@ -456,7 +456,7 @@ async def test_right(
     assert state.attributes.get("unit_of_measurement") == UnitOfEnergy.KILO_WATT_HOUR
 
 
-async def test_prefix(hass: HomeAssistant) -> None:
+async def test_prefix(hass: SmartHub) -> None:
     """Test integration sensor state using a power source."""
     config = {
         "sensor": {
@@ -492,7 +492,7 @@ async def test_prefix(hass: HomeAssistant) -> None:
     assert state.attributes.get("unit_of_measurement") == UnitOfEnergy.KILO_WATT_HOUR
 
 
-async def test_suffix(hass: HomeAssistant) -> None:
+async def test_suffix(hass: SmartHub) -> None:
     """Test integration sensor state using a network counter source."""
     config = {
         "sensor": {
@@ -531,7 +531,7 @@ async def test_suffix(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_UNIT_OF_MEASUREMENT] == UnitOfInformation.KILOBYTES
 
 
-async def test_suffix_2(hass: HomeAssistant) -> None:
+async def test_suffix_2(hass: SmartHub) -> None:
     """Test integration sensor state."""
     config = {
         "sensor": {
@@ -567,7 +567,7 @@ async def test_suffix_2(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_UNIT_OF_MEASUREMENT] == "m³"
 
 
-async def test_units(hass: HomeAssistant) -> None:
+async def test_units(hass: SmartHub) -> None:
     """Test integration sensor units using a power source."""
     config = {
         "sensor": {
@@ -616,7 +616,7 @@ async def test_units(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("method", ["trapezoidal", "left", "right"])
-async def test_device_class(hass: HomeAssistant, method) -> None:
+async def test_device_class(hass: SmartHub, method) -> None:
     """Test integration sensor units using a power source."""
     config = {
         "sensor": {
@@ -675,7 +675,7 @@ async def test_device_class(hass: HomeAssistant, method) -> None:
     ],
 )
 async def test_calc_errors(
-    hass: HomeAssistant, method: str, expected_states: list[str]
+    hass: SmartHub, method: str, expected_states: list[str]
 ) -> None:
     """Test integration sensor units using a power source."""
     config = {
@@ -738,7 +738,7 @@ async def test_calc_errors(
 
 
 async def test_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -797,7 +797,7 @@ def _integral_sensor_config(max_sub_interval: dict[str, int] | None) -> dict[str
 
 
 async def _setup_integral_sensor(
-    hass: HomeAssistant, max_sub_interval: dict[str, int] | None
+    hass: SmartHub, max_sub_interval: dict[str, int] | None
 ) -> None:
     await async_setup_component(
         hass, "sensor", _integral_sensor_config(max_sub_interval=max_sub_interval)
@@ -805,7 +805,7 @@ async def _setup_integral_sensor(
     await hass.async_block_till_done()
 
 
-async def _update_source_sensor(hass: HomeAssistant, value: int | str) -> None:
+async def _update_source_sensor(hass: SmartHub, value: int | str) -> None:
     hass.states.async_set(
         _integral_sensor_config(max_sub_interval=DEFAULT_MAX_SUB_INTERVAL)["sensor"][
             "source"
@@ -818,7 +818,7 @@ async def _update_source_sensor(hass: HomeAssistant, value: int | str) -> None:
 
 
 async def test_on_valid_source_expect_update_on_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test whether time based integration updates the integral on a valid source."""
     start_time = dt_util.utcnow()
@@ -844,7 +844,7 @@ async def test_on_valid_source_expect_update_on_time(
 
 
 async def test_on_0_source_expect_0_and_update_when_source_gets_positive(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test whether time based integration updates the integral on a valid zero source."""
     start_time = dt_util.utcnow()
@@ -877,7 +877,7 @@ async def test_on_0_source_expect_0_and_update_when_source_gets_positive(
 
 
 async def test_on_unvailable_source_expect_no_update_on_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test whether time based integration handles unavailability of the source properly."""
 
@@ -904,7 +904,7 @@ async def test_on_unvailable_source_expect_no_update_on_time(
 
 
 async def test_on_statechanges_source_expect_no_update_on_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test whether state changes cancel time based integration."""
 
@@ -937,7 +937,7 @@ async def test_on_statechanges_source_expect_no_update_on_time(
 
 
 async def test_on_no_max_sub_interval_expect_no_timebased_updates(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test whether integratal is not updated by time when max_sub_interval is not configured."""
 

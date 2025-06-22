@@ -8,8 +8,8 @@ from synology_dsm.api.dsm.network import NetworkInterface
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.synology_dsm.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.synology_dsm.const import DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
@@ -17,7 +17,7 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import mock_dsm_information
 from .consts import HOST, MACS, PASSWORD, PORT, SERIAL, USE_SSL, USERNAME
@@ -30,7 +30,7 @@ from tests.typing import ClientSessionGenerator
 @pytest.fixture
 def mock_dsm_with_usb():
     """Mock a successful service with USB support."""
-    with patch("homeassistant.components.synology_dsm.common.SynologyDSM") as dsm:
+    with patch("smarthub.components.synology_dsm.common.SynologyDSM") as dsm:
         dsm.login = AsyncMock(return_value=True)
         dsm.update = AsyncMock(return_value=True)
 
@@ -157,12 +157,12 @@ def mock_dsm_with_usb():
 
 @pytest.fixture
 async def setup_dsm_with_usb(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dsm_with_usb: MagicMock,
 ):
     """Mock setup of synology dsm config entry with USB."""
     with patch(
-        "homeassistant.components.synology_dsm.common.SynologyDSM",
+        "smarthub.components.synology_dsm.common.SynologyDSM",
         return_value=mock_dsm_with_usb,
     ):
         entry = MockConfigEntry(
@@ -185,7 +185,7 @@ async def setup_dsm_with_usb(
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup_dsm_with_usb: MagicMock,
     snapshot: SnapshotAssertion,

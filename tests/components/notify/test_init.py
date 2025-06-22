@@ -6,17 +6,17 @@ from unittest.mock import MagicMock
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import notify
-from homeassistant.components.notify import (
+from smarthub.components import notify
+from smarthub.components.notify import (
     DOMAIN,
     SERVICE_SEND_MESSAGE,
     NotifyEntity,
     NotifyEntityDescription,
     NotifyEntityFeature,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant, State
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub, State
 
 from tests.common import (
     MockConfigEntry,
@@ -53,7 +53,7 @@ class MockNotifyEntityNonAsync(MockEntity, NotifyEntity):
 
 
 async def help_async_setup_entry_init(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> bool:
     """Set up test config entry."""
     await hass.config_entries.async_forward_entry_setups(
@@ -63,7 +63,7 @@ async def help_async_setup_entry_init(
 
 
 async def help_async_unload_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> bool:
     """Unload test config emntry."""
     return await hass.config_entries.async_unload_platforms(
@@ -80,7 +80,7 @@ async def help_async_unload_entry(
     ids=["non_async", "async"],
 )
 async def test_send_message_service(
-    hass: HomeAssistant, config_flow_fixture: None, entity: NotifyEntity
+    hass: SmartHub, config_flow_fixture: None, entity: NotifyEntity
 ) -> None:
     """Test send_message service."""
 
@@ -153,7 +153,7 @@ async def test_send_message_service(
     ids=["non_async", "async"],
 )
 async def test_send_message_service_with_title(
-    hass: HomeAssistant, config_flow_fixture: None, entity: NotifyEntity
+    hass: SmartHub, config_flow_fixture: None, entity: NotifyEntity
 ) -> None:
     """Test send_message service."""
 
@@ -196,7 +196,7 @@ async def test_send_message_service_with_title(
     ],
 )
 async def test_restore_state(
-    hass: HomeAssistant, config_flow_fixture: None, state: str, init_state: str
+    hass: SmartHub, config_flow_fixture: None, state: str, init_state: str
 ) -> None:
     """Test we restore state integration."""
     mock_restore_cache(hass, (State("notify.test", state),))
@@ -221,7 +221,7 @@ async def test_restore_state(
     assert state.state is init_state
 
 
-async def test_name(hass: HomeAssistant, config_flow_fixture: None) -> None:
+async def test_name(hass: SmartHub, config_flow_fixture: None) -> None:
     """Test notify name."""
 
     mock_platform(hass, "test.config_flow")

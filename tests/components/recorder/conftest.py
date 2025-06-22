@@ -11,11 +11,11 @@ import pytest
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm.session import Session
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder import db_schema
-from homeassistant.components.recorder.const import MAX_IDS_FOR_INDEXED_GROUP_BY
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.core import HomeAssistant
+from smarthub.components import recorder
+from smarthub.components.recorder import db_schema
+from smarthub.components.recorder.const import MAX_IDS_FOR_INDEXED_GROUP_BY
+from smarthub.components.recorder.util import session_scope
+from smarthub.core import SmartHub
 
 
 def pytest_configure(config):
@@ -43,7 +43,7 @@ def skip_by_db_engine(request: pytest.FixtureRequest, recorder_db_url: str) -> N
 
 
 @pytest.fixture
-def recorder_dialect_name(hass: HomeAssistant, db_engine: str) -> Generator[None]:
+def recorder_dialect_name(hass: SmartHub, db_engine: str) -> Generator[None]:
     """Patch the recorder dialect."""
     if instance := hass.data.get(recorder.DATA_INSTANCE):
         instance.__dict__.pop("dialect_name", None)
@@ -52,7 +52,7 @@ def recorder_dialect_name(hass: HomeAssistant, db_engine: str) -> Generator[None
             instance.__dict__.pop("dialect_name", None)
     else:
         with patch(
-            "homeassistant.components.recorder.Recorder.dialect_name", db_engine
+            "smarthub.components.recorder.Recorder.dialect_name", db_engine
         ):
             yield
 
@@ -76,7 +76,7 @@ class InstrumentedMigration:
 
 @pytest.fixture(name="instrument_migration")
 def instrument_migration_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> Generator[InstrumentedMigration]:
     """Instrument recorder migration."""
     with instrument_migration(hass) as instrumented_migration:
@@ -85,7 +85,7 @@ def instrument_migration_fixture(
 
 @contextmanager
 def instrument_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> Generator[InstrumentedMigration]:
     """Instrument recorder migration."""
 
@@ -142,7 +142,7 @@ def instrument_migration(
 
     def _instrument_apply_update(
         instance: recorder.Recorder,
-        hass: HomeAssistant,
+        hass: SmartHub,
         engine: Engine,
         session_maker: Callable[[], Session],
         new_version: int,
@@ -160,17 +160,17 @@ def instrument_migration(
 
     with (
         patch(
-            "homeassistant.components.recorder.migration.migrate_schema_live",
+            "smarthub.components.recorder.migration.migrate_schema_live",
             wraps=partial(_instrument_migrate_schema_live, real_migrate_schema_live),
         ),
         patch(
-            "homeassistant.components.recorder.migration.migrate_schema_non_live",
+            "smarthub.components.recorder.migration.migrate_schema_non_live",
             wraps=partial(
                 _instrument_migrate_schema_non_live, real_migrate_schema_non_live
             ),
         ),
         patch(
-            "homeassistant.components.recorder.migration._apply_update",
+            "smarthub.components.recorder.migration._apply_update",
             wraps=_instrument_apply_update,
         ) as apply_update_mock,
     ):

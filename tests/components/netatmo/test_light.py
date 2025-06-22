@@ -4,15 +4,15 @@ from unittest.mock import AsyncMock, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.components.netatmo import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, CONF_WEBHOOK_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.netatmo import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, CONF_WEBHOOK_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     FAKE_WEBHOOK_ACTIVATION,
@@ -26,7 +26,7 @@ from tests.test_util.aiohttp import AiohttpClientMockResponse
 
 
 async def test_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     netatmo_auth: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -43,7 +43,7 @@ async def test_entity(
 
 
 async def test_camera_light_setup_and_services(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test camera ligiht setup and services."""
     with selected_platforms(["light"]):
@@ -109,7 +109,7 @@ async def test_camera_light_setup_and_services(
         )
 
 
-async def test_setup_component_no_devices(hass: HomeAssistant, config_entry) -> None:
+async def test_setup_component_no_devices(hass: SmartHub, config_entry) -> None:
     """Test setup with no devices."""
     fake_post_hits = 0
 
@@ -125,14 +125,14 @@ async def test_setup_component_no_devices(hass: HomeAssistant, config_entry) -> 
 
     with (
         patch(
-            "homeassistant.components.netatmo.api.AsyncConfigEntryNetatmoAuth"
+            "smarthub.components.netatmo.api.AsyncConfigEntryNetatmoAuth"
         ) as mock_auth,
-        patch("homeassistant.components.netatmo.data_handler.PLATFORMS", ["light"]),
+        patch("smarthub.components.netatmo.data_handler.PLATFORMS", ["light"]),
         patch(
-            "homeassistant.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
+            "smarthub.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.netatmo.webhook_generate_url",
+            "smarthub.components.netatmo.webhook_generate_url",
         ),
     ):
         mock_auth.return_value.async_post_api_request.side_effect = (
@@ -157,7 +157,7 @@ async def test_setup_component_no_devices(hass: HomeAssistant, config_entry) -> 
 
 
 async def test_light_setup_and_services(
-    hass: HomeAssistant, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, netatmo_auth: AsyncMock
 ) -> None:
     """Test setup and services."""
     with selected_platforms(["light"]):

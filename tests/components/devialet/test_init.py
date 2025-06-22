@@ -1,8 +1,8 @@
 """Test the Devialet init."""
 
-from homeassistant.components.media_player import DOMAIN as MP_DOMAIN, MediaPlayerState
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.media_player import DOMAIN as MP_DOMAIN, MediaPlayerState
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import NAME, setup_integration
 
@@ -10,7 +10,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the Devialet configuration entry loading and unloading."""
     entry = await setup_integration(hass, aioclient_mock)
@@ -28,7 +28,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_load_unload_config_entry_when_device_unavailable(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the Devialet configuration entry loading and unloading when the device is unavailable."""
     entry = await setup_integration(hass, aioclient_mock, state="unavailable")

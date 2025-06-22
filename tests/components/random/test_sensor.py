@@ -1,10 +1,10 @@
 """The test for the random number sensor platform."""
 
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
-async def test_random_sensor(hass: HomeAssistant) -> None:
+async def test_random_sensor(hass: SmartHub) -> None:
     """Test the Random number sensor."""
     config = {
         "sensor": {

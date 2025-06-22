@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.mcp_server.const import DOMAIN
-from homeassistant.const import CONF_LLM_HASS_API
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.mcp_server.const import DOMAIN
+from smarthub.const import CONF_LLM_HASS_API
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 @pytest.mark.parametrize(
@@ -20,7 +20,7 @@ from homeassistant.data_entry_flow import FlowResultType
     ],
 )
 async def test_form(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, params: dict[str, Any]
+    hass: SmartHub, mock_setup_entry: AsyncMock, params: dict[str, Any]
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(

@@ -6,10 +6,10 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = pytest.mark.usefixtures("system_get_info", "dsl_get_info", "wan_get_info")
 
@@ -17,12 +17,12 @@ pytestmark = pytest.mark.usefixtures("system_get_info", "dsl_get_info", "wan_get
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.sfr_box.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.sfr_box.PLATFORMS", [Platform.SENSOR]):
         yield
 
 
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,

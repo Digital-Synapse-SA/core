@@ -15,12 +15,12 @@ from evohomeasync2.zone import Zone
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.evohome.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util, slugify
-from homeassistant.util.json import JsonArrayType, JsonObjectType
+from smarthub.components.evohome.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME, Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util, slugify
+from smarthub.util.json import JsonArrayType, JsonObjectType
 
 from .const import ACCESS_TOKEN, REFRESH_TOKEN, SESSION_ID, USERNAME
 
@@ -139,7 +139,7 @@ def config() -> dict[str, str]:
 
 
 async def setup_evohome(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, str],
     install: str = "default",
 ) -> AsyncGenerator[MagicMock]:
@@ -162,8 +162,8 @@ async def setup_evohome(
     dt_util.set_default_time_zone(timezone(timedelta(minutes=utc_offset)))
 
     with (
-        # patch("homeassistant.components.evohome.ec1.EvohomeClient", return_value=None),
-        patch("homeassistant.components.evohome.ec2.EvohomeClient") as mock_client,
+        # patch("smarthub.components.evohome.ec1.EvohomeClient", return_value=None),
+        patch("smarthub.components.evohome.ec2.EvohomeClient") as mock_client,
         patch(
             "evohomeasync2.auth.CredentialsManagerBase._post_request",
             mock_post_request(install),
@@ -196,7 +196,7 @@ async def setup_evohome(
 
 @pytest.fixture
 async def evohome(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: dict[str, str],
     freezer: FrozenDateTimeFactory,
     install: str,

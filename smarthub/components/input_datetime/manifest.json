@@ -1,0 +1,8 @@
+{
+  "domain": "input_datetime",
+  "name": "Input Datetime",
+  "codeowners": ["@smart-hub/core"],
+  "documentation": "https://www.smart-hub.io/integrations/input_datetime",
+  "integration_type": "helper",
+  "quality_scale": "internal"
+}

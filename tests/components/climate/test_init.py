@@ -9,13 +9,13 @@ from unittest.mock import MagicMock, Mock
 import pytest
 import voluptuous as vol
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     DOMAIN,
     SET_TEMPERATURE_SCHEMA,
     ClimateEntity,
     HVACMode,
 )
-from homeassistant.components.climate.const import (
+from smarthub.components.climate.const import (
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
     ATTR_HUMIDITY,
@@ -37,9 +37,9 @@ from homeassistant.components.climate.const import (
     SWING_HORIZONTAL_ON,
     ClimateEntityFeature,
 )
-from homeassistant.const import ATTR_TEMPERATURE, PRECISION_WHOLE, UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.const import ATTR_TEMPERATURE, PRECISION_WHOLE, UnitOfTemperature
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from tests.common import (
     MockConfigEntry,
@@ -50,7 +50,7 @@ from tests.common import (
 
 
 async def test_set_temp_schema_no_req(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the set temperature schema with missing required data."""
     domain = "climate"
@@ -67,7 +67,7 @@ async def test_set_temp_schema_no_req(
 
 
 async def test_set_temp_schema(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the set temperature schema with ok required data."""
     domain = "climate"
@@ -160,7 +160,7 @@ class MockClimateEntityTestMethods(MockClimateEntity):
         """Turn off."""
 
 
-async def test_sync_turn_on(hass: HomeAssistant) -> None:
+async def test_sync_turn_on(hass: SmartHub) -> None:
     """Test if async turn_on calls sync turn_on."""
     climate = MockClimateEntityTestMethods()
     climate.hass = hass
@@ -171,7 +171,7 @@ async def test_sync_turn_on(hass: HomeAssistant) -> None:
     assert climate.turn_on.called
 
 
-async def test_sync_turn_off(hass: HomeAssistant) -> None:
+async def test_sync_turn_off(hass: SmartHub) -> None:
     """Test if async turn_off calls sync turn_off."""
     climate = MockClimateEntityTestMethods()
     climate.hass = hass
@@ -196,7 +196,7 @@ def _create_tuples(enum: type[Enum], constant_prefix: str) -> list[tuple[Enum, s
 
 
 async def test_temperature_features_is_valid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_test_integration: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -261,7 +261,7 @@ async def test_temperature_features_is_valid(
 
 
 async def test_mode_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_test_integration: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -418,7 +418,7 @@ async def test_mode_validation(
     assert exc.value.translation_key == "not_valid_fan_mode"
 
 
-async def test_turn_on_off_toggle(hass: HomeAssistant) -> None:
+async def test_turn_on_off_toggle(hass: SmartHub) -> None:
     """Test turn_on/turn_off/toggle methods."""
 
     class MockClimateEntityTest(MockClimateEntity):
@@ -450,7 +450,7 @@ async def test_turn_on_off_toggle(hass: HomeAssistant) -> None:
     assert climate.hvac_mode == HVACMode.OFF
 
 
-async def test_sync_toggle(hass: HomeAssistant) -> None:
+async def test_sync_toggle(hass: SmartHub) -> None:
     """Test if async toggle calls sync toggle."""
 
     class MockClimateEntityTest(MockClimateEntity):
@@ -495,7 +495,7 @@ async def test_sync_toggle(hass: HomeAssistant) -> None:
 
 
 async def test_humidity_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     register_test_integration: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -560,7 +560,7 @@ async def test_humidity_validation(
 
 
 async def test_temperature_validation(
-    hass: HomeAssistant, register_test_integration: MockConfigEntry
+    hass: SmartHub, register_test_integration: MockConfigEntry
 ) -> None:
     """Test validation for temperatures."""
 
@@ -659,7 +659,7 @@ async def test_temperature_validation(
 
 
 async def test_target_temp_high_higher_than_low(
-    hass: HomeAssistant, register_test_integration: MockConfigEntry
+    hass: SmartHub, register_test_integration: MockConfigEntry
 ) -> None:
     """Test that target high is higher than target low."""
 

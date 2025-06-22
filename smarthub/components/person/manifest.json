@@ -1,0 +1,10 @@
+{
+  "domain": "person",
+  "name": "Person",
+  "codeowners": [],
+  "dependencies": ["image_upload", "http"],
+  "documentation": "https://www.smart-hub.io/integrations/person",
+  "integration_type": "system",
+  "iot_class": "calculated",
+  "quality_scale": "internal"
+}

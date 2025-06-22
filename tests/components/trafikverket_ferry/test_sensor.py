@@ -8,15 +8,15 @@ from unittest.mock import patch
 import pytest
 from pytrafikverket.models import FerryStopModel
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
 
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
     monkeypatch: pytest.MonkeyPatch,
     get_ferries: list[FerryStopModel],
@@ -33,7 +33,7 @@ async def test_sensor(
     monkeypatch.setattr(get_ferries[0], "other_information", ["Nothing exiting"])
 
     with patch(
-        "homeassistant.components.trafikverket_ferry.coordinator.TrafikverketFerry.async_get_next_ferry_stops",
+        "smarthub.components.trafikverket_ferry.coordinator.TrafikverketFerry.async_get_next_ferry_stops",
         return_value=get_ferries,
     ):
         async_fire_time_changed(

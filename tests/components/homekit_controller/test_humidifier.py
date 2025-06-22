@@ -6,13 +6,13 @@ from aiohomekit.model import Accessory
 from aiohomekit.model.characteristics import CharacteristicsTypes
 from aiohomekit.model.services import Service, ServicesTypes
 
-from homeassistant.components.humidifier import (
+from smarthub.components.humidifier import (
     DOMAIN as HUMIDIFIER_DOMAIN,
     MODE_AUTO,
     MODE_NORMAL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_test_component
 
@@ -72,7 +72,7 @@ def create_dehumidifier_service(accessory: Accessory) -> Service:
 
 
 async def test_humidifier_active_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a HomeKit humidifier on and off again."""
     helper = await setup_test_component(hass, get_next_aid(), create_humidifier_service)
@@ -97,7 +97,7 @@ async def test_humidifier_active_state(
 
 
 async def test_dehumidifier_active_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a HomeKit dehumidifier on and off again."""
     helper = await setup_test_component(
@@ -124,7 +124,7 @@ async def test_dehumidifier_active_state(
 
 
 async def test_humidifier_read_humidity(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit humidifier accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_humidifier_service)
@@ -165,7 +165,7 @@ async def test_humidifier_read_humidity(
 
 
 async def test_dehumidifier_read_humidity(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit dehumidifier accessory."""
     helper = await setup_test_component(
@@ -206,7 +206,7 @@ async def test_dehumidifier_read_humidity(
 
 
 async def test_humidifier_set_humidity(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can set the state of a HomeKit humidifier accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_humidifier_service)
@@ -224,7 +224,7 @@ async def test_humidifier_set_humidity(
 
 
 async def test_dehumidifier_set_humidity(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can set the state of a HomeKit dehumidifier accessory."""
     helper = await setup_test_component(
@@ -244,7 +244,7 @@ async def test_dehumidifier_set_humidity(
 
 
 async def test_humidifier_set_mode(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can set the mode of a HomeKit humidifier accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_humidifier_service)
@@ -279,7 +279,7 @@ async def test_humidifier_set_mode(
 
 
 async def test_dehumidifier_set_mode(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can set the mode of a HomeKit dehumidifier accessory."""
     helper = await setup_test_component(
@@ -316,7 +316,7 @@ async def test_dehumidifier_set_mode(
 
 
 async def test_humidifier_read_only_mode(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit humidifier accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_humidifier_service)
@@ -358,7 +358,7 @@ async def test_humidifier_read_only_mode(
 
 
 async def test_dehumidifier_read_only_mode(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit dehumidifier accessory."""
     helper = await setup_test_component(
@@ -402,7 +402,7 @@ async def test_dehumidifier_read_only_mode(
 
 
 async def test_humidifier_target_humidity_modes(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit humidifier accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_humidifier_service)
@@ -449,7 +449,7 @@ async def test_humidifier_target_humidity_modes(
 
 
 async def test_dehumidifier_target_humidity_modes(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit dehumidifier accessory."""
     helper = await setup_test_component(
@@ -500,7 +500,7 @@ async def test_dehumidifier_target_humidity_modes(
 
 
 async def test_migrate_entity_ids(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:

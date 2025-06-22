@@ -8,9 +8,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import file_upload
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import file_upload
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.components.image_upload import TEST_IMAGE
 from tests.typing import ClientSessionGenerator
@@ -18,7 +18,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.fixture
 async def uploaded_file_dir(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> Path:
     """Test uploading and using a file."""
     assert await async_setup_component(hass, "file_upload", {})
@@ -27,7 +27,7 @@ async def uploaded_file_dir(
     with (
         patch(
             # Patch temp dir name to avoid tests fail running in parallel
-            "homeassistant.components.file_upload.TEMP_DIR_NAME",
+            "smarthub.components.file_upload.TEMP_DIR_NAME",
             file_upload.TEMP_DIR_NAME + f"-{getrandbits(10):03x}",
         ),
         TEST_IMAGE.open("rb") as fp,
@@ -42,7 +42,7 @@ async def uploaded_file_dir(
     return file_dir
 
 
-async def test_using_file(hass: HomeAssistant, uploaded_file_dir) -> None:
+async def test_using_file(hass: SmartHub, uploaded_file_dir) -> None:
     """Test uploading and using a file."""
     # Test we can use it
     with file_upload.process_uploaded_file(hass, uploaded_file_dir.name) as file_path:
@@ -55,7 +55,7 @@ async def test_using_file(hass: HomeAssistant, uploaded_file_dir) -> None:
 
 
 async def test_removing_file(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, uploaded_file_dir
+    hass: SmartHub, hass_client: ClientSessionGenerator, uploaded_file_dir
 ) -> None:
     """Test uploading and using a file."""
     client = await hass_client()
@@ -70,7 +70,7 @@ async def test_removing_file(
 
 
 async def test_removed_on_stop(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, uploaded_file_dir
+    hass: SmartHub, hass_client: ClientSessionGenerator, uploaded_file_dir
 ) -> None:
     """Test uploading and using a file."""
     await hass.async_stop()
@@ -80,7 +80,7 @@ async def test_removed_on_stop(
 
 
 async def test_upload_large_file(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, large_file_io
+    hass: SmartHub, hass_client: ClientSessionGenerator, large_file_io
 ) -> None:
     """Test uploading large file."""
     assert await async_setup_component(hass, "file_upload", {})
@@ -89,12 +89,12 @@ async def test_upload_large_file(
     with (
         patch(
             # Patch temp dir name to avoid tests fail running in parallel
-            "homeassistant.components.file_upload.TEMP_DIR_NAME",
+            "smarthub.components.file_upload.TEMP_DIR_NAME",
             file_upload.TEMP_DIR_NAME + f"-{getrandbits(10):03x}",
         ),
         patch(
             # Patch one megabyte to 50 bytes to prevent having to use big files in tests
-            "homeassistant.components.file_upload.ONE_MEGABYTE",
+            "smarthub.components.file_upload.ONE_MEGABYTE",
             50,
         ),
     ):
@@ -114,7 +114,7 @@ async def test_upload_large_file(
 
 
 async def test_upload_with_wrong_key_fails(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, large_file_io
+    hass: SmartHub, hass_client: ClientSessionGenerator, large_file_io
 ) -> None:
     """Test uploading fails."""
     assert await async_setup_component(hass, "file_upload", {})
@@ -122,7 +122,7 @@ async def test_upload_with_wrong_key_fails(
 
     with patch(
         # Patch temp dir name to avoid tests fail running in parallel
-        "homeassistant.components.file_upload.TEMP_DIR_NAME",
+        "smarthub.components.file_upload.TEMP_DIR_NAME",
         file_upload.TEMP_DIR_NAME + f"-{getrandbits(10):03x}",
     ):
         res = await client.post("/api/file_upload", data={"wrong_key": large_file_io})
@@ -131,7 +131,7 @@ async def test_upload_with_wrong_key_fails(
 
 
 async def test_upload_large_file_fails(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, large_file_io
+    hass: SmartHub, hass_client: ClientSessionGenerator, large_file_io
 ) -> None:
     """Test uploading large file."""
     assert await async_setup_component(hass, "file_upload", {})
@@ -151,16 +151,16 @@ async def test_upload_large_file_fails(
     with (
         patch(
             # Patch temp dir name to avoid tests fail running in parallel
-            "homeassistant.components.file_upload.TEMP_DIR_NAME",
+            "smarthub.components.file_upload.TEMP_DIR_NAME",
             file_upload.TEMP_DIR_NAME + f"-{getrandbits(10):03x}",
         ),
         patch(
             # Patch one megabyte to 50 bytes to prevent having to use big files in tests
-            "homeassistant.components.file_upload.ONE_MEGABYTE",
+            "smarthub.components.file_upload.ONE_MEGABYTE",
             50,
         ),
         patch(
-            "homeassistant.components.file_upload.Path.open", return_value=_mock_open()
+            "smarthub.components.file_upload.Path.open", return_value=_mock_open()
         ),
     ):
         res = await client.post("/api/file_upload", data={"file": large_file_io})

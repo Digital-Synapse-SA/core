@@ -5,8 +5,8 @@ from __future__ import annotations
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.fritz.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.fritz.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .const import MOCK_USER_DATA
 
@@ -16,7 +16,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     fc_class_mock,
     fh_class_mock,

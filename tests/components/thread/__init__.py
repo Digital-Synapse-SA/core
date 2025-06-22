@@ -88,7 +88,7 @@ ROUTER_DISCOVERY_GOOGLE_2 = {
 
 ROUTER_DISCOVERY_HASS = {
     "type_": "_meshcop._udp.local.",
-    "name": "HomeAssistant OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
+    "name": "SmartHub OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
     "addresses": [b"\xc0\xa8\x00s"],
     "port": 49153,
     "weight": 0,
@@ -97,7 +97,7 @@ ROUTER_DISCOVERY_HASS = {
     "properties": {
         b"rv": b"1",
         b"id": b"#\x0cj\x1a\xc5\x7foK\xe2b\xac\xf3.^\xf5,",
-        b"vn": b"HomeAssistant",
+        b"vn": b"SmartHub",
         b"mn": b"OpenThreadBorderRouter",
         b"nn": b"OpenThread HC",
         b"xp": b"\xe6\x0f\xc7\xc1\x86!,\xe5",
@@ -116,7 +116,7 @@ ROUTER_DISCOVERY_HASS = {
 
 ROUTER_DISCOVERY_HASS_BAD_DATA = {
     "type_": "_meshcop._udp.local.",
-    "name": "HomeAssistant OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
+    "name": "SmartHub OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
     "addresses": [b"\xc0\xa8\x00s"],
     "port": 49153,
     "weight": 0,
@@ -125,7 +125,7 @@ ROUTER_DISCOVERY_HASS_BAD_DATA = {
     "properties": {
         b"rv": b"1",
         b"id": b"#\x0cj\x1a\xc5\x7foK\xe2b\xac\xf3.^\xf5,",
-        b"vn": b"HomeAssistant\xff",  # Invalid UTF-8
+        b"vn": b"SmartHub\xff",  # Invalid UTF-8
         b"mn": b"OpenThreadBorderRouter",
         b"nn": b"OpenThread HC",
         b"xp": b"\xe6\x0f\xc7\xc1\x86!,\xe5",
@@ -144,7 +144,7 @@ ROUTER_DISCOVERY_HASS_BAD_DATA = {
 
 ROUTER_DISCOVERY_HASS_MISSING_DATA = {
     "type_": "_meshcop._udp.local.",
-    "name": "HomeAssistant OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
+    "name": "SmartHub OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
     "addresses": [b"\xc0\xa8\x00s"],
     "port": 49153,
     "weight": 0,
@@ -173,7 +173,7 @@ ROUTER_DISCOVERY_HASS_MISSING_DATA = {
 
 ROUTER_DISCOVERY_HASS_MISSING_MANDATORY_DATA_XA = {
     "type_": "_meshcop._udp.local.",
-    "name": "HomeAssistant OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
+    "name": "SmartHub OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
     "addresses": [b"\xc0\xa8\x00s"],
     "port": 49153,
     "weight": 0,
@@ -182,7 +182,7 @@ ROUTER_DISCOVERY_HASS_MISSING_MANDATORY_DATA_XA = {
     "properties": {
         b"rv": b"1",
         b"id": b"#\x0cj\x1a\xc5\x7foK\xe2b\xac\xf3.^\xf5,",
-        b"vn": b"HomeAssistant",
+        b"vn": b"SmartHub",
         b"mn": b"OpenThreadBorderRouter",
         b"nn": b"OpenThread HC",
         b"xp": b"\xe6\x0f\xc7\xc1\x86!,\xe5",
@@ -201,7 +201,7 @@ ROUTER_DISCOVERY_HASS_MISSING_MANDATORY_DATA_XA = {
 
 ROUTER_DISCOVERY_HASS_MISSING_MANDATORY_DATA_XP = {
     "type_": "_meshcop._udp.local.",
-    "name": "HomeAssistant OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
+    "name": "SmartHub OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
     "addresses": [b"\xc0\xa8\x00s"],
     "port": 49153,
     "weight": 0,
@@ -210,7 +210,7 @@ ROUTER_DISCOVERY_HASS_MISSING_MANDATORY_DATA_XP = {
     "properties": {
         b"rv": b"1",
         b"id": b"#\x0cj\x1a\xc5\x7foK\xe2b\xac\xf3.^\xf5,",
-        b"vn": b"HomeAssistant",
+        b"vn": b"SmartHub",
         b"mn": b"OpenThreadBorderRouter",
         b"nn": b"OpenThread HC",
         b"tv": b"1.3.0",
@@ -229,7 +229,7 @@ ROUTER_DISCOVERY_HASS_MISSING_MANDATORY_DATA_XP = {
 
 ROUTER_DISCOVERY_HASS_NO_ACTIVE_TIMESTAMP = {
     "type_": "_meshcop._udp.local.",
-    "name": "HomeAssistant OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
+    "name": "SmartHub OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
     "addresses": [b"\xc0\xa8\x00s"],
     "port": 49153,
     "weight": 0,
@@ -238,7 +238,7 @@ ROUTER_DISCOVERY_HASS_NO_ACTIVE_TIMESTAMP = {
     "properties": {
         b"rv": b"1",
         b"id": b"#\x0cj\x1a\xc5\x7foK\xe2b\xac\xf3.^\xf5,",
-        b"vn": b"HomeAssistant",
+        b"vn": b"SmartHub",
         b"mn": b"OpenThreadBorderRouter",
         b"nn": b"OpenThread HC",
         b"xp": b"\xe6\x0f\xc7\xc1\x86!,\xe5",
@@ -257,7 +257,7 @@ ROUTER_DISCOVERY_HASS_NO_ACTIVE_TIMESTAMP = {
 
 ROUTER_DISCOVERY_HASS_NO_STATE_BITMAP = {
     "type_": "_meshcop._udp.local.",
-    "name": "HomeAssistant OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
+    "name": "SmartHub OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
     "addresses": [b"\xc0\xa8\x00s"],
     "port": 49153,
     "weight": 0,
@@ -266,7 +266,7 @@ ROUTER_DISCOVERY_HASS_NO_STATE_BITMAP = {
     "properties": {
         b"rv": b"1",
         b"id": b"#\x0cj\x1a\xc5\x7foK\xe2b\xac\xf3.^\xf5,",
-        b"vn": b"HomeAssistant",
+        b"vn": b"SmartHub",
         b"mn": b"OpenThreadBorderRouter",
         b"nn": b"OpenThread HC",
         b"xp": b"\xe6\x0f\xc7\xc1\x86!,\xe5",
@@ -285,7 +285,7 @@ ROUTER_DISCOVERY_HASS_NO_STATE_BITMAP = {
 
 ROUTER_DISCOVERY_HASS_BAD_STATE_BITMAP = {
     "type_": "_meshcop._udp.local.",
-    "name": "HomeAssistant OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
+    "name": "SmartHub OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
     "addresses": [b"\xc0\xa8\x00s"],
     "port": 49153,
     "weight": 0,
@@ -294,7 +294,7 @@ ROUTER_DISCOVERY_HASS_BAD_STATE_BITMAP = {
     "properties": {
         b"rv": b"1",
         b"id": b"#\x0cj\x1a\xc5\x7foK\xe2b\xac\xf3.^\xf5,",
-        b"vn": b"HomeAssistant",
+        b"vn": b"SmartHub",
         b"mn": b"OpenThreadBorderRouter",
         b"nn": b"OpenThread HC",
         b"xp": b"\xe6\x0f\xc7\xc1\x86!,\xe5",
@@ -314,7 +314,7 @@ ROUTER_DISCOVERY_HASS_BAD_STATE_BITMAP = {
 
 ROUTER_DISCOVERY_HASS_STATE_BITMAP_NOT_ACTIVE = {
     "type_": "_meshcop._udp.local.",
-    "name": "HomeAssistant OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
+    "name": "SmartHub OpenThreadBorderRouter #0BBF._meshcop._udp.local.",
     "addresses": [b"\xc0\xa8\x00s"],
     "port": 49153,
     "weight": 0,
@@ -323,7 +323,7 @@ ROUTER_DISCOVERY_HASS_STATE_BITMAP_NOT_ACTIVE = {
     "properties": {
         b"rv": b"1",
         b"id": b"#\x0cj\x1a\xc5\x7foK\xe2b\xac\xf3.^\xf5,",
-        b"vn": b"HomeAssistant",
+        b"vn": b"SmartHub",
         b"mn": b"OpenThreadBorderRouter",
         b"nn": b"OpenThread HC",
         b"xp": b"\xe6\x0f\xc7\xc1\x86!,\xe5",

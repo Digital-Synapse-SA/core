@@ -4,10 +4,10 @@ from http import HTTPStatus
 
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import (
     CONFIG_ENTRY_DATA_OLD_FORMAT,
@@ -28,7 +28,7 @@ def platforms() -> list[Platform]:
 
 @pytest.fixture(autouse=True)
 async def setup_config_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> list[Platform]:
     """Fixture to setup the config entry."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -40,7 +40,7 @@ async def setup_config_entry(
     [(RAIN_SENSOR_OFF, "off"), (RAIN_SENSOR_ON, "on")],
 )
 async def test_rainsensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     responses: list[AiohttpClientMockResponse],
     entity_registry: er.EntityRegistry,
     expected_state: bool,
@@ -62,7 +62,7 @@ async def test_rainsensor(
     ],
 )
 async def test_no_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     responses: list[AiohttpClientMockResponse],
     entity_registry: er.EntityRegistry,
     config_entry: MockConfigEntry,

@@ -5,16 +5,16 @@ from ipaddress import ip_address
 
 from lektricowifi import DeviceConnectionError
 
-from homeassistant.components.lektrico.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import (
+from smarthub.components.lektrico.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import (
     ATTR_HW_VERSION,
     ATTR_SERIAL_NUMBER,
     CONF_HOST,
     CONF_TYPE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import (
     MOCKED_DEVICE_BOARD_REV,
@@ -27,7 +27,7 @@ from .conftest import (
 from tests.common import MockConfigEntry
 
 
-async def test_user_setup(hass: HomeAssistant, mock_device, mock_setup_entry) -> None:
+async def test_user_setup(hass: SmartHub, mock_device, mock_setup_entry) -> None:
     """Test manually setting up."""
 
     result = await hass.config_entries.flow.async_init(
@@ -60,7 +60,7 @@ async def test_user_setup(hass: HomeAssistant, mock_device, mock_setup_entry) ->
 
 
 async def test_user_setup_already_exists(
-    hass: HomeAssistant, mock_device, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_device, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test manually setting up when the device already exists."""
     mock_config_entry.add_to_hass(hass)
@@ -82,7 +82,7 @@ async def test_user_setup_already_exists(
     assert result["reason"] == "already_configured"
 
 
-async def test_user_setup_device_offline(hass: HomeAssistant, mock_device) -> None:
+async def test_user_setup_device_offline(hass: SmartHub, mock_device) -> None:
     """Test manually setting up when device is offline."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -116,7 +116,7 @@ async def test_user_setup_device_offline(hass: HomeAssistant, mock_device) -> No
 
 
 async def test_discovered_zeroconf(
-    hass: HomeAssistant, mock_device, mock_setup_entry
+    hass: SmartHub, mock_device, mock_setup_entry
 ) -> None:
     """Test we can setup when discovered from zeroconf."""
 
@@ -141,7 +141,7 @@ async def test_discovered_zeroconf(
 
 
 async def test_zeroconf_setup_already_exists(
-    hass: HomeAssistant, mock_device, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_device, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we abort zeroconf flow if device already configured."""
     mock_config_entry.add_to_hass(hass)
@@ -158,7 +158,7 @@ async def test_zeroconf_setup_already_exists(
 
 
 async def test_discovered_zeroconf_device_connection_error(
-    hass: HomeAssistant, mock_device
+    hass: SmartHub, mock_device
 ) -> None:
     """Test we can setup when discovered from zeroconf but device went offline."""
 

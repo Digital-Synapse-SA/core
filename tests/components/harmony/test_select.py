@@ -2,14 +2,14 @@
 
 from datetime import timedelta
 
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.util import utcnow
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.util import utcnow
 
 from .const import ENTITY_REMOTE, ENTITY_SELECT
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 async def test_connection_state_changes(
     harmony_client,
     mock_hc,
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_write_config,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -50,7 +50,7 @@ async def test_connection_state_changes(
 
 
 async def test_options(
-    mock_hc, hass: HomeAssistant, mock_write_config, mock_config_entry: MockConfigEntry
+    mock_hc, hass: SmartHub, mock_write_config, mock_config_entry: MockConfigEntry
 ) -> None:
     """Ensure calls to the switch modify the harmony state."""
 
@@ -69,7 +69,7 @@ async def test_options(
 
 
 async def test_select_option(
-    mock_hc, hass: HomeAssistant, mock_write_config, mock_config_entry: MockConfigEntry
+    mock_hc, hass: SmartHub, mock_write_config, mock_config_entry: MockConfigEntry
 ) -> None:
     """Ensure calls to the switch modify the harmony state."""
     mock_config_entry.add_to_hass(hass)
@@ -92,7 +92,7 @@ async def test_select_option(
 
 
 async def _select_option_and_wait(
-    hass: HomeAssistant, entity: str, option: str
+    hass: SmartHub, entity: str, option: str
 ) -> None:
     await hass.services.async_call(
         SELECT_DOMAIN,

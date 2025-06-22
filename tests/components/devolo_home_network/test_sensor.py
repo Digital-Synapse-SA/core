@@ -8,16 +8,16 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.devolo_home_network.const import (
+from smarthub.components.devolo_home_network.const import (
     DOMAIN,
     LONG_UPDATE_INTERVAL,
     SHORT_UPDATE_INTERVAL,
 )
-from homeassistant.components.sensor import DOMAIN as PLATFORM
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.sensor import DOMAIN as PLATFORM
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import configure_integration
 from .const import PLCNET
@@ -28,7 +28,7 @@ from tests.common import async_fire_time_changed
 
 @pytest.mark.usefixtures("mock_device")
 async def test_sensor_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test default setup of the sensor component."""
@@ -96,7 +96,7 @@ async def test_sensor_setup(
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.freeze_time("2023-01-13 12:00:00+00:00")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -139,7 +139,7 @@ async def test_sensor(
 
 
 async def test_update_plc_phyrates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -190,7 +190,7 @@ async def test_update_plc_phyrates(
 
 
 async def test_update_last_update_auth_failed(
-    hass: HomeAssistant, mock_device: MockDevice
+    hass: SmartHub, mock_device: MockDevice
 ) -> None:
     """Test getting the last update state with wrong password triggers the reauth flow."""
     entry = configure_integration(hass)

@@ -9,10 +9,10 @@ from aiohasupervisor.models import AddonsStats, AddonState
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant.auth.models import RefreshToken
-from homeassistant.components.hassio.handler import HassIO
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from smarthub.auth.models import RefreshToken
+from smarthub.components.hassio.handler import HassIO
+from smarthub.core import SmartHub
+from smarthub.helpers.aiohttp_client import async_get_clientsession
 
 from . import SUPERVISOR_TOKEN
 
@@ -24,7 +24,7 @@ from tests.typing import ClientSessionGenerator
 def disable_security_filter() -> Generator[None]:
     """Disable the security filter to ensure the integration is secure."""
     with patch(
-        "homeassistant.components.http.security_filter.FILTERS",
+        "smarthub.components.http.security_filter.FILTERS",
         re.compile("not-matching-anything"),
     ):
         yield
@@ -32,7 +32,7 @@ def disable_security_filter() -> Generator[None]:
 
 @pytest.fixture
 async def hassio_client(
-    hassio_stubs: RefreshToken, hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hassio_stubs: RefreshToken, hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> TestClient:
     """Return a Hass.io HTTP client."""
     return await hass_client()
@@ -41,7 +41,7 @@ async def hassio_client(
 @pytest.fixture
 async def hassio_noauth_client(
     hassio_stubs: RefreshToken,
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
 ) -> TestClient:
     """Return a Hass.io HTTP client without auth."""
@@ -50,7 +50,7 @@ async def hassio_noauth_client(
 
 @pytest.fixture
 async def hassio_client_supervisor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aiohttp_client: ClientSessionGenerator,
     hassio_stubs: RefreshToken,
 ) -> TestClient:
@@ -64,7 +64,7 @@ async def hassio_client_supervisor(
 
 @pytest.fixture
 async def hassio_handler(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> Generator[HassIO]:
     """Create mock hassio handler."""
     with patch.dict(os.environ, {"SUPERVISOR_TOKEN": SUPERVISOR_TOKEN}):
@@ -85,7 +85,7 @@ def all_setup_requests(
         "include_addons", False
     )
 
-    aioclient_mock.post("http://127.0.0.1/homeassistant/options", json={"result": "ok"})
+    aioclient_mock.post("http://127.0.0.1/smarthub/options", json={"result": "ok"})
     aioclient_mock.post("http://127.0.0.1/supervisor/options", json={"result": "ok"})
     aioclient_mock.get(
         "http://127.0.0.1/info",
@@ -93,7 +93,7 @@ def all_setup_requests(
             "result": "ok",
             "data": {
                 "supervisor": "222",
-                "homeassistant": "0.110.0",
+                "smarthub": "0.110.0",
                 "hassos": "1.2.3",
             },
         },
@@ -179,7 +179,7 @@ def all_setup_requests(
             addon_installed.return_value.name = "test"
             addon_installed.return_value.slug = "test"
             addon_installed.return_value.url = (
-                "https://github.com/home-assistant/addons/test"
+                "https://github.com/smart-hub/addons/test"
             )
             addon_installed.return_value.auto_update = True
         else:
@@ -271,5 +271,5 @@ def arch() -> str:
 @pytest.fixture(autouse=True)
 def mock_arch_file(arch: str) -> Generator[None]:
     """Mock arch file."""
-    with patch("homeassistant.components.hassio._get_arch", return_value=arch):
+    with patch("smarthub.components.hassio._get_arch", return_value=arch):
         yield

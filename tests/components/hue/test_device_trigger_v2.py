@@ -5,14 +5,14 @@ from unittest.mock import Mock
 from aiohue.v2.models.button import ButtonEvent
 from pytest_unordered import unordered
 
-from homeassistant.components import hue
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.hue.v2.device import async_setup_devices
-from homeassistant.components.hue.v2.hue_event import async_setup_hue_events
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util.json import JsonArrayType
+from smarthub.components import hue
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.hue.v2.device import async_setup_devices
+from smarthub.components.hue.v2.hue_event import async_setup_hue_events
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util.json import JsonArrayType
 
 from .conftest import setup_platform
 
@@ -20,7 +20,7 @@ from tests.common import async_capture_events, async_get_device_automations
 
 
 async def test_hue_event(
-    hass: HomeAssistant, mock_bridge_v2: Mock, v2_resources_test_data: JsonArrayType
+    hass: SmartHub, mock_bridge_v2: Mock, v2_resources_test_data: JsonArrayType
 ) -> None:
     """Test hue button events."""
     await mock_bridge_v2.api.load_test_data(v2_resources_test_data)
@@ -57,7 +57,7 @@ async def test_hue_event(
 
 
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_bridge_v2: Mock,
     v2_resources_test_data: JsonArrayType,

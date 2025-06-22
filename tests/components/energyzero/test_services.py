@@ -6,21 +6,21 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 import voluptuous as vol
 
-from homeassistant.components.energyzero.const import DOMAIN
-from homeassistant.components.energyzero.services import (
+from smarthub.components.energyzero.const import DOMAIN
+from smarthub.components.energyzero.services import (
     ATTR_CONFIG_ENTRY,
     ENERGY_SERVICE_NAME,
     GAS_SERVICE_NAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("init_integration")
 async def test_has_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the existence of the EnergyZero Service."""
     assert hass.services.has_service(DOMAIN, GAS_SERVICE_NAME)
@@ -33,7 +33,7 @@ async def test_has_services(
 @pytest.mark.parametrize("start", [{"start": "2023-01-01 00:00:00"}, {}])
 @pytest.mark.parametrize("end", [{"end": "2023-01-01 00:00:00"}, {}])
 async def test_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     service: str,
@@ -118,7 +118,7 @@ def config_entry_data(
     indirect=["config_entry_data"],
 )
 async def test_service_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     config_entry_data: dict[str, str],
     service_data: dict[str, str],
@@ -141,7 +141,7 @@ async def test_service_validation(
 @pytest.mark.usefixtures("init_integration")
 @pytest.mark.parametrize("service", [GAS_SERVICE_NAME, ENERGY_SERVICE_NAME])
 async def test_service_called_with_unloaded_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     service: str,
 ) -> None:

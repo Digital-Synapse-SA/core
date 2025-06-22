@@ -2,10 +2,10 @@
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.foscam import config_flow
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.foscam import config_flow
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import setup_mock_foscam_camera
 from .const import CAMERA_NAME, INVALID_RESPONSE_CONFIG, VALID_CONFIG
@@ -13,7 +13,7 @@ from .const import CAMERA_NAME, INVALID_RESPONSE_CONFIG, VALID_CONFIG
 from tests.common import MockConfigEntry
 
 
-async def test_user_valid(hass: HomeAssistant) -> None:
+async def test_user_valid(hass: SmartHub) -> None:
     """Test valid config from user input."""
 
     result = await hass.config_entries.flow.async_init(
@@ -24,10 +24,10 @@ async def test_user_valid(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.foscam.config_flow.FoscamCamera",
+            "smarthub.components.foscam.config_flow.FoscamCamera",
         ) as mock_foscam_camera,
         patch(
-            "homeassistant.components.foscam.async_setup_entry",
+            "smarthub.components.foscam.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -47,7 +47,7 @@ async def test_user_valid(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_invalid_auth(hass: HomeAssistant) -> None:
+async def test_user_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth from user input."""
 
     result = await hass.config_entries.flow.async_init(
@@ -57,7 +57,7 @@ async def test_user_invalid_auth(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.foscam.config_flow.FoscamCamera",
+        "smarthub.components.foscam.config_flow.FoscamCamera",
     ) as mock_foscam_camera:
         setup_mock_foscam_camera(mock_foscam_camera)
 
@@ -75,7 +75,7 @@ async def test_user_invalid_auth(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_user_cannot_connect(hass: HomeAssistant) -> None:
+async def test_user_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error from user input."""
 
     result = await hass.config_entries.flow.async_init(
@@ -85,7 +85,7 @@ async def test_user_cannot_connect(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.foscam.config_flow.FoscamCamera",
+        "smarthub.components.foscam.config_flow.FoscamCamera",
     ) as mock_foscam_camera:
         setup_mock_foscam_camera(mock_foscam_camera)
 
@@ -103,7 +103,7 @@ async def test_user_cannot_connect(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_user_invalid_response(hass: HomeAssistant) -> None:
+async def test_user_invalid_response(hass: SmartHub) -> None:
     """Test we handle invalid response error from user input."""
 
     result = await hass.config_entries.flow.async_init(
@@ -113,7 +113,7 @@ async def test_user_invalid_response(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.foscam.config_flow.FoscamCamera",
+        "smarthub.components.foscam.config_flow.FoscamCamera",
     ) as mock_foscam_camera:
         setup_mock_foscam_camera(mock_foscam_camera)
 
@@ -133,7 +133,7 @@ async def test_user_invalid_response(hass: HomeAssistant) -> None:
         assert result["errors"] == {"base": "invalid_response"}
 
 
-async def test_user_already_configured(hass: HomeAssistant) -> None:
+async def test_user_already_configured(hass: SmartHub) -> None:
     """Test we handle already configured from user input."""
 
     entry = MockConfigEntry(
@@ -149,7 +149,7 @@ async def test_user_already_configured(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.foscam.config_flow.FoscamCamera",
+        "smarthub.components.foscam.config_flow.FoscamCamera",
     ) as mock_foscam_camera:
         setup_mock_foscam_camera(mock_foscam_camera)
 
@@ -164,7 +164,7 @@ async def test_user_already_configured(hass: HomeAssistant) -> None:
         assert result["reason"] == "already_configured"
 
 
-async def test_user_unknown_exception(hass: HomeAssistant) -> None:
+async def test_user_unknown_exception(hass: SmartHub) -> None:
     """Test we handle unknown exceptions from user input."""
 
     result = await hass.config_entries.flow.async_init(
@@ -174,7 +174,7 @@ async def test_user_unknown_exception(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.foscam.config_flow.FoscamCamera",
+        "smarthub.components.foscam.config_flow.FoscamCamera",
     ) as mock_foscam_camera:
         mock_foscam_camera.side_effect = Exception("test")
 

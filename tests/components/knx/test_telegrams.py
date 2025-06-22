@@ -6,12 +6,12 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.knx.const import (
+from smarthub.components.knx.const import (
     CONF_KNX_TELEGRAM_LOG_SIZE,
     KNX_MODULE_KEY,
 )
-from homeassistant.components.knx.telegrams import TelegramDict
-from homeassistant.core import HomeAssistant
+from smarthub.components.knx.telegrams import TelegramDict
+from smarthub.core import SmartHub
 
 from .conftest import KNXTestKit
 
@@ -41,7 +41,7 @@ MOCK_TELEGRAMS = [
         "dpt_name": None,
         "payload": [1, 2, 3, 4],
         "source": "0.0.0",
-        "source_name": "Home Assistant",
+        "source_name": "SmartHub",
         "telegramtype": "GroupValueWrite",
         "timestamp": MOCK_TIMESTAMP,
         "unit": None,
@@ -65,7 +65,7 @@ def assert_telegram_history(telegrams: list[TelegramDict]) -> bool:
 
 
 async def test_store_telegam_history(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -88,7 +88,7 @@ async def test_store_telegam_history(
 
 
 async def test_load_telegam_history(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -102,7 +102,7 @@ async def test_load_telegam_history(
 
 
 async def test_remove_telegam_history(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     hass_storage: dict[str, Any],
 ) -> None:

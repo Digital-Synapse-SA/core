@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.select import ATTR_OPTIONS, DOMAIN as SELECT_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_OPTION, SERVICE_SELECT_OPTION
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.components.select import ATTR_OPTIONS, DOMAIN as SELECT_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, ATTR_OPTION, SERVICE_SELECT_OPTION
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from .util import async_init_integration
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_airzone_create_selects(hass: HomeAssistant) -> None:
+async def test_airzone_create_selects(hass: SmartHub) -> None:
     """Test creation of selects."""
 
     await async_init_integration(hass)
@@ -38,7 +38,7 @@ async def test_airzone_create_selects(hass: HomeAssistant) -> None:
     ]
 
 
-async def test_airzone_select_air_quality_mode(hass: HomeAssistant) -> None:
+async def test_airzone_select_air_quality_mode(hass: SmartHub) -> None:
     """Test select Air Quality mode."""
 
     await async_init_integration(hass)
@@ -55,7 +55,7 @@ async def test_airzone_select_air_quality_mode(hass: HomeAssistant) -> None:
         )
 
     with patch(
-        "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_patch_device",
+        "smarthub.components.airzone_cloud.AirzoneCloudApi.api_patch_device",
         return_value=None,
     ):
         await hass.services.async_call(
@@ -72,7 +72,7 @@ async def test_airzone_select_air_quality_mode(hass: HomeAssistant) -> None:
     assert state.state == "off"
 
 
-async def test_airzone_select_mode(hass: HomeAssistant) -> None:
+async def test_airzone_select_mode(hass: SmartHub) -> None:
     """Test select HVAC mode."""
 
     await async_init_integration(hass)
@@ -89,7 +89,7 @@ async def test_airzone_select_mode(hass: HomeAssistant) -> None:
         )
 
     with patch(
-        "homeassistant.components.airzone_cloud.AirzoneCloudApi.api_patch_device",
+        "smarthub.components.airzone_cloud.AirzoneCloudApi.api_patch_device",
         return_value=None,
     ):
         await hass.services.async_call(

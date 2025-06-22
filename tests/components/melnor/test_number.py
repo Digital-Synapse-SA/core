@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .conftest import (
     mock_config_entry,
@@ -12,7 +12,7 @@ from .conftest import (
 )
 
 
-async def test_manual_watering_minutes(hass: HomeAssistant) -> None:
+async def test_manual_watering_minutes(hass: SmartHub) -> None:
     """Test the manual watering duration number."""
 
     entry = mock_config_entry(hass)
@@ -51,7 +51,7 @@ async def test_manual_watering_minutes(hass: HomeAssistant) -> None:
         assert device.zone1.manual_watering_minutes == 10
 
 
-async def test_frequency_interval_hours(hass: HomeAssistant) -> None:
+async def test_frequency_interval_hours(hass: SmartHub) -> None:
     """Test the interval hours number."""
 
     entry = mock_config_entry(hass)
@@ -90,7 +90,7 @@ async def test_frequency_interval_hours(hass: HomeAssistant) -> None:
         assert device.zone1.frequency.interval_hours == 10
 
 
-async def test_frequency_duration_minutes(hass: HomeAssistant) -> None:
+async def test_frequency_duration_minutes(hass: SmartHub) -> None:
     """Test the duration minutes number."""
 
     entry = mock_config_entry(hass)

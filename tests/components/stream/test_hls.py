@@ -8,18 +8,18 @@ from urllib.parse import urlparse
 import av
 import pytest
 
-from homeassistant.components.stream import Stream, create_stream
-from homeassistant.components.stream.const import (
+from smarthub.components.stream import Stream, create_stream
+from smarthub.components.stream.const import (
     EXT_X_START_LL_HLS,
     EXT_X_START_NON_LL_HLS,
     HLS_PROVIDER,
     MAX_SEGMENTS,
     NUM_PLAYLIST_SEGMENTS,
 )
-from homeassistant.components.stream.core import Orientation, Part
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.stream.core import Orientation, Part
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from .common import (
     FAKE_TIME,
@@ -46,7 +46,7 @@ HLS_CONFIG = {
 
 
 @pytest.fixture
-async def setup_component(hass: HomeAssistant) -> None:
+async def setup_component(hass: SmartHub) -> None:
     """Test fixture to setup the stream component."""
     await async_setup_component(hass, "stream", HLS_CONFIG)
 
@@ -69,7 +69,7 @@ class HlsClient:
 
 
 @pytest.fixture
-def hls_stream(hass: HomeAssistant, hass_client: ClientSessionGenerator):
+def hls_stream(hass: SmartHub, hass_client: ClientSessionGenerator):
     """Create test fixture for creating an HLS client for a stream."""
 
     async def create_client_for_stream(stream):
@@ -139,7 +139,7 @@ def make_playlist(
 
 
 async def test_hls_stream(
-    hass: HomeAssistant, setup_component, hls_stream, stream_worker_sync, h264_video
+    hass: SmartHub, setup_component, hls_stream, stream_worker_sync, h264_video
 ) -> None:
     """Test hls stream.
 
@@ -198,7 +198,7 @@ async def test_hls_stream(
 
 
 async def test_stream_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup_component,
     stream_worker_sync,
@@ -255,7 +255,7 @@ async def test_stream_timeout(
 
 
 async def test_stream_timeout_after_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     setup_component,
     stream_worker_sync,
@@ -290,7 +290,7 @@ async def test_stream_timeout_after_stop(
     ],
 )
 async def test_stream_retries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_component,
     should_retry,
     exception,
@@ -327,8 +327,8 @@ async def test_stream_retries(
 
     with (
         patch("av.open") as av_open,
-        patch("homeassistant.components.stream.Stream._set_state", set_state_wrapper),
-        patch("homeassistant.components.stream.STREAM_RESTART_INCREMENT", 0),
+        patch("smarthub.components.stream.Stream._set_state", set_state_wrapper),
+        patch("smarthub.components.stream.STREAM_RESTART_INCREMENT", 0),
     ):
         av_open.side_effect = av_open_side_effect
         # Request stream. Enable retries which are disabled by default in tests.
@@ -350,7 +350,7 @@ async def test_stream_retries(
 
 
 async def test_hls_playlist_view_no_output(
-    hass: HomeAssistant, setup_component, hls_stream
+    hass: SmartHub, setup_component, hls_stream
 ) -> None:
     """Test rendering the hls playlist with no output segments."""
     stream = create_stream(hass, STREAM_SOURCE, {}, dynamic_stream_settings())
@@ -364,7 +364,7 @@ async def test_hls_playlist_view_no_output(
 
 
 async def test_hls_playlist_view(
-    hass: HomeAssistant, setup_component, hls_stream, stream_worker_sync
+    hass: SmartHub, setup_component, hls_stream, stream_worker_sync
 ) -> None:
     """Test rendering the hls playlist with 1 and 2 output segments."""
     stream = create_stream(hass, STREAM_SOURCE, {}, dynamic_stream_settings())
@@ -397,7 +397,7 @@ async def test_hls_playlist_view(
 
 
 async def test_hls_max_segments(
-    hass: HomeAssistant, setup_component, hls_stream, stream_worker_sync
+    hass: SmartHub, setup_component, hls_stream, stream_worker_sync
 ) -> None:
     """Test rendering the hls playlist with more segments than the segment deque can hold."""
     stream = create_stream(hass, STREAM_SOURCE, {}, dynamic_stream_settings())
@@ -446,7 +446,7 @@ async def test_hls_max_segments(
 
 
 async def test_hls_playlist_view_discontinuity(
-    hass: HomeAssistant, setup_component, hls_stream, stream_worker_sync
+    hass: SmartHub, setup_component, hls_stream, stream_worker_sync
 ) -> None:
     """Test a discontinuity across segments in the stream with 3 segments."""
 
@@ -484,7 +484,7 @@ async def test_hls_playlist_view_discontinuity(
 
 
 async def test_hls_max_segments_discontinuity(
-    hass: HomeAssistant, setup_component, hls_stream, stream_worker_sync
+    hass: SmartHub, setup_component, hls_stream, stream_worker_sync
 ) -> None:
     """Test a discontinuity with more segments than the segment deque can hold."""
     stream = create_stream(hass, STREAM_SOURCE, {}, dynamic_stream_settings())
@@ -525,7 +525,7 @@ async def test_hls_max_segments_discontinuity(
 
 
 async def test_remove_incomplete_segment_on_exit(
-    hass: HomeAssistant, setup_component, stream_worker_sync
+    hass: SmartHub, setup_component, stream_worker_sync
 ) -> None:
     """Test that the incomplete segment gets removed when the worker thread quits."""
     stream = create_stream(hass, STREAM_SOURCE, {}, dynamic_stream_settings())
@@ -545,7 +545,7 @@ async def test_remove_incomplete_segment_on_exit(
     assert len(segments) == 3
     assert not segments[-1].complete
     stream_worker_sync.resume()
-    with patch("homeassistant.components.stream.Stream.remove_provider"):
+    with patch("smarthub.components.stream.Stream.remove_provider"):
         # Patch remove_provider so the deque is not cleared
         stream._thread_quit.set()
         stream._thread.join()
@@ -557,7 +557,7 @@ async def test_remove_incomplete_segment_on_exit(
 
 
 async def test_hls_stream_rotate(
-    hass: HomeAssistant, setup_component, hls_stream, stream_worker_sync, h264_video
+    hass: SmartHub, setup_component, hls_stream, stream_worker_sync, h264_video
 ) -> None:
     """Test hls stream with rotation applied.
 

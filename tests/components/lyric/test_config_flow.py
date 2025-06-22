@@ -5,17 +5,17 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.application_credentials import (
+from smarthub import config_entries
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.lyric.const import DOMAIN, OAUTH2_AUTHORIZE, OAUTH2_TOKEN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.setup import async_setup_component
+from smarthub.components.lyric.const import DOMAIN, OAUTH2_AUTHORIZE, OAUTH2_TOKEN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -26,7 +26,7 @@ CLIENT_SECRET = "5678"
 
 
 @pytest.fixture
-async def mock_impl(hass: HomeAssistant) -> None:
+async def mock_impl(hass: SmartHub) -> None:
     """Mock implementation."""
     await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
@@ -36,7 +36,7 @@ async def mock_impl(hass: HomeAssistant) -> None:
     )
 
 
-async def test_abort_if_no_configuration(hass: HomeAssistant) -> None:
+async def test_abort_if_no_configuration(hass: SmartHub) -> None:
     """Check flow abort when no configuration."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -47,7 +47,7 @@ async def test_abort_if_no_configuration(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("current_request_with_host", "mock_impl")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -86,9 +86,9 @@ async def test_full_flow(
     )
 
     with (
-        patch("homeassistant.components.lyric.api.ConfigEntryLyricClient"),
+        patch("smarthub.components.lyric.api.ConfigEntryLyricClient"),
         patch(
-            "homeassistant.components.lyric.async_setup_entry", return_value=True
+            "smarthub.components.lyric.async_setup_entry", return_value=True
         ) as mock_setup,
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
@@ -113,7 +113,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host", "mock_impl")
 async def test_reauthentication_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -154,9 +154,9 @@ async def test_reauthentication_flow(
     )
 
     with (
-        patch("homeassistant.components.lyric.api.ConfigEntryLyricClient"),
+        patch("smarthub.components.lyric.api.ConfigEntryLyricClient"),
         patch(
-            "homeassistant.components.lyric.async_setup_entry", return_value=True
+            "smarthub.components.lyric.async_setup_entry", return_value=True
         ) as mock_setup,
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"])

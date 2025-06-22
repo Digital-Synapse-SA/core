@@ -6,10 +6,10 @@ from unittest.mock import AsyncMock, patch
 from pydiscovergy.models import Reading
 import pytest
 
-from homeassistant.components.discovergy.const import DOMAIN
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.discovergy.const import DOMAIN
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import GET_METERS, LAST_READING, LAST_READING_GAS
 
@@ -30,11 +30,11 @@ def mock_discovergy() -> Generator[AsyncMock]:
     """Mock the pydiscovergy client."""
     with (
         patch(
-            "homeassistant.components.discovergy.Discovergy",
+            "smarthub.components.discovergy.Discovergy",
             autospec=True,
         ) as mock_discovergy,
         patch(
-            "homeassistant.components.discovergy.config_flow.Discovergy",
+            "smarthub.components.discovergy.config_flow.Discovergy",
             new=mock_discovergy,
         ),
     ):
@@ -45,7 +45,7 @@ def mock_discovergy() -> Generator[AsyncMock]:
 
 
 @pytest.fixture(name="config_entry")
-async def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+async def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Return a MockConfigEntry for testing."""
     return MockConfigEntry(
         domain=DOMAIN,
@@ -57,7 +57,7 @@ async def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 @pytest.fixture(name="setup_integration")
 async def mock_setup_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry, discovergy: AsyncMock
+    hass: SmartHub, config_entry: MockConfigEntry, discovergy: AsyncMock
 ) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)

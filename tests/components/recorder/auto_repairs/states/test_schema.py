@@ -4,7 +4,7 @@ from unittest.mock import ANY, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from ...common import async_wait_recording_done
 
@@ -21,7 +21,7 @@ async def mock_recorder_before_hass(
 @pytest.mark.parametrize("enable_schema_validation", [True])
 @pytest.mark.parametrize("db_engine", ["mysql", "postgresql"])
 async def test_validate_db_schema_fix_float_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_test_recorder: RecorderInstanceContextManager,
     caplog: pytest.LogCaptureFixture,
     db_engine: str,
@@ -33,11 +33,11 @@ async def test_validate_db_schema_fix_float_issue(
     """
     with (
         patch(
-            "homeassistant.components.recorder.auto_repairs.schema._validate_db_schema_precision",
+            "smarthub.components.recorder.auto_repairs.schema._validate_db_schema_precision",
             return_value={"states.double precision"},
         ),
         patch(
-            "homeassistant.components.recorder.migration._modify_columns"
+            "smarthub.components.recorder.migration._modify_columns"
         ) as modify_columns_mock,
     ):
         async with async_test_recorder(hass):
@@ -59,7 +59,7 @@ async def test_validate_db_schema_fix_float_issue(
 @pytest.mark.parametrize("enable_schema_validation", [True])
 @pytest.mark.parametrize("db_engine", ["mysql"])
 async def test_validate_db_schema_fix_utf8_issue_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_test_recorder: RecorderInstanceContextManager,
     caplog: pytest.LogCaptureFixture,
     db_engine: str,
@@ -71,7 +71,7 @@ async def test_validate_db_schema_fix_utf8_issue_states(
     """
     with (
         patch(
-            "homeassistant.components.recorder.auto_repairs.schema._validate_table_schema_supports_utf8",
+            "smarthub.components.recorder.auto_repairs.schema._validate_table_schema_supports_utf8",
             return_value={"states.4-byte UTF-8"},
         ),
     ):
@@ -91,7 +91,7 @@ async def test_validate_db_schema_fix_utf8_issue_states(
 @pytest.mark.parametrize("enable_schema_validation", [True])
 @pytest.mark.parametrize("db_engine", ["mysql"])
 async def test_validate_db_schema_fix_utf8_issue_state_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_test_recorder: RecorderInstanceContextManager,
     caplog: pytest.LogCaptureFixture,
     db_engine: str,
@@ -103,7 +103,7 @@ async def test_validate_db_schema_fix_utf8_issue_state_attributes(
     """
     with (
         patch(
-            "homeassistant.components.recorder.auto_repairs.schema._validate_table_schema_supports_utf8",
+            "smarthub.components.recorder.auto_repairs.schema._validate_table_schema_supports_utf8",
             return_value={"state_attributes.4-byte UTF-8"},
         ),
     ):
@@ -124,7 +124,7 @@ async def test_validate_db_schema_fix_utf8_issue_state_attributes(
 @pytest.mark.parametrize("enable_schema_validation", [True])
 @pytest.mark.parametrize("db_engine", ["mysql"])
 async def test_validate_db_schema_fix_collation_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     async_test_recorder: RecorderInstanceContextManager,
     caplog: pytest.LogCaptureFixture,
     db_engine: str,
@@ -136,7 +136,7 @@ async def test_validate_db_schema_fix_collation_issue(
     """
     with (
         patch(
-            "homeassistant.components.recorder.auto_repairs.schema._validate_table_schema_has_correct_collation",
+            "smarthub.components.recorder.auto_repairs.schema._validate_table_schema_has_correct_collation",
             return_value={"states.utf8mb4_unicode_ci"},
         ),
     ):

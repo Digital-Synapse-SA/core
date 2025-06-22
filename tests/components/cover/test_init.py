@@ -2,12 +2,12 @@
 
 from enum import Enum
 
-from homeassistant.components import cover
-from homeassistant.components.cover import CoverState
-from homeassistant.const import ATTR_ENTITY_ID, CONF_PLATFORM, SERVICE_TOGGLE
-from homeassistant.core import HomeAssistant, ServiceResponse
-from homeassistant.helpers.entity import Entity
-from homeassistant.setup import async_setup_component
+from smarthub.components import cover
+from smarthub.components.cover import CoverState
+from smarthub.const import ATTR_ENTITY_ID, CONF_PLATFORM, SERVICE_TOGGLE
+from smarthub.core import SmartHub, ServiceResponse
+from smarthub.helpers.entity import Entity
+from smarthub.setup import async_setup_component
 
 from .common import MockCover
 
@@ -15,7 +15,7 @@ from tests.common import help_test_all, setup_test_component_platform
 
 
 async def test_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cover_entities: list[MockCover],
 ) -> None:
     """Test the provided services."""
@@ -109,7 +109,7 @@ async def test_services(
     assert is_closing(hass, ent5)
 
 
-def call_service(hass: HomeAssistant, service: str, ent: Entity) -> ServiceResponse:
+def call_service(hass: SmartHub, service: str, ent: Entity) -> ServiceResponse:
     """Call any service on entity."""
     return hass.services.async_call(
         cover.DOMAIN, service, {ATTR_ENTITY_ID: ent.entity_id}, blocking=True
@@ -126,22 +126,22 @@ def set_state(ent, state) -> None:
     ent._values["state"] = state
 
 
-def is_open(hass: HomeAssistant, ent: Entity) -> bool:
+def is_open(hass: SmartHub, ent: Entity) -> bool:
     """Return if the cover is closed based on the statemachine."""
     return hass.states.is_state(ent.entity_id, CoverState.OPEN)
 
 
-def is_opening(hass: HomeAssistant, ent: Entity) -> bool:
+def is_opening(hass: SmartHub, ent: Entity) -> bool:
     """Return if the cover is closed based on the statemachine."""
     return hass.states.is_state(ent.entity_id, CoverState.OPENING)
 
 
-def is_closed(hass: HomeAssistant, ent: Entity) -> bool:
+def is_closed(hass: SmartHub, ent: Entity) -> bool:
     """Return if the cover is closed based on the statemachine."""
     return hass.states.is_state(ent.entity_id, CoverState.CLOSED)
 
 
-def is_closing(hass: HomeAssistant, ent: Entity) -> bool:
+def is_closing(hass: SmartHub, ent: Entity) -> bool:
     """Return if the cover is closed based on the statemachine."""
     return hass.states.is_state(ent.entity_id, CoverState.CLOSING)
 

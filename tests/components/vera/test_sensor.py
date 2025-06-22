@@ -8,15 +8,15 @@ from unittest.mock import MagicMock
 
 import pyvera as pv
 
-from homeassistant.components.sensor import async_rounded_state
-from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, LIGHT_LUX, PERCENTAGE
-from homeassistant.core import HomeAssistant
+from smarthub.components.sensor import async_rounded_state
+from smarthub.const import ATTR_UNIT_OF_MEASUREMENT, LIGHT_LUX, PERCENTAGE
+from smarthub.core import SmartHub
 
 from .common import ComponentFactory, new_simple_controller_config
 
 
 async def run_sensor_test(
-    hass: HomeAssistant,
+    hass: SmartHub,
     vera_component_factory: ComponentFactory,
     category: int,
     class_property: str,
@@ -55,7 +55,7 @@ async def run_sensor_test(
 
 
 async def test_temperature_sensor_f(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
 
@@ -73,7 +73,7 @@ async def test_temperature_sensor_f(
 
 
 async def test_temperature_sensor_c(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
     await run_sensor_test(
@@ -86,7 +86,7 @@ async def test_temperature_sensor_c(
 
 
 async def test_light_sensor(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
     await run_sensor_test(
@@ -100,7 +100,7 @@ async def test_light_sensor(
 
 
 async def test_uv_sensor(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
     await run_sensor_test(
@@ -114,7 +114,7 @@ async def test_uv_sensor(
 
 
 async def test_humidity_sensor(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
     await run_sensor_test(
@@ -128,7 +128,7 @@ async def test_humidity_sensor(
 
 
 async def test_power_meter_sensor(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
     await run_sensor_test(
@@ -142,7 +142,7 @@ async def test_power_meter_sensor(
 
 
 async def test_trippable_sensor(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
 
@@ -160,7 +160,7 @@ async def test_trippable_sensor(
 
 
 async def test_unknown_sensor(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
 
@@ -178,7 +178,7 @@ async def test_unknown_sensor(
 
 
 async def test_scene_controller_sensor(
-    hass: HomeAssistant, vera_component_factory: ComponentFactory
+    hass: SmartHub, vera_component_factory: ComponentFactory
 ) -> None:
     """Test function."""
     vera_device: pv.VeraSensor = MagicMock(spec=pv.VeraSensor)

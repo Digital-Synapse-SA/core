@@ -8,11 +8,11 @@ from unittest.mock import AsyncMock, MagicMock
 from pysensibo import AuthenticationError, SensiboData, SensiboError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.sensibo.const import DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.sensibo.const import DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -20,7 +20,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_basic_setup(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_client: MagicMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_client: MagicMock
 ) -> None:
     """Test we get and complete the form."""
 
@@ -57,7 +57,7 @@ async def test_basic_setup(
     ],
 )
 async def test_flow_fails(
-    hass: HomeAssistant, mock_client: MagicMock, error_message: Exception, p_error: str
+    hass: SmartHub, mock_client: MagicMock, error_message: Exception, p_error: str
 ) -> None:
     """Test config flow errors."""
 
@@ -96,7 +96,7 @@ async def test_flow_fails(
 
 
 async def test_flow_get_no_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     get_data: tuple[SensiboData, dict[str, Any], dict[str, Any]],
 ) -> None:
@@ -137,7 +137,7 @@ async def test_flow_get_no_devices(
 
 
 async def test_flow_get_no_username(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
     get_data: tuple[SensiboData, dict[str, Any], dict[str, Any]],
 ) -> None:
@@ -177,7 +177,7 @@ async def test_flow_get_no_username(
     }
 
 
-async def test_reauth_flow(hass: HomeAssistant, mock_client: MagicMock) -> None:
+async def test_reauth_flow(hass: SmartHub, mock_client: MagicMock) -> None:
     """Test a reauthentication flow."""
     entry = MockConfigEntry(
         version=2,
@@ -210,7 +210,7 @@ async def test_reauth_flow(hass: HomeAssistant, mock_client: MagicMock) -> None:
     ],
 )
 async def test_reauth_flow_error(
-    hass: HomeAssistant, sideeffect: Exception, p_error: str, mock_client: MagicMock
+    hass: SmartHub, sideeffect: Exception, p_error: str, mock_client: MagicMock
 ) -> None:
     """Test a reauthentication flow with error."""
     entry = MockConfigEntry(
@@ -267,7 +267,7 @@ async def test_reauth_flow_error(
     ],
 )
 async def test_flow_reauth_no_username_or_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_devices: dict[str, Any],
     get_me: dict[str, Any],
     p_error: str,
@@ -315,7 +315,7 @@ async def test_flow_reauth_no_username_or_device(
     assert entry.data == {CONF_API_KEY: "1234567890"}
 
 
-async def test_reconfigure_flow(hass: HomeAssistant, mock_client: MagicMock) -> None:
+async def test_reconfigure_flow(hass: SmartHub, mock_client: MagicMock) -> None:
     """Test a reconfigure flow."""
     entry = MockConfigEntry(
         version=2,
@@ -348,7 +348,7 @@ async def test_reconfigure_flow(hass: HomeAssistant, mock_client: MagicMock) -> 
     ],
 )
 async def test_reconfigure_flow_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sideeffect: Exception,
     p_error: str,
     mock_client: MagicMock,
@@ -408,7 +408,7 @@ async def test_reconfigure_flow_error(
     ],
 )
 async def test_flow_reconfigure_no_username_or_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_devices: dict[str, Any],
     get_me: dict[str, Any],
     p_error: str,

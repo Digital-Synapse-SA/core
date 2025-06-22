@@ -8,16 +8,16 @@ from aiohttp.hdrs import AUTHORIZATION
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant import const, core, setup
-from homeassistant.components import (
+from smarthub import const, core, setup
+from smarthub.components import (
     google_assistant as ga,
     humidifier,
     light,
     media_player,
 )
-from homeassistant.const import CLOUD_NEVER_EXPOSED_ENTITIES, EntityCategory, Platform
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.const import CLOUD_NEVER_EXPOSED_ENTITIES, EntityCategory, Platform
+from smarthub.helpers import entity_registry as er
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from . import DEMO_DEVICES
 
@@ -38,7 +38,7 @@ def auth_header(hass_access_token: str) -> dict[str, str]:
 
 @pytest.fixture
 async def assistant_client(
-    hass: core.HomeAssistant,
+    hass: core.SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
 ) -> TestClient:
     """Create web client for the Google Assistant API."""
@@ -65,7 +65,7 @@ async def assistant_client(
 async def wanted_platforms_only() -> None:
     """Enable only the wanted demo platforms."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [
             Platform.ALARM_CONTROL_PANEL,
             Platform.CLIMATE,
@@ -82,9 +82,9 @@ async def wanted_platforms_only() -> None:
 
 
 @pytest.fixture
-async def hass_fixture(hass: core.HomeAssistant) -> core.HomeAssistant:
-    """Set up a Home Assistant instance for these tests."""
-    # We need to do this to get access to homeassistant/turn_(on,off)
+async def hass_fixture(hass: core.SmartHub) -> core.SmartHub:
+    """Set up a SmartHub instance for these tests."""
+    # We need to do this to get access to smarthub/turn_(on,off)
     await setup.async_setup_component(hass, core.DOMAIN, {})
 
     await setup.async_setup_component(hass, "demo", {})

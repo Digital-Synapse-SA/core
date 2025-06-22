@@ -2,15 +2,15 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.wyoming.devices import SatelliteDevice
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.components.wyoming.devices import SatelliteDevice
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
 
 from . import reload_satellite
 
 
 async def test_auto_gain_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     satellite_config_entry: ConfigEntry,
     satellite_device: SatelliteDevice,
 ) -> None:
@@ -57,7 +57,7 @@ async def test_auto_gain_number(
 
 
 async def test_volume_multiplier_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     satellite_config_entry: ConfigEntry,
     satellite_device: SatelliteDevice,
 ) -> None:

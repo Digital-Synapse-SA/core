@@ -7,12 +7,12 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.binary_sensor import DOMAIN as PLATFORM
-from homeassistant.components.devolo_home_network.const import LONG_UPDATE_INTERVAL
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.binary_sensor import DOMAIN as PLATFORM
+from smarthub.components.devolo_home_network.const import LONG_UPDATE_INTERVAL
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import configure_integration
 from .const import PLCNET_ATTACHED
@@ -23,7 +23,7 @@ from tests.common import async_fire_time_changed
 
 @pytest.mark.usefixtures("mock_device")
 async def test_binary_sensor_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test default setup of the binary sensor component."""
@@ -40,7 +40,7 @@ async def test_binary_sensor_setup(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_update_attached_to_router(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: MockDevice,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,

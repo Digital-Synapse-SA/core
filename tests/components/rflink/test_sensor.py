@@ -7,15 +7,15 @@ automatic sensor creation.
 
 import pytest
 
-from homeassistant.components.rflink import (
+from smarthub.components.rflink import (
     CONF_RECONNECT_INTERVAL,
     DATA_ENTITY_LOOKUP,
     EVENT_KEY_COMMAND,
     EVENT_KEY_SENSOR,
     TMP_ENTITY,
 )
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.const import (
     ATTR_ICON,
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
@@ -23,7 +23,7 @@ from homeassistant.const import (
     UnitOfPrecipitationDepth,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .test_init import mock_rflink
 
@@ -42,7 +42,7 @@ CONFIG = {
 
 
 async def test_default_setup(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test all basic functionality of the rflink sensor component."""
     # setup mocking rflink module
@@ -105,7 +105,7 @@ async def test_default_setup(
 
 
 async def test_disable_automatic_add(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """If disabled new devices should not be automatically added."""
     config = {
@@ -132,7 +132,7 @@ async def test_disable_automatic_add(
 
 
 async def test_entity_availability(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """If Rflink device is disconnected, entities should become unavailable."""
     # Make sure Rflink mock does not 'recover' to quickly from the
@@ -168,7 +168,7 @@ async def test_entity_availability(
     assert hass.states.get("sensor.test").state == STATE_UNKNOWN
 
 
-async def test_aliases(hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_aliases(hass: SmartHub, monkeypatch: pytest.MonkeyPatch) -> None:
     """Validate the response to sensor's alias (with aliases)."""
     config = {
         "rflink": {"port": "/dev/ttyABC0"},
@@ -211,7 +211,7 @@ async def test_aliases(hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch) -> 
 
 
 async def test_race_condition(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test race condition for unknown components."""
     config = {"rflink": {"port": "/dev/ttyABC0"}, DOMAIN: {"platform": "rflink"}}
@@ -252,7 +252,7 @@ async def test_race_condition(
 
 
 async def test_sensor_attributes(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Validate the sensor attributes."""
 

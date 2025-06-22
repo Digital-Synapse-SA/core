@@ -4,8 +4,8 @@ import logging
 
 import pytest
 
-from homeassistant.components.knx import CONF_EVENT, CONF_TYPE, KNX_ADDRESS
-from homeassistant.core import HomeAssistant
+from smarthub.components.knx import CONF_EVENT, CONF_TYPE, KNX_ADDRESS
+from smarthub.core import SmartHub
 
 from .conftest import KNXTestKit
 
@@ -13,7 +13,7 @@ from tests.common import async_capture_events
 
 
 async def test_knx_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     knx: KNXTestKit,
 ) -> None:

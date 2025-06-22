@@ -8,10 +8,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.event import ATTR_EVENT_TYPE
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.event import ATTR_EVENT_TYPE
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -22,19 +22,19 @@ FAULT_DATE = "fault_date"
 
 
 async def test_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test spa events."""
-    with patch("homeassistant.components.balboa.PLATFORMS", [Platform.EVENT]):
+    with patch("smarthub.components.balboa.PLATFORMS", [Platform.EVENT]):
         entry = await init_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_event(hass: HomeAssistant, client: MagicMock) -> None:
+async def test_event(hass: SmartHub, client: MagicMock) -> None:
     """Test spa fault event."""
     await init_integration(hass)
 

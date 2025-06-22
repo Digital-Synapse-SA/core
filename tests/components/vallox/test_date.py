@@ -4,9 +4,9 @@ from datetime import date
 
 from vallox_websocket_api import MetricData
 
-from homeassistant.components.date import DOMAIN as DATE_DOMAIN, SERVICE_SET_VALUE
-from homeassistant.const import ATTR_DATE, ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.date import DOMAIN as DATE_DOMAIN, SERVICE_SET_VALUE
+from smarthub.const import ATTR_DATE, ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import patch_set_filter_change_date
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 async def test_set_filter_change_date(
     mock_entry: MockConfigEntry,
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_fetch_metric_data_mock,
 ) -> None:
     """Test set filter change date."""

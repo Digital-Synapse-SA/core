@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.ping.helpers import PingDataSubProcess
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.ping.helpers import PingDataSubProcess
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -29,7 +29,7 @@ class MockAsyncSubprocess:
 
 @pytest.mark.parametrize("exc", [TypeError, ProcessLookupError])
 async def test_async_ping_expected_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     exc: Exception,
@@ -44,7 +44,7 @@ async def test_async_ping_expected_exceptions(
 
 
 async def test_async_ping_unexpected_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:

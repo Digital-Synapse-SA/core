@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.todo import (
+from smarthub.components.todo import (
     TodoItem,
     TodoItemStatus,
     TodoListEntity,
     TodoListEntityFeature,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from . import TEST_DOMAIN, MockFlow, MockTodoListEntity
 
@@ -21,7 +21,7 @@ from tests.common import MockModule, mock_config_flow, mock_integration, mock_pl
 
 
 @pytest.fixture(autouse=True)
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -30,11 +30,11 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
 
 
 @pytest.fixture(autouse=True)
-def mock_setup_integration(hass: HomeAssistant) -> None:
+def mock_setup_integration(hass: SmartHub) -> None:
     """Fixture to set up a mock integration."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -43,7 +43,7 @@ def mock_setup_integration(hass: HomeAssistant) -> None:
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
     ) -> bool:
         await hass.config_entries.async_unload_platforms(config_entry, [Platform.TODO])
@@ -61,7 +61,7 @@ def mock_setup_integration(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture(autouse=True)
-async def set_time_zone(hass: HomeAssistant) -> None:
+async def set_time_zone(hass: SmartHub) -> None:
     """Set the time zone for the tests that keesp UTC-6 all year round."""
     await hass.config.async_set_time_zone("America/Regina")
 

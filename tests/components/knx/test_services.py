@@ -5,11 +5,11 @@ from unittest.mock import patch
 import pytest
 from xknx.telegram.apci import GroupValueResponse, GroupValueWrite
 
-from homeassistant.components.knx import async_unload_entry as knx_async_unload_entry
-from homeassistant.components.knx.const import DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.knx import async_unload_entry as knx_async_unload_entry
+from smarthub.components.knx.const import DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .conftest import KNXTestKit
 
@@ -105,7 +105,7 @@ from tests.common import async_capture_events
     ],
 )
 async def test_send(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     service_payload,
     expected_telegrams,
@@ -126,7 +126,7 @@ async def test_send(
         await knx.assert_telegram(group_address, payload, expected_apci)
 
 
-async def test_read(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_read(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test `knx.read` service."""
     await knx.setup_integration()
 
@@ -146,7 +146,7 @@ async def test_read(hass: HomeAssistant, knx: KNXTestKit) -> None:
     await knx.assert_read("3/3/3")
 
 
-async def test_event_register(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_event_register(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test `knx.event_register` service."""
     events = async_capture_events(hass, "knx_event")
     test_address = "1/2/3"
@@ -195,7 +195,7 @@ async def test_event_register(hass: HomeAssistant, knx: KNXTestKit) -> None:
     assert untyped_event_1.data["value"] is None
 
 
-async def test_exposure_register(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_exposure_register(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test `knx.exposure_register` service."""
     test_address = "1/2/3"
     test_entity = "fake.entity"
@@ -262,7 +262,7 @@ async def test_exposure_register(hass: HomeAssistant, knx: KNXTestKit) -> None:
 
 
 async def test_reload_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
 ) -> None:
     """Test reload service."""
@@ -270,10 +270,10 @@ async def test_reload_service(
 
     with (
         patch(
-            "homeassistant.components.knx.async_unload_entry",
+            "smarthub.components.knx.async_unload_entry",
             wraps=knx_async_unload_entry,
         ) as mock_unload_entry,
-        patch("homeassistant.components.knx.async_setup_entry") as mock_setup_entry,
+        patch("smarthub.components.knx.async_setup_entry") as mock_setup_entry,
     ):
         await hass.services.async_call(
             "knx",
@@ -284,12 +284,12 @@ async def test_reload_service(
         mock_setup_entry.assert_called_once()
 
 
-async def test_service_setup_failed(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_service_setup_failed(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test service setup failed."""
     await knx.setup_integration()
     await hass.config_entries.async_unload(knx.mock_config_entry.entry_id)
 
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             "knx",
             "send",

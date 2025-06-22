@@ -6,14 +6,14 @@ from pypck.lcn_defs import AccessControlPeriphery, KeyAction, SendKeyCommand
 from pytest_unordered import unordered
 import voluptuous_serialize
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.lcn import device_trigger
-from homeassistant.components.lcn.const import DOMAIN, KEY_ACTIONS, SENDKEYS
-from homeassistant.const import CONF_DEVICE_ID, CONF_DOMAIN, CONF_PLATFORM, CONF_TYPE
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import config_validation as cv, device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.lcn import device_trigger
+from smarthub.components.lcn.const import DOMAIN, KEY_ACTIONS, SENDKEYS
+from smarthub.const import CONF_DEVICE_ID, CONF_DOMAIN, CONF_PLATFORM, CONF_TYPE
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import config_validation as cv, device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .conftest import MockConfigEntry, get_device, init_integration
 
@@ -21,7 +21,7 @@ from tests.common import async_get_device_automations
 
 
 async def test_get_triggers_module_device(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test we get the expected triggers from a LCN module device."""
     await init_integration(hass, entry)
@@ -57,7 +57,7 @@ async def test_get_triggers_module_device(
 
 
 async def test_get_triggers_non_module_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, entry: MockConfigEntry
+    hass: SmartHub, device_registry: dr.DeviceRegistry, entry: MockConfigEntry
 ) -> None:
     """Test we get the expected triggers from a LCN non-module device."""
     await init_integration(hass, entry)
@@ -78,7 +78,7 @@ async def test_get_triggers_non_module_device(
 
 
 async def test_if_fires_on_transponder_event(
-    hass: HomeAssistant, service_calls: list[ServiceCall], entry: MockConfigEntry
+    hass: SmartHub, service_calls: list[ServiceCall], entry: MockConfigEntry
 ) -> None:
     """Test for transponder event triggers firing."""
     lcn_connection = await init_integration(hass, entry)
@@ -126,7 +126,7 @@ async def test_if_fires_on_transponder_event(
 
 
 async def test_if_fires_on_fingerprint_event(
-    hass: HomeAssistant, service_calls: list[ServiceCall], entry: MockConfigEntry
+    hass: SmartHub, service_calls: list[ServiceCall], entry: MockConfigEntry
 ) -> None:
     """Test for fingerprint event triggers firing."""
     lcn_connection = await init_integration(hass, entry)
@@ -174,7 +174,7 @@ async def test_if_fires_on_fingerprint_event(
 
 
 async def test_if_fires_on_codelock_event(
-    hass: HomeAssistant, service_calls: list[ServiceCall], entry: MockConfigEntry
+    hass: SmartHub, service_calls: list[ServiceCall], entry: MockConfigEntry
 ) -> None:
     """Test for codelock event triggers firing."""
     lcn_connection = await init_integration(hass, entry)
@@ -222,7 +222,7 @@ async def test_if_fires_on_codelock_event(
 
 
 async def test_if_fires_on_transmitter_event(
-    hass: HomeAssistant, service_calls: list[ServiceCall], entry: MockConfigEntry
+    hass: SmartHub, service_calls: list[ServiceCall], entry: MockConfigEntry
 ) -> None:
     """Test for transmitter event triggers firing."""
     lcn_connection = await init_integration(hass, entry)
@@ -279,7 +279,7 @@ async def test_if_fires_on_transmitter_event(
 
 
 async def test_if_fires_on_send_keys_event(
-    hass: HomeAssistant, service_calls: list[ServiceCall], entry: MockConfigEntry
+    hass: SmartHub, service_calls: list[ServiceCall], entry: MockConfigEntry
 ) -> None:
     """Test for send_keys event triggers firing."""
     lcn_connection = await init_integration(hass, entry)
@@ -329,7 +329,7 @@ async def test_if_fires_on_send_keys_event(
 
 
 async def test_get_transponder_trigger_capabilities(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test we get the expected capabilities from a transponder device trigger."""
     await init_integration(hass, entry)
@@ -353,7 +353,7 @@ async def test_get_transponder_trigger_capabilities(
 
 
 async def test_get_fingerprint_trigger_capabilities(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test we get the expected capabilities from a fingerprint device trigger."""
     await init_integration(hass, entry)
@@ -377,7 +377,7 @@ async def test_get_fingerprint_trigger_capabilities(
 
 
 async def test_get_transmitter_trigger_capabilities(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test we get the expected capabilities from a transmitter device trigger."""
     await init_integration(hass, entry)
@@ -411,7 +411,7 @@ async def test_get_transmitter_trigger_capabilities(
 
 
 async def test_get_send_keys_trigger_capabilities(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test we get the expected capabilities from a send_keys device trigger."""
     await init_integration(hass, entry)
@@ -450,7 +450,7 @@ async def test_get_send_keys_trigger_capabilities(
 
 
 async def test_unknown_trigger_capabilities(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test we get empty capabilities if trigger is unknown."""
     await init_integration(hass, entry)

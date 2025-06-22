@@ -6,14 +6,14 @@ from unittest.mock import patch
 import pytest
 from requests.exceptions import RequestException
 
-from homeassistant.components.tado.const import (
+from smarthub.components.tado.const import (
     CONF_CONFIG_ENTRY,
     CONF_READING,
     DOMAIN,
     SERVICE_ADD_METER_READING,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .util import async_init_integration
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, async_load_fixture
 
 
 async def test_has_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the existence of the Tado Service."""
 
@@ -31,7 +31,7 @@ async def test_has_services(
 
 
 async def test_add_meter_readings(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the add_meter_readings service."""
 
@@ -56,7 +56,7 @@ async def test_add_meter_readings(
 
 
 async def test_add_meter_readings_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the add_meter_readings service with a RequestException."""
 
@@ -68,7 +68,7 @@ async def test_add_meter_readings_exception(
             "PyTado.interface.api.Tado.set_eiq_meter_readings",
             side_effect=RequestException("Error"),
         ),
-        pytest.raises(HomeAssistantError) as exc,
+        pytest.raises(SmartHubError) as exc,
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -84,7 +84,7 @@ async def test_add_meter_readings_exception(
 
 
 async def test_add_meter_readings_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the add_meter_readings service with an invalid_meter_reading response."""
 
@@ -99,7 +99,7 @@ async def test_add_meter_readings_invalid(
             "PyTado.interface.api.Tado.set_eiq_meter_readings",
             return_value=json.loads(fixture),
         ),
-        pytest.raises(HomeAssistantError) as exc,
+        pytest.raises(SmartHubError) as exc,
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -115,7 +115,7 @@ async def test_add_meter_readings_invalid(
 
 
 async def test_add_meter_readings_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the add_meter_readings service with a duplicated_meter_reading response."""
 
@@ -130,7 +130,7 @@ async def test_add_meter_readings_duplicate(
             "PyTado.interface.api.Tado.set_eiq_meter_readings",
             return_value=json.loads(fixture),
         ),
-        pytest.raises(HomeAssistantError) as exc,
+        pytest.raises(SmartHubError) as exc,
     ):
         await hass.services.async_call(
             DOMAIN,

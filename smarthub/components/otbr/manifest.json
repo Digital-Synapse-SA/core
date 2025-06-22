@@ -1,0 +1,12 @@
+{
+  "domain": "otbr",
+  "name": "Open Thread Border Router",
+  "after_dependencies": ["hassio", "smarthub_yellow", "zha"],
+  "codeowners": ["@smart-hub/core"],
+  "config_flow": true,
+  "dependencies": ["smarthub_hardware", "thread"],
+  "documentation": "https://www.smart-hub.io/integrations/otbr",
+  "integration_type": "service",
+  "iot_class": "local_polling",
+  "requirements": ["python-otbr-api==2.7.0"]
+}

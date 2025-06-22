@@ -6,16 +6,16 @@ import xml.etree.ElementTree as ET
 from pylgnetcast import AccessTokenError, LgNetCastClient, SessionIdError
 import requests
 
-from homeassistant.components.lg_netcast import DOMAIN
-from homeassistant.components.media_player import DOMAIN as MP_DOMAIN
-from homeassistant.const import (
+from smarthub.components.lg_netcast import DOMAIN
+from smarthub.components.media_player import DOMAIN as MP_DOMAIN
+from smarthub.const import (
     CONF_ACCESS_TOKEN,
     CONF_HOST,
     CONF_ID,
     CONF_MODEL,
     CONF_NAME,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -89,12 +89,12 @@ def _patch_lg_netcast(
         )
 
     return patch(
-        "homeassistant.components.lg_netcast.config_flow.LgNetCastClient",
+        "smarthub.components.lg_netcast.config_flow.LgNetCastClient",
         new=_generate_fake_lgnetcast_client,
     )
 
 
-async def setup_lgnetcast(hass: HomeAssistant, unique_id: str = UNIQUE_ID):
+async def setup_lgnetcast(hass: SmartHub, unique_id: str = UNIQUE_ID):
     """Initialize lg netcast and media_player for tests."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

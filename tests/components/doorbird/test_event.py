@@ -1,7 +1,7 @@
 """Test DoorBird events."""
 
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from . import mock_webhook_call
 from .conftest import DoorbirdMockerType
@@ -10,7 +10,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_doorbell_ring_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     doorbird_mocker: DoorbirdMockerType,
 ) -> None:
@@ -24,7 +24,7 @@ async def test_doorbell_ring_event(
 
 
 async def test_motion_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     doorbird_mocker: DoorbirdMockerType,
 ) -> None:

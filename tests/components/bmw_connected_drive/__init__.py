@@ -7,16 +7,16 @@ from bimmer_connected.const import (
 )
 import respx
 
-from homeassistant import config_entries
-from homeassistant.components.bmw_connected_drive.const import (
+from smarthub import config_entries
+from smarthub.components.bmw_connected_drive.const import (
     CONF_CAPTCHA_TOKEN,
     CONF_GCID,
     CONF_READ_ONLY,
     CONF_REFRESH_TOKEN,
     DOMAIN,
 )
-from homeassistant.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -54,14 +54,14 @@ REMOTE_SERVICE_EXC_TRANSLATION = (
 )
 
 BIMMER_CONNECTED_LOGIN_PATCH = (
-    "homeassistant.components.bmw_connected_drive.config_flow.MyBMWAuthentication.login"
+    "smarthub.components.bmw_connected_drive.config_flow.MyBMWAuthentication.login"
 )
 BIMMER_CONNECTED_VEHICLE_PATCH = (
-    "homeassistant.components.bmw_connected_drive.coordinator.MyBMWAccount.get_vehicles"
+    "smarthub.components.bmw_connected_drive.coordinator.MyBMWAccount.get_vehicles"
 )
 
 
-async def setup_mocked_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def setup_mocked_integration(hass: SmartHub) -> MockConfigEntry:
     """Mock a fully setup config entry and all components based on fixtures."""
 
     # Mock config entry and add to HA

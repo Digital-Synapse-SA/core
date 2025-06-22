@@ -11,12 +11,12 @@ from goslideapi.goslideapi import (
 )
 import pytest
 
-from homeassistant.components.slide_local.const import CONF_INVERT_POSITION, DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_API_VERSION, CONF_HOST, CONF_PASSWORD, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.slide_local.const import CONF_INVERT_POSITION, DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_API_VERSION, CONF_HOST, CONF_PASSWORD, Platform
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from . import setup_platform
 from .const import HOST, SLIDE_INFO_DATA
@@ -41,7 +41,7 @@ MOCK_ZEROCONF_DATA = ZeroconfServiceInfo(
 
 
 async def test_user(
-    hass: HomeAssistant, mock_slide_api: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_slide_api: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we get the form."""
 
@@ -70,7 +70,7 @@ async def test_user(
 
 
 async def test_user_api_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_slide_api: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -103,7 +103,7 @@ async def test_user_api_1(
 
 
 async def test_user_api_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_slide_api: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -160,7 +160,7 @@ async def test_user_api_error(
     ],
 )
 async def test_api_1_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     error: str,
     mock_slide_api: AsyncMock,
@@ -212,7 +212,7 @@ async def test_api_1_exceptions(
     ],
 )
 async def test_api_2_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     error: str,
     mock_slide_api: AsyncMock,
@@ -255,7 +255,7 @@ async def test_api_2_exceptions(
 
 
 async def test_abort_if_already_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_slide_api: AsyncMock,
 ) -> None:
     """Test we abort if the device is already setup."""
@@ -283,7 +283,7 @@ async def test_abort_if_already_setup(
 
 
 async def test_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_slide_api: AsyncMock,
     mock_config_entry: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -313,7 +313,7 @@ async def test_reconfigure(
 
 
 async def test_zeroconf(
-    hass: HomeAssistant, mock_slide_api: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_slide_api: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test starting a flow from discovery."""
 
@@ -335,7 +335,7 @@ async def test_zeroconf(
 
 
 async def test_zeroconf_duplicate_entry(
-    hass: HomeAssistant, mock_slide_api: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_slide_api: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test starting a flow from discovery."""
 
@@ -354,7 +354,7 @@ async def test_zeroconf_duplicate_entry(
 
 
 async def test_zeroconf_update_duplicate_entry(
-    hass: HomeAssistant, mock_slide_api: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_slide_api: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test updating an existing entry from discovery."""
 
@@ -383,7 +383,7 @@ async def test_zeroconf_update_duplicate_entry(
     ],
 )
 async def test_zeroconf_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     mock_slide_api: AsyncMock,
     mock_setup_entry: AsyncMock,
@@ -405,7 +405,7 @@ async def test_zeroconf_connection_error(
 
 
 async def test_options_flow(
-    hass: HomeAssistant, mock_slide_api: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_slide_api: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test options flow works correctly."""
     await setup_platform(hass, mock_config_entry, [Platform.COVER])

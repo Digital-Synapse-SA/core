@@ -8,9 +8,9 @@ from unittest.mock import MagicMock, patch
 from gotailwind import TailwindDeviceStatus
 import pytest
 
-from homeassistant.components.tailwind.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_TOKEN
-from homeassistant.core import HomeAssistant
+from smarthub.components.tailwind.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_TOKEN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -39,7 +39,7 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[None]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.tailwind.async_setup_entry", return_value=True
+        "smarthub.components.tailwind.async_setup_entry", return_value=True
     ):
         yield
 
@@ -49,10 +49,10 @@ def mock_tailwind(device_fixture: str) -> Generator[MagicMock]:
     """Return a mocked Tailwind client."""
     with (
         patch(
-            "homeassistant.components.tailwind.coordinator.Tailwind", autospec=True
+            "smarthub.components.tailwind.coordinator.Tailwind", autospec=True
         ) as tailwind_mock,
         patch(
-            "homeassistant.components.tailwind.config_flow.Tailwind",
+            "smarthub.components.tailwind.config_flow.Tailwind",
             new=tailwind_mock,
         ),
     ):
@@ -65,7 +65,7 @@ def mock_tailwind(device_fixture: str) -> Generator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_tailwind: MagicMock,
 ) -> MockConfigEntry:

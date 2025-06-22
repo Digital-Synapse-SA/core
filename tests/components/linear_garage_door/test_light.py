@@ -6,21 +6,21 @@ from unittest.mock import AsyncMock
 from freezegun.api import FrozenDateTimeFactory
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     DOMAIN as LIGHT_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.components.linear_garage_door import DOMAIN
-from homeassistant.const import (
+from smarthub.components.linear_garage_door import DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_BRIGHTNESS,
     STATE_OFF,
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -33,7 +33,7 @@ from tests.common import (
 
 
 async def test_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_linear: AsyncMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -47,7 +47,7 @@ async def test_data(
 
 
 async def test_turn_on(
-    hass: HomeAssistant, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that turning on the light works as intended."""
 
@@ -64,7 +64,7 @@ async def test_turn_on(
 
 
 async def test_turn_on_with_brightness(
-    hass: HomeAssistant, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that turning on the light works as intended."""
 
@@ -83,7 +83,7 @@ async def test_turn_on_with_brightness(
 
 
 async def test_turn_off(
-    hass: HomeAssistant, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_linear: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test that turning off the light works as intended."""
 
@@ -100,7 +100,7 @@ async def test_turn_off(
 
 
 async def test_update_light_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_linear: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,

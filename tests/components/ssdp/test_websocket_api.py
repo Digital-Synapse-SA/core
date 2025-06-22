@@ -3,7 +3,7 @@
 import asyncio
 from unittest.mock import ANY, AsyncMock, Mock, patch
 
-from homeassistant.core import EVENT_HOMEASSISTANT_STARTED, HomeAssistant
+from smarthub.core import EVENT_HOMEASSISTANT_STARTED, SmartHub
 
 from . import _ssdp_headers, init_ssdp_component
 
@@ -12,12 +12,12 @@ from tests.typing import WebSocketGenerator
 
 
 @patch(
-    "homeassistant.components.ssdp.async_get_ssdp",
+    "smarthub.components.ssdp.async_get_ssdp",
     return_value={"mock-domain": [{"deviceType": "Paulus"}]},
 )
 async def test_subscribe_discovery(
     mock_get_ssdp: Mock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     mock_flow_init: AsyncMock,
     hass_ws_client: WebSocketGenerator,
@@ -87,7 +87,7 @@ async def test_subscribe_discovery(
                 "friendlyName": "Bedroom TV",
             },
             "name": "Bedroom TV",
-            "x_homeassistant_matching_domains": [],
+            "x_smarthub_matching_domains": [],
         }
     ]
 
@@ -131,7 +131,7 @@ async def test_subscribe_discovery(
                 "friendlyName": "Bedroom TV",
             },
             "name": "Bedroom TV",
-            "x_homeassistant_matching_domains": ["mock-domain"],
+            "x_smarthub_matching_domains": ["mock-domain"],
         }
     ]
 

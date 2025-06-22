@@ -6,14 +6,14 @@ from unittest.mock import AsyncMock, patch
 from aiohttp import ClientResponseError
 import pytest
 
-from homeassistant.components.garages_amsterdam.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.garages_amsterdam.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 async def test_full_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_garages_amsterdam: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -49,12 +49,12 @@ async def test_full_user_flow(
     ],
 )
 async def test_error_handling(
-    side_effect: Exception, reason: str, hass: HomeAssistant
+    side_effect: Exception, reason: str, hass: SmartHub
 ) -> None:
     """Test error handling in the config flow."""
 
     with patch(
-        "homeassistant.components.garages_amsterdam.config_flow.ODPAmsterdam.all_garages",
+        "smarthub.components.garages_amsterdam.config_flow.ODPAmsterdam.all_garages",
         side_effect=side_effect,
     ):
         result = await hass.config_entries.flow.async_init(

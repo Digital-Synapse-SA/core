@@ -6,18 +6,18 @@ from unittest.mock import patch
 from aiounifi.models.message import MessageKey
 import pytest
 
-from homeassistant.components import unifi
-from homeassistant.components.unifi.const import (
+from smarthub.components import unifi
+from smarthub.components.unifi.const import (
     CONF_ALLOW_BANDWIDTH_SENSORS,
     CONF_ALLOW_UPTIME_SENSORS,
     CONF_TRACK_CLIENTS,
     CONF_TRACK_DEVICES,
 )
-from homeassistant.components.unifi.errors import AuthenticationRequired, CannotConnect
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.unifi.errors import AuthenticationRequired, CannotConnect
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .conftest import (
     DEFAULT_CONFIG_ENTRY_ID,
@@ -30,11 +30,11 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_setup_entry_fails_config_entry_not_ready(
-    hass: HomeAssistant, config_entry_factory: ConfigEntryFactoryType
+    hass: SmartHub, config_entry_factory: ConfigEntryFactoryType
 ) -> None:
     """Failed authentication trigger a reauthentication flow."""
     with patch(
-        "homeassistant.components.unifi.get_unifi_api",
+        "smarthub.components.unifi.get_unifi_api",
         side_effect=CannotConnect,
     ):
         config_entry = await config_entry_factory()
@@ -43,12 +43,12 @@ async def test_setup_entry_fails_config_entry_not_ready(
 
 
 async def test_setup_entry_fails_trigger_reauth_flow(
-    hass: HomeAssistant, config_entry_factory: ConfigEntryFactoryType
+    hass: SmartHub, config_entry_factory: ConfigEntryFactoryType
 ) -> None:
     """Failed authentication trigger a reauthentication flow."""
     with (
         patch(
-            "homeassistant.components.unifi.get_unifi_api",
+            "smarthub.components.unifi.get_unifi_api",
             side_effect=AuthenticationRequired,
         ),
         patch.object(hass.config_entries.flow, "async_init") as mock_flow_init,
@@ -79,7 +79,7 @@ async def test_setup_entry_fails_trigger_reauth_flow(
     ],
 )
 async def test_wireless_clients(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     config_entry_factory: ConfigEntryFactoryType,
 ) -> None:
@@ -164,7 +164,7 @@ async def test_wireless_clients(
     ],
 )
 async def test_remove_config_entry_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     client_payload: list[dict[str, Any]],

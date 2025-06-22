@@ -4,20 +4,20 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 CHILD_LOCK_SWITCH_ENTITY = "switch.baseboard_heater_child_lock"
 
 
-async def test_child_lock(hass: HomeAssistant) -> None:
+async def test_child_lock(hass: SmartHub) -> None:
     """Test creation of child lock entity."""
 
     await async_init_integration(hass)
@@ -28,13 +28,13 @@ async def test_child_lock(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     ("method", "expected"), [(SERVICE_TURN_ON, True), (SERVICE_TURN_OFF, False)]
 )
-async def test_set_child_lock(hass: HomeAssistant, method, expected) -> None:
+async def test_set_child_lock(hass: SmartHub, method, expected) -> None:
     """Test enable child lock on switch."""
 
     await async_init_integration(hass)
 
     with patch(
-        "homeassistant.components.tado.PyTado.interface.api.Tado.set_child_lock"
+        "smarthub.components.tado.PyTado.interface.api.Tado.set_child_lock"
     ) as mock_set_state:
         await hass.services.async_call(
             SWITCH_DOMAIN,

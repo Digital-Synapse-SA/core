@@ -2,12 +2,12 @@
 
 from unittest.mock import MagicMock, patch
 
-from homeassistant.components.dlink.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.dlink.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .conftest import (
     CONF_DATA,
@@ -21,10 +21,10 @@ from tests.common import MockConfigEntry
 
 
 def _patch_setup_entry():
-    return patch("homeassistant.components.dlink.async_setup_entry", return_value=True)
+    return patch("smarthub.components.dlink.async_setup_entry", return_value=True)
 
 
-async def test_flow_user(hass: HomeAssistant, mocked_plug: MagicMock) -> None:
+async def test_flow_user(hass: SmartHub, mocked_plug: MagicMock) -> None:
     """Test user initialized flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -41,7 +41,7 @@ async def test_flow_user(hass: HomeAssistant, mocked_plug: MagicMock) -> None:
 
 
 async def test_flow_user_already_configured(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test user initialized flow with duplicate server."""
     result = await hass.config_entries.flow.async_init(
@@ -53,7 +53,7 @@ async def test_flow_user_already_configured(
 
 
 async def test_flow_user_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mocked_plug_legacy: MagicMock,
     mocked_plug_legacy_no_auth: MagicMock,
 ) -> None:
@@ -77,7 +77,7 @@ async def test_flow_user_cannot_connect(
 
 
 async def test_flow_user_unknown_error(
-    hass: HomeAssistant, mocked_plug: MagicMock
+    hass: SmartHub, mocked_plug: MagicMock
 ) -> None:
     """Test user initialized flow with unreachable server."""
     with patch_config_flow(mocked_plug) as mock:
@@ -99,7 +99,7 @@ async def test_flow_user_unknown_error(
     assert result["data"] == CONF_DATA
 
 
-async def test_dhcp(hass: HomeAssistant, mocked_plug: MagicMock) -> None:
+async def test_dhcp(hass: SmartHub, mocked_plug: MagicMock) -> None:
     """Test we can process the discovery from dhcp."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_DHCP}, data=CONF_DHCP_FLOW
@@ -117,7 +117,7 @@ async def test_dhcp(hass: HomeAssistant, mocked_plug: MagicMock) -> None:
 
 
 async def test_dhcp_failed_legacy_auth(
-    hass: HomeAssistant, mocked_plug: MagicMock, mocked_plug_legacy_no_auth: MagicMock
+    hass: SmartHub, mocked_plug: MagicMock, mocked_plug_legacy_no_auth: MagicMock
 ) -> None:
     """Test we can recover from failed legacy authentication during dhcp flow."""
     result = await hass.config_entries.flow.async_init(
@@ -144,7 +144,7 @@ async def test_dhcp_failed_legacy_auth(
 
 
 async def test_dhcp_already_configured(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test dhcp initialized flow with duplicate server."""
     result = await hass.config_entries.flow.async_init(
@@ -157,7 +157,7 @@ async def test_dhcp_already_configured(
 
 
 async def test_dhcp_unique_id_assignment(
-    hass: HomeAssistant, mocked_plug: MagicMock
+    hass: SmartHub, mocked_plug: MagicMock
 ) -> None:
     """Test dhcp initialized flow with no unique id for matching entry."""
     dhcp_data = DhcpServiceInfo(
@@ -181,7 +181,7 @@ async def test_dhcp_unique_id_assignment(
 
 
 async def test_dhcp_changed_ip(
-    hass: HomeAssistant, config_entry_with_uid: MockConfigEntry
+    hass: SmartHub, config_entry_with_uid: MockConfigEntry
 ) -> None:
     """Test that we successfully change IP address for device with known mac address."""
     result = await hass.config_entries.flow.async_init(

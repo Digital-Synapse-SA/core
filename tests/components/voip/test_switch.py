@@ -1,12 +1,12 @@
 """Test VoIP switch devices."""
 
-from homeassistant.components.voip.devices import VoIPDevice
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.components.voip.devices import VoIPDevice
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
 
 
 async def test_allow_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     voip_device: VoIPDevice,
 ) -> None:

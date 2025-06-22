@@ -10,16 +10,16 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 import voluptuous as vol
 
-from homeassistant import config_entries
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.const import (
     EVENT_HOMEASSISTANT_START,
     STATE_UNAVAILABLE,
     EntityCategory,
 )
-from homeassistant.core import CoreState, HomeAssistant, callback
-from homeassistant.exceptions import MaxLengthExceeded
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util.dt import utc_from_timestamp, utcnow
+from smarthub.core import CoreState, SmartHub, callback
+from smarthub.exceptions import MaxLengthExceeded
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util.dt import utc_from_timestamp, utcnow
 
 from tests.common import (
     ANY,
@@ -30,7 +30,7 @@ from tests.common import (
     flush_store,
 )
 
-YAML__OPEN_PATH = "homeassistant.util.yaml.loader.open"
+YAML__OPEN_PATH = "smarthub.util.yaml.loader.open"
 
 
 async def test_get(entity_registry: er.EntityRegistry) -> None:
@@ -44,7 +44,7 @@ async def test_get(entity_registry: er.EntityRegistry) -> None:
 
 
 async def test_get_or_create_returns_same_entry(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Make sure we do not duplicate entries."""
     update_events = async_capture_events(hass, er.EVENT_ENTITY_REGISTRY_UPDATED)
@@ -73,7 +73,7 @@ def test_get_or_create_suggested_object_id(entity_registry: er.EntityRegistry) -
 
 
 def test_get_or_create_updates_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -281,7 +281,7 @@ def test_get_or_create_suggested_object_id_conflict_register(
 
 
 def test_get_or_create_suggested_object_id_conflict_existing(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that we don't generate an entity id that currently exists."""
     hass.states.async_set("light.hue_1234", "on")
@@ -316,7 +316,7 @@ def test_create_triggers_save(entity_registry: er.EntityRegistry) -> None:
 
 
 async def test_loading_saving_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -430,7 +430,7 @@ def test_generate_entity_considers_registered_entities(
 
 
 def test_generate_entity_considers_existing_entities(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that we don't create entity id that currently exists."""
     hass.states.async_set("light.kitchen", "on")
@@ -449,7 +449,7 @@ def test_is_registered(entity_registry: er.EntityRegistry) -> None:
 
 @pytest.mark.parametrize("load_registries", [False])
 async def test_filter_on_load(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test we transform some data when loading from storage."""
     hass_storage[er.STORAGE_KEY] = {
@@ -522,7 +522,7 @@ async def test_filter_on_load(
 
 @pytest.mark.parametrize("load_registries", [False])
 async def test_load_bad_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -681,7 +681,7 @@ def test_async_get_entity_id(entity_registry: er.EntityRegistry) -> None:
 
 
 async def test_updating_config_entry_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that we update config entry id in registry."""
     update_events = async_capture_events(hass, er.EVENT_ENTITY_REGISTRY_UPDATED)
@@ -714,7 +714,7 @@ async def test_updating_config_entry_id(
 
 
 async def test_removing_config_entry_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that we update config entry id in registry."""
     update_events = async_capture_events(hass, er.EVENT_ENTITY_REGISTRY_UPDATED)
@@ -743,7 +743,7 @@ async def test_removing_config_entry_id(
 
 
 async def test_deleted_entity_removing_config_entry_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test that we update config entry id in registry on deleted entity."""
@@ -782,7 +782,7 @@ async def test_deleted_entity_removing_config_entry_id(
 
 
 async def test_removing_config_subentry_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that we update config subentry id in registry."""
     update_events = async_capture_events(hass, er.EVENT_ENTITY_REGISTRY_UPDATED)
@@ -827,7 +827,7 @@ async def test_removing_config_subentry_id(
 
 
 async def test_deleted_entity_removing_config_subentry_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test that we update config subentry id in registry on deleted entity."""
@@ -936,7 +936,7 @@ async def test_removing_area_id_deleted_entity(
 
 
 @pytest.mark.parametrize("load_registries", [False])
-async def test_migration_1_1(hass: HomeAssistant, hass_storage: dict[str, Any]) -> None:
+async def test_migration_1_1(hass: SmartHub, hass_storage: dict[str, Any]) -> None:
     """Test migration from version 1.1."""
     hass_storage[er.STORAGE_KEY] = {
         "version": 1,
@@ -1008,7 +1008,7 @@ async def test_migration_1_1(hass: HomeAssistant, hass_storage: dict[str, Any]) 
 
 
 @pytest.mark.parametrize("load_registries", [False])
-async def test_migration_1_7(hass: HomeAssistant, hass_storage: dict[str, Any]) -> None:
+async def test_migration_1_7(hass: SmartHub, hass_storage: dict[str, Any]) -> None:
     """Test migration from version 1.7.
 
     This tests cleanup after frontend bug which incorrectly updated device_class
@@ -1081,7 +1081,7 @@ async def test_migration_1_7(hass: HomeAssistant, hass_storage: dict[str, Any]) 
 
 @pytest.mark.parametrize("load_registries", [False])
 async def test_migration_1_11(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test migration from version 1.11.
 
@@ -1210,7 +1210,7 @@ async def test_migration_1_11(
 
 
 async def test_update_entity_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test entity's unique_id is updated."""
     mock_config = MockConfigEntry(domain="light", entry_id="mock-id-1")
@@ -1240,7 +1240,7 @@ async def test_update_entity_unique_id(
 
 
 async def test_update_entity_unique_id_conflict(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test migration raises when unique_id already in use."""
@@ -1290,7 +1290,7 @@ async def test_update_entity_entity_id(entity_registry: er.EntityRegistry) -> No
 
 
 async def test_update_entity_entity_id_entity_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test update raises when entity_id already in use."""
     entry = entity_registry.async_get_or_create("light", "hue", "5678")
@@ -1335,7 +1335,7 @@ async def test_update_entity_entity_id_entity_id(
 
 
 async def test_update_entity(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test updating entity."""
     mock_config = MockConfigEntry(domain="light", entry_id="mock-id-1")
@@ -1365,7 +1365,7 @@ async def test_update_entity(
 
 
 async def test_update_entity_options(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test updating entity."""
     mock_config = MockConfigEntry(domain="light", entry_id="mock-id-1")
@@ -1422,7 +1422,7 @@ async def test_disabled_by(entity_registry: er.EntityRegistry) -> None:
 
 
 async def test_disabled_by_config_entry_pref(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test config entry preference setting disabled_by."""
@@ -1467,7 +1467,7 @@ async def test_hidden_by(entity_registry: er.EntityRegistry) -> None:
 
 
 async def test_restore_states(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test restoring states."""
     hass.set_state(CoreState.not_running)
@@ -1533,7 +1533,7 @@ async def test_restore_states(
 
 
 async def test_remove_device_removes_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -1563,7 +1563,7 @@ async def test_remove_device_removes_entities(
 
 
 async def test_remove_config_entry_from_device_removes_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1631,7 +1631,7 @@ async def test_remove_config_entry_from_device_removes_entities(
 
 
 async def test_remove_config_entry_from_device_removes_entities_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1676,7 +1676,7 @@ async def test_remove_config_entry_from_device_removes_entities_2(
 
 
 async def test_remove_config_subentry_from_device_removes_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1798,7 +1798,7 @@ async def test_remove_config_subentry_from_device_removes_entities(
 
 
 async def test_remove_config_subentry_from_device_removes_entities_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1878,7 +1878,7 @@ async def test_remove_config_subentry_from_device_removes_entities_2(
 
 
 async def test_update_device_race(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1915,7 +1915,7 @@ async def test_update_device_race(
 
 
 async def test_disable_device_disables_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1985,7 +1985,7 @@ async def test_disable_device_disables_entities(
 
 
 async def test_disable_config_entry_disables_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -2055,7 +2055,7 @@ async def test_disable_config_entry_disables_entities(
 
 
 async def test_disabled_entities_excluded_from_entity_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -2102,7 +2102,7 @@ async def test_disabled_entities_excluded_from_entity_list(
 
 
 async def test_entity_max_length_exceeded(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that an exception is raised when the max character length is exceeded."""
 
@@ -2326,7 +2326,7 @@ async def test_unique_id_non_string(
     ],
 )
 def test_migrate_entity_to_new_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     create_kwargs: dict,
     migrate_kwargs: dict,
@@ -2430,7 +2430,7 @@ def test_migrate_entity_to_new_platform(
 
 
 def test_migrate_entity_to_new_platform_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test migrate_entity_to_new_platform."""
@@ -2523,7 +2523,7 @@ def test_migrate_entity_to_new_platform_error_handling(
 
 
 async def test_restore_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
@@ -2767,7 +2767,7 @@ async def test_restore_entity(
 
 
 async def test_async_migrate_entry_delete_self(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test async_migrate_entry."""
     config_entry1 = MockConfigEntry(domain="test1")
@@ -2804,7 +2804,7 @@ async def test_async_migrate_entry_delete_self(
 
 
 async def test_async_migrate_entry_delete_other(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test async_migrate_entry."""
     config_entry1 = MockConfigEntry(domain="test1")
@@ -3054,7 +3054,7 @@ async def test_entries_for_category(entity_registry: er.EntityRegistry) -> None:
 
 
 async def test_get_or_create_thread_safety(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test call async_get_or_create_from a thread."""
     with pytest.raises(
@@ -3067,7 +3067,7 @@ async def test_get_or_create_thread_safety(
 
 
 async def test_async_update_entity_thread_safety(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test call async_get_or_create from a thread."""
     entry = entity_registry.async_get_or_create("light", "hue", "1234")
@@ -3085,7 +3085,7 @@ async def test_async_update_entity_thread_safety(
 
 
 async def test_async_remove_thread_safety(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test call async_remove from a thread."""
     entry = entity_registry.async_get_or_create("light", "hue", "1234")
@@ -3097,7 +3097,7 @@ async def test_async_remove_thread_safety(
 
 
 async def test_subentry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test subentry error handling."""

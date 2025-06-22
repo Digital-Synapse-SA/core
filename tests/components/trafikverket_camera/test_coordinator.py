@@ -13,11 +13,11 @@ from pytrafikverket import (
     UnknownError,
 )
 
-from homeassistant.components.trafikverket_camera.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryAuthFailed
-from homeassistant.helpers.update_coordinator import UpdateFailed
+from smarthub.components.trafikverket_camera.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import ConfigEntryAuthFailed
+from smarthub.helpers.update_coordinator import UpdateFailed
 
 from . import ENTRY_CONFIG
 
@@ -26,7 +26,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_coordinator(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     get_camera: CameraInfoModel,
 ) -> None:
@@ -47,7 +47,7 @@ async def test_coordinator(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         return_value=get_camera,
     ) as mock_data:
         await hass.config_entries.async_setup(entry.entry_id)
@@ -84,7 +84,7 @@ async def test_coordinator(
     ],
 )
 async def test_coordinator_failed_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     get_camera: CameraInfoModel,
     sideeffect: str,
@@ -108,7 +108,7 @@ async def test_coordinator_failed_update(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         side_effect=sideeffect,
     ) as mock_data:
         await hass.config_entries.async_setup(entry.entry_id)
@@ -121,7 +121,7 @@ async def test_coordinator_failed_update(
 
 
 async def test_coordinator_failed_get_image(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     get_camera: CameraInfoModel,
 ) -> None:
@@ -142,7 +142,7 @@ async def test_coordinator_failed_get_image(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
+        "smarthub.components.trafikverket_camera.coordinator.TrafikverketCamera.async_get_camera",
         return_value=get_camera,
     ) as mock_data:
         await hass.config_entries.async_setup(entry.entry_id)

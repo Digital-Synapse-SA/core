@@ -5,12 +5,12 @@ from unittest.mock import patch
 
 from aiohttp import ClientError as HTTPClientError
 
-from homeassistant.components.directv.const import CONF_RECEIVER_ID, DOMAIN
-from homeassistant.config_entries import SOURCE_SSDP, SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_SERIAL
+from smarthub.components.directv.const import CONF_RECEIVER_ID, DOMAIN
+from smarthub.config_entries import SOURCE_SSDP, SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_NAME, CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import ATTR_UPNP_SERIAL
 
 from . import (
     HOST,
@@ -25,7 +25,7 @@ from . import (
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
-async def test_show_user_form(hass: HomeAssistant) -> None:
+async def test_show_user_form(hass: SmartHub) -> None:
     """Test that the user set up form is served."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -37,7 +37,7 @@ async def test_show_user_form(hass: HomeAssistant) -> None:
 
 
 async def test_show_ssdp_form(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test that the ssdp confirmation form is served."""
     mock_connection(aioclient_mock)
@@ -53,7 +53,7 @@ async def test_show_ssdp_form(
 
 
 async def test_cannot_connect(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we show user form on connection error."""
     aioclient_mock.get("http://127.0.0.1:8080/info/getVersion", exc=HTTPClientError)
@@ -71,7 +71,7 @@ async def test_cannot_connect(
 
 
 async def test_ssdp_cannot_connect(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we abort SSDP flow on connection error."""
     aioclient_mock.get("http://127.0.0.1:8080/info/getVersion", exc=HTTPClientError)
@@ -88,7 +88,7 @@ async def test_ssdp_cannot_connect(
 
 
 async def test_ssdp_confirm_cannot_connect(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we abort SSDP flow on connection error."""
     aioclient_mock.get("http://127.0.0.1:8080/info/getVersion", exc=HTTPClientError)
@@ -105,7 +105,7 @@ async def test_ssdp_confirm_cannot_connect(
 
 
 async def test_user_device_exists_abort(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we abort user flow if DirecTV receiver already configured."""
     await setup_integration(hass, aioclient_mock, skip_entry_setup=True)
@@ -122,7 +122,7 @@ async def test_user_device_exists_abort(
 
 
 async def test_ssdp_device_exists_abort(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we abort SSDP flow if DirecTV receiver already configured."""
     await setup_integration(hass, aioclient_mock, skip_entry_setup=True)
@@ -139,7 +139,7 @@ async def test_ssdp_device_exists_abort(
 
 
 async def test_ssdp_with_receiver_id_device_exists_abort(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we abort SSDP flow if DirecTV receiver already configured."""
     await setup_integration(hass, aioclient_mock, skip_entry_setup=True)
@@ -157,12 +157,12 @@ async def test_ssdp_with_receiver_id_device_exists_abort(
 
 
 async def test_unknown_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we show user form on unknown error."""
     user_input = MOCK_USER_INPUT.copy()
     with patch(
-        "homeassistant.components.directv.config_flow.DIRECTV.update",
+        "smarthub.components.directv.config_flow.DIRECTV.update",
         side_effect=Exception,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -176,12 +176,12 @@ async def test_unknown_error(
 
 
 async def test_ssdp_unknown_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we abort SSDP flow on unknown error."""
     discovery_info = dataclasses.replace(MOCK_SSDP_DISCOVERY_INFO)
     with patch(
-        "homeassistant.components.directv.config_flow.DIRECTV.update",
+        "smarthub.components.directv.config_flow.DIRECTV.update",
         side_effect=Exception,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -195,12 +195,12 @@ async def test_ssdp_unknown_error(
 
 
 async def test_ssdp_confirm_unknown_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we abort SSDP flow on unknown error."""
     discovery_info = dataclasses.replace(MOCK_SSDP_DISCOVERY_INFO)
     with patch(
-        "homeassistant.components.directv.config_flow.DIRECTV.update",
+        "smarthub.components.directv.config_flow.DIRECTV.update",
         side_effect=Exception,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -214,7 +214,7 @@ async def test_ssdp_confirm_unknown_error(
 
 
 async def test_full_user_flow_implementation(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the full manual user flow from start to finish."""
     mock_connection(aioclient_mock)
@@ -228,7 +228,7 @@ async def test_full_user_flow_implementation(
     assert result["step_id"] == "user"
 
     user_input = MOCK_USER_INPUT.copy()
-    with patch("homeassistant.components.directv.async_setup_entry", return_value=True):
+    with patch("smarthub.components.directv.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input=user_input,
@@ -243,7 +243,7 @@ async def test_full_user_flow_implementation(
 
 
 async def test_full_ssdp_flow_implementation(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test the full SSDP flow from start to finish."""
     mock_connection(aioclient_mock)

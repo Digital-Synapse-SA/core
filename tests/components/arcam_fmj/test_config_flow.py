@@ -7,12 +7,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from arcam.fmj.client import ConnectionFailed
 import pytest
 
-from homeassistant.components.arcam_fmj.const import DOMAIN
-from homeassistant.config_entries import SOURCE_SSDP, SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_PORT, CONF_SOURCE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.components.arcam_fmj.const import DOMAIN
+from smarthub.config_entries import SOURCE_SSDP, SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_PORT, CONF_SOURCE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_DEVICE_TYPE,
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_MANUFACTURER,
@@ -64,13 +64,13 @@ MOCK_DISCOVER = SsdpServiceInfo(
 @pytest.fixture(name="dummy_client", autouse=True)
 def dummy_client_fixture() -> Generator[MagicMock]:
     """Mock out the real client."""
-    with patch("homeassistant.components.arcam_fmj.config_flow.Client") as client:
+    with patch("smarthub.components.arcam_fmj.config_flow.Client") as client:
         client.return_value.start.side_effect = AsyncMock(return_value=None)
         client.return_value.stop.side_effect = AsyncMock(return_value=None)
         yield client.return_value
 
 
-async def test_ssdp(hass: HomeAssistant) -> None:
+async def test_ssdp(hass: SmartHub) -> None:
     """Test a ssdp import flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -86,7 +86,7 @@ async def test_ssdp(hass: HomeAssistant) -> None:
     assert result["data"] == MOCK_CONFIG_ENTRY
 
 
-async def test_ssdp_abort(hass: HomeAssistant) -> None:
+async def test_ssdp_abort(hass: SmartHub) -> None:
     """Test a ssdp import flow."""
     entry = MockConfigEntry(
         domain=DOMAIN, data=MOCK_CONFIG_ENTRY, title=MOCK_NAME, unique_id=MOCK_UUID
@@ -103,7 +103,7 @@ async def test_ssdp_abort(hass: HomeAssistant) -> None:
 
 
 async def test_ssdp_unable_to_connect(
-    hass: HomeAssistant, dummy_client: MagicMock
+    hass: SmartHub, dummy_client: MagicMock
 ) -> None:
     """Test a ssdp import flow."""
     dummy_client.start.side_effect = AsyncMock(side_effect=ConnectionFailed)
@@ -121,7 +121,7 @@ async def test_ssdp_unable_to_connect(
     assert result["reason"] == "cannot_connect"
 
 
-async def test_ssdp_invalid_id(hass: HomeAssistant) -> None:
+async def test_ssdp_invalid_id(hass: SmartHub) -> None:
     """Test a ssdp with invalid  UDN."""
     discover = replace(
         MOCK_DISCOVER, upnp=MOCK_DISCOVER.upnp | {ATTR_UPNP_UDN: "invalid"}
@@ -136,7 +136,7 @@ async def test_ssdp_invalid_id(hass: HomeAssistant) -> None:
     assert result["reason"] == "cannot_connect"
 
 
-async def test_ssdp_update(hass: HomeAssistant) -> None:
+async def test_ssdp_update(hass: SmartHub) -> None:
     """Test a ssdp import flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -157,7 +157,7 @@ async def test_ssdp_update(hass: HomeAssistant) -> None:
     assert entry.data[CONF_HOST] == MOCK_HOST
 
 
-async def test_user(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_user(hass: SmartHub, aioclient_mock: AiohttpClientMocker) -> None:
     """Test a manual user configuration flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -185,7 +185,7 @@ async def test_user(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) ->
 
 
 async def test_invalid_ssdp(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test a a config flow where ssdp fails."""
     user_input = {
@@ -206,7 +206,7 @@ async def test_invalid_ssdp(
 
 
 async def test_user_wrong(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test a manual user configuration flow with no ssdp response."""
     user_input = {

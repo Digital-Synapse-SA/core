@@ -9,11 +9,11 @@ from xmlrpc.client import Fault
 from aiohttp.client_exceptions import ClientConnectionError, ClientResponseError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.webmin.const import DOMAIN
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.webmin.const import DOMAIN
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import TEST_USER_INPUT
 
@@ -23,7 +23,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 @pytest.fixture
-async def user_flow(hass: HomeAssistant) -> str:
+async def user_flow(hass: SmartHub) -> str:
     """Return a user-initiated flow after filling in host info."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -37,11 +37,11 @@ async def user_flow(hass: HomeAssistant) -> str:
     "fixture", ["webmin_update_without_mac.json", "webmin_update.json"]
 )
 async def test_form_user(
-    hass: HomeAssistant, user_flow: str, mock_setup_entry: AsyncMock, fixture: str
+    hass: SmartHub, user_flow: str, mock_setup_entry: AsyncMock, fixture: str
 ) -> None:
     """Test a successful user initiated flow."""
     with patch(
-        "homeassistant.components.webmin.helpers.WebminInstance.update",
+        "smarthub.components.webmin.helpers.WebminInstance.update",
         return_value=await async_load_json_object_fixture(hass, fixture, DOMAIN),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -79,11 +79,11 @@ async def test_form_user(
     ],
 )
 async def test_form_user_errors(
-    hass: HomeAssistant, user_flow: str, exception: Exception, error_type: str
+    hass: SmartHub, user_flow: str, exception: Exception, error_type: str
 ) -> None:
     """Test we handle errors."""
     with patch(
-        "homeassistant.components.webmin.helpers.WebminInstance.update",
+        "smarthub.components.webmin.helpers.WebminInstance.update",
         side_effect=exception,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -95,7 +95,7 @@ async def test_form_user_errors(
     assert result["errors"] == {"base": error_type}
 
     with patch(
-        "homeassistant.components.webmin.helpers.WebminInstance.update",
+        "smarthub.components.webmin.helpers.WebminInstance.update",
         return_value=await async_load_json_object_fixture(
             hass, "webmin_update.json", DOMAIN
         ),
@@ -110,13 +110,13 @@ async def test_form_user_errors(
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     user_flow: str,
     mock_setup_entry: AsyncMock,
 ) -> None:
     """Test a successful user initiated flow."""
     with patch(
-        "homeassistant.components.webmin.helpers.WebminInstance.update",
+        "smarthub.components.webmin.helpers.WebminInstance.update",
         return_value=await async_load_json_object_fixture(
             hass, "webmin_update.json", DOMAIN
         ),
@@ -131,7 +131,7 @@ async def test_duplicate_entry(
     assert result["options"] == TEST_USER_INPUT
 
     with patch(
-        "homeassistant.components.webmin.helpers.WebminInstance.update",
+        "smarthub.components.webmin.helpers.WebminInstance.update",
         return_value=await async_load_json_object_fixture(
             hass, "webmin_update.json", DOMAIN
         ),

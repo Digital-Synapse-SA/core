@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from elgato import BatteryInfo, ElgatoNoBatteryError, Info, Settings, State
 import pytest
 
-from homeassistant.components.elgato.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_MAC
-from homeassistant.core import HomeAssistant
+from smarthub.components.elgato.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_MAC
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, get_fixture_path, load_fixture
 from tests.components.light.conftest import mock_light_profiles  # noqa: F401
@@ -44,16 +44,16 @@ def mock_config_entry() -> MockConfigEntry:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.elgato.async_setup_entry", return_value=True
+        "smarthub.components.elgato.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
 
 @pytest.fixture
 def mock_onboarding() -> Generator[MagicMock]:
-    """Mock that Home Assistant is currently onboarding."""
+    """Mock that SmartHub is currently onboarding."""
     with patch(
-        "homeassistant.components.onboarding.async_is_onboarded",
+        "smarthub.components.onboarding.async_is_onboarded",
         return_value=False,
     ) as mock_onboarding:
         yield mock_onboarding
@@ -64,9 +64,9 @@ def mock_elgato(device_fixtures: str, state_variant: str) -> Generator[MagicMock
     """Return a mocked Elgato client."""
     with (
         patch(
-            "homeassistant.components.elgato.coordinator.Elgato", autospec=True
+            "smarthub.components.elgato.coordinator.Elgato", autospec=True
         ) as elgato_mock,
-        patch("homeassistant.components.elgato.config_flow.Elgato", new=elgato_mock),
+        patch("smarthub.components.elgato.config_flow.Elgato", new=elgato_mock),
     ):
         elgato = elgato_mock.return_value
         elgato.info.return_value = Info.from_json(
@@ -94,7 +94,7 @@ def mock_elgato(device_fixtures: str, state_variant: str) -> Generator[MagicMock
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_elgato: MagicMock,
 ) -> MockConfigEntry:

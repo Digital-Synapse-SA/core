@@ -6,13 +6,13 @@ from peblar import PeblarAuthenticationError, PeblarConnectionError, PeblarError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.peblar.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.peblar.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -25,7 +25,7 @@ pytestmark = [
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -55,7 +55,7 @@ async def test_entities(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_id: str,
@@ -78,7 +78,7 @@ async def test_buttons(
     # Test connection error handling
     mocked_method.side_effect = PeblarConnectionError("Could not connect")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=(
             r"An error occurred while communicating "
             r"with the Peblar EV charger: Could not connect"
@@ -98,7 +98,7 @@ async def test_buttons(
     # Test unknown error handling
     mocked_method.side_effect = PeblarError("Unknown error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=(
             r"An unknown error occurred while communicating "
             r"with the Peblar EV charger: Unknown error"
@@ -119,7 +119,7 @@ async def test_buttons(
     mocked_method.side_effect = PeblarAuthenticationError("Authentication error")
     mock_peblar.login.side_effect = PeblarAuthenticationError("Authentication error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=(
             r"An authentication failure occurred while communicating "
             r"with the Peblar EV charger"

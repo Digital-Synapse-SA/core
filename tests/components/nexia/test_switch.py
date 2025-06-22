@@ -2,8 +2,8 @@
 
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     EVENT_HOMEASSISTANT_STOP,
     SERVICE_TURN_OFF,
@@ -12,21 +12,21 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 from tests.common import async_fire_time_changed
 
 
-async def test_hold_switch(hass: HomeAssistant) -> None:
+async def test_hold_switch(hass: SmartHub) -> None:
     """Test creation of the hold switch."""
     await async_init_integration(hass)
     assert hass.states.get("switch.nick_office_hold").state == STATE_ON
 
 
 async def test_nexia_sensor_switch(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test NexiaRoomIQSensorSwitch."""
     await async_init_integration(hass, house_fixture="sensors_xl1050_house.json")

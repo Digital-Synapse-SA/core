@@ -9,11 +9,11 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.husqvarna_automower.const import EXECUTION_TIME_DELAY
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.husqvarna_automower.const import EXECUTION_TIME_DELAY
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 from .const import TEST_MOWER_ID
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_number_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -42,7 +42,7 @@ async def test_number_commands(
 
     mocked_method.side_effect = ApiError("Test error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Failed to send command: Test error",
     ):
         await hass.services.async_call(
@@ -56,7 +56,7 @@ async def test_number_commands(
 
 
 async def test_number_workarea_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -86,7 +86,7 @@ async def test_number_workarea_commands(
 
     mocked_method.cutting_height.side_effect = ApiError("Test error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Failed to send command: Test error",
     ):
         await hass.services.async_call(
@@ -101,7 +101,7 @@ async def test_number_workarea_commands(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_number_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -109,7 +109,7 @@ async def test_number_snapshot(
 ) -> None:
     """Snapshot tests of the number entities."""
     with patch(
-        "homeassistant.components.husqvarna_automower.PLATFORMS",
+        "smarthub.components.husqvarna_automower.PLATFORMS",
         [Platform.NUMBER],
     ):
         await setup_integration(hass, mock_config_entry)

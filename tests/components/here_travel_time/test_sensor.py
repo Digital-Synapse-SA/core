@@ -21,8 +21,8 @@ from here_transit import (
 )
 import pytest
 
-from homeassistant.components.here_travel_time.config_flow import DEFAULT_OPTIONS
-from homeassistant.components.here_travel_time.const import (
+from smarthub.components.here_travel_time.config_flow import DEFAULT_OPTIONS
+from smarthub.components.here_travel_time.const import (
     CONF_ARRIVAL_TIME,
     CONF_DEPARTURE_TIME,
     CONF_DESTINATION_ENTITY_ID,
@@ -45,13 +45,13 @@ from homeassistant.components.here_travel_time.const import (
     TRAVEL_MODE_PUBLIC,
     TRAVEL_MODE_TRUCK,
 )
-from homeassistant.components.here_travel_time.coordinator import BACKOFF_MULTIPLIER
-from homeassistant.components.sensor import (
+from smarthub.components.here_travel_time.coordinator import BACKOFF_MULTIPLIER
+from smarthub.components.sensor import (
     ATTR_LAST_RESET,
     ATTR_STATE_CLASS,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_ICON,
     ATTR_LATITUDE,
@@ -64,8 +64,8 @@ from homeassistant.const import (
     UnitOfLength,
     UnitOfTime,
 )
-from homeassistant.core import CoreState, HomeAssistant, State
-from homeassistant.setup import async_setup_component
+from smarthub.core import CoreState, SmartHub, State
+from smarthub.setup import async_setup_component
 
 from .conftest import RESPONSE, TRANSIT_RESPONSE
 from .const import (
@@ -115,7 +115,7 @@ from tests.common import (
 )
 @pytest.mark.usefixtures("valid_response")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mode,
     icon,
     arrival_time,
@@ -177,7 +177,7 @@ async def test_sensor(
 
 @pytest.mark.usefixtures("valid_response")
 async def test_circular_ref(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that a circular ref is handled."""
     hass.states.async_set(
@@ -209,7 +209,7 @@ async def test_circular_ref(
 
 
 @pytest.mark.usefixtures("valid_response")
-async def test_public_transport(hass: HomeAssistant) -> None:
+async def test_public_transport(hass: SmartHub) -> None:
     """Test that public transport mode is handled."""
     hass.set_state(CoreState.not_running)
     entry = MockConfigEntry(
@@ -245,7 +245,7 @@ async def test_public_transport(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("no_attribution_response")
-async def test_no_attribution_response(hass: HomeAssistant) -> None:
+async def test_no_attribution_response(hass: SmartHub) -> None:
     """Test that no_attribution is handled."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -273,7 +273,7 @@ async def test_no_attribution_response(hass: HomeAssistant) -> None:
     )
 
 
-async def test_entity_ids(hass: HomeAssistant, valid_response: MagicMock) -> None:
+async def test_entity_ids(hass: SmartHub, valid_response: MagicMock) -> None:
     """Test that origin/destination supplied by entities works."""
     hass.set_state(CoreState.not_running)
     zone_config = {
@@ -331,7 +331,7 @@ async def test_entity_ids(hass: HomeAssistant, valid_response: MagicMock) -> Non
 
 @pytest.mark.usefixtures("valid_response")
 async def test_destination_entity_not_found(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that a not existing destination_entity_id is caught."""
     entry = MockConfigEntry(
@@ -359,7 +359,7 @@ async def test_destination_entity_not_found(
 
 @pytest.mark.usefixtures("valid_response")
 async def test_origin_entity_not_found(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that a not existing origin_entity_id is caught."""
     entry = MockConfigEntry(
@@ -387,7 +387,7 @@ async def test_origin_entity_not_found(
 
 @pytest.mark.usefixtures("valid_response")
 async def test_invalid_destination_entity_state(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that an invalid state of the destination_entity_id is caught."""
     hass.states.async_set(
@@ -421,7 +421,7 @@ async def test_invalid_destination_entity_state(
 
 @pytest.mark.usefixtures("valid_response")
 async def test_invalid_origin_entity_state(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that an invalid state of the origin_entity_id is caught."""
     hass.states.async_set(
@@ -454,7 +454,7 @@ async def test_invalid_origin_entity_state(
 
 
 async def test_route_not_found(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that route not found error is correctly handled."""
     with patch(
@@ -487,7 +487,7 @@ async def test_route_not_found(
 
 
 @pytest.mark.usefixtures("valid_response")
-async def test_restore_state(hass: HomeAssistant) -> None:
+async def test_restore_state(hass: SmartHub) -> None:
     """Test sensor restore state."""
     # Home assistant is not running yet
     hass.set_state(CoreState.not_running)
@@ -635,7 +635,7 @@ async def test_restore_state(hass: HomeAssistant) -> None:
     ],
 )
 async def test_transit_errors(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, exception, expected_message
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, exception, expected_message
 ) -> None:
     """Test that transit errors are correctly handled."""
     hass.set_state(CoreState.not_running)
@@ -667,7 +667,7 @@ async def test_transit_errors(
 
 
 async def test_routing_rate_limit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -716,7 +716,7 @@ async def test_routing_rate_limit(
 
 
 async def test_transit_rate_limit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -774,7 +774,7 @@ async def test_transit_rate_limit(
 
 @pytest.mark.usefixtures("bike_response")
 async def test_multiple_sections(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that multiple sections are handled correctly."""
     hass.set_state(CoreState.not_running)

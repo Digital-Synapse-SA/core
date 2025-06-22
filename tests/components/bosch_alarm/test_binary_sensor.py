@@ -7,9 +7,9 @@ from bosch_alarm_mode2.const import ALARM_PANEL_FAULTS
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import call_observable, setup_integration
 
@@ -20,14 +20,14 @@ from tests.common import MockConfigEntry, snapshot_platform
 async def platforms() -> AsyncGenerator[None]:
     """Return the platforms to be loaded for this test."""
     with patch(
-        "homeassistant.components.bosch_alarm.PLATFORMS", [Platform.BINARY_SENSOR]
+        "smarthub.components.bosch_alarm.PLATFORMS", [Platform.BINARY_SENSOR]
     ):
         yield
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_panel: AsyncMock,
@@ -41,7 +41,7 @@ async def test_binary_sensor(
 
 @pytest.mark.parametrize("model", ["b5512"])
 async def test_panel_faults(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_panel: AsyncMock,
     area: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -57,7 +57,7 @@ async def test_panel_faults(
 
 @pytest.mark.parametrize("model", ["b5512"])
 async def test_area_ready_to_arm(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_panel: AsyncMock,
     area: AsyncMock,
     mock_config_entry: MockConfigEntry,

@@ -21,9 +21,9 @@ from music_assistant_models.player import Player
 from music_assistant_models.player_queue import PlayerQueue
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -38,7 +38,7 @@ def load_and_parse_fixture(fixture: str) -> dict[str, Any]:
 
 
 async def setup_integration_from_fixtures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     music_assistant_client: MagicMock,
 ) -> MockConfigEntry:
     """Set up MusicAssistant integration with fixture data."""
@@ -157,7 +157,7 @@ def create_library_podcasts_from_fixture() -> list[Podcast]:
 
 
 async def trigger_subscription_callback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     event: EventType = EventType.PLAYER_UPDATED,
     object_id: str | None = None,
@@ -200,7 +200,7 @@ async def trigger_subscription_callback(
 
 
 def snapshot_music_assistant_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     platform: Platform,

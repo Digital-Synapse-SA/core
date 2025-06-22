@@ -7,10 +7,10 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from sfrbox_api.models import DslInfo, FtthInfo, SystemInfo, WanInfo
 
-from homeassistant.components.sfr_box.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.sfr_box.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntry
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -19,13 +19,13 @@ from tests.common import MockConfigEntry, load_fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.sfr_box.async_setup_entry", return_value=True
+        "smarthub.components.sfr_box.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 @pytest.fixture(name="config_entry")
-def get_config_entry(hass: HomeAssistant) -> ConfigEntry:
+def get_config_entry(hass: SmartHub) -> ConfigEntry:
     """Create and register mock config entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -40,7 +40,7 @@ def get_config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 
 @pytest.fixture(name="config_entry_with_auth")
-def get_config_entry_with_auth(hass: HomeAssistant) -> ConfigEntry:
+def get_config_entry_with_auth(hass: SmartHub) -> ConfigEntry:
     """Create and register mock config entry."""
     config_entry_with_auth = MockConfigEntry(
         domain=DOMAIN,
@@ -63,7 +63,7 @@ def dsl_get_info() -> Generator[DslInfo]:
     """Fixture for SFRBox.dsl_get_info."""
     dsl_info = DslInfo(**json.loads(load_fixture("dsl_getInfo.json", DOMAIN)))
     with patch(
-        "homeassistant.components.sfr_box.coordinator.SFRBox.dsl_get_info",
+        "smarthub.components.sfr_box.coordinator.SFRBox.dsl_get_info",
         return_value=dsl_info,
     ):
         yield dsl_info
@@ -74,7 +74,7 @@ def ftth_get_info() -> Generator[FtthInfo]:
     """Fixture for SFRBox.ftth_get_info."""
     info = FtthInfo(**json.loads(load_fixture("ftth_getInfo.json", DOMAIN)))
     with patch(
-        "homeassistant.components.sfr_box.coordinator.SFRBox.ftth_get_info",
+        "smarthub.components.sfr_box.coordinator.SFRBox.ftth_get_info",
         return_value=info,
     ):
         yield info
@@ -85,7 +85,7 @@ def system_get_info() -> Generator[SystemInfo]:
     """Fixture for SFRBox.system_get_info."""
     info = SystemInfo(**json.loads(load_fixture("system_getInfo.json", DOMAIN)))
     with patch(
-        "homeassistant.components.sfr_box.coordinator.SFRBox.system_get_info",
+        "smarthub.components.sfr_box.coordinator.SFRBox.system_get_info",
         return_value=info,
     ):
         yield info
@@ -96,7 +96,7 @@ def wan_get_info() -> Generator[WanInfo]:
     """Fixture for SFRBox.wan_get_info."""
     info = WanInfo(**json.loads(load_fixture("wan_getInfo.json", DOMAIN)))
     with patch(
-        "homeassistant.components.sfr_box.coordinator.SFRBox.wan_get_info",
+        "smarthub.components.sfr_box.coordinator.SFRBox.wan_get_info",
         return_value=info,
     ):
         yield info

@@ -4,14 +4,14 @@ from unittest.mock import patch
 
 from hko import HKOError
 
-from homeassistant.components.hko.const import DEFAULT_LOCATION, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_LOCATION
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.hko.const import DEFAULT_LOCATION, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_LOCATION
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_config_flow_default(hass: HomeAssistant) -> None:
+async def test_config_flow_default(hass: SmartHub) -> None:
     """Test user config flow with default fields."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -32,9 +32,9 @@ async def test_config_flow_default(hass: HomeAssistant) -> None:
     assert result2["data"][CONF_LOCATION] == DEFAULT_LOCATION
 
 
-async def test_config_flow_cannot_connect(hass: HomeAssistant) -> None:
+async def test_config_flow_cannot_connect(hass: SmartHub) -> None:
     """Test user config flow without connection to the API."""
-    with patch("homeassistant.components.hko.config_flow.HKO.weather") as client_mock:
+    with patch("smarthub.components.hko.config_flow.HKO.weather") as client_mock:
         client_mock.side_effect = HKOError()
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -58,9 +58,9 @@ async def test_config_flow_cannot_connect(hass: HomeAssistant) -> None:
         assert result["data"][CONF_LOCATION] == DEFAULT_LOCATION
 
 
-async def test_config_flow_timeout(hass: HomeAssistant) -> None:
+async def test_config_flow_timeout(hass: SmartHub) -> None:
     """Test user config flow with timedout connection to the API."""
-    with patch("homeassistant.components.hko.config_flow.HKO.weather") as client_mock:
+    with patch("smarthub.components.hko.config_flow.HKO.weather") as client_mock:
         client_mock.side_effect = TimeoutError()
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -84,7 +84,7 @@ async def test_config_flow_timeout(hass: HomeAssistant) -> None:
         assert result["data"][CONF_LOCATION] == DEFAULT_LOCATION
 
 
-async def test_config_flow_already_configured(hass: HomeAssistant) -> None:
+async def test_config_flow_already_configured(hass: SmartHub) -> None:
     """Test user config flow with two equal entries."""
     r1 = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}

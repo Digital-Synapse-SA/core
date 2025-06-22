@@ -53,7 +53,7 @@ voices = get_all_voices(polly_client)
 supported_voices = set({v.id for v in voices})
 supported_engines = set().union(*[v.supported_engines for v in voices])
 
-Path("homeassistant/generated/amazon_polly.py").write_text(
+Path("smarthub/generated/amazon_polly.py").write_text(
     format_python_namespace(
         {
             "SUPPORTED_VOICES": supported_voices,

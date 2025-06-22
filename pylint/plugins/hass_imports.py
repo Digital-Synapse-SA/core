@@ -25,7 +25,7 @@ _OBSOLETE_IMPORT: dict[str, list[ObsoleteImportMatch]] = {
             constant=re.compile(r"^cached_property$"),
         ),
     ],
-    "homeassistant.components.light": [
+    "smarthub.components.light": [
         ObsoleteImportMatch(
             reason="replaced by ColorMode enum",
             constant=re.compile(r"^COLOR_MODE_(\w*)$"),
@@ -39,7 +39,7 @@ _OBSOLETE_IMPORT: dict[str, list[ObsoleteImportMatch]] = {
             constant=re.compile("^SUPPORT_(EFFECT|FLASH|TRANSITION)$"),
         ),
     ],
-    "homeassistant.components.media_player": [
+    "smarthub.components.media_player": [
         ObsoleteImportMatch(
             reason="replaced by MediaPlayerDeviceClass enum",
             constant=re.compile(r"^DEVICE_CLASS_(\w*)$"),
@@ -61,7 +61,7 @@ _OBSOLETE_IMPORT: dict[str, list[ObsoleteImportMatch]] = {
             constant=re.compile(r"^REPEAT_MODE(\w*)$"),
         ),
     ],
-    "homeassistant.components.media_player.const": [
+    "smarthub.components.media_player.const": [
         ObsoleteImportMatch(
             reason="replaced by MediaPlayerEntityFeature enum",
             constant=re.compile(r"^SUPPORT_(\w*)$"),
@@ -79,39 +79,39 @@ _OBSOLETE_IMPORT: dict[str, list[ObsoleteImportMatch]] = {
             constant=re.compile(r"^REPEAT_MODE(\w*)$"),
         ),
     ],
-    "homeassistant.components.vacuum": [
+    "smarthub.components.vacuum": [
         ObsoleteImportMatch(
             reason="replaced by VacuumEntityFeature enum",
             constant=re.compile(r"^SUPPORT_(\w*)$"),
         ),
     ],
-    "homeassistant.config_entries": [
+    "smarthub.config_entries": [
         ObsoleteImportMatch(
             reason="replaced by ConfigEntryDisabler enum",
             constant=re.compile(r"^DISABLED_(\w*)$"),
         ),
     ],
-    "homeassistant.const": [
+    "smarthub.const": [
         ObsoleteImportMatch(
             reason="replaced by local constants",
             constant=re.compile(r"^CONF_UNIT_SYSTEM_(\w+)$"),
         ),
     ],
-    "homeassistant.helpers.config_validation": [
+    "smarthub.helpers.config_validation": [
         ObsoleteImportMatch(
-            reason="should be imported from homeassistant/components/<platform>",
+            reason="should be imported from smarthub/components/<platform>",
             constant=re.compile(r"^PLATFORM_SCHEMA(_BASE)?$"),
         ),
     ],
-    "homeassistant.helpers.json": [
+    "smarthub.helpers.json": [
         ObsoleteImportMatch(
-            reason="moved to homeassistant.util.json",
+            reason="moved to smarthub.util.json",
             constant=re.compile(
                 r"^JSON_DECODE_EXCEPTIONS|JSON_ENCODE_EXCEPTIONS|json_loads$"
             ),
         ),
     ],
-    "homeassistant.util.unit_system": [
+    "smarthub.util.unit_system": [
         ObsoleteImportMatch(
             reason="replaced by US_CUSTOMARY_SYSTEM",
             constant=re.compile(r"^IMPERIAL_SYSTEM$"),
@@ -137,8 +137,8 @@ _IGNORE_ROOT_IMPORT = (
     "ffmpeg_motion",
     "google_assistant",
     "hardware",
-    "homeassistant",
-    "homeassistant_hardware",
+    "smarthub",
+    "smarthub_hardware",
     "http",
     "manual",
     "plex",
@@ -161,25 +161,25 @@ class NamespaceAlias:
 
 
 _FORCE_NAMESPACE_IMPORT: dict[str, NamespaceAlias] = {
-    "homeassistant.helpers.area_registry": NamespaceAlias("ar", {"async_get"}),
-    "homeassistant.helpers.category_registry": NamespaceAlias("cr", {"async_get"}),
-    "homeassistant.helpers.device_registry": NamespaceAlias(
+    "smarthub.helpers.area_registry": NamespaceAlias("ar", {"async_get"}),
+    "smarthub.helpers.category_registry": NamespaceAlias("cr", {"async_get"}),
+    "smarthub.helpers.device_registry": NamespaceAlias(
         "dr",
         {
             "async_get",
             "async_entries_for_config_entry",
         },
     ),
-    "homeassistant.helpers.entity_registry": NamespaceAlias(
+    "smarthub.helpers.entity_registry": NamespaceAlias(
         "er",
         {
             "async_get",
             "async_entries_for_config_entry",
         },
     ),
-    "homeassistant.helpers.floor_registry": NamespaceAlias("fr", {"async_get"}),
-    "homeassistant.helpers.issue_registry": NamespaceAlias("ir", {"async_get"}),
-    "homeassistant.helpers.label_registry": NamespaceAlias("lr", {"async_get"}),
+    "smarthub.helpers.floor_registry": NamespaceAlias("fr", {"async_get"}),
+    "smarthub.helpers.issue_registry": NamespaceAlias("ir", {"async_get"}),
+    "smarthub.helpers.label_registry": NamespaceAlias("lr", {"async_get"}),
 }
 
 
@@ -251,7 +251,7 @@ class HassImportsFormatChecker(BaseChecker):
                 self.add_message("hass-relative-import", node=node)
                 continue
             if (
-                module.startswith("homeassistant.components.")
+                module.startswith("smarthub.components.")
                 and len(module.split(".")) > 3
             ):
                 if (
@@ -268,7 +268,7 @@ class HassImportsFormatChecker(BaseChecker):
     ) -> None:
         """Check for improper 'from ._ import _' invocations."""
         if not current_package.startswith(
-            ("homeassistant.components.", "tests.components.")
+            ("smarthub.components.", "tests.components.")
         ):
             return
 
@@ -299,7 +299,7 @@ class HassImportsFormatChecker(BaseChecker):
     ) -> bool:
         """Check for hass-import-constant-alias."""
         if current_component == imported_component:
-            # Check for `from homeassistant.components.self import DOMAIN as XYZ`
+            # Check for `from smarthub.components.self import DOMAIN as XYZ`
             for name, alias in node.names:
                 if name == "DOMAIN" and (alias is not None and alias != "DOMAIN"):
                     self.add_message(
@@ -310,7 +310,7 @@ class HassImportsFormatChecker(BaseChecker):
                     return False
             return True
 
-        # Check for `from homeassistant.components.other import DOMAIN`
+        # Check for `from smarthub.components.other import DOMAIN`
         for name, alias in node.names:
             if name == "DOMAIN" and (alias is None or alias == "DOMAIN"):
                 self.add_message(
@@ -340,12 +340,12 @@ class HassImportsFormatChecker(BaseChecker):
         ):
             return True
 
-        # Check for `from homeassistant.components.other.module import something`
+        # Check for `from smarthub.components.other.module import something`
         if len(imported_parts) > 3:
             self.add_message("hass-component-root-import", node=node)
             return False
 
-        # Check for `from homeassistant.components.other import const`
+        # Check for `from smarthub.components.other import const`
         for name, _ in node.names:
             if name == "const":
                 self.add_message("hass-component-root-import", node=node)
@@ -366,7 +366,7 @@ class HassImportsFormatChecker(BaseChecker):
             self.add_message("hass-relative-import", node=node)
             return False
 
-        for root in ("homeassistant", "tests"):
+        for root in ("smarthub", "tests"):
             if current_package.startswith(f"{root}.components."):
                 if node.modname == f"{root}.components":
                     for name in node.names:
@@ -389,7 +389,7 @@ class HassImportsFormatChecker(BaseChecker):
 
         # Cache current component
         current_component: str | None = None
-        for root in ("homeassistant", "tests"):
+        for root in ("smarthub", "tests"):
             if self.current_package.startswith(f"{root}.components."):
                 current_component = self.current_package.split(".")[2]
 
@@ -399,7 +399,7 @@ class HassImportsFormatChecker(BaseChecker):
         ):
             return
 
-        if node.modname.startswith("homeassistant.components."):
+        if node.modname.startswith("smarthub.components."):
             imported_parts = node.modname.split(".")
             imported_component = imported_parts[2]
 

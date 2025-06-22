@@ -10,10 +10,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pysmhi.smhi_forecast import SMHIForecast, SMHIPointForecast
 import pytest
 
-from homeassistant.components.smhi import PLATFORMS
-from homeassistant.components.smhi.const import DOMAIN
-from homeassistant.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.components.smhi import PLATFORMS
+from smarthub.components.smhi.const import DOMAIN
+from smarthub.const import CONF_LATITUDE, CONF_LOCATION, CONF_LONGITUDE, Platform
+from smarthub.core import SmartHub
 
 from . import TEST_CONFIG
 
@@ -25,7 +25,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.smhi.async_setup_entry", return_value=True
+        "smarthub.components.smhi.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -38,7 +38,7 @@ async def patch_platform_constant() -> list[Platform]:
 
 @pytest.fixture
 async def load_int(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: SMHIPointForecast,
     load_platforms: list[Platform],
 ) -> MockConfigEntry:
@@ -56,7 +56,7 @@ async def load_int(
 
     config_entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.smhi.PLATFORMS", load_platforms):
+    with patch("smarthub.components.smhi.PLATFORMS", load_platforms):
         await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()
 
@@ -65,18 +65,18 @@ async def load_int(
 
 @pytest.fixture(name="mock_client")
 async def get_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_data: tuple[list[SMHIForecast], list[SMHIForecast], list[SMHIForecast]],
 ) -> AsyncGenerator[MagicMock]:
     """Mock SMHIPointForecast client."""
 
     with (
         patch(
-            "homeassistant.components.smhi.coordinator.SMHIPointForecast",
+            "smarthub.components.smhi.coordinator.SMHIPointForecast",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.smhi.config_flow.SMHIPointForecast",
+            "smarthub.components.smhi.config_flow.SMHIPointForecast",
             return_value=mock_client.return_value,
         ),
     ):
@@ -89,7 +89,7 @@ async def get_client(
 
 @pytest.fixture(name="get_data")
 async def get_data_from_library(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     load_json: dict[str, Any],
 ) -> AsyncGenerator[tuple[list[SMHIForecast], list[SMHIForecast], list[SMHIForecast]]]:

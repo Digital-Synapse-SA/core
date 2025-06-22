@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, create_autospec, patch
 import aiosomecomfort
 import pytest
 
-from homeassistant.components.honeywell.const import (
+from smarthub.components.honeywell.const import (
     CONF_COOL_AWAY_TEMPERATURE,
     CONF_HEAT_AWAY_TEMPERATURE,
     DOMAIN,
 )
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
 
 from tests.common import MockConfigEntry
 
@@ -250,7 +250,7 @@ def client(location):
     client_mock.discover = AsyncMock()
 
     with patch(
-        "homeassistant.components.honeywell.aiosomecomfort.AIOSomeComfort"
+        "smarthub.components.honeywell.aiosomecomfort.AIOSomeComfort"
     ) as sc_class_mock:
         sc_class_mock.return_value = client_mock
         yield client_mock

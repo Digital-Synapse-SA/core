@@ -7,18 +7,18 @@ from freezegun import freeze_time
 import pytest
 import voluptuous as vol
 
-from homeassistant import config as hass_config, core as ha
-from homeassistant.components.history_stats.const import (
+from smarthub import config as hass_config, core as ha
+from smarthub.components.history_stats.const import (
     CONF_END,
     CONF_START,
     DEFAULT_NAME,
     DOMAIN,
 )
-from homeassistant.components.history_stats.sensor import (
+from smarthub.components.history_stats.sensor import (
     PLATFORM_SCHEMA as SENSOR_SCHEMA,
 )
-from homeassistant.components.recorder import Recorder
-from homeassistant.const import (
+from smarthub.components.recorder import Recorder
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -27,18 +27,18 @@ from homeassistant.const import (
     SERVICE_RELOAD,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed, get_fixture_path
 from tests.components.recorder.common import async_wait_recording_done
 from tests.typing import RecorderInstanceGenerator
 
 
-async def test_setup(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_setup(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test the history statistics sensor setup."""
 
     config = {
@@ -61,7 +61,7 @@ async def test_setup(recorder_mock: Recorder, hass: HomeAssistant) -> None:
 
 
 async def test_setup_config_entry(
-    recorder_mock: Recorder, hass: HomeAssistant, loaded_entry: MockConfigEntry
+    recorder_mock: Recorder, hass: SmartHub, loaded_entry: MockConfigEntry
 ) -> None:
     """Test the history statistics sensor setup from a config entry."""
 
@@ -70,7 +70,7 @@ async def test_setup_config_entry(
 
 
 async def test_setup_multiple_states(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test the history statistics sensor setup for multiple states."""
 
@@ -131,7 +131,7 @@ def test_setup_invalid_config(config) -> None:
 
 
 async def test_invalid_date_for_start(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Verify with an invalid date for start."""
     await async_setup_component(
@@ -158,7 +158,7 @@ async def test_invalid_date_for_start(
 
 
 async def test_invalid_date_for_end(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Verify with an invalid date for end."""
     await async_setup_component(
@@ -185,7 +185,7 @@ async def test_invalid_date_for_end(
 
 
 async def test_invalid_entity_in_template(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Verify with an invalid entity in the template."""
     await async_setup_component(
@@ -212,7 +212,7 @@ async def test_invalid_entity_in_template(
 
 
 async def test_invalid_entity_returning_none_in_template(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Verify with an invalid entity returning none in the template."""
     await async_setup_component(
@@ -238,7 +238,7 @@ async def test_invalid_entity_returning_none_in_template(
     assert hass.states.get("sensor.test") is None
 
 
-async def test_reload(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_reload(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Verify we can reload history_stats sensors."""
     hass.state = ha.CoreState.not_running
     hass.states.async_set("binary_sensor.test_id", "on")
@@ -281,7 +281,7 @@ async def test_reload(recorder_mock: Recorder, hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.second_test")
 
 
-async def test_measure_multiple(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_measure_multiple(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test the history statistics sensor measure for multiple ."""
     start_time = dt_util.utcnow() - timedelta(minutes=60)
     t0 = start_time + timedelta(minutes=20)
@@ -305,7 +305,7 @@ async def test_measure_multiple(recorder_mock: Recorder, hass: HomeAssistant) ->
         }
 
     with patch(
-        "homeassistant.components.recorder.history.state_changes_during_period",
+        "smarthub.components.recorder.history.state_changes_during_period",
         _fake_states,
     ):
         await async_setup_component(
@@ -363,7 +363,7 @@ async def test_measure_multiple(recorder_mock: Recorder, hass: HomeAssistant) ->
     assert hass.states.get("sensor.sensor4").state == "50.0"
 
 
-async def test_measure(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_measure(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test the history statistics sensor measure."""
     start_time = dt_util.utcnow() - timedelta(minutes=60)
     t0 = start_time + timedelta(minutes=20)
@@ -384,7 +384,7 @@ async def test_measure(recorder_mock: Recorder, hass: HomeAssistant) -> None:
         }
 
     with patch(
-        "homeassistant.components.recorder.history.state_changes_during_period",
+        "smarthub.components.recorder.history.state_changes_during_period",
         _fake_states,
     ):
         await async_setup_component(
@@ -444,7 +444,7 @@ async def test_measure(recorder_mock: Recorder, hass: HomeAssistant) -> None:
 
 
 async def test_async_on_entire_period(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test the history statistics sensor measuring as on the entire period."""
     start_time = dt_util.utcnow() - timedelta(minutes=60)
@@ -471,7 +471,7 @@ async def test_async_on_entire_period(
         }
 
     with patch(
-        "homeassistant.components.recorder.history.state_changes_during_period",
+        "smarthub.components.recorder.history.state_changes_during_period",
         _fake_states,
     ):
         await async_setup_component(
@@ -530,7 +530,7 @@ async def test_async_on_entire_period(
 
 
 async def test_async_off_entire_period(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test the history statistics sensor measuring as off the entire period."""
     start_time = dt_util.utcnow() - timedelta(minutes=60)
@@ -599,7 +599,7 @@ async def test_async_off_entire_period(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.recorder.history.state_changes_during_period",
+        "smarthub.components.recorder.history.state_changes_during_period",
         _fake_states,
     ):
         for i in range(1, 5):
@@ -614,7 +614,7 @@ async def test_async_off_entire_period(
 
 async def test_async_start_from_history_and_switch_to_watching_state_changes_single(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we startup from history and switch to watching state changes."""
     await hass.config.async_set_time_zone("UTC")
@@ -639,7 +639,7 @@ async def test_async_start_from_history_and_switch_to_watching_state_changes_sin
 
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
         freeze_time(start_time),
@@ -715,7 +715,7 @@ async def test_async_start_from_history_and_switch_to_watching_state_changes_sin
 
 async def test_async_start_from_history_and_switch_to_watching_state_changes_single_expanding_window(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we startup from history and switch to watching state changes with an expanding end time."""
     await hass.config.async_set_time_zone("UTC")
@@ -740,7 +740,7 @@ async def test_async_start_from_history_and_switch_to_watching_state_changes_sin
 
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
         freeze_time(start_time),
@@ -832,7 +832,7 @@ async def test_async_start_from_history_and_switch_to_watching_state_changes_sin
 
 async def test_async_start_from_history_and_switch_to_watching_state_changes_multiple(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we startup from history and switch to watching state changes."""
     await hass.config.async_set_time_zone("UTC")
@@ -857,7 +857,7 @@ async def test_async_start_from_history_and_switch_to_watching_state_changes_mul
 
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
         freeze_time(start_time),
@@ -971,7 +971,7 @@ async def test_async_start_from_history_and_switch_to_watching_state_changes_mul
 
 async def test_start_from_history_then_watch_state_changes_sliding(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we startup from history and switch to watching state changes.
 
@@ -996,7 +996,7 @@ async def test_start_from_history_then_watch_state_changes_sliding(
 
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
         freeze_time(start_time),
@@ -1134,11 +1134,11 @@ async def test_start_from_history_then_watch_state_changes_sliding(
 
 
 async def test_does_not_work_into_the_future(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test history cannot tell the future.
 
-    Verifies we do not regress https://github.com/home-assistant/core/pull/20589
+    Verifies we do not regress https://github.com/smart-hub/core/pull/20589
     """
     await hass.config.async_set_time_zone("UTC")
     utcnow = dt_util.utcnow()
@@ -1161,7 +1161,7 @@ async def test_does_not_work_into_the_future(
         }
 
     with patch(
-        "homeassistant.components.recorder.history.state_changes_during_period",
+        "smarthub.components.recorder.history.state_changes_during_period",
         _fake_states,
     ):
         with freeze_time(start_time):
@@ -1251,7 +1251,7 @@ async def test_does_not_work_into_the_future(
     past_the_window = start_time + timedelta(hours=25)
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             return_value=[],
         ),
         freeze_time(past_the_window),
@@ -1276,7 +1276,7 @@ async def test_does_not_work_into_the_future(
     past_the_window_with_data = start_time + timedelta(hours=26)
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_off_states,
         ),
         freeze_time(past_the_window_with_data),
@@ -1289,7 +1289,7 @@ async def test_does_not_work_into_the_future(
     at_the_next_window_with_data = start_time + timedelta(days=1, hours=23)
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_off_states,
         ),
         freeze_time(at_the_next_window_with_data),
@@ -1301,7 +1301,7 @@ async def test_does_not_work_into_the_future(
 
 
 async def test_reload_before_start_event(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Verify we can reload history_stats sensors before the start event."""
     hass.state = ha.CoreState.not_running
@@ -1344,7 +1344,7 @@ async def test_reload_before_start_event(
 
 
 async def test_measure_sliding_window(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test the history statistics sensor with a moving end and a moving start."""
     start_time = dt_util.utcnow() - timedelta(minutes=60)
@@ -1367,7 +1367,7 @@ async def test_measure_sliding_window(
 
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
         freeze_time(start_time),
@@ -1430,7 +1430,7 @@ async def test_measure_sliding_window(
     past_next_update = start_time + timedelta(minutes=30)
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
         freeze_time(past_next_update),
@@ -1445,7 +1445,7 @@ async def test_measure_sliding_window(
 
 
 async def test_measure_from_end_going_backwards(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test the history statistics sensor with a moving end and a duration to find the start."""
     start_time = dt_util.utcnow() - timedelta(minutes=60)
@@ -1468,7 +1468,7 @@ async def test_measure_from_end_going_backwards(
 
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
         freeze_time(start_time),
@@ -1541,7 +1541,7 @@ async def test_measure_from_end_going_backwards(
     assert 16.6 <= float(hass.states.get("sensor.sensor4").state) <= 16.7
 
 
-async def test_measure_cet(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_measure_cet(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test the history statistics sensor measure with a non-UTC timezone."""
     await hass.config.async_set_time_zone("Europe/Berlin")
     start_time = dt_util.utcnow() - timedelta(minutes=60)
@@ -1564,7 +1564,7 @@ async def test_measure_cet(recorder_mock: Recorder, hass: HomeAssistant) -> None
 
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
         freeze_time(start_time + timedelta(minutes=60)),
@@ -1627,7 +1627,7 @@ async def test_measure_cet(recorder_mock: Recorder, hass: HomeAssistant) -> None
 
 async def test_state_change_during_window_rollover(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test when the tracked sensor and the start/end window change during the same update."""
     await hass.config.async_set_time_zone("UTC")
@@ -1649,7 +1649,7 @@ async def test_state_change_during_window_rollover(
     # The test begins at 23:00, and queries from the database that the sensor has been on since 12:00.
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
         freeze_time(start_time),
@@ -1742,7 +1742,7 @@ async def test_state_change_during_window_rollover(
 
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states_t6,
         ),
         freeze_time(t6),
@@ -1765,7 +1765,7 @@ async def test_state_change_during_window_rollover(
 async def test_end_time_with_microseconds_zeroed(
     time_zone: str,
     async_setup_recorder_instance: RecorderInstanceGenerator,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test the history statistics sensor that has the end time microseconds zeroed out."""
     await hass.config.async_set_time_zone(time_zone)
@@ -1803,7 +1803,7 @@ async def test_end_time_with_microseconds_zeroed(
     with (
         freeze_time(time_200),
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
     ):
@@ -1927,7 +1927,7 @@ async def test_end_time_with_microseconds_zeroed(
         )
 
 
-async def test_device_classes(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_device_classes(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test the device classes."""
     await async_setup_component(
         hass,
@@ -1972,7 +1972,7 @@ async def test_device_classes(recorder_mock: Recorder, hass: HomeAssistant) -> N
 
 async def test_history_stats_handles_floored_timestamps(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we account for microseconds when doing the data calculation."""
     await hass.config.async_set_time_zone("UTC")
@@ -1981,7 +1981,7 @@ async def test_history_stats_handles_floored_timestamps(
     last_times = None
 
     def _fake_states(
-        hass: HomeAssistant, start: datetime, end: datetime | None, *args, **kwargs
+        hass: SmartHub, start: datetime, end: datetime | None, *args, **kwargs
     ) -> dict[str, list[ha.State]]:
         """Fake state changes."""
         nonlocal last_times
@@ -1999,7 +1999,7 @@ async def test_history_stats_handles_floored_timestamps(
 
     with (
         patch(
-            "homeassistant.components.recorder.history.state_changes_during_period",
+            "smarthub.components.recorder.history.state_changes_during_period",
             _fake_states,
         ),
         freeze_time(start_time),
@@ -2029,7 +2029,7 @@ async def test_history_stats_handles_floored_timestamps(
 
 
 async def test_unique_id(
-    recorder_mock: Recorder, hass: HomeAssistant, entity_registry: er.EntityRegistry
+    recorder_mock: Recorder, hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test unique_id property."""
 
@@ -2056,7 +2056,7 @@ async def test_unique_id(
 
 async def test_device_id(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:

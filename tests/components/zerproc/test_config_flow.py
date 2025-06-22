@@ -4,13 +4,13 @@ from unittest.mock import patch
 
 import pyzerproc
 
-from homeassistant import config_entries
-from homeassistant.components.zerproc.config_flow import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.zerproc.config_flow import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_flow_success(hass: HomeAssistant) -> None:
+async def test_flow_success(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -21,11 +21,11 @@ async def test_flow_success(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.zerproc.config_flow.pyzerproc.discover",
+            "smarthub.components.zerproc.config_flow.pyzerproc.discover",
             return_value=["Light1", "Light2"],
         ),
         patch(
-            "homeassistant.components.zerproc.async_setup_entry",
+            "smarthub.components.zerproc.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -42,7 +42,7 @@ async def test_flow_success(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_flow_no_devices_found(hass: HomeAssistant) -> None:
+async def test_flow_no_devices_found(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -53,11 +53,11 @@ async def test_flow_no_devices_found(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.zerproc.config_flow.pyzerproc.discover",
+            "smarthub.components.zerproc.config_flow.pyzerproc.discover",
             return_value=[],
         ),
         patch(
-            "homeassistant.components.zerproc.async_setup_entry",
+            "smarthub.components.zerproc.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -72,7 +72,7 @@ async def test_flow_no_devices_found(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_flow_exceptions_caught(hass: HomeAssistant) -> None:
+async def test_flow_exceptions_caught(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -83,11 +83,11 @@ async def test_flow_exceptions_caught(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.zerproc.config_flow.pyzerproc.discover",
+            "smarthub.components.zerproc.config_flow.pyzerproc.discover",
             side_effect=pyzerproc.ZerprocException("TEST"),
         ),
         patch(
-            "homeassistant.components.zerproc.async_setup_entry",
+            "smarthub.components.zerproc.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):

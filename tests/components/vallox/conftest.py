@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from vallox_websocket_api import MetricData
 
-from homeassistant.components.vallox.const import DOMAIN
-from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.const import CONF_HOST, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub.components.vallox.const import DOMAIN
+from smarthub.config_entries import ConfigFlowResult
+from smarthub.const import CONF_HOST, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
@@ -32,13 +32,13 @@ def default_name() -> str:
 
 @pytest.fixture
 def mock_entry(
-    hass: HomeAssistant, default_host: str, default_name: str
+    hass: SmartHub, default_host: str, default_name: str
 ) -> MockConfigEntry:
     """Create mocked Vallox config entry fixture."""
     return create_mock_entry(hass, default_host, default_name)
 
 
-def create_mock_entry(hass: HomeAssistant, host: str, name: str) -> MockConfigEntry:
+def create_mock_entry(hass: SmartHub, host: str, name: str) -> MockConfigEntry:
     """Create mocked Vallox config entry."""
     vallox_mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -54,13 +54,13 @@ def create_mock_entry(hass: HomeAssistant, host: str, name: str) -> MockConfigEn
 
 @pytest.fixture
 async def setup_vallox_entry(
-    hass: HomeAssistant, default_host: str, default_name: str
+    hass: SmartHub, default_host: str, default_name: str
 ) -> None:
     """Define a fixture to set up Vallox."""
     await do_setup_vallox_entry(hass, default_host, default_name)
 
 
-async def do_setup_vallox_entry(hass: HomeAssistant, host: str, name: str) -> None:
+async def do_setup_vallox_entry(hass: SmartHub, host: str, name: str) -> None:
     """Set up the Vallox component."""
     assert await async_setup_component(
         hass,
@@ -75,7 +75,7 @@ async def do_setup_vallox_entry(hass: HomeAssistant, host: str, name: str) -> No
 
 @pytest.fixture
 async def init_reconfigure_flow(
-    hass: HomeAssistant, mock_entry, setup_vallox_entry
+    hass: SmartHub, mock_entry, setup_vallox_entry
 ) -> tuple[MockConfigEntry, ConfigFlowResult]:
     """Initialize a config entry and a reconfigure flow for it."""
     result = await mock_entry.start_reconfigure_flow(hass)
@@ -131,7 +131,7 @@ def default_metrics():
 def fetch_metric_data_mock(default_metrics):
     """Stub the Vallox fetch_metric_data method."""
     with patch(
-        "homeassistant.components.vallox.Vallox.fetch_metric_data",
+        "smarthub.components.vallox.Vallox.fetch_metric_data",
         new_callable=AsyncMock,
     ) as mock:
         mock.return_value = MetricData(default_metrics)
@@ -155,19 +155,19 @@ def setup_fetch_metric_data_mock(fetch_metric_data_mock, default_metrics):
 
 def patch_set_profile():
     """Patch the Vallox metrics set values."""
-    return patch("homeassistant.components.vallox.Vallox.set_profile")
+    return patch("smarthub.components.vallox.Vallox.set_profile")
 
 
 def patch_set_fan_speed():
     """Patch the Vallox metrics set values."""
-    return patch("homeassistant.components.vallox.Vallox.set_fan_speed")
+    return patch("smarthub.components.vallox.Vallox.set_fan_speed")
 
 
 def patch_set_values():
     """Patch the Vallox metrics set values."""
-    return patch("homeassistant.components.vallox.Vallox.set_values")
+    return patch("smarthub.components.vallox.Vallox.set_values")
 
 
 def patch_set_filter_change_date():
     """Patch the Vallox metrics set filter change date."""
-    return patch("homeassistant.components.vallox.Vallox.set_filter_change_date")
+    return patch("smarthub.components.vallox.Vallox.set_filter_change_date")

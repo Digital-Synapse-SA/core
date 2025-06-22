@@ -8,22 +8,22 @@ from bleak import BleakError
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
-from homeassistant.components.bluetooth_le_tracker import device_tracker
-from homeassistant.components.bluetooth_le_tracker.device_tracker import (
+from smarthub.components.bluetooth import BluetoothServiceInfoBleak
+from smarthub.components.bluetooth_le_tracker import device_tracker
+from smarthub.components.bluetooth_le_tracker.device_tracker import (
     CONF_TRACK_BATTERY,
     CONF_TRACK_BATTERY_INTERVAL,
 )
-from homeassistant.components.device_tracker import (
+from smarthub.components.device_tracker import (
     CONF_CONSIDER_HOME,
     CONF_SCAN_INTERVAL,
     CONF_TRACK_NEW,
     DOMAIN as DEVICE_TRACKER_DOMAIN,
 )
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util, slugify
+from smarthub.const import CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util, slugify
 
 from tests.common import async_fire_time_changed
 from tests.components.bluetooth import generate_advertisement_data, generate_ble_device
@@ -68,7 +68,7 @@ class MockBleakClientBattery5(MockBleakClient):
 
 
 @pytest.mark.usefixtures("mock_bluetooth", "mock_device_tracker_conf")
-async def test_do_not_see_device_if_time_not_updated(hass: HomeAssistant) -> None:
+async def test_do_not_see_device_if_time_not_updated(hass: SmartHub) -> None:
     """Test device going not_home after consider_home threshold from first scan if the subsequent scans have not incremented last seen time."""
 
     address = "DE:AD:BE:EF:13:37"
@@ -76,7 +76,7 @@ async def test_do_not_see_device_if_time_not_updated(hass: HomeAssistant) -> Non
     entity_id = f"{DEVICE_TRACKER_DOMAIN}.{slugify(name)}"
 
     with patch(
-        "homeassistant.components.bluetooth.async_discovered_service_info"
+        "smarthub.components.bluetooth.async_discovered_service_info"
     ) as mock_async_discovered_service_info:
         device = BluetoothServiceInfoBleak(
             name=name,
@@ -133,7 +133,7 @@ async def test_do_not_see_device_if_time_not_updated(hass: HomeAssistant) -> Non
 
 
 @pytest.mark.usefixtures("mock_bluetooth", "mock_device_tracker_conf")
-async def test_see_device_if_time_updated(hass: HomeAssistant) -> None:
+async def test_see_device_if_time_updated(hass: SmartHub) -> None:
     """Test device remaining home after consider_home threshold from first scan if the subsequent scans have incremented last seen time."""
 
     address = "DE:AD:BE:EF:13:37"
@@ -141,7 +141,7 @@ async def test_see_device_if_time_updated(hass: HomeAssistant) -> None:
     entity_id = f"{DEVICE_TRACKER_DOMAIN}.{slugify(name)}"
 
     with patch(
-        "homeassistant.components.bluetooth.async_discovered_service_info"
+        "smarthub.components.bluetooth.async_discovered_service_info"
     ) as mock_async_discovered_service_info:
         device = BluetoothServiceInfoBleak(
             name=name,
@@ -214,7 +214,7 @@ async def test_see_device_if_time_updated(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bluetooth", "mock_device_tracker_conf")
-async def test_preserve_new_tracked_device_name(hass: HomeAssistant) -> None:
+async def test_preserve_new_tracked_device_name(hass: SmartHub) -> None:
     """Test preserving tracked device name across new seens."""  # codespell:ignore seens
 
     address = "DE:AD:BE:EF:13:37"
@@ -222,7 +222,7 @@ async def test_preserve_new_tracked_device_name(hass: HomeAssistant) -> None:
     entity_id = f"{DEVICE_TRACKER_DOMAIN}.{slugify(name)}"
 
     with patch(
-        "homeassistant.components.bluetooth.async_discovered_service_info"
+        "smarthub.components.bluetooth.async_discovered_service_info"
     ) as mock_async_discovered_service_info:
         device = BluetoothServiceInfoBleak(
             name=name,
@@ -283,7 +283,7 @@ async def test_preserve_new_tracked_device_name(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bluetooth", "mock_device_tracker_conf")
-async def test_tracking_battery_times_out(hass: HomeAssistant) -> None:
+async def test_tracking_battery_times_out(hass: SmartHub) -> None:
     """Test tracking the battery times out."""
 
     address = "DE:AD:BE:EF:13:37"
@@ -291,7 +291,7 @@ async def test_tracking_battery_times_out(hass: HomeAssistant) -> None:
     entity_id = f"{DEVICE_TRACKER_DOMAIN}.{slugify(name)}"
 
     with patch(
-        "homeassistant.components.bluetooth.async_discovered_service_info"
+        "smarthub.components.bluetooth.async_discovered_service_info"
     ) as mock_async_discovered_service_info:
         device = BluetoothServiceInfoBleak(
             name=name,
@@ -332,7 +332,7 @@ async def test_tracking_battery_times_out(hass: HomeAssistant) -> None:
             await hass.async_block_till_done()
 
         with patch(
-            "homeassistant.components.bluetooth_le_tracker.device_tracker.BleakClient",
+            "smarthub.components.bluetooth_le_tracker.device_tracker.BleakClient",
             MockBleakClientTimesOut,
         ):
             # Wait for the battery scan
@@ -351,7 +351,7 @@ async def test_tracking_battery_times_out(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bluetooth", "mock_device_tracker_conf")
-async def test_tracking_battery_fails(hass: HomeAssistant) -> None:
+async def test_tracking_battery_fails(hass: SmartHub) -> None:
     """Test tracking the battery fails."""
 
     address = "DE:AD:BE:EF:13:37"
@@ -359,7 +359,7 @@ async def test_tracking_battery_fails(hass: HomeAssistant) -> None:
     entity_id = f"{DEVICE_TRACKER_DOMAIN}.{slugify(name)}"
 
     with patch(
-        "homeassistant.components.bluetooth.async_discovered_service_info"
+        "smarthub.components.bluetooth.async_discovered_service_info"
     ) as mock_async_discovered_service_info:
         device = BluetoothServiceInfoBleak(
             name=name,
@@ -399,7 +399,7 @@ async def test_tracking_battery_fails(hass: HomeAssistant) -> None:
             await hass.async_block_till_done()
 
         with patch(
-            "homeassistant.components.bluetooth_le_tracker.device_tracker.BleakClient",
+            "smarthub.components.bluetooth_le_tracker.device_tracker.BleakClient",
             MockBleakClientFailing,
         ):
             # Wait for the battery scan
@@ -418,7 +418,7 @@ async def test_tracking_battery_fails(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_bluetooth", "mock_device_tracker_conf")
-async def test_tracking_battery_successful(hass: HomeAssistant) -> None:
+async def test_tracking_battery_successful(hass: SmartHub) -> None:
     """Test tracking the battery gets a value."""
 
     address = "DE:AD:BE:EF:13:37"
@@ -426,7 +426,7 @@ async def test_tracking_battery_successful(hass: HomeAssistant) -> None:
     entity_id = f"{DEVICE_TRACKER_DOMAIN}.{slugify(name)}"
 
     with patch(
-        "homeassistant.components.bluetooth.async_discovered_service_info"
+        "smarthub.components.bluetooth.async_discovered_service_info"
     ) as mock_async_discovered_service_info:
         device = BluetoothServiceInfoBleak(
             name=name,
@@ -467,7 +467,7 @@ async def test_tracking_battery_successful(hass: HomeAssistant) -> None:
             await hass.async_block_till_done()
 
         with patch(
-            "homeassistant.components.bluetooth_le_tracker.device_tracker.BleakClient",
+            "smarthub.components.bluetooth_le_tracker.device_tracker.BleakClient",
             MockBleakClientBattery5,
         ):
             # Wait for the battery scan

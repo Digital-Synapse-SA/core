@@ -1,0 +1,10 @@
+{
+  "domain": "conversation",
+  "name": "Conversation",
+  "codeowners": ["@smart-hub/core", "@synesthesiam"],
+  "dependencies": ["http", "intent"],
+  "documentation": "https://www.smart-hub.io/integrations/conversation",
+  "integration_type": "system",
+  "quality_scale": "internal",
+  "requirements": ["hassil==2.2.3", "smart-hub-intents==2025.6.10"]
+}

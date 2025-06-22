@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.text import (
+from smarthub.components.text import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_MODE,
@@ -15,10 +15,10 @@ from homeassistant.components.text import (
     TextMode,
     _async_set_value,
 )
-from homeassistant.const import MAX_LENGTH_STATE_STATE
-from homeassistant.core import HomeAssistant, ServiceCall, State
-from homeassistant.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
-from homeassistant.setup import async_setup_component
+from smarthub.const import MAX_LENGTH_STATE_STATE
+from smarthub.core import SmartHub, ServiceCall, State
+from smarthub.helpers.restore_state import STORAGE_KEY as RESTORE_STATE_KEY
+from smarthub.setup import async_setup_component
 
 from .common import MockRestoreText, MockTextEntity
 
@@ -29,7 +29,7 @@ from tests.common import (
 )
 
 
-async def test_text_default(hass: HomeAssistant) -> None:
+async def test_text_default(hass: SmartHub) -> None:
     """Test text entity with defaults."""
     text = MockTextEntity()
     text.hass = hass
@@ -44,7 +44,7 @@ async def test_text_default(hass: HomeAssistant) -> None:
     assert text.state == "test"
 
 
-async def test_text_new_min_max_pattern(hass: HomeAssistant) -> None:
+async def test_text_new_min_max_pattern(hass: SmartHub) -> None:
     """Test text entity with new min, max, and pattern."""
     text = MockTextEntity(native_min=-1, native_max=500, pattern=r"[a-z]")
     text.hass = hass
@@ -57,7 +57,7 @@ async def test_text_new_min_max_pattern(hass: HomeAssistant) -> None:
     }
 
 
-async def test_text_set_value(hass: HomeAssistant) -> None:
+async def test_text_set_value(hass: SmartHub) -> None:
     """Test text entity with set_value service."""
     text = MockTextEntity(native_min=1, native_max=5, pattern=r"[a-z]")
     text.hass = hass
@@ -85,7 +85,7 @@ async def test_text_set_value(hass: HomeAssistant) -> None:
     assert text.state == "test2"
 
 
-async def test_text_value_outside_bounds(hass: HomeAssistant) -> None:
+async def test_text_value_outside_bounds(hass: SmartHub) -> None:
     """Test text entity with value that is outside min and max."""
     with pytest.raises(ValueError):
         _ = MockTextEntity(
@@ -107,7 +107,7 @@ RESTORE_DATA = {
 
 
 async def test_restore_number_save_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
 ) -> None:
     """Test RestoreNumber."""
@@ -144,7 +144,7 @@ async def test_restore_number_save_state(
     ],
 )
 async def test_restore_number_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     native_max,
     native_min,

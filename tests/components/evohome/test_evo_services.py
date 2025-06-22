@@ -9,20 +9,20 @@ from evohomeasync2 import EvohomeClient
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.evohome.const import (
+from smarthub.components.evohome.const import (
     ATTR_DURATION,
     ATTR_PERIOD,
     ATTR_SETPOINT,
     DOMAIN,
     EvoService,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_MODE
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, ATTR_MODE
+from smarthub.core import SmartHub
 
 
 @pytest.mark.parametrize("install", ["default"])
 async def test_service_refresh_system(
-    hass: HomeAssistant,
+    hass: SmartHub,
     evohome: EvohomeClient,
 ) -> None:
     """Test Evohome's refresh_system service (for all temperature control systems)."""
@@ -41,7 +41,7 @@ async def test_service_refresh_system(
 
 @pytest.mark.parametrize("install", ["default"])
 async def test_service_reset_system(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ctl_id: str,
 ) -> None:
     """Test Evohome's reset_system service (for a temperature control system)."""
@@ -60,7 +60,7 @@ async def test_service_reset_system(
 
 @pytest.mark.parametrize("install", ["default"])
 async def test_ctl_set_system_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ctl_id: str,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -116,7 +116,7 @@ async def test_ctl_set_system_mode(
 
 @pytest.mark.parametrize("install", ["default"])
 async def test_zone_clear_zone_override(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zone_id: str,
 ) -> None:
     """Test Evohome's clear_zone_override service (for a heating zone)."""
@@ -137,7 +137,7 @@ async def test_zone_clear_zone_override(
 
 @pytest.mark.parametrize("install", ["default"])
 async def test_zone_set_zone_override(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zone_id: str,
     freezer: FrozenDateTimeFactory,
 ) -> None:

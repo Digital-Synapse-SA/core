@@ -6,24 +6,24 @@ from unittest.mock import MagicMock, patch
 from fullykiosk import FullyKioskError
 import pytest
 
-from homeassistant.components.fully_kiosk.const import DOMAIN
-from homeassistant.components.fully_kiosk.entity import valid_global_mac_address
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.fully_kiosk.const import DOMAIN
+from smarthub.components.fully_kiosk.entity import valid_global_mac_address
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_HOST,
     CONF_MAC,
     CONF_PASSWORD,
     CONF_SSL,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, async_load_fixture
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_fully_kiosk: MagicMock,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_load_unload_config_entry(
     [FullyKioskError("error", "status"), TimeoutError],
 )
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_fully_kiosk: MagicMock,
     side_effect: Exception,
@@ -64,12 +64,12 @@ async def test_config_entry_not_ready(
 
 
 async def _load_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     device_info_fixture: str,
 ) -> None:
     with patch(
-        "homeassistant.components.fully_kiosk.coordinator.FullyKiosk",
+        "smarthub.components.fully_kiosk.coordinator.FullyKiosk",
         autospec=True,
     ) as client_mock:
         client = client_mock.return_value
@@ -86,7 +86,7 @@ async def _load_config(
 
 
 async def test_multiple_kiosk_with_empty_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:

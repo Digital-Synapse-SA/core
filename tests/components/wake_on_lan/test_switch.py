@@ -4,23 +4,23 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.components import switch
-from homeassistant.const import (
+from smarthub.components import switch
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from tests.common import async_mock_service
 
 
 async def test_valid_hostname(
-    hass: HomeAssistant, mock_send_magic_packet: AsyncMock
+    hass: SmartHub, mock_send_magic_packet: AsyncMock
 ) -> None:
     """Test with valid hostname."""
     assert await async_setup_component(
@@ -39,7 +39,7 @@ async def test_valid_hostname(
     state = hass.states.get("switch.wake_on_lan")
     assert state.state == STATE_OFF
 
-    with patch("homeassistant.components.wake_on_lan.switch.sp.call", return_value=0):
+    with patch("smarthub.components.wake_on_lan.switch.sp.call", return_value=0):
         await hass.services.async_call(
             switch.DOMAIN,
             SERVICE_TURN_ON,
@@ -62,7 +62,7 @@ async def test_valid_hostname(
 
 
 async def test_broadcast_config_ip_and_port(
-    hass: HomeAssistant, mock_send_magic_packet: AsyncMock
+    hass: SmartHub, mock_send_magic_packet: AsyncMock
 ) -> None:
     """Test with broadcast address and broadcast port config."""
     mac = "00:01:02:03:04:05"
@@ -100,7 +100,7 @@ async def test_broadcast_config_ip_and_port(
 
 
 async def test_broadcast_config_ip(
-    hass: HomeAssistant, mock_send_magic_packet: AsyncMock
+    hass: SmartHub, mock_send_magic_packet: AsyncMock
 ) -> None:
     """Test with only broadcast address."""
 
@@ -135,7 +135,7 @@ async def test_broadcast_config_ip(
 
 
 async def test_broadcast_config_port(
-    hass: HomeAssistant, mock_send_magic_packet: AsyncMock
+    hass: SmartHub, mock_send_magic_packet: AsyncMock
 ) -> None:
     """Test with only broadcast port config."""
 
@@ -164,7 +164,7 @@ async def test_broadcast_config_port(
 
 
 async def test_off_script(
-    hass: HomeAssistant, mock_send_magic_packet: AsyncMock
+    hass: SmartHub, mock_send_magic_packet: AsyncMock
 ) -> None:
     """Test with turn off script."""
 
@@ -186,7 +186,7 @@ async def test_off_script(
     state = hass.states.get("switch.wake_on_lan")
     assert state.state == STATE_OFF
 
-    with patch("homeassistant.components.wake_on_lan.switch.sp.call", return_value=0):
+    with patch("smarthub.components.wake_on_lan.switch.sp.call", return_value=0):
         await hass.services.async_call(
             switch.DOMAIN,
             SERVICE_TURN_ON,
@@ -198,7 +198,7 @@ async def test_off_script(
         assert state.state == STATE_ON
         assert len(calls) == 0
 
-    with patch("homeassistant.components.wake_on_lan.switch.sp.call", return_value=1):
+    with patch("smarthub.components.wake_on_lan.switch.sp.call", return_value=1):
         await hass.services.async_call(
             switch.DOMAIN,
             SERVICE_TURN_OFF,
@@ -212,7 +212,7 @@ async def test_off_script(
 
 
 async def test_no_hostname_state(
-    hass: HomeAssistant, mock_send_magic_packet: AsyncMock
+    hass: SmartHub, mock_send_magic_packet: AsyncMock
 ) -> None:
     """Test that the state updates if we do not pass in a hostname."""
 

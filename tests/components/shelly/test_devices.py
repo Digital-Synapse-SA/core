@@ -5,10 +5,10 @@ from unittest.mock import Mock
 from aioshelly.const import MODEL_2PM_G3, MODEL_PRO_EM3
 import pytest
 
-from homeassistant.components.shelly.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.components.shelly.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import init_integration
 
@@ -16,7 +16,7 @@ from tests.common import async_load_json_object_fixture
 
 
 async def test_shelly_2pm_gen3_no_relay_names(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
@@ -99,7 +99,7 @@ async def test_shelly_2pm_gen3_no_relay_names(
 
 
 async def test_shelly_2pm_gen3_relay_names(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
@@ -184,7 +184,7 @@ async def test_shelly_2pm_gen3_relay_names(
 
 
 async def test_shelly_2pm_gen3_cover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
@@ -241,7 +241,7 @@ async def test_shelly_2pm_gen3_cover(
 
 
 async def test_shelly_2pm_gen3_cover_with_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
@@ -299,7 +299,7 @@ async def test_shelly_2pm_gen3_cover_with_name(
 
 
 async def test_shelly_pro_3em(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
@@ -370,7 +370,7 @@ async def test_shelly_pro_3em(
 
 
 async def test_shelly_pro_3em_with_emeter_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     device_registry: DeviceRegistry,
@@ -443,7 +443,7 @@ async def test_shelly_pro_3em_with_emeter_name(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_block_channel_with_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,

@@ -2,11 +2,11 @@
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.ialarm.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.ialarm.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -15,7 +15,7 @@ TEST_DATA = {CONF_HOST: "1.1.1.1", CONF_PORT: 18034}
 TEST_MAC = "00:00:54:12:34:56"
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -26,15 +26,15 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.ialarm.config_flow.IAlarm.get_status",
+            "smarthub.components.ialarm.config_flow.IAlarm.get_status",
             return_value=1,
         ),
         patch(
-            "homeassistant.components.ialarm.config_flow.IAlarm.get_mac",
+            "smarthub.components.ialarm.config_flow.IAlarm.get_mac",
             return_value=TEST_MAC,
         ),
         patch(
-            "homeassistant.components.ialarm.async_setup_entry",
+            "smarthub.components.ialarm.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -49,14 +49,14 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.ialarm.config_flow.IAlarm.get_mac",
+        "smarthub.components.ialarm.config_flow.IAlarm.get_mac",
         side_effect=ConnectionError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -67,14 +67,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_exception(hass: HomeAssistant) -> None:
+async def test_form_exception(hass: SmartHub) -> None:
     """Test we handle unknown exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.ialarm.config_flow.IAlarm.get_mac",
+        "smarthub.components.ialarm.config_flow.IAlarm.get_mac",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -85,7 +85,7 @@ async def test_form_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_already_exists(hass: HomeAssistant) -> None:
+async def test_form_already_exists(hass: SmartHub) -> None:
     """Test that a flow with an existing host aborts."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -100,7 +100,7 @@ async def test_form_already_exists(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.ialarm.config_flow.IAlarm.get_mac",
+        "smarthub.components.ialarm.config_flow.IAlarm.get_mac",
         return_value=TEST_MAC,
     ):
         result2 = await hass.config_entries.flow.async_configure(

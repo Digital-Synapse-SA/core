@@ -9,8 +9,8 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components import automation
-from homeassistant.components.media_player import (
+from smarthub.components import automation
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_INPUT_SOURCE_LIST,
     ATTR_MEDIA_CONTENT_ID,
@@ -25,7 +25,7 @@ from homeassistant.components.media_player import (
     MediaPlayerState,
     MediaType,
 )
-from homeassistant.components.webostv.const import (
+from smarthub.components.webostv.const import (
     ATTR_BUTTON,
     ATTR_PAYLOAD,
     ATTR_SOUND_OUTPUT,
@@ -36,12 +36,12 @@ from homeassistant.components.webostv.const import (
     SERVICE_SELECT_SOUND_OUTPUT,
     WebOsTvCommandError,
 )
-from homeassistant.components.webostv.media_player import (
+from smarthub.components.webostv.media_player import (
     SUPPORT_WEBOSTV,
     SUPPORT_WEBOSTV_VOLUME,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     ATTR_COMMAND,
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
@@ -60,10 +60,10 @@ from homeassistant.const import (
     SERVICE_VOLUME_UP,
     STATE_OFF,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import setup_webostv
 from .const import CHANNEL_2, ENTITY_ID, TV_NAME
@@ -84,7 +84,7 @@ from tests.typing import ClientSessionGenerator
     ],
 )
 async def test_services_with_parameters(
-    hass: HomeAssistant, client, service, attr_data, client_call
+    hass: SmartHub, client, service, attr_data, client_call
 ) -> None:
     """Test services that has parameters in calls."""
     await setup_webostv(hass)
@@ -106,7 +106,7 @@ async def test_services_with_parameters(
         (SERVICE_MEDIA_STOP, "stop"),
     ],
 )
-async def test_services(hass: HomeAssistant, client, service, client_call) -> None:
+async def test_services(hass: SmartHub, client, service, client_call) -> None:
     """Test simple services without parameters."""
     await setup_webostv(hass)
 
@@ -116,7 +116,7 @@ async def test_services(hass: HomeAssistant, client, service, client_call) -> No
     getattr(client, client_call).assert_called_once()
 
 
-async def test_media_play_pause(hass: HomeAssistant, client) -> None:
+async def test_media_play_pause(hass: SmartHub, client) -> None:
     """Test media play pause service."""
     await setup_webostv(hass)
 
@@ -143,7 +143,7 @@ async def test_media_play_pause(hass: HomeAssistant, client) -> None:
     ],
 )
 async def test_media_next_previous_track(
-    hass: HomeAssistant, client, service, client_call
+    hass: SmartHub, client, service, client_call
 ) -> None:
     """Test media next/previous track services."""
     await setup_webostv(hass)
@@ -165,7 +165,7 @@ async def test_media_next_previous_track(
 
 
 async def test_select_source_with_empty_source_list(
-    hass: HomeAssistant, client
+    hass: SmartHub, client
 ) -> None:
     """Ensure we don't call client methods when we don't have sources."""
     await setup_webostv(hass)
@@ -176,7 +176,7 @@ async def test_select_source_with_empty_source_list(
         ATTR_INPUT_SOURCE: "nonexistent",
     }
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=f"Source nonexistent not found in the sources list for {TV_NAME}",
     ):
         await hass.services.async_call(MP_DOMAIN, SERVICE_SELECT_SOURCE, data, True)
@@ -185,7 +185,7 @@ async def test_select_source_with_empty_source_list(
     client.set_input.assert_not_called()
 
 
-async def test_select_app_source(hass: HomeAssistant, client) -> None:
+async def test_select_app_source(hass: SmartHub, client) -> None:
     """Test select app source."""
     await setup_webostv(hass)
     await client.mock_state_update()
@@ -200,7 +200,7 @@ async def test_select_app_source(hass: HomeAssistant, client) -> None:
     client.set_input.assert_not_called()
 
 
-async def test_select_input_source(hass: HomeAssistant, client) -> None:
+async def test_select_input_source(hass: SmartHub, client) -> None:
     """Test select input source."""
     await setup_webostv(hass)
     await client.mock_state_update()
@@ -215,7 +215,7 @@ async def test_select_input_source(hass: HomeAssistant, client) -> None:
     client.set_input.assert_called_once_with("in1")
 
 
-async def test_button(hass: HomeAssistant, client) -> None:
+async def test_button(hass: SmartHub, client) -> None:
     """Test generic button functionality."""
     await setup_webostv(hass)
 
@@ -230,7 +230,7 @@ async def test_button(hass: HomeAssistant, client) -> None:
 
 
 async def test_command(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -255,7 +255,7 @@ async def test_command(
     assert response == snapshot
 
 
-async def test_command_with_optional_arg(hass: HomeAssistant, client) -> None:
+async def test_command_with_optional_arg(hass: SmartHub, client) -> None:
     """Test generic command functionality."""
     await setup_webostv(hass)
 
@@ -272,7 +272,7 @@ async def test_command_with_optional_arg(hass: HomeAssistant, client) -> None:
 
 
 async def test_select_sound_output(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -300,7 +300,7 @@ async def test_select_sound_output(
 
 
 async def test_device_info_startup_off(
-    hass: HomeAssistant, client, device_registry: dr.DeviceRegistry
+    hass: SmartHub, client, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test device info when device is off at startup."""
     client.tv_info.system = {}
@@ -321,7 +321,7 @@ async def test_device_info_startup_off(
 
 
 async def test_entity_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,
@@ -362,7 +362,7 @@ async def test_entity_attributes(
     assert state.attributes.get(ATTR_SOUND_OUTPUT) is None
 
 
-async def test_service_entity_id_none(hass: HomeAssistant, client) -> None:
+async def test_service_entity_id_none(hass: SmartHub, client) -> None:
     """Test service call with none as entity id."""
     await setup_webostv(hass)
 
@@ -383,7 +383,7 @@ async def test_service_entity_id_none(hass: HomeAssistant, client) -> None:
         ("20", "ch2id"),  # Perfect Match by channel number
     ],
 )
-async def test_play_media(hass: HomeAssistant, client, media_id, ch_id) -> None:
+async def test_play_media(hass: SmartHub, client, media_id, ch_id) -> None:
     """Test play media service."""
     await setup_webostv(hass)
     await client.mock_state_update()
@@ -398,7 +398,7 @@ async def test_play_media(hass: HomeAssistant, client, media_id, ch_id) -> None:
     client.set_channel.assert_called_once_with(ch_id)
 
 
-async def test_update_sources_live_tv_find(hass: HomeAssistant, client) -> None:
+async def test_update_sources_live_tv_find(hass: SmartHub, client) -> None:
     """Test finding live TV app id in update sources."""
     await setup_webostv(hass)
     await client.mock_state_update()
@@ -478,7 +478,7 @@ async def test_update_sources_live_tv_find(hass: HomeAssistant, client) -> None:
 
 
 async def test_client_disconnected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     caplog: pytest.LogCaptureFixture,
     freezer: FrozenDateTimeFactory,
@@ -496,7 +496,7 @@ async def test_client_disconnected(
 
 
 async def test_client_key_update_on_connect(
-    hass: HomeAssistant, client, freezer: FrozenDateTimeFactory
+    hass: SmartHub, client, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test client key update upon connect."""
     config_entry = await setup_webostv(hass)
@@ -534,7 +534,7 @@ async def test_client_key_update_on_connect(
     ],
 )
 async def test_control_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     is_on: bool,
     exception: Exception,
@@ -547,13 +547,13 @@ async def test_control_error_handling(
     await client.mock_state_update()
 
     data = {ATTR_ENTITY_ID: ENTITY_ID}
-    with pytest.raises(HomeAssistantError, match=error_message):
+    with pytest.raises(SmartHubError, match=error_message):
         await hass.services.async_call(MP_DOMAIN, SERVICE_MEDIA_PLAY, data, True)
 
     assert client.play.call_count == int(is_on)
 
 
-async def test_turn_off_when_device_is_off(hass: HomeAssistant, client) -> None:
+async def test_turn_off_when_device_is_off(hass: SmartHub, client) -> None:
     """Test no error when turning off device that is already off."""
     await setup_webostv(hass)
     client.is_on = False
@@ -564,7 +564,7 @@ async def test_turn_off_when_device_is_off(hass: HomeAssistant, client) -> None:
     assert client.power_off.call_count == 1
 
 
-async def test_supported_features(hass: HomeAssistant, client) -> None:
+async def test_supported_features(hass: SmartHub, client) -> None:
     """Test test supported features."""
     client.tv_state.sound_output = "lineout"
     await setup_webostv(hass)
@@ -621,7 +621,7 @@ async def test_supported_features(hass: HomeAssistant, client) -> None:
     assert attrs[ATTR_SUPPORTED_FEATURES] == supported
 
 
-async def test_cached_supported_features(hass: HomeAssistant, client) -> None:
+async def test_cached_supported_features(hass: SmartHub, client) -> None:
     """Test test supported features."""
     client.tv_state.is_on = False
     client.tv_state.sound_output = None
@@ -726,7 +726,7 @@ async def test_cached_supported_features(hass: HomeAssistant, client) -> None:
     )
 
 
-async def test_supported_features_no_cache(hass: HomeAssistant, client) -> None:
+async def test_supported_features_no_cache(hass: SmartHub, client) -> None:
     """Test supported features if device is off and no cache."""
     client.tv_state.is_on = False
     client.tv_state.sound_output = None
@@ -740,7 +740,7 @@ async def test_supported_features_no_cache(hass: HomeAssistant, client) -> None:
     assert attrs[ATTR_SUPPORTED_FEATURES] == supported
 
 
-async def test_supported_features_ignore_cache(hass: HomeAssistant, client) -> None:
+async def test_supported_features_ignore_cache(hass: SmartHub, client) -> None:
     """Test ignore cached supported features if device is on at startup."""
     mock_restore_cache(
         hass,
@@ -765,7 +765,7 @@ async def test_supported_features_ignore_cache(hass: HomeAssistant, client) -> N
 
 
 async def test_get_image_http(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
@@ -789,7 +789,7 @@ async def test_get_image_http(
 
 
 async def test_get_image_http_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
@@ -816,7 +816,7 @@ async def test_get_image_http_error(
 
 
 async def test_get_image_https(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
@@ -840,7 +840,7 @@ async def test_get_image_https(
 
 
 async def test_reauth_reconnect(
-    hass: HomeAssistant, client, freezer: FrozenDateTimeFactory
+    hass: SmartHub, client, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test reauth flow triggered by reconnect."""
     entry = await setup_webostv(hass)
@@ -867,7 +867,7 @@ async def test_reauth_reconnect(
     assert flow["context"].get("entry_id") == entry.entry_id
 
 
-async def test_update_media_state(hass: HomeAssistant, client) -> None:
+async def test_update_media_state(hass: SmartHub, client) -> None:
     """Test updating media state."""
     await setup_webostv(hass)
 

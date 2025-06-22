@@ -2,7 +2,7 @@
 
 from aioimmich.albums.models import ImmichAlbum
 
-from homeassistant.const import (
+from smarthub.const import (
     CONF_API_KEY,
     CONF_HOST,
     CONF_PORT,

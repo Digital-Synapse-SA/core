@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.tessie.const import DOMAIN
-from homeassistant.const import CONF_ACCESS_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.tessie.const import DOMAIN
+from smarthub.const import CONF_ACCESS_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .common import (
     ERROR_AUTH,
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 def mock_config_flow_get_state_of_all_vehicles():
     """Mock get_state_of_all_vehicles in config flow."""
     with patch(
-        "homeassistant.components.tessie.config_flow.get_state_of_all_vehicles",
+        "smarthub.components.tessie.config_flow.get_state_of_all_vehicles",
         return_value=TEST_STATE_OF_ALL_VEHICLES,
     ) as mock_config_flow_get_state_of_all_vehicles:
         yield mock_config_flow_get_state_of_all_vehicles
@@ -35,14 +35,14 @@ def mock_config_flow_get_state_of_all_vehicles():
 def mock_async_setup_entry():
     """Mock async_setup_entry."""
     with patch(
-        "homeassistant.components.tessie.async_setup_entry",
+        "smarthub.components.tessie.async_setup_entry",
         return_value=True,
     ) as mock_async_setup_entry:
         yield mock_async_setup_entry
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_flow_get_state_of_all_vehicles,
     mock_async_setup_entry,
 ) -> None:
@@ -68,7 +68,7 @@ async def test_form(
 
 
 async def test_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_flow_get_state_of_all_vehicles,
     mock_async_setup_entry,
 ) -> None:
@@ -103,7 +103,7 @@ async def test_abort(
     ],
 )
 async def test_form_errors(
-    hass: HomeAssistant, side_effect, error, mock_config_flow_get_state_of_all_vehicles
+    hass: SmartHub, side_effect, error, mock_config_flow_get_state_of_all_vehicles
 ) -> None:
     """Test errors are handled."""
 
@@ -131,7 +131,7 @@ async def test_form_errors(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_flow_get_state_of_all_vehicles,
     mock_async_setup_entry,
 ) -> None:
@@ -171,7 +171,7 @@ async def test_reauth(
     ],
 )
 async def test_reauth_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_flow_get_state_of_all_vehicles,
     mock_async_setup_entry,
     side_effect,

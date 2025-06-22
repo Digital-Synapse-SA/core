@@ -5,18 +5,18 @@ from datetime import timedelta
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.alarm_control_panel import (
+from smarthub.components import automation
+from smarthub.components.alarm_control_panel import (
     DOMAIN,
     AlarmControlPanelEntityFeature,
     AlarmControlPanelState,
 )
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.const import EntityCategory
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -67,7 +67,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
     ],
 )
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     set_state: bool,
@@ -124,7 +124,7 @@ async def test_get_triggers(
     ],
 )
 async def test_get_triggers_hidden_auxiliary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hidden_by: er.RegistryEntryHider | None,
@@ -163,7 +163,7 @@ async def test_get_triggers_hidden_auxiliary(
 
 
 async def test_get_trigger_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -197,7 +197,7 @@ async def test_get_trigger_capabilities(
 
 
 async def test_get_trigger_capabilities_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -232,7 +232,7 @@ async def test_get_trigger_capabilities_legacy(
 
 
 async def test_if_fires_on_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -447,7 +447,7 @@ async def test_if_fires_on_state_change(
 
 
 async def test_if_fires_on_state_change_with_for(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -512,7 +512,7 @@ async def test_if_fires_on_state_change_with_for(
 
 
 async def test_if_fires_on_state_change_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],

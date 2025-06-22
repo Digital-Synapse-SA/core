@@ -1,0 +1,11 @@
+{
+  "domain": "nextdns",
+  "name": "NextDNS",
+  "codeowners": ["@bieniu"],
+  "config_flow": true,
+  "documentation": "https://www.smart-hub.io/integrations/nextdns",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "loggers": ["nextdns"],
+  "requirements": ["nextdns==4.0.0"]
+}

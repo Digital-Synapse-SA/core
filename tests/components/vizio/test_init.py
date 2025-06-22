@@ -4,10 +4,10 @@ from datetime import timedelta
 
 import pytest
 
-from homeassistant.components.vizio.const import DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.vizio.const import DOMAIN
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .const import MOCK_SPEAKER_CONFIG, MOCK_USER_VALID_TV_CONFIG, UNIQUE_ID
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_update")
-async def test_tv_load_and_unload(hass: HomeAssistant) -> None:
+async def test_tv_load_and_unload(hass: SmartHub) -> None:
     """Test loading and unloading TV entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data=MOCK_USER_VALID_TV_CONFIG, unique_id=UNIQUE_ID
@@ -36,7 +36,7 @@ async def test_tv_load_and_unload(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("vizio_connect", "vizio_update")
-async def test_speaker_load_and_unload(hass: HomeAssistant) -> None:
+async def test_speaker_load_and_unload(hass: SmartHub) -> None:
     """Test loading and unloading speaker entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data=MOCK_SPEAKER_CONFIG, unique_id=UNIQUE_ID
@@ -60,7 +60,7 @@ async def test_speaker_load_and_unload(hass: HomeAssistant) -> None:
     "vizio_connect", "vizio_bypass_update", "vizio_data_coordinator_update_failure"
 )
 async def test_coordinator_update_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test coordinator update failure after 10 days."""

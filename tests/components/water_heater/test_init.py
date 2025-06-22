@@ -9,8 +9,8 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import water_heater
-from homeassistant.components.water_heater import (
+from smarthub.components import water_heater
+from smarthub.components.water_heater import (
     DOMAIN,
     SERVICE_SET_OPERATION_MODE,
     SET_TEMPERATURE_SCHEMA,
@@ -18,12 +18,12 @@ from homeassistant.components.water_heater import (
     WaterHeaterEntityDescription,
     WaterHeaterEntityFeature,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform, UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import Platform, UnitOfTemperature
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import config_validation as cv
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from tests.common import (
     MockConfigEntry,
@@ -37,7 +37,7 @@ from tests.common import (
 
 
 async def test_set_temp_schema_no_req(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the set temperature schema with missing required data."""
     domain = "climate"
@@ -54,7 +54,7 @@ async def test_set_temp_schema_no_req(
 
 
 async def test_set_temp_schema(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the set temperature schema with ok required data."""
     domain = "water_heater"
@@ -85,7 +85,7 @@ class MockWaterHeaterEntity(WaterHeaterEntity):
     set_operation_mode: MagicMock = MagicMock()
 
 
-async def test_sync_turn_on(hass: HomeAssistant) -> None:
+async def test_sync_turn_on(hass: SmartHub) -> None:
     """Test if async turn_on calls sync turn_on."""
     water_heater = MockWaterHeaterEntity()
     water_heater.hass = hass
@@ -103,7 +103,7 @@ async def test_sync_turn_on(hass: HomeAssistant) -> None:
     assert water_heater.async_turn_on.call_count == 1
 
 
-async def test_sync_turn_off(hass: HomeAssistant) -> None:
+async def test_sync_turn_off(hass: SmartHub) -> None:
     """Test if async turn_off calls sync turn_off."""
     water_heater = MockWaterHeaterEntity()
     water_heater.hass = hass
@@ -122,7 +122,7 @@ async def test_sync_turn_off(hass: HomeAssistant) -> None:
 
 
 async def test_operation_mode_validation(
-    hass: HomeAssistant, config_flow_fixture: None
+    hass: SmartHub, config_flow_fixture: None
 ) -> None:
     """Test operation mode validation."""
     water_heater_entity = MockWaterHeaterEntity()
@@ -136,7 +136,7 @@ async def test_operation_mode_validation(
     water_heater_entity._attr_operation_list = None
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -145,7 +145,7 @@ async def test_operation_mode_validation(
         return True
 
     async def async_setup_entry_water_heater_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:

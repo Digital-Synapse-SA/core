@@ -5,10 +5,10 @@ from unittest.mock import patch
 from pysnmp.proto.rfc1902 import Integer32
 import pytest
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 config = {
     SWITCH_DOMAIN: {
@@ -22,12 +22,12 @@ config = {
 }
 
 
-async def test_snmp_integer_switch_off(hass: HomeAssistant) -> None:
+async def test_snmp_integer_switch_off(hass: SmartHub) -> None:
     """Test snmp switch returning int 0 for off."""
 
     mock_data = Integer32(0)
     with patch(
-        "homeassistant.components.snmp.switch.getCmd",
+        "smarthub.components.snmp.switch.getCmd",
         return_value=(None, None, None, [[mock_data]]),
     ):
         assert await async_setup_component(hass, SWITCH_DOMAIN, config)
@@ -36,12 +36,12 @@ async def test_snmp_integer_switch_off(hass: HomeAssistant) -> None:
         assert state.state == STATE_OFF
 
 
-async def test_snmp_integer_switch_on(hass: HomeAssistant) -> None:
+async def test_snmp_integer_switch_on(hass: SmartHub) -> None:
     """Test snmp switch returning int 1 for on."""
 
     mock_data = Integer32(1)
     with patch(
-        "homeassistant.components.snmp.switch.getCmd",
+        "smarthub.components.snmp.switch.getCmd",
         return_value=(None, None, None, [[mock_data]]),
     ):
         assert await async_setup_component(hass, SWITCH_DOMAIN, config)
@@ -51,13 +51,13 @@ async def test_snmp_integer_switch_on(hass: HomeAssistant) -> None:
 
 
 async def test_snmp_integer_switch_unknown(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test snmp switch returning int 3 (not a configured payload) for unknown."""
 
     mock_data = Integer32(3)
     with patch(
-        "homeassistant.components.snmp.switch.getCmd",
+        "smarthub.components.snmp.switch.getCmd",
         return_value=(None, None, None, [[mock_data]]),
     ):
         assert await async_setup_component(hass, SWITCH_DOMAIN, config)

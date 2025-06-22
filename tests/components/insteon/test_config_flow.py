@@ -7,20 +7,20 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from voluptuous_serialize import convert
 
-from homeassistant import config_entries
-from homeassistant.components.insteon.config_flow import (
+from smarthub import config_entries
+from smarthub.components.insteon.config_flow import (
     STEP_HUB_V1,
     STEP_HUB_V2,
     STEP_PLM,
     STEP_PLM_MANUALLY,
 )
-from homeassistant.components.insteon.const import CONF_HUB_VERSION, DOMAIN
-from homeassistant.config_entries import ConfigEntryState, ConfigFlowResult
-from homeassistant.const import CONF_DEVICE, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.usb import UsbServiceInfo
+from smarthub.components.insteon.const import CONF_HUB_VERSION, DOMAIN
+from smarthub.config_entries import ConfigEntryState, ConfigFlowResult
+from smarthub.const import CONF_DEVICE, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.usb import UsbServiceInfo
 
 from .const import (
     MOCK_DEVICE,
@@ -43,7 +43,7 @@ async def mock_successful_connection(*args, **kwargs):
     return True
 
 
-async def mock_usb_list(hass: HomeAssistant):
+async def mock_usb_list(hass: SmartHub):
     """Return a mock list of USB devices."""
     return USB_PORTS
 
@@ -63,7 +63,7 @@ async def mock_failed_connection(*args, **kwargs):
     raise ConnectionError("Connection failed")
 
 
-async def _init_form(hass: HomeAssistant, modem_type: str) -> ConfigFlowResult:
+async def _init_form(hass: SmartHub, modem_type: str) -> ConfigFlowResult:
     """Run the user form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -77,7 +77,7 @@ async def _init_form(hass: HomeAssistant, modem_type: str) -> ConfigFlowResult:
 
 
 async def _device_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     flow_id: str,
     connection: Callable[..., Any],
     user_input: dict[str, Any] | None,
@@ -98,7 +98,7 @@ async def _device_form(
     return result, mock_setup_entry
 
 
-async def test_form_select_modem(hass: HomeAssistant) -> None:
+async def test_form_select_modem(hass: SmartHub) -> None:
     """Test we get a modem form."""
 
     result = await _init_form(hass, STEP_HUB_V2)
@@ -106,7 +106,7 @@ async def test_form_select_modem(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
 
 
-async def test_fail_on_existing(hass: HomeAssistant) -> None:
+async def test_fail_on_existing(hass: SmartHub) -> None:
     """Test we fail if the integration is already configured."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -126,7 +126,7 @@ async def test_fail_on_existing(hass: HomeAssistant) -> None:
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_form_select_plm(hass: HomeAssistant) -> None:
+async def test_form_select_plm(hass: SmartHub) -> None:
     """Test we set up the PLM correctly."""
 
     result = await _init_form(hass, STEP_PLM)
@@ -140,7 +140,7 @@ async def test_form_select_plm(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_select_plm_no_usb(hass: HomeAssistant) -> None:
+async def test_form_select_plm_no_usb(hass: SmartHub) -> None:
     """Test we set up the PLM when no comm ports are found."""
 
     temp_usb_list = dict(USB_PORTS)
@@ -155,7 +155,7 @@ async def test_form_select_plm_no_usb(hass: HomeAssistant) -> None:
     assert result2["step_id"] == STEP_PLM_MANUALLY
 
 
-async def test_form_select_plm_manual(hass: HomeAssistant) -> None:
+async def test_form_select_plm_manual(hass: SmartHub) -> None:
     """Test we set up the PLM correctly."""
 
     result = await _init_form(hass, STEP_PLM)
@@ -174,7 +174,7 @@ async def test_form_select_plm_manual(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_select_hub_v1(hass: HomeAssistant) -> None:
+async def test_form_select_hub_v1(hass: SmartHub) -> None:
     """Test we set up the Hub v1 correctly."""
 
     result = await _init_form(hass, STEP_HUB_V1)
@@ -191,7 +191,7 @@ async def test_form_select_hub_v1(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_select_hub_v2(hass: HomeAssistant) -> None:
+async def test_form_select_hub_v2(hass: SmartHub) -> None:
     """Test we set up the Hub v2 correctly."""
 
     result = await _init_form(hass, STEP_HUB_V2)
@@ -208,7 +208,7 @@ async def test_form_select_hub_v2(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_discovery_dhcp(hass: HomeAssistant) -> None:
+async def test_form_discovery_dhcp(hass: SmartHub) -> None:
     """Test the discovery of the Hub via DHCP."""
     discovery_info = DhcpServiceInfo("1.2.3.4", "", "aabbccddeeff")
     result = await hass.config_entries.flow.async_init(
@@ -230,7 +230,7 @@ async def test_form_discovery_dhcp(hass: HomeAssistant) -> None:
     assert found_host
 
 
-async def test_failed_connection_plm(hass: HomeAssistant) -> None:
+async def test_failed_connection_plm(hass: SmartHub) -> None:
     """Test a failed connection with the PLM."""
 
     result = await _init_form(hass, STEP_PLM)
@@ -242,7 +242,7 @@ async def test_failed_connection_plm(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_failed_connection_plm_manually(hass: HomeAssistant) -> None:
+async def test_failed_connection_plm_manually(hass: SmartHub) -> None:
     """Test a failed connection with the PLM."""
 
     result = await _init_form(hass, STEP_PLM)
@@ -257,7 +257,7 @@ async def test_failed_connection_plm_manually(hass: HomeAssistant) -> None:
     assert result3["errors"] == {"base": "cannot_connect"}
 
 
-async def test_failed_connection_hub(hass: HomeAssistant) -> None:
+async def test_failed_connection_hub(hass: SmartHub) -> None:
     """Test a failed connection with a Hub."""
 
     result = await _init_form(hass, STEP_HUB_V2)
@@ -269,7 +269,7 @@ async def test_failed_connection_hub(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_discovery_via_usb(hass: HomeAssistant) -> None:
+async def test_discovery_via_usb(hass: SmartHub) -> None:
     """Test usb flow."""
     discovery_info = UsbServiceInfo(
         device="/dev/ttyINSTEON",
@@ -296,7 +296,7 @@ async def test_discovery_via_usb(hass: HomeAssistant) -> None:
     assert result2["data"] == {"device": "/dev/ttyINSTEON"}
 
 
-async def test_discovery_via_usb_already_setup(hass: HomeAssistant) -> None:
+async def test_discovery_via_usb_already_setup(hass: SmartHub) -> None:
     """Test usb flow -- already setup."""
 
     MockConfigEntry(

@@ -10,24 +10,24 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant import setup
-from homeassistant.components.command_line import DOMAIN
-from homeassistant.components.command_line.sensor import CommandSensor
-from homeassistant.components.homeassistant import (
+from smarthub import setup
+from smarthub.components.command_line import DOMAIN
+from smarthub.components.command_line.sensor import CommandSensor
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import mock_asyncio_subprocess_run
 
 from tests.common import async_fire_time_changed
 
 
-async def test_setup_platform_yaml(hass: HomeAssistant) -> None:
+async def test_setup_platform_yaml(hass: SmartHub) -> None:
     """Test setting up the platform with platform yaml."""
     await setup.async_setup_component(
         hass,
@@ -62,7 +62,7 @@ async def test_setup_platform_yaml(hass: HomeAssistant) -> None:
     ],
 )
 async def test_setup_integration_yaml(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test sensor setup."""
 
@@ -91,7 +91,7 @@ async def test_setup_integration_yaml(
         }
     ],
 )
-async def test_template(hass: HomeAssistant, load_yaml_integration: None) -> None:
+async def test_template(hass: SmartHub, load_yaml_integration: None) -> None:
     """Test command sensor with template."""
 
     entity_state = hass.states.get("sensor.test")
@@ -116,7 +116,7 @@ async def test_template(hass: HomeAssistant, load_yaml_integration: None) -> Non
     ],
 )
 async def test_template_render(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Ensure command with templates get rendered properly."""
     hass.states.async_set("sensor.input_sensor", "sensor_value")
@@ -133,7 +133,7 @@ async def test_template_render(
     assert entity_state.state == "sensor_value"
 
 
-async def test_template_render_with_quote(hass: HomeAssistant) -> None:
+async def test_template_render_with_quote(hass: SmartHub) -> None:
     """Ensure command with templates and quotes get rendered properly."""
     hass.states.async_set("sensor.input_sensor", "sensor_value")
     await setup.async_setup_component(
@@ -184,7 +184,7 @@ async def test_template_render_with_quote(hass: HomeAssistant) -> None:
     ],
 )
 async def test_bad_template_render(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, get_config: dict[str, Any]
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, get_config: dict[str, Any]
 ) -> None:
     """Test rendering a broken template."""
     await setup.async_setup_component(
@@ -212,7 +212,7 @@ async def test_bad_template_render(
         }
     ],
 )
-async def test_bad_command(hass: HomeAssistant, get_config: dict[str, Any]) -> None:
+async def test_bad_command(hass: SmartHub, get_config: dict[str, Any]) -> None:
     """Test bad command."""
     await setup.async_setup_component(
         hass,
@@ -242,7 +242,7 @@ async def test_bad_command(hass: HomeAssistant, get_config: dict[str, Any]) -> N
     ],
 )
 async def test_return_code(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, get_config: dict[str, Any]
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, get_config: dict[str, Any]
 ) -> None:
     """Test that an error return code is logged."""
     await setup.async_setup_component(
@@ -275,7 +275,7 @@ async def test_return_code(
     ],
 )
 async def test_update_with_json_attrs(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test attributes get extracted from a JSON result."""
     entity_state = hass.states.get("sensor.test")
@@ -307,7 +307,7 @@ async def test_update_with_json_attrs(
     ],
 )
 async def test_update_with_json_attrs_and_value_template(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test json_attributes can be used together with value_template."""
     entity_state = hass.states.get("sensor.test")
@@ -335,7 +335,7 @@ async def test_update_with_json_attrs_and_value_template(
     ],
 )
 async def test_update_with_json_attrs_no_data(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, get_config: dict[str, Any]
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, get_config: dict[str, Any]
 ) -> None:
     """Test attributes when no JSON result fetched."""
     await setup.async_setup_component(
@@ -368,7 +368,7 @@ async def test_update_with_json_attrs_no_data(
     ],
 )
 async def test_update_with_json_attrs_not_dict(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, get_config: dict[str, Any]
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, get_config: dict[str, Any]
 ) -> None:
     """Test attributes when the return value not a dict."""
     await setup.async_setup_component(
@@ -401,7 +401,7 @@ async def test_update_with_json_attrs_not_dict(
     ],
 )
 async def test_update_with_json_attrs_bad_json(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, get_config: dict[str, Any]
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, get_config: dict[str, Any]
 ) -> None:
     """Test attributes when the return value is invalid JSON."""
     await setup.async_setup_component(
@@ -442,7 +442,7 @@ async def test_update_with_json_attrs_bad_json(
     ],
 )
 async def test_update_with_missing_json_attrs(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, load_yaml_integration: None
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test attributes when an expected key is missing."""
 
@@ -474,7 +474,7 @@ async def test_update_with_missing_json_attrs(
     ],
 )
 async def test_update_with_unnecessary_json_attrs(
-    caplog: pytest.LogCaptureFixture, hass: HomeAssistant, load_yaml_integration: None
+    caplog: pytest.LogCaptureFixture, hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test attributes when an expected key is missing."""
 
@@ -512,7 +512,7 @@ async def test_update_with_unnecessary_json_attrs(
     ],
 )
 async def test_update_with_json_attrs_with_json_attrs_path(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test using json_attributes_path to select a different part of the json object as root."""
 
@@ -556,7 +556,7 @@ async def test_update_with_json_attrs_with_json_attrs_path(
     ],
 )
 async def test_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, load_yaml_integration: None
+    hass: SmartHub, entity_registry: er.EntityRegistry, load_yaml_integration: None
 ) -> None:
     """Test unique_id option and if it only creates one sensor per id."""
 
@@ -570,7 +570,7 @@ async def test_unique_id(
 
 
 async def test_updating_to_often(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test handling updating when command already running."""
     wait_till_event = asyncio.Event()
@@ -587,7 +587,7 @@ async def test_updating_to_often(
             await wait_till_event.wait()
 
     with patch(
-        "homeassistant.components.command_line.sensor.CommandSensor",
+        "smarthub.components.command_line.sensor.CommandSensor",
         side_effect=MockCommandSensor,
     ):
         await setup.async_setup_component(
@@ -632,9 +632,9 @@ async def test_updating_to_often(
 
 
 async def test_updating_manually(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """Test handling manual updating using homeassistant udate_entity service."""
+    """Test handling manual updating using smarthub udate_entity service."""
     await setup.async_setup_component(hass, HA_DOMAIN, {})
     called = []
 
@@ -646,7 +646,7 @@ async def test_updating_manually(
             called.append(1)
 
     with patch(
-        "homeassistant.components.command_line.sensor.CommandSensor",
+        "smarthub.components.command_line.sensor.CommandSensor",
         side_effect=MockCommandSensor,
     ):
         await setup.async_setup_component(
@@ -696,7 +696,7 @@ async def test_updating_manually(
     ],
 )
 async def test_scrape_sensor_device_timestamp(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test Command Line sensor with a device of type TIMESTAMP."""
     entity_state = hass.states.get("sensor.test")
@@ -722,7 +722,7 @@ async def test_scrape_sensor_device_timestamp(
     ],
 )
 async def test_scrape_sensor_device_date(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test Command Line sensor with a device of type DATE."""
     entity_state = hass.states.get("sensor.test")
@@ -731,7 +731,7 @@ async def test_scrape_sensor_device_date(
 
 
 async def test_template_not_error_when_data_is_none(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test command sensor with template not logging error when data is None."""
 
@@ -783,7 +783,7 @@ async def test_template_not_error_when_data_is_none(
     ],
 )
 async def test_availability_json_attributes_without_value_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_yaml_integration: None,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
@@ -858,7 +858,7 @@ async def test_availability_json_attributes_without_value_template(
     ],
 )
 async def test_availability_with_value_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_yaml_integration: None,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -888,7 +888,7 @@ async def test_availability_with_value_template(
 
 
 async def test_template_render_with_availability_syntax_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test availability template render with syntax errors."""
     assert await setup.async_setup_component(
@@ -948,7 +948,7 @@ async def test_template_render_with_availability_syntax_error(
     ],
 )
 async def test_command_template_render_with_availability(
-    hass: HomeAssistant, load_yaml_integration: None
+    hass: SmartHub, load_yaml_integration: None
 ) -> None:
     """Test command template is rendered properly with availability."""
     hass.states.async_set("sensor.input_sensor", "sensor_value")
@@ -996,7 +996,7 @@ async def test_command_template_render_with_availability(
     ],
 )
 async def test_availability_blocks_value_template(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_yaml_integration: None,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,

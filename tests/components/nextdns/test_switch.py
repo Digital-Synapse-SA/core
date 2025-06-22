@@ -10,10 +10,10 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from tenacity import RetryError
 
-from homeassistant.components.nextdns.const import DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.nextdns.const import DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -22,10 +22,10 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.util.dt import utcnow
 
 from . import init_integration, mock_nextdns
 
@@ -34,18 +34,18 @@ from tests.common import async_fire_time_changed, snapshot_platform
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_switch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test states of the switches."""
-    with patch("homeassistant.components.nextdns.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.nextdns.PLATFORMS", [Platform.SWITCH]):
         entry = await init_integration(hass)
 
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_switch_on(hass: HomeAssistant) -> None:
+async def test_switch_on(hass: SmartHub) -> None:
     """Test the switch can be turned on."""
     await init_integration(hass)
 
@@ -54,7 +54,7 @@ async def test_switch_on(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
     with patch(
-        "homeassistant.components.nextdns.NextDns.set_setting", return_value=True
+        "smarthub.components.nextdns.NextDns.set_setting", return_value=True
     ) as mock_switch_on:
         await hass.services.async_call(
             SWITCH_DOMAIN,
@@ -71,7 +71,7 @@ async def test_switch_on(hass: HomeAssistant) -> None:
         mock_switch_on.assert_called_once()
 
 
-async def test_switch_off(hass: HomeAssistant) -> None:
+async def test_switch_off(hass: SmartHub) -> None:
     """Test the switch can be turned on."""
     await init_integration(hass)
 
@@ -80,7 +80,7 @@ async def test_switch_off(hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
     with patch(
-        "homeassistant.components.nextdns.NextDns.set_setting", return_value=True
+        "smarthub.components.nextdns.NextDns.set_setting", return_value=True
     ) as mock_switch_on:
         await hass.services.async_call(
             SWITCH_DOMAIN,
@@ -105,7 +105,7 @@ async def test_switch_off(hass: HomeAssistant) -> None:
         TimeoutError,
     ],
 )
-async def test_availability(hass: HomeAssistant, exc: Exception) -> None:
+async def test_availability(hass: SmartHub, exc: Exception) -> None:
     """Ensure that we mark the entities unavailable correctly when service causes an error."""
     await init_integration(hass)
 
@@ -116,7 +116,7 @@ async def test_availability(hass: HomeAssistant, exc: Exception) -> None:
 
     future = utcnow() + timedelta(minutes=10)
     with patch(
-        "homeassistant.components.nextdns.NextDns.get_settings",
+        "smarthub.components.nextdns.NextDns.get_settings",
         side_effect=exc,
     ):
         async_fire_time_changed(hass, future)
@@ -146,13 +146,13 @@ async def test_availability(hass: HomeAssistant, exc: Exception) -> None:
         ClientError,
     ],
 )
-async def test_switch_failure(hass: HomeAssistant, exc: Exception) -> None:
-    """Tests that the turn on/off service throws HomeAssistantError."""
+async def test_switch_failure(hass: SmartHub, exc: Exception) -> None:
+    """Tests that the turn on/off service throws SmartHubError."""
     await init_integration(hass)
 
     with (
-        patch("homeassistant.components.nextdns.NextDns.set_setting", side_effect=exc),
-        pytest.raises(HomeAssistantError),
+        patch("smarthub.components.nextdns.NextDns.set_setting", side_effect=exc),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             SWITCH_DOMAIN,
@@ -162,12 +162,12 @@ async def test_switch_failure(hass: HomeAssistant, exc: Exception) -> None:
         )
 
 
-async def test_switch_auth_error(hass: HomeAssistant) -> None:
+async def test_switch_auth_error(hass: SmartHub) -> None:
     """Tests that the turn on/off action starts re-auth flow."""
     entry = await init_integration(hass)
 
     with patch(
-        "homeassistant.components.nextdns.NextDns.set_setting",
+        "smarthub.components.nextdns.NextDns.set_setting",
         side_effect=InvalidApiKeyError,
     ):
         await hass.services.async_call(

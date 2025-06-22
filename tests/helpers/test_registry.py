@@ -5,9 +5,9 @@ from typing import Any
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.helpers import storage
-from homeassistant.helpers.registry import SAVE_DELAY, SAVE_DELAY_LONG, BaseRegistry
+from smarthub.core import CoreState, SmartHub
+from smarthub.helpers import storage
+from smarthub.helpers.registry import SAVE_DELAY, SAVE_DELAY_LONG, BaseRegistry
 
 from tests.common import async_fire_time_changed
 
@@ -15,7 +15,7 @@ from tests.common import async_fire_time_changed
 class SampleRegistry(BaseRegistry):
     """Class to hold a registry of X."""
 
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self, hass: SmartHub) -> None:
         """Initialize the registry."""
         self.hass = hass
         self._store = storage.Store(hass, 1, "test")
@@ -37,7 +37,7 @@ class SampleRegistry(BaseRegistry):
     ],
 )
 async def test_async_schedule_save(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     long_delay_state: CoreState,
     hass_storage: dict[str, Any],

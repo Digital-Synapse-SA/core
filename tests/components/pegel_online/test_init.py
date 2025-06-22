@@ -5,15 +5,15 @@ from unittest.mock import patch
 from aiohttp.client_exceptions import ClientError
 import pytest
 
-from homeassistant.components.pegel_online.const import (
+from smarthub.components.pegel_online.const import (
     CONF_STATION,
     DOMAIN,
     MIN_TIME_BETWEEN_UPDATES,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.util import utcnow
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.util import utcnow
 
 from . import PegelOnlineMock
 from .const import (
@@ -26,7 +26,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_setup_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Tests error during config entry setup."""
     entry = MockConfigEntry(
@@ -35,7 +35,7 @@ async def test_setup_error(
         unique_id=MOCK_CONFIG_ENTRY_DATA_DRESDEN[CONF_STATION],
     )
     entry.add_to_hass(hass)
-    with patch("homeassistant.components.pegel_online.PegelOnline") as pegelonline:
+    with patch("smarthub.components.pegel_online.PegelOnline") as pegelonline:
         pegelonline.return_value = PegelOnlineMock(
             station_details=MOCK_STATION_DETAILS_DRESDEN,
             station_measurements=MOCK_STATION_MEASUREMENT_DRESDEN,
@@ -47,7 +47,7 @@ async def test_setup_error(
 
 
 async def test_update_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Tests error during update entity."""
     entry = MockConfigEntry(
@@ -56,7 +56,7 @@ async def test_update_error(
         unique_id=MOCK_CONFIG_ENTRY_DATA_DRESDEN[CONF_STATION],
     )
     entry.add_to_hass(hass)
-    with patch("homeassistant.components.pegel_online.PegelOnline") as pegelonline:
+    with patch("smarthub.components.pegel_online.PegelOnline") as pegelonline:
         pegelonline.return_value = PegelOnlineMock(
             station_details=MOCK_STATION_DETAILS_DRESDEN,
             station_measurements=MOCK_STATION_MEASUREMENT_DRESDEN,

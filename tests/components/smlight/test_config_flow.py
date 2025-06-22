@@ -7,13 +7,13 @@ from pysmlight import Info
 from pysmlight.exceptions import SmlightAuthError, SmlightConnectionError
 import pytest
 
-from homeassistant.components.smlight.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.smlight.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .conftest import (
     MOCK_DEVICE_NAME,
@@ -47,7 +47,7 @@ DISCOVERY_INFO_LEGACY = ZeroconfServiceInfo(
 
 
 @pytest.mark.usefixtures("mock_smlight_client")
-async def test_user_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_user_flow(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test the full manual user flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -73,7 +73,7 @@ async def test_user_flow(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> No
 
 
 async def test_user_flow_auth(
-    hass: HomeAssistant, mock_smlight_client: MagicMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_smlight_client: MagicMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test the full manual user flow with authentication."""
 
@@ -113,7 +113,7 @@ async def test_user_flow_auth(
 
 
 async def test_zeroconf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smlight_client: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -149,7 +149,7 @@ async def test_zeroconf_flow(
 
 
 async def test_zeroconf_flow_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smlight_client: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -203,7 +203,7 @@ async def test_zeroconf_flow_auth(
 
 
 async def test_zeroconf_unsupported_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
 ) -> None:
@@ -228,7 +228,7 @@ async def test_zeroconf_unsupported_abort(
 
 
 async def test_user_unsupported_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
 ) -> None:
@@ -255,7 +255,7 @@ async def test_user_unsupported_abort(
 
 
 async def test_user_unsupported_device_abort_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
 ) -> None:
@@ -290,7 +290,7 @@ async def test_user_unsupported_device_abort_auth(
 
 @pytest.mark.usefixtures("mock_smlight_client")
 async def test_user_device_exists_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort user flow if device already configured."""
@@ -310,7 +310,7 @@ async def test_user_device_exists_abort(
 
 @pytest.mark.usefixtures("mock_smlight_client")
 async def test_user_flow_can_override_discovery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -348,7 +348,7 @@ async def test_user_flow_can_override_discovery(
 
 @pytest.mark.usefixtures("mock_smlight_client")
 async def test_zeroconf_device_exists_abort(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we abort zeroconf flow if device already configured."""
     mock_config_entry.add_to_hass(hass)
@@ -364,7 +364,7 @@ async def test_zeroconf_device_exists_abort(
 
 
 async def test_user_invalid_auth(
-    hass: HomeAssistant, mock_smlight_client: MagicMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_smlight_client: MagicMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle invalid auth."""
     mock_smlight_client.check_auth_needed.return_value = True
@@ -416,7 +416,7 @@ async def test_user_invalid_auth(
 
 
 async def test_user_cannot_connect(
-    hass: HomeAssistant, mock_smlight_client: MagicMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_smlight_client: MagicMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle user cannot connect error."""
     mock_smlight_client.check_auth_needed.side_effect = SmlightConnectionError
@@ -453,7 +453,7 @@ async def test_user_cannot_connect(
 
 
 async def test_auth_cannot_connect(
-    hass: HomeAssistant, mock_smlight_client: MagicMock
+    hass: SmartHub, mock_smlight_client: MagicMock
 ) -> None:
     """Test we abort auth step on cannot connect error."""
     mock_smlight_client.check_auth_needed.return_value = True
@@ -487,7 +487,7 @@ async def test_auth_cannot_connect(
 
 
 async def test_zeroconf_cannot_connect(
-    hass: HomeAssistant, mock_smlight_client: MagicMock
+    hass: SmartHub, mock_smlight_client: MagicMock
 ) -> None:
     """Test we abort flow on zeroconf cannot connect error."""
     mock_smlight_client.check_auth_needed.side_effect = SmlightConnectionError
@@ -510,7 +510,7 @@ async def test_zeroconf_cannot_connect(
 
 
 async def test_zeroconf_legacy_cannot_connect(
-    hass: HomeAssistant, mock_smlight_client: MagicMock
+    hass: SmartHub, mock_smlight_client: MagicMock
 ) -> None:
     """Test we abort flow on zeroconf discovery unsupported firmware."""
     mock_smlight_client.get_info.side_effect = SmlightConnectionError
@@ -527,7 +527,7 @@ async def test_zeroconf_legacy_cannot_connect(
 
 @pytest.mark.usefixtures("mock_smlight_client")
 async def test_zeroconf_legacy_mac(
-    hass: HomeAssistant, mock_smlight_client: MagicMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_smlight_client: MagicMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we can get unique id MAC address for older firmwares."""
     result = await hass.config_entries.flow.async_init(
@@ -556,7 +556,7 @@ async def test_zeroconf_legacy_mac(
 
 @pytest.mark.usefixtures("mock_smlight_client")
 async def test_zeroconf_updates_host(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -578,7 +578,7 @@ async def test_zeroconf_updates_host(
 
 @pytest.mark.usefixtures("mock_smlight_client")
 async def test_dhcp_discovery_updates_host(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -602,7 +602,7 @@ async def test_dhcp_discovery_updates_host(
 
 @pytest.mark.usefixtures("mock_smlight_client")
 async def test_dhcp_discovery_aborts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -625,7 +625,7 @@ async def test_dhcp_discovery_aborts(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smlight_client: MagicMock,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
@@ -660,7 +660,7 @@ async def test_reauth_flow(
 
 
 async def test_reauth_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smlight_client: MagicMock,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
@@ -709,7 +709,7 @@ async def test_reauth_auth_error(
 
 
 async def test_reauth_connect_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_smlight_client: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

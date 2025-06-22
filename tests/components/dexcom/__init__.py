@@ -6,9 +6,9 @@ from unittest.mock import patch
 
 from pydexcom import GlucoseReading
 
-from homeassistant.components.dexcom.const import CONF_SERVER, DOMAIN, SERVER_US
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.dexcom.const import CONF_SERVER, DOMAIN, SERVER_US
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -22,9 +22,9 @@ GLUCOSE_READING = GlucoseReading(json.loads(load_fixture("data.json", "dexcom"))
 
 
 async def init_integration(
-    hass: HomeAssistant, options: dict[str, Any] | None = None
+    hass: SmartHub, options: dict[str, Any] | None = None
 ) -> MockConfigEntry:
-    """Set up the Dexcom integration in Home Assistant."""
+    """Set up the Dexcom integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="test_username",
@@ -34,11 +34,11 @@ async def init_integration(
     )
     with (
         patch(
-            "homeassistant.components.dexcom.Dexcom.get_current_glucose_reading",
+            "smarthub.components.dexcom.Dexcom.get_current_glucose_reading",
             return_value=GLUCOSE_READING,
         ),
         patch(
-            "homeassistant.components.dexcom.Dexcom.create_session",
+            "smarthub.components.dexcom.Dexcom.create_session",
             return_value="test_session_id",
         ),
     ):

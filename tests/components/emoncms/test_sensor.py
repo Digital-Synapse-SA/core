@@ -6,10 +6,10 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.emoncms.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.emoncms.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 from .conftest import EMONCMS_FAILURE, get_feed
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 
 async def test_no_feed_selected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_no_feed: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     emoncms_client: AsyncMock,
@@ -34,7 +34,7 @@ async def test_no_feed_selected(
 
 
 async def test_no_feed_broadcast(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     emoncms_client: AsyncMock,
@@ -51,7 +51,7 @@ async def test_no_feed_broadcast(
 
 
 async def test_coordinator_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_single_feed: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,

@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.file import DOMAIN
-from homeassistant.const import CONF_UNIT_OF_MEASUREMENT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.file import DOMAIN
+from smarthub.const import CONF_UNIT_OF_MEASUREMENT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -34,7 +34,7 @@ MOCK_OPTIONS_SENSOR = {"value_template": "{{ value | round(1) }}"}
     ],
 )
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_is_allowed_path: bool,
     platform: str,
@@ -76,7 +76,7 @@ async def test_form(
     ],
 )
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_is_allowed_path: bool,
     platform: str,
@@ -123,7 +123,7 @@ async def test_already_configured(
     ],
 )
 async def test_not_allowed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_is_allowed_path: bool,
     platform: str,
@@ -170,7 +170,7 @@ async def test_not_allowed(
     ],
 )
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_is_allowed_path: bool,
     platform: str,
     data: dict[str, Any],

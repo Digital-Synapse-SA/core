@@ -7,8 +7,8 @@ from nhc.cover import NHCCover
 from nhc.light import NHCLight
 import pytest
 
-from homeassistant.components.niko_home_control.const import DOMAIN
-from homeassistant.const import CONF_HOST
+from smarthub.components.niko_home_control.const import DOMAIN
+from smarthub.const import CONF_HOST
 
 from tests.common import MockConfigEntry
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override integration setup."""
     with patch(
-        "homeassistant.components.niko_home_control.async_setup_entry",
+        "smarthub.components.niko_home_control.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -68,11 +68,11 @@ def mock_niko_home_control_connection(
     """Mock a NHC client."""
     with (
         patch(
-            "homeassistant.components.niko_home_control.NHCController",
+            "smarthub.components.niko_home_control.NHCController",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.niko_home_control.config_flow.NHCController",
+            "smarthub.components.niko_home_control.config_flow.NHCController",
             new=mock_client,
         ),
     ):

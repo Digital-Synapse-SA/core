@@ -2,16 +2,16 @@
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.islamic_prayer_times.const import (
+from smarthub import config_entries
+from smarthub.components.islamic_prayer_times.const import (
     CONF_CALC_METHOD,
     CONF_LAT_ADJ_METHOD,
     CONF_MIDNIGHT_MODE,
     CONF_SCHOOL,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import MOCK_CONFIG, MOCK_USER_INPUT
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_flow_works(hass: HomeAssistant) -> None:
+async def test_flow_works(hass: SmartHub) -> None:
     """Test user config."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -37,7 +37,7 @@ async def test_flow_works(hass: HomeAssistant) -> None:
     assert result["title"] == "Home"
 
 
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test updating options."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -68,7 +68,7 @@ async def test_options(hass: HomeAssistant) -> None:
     assert result["data"][CONF_SCHOOL] == "hanafi"
 
 
-async def test_integration_already_configured(hass: HomeAssistant) -> None:
+async def test_integration_already_configured(hass: SmartHub) -> None:
     """Test integration is already configured."""
     entry = MockConfigEntry(
         domain=DOMAIN, data=MOCK_CONFIG, options={}, unique_id="12.34-23.45"

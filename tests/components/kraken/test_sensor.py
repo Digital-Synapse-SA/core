@@ -7,15 +7,15 @@ from freezegun.api import FrozenDateTimeFactory
 from pykrakenapi.pykrakenapi import KrakenAPIError
 import pytest
 
-from homeassistant.components.kraken.const import (
+from smarthub.components.kraken.const import (
     CONF_TRACKED_ASSET_PAIRS,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_TRACKED_ASSET_PAIR,
     DOMAIN,
 )
-from homeassistant.const import CONF_SCAN_INTERVAL, EVENT_HOMEASSISTANT_START
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.const import CONF_SCAN_INTERVAL, EVENT_HOMEASSISTANT_START
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from .const import (
     MISSING_PAIR_TICKER_INFORMATION_RESPONSE,
@@ -29,7 +29,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test that sensor has a value."""
@@ -139,7 +139,7 @@ async def test_sensor(
 
 
 async def test_sensors_available_after_restart(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -183,7 +183,7 @@ async def test_sensors_available_after_restart(
 
 
 async def test_sensors_added_after_config_update(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test that sensors are added when another tracked asset pair is added."""
     with (
@@ -231,7 +231,7 @@ async def test_sensors_added_after_config_update(
 
 
 async def test_missing_pair_marks_sensor_unavailable(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test that a missing tradable asset pair marks the sensor unavailable."""
     with (

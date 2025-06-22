@@ -6,10 +6,10 @@ from unittest.mock import patch
 import pytest
 from requests_mock.mocker import Mocker
 
-from homeassistant import config_entries
-from homeassistant.components.flume.const import DOMAIN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub import config_entries
+from smarthub.components.flume.const import DOMAIN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from .conftest import USER_ID
 
@@ -20,13 +20,13 @@ from tests.common import MockConfigEntry
 def platforms_fixture() -> Generator[None]:
     """Return the platforms to be loaded for this test."""
     # Arbitrary platform to ensure notifications are loaded
-    with patch("homeassistant.components.flume.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.flume.PLATFORMS", [Platform.BINARY_SENSOR]):
         yield
 
 
 @pytest.mark.usefixtures("access_token", "device_list")
 async def test_setup_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock: Mocker,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -42,7 +42,7 @@ async def test_setup_config_entry(
 
 @pytest.mark.usefixtures("access_token", "device_list_timeout")
 async def test_device_list_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock: Mocker,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -55,7 +55,7 @@ async def test_device_list_timeout(
 
 @pytest.mark.usefixtures("access_token", "device_list_unauthorized")
 async def test_reauth_when_unauthorized(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock: Mocker,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -72,7 +72,7 @@ async def test_reauth_when_unauthorized(
 
 @pytest.mark.usefixtures("access_token", "device_list", "notifications_list")
 async def test_list_notifications_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock: Mocker,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -99,7 +99,7 @@ async def test_list_notifications_service(
 
 @pytest.mark.usefixtures("access_token", "device_list", "notifications_list")
 async def test_list_notifications_service_config_entry_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     requests_mock: Mocker,
     config_entry: MockConfigEntry,
 ) -> None:

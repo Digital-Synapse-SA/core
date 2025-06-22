@@ -6,8 +6,8 @@ from aiohomekit.model import Accessory
 from aiohomekit.model.characteristics import CharacteristicsTypes
 from aiohomekit.model.services import ServicesTypes
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_test_component
 
@@ -135,7 +135,7 @@ def create_air_purifier_service(accessory: Accessory) -> None:
 
 
 async def test_fan_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit fan accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_fan_service)
@@ -151,7 +151,7 @@ async def test_fan_read_state(
     assert state.state == "on"
 
 
-async def test_turn_on(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_turn_on(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test that we can turn a fan on."""
     helper = await setup_test_component(hass, get_next_aid(), create_fan_service)
 
@@ -199,7 +199,7 @@ async def test_turn_on(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> 
 
 
 async def test_turn_on_off_without_rotation_speed(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a fan on."""
     helper = await setup_test_component(
@@ -233,7 +233,7 @@ async def test_turn_on_off_without_rotation_speed(
     )
 
 
-async def test_turn_off(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_turn_off(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test that we can turn a fan off."""
     helper = await setup_test_component(hass, get_next_aid(), create_fan_service)
 
@@ -253,7 +253,7 @@ async def test_turn_off(hass: HomeAssistant, get_next_aid: Callable[[], int]) ->
     )
 
 
-async def test_set_speed(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_set_speed(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test that we set fan speed."""
     helper = await setup_test_component(hass, get_next_aid(), create_fan_service)
 
@@ -313,7 +313,7 @@ async def test_set_speed(hass: HomeAssistant, get_next_aid: Callable[[], int]) -
 
 
 async def test_set_percentage(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we set fan speed by percentage."""
     helper = await setup_test_component(hass, get_next_aid(), create_fan_service)
@@ -347,7 +347,7 @@ async def test_set_percentage(
     )
 
 
-async def test_speed_read(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_speed_read(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test that we can read a fans oscillation."""
     helper = await setup_test_component(hass, get_next_aid(), create_fan_service)
 
@@ -388,7 +388,7 @@ async def test_speed_read(hass: HomeAssistant, get_next_aid: Callable[[], int]) 
 
 
 async def test_set_direction(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can set fan spin direction."""
     helper = await setup_test_component(hass, get_next_aid(), create_fan_service)
@@ -421,7 +421,7 @@ async def test_set_direction(
 
 
 async def test_direction_read(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read a fans oscillation."""
     helper = await setup_test_component(hass, get_next_aid(), create_fan_service)
@@ -438,7 +438,7 @@ async def test_direction_read(
 
 
 async def test_fanv2_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit fan accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_fanv2_service)
@@ -454,7 +454,7 @@ async def test_fanv2_read_state(
     assert state.state == "on"
 
 
-async def test_v2_turn_on(hass: HomeAssistant, get_next_aid: Callable[[], int]) -> None:
+async def test_v2_turn_on(hass: SmartHub, get_next_aid: Callable[[], int]) -> None:
     """Test that we can turn a fan on."""
     helper = await setup_test_component(hass, get_next_aid(), create_fanv2_service)
 
@@ -530,7 +530,7 @@ async def test_v2_turn_on(hass: HomeAssistant, get_next_aid: Callable[[], int]) 
 
 
 async def test_v2_turn_off(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a fan off."""
     helper = await setup_test_component(hass, get_next_aid(), create_fanv2_service)
@@ -552,7 +552,7 @@ async def test_v2_turn_off(
 
 
 async def test_v2_set_speed(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we set fan speed."""
     helper = await setup_test_component(hass, get_next_aid(), create_fanv2_service)
@@ -613,7 +613,7 @@ async def test_v2_set_speed(
 
 
 async def test_v2_set_percentage(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we set fan speed by percentage."""
     helper = await setup_test_component(hass, get_next_aid(), create_fanv2_service)
@@ -648,7 +648,7 @@ async def test_v2_set_percentage(
 
 
 async def test_fanv2_set_preset_mode(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we set preset mode when target state is available."""
     helper = await setup_test_component(
@@ -712,7 +712,7 @@ async def test_fanv2_set_preset_mode(
 
 
 async def test_v2_set_percentage_with_min_step(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we set fan speed by percentage."""
     helper = await setup_test_component(
@@ -749,7 +749,7 @@ async def test_v2_set_percentage_with_min_step(
 
 
 async def test_v2_speed_read(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read a fans oscillation."""
     helper = await setup_test_component(hass, get_next_aid(), create_fanv2_service)
@@ -790,7 +790,7 @@ async def test_v2_speed_read(
 
 
 async def test_v2_set_direction(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can set fan spin direction."""
     helper = await setup_test_component(hass, get_next_aid(), create_fanv2_service)
@@ -823,7 +823,7 @@ async def test_v2_set_direction(
 
 
 async def test_v2_direction_read(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read a fans oscillation."""
     helper = await setup_test_component(hass, get_next_aid(), create_fanv2_service)
@@ -840,7 +840,7 @@ async def test_v2_direction_read(
 
 
 async def test_v2_oscillate(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can control a fans oscillation."""
     helper = await setup_test_component(hass, get_next_aid(), create_fanv2_service)
@@ -873,7 +873,7 @@ async def test_v2_oscillate(
 
 
 async def test_v2_oscillate_read(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read a fans oscillation."""
     helper = await setup_test_component(hass, get_next_aid(), create_fanv2_service)
@@ -890,7 +890,7 @@ async def test_v2_oscillate_read(
 
 
 async def test_v2_set_percentage_non_standard_rotation_range(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we set fan speed with a non-standard rotation range."""
     helper = await setup_test_component(
@@ -953,7 +953,7 @@ async def test_v2_set_percentage_non_standard_rotation_range(
 
 
 async def test_air_purifier_turn_on(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn on an air purifier."""
     helper = await setup_test_component(
@@ -1032,7 +1032,7 @@ async def test_air_purifier_turn_on(
 
 
 async def test_air_purifier_turn_off(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn an air purifier fan off."""
     helper = await setup_test_component(
@@ -1058,7 +1058,7 @@ async def test_air_purifier_turn_off(
 
 
 async def test_air_purifier_set_speed(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we set air purifier fan speed."""
     helper = await setup_test_component(
@@ -1123,7 +1123,7 @@ async def test_air_purifier_set_speed(
 
 
 async def test_air_purifier_set_percentage(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we set air purifier fan speed by percentage."""
     helper = await setup_test_component(
@@ -1162,7 +1162,7 @@ async def test_air_purifier_set_percentage(
 
 
 async def test_air_purifier_set_preset_mode(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we set preset mode when target state is available."""
     helper = await setup_test_component(
@@ -1228,7 +1228,7 @@ async def test_air_purifier_set_preset_mode(
 
 
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:

@@ -6,11 +6,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.cert_expiry.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.cert_expiry.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import HOST, PORT
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_user(hass: HomeAssistant) -> None:
+async def test_user(hass: SmartHub) -> None:
     """Test user config."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -28,7 +28,7 @@ async def test_user(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.cert_expiry.config_flow.get_cert_expiry_timestamp"
+        "smarthub.components.cert_expiry.config_flow.get_cert_expiry_timestamp"
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], user_input={CONF_HOST: HOST, CONF_PORT: PORT}
@@ -40,7 +40,7 @@ async def test_user(hass: HomeAssistant) -> None:
     assert result["result"].unique_id == f"{HOST}:{PORT}"
 
 
-async def test_user_with_bad_cert(hass: HomeAssistant) -> None:
+async def test_user_with_bad_cert(hass: SmartHub) -> None:
     """Test user config with bad certificate."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -49,7 +49,7 @@ async def test_user_with_bad_cert(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.cert_expiry.helper.async_get_cert",
+        "smarthub.components.cert_expiry.helper.async_get_cert",
         side_effect=ssl.SSLError("some error"),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -63,7 +63,7 @@ async def test_user_with_bad_cert(hass: HomeAssistant) -> None:
     assert result["result"].unique_id == f"{HOST}:{PORT}"
 
 
-async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
+async def test_abort_if_already_setup(hass: SmartHub) -> None:
     """Test we abort if the cert is already setup."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -80,14 +80,14 @@ async def test_abort_if_already_setup(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_abort_on_socket_failed(hass: HomeAssistant) -> None:
+async def test_abort_on_socket_failed(hass: SmartHub) -> None:
     """Test we abort of we have errors during socket creation."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.cert_expiry.helper.async_get_cert",
+        "smarthub.components.cert_expiry.helper.async_get_cert",
         side_effect=socket.gaierror(),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -97,7 +97,7 @@ async def test_abort_on_socket_failed(hass: HomeAssistant) -> None:
     assert result["errors"] == {CONF_HOST: "resolve_failed"}
 
     with patch(
-        "homeassistant.components.cert_expiry.helper.async_get_cert",
+        "smarthub.components.cert_expiry.helper.async_get_cert",
         side_effect=TimeoutError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -107,7 +107,7 @@ async def test_abort_on_socket_failed(hass: HomeAssistant) -> None:
     assert result["errors"] == {CONF_HOST: "connection_timeout"}
 
     with patch(
-        "homeassistant.components.cert_expiry.helper.async_get_cert",
+        "smarthub.components.cert_expiry.helper.async_get_cert",
         side_effect=ConnectionRefusedError,
     ):
         result = await hass.config_entries.flow.async_configure(

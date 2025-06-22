@@ -5,7 +5,7 @@ from collections.abc import Generator
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.valve import (
+from smarthub.components.valve import (
     DOMAIN,
     ValveDeviceClass,
     ValveEntity,
@@ -13,16 +13,16 @@ from homeassistant.components.valve import (
     ValveEntityFeature,
     ValveState,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState, ConfigFlow
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntry, ConfigEntryState, ConfigFlow
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_SET_VALVE_POSITION,
     SERVICE_TOGGLE,
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.core import SmartHub, callback
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from tests.common import (
     MockConfigEntry,
@@ -120,7 +120,7 @@ class MockBinaryValveEntity(ValveEntity):
 
 
 @pytest.fixture(autouse=True)
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -129,7 +129,7 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant) -> tuple[MockConfigEntry, list[ValveEntity]]:
+def mock_config_entry(hass: SmartHub) -> tuple[MockConfigEntry, list[ValveEntity]]:
     """Mock a config entry which sets up a couple of valve entities."""
     entities = [
         MockBinaryValveEntity(
@@ -146,7 +146,7 @@ def mock_config_entry(hass: HomeAssistant) -> tuple[MockConfigEntry, list[ValveE
     ]
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -155,7 +155,7 @@ def mock_config_entry(hass: HomeAssistant) -> tuple[MockConfigEntry, list[ValveE
         return True
 
     async def async_unload_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Unload up test config entry."""
         await hass.config_entries.async_unload_platforms(config_entry, [Platform.VALVE])
@@ -172,7 +172,7 @@ def mock_config_entry(hass: HomeAssistant) -> tuple[MockConfigEntry, list[ValveE
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -192,7 +192,7 @@ def mock_config_entry(hass: HomeAssistant) -> tuple[MockConfigEntry, list[ValveE
 
 
 async def test_valve_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: tuple[MockConfigEntry, list[ValveEntity]],
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -223,7 +223,7 @@ async def test_valve_setup(
 
 
 async def test_services(
-    hass: HomeAssistant, mock_config_entry: tuple[MockConfigEntry, list[ValveEntity]]
+    hass: SmartHub, mock_config_entry: tuple[MockConfigEntry, list[ValveEntity]]
 ) -> None:
     """Test the provided services."""
     config_entry = mock_config_entry[0]
@@ -269,7 +269,7 @@ async def test_services(
     assert is_opening(hass, ent2)
 
 
-async def test_valve_device_class(hass: HomeAssistant) -> None:
+async def test_valve_device_class(hass: SmartHub) -> None:
     """Test valve entity with defaults."""
     default_valve = MockValveEntity()
     default_valve.hass = hass
@@ -289,7 +289,7 @@ async def test_valve_device_class(hass: HomeAssistant) -> None:
     assert water_valve.device_class is ValveDeviceClass.WATER
 
 
-async def test_valve_report_position(hass: HomeAssistant) -> None:
+async def test_valve_report_position(hass: SmartHub) -> None:
     """Test valve entity with defaults."""
     default_valve = MockValveEntity(reports_position=None)
     default_valve.hass = hass
@@ -308,7 +308,7 @@ async def test_valve_report_position(hass: HomeAssistant) -> None:
     assert third_valve.reports_position is True
 
 
-async def test_none_state(hass: HomeAssistant) -> None:
+async def test_none_state(hass: SmartHub) -> None:
     """Test different criteria for closeness."""
     binary_valve_with_none_is_closed_attr = MockBinaryValveEntity(is_closed=None)
     binary_valve_with_none_is_closed_attr.hass = hass
@@ -321,7 +321,7 @@ async def test_none_state(hass: HomeAssistant) -> None:
     assert pos_valve_with_none_is_closed_attr.state is None
 
 
-async def test_supported_features(hass: HomeAssistant) -> None:
+async def test_supported_features(hass: SmartHub) -> None:
     """Test valve entity with defaults."""
     valve = MockValveEntity(features=None)
     valve.hass = hass
@@ -330,7 +330,7 @@ async def test_supported_features(hass: HomeAssistant) -> None:
 
 
 def call_service(
-    hass: HomeAssistant, service: str, ent: ValveEntity, position: int | None = None
+    hass: SmartHub, service: str, ent: ValveEntity, position: int | None = None
 ):
     """Call any service on entity."""
     params = {ATTR_ENTITY_ID: ent.entity_id}
@@ -344,21 +344,21 @@ def set_valve_position(ent, position) -> None:
     ent._values["current_valve_position"] = position
 
 
-def is_open(hass: HomeAssistant, ent: ValveEntity) -> bool:
+def is_open(hass: SmartHub, ent: ValveEntity) -> bool:
     """Return if the valve is closed based on the statemachine."""
     return hass.states.is_state(ent.entity_id, ValveState.OPEN)
 
 
-def is_opening(hass: HomeAssistant, ent: ValveEntity) -> bool:
+def is_opening(hass: SmartHub, ent: ValveEntity) -> bool:
     """Return if the valve is closed based on the statemachine."""
     return hass.states.is_state(ent.entity_id, ValveState.OPENING)
 
 
-def is_closed(hass: HomeAssistant, ent: ValveEntity) -> bool:
+def is_closed(hass: SmartHub, ent: ValveEntity) -> bool:
     """Return if the valve is closed based on the statemachine."""
     return hass.states.is_state(ent.entity_id, ValveState.CLOSED)
 
 
-def is_closing(hass: HomeAssistant, ent: ValveEntity) -> bool:
+def is_closing(hass: SmartHub, ent: ValveEntity) -> bool:
     """Return if the valve is closed based on the statemachine."""
     return hass.states.is_state(ent.entity_id, ValveState.CLOSING)

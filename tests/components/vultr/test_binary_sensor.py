@@ -3,8 +3,8 @@
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import vultr as base_vultr
-from homeassistant.components.vultr import (
+from smarthub.components import vultr as base_vultr
+from smarthub.components.vultr import (
     ATTR_ALLOWED_BANDWIDTH,
     ATTR_AUTO_BACKUPS,
     ATTR_COST_PER_MONTH,
@@ -14,8 +14,8 @@ from homeassistant.components.vultr import (
     CONF_SUBSCRIPTION,
     binary_sensor as vultr,
 )
-from homeassistant.const import CONF_NAME, CONF_PLATFORM
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_NAME, CONF_PLATFORM
+from smarthub.core import SmartHub
 
 CONFIGS = [
     {CONF_SUBSCRIPTION: "576965", CONF_NAME: "A Server"},
@@ -25,7 +25,7 @@ CONFIGS = [
 
 
 @pytest.mark.usefixtures("valid_config")
-def test_binary_sensor(hass: HomeAssistant) -> None:
+def test_binary_sensor(hass: SmartHub) -> None:
     """Test successful instance."""
     hass_devices = []
 
@@ -82,7 +82,7 @@ def test_invalid_sensor_config() -> None:
 
 
 @pytest.mark.usefixtures("valid_config")
-def test_invalid_sensors(hass: HomeAssistant) -> None:
+def test_invalid_sensors(hass: SmartHub) -> None:
     """Test the VultrBinarySensor fails."""
     hass_devices = []
 

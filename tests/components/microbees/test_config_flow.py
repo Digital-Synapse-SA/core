@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, patch
 from microBeesPy import MicroBeesException
 import pytest
 
-from homeassistant.components.microbees.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.components.microbees.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from . import setup_integration
 from .conftest import CLIENT_ID, MICROBEES_AUTH_URI, MICROBEES_TOKEN_URI, SCOPES
@@ -21,7 +21,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     microbees: AsyncMock,
@@ -64,7 +64,7 @@ async def test_full_flow(
     )
 
     with patch(
-        "homeassistant.components.microbees.async_setup_entry", return_value=True
+        "smarthub.components.microbees.async_setup_entry", return_value=True
     ) as mock_setup:
         result = await hass.config_entries.flow.async_configure(result["flow_id"])
 
@@ -82,7 +82,7 @@ async def test_full_flow(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_config_non_unique_profile(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     microbees: AsyncMock,
     config_entry: MockConfigEntry,
@@ -135,7 +135,7 @@ async def test_config_non_unique_profile(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_config_reauth_profile(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,
@@ -189,7 +189,7 @@ async def test_config_reauth_profile(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_config_reauth_wrong_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,
@@ -243,7 +243,7 @@ async def test_config_reauth_wrong_account(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_config_flow_with_invalid_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     microbees: AsyncMock,
@@ -298,7 +298,7 @@ async def test_config_flow_with_invalid_credentials(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_unexpected_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,

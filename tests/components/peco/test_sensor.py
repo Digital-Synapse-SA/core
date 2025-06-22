@@ -5,9 +5,9 @@ from unittest.mock import patch
 from peco import AlertResults, OutageResults
 import pytest
 
-from homeassistant.components.peco.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.peco.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -26,7 +26,7 @@ INVALID_COUNTY_DATA = {"county": "INVALID"}
     ],
 )
 async def test_sensor_available(
-    hass: HomeAssistant, sensor: str, expected: str
+    hass: SmartHub, sensor: str, expected: str
 ) -> None:
     """Test that the sensors are working."""
     # Totals Test

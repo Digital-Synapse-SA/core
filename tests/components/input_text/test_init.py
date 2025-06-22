@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.input_text import (
+from smarthub.components.input_text import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_MODE,
@@ -17,17 +17,17 @@ from homeassistant.components.input_text import (
     MODE_TEXT,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_EDITABLE,
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     ATTR_NAME,
     SERVICE_RELOAD,
 )
-from homeassistant.core import Context, CoreState, HomeAssistant, State
-from homeassistant.exceptions import Unauthorized
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import Context, CoreState, SmartHub, State
+from smarthub.exceptions import Unauthorized
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockUser, mock_restore_cache
 from tests.typing import WebSocketGenerator
@@ -37,7 +37,7 @@ TEST_VAL_MAX = 22
 
 
 @pytest.fixture
-def storage_setup(hass: HomeAssistant, hass_storage: dict[str, Any]):
+def storage_setup(hass: SmartHub, hass_storage: dict[str, Any]):
     """Storage setup."""
 
     async def _storage(items=None, config=None):
@@ -71,7 +71,7 @@ def storage_setup(hass: HomeAssistant, hass_storage: dict[str, Any]):
     return _storage
 
 
-async def async_set_value(hass: HomeAssistant, entity_id: str, value: str) -> None:
+async def async_set_value(hass: SmartHub, entity_id: str, value: str) -> None:
     """Set input_text to value."""
     await hass.services.async_call(
         DOMAIN,
@@ -81,7 +81,7 @@ async def async_set_value(hass: HomeAssistant, entity_id: str, value: str) -> No
     )
 
 
-async def test_config(hass: HomeAssistant) -> None:
+async def test_config(hass: SmartHub) -> None:
     """Test config."""
     invalid_configs = [
         None,
@@ -93,7 +93,7 @@ async def test_config(hass: HomeAssistant) -> None:
         assert not await async_setup_component(hass, DOMAIN, {DOMAIN: cfg})
 
 
-async def test_set_value(hass: HomeAssistant) -> None:
+async def test_set_value(hass: SmartHub) -> None:
     """Test set_value method."""
     assert await async_setup_component(
         hass,
@@ -123,7 +123,7 @@ async def test_set_value(hass: HomeAssistant) -> None:
     assert hass.states.get(entity_id_2).state == ""
 
 
-async def test_mode(hass: HomeAssistant) -> None:
+async def test_mode(hass: SmartHub) -> None:
     """Test mode settings."""
     assert await async_setup_component(
         hass,
@@ -160,7 +160,7 @@ async def test_mode(hass: HomeAssistant) -> None:
     assert state.attributes["mode"] == "password"
 
 
-async def test_restore_state(hass: HomeAssistant) -> None:
+async def test_restore_state(hass: SmartHub) -> None:
     """Ensure states are restored on startup."""
     mock_restore_cache(
         hass,
@@ -182,7 +182,7 @@ async def test_restore_state(hass: HomeAssistant) -> None:
     assert str(state.state) == "unknown"
 
 
-async def test_initial_state_overrules_restore_state(hass: HomeAssistant) -> None:
+async def test_initial_state_overrules_restore_state(hass: SmartHub) -> None:
     """Ensure states are restored on startup."""
     mock_restore_cache(
         hass,
@@ -211,7 +211,7 @@ async def test_initial_state_overrules_restore_state(hass: HomeAssistant) -> Non
     assert str(state.state) == "test"
 
 
-async def test_no_initial_state_and_no_restore_state(hass: HomeAssistant) -> None:
+async def test_no_initial_state_and_no_restore_state(hass: SmartHub) -> None:
     """Ensure that entity is create without initial and restore feature."""
     hass.set_state(CoreState.starting)
 
@@ -223,7 +223,7 @@ async def test_no_initial_state_and_no_restore_state(hass: HomeAssistant) -> Non
 
 
 async def test_input_text_context(
-    hass: HomeAssistant, hass_admin_user: MockUser
+    hass: SmartHub, hass_admin_user: MockUser
 ) -> None:
     """Test that input_text context works."""
     assert await async_setup_component(
@@ -247,7 +247,7 @@ async def test_input_text_context(
     assert state2.context.user_id == hass_admin_user.id
 
 
-async def test_config_none(hass: HomeAssistant) -> None:
+async def test_config_none(hass: SmartHub) -> None:
     """Set up input_text without any config."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {"b1": None}})
 
@@ -262,7 +262,7 @@ async def test_config_none(hass: HomeAssistant) -> None:
 
 
 async def test_reload(
-    hass: HomeAssistant, hass_admin_user: MockUser, hass_read_only_user: MockUser
+    hass: SmartHub, hass_admin_user: MockUser, hass_read_only_user: MockUser
 ) -> None:
     """Test reload service."""
     count_start = len(hass.states.async_entity_ids())
@@ -288,7 +288,7 @@ async def test_reload(
     assert state_2.attributes[ATTR_MAX] == 100
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={
             DOMAIN: {
@@ -325,7 +325,7 @@ async def test_reload(
     assert state_3.attributes[ATTR_MAX] == 21
 
 
-async def test_load_from_storage(hass: HomeAssistant, storage_setup) -> None:
+async def test_load_from_storage(hass: SmartHub, storage_setup) -> None:
     """Test set up from storage."""
     assert await storage_setup()
     state = hass.states.get(f"{DOMAIN}.from_storage")
@@ -335,7 +335,7 @@ async def test_load_from_storage(hass: HomeAssistant, storage_setup) -> None:
     assert state.attributes[ATTR_MIN] == TEST_VAL_MIN
 
 
-async def test_editable_state_attribute(hass: HomeAssistant, storage_setup) -> None:
+async def test_editable_state_attribute(hass: SmartHub, storage_setup) -> None:
     """Test editable attribute."""
     assert await storage_setup(
         config={
@@ -365,7 +365,7 @@ async def test_editable_state_attribute(hass: HomeAssistant, storage_setup) -> N
 
 
 async def test_ws_list(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, storage_setup
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, storage_setup
 ) -> None:
     """Test listing via WS."""
     assert await storage_setup(
@@ -399,7 +399,7 @@ async def test_ws_list(
 
 
 async def test_ws_delete(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     storage_setup,
@@ -428,7 +428,7 @@ async def test_ws_delete(
 
 
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     storage_setup,
@@ -476,7 +476,7 @@ async def test_update(
 
 
 async def test_ws_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     storage_setup,
@@ -513,13 +513,13 @@ async def test_ws_create(
     assert state.attributes[ATTR_MIN] == 0
 
 
-async def test_setup_no_config(hass: HomeAssistant, hass_admin_user: MockUser) -> None:
+async def test_setup_no_config(hass: SmartHub, hass_admin_user: MockUser) -> None:
     """Test component setup with no config."""
     count_start = len(hass.states.async_entity_ids())
     assert await async_setup_component(hass, DOMAIN, {})
 
     with patch(
-        "homeassistant.config.load_yaml_config_file", autospec=True, return_value={}
+        "smarthub.config.load_yaml_config_file", autospec=True, return_value={}
     ):
         await hass.services.async_call(
             DOMAIN,

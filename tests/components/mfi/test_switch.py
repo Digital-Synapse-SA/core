@@ -4,10 +4,10 @@ from unittest import mock
 
 import pytest
 
-from homeassistant.components import switch as switch_component
-from homeassistant.components.mfi import switch as mfi
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import switch as switch_component
+from smarthub.components.mfi import switch as mfi
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 PLATFORM = mfi
 COMPONENT = switch_component
@@ -25,12 +25,12 @@ GOOD_CONFIG = {
 }
 
 
-async def test_setup_adds_proper_devices(hass: HomeAssistant) -> None:
+async def test_setup_adds_proper_devices(hass: SmartHub) -> None:
     """Test if setup adds devices."""
     with (
-        mock.patch("homeassistant.components.mfi.switch.MFiClient") as mock_client,
+        mock.patch("smarthub.components.mfi.switch.MFiClient") as mock_client,
         mock.patch(
-            "homeassistant.components.mfi.switch.MfiSwitch", side_effect=mfi.MfiSwitch
+            "smarthub.components.mfi.switch.MfiSwitch", side_effect=mfi.MfiSwitch
         ) as mock_switch,
     ):
         ports = {

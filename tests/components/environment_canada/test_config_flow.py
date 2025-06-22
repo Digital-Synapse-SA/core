@@ -6,11 +6,11 @@ import xml.etree.ElementTree as ET
 import aiohttp
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.environment_canada.const import CONF_STATION, DOMAIN
-from homeassistant.const import CONF_LANGUAGE, CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.environment_canada.const import CONF_STATION, DOMAIN
+from smarthub.const import CONF_LANGUAGE, CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -35,17 +35,17 @@ def mocked_ec():
     ec_mock.update = AsyncMock()
 
     return patch(
-        "homeassistant.components.environment_canada.config_flow.ECWeather",
+        "smarthub.components.environment_canada.config_flow.ECWeather",
         return_value=ec_mock,
     )
 
 
-async def test_create_entry(hass: HomeAssistant) -> None:
+async def test_create_entry(hass: SmartHub) -> None:
     """Test creating an entry."""
     with (
         mocked_ec(),
         patch(
-            "homeassistant.components.environment_canada.async_setup_entry",
+            "smarthub.components.environment_canada.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -61,7 +61,7 @@ async def test_create_entry(hass: HomeAssistant) -> None:
         assert result["title"] == FAKE_TITLE
 
 
-async def test_create_same_entry_twice(hass: HomeAssistant) -> None:
+async def test_create_same_entry_twice(hass: SmartHub) -> None:
     """Test duplicate entries."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -73,7 +73,7 @@ async def test_create_same_entry_twice(hass: HomeAssistant) -> None:
     with (
         mocked_ec(),
         patch(
-            "homeassistant.components.environment_canada.async_setup_entry",
+            "smarthub.components.environment_canada.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -98,11 +98,11 @@ async def test_create_same_entry_twice(hass: HomeAssistant) -> None:
         (ValueError, "unknown"),
     ],
 )
-async def test_exception_handling(hass: HomeAssistant, error) -> None:
+async def test_exception_handling(hass: SmartHub, error) -> None:
     """Test exception handling."""
     exc, base_error = error
     with patch(
-        "homeassistant.components.environment_canada.config_flow.ECWeather",
+        "smarthub.components.environment_canada.config_flow.ECWeather",
         side_effect=exc,
     ):
         flow = await hass.config_entries.flow.async_init(
@@ -117,12 +117,12 @@ async def test_exception_handling(hass: HomeAssistant, error) -> None:
         assert result["errors"] == {"base": base_error}
 
 
-async def test_lat_lon_not_specified(hass: HomeAssistant) -> None:
+async def test_lat_lon_not_specified(hass: SmartHub) -> None:
     """Test that the import step works when coordinates are not specified."""
     with (
         mocked_ec(),
         patch(
-            "homeassistant.components.environment_canada.async_setup_entry",
+            "smarthub.components.environment_canada.async_setup_entry",
             return_value=True,
         ),
     ):

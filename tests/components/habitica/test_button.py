@@ -10,13 +10,13 @@ from habiticalib import HabiticaUserResponse, Skill
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.habitica.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.habitica.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from .conftest import ERROR_BAD_REQUEST, ERROR_NOT_AUTHORIZED, ERROR_TOO_MANY_REQUESTS
 
@@ -32,7 +32,7 @@ from tests.common import (
 def button_only() -> Generator[None]:
     """Enable only the button platform."""
     with patch(
-        "homeassistant.components.habitica.PLATFORMS",
+        "smarthub.components.habitica.PLATFORMS",
         [Platform.BUTTON],
     ):
         yield
@@ -48,7 +48,7 @@ def button_only() -> Generator[None]:
     ],
 )
 async def test_buttons(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -156,7 +156,7 @@ async def test_buttons(
     ],
 )
 async def test_button_press(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     entity_id: str,
@@ -217,12 +217,12 @@ async def test_button_press(
         (
             ERROR_TOO_MANY_REQUESTS,
             "Rate limit exceeded, try again in 5 seconds",
-            HomeAssistantError,
+            SmartHubError,
         ),
         (
             ERROR_BAD_REQUEST,
             "Unable to connect to Habitica: reason",
-            HomeAssistantError,
+            SmartHubError,
         ),
         (
             ERROR_NOT_AUTHORIZED,
@@ -232,12 +232,12 @@ async def test_button_press(
         (
             ClientError,
             "Unable to connect to Habitica: ",
-            HomeAssistantError,
+            SmartHubError,
         ),
     ],
 )
 async def test_button_press_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     entity_id: str,
@@ -312,7 +312,7 @@ async def test_button_press_exceptions(
     ],
 )
 async def test_button_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     fixture: str,
@@ -336,7 +336,7 @@ async def test_button_unavailable(
 
 
 async def test_class_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     habitica: AsyncMock,
     freezer: FrozenDateTimeFactory,

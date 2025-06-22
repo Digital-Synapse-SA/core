@@ -4,18 +4,18 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.google_translate.const import CONF_TLD, DOMAIN
-from homeassistant.components.tts import CONF_LANG
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.google_translate.const import CONF_TLD, DOMAIN
+from smarthub.components.tts import CONF_LANG
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_user_step(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_user_step(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test user step create entry result."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -42,7 +42,7 @@ async def test_user_step(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> No
 
 
 async def test_already_configured(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test user step already configured entry."""
     config_entry = MockConfigEntry(
@@ -70,7 +70,7 @@ async def test_already_configured(
 
 
 async def test_onboarding_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test the onboarding configuration flow."""
     result = await hass.config_entries.flow.async_init(

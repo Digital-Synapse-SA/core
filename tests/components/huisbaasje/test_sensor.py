@@ -2,13 +2,13 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.huisbaasje.const import DOMAIN
-from homeassistant.components.sensor import (
+from smarthub.components.huisbaasje.const import DOMAIN
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ID,
@@ -19,14 +19,14 @@ from homeassistant.const import (
     UnitOfVolume,
     UnitOfVolumeFlowRate,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .test_data import MOCK_CURRENT_MEASUREMENTS, MOCK_LIMITED_CURRENT_MEASUREMENTS
 
 from tests.common import MockConfigEntry
 
 
-async def test_setup_entry(hass: HomeAssistant) -> None:
+async def test_setup_entry(hass: SmartHub) -> None:
     """Test for successfully loading sensor states."""
     with (
         patch(
@@ -316,7 +316,7 @@ async def test_setup_entry(hass: HomeAssistant) -> None:
         assert len(mock_current_measurements.mock_calls) == 1
 
 
-async def test_setup_entry_absent_measurement(hass: HomeAssistant) -> None:
+async def test_setup_entry_absent_measurement(hass: SmartHub) -> None:
     """Test for successfully loading sensor states when response does not contain all measurements."""
     with (
         patch(

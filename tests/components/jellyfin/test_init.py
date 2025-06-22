@@ -2,11 +2,11 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.jellyfin.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.jellyfin.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import async_load_json_fixture
 
@@ -15,7 +15,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
@@ -34,7 +34,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_jellyfin: MagicMock,
     mock_client: MagicMock,
@@ -59,7 +59,7 @@ async def test_invalid_auth(
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_jellyfin: MagicMock,
 ) -> None:
@@ -76,7 +76,7 @@ async def test_load_unload_config_entry(
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_config_entry: MockConfigEntry,
     mock_jellyfin: MagicMock,

@@ -7,9 +7,9 @@ from aioautomower.model import HeadlightModes, MowerAttributes
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.husqvarna_automower.coordinator import SCAN_INTERVAL
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.husqvarna_automower.coordinator import SCAN_INTERVAL
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from . import setup_integration
 from .const import TEST_MOWER_ID
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_select_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -57,7 +57,7 @@ async def test_select_states(
     ],
 )
 async def test_select_commands(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service: str,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -79,7 +79,7 @@ async def test_select_commands(
 
     mocked_method.side_effect = ApiError("Test error")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Failed to send command: Test error",
     ):
         await hass.services.async_call(

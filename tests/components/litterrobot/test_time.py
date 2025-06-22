@@ -8,9 +8,9 @@ from unittest.mock import MagicMock
 from pylitterbot import LitterRobot3
 import pytest
 
-from homeassistant.components.time import DOMAIN as PLATFORM_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.components.time import DOMAIN as PLATFORM_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import setup_integration
 
@@ -19,7 +19,7 @@ SLEEP_START_TIME_ENTITY_ID = "time.test_sleep_mode_start_time"
 
 @pytest.mark.freeze_time(datetime(2023, 7, 1, 12))
 async def test_sleep_mode_start_time(
-    hass: HomeAssistant, mock_account: MagicMock
+    hass: SmartHub, mock_account: MagicMock
 ) -> None:
     """Tests the sleep mode start time."""
     await setup_integration(hass, mock_account, PLATFORM_DOMAIN)

@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, Mock, patch
 import aiohue.v2 as aiohue_v2
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import hue
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components import hue
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_get_persistent_notifications
 
@@ -34,7 +34,7 @@ def mock_bridge_setup():
         yield mock_bridge.return_value
 
 
-async def test_setup_with_no_config(hass: HomeAssistant) -> None:
+async def test_setup_with_no_config(hass: SmartHub) -> None:
     """Test that we do not discover anything or try to set up a bridge."""
     assert await async_setup_component(hass, hue.DOMAIN, {}) is True
 
@@ -45,7 +45,7 @@ async def test_setup_with_no_config(hass: HomeAssistant) -> None:
     assert not hass.config_entries.async_entries(hue.DOMAIN)
 
 
-async def test_unload_entry(hass: HomeAssistant, mock_bridge_setup) -> None:
+async def test_unload_entry(hass: SmartHub, mock_bridge_setup) -> None:
     """Test being able to unload an entry."""
     entry = MockConfigEntry(
         domain=hue.DOMAIN, data={"host": "0.0.0.0", "api_version": 2}
@@ -66,7 +66,7 @@ async def test_unload_entry(hass: HomeAssistant, mock_bridge_setup) -> None:
     assert not hasattr(entry, "runtime_data")
 
 
-async def test_setting_unique_id(hass: HomeAssistant, mock_bridge_setup) -> None:
+async def test_setting_unique_id(hass: SmartHub, mock_bridge_setup) -> None:
     """Test we set unique ID if not set yet."""
     entry = MockConfigEntry(
         domain=hue.DOMAIN, data={"host": "0.0.0.0", "api_version": 2}
@@ -77,7 +77,7 @@ async def test_setting_unique_id(hass: HomeAssistant, mock_bridge_setup) -> None
 
 
 async def test_fixing_unique_id_no_other(
-    hass: HomeAssistant, mock_bridge_setup
+    hass: SmartHub, mock_bridge_setup
 ) -> None:
     """Test we set unique ID if not set yet."""
     entry = MockConfigEntry(
@@ -91,7 +91,7 @@ async def test_fixing_unique_id_no_other(
 
 
 async def test_fixing_unique_id_other_ignored(
-    hass: HomeAssistant, mock_bridge_setup
+    hass: SmartHub, mock_bridge_setup
 ) -> None:
     """Test we set unique ID if not set yet."""
     MockConfigEntry(
@@ -113,7 +113,7 @@ async def test_fixing_unique_id_other_ignored(
 
 
 async def test_fixing_unique_id_other_correct(
-    hass: HomeAssistant, mock_bridge_setup
+    hass: SmartHub, mock_bridge_setup
 ) -> None:
     """Test we remove config entry if another one has correct ID."""
     correct_entry = MockConfigEntry(
@@ -133,7 +133,7 @@ async def test_fixing_unique_id_other_correct(
     assert hass.config_entries.async_entries() == [correct_entry]
 
 
-async def test_security_vuln_check(hass: HomeAssistant) -> None:
+async def test_security_vuln_check(hass: SmartHub) -> None:
     """Test that we report security vulnerabilities."""
     entry = MockConfigEntry(
         domain=hue.DOMAIN, data={"host": "0.0.0.0", "api_version": 1}

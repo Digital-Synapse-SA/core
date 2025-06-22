@@ -4,17 +4,17 @@ from unittest.mock import patch
 
 from pyipma import IPMAException
 
-from homeassistant.components.ipma.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_MODE
-from homeassistant.core import HomeAssistant
+from smarthub.components.ipma.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_MODE
+from smarthub.core import SmartHub
 
 from .test_weather import MockLocation
 
 from tests.common import MockConfigEntry
 
 
-async def test_async_setup_raises_entry_not_ready(hass: HomeAssistant) -> None:
+async def test_async_setup_raises_entry_not_ready(hass: SmartHub) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
 
     with patch(
@@ -33,7 +33,7 @@ async def test_async_setup_raises_entry_not_ready(hass: HomeAssistant) -> None:
         assert config_entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_unload_config_entry(hass: HomeAssistant) -> None:
+async def test_unload_config_entry(hass: SmartHub) -> None:
     """Test entry unloading."""
 
     with patch(

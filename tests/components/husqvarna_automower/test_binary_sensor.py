@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensor_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_automower_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -24,7 +24,7 @@ async def test_binary_sensor_snapshot(
 ) -> None:
     """Snapshot test states of the binary sensors."""
     with patch(
-        "homeassistant.components.husqvarna_automower.PLATFORMS",
+        "smarthub.components.husqvarna_automower.PLATFORMS",
         [Platform.BINARY_SENSOR],
     ):
         await setup_integration(hass, mock_config_entry)

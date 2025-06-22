@@ -2,9 +2,9 @@
 
 from pylamarzocco.const import ModelName
 
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.service_info.bluetooth import BluetoothServiceInfo
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.helpers.service_info.bluetooth import BluetoothServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -29,7 +29,7 @@ WAKE_UP_SLEEP_ENTRY_IDS = ["Os2OswX", "aXFz5bJ"]
 
 
 async def async_init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Set up the La Marzocco integration for testing."""
     mock_config_entry.add_to_hass(hass)

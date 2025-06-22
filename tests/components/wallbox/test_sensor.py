@@ -1,7 +1,7 @@
 """Test Wallbox Switch component."""
 
-from homeassistant.const import CONF_UNIT_OF_MEASUREMENT, UnitOfPower
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_UNIT_OF_MEASUREMENT, UnitOfPower
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .const import (
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_wallbox_sensor_class(
-    hass: HomeAssistant, entry: MockConfigEntry
+    hass: SmartHub, entry: MockConfigEntry
 ) -> None:
     """Test wallbox sensor class."""
 

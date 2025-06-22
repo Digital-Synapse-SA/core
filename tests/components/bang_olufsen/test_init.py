@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock
 
 from aiohttp.client_exceptions import ServerTimeoutError
 
-from homeassistant.components.bang_olufsen import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceRegistry
+from smarthub.components.bang_olufsen import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import DeviceRegistry
 
 from .const import TEST_FRIENDLY_NAME, TEST_MODEL_BALANCE, TEST_SERIAL_NUMBER
 
@@ -15,7 +15,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: DeviceRegistry,
     mock_config_entry: MockConfigEntry,
     mock_mozart_client: AsyncMock,
@@ -46,7 +46,7 @@ async def test_setup_entry(
 
 
 async def test_setup_entry_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -73,7 +73,7 @@ async def test_setup_entry_failed(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_mozart_client: AsyncMock,
 ) -> None:

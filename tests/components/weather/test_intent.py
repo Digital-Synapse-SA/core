@@ -2,21 +2,21 @@
 
 import pytest
 
-from homeassistant.components import conversation
-from homeassistant.components.homeassistant.exposed_entities import async_expose_entity
-from homeassistant.components.weather import (
+from smarthub.components import conversation
+from smarthub.components.smarthub.exposed_entities import async_expose_entity
+from smarthub.components.weather import (
     DOMAIN,
     WeatherEntity,
     intent as weather_intent,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import intent
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import intent
+from smarthub.setup import async_setup_component
 
 
-async def test_get_weather(hass: HomeAssistant) -> None:
+async def test_get_weather(hass: SmartHub) -> None:
     """Test get weather for first entity and by name."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "weather", {"weather": {}})
 
     entity1 = WeatherEntity()
@@ -70,9 +70,9 @@ async def test_get_weather(hass: HomeAssistant) -> None:
         assert err.value.result.no_match_reason == intent.MatchFailedReason.ASSISTANT
 
 
-async def test_get_weather_wrong_name(hass: HomeAssistant) -> None:
+async def test_get_weather_wrong_name(hass: SmartHub) -> None:
     """Test get weather with the wrong name."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "weather", {"weather": {}})
 
     entity1 = WeatherEntity()
@@ -106,9 +106,9 @@ async def test_get_weather_wrong_name(hass: HomeAssistant) -> None:
         )
 
 
-async def test_get_weather_no_entities(hass: HomeAssistant) -> None:
+async def test_get_weather_no_entities(hass: SmartHub) -> None:
     """Test get weather with no weather entities."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "weather", {"weather": {}})
     await weather_intent.async_setup_intents(hass)
 

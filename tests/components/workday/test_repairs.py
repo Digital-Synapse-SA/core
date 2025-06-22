@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from homeassistant.components.workday.const import CONF_REMOVE_HOLIDAYS, DOMAIN
-from homeassistant.const import CONF_COUNTRY
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.workday.const import CONF_REMOVE_HOLIDAYS, DOMAIN
+from smarthub.const import CONF_COUNTRY
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from . import (
     TEST_CONFIG_INCORRECT_COUNTRY,
@@ -24,7 +24,7 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 
 async def test_bad_country(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -77,7 +77,7 @@ async def test_bad_country(
 
 
 async def test_bad_country_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -130,7 +130,7 @@ async def test_bad_country_none(
 
 
 async def test_bad_country_no_province(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -181,7 +181,7 @@ async def test_bad_country_no_province(
 
 
 async def test_bad_province(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -235,7 +235,7 @@ async def test_bad_province(
 
 
 async def test_bad_province_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -289,7 +289,7 @@ async def test_bad_province_none(
 
 
 async def test_bad_named_holiday(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     issue_registry: ir.IssueRegistry,
@@ -362,7 +362,7 @@ async def test_bad_named_holiday(
 
 
 async def test_bad_date_holiday(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     issue_registry: ir.IssueRegistry,
@@ -434,7 +434,7 @@ async def test_bad_date_holiday(
     ["component.workday.issues.issue_1.title"],
 )
 async def test_other_fixable_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:

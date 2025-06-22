@@ -6,9 +6,9 @@ from eheimdigital.types import EheimDeviceType, FilterErrorCode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import init_integration
 
@@ -17,7 +17,7 @@ from tests.common import MockConfigEntry, get_sensor_display_state, snapshot_pla
 
 @pytest.mark.usefixtures("classic_vario_mock")
 async def test_setup_classic_vario(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -27,9 +27,9 @@ async def test_setup_classic_vario(
     mock_config_entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.eheimdigital.PLATFORMS", [Platform.SENSOR]),
+        patch("smarthub.components.eheimdigital.PLATFORMS", [Platform.SENSOR]),
         patch(
-            "homeassistant.components.eheimdigital.coordinator.asyncio.Event",
+            "smarthub.components.eheimdigital.coordinator.asyncio.Event",
             new=AsyncMock,
         ),
     ):
@@ -76,7 +76,7 @@ async def test_setup_classic_vario(
     ],
 )
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,

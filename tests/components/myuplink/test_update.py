@@ -2,7 +2,7 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -10,7 +10,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_update_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_myuplink_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

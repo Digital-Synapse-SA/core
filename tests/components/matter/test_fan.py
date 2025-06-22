@@ -6,7 +6,7 @@ from matter_server.client.models.node import MatterNode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_DIRECTION,
     ATTR_OSCILLATING,
     ATTR_PERCENTAGE,
@@ -18,14 +18,14 @@ from homeassistant.components.fan import (
     SERVICE_SET_DIRECTION,
     FanEntityFeature,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -36,7 +36,7 @@ from .common import (
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_fans(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -46,7 +46,7 @@ async def test_fans(
 
 @pytest.mark.parametrize("node_fixture", ["air_purifier"])
 async def test_fan_base(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -114,7 +114,7 @@ async def test_fan_base(
 @pytest.mark.parametrize("expected_lingering_tasks", [True])
 @pytest.mark.parametrize("node_fixture", ["air_purifier"])
 async def test_fan_turn_on_with_percentage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -152,7 +152,7 @@ async def test_fan_turn_on_with_percentage(
 @pytest.mark.parametrize("expected_lingering_tasks", [True])
 @pytest.mark.parametrize("node_fixture", ["fan"])
 async def test_fan_turn_on_with_preset_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -228,7 +228,7 @@ async def test_fan_turn_on_with_preset_mode(
 
 @pytest.mark.parametrize("node_fixture", ["air_purifier"])
 async def test_fan_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -271,7 +271,7 @@ async def test_fan_turn_off(
 
 @pytest.mark.parametrize("node_fixture", ["air_purifier"])
 async def test_fan_oscillate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -295,7 +295,7 @@ async def test_fan_oscillate(
 
 @pytest.mark.parametrize("node_fixture", ["air_purifier"])
 async def test_fan_set_direction(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -369,7 +369,7 @@ async def test_fan_set_direction(
     ],
 )
 async def test_fan_supported_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,
@@ -431,7 +431,7 @@ async def test_fan_supported_features(
     ],
 )
 async def test_fan_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_id: str,

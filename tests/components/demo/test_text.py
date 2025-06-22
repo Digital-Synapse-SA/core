@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.text import (
+from smarthub.components.text import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_PATTERN,
@@ -13,14 +13,14 @@ from homeassistant.components.text import (
     DOMAIN as TEXT_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_MODE,
     MAX_LENGTH_STATE_STATE,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 ENTITY_TEXT = "text.text"
 
@@ -29,14 +29,14 @@ ENTITY_TEXT = "text.text"
 def text_only() -> Generator[None]:
     """Enable only the text platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.TEXT],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_demo_text(hass: HomeAssistant, text_only: None) -> None:
+async def setup_demo_text(hass: SmartHub, text_only: None) -> None:
     """Initialize setup demo text."""
     assert await async_setup_component(
         hass, TEXT_DOMAIN, {"text": {"platform": "demo"}}
@@ -44,7 +44,7 @@ async def setup_demo_text(hass: HomeAssistant, text_only: None) -> None:
     await hass.async_block_till_done()
 
 
-def test_setup_params(hass: HomeAssistant) -> None:
+def test_setup_params(hass: SmartHub) -> None:
     """Test the initial parameters."""
     state = hass.states.get(ENTITY_TEXT)
     assert state.state == "Hello world"
@@ -54,7 +54,7 @@ def test_setup_params(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_MODE] == "text"
 
 
-async def test_set_value(hass: HomeAssistant) -> None:
+async def test_set_value(hass: SmartHub) -> None:
     """Test set value service."""
     await hass.services.async_call(
         TEXT_DOMAIN,

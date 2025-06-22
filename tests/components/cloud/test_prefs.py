@@ -5,14 +5,14 @@ from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 
-from homeassistant.auth.const import GROUP_ID_ADMIN
-from homeassistant.components.cloud.const import DOMAIN, PREF_TTS_DEFAULT_VOICE
-from homeassistant.components.cloud.prefs import STORAGE_KEY, CloudPreferences
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.auth.const import GROUP_ID_ADMIN
+from smarthub.components.cloud.const import DOMAIN, PREF_TTS_DEFAULT_VOICE
+from smarthub.components.cloud.prefs import STORAGE_KEY, CloudPreferences
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
-async def test_set_username(hass: HomeAssistant) -> None:
+async def test_set_username(hass: SmartHub) -> None:
     """Test we clear config if we set different username."""
     prefs = CloudPreferences(hass)
     await prefs.async_initialize()
@@ -28,7 +28,7 @@ async def test_set_username(hass: HomeAssistant) -> None:
     assert prefs.google_enabled
 
 
-async def test_erase_config(hass: HomeAssistant) -> None:
+async def test_erase_config(hass: SmartHub) -> None:
     """Test erasing config."""
     prefs = CloudPreferences(hass)
     await prefs.async_initialize()
@@ -54,7 +54,7 @@ async def test_erase_config(hass: HomeAssistant) -> None:
     }
 
 
-async def test_set_username_migration(hass: HomeAssistant) -> None:
+async def test_set_username_migration(hass: SmartHub) -> None:
     """Test we do not clear config if we had no username."""
     prefs = CloudPreferences(hass)
 
@@ -73,7 +73,7 @@ async def test_set_username_migration(hass: HomeAssistant) -> None:
 
 
 async def test_set_new_username(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test if setting new username returns true."""
     hass_storage[STORAGE_KEY] = {"version": 1, "data": {"username": "old-user"}}
@@ -87,7 +87,7 @@ async def test_set_new_username(
 
 
 async def test_load_invalid_cloud_user(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test loading cloud user with invalid storage."""
     hass_storage[STORAGE_KEY] = {"version": 1, "data": {"cloud_user": "non-existing"}}
@@ -108,7 +108,7 @@ async def test_load_invalid_cloud_user(
 
 
 async def test_setup_remove_cloud_user(
-    hass: HomeAssistant, hass_storage: dict[str, Any]
+    hass: SmartHub, hass_storage: dict[str, Any]
 ) -> None:
     """Test creating and removing cloud user."""
     hass_storage[STORAGE_KEY] = {"version": 1, "data": {"cloud_user": None}}
@@ -136,7 +136,7 @@ async def test_setup_remove_cloud_user(
     [([], False), (["cloud-user"], True), (["other-user"], False)],
 )
 async def test_import_google_assistant_settings(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     google_assistant_users: list[str],
     google_connected: bool,
@@ -145,7 +145,7 @@ async def test_import_google_assistant_settings(
     hass_storage[STORAGE_KEY] = {"version": 1, "data": {"username": "cloud-user"}}
 
     with patch(
-        "homeassistant.components.cloud.prefs.async_get_google_assistant_users"
+        "smarthub.components.cloud.prefs.async_get_google_assistant_users"
     ) as mock_get_users:
         mock_get_users.return_value = google_assistant_users
         prefs = CloudPreferences(hass)
@@ -158,7 +158,7 @@ async def test_import_google_assistant_settings(
     [("en-US", "en-US", "GuyNeural"), ("missing_language", "en-US", "JennyNeural")],
 )
 async def test_tts_default_voice_legacy_gender(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cloud: MagicMock,
     hass_storage: dict[str, Any],
     stored_language: str,

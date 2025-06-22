@@ -1,19 +1,19 @@
-"""Test Home Assistant Cast."""
+"""Test SmartHub Cast."""
 
 from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.cast import DOMAIN, home_assistant_cast
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.cast import DOMAIN, home_assistant_cast
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry, async_mock_signal
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_service_show_view(hass: HomeAssistant) -> None:
+async def test_service_show_view(hass: SmartHub) -> None:
     """Test showing a view."""
     entry = MockConfigEntry(domain=DOMAIN)
     entry.add_to_hass(hass)
@@ -21,7 +21,7 @@ async def test_service_show_view(hass: HomeAssistant) -> None:
     calls = async_mock_signal(hass, home_assistant_cast.SIGNAL_HASS_CAST_SHOW_VIEW)
 
     # No valid URL
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             "cast",
             "show_lovelace_view",
@@ -53,7 +53,7 @@ async def test_service_show_view(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_service_show_view_dashboard(hass: HomeAssistant) -> None:
+async def test_service_show_view_dashboard(hass: SmartHub) -> None:
     """Test casting a specific dashboard."""
     await async_process_ha_core_config(
         hass,
@@ -83,7 +83,7 @@ async def test_service_show_view_dashboard(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_use_cloud_url(hass: HomeAssistant) -> None:
+async def test_use_cloud_url(hass: SmartHub) -> None:
     """Test that we fall back to cloud url."""
     await async_process_ha_core_config(
         hass,
@@ -97,7 +97,7 @@ async def test_use_cloud_url(hass: HomeAssistant) -> None:
     calls = async_mock_signal(hass, home_assistant_cast.SIGNAL_HASS_CAST_SHOW_VIEW)
 
     with patch(
-        "homeassistant.components.cloud.async_remote_ui_url",
+        "smarthub.components.cloud.async_remote_ui_url",
         return_value="https://something.nabu.casa",
     ):
         await hass.services.async_call(
@@ -113,7 +113,7 @@ async def test_use_cloud_url(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_zeroconf")
-async def test_remove_entry(hass: HomeAssistant) -> None:
+async def test_remove_entry(hass: SmartHub) -> None:
     """Test removing config entry removes user."""
     entry = MockConfigEntry(
         data={},

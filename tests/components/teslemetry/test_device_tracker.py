@@ -6,9 +6,9 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from teslemetry_stream.const import Signal
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, assert_entities_alt, setup_platform
 from .const import METADATA_NOSCOPE, VEHICLE_DATA_ALT
@@ -16,7 +16,7 @@ from .const import METADATA_NOSCOPE, VEHICLE_DATA_ALT
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_device_tracker(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_legacy: AsyncMock,
@@ -29,7 +29,7 @@ async def test_device_tracker(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_device_tracker_alt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_vehicle_data: AsyncMock,
@@ -44,7 +44,7 @@ async def test_device_tracker_alt(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_device_tracker_noscope(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
     mock_metadata: AsyncMock,
@@ -61,7 +61,7 @@ async def test_device_tracker_noscope(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_device_tracker_streaming(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_vehicle_data: AsyncMock,
     mock_add_listener: AsyncMock,

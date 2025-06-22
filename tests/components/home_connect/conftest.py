@@ -31,15 +31,15 @@ from aiohomeconnect.model.error import HomeConnectApiError, HomeConnectError
 from aiohomeconnect.model.program import EnumerateProgram
 import pytest
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.home_connect.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.home_connect.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import MOCK_AVAILABLE_COMMANDS, MOCK_PROGRAMS, MOCK_SETTINGS, MOCK_STATUS
 
@@ -121,7 +121,7 @@ def mock_config_entry_v1_2(token_entry: dict[str, Any]) -> MockConfigEntry:
 
 
 @pytest.fixture(autouse=True)
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -140,7 +140,7 @@ def platforms() -> list[Platform]:
 
 @pytest.fixture(name="integration_setup")
 async def mock_integration_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     platforms: list[Platform],
     config_entry: MockConfigEntry,
 ) -> Callable[[MagicMock], Awaitable[bool]]:
@@ -150,9 +150,9 @@ async def mock_integration_setup(
     async def run(client: MagicMock) -> bool:
         assert config_entry.state is ConfigEntryState.NOT_LOADED
         with (
-            patch("homeassistant.components.home_connect.PLATFORMS", platforms),
+            patch("smarthub.components.home_connect.PLATFORMS", platforms),
             patch(
-                "homeassistant.components.home_connect.HomeConnectClient"
+                "smarthub.components.home_connect.HomeConnectClient"
             ) as client_mock,
         ):
             client_mock.return_value = client

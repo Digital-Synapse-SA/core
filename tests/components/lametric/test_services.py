@@ -14,7 +14,7 @@ from demetriek import (
 )
 import pytest
 
-from homeassistant.components.lametric.const import (
+from smarthub.components.lametric.const import (
     CONF_CYCLES,
     CONF_DATA,
     CONF_ICON_TYPE,
@@ -25,16 +25,16 @@ from homeassistant.components.lametric.const import (
     SERVICE_CHART,
     SERVICE_MESSAGE,
 )
-from homeassistant.const import CONF_DEVICE_ID, CONF_ICON
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import CONF_DEVICE_ID, CONF_ICON
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 pytestmark = pytest.mark.usefixtures("init_integration")
 
 
 async def test_service_chart(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_lametric: MagicMock,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_service_chart(
 
     mock_lametric.notify.side_effect = LaMetricError
     with pytest.raises(
-        HomeAssistantError, match="Could not send LaMetric notification"
+        SmartHubError, match="Could not send LaMetric notification"
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -121,7 +121,7 @@ async def test_service_chart(
 
 
 async def test_service_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_lametric: MagicMock,
 ) -> None:
@@ -195,7 +195,7 @@ async def test_service_message(
 
     mock_lametric.notify.side_effect = LaMetricError
     with pytest.raises(
-        HomeAssistantError, match="Could not send LaMetric notification"
+        SmartHubError, match="Could not send LaMetric notification"
     ):
         await hass.services.async_call(
             DOMAIN,

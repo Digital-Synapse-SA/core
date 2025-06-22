@@ -13,10 +13,10 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.extensions.image import PNGImageSnapshotExtension
 
-from homeassistant.components.habitica.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.components.habitica.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_time_changed, async_load_fixture
 from tests.typing import ClientSessionGenerator
@@ -26,7 +26,7 @@ from tests.typing import ClientSessionGenerator
 def image_only() -> Generator[None]:
     """Enable only the image platform."""
     with patch(
-        "homeassistant.components.habitica.PLATFORMS",
+        "smarthub.components.habitica.PLATFORMS",
         [Platform.IMAGE],
     ):
         yield
@@ -36,7 +36,7 @@ def image_only() -> Generator[None]:
     sys.platform != "linux", reason="linux only"
 )  # Pillow output on win/mac is different
 async def test_image_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     hass_client: ClientSessionGenerator,
@@ -46,7 +46,7 @@ async def test_image_platform(
     """Test image platform."""
     freezer.move_to("2024-09-20T22:00:00.000")
     with patch(
-        "homeassistant.components.habitica.coordinator.BytesIO",
+        "smarthub.components.habitica.coordinator.BytesIO",
     ) as avatar:
         avatar.side_effect = [
             BytesIO(

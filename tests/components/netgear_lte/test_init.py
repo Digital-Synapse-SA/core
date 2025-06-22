@@ -7,12 +7,12 @@ from eternalegypt.eternalegypt import Error
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.netgear_lte.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.util import dt as dt_util
+from smarthub.components.netgear_lte.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.util import dt as dt_util
 
 from .conftest import CONF_DATA
 
@@ -20,7 +20,7 @@ from tests.common import async_fire_time_changed
 
 
 @pytest.mark.usefixtures("setup_integration")
-async def test_setup_unload(hass: HomeAssistant) -> None:
+async def test_setup_unload(hass: SmartHub) -> None:
     """Test setup and unload."""
     entry = hass.config_entries.async_entries(DOMAIN)[0]
     assert entry.state is ConfigEntryState.LOADED
@@ -34,7 +34,7 @@ async def test_setup_unload(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("setup_cannot_connect")
-async def test_async_setup_entry_not_ready(hass: HomeAssistant) -> None:
+async def test_async_setup_entry_not_ready(hass: SmartHub) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     entry = hass.config_entries.async_entries(DOMAIN)[0]
     assert len(hass.config_entries.async_entries(DOMAIN)) == 1
@@ -43,7 +43,7 @@ async def test_async_setup_entry_not_ready(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_integration")
 async def test_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -55,10 +55,10 @@ async def test_device(
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "setup_integration")
-async def test_update_failed(hass: HomeAssistant) -> None:
+async def test_update_failed(hass: SmartHub) -> None:
     """Test coordinator throws UpdateFailed after failed update."""
     with patch(
-        "homeassistant.components.netgear_lte.eternalegypt.Modem.information",
+        "smarthub.components.netgear_lte.eternalegypt.Modem.information",
         side_effect=Error,
     ) as updater:
         next_update = dt_util.utcnow() + timedelta(seconds=10)

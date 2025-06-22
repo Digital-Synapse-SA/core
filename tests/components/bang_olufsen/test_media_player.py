@@ -20,13 +20,13 @@ from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 from voluptuous import Invalid, MultipleInvalid
 
-from homeassistant.components.bang_olufsen.const import (
+from smarthub.components.bang_olufsen.const import (
     BANG_OLUFSEN_REPEAT_FROM_HA,
     BANG_OLUFSEN_STATES,
     DOMAIN,
     BangOlufsenSource,
 )
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_GROUP_MEMBERS,
     ATTR_INPUT_SOURCE,
     ATTR_INPUT_SOURCE_LIST,
@@ -70,11 +70,11 @@ from homeassistant.components.media_player import (
     MediaType,
     RepeatMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.setup import async_setup_component
 
 from .const import (
     TEST_ACTIVE_SOUND_MODE_NAME,
@@ -120,7 +120,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_initialization(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     mock_config_entry: MockConfigEntry,
     mock_mozart_client: AsyncMock,
@@ -156,7 +156,7 @@ async def test_initialization(
 
 
 async def test_async_update_sources_audio_only(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -171,7 +171,7 @@ async def test_async_update_sources_audio_only(
 
 
 async def test_async_update_sources_outdated_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mozart_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -189,7 +189,7 @@ async def test_async_update_sources_outdated_api(
 
 
 async def test_async_update_sources_remote(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -211,7 +211,7 @@ async def test_async_update_sources_remote(
 
 
 async def test_async_update_sources_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mozart_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -242,7 +242,7 @@ async def test_async_update_sources_availability(
 
 
 async def test_async_update_playback_metadata(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -277,7 +277,7 @@ async def test_async_update_playback_metadata(
 
 
 async def test_async_update_playback_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -297,7 +297,7 @@ async def test_async_update_playback_error(
 
 
 async def test_async_update_playback_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -321,7 +321,7 @@ async def test_async_update_playback_progress(
 
 
 async def test_async_update_playback_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -366,7 +366,7 @@ async def test_async_update_playback_state(
     ],
 )
 async def test_async_update_source_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
     source: Source,
@@ -403,7 +403,7 @@ async def test_async_update_source_change(
 
 
 async def test_async_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -431,7 +431,7 @@ async def test_async_turn_off(
 
 
 async def test_async_set_volume_level(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -465,7 +465,7 @@ async def test_async_set_volume_level(
 
 
 async def test_async_update_beolink_line_in(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mozart_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -494,7 +494,7 @@ async def test_async_update_beolink_line_in(
 
 
 async def test_async_update_beolink_listener(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -540,7 +540,7 @@ async def test_async_update_beolink_listener(
 
 
 async def test_async_update_name_and_beolink(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: DeviceRegistry,
     mock_mozart_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -577,7 +577,7 @@ async def test_async_update_name_and_beolink(
 
 
 async def test_async_mute_volume(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -621,7 +621,7 @@ async def test_async_mute_volume(
     ],
 )
 async def test_async_media_play_pause(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
     initial_state: RenderingState,
@@ -650,7 +650,7 @@ async def test_async_media_play_pause(
 
 
 async def test_async_media_stop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -678,7 +678,7 @@ async def test_async_media_stop(
 
 
 async def test_async_media_next_track(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -699,13 +699,13 @@ async def test_async_media_next_track(
         # Seekable source, seek expected
         (TEST_SOURCE, does_not_raise(), 1),
         # Non seekable source, seek shouldn't work
-        (BangOlufsenSource.LINE_IN, pytest.raises(HomeAssistantError), 0),
+        (BangOlufsenSource.LINE_IN, pytest.raises(SmartHubError), 0),
         # Malformed source, seek shouldn't work
-        (Source(), pytest.raises(HomeAssistantError), 0),
+        (Source(), pytest.raises(SmartHubError), 0),
     ],
 )
 async def test_async_media_seek(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
     source: Source,
@@ -736,7 +736,7 @@ async def test_async_media_seek(
 
 
 async def test_async_media_previous_track(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -752,7 +752,7 @@ async def test_async_media_previous_track(
 
 
 async def test_async_clear_playlist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -779,7 +779,7 @@ async def test_async_clear_playlist(
     ],
 )
 async def test_async_select_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
     source: str,
@@ -804,7 +804,7 @@ async def test_async_select_source(
 
 
 async def test_async_select_sound_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -837,7 +837,7 @@ async def test_async_select_sound_mode(
 
 
 async def test_async_select_sound_mode_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
 ) -> None:
     """Test async_select_sound_mode with an invalid sound_mode."""
@@ -859,7 +859,7 @@ async def test_async_select_sound_mode_invalid(
 
 
 async def test_async_play_media_invalid_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
 ) -> None:
     """Test async_play_media only accepts valid media types."""
@@ -878,11 +878,11 @@ async def test_async_play_media_invalid_type(
 
     assert exc_info.value.translation_domain == DOMAIN
     assert exc_info.value.translation_key == "invalid_media_type"
-    assert exc_info.errisinstance(HomeAssistantError)
+    assert exc_info.errisinstance(SmartHubError)
 
 
 async def test_async_play_media_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -905,11 +905,11 @@ async def test_async_play_media_url(
 
 
 async def test_async_play_media_overlay_absolute_volume_uri(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
-    """Test async_play_media overlay with Home Assistant local URI and absolute volume."""
+    """Test async_play_media overlay with SmartHub local URI and absolute volume."""
 
     await async_setup_component(hass, "media_source", {"media_source": {}})
 
@@ -935,12 +935,12 @@ async def test_async_play_media_overlay_absolute_volume_uri(
 
 
 async def test_async_play_media_overlay_invalid_offset_volume_tts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
-    """Test async_play_media with Home Assistant invalid offset volume and B&O tts."""
+    """Test async_play_media with SmartHub invalid offset volume and B&O tts."""
     await hass.services.async_call(
         MEDIA_PLAYER_DOMAIN,
         SERVICE_PLAY_MEDIA,
@@ -964,11 +964,11 @@ async def test_async_play_media_overlay_invalid_offset_volume_tts(
 
 
 async def test_async_play_media_overlay_offset_volume_tts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
-    """Test async_play_media with Home Assistant invalid offset volume and B&O tts."""
+    """Test async_play_media with SmartHub invalid offset volume and B&O tts."""
     volume_callback = mock_mozart_client.get_volume_notifications.call_args[0][0]
 
     # Set the volume to enable offset
@@ -993,11 +993,11 @@ async def test_async_play_media_overlay_offset_volume_tts(
 
 
 async def test_async_play_media_tts(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
-    """Test async_play_media with Home Assistant tts."""
+    """Test async_play_media with SmartHub tts."""
     await async_setup_component(hass, "media_source", {"media_source": {}})
 
     await hass.services.async_call(
@@ -1015,7 +1015,7 @@ async def test_async_play_media_tts(
 
 
 async def test_async_play_media_radio(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -1037,7 +1037,7 @@ async def test_async_play_media_radio(
 
 
 async def test_async_play_media_favourite(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -1057,7 +1057,7 @@ async def test_async_play_media_favourite(
 
 
 async def test_async_play_media_deezer_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -1082,7 +1082,7 @@ async def test_async_play_media_deezer_flow(
 
 
 async def test_async_play_media_deezer_playlist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -1105,7 +1105,7 @@ async def test_async_play_media_deezer_playlist(
 
 
 async def test_async_play_media_deezer_track(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -1127,7 +1127,7 @@ async def test_async_play_media_deezer_track(
 
 
 async def test_async_play_media_invalid_deezer(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -1135,7 +1135,7 @@ async def test_async_play_media_invalid_deezer(
 
     mock_mozart_client.start_deezer_flow.side_effect = TEST_DEEZER_INVALID_FLOW
 
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             MEDIA_PLAYER_DOMAIN,
             SERVICE_PLAY_MEDIA,
@@ -1149,13 +1149,13 @@ async def test_async_play_media_invalid_deezer(
 
     assert exc_info.value.translation_domain == DOMAIN
     assert exc_info.value.translation_key == "play_media_error"
-    assert exc_info.errisinstance(HomeAssistantError)
+    assert exc_info.errisinstance(SmartHubError)
 
     mock_mozart_client.start_deezer_flow.assert_called_once()
 
 
 async def test_async_play_media_url_m3u(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
 ) -> None:
@@ -1163,9 +1163,9 @@ async def test_async_play_media_url_m3u(
     await async_setup_component(hass, "media_source", {"media_source": {}})
 
     with (
-        pytest.raises(HomeAssistantError) as exc_info,
+        pytest.raises(SmartHubError) as exc_info,
         patch(
-            "homeassistant.components.bang_olufsen.media_player.async_process_play_media_url",
+            "smarthub.components.bang_olufsen.media_player.async_process_play_media_url",
             return_value="https://test.com/test.m3u",
         ),
     ):
@@ -1183,7 +1183,7 @@ async def test_async_play_media_url_m3u(
     # Check exception
     assert exc_info.value.translation_domain == DOMAIN
     assert exc_info.value.translation_key == "m3u_invalid_format"
-    assert exc_info.errisinstance(HomeAssistantError)
+    assert exc_info.errisinstance(SmartHubError)
 
     mock_mozart_client.post_uri_source.assert_not_called()
 
@@ -1224,7 +1224,7 @@ async def test_async_play_media_url_m3u(
     ],
 )
 async def test_async_browse_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     integration: None,
     child: dict[str, str | bool | None],
@@ -1257,7 +1257,7 @@ async def test_async_browse_media(
     ],
 )
 async def test_async_join_players(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -1320,7 +1320,7 @@ async def test_async_join_players(
     ],
 )
 async def test_async_join_players_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -1353,7 +1353,7 @@ async def test_async_join_players_invalid(
 
     assert exc_info.value.translation_domain == DOMAIN
     assert exc_info.value.translation_key == error_type
-    assert exc_info.errisinstance(HomeAssistantError)
+    assert exc_info.errisinstance(SmartHubError)
 
     assert mock_mozart_client.post_beolink_expand.call_count == 0
     assert mock_mozart_client.join_latest_beolink_experience.call_count == 0
@@ -1368,7 +1368,7 @@ async def test_async_join_players_invalid(
 
 
 async def test_async_unjoin_player(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -1411,7 +1411,7 @@ async def test_async_unjoin_player(
     ],
 )
 async def test_async_beolink_join(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -1456,7 +1456,7 @@ async def test_async_beolink_join(
     ],
 )
 async def test_async_beolink_join_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -1515,7 +1515,7 @@ async def test_async_beolink_join_invalid(
     ],
 )
 async def test_async_beolink_expand(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     snapshot: SnapshotAssertion,
     integration: None,
@@ -1562,7 +1562,7 @@ async def test_async_beolink_expand(
 
 
 async def test_async_beolink_unexpand(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -1585,7 +1585,7 @@ async def test_async_beolink_unexpand(
 
 
 async def test_async_beolink_allstandby(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     integration: None,
     mock_mozart_client: AsyncMock,
@@ -1616,7 +1616,7 @@ async def test_async_beolink_allstandby(
     ],
 )
 async def test_async_set_repeat(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
     repeat: RepeatMode,
@@ -1661,7 +1661,7 @@ async def test_async_set_repeat(
     ],
 )
 async def test_async_set_shuffle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     integration: None,
     mock_mozart_client: AsyncMock,
     shuffle: bool,

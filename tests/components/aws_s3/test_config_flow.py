@@ -9,10 +9,10 @@ from botocore.exceptions import (
 )
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.aws_s3.const import CONF_BUCKET, CONF_ENDPOINT_URL, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.aws_s3.const import CONF_BUCKET, CONF_ENDPOINT_URL, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import USER_INPUT
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry
 
 
 async def _async_start_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     user_input: dict[str, str] | None = None,
 ) -> FlowResultType:
     """Initialize the config flow."""
@@ -38,7 +38,7 @@ async def _async_start_flow(
     )
 
 
-async def test_flow(hass: HomeAssistant) -> None:
+async def test_flow(hass: SmartHub) -> None:
     """Test config flow."""
     result = await _async_start_flow(hass)
     assert result["type"] is FlowResultType.CREATE_ENTRY
@@ -61,7 +61,7 @@ async def test_flow(hass: HomeAssistant) -> None:
     ],
 )
 async def test_flow_create_client_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     errors: dict[str, str],
 ) -> None:
@@ -87,7 +87,7 @@ async def test_flow_create_client_errors(
 
 
 async def test_flow_head_bucket_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: AsyncMock,
 ) -> None:
     """Test setup_entry error when calling head_bucket."""
@@ -112,7 +112,7 @@ async def test_flow_head_bucket_error(
 
 
 async def test_abort_if_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort if the account is already configured."""
@@ -123,7 +123,7 @@ async def test_abort_if_already_configured(
 
 
 async def test_flow_create_not_aws_endpoint(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test config flow with a not aws endpoint should raise an error."""
     result = await _async_start_flow(

@@ -9,10 +9,10 @@ import pytest
 from renault_api.kamereon import exceptions, models, schemas
 from renault_api.renault_account import RenaultAccount
 
-from homeassistant.components.renault.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import aiohttp_client
+from smarthub.components.renault.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers import aiohttp_client
 
 from .const import MOCK_ACCOUNT_ID, MOCK_CONFIG, MOCK_VEHICLES
 
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry, load_fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.renault.async_setup_entry", return_value=True
+        "smarthub.components.renault.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -35,7 +35,7 @@ def get_vehicle_type(request: pytest.FixtureRequest) -> str:
 
 
 @pytest.fixture(name="config_entry")
-def get_config_entry(hass: HomeAssistant) -> ConfigEntry:
+def get_config_entry(hass: SmartHub) -> ConfigEntry:
     """Create and register mock config entry."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -50,7 +50,7 @@ def get_config_entry(hass: HomeAssistant) -> ConfigEntry:
 
 
 @pytest.fixture(name="patch_renault_account")
-async def patch_renault_account(hass: HomeAssistant) -> AsyncGenerator[RenaultAccount]:
+async def patch_renault_account(hass: SmartHub) -> AsyncGenerator[RenaultAccount]:
     """Create a Renault account."""
     renault_account = RenaultAccount(
         MOCK_ACCOUNT_ID,

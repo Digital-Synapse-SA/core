@@ -12,11 +12,11 @@ from pyoctoprintapi import (
     TrackingSetting,
 )
 
-from homeassistant.components.octoprint import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import UNDEFINED, UndefinedType
+from smarthub.components.octoprint import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import UNDEFINED, UndefinedType
 
 from tests.common import MockConfigEntry
 
@@ -35,12 +35,12 @@ DEFAULT_PRINTER = {
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     platform: Platform,
     printer: dict[str, Any] | UndefinedType | None = UNDEFINED,
     job: dict[str, Any] | None = None,
 ) -> None:
-    """Set up the octoprint integration in Home Assistant."""
+    """Set up the octoprint integration in SmartHub."""
     printer_info: OctoprintPrinterInfo | None = None
     if printer is UNDEFINED:
         printer = DEFAULT_PRINTER
@@ -49,7 +49,7 @@ async def init_integration(
     if job is None:
         job = DEFAULT_JOB
     with (
-        patch("homeassistant.components.octoprint.PLATFORMS", [platform]),
+        patch("smarthub.components.octoprint.PLATFORMS", [platform]),
         patch("pyoctoprintapi.OctoprintClient.get_server_info", return_value={}),
         patch(
             "pyoctoprintapi.OctoprintClient.get_printer_info",

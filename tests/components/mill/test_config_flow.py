@@ -4,12 +4,12 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.mill.const import CLOUD, CONNECTION_TYPE, DOMAIN, LOCAL
-from homeassistant.components.recorder import Recorder
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.mill.const import CLOUD, CONNECTION_TYPE, DOMAIN, LOCAL
+from smarthub.components.recorder import Recorder
+from smarthub.const import CONF_IP_ADDRESS, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -17,7 +17,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_show_config_form(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test show configuration form."""
     result = await hass.config_entries.flow.async_init(
@@ -29,7 +29,7 @@ async def test_show_config_form(
 
 
 async def test_create_entry(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test create entry from user input."""
     result = await hass.config_entries.flow.async_init(
@@ -66,7 +66,7 @@ async def test_create_entry(
 
 
 async def test_flow_entry_already_exists(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test user input for config_entry that already exists."""
 
@@ -108,7 +108,7 @@ async def test_flow_entry_already_exists(
 
 
 async def test_connection_error(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test connection error."""
     result = await hass.config_entries.flow.async_init(
@@ -139,7 +139,7 @@ async def test_connection_error(
 
 
 async def test_local_create_entry(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test create entry from user input."""
     result = await hass.config_entries.flow.async_init(
@@ -181,7 +181,7 @@ async def test_local_create_entry(
 
 
 async def test_local_flow_entry_already_exists(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test user input for config_entry that already exists."""
 
@@ -233,7 +233,7 @@ async def test_local_flow_entry_already_exists(
 
 
 async def test_local_connection_error(
-    recorder_mock: Recorder, hass: HomeAssistant, mock_setup_entry: AsyncMock
+    recorder_mock: Recorder, hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test connection error."""
 

@@ -10,14 +10,14 @@ from flux_led.const import (
 from flux_led.protocol import PowerRestoreState, RemoteConfig
 import pytest
 
-from homeassistant.components import flux_led
-from homeassistant.components.flux_led.const import CONF_WHITE_CHANNEL_TYPE, DOMAIN
-from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_OPTION, CONF_HOST, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import flux_led
+from smarthub.components.flux_led.const import CONF_WHITE_CHANNEL_TYPE, DOMAIN
+from smarthub.components.select import DOMAIN as SELECT_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, ATTR_OPTION, CONF_HOST, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -37,11 +37,11 @@ from tests.common import MockConfigEntry
 @pytest.fixture(autouse=True)
 def no_wait_on_state_change():
     """Disable waiting for state change in tests."""
-    with patch("homeassistant.components.flux_led.select.STATE_CHANGE_LATENCY", 0):
+    with patch("smarthub.components.flux_led.select.STATE_CHANGE_LATENCY", 0):
         yield
 
 
-async def test_switch_power_restore_state(hass: HomeAssistant) -> None:
+async def test_switch_power_restore_state(hass: SmartHub) -> None:
     """Test a smart plug power restore state."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -71,7 +71,7 @@ async def test_switch_power_restore_state(hass: HomeAssistant) -> None:
 
 
 async def test_power_restored_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a select unique id."""
     config_entry = MockConfigEntry(
@@ -93,7 +93,7 @@ async def test_power_restored_unique_id(
 
 
 async def test_power_restored_unique_id_no_discovery(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a select unique id."""
     config_entry = MockConfigEntry(
@@ -113,7 +113,7 @@ async def test_power_restored_unique_id_no_discovery(
     )
 
 
-async def test_select_addressable_strip_config(hass: HomeAssistant) -> None:
+async def test_select_addressable_strip_config(hass: SmartHub) -> None:
     """Test selecting addressable strip configs."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -160,7 +160,7 @@ async def test_select_addressable_strip_config(hass: HomeAssistant) -> None:
         )
 
     with patch(
-        "homeassistant.components.flux_led.async_setup_entry"
+        "smarthub.components.flux_led.async_setup_entry"
     ) as mock_setup_entry:
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -173,7 +173,7 @@ async def test_select_addressable_strip_config(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_select_mutable_0x25_strip_config(hass: HomeAssistant) -> None:
+async def test_select_mutable_0x25_strip_config(hass: SmartHub) -> None:
     """Test selecting mutable 0x25 strip configs."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -202,7 +202,7 @@ async def test_select_mutable_0x25_strip_config(hass: HomeAssistant) -> None:
         )
 
     with patch(
-        "homeassistant.components.flux_led.async_setup_entry"
+        "smarthub.components.flux_led.async_setup_entry"
     ) as mock_setup_entry:
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -215,7 +215,7 @@ async def test_select_mutable_0x25_strip_config(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_select_24ghz_remote_config(hass: HomeAssistant) -> None:
+async def test_select_24ghz_remote_config(hass: SmartHub) -> None:
     """Test selecting 2.4ghz remote config."""
     _mock_config_entry_for_bulb(hass)
     bulb = _mocked_bulb()
@@ -257,7 +257,7 @@ async def test_select_24ghz_remote_config(hass: HomeAssistant) -> None:
     bulb.async_config_remotes.reset_mock()
 
 
-async def test_select_white_channel_type(hass: HomeAssistant) -> None:
+async def test_select_white_channel_type(hass: SmartHub) -> None:
     """Test selecting the white channel type."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -286,7 +286,7 @@ async def test_select_white_channel_type(hass: HomeAssistant) -> None:
         )
 
     with patch(
-        "homeassistant.components.flux_led.async_setup_entry"
+        "smarthub.components.flux_led.async_setup_entry"
     ) as mock_setup_entry:
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -305,7 +305,7 @@ async def test_select_white_channel_type(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_select_device_no_wiring(hass: HomeAssistant) -> None:
+async def test_select_device_no_wiring(hass: SmartHub) -> None:
     """Test select is not created if the device does not support wiring."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

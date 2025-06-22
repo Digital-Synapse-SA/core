@@ -6,15 +6,15 @@ from aemet_opendata.exceptions import AuthError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.aemet.const import (
+from smarthub.components.aemet.const import (
     CONF_RADAR_UPDATES,
     CONF_STATION_UPDATES,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .util import mock_api_call
 
@@ -30,11 +30,11 @@ CONFIG = {
 }
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test that the form is served with valid input."""
 
     with patch(
-        "homeassistant.components.aemet.AEMET.api_call",
+        "smarthub.components.aemet.AEMET.api_call",
         side_effect=mock_api_call,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -75,7 +75,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
     ],
 )
 async def test_form_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     user_input: dict[str, bool],
     expected: dict[str, bool],
@@ -85,7 +85,7 @@ async def test_form_options(
     await hass.config.async_set_time_zone("UTC")
     freezer.move_to("2021-01-09 12:00:00+00:00")
     with patch(
-        "homeassistant.components.aemet.AEMET.api_call",
+        "smarthub.components.aemet.AEMET.api_call",
         side_effect=mock_api_call,
     ):
         entry = MockConfigEntry(
@@ -119,7 +119,7 @@ async def test_form_options(
 
 
 async def test_form_duplicated_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test setting up duplicated entry."""
@@ -127,7 +127,7 @@ async def test_form_duplicated_id(
     await hass.config.async_set_time_zone("UTC")
     freezer.move_to("2021-01-09 12:00:00+00:00")
     with patch(
-        "homeassistant.components.aemet.AEMET.api_call",
+        "smarthub.components.aemet.AEMET.api_call",
         side_effect=mock_api_call,
     ):
         entry = MockConfigEntry(
@@ -143,13 +143,13 @@ async def test_form_duplicated_id(
         assert result["reason"] == "already_configured"
 
 
-async def test_form_auth_error(hass: HomeAssistant) -> None:
+async def test_form_auth_error(hass: SmartHub) -> None:
     """Test setting up with api auth error."""
     mocked_aemet = MagicMock()
     mocked_aemet.select_coordinates.side_effect = AuthError
 
     with patch(
-        "homeassistant.components.aemet.config_flow.AEMET",
+        "smarthub.components.aemet.config_flow.AEMET",
         return_value=mocked_aemet,
     ):
         result = await hass.config_entries.flow.async_init(

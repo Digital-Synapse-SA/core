@@ -7,21 +7,21 @@ from freezegun.api import FrozenDateTimeFactory
 from holidays import UNOFFICIAL
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.holiday.const import (
+from smarthub import config_entries
+from smarthub.components.holiday.const import (
     CONF_CATEGORIES,
     CONF_PROVINCE,
     DOMAIN,
 )
-from homeassistant.const import CONF_COUNTRY, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.util import dt as dt_util
+from smarthub.const import CONF_COUNTRY, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
+async def test_form(hass: SmartHub, mock_setup_entry: AsyncMock) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -56,7 +56,7 @@ async def test_form(hass: HomeAssistant, mock_setup_entry: AsyncMock) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form_no_subdivision(hass: HomeAssistant) -> None:
+async def test_form_no_subdivision(hass: SmartHub) -> None:
     """Test we get the forms correctly without subdivision."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -79,7 +79,7 @@ async def test_form_no_subdivision(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form_translated_title(hass: HomeAssistant) -> None:
+async def test_form_translated_title(hass: SmartHub) -> None:
     """Test the title gets translated."""
     hass.config.language = "de"
 
@@ -99,7 +99,7 @@ async def test_form_translated_title(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_single_combination_country_province(hass: HomeAssistant) -> None:
+async def test_single_combination_country_province(hass: SmartHub) -> None:
     """Test that configuring more than one instance is rejected."""
     data_de = {
         CONF_COUNTRY: "DE",
@@ -139,7 +139,7 @@ async def test_single_combination_country_province(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form_babel_unresolved_language(hass: HomeAssistant) -> None:
+async def test_form_babel_unresolved_language(hass: SmartHub) -> None:
     """Test the config flow if using not babel supported language."""
     hass.config.language = "en-XX"
 
@@ -186,7 +186,7 @@ async def test_form_babel_unresolved_language(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_form_babel_replace_dash_with_underscore(hass: HomeAssistant) -> None:
+async def test_form_babel_replace_dash_with_underscore(hass: SmartHub) -> None:
     """Test the config flow if using language with dash."""
     hass.config.language = "en-GB"
 
@@ -233,7 +233,7 @@ async def test_form_babel_replace_dash_with_underscore(hass: HomeAssistant) -> N
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_reconfigure(hass: HomeAssistant) -> None:
+async def test_reconfigure(hass: SmartHub) -> None:
     """Test reconfigure flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -261,7 +261,7 @@ async def test_reconfigure(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_reconfigure_with_categories(hass: HomeAssistant) -> None:
+async def test_reconfigure_with_categories(hass: SmartHub) -> None:
     """Test reconfigure flow with categories."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -291,7 +291,7 @@ async def test_reconfigure_with_categories(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_reconfigure_incorrect_language(hass: HomeAssistant) -> None:
+async def test_reconfigure_incorrect_language(hass: SmartHub) -> None:
     """Test reconfigure flow default to English."""
     hass.config.language = "en-XX"
 
@@ -321,7 +321,7 @@ async def test_reconfigure_incorrect_language(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_reconfigure_entry_exists(hass: HomeAssistant) -> None:
+async def test_reconfigure_entry_exists(hass: SmartHub) -> None:
     """Test reconfigure flow stops if other entry already exist."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -355,7 +355,7 @@ async def test_reconfigure_entry_exists(hass: HomeAssistant) -> None:
 
 
 async def test_form_with_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test the flow with configuring options."""
@@ -426,7 +426,7 @@ async def test_form_with_options(
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
-async def test_options_abort_no_categories(hass: HomeAssistant) -> None:
+async def test_options_abort_no_categories(hass: SmartHub) -> None:
     """Test the options flow abort if no categories to select."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

@@ -1,6 +1,6 @@
 """Common helper and classes for number entity tests."""
 
-from homeassistant.components.number import NumberEntity, RestoreNumber
+from smarthub.components.number import NumberEntity, RestoreNumber
 
 from tests.common import MockEntity
 

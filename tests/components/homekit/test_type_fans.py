@@ -2,7 +2,7 @@
 
 from pyhap.const import HAP_REPR_AID, HAP_REPR_CHARS, HAP_REPR_IID, HAP_REPR_VALUE
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_DIRECTION,
     ATTR_OSCILLATING,
     ATTR_PERCENTAGE,
@@ -14,15 +14,15 @@ from homeassistant.components.fan import (
     DOMAIN as FAN_DOMAIN,
     FanEntityFeature,
 )
-from homeassistant.components.homekit.accessories import HomeDriver
-from homeassistant.components.homekit.const import (
+from smarthub.components.homekit.accessories import HomeDriver
+from smarthub.components.homekit.const import (
     ATTR_VALUE,
     CHAR_CONFIGURED_NAME,
     PROP_MIN_STEP,
     SERV_SWITCH,
 )
-from homeassistant.components.homekit.type_fans import Fan
-from homeassistant.const import (
+from smarthub.components.homekit.type_fans import Fan
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_SUPPORTED_FEATURES,
     EVENT_HOMEASSISTANT_START,
@@ -30,13 +30,13 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import CoreState, Event, HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import CoreState, Event, SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import async_mock_service
 
 
-async def test_fan_basic(hass: HomeAssistant, hk_driver, events: list[Event]) -> None:
+async def test_fan_basic(hass: SmartHub, hk_driver, events: list[Event]) -> None:
     """Test fan with char state."""
     entity_id = "fan.demo"
 
@@ -115,7 +115,7 @@ async def test_fan_basic(hass: HomeAssistant, hk_driver, events: list[Event]) ->
 
 
 async def test_fan_direction(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test fan with direction."""
     entity_id = "fan.demo"
@@ -195,7 +195,7 @@ async def test_fan_direction(
 
 
 async def test_fan_oscillate(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test fan with oscillate."""
     entity_id = "fan.demo"
@@ -269,7 +269,7 @@ async def test_fan_oscillate(
     assert events[-1].data[ATTR_VALUE] is True
 
 
-async def test_fan_speed(hass: HomeAssistant, hk_driver, events: list[Event]) -> None:
+async def test_fan_speed(hass: SmartHub, hk_driver, events: list[Event]) -> None:
     """Test fan with speed."""
     entity_id = "fan.demo"
 
@@ -372,7 +372,7 @@ async def test_fan_speed(hass: HomeAssistant, hk_driver, events: list[Event]) ->
 
 
 async def test_fan_set_all_one_shot(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test fan with speed."""
     entity_id = "fan.demo"
@@ -567,7 +567,7 @@ async def test_fan_set_all_one_shot(
 
 
 async def test_fan_restore(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, hk_driver
+    hass: SmartHub, entity_registry: er.EntityRegistry, hk_driver
 ) -> None:
     """Test setting up an entity from state in the event registry."""
     hass.set_state(CoreState.not_running)
@@ -609,7 +609,7 @@ async def test_fan_restore(
 
 
 async def test_fan_multiple_preset_modes(
-    hass: HomeAssistant, hk_driver: HomeDriver, events: list[Event]
+    hass: SmartHub, hk_driver: HomeDriver, events: list[Event]
 ) -> None:
     """Test fan with multiple preset modes."""
     entity_id = "fan.demo"
@@ -694,7 +694,7 @@ async def test_fan_multiple_preset_modes(
 
 
 async def test_fan_single_preset_mode(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test fan with a single preset mode."""
     entity_id = "fan.demo"

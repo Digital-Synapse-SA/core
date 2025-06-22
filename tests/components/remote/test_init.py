@@ -1,7 +1,7 @@
 """The tests for the Remote component, adapted from Light Test."""
 
-from homeassistant.components import remote
-from homeassistant.components.remote import (
+from smarthub.components import remote
+from smarthub.components.remote import (
     ATTR_ALTERNATIVE,
     ATTR_COMMAND,
     ATTR_COMMAND_TYPE,
@@ -11,7 +11,7 @@ from homeassistant.components.remote import (
     ATTR_TIMEOUT,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_PLATFORM,
     SERVICE_TURN_OFF,
@@ -19,7 +19,7 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import async_mock_service
 
@@ -30,7 +30,7 @@ SERVICE_DELETE_COMMAND = "delete_command"
 ENTITY_ID = "entity_id_val"
 
 
-async def test_is_on(hass: HomeAssistant) -> None:
+async def test_is_on(hass: SmartHub) -> None:
     """Test is_on."""
     hass.states.async_set("remote.test", STATE_ON)
     assert remote.is_on(hass, "remote.test")
@@ -39,7 +39,7 @@ async def test_is_on(hass: HomeAssistant) -> None:
     assert not remote.is_on(hass, "remote.test")
 
 
-async def test_turn_on(hass: HomeAssistant) -> None:
+async def test_turn_on(hass: SmartHub) -> None:
     """Test turn_on."""
     turn_on_calls = async_mock_service(hass, DOMAIN, SERVICE_TURN_ON)
     await hass.services.async_call(DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: ENTITY_ID})
@@ -52,7 +52,7 @@ async def test_turn_on(hass: HomeAssistant) -> None:
     assert call.domain == DOMAIN
 
 
-async def test_turn_off(hass: HomeAssistant) -> None:
+async def test_turn_off(hass: SmartHub) -> None:
     """Test turn_off."""
     turn_off_calls = async_mock_service(hass, DOMAIN, SERVICE_TURN_OFF)
 
@@ -70,7 +70,7 @@ async def test_turn_off(hass: HomeAssistant) -> None:
     assert call.data[ATTR_ENTITY_ID] == ENTITY_ID
 
 
-async def test_send_command(hass: HomeAssistant) -> None:
+async def test_send_command(hass: SmartHub) -> None:
     """Test send_command."""
     send_command_calls = async_mock_service(hass, DOMAIN, SERVICE_SEND_COMMAND)
 
@@ -94,7 +94,7 @@ async def test_send_command(hass: HomeAssistant) -> None:
     assert call.data[ATTR_ENTITY_ID] == ENTITY_ID
 
 
-async def test_learn_command(hass: HomeAssistant) -> None:
+async def test_learn_command(hass: SmartHub) -> None:
     """Test learn_command."""
     learn_command_calls = async_mock_service(hass, DOMAIN, SERVICE_LEARN_COMMAND)
 
@@ -118,7 +118,7 @@ async def test_learn_command(hass: HomeAssistant) -> None:
     assert call.data[ATTR_ENTITY_ID] == ENTITY_ID
 
 
-async def test_delete_command(hass: HomeAssistant) -> None:
+async def test_delete_command(hass: SmartHub) -> None:
     """Test delete_command."""
     delete_command_calls = async_mock_service(
         hass, remote.DOMAIN, SERVICE_DELETE_COMMAND

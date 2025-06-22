@@ -9,12 +9,12 @@ from requests.exceptions import ConnectionError as RequestsConnectionError
 from requests_mock.mocker import Mocker
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fitbit.const import DOMAIN, OAUTH2_TOKEN
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.util.unit_system import (
+from smarthub.components.fitbit.const import DOMAIN, OAUTH2_TOKEN
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.util.unit_system import (
     METRIC_SYSTEM,
     US_CUSTOMARY_SYSTEM,
     UnitSystem,
@@ -229,7 +229,7 @@ def mock_token_refresh(requests_mock: Mocker) -> None:
     ],
 )
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     register_timeseries: Callable[[str, dict[str, Any]], None],
@@ -260,7 +260,7 @@ async def test_sensors(
     [([DEVICE_RESPONSE_CHARGE_2, DEVICE_RESPONSE_ARIA_AIR], ["devices/battery"])],
 )
 async def test_device_battery(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     entity_registry: er.EntityRegistry,
@@ -307,7 +307,7 @@ async def test_device_battery(
     [([DEVICE_RESPONSE_CHARGE_2, DEVICE_RESPONSE_ARIA_AIR], ["devices/battery"])],
 )
 async def test_device_battery_level(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     entity_registry: er.EntityRegistry,
@@ -364,7 +364,7 @@ async def test_device_battery_level(
     ],
 )
 async def test_profile_local(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     register_timeseries: Callable[[str, dict[str, Any]], None],
@@ -413,7 +413,7 @@ async def test_profile_local(
     ],
 )
 async def test_sleep_time_clock_format(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     register_timeseries: Callable[[str, dict[str, Any]], None],
@@ -437,7 +437,7 @@ async def test_sleep_time_clock_format(
     [(["activity"])],
 )
 async def test_activity_scope_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     register_timeseries: Callable[[str, dict[str, Any]], None],
@@ -481,7 +481,7 @@ async def test_activity_scope_config_entry(
     [(["heartrate"])],
 )
 async def test_heartrate_scope_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     register_timeseries: Callable[[str, dict[str, Any]], None],
@@ -505,7 +505,7 @@ async def test_heartrate_scope_config_entry(
     [(["nutrition"], METRIC_SYSTEM), (["nutrition"], US_CUSTOMARY_SYSTEM)],
 )
 async def test_nutrition_scope_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     register_timeseries: Callable[[str, dict[str, Any]], None],
@@ -538,7 +538,7 @@ async def test_nutrition_scope_config_entry(
     [(["sleep"])],
 )
 async def test_sleep_scope_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     register_timeseries: Callable[[str, dict[str, Any]], None],
@@ -579,7 +579,7 @@ async def test_sleep_scope_config_entry(
     [(["weight"])],
 )
 async def test_weight_scope_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     register_timeseries: Callable[[str, dict[str, Any]], None],
@@ -600,7 +600,7 @@ async def test_weight_scope_config_entry(
     [(["settings"], [DEVICE_RESPONSE_CHARGE_2])],
 )
 async def test_settings_scope_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     register_timeseries: Callable[[str, dict[str, Any]], None],
@@ -625,7 +625,7 @@ async def test_settings_scope_config_entry(
     ],
 )
 async def test_sensor_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     requests_mock: Mocker,
@@ -655,7 +655,7 @@ async def test_sensor_update_failed(
     [(["heartrate"])],
 )
 async def test_sensor_update_failed_requires_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     requests_mock: Mocker,
@@ -688,7 +688,7 @@ async def test_sensor_update_failed_requires_reauth(
     [(["heartrate"])],
 )
 async def test_sensor_update_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     requests_mock: Mocker,
@@ -733,7 +733,7 @@ async def test_sensor_update_success(
     [(["settings"], None)],
 )
 async def test_device_battery_level_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     requests_mock: Mocker,
@@ -787,7 +787,7 @@ async def test_device_battery_level_update_failed(
     [(["settings"], None)],
 )
 async def test_device_battery_level_reauth_required(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     config_entry: MockConfigEntry,
@@ -855,7 +855,7 @@ async def test_device_battery_level_reauth_required(
     ids=("missing", "valid", "zero"),
 )
 async def test_resting_heart_rate_responses(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_credentials: None,
     integration_setup: Callable[[], Awaitable[bool]],
     register_timeseries: Callable[[str, dict[str, Any]], None],

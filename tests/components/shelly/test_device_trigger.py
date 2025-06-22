@@ -6,22 +6,22 @@ from aioshelly.const import MODEL_BUTTON1
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.device_automation.exceptions import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.device_automation.exceptions import (
     InvalidDeviceAutomationConfig,
 )
-from homeassistant.components.shelly.const import (
+from smarthub.components.shelly.const import (
     ATTR_CHANNEL,
     ATTR_CLICK_TYPE,
     CONF_SUBTYPE,
     DOMAIN,
     EVENT_SHELLY_CLICK,
 )
-from homeassistant.const import CONF_DEVICE_ID, CONF_DOMAIN, CONF_PLATFORM, CONF_TYPE
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.const import CONF_DEVICE_ID, CONF_DOMAIN, CONF_PLATFORM, CONF_TYPE
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import init_integration
 
@@ -38,7 +38,7 @@ from tests.common import async_get_device_automations
     ],
 )
 async def test_get_triggers_block_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -79,7 +79,7 @@ async def test_get_triggers_block_device(
 
 
 async def test_get_triggers_rpc_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, mock_rpc_device: Mock
+    hass: SmartHub, device_registry: dr.DeviceRegistry, mock_rpc_device: Mock
 ) -> None:
     """Test we get the expected triggers from a shelly RPC device."""
     entry = await init_integration(hass, 2)
@@ -112,7 +112,7 @@ async def test_get_triggers_rpc_device(
 
 
 async def test_get_triggers_button(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, mock_block_device: Mock
+    hass: SmartHub, device_registry: dr.DeviceRegistry, mock_block_device: Mock
 ) -> None:
     """Test we get the expected triggers from a shelly button."""
     entry = await init_integration(hass, 1, model=MODEL_BUTTON1)
@@ -138,7 +138,7 @@ async def test_get_triggers_button(
 
 
 async def test_get_triggers_non_initialized_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -158,7 +158,7 @@ async def test_get_triggers_non_initialized_devices(
 
 
 async def test_get_triggers_for_invalid_device_id(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, mock_block_device: Mock
+    hass: SmartHub, device_registry: dr.DeviceRegistry, mock_block_device: Mock
 ) -> None:
     """Test error raised for invalid shelly device_id."""
     await init_integration(hass, 1)
@@ -178,7 +178,7 @@ async def test_get_triggers_for_invalid_device_id(
 
 
 async def test_if_fires_on_click_event_block_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mock_block_device: Mock,
@@ -222,7 +222,7 @@ async def test_if_fires_on_click_event_block_device(
 
 
 async def test_if_fires_on_click_event_rpc_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mock_rpc_device: Mock,
@@ -266,7 +266,7 @@ async def test_if_fires_on_click_event_rpc_device(
 
 
 async def test_validate_trigger_block_device_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mock_block_device: Mock,
@@ -311,7 +311,7 @@ async def test_validate_trigger_block_device_not_ready(
 
 
 async def test_validate_trigger_rpc_device_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mock_rpc_device: Mock,
@@ -356,7 +356,7 @@ async def test_validate_trigger_rpc_device_not_ready(
 
 
 async def test_validate_trigger_invalid_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_block_device: Mock,
     caplog: pytest.LogCaptureFixture,
@@ -394,7 +394,7 @@ async def test_validate_trigger_invalid_triggers(
 
 
 async def test_rpc_no_runtime_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mock_rpc_device: Mock,
@@ -439,7 +439,7 @@ async def test_rpc_no_runtime_data(
 
 
 async def test_block_no_runtime_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     mock_block_device: Mock,

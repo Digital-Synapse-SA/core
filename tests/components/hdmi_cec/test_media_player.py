@@ -27,12 +27,12 @@ from pycec.const import (
 )
 import pytest
 
-from homeassistant.components.hdmi_cec import EVENT_HDMI_CEC_UNAVAILABLE
-from homeassistant.components.media_player import (
+from smarthub.components.hdmi_cec import EVENT_HDMI_CEC_UNAVAILABLE
+from smarthub.components.media_player import (
     DOMAIN as MEDIA_PLAYER_DOMAIN,
     MediaPlayerEntityFeature as MPEF,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_MEDIA_NEXT_TRACK,
     SERVICE_MEDIA_PAUSE,
@@ -53,7 +53,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import MockHDMIDevice, assert_key_press_release
 from .conftest import CecEntityCreator, HDMINetworkCreator
@@ -93,7 +93,7 @@ def assert_state_fixture(request: pytest.FixtureRequest) -> AssertState:
 
 
 async def test_load_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
 ) -> None:
@@ -111,7 +111,7 @@ async def test_load_platform(
 
 @pytest.mark.parametrize("platform", [{}, {"platform": "switch"}])
 async def test_load_types(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     platform: dict[str, Any],
@@ -139,7 +139,7 @@ async def test_load_types(
 
 
 async def test_service_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     assert_state: AssertState,
@@ -166,7 +166,7 @@ async def test_service_on(
 
 
 async def test_service_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     assert_state: AssertState,
@@ -266,7 +266,7 @@ async def test_service_off(
     ],
 )
 async def test_supported_features(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     type_id: int,
@@ -295,7 +295,7 @@ async def test_supported_features(
     ],
 )
 async def test_volume_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     service: str,
@@ -331,7 +331,7 @@ async def test_volume_services(
     ],
 )
 async def test_track_change_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     service: str,
@@ -370,7 +370,7 @@ async def test_track_change_services(
     ],
 )
 async def test_playback_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     assert_state: AssertState,
@@ -400,7 +400,7 @@ async def test_playback_services(
 
 @pytest.mark.xfail(reason="PLAY feature isn't enabled")
 async def test_play_pause_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     assert_state: AssertState,
@@ -462,7 +462,7 @@ async def test_play_pause_service(
     ],
 )
 async def test_update_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     type_id: int,
@@ -513,7 +513,7 @@ async def test_update_state(
     ],
 )
 async def test_starting_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
     data: dict[str, Any],
@@ -531,7 +531,7 @@ async def test_starting_state(
     reason="The code only sets the state to unavailable, doesn't set the `_attr_available` to false."
 )
 async def test_unavailable_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_hdmi_network: HDMINetworkCreator,
     create_cec_entity: CecEntityCreator,
 ) -> None:

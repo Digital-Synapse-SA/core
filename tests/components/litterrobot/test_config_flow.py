@@ -6,17 +6,17 @@ from pylitterbot import Account
 from pylitterbot.exceptions import LitterRobotException, LitterRobotLoginException
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.const import CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.const import CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .common import CONF_USERNAME, CONFIG, DOMAIN
 
 from tests.common import MockConfigEntry
 
 
-async def test_full_flow(hass: HomeAssistant, mock_account) -> None:
+async def test_full_flow(hass: SmartHub, mock_account) -> None:
     """Test full flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -26,11 +26,11 @@ async def test_full_flow(hass: HomeAssistant, mock_account) -> None:
 
     with (
         patch(
-            "homeassistant.components.litterrobot.config_flow.Account.connect",
+            "smarthub.components.litterrobot.config_flow.Account.connect",
             return_value=mock_account,
         ),
         patch(
-            "homeassistant.components.litterrobot.async_setup_entry",
+            "smarthub.components.litterrobot.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -44,7 +44,7 @@ async def test_full_flow(hass: HomeAssistant, mock_account) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_already_configured(hass: HomeAssistant) -> None:
+async def test_already_configured(hass: SmartHub) -> None:
     """Test already configured case."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -70,7 +70,7 @@ async def test_already_configured(hass: HomeAssistant) -> None:
     ],
 )
 async def test_create_entry(
-    hass: HomeAssistant, mock_account, side_effect, connect_errors
+    hass: SmartHub, mock_account, side_effect, connect_errors
 ) -> None:
     """Test creating an entry."""
     result = await hass.config_entries.flow.async_init(
@@ -78,7 +78,7 @@ async def test_create_entry(
     )
 
     with patch(
-        "homeassistant.components.litterrobot.config_flow.Account.connect",
+        "smarthub.components.litterrobot.config_flow.Account.connect",
         side_effect=side_effect,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -90,11 +90,11 @@ async def test_create_entry(
 
     with (
         patch(
-            "homeassistant.components.litterrobot.config_flow.Account.connect",
+            "smarthub.components.litterrobot.config_flow.Account.connect",
             return_value=mock_account,
         ),
         patch(
-            "homeassistant.components.litterrobot.async_setup_entry",
+            "smarthub.components.litterrobot.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -107,7 +107,7 @@ async def test_create_entry(
     assert result["data"] == CONFIG[DOMAIN]
 
 
-async def test_reauth(hass: HomeAssistant, mock_account: Account) -> None:
+async def test_reauth(hass: SmartHub, mock_account: Account) -> None:
     """Test reauth flow (with fail and recover)."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -121,7 +121,7 @@ async def test_reauth(hass: HomeAssistant, mock_account: Account) -> None:
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.litterrobot.config_flow.Account.connect",
+        "smarthub.components.litterrobot.config_flow.Account.connect",
         side_effect=LitterRobotLoginException,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -134,11 +134,11 @@ async def test_reauth(hass: HomeAssistant, mock_account: Account) -> None:
 
     with (
         patch(
-            "homeassistant.components.litterrobot.config_flow.Account.connect",
+            "smarthub.components.litterrobot.config_flow.Account.connect",
             return_value=mock_account,
         ),
         patch(
-            "homeassistant.components.litterrobot.async_setup_entry",
+            "smarthub.components.litterrobot.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):

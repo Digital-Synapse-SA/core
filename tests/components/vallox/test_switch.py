@@ -2,9 +2,9 @@
 
 import pytest
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.core import SmartHub
 
 from .conftest import patch_set_values
 
@@ -24,7 +24,7 @@ async def test_switch_entities(
     value: int,
     expected_state: str,
     mock_entry: MockConfigEntry,
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_fetch_metric_data_mock,
 ) -> None:
     """Test switch entities."""
@@ -53,7 +53,7 @@ async def test_bypass_lock_switch_entitity_set(
     metric_key: str,
     value: int,
     mock_entry: MockConfigEntry,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test bypass lock switch set."""
     # Act

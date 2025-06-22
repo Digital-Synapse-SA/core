@@ -9,11 +9,11 @@ from freezegun.api import FrozenDateTimeFactory
 import motionmount
 import pytest
 
-from homeassistant.components.motionmount.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PIN, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.motionmount.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_NAME, CONF_PIN, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     HOST,
@@ -34,7 +34,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
 async def test_user_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the flow is aborted when there is an connection error."""
@@ -53,7 +53,7 @@ async def test_user_connection_error(
 
 
 async def test_user_connection_error_invalid_hostname(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the flow is aborted when an invalid hostname is provided."""
@@ -72,7 +72,7 @@ async def test_user_connection_error_invalid_hostname(
 
 
 async def test_user_timeout_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the flow is aborted when there is a timeout error."""
@@ -91,7 +91,7 @@ async def test_user_timeout_error(
 
 
 async def test_user_not_connected_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the flow is aborted when there is a not connected error."""
@@ -110,7 +110,7 @@ async def test_user_not_connected_error(
 
 
 async def test_user_response_error_single_device_new_ce_old_pro(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the flow creates an entry when there is a response error."""
@@ -136,7 +136,7 @@ async def test_user_response_error_single_device_new_ce_old_pro(
 
 
 async def test_user_response_error_single_device_new_ce_new_pro(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the flow creates an entry when there is a response error."""
@@ -163,7 +163,7 @@ async def test_user_response_error_single_device_new_ce_new_pro(
 
 
 async def test_user_response_error_multi_device_new_ce_new_pro(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:
@@ -186,7 +186,7 @@ async def test_user_response_error_multi_device_new_ce_new_pro(
 
 
 async def test_user_response_authentication_needed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:
@@ -227,7 +227,7 @@ async def test_user_response_authentication_needed(
 
 
 async def test_zeroconf_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the flow is aborted when there is an connection error."""
@@ -246,7 +246,7 @@ async def test_zeroconf_connection_error(
 
 
 async def test_zeroconf_connection_error_invalid_hostname(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the flow is aborted when there is an connection error."""
@@ -265,7 +265,7 @@ async def test_zeroconf_connection_error_invalid_hostname(
 
 
 async def test_zeroconf_timout_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the flow is aborted when there is a timeout error."""
@@ -284,7 +284,7 @@ async def test_zeroconf_timout_error(
 
 
 async def test_zeroconf_not_connected_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the flow is aborted when there is a not connected error."""
@@ -303,7 +303,7 @@ async def test_zeroconf_not_connected_error(
 
 
 async def test_show_zeroconf_form_new_ce_old_pro(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the zeroconf confirmation form is served."""
@@ -337,7 +337,7 @@ async def test_show_zeroconf_form_new_ce_old_pro(
 
 
 async def test_show_zeroconf_form_new_ce_new_pro(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test that the zeroconf confirmation form is served."""
@@ -371,7 +371,7 @@ async def test_show_zeroconf_form_new_ce_new_pro(
 
 
 async def test_zeroconf_device_exists_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:
@@ -390,7 +390,7 @@ async def test_zeroconf_device_exists_abort(
 
 
 async def test_zeroconf_authentication_needed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:
@@ -430,7 +430,7 @@ async def test_zeroconf_authentication_needed(
 
 
 async def test_authentication_incorrect_then_correct_pin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:
@@ -481,7 +481,7 @@ async def test_authentication_incorrect_then_correct_pin(
 
 
 async def test_authentication_first_incorrect_pin_to_backoff(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -535,7 +535,7 @@ async def test_authentication_first_incorrect_pin_to_backoff(
 
 
 async def test_authentication_multiple_incorrect_pins(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -590,7 +590,7 @@ async def test_authentication_multiple_incorrect_pins(
 
 
 async def test_authentication_show_backoff_when_still_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -653,7 +653,7 @@ async def test_authentication_show_backoff_when_still_running(
 
 
 async def test_authentication_correct_pin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:
@@ -692,7 +692,7 @@ async def test_authentication_correct_pin(
 
 
 async def test_full_user_flow_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test the full manual user flow from start to finish."""
@@ -724,7 +724,7 @@ async def test_full_user_flow_implementation(
 
 
 async def test_full_zeroconf_flow_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_motionmount: MagicMock,
 ) -> None:
     """Test the full zeroconf flow from start to finish."""
@@ -758,7 +758,7 @@ async def test_full_zeroconf_flow_implementation(
 
 
 async def test_full_reauth_flow_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_motionmount: MagicMock,
 ) -> None:

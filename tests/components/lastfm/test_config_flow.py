@@ -5,16 +5,16 @@ from unittest.mock import patch
 from pylast import WSError
 import pytest
 
-from homeassistant.components.lastfm.const import (
+from smarthub.components.lastfm.const import (
     CONF_MAIN_USER,
     CONF_USERS,
     DEFAULT_NAME,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     API_KEY,
@@ -30,7 +30,7 @@ from .conftest import ComponentSetup
 from tests.common import MockConfigEntry
 
 
-async def test_full_user_flow(hass: HomeAssistant, default_user: MockUser) -> None:
+async def test_full_user_flow(hass: SmartHub, default_user: MockUser) -> None:
     """Test the full user configuration flow."""
     with patch("pylast.User", return_value=default_user), patch_setup_entry():
         result = await hass.config_entries.flow.async_init(
@@ -71,7 +71,7 @@ async def test_full_user_flow(hass: HomeAssistant, default_user: MockUser) -> No
     ],
 )
 async def test_flow_fails(
-    hass: HomeAssistant, error: Exception, message: str, default_user: MockUser
+    hass: SmartHub, error: Exception, message: str, default_user: MockUser
 ) -> None:
     """Test user initialized flow with invalid username."""
     with patch("pylast.User", return_value=MockUser(thrown_error=error)):
@@ -100,7 +100,7 @@ async def test_flow_fails(
 
 
 async def test_flow_friends_invalid_username(
-    hass: HomeAssistant, default_user: MockUser
+    hass: SmartHub, default_user: MockUser
 ) -> None:
     """Test user initialized flow with invalid username."""
     with patch("pylast.User", return_value=default_user), patch_setup_entry():
@@ -138,7 +138,7 @@ async def test_flow_friends_invalid_username(
 
 
 async def test_flow_friends_no_friends(
-    hass: HomeAssistant, default_user_no_friends: MockUser
+    hass: SmartHub, default_user_no_friends: MockUser
 ) -> None:
     """Test options is empty when user has no friends."""
     with (
@@ -159,7 +159,7 @@ async def test_flow_friends_no_friends(
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
     default_user: MockUser,
@@ -189,7 +189,7 @@ async def test_options_flow(
 
 
 async def test_options_flow_incorrect_username(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
     default_user: MockUser,
@@ -236,7 +236,7 @@ async def test_options_flow_incorrect_username(
 
 
 async def test_options_flow_from_import(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     imported_config_entry: MockConfigEntry,
     default_user_no_friends: MockUser,
@@ -254,7 +254,7 @@ async def test_options_flow_from_import(
 
 
 async def test_options_flow_without_friends(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: ComponentSetup,
     config_entry: MockConfigEntry,
     default_user_no_friends: MockUser,

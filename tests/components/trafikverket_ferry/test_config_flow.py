@@ -7,21 +7,21 @@ from unittest.mock import patch
 import pytest
 from pytrafikverket.exceptions import InvalidAuthentication, NoFerryFound
 
-from homeassistant import config_entries
-from homeassistant.components.trafikverket_ferry.const import (
+from smarthub import config_entries
+from smarthub.components.trafikverket_ferry.const import (
     CONF_FROM,
     CONF_TIME,
     CONF_TO,
     DOMAIN,
 )
-from homeassistant.const import CONF_API_KEY, CONF_NAME, CONF_WEEKDAY, WEEKDAYS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_API_KEY, CONF_NAME, CONF_WEEKDAY, WEEKDAYS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -32,10 +32,10 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.trafikverket_ferry.config_flow.TrafikverketFerry.async_get_next_ferry_stop",
+            "smarthub.components.trafikverket_ferry.config_flow.TrafikverketFerry.async_get_next_ferry_stop",
         ),
         patch(
-            "homeassistant.components.trafikverket_ferry.async_setup_entry",
+            "smarthub.components.trafikverket_ferry.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -83,7 +83,7 @@ async def test_form(hass: HomeAssistant) -> None:
     ],
 )
 async def test_flow_fails(
-    hass: HomeAssistant, side_effect: str, base_error: str
+    hass: SmartHub, side_effect: str, base_error: str
 ) -> None:
     """Test config flow errors."""
     result4 = await hass.config_entries.flow.async_init(
@@ -94,7 +94,7 @@ async def test_flow_fails(
     assert result4["step_id"] == config_entries.SOURCE_USER
 
     with patch(
-        "homeassistant.components.trafikverket_ferry.config_flow.TrafikverketFerry.async_get_next_ferry_stop",
+        "smarthub.components.trafikverket_ferry.config_flow.TrafikverketFerry.async_get_next_ferry_stop",
         side_effect=side_effect(),
     ):
         result4 = await hass.config_entries.flow.async_configure(
@@ -110,7 +110,7 @@ async def test_flow_fails(
     assert result4["errors"] == {"base": base_error}
 
 
-async def test_reauth_flow(hass: HomeAssistant) -> None:
+async def test_reauth_flow(hass: SmartHub) -> None:
     """Test a reauthentication flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -133,10 +133,10 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.trafikverket_ferry.config_flow.TrafikverketFerry.async_get_next_ferry_stop",
+            "smarthub.components.trafikverket_ferry.config_flow.TrafikverketFerry.async_get_next_ferry_stop",
         ),
         patch(
-            "homeassistant.components.trafikverket_ferry.async_setup_entry",
+            "smarthub.components.trafikverket_ferry.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -176,7 +176,7 @@ async def test_reauth_flow(hass: HomeAssistant) -> None:
     ],
 )
 async def test_reauth_flow_error(
-    hass: HomeAssistant, side_effect: Exception, p_error: str
+    hass: SmartHub, side_effect: Exception, p_error: str
 ) -> None:
     """Test a reauthentication flow with error."""
     entry = MockConfigEntry(
@@ -196,7 +196,7 @@ async def test_reauth_flow_error(
     result = await entry.start_reauth_flow(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_ferry.config_flow.TrafikverketFerry.async_get_next_ferry_stop",
+        "smarthub.components.trafikverket_ferry.config_flow.TrafikverketFerry.async_get_next_ferry_stop",
         side_effect=side_effect(),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -211,10 +211,10 @@ async def test_reauth_flow_error(
 
     with (
         patch(
-            "homeassistant.components.trafikverket_ferry.config_flow.TrafikverketFerry.async_get_next_ferry_stop",
+            "smarthub.components.trafikverket_ferry.config_flow.TrafikverketFerry.async_get_next_ferry_stop",
         ),
         patch(
-            "homeassistant.components.trafikverket_ferry.async_setup_entry",
+            "smarthub.components.trafikverket_ferry.async_setup_entry",
             return_value=True,
         ),
     ):

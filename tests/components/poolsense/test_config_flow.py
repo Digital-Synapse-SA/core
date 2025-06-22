@@ -2,17 +2,17 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.poolsense.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.poolsense.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_form(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_poolsense_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_poolsense_client: AsyncMock
 ) -> None:
     """Test full flow."""
     result = await hass.config_entries.flow.async_init(
@@ -39,7 +39,7 @@ async def test_full_form(
 
 
 async def test_invalid_credentials(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_poolsense_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_poolsense_client: AsyncMock
 ) -> None:
     """Test we handle invalid credentials."""
     mock_poolsense_client.test_poolsense_credentials.return_value = False
@@ -63,7 +63,7 @@ async def test_invalid_credentials(
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_poolsense_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

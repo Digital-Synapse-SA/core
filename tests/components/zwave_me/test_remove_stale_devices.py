@@ -6,10 +6,10 @@ import uuid
 import pytest
 from zwave_me_ws import ZWaveMeData
 
-from homeassistant.components.zwave_me import ZWaveMePlatform
-from homeassistant.const import CONF_TOKEN, CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.zwave_me import ZWaveMePlatform
+from smarthub.const import CONF_TOKEN, CONF_URL
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 
@@ -36,7 +36,7 @@ async def mock_connection(controller):
     ],
 )
 async def test_remove_stale_devices(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, identifier, should_exist
+    hass: SmartHub, device_registry: dr.DeviceRegistry, identifier, should_exist
 ) -> None:
     """Test removing devices with old-format ids."""
 
@@ -53,11 +53,11 @@ async def test_remove_stale_devices(
     )
     with (
         patch(
-            "homeassistant.components.zwave_me.ZWaveMe.get_connection",
+            "smarthub.components.zwave_me.ZWaveMe.get_connection",
             mock_connection,
         ),
         patch(
-            "homeassistant.components.zwave_me.async_setup_platforms",
+            "smarthub.components.zwave_me.async_setup_platforms",
         ),
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)

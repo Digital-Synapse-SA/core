@@ -5,13 +5,13 @@ from unittest.mock import patch
 import aiohttp
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.mutesync.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.mutesync.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -26,7 +26,7 @@ async def test_form(hass: HomeAssistant) -> None:
             return_value="bla",
         ),
         patch(
-            "homeassistant.components.mutesync.async_setup_entry",
+            "smarthub.components.mutesync.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -57,7 +57,7 @@ async def test_form(hass: HomeAssistant) -> None:
     ],
 )
 async def test_form_error(
-    side_effect: Exception, error: str, hass: HomeAssistant
+    side_effect: Exception, error: str, hass: SmartHub
 ) -> None:
     """Test we handle error situations."""
     result = await hass.config_entries.flow.async_init(

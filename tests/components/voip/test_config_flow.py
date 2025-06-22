@@ -2,15 +2,15 @@
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components import voip
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components import voip
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form_user(hass: HomeAssistant) -> None:
+async def test_form_user(hass: SmartHub) -> None:
     """Test user form config flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -20,7 +20,7 @@ async def test_form_user(hass: HomeAssistant) -> None:
     assert not result["errors"]
 
     with patch(
-        "homeassistant.components.voip.async_setup_entry",
+        "smarthub.components.voip.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -35,7 +35,7 @@ async def test_form_user(hass: HomeAssistant) -> None:
 
 
 async def test_single_instance(
-    hass: HomeAssistant, config_entry: config_entries.ConfigEntry
+    hass: SmartHub, config_entry: config_entries.ConfigEntry
 ) -> None:
     """Test that only one instance can be created."""
     result = await hass.config_entries.flow.async_init(
@@ -45,7 +45,7 @@ async def test_single_instance(
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test config flow options."""
     config_entry = MockConfigEntry(
         domain=voip.DOMAIN,

@@ -7,8 +7,8 @@ from dateutil.tz import tzutc
 from twitchAPI.object.api import FollowedChannel, Stream, UserSubscription
 from twitchAPI.type import TwitchResourceNotFound
 
-from homeassistant.components.twitch.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.twitch.const import DOMAIN
+from smarthub.core import SmartHub
 
 from . import TwitchIterObject, get_generator_from_data, setup_integration
 
@@ -18,7 +18,7 @@ ENTITY_ID = "sensor.channel123"
 
 
 async def test_offline(
-    hass: HomeAssistant, twitch_mock: AsyncMock, config_entry: MockConfigEntry
+    hass: SmartHub, twitch_mock: AsyncMock, config_entry: MockConfigEntry
 ) -> None:
     """Test offline state."""
     twitch_mock.return_value.get_followed_streams.return_value = (
@@ -32,7 +32,7 @@ async def test_offline(
 
 
 async def test_streaming(
-    hass: HomeAssistant, twitch_mock: AsyncMock, config_entry: MockConfigEntry
+    hass: SmartHub, twitch_mock: AsyncMock, config_entry: MockConfigEntry
 ) -> None:
     """Test streaming state."""
     await setup_integration(hass, config_entry)
@@ -49,7 +49,7 @@ async def test_streaming(
 
 
 async def test_oauth_without_sub_and_follow(
-    hass: HomeAssistant, twitch_mock: AsyncMock, config_entry: MockConfigEntry
+    hass: SmartHub, twitch_mock: AsyncMock, config_entry: MockConfigEntry
 ) -> None:
     """Test state with oauth."""
     twitch_mock.return_value.get_followed_channels.return_value = TwitchIterObject(
@@ -66,7 +66,7 @@ async def test_oauth_without_sub_and_follow(
 
 
 async def test_oauth_with_sub(
-    hass: HomeAssistant, twitch_mock: AsyncMock, config_entry: MockConfigEntry
+    hass: SmartHub, twitch_mock: AsyncMock, config_entry: MockConfigEntry
 ) -> None:
     """Test state with oauth and sub."""
     twitch_mock.return_value.get_followed_channels.return_value = TwitchIterObject(
@@ -88,7 +88,7 @@ async def test_oauth_with_sub(
 
 
 async def test_oauth_with_follow(
-    hass: HomeAssistant, twitch_mock: AsyncMock, config_entry: MockConfigEntry
+    hass: SmartHub, twitch_mock: AsyncMock, config_entry: MockConfigEntry
 ) -> None:
     """Test state with oauth and follow."""
     await setup_integration(hass, config_entry)

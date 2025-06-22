@@ -6,10 +6,10 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.ambient_station.const import CONF_APP_KEY, DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.util.json import JsonArrayType, JsonObjectType
+from smarthub.components.ambient_station.const import CONF_APP_KEY, DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.util.json import JsonArrayType, JsonObjectType
 
 from tests.common import (
     MockConfigEntry,
@@ -35,7 +35,7 @@ def config_fixture() -> dict[str, Any]:
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any]
 ) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
@@ -64,7 +64,7 @@ def mock_aioambient_fixture(api: Mock) -> Generator[None]:
     """Define a fixture to patch aioambient."""
     with (
         patch(
-            "homeassistant.components.ambient_station.config_flow.API",
+            "smarthub.components.ambient_station.config_flow.API",
             return_value=api,
         ),
         patch("aioambient.websocket.Websocket.connect"),
@@ -74,7 +74,7 @@ def mock_aioambient_fixture(api: Mock) -> Generator[None]:
 
 @pytest.fixture(name="setup_config_entry")
 async def setup_config_entry_fixture(
-    hass: HomeAssistant, config_entry: MockConfigEntry, mock_aioambient: None
+    hass: SmartHub, config_entry: MockConfigEntry, mock_aioambient: None
 ) -> None:
     """Define a fixture to set up ambient_station."""
     assert await hass.config_entries.async_setup(config_entry.entry_id)

@@ -6,12 +6,12 @@ from unittest.mock import ANY, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.met.const import DOMAIN, HOME_LOCATION_NAME
-from homeassistant.const import CONF_ELEVATION, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.met.const import DOMAIN, HOME_LOCATION_NAME
+from smarthub.const import CONF_ELEVATION, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.data_entry_flow import FlowResultType
 
 from . import init_integration
 
@@ -24,11 +24,11 @@ def met_setup_fixture(request: pytest.FixtureRequest) -> Generator[Any]:
     if "disable_autouse_fixture" in request.keywords:
         yield
     else:
-        with patch("homeassistant.components.met.async_setup_entry", return_value=True):
+        with patch("smarthub.components.met.async_setup_entry", return_value=True):
             yield
 
 
-async def test_show_config_form(hass: HomeAssistant) -> None:
+async def test_show_config_form(hass: SmartHub) -> None:
     """Test show configuration form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -38,7 +38,7 @@ async def test_show_config_form(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_flow_with_home_location(hass: HomeAssistant) -> None:
+async def test_flow_with_home_location(hass: SmartHub) -> None:
     """Test config flow.
 
     Test the flow when a default location is configured.
@@ -62,7 +62,7 @@ async def test_flow_with_home_location(hass: HomeAssistant) -> None:
     assert default_data["elevation"] == 3
 
 
-async def test_create_entry(hass: HomeAssistant) -> None:
+async def test_create_entry(hass: SmartHub) -> None:
     """Test create entry from user input."""
     test_data = {
         "name": "home",
@@ -80,7 +80,7 @@ async def test_create_entry(hass: HomeAssistant) -> None:
     assert result["data"] == test_data
 
 
-async def test_flow_entry_already_exists(hass: HomeAssistant) -> None:
+async def test_flow_entry_already_exists(hass: SmartHub) -> None:
     """Test user input for config_entry that already exists.
 
     Test when the form should show when user puts existing location
@@ -107,7 +107,7 @@ async def test_flow_entry_already_exists(hass: HomeAssistant) -> None:
     assert result["errors"]["name"] == "already_configured"
 
 
-async def test_onboarding_step(hass: HomeAssistant) -> None:
+async def test_onboarding_step(hass: SmartHub) -> None:
     """Test initializing via onboarding step."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": "onboarding"}, data={}
@@ -122,7 +122,7 @@ async def test_onboarding_step(hass: HomeAssistant) -> None:
     ("latitude", "longitude"), [(52.3731339, 4.8903147), (0.0, 0.0)]
 )
 async def test_onboarding_step_abort_no_home(
-    hass: HomeAssistant, latitude, longitude
+    hass: SmartHub, latitude, longitude
 ) -> None:
     """Test entry not created when default step fails."""
     await async_process_ha_core_config(
@@ -142,7 +142,7 @@ async def test_onboarding_step_abort_no_home(
 
 
 @pytest.mark.disable_autouse_fixture
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test show options form."""
     update_data = {
         CONF_NAME: "test",
@@ -161,7 +161,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
     # Test Options flow updated config entry
     with patch(
-        "homeassistant.components.met.coordinator.metno.MetWeatherData"
+        "smarthub.components.met.coordinator.metno.MetWeatherData"
     ) as weatherdatamock:
         result = await hass.config_entries.options.async_init(
             entry.entry_id, data=update_data

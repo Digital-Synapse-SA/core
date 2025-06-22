@@ -3,18 +3,18 @@
 import pytest
 from sqlalchemy import text
 
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.auto_repairs.schema import (
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.auto_repairs.schema import (
     correct_db_schema_precision,
     correct_db_schema_utf8,
     validate_db_schema_precision,
     validate_table_schema_has_correct_collation,
     validate_table_schema_supports_utf8,
 )
-from homeassistant.components.recorder.db_schema import States
-from homeassistant.components.recorder.migration import _modify_columns
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.core import HomeAssistant
+from smarthub.components.recorder.db_schema import States
+from smarthub.components.recorder.migration import _modify_columns
+from smarthub.components.recorder.util import session_scope
+from smarthub.core import SmartHub
 
 from ..common import async_wait_recording_done
 
@@ -31,7 +31,7 @@ async def mock_recorder_before_hass(
 @pytest.mark.parametrize("enable_schema_validation", [True])
 @pytest.mark.parametrize("db_engine", ["mysql", "postgresql"])
 async def test_validate_db_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     caplog: pytest.LogCaptureFixture,
     db_engine: str,
@@ -50,7 +50,7 @@ async def test_validate_db_schema(
 @pytest.mark.skip_on_db_engine(["postgresql", "sqlite"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_validate_db_schema_fix_utf8_issue_good_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_validate_db_schema_fix_utf8_issue_good_schema(
 @pytest.mark.skip_on_db_engine(["postgresql", "sqlite"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_validate_db_schema_fix_utf8_issue_with_broken_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -104,7 +104,7 @@ async def test_validate_db_schema_fix_utf8_issue_with_broken_schema(
 @pytest.mark.skip_on_db_engine(["postgresql", "sqlite"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_validate_db_schema_fix_incorrect_collation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -142,7 +142,7 @@ async def test_validate_db_schema_fix_incorrect_collation(
 @pytest.mark.skip_on_db_engine(["postgresql", "sqlite"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_validate_db_schema_precision_correct_collation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_validate_db_schema_precision_correct_collation(
 @pytest.mark.skip_on_db_engine(["postgresql", "sqlite"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_validate_db_schema_fix_utf8_issue_with_broken_schema_unrepairable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -196,7 +196,7 @@ async def test_validate_db_schema_fix_utf8_issue_with_broken_schema_unrepairable
 @pytest.mark.skip_on_db_engine(["sqlite"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_validate_db_schema_precision_good_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -213,7 +213,7 @@ async def test_validate_db_schema_precision_good_schema(
 @pytest.mark.skip_on_db_engine(["sqlite"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_validate_db_schema_precision_with_broken_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -257,7 +257,7 @@ async def test_validate_db_schema_precision_with_broken_schema(
 @pytest.mark.skip_on_db_engine(["postgresql", "sqlite"])
 @pytest.mark.usefixtures("skip_by_db_engine")
 async def test_validate_db_schema_precision_with_unrepairable_broken_schema(
-    hass: HomeAssistant,
+    hass: SmartHub,
     recorder_mock: Recorder,
     recorder_db_url: str,
     caplog: pytest.LogCaptureFixture,

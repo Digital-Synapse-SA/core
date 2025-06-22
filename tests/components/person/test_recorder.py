@@ -6,11 +6,11 @@ from datetime import timedelta
 
 import pytest
 
-from homeassistant.components.person import ATTR_DEVICE_TRACKERS, DOMAIN
-from homeassistant.components.recorder.history import get_significant_states
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.person import ATTR_DEVICE_TRACKERS, DOMAIN
+from smarthub.components.recorder.history import get_significant_states
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockUser, async_fire_time_changed
 from tests.components.recorder.common import async_wait_recording_done
@@ -18,7 +18,7 @@ from tests.components.recorder.common import async_wait_recording_done
 
 @pytest.mark.usefixtures("recorder_mock", "enable_custom_integrations")
 async def test_exclude_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
     storage_setup,
 ) -> None:

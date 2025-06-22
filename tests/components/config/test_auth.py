@@ -2,9 +2,9 @@
 
 import pytest
 
-from homeassistant.auth import models as auth_models
-from homeassistant.components.config import auth as auth_config
-from homeassistant.core import HomeAssistant
+from smarthub.auth import models as auth_models
+from smarthub.components.config import auth as auth_config
+from smarthub.core import SmartHub
 
 from tests.common import CLIENT_ID, MockGroup, MockUser
 from tests.typing import ClientSessionGenerator, WebSocketGenerator
@@ -12,14 +12,14 @@ from tests.typing import ClientSessionGenerator, WebSocketGenerator
 
 @pytest.fixture(autouse=True)
 async def setup_config(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
-    """Fixture that sets up the auth provider homeassistant module."""
+    """Fixture that sets up the auth provider smarthub module."""
     auth_config.async_setup(hass)
 
 
 async def test_list_requires_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_read_only_access_token: str,
 ) -> None:
@@ -34,7 +34,7 @@ async def test_list_requires_admin(
 
 
 async def test_list(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, hass_admin_user: MockUser
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, hass_admin_user: MockUser
 ) -> None:
     """Test get users."""
     group = MockGroup().add_to_hass(hass)
@@ -45,7 +45,7 @@ async def test_list(
 
     owner.credentials.append(
         auth_models.Credentials(
-            auth_provider_type="homeassistant",
+            auth_provider_type="smarthub",
             auth_provider_id=None,
             data={"username": "test-owner"},
         )
@@ -80,7 +80,7 @@ async def test_list(
         "local_only": False,
         "system_generated": False,
         "group_ids": [group.id for group in hass_admin_user.groups],
-        "credentials": [{"type": "homeassistant"}],
+        "credentials": [{"type": "smarthub"}],
     }
     assert data[1] == {
         "id": owner.id,
@@ -91,7 +91,7 @@ async def test_list(
         "local_only": False,
         "system_generated": False,
         "group_ids": [group.id for group in owner.groups],
-        "credentials": [{"type": "homeassistant"}],
+        "credentials": [{"type": "smarthub"}],
     }
     assert data[2] == {
         "id": system.id,
@@ -118,7 +118,7 @@ async def test_list(
 
 
 async def test_delete_requires_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_read_only_access_token: str,
 ) -> None:
@@ -135,7 +135,7 @@ async def test_delete_requires_admin(
 
 
 async def test_delete_unable_self_account(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, hass_access_token: str
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, hass_access_token: str
 ) -> None:
     """Test we cannot delete our own account."""
     client = await hass_ws_client(hass, hass_access_token)
@@ -151,7 +151,7 @@ async def test_delete_unable_self_account(
 
 
 async def test_delete_unknown_user(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, hass_access_token: str
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, hass_access_token: str
 ) -> None:
     """Test we cannot delete an unknown user."""
     client = await hass_ws_client(hass, hass_access_token)
@@ -166,7 +166,7 @@ async def test_delete_unknown_user(
 
 
 async def test_delete(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, hass_access_token: str
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, hass_access_token: str
 ) -> None:
     """Test delete command works."""
     client = await hass_ws_client(hass, hass_access_token)
@@ -184,7 +184,7 @@ async def test_delete(
 
 
 async def test_create(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, hass_access_token: str
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, hass_access_token: str
 ) -> None:
     """Test create command works."""
     client = await hass_ws_client(hass, hass_access_token)
@@ -208,7 +208,7 @@ async def test_create(
 
 
 async def test_create_user_group(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, hass_access_token: str
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, hass_access_token: str
 ) -> None:
     """Test create user with a group."""
     client = await hass_ws_client(hass, hass_access_token)
@@ -239,7 +239,7 @@ async def test_create_user_group(
 
 
 async def test_create_requires_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_read_only_access_token: str,
 ) -> None:
@@ -253,7 +253,7 @@ async def test_create_requires_admin(
     assert result["error"]["code"] == "unauthorized"
 
 
-async def test_update(hass: HomeAssistant, hass_ws_client: WebSocketGenerator) -> None:
+async def test_update(hass: SmartHub, hass_ws_client: WebSocketGenerator) -> None:
     """Test update command works."""
     client = await hass_ws_client(hass)
 
@@ -281,7 +281,7 @@ async def test_update(hass: HomeAssistant, hass_ws_client: WebSocketGenerator) -
 
 
 async def test_update_requires_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_read_only_access_token: str,
 ) -> None:
@@ -306,7 +306,7 @@ async def test_update_requires_admin(
 
 
 async def test_update_system_generated(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test update command cannot update a system generated."""
     client = await hass_ws_client(hass)
@@ -329,7 +329,7 @@ async def test_update_system_generated(
 
 
 async def test_deactivate(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test deactivation and reactivation of regular user."""
     client = await hass_ws_client(hass)
@@ -369,7 +369,7 @@ async def test_deactivate(
 
 
 async def test_deactivate_owner(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that owner cannot be deactivated."""
     user = MockUser(id="abc", name="Test Owner", is_owner=True).add_to_hass(hass)
@@ -388,7 +388,7 @@ async def test_deactivate_owner(
 
 
 async def test_deactivate_system_generated(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test that owner cannot be deactivated."""
     client = await hass_ws_client(hass)

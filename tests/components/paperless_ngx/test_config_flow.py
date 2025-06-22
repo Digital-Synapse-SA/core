@@ -12,12 +12,12 @@ from pypaperless.exceptions import (
 )
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.paperless_ngx.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_KEY, CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.paperless_ngx.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_KEY, CONF_URL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import USER_INPUT_ONE, USER_INPUT_REAUTH, USER_INPUT_TWO
 
@@ -28,12 +28,12 @@ from tests.common import MockConfigEntry, patch
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.paperless_ngx.async_setup_entry", return_value=True
+        "smarthub.components.paperless_ngx.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
-async def test_full_config_flow(hass: HomeAssistant) -> None:
+async def test_full_config_flow(hass: SmartHub) -> None:
     """Test registering an integration and finishing flow works."""
 
     result = await hass.config_entries.flow.async_init(
@@ -56,7 +56,7 @@ async def test_full_config_flow(hass: HomeAssistant) -> None:
 
 
 async def test_full_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -78,7 +78,7 @@ async def test_full_reauth_flow(
 
 
 async def test_full_reconfigure_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -112,7 +112,7 @@ async def test_full_reconfigure_flow(
     ],
 )
 async def test_config_flow_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_paperless: AsyncMock,
     side_effect: Exception,
     expected_error: dict[str, str],
@@ -154,7 +154,7 @@ async def test_config_flow_error_handling(
     ],
 )
 async def test_reauth_flow_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_paperless: AsyncMock,
     side_effect: Exception,
@@ -191,7 +191,7 @@ async def test_reauth_flow_error_handling(
     ],
 )
 async def test_reconfigure_flow_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_paperless: AsyncMock,
     side_effect: Exception,
@@ -218,7 +218,7 @@ async def test_reconfigure_flow_error_handling(
 
 
 async def test_config_already_exists(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we only allow a single config flow."""
     mock_config_entry.add_to_hass(hass)
@@ -233,7 +233,7 @@ async def test_config_already_exists(
 
 
 async def test_config_already_exists_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
 ) -> None:

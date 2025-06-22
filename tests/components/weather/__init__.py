@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from homeassistant.components.weather import (
+from smarthub.components.weather import (
     ATTR_CONDITION_SUNNY,
     ATTR_FORECAST_CLOUD_COVERAGE,
     ATTR_FORECAST_HUMIDITY,
@@ -18,10 +18,10 @@ from homeassistant.components.weather import (
     ATTR_FORECAST_WIND_BEARING,
     Forecast,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from tests.common import (
     MockConfigEntry,
@@ -60,7 +60,7 @@ class MockWeatherTest(WeatherPlatform.MockWeather):
 
 
 async def create_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_weather: type[WeatherPlatform.MockWeather],
     manifest_extra: dict[str, Any] | None,
     **kwargs,
@@ -81,7 +81,7 @@ async def create_entity(
     )
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -90,7 +90,7 @@ async def create_entity(
         return True
 
     async def async_setup_entry_weather_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:

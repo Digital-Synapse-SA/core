@@ -6,12 +6,12 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from homeassistant.components.bosch_alarm.const import DOMAIN
-from homeassistant.config_entries import SOURCE_DHCP, SOURCE_RECONFIGURE, SOURCE_USER
-from homeassistant.const import CONF_HOST, CONF_MAC, CONF_MODEL, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.components.bosch_alarm.const import DOMAIN
+from smarthub.config_entries import SOURCE_DHCP, SOURCE_RECONFIGURE, SOURCE_USER
+from smarthub.const import CONF_HOST, CONF_MAC, CONF_MODEL, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from . import setup_integration
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_form_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_panel: AsyncMock,
     model_name: str,
@@ -67,7 +67,7 @@ async def test_form_user(
     ],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_panel: AsyncMock,
     config_flow_data: dict[str, Any],
@@ -116,7 +116,7 @@ async def test_form_exceptions(
     ],
 )
 async def test_form_exceptions_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_panel: AsyncMock,
     config_flow_data: dict[str, Any],
@@ -158,7 +158,7 @@ async def test_form_exceptions_user(
 
 @pytest.mark.parametrize("model", ["solution_3000", "amax_3000"])
 async def test_entry_already_configured_host(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_panel: AsyncMock,
     config_flow_data: dict[str, Any],
@@ -180,7 +180,7 @@ async def test_entry_already_configured_host(
 
 @pytest.mark.parametrize("model", ["b5512"])
 async def test_entry_already_configured_serial(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_panel: AsyncMock,
     config_flow_data: dict[str, Any],
@@ -208,7 +208,7 @@ async def test_entry_already_configured_serial(
 
 
 async def test_dhcp_can_finish(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_panel: AsyncMock,
     model_name: str,
@@ -255,7 +255,7 @@ async def test_dhcp_can_finish(
     ],
 )
 async def test_dhcp_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_panel: AsyncMock,
     model_name: str,
@@ -282,7 +282,7 @@ async def test_dhcp_exceptions(
 
 @pytest.mark.parametrize("mac_address", ["34ea34b43b5a"])
 async def test_dhcp_updates_host(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_panel: AsyncMock,
@@ -311,7 +311,7 @@ async def test_dhcp_updates_host(
 
 @pytest.mark.parametrize("serial_number", ["12345678"])
 async def test_dhcp_discovery_if_panel_setup_config_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_panel: AsyncMock,
@@ -360,7 +360,7 @@ async def test_dhcp_discovery_if_panel_setup_config_flow(
 
 @pytest.mark.parametrize("model", ["solution_3000", "amax_3000"])
 async def test_dhcp_abort_ongoing_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_panel: AsyncMock,
     config_flow_data: dict[str, Any],
@@ -391,7 +391,7 @@ async def test_dhcp_abort_ongoing_flow(
 
 
 async def test_dhcp_updates_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_panel: AsyncMock,
@@ -420,7 +420,7 @@ async def test_dhcp_updates_mac(
 
 
 async def test_reauth_flow_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_panel: AsyncMock,
@@ -455,7 +455,7 @@ async def test_reauth_flow_success(
     ],
 )
 async def test_reauth_flow_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_panel: AsyncMock,
@@ -490,7 +490,7 @@ async def test_reauth_flow_error(
 
 
 async def test_reconfig_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_panel: AsyncMock,
@@ -536,7 +536,7 @@ async def test_reconfig_flow(
 
 @pytest.mark.parametrize("model", ["b5512"])
 async def test_reconfig_flow_incorrect_model(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_panel: AsyncMock,

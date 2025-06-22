@@ -1,6 +1,6 @@
 """The tests for SleepIQ number platform."""
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_MAX,
     ATTR_MIN,
     ATTR_STEP,
@@ -8,9 +8,9 @@ from homeassistant.components.number import (
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_FRIENDLY_NAME, ATTR_ICON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_FRIENDLY_NAME, ATTR_ICON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import (
     BED_ID,
@@ -27,7 +27,7 @@ from .conftest import (
 
 
 async def test_firmness(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_asyncsleepiq
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_asyncsleepiq
 ) -> None:
     """Test the SleepIQ firmness number values for a bed with two sides."""
     entry = await setup_platform(hass, NUMBER_DOMAIN)
@@ -86,7 +86,7 @@ async def test_firmness(
 
 
 async def test_actuators(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_asyncsleepiq
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_asyncsleepiq
 ) -> None:
     """Test the SleepIQ actuator position values for a bed with adjustable head and foot."""
     entry = await setup_platform(hass, NUMBER_DOMAIN)
@@ -162,7 +162,7 @@ async def test_actuators(
 
 
 async def test_foot_warmer_timer(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_asyncsleepiq
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_asyncsleepiq
 ) -> None:
     """Test the SleepIQ foot warmer number values for a bed with two sides."""
     entry = await setup_platform(hass, NUMBER_DOMAIN)

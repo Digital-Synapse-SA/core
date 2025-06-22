@@ -5,10 +5,10 @@ from unittest.mock import MagicMock, call
 from androidtvremote2 import ConnectionClosed
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry
 
@@ -16,7 +16,7 @@ REMOTE_ENTITY = "remote.my_android_tv"
 
 
 async def test_remote_receives_push_updates(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test the Android TV Remote receives push updates and state is updated."""
     new_options = {"apps": {"com.google.android.youtube.tv": {"app_name": "YouTube"}}}
@@ -49,7 +49,7 @@ async def test_remote_receives_push_updates(
 
 
 async def test_remote_toggles(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test the Android TV Remote toggles."""
     new_options = {"apps": {"com.google.android.youtube.tv": {"app_name": "YouTube"}}}
@@ -103,7 +103,7 @@ async def test_remote_toggles(
 
 
 async def test_remote_send_command(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test remote.send_command service."""
     mock_config_entry.add_to_hass(hass)
@@ -126,7 +126,7 @@ async def test_remote_send_command(
 
 
 async def test_remote_send_command_multiple(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test remote.send_command service with multiple commands."""
     mock_config_entry.add_to_hass(hass)
@@ -150,7 +150,7 @@ async def test_remote_send_command_multiple(
 
 
 async def test_remote_send_command_with_hold_secs(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test remote.send_command service with hold_secs."""
     mock_config_entry.add_to_hass(hass)
@@ -175,16 +175,16 @@ async def test_remote_send_command_with_hold_secs(
 
 
 async def test_remote_connection_closed(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
-    """Test commands raise HomeAssistantError if ConnectionClosed."""
+    """Test commands raise SmartHubError if ConnectionClosed."""
     mock_config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(mock_config_entry.entry_id)
     assert mock_config_entry.state is ConfigEntryState.LOADED
 
     mock_api.send_key_command.side_effect = ConnectionClosed()
     with pytest.raises(
-        HomeAssistantError, match="Connection to the Android TV device is closed"
+        SmartHubError, match="Connection to the Android TV device is closed"
     ):
         await hass.services.async_call(
             "remote",
@@ -200,7 +200,7 @@ async def test_remote_connection_closed(
 
     mock_api.send_launch_app_command.side_effect = ConnectionClosed()
     with pytest.raises(
-        HomeAssistantError, match="Connection to the Android TV device is closed"
+        SmartHubError, match="Connection to the Android TV device is closed"
     ):
         await hass.services.async_call(
             "remote",

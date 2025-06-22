@@ -2,8 +2,8 @@
 
 import requests_mock
 
-from homeassistant.components.nuki.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.nuki.const import DOMAIN
+from smarthub.core import SmartHub
 
 from .mock import MOCK_INFO, setup_nuki_integration
 
@@ -14,7 +14,7 @@ from tests.common import (
 )
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
     """Mock integration setup."""
     with requests_mock.Mocker() as mock:
         # Mocking authentication endpoint

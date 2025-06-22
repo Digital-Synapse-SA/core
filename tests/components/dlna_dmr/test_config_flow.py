@@ -11,18 +11,18 @@ from async_upnp_client.client import UpnpDevice
 from async_upnp_client.exceptions import UpnpError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.dlna_dmr.const import (
+from smarthub import config_entries
+from smarthub.components.dlna_dmr.const import (
     CONF_BROWSE_UNFILTERED,
     CONF_CALLBACK_URL_OVERRIDE,
     CONF_LISTEN_PORT,
     CONF_POLL_AVAILABILITY,
     DOMAIN,
 )
-from homeassistant.const import CONF_DEVICE_ID, CONF_HOST, CONF_MAC, CONF_TYPE, CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub.const import CONF_DEVICE_ID, CONF_HOST, CONF_MAC, CONF_TYPE, CONF_URL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_DEVICE_TYPE,
     ATTR_UPNP_FRIENDLY_NAME,
     ATTR_UPNP_MANUFACTURER,
@@ -92,7 +92,7 @@ MOCK_DISCOVERY = SsdpServiceInfo(
             ]
         },
     },
-    x_homeassistant_matching_domains={DOMAIN},
+    x_smarthub_matching_domains={DOMAIN},
 )
 
 
@@ -100,7 +100,7 @@ MOCK_DISCOVERY = SsdpServiceInfo(
 def mock_get_mac_address() -> Generator[Mock]:
     """Mock the get_mac_address function to prevent network access and assist tests."""
     with patch(
-        "homeassistant.components.dlna_dmr.config_flow.get_mac_address", autospec=True
+        "smarthub.components.dlna_dmr.config_flow.get_mac_address", autospec=True
     ) as gma_mock:
         gma_mock.return_value = MOCK_MAC_ADDRESS
         yield gma_mock
@@ -110,12 +110,12 @@ def mock_get_mac_address() -> Generator[Mock]:
 def mock_setup_entry() -> Generator[Mock]:
     """Mock async_setup_entry."""
     with patch(
-        "homeassistant.components.dlna_dmr.async_setup_entry", return_value=True
+        "smarthub.components.dlna_dmr.async_setup_entry", return_value=True
     ) as setup_entry_mock:
         yield setup_entry_mock
 
 
-async def test_user_flow_undiscovered_manual(hass: HomeAssistant) -> None:
+async def test_user_flow_undiscovered_manual(hass: SmartHub) -> None:
     """Test user-init'd flow, no discovered devices, user entering a valid URL."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -140,7 +140,7 @@ async def test_user_flow_undiscovered_manual(hass: HomeAssistant) -> None:
 
 
 async def test_user_flow_discovered_manual(
-    hass: HomeAssistant, ssdp_scanner_mock: Mock
+    hass: SmartHub, ssdp_scanner_mock: Mock
 ) -> None:
     """Test user-init'd flow, with discovered devices, user entering a valid URL."""
     ssdp_scanner_mock.async_get_discovery_info_by_st.side_effect = [
@@ -179,7 +179,7 @@ async def test_user_flow_discovered_manual(
     assert result["options"] == {CONF_POLL_AVAILABILITY: True}
 
 
-async def test_user_flow_selected(hass: HomeAssistant, ssdp_scanner_mock: Mock) -> None:
+async def test_user_flow_selected(hass: SmartHub, ssdp_scanner_mock: Mock) -> None:
     """Test user-init'd flow, user selects discovered device."""
     ssdp_scanner_mock.async_get_discovery_info_by_st.side_effect = [
         [MOCK_DISCOVERY],
@@ -210,7 +210,7 @@ async def test_user_flow_selected(hass: HomeAssistant, ssdp_scanner_mock: Mock) 
 
 
 async def test_user_flow_uncontactable(
-    hass: HomeAssistant, domain_data_mock: Mock
+    hass: SmartHub, domain_data_mock: Mock
 ) -> None:
     """Test user-init'd config flow with user entering an uncontactable URL."""
     # Device is not contactable
@@ -233,7 +233,7 @@ async def test_user_flow_uncontactable(
 
 
 async def test_user_flow_embedded_st(
-    hass: HomeAssistant, domain_data_mock: Mock
+    hass: SmartHub, domain_data_mock: Mock
 ) -> None:
     """Test user-init'd flow for device with an embedded DMR."""
     # Device is the wrong type
@@ -273,7 +273,7 @@ async def test_user_flow_embedded_st(
     assert result["options"] == {CONF_POLL_AVAILABILITY: True}
 
 
-async def test_user_flow_wrong_st(hass: HomeAssistant, domain_data_mock: Mock) -> None:
+async def test_user_flow_wrong_st(hass: SmartHub, domain_data_mock: Mock) -> None:
     """Test user-init'd config flow with user entering a URL for the wrong device."""
     # Device has a sub device of the right type
     upnp_device = domain_data_mock.upnp_factory.async_create_device.return_value
@@ -295,9 +295,9 @@ async def test_user_flow_wrong_st(hass: HomeAssistant, domain_data_mock: Mock) -
     assert result["step_id"] == "manual"
 
 
-async def test_ssdp_flow_success(hass: HomeAssistant) -> None:
+async def test_ssdp_flow_success(hass: SmartHub) -> None:
     """Test that SSDP discovery with an available device works."""
-    logging.getLogger("homeassistant.components.dlna_dmr.config_flow").setLevel(
+    logging.getLogger("smarthub.components.dlna_dmr.config_flow").setLevel(
         logging.DEBUG
     )
     result = await hass.config_entries.flow.async_init(
@@ -325,7 +325,7 @@ async def test_ssdp_flow_success(hass: HomeAssistant) -> None:
 
 
 async def test_ssdp_flow_unavailable(
-    hass: HomeAssistant, domain_data_mock: Mock
+    hass: SmartHub, domain_data_mock: Mock
 ) -> None:
     """Test that SSDP discovery with an unavailable device still succeeds.
 
@@ -359,7 +359,7 @@ async def test_ssdp_flow_unavailable(
 
 
 async def test_ssdp_flow_existing(
-    hass: HomeAssistant, config_entry_mock: MockConfigEntry
+    hass: SmartHub, config_entry_mock: MockConfigEntry
 ) -> None:
     """Test that SSDP discovery of existing config entry updates the URL."""
     config_entry_mock.add_to_hass(hass)
@@ -384,7 +384,7 @@ async def test_ssdp_flow_existing(
 
 
 async def test_ssdp_flow_duplicate_location(
-    hass: HomeAssistant, config_entry_mock: MockConfigEntry, mock_get_mac_address: Mock
+    hass: SmartHub, config_entry_mock: MockConfigEntry, mock_get_mac_address: Mock
 ) -> None:
     """Test that discovery of device with URL matching existing entry gets aborted."""
     # Prevent matching based on MAC address
@@ -404,7 +404,7 @@ async def test_ssdp_flow_duplicate_location(
 
 
 async def test_ssdp_duplicate_mac_ignored_entry(
-    hass: HomeAssistant, config_entry_mock: MockConfigEntry
+    hass: SmartHub, config_entry_mock: MockConfigEntry
 ) -> None:
     """Test SSDP with different UDN but matching MAC for ignored config entry is ignored."""
     # Add an ignored entry
@@ -429,7 +429,7 @@ async def test_ssdp_duplicate_mac_ignored_entry(
 
 
 async def test_ssdp_duplicate_mac_configured_entry(
-    hass: HomeAssistant, config_entry_mock: MockConfigEntry
+    hass: SmartHub, config_entry_mock: MockConfigEntry
 ) -> None:
     """Test SSDP with different UDN but matching MAC for existing entry is ignored."""
     config_entry_mock.add_to_hass(hass)
@@ -452,7 +452,7 @@ async def test_ssdp_duplicate_mac_configured_entry(
 
 
 async def test_ssdp_add_mac(
-    hass: HomeAssistant, config_entry_mock_no_mac: MockConfigEntry
+    hass: SmartHub, config_entry_mock_no_mac: MockConfigEntry
 ) -> None:
     """Test adding of MAC to existing entry that didn't have one."""
     config_entry_mock_no_mac.add_to_hass(hass)
@@ -472,7 +472,7 @@ async def test_ssdp_add_mac(
 
 
 async def test_ssdp_dont_remove_mac(
-    hass: HomeAssistant, config_entry_mock: MockConfigEntry
+    hass: SmartHub, config_entry_mock: MockConfigEntry
 ) -> None:
     """SSDP with failure to resolve MAC should not remove MAC from config entry."""
     config_entry_mock.add_to_hass(hass)
@@ -493,7 +493,7 @@ async def test_ssdp_dont_remove_mac(
 
 
 async def test_ssdp_flow_upnp_udn(
-    hass: HomeAssistant, config_entry_mock: MockConfigEntry
+    hass: SmartHub, config_entry_mock: MockConfigEntry
 ) -> None:
     """Test that SSDP discovery ignores the root device's UDN."""
     config_entry_mock.add_to_hass(hass)
@@ -517,7 +517,7 @@ async def test_ssdp_flow_upnp_udn(
     assert config_entry_mock.data[CONF_URL] == NEW_DEVICE_LOCATION
 
 
-async def test_ssdp_missing_services(hass: HomeAssistant) -> None:
+async def test_ssdp_missing_services(hass: SmartHub) -> None:
     """Test SSDP ignores devices that are missing required services."""
     # No service list at all
     discovery = dataclasses.replace(MOCK_DISCOVERY)
@@ -560,7 +560,7 @@ async def test_ssdp_missing_services(hass: HomeAssistant) -> None:
     assert result["reason"] == "not_dmr"
 
 
-async def test_ssdp_single_service(hass: HomeAssistant) -> None:
+async def test_ssdp_single_service(hass: SmartHub) -> None:
     """Test SSDP discovery info with only one service defined.
 
     THe etree_to_dict function turns multiple services into a list of dicts, but
@@ -582,11 +582,11 @@ async def test_ssdp_single_service(hass: HomeAssistant) -> None:
     assert result["reason"] == "not_dmr"
 
 
-async def test_ssdp_ignore_device(hass: HomeAssistant) -> None:
+async def test_ssdp_ignore_device(hass: SmartHub) -> None:
     """Test SSDP discovery ignores certain devices."""
     discovery = dataclasses.replace(MOCK_DISCOVERY)
-    discovery.x_homeassistant_matching_domains = {DOMAIN, "other_domain"}
-    assert discovery.x_homeassistant_matching_domains
+    discovery.x_smarthub_matching_domains = {DOMAIN, "other_domain"}
+    assert discovery.x_smarthub_matching_domains
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_SSDP},
@@ -625,7 +625,7 @@ async def test_ssdp_ignore_device(hass: HomeAssistant) -> None:
         assert result["reason"] == "alternative_integration"
 
 
-async def test_ignore_flow(hass: HomeAssistant, ssdp_scanner_mock: Mock) -> None:
+async def test_ignore_flow(hass: SmartHub, ssdp_scanner_mock: Mock) -> None:
     """Test ignoring an SSDP discovery fills in config entry data from SSDP."""
     # Device found via SSDP, matching the 2nd device type tried
     ssdp_scanner_mock.async_get_discovery_info_by_udn_st.side_effect = [
@@ -654,7 +654,7 @@ async def test_ignore_flow(hass: HomeAssistant, ssdp_scanner_mock: Mock) -> None
 
 
 async def test_ignore_flow_no_ssdp(
-    hass: HomeAssistant, ssdp_scanner_mock: Mock
+    hass: SmartHub, ssdp_scanner_mock: Mock
 ) -> None:
     """Test ignoring a flow without SSDP info still creates a config entry."""
     # Nothing found from SSDP
@@ -678,7 +678,7 @@ async def test_ignore_flow_no_ssdp(
 
 
 async def test_get_mac_address_ipv4(
-    hass: HomeAssistant, mock_get_mac_address: Mock
+    hass: SmartHub, mock_get_mac_address: Mock
 ) -> None:
     """Test getting MAC address from IPv4 address for SSDP discovery."""
     # Init'ing the flow should be enough to get the MAC address
@@ -694,7 +694,7 @@ async def test_get_mac_address_ipv4(
 
 
 async def test_get_mac_address_ipv6(
-    hass: HomeAssistant, mock_get_mac_address: Mock
+    hass: SmartHub, mock_get_mac_address: Mock
 ) -> None:
     """Test getting MAC address from IPv6 address for SSDP discovery."""
     # Use a scoped link-local IPv6 address for the host
@@ -719,7 +719,7 @@ async def test_get_mac_address_ipv6(
 
 
 async def test_get_mac_address_host(
-    hass: HomeAssistant, mock_get_mac_address: Mock
+    hass: SmartHub, mock_get_mac_address: Mock
 ) -> None:
     """Test getting MAC address from hostname for manual location entry."""
     # Create device via manual URL entry, so that it must be contacted directly,
@@ -746,7 +746,7 @@ async def test_get_mac_address_host(
 
 
 async def test_options_flow(
-    hass: HomeAssistant, config_entry_mock: MockConfigEntry
+    hass: SmartHub, config_entry_mock: MockConfigEntry
 ) -> None:
     """Test config flow options."""
     config_entry_mock.add_to_hass(hass)

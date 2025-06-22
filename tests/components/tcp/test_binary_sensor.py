@@ -5,10 +5,10 @@ from unittest.mock import call, patch
 
 import pytest
 
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from . import test_sensor as test_tcp
 
@@ -23,9 +23,9 @@ TEST_ENTITY = "binary_sensor.test_name"
 def mock_socket_fixture():
     """Mock the socket."""
     with (
-        patch("homeassistant.components.tcp.entity.socket.socket") as mock_socket,
+        patch("smarthub.components.tcp.entity.socket.socket") as mock_socket,
         patch(
-            "homeassistant.components.tcp.entity.select.select",
+            "smarthub.components.tcp.entity.select.select",
             return_value=(True, False, False),
         ),
     ):
@@ -39,14 +39,14 @@ def now():
     return utcnow()
 
 
-async def test_setup_platform_valid_config(hass: HomeAssistant, mock_socket) -> None:
+async def test_setup_platform_valid_config(hass: SmartHub, mock_socket) -> None:
     """Check a valid configuration."""
     with assert_setup_component(1, "binary_sensor"):
         assert await async_setup_component(hass, "binary_sensor", TEST_CONFIG)
         await hass.async_block_till_done()
 
 
-async def test_setup_platform_invalid_config(hass: HomeAssistant, mock_socket) -> None:
+async def test_setup_platform_invalid_config(hass: SmartHub, mock_socket) -> None:
     """Check the invalid configuration."""
     with assert_setup_component(0):
         assert await async_setup_component(
@@ -57,7 +57,7 @@ async def test_setup_platform_invalid_config(hass: HomeAssistant, mock_socket) -
         await hass.async_block_till_done()
 
 
-async def test_state(hass: HomeAssistant, mock_socket, now) -> None:
+async def test_state(hass: SmartHub, mock_socket, now) -> None:
     """Check the state and update of the binary sensor."""
     mock_socket.recv.return_value = b"off"
     assert await async_setup_component(hass, "binary_sensor", TEST_CONFIG)

@@ -4,14 +4,14 @@ from collections.abc import Callable
 
 import pytest
 
-from homeassistant.components.lock import (
+from smarthub.components.lock import (
     DOMAIN as LOCK_DOMAIN,
     SERVICE_LOCK,
     SERVICE_UNLOCK,
     LockState,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import WebsocketDataType
 
@@ -38,7 +38,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_lock_from_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
     light_ws_data: WebsocketDataType,
 ) -> None:
@@ -102,7 +102,7 @@ async def test_lock_from_light(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_lock_from_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_put_request: Callable[[str, str], AiohttpClientMocker],
     sensor_ws_data: WebsocketDataType,
 ) -> None:

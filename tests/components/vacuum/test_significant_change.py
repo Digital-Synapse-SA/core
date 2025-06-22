@@ -2,12 +2,12 @@
 
 import pytest
 
-from homeassistant.components.vacuum import (
+from smarthub.components.vacuum import (
     ATTR_BATTERY_ICON,
     ATTR_BATTERY_LEVEL,
     ATTR_FAN_SPEED,
 )
-from homeassistant.components.vacuum.significant_change import (
+from smarthub.components.vacuum.significant_change import (
     async_check_significant_change,
 )
 

@@ -6,7 +6,7 @@ from unittest.mock import patch
 from freezegun import freeze_time
 import pytest
 
-from homeassistant.components import (
+from smarthub.components import (
     conversation,
     cover,
     light,
@@ -15,28 +15,28 @@ from homeassistant.components import (
     vacuum,
     valve,
 )
-from homeassistant.components.cover import intent as cover_intent
-from homeassistant.components.homeassistant.exposed_entities import async_expose_entity
-from homeassistant.components.media_player import (
+from smarthub.components.cover import intent as cover_intent
+from smarthub.components.smarthub.exposed_entities import async_expose_entity
+from smarthub.components.media_player import (
     MediaPlayerEntityFeature,
     intent as media_player_intent,
 )
-from homeassistant.components.vacuum import intent as vaccum_intent
-from homeassistant.const import (
+from smarthub.components.vacuum import intent as vaccum_intent
+from smarthub.const import (
     ATTR_SUPPORTED_FEATURES,
     STATE_CLOSED,
     STATE_PAUSED,
     STATE_PLAYING,
 )
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.helpers import (
+from smarthub.core import Context, SmartHub
+from smarthub.helpers import (
     area_registry as ar,
     entity_registry as er,
     floor_registry as fr,
     intent,
 )
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_mock_service
 
@@ -63,15 +63,15 @@ class MockTodoListEntity(todo.TodoListEntity):
 
 
 @pytest.fixture
-async def init_components(hass: HomeAssistant):
+async def init_components(hass: SmartHub):
     """Initialize relevant components with empty configs."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})
     assert await async_setup_component(hass, "intent", {})
 
 
 async def test_cover_set_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
 ) -> None:
     """Test the open/close/set position for covers."""
@@ -125,7 +125,7 @@ async def test_cover_set_position(
 
 
 async def test_cover_device_class(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
 ) -> None:
     """Test the open position for covers by device class."""
@@ -153,7 +153,7 @@ async def test_cover_device_class(
 
 
 async def test_valve_intents(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
 ) -> None:
     """Test open/close/set position for valves."""
@@ -205,7 +205,7 @@ async def test_valve_intents(
 
 
 async def test_vacuum_intents(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
 ) -> None:
     """Test start/return to base for vacuums."""
@@ -245,7 +245,7 @@ async def test_vacuum_intents(
 
 
 async def test_media_player_intents(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
 ) -> None:
     """Test pause/unpause/next/set volume for media players."""
@@ -334,7 +334,7 @@ async def test_media_player_intents(
 
 
 async def test_turn_floor_lights_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     entity_registry: er.EntityRegistry,
     area_registry: ar.AreaRegistry,
@@ -423,7 +423,7 @@ async def test_turn_floor_lights_on_off(
 
 
 async def test_todo_add_item_fr(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
 ) -> None:
     """Test that wildcard matches prioritize results with more literal text matched."""
@@ -433,7 +433,7 @@ async def test_todo_add_item_fr(
     with (
         patch.object(hass.config, "language", "fr"),
         patch(
-            "homeassistant.components.todo.intent.ListAddItemIntent.async_handle",
+            "smarthub.components.todo.intent.ListAddItemIntent.async_handle",
             return_value=intent.IntentResponse(hass.config.language),
         ) as mock_handle,
     ):
@@ -457,7 +457,7 @@ async def test_todo_add_item_fr(
     )
 )
 async def test_date_time(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
 ) -> None:
     """Test the date and time intents."""

@@ -7,9 +7,9 @@ import requests
 import requests_mock
 import voluptuous as vol
 
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
-from homeassistant.components.tomato import device_tracker as tomato
-from homeassistant.const import (
+from smarthub.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
+from smarthub.components.tomato import device_tracker as tomato
+from smarthub.const import (
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PLATFORM,
@@ -18,7 +18,7 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 def mock_session_response(*args, **kwargs):
@@ -53,7 +53,7 @@ def mock_session_response(*args, **kwargs):
 def mock_exception_logger():
     """Mock pyunifi."""
     with mock.patch(
-        "homeassistant.components.tomato.device_tracker._LOGGER.exception"
+        "smarthub.components.tomato.device_tracker._LOGGER.exception"
     ) as mock_exception_logger:
         yield mock_exception_logger
 
@@ -65,7 +65,7 @@ def mock_session_send():
         yield mock_session_send
 
 
-def test_config_missing_optional_params(hass: HomeAssistant, mock_session_send) -> None:
+def test_config_missing_optional_params(hass: SmartHub, mock_session_send) -> None:
     """Test the setup without optional parameters."""
     config = {
         DEVICE_TRACKER_DOMAIN: tomato.PLATFORM_SCHEMA(
@@ -91,7 +91,7 @@ def test_config_missing_optional_params(hass: HomeAssistant, mock_session_send) 
 
 @mock.patch("os.access", return_value=True)
 @mock.patch("os.path.isfile", mock.Mock(return_value=True))
-def test_config_default_nonssl_port(hass: HomeAssistant, mock_session_send) -> None:
+def test_config_default_nonssl_port(hass: SmartHub, mock_session_send) -> None:
     """Test the setup without a default port set without ssl enabled."""
     config = {
         DEVICE_TRACKER_DOMAIN: tomato.PLATFORM_SCHEMA(
@@ -110,7 +110,7 @@ def test_config_default_nonssl_port(hass: HomeAssistant, mock_session_send) -> N
 
 @mock.patch("os.access", return_value=True)
 @mock.patch("os.path.isfile", mock.Mock(return_value=True))
-def test_config_default_ssl_port(hass: HomeAssistant, mock_session_send) -> None:
+def test_config_default_ssl_port(hass: SmartHub, mock_session_send) -> None:
     """Test the setup without a default port set with ssl enabled."""
     config = {
         DEVICE_TRACKER_DOMAIN: tomato.PLATFORM_SCHEMA(
@@ -131,7 +131,7 @@ def test_config_default_ssl_port(hass: HomeAssistant, mock_session_send) -> None
 @mock.patch("os.access", return_value=True)
 @mock.patch("os.path.isfile", mock.Mock(return_value=True))
 def test_config_verify_ssl_but_no_ssl_enabled(
-    hass: HomeAssistant, mock_session_send
+    hass: SmartHub, mock_session_send
 ) -> None:
     """Test the setup with a string with ssl_verify but ssl not enabled."""
     config = {
@@ -163,7 +163,7 @@ def test_config_verify_ssl_but_no_ssl_enabled(
 
 @mock.patch("os.access", return_value=True)
 @mock.patch("os.path.isfile", mock.Mock(return_value=True))
-def test_config_valid_verify_ssl_path(hass: HomeAssistant, mock_session_send) -> None:
+def test_config_valid_verify_ssl_path(hass: SmartHub, mock_session_send) -> None:
     """Test the setup with a string for ssl_verify.
 
     Representing the absolute path to a CA certificate bundle.
@@ -197,7 +197,7 @@ def test_config_valid_verify_ssl_path(hass: HomeAssistant, mock_session_send) ->
     )
 
 
-def test_config_valid_verify_ssl_bool(hass: HomeAssistant, mock_session_send) -> None:
+def test_config_valid_verify_ssl_bool(hass: SmartHub, mock_session_send) -> None:
     """Test the setup with a bool for ssl_verify."""
     config = {
         DEVICE_TRACKER_DOMAIN: tomato.PLATFORM_SCHEMA(
@@ -298,7 +298,7 @@ def test_config_errors() -> None:
 
 
 @mock.patch("requests.Session.send", side_effect=mock_session_response)
-def test_config_bad_credentials(hass: HomeAssistant, mock_exception_logger) -> None:
+def test_config_bad_credentials(hass: SmartHub, mock_exception_logger) -> None:
     """Test the setup with bad credentials."""
     config = {
         DEVICE_TRACKER_DOMAIN: tomato.PLATFORM_SCHEMA(
@@ -321,7 +321,7 @@ def test_config_bad_credentials(hass: HomeAssistant, mock_exception_logger) -> N
 
 
 @mock.patch("requests.Session.send", side_effect=mock_session_response)
-def test_bad_response(hass: HomeAssistant, mock_exception_logger) -> None:
+def test_bad_response(hass: SmartHub, mock_exception_logger) -> None:
     """Test the setup with bad response from router."""
     config = {
         DEVICE_TRACKER_DOMAIN: tomato.PLATFORM_SCHEMA(
@@ -344,7 +344,7 @@ def test_bad_response(hass: HomeAssistant, mock_exception_logger) -> None:
 
 
 @mock.patch("requests.Session.send", side_effect=mock_session_response)
-def test_scan_devices(hass: HomeAssistant, mock_exception_logger) -> None:
+def test_scan_devices(hass: SmartHub, mock_exception_logger) -> None:
     """Test scanning for new devices."""
     config = {
         DEVICE_TRACKER_DOMAIN: tomato.PLATFORM_SCHEMA(
@@ -363,7 +363,7 @@ def test_scan_devices(hass: HomeAssistant, mock_exception_logger) -> None:
 
 
 @mock.patch("requests.Session.send", side_effect=mock_session_response)
-def test_bad_connection(hass: HomeAssistant, mock_exception_logger) -> None:
+def test_bad_connection(hass: SmartHub, mock_exception_logger) -> None:
     """Test the router with a connection error."""
     config = {
         DEVICE_TRACKER_DOMAIN: tomato.PLATFORM_SCHEMA(
@@ -391,7 +391,7 @@ def test_bad_connection(hass: HomeAssistant, mock_exception_logger) -> None:
 
 
 @mock.patch("requests.Session.send", side_effect=mock_session_response)
-def test_router_timeout(hass: HomeAssistant, mock_exception_logger) -> None:
+def test_router_timeout(hass: SmartHub, mock_exception_logger) -> None:
     """Test the router with a timeout error."""
     config = {
         DEVICE_TRACKER_DOMAIN: tomato.PLATFORM_SCHEMA(
@@ -419,7 +419,7 @@ def test_router_timeout(hass: HomeAssistant, mock_exception_logger) -> None:
 
 
 @mock.patch("requests.Session.send", side_effect=mock_session_response)
-def test_get_device_name(hass: HomeAssistant, mock_exception_logger) -> None:
+def test_get_device_name(hass: SmartHub, mock_exception_logger) -> None:
     """Test getting device names."""
     config = {
         DEVICE_TRACKER_DOMAIN: tomato.PLATFORM_SCHEMA(

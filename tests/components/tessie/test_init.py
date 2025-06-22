@@ -4,13 +4,13 @@ from unittest.mock import patch
 
 from tesla_fleet_api.exceptions import TeslaFleetError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .common import ERROR_AUTH, ERROR_CONNECTION, ERROR_UNKNOWN, setup_platform
 
 
-async def test_load_unload(hass: HomeAssistant) -> None:
+async def test_load_unload(hass: SmartHub) -> None:
     """Test load and unload."""
 
     entry = await setup_platform(hass)
@@ -21,7 +21,7 @@ async def test_load_unload(hass: HomeAssistant) -> None:
 
 
 async def test_auth_failure(
-    hass: HomeAssistant, mock_get_state_of_all_vehicles
+    hass: SmartHub, mock_get_state_of_all_vehicles
 ) -> None:
     """Test init with an authentication error."""
 
@@ -31,7 +31,7 @@ async def test_auth_failure(
 
 
 async def test_unknown_failure(
-    hass: HomeAssistant, mock_get_state_of_all_vehicles
+    hass: SmartHub, mock_get_state_of_all_vehicles
 ) -> None:
     """Test init with an client response error."""
 
@@ -41,7 +41,7 @@ async def test_unknown_failure(
 
 
 async def test_connection_failure(
-    hass: HomeAssistant, mock_get_state_of_all_vehicles
+    hass: SmartHub, mock_get_state_of_all_vehicles
 ) -> None:
     """Test init with a network connection error."""
 
@@ -50,21 +50,21 @@ async def test_connection_failure(
     assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_products_error(hass: HomeAssistant) -> None:
+async def test_products_error(hass: SmartHub) -> None:
     """Test init with a fleet error on products."""
 
     with patch(
-        "homeassistant.components.tessie.Tessie.products", side_effect=TeslaFleetError
+        "smarthub.components.tessie.Tessie.products", side_effect=TeslaFleetError
     ):
         entry = await setup_platform(hass)
         assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_scopes_error(hass: HomeAssistant) -> None:
+async def test_scopes_error(hass: SmartHub) -> None:
     """Test init with a fleet error on scopes."""
 
     with patch(
-        "homeassistant.components.tessie.Tessie.scopes", side_effect=TeslaFleetError
+        "smarthub.components.tessie.Tessie.scopes", side_effect=TeslaFleetError
     ):
         entry = await setup_platform(hass)
         assert entry.state is ConfigEntryState.SETUP_RETRY

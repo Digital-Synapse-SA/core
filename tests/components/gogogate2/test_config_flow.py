@@ -7,23 +7,23 @@ from ismartgate import GogoGate2Api, ISmartGateApi
 from ismartgate.common import ApiError
 from ismartgate.const import GogoGate2ApiErrorCode
 
-from homeassistant import config_entries
-from homeassistant.components.gogogate2.const import (
+from smarthub import config_entries
+from smarthub.components.gogogate2.const import (
     DEVICE_TYPE_GOGOGATE2,
     DEVICE_TYPE_ISMARTGATE,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_DEVICE,
     CONF_IP_ADDRESS,
     CONF_PASSWORD,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import (
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
@@ -35,10 +35,10 @@ from tests.common import MockConfigEntry
 MOCK_MAC_ADDR = "AA:BB:CC:DD:EE:FF"
 
 
-@patch("homeassistant.components.gogogate2.async_setup_entry", return_value=True)
-@patch("homeassistant.components.gogogate2.common.GogoGate2Api")
+@patch("smarthub.components.gogogate2.async_setup_entry", return_value=True)
+@patch("smarthub.components.gogogate2.common.GogoGate2Api")
 async def test_auth_fail(
-    gogogate2api_mock, async_setup_entry_mock, hass: HomeAssistant
+    gogogate2api_mock, async_setup_entry_mock, hass: SmartHub
 ) -> None:
     """Test authorization failures."""
     api: GogoGate2Api = MagicMock(spec=GogoGate2Api)
@@ -103,7 +103,7 @@ async def test_auth_fail(
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_homekit_unique_id_already_setup(hass: HomeAssistant) -> None:
+async def test_form_homekit_unique_id_already_setup(hass: SmartHub) -> None:
     """Test that we abort from homekit if gogogate2 is already setup."""
 
     result = await hass.config_entries.flow.async_init(
@@ -150,7 +150,7 @@ async def test_form_homekit_unique_id_already_setup(hass: HomeAssistant) -> None
     assert result["type"] is FlowResultType.ABORT
 
 
-async def test_form_homekit_ip_address_already_setup(hass: HomeAssistant) -> None:
+async def test_form_homekit_ip_address_already_setup(hass: SmartHub) -> None:
     """Test that we abort from homekit if gogogate2 is already setup."""
 
     entry = MockConfigEntry(
@@ -175,7 +175,7 @@ async def test_form_homekit_ip_address_already_setup(hass: HomeAssistant) -> Non
     assert result["type"] is FlowResultType.ABORT
 
 
-async def test_form_homekit_ip_address(hass: HomeAssistant) -> None:
+async def test_form_homekit_ip_address(hass: SmartHub) -> None:
     """Test homekit includes the defaults ip address."""
 
     result = await hass.config_entries.flow.async_init(
@@ -203,10 +203,10 @@ async def test_form_homekit_ip_address(hass: HomeAssistant) -> None:
     }
 
 
-@patch("homeassistant.components.gogogate2.async_setup_entry", return_value=True)
-@patch("homeassistant.components.gogogate2.common.ISmartGateApi")
+@patch("smarthub.components.gogogate2.async_setup_entry", return_value=True)
+@patch("smarthub.components.gogogate2.common.ISmartGateApi")
 async def test_discovered_dhcp(
-    ismartgateapi_mock, async_setup_entry_mock, hass: HomeAssistant
+    ismartgateapi_mock, async_setup_entry_mock, hass: SmartHub
 ) -> None:
     """Test we get the form with homekit and abort for dhcp source when we get both."""
     api: ISmartGateApi = MagicMock(spec=ISmartGateApi)
@@ -258,7 +258,7 @@ async def test_discovered_dhcp(
     }
 
 
-async def test_discovered_by_homekit_and_dhcp(hass: HomeAssistant) -> None:
+async def test_discovered_by_homekit_and_dhcp(hass: SmartHub) -> None:
     """Test we get the form with homekit and abort for dhcp source when we get both."""
 
     result = await hass.config_entries.flow.async_init(

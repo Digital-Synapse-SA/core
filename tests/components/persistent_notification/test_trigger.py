@@ -2,12 +2,12 @@
 
 from typing import Any
 
-from homeassistant.components import persistent_notification as pn
-from homeassistant.components.persistent_notification import trigger
-from homeassistant.core import Context, HomeAssistant, callback
+from smarthub.components import persistent_notification as pn
+from smarthub.components.persistent_notification import trigger
+from smarthub.core import Context, SmartHub, callback
 
 
-async def test_automation_with_pn_trigger(hass: HomeAssistant) -> None:
+async def test_automation_with_pn_trigger(hass: SmartHub) -> None:
     """Test automation with a persistent_notification trigger."""
 
     result_any = []

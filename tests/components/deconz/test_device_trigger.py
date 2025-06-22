@@ -5,22 +5,22 @@ from unittest.mock import Mock
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components.automation import DOMAIN as AUTOMATION_DOMAIN
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from smarthub.components.automation import DOMAIN as AUTOMATION_DOMAIN
+from smarthub.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.binary_sensor.device_trigger import (
+from smarthub.components.binary_sensor.device_trigger import (
     CONF_BAT_LOW,
     CONF_NOT_BAT_LOW,
     CONF_NOT_TAMPERED,
     CONF_TAMPERED,
 )
-from homeassistant.components.deconz import device_trigger
-from homeassistant.components.deconz.const import DOMAIN
-from homeassistant.components.deconz.device_trigger import CONF_SUBTYPE
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import (
+from smarthub.components.deconz import device_trigger
+from smarthub.components.deconz.const import DOMAIN
+from smarthub.components.deconz.device_trigger import CONF_SUBTYPE
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import (
     ATTR_BATTERY_LEVEL,
     ATTR_ENTITY_ID,
     CONF_DEVICE_ID,
@@ -29,10 +29,10 @@ from homeassistant.const import (
     CONF_TYPE,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.trigger import async_initialize_triggers
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.trigger import async_initialize_triggers
+from smarthub.setup import async_setup_component
 
 from .conftest import WebsocketDataType
 
@@ -70,7 +70,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -181,7 +181,7 @@ async def test_get_triggers(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_get_triggers_for_alarm_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -268,7 +268,7 @@ async def test_get_triggers_for_alarm_event(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_get_triggers_manage_unsupported_remotes(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Verify no triggers for an unsupported remote."""
     device = device_registry.async_get_device(
@@ -310,7 +310,7 @@ async def test_get_triggers_manage_unsupported_remotes(
 )
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_functional_device_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     sensor_ws_data: WebsocketDataType,
@@ -352,7 +352,7 @@ async def test_functional_device_trigger(
 
 @pytest.mark.skip(reason="Temporarily disabled until automation validation is improved")
 @pytest.mark.usefixtures("config_entry_setup")
-async def test_validate_trigger_unknown_device(hass: HomeAssistant) -> None:
+async def test_validate_trigger_unknown_device(hass: SmartHub) -> None:
     """Test unknown device does not return a trigger config."""
     assert await async_setup_component(
         hass,
@@ -381,7 +381,7 @@ async def test_validate_trigger_unknown_device(hass: HomeAssistant) -> None:
 
 
 async def test_validate_trigger_unsupported_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry_setup: MockConfigEntry,
 ) -> None:
@@ -421,7 +421,7 @@ async def test_validate_trigger_unsupported_device(
 
 
 async def test_validate_trigger_unsupported_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry_setup: MockConfigEntry,
 ) -> None:
@@ -463,7 +463,7 @@ async def test_validate_trigger_unsupported_trigger(
 
 
 async def test_attach_trigger_no_matching_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry_setup: MockConfigEntry,
 ) -> None:

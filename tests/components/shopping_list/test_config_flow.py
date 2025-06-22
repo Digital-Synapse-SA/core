@@ -1,12 +1,12 @@
 """Test config flow."""
 
-from homeassistant.components.shopping_list.const import DOMAIN
-from homeassistant.config_entries import SOURCE_IMPORT, SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.shopping_list.const import DOMAIN
+from smarthub.config_entries import SOURCE_IMPORT, SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_import(hass: HomeAssistant) -> None:
+async def test_import(hass: SmartHub) -> None:
     """Test entry will be imported."""
 
     result = await hass.config_entries.flow.async_init(
@@ -15,7 +15,7 @@ async def test_import(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_user(hass: HomeAssistant) -> None:
+async def test_user(hass: SmartHub) -> None:
     """Test we can start a config flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -26,7 +26,7 @@ async def test_user(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
 
-async def test_user_confirm(hass: HomeAssistant) -> None:
+async def test_user_confirm(hass: SmartHub) -> None:
     """Test we can finish a config flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -37,7 +37,7 @@ async def test_user_confirm(hass: HomeAssistant) -> None:
     assert result["result"].data == {}
 
 
-async def test_onboarding_flow(hass: HomeAssistant) -> None:
+async def test_onboarding_flow(hass: SmartHub) -> None:
     """Test the onboarding configuration flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": "onboarding"}

@@ -7,10 +7,10 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.madvr.sensor import get_temperature
-from homeassistant.const import STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.madvr.sensor import get_temperature
+from smarthub.const import STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 from .conftest import get_update_callback
@@ -20,14 +20,14 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensor_setup_and_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     mock_madvr_client: AsyncMock,
 ) -> None:
     """Test setup of the sensor entities and their states."""
-    with patch("homeassistant.components.madvr.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.madvr.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_config_entry)
 
     update_callback = get_update_callback(mock_madvr_client)

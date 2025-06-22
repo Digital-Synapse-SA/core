@@ -9,11 +9,11 @@ from nice_go import ApiError, AuthFailedError, Barrier, BarrierState
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.nice_go.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP, Platform
-from homeassistant.core import Event, HomeAssistant, callback
-from homeassistant.helpers import issue_registry as ir
+from smarthub.components.nice_go.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import EVENT_HOMEASSISTANT_STOP, Platform
+from smarthub.core import Event, SmartHub, callback
+from smarthub.helpers import issue_registry as ir
 
 from . import setup_integration
 
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, mock_nice_go: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_nice_go: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test the unload entry."""
 
@@ -34,7 +34,7 @@ async def test_unload_entry(
 
 
 async def test_setup_failure_api_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -47,7 +47,7 @@ async def test_setup_failure_api_error(
 
 
 async def test_setup_failure_auth_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -62,7 +62,7 @@ async def test_setup_failure_auth_failed(
 
 
 async def test_firmware_update_required(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     issue_registry: ir.IssueRegistry,
@@ -99,7 +99,7 @@ async def test_firmware_update_required(
 
 
 async def test_update_refresh_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -125,7 +125,7 @@ async def test_update_refresh_token(
 
 
 async def test_update_refresh_token_api_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -153,7 +153,7 @@ async def test_update_refresh_token_api_error(
 
 
 async def test_update_refresh_token_auth_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -183,7 +183,7 @@ async def test_update_refresh_token_auth_failed(
 
 
 async def test_client_listen_api_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -207,7 +207,7 @@ async def test_client_listen_api_error(
 
 
 async def test_on_data_none_parsed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -242,7 +242,7 @@ async def test_on_data_none_parsed(
 
 
 async def test_on_connected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -261,7 +261,7 @@ async def test_on_connected(
 
 
 async def test_on_connection_lost(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -274,7 +274,7 @@ async def test_on_connection_lost(
 
     assert mock_nice_go.listen.call_count == 3
 
-    with patch("homeassistant.components.nice_go.coordinator.RECONNECT_DELAY", 0):
+    with patch("smarthub.components.nice_go.coordinator.RECONNECT_DELAY", 0):
         await mock_nice_go.listen.call_args_list[2][0][1](
             {"exception": ValueError("test")}
         )
@@ -293,7 +293,7 @@ async def test_on_connection_lost(
 
 
 async def test_on_connection_lost_reconnect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -308,7 +308,7 @@ async def test_on_connection_lost_reconnect(
 
     assert hass.states.get("cover.test_garage_1").state == "closed"
 
-    with patch("homeassistant.components.nice_go.coordinator.RECONNECT_DELAY", 0):
+    with patch("smarthub.components.nice_go.coordinator.RECONNECT_DELAY", 0):
         await mock_nice_go.listen.call_args_list[2][0][1](
             {"exception": ValueError("test")}
         )
@@ -317,7 +317,7 @@ async def test_on_connection_lost_reconnect(
 
 
 async def test_no_connection_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -350,7 +350,7 @@ async def test_no_connection_state(
 
 
 async def test_connection_attempts_exhausted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -361,8 +361,8 @@ async def test_connection_attempts_exhausted(
     mock_nice_go.connect.side_effect = ApiError
 
     with (
-        patch("homeassistant.components.nice_go.coordinator.RECONNECT_ATTEMPTS", 1),
-        patch("homeassistant.components.nice_go.coordinator.RECONNECT_DELAY", 0),
+        patch("smarthub.components.nice_go.coordinator.RECONNECT_ATTEMPTS", 1),
+        patch("smarthub.components.nice_go.coordinator.RECONNECT_DELAY", 0),
     ):
         await setup_integration(hass, mock_config_entry, [Platform.COVER])
 
@@ -371,7 +371,7 @@ async def test_connection_attempts_exhausted(
 
 
 async def test_reconnect_hass_stopping(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -391,8 +391,8 @@ async def test_reconnect_hass_stopping(
     hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, _async_ha_stop)
 
     with (
-        patch("homeassistant.components.nice_go.coordinator.RECONNECT_DELAY", 0.1),
-        patch("homeassistant.components.nice_go.coordinator.RECONNECT_ATTEMPTS", 20),
+        patch("smarthub.components.nice_go.coordinator.RECONNECT_DELAY", 0.1),
+        patch("smarthub.components.nice_go.coordinator.RECONNECT_ATTEMPTS", 20),
     ):
         await setup_integration(hass, mock_config_entry, [Platform.COVER])
         await hass.async_block_till_done()

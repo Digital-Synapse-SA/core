@@ -4,14 +4,14 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import fan
-from homeassistant.components.demo.fan import (
+from smarthub.components import fan
+from smarthub.components.demo.fan import (
     PRESET_MODE_AUTO,
     PRESET_MODE_ON,
     PRESET_MODE_SLEEP,
     PRESET_MODE_SMART,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ENTITY_MATCH_ALL,
     SERVICE_TURN_OFF,
@@ -20,8 +20,8 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 FULL_FAN_ENTITY_IDS = ["fan.living_room_fan", "fan.percentage_full_fan"]
 FANS_WITH_PRESET_MODE_ONLY = ["fan.preset_only_limited_fan"]
@@ -38,21 +38,21 @@ PERCENTAGE_MODEL_FANS = ["fan.percentage_full_fan", "fan.percentage_limited_fan"
 async def fan_only() -> None:
     """Enable only the datetime platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.FAN],
     ):
         yield
 
 
 @pytest.fixture(autouse=True)
-async def setup_comp(hass: HomeAssistant, fan_only: None):
+async def setup_comp(hass: SmartHub, fan_only: None):
     """Initialize components."""
     assert await async_setup_component(hass, fan.DOMAIN, {"fan": {"platform": "demo"}})
     await hass.async_block_till_done()
 
 
 @pytest.mark.parametrize("fan_entity_id", LIMITED_AND_FULL_FAN_ENTITY_IDS)
-async def test_turn_on(hass: HomeAssistant, fan_entity_id) -> None:
+async def test_turn_on(hass: SmartHub, fan_entity_id) -> None:
     """Test turning on the device."""
     state = hass.states.get(fan_entity_id)
     assert state.state == STATE_OFF
@@ -66,7 +66,7 @@ async def test_turn_on(hass: HomeAssistant, fan_entity_id) -> None:
 
 @pytest.mark.parametrize("fan_entity_id", FULL_FAN_ENTITY_IDS)
 async def test_turn_on_with_speed_and_percentage(
-    hass: HomeAssistant, fan_entity_id
+    hass: SmartHub, fan_entity_id
 ) -> None:
     """Test turning on the device."""
     state = hass.states.get(fan_entity_id)
@@ -144,7 +144,7 @@ async def test_turn_on_with_speed_and_percentage(
 
 @pytest.mark.parametrize("fan_entity_id", FANS_WITH_PRESET_MODE_ONLY)
 async def test_turn_on_with_preset_mode_only(
-    hass: HomeAssistant, fan_entity_id
+    hass: SmartHub, fan_entity_id
 ) -> None:
     """Test turning on the device with a preset_mode and no speed setting."""
     state = hass.states.get(fan_entity_id)
@@ -203,7 +203,7 @@ async def test_turn_on_with_preset_mode_only(
 
 @pytest.mark.parametrize("fan_entity_id", FANS_WITH_PRESET_MODES)
 async def test_turn_on_with_preset_mode_and_speed(
-    hass: HomeAssistant, fan_entity_id
+    hass: SmartHub, fan_entity_id
 ) -> None:
     """Test turning on the device with a preset_mode and speed."""
     state = hass.states.get(fan_entity_id)
@@ -276,7 +276,7 @@ async def test_turn_on_with_preset_mode_and_speed(
 
 
 @pytest.mark.parametrize("fan_entity_id", LIMITED_AND_FULL_FAN_ENTITY_IDS)
-async def test_turn_off(hass: HomeAssistant, fan_entity_id) -> None:
+async def test_turn_off(hass: SmartHub, fan_entity_id) -> None:
     """Test turning off the device."""
     state = hass.states.get(fan_entity_id)
     assert state.state == STATE_OFF
@@ -295,7 +295,7 @@ async def test_turn_off(hass: HomeAssistant, fan_entity_id) -> None:
 
 
 @pytest.mark.parametrize("fan_entity_id", LIMITED_AND_FULL_FAN_ENTITY_IDS)
-async def test_turn_off_without_entity_id(hass: HomeAssistant, fan_entity_id) -> None:
+async def test_turn_off_without_entity_id(hass: SmartHub, fan_entity_id) -> None:
     """Test turning off all fans."""
     state = hass.states.get(fan_entity_id)
     assert state.state == STATE_OFF
@@ -314,7 +314,7 @@ async def test_turn_off_without_entity_id(hass: HomeAssistant, fan_entity_id) ->
 
 
 @pytest.mark.parametrize("fan_entity_id", FULL_FAN_ENTITY_IDS)
-async def test_set_direction(hass: HomeAssistant, fan_entity_id) -> None:
+async def test_set_direction(hass: SmartHub, fan_entity_id) -> None:
     """Test setting the direction of the device."""
     state = hass.states.get(fan_entity_id)
     assert state.state == STATE_OFF
@@ -330,7 +330,7 @@ async def test_set_direction(hass: HomeAssistant, fan_entity_id) -> None:
 
 
 @pytest.mark.parametrize("fan_entity_id", FANS_WITH_PRESET_MODES)
-async def test_set_preset_mode(hass: HomeAssistant, fan_entity_id) -> None:
+async def test_set_preset_mode(hass: SmartHub, fan_entity_id) -> None:
     """Test setting the preset mode of the device."""
     state = hass.states.get(fan_entity_id)
     assert state.state == STATE_OFF
@@ -348,7 +348,7 @@ async def test_set_preset_mode(hass: HomeAssistant, fan_entity_id) -> None:
 
 
 @pytest.mark.parametrize("fan_entity_id", LIMITED_AND_FULL_FAN_ENTITY_IDS)
-async def test_set_preset_mode_invalid(hass: HomeAssistant, fan_entity_id) -> None:
+async def test_set_preset_mode_invalid(hass: SmartHub, fan_entity_id) -> None:
     """Test setting a invalid preset mode for the device."""
     state = hass.states.get(fan_entity_id)
     assert state.state == STATE_OFF
@@ -375,7 +375,7 @@ async def test_set_preset_mode_invalid(hass: HomeAssistant, fan_entity_id) -> No
 
 
 @pytest.mark.parametrize("fan_entity_id", FULL_FAN_ENTITY_IDS)
-async def test_set_percentage(hass: HomeAssistant, fan_entity_id) -> None:
+async def test_set_percentage(hass: SmartHub, fan_entity_id) -> None:
     """Test setting the percentage speed of the device."""
     state = hass.states.get(fan_entity_id)
     assert state.state == STATE_OFF
@@ -391,7 +391,7 @@ async def test_set_percentage(hass: HomeAssistant, fan_entity_id) -> None:
 
 
 @pytest.mark.parametrize("fan_entity_id", LIMITED_AND_FULL_FAN_ENTITY_IDS)
-async def test_increase_decrease_speed(hass: HomeAssistant, fan_entity_id) -> None:
+async def test_increase_decrease_speed(hass: SmartHub, fan_entity_id) -> None:
     """Test increasing and decreasing the percentage speed of the device."""
     state = hass.states.get(fan_entity_id)
     assert state.state == STATE_OFF
@@ -472,7 +472,7 @@ async def test_increase_decrease_speed(hass: HomeAssistant, fan_entity_id) -> No
 
 @pytest.mark.parametrize("fan_entity_id", PERCENTAGE_MODEL_FANS)
 async def test_increase_decrease_speed_with_percentage_step(
-    hass: HomeAssistant, fan_entity_id
+    hass: SmartHub, fan_entity_id
 ) -> None:
     """Test increasing speed with a percentage step."""
     await hass.services.async_call(
@@ -504,7 +504,7 @@ async def test_increase_decrease_speed_with_percentage_step(
 
 
 @pytest.mark.parametrize("fan_entity_id", FULL_FAN_ENTITY_IDS)
-async def test_oscillate(hass: HomeAssistant, fan_entity_id) -> None:
+async def test_oscillate(hass: SmartHub, fan_entity_id) -> None:
     """Test oscillating the fan."""
     state = hass.states.get(fan_entity_id)
     assert state.state == STATE_OFF
@@ -530,7 +530,7 @@ async def test_oscillate(hass: HomeAssistant, fan_entity_id) -> None:
 
 
 @pytest.mark.parametrize("fan_entity_id", LIMITED_AND_FULL_FAN_ENTITY_IDS)
-async def test_is_on(hass: HomeAssistant, fan_entity_id) -> None:
+async def test_is_on(hass: SmartHub, fan_entity_id) -> None:
     """Test is on service call."""
     assert not fan.is_on(hass, fan_entity_id)
 

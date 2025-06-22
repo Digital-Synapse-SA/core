@@ -9,11 +9,11 @@ from pyairvisual.node import (
 )
 import pytest
 
-from homeassistant.components.airvisual_pro.const import DOMAIN
-from homeassistant.config_entries import SOURCE_IMPORT, SOURCE_USER
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.airvisual_pro.const import DOMAIN
+from smarthub.config_entries import SOURCE_IMPORT, SOURCE_USER
+from smarthub.const import CONF_IP_ADDRESS, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -30,7 +30,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
     ],
 )
 async def test_create_entry(
-    hass: HomeAssistant, config, connect_errors, connect_mock, pro, setup_airvisual_pro
+    hass: SmartHub, config, connect_errors, connect_mock, pro, setup_airvisual_pro
 ) -> None:
     """Test creating an entry."""
     result = await hass.config_entries.flow.async_init(
@@ -59,7 +59,7 @@ async def test_create_entry(
 
 
 async def test_duplicate_error(
-    hass: HomeAssistant, config, config_entry, setup_airvisual_pro
+    hass: SmartHub, config, config_entry, setup_airvisual_pro
 ) -> None:
     """Test that errors are shown when duplicates are added."""
     result = await hass.config_entries.flow.async_init(
@@ -75,7 +75,7 @@ async def test_duplicate_error(
     assert result["reason"] == "already_configured"
 
 
-async def test_step_import(hass: HomeAssistant, config, setup_airvisual_pro) -> None:
+async def test_step_import(hass: SmartHub, config, setup_airvisual_pro) -> None:
     """Test that the user step works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_IMPORT}, data=config
@@ -98,7 +98,7 @@ async def test_step_import(hass: HomeAssistant, config, setup_airvisual_pro) -> 
     ],
 )
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config,
     config_entry: MockConfigEntry,
     connect_errors,

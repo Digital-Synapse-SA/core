@@ -7,14 +7,14 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.onewire.onewirehub import _DEVICE_SCAN_INTERVAL
-from homeassistant.components.select import (
+from smarthub.components.onewire.onewirehub import _DEVICE_SCAN_INTERVAL
+from smarthub.components.select import (
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_OPTION, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_OPTION, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_owproxy_mock_devices
 from .const import MOCK_OWPROXY_DEVICES
@@ -25,13 +25,13 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.onewire._PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.onewire._PLATFORMS", [Platform.SELECT]):
         yield
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_selects(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     owproxy: MagicMock,
     entity_registry: er.EntityRegistry,
@@ -47,7 +47,7 @@ async def test_selects(
 @pytest.mark.parametrize("device_id", ["28.111111111111"])
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_selects_delayed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     owproxy: MagicMock,
     device_id: str,
@@ -73,7 +73,7 @@ async def test_selects_delayed(
 
 @pytest.mark.parametrize("device_id", ["28.111111111111"])
 async def test_selection_option_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     owproxy: MagicMock,
     device_id: str,

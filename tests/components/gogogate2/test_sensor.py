@@ -17,10 +17,10 @@ from ismartgate.common import (
     Wifi,
 )
 
-from homeassistant.components.gogogate2.const import DEVICE_TYPE_ISMARTGATE, DOMAIN
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.components.gogogate2.const import DEVICE_TYPE_ISMARTGATE, DOMAIN
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_DEVICE,
@@ -30,8 +30,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -162,8 +162,8 @@ def _mocked_ismartgate_sensor_response(battery_level: int, temperature: float):
     )
 
 
-@patch("homeassistant.components.gogogate2.common.GogoGate2Api")
-async def test_sensor_update(gogogate2api_mock, hass: HomeAssistant) -> None:
+@patch("smarthub.components.gogogate2.common.GogoGate2Api")
+async def test_sensor_update(gogogate2api_mock, hass: SmartHub) -> None:
     """Test data update."""
 
     bat_attributes = {
@@ -240,8 +240,8 @@ async def test_sensor_update(gogogate2api_mock, hass: HomeAssistant) -> None:
     assert not hass.states.async_entity_ids(DOMAIN)
 
 
-@patch("homeassistant.components.gogogate2.common.ISmartGateApi")
-async def test_availability(ismartgateapi_mock, hass: HomeAssistant) -> None:
+@patch("smarthub.components.gogogate2.common.ISmartGateApi")
+async def test_availability(ismartgateapi_mock, hass: SmartHub) -> None:
     """Test availability."""
     bat_attributes = {
         "device_class": "battery",

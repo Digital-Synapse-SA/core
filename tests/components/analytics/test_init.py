@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.analytics.const import ANALYTICS_ENDPOINT_URL, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.analytics.const import ANALYTICS_ENDPOINT_URL, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 from tests.typing import WebSocketGenerator
@@ -14,7 +14,7 @@ from tests.typing import WebSocketGenerator
 MOCK_VERSION = "1970.1.0"
 
 
-async def test_setup(hass: HomeAssistant) -> None:
+async def test_setup(hass: SmartHub) -> None:
     """Test setup of the integration."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     await hass.async_block_till_done()
@@ -24,7 +24,7 @@ async def test_setup(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("supervisor_client")
 async def test_websocket(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -40,7 +40,7 @@ async def test_websocket(
 
     assert response["success"]
 
-    with patch("homeassistant.components.analytics.analytics.HA_VERSION", MOCK_VERSION):
+    with patch("smarthub.components.analytics.analytics.HA_VERSION", MOCK_VERSION):
         await ws_client.send_json_auto_id(
             {"type": "analytics/preferences", "preferences": {"base": True}}
         )

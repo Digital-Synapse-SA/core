@@ -9,8 +9,8 @@ import plexapi.playqueue
 import pytest
 import requests_mock
 
-from homeassistant.components.media_player import MediaType
-from homeassistant.components.plex.const import (
+from smarthub.components.media_player import MediaType
+from smarthub.components.plex.const import (
     CONF_SERVER,
     CONF_SERVER_IDENTIFIER,
     DOMAIN,
@@ -18,10 +18,10 @@ from homeassistant.components.plex.const import (
     PLEX_URI_SCHEME,
     SERVICE_REFRESH_LIBRARY,
 )
-from homeassistant.components.plex.services import process_plex_payload
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.plex.services import process_plex_payload
+from smarthub.const import CONF_URL
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from .const import DEFAULT_DATA, DEFAULT_OPTIONS, SECONDARY_DATA
 
@@ -29,7 +29,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_refresh_library(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_plex_server,
     setup_plex_server,
     requests_mock: requests_mock.Mocker,
@@ -44,7 +44,7 @@ async def test_refresh_library(
     )
 
     # Test with non-existent server
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_REFRESH_LIBRARY,
@@ -95,7 +95,7 @@ async def test_refresh_library(
     await setup_plex_server(config_entry=entry_2)
 
     # Test multiple servers available but none specified
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             DOMAIN,
             SERVICE_REFRESH_LIBRARY,
@@ -107,7 +107,7 @@ async def test_refresh_library(
 
 
 async def test_lookup_media_for_other_integrations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry,
     setup_plex_server,
     requests_mock: requests_mock.Mocker,
@@ -132,19 +132,19 @@ async def test_lookup_media_for_other_integrations(
     )
 
     # Test with no Plex integration available
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         process_plex_payload(hass, MediaType.MUSIC, CONTENT_ID)
     assert "Plex integration not configured" in str(excinfo.value)
 
     with patch(
-        "homeassistant.components.plex.PlexServer.connect", side_effect=NotFound
+        "smarthub.components.plex.PlexServer.connect", side_effect=NotFound
     ):
         # Initialize Plex integration without setting up a server
         with pytest.raises(AssertionError):
             await setup_plex_server()
 
         # Test with no Plex servers available
-        with pytest.raises(HomeAssistantError) as excinfo:
+        with pytest.raises(SmartHubError) as excinfo:
             process_plex_payload(hass, MediaType.MUSIC, CONTENT_ID)
         assert "No Plex servers available" in str(excinfo.value)
 
@@ -186,7 +186,7 @@ async def test_lookup_media_for_other_integrations(
         return_value=None,
         __qualname__="search",
     ):
-        with pytest.raises(HomeAssistantError) as excinfo:
+        with pytest.raises(SmartHubError) as excinfo:
             process_plex_payload(hass, MediaType.MUSIC, CONTENT_ID_BAD_MEDIA)
         assert f"No {MediaType.MUSIC} results in 'Music' for" in str(excinfo.value)
 
@@ -199,7 +199,7 @@ async def test_lookup_media_for_other_integrations(
     requests_mock.get(
         "https://1.2.3.4:32400/playQueues/1235", status_code=HTTPStatus.NOT_FOUND
     )
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         process_plex_payload(hass, MediaType.MUSIC, CONTENT_ID_BAD_PLAYQUEUE)
     assert "PlayQueue '1235' could not be found" in str(excinfo.value)
 
@@ -209,7 +209,7 @@ async def test_lookup_media_for_other_integrations(
     assert isinstance(result.media, plexapi.playqueue.PlayQueue)
 
 
-async def test_lookup_media_with_urls(hass: HomeAssistant, mock_plex_server) -> None:
+async def test_lookup_media_with_urls(hass: SmartHub, mock_plex_server) -> None:
     """Test media lookup for media_player.play_media calls from cast/sonos."""
     CONTENT_ID_URL = f"{PLEX_URI_SCHEME}{DEFAULT_DATA[CONF_SERVER_IDENTIFIER]}/100"
 

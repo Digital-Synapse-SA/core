@@ -4,10 +4,10 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components.zeroconf import async_get_instance
-from homeassistant.components.zeroconf.usage import install_multiple_zeroconf_catcher
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.zeroconf import async_get_instance
+from smarthub.components.zeroconf.usage import install_multiple_zeroconf_catcher
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import extract_stack_to_frame
 
@@ -26,7 +26,7 @@ class MockZeroconf:
 
 @pytest.mark.usefixtures("mock_async_zeroconf", "mock_zeroconf")
 async def test_multiple_zeroconf_instances(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test creating multiple zeroconf throws without an integration."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -44,7 +44,7 @@ async def test_multiple_zeroconf_instances(
 
 @pytest.mark.usefixtures("mock_async_zeroconf", "mock_zeroconf")
 async def test_multiple_zeroconf_instances_gives_shared(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test creating multiple zeroconf gives the shared instance to an integration."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -61,21 +61,21 @@ async def test_multiple_zeroconf_instances_gives_shared(
         )
         with (
             patch(
-                "homeassistant.helpers.frame.linecache.getline",
+                "smarthub.helpers.frame.linecache.getline",
                 return_value=correct_frame.line,
             ),
             patch(
-                "homeassistant.helpers.frame.get_current_frame",
+                "smarthub.helpers.frame.get_current_frame",
                 return_value=extract_stack_to_frame(
                     [
                         Mock(
-                            filename="/home/dev/homeassistant/core.py",
+                            filename="/home/dev/smarthub/core.py",
                             lineno="23",
                             line="do_something()",
                         ),
                         correct_frame,
                         Mock(
-                            filename="/home/dev/homeassistant/components/zeroconf/usage.py",
+                            filename="/home/dev/smarthub/components/zeroconf/usage.py",
                             lineno="23",
                             line="self.light.is_on",
                         ),

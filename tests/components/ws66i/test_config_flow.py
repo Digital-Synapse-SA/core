@@ -2,8 +2,8 @@
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.ws66i.const import (
+from smarthub import config_entries
+from smarthub.components.ws66i.const import (
     CONF_SOURCE_1,
     CONF_SOURCE_2,
     CONF_SOURCE_3,
@@ -14,9 +14,9 @@ from homeassistant.components.ws66i.const import (
     DOMAIN,
     INIT_OPTIONS_DEFAULT,
 )
-from homeassistant.const import CONF_IP_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_IP_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .test_media_player import AttrDict
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 CONFIG = {CONF_IP_ADDRESS: "1.1.1.1"}
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -35,10 +35,10 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.ws66i.config_flow.get_ws66i",
+            "smarthub.components.ws66i.config_flow.get_ws66i",
         ) as mock_ws66i,
         patch(
-            "homeassistant.components.ws66i.async_setup_entry",
+            "smarthub.components.ws66i.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -59,13 +59,13 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
-    with patch("homeassistant.components.ws66i.config_flow.get_ws66i") as mock_ws66i:
+    with patch("smarthub.components.ws66i.config_flow.get_ws66i") as mock_ws66i:
         ws66i_instance = mock_ws66i.return_value
         ws66i_instance.open.side_effect = ConnectionError
         result2 = await hass.config_entries.flow.async_configure(
@@ -76,13 +76,13 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_wrong_ip(hass: HomeAssistant) -> None:
+async def test_form_wrong_ip(hass: SmartHub) -> None:
     """Test cannot connect error with bad IP."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
-    with patch("homeassistant.components.ws66i.config_flow.get_ws66i") as mock_ws66i:
+    with patch("smarthub.components.ws66i.config_flow.get_ws66i") as mock_ws66i:
         ws66i_instance = mock_ws66i.return_value
         ws66i_instance.zone_status.return_value = None
         result2 = await hass.config_entries.flow.async_configure(
@@ -93,13 +93,13 @@ async def test_form_wrong_ip(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_generic_exception(hass: HomeAssistant) -> None:
+async def test_generic_exception(hass: SmartHub) -> None:
     """Test generic exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
-    with patch("homeassistant.components.ws66i.config_flow.get_ws66i") as mock_ws66i:
+    with patch("smarthub.components.ws66i.config_flow.get_ws66i") as mock_ws66i:
         ws66i_instance = mock_ws66i.return_value
         ws66i_instance.open.side_effect = Exception
         result2 = await hass.config_entries.flow.async_configure(
@@ -110,7 +110,7 @@ async def test_generic_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_options_flow(hass: HomeAssistant) -> None:
+async def test_options_flow(hass: SmartHub) -> None:
     """Test config flow options."""
     conf = {CONF_IP_ADDRESS: "1.1.1.1", CONF_SOURCES: INIT_OPTIONS_DEFAULT}
 
@@ -121,7 +121,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     )
     config_entry.add_to_hass(hass)
 
-    with patch("homeassistant.components.ws66i.get_ws66i") as mock_ws66i:
+    with patch("smarthub.components.ws66i.get_ws66i") as mock_ws66i:
         ws66i_instance = mock_ws66i.return_value
         ws66i_instance.zone_status.return_value = AttrDict(
             power=True, volume=0, mute=True, source=1, treble=0, bass=0, balance=10

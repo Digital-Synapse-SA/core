@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.poolsense.const import DOMAIN
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.components.poolsense.const import DOMAIN
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
 
 from tests.common import MockConfigEntry
 
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.poolsense.async_setup_entry",
+        "smarthub.components.poolsense.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -27,11 +27,11 @@ def mock_poolsense_client() -> Generator[AsyncMock]:
     """Mock a PoolSense client."""
     with (
         patch(
-            "homeassistant.components.poolsense.PoolSense",
+            "smarthub.components.poolsense.PoolSense",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.poolsense.config_flow.PoolSense",
+            "smarthub.components.poolsense.config_flow.PoolSense",
             new=mock_client,
         ),
     ):

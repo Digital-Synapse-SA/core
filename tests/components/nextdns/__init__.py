@@ -13,9 +13,9 @@ from nextdns import (
     Settings,
 )
 
-from homeassistant.components.nextdns.const import CONF_PROFILE_ID, DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
+from smarthub.components.nextdns.const import CONF_PROFILE_ID, DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -119,43 +119,43 @@ def mock_nextdns():
     """Mock the NextDNS class."""
     with (
         patch(
-            "homeassistant.components.nextdns.NextDns.get_profiles",
+            "smarthub.components.nextdns.NextDns.get_profiles",
             return_value=PROFILES,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_status",
+            "smarthub.components.nextdns.NextDns.get_analytics_status",
             return_value=STATUS,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_encryption",
+            "smarthub.components.nextdns.NextDns.get_analytics_encryption",
             return_value=ENCRYPTION,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_dnssec",
+            "smarthub.components.nextdns.NextDns.get_analytics_dnssec",
             return_value=DNSSEC,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_ip_versions",
+            "smarthub.components.nextdns.NextDns.get_analytics_ip_versions",
             return_value=IP_VERSIONS,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_analytics_protocols",
+            "smarthub.components.nextdns.NextDns.get_analytics_protocols",
             return_value=PROTOCOLS,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.get_settings",
+            "smarthub.components.nextdns.NextDns.get_settings",
             return_value=SETTINGS,
         ),
         patch(
-            "homeassistant.components.nextdns.NextDns.connection_status",
+            "smarthub.components.nextdns.NextDns.connection_status",
             return_value=CONNECTION_STATUS,
         ),
     ):
         yield
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the NextDNS integration in Home Assistant."""
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
+    """Set up the NextDNS integration in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Fake Profile",

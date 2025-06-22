@@ -7,12 +7,12 @@ from unittest.mock import patch
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from homeassistant import config_entries
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.components.sql.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.recorder import Recorder
+from smarthub.components.sensor import SensorDeviceClass, SensorStateClass
+from smarthub.components.sql.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     ENTRY_CONFIG,
@@ -37,7 +37,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_form(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_form(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -47,7 +47,7 @@ async def test_form(recorder_mock: Recorder, hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.sql.async_setup_entry",
+        "smarthub.components.sql.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -70,7 +70,7 @@ async def test_form(recorder_mock: Recorder, hass: HomeAssistant) -> None:
 
 
 async def test_form_with_value_template(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test for with value template."""
 
@@ -81,7 +81,7 @@ async def test_form_with_value_template(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.sql.async_setup_entry",
+        "smarthub.components.sql.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -102,7 +102,7 @@ async def test_form_with_value_template(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_flow_fails_db_url(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_flow_fails_db_url(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test config flow fails incorrect db url."""
     result4 = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -112,7 +112,7 @@ async def test_flow_fails_db_url(recorder_mock: Recorder, hass: HomeAssistant) -
     assert result4["step_id"] == config_entries.SOURCE_USER
 
     with patch(
-        "homeassistant.components.sql.config_flow.sqlalchemy.create_engine",
+        "smarthub.components.sql.config_flow.sqlalchemy.create_engine",
         side_effect=SQLAlchemyError("error_message"),
     ):
         result4 = await hass.config_entries.flow.async_configure(
@@ -124,7 +124,7 @@ async def test_flow_fails_db_url(recorder_mock: Recorder, hass: HomeAssistant) -
 
 
 async def test_flow_fails_invalid_query(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test config flow fails incorrect db url."""
     result4 = await hass.config_entries.flow.async_init(
@@ -222,7 +222,7 @@ async def test_flow_fails_invalid_query(
 
 
 async def test_flow_fails_invalid_column_name(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test config flow fails invalid column name."""
     result4 = await hass.config_entries.flow.async_init(
@@ -259,7 +259,7 @@ async def test_flow_fails_invalid_column_name(
     }
 
 
-async def test_options_flow(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_options_flow(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test options config flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -277,7 +277,7 @@ async def test_options_flow(recorder_mock: Recorder, hass: HomeAssistant) -> Non
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.sql.async_setup_entry",
+        "smarthub.components.sql.async_setup_entry",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -314,7 +314,7 @@ async def test_options_flow(recorder_mock: Recorder, hass: HomeAssistant) -> Non
 
 
 async def test_options_flow_name_previously_removed(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test options config flow where the name was missing."""
     entry = MockConfigEntry(
@@ -339,7 +339,7 @@ async def test_options_flow_name_previously_removed(
     assert result["step_id"] == "init"
 
     with patch(
-        "homeassistant.components.sql.async_setup_entry",
+        "smarthub.components.sql.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.options.async_configure(
@@ -364,7 +364,7 @@ async def test_options_flow_name_previously_removed(
 
 
 async def test_options_flow_fails_db_url(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test options flow fails incorrect db url."""
     entry = MockConfigEntry(
@@ -381,7 +381,7 @@ async def test_options_flow_fails_db_url(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.sql.async_setup_entry",
+        "smarthub.components.sql.async_setup_entry",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -390,7 +390,7 @@ async def test_options_flow_fails_db_url(
     result = await hass.config_entries.options.async_init(entry.entry_id)
 
     with patch(
-        "homeassistant.components.sql.config_flow.sqlalchemy.create_engine",
+        "smarthub.components.sql.config_flow.sqlalchemy.create_engine",
         side_effect=SQLAlchemyError("error_message"),
     ):
         result2 = await hass.config_entries.options.async_configure(
@@ -407,7 +407,7 @@ async def test_options_flow_fails_db_url(
 
 
 async def test_options_flow_fails_invalid_query(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test options flow fails incorrect query and template."""
     entry = MockConfigEntry(
@@ -424,7 +424,7 @@ async def test_options_flow_fails_invalid_query(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.sql.async_setup_entry",
+        "smarthub.components.sql.async_setup_entry",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -512,7 +512,7 @@ async def test_options_flow_fails_invalid_query(
 
 
 async def test_options_flow_fails_invalid_column_name(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test options flow fails invalid column name."""
     entry = MockConfigEntry(
@@ -528,7 +528,7 @@ async def test_options_flow_fails_invalid_column_name(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.sql.async_setup_entry",
+        "smarthub.components.sql.async_setup_entry",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -565,7 +565,7 @@ async def test_options_flow_fails_invalid_column_name(
 
 
 async def test_options_flow_db_url_empty(
-    recorder_mock: Recorder, hass: HomeAssistant
+    recorder_mock: Recorder, hass: SmartHub
 ) -> None:
     """Test options config flow with leaving db_url empty."""
     entry = MockConfigEntry(
@@ -582,7 +582,7 @@ async def test_options_flow_db_url_empty(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.sql.async_setup_entry",
+        "smarthub.components.sql.async_setup_entry",
         return_value=True,
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -595,7 +595,7 @@ async def test_options_flow_db_url_empty(
 
     with (
         patch(
-            "homeassistant.components.sql.async_setup_entry",
+            "smarthub.components.sql.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -620,7 +620,7 @@ async def test_options_flow_db_url_empty(
 
 async def test_full_flow_not_recorder_db(
     recorder_mock: Recorder,
-    hass: HomeAssistant,
+    hass: SmartHub,
     tmp_path: Path,
 ) -> None:
     """Test full config flow with not using recorder db."""
@@ -634,7 +634,7 @@ async def test_full_flow_not_recorder_db(
 
     with (
         patch(
-            "homeassistant.components.sql.async_setup_entry",
+            "smarthub.components.sql.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -667,7 +667,7 @@ async def test_full_flow_not_recorder_db(
 
     with (
         patch(
-            "homeassistant.components.sql.async_setup_entry",
+            "smarthub.components.sql.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -723,7 +723,7 @@ async def test_full_flow_not_recorder_db(
     }
 
 
-async def test_device_state_class(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def test_device_state_class(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Test we get the form."""
 
     entry = MockConfigEntry(
@@ -743,7 +743,7 @@ async def test_device_state_class(recorder_mock: Recorder, hass: HomeAssistant) 
     assert result["step_id"] == "init"
 
     with patch(
-        "homeassistant.components.sql.async_setup_entry",
+        "smarthub.components.sql.async_setup_entry",
         return_value=True,
     ):
         result2 = await hass.config_entries.options.async_configure(
@@ -773,7 +773,7 @@ async def test_device_state_class(recorder_mock: Recorder, hass: HomeAssistant) 
     assert result["step_id"] == "init"
 
     with patch(
-        "homeassistant.components.sql.async_setup_entry",
+        "smarthub.components.sql.async_setup_entry",
         return_value=True,
     ):
         result3 = await hass.config_entries.options.async_configure(

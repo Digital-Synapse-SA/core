@@ -1,12 +1,12 @@
 """Stub switch platform for translation tests."""
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_platform import AddEntitiesCallback
+from smarthub.helpers.typing import ConfigType, DiscoveryInfoType
 
 
 async def async_setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config: ConfigType,
     async_add_entities_callback: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,

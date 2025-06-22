@@ -3,7 +3,7 @@
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -11,7 +11,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_get_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     hass_client: ClientSessionGenerator,
     mock_config_entry: MockConfigEntry,

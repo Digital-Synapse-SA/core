@@ -2,15 +2,15 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.ecobee.const import CONF_REFRESH_TOKEN, DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
+from smarthub.components.ecobee.const import CONF_REFRESH_TOKEN, DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     platforms: str | list[str],
 ) -> MockConfigEntry:
     """Set up the ecobee platform."""
@@ -26,7 +26,7 @@ async def setup_platform(
 
     platforms = [platforms] if isinstance(platforms, str) else platforms
 
-    with patch("homeassistant.components.ecobee.PLATFORMS", platforms):
+    with patch("smarthub.components.ecobee.PLATFORMS", platforms):
         await hass.config_entries.async_setup(mock_entry.entry_id)
         await hass.async_block_till_done()
     return mock_entry

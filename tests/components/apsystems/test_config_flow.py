@@ -2,17 +2,17 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.apsystems.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.apsystems.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_IP_ADDRESS, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_form_create_success(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_apsystems: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_apsystems: AsyncMock
 ) -> None:
     """Test we handle creatinw with success."""
     result = await hass.config_entries.flow.async_init(
@@ -28,7 +28,7 @@ async def test_form_create_success(
 
 
 async def test_form_create_success_custom_port(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_apsystems: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_apsystems: AsyncMock
 ) -> None:
     """Test we handle creating with custom port with success."""
     result = await hass.config_entries.flow.async_init(
@@ -46,7 +46,7 @@ async def test_form_create_success_custom_port(
 
 
 async def test_form_cannot_connect_and_recover(
-    hass: HomeAssistant, mock_apsystems: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_apsystems: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle cannot connect error."""
 
@@ -76,7 +76,7 @@ async def test_form_cannot_connect_and_recover(
 
 
 async def test_form_cannot_connect_and_recover_custom_port(
-    hass: HomeAssistant, mock_apsystems: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_apsystems: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle cannot connect error but recovering with custom port."""
 
@@ -103,7 +103,7 @@ async def test_form_cannot_connect_and_recover_custom_port(
 
 
 async def test_form_unique_id_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_apsystems: AsyncMock,
     mock_config_entry: MockConfigEntry,

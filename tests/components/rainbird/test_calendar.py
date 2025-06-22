@@ -10,10 +10,10 @@ from zoneinfo import ZoneInfo
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import CONFIG_ENTRY_DATA_OLD_FORMAT, mock_response, mock_response_error
 
@@ -83,7 +83,7 @@ def platforms() -> list[str]:
 
 @pytest.fixture(autouse=True)
 async def setup_config_entry(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> list[Platform]:
     """Fixture to setup the config entry."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -91,7 +91,7 @@ async def setup_config_entry(
 
 
 @pytest.fixture(autouse=True)
-async def set_time_zone(hass: HomeAssistant):
+async def set_time_zone(hass: SmartHub):
     """Set the time zone for the tests."""
     await hass.config.async_set_time_zone("America/Regina")
 
@@ -131,7 +131,7 @@ def get_events_fixture(
 
 
 @pytest.mark.freeze_time("2023-01-21 09:32:00")
-async def test_get_events(hass: HomeAssistant, get_events: GetEventsFn) -> None:
+async def test_get_events(hass: SmartHub, get_events: GetEventsFn) -> None:
     """Test calendar event fetching APIs."""
 
     events = await get_events("2023-01-20T00:00:00Z", "2023-02-05T00:00:00Z")
@@ -179,7 +179,7 @@ async def test_get_events(hass: HomeAssistant, get_events: GetEventsFn) -> None:
     ],
 )
 async def test_event_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_events: GetEventsFn,
     freezer: FrozenDateTimeFactory,
     freeze_time: datetime.datetime,
@@ -220,7 +220,7 @@ async def test_event_state(
     ids=("ESP-TM2", "ST8x-WiFi"),
 )
 async def test_calendar_not_supported_by_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     has_entity: bool,
 ) -> None:
     """Test calendar upcoming event state."""
@@ -234,7 +234,7 @@ async def test_calendar_not_supported_by_device(
     [([None])],  # Disable success responses
 )
 async def test_no_schedule(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_events: GetEventsFn,
     responses: list[AiohttpClientMockResponse],
     hass_client: ClientSessionGenerator,
@@ -261,7 +261,7 @@ async def test_no_schedule(
     [(EMPTY_SCHEDULE_RESPONSES)],
 )
 async def test_program_schedule_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_events: GetEventsFn,
 ) -> None:
     """Test calendar when the program is disabled with no upcoming events."""
@@ -283,7 +283,7 @@ async def test_program_schedule_disabled(
     ],
 )
 async def test_no_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     get_events: GetEventsFn,
     responses: list[AiohttpClientMockResponse],
     entity_registry: er.EntityRegistry,

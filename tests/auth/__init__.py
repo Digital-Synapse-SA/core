@@ -1,1 +1,1 @@
-"""Tests for the Home Assistant auth module."""
+"""Tests for the SmartHub auth module."""

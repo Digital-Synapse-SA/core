@@ -5,10 +5,10 @@ from unittest.mock import patch
 from pyprusalink.types import Conflict
 import pytest
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -16,7 +16,7 @@ from tests.typing import ClientSessionGenerator
 @pytest.fixture(autouse=True)
 def setup_button_platform_only():
     """Only setup button platform."""
-    with patch("homeassistant.components.prusalink.PLATFORMS", [Platform.BUTTON]):
+    with patch("smarthub.components.prusalink.PLATFORMS", [Platform.BUTTON]):
         yield
 
 
@@ -28,7 +28,7 @@ def setup_button_platform_only():
     ],
 )
 async def test_button_pause_cancel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry,
     mock_api,
     hass_client: ClientSessionGenerator,
@@ -56,7 +56,7 @@ async def test_button_pause_cancel(
 
     # Verify it calls correct method + does error handling
     with (
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
         patch(f"pyprusalink.PrusaLink.{method}", side_effect=Conflict),
     ):
         await hass.services.async_call(
@@ -75,7 +75,7 @@ async def test_button_pause_cancel(
     ],
 )
 async def test_button_resume_cancel(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry,
     mock_api,
     hass_client: ClientSessionGenerator,
@@ -93,7 +93,7 @@ async def test_button_resume_cancel(
     with (
         patch(f"pyprusalink.PrusaLink.{method}") as mock_meth,
         patch(
-            "homeassistant.components.prusalink.coordinator.PrusaLinkUpdateCoordinator._fetch_data"
+            "smarthub.components.prusalink.coordinator.PrusaLinkUpdateCoordinator._fetch_data"
         ),
     ):
         await hass.services.async_call(
@@ -107,7 +107,7 @@ async def test_button_resume_cancel(
 
     # Verify it calls correct method + does error handling
     with (
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
         patch(f"pyprusalink.PrusaLink.{method}", side_effect=Conflict),
     ):
         await hass.services.async_call(

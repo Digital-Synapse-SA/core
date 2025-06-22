@@ -7,10 +7,10 @@ from aiohttp import ClientConnectionError, ClientError, ClientResponseError, Req
 import pytest
 from yarl import URL
 
-from homeassistant import config_entries
-from homeassistant.components.ukraine_alarm.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.ukraine_alarm.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -45,13 +45,13 @@ def mock_get_regions() -> Generator[AsyncMock]:
     """Mock the get_regions method."""
 
     with patch(
-        "homeassistant.components.ukraine_alarm.config_flow.Client.get_regions",
+        "smarthub.components.ukraine_alarm.config_flow.Client.get_regions",
         return_value=REGIONS,
     ) as mock_get:
         yield mock_get
 
 
-async def test_state(hass: HomeAssistant) -> None:
+async def test_state(hass: SmartHub) -> None:
     """Test we can create entry for state."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -62,7 +62,7 @@ async def test_state(hass: HomeAssistant) -> None:
     assert result2["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.ukraine_alarm.async_setup_entry",
+        "smarthub.components.ukraine_alarm.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result3 = await hass.config_entries.flow.async_configure(
@@ -82,7 +82,7 @@ async def test_state(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_state_district(hass: HomeAssistant) -> None:
+async def test_state_district(hass: SmartHub) -> None:
     """Test we can create entry for state + district."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -101,7 +101,7 @@ async def test_state_district(hass: HomeAssistant) -> None:
     assert result3["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.ukraine_alarm.async_setup_entry",
+        "smarthub.components.ukraine_alarm.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result4 = await hass.config_entries.flow.async_configure(
@@ -121,7 +121,7 @@ async def test_state_district(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_state_district_pick_region(hass: HomeAssistant) -> None:
+async def test_state_district_pick_region(hass: SmartHub) -> None:
     """Test we can create entry for region which has districts."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -140,7 +140,7 @@ async def test_state_district_pick_region(hass: HomeAssistant) -> None:
     assert result3["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.ukraine_alarm.async_setup_entry",
+        "smarthub.components.ukraine_alarm.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result4 = await hass.config_entries.flow.async_configure(
@@ -160,7 +160,7 @@ async def test_state_district_pick_region(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_state_district_community(hass: HomeAssistant) -> None:
+async def test_state_district_community(hass: SmartHub) -> None:
     """Test we can create entry for state + district + community."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -189,7 +189,7 @@ async def test_state_district_community(hass: HomeAssistant) -> None:
     assert result4["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.ukraine_alarm.async_setup_entry",
+        "smarthub.components.ukraine_alarm.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result5 = await hass.config_entries.flow.async_configure(
@@ -209,7 +209,7 @@ async def test_state_district_community(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_max_regions(hass: HomeAssistant) -> None:
+async def test_max_regions(hass: SmartHub) -> None:
     """Test max regions config."""
     for i in range(5):
         MockConfigEntry(
@@ -225,7 +225,7 @@ async def test_max_regions(hass: HomeAssistant) -> None:
     assert result["reason"] == "max_regions"
 
 
-async def test_rate_limit(hass: HomeAssistant, mock_get_regions: AsyncMock) -> None:
+async def test_rate_limit(hass: SmartHub, mock_get_regions: AsyncMock) -> None:
     """Test rate limit error."""
     mock_get_regions.side_effect = ClientResponseError(None, None, status=429)
     result = await hass.config_entries.flow.async_init(
@@ -235,7 +235,7 @@ async def test_rate_limit(hass: HomeAssistant, mock_get_regions: AsyncMock) -> N
     assert result["reason"] == "rate_limit"
 
 
-async def test_server_error(hass: HomeAssistant, mock_get_regions) -> None:
+async def test_server_error(hass: SmartHub, mock_get_regions) -> None:
     """Test server error."""
     mock_get_regions.side_effect = ClientResponseError(
         RequestInfo(None, None, None, real_url=URL("/regions")), None, status=500
@@ -247,7 +247,7 @@ async def test_server_error(hass: HomeAssistant, mock_get_regions) -> None:
     assert result["reason"] == "unknown"
 
 
-async def test_cannot_connect(hass: HomeAssistant, mock_get_regions: AsyncMock) -> None:
+async def test_cannot_connect(hass: SmartHub, mock_get_regions: AsyncMock) -> None:
     """Test connection error."""
     mock_get_regions.side_effect = ClientConnectionError
     result = await hass.config_entries.flow.async_init(
@@ -258,7 +258,7 @@ async def test_cannot_connect(hass: HomeAssistant, mock_get_regions: AsyncMock) 
 
 
 async def test_unknown_client_error(
-    hass: HomeAssistant, mock_get_regions: AsyncMock
+    hass: SmartHub, mock_get_regions: AsyncMock
 ) -> None:
     """Test client error."""
     mock_get_regions.side_effect = ClientError
@@ -269,7 +269,7 @@ async def test_unknown_client_error(
     assert result["reason"] == "unknown"
 
 
-async def test_timeout_error(hass: HomeAssistant, mock_get_regions: AsyncMock) -> None:
+async def test_timeout_error(hass: SmartHub, mock_get_regions: AsyncMock) -> None:
     """Test timeout error."""
     mock_get_regions.side_effect = TimeoutError
     result = await hass.config_entries.flow.async_init(
@@ -280,7 +280,7 @@ async def test_timeout_error(hass: HomeAssistant, mock_get_regions: AsyncMock) -
 
 
 async def test_no_regions_returned(
-    hass: HomeAssistant, mock_get_regions: AsyncMock
+    hass: SmartHub, mock_get_regions: AsyncMock
 ) -> None:
     """Test regions not returned."""
     mock_get_regions.return_value = {}

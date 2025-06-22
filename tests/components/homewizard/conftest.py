@@ -14,9 +14,9 @@ from homewizard_energy.models import (
 )
 import pytest
 
-from homeassistant.components.homewizard.const import DOMAIN
-from homeassistant.const import CONF_IP_ADDRESS, CONF_TOKEN
-from homeassistant.core import HomeAssistant
+from smarthub.components.homewizard.const import DOMAIN
+from smarthub.const import CONF_IP_ADDRESS, CONF_TOKEN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, get_fixture_path, load_json_object_fixture
 
@@ -34,11 +34,11 @@ def mock_homewizardenergy(
     """Return a mock bridge."""
     with (
         patch(
-            "homeassistant.components.homewizard.HomeWizardEnergyV1",
+            "smarthub.components.homewizard.HomeWizardEnergyV1",
             autospec=True,
         ) as homewizard,
         patch(
-            "homeassistant.components.homewizard.config_flow.HomeWizardEnergyV1",
+            "smarthub.components.homewizard.config_flow.HomeWizardEnergyV1",
             new=homewizard,
         ),
     ):
@@ -87,11 +87,11 @@ def mock_homewizardenergy_v2(
     """Return a mock bridge."""
     with (
         patch(
-            "homeassistant.components.homewizard.HomeWizardEnergyV2",
+            "smarthub.components.homewizard.HomeWizardEnergyV2",
             autospec=True,
         ) as homewizard,
         patch(
-            "homeassistant.components.homewizard.config_flow.HomeWizardEnergyV2",
+            "smarthub.components.homewizard.config_flow.HomeWizardEnergyV2",
             new=homewizard,
         ),
     ):
@@ -144,7 +144,7 @@ def mock_homewizardenergy_v2(
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Mock setting up a config entry."""
     with patch(
-        "homeassistant.components.homewizard.async_setup_entry", return_value=True
+        "smarthub.components.homewizard.async_setup_entry", return_value=True
     ) as mock_setup:
         yield mock_setup
 
@@ -181,7 +181,7 @@ def mock_config_entry_v2() -> MockConfigEntry:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_homewizardenergy: AsyncMock,
 ) -> MockConfigEntry:
@@ -196,9 +196,9 @@ async def init_integration(
 
 @pytest.fixture
 def mock_onboarding() -> Generator[MagicMock]:
-    """Mock that Home Assistant is currently onboarding."""
+    """Mock that SmartHub is currently onboarding."""
     with patch(
-        "homeassistant.components.onboarding.async_is_onboarded",
+        "smarthub.components.onboarding.async_is_onboarded",
         return_value=False,
     ) as mock_onboarding:
         yield mock_onboarding

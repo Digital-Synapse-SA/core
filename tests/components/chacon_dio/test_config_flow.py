@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock
 from dio_chacon_wifi_api.exceptions import DIOChaconAPIError, DIOChaconInvalidAuthError
 import pytest
 
-from homeassistant.components.chacon_dio.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.chacon_dio.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_dio_chacon_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_dio_chacon_client: AsyncMock
 ) -> None:
     """Test the full flow."""
 
@@ -53,7 +53,7 @@ async def test_full_flow(
     ],
 )
 async def test_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_dio_chacon_client: AsyncMock,
     exception: Exception,
@@ -95,7 +95,7 @@ async def test_errors(
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_dio_chacon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

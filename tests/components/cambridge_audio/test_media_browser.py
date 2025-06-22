@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .const import ENTITY_ID
@@ -14,7 +14,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_browse_media_root(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
@@ -37,7 +37,7 @@ async def test_browse_media_root(
 
 
 async def test_browse_presets(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_stream_magic_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,

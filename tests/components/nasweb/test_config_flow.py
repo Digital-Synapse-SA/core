@@ -5,13 +5,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from webio_api.api_client import AuthError
 
-from homeassistant import config_entries
-from homeassistant.components.nasweb.const import DOMAIN
-from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.network import NoURLAvailableError
+from smarthub import config_entries
+from smarthub.components.nasweb.const import DOMAIN
+from smarthub.config_entries import ConfigFlowResult
+from smarthub.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.network import NoURLAvailableError
 
 from .conftest import (
     BASE_CONFIG_FLOW,
@@ -30,7 +30,7 @@ TEST_USER_INPUT = {
 }
 
 
-async def _add_test_config_entry(hass: HomeAssistant) -> ConfigFlowResult:
+async def _add_test_config_entry(hass: SmartHub) -> ConfigFlowResult:
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
@@ -45,7 +45,7 @@ async def _add_test_config_entry(hass: HomeAssistant) -> ConfigFlowResult:
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     validate_input_all_ok: dict[str, AsyncMock | MagicMock],
 ) -> None:
@@ -63,7 +63,7 @@ async def test_form(
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     validate_input_all_ok: dict[str, AsyncMock | MagicMock],
 ) -> None:
     """Test cannot connect error."""
@@ -81,7 +81,7 @@ async def test_form_cannot_connect(
 
 
 async def test_form_invalid_auth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     validate_input_all_ok: dict[str, AsyncMock | MagicMock],
 ) -> None:
     """Test invalid auth."""
@@ -102,7 +102,7 @@ async def test_form_invalid_auth(
 
 
 async def test_form_missing_internal_url(
-    hass: HomeAssistant,
+    hass: SmartHub,
     validate_input_all_ok: dict[str, AsyncMock | MagicMock],
 ) -> None:
     """Test missing internal url."""
@@ -121,7 +121,7 @@ async def test_form_missing_internal_url(
 
 
 async def test_form_missing_nasweb_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     validate_input_all_ok: dict[str, AsyncMock | MagicMock],
 ) -> None:
     """Test invalid auth."""
@@ -147,7 +147,7 @@ async def test_form_missing_nasweb_data(
 
 
 async def test_missing_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     validate_input_all_ok: dict[str, AsyncMock | MagicMock],
 ) -> None:
     """Test missing status update."""
@@ -167,7 +167,7 @@ async def test_missing_status(
 
 
 async def test_form_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     validate_input_all_ok: dict[str, AsyncMock | MagicMock],
 ) -> None:
     """Test other exceptions."""
@@ -176,7 +176,7 @@ async def test_form_exception(
     )
 
     with patch(
-        "homeassistant.components.nasweb.config_flow.validate_input",
+        "smarthub.components.nasweb.config_flow.validate_input",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -187,7 +187,7 @@ async def test_form_exception(
 
 
 async def test_form_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     validate_input_all_ok: dict[str, AsyncMock | MagicMock],
 ) -> None:
     """Test already configured device."""

@@ -8,8 +8,8 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import vacuum
-from homeassistant.components.vacuum import (
+from smarthub.components import vacuum
+from smarthub.components.vacuum import (
     DOMAIN,
     SERVICE_CLEAN_SPOT,
     SERVICE_LOCATE,
@@ -23,7 +23,7 @@ from homeassistant.components.vacuum import (
     VacuumActivity,
     VacuumEntityFeature,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import MockVacuum, help_async_setup_entry_init, help_async_unload_entry
 from .common import async_start
@@ -101,7 +101,7 @@ def test_deprecated_constants_for_state(
     ],
 )
 async def test_state_services(
-    hass: HomeAssistant, config_flow_fixture: None, service: str, expected_state: str
+    hass: SmartHub, config_flow_fixture: None, service: str, expected_state: str
 ) -> None:
     """Test get vacuum service that affect state."""
     mock_vacuum = MockVacuum(
@@ -133,7 +133,7 @@ async def test_state_services(
     assert activity.state == expected_state
 
 
-async def test_fan_speed(hass: HomeAssistant, config_flow_fixture: None) -> None:
+async def test_fan_speed(hass: SmartHub, config_flow_fixture: None) -> None:
     """Test set vacuum fan speed."""
     mock_vacuum = MockVacuum(
         name="Testing",
@@ -166,7 +166,7 @@ async def test_fan_speed(hass: HomeAssistant, config_flow_fixture: None) -> None
     assert mock_vacuum.fan_speed == "high"
 
 
-async def test_locate(hass: HomeAssistant, config_flow_fixture: None) -> None:
+async def test_locate(hass: SmartHub, config_flow_fixture: None) -> None:
     """Test vacuum locate."""
 
     calls = []
@@ -209,7 +209,7 @@ async def test_locate(hass: HomeAssistant, config_flow_fixture: None) -> None:
     assert "locate" in calls
 
 
-async def test_send_command(hass: HomeAssistant, config_flow_fixture: None) -> None:
+async def test_send_command(hass: SmartHub, config_flow_fixture: None) -> None:
     """Test Vacuum send command."""
 
     strings = []
@@ -263,7 +263,7 @@ async def test_send_command(hass: HomeAssistant, config_flow_fixture: None) -> N
 
 
 async def test_vacuum_not_log_deprecated_state_warning(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_vacuum_entity: MockVacuum,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -278,7 +278,7 @@ async def test_vacuum_not_log_deprecated_state_warning(
 
 @pytest.mark.usefixtures("mock_as_custom_component")
 async def test_vacuum_log_deprecated_state_warning_using_state_prop(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -322,7 +322,7 @@ async def test_vacuum_log_deprecated_state_warning_using_state_prop(
 
 @pytest.mark.usefixtures("mock_as_custom_component")
 async def test_vacuum_log_deprecated_state_warning_using_attr_state_attr(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -379,7 +379,7 @@ async def test_vacuum_log_deprecated_state_warning_using_attr_state_attr(
 
 @pytest.mark.usefixtures("mock_as_custom_component")
 async def test_vacuum_deprecated_state_does_not_break_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_flow_fixture: None,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

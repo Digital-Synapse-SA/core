@@ -5,13 +5,13 @@ from unittest.mock import MagicMock
 from p1monitor import P1MonitorNoDataError
 import pytest
 
-from homeassistant.components.p1_monitor.const import DOMAIN
-from homeassistant.components.sensor import (
+from smarthub.components.p1_monitor.const import DOMAIN
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -22,14 +22,14 @@ from homeassistant.const import (
     UnitOfPower,
     UnitOfVolume,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_smartmeter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
@@ -86,7 +86,7 @@ async def test_smartmeter(
 
 
 async def test_phases(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
@@ -143,7 +143,7 @@ async def test_phases(
 
 
 async def test_settings(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
@@ -195,7 +195,7 @@ async def test_settings(
 
 
 async def test_watermeter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
@@ -224,7 +224,7 @@ async def test_watermeter(
 
 
 async def test_no_watermeter(
-    hass: HomeAssistant, mock_p1monitor: MagicMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_p1monitor: MagicMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test the P1 Monitor - Without WaterMeter sensors."""
     mock_p1monitor.watermeter.side_effect = P1MonitorNoDataError
@@ -242,7 +242,7 @@ async def test_no_watermeter(
     ["sensor.smartmeter_gas_consumption"],
 )
 async def test_smartmeter_disabled_by_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
     entity_id: str,

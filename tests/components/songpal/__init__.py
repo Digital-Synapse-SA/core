@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from songpal import SongpalException
 from songpal.containers import Sysinfo
 
-from homeassistant.components.songpal.const import CONF_ENDPOINT
-from homeassistant.const import CONF_NAME
+from smarthub.components.songpal.const import CONF_ENDPOINT
+from smarthub.const import CONF_NAME
 
 FRIENDLY_NAME = "name"
 ENTITY_ID = f"media_player.{FRIENDLY_NAME}"
@@ -131,13 +131,13 @@ def _create_mocked_device(
 
 def _patch_config_flow_device(mocked_device):
     return patch(
-        "homeassistant.components.songpal.config_flow.Device",
+        "smarthub.components.songpal.config_flow.Device",
         return_value=mocked_device,
     )
 
 
 def _patch_media_player_device(mocked_device):
     return patch(
-        "homeassistant.components.songpal.media_player.Device",
+        "smarthub.components.songpal.media_player.Device",
         return_value=mocked_device,
     )

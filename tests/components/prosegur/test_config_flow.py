@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.prosegur.config_flow import CannotConnect, InvalidAuth
-from homeassistant.components.prosegur.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.prosegur.config_flow import CannotConnect, InvalidAuth
+from smarthub.components.prosegur.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant, mock_list_contracts) -> None:
+async def test_form(hass: SmartHub, mock_list_contracts) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -24,11 +24,11 @@ async def test_form(hass: HomeAssistant, mock_list_contracts) -> None:
 
     with (
         patch(
-            "homeassistant.components.prosegur.config_flow.Installation.list",
+            "smarthub.components.prosegur.config_flow.Installation.list",
             return_value=mock_list_contracts,
         ) as mock_retrieve,
         patch(
-            "homeassistant.components.prosegur.async_setup_entry",
+            "smarthub.components.prosegur.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -61,7 +61,7 @@ async def test_form(hass: HomeAssistant, mock_list_contracts) -> None:
     assert len(mock_retrieve.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -84,14 +84,14 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.prosegur.config_flow.Installation.list",
+        "smarthub.components.prosegur.config_flow.Installation.list",
         side_effect=ConnectionError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -107,7 +107,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_unknown_exception(hass: HomeAssistant) -> None:
+async def test_form_unknown_exception(hass: SmartHub) -> None:
     """Test we handle unknown exceptions."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -130,7 +130,7 @@ async def test_form_unknown_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_reauth_flow(hass: HomeAssistant, mock_list_contracts) -> None:
+async def test_reauth_flow(hass: SmartHub, mock_list_contracts) -> None:
     """Test a reauthentication flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -150,11 +150,11 @@ async def test_reauth_flow(hass: HomeAssistant, mock_list_contracts) -> None:
 
     with (
         patch(
-            "homeassistant.components.prosegur.config_flow.Installation.list",
+            "smarthub.components.prosegur.config_flow.Installation.list",
             return_value=mock_list_contracts,
         ) as mock_installation,
         patch(
-            "homeassistant.components.prosegur.async_setup_entry",
+            "smarthub.components.prosegur.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -187,7 +187,7 @@ async def test_reauth_flow(hass: HomeAssistant, mock_list_contracts) -> None:
         (Exception, "unknown"),
     ],
 )
-async def test_reauth_flow_error(hass: HomeAssistant, exception, base_error) -> None:
+async def test_reauth_flow_error(hass: SmartHub, exception, base_error) -> None:
     """Test a reauthentication flow with errors."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -203,7 +203,7 @@ async def test_reauth_flow_error(hass: HomeAssistant, exception, base_error) -> 
     result = await entry.start_reauth_flow(hass)
 
     with patch(
-        "homeassistant.components.prosegur.config_flow.Installation.list",
+        "smarthub.components.prosegur.config_flow.Installation.list",
         side_effect=exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(

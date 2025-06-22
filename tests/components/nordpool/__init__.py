@@ -1,7 +1,7 @@
 """Tests for the Nord Pool integration."""
 
-from homeassistant.components.nordpool.const import CONF_AREAS
-from homeassistant.const import CONF_CURRENCY
+from smarthub.components.nordpool.const import CONF_AREAS
+from smarthub.const import CONF_CURRENCY
 
 ENTRY_CONFIG = {
     CONF_AREAS: ["SE3", "SE4"],

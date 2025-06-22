@@ -5,20 +5,20 @@ from unittest.mock import patch
 
 from fnv_hash_fast import fnv1a_32
 
-from homeassistant.components.homekit.aidmanager import (
+from smarthub.components.homekit.aidmanager import (
     AccessoryAidStorage,
     get_aid_storage_filename_for_entry_id,
     get_system_unique_id,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.storage import STORAGE_DIR
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.storage import STORAGE_DIR
 
 from tests.common import MockConfigEntry
 
 
 async def test_aid_generation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -44,7 +44,7 @@ async def test_aid_generation(
     hass.states.async_set("remote.has_no_unique_id", "on")
 
     with patch(
-        "homeassistant.components.homekit.aidmanager.AccessoryAidStorage.async_schedule_save"
+        "smarthub.components.homekit.aidmanager.AccessoryAidStorage.async_schedule_save"
     ):
         aid_storage = AccessoryAidStorage(hass, config_entry)
     await aid_storage.async_initialize()
@@ -92,7 +92,7 @@ async def test_aid_generation(
 
 
 async def test_no_aid_collision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_no_aid_collision(
     )
 
     with patch(
-        "homeassistant.components.homekit.aidmanager.AccessoryAidStorage.async_schedule_save"
+        "smarthub.components.homekit.aidmanager.AccessoryAidStorage.async_schedule_save"
     ):
         aid_storage = AccessoryAidStorage(hass, config_entry)
     await aid_storage.async_initialize()
@@ -123,7 +123,7 @@ async def test_no_aid_collision(
 
 
 async def test_aid_generation_no_unique_ids_handles_collision(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -622,7 +622,7 @@ async def test_aid_generation_no_unique_ids_handles_collision(
 
 
 async def test_handle_unique_id_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test handling unique id changes."""
@@ -630,7 +630,7 @@ async def test_handle_unique_id_change(
     config_entry = MockConfigEntry(domain="test", data={})
     config_entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.homekit.aidmanager.AccessoryAidStorage.async_schedule_save"
+        "smarthub.components.homekit.aidmanager.AccessoryAidStorage.async_schedule_save"
     ):
         aid_storage = AccessoryAidStorage(hass, config_entry)
     await aid_storage.async_initialize()

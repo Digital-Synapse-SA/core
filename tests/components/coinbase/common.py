@@ -1,12 +1,12 @@
 """Collection of helpers."""
 
-from homeassistant.components.coinbase.const import (
+from smarthub.components.coinbase.const import (
     CONF_CURRENCIES,
     CONF_EXCHANGE_RATES,
     DOMAIN,
 )
-from homeassistant.const import CONF_API_KEY, CONF_API_TOKEN, CONF_API_VERSION
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_API_KEY, CONF_API_TOKEN, CONF_API_VERSION
+from smarthub.core import SmartHub
 
 from .const import (
     GOOD_CURRENCY_2,
@@ -117,7 +117,7 @@ def mock_get_portfolios():
 
 
 async def init_mock_coinbase(
-    hass: HomeAssistant,
+    hass: SmartHub,
     currencies: list[str] | None = None,
     rates: list[str] | None = None,
 ) -> MockConfigEntry:
@@ -142,7 +142,7 @@ async def init_mock_coinbase(
 
 
 async def init_mock_coinbase_v3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     currencies: list[str] | None = None,
     rates: list[str] | None = None,
 ) -> MockConfigEntry:

@@ -13,13 +13,13 @@ from demetriek import (
 )
 import pytest
 
-from homeassistant.components.notify import (
+from smarthub.components.notify import (
     ATTR_DATA,
     ATTR_MESSAGE,
     DOMAIN as NOTIFY_DOMAIN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 NOTIFY_SERVICE = "frenck_s_lametric"
 
@@ -27,7 +27,7 @@ pytestmark = pytest.mark.usefixtures("init_integration")
 
 
 async def test_notification_defaults(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test the LaMetric notification defaults."""
@@ -63,7 +63,7 @@ async def test_notification_defaults(
 
 
 async def test_notification_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test the LaMetric notification options."""
@@ -105,14 +105,14 @@ async def test_notification_options(
 
 
 async def test_notification_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lametric: MagicMock,
 ) -> None:
     """Test the LaMetric notification error."""
     mock_lametric.notify.side_effect = LaMetricError
 
     with pytest.raises(
-        HomeAssistantError, match="Could not send LaMetric notification"
+        SmartHubError, match="Could not send LaMetric notification"
     ):
         await hass.services.async_call(
             NOTIFY_DOMAIN,

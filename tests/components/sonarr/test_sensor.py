@@ -7,15 +7,15 @@ from aiopyarr import ArrException
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import (
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     STATE_UNAVAILABLE,
     UnitOfInformation,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -24,7 +24,7 @@ UPCOMING_ENTITY_ID = f"{SENSOR_DOMAIN}.sonarr_upcoming"
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_sonarr: MagicMock,
@@ -98,7 +98,7 @@ async def test_sensors(
     ],
 )
 async def test_disabled_by_default_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
     entity_id: str,
@@ -114,7 +114,7 @@ async def test_disabled_by_default_sensors(
 
 
 async def test_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,
     mock_sonarr: MagicMock,

@@ -7,11 +7,11 @@ from freezegun.api import FrozenDateTimeFactory
 from pynecil import CommunicationError, DeviceInfoResponse
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-import homeassistant.helpers.device_registry as dr
-from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
+import smarthub.helpers.device_registry as dr
+from smarthub.helpers.device_registry import CONNECTION_BLUETOOTH
 
 from .conftest import DEFAULT_NAME
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("mock_pynecil", "ble_device")
 async def test_setup_and_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test integration setup and unload."""
@@ -39,7 +39,7 @@ async def test_setup_and_unload(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "ble_device")
 async def test_settings_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pynecil: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -64,7 +64,7 @@ async def test_settings_exception(
     "entity_registry_enabled_by_default", "mock_pynecil", "ble_device"
 )
 async def test_v223_entities_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pynecil: AsyncMock,
 ) -> None:
@@ -94,7 +94,7 @@ async def test_v223_entities_not_loaded(
 
 @pytest.mark.usefixtures("ble_device")
 async def test_device_info_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_pynecil: AsyncMock,
     device_registry: dr.DeviceRegistry,

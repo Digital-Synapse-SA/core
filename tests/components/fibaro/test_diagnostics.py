@@ -4,9 +4,9 @@ from unittest.mock import Mock
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.fibaro import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.fibaro import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from .conftest import TEST_SERIALNUMBER, init_integration
 
@@ -19,7 +19,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
@@ -42,7 +42,7 @@ async def test_config_entry_diagnostics(
 
 
 async def test_device_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,
@@ -70,7 +70,7 @@ async def test_device_diagnostics(
 
 
 async def test_device_diagnostics_for_hub(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     mock_fibaro_client: Mock,
     mock_config_entry: MockConfigEntry,

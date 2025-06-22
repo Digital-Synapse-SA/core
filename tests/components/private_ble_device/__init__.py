@@ -5,10 +5,10 @@ import time
 
 from home_assistant_bluetooth import BluetoothServiceInfoBleak
 
-from homeassistant.components.private_ble_device.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.private_ble_device.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.components.bluetooth import (
@@ -26,7 +26,7 @@ MAC_STATIC = "00:01:ff:a0:3a:76"
 DUMMY_IRK = "00000000000000000000000000000000"
 
 
-async def async_mock_config_entry(hass: HomeAssistant, irk: str = DUMMY_IRK) -> None:
+async def async_mock_config_entry(hass: SmartHub, irk: str = DUMMY_IRK) -> None:
     """Create a test device for a dummy IRK."""
     entry = MockConfigEntry(
         version=1,
@@ -43,7 +43,7 @@ async def async_mock_config_entry(hass: HomeAssistant, irk: str = DUMMY_IRK) -> 
 
 
 async def async_inject_broadcast(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac: str = MAC_RPA_VALID_1,
     mfr_data: bytes = b"",
     broadcast_time: float | None = None,
@@ -69,7 +69,7 @@ async def async_inject_broadcast(
     await hass.async_block_till_done()
 
 
-async def async_move_time_forwards(hass: HomeAssistant, offset: float):
+async def async_move_time_forwards(hass: SmartHub, offset: float):
     """Mock time advancing from now to now+offset."""
     with patch_bluetooth_time(
         time.monotonic() + offset,

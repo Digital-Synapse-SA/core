@@ -2,8 +2,8 @@
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.util import slugify
+from smarthub.core import SmartHub
+from smarthub.util import slugify
 
 from . import init_integration
 from .consts import (
@@ -39,7 +39,7 @@ DEVICE_SENSORS_TUPLE = (
 
 
 @pytest.mark.parametrize("mock_bridge", [DUMMY_SWITCHER_SENSORS_DEVICES], indirect=True)
-async def test_sensor_platform(hass: HomeAssistant, mock_bridge) -> None:
+async def test_sensor_platform(hass: SmartHub, mock_bridge) -> None:
     """Test sensor platform."""
     entry = await init_integration(hass)
     assert mock_bridge
@@ -56,7 +56,7 @@ async def test_sensor_platform(hass: HomeAssistant, mock_bridge) -> None:
 
 @pytest.mark.parametrize("mock_bridge", [[DUMMY_WATER_HEATER_DEVICE]], indirect=True)
 async def test_sensor_update(
-    hass: HomeAssistant, mock_bridge, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_bridge, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test sensor update."""
     await init_integration(hass)

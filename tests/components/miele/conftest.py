@@ -7,13 +7,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from pymiele import MieleAction, MieleDevices
 import pytest
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.miele.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.miele.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import get_actions_callback, get_data_callback
 from .const import CLIENT_ID, CLIENT_SECRET
@@ -32,7 +32,7 @@ def mock_expires_at() -> float:
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant, expires_at: float) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub, expires_at: float) -> MockConfigEntry:
     """Return the default mocked config entry."""
     config_entry = MockConfigEntry(
         minor_version=1,
@@ -55,7 +55,7 @@ def mock_config_entry(hass: HomeAssistant, expires_at: float) -> MockConfigEntry
 
 
 @pytest.fixture(autouse=True)
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -79,7 +79,7 @@ def load_device_file() -> str:
 
 
 @pytest.fixture
-async def device_fixture(hass: HomeAssistant, load_device_file: str) -> MieleDevices:
+async def device_fixture(hass: SmartHub, load_device_file: str) -> MieleDevices:
     """Fixture for device."""
     return await async_load_json_object_fixture(hass, load_device_file, DOMAIN)
 
@@ -91,7 +91,7 @@ def load_action_file() -> str:
 
 
 @pytest.fixture
-async def action_fixture(hass: HomeAssistant, load_action_file: str) -> MieleAction:
+async def action_fixture(hass: SmartHub, load_action_file: str) -> MieleAction:
     """Fixture for action."""
     return await async_load_json_object_fixture(hass, load_action_file, DOMAIN)
 
@@ -103,7 +103,7 @@ def load_programs_file() -> str:
 
 
 @pytest.fixture
-async def programs_fixture(hass: HomeAssistant, load_programs_file: str) -> list[dict]:
+async def programs_fixture(hass: SmartHub, load_programs_file: str) -> list[dict]:
     """Fixture for available programs."""
     return await async_load_fixture(hass, load_programs_file, DOMAIN)
 
@@ -117,7 +117,7 @@ def mock_miele_client(
     """Mock a Miele client."""
 
     with patch(
-        "homeassistant.components.miele.AsyncConfigEntryAuth",
+        "smarthub.components.miele.AsyncConfigEntryAuth",
         autospec=True,
     ) as mock_client:
         client = mock_client.return_value
@@ -137,20 +137,20 @@ def platforms() -> list[str]:
 
 @pytest.fixture
 async def setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     platforms,
 ) -> AsyncGenerator[None]:
     """Set up one or all platforms."""
 
-    with patch(f"homeassistant.components.{DOMAIN}.PLATFORMS", platforms):
+    with patch(f"smarthub.components.{DOMAIN}.PLATFORMS", platforms):
         assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
         yield mock_config_entry
 
 
 @pytest.fixture
-async def access_token(hass: HomeAssistant) -> str:
+async def access_token(hass: SmartHub) -> str:
     """Return a valid access token."""
     return "mock-access-token"
 
@@ -159,14 +159,14 @@ async def access_token(hass: HomeAssistant) -> str:
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.miele.async_setup_entry", return_value=True
+        "smarthub.components.miele.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
 
 @pytest.fixture
 async def push_data_and_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     device_fixture: MieleDevices,
 ) -> None:

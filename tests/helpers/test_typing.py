@@ -6,8 +6,8 @@ from typing import Any
 
 import pytest
 
-from homeassistant.core import Context, Event, HomeAssistant, ServiceCall
-from homeassistant.helpers import typing as ha_typing
+from smarthub.core import Context, Event, SmartHub, ServiceCall
+from smarthub.helpers import typing as ha_typing
 
 from tests.common import import_and_test_deprecated_alias
 
@@ -17,7 +17,7 @@ from tests.common import import_and_test_deprecated_alias
     [
         ("ContextType", Context, "2025.5"),
         ("EventType", Event, "2025.5"),
-        ("HomeAssistantType", HomeAssistant, "2025.5"),
+        ("SmartHubType", SmartHub, "2025.5"),
         ("ServiceCallType", ServiceCall, "2025.5"),
     ],
 )

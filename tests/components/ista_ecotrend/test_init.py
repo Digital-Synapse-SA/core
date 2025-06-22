@@ -6,17 +6,17 @@ from pyecotrend_ista import KeycloakError, LoginError, ParserError, ServerError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.ista_ecotrend.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.ista_ecotrend.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_ista")
 async def test_entry_setup_unload(
-    hass: HomeAssistant, ista_config_entry: MockConfigEntry
+    hass: SmartHub, ista_config_entry: MockConfigEntry
 ) -> None:
     """Test integration setup and unload."""
 
@@ -37,7 +37,7 @@ async def test_entry_setup_unload(
     [ServerError, ParserError],
 )
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
     mock_ista: MagicMock,
     side_effect: Exception,
@@ -56,7 +56,7 @@ async def test_config_entry_not_ready(
     [LoginError, KeycloakError],
 )
 async def test_config_entry_auth_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
     mock_ista: MagicMock,
     side_effect: Exception,
@@ -73,7 +73,7 @@ async def test_config_entry_auth_failed(
 
 @pytest.mark.usefixtures("mock_ista")
 async def test_device_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,
@@ -92,14 +92,14 @@ async def test_device_registry(
 
 
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ista_config_entry: MockConfigEntry,
     mock_ista: MagicMock,
 ) -> None:
     """Test coordinator update failed."""
 
     with patch(
-        "homeassistant.components.ista_ecotrend.PLATFORMS",
+        "smarthub.components.ista_ecotrend.PLATFORMS",
         [],
     ):
         mock_ista.get_consumption_data.side_effect = ServerError
@@ -111,11 +111,11 @@ async def test_update_failed(
 
 
 async def test_auth_failed(
-    hass: HomeAssistant, ista_config_entry: MockConfigEntry, mock_ista: MagicMock
+    hass: SmartHub, ista_config_entry: MockConfigEntry, mock_ista: MagicMock
 ) -> None:
     """Test coordinator auth failed and reauth flow started."""
     with patch(
-        "homeassistant.components.ista_ecotrend.PLATFORMS",
+        "smarthub.components.ista_ecotrend.PLATFORMS",
         [],
     ):
         mock_ista.get_consumption_data.side_effect = LoginError

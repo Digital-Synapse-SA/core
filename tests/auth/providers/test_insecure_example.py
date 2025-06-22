@@ -5,13 +5,13 @@ import uuid
 
 import pytest
 
-from homeassistant.auth import AuthManager, auth_store, models as auth_models
-from homeassistant.auth.providers import insecure_example
-from homeassistant.core import HomeAssistant
+from smarthub.auth import AuthManager, auth_store, models as auth_models
+from smarthub.auth.providers import insecure_example
+from smarthub.core import SmartHub
 
 
 @pytest.fixture
-async def store(hass: HomeAssistant) -> auth_store.AuthStore:
+async def store(hass: SmartHub) -> auth_store.AuthStore:
     """Mock store."""
     store = auth_store.AuthStore(hass)
     await store.async_load()
@@ -20,7 +20,7 @@ async def store(hass: HomeAssistant) -> auth_store.AuthStore:
 
 @pytest.fixture
 def provider(
-    hass: HomeAssistant, store: auth_store.AuthStore
+    hass: SmartHub, store: auth_store.AuthStore
 ) -> insecure_example.ExampleAuthProvider:
     """Mock provider."""
     return insecure_example.ExampleAuthProvider(
@@ -42,7 +42,7 @@ def provider(
 
 @pytest.fixture
 def manager(
-    hass: HomeAssistant,
+    hass: SmartHub,
     store: auth_store.AuthStore,
     provider: insecure_example.ExampleAuthProvider,
 ) -> AuthManager:

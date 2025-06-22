@@ -11,19 +11,19 @@ from pyenphase.auth import EnvoyLegacyAuth
 import pytest
 import respx
 
-from homeassistant.components.enphase_envoy import DOMAIN
-from homeassistant.components.enphase_envoy.const import (
+from smarthub.components.enphase_envoy import DOMAIN
+from smarthub.components.enphase_envoy.const import (
     OPTION_DIAGNOSTICS_INCLUDE_FIXTURES,
     OPTION_DISABLE_KEEP_ALIVE,
     Platform,
 )
-from homeassistant.components.enphase_envoy.coordinator import (
+from smarthub.components.enphase_envoy.coordinator import (
     FIRMWARE_REFRESH_INTERVAL,
     MAC_VERIFICATION_DELAY,
     SCAN_INTERVAL,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_HOST,
     CONF_NAME,
     CONF_PASSWORD,
@@ -31,9 +31,9 @@ from homeassistant.const import (
     CONF_USERNAME,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import setup_integration
 
@@ -42,7 +42,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_with_pre_v7_firmware(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:
@@ -59,7 +59,7 @@ async def test_with_pre_v7_firmware(
 
 @pytest.mark.freeze_time("2024-07-23 00:00:00+00:00")
 async def test_token_in_config_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
 ) -> None:
     """Test coordinator with token provided from config."""
@@ -91,7 +91,7 @@ async def test_token_in_config_file(
 @respx.mock
 @pytest.mark.freeze_time("2024-07-23 00:00:00+00:00")
 async def test_expired_token_in_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
 ) -> None:
     """Test coordinator with expired token provided from config."""
@@ -132,7 +132,7 @@ async def test_expired_token_in_config(
 
 
 async def test_coordinator_update_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -169,13 +169,13 @@ async def test_coordinator_update_error(
 
 
 async def test_coordinator_update_authentication_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test enphase_envoy coordinator update authentication error handling."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, config_entry)
 
     # force HA to detect changed data by changing raw
@@ -193,7 +193,7 @@ async def test_coordinator_update_authentication_error(
 
 @pytest.mark.freeze_time("2024-07-23 00:00:00+00:00")
 async def test_coordinator_token_refresh_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
 ) -> None:
     """Test coordinator with expired token and failure to refresh."""
@@ -230,7 +230,7 @@ async def test_coordinator_token_refresh_error(
 
 
 async def test_config_no_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
 ) -> None:
     """Test enphase_envoy init if config entry has no unique id."""
@@ -251,7 +251,7 @@ async def test_config_no_unique_id(
 
 
 async def test_config_different_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
 ) -> None:
     """Test enphase_envoy init if config entry has different unique id."""
@@ -278,7 +278,7 @@ async def test_config_different_unique_id(
     indirect=["mock_envoy"],
 )
 async def test_remove_config_entry_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     hass_ws_client: WebSocketGenerator,
@@ -332,7 +332,7 @@ async def test_remove_config_entry_device(
 
 
 async def test_option_change_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
 ) -> None:
@@ -377,12 +377,12 @@ def mock_envoy_setup(mock_envoy: AsyncMock):
 
 
 @patch(
-    "homeassistant.components.enphase_envoy.coordinator.SCAN_INTERVAL",
+    "smarthub.components.enphase_envoy.coordinator.SCAN_INTERVAL",
     timedelta(days=1),
 )
 @respx.mock
 async def test_coordinator_firmware_refresh(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -407,7 +407,7 @@ async def test_coordinator_firmware_refresh(
     caplog.set_level(logging.WARNING)
 
     with patch(
-        "homeassistant.components.enphase_envoy.Envoy.setup",
+        "smarthub.components.enphase_envoy.Envoy.setup",
         MagicMock(return_value=mock_envoy_setup(mock_envoy)),
     ):
         freezer.tick(FIRMWARE_REFRESH_INTERVAL)
@@ -424,7 +424,7 @@ async def test_coordinator_firmware_refresh(
 
 @respx.mock
 async def test_coordinator_firmware_refresh_with_envoy_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -434,7 +434,7 @@ async def test_coordinator_firmware_refresh_with_envoy_error(
     await setup_integration(hass, config_entry)
 
     caplog.set_level(logging.DEBUG)
-    logging.getLogger("homeassistant.components.enphase_envoy.coordinator").setLevel(
+    logging.getLogger("smarthub.components.enphase_envoy.coordinator").setLevel(
         logging.DEBUG
     )
 
@@ -448,7 +448,7 @@ async def test_coordinator_firmware_refresh_with_envoy_error(
 
 @respx.mock
 async def test_coordinator_interface_information(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -458,7 +458,7 @@ async def test_coordinator_interface_information(
     await setup_integration(hass, config_entry)
 
     caplog.set_level(logging.DEBUG)
-    logging.getLogger("homeassistant.components.enphase_envoy.coordinator").setLevel(
+    logging.getLogger("smarthub.components.enphase_envoy.coordinator").setLevel(
         logging.DEBUG
     )
 
@@ -494,7 +494,7 @@ async def test_coordinator_interface_information(
 
 @respx.mock
 async def test_coordinator_interface_information_no_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -505,7 +505,7 @@ async def test_coordinator_interface_information_no_device(
     await setup_integration(hass, config_entry)
 
     caplog.set_level(logging.DEBUG)
-    logging.getLogger("homeassistant.components.enphase_envoy.coordinator").setLevel(
+    logging.getLogger("smarthub.components.enphase_envoy.coordinator").setLevel(
         logging.DEBUG
     )
 
@@ -534,7 +534,7 @@ async def test_coordinator_interface_information_no_device(
 
 @respx.mock
 async def test_coordinator_interface_information_mac_also_in_other_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_envoy: AsyncMock,
     freezer: FrozenDateTimeFactory,
@@ -545,7 +545,7 @@ async def test_coordinator_interface_information_mac_also_in_other_device(
     await setup_integration(hass, config_entry)
 
     caplog.set_level(logging.DEBUG)
-    logging.getLogger("homeassistant.components.enphase_envoy.coordinator").setLevel(
+    logging.getLogger("smarthub.components.enphase_envoy.coordinator").setLevel(
         logging.DEBUG
     )
 

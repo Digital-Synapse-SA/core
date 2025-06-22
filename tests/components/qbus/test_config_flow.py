@@ -7,14 +7,14 @@ from unittest.mock import patch
 import pytest
 from qbusmqttapi.discovery import QbusDiscovery
 
-from homeassistant.components.qbus.const import CONF_SERIAL_NUMBER, DOMAIN
-from homeassistant.components.qbus.coordinator import QbusConfigCoordinator
-from homeassistant.config_entries import SOURCE_MQTT, SOURCE_USER
-from homeassistant.const import CONF_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.mqtt import MqttServiceInfo
-from homeassistant.util.json import JsonObjectType
+from smarthub.components.qbus.const import CONF_SERIAL_NUMBER, DOMAIN
+from smarthub.components.qbus.coordinator import QbusConfigCoordinator
+from smarthub.config_entries import SOURCE_MQTT, SOURCE_USER
+from smarthub.const import CONF_ID
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.mqtt import MqttServiceInfo
+from smarthub.util.json import JsonObjectType
 
 from .const import TOPIC_CONFIG
 
@@ -22,7 +22,7 @@ _PAYLOAD_DEVICE_STATE = '{"id":"UL1","properties":{"connected":true},"type":"eve
 
 
 async def test_step_discovery_confirm_create_entry(
-    hass: HomeAssistant, payload_config: JsonObjectType
+    hass: SmartHub, payload_config: JsonObjectType
 ) -> None:
     """Test mqtt confirm step and entry creation."""
     discovery = MqttServiceInfo(
@@ -69,7 +69,7 @@ async def test_step_discovery_confirm_create_entry(
     ],
 )
 async def test_step_mqtt_invalid(
-    hass: HomeAssistant, topic: str, payload: bytes
+    hass: SmartHub, topic: str, payload: bytes
 ) -> None:
     """Test mqtt discovery with empty payload."""
     discovery = MqttServiceInfo(
@@ -97,7 +97,7 @@ async def test_step_mqtt_invalid(
     ],
 )
 async def test_handle_gateway_topic_when_online(
-    hass: HomeAssistant, payload: str, mqtt_publish: bool
+    hass: SmartHub, payload: str, mqtt_publish: bool
 ) -> None:
     """Test handling of gateway topic with payload indicating online."""
     discovery = MqttServiceInfo(
@@ -110,7 +110,7 @@ async def test_handle_gateway_topic_when_online(
     )
 
     with (
-        patch("homeassistant.components.mqtt.client.async_publish") as mock_publish,
+        patch("smarthub.components.mqtt.client.async_publish") as mock_publish,
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": SOURCE_MQTT}, data=discovery
@@ -122,7 +122,7 @@ async def test_handle_gateway_topic_when_online(
 
 
 async def test_handle_config_topic(
-    hass: HomeAssistant, payload_config: JsonObjectType
+    hass: SmartHub, payload_config: JsonObjectType
 ) -> None:
     """Test handling of config topic."""
 
@@ -136,7 +136,7 @@ async def test_handle_config_topic(
     )
 
     with (
-        patch("homeassistant.components.mqtt.client.async_publish") as mock_publish,
+        patch("smarthub.components.mqtt.client.async_publish") as mock_publish,
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": SOURCE_MQTT}, data=discovery
@@ -147,7 +147,7 @@ async def test_handle_config_topic(
     assert result.get("reason") == "discovery_in_progress"
 
 
-async def test_handle_device_topic_missing_config(hass: HomeAssistant) -> None:
+async def test_handle_device_topic_missing_config(hass: SmartHub) -> None:
     """Test handling of device topic when config is missing."""
     discovery = MqttServiceInfo(
         subscribed_topic="cloudapp/QBUSMQTTGW/+/state",
@@ -167,7 +167,7 @@ async def test_handle_device_topic_missing_config(hass: HomeAssistant) -> None:
 
 
 async def test_handle_device_topic_device_not_found(
-    hass: HomeAssistant, payload_config: JsonObjectType
+    hass: SmartHub, payload_config: JsonObjectType
 ) -> None:
     """Test handling of device topic when device is not found."""
     discovery = MqttServiceInfo(
@@ -192,7 +192,7 @@ async def test_handle_device_topic_device_not_found(
     assert result.get("reason") == "invalid_discovery_info"
 
 
-async def test_step_user_not_supported(hass: HomeAssistant) -> None:
+async def test_step_user_not_supported(hass: SmartHub) -> None:
     """Test user step, which should abort."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}

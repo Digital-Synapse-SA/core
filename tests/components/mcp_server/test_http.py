@@ -13,21 +13,21 @@ import mcp.client.sse
 from mcp.shared.exceptions import McpError
 import pytest
 
-from homeassistant.components.conversation import DOMAIN as CONVERSATION_DOMAIN
-from homeassistant.components.homeassistant.exposed_entities import async_expose_entity
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.mcp_server.const import STATELESS_LLM_API
-from homeassistant.components.mcp_server.http import MESSAGES_API, SSE_API
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_LLM_HASS_API, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import (
+from smarthub.components.conversation import DOMAIN as CONVERSATION_DOMAIN
+from smarthub.components.smarthub.exposed_entities import async_expose_entity
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.components.mcp_server.const import STATELESS_LLM_API
+from smarthub.components.mcp_server.http import MESSAGES_API, SSE_API
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_LLM_HASS_API, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import (
     area_registry as ar,
     device_registry as dr,
     entity_registry as er,
     llm,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, setup_test_component_platform
 from tests.components.light.common import MockLight
@@ -59,7 +59,7 @@ EXPECTED_PROMPT_SUFFIX = """
 
 
 @pytest.fixture
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Set up the config entry."""
     await hass.config_entries.async_setup(config_entry.entry_id)
     assert config_entry.state is ConfigEntryState.LOADED
@@ -67,7 +67,7 @@ async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) 
 
 @pytest.fixture(autouse=True)
 async def mock_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     area_registry: ar.AreaRegistry,
@@ -117,7 +117,7 @@ async def sse_response_reader(
 
 
 async def test_http_sse(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -149,7 +149,7 @@ async def test_http_sse(
 
 
 async def test_http_messages_missing_session_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -163,7 +163,7 @@ async def test_http_messages_missing_session_id(
 
 
 async def test_http_messages_invalid_message_format(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -183,7 +183,7 @@ async def test_http_messages_invalid_message_format(
 
 
 async def test_http_sse_multiple_config_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -209,7 +209,7 @@ async def test_http_sse_multiple_config_entries(
 
 
 async def test_http_sse_no_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     config_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
@@ -229,7 +229,7 @@ async def test_http_sse_no_config_entry(
 
 
 async def test_http_messages_no_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     config_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
@@ -260,7 +260,7 @@ async def test_http_messages_no_config_entry(
 
 
 async def test_http_requires_authentication(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     hass_client_no_auth: ClientSessionGenerator,
 ) -> None:
@@ -301,7 +301,7 @@ async def mcp_session(
 
 @pytest.mark.parametrize("llm_hass_api", [llm.LLM_API_ASSIST, STATELESS_LLM_API])
 async def test_mcp_tools_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     mcp_sse_url: str,
     hass_supervisor_access_token: str,
@@ -324,7 +324,7 @@ async def test_mcp_tools_list(
 
 @pytest.mark.parametrize("llm_hass_api", [llm.LLM_API_ASSIST, STATELESS_LLM_API])
 async def test_mcp_tool_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     mcp_sse_url: str,
     hass_supervisor_access_token: str,
@@ -356,7 +356,7 @@ async def test_mcp_tool_call(
 
 
 async def test_mcp_tool_call_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     mcp_sse_url: str,
     hass_supervisor_access_token: str,
@@ -377,7 +377,7 @@ async def test_mcp_tool_call_failed(
 
 @pytest.mark.parametrize("llm_hass_api", [llm.LLM_API_ASSIST, STATELESS_LLM_API])
 async def test_prompt_list(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     mcp_sse_url: str,
     hass_supervisor_access_token: str,
@@ -390,12 +390,12 @@ async def test_prompt_list(
     assert len(result.prompts) == 1
     prompt = result.prompts[0]
     assert prompt.name == "Assist"
-    assert prompt.description == "Default prompt for Home Assistant Assist API"
+    assert prompt.description == "Default prompt for SmartHub Assist API"
 
 
 @pytest.mark.parametrize("llm_hass_api", [llm.LLM_API_ASSIST, STATELESS_LLM_API])
 async def test_prompt_get(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     mcp_sse_url: str,
     hass_supervisor_access_token: str,
@@ -405,16 +405,16 @@ async def test_prompt_get(
     async with mcp_session(mcp_sse_url, hass_supervisor_access_token) as session:
         result = await session.get_prompt(name="Assist")
 
-    assert result.description == "Default prompt for Home Assistant Assist API"
+    assert result.description == "Default prompt for SmartHub Assist API"
     assert len(result.messages) == 1
     assert result.messages[0].role == "assistant"
     assert result.messages[0].content.type == "text"
-    assert "When controlling Home Assistant" in result.messages[0].content.text
+    assert "When controlling SmartHub" in result.messages[0].content.text
     assert result.messages[0].content.text.endswith(EXPECTED_PROMPT_SUFFIX)
 
 
 async def test_get_unknwon_prompt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     mcp_sse_url: str,
     hass_supervisor_access_token: str,

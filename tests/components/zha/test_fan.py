@@ -7,7 +7,7 @@ from zha.application.platforms.fan.const import PRESET_MODE_ON
 from zigpy.profiles import zha
 from zigpy.zcl.clusters import general, hvac
 
-from homeassistant.components.fan import (
+from smarthub.components.fan import (
     ATTR_PERCENTAGE,
     ATTR_PRESET_MODE,
     DOMAIN as FAN_DOMAIN,
@@ -15,13 +15,13 @@ from homeassistant.components.fan import (
     SERVICE_SET_PRESET_MODE,
     NotValidPresetModeError,
 )
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -29,7 +29,7 @@ from homeassistant.const import (
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .common import find_entity_id, send_attributes_report
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
@@ -42,7 +42,7 @@ OFF = 0
 def fan_platform_only():
     """Only set up the fan and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.BUTTON,
             Platform.BINARY_SENSOR,
@@ -58,7 +58,7 @@ def fan_platform_only():
         yield
 
 
-async def test_fan(hass: HomeAssistant, setup_zha, zigpy_device_mock) -> None:
+async def test_fan(hass: SmartHub, setup_zha, zigpy_device_mock) -> None:
     """Test ZHA fan platform."""
 
     await setup_zha()
@@ -141,7 +141,7 @@ async def test_fan(hass: HomeAssistant, setup_zha, zigpy_device_mock) -> None:
     assert len(cluster.write_attributes.mock_calls) == 0
 
 
-async def async_turn_on(hass: HomeAssistant, entity_id, percentage=None):
+async def async_turn_on(hass: SmartHub, entity_id, percentage=None):
     """Turn fan on."""
     data = {
         key: value
@@ -152,14 +152,14 @@ async def async_turn_on(hass: HomeAssistant, entity_id, percentage=None):
     await hass.services.async_call(Platform.FAN, SERVICE_TURN_ON, data, blocking=True)
 
 
-async def async_turn_off(hass: HomeAssistant, entity_id):
+async def async_turn_off(hass: SmartHub, entity_id):
     """Turn fan off."""
     data = {ATTR_ENTITY_ID: entity_id} if entity_id else {}
 
     await hass.services.async_call(Platform.FAN, SERVICE_TURN_OFF, data, blocking=True)
 
 
-async def async_set_percentage(hass: HomeAssistant, entity_id, percentage=None):
+async def async_set_percentage(hass: SmartHub, entity_id, percentage=None):
     """Set percentage for specified fan."""
     data = {
         key: value
@@ -172,7 +172,7 @@ async def async_set_percentage(hass: HomeAssistant, entity_id, percentage=None):
     )
 
 
-async def async_set_preset_mode(hass: HomeAssistant, entity_id, preset_mode=None):
+async def async_set_preset_mode(hass: SmartHub, entity_id, preset_mode=None):
     """Set preset_mode for specified fan."""
     data = {
         key: value

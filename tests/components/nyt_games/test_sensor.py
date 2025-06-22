@@ -8,10 +8,10 @@ from nyt_games import NYTGamesError, WordleStats
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.nyt_games.const import DOMAIN
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.nyt_games.const import DOMAIN
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -25,7 +25,7 @@ from tests.common import (
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_nyt_games_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -38,7 +38,7 @@ async def test_all_entities(
 
 
 async def test_updating_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nyt_games_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -64,7 +64,7 @@ async def test_updating_exception(
 
 
 async def test_new_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nyt_games_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

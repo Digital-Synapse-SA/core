@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 from bluecurrent_api import Client
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -27,7 +27,7 @@ class FutureContainer:
 
 
 def create_client_mock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     future_container: FutureContainer,
     started_loop: Event,
     charge_point: dict,
@@ -87,14 +87,14 @@ def create_client_mock(
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     platform="",
     charge_point: dict | None = None,
     status: dict | None = None,
     grid: dict | None = None,
 ) -> tuple[MagicMock, Event, FutureContainer]:
-    """Set up the Blue Current integration in Home Assistant."""
+    """Set up the Blue Current integration in SmartHub."""
 
     if charge_point is None:
         charge_point = DEFAULT_CHARGE_POINT
@@ -113,8 +113,8 @@ async def init_integration(
     )
 
     with (
-        patch("homeassistant.components.blue_current.PLATFORMS", [platform]),
-        patch("homeassistant.components.blue_current.Client", return_value=client_mock),
+        patch("smarthub.components.blue_current.PLATFORMS", [platform]),
+        patch("smarthub.components.blue_current.Client", return_value=client_mock),
     ):
         config_entry.add_to_hass(hass)
 

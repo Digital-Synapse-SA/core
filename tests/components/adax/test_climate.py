@@ -1,9 +1,9 @@
 """Test Adax climate entity."""
 
-from homeassistant.components.adax.const import SCAN_INTERVAL
-from homeassistant.components.climate import ATTR_CURRENT_TEMPERATURE, HVACMode
-from homeassistant.const import ATTR_TEMPERATURE, STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.components.adax.const import SCAN_INTERVAL
+from smarthub.components.climate import ATTR_CURRENT_TEMPERATURE, HVACMode
+from smarthub.const import ATTR_TEMPERATURE, STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .conftest import CLOUD_DEVICE_DATA, LOCAL_DEVICE_DATA
@@ -13,7 +13,7 @@ from tests.test_setup import FrozenDateTimeFactory
 
 
 async def test_climate_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_cloud_config_entry: MockConfigEntry,
     mock_adax_cloud: AsyncMock,
@@ -48,7 +48,7 @@ async def test_climate_cloud(
 
 
 async def test_climate_local(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_local_config_entry: MockConfigEntry,
     mock_adax_local: AsyncMock,

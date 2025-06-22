@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.device_automation.exceptions import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.device_automation.exceptions import (
     InvalidDeviceAutomationConfig,
 )
-from homeassistant.components.nest import DOMAIN
-from homeassistant.components.nest.events import NEST_EVENT
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.components.nest import DOMAIN
+from smarthub.components.nest.events import NEST_EVENT
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from .common import DEVICE_ID, CreateDevice, PlatformSetup, create_nest_event
 
@@ -60,7 +60,7 @@ def make_camera(
 
 
 async def setup_automation(
-    hass: HomeAssistant, device_id: str, trigger_type: str
+    hass: SmartHub, device_id: str, trigger_type: str
 ) -> bool:
     """Set up an automation trigger for testing triggering."""
     return await async_setup_component(
@@ -86,7 +86,7 @@ async def setup_automation(
 
 
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -128,7 +128,7 @@ async def test_get_triggers(
 
 
 async def test_multiple_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -185,7 +185,7 @@ async def test_multiple_devices(
 
 
 async def test_triggers_for_invalid_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -221,7 +221,7 @@ async def test_triggers_for_invalid_device_id(
 
 
 async def test_no_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -240,7 +240,7 @@ async def test_no_triggers(
 
 
 async def test_fires_on_camera_motion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -274,7 +274,7 @@ async def test_fires_on_camera_motion(
 
 
 async def test_fires_on_camera_person(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -308,7 +308,7 @@ async def test_fires_on_camera_person(
 
 
 async def test_fires_on_camera_sound(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -342,7 +342,7 @@ async def test_fires_on_camera_sound(
 
 
 async def test_fires_on_doorbell_chime(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -376,7 +376,7 @@ async def test_fires_on_doorbell_chime(
 
 
 async def test_trigger_for_wrong_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -409,7 +409,7 @@ async def test_trigger_for_wrong_device_id(
 
 
 async def test_trigger_for_wrong_event_type(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     create_device: CreateDevice,
     setup_platform: PlatformSetup,
@@ -442,7 +442,7 @@ async def test_trigger_for_wrong_event_type(
 
 
 async def test_subscriber_automation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     create_device: CreateDevice,

@@ -7,7 +7,7 @@ set up the KNX integration with `knx.setup_integration`.
 You can pass a KNX YAML-config dict or a ConfigStore fixture filename to the setup method. The fixture should be placed in the `tests/components/knx/fixtures` directory.
 
 ```python
-async def test_some_yaml(hass: HomeAssistant, knx: KNXTestKit):
+async def test_some_yaml(hass: SmartHub, knx: KNXTestKit):
     await knx.setup_integration(
         yaml_config={
             "switch": {
@@ -17,7 +17,7 @@ async def test_some_yaml(hass: HomeAssistant, knx: KNXTestKit):
         }
     )
 
-async def test_some_config_store(hass: HomeAssistant, knx: KNXTestKit):
+async def test_some_config_store(hass: SmartHub, knx: KNXTestKit):
     await knx.setup_integration(config_store_fixture="config_store_filename.json")
 ```
 

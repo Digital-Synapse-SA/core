@@ -1,12 +1,12 @@
 """Test Qbus switch entities."""
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from tests.common import async_fire_mqtt_message
 from tests.typing import MqttMockHAClient
@@ -27,7 +27,7 @@ _SWITCH_ENTITY_ID = "switch.living"
 
 
 async def test_switch_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     setup_integration: None,
 ) -> None:

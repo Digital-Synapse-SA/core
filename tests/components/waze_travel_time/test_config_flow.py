@@ -2,9 +2,9 @@
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.waze_travel_time.config_flow import WazeConfigFlow
-from homeassistant.components.waze_travel_time.const import (
+from smarthub import config_entries
+from smarthub.components.waze_travel_time.config_flow import WazeConfigFlow
+from smarthub.components.waze_travel_time.const import (
     CONF_AVOID_FERRIES,
     CONF_AVOID_SUBSCRIPTION_ROADS,
     CONF_AVOID_TOLL_ROADS,
@@ -20,9 +20,9 @@ from homeassistant.components.waze_travel_time.const import (
     DOMAIN,
     IMPERIAL_UNITS,
 )
-from homeassistant.const import CONF_NAME, CONF_REGION
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.const import CONF_NAME, CONF_REGION
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import CONFIG_FLOW_USER_INPUT, MOCK_CONFIG
 
@@ -30,7 +30,7 @@ from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("validate_config_entry")
-async def test_minimum_fields(hass: HomeAssistant) -> None:
+async def test_minimum_fields(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -55,7 +55,7 @@ async def test_minimum_fields(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_update")
-async def test_reconfigure(hass: HomeAssistant) -> None:
+async def test_reconfigure(hass: SmartHub) -> None:
     """Test reconfigure flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -93,7 +93,7 @@ async def test_reconfigure(hass: HomeAssistant) -> None:
     }
 
 
-async def test_options(hass: HomeAssistant) -> None:
+async def test_options(hass: SmartHub) -> None:
     """Test options flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -149,7 +149,7 @@ async def test_options(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("validate_config_entry")
-async def test_dupe(hass: HomeAssistant) -> None:
+async def test_dupe(hass: SmartHub) -> None:
     """Test setting up the same entry data twice is OK."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -183,7 +183,7 @@ async def test_dupe(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("invalidate_config_entry")
 async def test_invalid_config_entry(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
@@ -203,7 +203,7 @@ async def test_invalid_config_entry(
 
 
 @pytest.mark.usefixtures("mock_update")
-async def test_reset_filters(hass: HomeAssistant) -> None:
+async def test_reset_filters(hass: SmartHub) -> None:
     """Test resetting inclusive and exclusive filters to empty string."""
     options = {**DEFAULT_OPTIONS}
     options[CONF_INCL_FILTER] = ["test"]

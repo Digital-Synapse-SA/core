@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from ttn_client import TTNSensorValue
 
-from homeassistant.components.thethingsnetwork.const import (
+from smarthub.components.thethingsnetwork.const import (
     CONF_APP_ID,
     DOMAIN,
     TTN_API_HOST,
 )
-from homeassistant.const import CONF_API_KEY, CONF_HOST
+from smarthub.const import CONF_API_KEY, CONF_HOST
 
 from tests.common import MockConfigEntry
 
@@ -82,11 +82,11 @@ def mock_ttnclient():
 
     with (
         patch(
-            "homeassistant.components.thethingsnetwork.coordinator.TTNClient",
+            "smarthub.components.thethingsnetwork.coordinator.TTNClient",
             autospec=True,
         ) as ttn_client,
         patch(
-            "homeassistant.components.thethingsnetwork.config_flow.TTNClient",
+            "smarthub.components.thethingsnetwork.config_flow.TTNClient",
             new=ttn_client,
         ),
     ):

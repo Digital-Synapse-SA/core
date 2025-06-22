@@ -1,6 +1,6 @@
 """Enforce that the integration raises correctly during initialisation.
 
-https://developers.home-assistant.io/docs/core/integration-quality-scale/rules/test-before-setup/
+https://developers.smart-hub.io/docs/core/integration-quality-scale/rules/test-before-setup/
 """
 
 import ast

@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock, Mock, call, patch
 
 from dynalite_devices_lib.dynalitebase import DynaliteBaseDevice
 
-from homeassistant.components import dynalite
-from homeassistant.const import ATTR_SERVICE, CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.components import dynalite
+from smarthub.const import ATTR_SERVICE, CONF_HOST
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -24,20 +24,20 @@ def create_mock_device(platform, spec):
     return device
 
 
-async def get_entry_id_from_hass(hass: HomeAssistant) -> str:
+async def get_entry_id_from_hass(hass: SmartHub) -> str:
     """Get the config entry id from hass."""
     conf_entries = hass.config_entries.async_entries(dynalite.DOMAIN)
     assert len(conf_entries) == 1
     return conf_entries[0].entry_id
 
 
-async def create_entity_from_device(hass: HomeAssistant, device: DynaliteBaseDevice):
+async def create_entity_from_device(hass: SmartHub, device: DynaliteBaseDevice):
     """Set up the component and platform and create a light based on the device provided."""
     host = "1.2.3.4"
     entry = MockConfigEntry(domain=dynalite.DOMAIN, data={CONF_HOST: host})
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.dynalite.bridge.DynaliteDevices"
+        "smarthub.components.dynalite.bridge.DynaliteDevices"
     ) as mock_dyn_dev:
         mock_dyn_dev().async_setup = AsyncMock(return_value=True)
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -48,7 +48,7 @@ async def create_entity_from_device(hass: HomeAssistant, device: DynaliteBaseDev
     return mock_dyn_dev.mock_calls[1][2]["update_device_func"]
 
 
-async def run_service_tests(hass: HomeAssistant, device, platform, services):
+async def run_service_tests(hass: SmartHub, device, platform, services):
     """Run a series of service calls and check that the entity and device behave correctly."""
     for cur_item in services:
         service = cur_item[ATTR_SERVICE]

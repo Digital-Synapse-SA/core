@@ -8,8 +8,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.statistics import DOMAIN
-from homeassistant.components.statistics.sensor import (
+from smarthub.components.statistics import DOMAIN
+from smarthub.components.statistics.sensor import (
     CONF_KEEP_LAST_SAMPLE,
     CONF_MAX_AGE,
     CONF_PERCENTILE,
@@ -19,14 +19,14 @@ from homeassistant.components.statistics.sensor import (
     DEFAULT_NAME,
     STAT_AVERAGE_LINEAR,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITY_ID,
     CONF_NAME,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .test_sensor import VALUES_NUMERIC
 
@@ -37,7 +37,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Automatically path uuid generator."""
     with patch(
-        "homeassistant.components.statistics.async_setup_entry",
+        "smarthub.components.statistics.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -64,9 +64,9 @@ async def get_config_to_integration_load() -> dict[str, Any]:
 
 @pytest.fixture(name="loaded_entry")
 async def load_integration(
-    hass: HomeAssistant, get_config: dict[str, Any]
+    hass: SmartHub, get_config: dict[str, Any]
 ) -> MockConfigEntry:
-    """Set up the Statistics integration in Home Assistant."""
+    """Set up the Statistics integration in SmartHub."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,

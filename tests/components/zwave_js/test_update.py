@@ -9,7 +9,7 @@ from zwave_js_server.event import Event
 from zwave_js_server.exceptions import FailedZWaveCommand
 from zwave_js_server.model.node.firmware import NodeFirmwareUpdateStatus
 
-from homeassistant.components.update import (
+from smarthub.components.update import (
     ATTR_AUTO_UPDATE,
     ATTR_IN_PROGRESS,
     ATTR_INSTALLED_VERSION,
@@ -21,13 +21,13 @@ from homeassistant.components.update import (
     SERVICE_INSTALL,
     SERVICE_SKIP,
 )
-from homeassistant.components.zwave_js.const import DOMAIN, SERVICE_REFRESH_VALUE
-from homeassistant.components.zwave_js.helpers import get_valueless_base_unique_id
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import CoreState, HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.zwave_js.const import DOMAIN, SERVICE_REFRESH_VALUE
+from smarthub.components.zwave_js.helpers import get_valueless_base_unique_id
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import CoreState, SmartHub, State
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     MockConfigEntry,
@@ -113,7 +113,7 @@ FIRMWARE_UPDATES = {
 
 
 async def test_update_entity_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
@@ -209,7 +209,7 @@ async def test_update_entity_states(
 
 
 async def test_update_entity_install_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     integration,
@@ -223,7 +223,7 @@ async def test_update_entity_install_raises(
     # Test failed installation by driver
     client.async_send_command.side_effect = FailedZWaveCommand("test", 12, "test")
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,
@@ -235,7 +235,7 @@ async def test_update_entity_install_raises(
 
 
 async def test_update_entity_sleep(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     zen_31,
     integration,
@@ -272,7 +272,7 @@ async def test_update_entity_sleep(
 
 
 async def test_update_entity_dead(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     zen_31,
     integration,
@@ -309,7 +309,7 @@ async def test_update_entity_dead(
 
 
 async def test_update_entity_ha_not_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     zen_31,
     hass_ws_client: WebSocketGenerator,
@@ -351,7 +351,7 @@ async def test_update_entity_ha_not_running(
 
 
 async def test_update_entity_update_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     integration,
@@ -376,7 +376,7 @@ async def test_update_entity_update_failure(
 
 
 async def test_update_entity_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     integration,
@@ -476,7 +476,7 @@ async def test_update_entity_progress(
 
 
 async def test_update_entity_install_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     integration,
@@ -568,12 +568,12 @@ async def test_update_entity_install_failed(
     assert state.state == STATE_ON
 
     # validate that the install task failed
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await install_task
 
 
 async def test_update_entity_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     integration,
@@ -634,7 +634,7 @@ async def test_update_entity_reload(
 
 
 async def test_update_entity_delay(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     ge_in_wall_dimmer_switch,
     zen_31,
@@ -684,7 +684,7 @@ async def test_update_entity_delay(
 
 
 async def test_update_entity_partial_restore_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     hass_ws_client: WebSocketGenerator,
@@ -715,7 +715,7 @@ async def test_update_entity_partial_restore_data(
 
 
 async def test_update_entity_partial_restore_data_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     hass_ws_client: WebSocketGenerator,
@@ -751,7 +751,7 @@ async def test_update_entity_partial_restore_data_2(
 
 
 async def test_update_entity_full_restore_data_skipped_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     hass_ws_client: WebSocketGenerator,
@@ -787,7 +787,7 @@ async def test_update_entity_full_restore_data_skipped_version(
 
 
 async def test_update_entity_full_restore_data_update_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     hass_ws_client: WebSocketGenerator,
@@ -873,7 +873,7 @@ async def test_update_entity_full_restore_data_update_available(
 
 
 async def test_update_entity_full_restore_data_no_update_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     hass_ws_client: WebSocketGenerator,
@@ -909,7 +909,7 @@ async def test_update_entity_full_restore_data_no_update_available(
 
 
 async def test_update_entity_no_latest_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     climate_radio_thermostat_ct100_plus_different_endpoints,
     hass_ws_client: WebSocketGenerator,
@@ -945,7 +945,7 @@ async def test_update_entity_no_latest_version(
 
 
 async def test_update_entity_unload_asleep_node(
-    hass: HomeAssistant, client, wallmote_central_scene, integration
+    hass: SmartHub, client, wallmote_central_scene, integration
 ) -> None:
     """Test unloading config entry after attempting an update for an asleep node."""
     assert len(client.async_send_command.call_args_list) == 0

@@ -5,12 +5,12 @@ from unittest.mock import patch
 from hatasmota.discovery import get_status_sensor_entities
 import pytest
 
-from homeassistant.components.tasmota.const import (
+from smarthub.components.tasmota.const import (
     CONF_DISCOVERY_PREFIX,
     DEFAULT_PREFIX,
     DOMAIN,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.components.light.conftest import mock_light_profiles  # noqa: F401
@@ -37,7 +37,7 @@ def disable_status_sensor(status_sensor_disabled):
         yield
 
 
-async def setup_tasmota_helper(hass: HomeAssistant) -> None:
+async def setup_tasmota_helper(hass: SmartHub) -> None:
     """Set up Tasmota."""
     hass.config.components.add("tasmota")
 
@@ -56,6 +56,6 @@ async def setup_tasmota_helper(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-async def setup_tasmota(hass: HomeAssistant) -> None:
+async def setup_tasmota(hass: SmartHub) -> None:
     """Set up Tasmota."""
     await setup_tasmota_helper(hass)

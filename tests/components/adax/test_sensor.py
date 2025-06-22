@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -14,14 +14,14 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_sensor_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_adax_cloud: AsyncMock,
     mock_cloud_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test sensor setup for cloud connection."""
-    with patch("homeassistant.components.adax.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.adax.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_cloud_config_entry)
         # Now we use fetch_rooms_info as primary method
         mock_adax_cloud.fetch_rooms_info.assert_called_once()
@@ -32,12 +32,12 @@ async def test_sensor_cloud(
 
 
 async def test_sensor_local_not_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_adax_local: AsyncMock,
     mock_local_config_entry: MockConfigEntry,
 ) -> None:
     """Test that sensors are not created for local connection."""
-    with patch("homeassistant.components.adax.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.adax.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_local_config_entry)
 
         # No sensor entities should be created for local connection
@@ -47,7 +47,7 @@ async def test_sensor_local_not_created(
 
 
 async def test_multiple_devices_create_individual_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_adax_cloud: AsyncMock,
     mock_cloud_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -79,7 +79,7 @@ async def test_multiple_devices_create_individual_sensors(
     mock_adax_cloud.fetch_rooms_info.return_value = multiple_devices_data
     mock_adax_cloud.get_rooms.return_value = multiple_devices_data
 
-    with patch("homeassistant.components.adax.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.adax.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_cloud_config_entry)
 
         await snapshot_platform(
@@ -88,7 +88,7 @@ async def test_multiple_devices_create_individual_sensors(
 
 
 async def test_fallback_to_get_rooms(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_adax_cloud: AsyncMock,
     mock_cloud_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -109,7 +109,7 @@ async def test_fallback_to_get_rooms(
         }
     ]
 
-    with patch("homeassistant.components.adax.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.adax.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_cloud_config_entry)
 
         # Should call both methods

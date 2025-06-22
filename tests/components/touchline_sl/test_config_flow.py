@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock
 import pytest
 from pytouchlinesl.client import RothAPIError
 
-from homeassistant.components.touchline_sl.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.touchline_sl.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -22,7 +22,7 @@ CONFIG_DATA = {
 
 
 async def test_config_flow_success(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_touchlinesl_client: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_touchlinesl_client: AsyncMock
 ) -> None:
     """Test the happy path where the provided username/password result in a new entry."""
     result = await hass.config_entries.flow.async_init(
@@ -52,7 +52,7 @@ async def test_config_flow_success(
     ],
 )
 async def test_config_flow_failure_api_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     error_base: str,
     mock_setup_entry: AsyncMock,
@@ -90,7 +90,7 @@ async def test_config_flow_failure_api_exceptions(
 
 
 async def test_config_flow_failure_adding_non_unique_account(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_touchlinesl_client: AsyncMock,
     mock_config_entry: MockConfigEntry,

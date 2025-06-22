@@ -2,19 +2,19 @@
 
 import pytest
 
-from homeassistant.components.websocket_api.messages import (
+from smarthub.components.websocket_api.messages import (
     _partial_cached_event_message as lru_event_cache,
     _state_diff_event,
     cached_event_message,
     message_to_json_bytes,
 )
-from homeassistant.const import EVENT_STATE_CHANGED
-from homeassistant.core import Context, Event, HomeAssistant, State, callback
+from smarthub.const import EVENT_STATE_CHANGED
+from smarthub.core import Context, Event, SmartHub, State, callback
 
 from tests.common import async_capture_events
 
 
-async def test_cached_event_message(hass: HomeAssistant) -> None:
+async def test_cached_event_message(hass: SmartHub) -> None:
     """Test that we cache event messages."""
 
     events = []
@@ -52,7 +52,7 @@ async def test_cached_event_message(hass: HomeAssistant) -> None:
     assert cache_info.currsize == 2
 
 
-async def test_cached_event_message_with_different_idens(hass: HomeAssistant) -> None:
+async def test_cached_event_message_with_different_idens(hass: SmartHub) -> None:
     """Test that we cache event messages when the subscrition idens differ."""
 
     events = []
@@ -83,7 +83,7 @@ async def test_cached_event_message_with_different_idens(hass: HomeAssistant) ->
     assert cache_info.currsize == 1
 
 
-async def test_state_diff_event(hass: HomeAssistant) -> None:
+async def test_state_diff_event(hass: SmartHub) -> None:
     """Test building state_diff_message."""
     state_change_events = async_capture_events(hass, EVENT_STATE_CHANGED)
     context = Context(user_id="user-id", parent_id="parent-id", id="id")

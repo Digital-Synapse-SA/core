@@ -6,8 +6,8 @@ from typing import Any
 import pytest
 import voluptuous as vol
 
-from homeassistant.helpers import selector
-from homeassistant.util import yaml as yaml_util
+from smarthub.helpers import selector
+from smarthub.util import yaml as yaml_util
 
 FAKE_UUID = "a266a680b608c32770e6c45bfe6b8411"
 

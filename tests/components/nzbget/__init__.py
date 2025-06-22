@@ -2,8 +2,8 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.nzbget.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.nzbget.const import DOMAIN
+from smarthub.const import (
     CONF_HOST,
     CONF_NAME,
     CONF_PASSWORD,
@@ -13,7 +13,7 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -60,8 +60,8 @@ MOCK_HISTORY = [
 ]
 
 
-async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
-    """Set up the NZBGet integration in Home Assistant."""
+async def init_integration(hass: SmartHub) -> MockConfigEntry:
+    """Set up the NZBGet integration in SmartHub."""
     entry = MockConfigEntry(domain=DOMAIN, data=ENTRY_CONFIG, options=ENTRY_OPTIONS)
     entry.add_to_hass(hass)
 
@@ -73,27 +73,27 @@ async def init_integration(hass: HomeAssistant) -> MockConfigEntry:
 
 def _patch_async_setup_entry(return_value=True):
     return patch(
-        "homeassistant.components.nzbget.async_setup_entry",
+        "smarthub.components.nzbget.async_setup_entry",
         return_value=return_value,
     )
 
 
 def _patch_history():
     return patch(
-        "homeassistant.components.nzbget.coordinator.NZBGetAPI.history",
+        "smarthub.components.nzbget.coordinator.NZBGetAPI.history",
         return_value=MOCK_HISTORY,
     )
 
 
 def _patch_status():
     return patch(
-        "homeassistant.components.nzbget.coordinator.NZBGetAPI.status",
+        "smarthub.components.nzbget.coordinator.NZBGetAPI.status",
         return_value=MOCK_STATUS,
     )
 
 
 def _patch_version(return_value=MOCK_VERSION):
     return patch(
-        "homeassistant.components.nzbget.coordinator.NZBGetAPI.version",
+        "smarthub.components.nzbget.coordinator.NZBGetAPI.version",
         return_value=return_value,
     )

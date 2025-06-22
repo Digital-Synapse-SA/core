@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant.components.aranet.const import DOMAIN
-from homeassistant.components.sensor import ATTR_OPTIONS, ATTR_STATE_CLASS
-from homeassistant.const import ATTR_FRIENDLY_NAME, ATTR_UNIT_OF_MEASUREMENT
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.aranet.const import DOMAIN
+from smarthub.components.sensor import ATTR_OPTIONS, ATTR_STATE_CLASS
+from smarthub.const import ATTR_FRIENDLY_NAME, ATTR_UNIT_OF_MEASUREMENT
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import (
     DISABLED_INTEGRATIONS_SERVICE_INFO,
@@ -22,7 +22,7 @@ from tests.components.bluetooth import inject_bluetooth_service_info
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors_aranet_radiation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -92,7 +92,7 @@ async def test_sensors_aranet_radiation(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors_aranet2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -153,7 +153,7 @@ async def test_sensors_aranet2(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors_aranet4(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -234,7 +234,7 @@ async def test_sensors_aranet4(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors_aranetrn(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -316,7 +316,7 @@ async def test_sensors_aranetrn(
 
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
-async def test_smart_home_integration_disabled(hass: HomeAssistant) -> None:
+async def test_smart_home_integration_disabled(hass: SmartHub) -> None:
     """Test disabling smart home integration marks entities as unavailable."""
     entry = MockConfigEntry(
         domain=DOMAIN,

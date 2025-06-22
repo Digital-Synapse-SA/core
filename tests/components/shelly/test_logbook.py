@@ -2,17 +2,17 @@
 
 from unittest.mock import Mock
 
-from homeassistant.components.shelly.const import (
+from smarthub.components.shelly.const import (
     ATTR_CHANNEL,
     ATTR_CLICK_TYPE,
     ATTR_DEVICE,
     DOMAIN,
     EVENT_SHELLY_CLICK,
 )
-from homeassistant.const import ATTR_DEVICE_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_DEVICE_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import init_integration
 
@@ -20,7 +20,7 @@ from tests.components.logbook.common import MockRow, mock_humanify
 
 
 async def test_humanify_shelly_click_event_block_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, mock_block_device: Mock
+    hass: SmartHub, device_registry: dr.DeviceRegistry, mock_block_device: Mock
 ) -> None:
     """Test humanifying Shelly click event for block device."""
     entry = await init_integration(hass, 1)
@@ -70,7 +70,7 @@ async def test_humanify_shelly_click_event_block_device(
 
 
 async def test_humanify_shelly_click_event_rpc_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, mock_rpc_device: Mock
+    hass: SmartHub, device_registry: dr.DeviceRegistry, mock_rpc_device: Mock
 ) -> None:
     """Test humanifying Shelly click event for rpc device."""
     entry = await init_integration(hass, 2)

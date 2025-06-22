@@ -6,11 +6,11 @@ import subprocess
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.util import process
+from smarthub.core import SmartHub
+from smarthub.util import process
 
 
-async def test_kill_process(hass: HomeAssistant) -> None:
+async def test_kill_process(hass: SmartHub) -> None:
     """Test killing a process."""
     sleeper = await hass.async_add_executor_job(
         partial(  # noqa: S604 # shell by design

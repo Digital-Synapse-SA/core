@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock, patch
 
 from pyefergy import exceptions
 
-from homeassistant.components.efergy.const import DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.efergy.const import DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -21,8 +21,8 @@ HID = "12345678901234567890123456789012"
 BASE_URL = "https://engage.efergy.com/mobile_proxy/"
 
 
-def create_entry(hass: HomeAssistant, token: str = TOKEN) -> MockConfigEntry:
-    """Create Efergy entry in Home Assistant."""
+def create_entry(hass: SmartHub, token: str = TOKEN) -> MockConfigEntry:
+    """Create Efergy entry in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id=HID,
@@ -33,12 +33,12 @@ def create_entry(hass: HomeAssistant, token: str = TOKEN) -> MockConfigEntry:
 
 
 async def init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     token: str = TOKEN,
     error: bool = False,
 ) -> MockConfigEntry:
-    """Set up the Efergy integration in Home Assistant."""
+    """Set up the Efergy integration in SmartHub."""
     entry = create_entry(hass, token=token)
     await mock_responses(hass, aioclient_mock, token=token, error=error)
     await hass.config_entries.async_setup(entry.entry_id)
@@ -48,7 +48,7 @@ async def init_integration(
 
 
 async def mock_responses(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     token: str = TOKEN,
     error: bool = False,
@@ -126,17 +126,17 @@ def _patch_efergy():
     mocked_efergy.info["type"] = "EEEHub"
     mocked_efergy.info["version"] = "2.3.7"
     return patch(
-        "homeassistant.components.efergy.config_flow.Efergy",
+        "smarthub.components.efergy.config_flow.Efergy",
         return_value=mocked_efergy,
     )
 
 
 def _patch_efergy_status():
-    return patch("homeassistant.components.efergy.config_flow.Efergy.async_status")
+    return patch("smarthub.components.efergy.config_flow.Efergy.async_status")
 
 
 async def setup_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     platform: str,
     token: str = TOKEN,
@@ -145,7 +145,7 @@ async def setup_platform(
     """Set up the platform."""
     entry = await init_integration(hass, aioclient_mock, token=token, error=error)
 
-    with patch("homeassistant.components.efergy.PLATFORMS", [platform]):
+    with patch("smarthub.components.efergy.PLATFORMS", [platform]):
         assert await async_setup_component(hass, DOMAIN, {})
 
     return entry

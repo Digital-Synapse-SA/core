@@ -5,15 +5,15 @@ from unittest.mock import AsyncMock, patch
 from aiorecollect.errors import RecollectError
 import pytest
 
-from homeassistant.components.recollect_waste import (
+from smarthub.components.recollect_waste import (
     CONF_PLACE_ID,
     CONF_SERVICE_ID,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_FRIENDLY_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_FRIENDLY_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .conftest import TEST_PLACE_ID, TEST_SERVICE_ID
 
@@ -28,7 +28,7 @@ from .conftest import TEST_PLACE_ID, TEST_SERVICE_ID
     ],
 )
 async def test_create_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client,
     config,
     get_pickup_events_errors,
@@ -61,7 +61,7 @@ async def test_create_entry(
     }
 
 
-async def test_duplicate_error(hass: HomeAssistant, config, setup_config_entry) -> None:
+async def test_duplicate_error(hass: SmartHub, config, setup_config_entry) -> None:
     """Test that errors are shown when duplicates are added."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}, data=config
@@ -71,7 +71,7 @@ async def test_duplicate_error(hass: HomeAssistant, config, setup_config_entry) 
 
 
 async def test_options_flow(
-    hass: HomeAssistant, config, config_entry, setup_config_entry
+    hass: SmartHub, config, config_entry, setup_config_entry
 ) -> None:
     """Test config flow options."""
     result = await hass.config_entries.options.async_init(config_entry.entry_id)

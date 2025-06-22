@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock
 from accuweather import ApiError
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.accuweather.const import (
+from smarthub.components.accuweather.const import (
     DOMAIN,
     UPDATE_INTERVAL_DAILY_FORECAST,
     UPDATE_INTERVAL_OBSERVATION,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 
 async def test_async_setup_entry(
-    hass: HomeAssistant, mock_accuweather_client: AsyncMock
+    hass: SmartHub, mock_accuweather_client: AsyncMock
 ) -> None:
     """Test a successful setup entry."""
     await init_integration(hass)
@@ -34,7 +34,7 @@ async def test_async_setup_entry(
 
 
 async def test_config_not_ready(
-    hass: HomeAssistant, mock_accuweather_client: AsyncMock
+    hass: SmartHub, mock_accuweather_client: AsyncMock
 ) -> None:
     """Test for setup failure if connection to AccuWeather is missing."""
     entry = MockConfigEntry(
@@ -59,7 +59,7 @@ async def test_config_not_ready(
 
 
 async def test_unload_entry(
-    hass: HomeAssistant, mock_accuweather_client: AsyncMock
+    hass: SmartHub, mock_accuweather_client: AsyncMock
 ) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass)
@@ -75,7 +75,7 @@ async def test_unload_entry(
 
 
 async def test_update_interval(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_accuweather_client: AsyncMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -101,7 +101,7 @@ async def test_update_interval(
 
 
 async def test_remove_ozone_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_accuweather_client: AsyncMock,
 ) -> None:

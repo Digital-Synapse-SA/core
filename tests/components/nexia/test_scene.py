@@ -1,11 +1,11 @@
 """The scene tests for the nexia platform."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .util import async_init_integration
 
 
-async def test_automation_scenes(hass: HomeAssistant) -> None:
+async def test_automation_scenes(hass: SmartHub) -> None:
     """Test creation automation scenes."""
 
     await async_init_integration(hass)

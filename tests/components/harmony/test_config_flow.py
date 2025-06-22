@@ -4,13 +4,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
 
-from homeassistant import config_entries
-from homeassistant.components.harmony.config_flow import CannotConnect
-from homeassistant.components.harmony.const import DOMAIN, PREVIOUS_ACTIVE_ACTIVITY
-from homeassistant.const import CONF_HOST, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import SsdpServiceInfo
+from smarthub import config_entries
+from smarthub.components.harmony.config_flow import CannotConnect
+from smarthub.components.harmony.const import DOMAIN, PREVIOUS_ACTIVE_ACTIVITY
+from smarthub.const import CONF_HOST, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import SsdpServiceInfo
 
 from tests.common import MockConfigEntry
 
@@ -23,7 +23,7 @@ def _get_mock_harmonyapi(connect=None, close=None):
     return harmonyapi_mock
 
 
-async def test_user_form(hass: HomeAssistant) -> None:
+async def test_user_form(hass: SmartHub) -> None:
     """Test we get the user form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -35,11 +35,11 @@ async def test_user_form(hass: HomeAssistant) -> None:
     harmonyapi = _get_mock_harmonyapi(connect=True)
     with (
         patch(
-            "homeassistant.components.harmony.util.HarmonyAPI",
+            "smarthub.components.harmony.util.HarmonyAPI",
             return_value=harmonyapi,
         ),
         patch(
-            "homeassistant.components.harmony.async_setup_entry",
+            "smarthub.components.harmony.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -55,11 +55,11 @@ async def test_user_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_ssdp(hass: HomeAssistant) -> None:
+async def test_form_ssdp(hass: SmartHub) -> None:
     """Test we get the form with ssdp source."""
 
     with patch(
-        "homeassistant.components.harmony.config_flow.HubConnector.get_remote_id",
+        "smarthub.components.harmony.config_flow.HubConnector.get_remote_id",
         return_value=1234,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -90,11 +90,11 @@ async def test_form_ssdp(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.harmony.util.HarmonyAPI",
+            "smarthub.components.harmony.util.HarmonyAPI",
             return_value=harmonyapi,
         ),
         patch(
-            "homeassistant.components.harmony.async_setup_entry",
+            "smarthub.components.harmony.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -110,11 +110,11 @@ async def test_form_ssdp(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_ssdp_fails_to_get_remote_id(hass: HomeAssistant) -> None:
+async def test_form_ssdp_fails_to_get_remote_id(hass: SmartHub) -> None:
     """Test we abort if we cannot get the remote id."""
 
     with patch(
-        "homeassistant.components.harmony.config_flow.HubConnector.get_remote_id",
+        "smarthub.components.harmony.config_flow.HubConnector.get_remote_id",
         side_effect=aiohttp.ClientError,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -134,7 +134,7 @@ async def test_form_ssdp_fails_to_get_remote_id(hass: HomeAssistant) -> None:
 
 
 async def test_form_ssdp_aborts_before_checking_remoteid_if_host_known(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we abort without connecting if the host is already known."""
 
@@ -153,7 +153,7 @@ async def test_form_ssdp_aborts_before_checking_remoteid_if_host_known(
     harmonyapi = _get_mock_harmonyapi(connect=True)
 
     with patch(
-        "homeassistant.components.harmony.util.HarmonyAPI",
+        "smarthub.components.harmony.util.HarmonyAPI",
         return_value=harmonyapi,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -171,14 +171,14 @@ async def test_form_ssdp_aborts_before_checking_remoteid_if_host_known(
     assert result["type"] is FlowResultType.ABORT
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.harmony.util.HarmonyAPI",
+        "smarthub.components.harmony.util.HarmonyAPI",
         side_effect=CannotConnect,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -195,7 +195,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_options_flow(hass: HomeAssistant, mock_hc, mock_write_config) -> None:
+async def test_options_flow(hass: SmartHub, mock_hc, mock_write_config) -> None:
     """Test config flow options."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

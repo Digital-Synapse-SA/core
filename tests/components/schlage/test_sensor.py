@@ -1,14 +1,14 @@
 """Test schlage sensor."""
 
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import PERCENTAGE
-from homeassistant.core import HomeAssistant
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import PERCENTAGE
+from smarthub.core import SmartHub
 
 from . import MockSchlageConfigEntry
 
 
 async def test_battery_sensor(
-    hass: HomeAssistant, mock_added_config_entry: MockSchlageConfigEntry
+    hass: SmartHub, mock_added_config_entry: MockSchlageConfigEntry
 ) -> None:
     """Test the battery sensor."""
     battery_sensor = hass.states.get("sensor.vault_door_battery")

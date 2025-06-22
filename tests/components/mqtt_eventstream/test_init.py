@@ -5,12 +5,12 @@ from unittest.mock import ANY, patch
 
 import pytest
 
-from homeassistant.components import mqtt_eventstream as eventstream
-from homeassistant.const import EVENT_STATE_CHANGED, MATCH_ALL
-from homeassistant.core import HomeAssistant, State, callback
-from homeassistant.helpers.json import JSONEncoder
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components import mqtt_eventstream as eventstream
+from smarthub.const import EVENT_STATE_CHANGED, MATCH_ALL
+from smarthub.core import SmartHub, State, callback
+from smarthub.helpers.json import JSONEncoder
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import (
     async_fire_mqtt_message,
@@ -21,7 +21,7 @@ from tests.typing import MqttMockHAClient
 
 
 async def add_eventstream(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sub_topic: str | None = None,
     pub_topic: str | None = None,
     ignore_event: list[str] | None = None,
@@ -39,20 +39,20 @@ async def add_eventstream(
     )
 
 
-async def test_setup_succeeds(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_setup_succeeds(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test the success of the setup."""
     assert await add_eventstream(hass)
 
 
 async def test_setup_no_mqtt(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test the failure of the setup if mqtt is not set up."""
     assert not await add_eventstream(hass)
     assert "MQTT integration is not available" in caplog.text
 
 
-async def test_setup_with_pub(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_setup_with_pub(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test the setup with subscription."""
     # Should start off with no listeners for all events
     assert not hass.bus.async_listeners().get("*")
@@ -64,7 +64,7 @@ async def test_setup_with_pub(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) 
     assert hass.bus.async_listeners().get("*") == 1
 
 
-async def test_subscribe(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_subscribe(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test the subscription."""
     sub_topic = "foo"
     assert await add_eventstream(hass, sub_topic=sub_topic)
@@ -75,14 +75,14 @@ async def test_subscribe(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> No
 
 
 async def test_state_changed_event_sends_message(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the sending of a new message if event changed."""
     now = dt_util.as_utc(dt_util.now())
     e_id = "fake.entity"
     pub_topic = "bar"
     with patch(
-        ("homeassistant.core.dt_util.utcnow"),
+        ("smarthub.core.dt_util.utcnow"),
         return_value=now,
     ):
         # Add the eventstream component for publishing events
@@ -125,7 +125,7 @@ async def test_state_changed_event_sends_message(
 
 
 async def test_time_event_does_not_send_message(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the sending of a new message if time event."""
     assert await add_eventstream(hass, pub_topic="bar")
@@ -141,7 +141,7 @@ async def test_time_event_does_not_send_message(
 
 
 async def test_receiving_remote_event_fires_hass_event(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the receiving of the remotely fired event."""
     sub_topic = "foo"
@@ -169,7 +169,7 @@ async def test_receiving_remote_event_fires_hass_event(
 
 
 async def test_receiving_blocked_event_fires_hass_event(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the receiving of blocked event does not fire."""
     sub_topic = "foo"
@@ -196,7 +196,7 @@ async def test_receiving_blocked_event_fires_hass_event(
 
 
 async def test_ignored_event_doesnt_send_over_stream(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the ignoring of sending events if defined."""
     assert await add_eventstream(hass, pub_topic="bar", ignore_event=["state_changed"])
@@ -221,7 +221,7 @@ async def test_ignored_event_doesnt_send_over_stream(
 
 
 async def test_wrong_ignored_event_sends_over_stream(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test the ignoring of sending events if defined."""
     assert await add_eventstream(hass, pub_topic="bar", ignore_event=["statee_changed"])

@@ -5,8 +5,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, callback
+from smarthub.setup import async_setup_component
 
 from tests.typing import ClientSessionGenerator
 
@@ -17,7 +17,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 @pytest.fixture(autouse=True)
-async def setup_http(hass: HomeAssistant) -> None:
+async def setup_http(hass: SmartHub) -> None:
     """Set up http."""
     assert await async_setup_component(hass, "http", {})
     assert await async_setup_component(hass, "webhook", {})
@@ -25,7 +25,7 @@ async def setup_http(hass: HomeAssistant) -> None:
 
 
 async def test_webhook_json(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test triggering with a JSON webhook."""
     events = []
@@ -66,7 +66,7 @@ async def test_webhook_json(
 
 
 async def test_webhook_post(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test triggering with a POST webhook."""
     # Set up fake cloud
@@ -110,7 +110,7 @@ async def test_webhook_post(
 
     # Request from remote IP
     with patch(
-        "homeassistant.components.webhook.ip_address",
+        "smarthub.components.webhook.ip_address",
         return_value=ip_address("123.123.123.123"),
     ):
         await client.post("/api/webhook/post_webhook", data={"hello": "world"})
@@ -118,7 +118,7 @@ async def test_webhook_post(
     await hass.async_block_till_done()
     assert len(events) == 1
 
-    # Request from Home Assistant Cloud remote UI
+    # Request from SmartHub Cloud remote UI
     with patch(
         "hass_nabucasa.remote.is_cloud_request", Mock(get=Mock(return_value=True))
     ):
@@ -130,7 +130,7 @@ async def test_webhook_post(
 
 
 async def test_webhook_allowed_methods_internet(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test the webhook obeys allowed_methods and local_only options."""
     events = []
@@ -170,7 +170,7 @@ async def test_webhook_allowed_methods_internet(
 
     # Request from remote IP
     with patch(
-        "homeassistant.components.webhook.ip_address",
+        "smarthub.components.webhook.ip_address",
         return_value=ip_address("123.123.123.123"),
     ):
         await client.put("/api/webhook/post_webhook")
@@ -179,7 +179,7 @@ async def test_webhook_allowed_methods_internet(
 
 
 async def test_webhook_query(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test triggering with a query POST webhook."""
     events = []
@@ -216,7 +216,7 @@ async def test_webhook_query(
 
 
 async def test_webhook_multiple(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test triggering multiple triggers with a POST webhook."""
     events1 = []
@@ -273,7 +273,7 @@ async def test_webhook_multiple(
 
 
 async def test_webhook_reload(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Test reloading a webhook."""
     events = []
@@ -309,7 +309,7 @@ async def test_webhook_reload(
     assert events[0].data["hello"] == "yo world"
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={
             "automation": {

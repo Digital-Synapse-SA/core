@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock
 from cookidoo_api import CookidooAuthException, CookidooRequestException
 import pytest
 
-from homeassistant.components.cookidoo.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.cookidoo.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     CONF_COUNTRY,
     CONF_EMAIL,
     CONF_LANGUAGE,
     CONF_PASSWORD,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import setup_integration
 from .conftest import COUNTRY, EMAIL, LANGUAGE, PASSWORD, TEST_UUID
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("mock_cookidoo_client")
 async def test_load_unload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cookidoo_config_entry: MockConfigEntry,
 ) -> None:
     """Test loading and unloading of the config entry."""
@@ -48,7 +48,7 @@ async def test_load_unload(
     ],
 )
 async def test_init_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cookidoo_client: AsyncMock,
     status: ConfigEntryState,
     exception: Exception,
@@ -68,7 +68,7 @@ async def test_init_failure(
     ],
 )
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cookidoo_config_entry: MockConfigEntry,
     mock_cookidoo_client: AsyncMock,
     cookidoo_method: str,
@@ -93,7 +93,7 @@ async def test_config_entry_not_ready(
     ],
 )
 async def test_config_entry_not_ready_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cookidoo_config_entry: MockConfigEntry,
     mock_cookidoo_client: AsyncMock,
     exception: Exception | None,
@@ -139,7 +139,7 @@ OLD_ENTRY_ID = "OLD_OLD_ENTRY_ID"
     ],
 )
 async def test_migration_from(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     from_version,
@@ -252,7 +252,7 @@ async def test_migration_from(
     ],
 )
 async def test_migration_from_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     from_version,

@@ -4,9 +4,9 @@ from unittest.mock import MagicMock
 
 from eheimdigital.types import EheimDeviceType
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .conftest import init_integration
 
@@ -15,7 +15,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_remove_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,

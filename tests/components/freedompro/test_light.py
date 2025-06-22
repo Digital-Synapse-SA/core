@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_HS_COLOR,
     DOMAIN as LIGHT_DOMAIN,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -20,12 +20,12 @@ from tests.common import MockConfigEntry
 @pytest.fixture(autouse=True)
 def mock_freedompro_put_state():
     """Mock freedompro put_state."""
-    with patch("homeassistant.components.freedompro.light.put_state"):
+    with patch("smarthub.components.freedompro.light.put_state"):
         yield
 
 
 async def test_light_get_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -46,7 +46,7 @@ async def test_light_get_state(
 
 
 async def test_light_set_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -78,7 +78,7 @@ async def test_light_set_on(
 
 
 async def test_light_set_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -110,7 +110,7 @@ async def test_light_set_off(
 
 
 async def test_light_set_brightness(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:
@@ -143,7 +143,7 @@ async def test_light_set_brightness(
 
 
 async def test_light_set_hue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
 ) -> None:

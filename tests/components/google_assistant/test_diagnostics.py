@@ -6,11 +6,11 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant import setup
-from homeassistant.components import google_assistant as ga, switch
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub import setup
+from smarthub.components import google_assistant as ga, switch
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .test_http import DUMMY_CONFIG
 
@@ -22,20 +22,20 @@ from tests.typing import ClientSessionGenerator
 async def switch_only() -> None:
     """Enable only the switch platform."""
     with patch(
-        "homeassistant.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
+        "smarthub.components.demo.COMPONENTS_WITH_CONFIG_ENTRY_DEMO_PLATFORM",
         [Platform.SWITCH],
     ):
         yield
 
 
 async def test_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test diagnostics v1."""
 
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await setup.async_setup_component(
         hass, switch.DOMAIN, {"switch": [{"platform": "demo"}]}
     )

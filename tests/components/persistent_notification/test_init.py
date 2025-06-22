@@ -1,14 +1,14 @@
 """The tests for the persistent notification component."""
 
-from homeassistant.components import persistent_notification as pn
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import persistent_notification as pn
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import WebSocketGenerator
 
 
-async def test_create(hass: HomeAssistant) -> None:
+async def test_create(hass: SmartHub) -> None:
     """Test creating notification without title or notification id."""
     notifications = pn._async_get_or_create_notifications(hass)
     assert len(hass.states.async_entity_ids(pn.DOMAIN)) == 0
@@ -23,7 +23,7 @@ async def test_create(hass: HomeAssistant) -> None:
     assert notification["created_at"] is not None
 
 
-async def test_create_notification_id(hass: HomeAssistant) -> None:
+async def test_create_notification_id(hass: SmartHub) -> None:
     """Ensure overwrites existing notification with same id."""
     notifications = pn._async_get_or_create_notifications(hass)
     assert len(hass.states.async_entity_ids(pn.DOMAIN)) == 0
@@ -45,7 +45,7 @@ async def test_create_notification_id(hass: HomeAssistant) -> None:
     assert notification["message"] == "test 2"
 
 
-async def test_dismiss_notification(hass: HomeAssistant) -> None:
+async def test_dismiss_notification(hass: SmartHub) -> None:
     """Ensure removal of specific notification."""
     notifications = pn._async_get_or_create_notifications(hass)
     assert len(notifications) == 0
@@ -62,7 +62,7 @@ async def test_dismiss_notification(hass: HomeAssistant) -> None:
     assert len(notifications) == 0
 
 
-async def test_dismiss_all_notifications(hass: HomeAssistant) -> None:
+async def test_dismiss_all_notifications(hass: SmartHub) -> None:
     """Ensure removal of all notifications."""
     notifications = pn._async_get_or_create_notifications(hass)
     assert len(notifications) == 0
@@ -79,7 +79,7 @@ async def test_dismiss_all_notifications(hass: HomeAssistant) -> None:
 
 
 async def test_ws_get_notifications(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test websocket endpoint for retrieving persistent notifications."""
     await async_setup_component(hass, pn.DOMAIN, {})
@@ -118,7 +118,7 @@ async def test_ws_get_notifications(
 
 
 async def test_ws_get_subscribe(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test websocket subscribe endpoint for retrieving persistent notifications."""
     await async_setup_component(hass, pn.DOMAIN, {})
@@ -166,7 +166,7 @@ async def test_ws_get_subscribe(
     assert event["type"] == "removed"
 
 
-async def test_manual_notification_id_round_trip(hass: HomeAssistant) -> None:
+async def test_manual_notification_id_round_trip(hass: SmartHub) -> None:
     """Test that a manual notification id can be round tripped."""
     notifications = pn._async_get_or_create_notifications(hass)
     assert len(notifications) == 0
@@ -190,7 +190,7 @@ async def test_manual_notification_id_round_trip(hass: HomeAssistant) -> None:
     assert len(notifications) == 0
 
 
-async def test_manual_dismiss_all(hass: HomeAssistant) -> None:
+async def test_manual_dismiss_all(hass: SmartHub) -> None:
     """Test the dismiss all service."""
     notifications = pn._async_get_or_create_notifications(hass)
     assert len(notifications) == 0

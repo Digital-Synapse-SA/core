@@ -14,23 +14,23 @@ from aiohasupervisor.models import Discovery
 import pytest
 import voluptuous as vol
 
-from homeassistant import config_entries
-from homeassistant.components import mqtt
-from homeassistant.components.hassio import AddonError
-from homeassistant.components.mqtt.config_flow import PWD_NOT_CHANGED
-from homeassistant.components.mqtt.util import learn_more_url
-from homeassistant.config_entries import ConfigSubentry, ConfigSubentryData
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components import mqtt
+from smarthub.components.hassio import AddonError
+from smarthub.components.mqtt.config_flow import PWD_NOT_CHANGED
+from smarthub.components.mqtt.util import learn_more_url
+from smarthub.config_entries import ConfigSubentry, ConfigSubentryData
+from smarthub.const import (
     CONF_CLIENT_ID,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_PROTOCOL,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
 
 from .common import (
     MOCK_BINARY_SENSOR_SUBENTRY_DATA_SINGLE,
@@ -128,7 +128,7 @@ MOCK_ENTRY_OPTIONS = {
 def mock_finish_setup() -> Generator[MagicMock]:
     """Mock out the finish setup method."""
     with patch(
-        "homeassistant.components.mqtt.MQTT.async_connect", return_value=True
+        "smarthub.components.mqtt.MQTT.async_connect", return_value=True
     ) as mock_finish:
         yield mock_finish
 
@@ -137,7 +137,7 @@ def mock_finish_setup() -> Generator[MagicMock]:
 def mock_client_cert_check_fail() -> Generator[MagicMock]:
     """Mock the client certificate check."""
     with patch(
-        "homeassistant.components.mqtt.config_flow.load_pem_x509_certificate",
+        "smarthub.components.mqtt.config_flow.load_pem_x509_certificate",
         side_effect=ValueError,
     ) as mock_cert_check:
         yield mock_cert_check
@@ -147,7 +147,7 @@ def mock_client_cert_check_fail() -> Generator[MagicMock]:
 def mock_client_key_check_fail() -> Generator[MagicMock]:
     """Mock the client key file check."""
     with patch(
-        "homeassistant.components.mqtt.config_flow.load_pem_private_key",
+        "smarthub.components.mqtt.config_flow.load_pem_private_key",
         side_effect=ValueError,
     ) as mock_key_check:
         yield mock_key_check
@@ -163,18 +163,18 @@ def mock_context_client_key() -> bytes:
 def mock_ssl_context(mock_context_client_key: bytes) -> Generator[dict[str, MagicMock]]:
     """Mock the SSL context used to load the cert chain and to load verify locations."""
     with (
-        patch("homeassistant.components.mqtt.config_flow.SSLContext") as mock_context,
+        patch("smarthub.components.mqtt.config_flow.SSLContext") as mock_context,
         patch(
-            "homeassistant.components.mqtt.config_flow.load_pem_private_key"
+            "smarthub.components.mqtt.config_flow.load_pem_private_key"
         ) as mock_pem_key_check,
         patch(
-            "homeassistant.components.mqtt.config_flow.load_der_private_key"
+            "smarthub.components.mqtt.config_flow.load_der_private_key"
         ) as mock_der_key_check,
         patch(
-            "homeassistant.components.mqtt.config_flow.load_pem_x509_certificate"
+            "smarthub.components.mqtt.config_flow.load_pem_x509_certificate"
         ) as mock_pem_cert_check,
         patch(
-            "homeassistant.components.mqtt.config_flow.load_der_x509_certificate"
+            "smarthub.components.mqtt.config_flow.load_der_x509_certificate"
         ) as mock_der_cert_check,
     ):
         mock_pem_key_check().private_bytes.return_value = mock_context_client_key
@@ -194,7 +194,7 @@ def mock_ssl_context(mock_context_client_key: bytes) -> Generator[dict[str, Magi
 def mock_reload_after_entry_update() -> Generator[MagicMock]:
     """Mock out the reload after updating the entry."""
     with patch(
-        "homeassistant.components.mqtt._async_config_entry_updated"
+        "smarthub.components.mqtt._async_config_entry_updated"
     ) as mock_reload:
         yield mock_reload
 
@@ -202,7 +202,7 @@ def mock_reload_after_entry_update() -> Generator[MagicMock]:
 @pytest.fixture
 def mock_try_connection() -> Generator[MagicMock]:
     """Mock the try connection method."""
-    with patch("homeassistant.components.mqtt.config_flow.try_connection") as mock_try:
+    with patch("smarthub.components.mqtt.config_flow.try_connection") as mock_try:
         yield mock_try
 
 
@@ -232,7 +232,7 @@ def mock_try_connection_success() -> Generator[MqttMockPahoClient]:
         return (0, mid)
 
     with patch(
-        "homeassistant.components.mqtt.async_client.AsyncMQTTClient"
+        "smarthub.components.mqtt.async_client.AsyncMQTTClient"
     ) as mock_client:
         mock_client().loop_start = loop_start
         mock_client().subscribe = _subscribe
@@ -248,9 +248,9 @@ def mock_try_connection_time_out() -> Generator[MagicMock]:
     # Patch prevent waiting 5 sec for a timeout
     with (
         patch(
-            "homeassistant.components.mqtt.async_client.AsyncMQTTClient"
+            "smarthub.components.mqtt.async_client.AsyncMQTTClient"
         ) as mock_client,
-        patch("homeassistant.components.mqtt.config_flow.MQTT_TIMEOUT", 0),
+        patch("smarthub.components.mqtt.config_flow.MQTT_TIMEOUT", 0),
     ):
         mock_client().loop_start = lambda *args: 1
         yield mock_client()
@@ -289,7 +289,7 @@ def mock_process_uploaded_file(
 
     @contextmanager
     def _mock_process_uploaded_file(
-        hass: HomeAssistant, file_id: str
+        hass: SmartHub, file_id: str
     ) -> Iterator[Path | None]:
         if file_id == file_id_ca:
             with open(tmp_path / "ca.crt", "wb") as cafile:
@@ -307,7 +307,7 @@ def mock_process_uploaded_file(
             pytest.fail(f"Unexpected file_id: {file_id}")
 
     with patch(
-        "homeassistant.components.mqtt.config_flow.process_uploaded_file",
+        "smarthub.components.mqtt.config_flow.process_uploaded_file",
         side_effect=_mock_process_uploaded_file,
     ) as mock_upload:
         mock_upload.file_id = {
@@ -322,7 +322,7 @@ def mock_process_uploaded_file(
 def supervisor_fixture() -> Generator[MagicMock]:
     """Mock Supervisor."""
     with patch(
-        "homeassistant.components.mqtt.config_flow.is_hassio", return_value=True
+        "smarthub.components.mqtt.config_flow.is_hassio", return_value=True
     ) as is_hassio:
         yield is_hassio
 
@@ -331,7 +331,7 @@ def supervisor_fixture() -> Generator[MagicMock]:
 def addon_setup_time_fixture() -> Generator[int]:
     """Mock add-on setup sleep time."""
     with patch(
-        "homeassistant.components.mqtt.config_flow.ADDON_SETUP_TIMEOUT", new=0
+        "smarthub.components.mqtt.config_flow.ADDON_SETUP_TIMEOUT", new=0
     ) as addon_setup_time:
         yield addon_setup_time
 
@@ -343,7 +343,7 @@ def mock_get_addon_discovery_info(get_addon_discovery_info: AsyncMock) -> None:
 
 @pytest.mark.usefixtures("mqtt_client_mock")
 async def test_user_connection_works(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection: MagicMock,
     mock_finish_setup: MagicMock,
 ) -> None:
@@ -375,7 +375,7 @@ async def test_user_connection_works(
 
 @pytest.mark.usefixtures("mqtt_client_mock", "supervisor", "supervisor_client")
 async def test_user_connection_works_with_supervisor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection: MagicMock,
     mock_finish_setup: MagicMock,
 ) -> None:
@@ -415,7 +415,7 @@ async def test_user_connection_works_with_supervisor(
 
 @pytest.mark.usefixtures("mqtt_client_mock")
 async def test_user_v5_connection_works(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection: MagicMock,
     mock_finish_setup: MagicMock,
 ) -> None:
@@ -455,7 +455,7 @@ async def test_user_v5_connection_works(
 
 
 async def test_user_connection_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection_time_out: MagicMock,
     mock_finish_setup: MagicMock,
 ) -> None:
@@ -480,7 +480,7 @@ async def test_user_connection_fails(
 
 @pytest.mark.parametrize("hass_config", [{"mqtt": {"sensor": {"state_topic": "test"}}}])
 async def test_manual_config_set(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection: MqttMockPahoClient,
     mock_finish_setup: MagicMock,
 ) -> None:
@@ -517,7 +517,7 @@ async def test_manual_config_set(
     assert config_entry.title == "127.0.0.1"
 
 
-async def test_user_single_instance(hass: HomeAssistant) -> None:
+async def test_user_single_instance(hass: SmartHub) -> None:
     """Test we only allow a single config flow."""
     MockConfigEntry(
         domain="mqtt",
@@ -532,7 +532,7 @@ async def test_user_single_instance(hass: HomeAssistant) -> None:
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_hassio_already_configured(hass: HomeAssistant) -> None:
+async def test_hassio_already_configured(hass: SmartHub) -> None:
     """Test we only allow a single config flow."""
     MockConfigEntry(
         domain="mqtt",
@@ -547,7 +547,7 @@ async def test_hassio_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_hassio_ignored(hass: HomeAssistant) -> None:
+async def test_hassio_ignored(hass: SmartHub) -> None:
     """Test we supervisor discovered instance can be ignored."""
     MockConfigEntry(
         domain=mqtt.DOMAIN,
@@ -577,7 +577,7 @@ async def test_hassio_ignored(hass: HomeAssistant) -> None:
 
 
 async def test_hassio_confirm(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection_success: MqttMockPahoClient,
     mock_finish_setup: MagicMock,
 ) -> None:
@@ -616,7 +616,7 @@ async def test_hassio_confirm(
 
 
 async def test_hassio_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection_time_out: MagicMock,
     mock_finish_setup: MagicMock,
 ) -> None:
@@ -673,7 +673,7 @@ async def test_hassio_cannot_connect(
     ],
 )
 async def test_addon_flow_with_supervisor_addon_running(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection_success: MagicMock,
     mock_finish_setup: MagicMock,
 ) -> None:
@@ -727,7 +727,7 @@ async def test_addon_flow_with_supervisor_addon_running(
     ],
 )
 async def test_addon_flow_with_supervisor_addon_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection_success: MagicMock,
     mock_finish_setup: MagicMock,
 ) -> None:
@@ -794,7 +794,7 @@ async def test_addon_flow_with_supervisor_addon_installed(
     ],
 )
 async def test_addon_flow_with_supervisor_addon_running_connection_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection: MagicMock,
 ) -> None:
     """Test we perform an auto config flow with a supervised install.
@@ -826,7 +826,7 @@ async def test_addon_flow_with_supervisor_addon_running_connection_fails(
     "addon_installed",
 )
 async def test_addon_not_running_api_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     start_addon: AsyncMock,
 ) -> None:
     """Test we perform an auto config flow with a supervised install.
@@ -869,7 +869,7 @@ async def test_addon_not_running_api_error(
     "addon_installed",
 )
 async def test_addon_discovery_info_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info: AsyncMock,
     get_addon_discovery_info: AsyncMock,
 ) -> None:
@@ -913,7 +913,7 @@ async def test_addon_discovery_info_error(
     "addon_installed",
 )
 async def test_addon_info_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_info: AsyncMock,
 ) -> None:
     """Test we perform an auto config flow with a supervised install.
@@ -961,7 +961,7 @@ async def test_addon_info_error(
     ],
 )
 async def test_addon_flow_with_supervisor_addon_not_installed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection_success: MagicMock,
     mock_finish_setup: MagicMock,
 ) -> None:
@@ -1024,7 +1024,7 @@ async def test_addon_flow_with_supervisor_addon_not_installed(
     "start_addon",
 )
 async def test_addon_not_installed_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     install_addon: AsyncMock,
 ) -> None:
     """Test we perform an auto config flow with a supervised install.
@@ -1061,12 +1061,12 @@ async def test_addon_not_installed_failures(
 
 
 async def test_option_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
 ) -> None:
     """Test config flow options."""
     with patch(
-        "homeassistant.config.async_hass_config_yaml", AsyncMock(return_value={})
+        "smarthub.config.async_hass_config_yaml", AsyncMock(return_value={})
     ) as yaml_mock:
         await mqtt_mock_entry()
         config_entry = hass.config_entries.async_entries(mqtt.DOMAIN)[0]
@@ -1083,7 +1083,7 @@ async def test_option_flow(
             result["flow_id"],
             user_input={
                 mqtt.CONF_DISCOVERY: True,
-                "discovery_prefix": "homeassistant",
+                "discovery_prefix": "smarthub",
                 "birth_enable": True,
                 "birth_topic": "ha_state/online",
                 "birth_payload": "online",
@@ -1102,7 +1102,7 @@ async def test_option_flow(
         assert config_entry.data == {mqtt.CONF_BROKER: "mock-broker"}
         assert config_entry.options == {
             mqtt.CONF_DISCOVERY: True,
-            mqtt.CONF_DISCOVERY_PREFIX: "homeassistant",
+            mqtt.CONF_DISCOVERY_PREFIX: "smarthub",
             mqtt.CONF_BIRTH_MESSAGE: {
                 mqtt.ATTR_TOPIC: "ha_state/online",
                 mqtt.ATTR_PAYLOAD: "online",
@@ -1159,7 +1159,7 @@ async def test_option_flow(
     ],
 )
 async def test_bad_certificate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     mock_try_connection_success: MqttMockPahoClient,
     mock_ssl_context: dict[str, MagicMock],
@@ -1282,7 +1282,7 @@ async def test_bad_certificate(
 )
 @pytest.mark.usefixtures("mock_reload_after_entry_update")
 async def test_keepalive_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     mock_try_connection: MagicMock,
     input_value: str,
@@ -1331,7 +1331,7 @@ async def test_keepalive_validation(
 
 
 async def test_disable_birth_will(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     mock_try_connection: MagicMock,
     mock_reload_after_entry_update: MagicMock,
@@ -1359,7 +1359,7 @@ async def test_disable_birth_will(
         result["flow_id"],
         user_input={
             mqtt.CONF_DISCOVERY: True,
-            mqtt.CONF_DISCOVERY_PREFIX: "homeassistant",
+            mqtt.CONF_DISCOVERY_PREFIX: "smarthub",
             "birth_enable": False,
             "birth_topic": "ha_state/online",
             "birth_payload": "online",
@@ -1376,13 +1376,13 @@ async def test_disable_birth_will(
     assert result["data"] == {
         "birth_message": {},
         "discovery": True,
-        "discovery_prefix": "homeassistant",
+        "discovery_prefix": "smarthub",
         "will_message": {},
     }
     assert config_entry.data == {mqtt.CONF_BROKER: "test-broker", CONF_PORT: 1234}
     assert config_entry.options == {
         mqtt.CONF_DISCOVERY: True,
-        mqtt.CONF_DISCOVERY_PREFIX: "homeassistant",
+        mqtt.CONF_DISCOVERY_PREFIX: "smarthub",
         mqtt.CONF_BIRTH_MESSAGE: {},
         mqtt.CONF_WILL_MESSAGE: {},
     }
@@ -1393,7 +1393,7 @@ async def test_disable_birth_will(
 
 
 async def test_invalid_discovery_prefix(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     mock_try_connection: MagicMock,
     mock_reload_after_entry_update: MagicMock,
@@ -1410,7 +1410,7 @@ async def test_invalid_discovery_prefix(
         },
         options={
             mqtt.CONF_DISCOVERY: True,
-            mqtt.CONF_DISCOVERY_PREFIX: "homeassistant",
+            mqtt.CONF_DISCOVERY_PREFIX: "smarthub",
         },
     )
     await hass.async_block_till_done()
@@ -1428,7 +1428,7 @@ async def test_invalid_discovery_prefix(
         result["flow_id"],
         user_input={
             mqtt.CONF_DISCOVERY: True,
-            mqtt.CONF_DISCOVERY_PREFIX: "homeassistant#invalid",
+            mqtt.CONF_DISCOVERY_PREFIX: "smarthub#invalid",
         },
     )
     assert result["type"] is FlowResultType.FORM
@@ -1440,7 +1440,7 @@ async def test_invalid_discovery_prefix(
     }
     assert config_entry.options == {
         mqtt.CONF_DISCOVERY: True,
-        mqtt.CONF_DISCOVERY_PREFIX: "homeassistant",
+        mqtt.CONF_DISCOVERY_PREFIX: "smarthub",
     }
 
     await hass.async_block_till_done()
@@ -1460,7 +1460,7 @@ def get_default(schema: vol.Schema, key: str) -> Any | None:
 
 @pytest.mark.usefixtures("mock_reload_after_entry_update")
 async def test_option_flow_default_suggested_values(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     mock_try_connection_success: MqttMockPahoClient,
 ) -> None:
@@ -1575,7 +1575,7 @@ async def test_option_flow_default_suggested_values(
 )
 @pytest.mark.usefixtures("mock_reload_after_entry_update")
 async def test_skipping_advanced_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     mock_try_connection: MagicMock,
     advanced_options: bool,
@@ -1641,7 +1641,7 @@ async def test_skipping_advanced_options(
 )
 @pytest.mark.usefixtures("mock_reload_after_entry_update")
 async def test_step_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_client_mock: MqttMockPahoClient,
     mock_try_connection: MagicMock,
     test_input: dict[str, Any],
@@ -1717,7 +1717,7 @@ async def test_step_reauth(
     "mqtt_client_mock", "mock_reload_after_entry_update", "supervisor", "addon_running"
 )
 async def test_step_hassio_reauth(
-    hass: HomeAssistant, mock_try_connection: MagicMock, addon_info: AsyncMock
+    hass: SmartHub, mock_try_connection: MagicMock, addon_info: AsyncMock
 ) -> None:
     """Test that the reauth step works in case the Mosquitto broker add-on was re-installed."""
 
@@ -1796,7 +1796,7 @@ async def test_step_hassio_reauth(
     "mqtt_client_mock", "mock_reload_after_entry_update", "supervisor", "addon_running"
 )
 async def test_step_hassio_reauth_no_discovery_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection: MagicMock,
     addon_info: AsyncMock,
     broker: str,
@@ -1847,7 +1847,7 @@ async def test_step_hassio_reauth_no_discovery_info(
 
 
 async def test_reconfigure_user_connection_fails(
-    hass: HomeAssistant, mock_try_connection_time_out: MagicMock
+    hass: SmartHub, mock_try_connection_time_out: MagicMock
 ) -> None:
     """Test if connection cannot be made."""
     config_entry = MockConfigEntry(
@@ -1885,7 +1885,7 @@ async def test_reconfigure_user_connection_fails(
 
 
 async def test_options_bad_birth_message_fails(
-    hass: HomeAssistant, mock_try_connection: MqttMockPahoClient
+    hass: SmartHub, mock_try_connection: MqttMockPahoClient
 ) -> None:
     """Test bad birth message."""
     config_entry = MockConfigEntry(
@@ -1923,7 +1923,7 @@ async def test_options_bad_birth_message_fails(
 
 
 async def test_options_bad_will_message_fails(
-    hass: HomeAssistant, mock_try_connection: MagicMock
+    hass: SmartHub, mock_try_connection: MagicMock
 ) -> None:
     """Test bad will message."""
     config_entry = MockConfigEntry(
@@ -1966,7 +1966,7 @@ async def test_options_bad_will_message_fails(
 )
 @pytest.mark.usefixtures("mock_ssl_context", "mock_process_uploaded_file")
 async def test_try_connection_with_advanced_parameters(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection_success: MqttMockPahoClient,
     mock_context_client_key: bytes,
 ) -> None:
@@ -2100,7 +2100,7 @@ async def test_try_connection_with_advanced_parameters(
 
 @pytest.mark.usefixtures("mock_ssl_context")
 async def test_setup_with_advanced_settings(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection: MagicMock,
     mock_process_uploaded_file: MagicMock,
 ) -> None:
@@ -2278,7 +2278,7 @@ async def test_setup_with_advanced_settings(
     ],
 )
 async def test_setup_with_certificates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection: MagicMock,
     mock_process_uploaded_file: MagicMock,
     client_key_password: str,
@@ -2402,7 +2402,7 @@ async def test_setup_with_certificates(
 
 @pytest.mark.usefixtures("mock_ssl_context", "mock_process_uploaded_file")
 async def test_change_websockets_transport_to_tcp(
-    hass: HomeAssistant, mock_try_connection: MagicMock
+    hass: SmartHub, mock_try_connection: MagicMock
 ) -> None:
     """Test reconfiguration flow changing websockets transport settings."""
     config_entry = MockConfigEntry(
@@ -2467,7 +2467,7 @@ async def test_change_websockets_transport_to_tcp(
     ],
 )
 async def test_reconfigure_flow_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection: MagicMock,
     mqtt_mock_entry: MqttMockHAClientGenerator,
 ) -> None:
@@ -2518,7 +2518,7 @@ async def test_reconfigure_flow_form(
     ],
 )
 async def test_reconfigure_no_changed_password(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_try_connection: MagicMock,
     mqtt_mock_entry: MqttMockHAClientGenerator,
 ) -> None:
@@ -2574,7 +2574,7 @@ async def test_reconfigure_no_changed_password(
 )
 @pytest.mark.usefixtures("mock_reload_after_entry_update")
 async def test_migrate_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     version: int,
     minor_version: int,
@@ -2619,7 +2619,7 @@ async def test_migrate_config_entry(
 )
 @pytest.mark.usefixtures("mock_reload_after_entry_update")
 async def test_migrate_of_incompatible_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     version: int,
     minor_version: int,
@@ -3141,7 +3141,7 @@ async def test_migrate_of_incompatible_config_entry(
     ],
 )
 async def test_subentry_configflow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     config_subentries_data: dict[str, Any],
     mock_device_user_input: dict[str, Any],
@@ -3298,7 +3298,7 @@ async def test_subentry_configflow(
     ids=["notify"],
 )
 async def test_subentry_reconfigure_remove_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -3421,7 +3421,7 @@ async def test_subentry_reconfigure_remove_entity(
     ids=["notify"],
 )
 async def test_subentry_reconfigure_edit_entity_multi_entitites(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -3632,7 +3632,7 @@ async def test_subentry_reconfigure_edit_entity_multi_entitites(
     ids=["notify", "sensor", "light_basic"],
 )
 async def test_subentry_reconfigure_edit_entity_single_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -3781,7 +3781,7 @@ async def test_subentry_reconfigure_edit_entity_single_entity(
     ids=["sensor_last_reset_template"],
 )
 async def test_subentry_reconfigure_edit_entity_reset_fields(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -3911,7 +3911,7 @@ async def test_subentry_reconfigure_edit_entity_reset_fields(
     ids=["notify_notify"],
 )
 async def test_subentry_reconfigure_add_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -4013,7 +4013,7 @@ async def test_subentry_reconfigure_add_entity(
     ],
 )
 async def test_subentry_reconfigure_update_device_properties(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -4106,7 +4106,7 @@ async def test_subentry_reconfigure_update_device_properties(
     ],
 )
 async def test_subentry_reconfigure_availablity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock_entry: MqttMockHAClientGenerator,
 ) -> None:
     """Test the subentry ConfigFlow reconfigure and update device properties."""

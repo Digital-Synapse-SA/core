@@ -9,17 +9,17 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.ping.const import CONF_IMPORTED_BY, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.ping.const import CONF_IMPORTED_BY, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("setup_integration")
 async def test_setup_and_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
     snapshot: SnapshotAssertion,
@@ -35,7 +35,7 @@ async def test_setup_and_update(
 
     # check if the sensor turns off.
     with patch(
-        "homeassistant.components.ping.helpers.async_ping",
+        "smarthub.components.ping.helpers.async_ping",
         return_value=Host(address="10.10.10.10", packets_sent=10, rtts=[]),
     ):
         freezer.tick(timedelta(minutes=6))
@@ -46,7 +46,7 @@ async def test_setup_and_update(
 
 
 async def test_disabled_after_import(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:

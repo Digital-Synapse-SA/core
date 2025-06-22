@@ -8,17 +8,17 @@ from pysmlight.exceptions import SmlightAuthError, SmlightConnectionError, Smlig
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.smlight.const import (
+from smarthub.components.smlight.const import (
     DOMAIN,
     SCAN_FIRMWARE_INTERVAL,
     SCAN_INTERVAL,
 )
-from homeassistant.components.update import ATTR_INSTALLED_VERSION
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.issue_registry import IssueRegistry
+from smarthub.components.update import ATTR_INSTALLED_VERSION
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_ON, STATE_UNAVAILABLE, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.issue_registry import IssueRegistry
 
 from .conftest import setup_integration
 
@@ -32,7 +32,7 @@ pytestmark = [
 
 
 async def test_async_setup_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test async_setup_entry."""
     entry = await setup_integration(hass, mock_config_entry)
@@ -46,7 +46,7 @@ async def test_async_setup_entry(
 
 
 async def test_async_setup_auth_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
 ) -> None:
@@ -63,7 +63,7 @@ async def test_async_setup_auth_failed(
 
 
 async def test_async_setup_missing_credentials(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_host: MockConfigEntry,
     mock_smlight_client: MagicMock,
 ) -> None:
@@ -79,7 +79,7 @@ async def test_async_setup_missing_credentials(
 
 
 async def test_async_setup_no_internet(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry_host: MockConfigEntry,
     mock_smlight_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -116,7 +116,7 @@ async def test_async_setup_no_internet(
 
 @pytest.mark.parametrize("error", [SmlightConnectionError, SmlightAuthError])
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -140,7 +140,7 @@ async def test_update_failed(
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,
@@ -156,7 +156,7 @@ async def test_device_info(
 
 
 async def test_device_legacy_firmware(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
     device_registry: dr.DeviceRegistry,

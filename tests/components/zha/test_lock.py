@@ -8,15 +8,15 @@ from zigpy.zcl import Cluster
 from zigpy.zcl.clusters import closures, general
 import zigpy.zcl.foundation as zcl_f
 
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN, LockState
-from homeassistant.components.zha.helpers import (
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN, LockState
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from .common import find_entity_id, send_attributes_report
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
@@ -26,7 +26,7 @@ from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
 def lock_platform_only():
     """Only set up the lock and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.DEVICE_TRACKER,
             Platform.LOCK,
@@ -36,7 +36,7 @@ def lock_platform_only():
         yield
 
 
-async def test_lock(hass: HomeAssistant, setup_zha, zigpy_device_mock) -> None:
+async def test_lock(hass: SmartHub, setup_zha, zigpy_device_mock) -> None:
     """Test ZHA lock platform."""
 
     await setup_zha()
@@ -102,7 +102,7 @@ async def test_lock(hass: HomeAssistant, setup_zha, zigpy_device_mock) -> None:
     await async_disable_user_code(hass, cluster, entity_id)
 
 
-async def async_lock(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def async_lock(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Test lock functionality from hass."""
     with patch("zigpy.zcl.Cluster.request", return_value=[zcl_f.Status.SUCCESS]):
         # lock via UI
@@ -117,7 +117,7 @@ async def async_lock(hass: HomeAssistant, cluster: Cluster, entity_id: str):
         )
 
 
-async def async_unlock(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def async_unlock(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Test lock functionality from hass."""
     with patch("zigpy.zcl.Cluster.request", return_value=[zcl_f.Status.SUCCESS]):
         # lock via UI
@@ -132,7 +132,7 @@ async def async_unlock(hass: HomeAssistant, cluster: Cluster, entity_id: str):
         )
 
 
-async def async_set_user_code(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def async_set_user_code(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Test set lock code functionality from hass."""
     with patch("zigpy.zcl.Cluster.request", return_value=[zcl_f.Status.SUCCESS]):
         # set lock code via service call
@@ -156,7 +156,7 @@ async def async_set_user_code(hass: HomeAssistant, cluster: Cluster, entity_id: 
         assert cluster.request.call_args[0][6] == "13246579"
 
 
-async def async_clear_user_code(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def async_clear_user_code(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Test clear lock code functionality from hass."""
     with patch("zigpy.zcl.Cluster.request", return_value=[zcl_f.Status.SUCCESS]):
         # set lock code via service call
@@ -178,7 +178,7 @@ async def async_clear_user_code(hass: HomeAssistant, cluster: Cluster, entity_id
         assert cluster.request.call_args[0][3] == 2  # user slot 3 => internal slot 2
 
 
-async def async_enable_user_code(hass: HomeAssistant, cluster: Cluster, entity_id: str):
+async def async_enable_user_code(hass: SmartHub, cluster: Cluster, entity_id: str):
     """Test enable lock code functionality from hass."""
     with patch("zigpy.zcl.Cluster.request", return_value=[zcl_f.Status.SUCCESS]):
         # set lock code via service call
@@ -202,7 +202,7 @@ async def async_enable_user_code(hass: HomeAssistant, cluster: Cluster, entity_i
 
 
 async def async_disable_user_code(
-    hass: HomeAssistant, cluster: Cluster, entity_id: str
+    hass: SmartHub, cluster: Cluster, entity_id: str
 ):
     """Test disable lock code functionality from hass."""
     with patch("zigpy.zcl.Cluster.request", return_value=[zcl_f.Status.SUCCESS]):

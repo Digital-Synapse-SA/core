@@ -7,13 +7,13 @@ import urllib.parse
 
 import steam
 
-from homeassistant.components.steam_online.const import (
+from smarthub.components.steam_online.const import (
     CONF_ACCOUNT,
     CONF_ACCOUNTS,
     DOMAIN,
 )
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -40,8 +40,8 @@ CONF_OPTIONS_2 = {
 MAX_LENGTH_STEAM_IDS = 30
 
 
-def create_entry(hass: HomeAssistant) -> MockConfigEntry:
-    """Add config entry in Home Assistant."""
+def create_entry(hass: SmartHub) -> MockConfigEntry:
+    """Add config entry in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         data=CONF_DATA,

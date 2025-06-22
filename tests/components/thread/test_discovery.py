@@ -5,10 +5,10 @@ from unittest.mock import ANY, AsyncMock, MagicMock, Mock
 import pytest
 from zeroconf.asyncio import AsyncServiceInfo
 
-from homeassistant.components.thread import discovery
-from homeassistant.components.thread.const import DOMAIN
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.setup import async_setup_component
+from smarthub.components.thread import discovery
+from smarthub.components.thread.const import DOMAIN
+from smarthub.core import SmartHub, callback
+from smarthub.setup import async_setup_component
 
 from . import (
     ROUTER_DISCOVERY_GOOGLE_1,
@@ -25,7 +25,7 @@ from . import (
 
 
 async def test_discover_routers(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test discovering thread routers."""
     mock_async_zeroconf.async_add_service_listener = AsyncMock()
@@ -74,10 +74,10 @@ async def test_discover_routers(
     assert discovered[-1] == (
         "aeeb2f594b570bbf",
         discovery.ThreadRouterDiscoveryData(
-            instance_name="HomeAssistant OpenThreadBorderRouter #0BBF",
+            instance_name="SmartHub OpenThreadBorderRouter #0BBF",
             addresses=["192.168.0.115"],
             border_agent_id="230c6a1ac57f6f4be262acf32e5ef52c",
-            brand="homeassistant",
+            brand="smarthub",
             extended_address="aeeb2f594b570bbf",
             extended_pan_id="e60fc7c186212ce5",
             model_name="OpenThreadBorderRouter",
@@ -85,7 +85,7 @@ async def test_discover_routers(
             server="core-silabs-multiprotocol.local.",
             thread_version="1.3.0",
             unconfigured=None,
-            vendor_name="HomeAssistant",
+            vendor_name="SmartHub",
         ),
     )
 
@@ -155,7 +155,7 @@ async def test_discover_routers(
     ],
 )
 async def test_discover_routers_unconfigured(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock, data, unconfigured
+    hass: SmartHub, mock_async_zeroconf: MagicMock, data, unconfigured
 ) -> None:
     """Test discovering thread routers and setting the unconfigured flag."""
     mock_async_zeroconf.async_add_service_listener = AsyncMock()
@@ -182,10 +182,10 @@ async def test_discover_routers_unconfigured(
     router_discovered_removed.assert_called_once_with(
         "aeeb2f594b570bbf",
         discovery.ThreadRouterDiscoveryData(
-            instance_name="HomeAssistant OpenThreadBorderRouter #0BBF",
+            instance_name="SmartHub OpenThreadBorderRouter #0BBF",
             addresses=["192.168.0.115"],
             border_agent_id="230c6a1ac57f6f4be262acf32e5ef52c",
-            brand="homeassistant",
+            brand="smarthub",
             extended_address="aeeb2f594b570bbf",
             extended_pan_id="e60fc7c186212ce5",
             model_name="OpenThreadBorderRouter",
@@ -193,7 +193,7 @@ async def test_discover_routers_unconfigured(
             server="core-silabs-multiprotocol.local.",
             thread_version="1.3.0",
             unconfigured=unconfigured,
-            vendor_name="HomeAssistant",
+            vendor_name="SmartHub",
         ),
     )
 
@@ -202,7 +202,7 @@ async def test_discover_routers_unconfigured(
     "data", [ROUTER_DISCOVERY_HASS_BAD_DATA, ROUTER_DISCOVERY_HASS_MISSING_DATA]
 )
 async def test_discover_routers_bad_or_missing_optional_data(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock, data
+    hass: SmartHub, mock_async_zeroconf: MagicMock, data
 ) -> None:
     """Test discovering thread routers with bad or missing vendor mDNS data."""
     mock_async_zeroconf.async_add_service_listener = AsyncMock()
@@ -229,7 +229,7 @@ async def test_discover_routers_bad_or_missing_optional_data(
     router_discovered_removed.assert_called_once_with(
         "aeeb2f594b570bbf",
         discovery.ThreadRouterDiscoveryData(
-            instance_name="HomeAssistant OpenThreadBorderRouter #0BBF",
+            instance_name="SmartHub OpenThreadBorderRouter #0BBF",
             addresses=["192.168.0.115"],
             border_agent_id="230c6a1ac57f6f4be262acf32e5ef52c",
             brand=None,
@@ -253,7 +253,7 @@ async def test_discover_routers_bad_or_missing_optional_data(
     ],
 )
 async def test_discover_routers_bad_or_missing_mandatory_data(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock, service
+    hass: SmartHub, mock_async_zeroconf: MagicMock, service
 ) -> None:
     """Test discovering thread routers with missing mandatory mDNS data."""
     mock_async_zeroconf.async_add_service_listener = AsyncMock()
@@ -287,7 +287,7 @@ async def test_discover_routers_bad_or_missing_mandatory_data(
 
 
 async def test_discover_routers_get_service_info_fails(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test discovering thread routers with invalid mDNS data."""
     mock_async_zeroconf.async_add_service_listener = AsyncMock()
@@ -317,7 +317,7 @@ async def test_discover_routers_get_service_info_fails(
 
 
 async def test_discover_routers_update_unchanged(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test discovering thread routers with identical mDNS data in update."""
     mock_async_zeroconf.async_add_service_listener = AsyncMock()
@@ -359,7 +359,7 @@ async def test_discover_routers_update_unchanged(
 
 
 async def test_discover_routers_stop_twice(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test discovering thread routers stopping discovery twice."""
     mock_async_zeroconf.async_add_service_listener = AsyncMock()

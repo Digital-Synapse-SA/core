@@ -11,22 +11,22 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 import yaml
 
-from homeassistant.components import conversation, cover, media_player, weather
-from homeassistant.components.conversation import default_agent
-from homeassistant.components.conversation.const import DATA_DEFAULT_ENTITY
-from homeassistant.components.conversation.default_agent import METADATA_CUSTOM_SENTENCE
-from homeassistant.components.conversation.models import ConversationInput
-from homeassistant.components.cover import SERVICE_OPEN_COVER
-from homeassistant.components.homeassistant.exposed_entities import (
+from smarthub.components import conversation, cover, media_player, weather
+from smarthub.components.conversation import default_agent
+from smarthub.components.conversation.const import DATA_DEFAULT_ENTITY
+from smarthub.components.conversation.default_agent import METADATA_CUSTOM_SENTENCE
+from smarthub.components.conversation.models import ConversationInput
+from smarthub.components.cover import SERVICE_OPEN_COVER
+from smarthub.components.smarthub.exposed_entities import (
     async_get_assistant_settings,
 )
-from homeassistant.components.intent import (
+from smarthub.components.intent import (
     TimerEventType,
     TimerInfo,
     async_register_timer_handler,
 )
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import (
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     STATE_CLOSED,
@@ -35,20 +35,20 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     EntityCategory,
 )
-from homeassistant.core import (
+from smarthub.core import (
     DOMAIN as HOMEASSISTANT_DOMAIN,
     Context,
-    HomeAssistant,
+    SmartHub,
     callback,
 )
-from homeassistant.helpers import (
+from smarthub.helpers import (
     area_registry as ar,
     device_registry as dr,
     entity_registry as er,
     floor_registry as fr,
     intent,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from . import expose_entity, expose_new
 
@@ -75,9 +75,9 @@ class OrderBeerIntentHandler(intent.IntentHandler):
 
 
 @pytest.fixture
-async def init_components(hass: HomeAssistant) -> None:
+async def init_components(hass: SmartHub) -> None:
     """Initialize relevant components with empty configs."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})
     assert await async_setup_component(hass, "intent", {})
 
@@ -93,7 +93,7 @@ async def init_components(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("init_components")
 async def test_hidden_entities_skipped(
-    hass: HomeAssistant, er_kwargs: dict[str, Any], entity_registry: er.EntityRegistry
+    hass: SmartHub, er_kwargs: dict[str, Any], entity_registry: er.EntityRegistry
 ) -> None:
     """Test we skip hidden entities."""
 
@@ -112,7 +112,7 @@ async def test_hidden_entities_skipped(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_exposed_domains(hass: HomeAssistant) -> None:
+async def test_exposed_domains(hass: SmartHub) -> None:
     """Test that we can't interact with entities that aren't exposed."""
     hass.states.async_set(
         "lock.front_door", "off", attributes={ATTR_FRIENDLY_NAME: "Front Door"}
@@ -138,7 +138,7 @@ async def test_exposed_domains(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("init_components")
 async def test_exposed_areas(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -204,11 +204,11 @@ async def test_exposed_areas(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_conversation_agent(hass: HomeAssistant) -> None:
+async def test_conversation_agent(hass: SmartHub) -> None:
     """Test DefaultAgent."""
     agent = hass.data[DATA_DEFAULT_ENTITY]
     with patch(
-        "homeassistant.components.conversation.default_agent.get_languages",
+        "smarthub.components.conversation.default_agent.get_languages",
         return_value=["dwarvish", "elvish", "entish"],
     ):
         assert agent.supported_languages == ["dwarvish", "elvish", "entish"]
@@ -223,11 +223,11 @@ async def test_conversation_agent(hass: HomeAssistant) -> None:
 
 
 async def test_expose_flag_automatically_set(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test DefaultAgent sets the expose flag on all entities automatically."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
 
     light = entity_registry.async_get_or_create("light", "demo", "1234")
     test = entity_registry.async_get_or_create("test", "demo", "1234")
@@ -236,7 +236,7 @@ async def test_expose_flag_automatically_set(
 
     assert await async_setup_component(hass, "conversation", {})
     await hass.async_block_till_done()
-    with patch("homeassistant.components.http.start_http_server_and_save_config"):
+    with patch("smarthub.components.http.start_http_server_and_save_config"):
         await hass.async_start()
 
     # After setting up conversation, the expose flag should now be set on all entities
@@ -260,7 +260,7 @@ async def test_expose_flag_automatically_set(
 
 @pytest.mark.usefixtures("init_components")
 async def test_unexposed_entities_skipped(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -313,7 +313,7 @@ async def test_unexposed_entities_skipped(
 
 @pytest.mark.usefixtures("init_components")
 async def test_duplicated_names_resolved_with_device_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -378,7 +378,7 @@ async def test_duplicated_names_resolved_with_device_area(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_trigger_sentences(hass: HomeAssistant) -> None:
+async def test_trigger_sentences(hass: SmartHub) -> None:
     """Test registering/unregistering/matching a few trigger sentences."""
     trigger_sentences = ["It's party time", "It is time to party"]
     trigger_response = "Cowabunga!"
@@ -425,7 +425,7 @@ async def test_trigger_sentences(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("init_components")
 async def test_trigger_sentence_response_translation(
-    hass: HomeAssistant, language: str, expected: str
+    hass: SmartHub, language: str, expected: str
 ) -> None:
     """Test translation of default response 'done'."""
     hass.config.language = language
@@ -440,7 +440,7 @@ async def test_trigger_sentence_response_translation(
     }
 
     with patch(
-        "homeassistant.components.conversation.default_agent.translation.async_get_translations",
+        "smarthub.components.conversation.default_agent.translation.async_get_translations",
         return_value=translations.get(language),
     ):
         unregister = agent.register_trigger(
@@ -458,7 +458,7 @@ async def test_trigger_sentence_response_translation(
 
 
 @pytest.mark.usefixtures("init_components", "sl_setup")
-async def test_shopping_list_add_item(hass: HomeAssistant) -> None:
+async def test_shopping_list_add_item(hass: SmartHub) -> None:
     """Test adding an item to the shopping list through the default agent."""
     result = await conversation.async_converse(
         hass, "add apples to my shopping list", None, Context()
@@ -470,7 +470,7 @@ async def test_shopping_list_add_item(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_nevermind_intent(hass: HomeAssistant) -> None:
+async def test_nevermind_intent(hass: SmartHub) -> None:
     """Test HassNevermind intent through the default agent."""
     result = await conversation.async_converse(hass, "nevermind", None, Context())
     assert result.response.intent is not None
@@ -481,19 +481,19 @@ async def test_nevermind_intent(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_respond_intent(hass: HomeAssistant) -> None:
+async def test_respond_intent(hass: SmartHub) -> None:
     """Test HassRespond intent through the default agent."""
     result = await conversation.async_converse(hass, "hello", None, Context())
     assert result.response.intent is not None
     assert result.response.intent.intent_type == intent.INTENT_RESPOND
 
     assert result.response.response_type == intent.IntentResponseType.ACTION_DONE
-    assert result.response.speech["plain"]["speech"] == "Hello from Home Assistant."
+    assert result.response.speech["plain"]["speech"] == "Hello from SmartHub."
 
 
 @pytest.mark.usefixtures("init_components")
 async def test_device_area_context(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -631,7 +631,7 @@ async def test_device_area_context(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_no_device(hass: HomeAssistant) -> None:
+async def test_error_no_device(hass: SmartHub) -> None:
     """Test error message when device/entity doesn't exist."""
     result = await conversation.async_converse(
         hass, "turn on missing entity", None, Context(), None
@@ -646,7 +646,7 @@ async def test_error_no_device(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_no_device_exposed(hass: HomeAssistant) -> None:
+async def test_error_no_device_exposed(hass: SmartHub) -> None:
     """Test error message when device/entity exists but is not exposed."""
     hass.states.async_set("light.kitchen_light", "off")
     expose_entity(hass, "light.kitchen_light", False)
@@ -664,7 +664,7 @@ async def test_error_no_device_exposed(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_no_area(hass: HomeAssistant) -> None:
+async def test_error_no_area(hass: SmartHub) -> None:
     """Test error message when area doesn't exist."""
     result = await conversation.async_converse(
         hass, "turn on the lights in missing area", None, Context(), None
@@ -679,7 +679,7 @@ async def test_error_no_area(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_no_floor(hass: HomeAssistant) -> None:
+async def test_error_no_floor(hass: SmartHub) -> None:
     """Test error message when floor doesn't exist."""
     result = await conversation.async_converse(
         hass, "turn on all the lights on missing floor", None, Context(), None
@@ -695,7 +695,7 @@ async def test_error_no_floor(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_device_in_area(
-    hass: HomeAssistant, area_registry: ar.AreaRegistry
+    hass: SmartHub, area_registry: ar.AreaRegistry
 ) -> None:
     """Test error message when area exists but is does not contain a device/entity."""
     area_kitchen = area_registry.async_get_or_create("kitchen_id")
@@ -714,7 +714,7 @@ async def test_error_no_device_in_area(
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_device_on_floor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     floor_registry: fr.FloorRegistry,
 ) -> None:
     """Test error message when floor exists but is does not contain a device/entity."""
@@ -733,7 +733,7 @@ async def test_error_no_device_on_floor(
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_device_on_floor_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     area_registry: ar.AreaRegistry,
     floor_registry: fr.FloorRegistry,
@@ -771,7 +771,7 @@ async def test_error_no_device_on_floor_exposed(
     )
 
     with patch(
-        "homeassistant.components.conversation.default_agent.recognize_best",
+        "smarthub.components.conversation.default_agent.recognize_best",
         return_value=recognize_result,
     ):
         result = await conversation.async_converse(
@@ -791,7 +791,7 @@ async def test_error_no_device_on_floor_exposed(
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_device_in_area_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     area_registry: ar.AreaRegistry,
 ) -> None:
@@ -826,7 +826,7 @@ async def test_error_no_device_in_area_exposed(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_no_domain(hass: HomeAssistant) -> None:
+async def test_error_no_domain(hass: SmartHub) -> None:
     """Test error message when no devices/entities exist for a domain."""
 
     # We don't have a sentence for turning on all fans
@@ -839,7 +839,7 @@ async def test_error_no_domain(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.conversation.default_agent.recognize_best",
+        "smarthub.components.conversation.default_agent.recognize_best",
         return_value=recognize_result,
     ):
         result = await conversation.async_converse(
@@ -858,7 +858,7 @@ async def test_error_no_domain(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_no_domain_exposed(hass: HomeAssistant) -> None:
+async def test_error_no_domain_exposed(hass: SmartHub) -> None:
     """Test error message when devices/entities exist for a domain but are not exposed."""
     hass.states.async_set("fan.test_fan", "off")
     expose_entity(hass, "fan.test_fan", False)
@@ -874,7 +874,7 @@ async def test_error_no_domain_exposed(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.conversation.default_agent.recognize_best",
+        "smarthub.components.conversation.default_agent.recognize_best",
         return_value=recognize_result,
     ):
         result = await conversation.async_converse(
@@ -891,7 +891,7 @@ async def test_error_no_domain_exposed(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_domain_in_area(
-    hass: HomeAssistant, area_registry: ar.AreaRegistry
+    hass: SmartHub, area_registry: ar.AreaRegistry
 ) -> None:
     """Test error message when no devices/entities for a domain exist in an area."""
     area_kitchen = area_registry.async_get_or_create("kitchen_id")
@@ -910,7 +910,7 @@ async def test_error_no_domain_in_area(
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_domain_in_area_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     area_registry: ar.AreaRegistry,
 ) -> None:
@@ -946,7 +946,7 @@ async def test_error_no_domain_in_area_exposed(
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_domain_on_floor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     floor_registry: fr.FloorRegistry,
 ) -> None:
@@ -988,7 +988,7 @@ async def test_error_no_domain_on_floor(
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_domain_on_floor_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     area_registry: ar.AreaRegistry,
     floor_registry: fr.FloorRegistry,
@@ -1026,7 +1026,7 @@ async def test_error_no_domain_on_floor_exposed(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_no_device_class(hass: HomeAssistant) -> None:
+async def test_error_no_device_class(hass: SmartHub) -> None:
     """Test error message when no entities of a device class exist."""
     # Create a cover entity that is not a window.
     # This ensures that the filtering below won't exit early because there are
@@ -1048,7 +1048,7 @@ async def test_error_no_device_class(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.conversation.default_agent.recognize_best",
+        "smarthub.components.conversation.default_agent.recognize_best",
         return_value=recognize_result,
     ):
         result = await conversation.async_converse(
@@ -1067,7 +1067,7 @@ async def test_error_no_device_class(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_no_device_class_exposed(hass: HomeAssistant) -> None:
+async def test_error_no_device_class_exposed(hass: SmartHub) -> None:
     """Test error message when entities of a device class exist but aren't exposed."""
     # Create a cover entity that is not a window.
     # This ensures that the filtering below won't exit early because there are
@@ -1097,7 +1097,7 @@ async def test_error_no_device_class_exposed(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.conversation.default_agent.recognize_best",
+        "smarthub.components.conversation.default_agent.recognize_best",
         return_value=recognize_result,
     ):
         result = await conversation.async_converse(
@@ -1116,7 +1116,7 @@ async def test_error_no_device_class_exposed(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_device_class_in_area(
-    hass: HomeAssistant, area_registry: ar.AreaRegistry
+    hass: SmartHub, area_registry: ar.AreaRegistry
 ) -> None:
     """Test error message when no entities of a device class exist in an area."""
     area_bedroom = area_registry.async_get_or_create("bedroom_id")
@@ -1135,7 +1135,7 @@ async def test_error_no_device_class_in_area(
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_device_class_in_area_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     area_registry: ar.AreaRegistry,
 ) -> None:
@@ -1170,7 +1170,7 @@ async def test_error_no_device_class_in_area_exposed(
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_device_class_on_floor_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     area_registry: ar.AreaRegistry,
     floor_registry: fr.FloorRegistry,
@@ -1208,7 +1208,7 @@ async def test_error_no_device_class_on_floor_exposed(
     )
 
     with patch(
-        "homeassistant.components.conversation.default_agent.recognize_best",
+        "smarthub.components.conversation.default_agent.recognize_best",
         return_value=recognize_result,
     ):
         result = await conversation.async_converse(
@@ -1227,10 +1227,10 @@ async def test_error_no_device_class_on_floor_exposed(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_no_intent(hass: HomeAssistant) -> None:
+async def test_error_no_intent(hass: SmartHub) -> None:
     """Test response with an intent match failure."""
     with patch(
-        "homeassistant.components.conversation.default_agent.recognize_best",
+        "smarthub.components.conversation.default_agent.recognize_best",
         return_value=None,
     ):
         result = await conversation.async_converse(
@@ -1249,7 +1249,7 @@ async def test_error_no_intent(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_duplicate_names(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test error message when multiple devices have the same name (or alias)."""
     kitchen_light_1 = entity_registry.async_get_or_create("light", "demo", "1234")
@@ -1301,7 +1301,7 @@ async def test_error_duplicate_names(
 
 @pytest.mark.usefixtures("init_components")
 async def test_duplicate_names_but_one_is_exposed(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test when multiple devices have the same name (or alias), but only one of them is exposed."""
     kitchen_light_1 = entity_registry.async_get_or_create("light", "demo", "1234")
@@ -1337,7 +1337,7 @@ async def test_duplicate_names_but_one_is_exposed(
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_duplicate_names_same_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1395,7 +1395,7 @@ async def test_error_duplicate_names_same_area(
 
 @pytest.mark.usefixtures("init_components")
 async def test_duplicate_names_same_area_but_one_is_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1437,7 +1437,7 @@ async def test_duplicate_names_same_area_but_one_is_exposed(
 
 @pytest.mark.usefixtures("init_components")
 async def test_duplicate_names_different_areas(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
@@ -1515,7 +1515,7 @@ async def test_duplicate_names_different_areas(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_wrong_state(hass: HomeAssistant) -> None:
+async def test_error_wrong_state(hass: SmartHub) -> None:
     """Test error message when no entities are in the correct state."""
     assert await async_setup_component(hass, media_player.DOMAIN, {})
 
@@ -1535,7 +1535,7 @@ async def test_error_wrong_state(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_feature_not_supported(hass: HomeAssistant) -> None:
+async def test_error_feature_not_supported(hass: SmartHub) -> None:
     """Test error message when no devices support a required feature."""
     assert await async_setup_component(hass, media_player.DOMAIN, {})
 
@@ -1560,7 +1560,7 @@ async def test_error_feature_not_supported(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_no_timer_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -1591,7 +1591,7 @@ async def test_error_no_timer_support(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_error_timer_not_found(hass: HomeAssistant) -> None:
+async def test_error_timer_not_found(hass: SmartHub) -> None:
     """Test error message when a timer cannot be matched."""
     device_id = "test_device"
 
@@ -1615,7 +1615,7 @@ async def test_error_timer_not_found(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("init_components")
 async def test_error_multiple_timers_matched(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:
@@ -1665,14 +1665,14 @@ async def test_error_multiple_timers_matched(
 
 @pytest.mark.usefixtures("init_components")
 async def test_no_states_matched_default_error(
-    hass: HomeAssistant, area_registry: ar.AreaRegistry
+    hass: SmartHub, area_registry: ar.AreaRegistry
 ) -> None:
     """Test default response when no states match and slots are missing."""
     area_kitchen = area_registry.async_get_or_create("kitchen_id")
     area_kitchen = area_registry.async_update(area_kitchen.id, name="kitchen")
 
     with patch(
-        "homeassistant.components.conversation.default_agent.intent.async_handle",
+        "smarthub.components.conversation.default_agent.intent.async_handle",
         side_effect=intent.MatchFailedError(
             intent.MatchTargetsResult(False), intent.MatchTargetsConstraints()
         ),
@@ -1694,7 +1694,7 @@ async def test_no_states_matched_default_error(
 
 @pytest.mark.usefixtures("init_components")
 async def test_empty_aliases(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1732,7 +1732,7 @@ async def test_empty_aliases(
     )
 
     with patch(
-        "homeassistant.components.conversation.default_agent.DefaultAgent._recognize",
+        "smarthub.components.conversation.default_agent.DefaultAgent._recognize",
         return_value=None,
     ) as mock_recognize_all:
         await conversation.async_converse(
@@ -1758,7 +1758,7 @@ async def test_empty_aliases(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_all_domains_loaded(hass: HomeAssistant) -> None:
+async def test_all_domains_loaded(hass: SmartHub) -> None:
     """Test that sentences for all domains are always loaded."""
 
     # light domain is not loaded
@@ -1779,7 +1779,7 @@ async def test_all_domains_loaded(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("init_components")
 async def test_same_named_entities_in_different_areas(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1876,7 +1876,7 @@ async def test_same_named_entities_in_different_areas(
 
 @pytest.mark.usefixtures("init_components")
 async def test_same_aliased_entities_in_different_areas(
-    hass: HomeAssistant,
+    hass: SmartHub,
     area_registry: ar.AreaRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -1966,7 +1966,7 @@ async def test_same_aliased_entities_in_different_areas(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_device_id_in_handler(hass: HomeAssistant) -> None:
+async def test_device_id_in_handler(hass: SmartHub) -> None:
     """Test that the default agent passes device_id to intent handler."""
     device_id = "test_device"
 
@@ -1999,7 +1999,7 @@ async def test_device_id_in_handler(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_name_wildcard_lower_priority(hass: HomeAssistant) -> None:
+async def test_name_wildcard_lower_priority(hass: SmartHub) -> None:
     """Test that the default agent does not prioritize a {name} slot when it's a wildcard."""
 
     class OrderBeerIntentHandler(intent.IntentHandler):
@@ -2052,7 +2052,7 @@ async def test_name_wildcard_lower_priority(hass: HomeAssistant) -> None:
 
 
 async def test_intent_entity_added_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -2119,7 +2119,7 @@ async def test_intent_entity_added_removed(
 
 
 async def test_intent_alias_added_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -2170,7 +2170,7 @@ async def test_intent_alias_added_removed(
 
 
 async def test_intent_entity_renamed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -2219,7 +2219,7 @@ async def test_intent_entity_renamed(
 
 
 async def test_intent_entity_remove_custom_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -2274,7 +2274,7 @@ async def test_intent_entity_remove_custom_name(
 
 
 async def test_intent_entity_fail_if_unexposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -2310,7 +2310,7 @@ async def test_intent_entity_fail_if_unexposed(
 
 
 async def test_intent_entity_exposed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -2352,7 +2352,7 @@ async def test_intent_entity_exposed(
 
 
 async def test_intent_conversion_not_expose_new(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     hass_admin_user: MockUser,
     entity_registry: er.EntityRegistry,
@@ -2401,7 +2401,7 @@ async def test_intent_conversion_not_expose_new(
 
 
 async def test_custom_sentences(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -2432,11 +2432,11 @@ async def test_custom_sentences(
 
 
 async def test_custom_sentences_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test custom sentences with a custom intent in config."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(
         hass,
         "conversation",
@@ -2464,7 +2464,7 @@ async def test_custom_sentences_config(
     assert data["response"]["speech"]["plain"]["speech"] == "Stealth mode engaged"
 
 
-async def test_language_region(hass: HomeAssistant, init_components) -> None:
+async def test_language_region(hass: SmartHub, init_components) -> None:
     """Test regional languages."""
     hass.states.async_set("light.kitchen", "off")
     calls = async_mock_service(hass, LIGHT_DOMAIN, "turn_on")
@@ -2488,7 +2488,7 @@ async def test_language_region(hass: HomeAssistant, init_components) -> None:
     assert call.data == {"entity_id": ["light.kitchen"]}
 
 
-async def test_non_default_response(hass: HomeAssistant, init_components) -> None:
+async def test_non_default_response(hass: SmartHub, init_components) -> None:
     """Test intent response that is not the default."""
     hass.states.async_set("cover.front_door", "closed")
     calls = async_mock_service(hass, "cover", SERVICE_OPEN_COVER)
@@ -2511,7 +2511,7 @@ async def test_non_default_response(hass: HomeAssistant, init_components) -> Non
 
 
 async def test_turn_on_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
@@ -2583,7 +2583,7 @@ async def test_turn_on_area(
 
 
 async def test_light_area_same_name(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
@@ -2648,7 +2648,7 @@ async def test_light_area_same_name(
 
 
 async def test_custom_sentences_priority(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -2673,7 +2673,7 @@ async def test_custom_sentences_priority(
         custom_sentences_file.flush()
         custom_sentences_file.seek(0)
 
-        assert await async_setup_component(hass, "homeassistant", {})
+        assert await async_setup_component(hass, "smarthub", {})
         assert await async_setup_component(hass, "conversation", {})
         assert await async_setup_component(hass, "light", {})
         assert await async_setup_component(hass, "intent", {})
@@ -2705,7 +2705,7 @@ async def test_custom_sentences_priority(
 
 
 async def test_config_sentences_priority(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_admin_user: MockUser,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -2715,7 +2715,7 @@ async def test_config_sentences_priority(
     """
     # Add a custom sentence that would match a builtin sentence.
     # Custom sentences have priority.
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "intent", {})
     assert await async_setup_component(
         hass,
@@ -2769,7 +2769,7 @@ async def test_config_sentences_priority(
 
 
 async def test_query_same_name_different_areas(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     area_registry: ar.AreaRegistry,
     device_registry: dr.DeviceRegistry,
@@ -2837,7 +2837,7 @@ async def test_query_same_name_different_areas(
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_intent_cache_exposed(hass: HomeAssistant) -> None:
+async def test_intent_cache_exposed(hass: SmartHub) -> None:
     """Test that intent recognition results are cached for exposed entities."""
     agent = hass.data[DATA_DEFAULT_ENTITY]
     assert isinstance(agent, default_agent.DefaultAgent)
@@ -2876,7 +2876,7 @@ async def test_intent_cache_exposed(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_intent_cache_all_entities(hass: HomeAssistant) -> None:
+async def test_intent_cache_all_entities(hass: SmartHub) -> None:
     """Test that intent recognition results are cached for all entities."""
     agent = hass.data[DATA_DEFAULT_ENTITY]
     assert isinstance(agent, default_agent.DefaultAgent)
@@ -2915,7 +2915,7 @@ async def test_intent_cache_all_entities(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_intent_cache_fuzzy(hass: HomeAssistant) -> None:
+async def test_intent_cache_fuzzy(hass: SmartHub) -> None:
     """Test that intent recognition results are cached for fuzzy matches."""
     agent = hass.data[DATA_DEFAULT_ENTITY]
     assert isinstance(agent, default_agent.DefaultAgent)
@@ -2944,7 +2944,7 @@ async def test_intent_cache_fuzzy(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_entities_filtered_by_input(hass: HomeAssistant) -> None:
+async def test_entities_filtered_by_input(hass: SmartHub) -> None:
     """Test that entities are filtered by the input text before intent matching."""
     agent = hass.data[DATA_DEFAULT_ENTITY]
     assert isinstance(agent, default_agent.DefaultAgent)
@@ -2973,7 +2973,7 @@ async def test_entities_filtered_by_input(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.conversation.default_agent.recognize_best",
+        "smarthub.components.conversation.default_agent.recognize_best",
         return_value=None,
     ) as recognize_best:
         await agent.async_recognize_intent(user_input)
@@ -2999,7 +2999,7 @@ async def test_entities_filtered_by_input(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.conversation.default_agent.recognize_best",
+        "smarthub.components.conversation.default_agent.recognize_best",
         return_value=None,
     ) as recognize_best:
         await agent.async_recognize_intent(user_input)
@@ -3017,7 +3017,7 @@ async def test_entities_filtered_by_input(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("init_components")
-async def test_entities_names_are_not_templates(hass: HomeAssistant) -> None:
+async def test_entities_names_are_not_templates(hass: SmartHub) -> None:
     """Test that entities names are not treated as hassil templates."""
     # Contains hassil template characters
     hass.states.async_set(
@@ -3071,7 +3071,7 @@ async def test_entities_names_are_not_templates(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("init_components")
 async def test_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     language: str,
     light_name: str,
     on_sentence: str,
@@ -3117,7 +3117,7 @@ async def test_turn_on_off(
 )
 @pytest.mark.usefixtures("init_components")
 async def test_handle_intents_with_response_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: None,
     area_registry: ar.AreaRegistry,
     error_code: intent.IntentResponseErrorCode,
@@ -3139,7 +3139,7 @@ async def test_handle_intents_with_response_errors(
     )
 
     with patch(
-        "homeassistant.components.conversation.default_agent.DefaultAgent._async_process_intent_result",
+        "smarthub.components.conversation.default_agent.DefaultAgent._async_process_intent_result",
         return_value=default_agent._make_error_result(
             user_input.language, error_code, "Mock error message"
         ),
@@ -3156,7 +3156,7 @@ async def test_handle_intents_with_response_errors(
 
 @pytest.mark.usefixtures("init_components")
 async def test_handle_intents_filters_results(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: None,
     area_registry: ar.AreaRegistry,
 ) -> None:
@@ -3190,11 +3190,11 @@ async def test_handle_intents_filters_results(
 
     with (
         patch(
-            "homeassistant.components.conversation.default_agent.DefaultAgent.async_recognize_intent",
+            "smarthub.components.conversation.default_agent.DefaultAgent.async_recognize_intent",
             return_value=mock_result,
         ) as mock_recognize,
         patch(
-            "homeassistant.components.conversation.default_agent.DefaultAgent._async_process_intent_result",
+            "smarthub.components.conversation.default_agent.DefaultAgent._async_process_intent_result",
         ) as mock_process,
     ):
         response = await agent.async_handle_intents(
@@ -3229,7 +3229,7 @@ async def test_handle_intents_filters_results(
 
 @pytest.mark.usefixtures("init_components")
 async def test_state_names_are_not_translated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components: None,
 ) -> None:
     """Test that state names are not translated in responses."""
@@ -3239,7 +3239,7 @@ async def test_state_names_are_not_translated(
     expose_entity(hass, "weather.test_weather", True)
 
     with patch(
-        "homeassistant.helpers.template.Template.async_render"
+        "smarthub.helpers.template.Template.async_render"
     ) as mock_async_render:
         result = await conversation.async_converse(
             hass, "what is the weather like?", None, Context(), None
@@ -3254,7 +3254,7 @@ async def test_state_names_are_not_translated(
 
 
 async def test_language_with_alternative_code(
-    hass: HomeAssistant, init_components
+    hass: SmartHub, init_components
 ) -> None:
     """Test different codes for the same language."""
     entity_ids: dict[str, str] = {}

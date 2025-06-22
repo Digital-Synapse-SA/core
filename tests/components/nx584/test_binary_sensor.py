@@ -7,9 +7,9 @@ from nx584 import client as nx584_client
 import pytest
 import requests
 
-from homeassistant.components.nx584 import binary_sensor as nx584
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.nx584 import binary_sensor as nx584
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 DEFAULT_CONFIG = {
     "host": nx584.DEFAULT_HOST,
@@ -58,10 +58,10 @@ def client(fake_zones):
 
 
 @pytest.mark.usefixtures("client")
-@mock.patch("homeassistant.components.nx584.binary_sensor.NX584Watcher")
-@mock.patch("homeassistant.components.nx584.binary_sensor.NX584ZoneSensor")
+@mock.patch("smarthub.components.nx584.binary_sensor.NX584Watcher")
+@mock.patch("smarthub.components.nx584.binary_sensor.NX584ZoneSensor")
 def test_nx584_sensor_setup_defaults(
-    mock_nx, mock_watcher, hass: HomeAssistant, fake_zones
+    mock_nx, mock_watcher, hass: SmartHub, fake_zones
 ) -> None:
     """Test the setup with no configuration."""
     add_entities = mock.MagicMock()
@@ -74,10 +74,10 @@ def test_nx584_sensor_setup_defaults(
 
 
 @pytest.mark.usefixtures("client")
-@mock.patch("homeassistant.components.nx584.binary_sensor.NX584Watcher")
-@mock.patch("homeassistant.components.nx584.binary_sensor.NX584ZoneSensor")
+@mock.patch("smarthub.components.nx584.binary_sensor.NX584Watcher")
+@mock.patch("smarthub.components.nx584.binary_sensor.NX584ZoneSensor")
 def test_nx584_sensor_setup_full_config(
-    mock_nx, mock_watcher, hass: HomeAssistant, fake_zones
+    mock_nx, mock_watcher, hass: SmartHub, fake_zones
 ) -> None:
     """Test the setup with full configuration."""
     config = {
@@ -101,7 +101,7 @@ def test_nx584_sensor_setup_full_config(
 
 
 async def _test_assert_graceful_fail(
-    hass: HomeAssistant, config: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any]
 ) -> None:
     """Test the failing."""
     assert not await async_setup_component(hass, "nx584", config)
@@ -118,7 +118,7 @@ async def _test_assert_graceful_fail(
     ],
 )
 async def test_nx584_sensor_setup_bad_config(
-    hass: HomeAssistant, config: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any]
 ) -> None:
     """Test the setup with bad configuration."""
     await _test_assert_graceful_fail(hass, config)
@@ -133,7 +133,7 @@ async def test_nx584_sensor_setup_bad_config(
     ],
 )
 async def test_nx584_sensor_setup_with_exceptions(
-    hass: HomeAssistant, exception_type
+    hass: SmartHub, exception_type
 ) -> None:
     """Test the setup handles exceptions."""
     nx584_client.Client.return_value.list_zones.side_effect = exception_type
@@ -141,14 +141,14 @@ async def test_nx584_sensor_setup_with_exceptions(
 
 
 @pytest.mark.usefixtures("client")
-async def test_nx584_sensor_setup_version_too_old(hass: HomeAssistant) -> None:
+async def test_nx584_sensor_setup_version_too_old(hass: SmartHub) -> None:
     """Test if version is too old."""
     nx584_client.Client.return_value.get_version.return_value = "1.0"
     await _test_assert_graceful_fail(hass, {})
 
 
 @pytest.mark.usefixtures("client")
-def test_nx584_sensor_setup_no_zones(hass: HomeAssistant) -> None:
+def test_nx584_sensor_setup_no_zones(hass: SmartHub) -> None:
     """Test the setup with no zones."""
     nx584_client.Client.return_value.list_zones.return_value = []
     add_entities = mock.MagicMock()

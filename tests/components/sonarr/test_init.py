@@ -4,9 +4,9 @@ from unittest.mock import MagicMock, patch
 
 from aiopyarr import ArrAuthenticationException, ArrException
 
-from homeassistant.components.sonarr.const import CONF_BASE_PATH, DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.sonarr.const import CONF_BASE_PATH, DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     CONF_API_KEY,
     CONF_HOST,
     CONF_PORT,
@@ -15,13 +15,13 @@ from homeassistant.const import (
     CONF_URL,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_sonarr: MagicMock,
 ) -> None:
@@ -36,7 +36,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_config_entry_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_sonarr: MagicMock,
 ) -> None:
@@ -63,7 +63,7 @@ async def test_config_entry_reauth(
 
 
 async def test_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_sonarr: MagicMock,
 ) -> None:
@@ -71,7 +71,7 @@ async def test_unload_config_entry(
     mock_config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.sonarr.sensor.async_setup_entry",
+        "smarthub.components.sonarr.sensor.async_setup_entry",
         return_value=True,
     ):
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -88,7 +88,7 @@ async def test_unload_config_entry(
     assert mock_config_entry.entry_id not in hass.data[DOMAIN]
 
 
-async def test_migrate_config_entry(hass: HomeAssistant) -> None:
+async def test_migrate_config_entry(hass: SmartHub) -> None:
     """Test successful migration of entry data."""
     legacy_config = {
         CONF_API_KEY: "MOCK_API_KEY",
@@ -105,7 +105,7 @@ async def test_migrate_config_entry(hass: HomeAssistant) -> None:
     assert entry.version == 1
     assert not entry.unique_id
 
-    with patch("homeassistant.components.sonarr.async_setup_entry", return_value=True):
+    with patch("smarthub.components.sonarr.async_setup_entry", return_value=True):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 

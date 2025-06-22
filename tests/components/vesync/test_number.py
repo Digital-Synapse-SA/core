@@ -4,14 +4,14 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from .common import ENTITY_HUMIDIFIER_MIST_LEVEL
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_set_mist_level_bad_range(
-    hass: HomeAssistant, humidifier_config_entry: MockConfigEntry
+    hass: SmartHub, humidifier_config_entry: MockConfigEntry
 ) -> None:
     """Test set_mist_level invalid value."""
     with (
@@ -40,7 +40,7 @@ async def test_set_mist_level_bad_range(
 
 
 async def test_set_mist_level(
-    hass: HomeAssistant, humidifier_config_entry: MockConfigEntry
+    hass: SmartHub, humidifier_config_entry: MockConfigEntry
 ) -> None:
     """Test set_mist_level usage."""
 
@@ -59,7 +59,7 @@ async def test_set_mist_level(
 
 
 async def test_mist_level(
-    hass: HomeAssistant, humidifier_config_entry: MockConfigEntry
+    hass: SmartHub, humidifier_config_entry: MockConfigEntry
 ) -> None:
     """Test the state of mist_level number entity."""
 

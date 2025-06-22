@@ -3,8 +3,8 @@
 import pytest
 import smarttub
 
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 
 @pytest.mark.parametrize(
@@ -19,7 +19,7 @@ from homeassistant.core import HomeAssistant
     ],
 )
 async def test_sensor(
-    spa, setup_entry, hass: HomeAssistant, entity_suffix, expected_state
+    spa, setup_entry, hass: SmartHub, entity_suffix, expected_state
 ) -> None:
     """Test simple sensors."""
 
@@ -29,12 +29,12 @@ async def test_sensor(
     assert state.state == expected_state
 
 
-# https://github.com/home-assistant/core/issues/102339
+# https://github.com/smart-hub/core/issues/102339
 async def test_null_blowoutcycle(
     spa,
     spa_state,
     config_entry,
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test blowoutCycle having null value."""
 
@@ -51,7 +51,7 @@ async def test_null_blowoutcycle(
 
 
 async def test_primary_filtration(
-    spa, spa_state, setup_entry, hass: HomeAssistant
+    spa, spa_state, setup_entry, hass: SmartHub
 ) -> None:
     """Test the primary filtration cycle sensor."""
 
@@ -74,7 +74,7 @@ async def test_primary_filtration(
 
 
 async def test_secondary_filtration(
-    spa, spa_state, setup_entry, hass: HomeAssistant
+    spa, spa_state, setup_entry, hass: SmartHub
 ) -> None:
     """Test the secondary filtration cycle sensor."""
 

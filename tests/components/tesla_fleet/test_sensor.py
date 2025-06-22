@@ -7,10 +7,10 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from tesla_fleet_api.exceptions import VehicleOffline
 
-from homeassistant.components.tesla_fleet.coordinator import VEHICLE_INTERVAL
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.tesla_fleet.coordinator import VEHICLE_INTERVAL
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import assert_entities, assert_entities_alt, setup_platform
 from .const import VEHICLE_DATA_ALT
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     normal_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -53,7 +53,7 @@ async def test_sensors(
     ],
 )
 async def test_sensors_restore(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     normal_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -73,7 +73,7 @@ async def test_sensors_restore(
 
     mock_vehicle_data.side_effect = VehicleOffline
 
-    with patch("homeassistant.components.tesla_fleet.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.tesla_fleet.PLATFORMS", [Platform.SENSOR]):
         assert await hass.config_entries.async_reload(normal_config_entry.entry_id)
 
     assert hass.states.get(entity_id).state == restored

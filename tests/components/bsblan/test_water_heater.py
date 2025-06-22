@@ -8,7 +8,7 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.water_heater import (
+from smarthub.components.water_heater import (
     ATTR_OPERATION_MODE,
     DOMAIN as WATER_HEATER_DOMAIN,
     SERVICE_SET_OPERATION_MODE,
@@ -17,10 +17,10 @@ from homeassistant.components.water_heater import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_with_selected_platforms
 
@@ -36,7 +36,7 @@ ENTITY_ID = "water_heater.bsb_lan"
     ],
 )
 async def test_water_heater_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -51,7 +51,7 @@ async def test_water_heater_states(
 
 
 async def test_water_heater_entity_properties(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -86,7 +86,7 @@ async def test_water_heater_entity_properties(
     ],
 )
 async def test_set_operation_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mode: str,
@@ -111,7 +111,7 @@ async def test_set_operation_mode(
 
 
 async def test_set_invalid_operation_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -121,7 +121,7 @@ async def test_set_invalid_operation_mode(
     )
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"Operation mode invalid_mode is not valid for water_heater\.bsb_lan\. Valid operation modes are: eco, off, on",
     ):
         await hass.services.async_call(
@@ -136,7 +136,7 @@ async def test_set_invalid_operation_mode(
 
 
 async def test_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -159,7 +159,7 @@ async def test_set_temperature(
 
 
 async def test_set_temperature_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -171,7 +171,7 @@ async def test_set_temperature_failure(
     mock_bsblan.set_hot_water.side_effect = BSBLANError("Test error")
 
     with pytest.raises(
-        HomeAssistantError, match="An error occurred while setting the temperature"
+        SmartHubError, match="An error occurred while setting the temperature"
     ):
         await hass.services.async_call(
             domain=WATER_HEATER_DOMAIN,
@@ -185,7 +185,7 @@ async def test_set_temperature_failure(
 
 
 async def test_operation_mode_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bsblan: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -197,7 +197,7 @@ async def test_operation_mode_error(
     mock_bsblan.set_hot_water.side_effect = BSBLANError("Test error")
 
     with pytest.raises(
-        HomeAssistantError, match="An error occurred while setting the operation mode"
+        SmartHubError, match="An error occurred while setting the operation mode"
     ):
         await hass.services.async_call(
             domain=WATER_HEATER_DOMAIN,

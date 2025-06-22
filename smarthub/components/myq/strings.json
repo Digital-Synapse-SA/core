@@ -1,0 +1,8 @@
+{
+  "issues": {
+    "integration_removed": {
+      "title": "The MyQ integration has been removed",
+      "description": "The MyQ integration has been removed from SmartHub.\n\nMyQ has blocked all third-party integrations. Read about it [here]({blog}).\n\nTo resolve this issue, please remove the (now defunct) integration entries from your SmartHub setup. [Click here to see your existing MyQ integration entries]({entries})."
+    }
+  }
+}

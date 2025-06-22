@@ -7,13 +7,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.application_credentials import (
+from smarthub.components.application_credentials import (
     ClientCredential,
     async_import_client_credential,
 )
-from homeassistant.components.youtube.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.youtube.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import MockYouTube
 
@@ -30,7 +30,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/youtube.readonly",
 ]
 TITLE = "Google for Developers"
-TOKEN = "homeassistant.components.youtube.api.config_entry_oauth2_flow.OAuth2Session.async_ensure_token_valid"
+TOKEN = "smarthub.components.youtube.api.config_entry_oauth2_flow.OAuth2Session.async_ensure_token_valid"
 
 
 @pytest.fixture(name="scopes")
@@ -40,7 +40,7 @@ def mock_scopes() -> list[str]:
 
 
 @pytest.fixture(autouse=True)
-async def setup_credentials(hass: HomeAssistant) -> None:
+async def setup_credentials(hass: SmartHub) -> None:
     """Fixture to setup credentials."""
     assert await async_setup_component(hass, "application_credentials", {})
     await async_import_client_credential(
@@ -59,7 +59,7 @@ def mock_expires_at() -> int:
 
 @pytest.fixture(name="config_entry")
 def mock_config_entry(expires_at: int, scopes: list[str]) -> MockConfigEntry:
-    """Create YouTube entry in Home Assistant."""
+    """Create YouTube entry in SmartHub."""
     return MockConfigEntry(
         domain=DOMAIN,
         title=TITLE,
@@ -93,7 +93,7 @@ def mock_connection(aioclient_mock: AiohttpClientMocker) -> None:
 
 @pytest.fixture(name="setup_integration")
 async def mock_setup_integration(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> Callable[[], Coroutine[Any, Any, MockYouTube]]:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
@@ -108,7 +108,7 @@ async def mock_setup_integration(
 
     async def func() -> MockYouTube:
         mock = MockYouTube(hass)
-        with patch("homeassistant.components.youtube.api.YouTube", return_value=mock):
+        with patch("smarthub.components.youtube.api.YouTube", return_value=mock):
             assert await async_setup_component(hass, DOMAIN, {})
             await hass.async_block_till_done()
         return mock

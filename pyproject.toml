@@ -3,14 +3,14 @@ requires = ["setuptools==78.1.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "homeassistant"
+name = "smarthub"
 version = "2025.7.0.dev0"
 license = "Apache-2.0"
-license-files = ["LICENSE*", "homeassistant/backports/LICENSE*"]
+license-files = ["LICENSE*", "smarthub/backports/LICENSE*"]
 description = "Open-source home automation platform running on Python 3."
 readme = "README.rst"
 authors = [
-  { name = "The Home Assistant Authors", email = "hello@home-assistant.io" },
+  { name = "The SmartHub Authors", email = "hello@smart-hub.io" },
 ]
 keywords = ["home", "automation"]
 classifiers = [
@@ -38,7 +38,7 @@ dependencies = [
   "astral==2.2",
   "async-interrupt==1.2.2",
   "attrs==25.3.0",
-  "atomicwrites-homeassistant==1.4.1",
+  "atomicwrites-smarthub==1.4.1",
   "audioop-lts==0.2.1",
   "awesomeversion==25.5.0",
   "bcrypt==4.3.0",
@@ -62,12 +62,12 @@ dependencies = [
   # When bumping httpx, please check the version pins of
   # httpcore, anyio, and h11 in gen_requirements_all
   "httpx==0.28.1",
-  "home-assistant-bluetooth==1.13.1",
+  "smart-hub-bluetooth==1.13.1",
   # home_assistant_intents is indirectly imported from onboarding via the import chain
   # onboarding->cloud->assist_pipeline->conversation->home_assistant_intents. Onboarding needs
   # to be setup in stage 0, but we don't want to also promote cloud with all its
   # dependencies to stage 0.
-  "home-assistant-intents==2025.6.10",
+  "smart-hub-intents==2025.6.10",
   "ifaddr==0.2.0",
   "Jinja2==3.1.6",
   "lru-dict==1.3.0",
@@ -89,7 +89,7 @@ dependencies = [
   "pyOpenSSL==25.1.0",
   "orjson==3.10.18",
   "packaging>=23.1",
-  "psutil-home-assistant==0.0.1",
+  "psutil-smart-hub==0.0.1",
   # pymicro_vad is indirectly imported from onboarding via the import chain
   # onboarding->cloud->assist_pipeline->pymicro_vad. Onboarding needs
   # to be setup in stage 0, but we don't want to also promote cloud with all its
@@ -125,21 +125,21 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://www.home-assistant.io/"
-"Source Code" = "https://github.com/home-assistant/core"
-"Bug Reports" = "https://github.com/home-assistant/core/issues"
-"Docs: Dev" = "https://developers.home-assistant.io/"
-"Discord" = "https://www.home-assistant.io/join-chat/"
-"Forum" = "https://community.home-assistant.io/"
+"Homepage" = "https://www.smart-hub.io/"
+"Source Code" = "https://github.com/smart-hub/core"
+"Bug Reports" = "https://github.com/smart-hub/core/issues"
+"Docs: Dev" = "https://developers.smart-hub.io/"
+"Discord" = "https://www.smart-hub.io/join-chat/"
+"Forum" = "https://community.smart-hub.io/"
 
 [project.scripts]
-hass = "homeassistant.__main__:main"
+hass = "smarthub.__main__:main"
 
 [tool.setuptools]
 include-package-data = true
 
 [tool.setuptools.packages.find]
-include = ["homeassistant*"]
+include = ["smarthub*"]
 
 [tool.pylint.MAIN]
 py-version = "3.13"
@@ -473,7 +473,7 @@ expected-line-ending-format = "LF"
 overgeneral-exceptions = [
   "builtins.BaseException",
   "builtins.Exception",
-  # "homeassistant.exceptions.HomeAssistantError",  # too many issues
+  # "smarthub.exceptions.SmartHubError",  # too many issues
 ]
 
 [tool.pylint.TYPING]
@@ -493,11 +493,11 @@ filterwarnings = [
   "error::sqlalchemy.exc.SAWarning",
   "error:usefixtures\\(\\) in .* without arguments has no effect:UserWarning",  # pytest
 
-  # -- HomeAssistant - aiohttp
+  # -- SmartHub - aiohttp
   # Overwrite web.Application to pass a custom default argument to _make_request
-  "ignore:Inheritance class HomeAssistantApplication from web.Application is discouraged:DeprecationWarning",
+  "ignore:Inheritance class SmartHubApplication from web.Application is discouraged:DeprecationWarning",
   # Hass wraps `ClientSession.close` to emit a warning if the session is closed accidentally
-  "ignore:Setting custom ClientSession.close attribute is discouraged:DeprecationWarning:homeassistant.helpers.aiohttp_client",
+  "ignore:Setting custom ClientSession.close attribute is discouraged:DeprecationWarning:smarthub.helpers.aiohttp_client",
   # Modify app state for testing
   "ignore:Changing state of started or joined application is deprecated:DeprecationWarning:tests.components.http.test_ban",
 
@@ -583,7 +583,7 @@ filterwarnings = [
   # https://github.com/briis/pyweatherflowudp/blob/v1.4.5/pyweatherflowudp/const.py#L20 - v1.4.5 - 2023-10-10
   "ignore:This function will be removed in future versions of pint:DeprecationWarning:pyweatherflowudp.const",
   # New in aiohttp - v3.9.0
-  "ignore:It is recommended to use web.AppKey instances for keys:UserWarning:(homeassistant|tests|aiohttp_cors)",
+  "ignore:It is recommended to use web.AppKey instances for keys:UserWarning:(smarthub|tests|aiohttp_cors)",
   # - SyntaxWarnings
   # https://pypi.org/project/aprslib/ - v0.7.2 - 2022-07-10
   "ignore:.*invalid escape sequence:SyntaxWarning:.*aprslib.parsing.common",
@@ -608,7 +608,7 @@ filterwarnings = [
   "ignore:pkg_resources is deprecated as an API:UserWarning:pysiaalarm.data.data",
   # https://pypi.org/project/pybotvac/ - v0.0.28 - 2025-06-11
   "ignore:pkg_resources is deprecated as an API:UserWarning:pybotvac.version",
-  # https://github.com/home-assistant-ecosystem/python-mystrom/blob/2.2.0/pymystrom/__init__.py#L10 - v2.2.0 - 2023-05-21
+  # https://github.com/smart-hub-ecosystem/python-mystrom/blob/2.2.0/pymystrom/__init__.py#L10 - v2.2.0 - 2023-05-21
   "ignore:pkg_resources is deprecated as an API:UserWarning:pymystrom",
   # - SyntaxWarning - is with literal
   # https://github.com/majuss/lupupy/pull/15 - >0.3.2
@@ -623,7 +623,7 @@ filterwarnings = [
   "ignore:'count' is passed as positional argument:DeprecationWarning:feedparser.html",
   # https://github.com/youknowone/python-deadlib - Backports for aifc, telnetlib
   "ignore:aifc was removed in Python 3.13.*'standard-aifc':DeprecationWarning:speech_recognition",
-  "ignore:telnetlib was removed in Python 3.13.*'standard-telnetlib':DeprecationWarning:homeassistant.components.hddtemp.sensor",
+  "ignore:telnetlib was removed in Python 3.13.*'standard-telnetlib':DeprecationWarning:smarthub.components.hddtemp.sensor",
   "ignore:telnetlib was removed in Python 3.13.*'standard-telnetlib':DeprecationWarning:ndms2_client.connection",
   "ignore:telnetlib was removed in Python 3.13.*'standard-telnetlib':DeprecationWarning:plumlightpad.lightpad",
   "ignore:telnetlib was removed in Python 3.13.*'standard-telnetlib':DeprecationWarning:pyws66i",
@@ -631,7 +631,7 @@ filterwarnings = [
   # -- Websockets 14.1
   # https://websockets.readthedocs.io/en/stable/howto/upgrade.html
   "ignore:websockets.legacy is deprecated:DeprecationWarning:websockets.legacy",
-  # https://github.com/bluecurrent/HomeAssistantAPI/pull/19 - >=1.2.4
+  # https://github.com/bluecurrent/SmartHubAPI/pull/19 - >=1.2.4
   "ignore:websockets.client.connect is deprecated:DeprecationWarning:bluecurrent_api.websocket",
   "ignore:websockets.client.WebSocketClientProtocol is deprecated:DeprecationWarning:bluecurrent_api.websocket",
   "ignore:websockets.exceptions.InvalidStatusCode is deprecated:DeprecationWarning:bluecurrent_api.websocket",
@@ -676,7 +676,7 @@ filterwarnings = [
 ]
 
 [tool.coverage.run]
-source = ["homeassistant"]
+source = ["smarthub"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -858,65 +858,65 @@ ignore = [
 
 [tool.ruff.lint.flake8-import-conventions.extend-aliases]
 voluptuous = "vol"
-"homeassistant.components.air_quality.PLATFORM_SCHEMA" = "AIR_QUALITY_PLATFORM_SCHEMA"
-"homeassistant.components.alarm_control_panel.PLATFORM_SCHEMA" = "ALARM_CONTROL_PANEL_PLATFORM_SCHEMA"
-"homeassistant.components.binary_sensor.PLATFORM_SCHEMA" = "BINARY_SENSOR_PLATFORM_SCHEMA"
-"homeassistant.components.button.PLATFORM_SCHEMA" = "BUTTON_PLATFORM_SCHEMA"
-"homeassistant.components.calendar.PLATFORM_SCHEMA" = "CALENDAR_PLATFORM_SCHEMA"
-"homeassistant.components.camera.PLATFORM_SCHEMA" = "CAMERA_PLATFORM_SCHEMA"
-"homeassistant.components.climate.PLATFORM_SCHEMA" = "CLIMATE_PLATFORM_SCHEMA"
-"homeassistant.components.conversation.PLATFORM_SCHEMA" = "CONVERSATION_PLATFORM_SCHEMA"
-"homeassistant.components.cover.PLATFORM_SCHEMA" = "COVER_PLATFORM_SCHEMA"
-"homeassistant.components.date.PLATFORM_SCHEMA" = "DATE_PLATFORM_SCHEMA"
-"homeassistant.components.datetime.PLATFORM_SCHEMA" = "DATETIME_PLATFORM_SCHEMA"
-"homeassistant.components.device_tracker.PLATFORM_SCHEMA" = "DEVICE_TRACKER_PLATFORM_SCHEMA"
-"homeassistant.components.event.PLATFORM_SCHEMA" = "EVENT_PLATFORM_SCHEMA"
-"homeassistant.components.fan.PLATFORM_SCHEMA" = "FAN_PLATFORM_SCHEMA"
-"homeassistant.components.geo_location.PLATFORM_SCHEMA" = "GEO_LOCATION_PLATFORM_SCHEMA"
-"homeassistant.components.humidifier.PLATFORM_SCHEMA" = "HUMIDIFIER_PLATFORM_SCHEMA"
-"homeassistant.components.image.PLATFORM_SCHEMA" = "IMAGE_PLATFORM_SCHEMA"
-"homeassistant.components.image_processing.PLATFORM_SCHEMA" = "IMAGE_PROCESSING_PLATFORM_SCHEMA"
-"homeassistant.components.lawn_mower.PLATFORM_SCHEMA" = "LAWN_MOWER_PLATFORM_SCHEMA"
-"homeassistant.components.light.PLATFORM_SCHEMA" = "LIGHT_PLATFORM_SCHEMA"
-"homeassistant.components.lock.PLATFORM_SCHEMA" = "LOCK_PLATFORM_SCHEMA"
-"homeassistant.components.media_player.PLATFORM_SCHEMA" = "MEDIA_PLAYER_PLATFORM_SCHEMA"
-"homeassistant.components.notify.PLATFORM_SCHEMA" = "NOTIFY_PLATFORM_SCHEMA"
-"homeassistant.components.number.PLATFORM_SCHEMA" = "NUMBER_PLATFORM_SCHEMA"
-"homeassistant.components.remote.PLATFORM_SCHEMA" = "REMOTE_PLATFORM_SCHEMA"
-"homeassistant.components.scene.PLATFORM_SCHEMA" = "SCENE_PLATFORM_SCHEMA"
-"homeassistant.components.select.PLATFORM_SCHEMA" = "SELECT_PLATFORM_SCHEMA"
-"homeassistant.components.sensor.PLATFORM_SCHEMA" = "SENSOR_PLATFORM_SCHEMA"
-"homeassistant.components.siren.PLATFORM_SCHEMA" = "SIREN_PLATFORM_SCHEMA"
-"homeassistant.components.stt.PLATFORM_SCHEMA" = "STT_PLATFORM_SCHEMA"
-"homeassistant.components.switch.PLATFORM_SCHEMA" = "SWITCH_PLATFORM_SCHEMA"
-"homeassistant.components.text.PLATFORM_SCHEMA" = "TEXT_PLATFORM_SCHEMA"
-"homeassistant.components.time.PLATFORM_SCHEMA" = "TIME_PLATFORM_SCHEMA"
-"homeassistant.components.todo.PLATFORM_SCHEMA" = "TODO_PLATFORM_SCHEMA"
-"homeassistant.components.tts.PLATFORM_SCHEMA" = "TTS_PLATFORM_SCHEMA"
-"homeassistant.components.vacuum.PLATFORM_SCHEMA" = "VACUUM_PLATFORM_SCHEMA"
-"homeassistant.components.valve.PLATFORM_SCHEMA" = "VALVE_PLATFORM_SCHEMA"
-"homeassistant.components.update.PLATFORM_SCHEMA" = "UPDATE_PLATFORM_SCHEMA"
-"homeassistant.components.wake_word.PLATFORM_SCHEMA" = "WAKE_WORD_PLATFORM_SCHEMA"
-"homeassistant.components.water_heater.PLATFORM_SCHEMA" = "WATER_HEATER_PLATFORM_SCHEMA"
-"homeassistant.components.weather.PLATFORM_SCHEMA" = "WEATHER_PLATFORM_SCHEMA"
-"homeassistant.core.DOMAIN" = "HOMEASSISTANT_DOMAIN"
-"homeassistant.helpers.area_registry" = "ar"
-"homeassistant.helpers.category_registry" = "cr"
-"homeassistant.helpers.config_validation" = "cv"
-"homeassistant.helpers.device_registry" = "dr"
-"homeassistant.helpers.entity_registry" = "er"
-"homeassistant.helpers.floor_registry" = "fr"
-"homeassistant.helpers.issue_registry" = "ir"
-"homeassistant.helpers.label_registry" = "lr"
-"homeassistant.util.color" = "color_util"
-"homeassistant.util.dt" = "dt_util"
-"homeassistant.util.json" = "json_util"
-"homeassistant.util.location" = "location_util"
-"homeassistant.util.logging" = "logging_util"
-"homeassistant.util.network" = "network_util"
-"homeassistant.util.ulid" = "ulid_util"
-"homeassistant.util.uuid" = "uuid_util"
-"homeassistant.util.yaml" = "yaml_util"
+"smarthub.components.air_quality.PLATFORM_SCHEMA" = "AIR_QUALITY_PLATFORM_SCHEMA"
+"smarthub.components.alarm_control_panel.PLATFORM_SCHEMA" = "ALARM_CONTROL_PANEL_PLATFORM_SCHEMA"
+"smarthub.components.binary_sensor.PLATFORM_SCHEMA" = "BINARY_SENSOR_PLATFORM_SCHEMA"
+"smarthub.components.button.PLATFORM_SCHEMA" = "BUTTON_PLATFORM_SCHEMA"
+"smarthub.components.calendar.PLATFORM_SCHEMA" = "CALENDAR_PLATFORM_SCHEMA"
+"smarthub.components.camera.PLATFORM_SCHEMA" = "CAMERA_PLATFORM_SCHEMA"
+"smarthub.components.climate.PLATFORM_SCHEMA" = "CLIMATE_PLATFORM_SCHEMA"
+"smarthub.components.conversation.PLATFORM_SCHEMA" = "CONVERSATION_PLATFORM_SCHEMA"
+"smarthub.components.cover.PLATFORM_SCHEMA" = "COVER_PLATFORM_SCHEMA"
+"smarthub.components.date.PLATFORM_SCHEMA" = "DATE_PLATFORM_SCHEMA"
+"smarthub.components.datetime.PLATFORM_SCHEMA" = "DATETIME_PLATFORM_SCHEMA"
+"smarthub.components.device_tracker.PLATFORM_SCHEMA" = "DEVICE_TRACKER_PLATFORM_SCHEMA"
+"smarthub.components.event.PLATFORM_SCHEMA" = "EVENT_PLATFORM_SCHEMA"
+"smarthub.components.fan.PLATFORM_SCHEMA" = "FAN_PLATFORM_SCHEMA"
+"smarthub.components.geo_location.PLATFORM_SCHEMA" = "GEO_LOCATION_PLATFORM_SCHEMA"
+"smarthub.components.humidifier.PLATFORM_SCHEMA" = "HUMIDIFIER_PLATFORM_SCHEMA"
+"smarthub.components.image.PLATFORM_SCHEMA" = "IMAGE_PLATFORM_SCHEMA"
+"smarthub.components.image_processing.PLATFORM_SCHEMA" = "IMAGE_PROCESSING_PLATFORM_SCHEMA"
+"smarthub.components.lawn_mower.PLATFORM_SCHEMA" = "LAWN_MOWER_PLATFORM_SCHEMA"
+"smarthub.components.light.PLATFORM_SCHEMA" = "LIGHT_PLATFORM_SCHEMA"
+"smarthub.components.lock.PLATFORM_SCHEMA" = "LOCK_PLATFORM_SCHEMA"
+"smarthub.components.media_player.PLATFORM_SCHEMA" = "MEDIA_PLAYER_PLATFORM_SCHEMA"
+"smarthub.components.notify.PLATFORM_SCHEMA" = "NOTIFY_PLATFORM_SCHEMA"
+"smarthub.components.number.PLATFORM_SCHEMA" = "NUMBER_PLATFORM_SCHEMA"
+"smarthub.components.remote.PLATFORM_SCHEMA" = "REMOTE_PLATFORM_SCHEMA"
+"smarthub.components.scene.PLATFORM_SCHEMA" = "SCENE_PLATFORM_SCHEMA"
+"smarthub.components.select.PLATFORM_SCHEMA" = "SELECT_PLATFORM_SCHEMA"
+"smarthub.components.sensor.PLATFORM_SCHEMA" = "SENSOR_PLATFORM_SCHEMA"
+"smarthub.components.siren.PLATFORM_SCHEMA" = "SIREN_PLATFORM_SCHEMA"
+"smarthub.components.stt.PLATFORM_SCHEMA" = "STT_PLATFORM_SCHEMA"
+"smarthub.components.switch.PLATFORM_SCHEMA" = "SWITCH_PLATFORM_SCHEMA"
+"smarthub.components.text.PLATFORM_SCHEMA" = "TEXT_PLATFORM_SCHEMA"
+"smarthub.components.time.PLATFORM_SCHEMA" = "TIME_PLATFORM_SCHEMA"
+"smarthub.components.todo.PLATFORM_SCHEMA" = "TODO_PLATFORM_SCHEMA"
+"smarthub.components.tts.PLATFORM_SCHEMA" = "TTS_PLATFORM_SCHEMA"
+"smarthub.components.vacuum.PLATFORM_SCHEMA" = "VACUUM_PLATFORM_SCHEMA"
+"smarthub.components.valve.PLATFORM_SCHEMA" = "VALVE_PLATFORM_SCHEMA"
+"smarthub.components.update.PLATFORM_SCHEMA" = "UPDATE_PLATFORM_SCHEMA"
+"smarthub.components.wake_word.PLATFORM_SCHEMA" = "WAKE_WORD_PLATFORM_SCHEMA"
+"smarthub.components.water_heater.PLATFORM_SCHEMA" = "WATER_HEATER_PLATFORM_SCHEMA"
+"smarthub.components.weather.PLATFORM_SCHEMA" = "WEATHER_PLATFORM_SCHEMA"
+"smarthub.core.DOMAIN" = "HOMEASSISTANT_DOMAIN"
+"smarthub.helpers.area_registry" = "ar"
+"smarthub.helpers.category_registry" = "cr"
+"smarthub.helpers.config_validation" = "cv"
+"smarthub.helpers.device_registry" = "dr"
+"smarthub.helpers.entity_registry" = "er"
+"smarthub.helpers.floor_registry" = "fr"
+"smarthub.helpers.issue_registry" = "ir"
+"smarthub.helpers.label_registry" = "lr"
+"smarthub.util.color" = "color_util"
+"smarthub.util.dt" = "dt_util"
+"smarthub.util.json" = "json_util"
+"smarthub.util.location" = "location_util"
+"smarthub.util.logging" = "logging_util"
+"smarthub.util.network" = "network_util"
+"smarthub.util.ulid" = "ulid_util"
+"smarthub.util.uuid" = "uuid_util"
+"smarthub.util.yaml" = "yaml_util"
 
 [tool.ruff.lint.flake8-pytest-style]
 fixture-parentheses = false
@@ -929,24 +929,24 @@ mark-parentheses = false
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
-known-first-party = ["homeassistant"]
+known-first-party = ["smarthub"]
 combine-as-imports = true
 split-on-trailing-comma = false
 
 [tool.ruff.lint.per-file-ignores]
 
 # Allow for main entry & scripts to write to stdout
-"homeassistant/__main__.py" = ["T201"]
-"homeassistant/scripts/*" = ["T201"]
+"smarthub/__main__.py" = ["T201"]
+"smarthub/scripts/*" = ["T201"]
 "script/*" = ["T20"]
 
 # Allow relative imports within auth and within components
-"homeassistant/auth/*/*" = ["TID252"]
-"homeassistant/components/*/*/*" = ["TID252"]
+"smarthub/auth/*/*" = ["TID252"]
+"smarthub/components/*/*/*" = ["TID252"]
 "tests/components/*/*/*" = ["TID252"]
 
 # Temporary
-"homeassistant/**" = ["PTH"]
+"smarthub/**" = ["PTH"]
 "tests/**" = ["PTH"]
 
 [tool.ruff.lint.mccabe]

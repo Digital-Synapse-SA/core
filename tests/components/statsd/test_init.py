@@ -6,10 +6,10 @@ from unittest.mock import patch
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import statsd
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import statsd
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture
@@ -29,7 +29,7 @@ def test_invalid_config() -> None:
         statsd.CONFIG_SCHEMA(config)
 
 
-async def test_statsd_setup_full(hass: HomeAssistant) -> None:
+async def test_statsd_setup_full(hass: SmartHub) -> None:
     """Test setup with all data."""
     config = {"statsd": {"host": "host", "port": 123, "rate": 1, "prefix": "foo"}}
     with patch("statsd.StatsClient") as mock_init:
@@ -43,7 +43,7 @@ async def test_statsd_setup_full(hass: HomeAssistant) -> None:
         assert len(mock_init.mock_calls) == 3
 
 
-async def test_statsd_setup_defaults(hass: HomeAssistant) -> None:
+async def test_statsd_setup_defaults(hass: SmartHub) -> None:
     """Test setup with defaults."""
     config = {"statsd": {"host": "host"}}
 
@@ -60,7 +60,7 @@ async def test_statsd_setup_defaults(hass: HomeAssistant) -> None:
         assert len(mock_init.mock_calls) == 3
 
 
-async def test_event_listener_defaults(hass: HomeAssistant, mock_client) -> None:
+async def test_event_listener_defaults(hass: SmartHub, mock_client) -> None:
     """Test event listener."""
     config = {"statsd": {"host": "host", "value_mapping": {"custom": 3}}}
 
@@ -91,7 +91,7 @@ async def test_event_listener_defaults(hass: HomeAssistant, mock_client) -> None
         assert mock_client.incr.called
 
 
-async def test_event_listener_attr_details(hass: HomeAssistant, mock_client) -> None:
+async def test_event_listener_attr_details(hass: SmartHub, mock_client) -> None:
     """Test event listener."""
     config = {"statsd": {"host": "host", "log_attributes": True}}
 

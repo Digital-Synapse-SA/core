@@ -9,16 +9,16 @@ from zigpy.device import Device as ZigpyDevice
 import zigpy.profiles.zha
 import zigpy.types
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.device_automation.exceptions import (
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.device_automation.exceptions import (
     InvalidDeviceAutomationConfig,
 )
-from homeassistant.components.zha.helpers import get_zha_gateway
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.zha.helpers import get_zha_gateway
+from smarthub.const import Platform
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_get_device_automations
 
@@ -45,7 +45,7 @@ LONG_RELEASE = "remote_button_long_release"
 @pytest.fixture(autouse=True)
 def sensor_platforms_only():
     """Only set up the sensor platform and required base platforms to speed up tests."""
-    with patch("homeassistant.components.zha.PLATFORMS", (Platform.SENSOR,)):
+    with patch("smarthub.components.zha.PLATFORMS", (Platform.SENSOR,)):
         yield
 
 
@@ -57,7 +57,7 @@ def _same_lists(list_a, list_b):
 
 
 async def test_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     setup_zha,
 ) -> None:
@@ -145,7 +145,7 @@ async def test_triggers(
 
 
 async def test_no_triggers(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, setup_zha
+    hass: SmartHub, device_registry: dr.DeviceRegistry, setup_zha
 ) -> None:
     """Test ZHA device with no triggers."""
     await setup_zha()
@@ -182,7 +182,7 @@ async def test_no_triggers(
 
 
 async def test_if_fires_on_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     setup_zha,
@@ -258,7 +258,7 @@ async def test_if_fires_on_event(
 
 
 async def test_device_offline_fires(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     service_calls: list[ServiceCall],
     setup_zha,
@@ -314,7 +314,7 @@ async def test_device_offline_fires(
 
 
 async def test_exception_no_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
     setup_zha,
@@ -367,7 +367,7 @@ async def test_exception_no_triggers(
 
 
 async def test_exception_bad_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
     setup_zha,
@@ -427,7 +427,7 @@ async def test_exception_bad_trigger(
 
 
 async def test_validate_trigger_config_missing_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
@@ -494,7 +494,7 @@ async def test_validate_trigger_config_missing_info(
 
 
 async def test_validate_trigger_config_unloaded_bad_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,

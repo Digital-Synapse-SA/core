@@ -8,17 +8,17 @@ from homewizard_energy.models import Batteries
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.homewizard.const import UPDATE_INTERVAL
-from homeassistant.components.select import (
+from smarthub.components.homewizard.const import UPDATE_INTERVAL
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed
 
@@ -63,7 +63,7 @@ pytestmark = [
     ],
 )
 async def test_entities_not_created_for_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_ids: list[str],
 ) -> None:
     """Ensures entities for a specific device are not created."""
@@ -79,7 +79,7 @@ async def test_entities_not_created_for_device(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select_entity_snapshots(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -117,7 +117,7 @@ async def test_select_entity_snapshots(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select_set_option(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     entity_id: str,
     option: str,
@@ -146,15 +146,15 @@ async def test_select_set_option(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select_request_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     entity_id: str,
     option: str,
 ) -> None:
-    """Test that RequestError is handled and raises HomeAssistantError."""
+    """Test that RequestError is handled and raises SmartHubError."""
     mock_homewizardenergy.batteries.side_effect = RequestError
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"^An error occurred while communicating with your HomeWizard Energy device$",
     ):
         await hass.services.async_call(
@@ -176,15 +176,15 @@ async def test_select_request_error(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select_unauthorized_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     entity_id: str,
     option: str,
 ) -> None:
-    """Test that UnauthorizedError is handled and raises HomeAssistantError."""
+    """Test that UnauthorizedError is handled and raises SmartHubError."""
     mock_homewizardenergy.batteries.side_effect = UnauthorizedError
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=r"^The local API is unauthorized\. Restore API access by following the instructions in the repair issue$",
     ):
         await hass.services.async_call(
@@ -208,7 +208,7 @@ async def test_select_unauthorized_error(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select_unreachable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     exception: Exception,
     entity_id: str,
@@ -232,7 +232,7 @@ async def test_select_unreachable(
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_select_multiple_state_changes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     entity_id: str,
 ) -> None:
@@ -283,7 +283,7 @@ async def test_select_multiple_state_changes(
     ],
 )
 async def test_disabled_by_default_selects(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, entity_ids: list[str]
+    hass: SmartHub, entity_registry: er.EntityRegistry, entity_ids: list[str]
 ) -> None:
     """Test the disabled by default selects."""
     for entity_id in entity_ids:

@@ -1,14 +1,14 @@
-"""Test Home Assistant icon util methods."""
+"""Test SmartHub icon util methods."""
 
 import pathlib
 from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import icon
-from homeassistant.loader import IntegrationNotFound
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import icon
+from smarthub.loader import IntegrationNotFound
+from smarthub.setup import async_setup_component
 
 
 def test_battery_icon() -> None:
@@ -60,7 +60,7 @@ def test_signal_icon() -> None:
     assert icon.icon_for_signal_level(100) == "mdi:signal-cellular-3"
 
 
-def test_load_icons_files(hass: HomeAssistant) -> None:
+def test_load_icons_files(hass: SmartHub) -> None:
     """Test the load icons files function."""
     file1 = hass.config.path("custom_components", "test", "icons.json")
     file2 = hass.config.path("custom_components", "test", "invalid.json")
@@ -79,7 +79,7 @@ def test_load_icons_files(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_custom_integrations")
-async def test_get_icons(hass: HomeAssistant) -> None:
+async def test_get_icons(hass: SmartHub) -> None:
     """Test the get icon helper."""
     icons = await icon.async_get_icons(hass, "entity")
     assert icons == {}
@@ -144,7 +144,7 @@ async def test_get_icons(hass: HomeAssistant) -> None:
         await icon.async_get_icons(hass, "entity", ["non_existing"])
 
 
-async def test_get_icons_while_loading_components(hass: HomeAssistant) -> None:
+async def test_get_icons_while_loading_components(hass: SmartHub) -> None:
     """Test the get icons helper loads icons."""
     integration = Mock(file_path=pathlib.Path(__file__))
     integration.name = "Component 1"
@@ -159,11 +159,11 @@ async def test_get_icons_while_loading_components(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.helpers.icon._load_icons_files",
+            "smarthub.helpers.icon._load_icons_files",
             mock_load_icons_files,
         ),
         patch(
-            "homeassistant.helpers.icon.async_get_integrations",
+            "smarthub.helpers.icon.async_get_integrations",
             return_value={"component1": integration},
         ),
     ):
@@ -177,14 +177,14 @@ async def test_get_icons_while_loading_components(hass: HomeAssistant) -> None:
     assert load_count == 1
 
 
-async def test_caching(hass: HomeAssistant) -> None:
+async def test_caching(hass: SmartHub) -> None:
     """Test we cache data."""
     hass.config.components.add("binary_sensor")
     hass.config.components.add("switch")
 
     # Patch with same method so we can count invocations
     with patch(
-        "homeassistant.helpers.icon.build_resources",
+        "smarthub.helpers.icon.build_resources",
         side_effect=icon.build_resources,
     ) as mock_build:
         load1 = await icon.async_get_icons(hass, "entity_component")
@@ -213,7 +213,7 @@ async def test_caching(hass: HomeAssistant) -> None:
     # Check if new loaded component, trigger load
     hass.config.components.add("media_player")
     with patch(
-        "homeassistant.helpers.icon._load_icons_files",
+        "smarthub.helpers.icon._load_icons_files",
         side_effect=icon._load_icons_files,
     ) as mock_load:
         load_sensor_only = await icon.async_get_icons(

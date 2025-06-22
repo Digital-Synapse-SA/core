@@ -9,13 +9,13 @@ from unittest.mock import ANY, AsyncMock, Mock
 import pytest
 import voluptuous as vol
 
-from homeassistant import data_entry_flow
-from homeassistant.components.repairs import RepairsFlow
-from homeassistant.components.repairs.const import DOMAIN
-from homeassistant.const import __version__ as ha_version
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub import data_entry_flow
+from smarthub.components.repairs import RepairsFlow
+from smarthub.components.repairs.const import DOMAIN
+from smarthub.const import __version__ as ha_version
+from smarthub.core import SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 from tests.common import MockUser, mock_platform
 from tests.typing import (
@@ -39,7 +39,7 @@ DEFAULT_ISSUES = [
 
 
 async def create_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ws_client: MockHAClientWebSocket,
     issues: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
@@ -123,12 +123,12 @@ class MockFixFlowAbort(RepairsFlow):
 
 
 @pytest.fixture(autouse=True)
-async def mock_repairs_integration(hass: HomeAssistant) -> None:
+async def mock_repairs_integration(hass: SmartHub) -> None:
     """Mock a repairs integration."""
     hass.config.components.add("fake_integration")
 
     def async_create_fix_flow(
-        hass: HomeAssistant,
+        hass: SmartHub,
         issue_id: str,
         data: dict[str, str | int | float | None] | None,
     ) -> RepairsFlow:
@@ -153,7 +153,7 @@ async def mock_repairs_integration(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["fake_integration"])
 async def test_dismiss_issue(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can dismiss an issue."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -237,7 +237,7 @@ async def test_dismiss_issue(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["fake_integration"])
 async def test_fix_non_existing_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -300,7 +300,7 @@ async def test_fix_non_existing_issue(
     ],
 )
 async def test_fix_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     domain,
@@ -374,7 +374,7 @@ async def test_fix_issue(
 
 
 async def test_fix_issue_unauth(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator, hass_admin_user: MockUser
+    hass: SmartHub, hass_client: ClientSessionGenerator, hass_admin_user: MockUser
 ) -> None:
     """Test we can't query the result if not authorized."""
     assert await async_setup_component(hass, "http", {})
@@ -394,7 +394,7 @@ async def test_fix_issue_unauth(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["fake_integration"])
 async def test_get_progress_unauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     hass_admin_user: MockUser,
@@ -426,7 +426,7 @@ async def test_get_progress_unauth(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["fake_integration"])
 async def test_step_unauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
     hass_admin_user: MockUser,
@@ -459,7 +459,7 @@ async def test_step_unauth(
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 @pytest.mark.freeze_time("2022-07-19 07:53:05")
 async def test_list_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -550,7 +550,7 @@ async def test_list_issues(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["fake_integration"])
 async def test_fix_issue_aborted(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -613,7 +613,7 @@ async def test_fix_issue_aborted(
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 @pytest.mark.freeze_time("2022-07-19 07:53:05")
 async def test_get_issue_data(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can get issue data."""
 

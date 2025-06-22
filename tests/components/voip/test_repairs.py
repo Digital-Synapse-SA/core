@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant.components.voip import repairs
-from homeassistant.core import HomeAssistant
+from smarthub.components.voip import repairs
+from smarthub.core import SmartHub
 
 
-async def test_create_fix_flow_raises_on_unknown_issue_id(hass: HomeAssistant) -> None:
+async def test_create_fix_flow_raises_on_unknown_issue_id(hass: SmartHub) -> None:
     """Test reate_fix_flow raises on unknown issue_id."""
 
     with pytest.raises(ValueError):

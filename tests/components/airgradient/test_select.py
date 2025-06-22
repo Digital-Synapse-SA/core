@@ -8,15 +8,15 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.airgradient.const import DOMAIN
-from homeassistant.components.select import (
+from smarthub.components.airgradient.const import DOMAIN
+from smarthub.components.select import (
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_OPTION, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, ATTR_OPTION, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -30,21 +30,21 @@ from tests.common import (
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     airgradient_devices: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.airgradient.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.airgradient.PLATFORMS", [Platform.SELECT]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_setting_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airgradient_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -65,13 +65,13 @@ async def test_setting_value(
 
 
 async def test_cloud_creates_no_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloud_airgradient_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
     """Test cloud configuration control."""
-    with patch("homeassistant.components.airgradient.PLATFORMS", [Platform.SELECT]):
+    with patch("smarthub.components.airgradient.PLATFORMS", [Platform.SELECT]):
         await setup_integration(hass, mock_config_entry)
 
     assert len(hass.states.async_all()) == 1
@@ -111,7 +111,7 @@ async def test_cloud_creates_no_number(
     ],
 )
 async def test_exception_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_airgradient_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
@@ -121,7 +121,7 @@ async def test_exception_handling(
     await setup_integration(hass, mock_config_entry)
 
     mock_airgradient_client.set_configuration_control.side_effect = exception
-    with pytest.raises(HomeAssistantError, match=error_message):
+    with pytest.raises(SmartHubError, match=error_message):
         await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,

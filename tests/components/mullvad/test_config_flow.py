@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 from mullvad_api import MullvadAPIError
 
-from homeassistant import config_entries, setup
-from homeassistant.components.mullvad.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries, setup
+from smarthub.components.mullvad.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form_user(hass: HomeAssistant) -> None:
+async def test_form_user(hass: SmartHub) -> None:
     """Test we can setup by the user."""
     await setup.async_setup_component(hass, DOMAIN, {})
     result = await hass.config_entries.flow.async_init(
@@ -23,11 +23,11 @@ async def test_form_user(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.mullvad.async_setup_entry",
+            "smarthub.components.mullvad.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.mullvad.config_flow.MullvadAPI"
+            "smarthub.components.mullvad.config_flow.MullvadAPI"
         ) as mock_mullvad_api,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -43,7 +43,7 @@ async def test_form_user(hass: HomeAssistant) -> None:
     assert len(mock_mullvad_api.mock_calls) == 1
 
 
-async def test_form_user_only_once(hass: HomeAssistant) -> None:
+async def test_form_user_only_once(hass: SmartHub) -> None:
     """Test we can setup by the user only once."""
     MockConfigEntry(domain=DOMAIN).add_to_hass(hass)
 
@@ -54,7 +54,7 @@ async def test_form_user_only_once(hass: HomeAssistant) -> None:
     assert result["reason"] == "single_instance_allowed"
 
 
-async def test_connection_error(hass: HomeAssistant) -> None:
+async def test_connection_error(hass: SmartHub) -> None:
     """Test we show an error when we have trouble connecting."""
     await setup.async_setup_component(hass, DOMAIN, {})
     result = await hass.config_entries.flow.async_init(
@@ -62,7 +62,7 @@ async def test_connection_error(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.mullvad.config_flow.MullvadAPI",
+        "smarthub.components.mullvad.config_flow.MullvadAPI",
         side_effect=MullvadAPIError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -75,7 +75,7 @@ async def test_connection_error(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_unknown_error(hass: HomeAssistant) -> None:
+async def test_unknown_error(hass: SmartHub) -> None:
     """Test we show an error when an unknown error occurs."""
     await setup.async_setup_component(hass, DOMAIN, {})
     result = await hass.config_entries.flow.async_init(
@@ -83,7 +83,7 @@ async def test_unknown_error(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.mullvad.config_flow.MullvadAPI",
+        "smarthub.components.mullvad.config_flow.MullvadAPI",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(

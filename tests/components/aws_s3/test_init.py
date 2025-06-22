@@ -9,8 +9,8 @@ from botocore.exceptions import (
 )
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test loading and unloading the integration."""
@@ -47,7 +47,7 @@ async def test_load_unload_config_entry(
     ],
 )
 async def test_setup_entry_create_client_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
     state: ConfigEntryState,
@@ -62,7 +62,7 @@ async def test_setup_entry_create_client_errors(
 
 
 async def test_setup_entry_head_bucket_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_client: AsyncMock,
 ) -> None:

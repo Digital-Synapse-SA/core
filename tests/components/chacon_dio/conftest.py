@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.chacon_dio.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.components.chacon_dio.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
 
 from tests.common import MockConfigEntry
 
@@ -27,7 +27,7 @@ MOCK_COVER_DEVICE = {
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.chacon_dio.async_setup_entry", return_value=True
+        "smarthub.components.chacon_dio.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -51,11 +51,11 @@ def mock_dio_chacon_client() -> Generator[AsyncMock]:
 
     with (
         patch(
-            "homeassistant.components.chacon_dio.DIOChaconAPIClient",
+            "smarthub.components.chacon_dio.DIOChaconAPIClient",
             autospec=True,
         ) as mock_client,
         patch(
-            "homeassistant.components.chacon_dio.config_flow.DIOChaconAPIClient",
+            "smarthub.components.chacon_dio.config_flow.DIOChaconAPIClient",
             new=mock_client,
         ),
     ):

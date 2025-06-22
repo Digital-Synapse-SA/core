@@ -8,7 +8,7 @@ from unittest.mock import patch
 from aiodns.error import DNSError
 from freezegun.api import FrozenDateTimeFactory
 
-from homeassistant.components.dnsip.const import (
+from smarthub.components.dnsip.const import (
     CONF_HOSTNAME,
     CONF_IPV4,
     CONF_IPV6,
@@ -17,24 +17,24 @@ from homeassistant.components.dnsip.const import (
     CONF_RESOLVER_IPV6,
     DOMAIN,
 )
-from homeassistant.components.dnsip.sensor import SCAN_INTERVAL
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_NAME, CONF_PORT, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from smarthub.components.dnsip.sensor import SCAN_INTERVAL
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_NAME, CONF_PORT, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
 
 from . import RetrieveDNS
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_sensor(hass: HomeAssistant) -> None:
+async def test_sensor(hass: SmartHub) -> None:
     """Test the DNS IP sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,
         data={
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_IPV4: True,
             CONF_IPV6: True,
         },
@@ -45,12 +45,12 @@ async def test_sensor(hass: HomeAssistant) -> None:
             CONF_PORT_IPV6: 53,
         },
         entry_id="1",
-        unique_id="home-assistant.io",
+        unique_id="smart-hub.io",
     )
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.dnsip.sensor.aiodns.DNSResolver",
+        "smarthub.components.dnsip.sensor.aiodns.DNSResolver",
         return_value=RetrieveDNS(),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -70,14 +70,14 @@ async def test_sensor(hass: HomeAssistant) -> None:
     ]
 
 
-async def test_legacy_sensor(hass: HomeAssistant) -> None:
+async def test_legacy_sensor(hass: SmartHub) -> None:
     """Test the DNS IP sensor configured before the addition of ports."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,
         data={
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_IPV4: True,
             CONF_IPV6: True,
         },
@@ -86,14 +86,14 @@ async def test_legacy_sensor(hass: HomeAssistant) -> None:
             CONF_RESOLVER_IPV6: "2620:119:53::53",
         },
         entry_id="1",
-        unique_id="home-assistant.io",
+        unique_id="smart-hub.io",
         version=1,
         minor_version=1,
     )
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.dnsip.sensor.aiodns.DNSResolver",
+        "smarthub.components.dnsip.sensor.aiodns.DNSResolver",
         return_value=RetrieveDNS(),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -114,15 +114,15 @@ async def test_legacy_sensor(hass: HomeAssistant) -> None:
 
 
 async def test_sensor_no_response(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test the DNS IP sensor with DNS error."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,
         data={
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_IPV4: True,
             CONF_IPV6: False,
         },
@@ -133,13 +133,13 @@ async def test_sensor_no_response(
             CONF_PORT_IPV6: 53,
         },
         entry_id="1",
-        unique_id="home-assistant.io",
+        unique_id="smart-hub.io",
     )
     entry.add_to_hass(hass)
 
     dns_mock = RetrieveDNS()
     with patch(
-        "homeassistant.components.dnsip.sensor.aiodns.DNSResolver",
+        "smarthub.components.dnsip.sensor.aiodns.DNSResolver",
         return_value=dns_mock,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -151,7 +151,7 @@ async def test_sensor_no_response(
 
     dns_mock.error = DNSError()
     with patch(
-        "homeassistant.components.dnsip.sensor.aiodns.DNSResolver",
+        "smarthub.components.dnsip.sensor.aiodns.DNSResolver",
         return_value=dns_mock,
     ):
         freezer.tick(timedelta(seconds=SCAN_INTERVAL.seconds))

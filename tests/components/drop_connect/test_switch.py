@@ -1,12 +1,12 @@
 """Test DROP switch entities."""
 
-from homeassistant.components.switch import (
+from smarthub.components.switch import (
     DOMAIN as SWITCH_DOMAIN,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from .common import (
     TEST_DATA_FILTER,
@@ -31,7 +31,7 @@ from tests.common import async_fire_mqtt_message
 from tests.typing import MqttMockHAClient
 
 
-async def test_switches_hub(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_switches_hub(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test DROP switches for hubs."""
     entry = config_entry_hub()
     entry.add_to_hass(hass)
@@ -114,7 +114,7 @@ async def test_switches_hub(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) ->
 
 
 async def test_switches_protection_valve(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test DROP switches for protection valves."""
     entry = config_entry_protection_valve()
@@ -172,7 +172,7 @@ async def test_switches_protection_valve(
 
 
 async def test_switches_softener(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test DROP switches for softeners."""
     entry = config_entry_softener()
@@ -222,7 +222,7 @@ async def test_switches_softener(
 
 
 async def test_switches_filter(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test DROP switches for filters."""
     entry = config_entry_filter()

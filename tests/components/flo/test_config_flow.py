@@ -7,11 +7,11 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.flo.const import DOMAIN
-from homeassistant.const import CONTENT_TYPE_JSON
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.flo.const import DOMAIN
+from smarthub.const import CONTENT_TYPE_JSON
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .common import TEST_EMAIL_ADDRESS, TEST_PASSWORD, TEST_TOKEN, TEST_USER_ID
 
@@ -19,7 +19,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.mark.usefixtures("aioclient_mock_fixture")
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -29,7 +29,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.flo.async_setup_entry", return_value=True
+        "smarthub.components.flo.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"], {"username": TEST_USER_ID, "password": TEST_PASSWORD}
@@ -43,7 +43,7 @@ async def test_form(hass: HomeAssistant) -> None:
 
 
 async def test_form_cannot_connect(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test we handle cannot connect error."""
     now = round(time.time())

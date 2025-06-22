@@ -2,7 +2,7 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.awair.const import (
+from smarthub.components.awair.const import (
     API_CO2,
     API_HUMID,
     API_LUX,
@@ -13,12 +13,12 @@ from homeassistant.components.awair.const import (
     API_TEMP,
     API_VOC,
 )
-from homeassistant.components.awair.sensor import (
+from smarthub.components.awair.sensor import (
     SENSOR_TYPE_SCORE,
     SENSOR_TYPES,
     SENSOR_TYPES_DUST,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
     CONCENTRATION_PARTS_PER_BILLION,
@@ -28,9 +28,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 from . import setup_awair
 from .const import (
@@ -47,7 +47,7 @@ SENSOR_TYPES_MAP = {
 
 
 def assert_expected_properties(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.RegistryEntry,
     name: str,
     unique_id: str,
@@ -74,7 +74,7 @@ def assert_expected_properties(
 
 
 async def test_awair_gen1_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     user,
     cloud_devices,
@@ -171,7 +171,7 @@ async def test_awair_gen1_sensors(
 
 
 async def test_awair_gen2_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     user,
     cloud_devices,
@@ -209,7 +209,7 @@ async def test_awair_gen2_sensors(
 
 
 async def test_local_awair_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     local_devices,
     local_data,
@@ -232,7 +232,7 @@ async def test_local_awair_sensors(
 
 
 async def test_awair_mint_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     user,
     cloud_devices,
@@ -278,7 +278,7 @@ async def test_awair_mint_sensors(
 
 
 async def test_awair_glow_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     user,
     cloud_devices,
@@ -303,7 +303,7 @@ async def test_awair_glow_sensors(
 
 
 async def test_awair_omni_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     user,
     cloud_devices,
@@ -343,7 +343,7 @@ async def test_awair_omni_sensors(
 
 
 async def test_awair_offline(
-    hass: HomeAssistant, user, cloud_devices, awair_offline
+    hass: SmartHub, user, cloud_devices, awair_offline
 ) -> None:
     """Test expected behavior when an Awair is offline."""
 
@@ -363,7 +363,7 @@ async def test_awair_offline(
 
 
 async def test_awair_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     user,
     cloud_devices,

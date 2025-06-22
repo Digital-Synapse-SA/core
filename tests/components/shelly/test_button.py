@@ -7,19 +7,19 @@ from aioshelly.exceptions import DeviceConnectionError, InvalidAuthError, RpcCal
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
-from homeassistant.components.shelly.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.entity_registry import EntityRegistry
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from smarthub.components.shelly.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.entity_registry import EntityRegistry
 
 from . import init_integration
 
 
 async def test_block_button(
-    hass: HomeAssistant, mock_block_device: Mock, entity_registry: EntityRegistry
+    hass: SmartHub, mock_block_device: Mock, entity_registry: EntityRegistry
 ) -> None:
     """Test block device reboot button."""
     await init_integration(hass, 1)
@@ -43,7 +43,7 @@ async def test_block_button(
 
 
 async def test_rpc_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -83,7 +83,7 @@ async def test_rpc_button(
     ],
 )
 async def test_rpc_button_exc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     exception: Exception,
     error: str,
@@ -93,7 +93,7 @@ async def test_rpc_button_exc(
 
     mock_rpc_device.trigger_reboot.side_effect = exception
 
-    with pytest.raises(HomeAssistantError, match=error):
+    with pytest.raises(SmartHubError, match=error):
         await hass.services.async_call(
             BUTTON_DOMAIN,
             SERVICE_PRESS,
@@ -103,7 +103,7 @@ async def test_rpc_button_exc(
 
 
 async def test_rpc_button_reauth_error(
-    hass: HomeAssistant, mock_rpc_device: Mock
+    hass: SmartHub, mock_rpc_device: Mock
 ) -> None:
     """Test rpc device OTA button with authentication error."""
     entry = await init_integration(hass, 2)
@@ -140,7 +140,7 @@ async def test_rpc_button_reauth_error(
     ],
 )
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
@@ -177,7 +177,7 @@ async def test_migrate_unique_id(
 
 
 async def test_rpc_blu_trv_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -221,7 +221,7 @@ async def test_rpc_blu_trv_button(
     ],
 )
 async def test_rpc_blu_trv_button_exc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     monkeypatch: pytest.MonkeyPatch,
     exception: Exception,
@@ -236,7 +236,7 @@ async def test_rpc_blu_trv_button_exc(
 
     mock_blu_trv.trigger_blu_trv_calibration.side_effect = exception
 
-    with pytest.raises(HomeAssistantError, match=error):
+    with pytest.raises(SmartHubError, match=error):
         await hass.services.async_call(
             BUTTON_DOMAIN,
             SERVICE_PRESS,
@@ -246,7 +246,7 @@ async def test_rpc_blu_trv_button_exc(
 
 
 async def test_rpc_blu_trv_button_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

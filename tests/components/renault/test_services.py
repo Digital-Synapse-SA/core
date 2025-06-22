@@ -10,8 +10,8 @@ from renault_api.kamereon import schemas
 from renault_api.kamereon.models import ChargeSchedule, HvacSchedule
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.renault.const import DOMAIN
-from homeassistant.components.renault.services import (
+from smarthub.components.renault.const import DOMAIN
+from smarthub.components.renault.services import (
     ATTR_SCHEDULES,
     ATTR_TEMPERATURE,
     ATTR_VEHICLE,
@@ -21,10 +21,10 @@ from homeassistant.components.renault.services import (
     SERVICE_AC_START,
     SERVICE_CHARGE_SET_SCHEDULES,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import device_registry as dr
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import device_registry as dr
 
 from tests.common import async_load_fixture
 
@@ -34,7 +34,7 @@ pytestmark = pytest.mark.usefixtures("patch_renault_account", "patch_get_vehicle
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.renault.PLATFORMS", []):
+    with patch("smarthub.components.renault.PLATFORMS", []):
         yield
 
 
@@ -44,7 +44,7 @@ def override_vehicle_type(request: pytest.FixtureRequest) -> str:
     return request.param
 
 
-def get_device_id(hass: HomeAssistant) -> str:
+def get_device_id(hass: SmartHub) -> str:
     """Get device_id."""
     device_registry = dr.async_get(hass)
     identifiers = {(DOMAIN, "VF1ZOE40VIN")}
@@ -53,7 +53,7 @@ def get_device_id(hass: HomeAssistant) -> str:
 
 
 async def test_service_set_ac_cancel(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test that service invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -79,7 +79,7 @@ async def test_service_set_ac_cancel(
 
 
 async def test_service_set_ac_start_simple(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test that service invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -107,7 +107,7 @@ async def test_service_set_ac_start_simple(
 
 
 async def test_service_set_ac_start_with_date(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test that service invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -137,7 +137,7 @@ async def test_service_set_ac_start_with_date(
 
 
 async def test_service_set_charge_schedule(
-    hass: HomeAssistant, config_entry: ConfigEntry, snapshot: SnapshotAssertion
+    hass: SmartHub, config_entry: ConfigEntry, snapshot: SnapshotAssertion
 ) -> None:
     """Test that service invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -177,7 +177,7 @@ async def test_service_set_charge_schedule(
 
 
 async def test_service_set_charge_schedule_multi(
-    hass: HomeAssistant, config_entry: ConfigEntry, snapshot: SnapshotAssertion
+    hass: SmartHub, config_entry: ConfigEntry, snapshot: SnapshotAssertion
 ) -> None:
     """Test that service invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -238,7 +238,7 @@ async def test_service_set_charge_schedule_multi(
 
 
 async def test_service_set_ac_schedule(
-    hass: HomeAssistant, config_entry: ConfigEntry, snapshot: SnapshotAssertion
+    hass: SmartHub, config_entry: ConfigEntry, snapshot: SnapshotAssertion
 ) -> None:
     """Test that service invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -277,7 +277,7 @@ async def test_service_set_ac_schedule(
 
 
 async def test_service_set_ac_schedule_multi(
-    hass: HomeAssistant, config_entry: ConfigEntry, snapshot: SnapshotAssertion
+    hass: SmartHub, config_entry: ConfigEntry, snapshot: SnapshotAssertion
 ) -> None:
     """Test that service invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -337,7 +337,7 @@ async def test_service_set_ac_schedule_multi(
 
 
 async def test_service_invalid_device_id(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test that service fails if device_id not found in registry."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -354,7 +354,7 @@ async def test_service_invalid_device_id(
 
 
 async def test_service_invalid_device_id2(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, config_entry: ConfigEntry
+    hass: SmartHub, device_registry: dr.DeviceRegistry, config_entry: ConfigEntry
 ) -> None:
     """Test that service fails if device_id not available in the hub."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -382,7 +382,7 @@ async def test_service_invalid_device_id2(
 
 
 async def test_service_exception(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: SmartHub, config_entry: ConfigEntry
 ) -> None:
     """Test that service invokes renault_api with correct data."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -397,7 +397,7 @@ async def test_service_exception(
             "renault_api.renault_vehicle.RenaultVehicle.set_ac_stop",
             side_effect=RenaultException("Didn't work"),
         ) as mock_action,
-        pytest.raises(HomeAssistantError, match="Didn't work"),
+        pytest.raises(SmartHubError, match="Didn't work"),
     ):
         await hass.services.async_call(
             DOMAIN, SERVICE_AC_CANCEL, service_data=data, blocking=True

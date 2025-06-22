@@ -10,12 +10,12 @@ from tesla_fleet_api.exceptions import (
     TeslaFleetError,
 )
 
-from homeassistant import config_entries
-from homeassistant.components.teslemetry.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ACCESS_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.teslemetry.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_ACCESS_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import CONFIG, METADATA
 
@@ -25,7 +25,7 @@ BAD_CONFIG = {CONF_ACCESS_TOKEN: "bad_access_token"}
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we get the form."""
 
@@ -36,7 +36,7 @@ async def test_form(
     assert not result1["errors"]
 
     with patch(
-        "homeassistant.components.teslemetry.async_setup_entry",
+        "smarthub.components.teslemetry.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -60,7 +60,7 @@ async def test_form(
     ],
 )
 async def test_form_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     side_effect: TeslaFleetError,
     error: dict[str, str],
     mock_metadata: AsyncMock,
@@ -89,7 +89,7 @@ async def test_form_errors(
     assert result3["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_reauth(hass: HomeAssistant, mock_metadata: AsyncMock) -> None:
+async def test_reauth(hass: SmartHub, mock_metadata: AsyncMock) -> None:
     """Test reauth flow."""
 
     mock_entry = MockConfigEntry(
@@ -104,7 +104,7 @@ async def test_reauth(hass: HomeAssistant, mock_metadata: AsyncMock) -> None:
     assert not result1["errors"]
 
     with patch(
-        "homeassistant.components.teslemetry.async_setup_entry",
+        "smarthub.components.teslemetry.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -130,7 +130,7 @@ async def test_reauth(hass: HomeAssistant, mock_metadata: AsyncMock) -> None:
     ],
 )
 async def test_reauth_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_metadata: AsyncMock,
     side_effect: TeslaFleetError,
     error: dict[str, str],
@@ -168,7 +168,7 @@ async def test_reauth_errors(
 
 
 async def test_unique_id_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test duplicate unique ID in config."""
 
@@ -184,7 +184,7 @@ async def test_unique_id_abort(
     assert result2["type"] is FlowResultType.ABORT
 
 
-async def test_migrate_from_1_1(hass: HomeAssistant, mock_metadata: AsyncMock) -> None:
+async def test_migrate_from_1_1(hass: SmartHub, mock_metadata: AsyncMock) -> None:
     """Test config migration."""
 
     mock_entry = MockConfigEntry(
@@ -206,7 +206,7 @@ async def test_migrate_from_1_1(hass: HomeAssistant, mock_metadata: AsyncMock) -
 
 
 async def test_migrate_error_from_1_1(
-    hass: HomeAssistant, mock_metadata: AsyncMock
+    hass: SmartHub, mock_metadata: AsyncMock
 ) -> None:
     """Test config migration handles errors."""
 
@@ -229,7 +229,7 @@ async def test_migrate_error_from_1_1(
 
 
 async def test_migrate_error_from_future(
-    hass: HomeAssistant, mock_metadata: AsyncMock
+    hass: SmartHub, mock_metadata: AsyncMock
 ) -> None:
     """Test a future version isn't migrated."""
 

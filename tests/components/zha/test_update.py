@@ -16,11 +16,11 @@ from zigpy.zcl import foundation
 from zigpy.zcl.clusters import general
 import zigpy.zdo.types as zdo_t
 
-from homeassistant.components.homeassistant import (
+from smarthub.components.smarthub import (
     DOMAIN as HA_DOMAIN,
     SERVICE_UPDATE_ENTITY,
 )
-from homeassistant.components.update import (
+from smarthub.components.update import (
     ATTR_IN_PROGRESS,
     ATTR_INSTALLED_VERSION,
     ATTR_LATEST_VERSION,
@@ -28,26 +28,26 @@ from homeassistant.components.update import (
     DOMAIN as UPDATE_DOMAIN,
     SERVICE_INSTALL,
 )
-from homeassistant.components.zha.helpers import (
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.components.zha.update import (
+from smarthub.components.zha.update import (
     OTA_MESSAGE_BATTERY_POWERED,
     OTA_MESSAGE_RELIABILITY,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_OFF,
     STATE_ON,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.setup import async_setup_component
 
 from .common import find_entity_id, update_attribute_cache
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
@@ -59,7 +59,7 @@ from tests.typing import WebSocketGenerator
 def update_platform_only():
     """Only set up the update and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.UPDATE,
             Platform.SENSOR,
@@ -71,7 +71,7 @@ def update_platform_only():
 
 
 async def setup_test_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     zigpy_device_mock,
     skip_attribute_plugs=False,
     file_not_found=False,
@@ -162,7 +162,7 @@ async def setup_test_data(
 
 
 async def test_firmware_update_notification_from_zigpy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_zha,
     zigpy_device_mock,
 ) -> None:
@@ -205,7 +205,7 @@ async def test_firmware_update_notification_from_zigpy(
 
 
 async def test_firmware_update_notification_from_service_call(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_zha,
     zigpy_device_mock,
 ) -> None:
@@ -293,7 +293,7 @@ def make_packet(zigpy_device, cluster, cmd_name: str, **kwargs):
 
 @patch("zigpy.device.AFTER_OTA_ATTR_READ_DELAY", 0.01)
 async def test_firmware_update_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_zha,
     zigpy_device_mock,
 ) -> None:
@@ -490,7 +490,7 @@ async def test_firmware_update_success(
 
 
 async def test_firmware_update_raises(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_zha,
     zigpy_device_mock,
 ) -> None:
@@ -557,7 +557,7 @@ async def test_firmware_update_raises(
                 raise DeliveryError("failed to deliver")
 
     ota_cluster.endpoint.reply = AsyncMock(side_effect=endpoint_reply)
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             UPDATE_DOMAIN,
             SERVICE_INSTALL,
@@ -572,7 +572,7 @@ async def test_firmware_update_raises(
             "zigpy.device.Device.update_firmware",
             AsyncMock(side_effect=DeliveryError("failed to deliver")),
         ),
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
     ):
         await hass.services.async_call(
             UPDATE_DOMAIN,
@@ -585,7 +585,7 @@ async def test_firmware_update_raises(
 
 
 async def test_update_release_notes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     setup_zha,
     zigpy_device_mock,

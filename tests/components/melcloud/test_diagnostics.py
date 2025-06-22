@@ -5,8 +5,8 @@ from unittest.mock import patch
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.melcloud.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.melcloud.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.components.diagnostics import get_diagnostics_for_config_entry
@@ -14,7 +14,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_get_config_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     hass_client: ClientSessionGenerator,
 ) -> None:
@@ -29,7 +29,7 @@ async def test_get_config_entry_diagnostics(
     config_entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.melcloud.async_setup_entry", return_value=True
+        "smarthub.components.melcloud.async_setup_entry", return_value=True
     ):
         await hass.config_entries.async_setup(config_entry.entry_id)
         await hass.async_block_till_done()

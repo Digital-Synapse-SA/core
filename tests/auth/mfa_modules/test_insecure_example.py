@@ -1,14 +1,14 @@
 """Test the example module auth module."""
 
-from homeassistant import auth, data_entry_flow
-from homeassistant.auth.mfa_modules import auth_mfa_module_from_config
-from homeassistant.auth.models import Credentials
-from homeassistant.core import HomeAssistant
+from smarthub import auth, data_entry_flow
+from smarthub.auth.mfa_modules import auth_mfa_module_from_config
+from smarthub.auth.models import Credentials
+from smarthub.core import SmartHub
 
 from tests.common import MockUser
 
 
-async def test_validate(hass: HomeAssistant) -> None:
+async def test_validate(hass: SmartHub) -> None:
     """Test validating pin."""
     auth_module = await auth_mfa_module_from_config(
         hass,
@@ -28,7 +28,7 @@ async def test_validate(hass: HomeAssistant) -> None:
     assert result is False
 
 
-async def test_setup_user(hass: HomeAssistant) -> None:
+async def test_setup_user(hass: SmartHub) -> None:
     """Test setup user."""
     auth_module = await auth_mfa_module_from_config(
         hass, {"type": "insecure_example", "data": []}
@@ -41,7 +41,7 @@ async def test_setup_user(hass: HomeAssistant) -> None:
     assert result is True
 
 
-async def test_depose_user(hass: HomeAssistant) -> None:
+async def test_depose_user(hass: SmartHub) -> None:
     """Test despose user."""
     auth_module = await auth_mfa_module_from_config(
         hass,
@@ -56,7 +56,7 @@ async def test_depose_user(hass: HomeAssistant) -> None:
     assert len(auth_module._data) == 0
 
 
-async def test_is_user_setup(hass: HomeAssistant) -> None:
+async def test_is_user_setup(hass: SmartHub) -> None:
     """Test is user setup."""
     auth_module = await auth_mfa_module_from_config(
         hass,
@@ -69,7 +69,7 @@ async def test_is_user_setup(hass: HomeAssistant) -> None:
     assert await auth_module.async_is_user_setup("invalid-user") is False
 
 
-async def test_login(hass: HomeAssistant) -> None:
+async def test_login(hass: SmartHub) -> None:
     """Test login flow with auth module."""
     hass.auth = await auth.auth_manager_from_config(
         hass,
@@ -136,7 +136,7 @@ async def test_login(hass: HomeAssistant) -> None:
     assert result["data"].id == "mock-id"
 
 
-async def test_setup_flow(hass: HomeAssistant) -> None:
+async def test_setup_flow(hass: SmartHub) -> None:
     """Test validating pin."""
     auth_module = await auth_mfa_module_from_config(
         hass,

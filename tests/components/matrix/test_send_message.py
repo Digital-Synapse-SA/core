@@ -2,16 +2,16 @@
 
 import pytest
 
-from homeassistant.components.matrix import ATTR_FORMAT, ATTR_IMAGES, DOMAIN, MatrixBot
-from homeassistant.components.matrix.const import FORMAT_HTML, SERVICE_SEND_MESSAGE
-from homeassistant.components.notify import ATTR_DATA, ATTR_MESSAGE, ATTR_TARGET
-from homeassistant.core import Event, HomeAssistant
+from smarthub.components.matrix import ATTR_FORMAT, ATTR_IMAGES, DOMAIN, MatrixBot
+from smarthub.components.matrix.const import FORMAT_HTML, SERVICE_SEND_MESSAGE
+from smarthub.components.notify import ATTR_DATA, ATTR_MESSAGE, ATTR_TARGET
+from smarthub.core import Event, SmartHub
 
 from .conftest import TEST_BAD_ROOM, TEST_JOINABLE_ROOMS
 
 
 async def test_send_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matrix_bot: MatrixBot,
     image_path,
     matrix_events: list[Event],
@@ -50,7 +50,7 @@ async def test_send_message(
 
 
 async def test_unsendable_message(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matrix_bot: MatrixBot,
     matrix_events: list[Event],
     caplog: pytest.LogCaptureFixture,

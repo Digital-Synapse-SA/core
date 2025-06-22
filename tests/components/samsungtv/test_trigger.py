@@ -4,12 +4,12 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.components.samsungtv.const import DOMAIN
-from homeassistant.const import SERVICE_RELOAD, SERVICE_TURN_ON
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.samsungtv.const import DOMAIN
+from smarthub.const import SERVICE_RELOAD, SERVICE_TURN_ON
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import setup_samsungtv_entry
 from .const import ENTRYDATA_ENCRYPTED_WEBSOCKET
@@ -20,7 +20,7 @@ from tests.common import MockEntity, MockEntityPlatform
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
 @pytest.mark.parametrize("entity_domain", ["media_player", "remote"])
 async def test_turn_on_trigger_device_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
     entity_domain: str,
@@ -66,14 +66,14 @@ async def test_turn_on_trigger_device_id(
     assert service_calls[1].data["some"] == device.id
     assert service_calls[1].data["id"] == 0
 
-    with patch("homeassistant.config.load_yaml_dict", return_value={}):
+    with patch("smarthub.config.load_yaml_dict", return_value={}):
         await hass.services.async_call(automation.DOMAIN, SERVICE_RELOAD, blocking=True)
 
     service_calls.clear()
 
     # Ensure WOL backup is called when trigger not present
     with patch(
-        "homeassistant.components.samsungtv.entity.send_magic_packet"
+        "smarthub.components.samsungtv.entity.send_magic_packet"
     ) as mock_send_magic_packet:
         await hass.services.async_call(
             entity_domain, SERVICE_TURN_ON, {"entity_id": entity_id}, blocking=True
@@ -87,7 +87,7 @@ async def test_turn_on_trigger_device_id(
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
 @pytest.mark.parametrize("entity_domain", ["media_player", "remote"])
 async def test_turn_on_trigger_entity_id(
-    hass: HomeAssistant, service_calls: list[ServiceCall], entity_domain: str
+    hass: SmartHub, service_calls: list[ServiceCall], entity_domain: str
 ) -> None:
     """Test for turn_on triggers by entity_id firing."""
     await setup_samsungtv_entry(hass, ENTRYDATA_ENCRYPTED_WEBSOCKET)
@@ -129,7 +129,7 @@ async def test_turn_on_trigger_entity_id(
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
 @pytest.mark.parametrize("entity_domain", ["media_player", "remote"])
 async def test_wrong_trigger_platform_type(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, entity_domain: str
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, entity_domain: str
 ) -> None:
     """Test wrong trigger platform type."""
     await setup_samsungtv_entry(hass, ENTRYDATA_ENCRYPTED_WEBSOCKET)
@@ -166,7 +166,7 @@ async def test_wrong_trigger_platform_type(
 @pytest.mark.usefixtures("remote_encrypted_websocket", "rest_api")
 @pytest.mark.parametrize("entity_domain", ["media_player", "remote"])
 async def test_trigger_invalid_entity_id(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, entity_domain: str
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, entity_domain: str
 ) -> None:
     """Test turn on trigger using invalid entity_id."""
     await setup_samsungtv_entry(hass, ENTRYDATA_ENCRYPTED_WEBSOCKET)

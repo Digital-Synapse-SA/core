@@ -8,8 +8,8 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from yalexs.manager.activity import INITIAL_LOCK_RESYNC_TIME
 
-from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN, LockState
-from homeassistant.const import (
+from smarthub.components.lock import DOMAIN as LOCK_DOMAIN, LockState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_LOCK,
     SERVICE_OPEN,
@@ -17,10 +17,10 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceNotSupported
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceNotSupported
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.util import dt as dt_util
 
 from .mocks import (
     _create_yale_with_devices,
@@ -36,7 +36,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_lock_device_registry(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry, snapshot: SnapshotAssertion
+    hass: SmartHub, device_registry: dr.DeviceRegistry, snapshot: SnapshotAssertion
 ) -> None:
     """Test creation of a lock with doorsense and bridge ands up in the registry."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
@@ -48,7 +48,7 @@ async def test_lock_device_registry(
     assert reg_device == snapshot
 
 
-async def test_lock_changed_by(hass: HomeAssistant) -> None:
+async def test_lock_changed_by(hass: SmartHub) -> None:
     """Test creation of a lock with doorsense and bridge."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
 
@@ -60,7 +60,7 @@ async def test_lock_changed_by(hass: HomeAssistant) -> None:
     assert lock_state.attributes["changed_by"] == "Your favorite elven princess"
 
 
-async def test_state_locking(hass: HomeAssistant) -> None:
+async def test_state_locking(hass: SmartHub) -> None:
     """Test creation of a lock with doorsense and bridge that is locking."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
 
@@ -70,7 +70,7 @@ async def test_state_locking(hass: HomeAssistant) -> None:
     assert hass.states.get("lock.online_with_doorsense_name").state == LockState.LOCKING
 
 
-async def test_state_unlocking(hass: HomeAssistant) -> None:
+async def test_state_unlocking(hass: SmartHub) -> None:
     """Test creation of a lock with doorsense and bridge that is unlocking."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
 
@@ -84,7 +84,7 @@ async def test_state_unlocking(hass: HomeAssistant) -> None:
     assert lock_online_with_doorsense_name.state == LockState.UNLOCKING
 
 
-async def test_state_jammed(hass: HomeAssistant) -> None:
+async def test_state_jammed(hass: SmartHub) -> None:
     """Test creation of a lock with doorsense and bridge that is jammed."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
 
@@ -95,7 +95,7 @@ async def test_state_jammed(hass: HomeAssistant) -> None:
 
 
 async def test_one_lock_operation(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test creation of a lock with doorsense and bridge."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
@@ -128,7 +128,7 @@ async def test_one_lock_operation(
     assert operator_state.state == STATE_UNKNOWN
 
 
-async def test_open_lock_operation(hass: HomeAssistant) -> None:
+async def test_open_lock_operation(hass: SmartHub) -> None:
     """Test open lock operation using the open service."""
     lock_with_unlatch = await _mock_lock_with_unlatch(hass)
     await _create_yale_with_devices(hass, [lock_with_unlatch])
@@ -142,7 +142,7 @@ async def test_open_lock_operation(hass: HomeAssistant) -> None:
 
 
 async def test_open_lock_operation_socketio_connected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -175,7 +175,7 @@ async def test_open_lock_operation_socketio_connected(
 
 
 async def test_one_lock_operation_socketio_connected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -248,7 +248,7 @@ async def test_one_lock_operation_socketio_connected(
     assert states.get("lock.online_with_doorsense_name").state == LockState.UNLOCKED
 
 
-async def test_lock_jammed(hass: HomeAssistant) -> None:
+async def test_lock_jammed(hass: SmartHub) -> None:
     """Test lock gets jammed on unlock."""
 
     def _unlock_return_activities_side_effect(access_token, device_id):
@@ -276,7 +276,7 @@ async def test_lock_jammed(hass: HomeAssistant) -> None:
 
 
 async def test_lock_throws_exception_on_unknown_status_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test lock throws exception."""
 
@@ -302,7 +302,7 @@ async def test_lock_throws_exception_on_unknown_status_code(
         await hass.services.async_call(LOCK_DOMAIN, SERVICE_UNLOCK, data, blocking=True)
 
 
-async def test_one_lock_unknown_state(hass: HomeAssistant) -> None:
+async def test_one_lock_unknown_state(hass: SmartHub) -> None:
     """Test creation of a lock with doorsense and bridge."""
     lock_one = await _mock_lock_from_fixture(
         hass,
@@ -313,7 +313,7 @@ async def test_one_lock_unknown_state(hass: HomeAssistant) -> None:
     assert hass.states.get("lock.brokenid_name").state == STATE_UNKNOWN
 
 
-async def test_lock_bridge_offline(hass: HomeAssistant) -> None:
+async def test_lock_bridge_offline(hass: SmartHub) -> None:
     """Test creation of a lock with doorsense and bridge that goes offline."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
 
@@ -326,7 +326,7 @@ async def test_lock_bridge_offline(hass: HomeAssistant) -> None:
     assert states.get("lock.online_with_doorsense_name").state == STATE_UNAVAILABLE
 
 
-async def test_lock_bridge_online(hass: HomeAssistant) -> None:
+async def test_lock_bridge_online(hass: SmartHub) -> None:
     """Test creation of a lock with doorsense and bridge that goes offline."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
 
@@ -339,7 +339,7 @@ async def test_lock_bridge_online(hass: HomeAssistant) -> None:
     assert states.get("lock.online_with_doorsense_name").state == LockState.LOCKED
 
 
-async def test_lock_update_via_socketio(hass: HomeAssistant) -> None:
+async def test_lock_update_via_socketio(hass: SmartHub) -> None:
     """Test creation of a lock with doorsense and bridge."""
     lock_one = await _mock_doorsense_enabled_yale_lock_detail(hass)
     assert lock_one.pubsub_channel == "pubsub"
@@ -416,11 +416,11 @@ async def test_lock_update_via_socketio(hass: HomeAssistant) -> None:
 
 
 async def test_open_throws_hass_service_not_supported_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test open throws correct error on entity does not support this service error."""
     # Fetch translations
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     mocked_lock_detail = await _mock_operative_yale_lock_detail(hass)
     await _create_yale_with_devices(hass, [mocked_lock_detail])
     entity_id = "lock.a6697750d607098bae8d6baa11ef8063_name"

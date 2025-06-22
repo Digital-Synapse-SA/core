@@ -1,9 +1,9 @@
 """Tests for Overkiz integration init."""
 
-from homeassistant.components.overkiz.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.overkiz.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .test_config_flow import TEST_EMAIL, TEST_GATEWAY_ID, TEST_PASSWORD, TEST_SERVER
 
@@ -18,7 +18,7 @@ ENTITY_SENSOR_TARGET_CLOSURE_STATE_2 = (
 )
 
 
-async def test_unique_id_migration(hass: HomeAssistant) -> None:
+async def test_unique_id_migration(hass: SmartHub) -> None:
     """Test migration of sensor unique IDs."""
 
     mock_entry = MockConfigEntry(

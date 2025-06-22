@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 from smarttub import LoginFailed
 
-from homeassistant import config_entries
-from homeassistant.components.smarttub.const import DOMAIN
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.smarttub.const import DOMAIN
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -22,7 +22,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.smarttub.async_setup_entry",
+        "smarthub.components.smarttub.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -40,7 +40,7 @@ async def test_form(hass: HomeAssistant) -> None:
         mock_setup_entry.assert_called_once()
 
 
-async def test_form_invalid_auth(hass: HomeAssistant, smarttub_api) -> None:
+async def test_form_invalid_auth(hass: SmartHub, smarttub_api) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -57,7 +57,7 @@ async def test_form_invalid_auth(hass: HomeAssistant, smarttub_api) -> None:
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_reauth_success(hass: HomeAssistant, smarttub_api, account) -> None:
+async def test_reauth_success(hass: SmartHub, smarttub_api, account) -> None:
     """Test reauthentication flow."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -81,7 +81,7 @@ async def test_reauth_success(hass: HomeAssistant, smarttub_api, account) -> Non
     assert mock_entry.data[CONF_PASSWORD] == "test-password3"
 
 
-async def test_reauth_wrong_account(hass: HomeAssistant, smarttub_api, account) -> None:
+async def test_reauth_wrong_account(hass: SmartHub, smarttub_api, account) -> None:
     """Test reauthentication flow if the user enters credentials for a different already-configured account."""
     mock_entry1 = MockConfigEntry(
         domain=DOMAIN,

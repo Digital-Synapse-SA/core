@@ -12,11 +12,11 @@ from pyvesync.vesyncoutlet import VeSyncOutlet
 from pyvesync.vesyncswitch import VeSyncSwitch
 import requests_mock
 
-from homeassistant.components.vesync import DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType
+from smarthub.components.vesync import DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.helpers.typing import ConfigType
 
 from .common import mock_multiple_device_responses
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry
 
 
 @pytest.fixture(name="config_entry")
-def config_entry_fixture(hass: HomeAssistant, config) -> ConfigEntry:
+def config_entry_fixture(hass: SmartHub, config) -> ConfigEntry:
     """Create a mock VeSync config entry."""
     entry = MockConfigEntry(
         title="VeSync",
@@ -67,7 +67,7 @@ def manager_fixture() -> VeSync:
     mock_vesync.time_zone = "America/New_York"
     mock = Mock(return_value=mock_vesync)
 
-    with patch("homeassistant.components.vesync.VeSync", new=mock):
+    with patch("smarthub.components.vesync.VeSync", new=mock):
         yield mock_vesync
 
 
@@ -165,7 +165,7 @@ def humidifier_300s_fixture():
 
 @pytest.fixture(name="humidifier_config_entry")
 async def humidifier_config_entry(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker, config
+    hass: SmartHub, requests_mock: requests_mock.Mocker, config
 ) -> MockConfigEntry:
     """Create a mock VeSync config entry for `Humidifier 200s`."""
     entry = MockConfigEntry(
@@ -185,7 +185,7 @@ async def humidifier_config_entry(
 
 @pytest.fixture
 async def install_humidifier_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     manager,
     request: pytest.FixtureRequest,
@@ -200,7 +200,7 @@ async def install_humidifier_device(
 
 @pytest.fixture(name="fan_config_entry")
 async def fan_config_entry(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker, config
+    hass: SmartHub, requests_mock: requests_mock.Mocker, config
 ) -> MockConfigEntry:
     """Create a mock VeSync config entry for `SmartTowerFan`."""
     entry = MockConfigEntry(
@@ -220,7 +220,7 @@ async def fan_config_entry(
 
 @pytest.fixture(name="switch_old_id_config_entry")
 async def switch_old_id_config_entry(
-    hass: HomeAssistant, requests_mock: requests_mock.Mocker, config
+    hass: SmartHub, requests_mock: requests_mock.Mocker, config
 ) -> MockConfigEntry:
     """Create a mock VeSync config entry for `switch` with the old unique ID approach."""
     entry = MockConfigEntry(

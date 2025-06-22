@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from switchbot.devices.device import SwitchbotOperationError
 
-from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
-from homeassistant.components.cover import (
+from smarthub.components.bluetooth import BluetoothServiceInfoBleak
+from smarthub.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_CURRENT_TILT_POSITION,
     ATTR_POSITION,
@@ -15,7 +15,7 @@ from homeassistant.components.cover import (
     DOMAIN as COVER_DOMAIN,
     CoverState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_CLOSE_COVER_TILT,
@@ -26,8 +26,8 @@ from homeassistant.const import (
     SERVICE_STOP_COVER,
     SERVICE_STOP_COVER_TILT,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError
 
 from . import (
     ROLLER_SHADE_SERVICE_INFO,
@@ -41,7 +41,7 @@ from tests.components.bluetooth import inject_bluetooth_service_info
 
 
 async def test_curtain3_setup(
-    hass: HomeAssistant, mock_entry_factory: Callable[[str], MockConfigEntry]
+    hass: SmartHub, mock_entry_factory: Callable[[str], MockConfigEntry]
 ) -> None:
     """Test setting up the Curtain3."""
     inject_bluetooth_service_info(hass, WOCURTAIN3_SERVICE_INFO)
@@ -70,7 +70,7 @@ async def test_curtain3_setup(
 
 
 async def test_curtain3_controlling(
-    hass: HomeAssistant, mock_entry_factory: Callable[[str], MockConfigEntry]
+    hass: SmartHub, mock_entry_factory: Callable[[str], MockConfigEntry]
 ) -> None:
     """Test Curtain3 controlling."""
     inject_bluetooth_service_info(hass, WOCURTAIN3_SERVICE_INFO)
@@ -80,19 +80,19 @@ async def test_curtain3_controlling(
 
     with (
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotCurtain.open",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotCurtain.open",
             new=AsyncMock(return_value=True),
         ) as mock_open,
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotCurtain.close",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotCurtain.close",
             new=AsyncMock(return_value=True),
         ) as mock_close,
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotCurtain.stop",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotCurtain.stop",
             new=AsyncMock(return_value=True),
         ) as mock_stop,
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotCurtain.set_position",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotCurtain.set_position",
             new=AsyncMock(return_value=True),
         ) as mock_set_position,
     ):
@@ -171,7 +171,7 @@ async def test_curtain3_controlling(
 
 
 async def test_blindtilt_setup(
-    hass: HomeAssistant, mock_entry_factory: Callable[[str], MockConfigEntry]
+    hass: SmartHub, mock_entry_factory: Callable[[str], MockConfigEntry]
 ) -> None:
     """Test setting up the blindtilt."""
     inject_bluetooth_service_info(hass, WOBLINDTILT_SERVICE_INFO)
@@ -191,7 +191,7 @@ async def test_blindtilt_setup(
 
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.switchbot.cover.switchbot.SwitchbotBlindTilt.update",
+        "smarthub.components.switchbot.cover.switchbot.SwitchbotBlindTilt.update",
         new=AsyncMock(return_value=True),
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -203,7 +203,7 @@ async def test_blindtilt_setup(
 
 
 async def test_blindtilt_controlling(
-    hass: HomeAssistant, mock_entry_factory: Callable[[str], MockConfigEntry]
+    hass: SmartHub, mock_entry_factory: Callable[[str], MockConfigEntry]
 ) -> None:
     """Test blindtilt controlling."""
     inject_bluetooth_service_info(hass, WOBLINDTILT_SERVICE_INFO)
@@ -220,23 +220,23 @@ async def test_blindtilt_controlling(
     }
     with (
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotBlindTilt.get_basic_info",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotBlindTilt.get_basic_info",
             new=AsyncMock(return_value=info),
         ),
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotBlindTilt.open",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotBlindTilt.open",
             new=AsyncMock(return_value=True),
         ) as mock_open,
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotBlindTilt.close",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotBlindTilt.close",
             new=AsyncMock(return_value=True),
         ) as mock_close,
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotBlindTilt.stop",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotBlindTilt.stop",
             new=AsyncMock(return_value=True),
         ) as mock_stop,
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotBlindTilt.set_position",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotBlindTilt.set_position",
             new=AsyncMock(return_value=True),
         ) as mock_set_position,
     ):
@@ -256,7 +256,7 @@ async def test_blindtilt_controlling(
             blocking=True,
         )
         with patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotBlindTilt.get_basic_info",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotBlindTilt.get_basic_info",
             return_value=info,
         ):
             inject_bluetooth_service_info(
@@ -279,7 +279,7 @@ async def test_blindtilt_controlling(
             blocking=True,
         )
         with patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotBlindTilt.get_basic_info",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotBlindTilt.get_basic_info",
             return_value=info,
         ):
             inject_bluetooth_service_info(
@@ -301,7 +301,7 @@ async def test_blindtilt_controlling(
             blocking=True,
         )
         with patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotBlindTilt.get_basic_info",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotBlindTilt.get_basic_info",
             return_value=info,
         ):
             inject_bluetooth_service_info(
@@ -323,7 +323,7 @@ async def test_blindtilt_controlling(
             blocking=True,
         )
         with patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotBlindTilt.get_basic_info",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotBlindTilt.get_basic_info",
             return_value=info,
         ):
             inject_bluetooth_service_info(
@@ -338,7 +338,7 @@ async def test_blindtilt_controlling(
 
 
 async def test_roller_shade_setup(
-    hass: HomeAssistant, mock_entry_factory: Callable[[str], MockConfigEntry]
+    hass: SmartHub, mock_entry_factory: Callable[[str], MockConfigEntry]
 ) -> None:
     """Test setting up the RollerShade."""
     inject_bluetooth_service_info(hass, WOCURTAIN3_SERVICE_INFO)
@@ -359,7 +359,7 @@ async def test_roller_shade_setup(
 
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.switchbot.cover.switchbot.SwitchbotRollerShade.update",
+        "smarthub.components.switchbot.cover.switchbot.SwitchbotRollerShade.update",
         new=AsyncMock(return_value=True),
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
@@ -371,7 +371,7 @@ async def test_roller_shade_setup(
 
 
 async def test_roller_shade_controlling(
-    hass: HomeAssistant, mock_entry_factory: Callable[[str], MockConfigEntry]
+    hass: SmartHub, mock_entry_factory: Callable[[str], MockConfigEntry]
 ) -> None:
     """Test Roller Shade controlling."""
     inject_bluetooth_service_info(hass, ROLLER_SHADE_SERVICE_INFO)
@@ -381,23 +381,23 @@ async def test_roller_shade_controlling(
     info = {"battery": 39}
     with (
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotRollerShade.get_basic_info",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotRollerShade.get_basic_info",
             new=AsyncMock(return_value=info),
         ),
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotRollerShade.open",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotRollerShade.open",
             new=AsyncMock(return_value=True),
         ) as mock_open,
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotRollerShade.close",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotRollerShade.close",
             new=AsyncMock(return_value=True),
         ) as mock_close,
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotRollerShade.stop",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotRollerShade.stop",
             new=AsyncMock(return_value=True),
         ) as mock_stop,
         patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotRollerShade.set_position",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotRollerShade.set_position",
             new=AsyncMock(return_value=True),
         ) as mock_set_position,
     ):
@@ -417,7 +417,7 @@ async def test_roller_shade_controlling(
             blocking=True,
         )
         with patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotRollerShade.get_basic_info",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotRollerShade.get_basic_info",
             new=AsyncMock(return_value=info),
         ):
             inject_bluetooth_service_info(
@@ -439,7 +439,7 @@ async def test_roller_shade_controlling(
             blocking=True,
         )
         with patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotRollerShade.get_basic_info",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotRollerShade.get_basic_info",
             return_value=info,
         ):
             inject_bluetooth_service_info(
@@ -461,7 +461,7 @@ async def test_roller_shade_controlling(
             blocking=True,
         )
         with patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotRollerShade.get_basic_info",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotRollerShade.get_basic_info",
             return_value=info,
         ):
             inject_bluetooth_service_info(
@@ -483,7 +483,7 @@ async def test_roller_shade_controlling(
             blocking=True,
         )
         with patch(
-            "homeassistant.components.switchbot.cover.switchbot.SwitchbotRollerShade.get_basic_info",
+            "smarthub.components.switchbot.cover.switchbot.SwitchbotRollerShade.get_basic_info",
             return_value=info,
         ):
             inject_bluetooth_service_info(
@@ -615,7 +615,7 @@ async def test_roller_shade_controlling(
     ],
 )
 async def test_exception_handling_cover_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry_factory: Callable[[str], MockConfigEntry],
     sensor_type: str,
     service_info: BluetoothServiceInfoBleak,
@@ -634,14 +634,14 @@ async def test_exception_handling_cover_service(
     entity_id = "cover.test_name"
 
     with patch.multiple(
-        f"homeassistant.components.switchbot.cover.switchbot.{class_name}",
+        f"smarthub.components.switchbot.cover.switchbot.{class_name}",
         update=AsyncMock(return_value=None),
         **{mock_method: AsyncMock(side_effect=exception)},
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
-        with pytest.raises(HomeAssistantError, match=error_message):
+        with pytest.raises(SmartHubError, match=error_message):
             await hass.services.async_call(
                 COVER_DOMAIN,
                 service,

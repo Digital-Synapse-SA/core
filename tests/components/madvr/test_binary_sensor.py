@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 from .conftest import get_update_callback
@@ -18,13 +18,13 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_binary_sensor_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test setup of the binary sensor entities."""
-    with patch("homeassistant.components.madvr.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.madvr.PLATFORMS", [Platform.BINARY_SENSOR]):
         await setup_integration(hass, mock_config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
@@ -55,7 +55,7 @@ async def test_binary_sensor_setup(
     ],
 )
 async def test_binary_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_madvr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     entity_id: str,

@@ -6,15 +6,15 @@ from aiohttp import ClientError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_OPTION,
     SERVICE_SELECT_OPTION,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
@@ -27,7 +27,7 @@ ENTITY_UID = "robin-r-1234-20240201-123456-aa-bb-cc-dd-ee-ff-47041"
 
 
 async def test_selecting(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_myuplink_client: MagicMock,
     setup_platform: None,
 ) -> None:
@@ -45,7 +45,7 @@ async def test_selecting(
     # Test handling of exception from API.
 
     mock_myuplink_client.async_set_device_points.side_effect = ClientError
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             TEST_PLATFORM,
             SERVICE_SELECT_OPTION,
@@ -60,7 +60,7 @@ async def test_selecting(
     ["device_points_nibe_smo20.json"],
 )
 async def test_entity_registry_smo20(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_myuplink_client: MagicMock,
     setup_platform: None,
@@ -72,7 +72,7 @@ async def test_entity_registry_smo20(
 
 
 async def test_select_states(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_myuplink_client: MagicMock,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,

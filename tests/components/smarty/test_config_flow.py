@@ -2,17 +2,17 @@
 
 from unittest.mock import AsyncMock
 
-from homeassistant.components.smarty.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.smarty.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant, mock_smarty: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_smarty: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test the full flow."""
 
@@ -35,7 +35,7 @@ async def test_full_flow(
 
 
 async def test_cannot_connect(
-    hass: HomeAssistant, mock_smarty: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_smarty: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle cannot connect error."""
 
@@ -66,7 +66,7 @@ async def test_cannot_connect(
 
 
 async def test_unknown_error(
-    hass: HomeAssistant, mock_smarty: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_smarty: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test we handle unknown error."""
 
@@ -97,7 +97,7 @@ async def test_unknown_error(
 
 
 async def test_existing_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we handle existing entry."""
     mock_config_entry.add_to_hass(hass)

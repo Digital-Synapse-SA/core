@@ -10,18 +10,18 @@ from aioelectricitymaps import (
 )
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.co2signal import config_flow
-from homeassistant.components.co2signal.const import DOMAIN
-from homeassistant.const import CONF_API_KEY
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.co2signal import config_flow
+from smarthub.components.co2signal.const import DOMAIN
+from smarthub.const import CONF_API_KEY
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("electricity_maps")
-async def test_form_home(hass: HomeAssistant) -> None:
+async def test_form_home(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -31,7 +31,7 @@ async def test_form_home(hass: HomeAssistant) -> None:
     assert result["errors"] is None
 
     with patch(
-        "homeassistant.components.co2signal.async_setup_entry",
+        "smarthub.components.co2signal.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
@@ -52,7 +52,7 @@ async def test_form_home(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("electricity_maps")
-async def test_form_coordinates(hass: HomeAssistant) -> None:
+async def test_form_coordinates(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -71,7 +71,7 @@ async def test_form_coordinates(hass: HomeAssistant) -> None:
     assert result2["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.co2signal.async_setup_entry",
+        "smarthub.components.co2signal.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result3 = await hass.config_entries.flow.async_configure(
@@ -94,7 +94,7 @@ async def test_form_coordinates(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("electricity_maps")
-async def test_form_country(hass: HomeAssistant) -> None:
+async def test_form_country(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -113,7 +113,7 @@ async def test_form_country(hass: HomeAssistant) -> None:
     assert result2["type"] is FlowResultType.FORM
 
     with patch(
-        "homeassistant.components.co2signal.async_setup_entry",
+        "smarthub.components.co2signal.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result3 = await hass.config_entries.flow.async_configure(
@@ -147,7 +147,7 @@ async def test_form_country(hass: HomeAssistant) -> None:
     ids=["invalid auth", "generic error", "json decode error", "no data error"],
 )
 async def test_form_error_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     electricity_maps: AsyncMock,
     side_effect: Exception,
     err_code: str,
@@ -192,7 +192,7 @@ async def test_form_error_handling(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     electricity_maps: AsyncMock,
 ) -> None:
@@ -205,7 +205,7 @@ async def test_reauth(
     assert init_result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.co2signal.async_setup_entry",
+        "smarthub.components.co2signal.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         configure_result = await hass.config_entries.flow.async_configure(

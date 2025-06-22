@@ -5,11 +5,11 @@ from unittest.mock import patch
 from bleak import BleakError
 from led_ble import CharacteristicMissingError
 
-from homeassistant import config_entries
-from homeassistant.components.led_ble.const import DOMAIN
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.led_ble.const import DOMAIN
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import (
     LED_BLE_DISCOVERY_INFO,
@@ -20,10 +20,10 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_user_step_success(hass: HomeAssistant) -> None:
+async def test_user_step_success(hass: SmartHub) -> None:
     """Test user step success path."""
     with patch(
-        "homeassistant.components.led_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.led_ble.config_flow.async_discovered_service_info",
         return_value=[NOT_LED_BLE_DISCOVERY_INFO, LED_BLE_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -35,10 +35,10 @@ async def test_user_step_success(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.led_ble.config_flow.LEDBLE.update",
+            "smarthub.components.led_ble.config_flow.LEDBLE.update",
         ),
         patch(
-            "homeassistant.components.led_ble.async_setup_entry",
+            "smarthub.components.led_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -59,10 +59,10 @@ async def test_user_step_success(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_step_no_devices_found(hass: HomeAssistant) -> None:
+async def test_user_step_no_devices_found(hass: SmartHub) -> None:
     """Test user step with no devices found."""
     with patch(
-        "homeassistant.components.led_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.led_ble.config_flow.async_discovered_service_info",
         return_value=[NOT_LED_BLE_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -72,7 +72,7 @@ async def test_user_step_no_devices_found(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_user_step_no_new_devices_found(hass: HomeAssistant) -> None:
+async def test_user_step_no_new_devices_found(hass: SmartHub) -> None:
     """Test user step with only existing devices found."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -83,7 +83,7 @@ async def test_user_step_no_new_devices_found(hass: HomeAssistant) -> None:
     )
     entry.add_to_hass(hass)
     with patch(
-        "homeassistant.components.led_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.led_ble.config_flow.async_discovered_service_info",
         return_value=[LED_BLE_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -93,10 +93,10 @@ async def test_user_step_no_new_devices_found(hass: HomeAssistant) -> None:
     assert result["reason"] == "no_devices_found"
 
 
-async def test_user_step_cannot_connect(hass: HomeAssistant) -> None:
+async def test_user_step_cannot_connect(hass: SmartHub) -> None:
     """Test user step and we cannot connect."""
     with patch(
-        "homeassistant.components.led_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.led_ble.config_flow.async_discovered_service_info",
         return_value=[LED_BLE_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -107,7 +107,7 @@ async def test_user_step_cannot_connect(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.led_ble.config_flow.LEDBLE.update",
+        "smarthub.components.led_ble.config_flow.LEDBLE.update",
         side_effect=BleakError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -124,10 +124,10 @@ async def test_user_step_cannot_connect(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.led_ble.config_flow.LEDBLE.update",
+            "smarthub.components.led_ble.config_flow.LEDBLE.update",
         ),
         patch(
-            "homeassistant.components.led_ble.async_setup_entry",
+            "smarthub.components.led_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -148,10 +148,10 @@ async def test_user_step_cannot_connect(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_step_unknown_exception(hass: HomeAssistant) -> None:
+async def test_user_step_unknown_exception(hass: SmartHub) -> None:
     """Test user step with an unknown exception."""
     with patch(
-        "homeassistant.components.led_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.led_ble.config_flow.async_discovered_service_info",
         return_value=[NOT_LED_BLE_DISCOVERY_INFO, LED_BLE_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -162,7 +162,7 @@ async def test_user_step_unknown_exception(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.led_ble.config_flow.LEDBLE.update",
+        "smarthub.components.led_ble.config_flow.LEDBLE.update",
         side_effect=RuntimeError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -179,10 +179,10 @@ async def test_user_step_unknown_exception(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.led_ble.config_flow.LEDBLE.update",
+            "smarthub.components.led_ble.config_flow.LEDBLE.update",
         ),
         patch(
-            "homeassistant.components.led_ble.async_setup_entry",
+            "smarthub.components.led_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -203,10 +203,10 @@ async def test_user_step_unknown_exception(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_step_not_supported(hass: HomeAssistant) -> None:
+async def test_user_step_not_supported(hass: SmartHub) -> None:
     """Test user step with a non supported device."""
     with patch(
-        "homeassistant.components.led_ble.config_flow.async_discovered_service_info",
+        "smarthub.components.led_ble.config_flow.async_discovered_service_info",
         return_value=[LED_BLE_DISCOVERY_INFO],
     ):
         result = await hass.config_entries.flow.async_init(
@@ -217,7 +217,7 @@ async def test_user_step_not_supported(hass: HomeAssistant) -> None:
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.led_ble.config_flow.LEDBLE.update",
+        "smarthub.components.led_ble.config_flow.LEDBLE.update",
         side_effect=CharacteristicMissingError,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -232,7 +232,7 @@ async def test_user_step_not_supported(hass: HomeAssistant) -> None:
     assert result2["reason"] == "not_supported"
 
 
-async def test_bluetooth_step_success(hass: HomeAssistant) -> None:
+async def test_bluetooth_step_success(hass: SmartHub) -> None:
     """Test bluetooth step success path."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -245,10 +245,10 @@ async def test_bluetooth_step_success(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.led_ble.config_flow.LEDBLE.update",
+            "smarthub.components.led_ble.config_flow.LEDBLE.update",
         ),
         patch(
-            "homeassistant.components.led_ble.async_setup_entry",
+            "smarthub.components.led_ble.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -269,7 +269,7 @@ async def test_bluetooth_step_success(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_bluetooth_unsupported_model(hass: HomeAssistant) -> None:
+async def test_bluetooth_unsupported_model(hass: SmartHub) -> None:
     """Test bluetooth step with an unsupported model path."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,

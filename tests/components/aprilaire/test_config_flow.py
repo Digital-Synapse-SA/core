@@ -6,11 +6,11 @@ from pyaprilaire.client import AprilaireClient
 from pyaprilaire.const import FunctionalDomain
 import pytest
 
-from homeassistant.components.aprilaire.config_flow import (
+from smarthub.components.aprilaire.config_flow import (
     STEP_USER_DATA_SCHEMA,
     AprilaireConfigFlow,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 @pytest.fixture
@@ -67,7 +67,7 @@ async def test_config_flow_invalid_data(client: AprilaireClient) -> None:
     )
 
 
-async def test_config_flow_data(client: AprilaireClient, hass: HomeAssistant) -> None:
+async def test_config_flow_data(client: AprilaireClient, hass: SmartHub) -> None:
     """Test the config flow with valid data."""
 
     client.data = {"mac_address": "1:2:3:4:5:6"}

@@ -7,14 +7,14 @@ import pytest
 from requests.exceptions import HTTPError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import PRESET_COMFORT, PRESET_ECO
-from homeassistant.components.fritzbox.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_DEVICES, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.climate import PRESET_COMFORT, PRESET_ECO
+from smarthub.components.fritzbox.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_DEVICES, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import (
     FritzDeviceBinarySensorMock,
@@ -42,7 +42,7 @@ ENTITY_ID = f"{SENSOR_DOMAIN}.{CONF_FAKE_NAME}"
     ],
 )
 async def test_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     fritz: Mock,
@@ -51,7 +51,7 @@ async def test_setup(
     """Test setup of sensor platform for different device types."""
     device = device()
 
-    with patch("homeassistant.components.fritzbox.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.fritzbox.PLATFORMS", [Platform.SENSOR]):
         entry = await setup_config_entry(
             hass, MOCK_CONFIG[DOMAIN][CONF_DEVICES][0], ENTITY_ID, device, fritz
         )
@@ -60,7 +60,7 @@ async def test_setup(
     await snapshot_platform(hass, entity_registry, snapshot, entry.entry_id)
 
 
-async def test_update(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_update(hass: SmartHub, fritz: Mock) -> None:
     """Test update without error."""
     device = FritzDeviceSensorMock()
     await setup_config_entry(
@@ -77,7 +77,7 @@ async def test_update(hass: HomeAssistant, fritz: Mock) -> None:
     assert fritz().login.call_count == 1
 
 
-async def test_update_error(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_update_error(hass: SmartHub, fritz: Mock) -> None:
     """Test update with error."""
     device = FritzDeviceSensorMock()
     fritz().update_devices.side_effect = HTTPError("Boom")
@@ -96,7 +96,7 @@ async def test_update_error(hass: HomeAssistant, fritz: Mock) -> None:
     assert fritz().login.call_count == 4
 
 
-async def test_discover_new_device(hass: HomeAssistant, fritz: Mock) -> None:
+async def test_discover_new_device(hass: SmartHub, fritz: Mock) -> None:
     """Test adding new discovered devices during runtime."""
     device = FritzDeviceSensorMock()
     await setup_config_entry(
@@ -142,7 +142,7 @@ async def test_discover_new_device(hass: HomeAssistant, fritz: Mock) -> None:
     ],
 )
 async def test_next_change_sensors(
-    hass: HomeAssistant, fritz: Mock, next_changes: list, expected_states: list
+    hass: SmartHub, fritz: Mock, next_changes: list, expected_states: list
 ) -> None:
     """Test next change sensors."""
     device = FritzDeviceClimateMock()

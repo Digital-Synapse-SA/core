@@ -2,13 +2,13 @@
 
 import pytest
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.kodi.const import DOMAIN
-from homeassistant.components.media_player import DOMAIN as MP_DOMAIN
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.kodi.const import DOMAIN
+from smarthub.components.media_player import DOMAIN as MP_DOMAIN
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import init_integration
 
@@ -21,14 +21,14 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 @pytest.fixture
-async def kodi_media_player(hass: HomeAssistant) -> str:
+async def kodi_media_player(hass: SmartHub) -> str:
     """Get a kodi media player."""
     await init_integration(hass)
     return f"{MP_DOMAIN}.name"
 
 
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_get_triggers(
 
 
 async def test_if_fires_on_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
     kodi_media_player: str,
@@ -141,7 +141,7 @@ async def test_if_fires_on_state_change(
 
 
 async def test_if_fires_on_state_change_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
     kodi_media_player: str,

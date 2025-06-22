@@ -4,16 +4,16 @@ from unittest.mock import patch
 
 from aioairzone_cloud.exceptions import AirzoneTimeout
 
-from homeassistant.components.airzone_cloud.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.components.airzone_cloud.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .util import CONFIG
 
 from tests.common import MockConfigEntry
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test unload."""
 
     config_entry = MockConfigEntry(
@@ -25,23 +25,23 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.login",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.login",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.logout",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.logout",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.list_installations",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.list_installations",
             return_value=[],
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.update_installation",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.update_installation",
             return_value=None,
         ),
         patch(
-            "homeassistant.components.airzone_cloud.AirzoneCloudApi.update",
+            "smarthub.components.airzone_cloud.AirzoneCloudApi.update",
             return_value=None,
         ),
     ):
@@ -54,11 +54,11 @@ async def test_unload_entry(hass: HomeAssistant) -> None:
         assert config_entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_init_api_timeout(hass: HomeAssistant) -> None:
+async def test_init_api_timeout(hass: SmartHub) -> None:
     """Test API timeouts when loading the Airzone Cloud integration."""
 
     with patch(
-        "homeassistant.components.airzone_cloud.AirzoneCloudApi.login",
+        "smarthub.components.airzone_cloud.AirzoneCloudApi.login",
         side_effect=AirzoneTimeout,
     ):
         config_entry = MockConfigEntry(

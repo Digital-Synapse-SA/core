@@ -11,8 +11,8 @@ from freezegun.api import FrozenDateTimeFactory
 from pymodbus.exceptions import ModbusException
 import pytest
 
-from homeassistant.components.modbus.const import MODBUS_DOMAIN as DOMAIN, TCP
-from homeassistant.const import (
+from smarthub.components.modbus.const import MODBUS_DOMAIN as DOMAIN, TCP
+from smarthub.const import (
     CONF_ADDRESS,
     CONF_HOST,
     CONF_NAME,
@@ -20,9 +20,9 @@ from homeassistant.const import (
     CONF_SENSORS,
     CONF_TYPE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed, mock_restore_cache
 
@@ -99,17 +99,17 @@ def mock_pymodbus_fixture(do_exception, register_words):
         mock_pb.write_coils.side_effect = exc
     with (
         mock.patch(
-            "homeassistant.components.modbus.modbus.AsyncModbusTcpClient",
+            "smarthub.components.modbus.modbus.AsyncModbusTcpClient",
             return_value=mock_pb,
             autospec=True,
         ),
         mock.patch(
-            "homeassistant.components.modbus.modbus.AsyncModbusSerialClient",
+            "smarthub.components.modbus.modbus.AsyncModbusSerialClient",
             return_value=mock_pb,
             autospec=True,
         ),
         mock.patch(
-            "homeassistant.components.modbus.modbus.AsyncModbusUdpClient",
+            "smarthub.components.modbus.modbus.AsyncModbusUdpClient",
             return_value=mock_pb,
             autospec=True,
         ),
@@ -119,7 +119,7 @@ def mock_pymodbus_fixture(do_exception, register_words):
 
 @pytest.fixture(name="mock_modbus")
 async def mock_modbus_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     check_config_loaded,
     config_addon,
@@ -151,7 +151,7 @@ async def mock_modbus_fixture(
     }
     now = dt_util.utcnow()
     with mock.patch(
-        "homeassistant.helpers.event.dt_util.utcnow",
+        "smarthub.helpers.event.dt_util.utcnow",
         return_value=now,
         autospec=True,
     ):
@@ -163,7 +163,7 @@ async def mock_modbus_fixture(
 
 @pytest.fixture(name="mock_do_cycle")
 async def mock_do_cycle_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_modbus,
 ) -> FrozenDateTimeFactory:
@@ -175,7 +175,7 @@ async def mock_do_cycle_fixture(
 
 
 async def do_next_cycle(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory, cycle: int
+    hass: SmartHub, freezer: FrozenDateTimeFactory, cycle: int
 ) -> None:
     """Trigger update call with time_changed event."""
     freezer.tick(timedelta(seconds=cycle))
@@ -185,7 +185,7 @@ async def do_next_cycle(
 
 @pytest.fixture(name="mock_test_state")
 async def mock_test_state_fixture(
-    hass: HomeAssistant, request: pytest.FixtureRequest
+    hass: SmartHub, request: pytest.FixtureRequest
 ) -> Any:
     """Mock restore cache."""
     mock_restore_cache(hass, request.param)
@@ -194,10 +194,10 @@ async def mock_test_state_fixture(
 
 @pytest.fixture(name="mock_modbus_ha")
 async def mock_modbus_ha_fixture(
-    hass: HomeAssistant, mock_modbus: mock.AsyncMock
+    hass: SmartHub, mock_modbus: mock.AsyncMock
 ) -> mock.AsyncMock:
-    """Load homeassistant to allow service calls."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    """Load smarthub to allow service calls."""
+    assert await async_setup_component(hass, "smarthub", {})
     await hass.async_block_till_done()
     return mock_modbus
 

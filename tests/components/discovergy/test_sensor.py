@@ -8,8 +8,8 @@ from pydiscovergy.error import DiscovergyClientError, HTTPError, InvalidLogin
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 
 @pytest.mark.parametrize(
@@ -31,7 +31,7 @@ from homeassistant.helpers import entity_registry as er
 )
 @pytest.mark.usefixtures("setup_integration")
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     state_name: str,
     snapshot: SnapshotAssertion,
@@ -56,7 +56,7 @@ async def test_sensor(
 )
 @pytest.mark.usefixtures("setup_integration")
 async def test_sensor_update_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     discovergy: AsyncMock,
     error: Exception,

@@ -1,4 +1,4 @@
-"""Test Home Assistant executor util."""
+"""Test SmartHub executor util."""
 
 import concurrent.futures
 import time
@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.util import executor
-from homeassistant.util.executor import InterruptibleThreadPoolExecutor
+from smarthub.util import executor
+from smarthub.util.executor import InterruptibleThreadPoolExecutor
 
 
 async def test_executor_shutdown_can_interrupt_threads(

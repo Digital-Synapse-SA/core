@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock
 from mastodon.Mastodon import MastodonNetworkError, MastodonUnauthorizedError
 import pytest
 
-from homeassistant.components.mastodon.const import CONF_BASE_URL, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_CLIENT_ID, CONF_CLIENT_SECRET
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.mastodon.const import CONF_BASE_URL, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_CLIENT_ID, CONF_CLIENT_SECRET
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_full_flow(
 
 
 async def test_full_flow_with_path(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -89,7 +89,7 @@ async def test_full_flow_with_path(
     ],
 )
 async def test_flow_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     exception: Exception,
@@ -133,7 +133,7 @@ async def test_flow_errors(
 
 
 async def test_duplicate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     mock_config_entry: MockConfigEntry,

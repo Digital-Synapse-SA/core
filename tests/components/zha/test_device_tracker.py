@@ -9,16 +9,16 @@ from zha.application.registries import SMARTTHINGS_ARRIVAL_SENSOR_DEVICE_TYPE
 from zigpy.profiles import zha
 from zigpy.zcl.clusters import general
 
-from homeassistant.components.device_tracker import SourceType
-from homeassistant.components.zha.helpers import (
+from smarthub.components.device_tracker import SourceType
+from smarthub.components.zha.helpers import (
     ZHADeviceProxy,
     ZHAGatewayProxy,
     get_zha_gateway,
     get_zha_gateway_proxy,
 )
-from homeassistant.const import STATE_HOME, STATE_NOT_HOME, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.const import STATE_HOME, STATE_NOT_HOME, Platform
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from .common import find_entity_id, send_attributes_report
 from .conftest import SIG_EP_INPUT, SIG_EP_OUTPUT, SIG_EP_PROFILE, SIG_EP_TYPE
@@ -30,7 +30,7 @@ from tests.common import async_fire_time_changed
 def device_tracker_platforms_only():
     """Only set up the device_tracker platforms and required base platforms to speed up tests."""
     with patch(
-        "homeassistant.components.zha.PLATFORMS",
+        "smarthub.components.zha.PLATFORMS",
         (
             Platform.DEVICE_TRACKER,
             Platform.BUTTON,
@@ -44,7 +44,7 @@ def device_tracker_platforms_only():
 
 
 async def test_device_tracker(
-    hass: HomeAssistant, setup_zha, zigpy_device_mock
+    hass: SmartHub, setup_zha, zigpy_device_mock
 ) -> None:
     """Test ZHA device tracker platform."""
 

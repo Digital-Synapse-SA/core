@@ -11,26 +11,26 @@ from unittest.mock import patch
 from habluetooth.advertisement_tracker import TRACKER_BUFFERING_WOBBLE_SECONDS
 import pytest
 
-from homeassistant.components import bluetooth
-from homeassistant.components.bluetooth import (
+from smarthub.components import bluetooth
+from smarthub.components.bluetooth import (
     BaseHaRemoteScanner,
     HaBluetoothConnector,
     storage,
 )
-from homeassistant.components.bluetooth.const import (
+from smarthub.components.bluetooth.const import (
     CONNECTABLE_FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
     FALLBACK_MAXIMUM_STALE_ADVERTISEMENT_SECONDS,
     SCANNER_WATCHDOG_INTERVAL,
     SCANNER_WATCHDOG_TIMEOUT,
     UNAVAILABLE_TRACK_SECONDS,
 )
-from homeassistant.components.bluetooth.manager import HomeAssistantBluetoothManager
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
-from homeassistant.util.json import json_loads
+from smarthub.components.bluetooth.manager import SmartHubBluetoothManager
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub, callback
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
+from smarthub.util.json import json_loads
 
 from . import (
     FakeRemoteScanner as FakeScanner,
@@ -46,7 +46,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, async_load_fi
 
 @pytest.mark.parametrize("name_2", [None, "w"])
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_remote_scanner(hass: HomeAssistant, name_2: str | None) -> None:
+async def test_remote_scanner(hass: SmartHub, name_2: str | None) -> None:
     """Test the remote scanner base class merges advertisement_data."""
     manager = _get_manager()
 
@@ -138,7 +138,7 @@ async def test_remote_scanner(hass: HomeAssistant, name_2: str | None) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_remote_scanner_expires_connectable(hass: HomeAssistant) -> None:
+async def test_remote_scanner_expires_connectable(hass: SmartHub) -> None:
     """Test the remote scanner expires stale connectable data."""
     manager = _get_manager()
 
@@ -191,7 +191,7 @@ async def test_remote_scanner_expires_connectable(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_remote_scanner_expires_non_connectable(hass: HomeAssistant) -> None:
+async def test_remote_scanner_expires_non_connectable(hass: SmartHub) -> None:
     """Test the remote scanner expires stale non connectable data."""
     manager = _get_manager()
 
@@ -264,7 +264,7 @@ async def test_remote_scanner_expires_non_connectable(hass: HomeAssistant) -> No
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_base_scanner_connecting_behavior(hass: HomeAssistant) -> None:
+async def test_base_scanner_connecting_behavior(hass: SmartHub) -> None:
     """Test that the default behavior is to mark the scanner as not scanning when connecting."""
     manager = _get_manager()
 
@@ -308,7 +308,7 @@ async def test_base_scanner_connecting_behavior(hass: HomeAssistant) -> None:
 
 
 async def test_restore_history_remote_adapter(
-    hass: HomeAssistant, hass_storage: dict[str, Any], disable_new_discovery_flows
+    hass: SmartHub, hass_storage: dict[str, Any], disable_new_discovery_flows
 ) -> None:
     """Test we can restore history for a remote adapter."""
 
@@ -368,7 +368,7 @@ async def test_restore_history_remote_adapter(
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_device_with_ten_minute_advertising_interval(hass: HomeAssistant) -> None:
+async def test_device_with_ten_minute_advertising_interval(hass: SmartHub) -> None:
     """Test a device with a 10 minute advertising interval."""
     manager = _get_manager()
 
@@ -471,7 +471,7 @@ async def test_device_with_ten_minute_advertising_interval(hass: HomeAssistant) 
 
 
 @pytest.mark.usefixtures("enable_bluetooth")
-async def test_scanner_stops_responding(hass: HomeAssistant) -> None:
+async def test_scanner_stops_responding(hass: SmartHub) -> None:
     """Test we mark a scanner are not scanning when it stops responding."""
     manager = _get_manager()
 
@@ -533,13 +533,13 @@ async def test_scanner_stops_responding(hass: HomeAssistant) -> None:
     ],
 )
 async def test_remote_scanner_bluetooth_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     manufacturer: str,
     source: str,
 ) -> None:
     """Test the remote scanner gets a bluetooth config entry."""
-    manager: HomeAssistantBluetoothManager = _get_manager()
+    manager: SmartHubBluetoothManager = _get_manager()
 
     switchbot_device = generate_ble_device(
         "44:44:33:11:23:45",

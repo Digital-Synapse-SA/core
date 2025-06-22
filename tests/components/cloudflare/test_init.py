@@ -6,24 +6,24 @@ from unittest.mock import MagicMock, patch
 import pycfdns
 import pytest
 
-from homeassistant.components.cloudflare.const import (
+from smarthub.components.cloudflare.const import (
     CONF_RECORDS,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
     SERVICE_UPDATE_RECORDS,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util import dt as dt_util
-from homeassistant.util.location import LocationInfo
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.util import dt as dt_util
+from smarthub.util.location import LocationInfo
 
 from . import ENTRY_CONFIG, init_integration
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
 
-async def test_unload_entry(hass: HomeAssistant, cfupdate: MagicMock) -> None:
+async def test_unload_entry(hass: SmartHub, cfupdate: MagicMock) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass)
 
@@ -42,7 +42,7 @@ async def test_unload_entry(hass: HomeAssistant, cfupdate: MagicMock) -> None:
     [pycfdns.ComunicationException()],
 )
 async def test_async_setup_raises_entry_not_ready(
-    hass: HomeAssistant, cfupdate: MagicMock, side_effect: Exception
+    hass: SmartHub, cfupdate: MagicMock, side_effect: Exception
 ) -> None:
     """Test that it throws ConfigEntryNotReady when exception occurs during setup."""
     instance = cfupdate.return_value
@@ -57,7 +57,7 @@ async def test_async_setup_raises_entry_not_ready(
 
 
 async def test_async_setup_raises_entry_auth_failed(
-    hass: HomeAssistant, cfupdate: MagicMock
+    hass: SmartHub, cfupdate: MagicMock
 ) -> None:
     """Test that it throws ConfigEntryAuthFailed when exception occurs during setup."""
     instance = cfupdate.return_value
@@ -84,7 +84,7 @@ async def test_async_setup_raises_entry_auth_failed(
 
 
 async def test_integration_services(
-    hass: HomeAssistant, cfupdate: MagicMock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, cfupdate: MagicMock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test integration services."""
     instance = cfupdate.return_value
@@ -93,7 +93,7 @@ async def test_integration_services(
     assert entry.state is ConfigEntryState.LOADED
 
     with patch(
-        "homeassistant.components.cloudflare.async_detect_location_info",
+        "smarthub.components.cloudflare.async_detect_location_info",
         return_value=LocationInfo(
             "0.0.0.0",
             "US",
@@ -121,7 +121,7 @@ async def test_integration_services(
 
 
 async def test_integration_services_with_issue(
-    hass: HomeAssistant, cfupdate: MagicMock
+    hass: SmartHub, cfupdate: MagicMock
 ) -> None:
     """Test integration services with issue."""
     instance = cfupdate.return_value
@@ -131,10 +131,10 @@ async def test_integration_services_with_issue(
 
     with (
         patch(
-            "homeassistant.components.cloudflare.async_detect_location_info",
+            "smarthub.components.cloudflare.async_detect_location_info",
             return_value=None,
         ),
-        pytest.raises(HomeAssistantError, match="Could not get external IPv4 address"),
+        pytest.raises(SmartHubError, match="Could not get external IPv4 address"),
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -147,7 +147,7 @@ async def test_integration_services_with_issue(
 
 
 async def test_integration_services_with_nonexisting_record(
-    hass: HomeAssistant, cfupdate: MagicMock, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, cfupdate: MagicMock, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test integration services."""
     instance = cfupdate.return_value
@@ -158,7 +158,7 @@ async def test_integration_services_with_nonexisting_record(
     assert entry.state is ConfigEntryState.LOADED
 
     with patch(
-        "homeassistant.components.cloudflare.async_detect_location_info",
+        "smarthub.components.cloudflare.async_detect_location_info",
         return_value=LocationInfo(
             "0.0.0.0",
             "US",
@@ -186,7 +186,7 @@ async def test_integration_services_with_nonexisting_record(
 
 
 async def test_integration_update_interval(
-    hass: HomeAssistant,
+    hass: SmartHub,
     cfupdate: MagicMock,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -197,7 +197,7 @@ async def test_integration_update_interval(
     assert entry.state is ConfigEntryState.LOADED
 
     with patch(
-        "homeassistant.components.cloudflare.async_detect_location_info",
+        "smarthub.components.cloudflare.async_detect_location_info",
         return_value=LocationInfo(
             "0.0.0.0",
             "US",

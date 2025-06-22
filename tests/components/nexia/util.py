@@ -5,22 +5,22 @@ import uuid
 
 from nexia.home import NexiaHome
 
-from homeassistant.components.nexia.const import DOMAIN
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.nexia.const import DOMAIN
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_load_fixture
 from tests.test_util.aiohttp import mock_aiohttp_client
 
 
 async def async_init_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     skip_setup: bool = False,
     exception: Exception | None = None,
     *,
     house_fixture="mobile_houses_123456.json",
 ) -> MockConfigEntry:
-    """Set up the nexia integration in Home Assistant."""
+    """Set up the nexia integration in SmartHub."""
 
     session_fixture = "session_123456.json"
     sign_in_fixture = "sign_in.json"

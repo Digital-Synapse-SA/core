@@ -7,8 +7,8 @@ from unittest.mock import AsyncMock, Mock, patch
 from aioambient import OpenAPI
 import pytest
 
-from homeassistant.components.ambient_network.const import DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.ambient_network.const import DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import (
     MockConfigEntry,
@@ -21,7 +21,7 @@ from tests.common import (
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.ambient_network.async_setup_entry", return_value=True
+        "smarthub.components.ambient_network.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -54,11 +54,11 @@ async def mock_aioambient(open_api: OpenAPI):
     """Mock aioambient library."""
     with (
         patch(
-            "homeassistant.components.ambient_network.config_flow.OpenAPI",
+            "smarthub.components.ambient_network.config_flow.OpenAPI",
             return_value=open_api,
         ),
         patch(
-            "homeassistant.components.ambient_network.OpenAPI",
+            "smarthub.components.ambient_network.OpenAPI",
             return_value=open_api,
         ),
     ):
@@ -77,7 +77,7 @@ def config_entry_fixture(request: pytest.FixtureRequest) -> MockConfigEntry:
 
 async def setup_platform(
     expected_outcome: bool,
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Load the Ambient Network integration with the provided OpenAPI and config entry."""

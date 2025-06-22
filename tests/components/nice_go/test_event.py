@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.freeze_time("2024-08-19")
 async def test_barrier_obstructed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_nice_go: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

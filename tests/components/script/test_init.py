@@ -7,10 +7,10 @@ from unittest.mock import ANY, Mock, patch
 
 import pytest
 
-from homeassistant.components import script
-from homeassistant.components.script import DOMAIN, EVENT_SCRIPT_STARTED, ScriptEntity
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.components import script
+from smarthub.components.script import DOMAIN, EVENT_SCRIPT_STARTED, ScriptEntity
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_NAME,
     SERVICE_RELOAD,
@@ -20,19 +20,19 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import (
+from smarthub.core import (
     Context,
     CoreState,
-    HomeAssistant,
+    SmartHub,
     ServiceCall,
     State,
     callback,
     split_entity_id,
 )
-from homeassistant.exceptions import ServiceNotFound, TemplateError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.event import async_track_state_change
-from homeassistant.helpers.script import (
+from smarthub.exceptions import ServiceNotFound, TemplateError
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.event import async_track_state_change
+from smarthub.helpers.script import (
     SCRIPT_MODE_CHOICES,
     SCRIPT_MODE_PARALLEL,
     SCRIPT_MODE_QUEUED,
@@ -40,9 +40,9 @@ from homeassistant.helpers.script import (
     SCRIPT_MODE_SINGLE,
     _async_stop_scripts_at_shutdown,
 )
-from homeassistant.helpers.service import async_get_all_descriptions
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util, yaml as yaml_util
+from smarthub.helpers.service import async_get_all_descriptions
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util, yaml as yaml_util
 
 from tests.common import (
     MockConfigEntry,
@@ -59,12 +59,12 @@ ENTITY_ID = "script.test"
 
 
 @pytest.fixture
-def calls(hass: HomeAssistant) -> list[ServiceCall]:
+def calls(hass: SmartHub) -> list[ServiceCall]:
     """Track calls to a mock service."""
     return async_mock_service(hass, "test", "script")
 
 
-async def test_passing_variables(hass: HomeAssistant) -> None:
+async def test_passing_variables(hass: SmartHub) -> None:
     """Test different ways of passing in variables."""
     mock_restore_cache(hass, ())
     calls = []
@@ -116,7 +116,7 @@ async def test_passing_variables(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize("toggle", [False, True])
 @pytest.mark.parametrize("action_schema_variations", ["action", "service"])
 async def test_turn_on_off_toggle(
-    hass: HomeAssistant, toggle: bool, action_schema_variations: str
+    hass: SmartHub, toggle: bool, action_schema_variations: str
 ) -> None:
     """Verify turn_on, turn_off & toggle services.
 
@@ -176,7 +176,7 @@ async def test_turn_on_off_toggle(
 invalid_configs = [
     {"test": {}},
     {"test hello world": {"sequence": [{"event": "bla"}]}},
-    {"test": {"sequence": {"event": "test_event", "action": "homeassistant.turn_on"}}},
+    {"test": {"sequence": {"event": "test_event", "action": "smarthub.turn_on"}}},
 ]
 
 
@@ -191,7 +191,7 @@ invalid_configs = [
                 "test": {
                     "sequence": {
                         "event": "test_event",
-                        "action": "homeassistant.turn_on",
+                        "action": "smarthub.turn_on",
                     }
                 }
             },
@@ -200,7 +200,7 @@ invalid_configs = [
     ],
 )
 async def test_setup_with_invalid_configs(
-    hass: HomeAssistant, config, nbr_script_entities
+    hass: SmartHub, config, nbr_script_entities
 ) -> None:
     """Test setup with invalid configs."""
     assert await async_setup_component(hass, "script", {"script": config})
@@ -229,7 +229,7 @@ async def test_setup_with_invalid_configs(
     ],
 )
 async def test_bad_config_validation_critical(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     object_id,
     broken_config,
@@ -291,7 +291,7 @@ async def test_bad_config_validation_critical(
     ],
 )
 async def test_bad_config_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     hass_admin_user: MockUser,
@@ -346,7 +346,7 @@ async def test_bad_config_validation(
 
     # Reloading the automation with fixed config should clear the issue
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={
             script.DOMAIN: {
@@ -371,7 +371,7 @@ async def test_bad_config_validation(
 
 
 @pytest.mark.parametrize("running", ["no", "same", "different"])
-async def test_reload_service(hass: HomeAssistant, running) -> None:
+async def test_reload_service(hass: SmartHub, running) -> None:
     """Verify the reload service."""
     event = "test_event"
     event_flag = asyncio.Event()
@@ -410,7 +410,7 @@ async def test_reload_service(hass: HomeAssistant, running) -> None:
 
     object_id = "test" if running == "same" else "test2"
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         return_value={"script": {object_id: {"sequence": [{"delay": {"seconds": 5}}]}}},
     ):
         await hass.services.async_call(DOMAIN, SERVICE_RELOAD, blocking=True)
@@ -430,7 +430,7 @@ async def test_reload_service(hass: HomeAssistant, running) -> None:
 
 
 async def test_reload_unchanged_does_not_stop(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test that reloading stops any running actions as appropriate."""
     test_entity = "test.entity"
@@ -467,7 +467,7 @@ async def test_reload_unchanged_does_not_stop(
     assert len(calls) == 0
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value=config,
     ):
@@ -518,11 +518,11 @@ async def test_reload_unchanged_does_not_stop(
     ],
 )
 async def test_reload_unchanged_script(
-    hass: HomeAssistant, calls: list[ServiceCall], script_config
+    hass: SmartHub, calls: list[ServiceCall], script_config
 ) -> None:
     """Test an unmodified script is not reloaded."""
     with patch(
-        "homeassistant.components.script.ScriptEntity", wraps=ScriptEntity
+        "smarthub.components.script.ScriptEntity", wraps=ScriptEntity
     ) as script_entity_init:
         config = {script.DOMAIN: [script_config]}
         assert await async_setup_component(hass, script.DOMAIN, config)
@@ -540,7 +540,7 @@ async def test_reload_unchanged_script(
 
         # Reload the scripts without any change
         with patch(
-            "homeassistant.config.load_yaml_config_file",
+            "smarthub.config.load_yaml_config_file",
             autospec=True,
             return_value=config,
         ):
@@ -556,7 +556,7 @@ async def test_reload_unchanged_script(
         assert len(calls) == 2
 
 
-async def test_service_descriptions(hass: HomeAssistant) -> None:
+async def test_service_descriptions(hass: SmartHub) -> None:
     """Test that service descriptions are loaded and reloaded correctly."""
     # Test 1: has "description" but no "fields"
     assert await async_setup_component(
@@ -580,7 +580,7 @@ async def test_service_descriptions(hass: HomeAssistant) -> None:
 
     # Test 2: has "fields" but no "description"
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         return_value={
             "script": {
                 "test": {
@@ -611,7 +611,7 @@ async def test_service_descriptions(hass: HomeAssistant) -> None:
 
     # Test 3: has "alias" that will be used as "name"
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         return_value={
             "script": {
                 "test_name": {
@@ -631,7 +631,7 @@ async def test_service_descriptions(hass: HomeAssistant) -> None:
     assert descriptions[DOMAIN]["turn_on"]["name"] == "Turn on"
 
 
-async def test_shared_context(hass: HomeAssistant) -> None:
+async def test_shared_context(hass: SmartHub) -> None:
     """Test that the shared context is passed down the chain."""
     event = "test_event"
     context = Context()
@@ -671,7 +671,7 @@ async def test_shared_context(hass: HomeAssistant) -> None:
 
 
 async def test_logging_script_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test logging script error."""
     assert await async_setup_component(
@@ -687,7 +687,7 @@ async def test_logging_script_error(
     assert "Error executing script" in caplog.text
 
 
-async def test_turning_no_scripts_off(hass: HomeAssistant) -> None:
+async def test_turning_no_scripts_off(hass: SmartHub) -> None:
     """Test it is possible to turn two scripts off."""
     assert await async_setup_component(hass, "script", {})
 
@@ -697,11 +697,11 @@ async def test_turning_no_scripts_off(hass: HomeAssistant) -> None:
     )
 
 
-async def test_async_get_descriptions_script(hass: HomeAssistant) -> None:
+async def test_async_get_descriptions_script(hass: SmartHub) -> None:
     """Test async_set_service_schema for the script integration."""
     script_config = {
         DOMAIN: {
-            "test1": {"sequence": [{"action": "homeassistant.restart"}]},
+            "test1": {"sequence": [{"action": "smarthub.restart"}]},
             "test2": {
                 "description": "test2",
                 "fields": {
@@ -710,7 +710,7 @@ async def test_async_get_descriptions_script(hass: HomeAssistant) -> None:
                         "example": "param_example",
                     }
                 },
-                "sequence": [{"action": "homeassistant.restart"}],
+                "sequence": [{"action": "smarthub.restart"}],
             },
         }
     }
@@ -731,7 +731,7 @@ async def test_async_get_descriptions_script(hass: HomeAssistant) -> None:
     )
 
 
-async def test_extraction_functions_not_setup(hass: HomeAssistant) -> None:
+async def test_extraction_functions_not_setup(hass: SmartHub) -> None:
     """Test extraction functions when script is not setup."""
     assert script.scripts_with_area(hass, "area-in-both") == []
     assert script.areas_in_script(hass, "script.test") == []
@@ -747,7 +747,7 @@ async def test_extraction_functions_not_setup(hass: HomeAssistant) -> None:
     assert script.labels_in_script(hass, "script.test") == []
 
 
-async def test_extraction_functions_unknown_script(hass: HomeAssistant) -> None:
+async def test_extraction_functions_unknown_script(hass: SmartHub) -> None:
     """Test extraction functions for an unknown script."""
     assert await async_setup_component(hass, DOMAIN, {})
     assert script.labels_in_script(hass, "script.unknown") == []
@@ -758,7 +758,7 @@ async def test_extraction_functions_unknown_script(hass: HomeAssistant) -> None:
     assert script.entities_in_script(hass, "script.unknown") == []
 
 
-async def test_extraction_functions_unavailable_script(hass: HomeAssistant) -> None:
+async def test_extraction_functions_unavailable_script(hass: SmartHub) -> None:
     """Test extraction functions for an unknown automation."""
     entity_id = "script.test1"
     assert await async_setup_component(
@@ -782,7 +782,7 @@ async def test_extraction_functions_unavailable_script(hass: HomeAssistant) -> N
 
 
 async def test_extraction_functions(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test extraction functions."""
     config_entry = MockConfigEntry(domain="fake_integration", data={})
@@ -946,7 +946,7 @@ async def test_extraction_functions(
 
 
 async def test_config_basic(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test passing info in config."""
     assert await async_setup_component(
@@ -972,7 +972,7 @@ async def test_config_basic(
     assert entry.unique_id == "test_script"
 
 
-async def test_config_multiple_domains(hass: HomeAssistant) -> None:
+async def test_config_multiple_domains(hass: SmartHub) -> None:
     """Test splitting configuration over multiple domains."""
     assert await async_setup_component(
         hass,
@@ -1002,7 +1002,7 @@ async def test_config_multiple_domains(hass: HomeAssistant) -> None:
     assert test_script.name == "Secondary domain"
 
 
-async def test_logbook_humanify_script_started_event(hass: HomeAssistant) -> None:
+async def test_logbook_humanify_script_started_event(hass: SmartHub) -> None:
     """Test humanifying script started event."""
     hass.config.components.add("recorder")
     await async_setup_component(hass, DOMAIN, {})
@@ -1035,7 +1035,7 @@ async def test_logbook_humanify_script_started_event(hass: HomeAssistant) -> Non
 
 
 @pytest.mark.parametrize("concurrently", [False, True])
-async def test_concurrent_script(hass: HomeAssistant, concurrently) -> None:
+async def test_concurrent_script(hass: SmartHub, concurrently) -> None:
     """Test calling script concurrently or not."""
     if concurrently:
         call_script_2 = {
@@ -1121,7 +1121,7 @@ async def test_concurrent_script(hass: HomeAssistant, concurrently) -> None:
 
 
 async def test_script_variables(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test defining scripts."""
     assert await async_setup_component(
@@ -1220,7 +1220,7 @@ async def test_script_variables(
 
 
 async def test_script_this_var_always(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test script always has reference to this, even with no variables are configured."""
 
@@ -1252,7 +1252,7 @@ async def test_script_this_var_always(
     assert "Error rendering variables" not in caplog.text
 
 
-async def test_script_restore_last_triggered(hass: HomeAssistant) -> None:
+async def test_script_restore_last_triggered(hass: SmartHub) -> None:
     """Test if last triggered is restored on start."""
     time = dt_util.utcnow()
     mock_restore_cache(
@@ -1298,7 +1298,7 @@ async def test_script_restore_last_triggered(hass: HomeAssistant) -> None:
     ],
 )
 async def test_recursive_script(
-    hass: HomeAssistant, script_mode, warning_msg, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, script_mode, warning_msg, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test recursive script calls does not deadlock."""
     # Make sure we cover all script modes
@@ -1348,7 +1348,7 @@ async def test_recursive_script(
     ],
 )
 async def test_recursive_script_indirect(
-    hass: HomeAssistant, script_mode, warning_msg, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, script_mode, warning_msg, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test recursive script calls does not deadlock."""
     # Make sure we cover all script modes
@@ -1411,12 +1411,12 @@ async def test_recursive_script_indirect(
 )
 @pytest.mark.parametrize("wait_for_stop_scripts_after_shutdown", [True])
 async def test_recursive_script_turn_on(
-    hass: HomeAssistant, script_mode, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, script_mode, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test script turning itself on.
 
     - Illegal recursion detection should not be triggered
-    - Home Assistant should not hang on shut down
+    - SmartHub should not hang on shut down
     - SCRIPT_MODE_SINGLE is not relevant because suca script can't turn itself on
     """
     # Make sure we cover all script modes
@@ -1434,7 +1434,7 @@ async def test_recursive_script_turn_on(
         stop_scripts_at_shutdown_called.set()
 
     with patch(
-        "homeassistant.helpers.script._async_stop_scripts_at_shutdown",
+        "smarthub.helpers.script._async_stop_scripts_at_shutdown",
         wraps=stop_scripts_at_shutdown,
     ):
         assert await async_setup_component(
@@ -1484,7 +1484,7 @@ async def test_recursive_script_turn_on(
 
         # Trigger 1st stage script shutdown
         hass.set_state(CoreState.stopping)
-        hass.bus.async_fire("homeassistant_stop")
+        hass.bus.async_fire("smarthub_stop")
         await asyncio.wait_for(stop_scripts_at_shutdown_called.wait(), 1)
 
         # Trigger 2nd stage script shutdown
@@ -1495,7 +1495,7 @@ async def test_recursive_script_turn_on(
 
 
 async def test_setup_with_duplicate_scripts(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test setup with duplicate configs."""
     assert await async_setup_component(
@@ -1519,7 +1519,7 @@ async def test_setup_with_duplicate_scripts(
 
 
 async def test_websocket_config(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test config command."""
     config = {
@@ -1562,7 +1562,7 @@ async def test_websocket_config(
 
 
 async def test_script_service_changed_entity_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test the script service works for scripts with overridden entity_id."""
     entry = entity_registry.async_get_or_create("script", "script", "test")
@@ -1617,7 +1617,7 @@ async def test_script_service_changed_entity_id(
     assert calls[1].data["entity_id"] == "script.custom_entity_id_2"
 
 
-async def test_blueprint_script(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_blueprint_script(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test blueprint script."""
     assert await async_setup_component(
         hass,
@@ -1674,7 +1674,7 @@ async def test_blueprint_script(hass: HomeAssistant, calls: list[ServiceCall]) -
     ],
 )
 async def test_blueprint_script_bad_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
     blueprint_inputs,
@@ -1714,13 +1714,13 @@ async def test_blueprint_script_bad_config(
 
 
 async def test_blueprint_script_fails_substitution(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test blueprint script with bad inputs."""
     with patch(
-        "homeassistant.components.blueprint.models.BlueprintInputs.async_substitute",
+        "smarthub.components.blueprint.models.BlueprintInputs.async_substitute",
         side_effect=yaml_util.UndefinedSubstitution("blah"),
     ):
         assert await async_setup_component(
@@ -1759,7 +1759,7 @@ async def test_blueprint_script_fails_substitution(
 
 
 @pytest.mark.parametrize("response", [{"value": 5}, '{"value": 5}'])
-async def test_responses(hass: HomeAssistant, response: Any) -> None:
+async def test_responses(hass: SmartHub, response: Any) -> None:
     """Test we can get responses."""
     mock_restore_cache(hass, ())
     assert await async_setup_component(
@@ -1794,7 +1794,7 @@ async def test_responses(hass: HomeAssistant, response: Any) -> None:
     )
 
 
-async def test_responses_no_response(hass: HomeAssistant) -> None:
+async def test_responses_no_response(hass: SmartHub) -> None:
     """Test response variable not set."""
     mock_restore_cache(hass, ())
     assert await async_setup_component(
@@ -1830,7 +1830,7 @@ async def test_responses_no_response(hass: HomeAssistant) -> None:
     )
 
 
-async def test_script_queued_mode(hass: HomeAssistant) -> None:
+async def test_script_queued_mode(hass: SmartHub) -> None:
     """Test calling a queued mode script called in parallel."""
     calls = 0
 

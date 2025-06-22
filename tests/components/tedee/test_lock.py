@@ -14,24 +14,24 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.lock import (
+from smarthub.components.lock import (
     DOMAIN as LOCK_DOMAIN,
     SERVICE_LOCK,
     SERVICE_OPEN,
     SERVICE_UNLOCK,
     LockState,
 )
-from homeassistant.components.webhook import async_generate_url
-from homeassistant.const import (
+from smarthub.components.webhook import async_generate_url
+from smarthub.const import (
     ATTR_ENTITY_ID,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceNotSupported
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceNotSupported
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
 
 from . import setup_integration
 from .conftest import WEBHOOK_ID
@@ -41,14 +41,14 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_locks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test tedee locks."""
-    with patch("homeassistant.components.tedee.PLATFORMS", [Platform.LOCK]):
+    with patch("smarthub.components.tedee.PLATFORMS", [Platform.LOCK]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
@@ -56,7 +56,7 @@ async def test_locks(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_lock_service_calls(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
 ) -> None:
     """Test the tedee lock."""
@@ -109,7 +109,7 @@ async def test_lock_service_calls(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_lock_without_pullspring(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -117,7 +117,7 @@ async def test_lock_without_pullspring(
 ) -> None:
     """Test the tedee lock without pullspring."""
     # Fetch translations
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     state = hass.states.get("lock.lock_2c3d")
     assert state
@@ -150,12 +150,12 @@ async def test_lock_without_pullspring(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_lock_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
 ) -> None:
     """Test event errors."""
     mock_tedee.lock.side_effect = TedeeClientException("Boom")
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_LOCK,
@@ -167,7 +167,7 @@ async def test_lock_errors(
     assert exc_info.value.translation_key == "lock_failed"
 
     mock_tedee.unlock.side_effect = TedeeClientException("Boom")
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_UNLOCK,
@@ -179,7 +179,7 @@ async def test_lock_errors(
     assert exc_info.value.translation_key == "unlock_failed"
 
     mock_tedee.open.side_effect = TedeeClientException("Boom")
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_OPEN,
@@ -202,7 +202,7 @@ async def test_lock_errors(
     ],
 )
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
     freezer: FrozenDateTimeFactory,
     side_effect: Exception,
@@ -220,7 +220,7 @@ async def test_update_failed(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_cleanup_removed_locks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
@@ -251,7 +251,7 @@ async def test_cleanup_removed_locks(
 
 @pytest.mark.usefixtures("init_integration")
 async def test_new_lock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -289,7 +289,7 @@ async def test_new_lock(
     ],
 )
 async def test_webhook_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tedee: MagicMock,
     hass_client_no_auth: ClientSessionGenerator,
     lib_state: TedeeLockState,

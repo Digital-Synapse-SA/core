@@ -6,9 +6,9 @@ from typing import Any
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant.components.mobile_app.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.mobile_app.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .const import REGISTER, REGISTER_CLEARTEXT
 
@@ -17,7 +17,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.fixture
 async def create_registrations(
-    hass: HomeAssistant, webhook_client: TestClient
+    hass: SmartHub, webhook_client: TestClient
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return two new registrations."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -40,7 +40,7 @@ async def create_registrations(
 
 
 @pytest.fixture
-async def push_registration(hass: HomeAssistant, webhook_client: TestClient):
+async def push_registration(hass: SmartHub, webhook_client: TestClient):
     """Return registration with push notifications enabled."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
 
@@ -61,7 +61,7 @@ async def push_registration(hass: HomeAssistant, webhook_client: TestClient):
 
 @pytest.fixture
 async def webhook_client(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> TestClient:
     """Provide an authenticated client for mobile_app to use."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
@@ -70,7 +70,7 @@ async def webhook_client(
 
 
 @pytest.fixture(autouse=True)
-async def setup_ws(hass: HomeAssistant) -> None:
+async def setup_ws(hass: SmartHub) -> None:
     """Configure the websocket_api component."""
     assert await async_setup_component(hass, "repairs", {})
     assert await async_setup_component(hass, "websocket_api", {})

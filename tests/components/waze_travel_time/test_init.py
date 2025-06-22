@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.waze_travel_time.const import (
+from smarthub.components.waze_travel_time.const import (
     CONF_AVOID_FERRIES,
     CONF_AVOID_SUBSCRIPTION_ROADS,
     CONF_AVOID_TOLL_ROADS,
@@ -21,8 +21,8 @@ from homeassistant.components.waze_travel_time.const import (
     DOMAIN,
     METRIC_UNITS,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .const import MOCK_CONFIG
 
@@ -34,7 +34,7 @@ from tests.common import MockConfigEntry
     [(MOCK_CONFIG, DEFAULT_OPTIONS)],
 )
 @pytest.mark.usefixtures("mock_update", "mock_config")
-async def test_service_get_travel_times(hass: HomeAssistant) -> None:
+async def test_service_get_travel_times(hass: SmartHub) -> None:
     """Test service get_travel_times."""
     response_data = await hass.services.async_call(
         "waze_travel_time",
@@ -63,7 +63,7 @@ async def test_service_get_travel_times(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_update")
-async def test_migrate_entry_v1_v2(hass: HomeAssistant) -> None:
+async def test_migrate_entry_v1_v2(hass: SmartHub) -> None:
     """Test successful migration of entry data."""
     mock_entry = MockConfigEntry(
         domain=DOMAIN,

@@ -1,6 +1,6 @@
 """Test the Lock significant change platform."""
 
-from homeassistant.components.lock.significant_change import (
+from smarthub.components.lock.significant_change import (
     async_check_significant_change,
 )
 

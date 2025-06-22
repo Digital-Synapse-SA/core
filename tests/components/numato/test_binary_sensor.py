@@ -5,10 +5,10 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import discovery
-from homeassistant.setup import async_setup_component
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import discovery
+from smarthub.setup import async_setup_component
 
 from .common import NUMATO_CFG, mockup_raise
 from .numato_mock import NumatoGpioError, NumatoModuleMock
@@ -21,7 +21,7 @@ MOCKUP_ENTITY_IDS = {
 
 
 async def test_failing_setups_no_entities(
-    hass: HomeAssistant, numato_fixture, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, numato_fixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """When port setup fails, no entity shall be created."""
     monkeypatch.setattr(numato_fixture.NumatoDeviceMock, "setup", mockup_raise)
@@ -31,7 +31,7 @@ async def test_failing_setups_no_entities(
         assert entity_id not in hass.states.async_entity_ids()
 
 
-async def test_setup_callbacks(hass: HomeAssistant, numato_fixture) -> None:
+async def test_setup_callbacks(hass: SmartHub, numato_fixture) -> None:
     """During setup a callback shall be registered."""
 
     with patch.object(
@@ -53,9 +53,9 @@ async def test_setup_callbacks(hass: HomeAssistant, numato_fixture) -> None:
 
 
 async def test_hass_binary_sensor_notification(
-    hass: HomeAssistant, numato_fixture
+    hass: SmartHub, numato_fixture
 ) -> None:
-    """Test regular operations from within Home Assistant."""
+    """Test regular operations from within SmartHub."""
     assert await async_setup_component(hass, "numato", NUMATO_CFG)
     await hass.async_block_till_done()  # wait until services are registered
     assert (
@@ -69,7 +69,7 @@ async def test_hass_binary_sensor_notification(
 
 
 async def test_binary_sensor_setup_without_discovery_info(
-    hass: HomeAssistant, config, numato_fixture
+    hass: SmartHub, config, numato_fixture
 ) -> None:
     """Test handling of empty discovery_info."""
     numato_fixture.discover()
@@ -84,7 +84,7 @@ async def test_binary_sensor_setup_without_discovery_info(
 
 
 async def test_binary_sensor_setup_no_notify(
-    hass: HomeAssistant,
+    hass: SmartHub,
     numato_fixture,
     caplog: pytest.LogCaptureFixture,
 ) -> None:

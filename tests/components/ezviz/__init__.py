@@ -1,12 +1,12 @@
 """Tests for the EZVIZ integration."""
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
-async def setup_integration(hass: HomeAssistant, entry: MockConfigEntry) -> None:
-    """Set up the EZVIZ integration in Home Assistant."""
+async def setup_integration(hass: SmartHub, entry: MockConfigEntry) -> None:
+    """Set up the EZVIZ integration in SmartHub."""
     entry.add_to_hass(hass)
 
     await hass.config_entries.async_setup(entry.entry_id)

@@ -7,11 +7,11 @@ from matter_server.client.models.node import MatterNode
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.lock import LockEntityFeature, LockState
-from homeassistant.const import ATTR_CODE, STATE_UNKNOWN, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.lock import LockEntityFeature, LockState
+from smarthub.const import ATTR_CODE, STATE_UNKNOWN, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import entity_registry as er
 
 from .common import (
     set_node_attribute,
@@ -22,7 +22,7 @@ from .common import (
 
 @pytest.mark.usefixtures("matter_devices")
 async def test_locks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -32,7 +32,7 @@ async def test_locks(
 
 @pytest.mark.parametrize("node_fixture", ["door_lock"])
 async def test_lock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:
@@ -115,7 +115,7 @@ async def test_lock(
 
 @pytest.mark.parametrize("node_fixture", ["door_lock"])
 async def test_lock_requires_pin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
     entity_registry: er.EntityRegistry,
@@ -178,7 +178,7 @@ async def test_lock_requires_pin(
 
 @pytest.mark.parametrize("node_fixture", ["door_lock_with_unbolt"])
 async def test_lock_with_unbolt(
-    hass: HomeAssistant,
+    hass: SmartHub,
     matter_client: MagicMock,
     matter_node: MatterNode,
 ) -> None:

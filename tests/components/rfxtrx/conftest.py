@@ -10,10 +10,10 @@ from freezegun import freeze_time
 import pytest
 from RFXtrx import Connect, RFXtrxTransport
 
-from homeassistant.components import rfxtrx
-from homeassistant.components.rfxtrx import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.components import rfxtrx
+from smarthub.components.rfxtrx import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.components.light.conftest import mock_light_profiles  # noqa: F401
@@ -40,7 +40,7 @@ def create_rfx_test_cfg(
 
 
 async def setup_rfx_test_cfg(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device="abcd",
     automatic_add=False,
     devices: dict[str, dict] | None = None,
@@ -87,7 +87,7 @@ def connect_mock() -> Generator[MagicMock]:
 
 
 @pytest.fixture(autouse=True, name="rfxtrx")
-def rfxtrx_fixture(hass: HomeAssistant, connect_mock: MagicMock) -> Mock:
+def rfxtrx_fixture(hass: SmartHub, connect_mock: MagicMock) -> Mock:
     """Fixture that cleans up threads from integration."""
 
     rfx = Mock(spec=Connect)
@@ -116,7 +116,7 @@ def rfxtrx_fixture(hass: HomeAssistant, connect_mock: MagicMock) -> Mock:
 
 
 @pytest.fixture(name="rfxtrx_automatic")
-async def rfxtrx_automatic_fixture(hass: HomeAssistant, rfxtrx: Mock) -> Mock:
+async def rfxtrx_automatic_fixture(hass: SmartHub, rfxtrx: Mock) -> Mock:
     """Fixture that starts up with automatic additions."""
     await setup_rfx_test_cfg(hass, automatic_add=True, devices={})
     return rfxtrx
@@ -124,7 +124,7 @@ async def rfxtrx_automatic_fixture(hass: HomeAssistant, rfxtrx: Mock) -> Mock:
 
 @pytest.fixture
 def timestep(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> Generator[Callable[[int], Coroutine[Any, Any, None]]]:
     """Step system time forward."""
 

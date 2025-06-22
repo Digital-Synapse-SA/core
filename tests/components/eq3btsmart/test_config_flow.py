@@ -2,21 +2,21 @@
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
-from homeassistant.components.eq3btsmart.const import DOMAIN
-from homeassistant.const import CONF_MAC
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.device_registry import format_mac
-from homeassistant.util import slugify
+from smarthub import config_entries
+from smarthub.components.bluetooth import BluetoothServiceInfoBleak
+from smarthub.components.eq3btsmart.const import DOMAIN
+from smarthub.const import CONF_MAC
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.device_registry import format_mac
+from smarthub.util import slugify
 
 from .const import MAC
 
 from tests.common import MockConfigEntry
 
 
-async def test_user_flow(hass: HomeAssistant) -> None:
+async def test_user_flow(hass: SmartHub) -> None:
     """Test we can handle a regular successflow setup flow."""
 
     result = await hass.config_entries.flow.async_init(
@@ -24,7 +24,7 @@ async def test_user_flow(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.eq3btsmart.async_setup_entry",
+        "smarthub.components.eq3btsmart.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -40,7 +40,7 @@ async def test_user_flow(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_flow_invalid_mac(hass: HomeAssistant) -> None:
+async def test_user_flow_invalid_mac(hass: SmartHub) -> None:
     """Test we handle invalid mac address."""
 
     result = await hass.config_entries.flow.async_init(
@@ -48,7 +48,7 @@ async def test_user_flow_invalid_mac(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.eq3btsmart.async_setup_entry",
+        "smarthub.components.eq3btsmart.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -75,7 +75,7 @@ async def test_user_flow_invalid_mac(hass: HomeAssistant) -> None:
 
 
 async def test_bluetooth_flow(
-    hass: HomeAssistant, fake_service_info: BluetoothServiceInfoBleak
+    hass: SmartHub, fake_service_info: BluetoothServiceInfoBleak
 ) -> None:
     """Test we can handle a bluetooth discovery flow."""
 
@@ -86,7 +86,7 @@ async def test_bluetooth_flow(
     )
 
     with patch(
-        "homeassistant.components.eq3btsmart.async_setup_entry",
+        "smarthub.components.eq3btsmart.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(
@@ -102,7 +102,7 @@ async def test_bluetooth_flow(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_duplicate_entry(hass: HomeAssistant) -> None:
+async def test_duplicate_entry(hass: SmartHub) -> None:
     """Test duplicate setup handling."""
 
     entry = MockConfigEntry(
@@ -119,7 +119,7 @@ async def test_duplicate_entry(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.eq3btsmart.async_setup_entry",
+        "smarthub.components.eq3btsmart.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         result = await hass.config_entries.flow.async_configure(

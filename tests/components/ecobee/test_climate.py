@@ -6,19 +6,19 @@ from unittest import mock
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant import const
-from homeassistant.components.climate import ClimateEntityFeature
-from homeassistant.components.ecobee.climate import (
+from smarthub import const
+from smarthub.components.climate import ClimateEntityFeature
+from smarthub.components.ecobee.climate import (
     ATTR_PRESET_MODE,
     ATTR_SENSOR_LIST,
     PRESET_AWAY_INDEFINITELY,
     Thermostat,
 )
-from homeassistant.components.ecobee.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_SUPPORTED_FEATURES, STATE_OFF
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.ecobee.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, ATTR_SUPPORTED_FEATURES, STATE_OFF
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
+from smarthub.helpers import device_registry as dr
 
 from .common import setup_platform
 
@@ -107,7 +107,7 @@ def data_fixture(ecobee_fixture):
 
 
 @pytest.fixture(name="thermostat")
-def thermostat_fixture(data, hass: HomeAssistant):
+def thermostat_fixture(data, hass: SmartHub):
     """Set up ecobee thermostat object."""
     thermostat = data.ecobee.get_thermostat(1)
     return Thermostat(data, 1, thermostat, hass)
@@ -118,7 +118,7 @@ async def test_name(thermostat) -> None:
     assert thermostat.device_info["name"] == "Ecobee"
 
 
-async def test_aux_heat_not_supported_by_default(hass: HomeAssistant) -> None:
+async def test_aux_heat_not_supported_by_default(hass: SmartHub) -> None:
     """Default setup should not support Aux heat."""
     await setup_platform(hass, const.Platform.CLIMATE)
     state = hass.states.get(ENTITY_ID)
@@ -420,7 +420,7 @@ async def test_set_preset_mode(ecobee_fixture, thermostat, data) -> None:
     )
 
 
-async def test_remote_sensors(hass: HomeAssistant) -> None:
+async def test_remote_sensors(hass: SmartHub) -> None:
     """Test remote sensors."""
     await setup_platform(hass, [const.Platform.CLIMATE, const.Platform.SENSOR])
     platform = hass.data[const.Platform.CLIMATE].entities
@@ -436,7 +436,7 @@ async def test_remote_sensors(hass: HomeAssistant) -> None:
 
 
 async def test_remote_sensor_devices(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test remote sensor devices."""
     await setup_platform(hass, [const.Platform.CLIMATE, const.Platform.SENSOR])
@@ -454,7 +454,7 @@ async def test_remote_sensor_devices(
     )
 
 
-async def test_active_sensors_in_preset_mode(hass: HomeAssistant) -> None:
+async def test_active_sensors_in_preset_mode(hass: SmartHub) -> None:
     """Test active sensors in preset mode property."""
     await setup_platform(hass, [const.Platform.CLIMATE, const.Platform.SENSOR])
     platform = hass.data[const.Platform.CLIMATE].entities
@@ -469,7 +469,7 @@ async def test_active_sensors_in_preset_mode(hass: HomeAssistant) -> None:
     assert sorted(remote_sensors) == sorted(["ecobee"])
 
 
-async def test_active_sensor_devices_in_preset_mode(hass: HomeAssistant) -> None:
+async def test_active_sensor_devices_in_preset_mode(hass: SmartHub) -> None:
     """Test active sensor devices in preset mode."""
     await setup_platform(hass, [const.Platform.CLIMATE, const.Platform.SENSOR])
     state = hass.states.get(ENTITY_ID)
@@ -477,7 +477,7 @@ async def test_active_sensor_devices_in_preset_mode(hass: HomeAssistant) -> None
     assert state.attributes.get("active_sensors") == ["ecobee"]
 
 
-async def test_remote_sensor_ids_names(hass: HomeAssistant) -> None:
+async def test_remote_sensor_ids_names(hass: SmartHub) -> None:
     """Test getting ids and names_by_user for thermostat."""
     await setup_platform(hass, [const.Platform.CLIMATE, const.Platform.SENSOR])
     platform = hass.data[const.Platform.CLIMATE].entities
@@ -496,7 +496,7 @@ async def test_remote_sensor_ids_names(hass: HomeAssistant) -> None:
     assert sorted(name_by_user_list) == sorted(["Remote Sensor 1", "ecobee"])
 
 
-async def test_set_sensors_used_in_climate(hass: HomeAssistant) -> None:
+async def test_set_sensors_used_in_climate(hass: SmartHub) -> None:
     """Test set sensors used in climate."""
     # Get device_id of remote sensor from the device registry.
     await setup_platform(hass, [const.Platform.CLIMATE, const.Platform.SENSOR])

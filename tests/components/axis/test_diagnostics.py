@@ -4,7 +4,7 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from .const import API_DISCOVERY_BASIC_DEVICE_INFO
 
@@ -15,7 +15,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.parametrize("api_discovery_items", [API_DISCOVERY_BASIC_DEVICE_INFO])
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     config_entry_setup: MockConfigEntry,
     snapshot: SnapshotAssertion,

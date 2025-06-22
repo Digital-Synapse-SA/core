@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.timer import (
+from smarthub.components.timer import (
     ATTR_DURATION,
     ATTR_FINISHES_AT,
     ATTR_REMAINING,
@@ -35,7 +35,7 @@ from homeassistant.components.timer import (
     Timer,
     _format_timedelta,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_EDITABLE,
     ATTR_FRIENDLY_NAME,
     ATTR_ICON,
@@ -46,12 +46,12 @@ from homeassistant.const import (
     EVENT_STATE_CHANGED,
     SERVICE_RELOAD,
 )
-from homeassistant.core import Context, CoreState, Event, HomeAssistant, State, callback
-from homeassistant.exceptions import HomeAssistantError, Unauthorized
-from homeassistant.helpers import config_validation as cv, entity_registry as er
-from homeassistant.helpers.restore_state import StoredState, async_get
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import utcnow
+from smarthub.core import Context, CoreState, Event, SmartHub, State, callback
+from smarthub.exceptions import SmartHubError, Unauthorized
+from smarthub.helpers import config_validation as cv, entity_registry as er
+from smarthub.helpers.restore_state import StoredState, async_get
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import utcnow
 
 from tests.common import MockUser, async_capture_events, async_fire_time_changed
 from tests.typing import WebSocketGenerator
@@ -60,7 +60,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def storage_setup(hass: HomeAssistant, hass_storage: dict[str, Any]):
+def storage_setup(hass: SmartHub, hass_storage: dict[str, Any]):
     """Storage setup."""
 
     async def _storage(items=None, config=None):
@@ -92,7 +92,7 @@ def storage_setup(hass: HomeAssistant, hass_storage: dict[str, Any]):
     return _storage
 
 
-async def test_config(hass: HomeAssistant) -> None:
+async def test_config(hass: SmartHub) -> None:
     """Test config."""
     invalid_configs = [None, 1, {}, {"name with space": None}]
 
@@ -100,7 +100,7 @@ async def test_config(hass: HomeAssistant) -> None:
         assert not await async_setup_component(hass, DOMAIN, {DOMAIN: cfg})
 
 
-async def test_config_options(hass: HomeAssistant) -> None:
+async def test_config_options(hass: SmartHub) -> None:
     """Test configuration options."""
     count_start = len(hass.states.async_entity_ids())
 
@@ -147,7 +147,7 @@ async def test_config_options(hass: HomeAssistant) -> None:
     )
 
 
-async def test_methods_and_events(hass: HomeAssistant) -> None:
+async def test_methods_and_events(hass: SmartHub) -> None:
     """Test methods and events."""
     hass.set_state(CoreState.starting)
 
@@ -296,7 +296,7 @@ async def test_methods_and_events(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2023-06-05 17:47:50")
-async def test_start_service(hass: HomeAssistant) -> None:
+async def test_start_service(hass: SmartHub) -> None:
     """Test the start/stop service."""
     await async_setup_component(hass, DOMAIN, {DOMAIN: {"test1": {CONF_DURATION: 10}}})
 
@@ -325,7 +325,7 @@ async def test_start_service(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_DURATION] == "0:00:10"
     assert ATTR_REMAINING not in state.attributes
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_CHANGE,
@@ -347,7 +347,7 @@ async def test_start_service(hass: HomeAssistant) -> None:
     assert state.attributes[ATTR_REMAINING] == "0:00:15"
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Not possible to change timer timer.test1 beyond duration",
     ):
         await hass.services.async_call(
@@ -358,7 +358,7 @@ async def test_start_service(hass: HomeAssistant) -> None:
         )
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Not possible to change timer timer.test1 to negative time remaining",
     ):
         await hass.services.async_call(
@@ -403,7 +403,7 @@ async def test_start_service(hass: HomeAssistant) -> None:
     assert ATTR_REMAINING not in state.attributes
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Timer timer.test1 is not running, only active timers can be changed",
     ):
         await hass.services.async_call(
@@ -420,7 +420,7 @@ async def test_start_service(hass: HomeAssistant) -> None:
     assert ATTR_REMAINING not in state.attributes
 
 
-async def test_wait_till_timer_expires(hass: HomeAssistant) -> None:
+async def test_wait_till_timer_expires(hass: SmartHub) -> None:
     """Test for a timer to end."""
     hass.set_state(CoreState.starting)
 
@@ -488,7 +488,7 @@ async def test_wait_till_timer_expires(hass: HomeAssistant) -> None:
     assert len(results) == 3
 
 
-async def test_no_initial_state_and_no_restore_state(hass: HomeAssistant) -> None:
+async def test_no_initial_state_and_no_restore_state(hass: SmartHub) -> None:
     """Ensure that entity is create without initial and restore feature."""
     hass.set_state(CoreState.starting)
 
@@ -500,7 +500,7 @@ async def test_no_initial_state_and_no_restore_state(hass: HomeAssistant) -> Non
 
 
 async def test_config_reload(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_admin_user: MockUser,
     hass_read_only_user: MockUser,
@@ -548,7 +548,7 @@ async def test_config_reload(
     assert state_2.attributes.get(ATTR_DURATION) == "0:00:10"
 
     with patch(
-        "homeassistant.config.load_yaml_config_file",
+        "smarthub.config.load_yaml_config_file",
         autospec=True,
         return_value={
             DOMAIN: {
@@ -599,7 +599,7 @@ async def test_config_reload(
     assert ATTR_FRIENDLY_NAME not in state_3.attributes
 
 
-async def test_timer_restarted_event(hass: HomeAssistant) -> None:
+async def test_timer_restarted_event(hass: SmartHub) -> None:
     """Ensure restarted event is called after starting a paused or running timer."""
     hass.set_state(CoreState.starting)
 
@@ -667,7 +667,7 @@ async def test_timer_restarted_event(hass: HomeAssistant) -> None:
     assert len(results) == 4
 
 
-async def test_state_changed_when_timer_restarted(hass: HomeAssistant) -> None:
+async def test_state_changed_when_timer_restarted(hass: SmartHub) -> None:
     """Ensure timer's state changes when it restarted."""
     hass.set_state(CoreState.starting)
 
@@ -709,7 +709,7 @@ async def test_state_changed_when_timer_restarted(hass: HomeAssistant) -> None:
     assert len(results) == 2
 
 
-async def test_load_from_storage(hass: HomeAssistant, storage_setup) -> None:
+async def test_load_from_storage(hass: SmartHub, storage_setup) -> None:
     """Test set up from storage."""
     assert await storage_setup()
     state = hass.states.get(f"{DOMAIN}.timer_from_storage")
@@ -718,7 +718,7 @@ async def test_load_from_storage(hass: HomeAssistant, storage_setup) -> None:
     assert state.attributes.get(ATTR_EDITABLE)
 
 
-async def test_editable_state_attribute(hass: HomeAssistant, storage_setup) -> None:
+async def test_editable_state_attribute(hass: SmartHub, storage_setup) -> None:
     """Test editable attribute."""
     assert await storage_setup(config={DOMAIN: {"from_yaml": None}})
 
@@ -733,7 +733,7 @@ async def test_editable_state_attribute(hass: HomeAssistant, storage_setup) -> N
 
 
 async def test_ws_list(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, storage_setup
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, storage_setup
 ) -> None:
     """Test listing via WS."""
     assert await storage_setup(config={DOMAIN: {"from_yaml": None}})
@@ -755,7 +755,7 @@ async def test_ws_list(
 
 
 async def test_ws_delete(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     storage_setup,
@@ -785,7 +785,7 @@ async def test_ws_delete(
 
 
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     storage_setup,
@@ -833,7 +833,7 @@ async def test_update(
 
 
 async def test_ws_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     storage_setup,
@@ -869,13 +869,13 @@ async def test_ws_create(
     )
 
 
-async def test_setup_no_config(hass: HomeAssistant, hass_admin_user: MockUser) -> None:
+async def test_setup_no_config(hass: SmartHub, hass_admin_user: MockUser) -> None:
     """Test component setup with no config."""
     count_start = len(hass.states.async_entity_ids())
     assert await async_setup_component(hass, DOMAIN, {})
 
     with patch(
-        "homeassistant.config.load_yaml_config_file", autospec=True, return_value={}
+        "smarthub.config.load_yaml_config_file", autospec=True, return_value={}
     ):
         await hass.services.async_call(
             DOMAIN,
@@ -889,7 +889,7 @@ async def test_setup_no_config(hass: HomeAssistant, hass_admin_user: MockUser) -
 
 
 @pytest.mark.freeze_time("2023-06-05 17:47:50")
-async def test_restore_paused(hass: HomeAssistant) -> None:
+async def test_restore_paused(hass: SmartHub) -> None:
     """Test entity restore logic when timer is paused."""
     utc_now = utcnow()
     stored_state = StoredState(
@@ -927,7 +927,7 @@ async def test_restore_paused(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.freeze_time("2023-06-05 17:47:50")
-async def test_restore_active_resume(hass: HomeAssistant) -> None:
+async def test_restore_active_resume(hass: SmartHub) -> None:
     """Test entity restore logic when timer is active and end time is after startup."""
     events = async_capture_events(hass, EVENT_TIMER_RESTARTED)
     assert not events
@@ -961,7 +961,7 @@ async def test_restore_active_resume(hass: HomeAssistant) -> None:
 
     # In patch make sure we ignore microseconds
     with patch(
-        "homeassistant.components.timer.dt_util.utcnow",
+        "smarthub.components.timer.dt_util.utcnow",
         return_value=simulated_utc_now.replace(microsecond=999),
     ):
         await entity.async_added_to_hass()
@@ -975,8 +975,8 @@ async def test_restore_active_resume(hass: HomeAssistant) -> None:
     assert len(events) == 1
 
 
-async def test_restore_active_finished_outside_grace(hass: HomeAssistant) -> None:
-    """Test entity restore logic: timer is active, ended while Home Assistant was stopped."""
+async def test_restore_active_finished_outside_grace(hass: SmartHub) -> None:
+    """Test entity restore logic: timer is active, ended while SmartHub was stopped."""
     events = async_capture_events(hass, EVENT_TIMER_FINISHED)
     assert not events
     utc_now = utcnow()
@@ -1008,7 +1008,7 @@ async def test_restore_active_finished_outside_grace(hass: HomeAssistant) -> Non
     entity.entity_id = "timer.test"
 
     with patch(
-        "homeassistant.components.timer.dt_util.utcnow", return_value=simulated_utc_now
+        "smarthub.components.timer.dt_util.utcnow", return_value=simulated_utc_now
     ):
         await entity.async_added_to_hass()
         await hass.async_block_till_done()

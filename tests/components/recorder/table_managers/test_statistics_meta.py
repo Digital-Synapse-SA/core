@@ -7,21 +7,21 @@ import threading
 
 import pytest
 
-from homeassistant.components import recorder
-from homeassistant.components.recorder.db_schema import StatisticsMeta
-from homeassistant.components.recorder.models import (
+from smarthub.components import recorder
+from smarthub.components.recorder.db_schema import StatisticsMeta
+from smarthub.components.recorder.models import (
     StatisticMeanType,
     StatisticMetaData,
 )
-from homeassistant.components.recorder.util import session_scope
-from homeassistant.const import DEGREE
-from homeassistant.core import HomeAssistant
+from smarthub.components.recorder.util import session_scope
+from smarthub.const import DEGREE
+from smarthub.core import SmartHub
 
 from tests.typing import RecorderInstanceGenerator
 
 
 async def test_passing_mutually_exclusive_options_to_get_many(
-    async_setup_recorder_instance: RecorderInstanceGenerator, hass: HomeAssistant
+    async_setup_recorder_instance: RecorderInstanceGenerator, hass: SmartHub
 ) -> None:
     """Test passing mutually exclusive options to get_many."""
     instance = await async_setup_recorder_instance(
@@ -48,7 +48,7 @@ async def test_passing_mutually_exclusive_options_to_get_many(
 
 
 async def test_unsafe_calls_to_statistics_meta_manager(
-    async_setup_recorder_instance: RecorderInstanceGenerator, hass: HomeAssistant
+    async_setup_recorder_instance: RecorderInstanceGenerator, hass: SmartHub
 ) -> None:
     """Test we raise when trying to call non-threadsafe functions on statistics_meta_manager."""
     instance = await async_setup_recorder_instance(
@@ -68,7 +68,7 @@ async def test_unsafe_calls_to_statistics_meta_manager(
 
 async def test_invalid_mean_types(
     async_setup_recorder_instance: RecorderInstanceGenerator,
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test passing invalid mean types will be skipped and logged."""
@@ -135,7 +135,7 @@ async def test_invalid_mean_types(
         # Check that the invalid mean type was skipped
         assert manager.get_many(session) == valid_metadata
         assert (
-            "homeassistant.components.recorder.table_managers.statistics_meta",
+            "smarthub.components.recorder.table_managers.statistics_meta",
             logging.WARNING,
             "Invalid mean type found for statistic_id: sensor.invalid, mean_type: 12345. Skipping",
         ) in caplog.record_tuples

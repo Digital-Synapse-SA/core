@@ -6,11 +6,11 @@ from unittest.mock import patch
 from pyipma import IPMAException
 import pytest
 
-from homeassistant.components.ipma.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.ipma.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import MockLocation
 
@@ -20,11 +20,11 @@ from tests.common import MockConfigEntry
 @pytest.fixture(name="ipma_setup", autouse=True)
 def ipma_setup_fixture() -> Generator[None]:
     """Patch ipma setup entry."""
-    with patch("homeassistant.components.ipma.async_setup_entry", return_value=True):
+    with patch("smarthub.components.ipma.async_setup_entry", return_value=True):
         yield
 
 
-async def test_config_flow(hass: HomeAssistant) -> None:
+async def test_config_flow(hass: SmartHub) -> None:
     """Test configuration form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -54,7 +54,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     }
 
 
-async def test_config_flow_failures(hass: HomeAssistant) -> None:
+async def test_config_flow_failures(hass: SmartHub) -> None:
     """Test config flow with failures."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -96,7 +96,7 @@ async def test_config_flow_failures(hass: HomeAssistant) -> None:
 
 
 async def test_flow_entry_already_exists(
-    hass: HomeAssistant, init_integration: MockConfigEntry
+    hass: SmartHub, init_integration: MockConfigEntry
 ) -> None:
     """Test user input for config_entry that already exists.
 

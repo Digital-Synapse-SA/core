@@ -7,17 +7,17 @@ from unittest.mock import AsyncMock, Mock
 from uiprotect.data import Light
 from uiprotect.data.types import LEDLevel
 
-from homeassistant.components.light import ATTR_BRIGHTNESS
-from homeassistant.components.unifiprotect.const import DEFAULT_ATTRIBUTION
-from homeassistant.const import (
+from smarthub.components.light import ATTR_BRIGHTNESS
+from smarthub.components.unifiprotect.const import DEFAULT_ATTRIBUTION
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_ENTITY_ID,
     STATE_OFF,
     STATE_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .utils import (
     MockUFPFixture,
@@ -29,7 +29,7 @@ from .utils import (
 
 
 async def test_light_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, light: Light
+    hass: SmartHub, ufp: MockUFPFixture, light: Light
 ) -> None:
     """Test removing and re-adding a light device."""
 
@@ -42,7 +42,7 @@ async def test_light_remove(
 
 
 async def test_light_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     light: Light,
@@ -67,7 +67,7 @@ async def test_light_setup(
 
 
 async def test_light_update(
-    hass: HomeAssistant, ufp: MockUFPFixture, light: Light, unadopted_light: Light
+    hass: SmartHub, ufp: MockUFPFixture, light: Light, unadopted_light: Light
 ) -> None:
     """Test light entity update."""
 
@@ -93,7 +93,7 @@ async def test_light_update(
 
 
 async def test_light_turn_on(
-    hass: HomeAssistant, ufp: MockUFPFixture, light: Light, unadopted_light: Light
+    hass: SmartHub, ufp: MockUFPFixture, light: Light, unadopted_light: Light
 ) -> None:
     """Test light entity turn on."""
 
@@ -113,7 +113,7 @@ async def test_light_turn_on(
 
 
 async def test_light_turn_off(
-    hass: HomeAssistant, ufp: MockUFPFixture, light: Light, unadopted_light: Light
+    hass: SmartHub, ufp: MockUFPFixture, light: Light, unadopted_light: Light
 ) -> None:
     """Test light entity turn off."""
 

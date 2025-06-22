@@ -10,11 +10,11 @@ from airthings_ble import (
     AirthingsDeviceType,
 )
 
-from homeassistant.components.airthings_ble.const import DOMAIN
-from homeassistant.components.bluetooth.models import BluetoothServiceInfoBleak
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH, DeviceRegistry
+from smarthub.components.airthings_ble.const import DOMAIN
+from smarthub.components.bluetooth.models import BluetoothServiceInfoBleak
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.helpers.device_registry import CONNECTION_BLUETOOTH, DeviceRegistry
 
 from tests.common import MockConfigEntry, MockEntity
 from tests.components.bluetooth import generate_advertisement_data, generate_ble_device
@@ -23,7 +23,7 @@ from tests.components.bluetooth import generate_advertisement_data, generate_ble
 def patch_async_setup_entry(return_value=True):
     """Patch async setup entry to return True."""
     return patch(
-        "homeassistant.components.airthings_ble.async_setup_entry",
+        "smarthub.components.airthings_ble.async_setup_entry",
         return_value=return_value,
     )
 
@@ -31,7 +31,7 @@ def patch_async_setup_entry(return_value=True):
 def patch_async_ble_device_from_address(return_value: BluetoothServiceInfoBleak | None):
     """Patch async ble device from address to return a given value."""
     return patch(
-        "homeassistant.components.bluetooth.async_ble_device_from_address",
+        "smarthub.components.bluetooth.async_ble_device_from_address",
         return_value=return_value,
     )
 
@@ -49,7 +49,7 @@ def patch_airthings_ble(return_value=AirthingsDevice, side_effect=None):
 def patch_airthings_device_update():
     """Patch airthings-ble device."""
     return patch(
-        "homeassistant.components.airthings_ble.coordinator.AirthingsBluetoothDeviceData.update_device",
+        "smarthub.components.airthings_ble.coordinator.AirthingsBluetoothDeviceData.update_device",
         return_value=WAVE_DEVICE_INFO,
     )
 
@@ -226,7 +226,7 @@ VOC_V3 = MockEntity(
 )
 
 
-def create_entry(hass: HomeAssistant) -> MockConfigEntry:
+def create_entry(hass: SmartHub) -> MockConfigEntry:
     """Create a config entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,

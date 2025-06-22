@@ -2,8 +2,8 @@
 
 import pytest
 
-from homeassistant.components.sensor import SensorDeviceClass, significant_change
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass, significant_change
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     UnitOfTemperature,

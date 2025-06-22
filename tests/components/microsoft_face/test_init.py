@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import camera, microsoft_face as mf
-from homeassistant.components.microsoft_face import (
+from smarthub.components import camera, microsoft_face as mf
+from smarthub.components.microsoft_face import (
     ATTR_CAMERA_ENTITY,
     ATTR_GROUP,
     ATTR_PERSON,
@@ -17,21 +17,21 @@ from homeassistant.components.microsoft_face import (
     SERVICE_FACE_PERSON,
     SERVICE_TRAIN_GROUP,
 )
-from homeassistant.const import ATTR_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_NAME
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import assert_setup_component, async_load_fixture
 from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant):
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub):
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
-def create_group(hass: HomeAssistant, name: str) -> None:
+def create_group(hass: SmartHub, name: str) -> None:
     """Create a new person group.
 
     This is a legacy helper method. Do not use it for new tests.
@@ -40,7 +40,7 @@ def create_group(hass: HomeAssistant, name: str) -> None:
     hass.async_create_task(hass.services.async_call(DOMAIN, SERVICE_CREATE_GROUP, data))
 
 
-def delete_group(hass: HomeAssistant, name: str) -> None:
+def delete_group(hass: SmartHub, name: str) -> None:
     """Delete a person group.
 
     This is a legacy helper method. Do not use it for new tests.
@@ -49,7 +49,7 @@ def delete_group(hass: HomeAssistant, name: str) -> None:
     hass.async_create_task(hass.services.async_call(DOMAIN, SERVICE_DELETE_GROUP, data))
 
 
-def train_group(hass: HomeAssistant, group: str) -> None:
+def train_group(hass: SmartHub, group: str) -> None:
     """Train a person group.
 
     This is a legacy helper method. Do not use it for new tests.
@@ -58,7 +58,7 @@ def train_group(hass: HomeAssistant, group: str) -> None:
     hass.async_create_task(hass.services.async_call(DOMAIN, SERVICE_TRAIN_GROUP, data))
 
 
-def create_person(hass: HomeAssistant, group: str, name: str) -> None:
+def create_person(hass: SmartHub, group: str, name: str) -> None:
     """Create a person in a group.
 
     This is a legacy helper method. Do not use it for new tests.
@@ -69,7 +69,7 @@ def create_person(hass: HomeAssistant, group: str, name: str) -> None:
     )
 
 
-def delete_person(hass: HomeAssistant, group: str, name: str) -> None:
+def delete_person(hass: SmartHub, group: str, name: str) -> None:
     """Delete a person in a group.
 
     This is a legacy helper method. Do not use it for new tests.
@@ -81,7 +81,7 @@ def delete_person(hass: HomeAssistant, group: str, name: str) -> None:
 
 
 def face_person(
-    hass: HomeAssistant, group: str, person: str, camera_entity: str
+    hass: SmartHub, group: str, person: str, camera_entity: str
 ) -> None:
     """Add a new face picture to a person.
 
@@ -99,25 +99,25 @@ ENDPOINT_URL = f"https://westus.{mf.FACE_API_URL}"
 def mock_update():
     """Mock update store."""
     with patch(
-        "homeassistant.components.microsoft_face.MicrosoftFace.update_store",
+        "smarthub.components.microsoft_face.MicrosoftFace.update_store",
         return_value=None,
     ) as mock_update_store:
         yield mock_update_store
 
 
-async def test_setup_component(hass: HomeAssistant, mock_update) -> None:
+async def test_setup_component(hass: SmartHub, mock_update) -> None:
     """Set up component."""
     with assert_setup_component(3, mf.DOMAIN):
         await async_setup_component(hass, mf.DOMAIN, CONFIG)
 
 
-async def test_setup_component_wrong_api_key(hass: HomeAssistant, mock_update) -> None:
+async def test_setup_component_wrong_api_key(hass: SmartHub, mock_update) -> None:
     """Set up component without api key."""
     with assert_setup_component(0, mf.DOMAIN):
         await async_setup_component(hass, mf.DOMAIN, {mf.DOMAIN: {}})
 
 
-async def test_setup_component_test_service(hass: HomeAssistant, mock_update) -> None:
+async def test_setup_component_test_service(hass: SmartHub, mock_update) -> None:
     """Set up component."""
     with assert_setup_component(3, mf.DOMAIN):
         await async_setup_component(hass, mf.DOMAIN, CONFIG)
@@ -131,7 +131,7 @@ async def test_setup_component_test_service(hass: HomeAssistant, mock_update) ->
 
 
 async def test_setup_component_test_entities(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set up component."""
     aioclient_mock.get(
@@ -166,7 +166,7 @@ async def test_setup_component_test_entities(
 
 
 async def test_service_groups(
-    hass: HomeAssistant, mock_update, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, mock_update, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set up component, test groups services."""
     aioclient_mock.put(
@@ -199,7 +199,7 @@ async def test_service_groups(
 
 
 async def test_service_person(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set up component, test person services."""
     aioclient_mock.get(
@@ -252,7 +252,7 @@ async def test_service_person(
 
 
 async def test_service_train(
-    hass: HomeAssistant, mock_update, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, mock_update, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set up component, test train groups services."""
     with assert_setup_component(3, mf.DOMAIN):
@@ -271,7 +271,7 @@ async def test_service_train(
 
 
 async def test_service_face(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set up component, test person face services."""
     aioclient_mock.get(
@@ -303,7 +303,7 @@ async def test_service_face(
     )
 
     with patch(
-        "homeassistant.components.camera.async_get_image",
+        "smarthub.components.camera.async_get_image",
         return_value=camera.Image("image/jpeg", b"Test"),
     ):
         face_person(hass, "test_group2", "David", "camera.demo_camera")
@@ -314,7 +314,7 @@ async def test_service_face(
 
 
 async def test_service_status_400(
-    hass: HomeAssistant, mock_update, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, mock_update, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set up component, test groups services with error."""
     aioclient_mock.put(
@@ -335,7 +335,7 @@ async def test_service_status_400(
 
 
 async def test_service_status_timeout(
-    hass: HomeAssistant, mock_update, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, mock_update, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Set up component, test groups services with timeout."""
     aioclient_mock.put(

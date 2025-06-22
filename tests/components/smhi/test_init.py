@@ -2,11 +2,11 @@
 
 from pysmhi import SMHIPointForecast
 
-from homeassistant.components.smhi.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.smhi.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import ENTITY_ID, TEST_CONFIG, TEST_CONFIG_MIGRATE
 
@@ -14,7 +14,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_and_unload_config_entry(
-    hass: HomeAssistant, load_int: MockConfigEntry
+    hass: SmartHub, load_int: MockConfigEntry
 ) -> None:
     """Test remove entry."""
 
@@ -31,7 +31,7 @@ async def test_load_and_unload_config_entry(
 
 
 async def test_migrate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_client: SMHIPointForecast,
 ) -> None:
@@ -65,7 +65,7 @@ async def test_migrate_entry(
 
 
 async def test_migrate_from_future_version(
-    hass: HomeAssistant, mock_client: SMHIPointForecast
+    hass: SmartHub, mock_client: SMHIPointForecast
 ) -> None:
     """Test migrate entry not possible from future version."""
     entry = MockConfigEntry(domain=DOMAIN, data=TEST_CONFIG_MIGRATE, version=4)

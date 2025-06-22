@@ -15,7 +15,7 @@ from typing import Any
 from awesomeversion import AwesomeVersion, AwesomeVersionStrategy
 from tqdm import tqdm
 
-import homeassistant.util.package as pkg_util
+import smarthub.util.package as pkg_util
 from script.gen_requirements_all import (
     EXCLUDED_REQUIREMENTS_ALL,
     normalize_package_name,
@@ -65,7 +65,7 @@ FORBIDDEN_PACKAGES = {
     # Only needed for tests
     "codecov": "not be a runtime dependency",
     # Does blocking I/O and should be replaced by pyserial-asyncio-fast
-    # See https://github.com/home-assistant/core/pull/116635
+    # See https://github.com/smart-hub/core/pull/116635
     "pyserial-asyncio": "be replaced by pyserial-asyncio-fast",
     # Only needed for tests
     "pytest": "not be a runtime dependency",
@@ -155,7 +155,7 @@ FORBIDDEN_PACKAGE_EXCEPTIONS: dict[str, dict[str, set[str]]] = {
         # pyhive-integration > unasync > setuptools
         "unasync": {"setuptools"}
     },
-    "homeassistant_hardware": {
+    "smarthub_hardware": {
         # https://github.com/zigpy/zigpy/issues/1604
         # universal-silabs-flasher > zigpy > pyserial-asyncio
         "zigpy": {"pyserial-asyncio"},
@@ -221,7 +221,7 @@ FORBIDDEN_PACKAGE_EXCEPTIONS: dict[str, dict[str, set[str]]] = {
         "pymonoprice": {"pyserial-asyncio"}
     },
     "mystrom": {
-        # https://github.com/home-assistant-ecosystem/python-mystrom/issues/55
+        # https://github.com/smart-hub-ecosystem/python-mystrom/issues/55
         # python-mystrom > setuptools
         "python-mystrom": {"setuptools"}
     },
@@ -270,7 +270,7 @@ FORBIDDEN_PACKAGE_EXCEPTIONS: dict[str, dict[str, set[str]]] = {
     },
     "travisci": {
         # https://github.com/menegazzo/travispy seems to be unmaintained
-        # and unused https://www.home-assistant.io/integrations/travisci
+        # and unused https://www.smart-hub.io/integrations/travisci
         # travispy > pytest-rerunfailures > pytest
         "pytest-rerunfailures": {"pytest"},
         # travispy > pytest
@@ -299,11 +299,11 @@ PYTHON_VERSION_CHECK_EXCEPTIONS: dict[str, dict[str, set[str]]] = {
     # - dependencyX should be the name of the referenced dependency
     "bluetooth": {
         # https://github.com/hbldh/bleak/pull/1718 (not yet released)
-        "homeassistant": {"bleak"}
+        "smarthub": {"bleak"}
     },
     "python_script": {
         # Security audits are needed for each Python version
-        "homeassistant": {"restrictedpython"}
+        "smarthub": {"restrictedpython"}
     },
 }
 
@@ -515,7 +515,7 @@ def get_requirements(integration: Integration, packages: set[str]) -> set[str]:
         ):
             needs_python_version_check_exception = True
             integration.add_warning_or_error(
-                package in python_version_check_exceptions.get("homeassistant", set()),
+                package in python_version_check_exceptions.get("smarthub", set()),
                 "requirements",
                 "Version restrictions for Python are too strict "
                 f"({requires_python}) in {package}",

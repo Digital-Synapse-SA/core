@@ -9,8 +9,8 @@ from mcstatus.responses import BedrockStatusResponse, JavaStatusResponse
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_OFF
-from homeassistant.core import HomeAssistant
+from smarthub.const import STATE_OFF
+from smarthub.core import SmartHub
 
 from .const import (
     TEST_BEDROCK_STATUS_RESPONSE,
@@ -40,7 +40,7 @@ from tests.common import async_fire_time_changed
     ],
 )
 async def test_binary_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: str,
     server: JavaServer | BedrockServer,
     lookup_function_name: str,
@@ -54,11 +54,11 @@ async def test_binary_sensor(
 
     with (
         patch(
-            f"homeassistant.components.minecraft_server.api.{server.__name__}.{lookup_function_name}",
+            f"smarthub.components.minecraft_server.api.{server.__name__}.{lookup_function_name}",
             return_value=server(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            f"homeassistant.components.minecraft_server.api.{server.__name__}.async_status",
+            f"smarthub.components.minecraft_server.api.{server.__name__}.async_status",
             return_value=status_response,
         ),
     ):
@@ -87,7 +87,7 @@ async def test_binary_sensor(
     ],
 )
 async def test_binary_sensor_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: str,
     server: JavaServer | BedrockServer,
     lookup_function_name: str,
@@ -102,11 +102,11 @@ async def test_binary_sensor_update(
 
     with (
         patch(
-            f"homeassistant.components.minecraft_server.api.{server.__name__}.{lookup_function_name}",
+            f"smarthub.components.minecraft_server.api.{server.__name__}.{lookup_function_name}",
             return_value=server(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            f"homeassistant.components.minecraft_server.api.{server.__name__}.async_status",
+            f"smarthub.components.minecraft_server.api.{server.__name__}.async_status",
             return_value=status_response,
         ),
     ):
@@ -138,7 +138,7 @@ async def test_binary_sensor_update(
     ],
 )
 async def test_binary_sensor_update_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: str,
     server: JavaServer | BedrockServer,
     lookup_function_name: str,
@@ -152,11 +152,11 @@ async def test_binary_sensor_update_failure(
 
     with (
         patch(
-            f"homeassistant.components.minecraft_server.api.{server.__name__}.{lookup_function_name}",
+            f"smarthub.components.minecraft_server.api.{server.__name__}.{lookup_function_name}",
             return_value=server(host=TEST_HOST, port=TEST_PORT),
         ),
         patch(
-            f"homeassistant.components.minecraft_server.api.{server.__name__}.async_status",
+            f"smarthub.components.minecraft_server.api.{server.__name__}.async_status",
             return_value=status_response,
         ),
     ):
@@ -164,7 +164,7 @@ async def test_binary_sensor_update_failure(
         await hass.async_block_till_done()
 
     with patch(
-        f"homeassistant.components.minecraft_server.api.{server.__name__}.async_status",
+        f"smarthub.components.minecraft_server.api.{server.__name__}.async_status",
         side_effect=OSError,
     ):
         freezer.tick(timedelta(minutes=1))

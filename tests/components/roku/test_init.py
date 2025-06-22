@@ -4,18 +4,18 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from rokuecp import RokuConnectionError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 @patch(
-    "homeassistant.components.roku.coordinator.Roku._request",
+    "smarthub.components.roku.coordinator.Roku._request",
     side_effect=RokuConnectionError,
 )
 async def test_config_entry_not_ready(
-    mock_request: MagicMock, hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    mock_request: MagicMock, hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test the Roku configuration entry not ready."""
     mock_config_entry.add_to_hass(hass)
@@ -27,7 +27,7 @@ async def test_config_entry_not_ready(
 
 
 async def test_config_entry_no_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_roku: AsyncMock,
 ) -> None:
@@ -41,7 +41,7 @@ async def test_config_entry_no_unique_id(
 
 
 async def test_load_unload_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_roku: AsyncMock,
 ) -> None:

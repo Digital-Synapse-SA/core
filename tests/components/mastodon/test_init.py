@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock
 from mastodon.Mastodon import MastodonError
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.mastodon.config_flow import MastodonConfigFlow
-from homeassistant.components.mastodon.const import CONF_BASE_URL, DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_CLIENT_ID, CONF_CLIENT_SECRET
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.mastodon.config_flow import MastodonConfigFlow
+from smarthub.components.mastodon.const import CONF_BASE_URL, DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_CLIENT_ID, CONF_CLIENT_SECRET
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_mastodon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -34,7 +34,7 @@ async def test_device_info(
 
 
 async def test_initialization_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -47,7 +47,7 @@ async def test_initialization_failure(
 
 
 async def test_migrate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mastodon_client: AsyncMock,
 ) -> None:
     """Test migration."""

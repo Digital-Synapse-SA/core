@@ -5,17 +5,17 @@ from unittest.mock import patch
 from pynuki.bridge import InvalidCredentialsException
 from requests.exceptions import RequestException
 
-from homeassistant import config_entries
-from homeassistant.components.nuki.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub import config_entries
+from smarthub.components.nuki.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_PORT, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
 
 from .mock import DHCP_FORMATTED_MAC, HOST, MOCK_INFO, NAME, setup_nuki_integration
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -26,11 +26,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nuki.config_flow.NukiBridge.info",
+            "smarthub.components.nuki.config_flow.NukiBridge.info",
             return_value=MOCK_INFO,
         ),
         patch(
-            "homeassistant.components.nuki.async_setup_entry",
+            "smarthub.components.nuki.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -54,14 +54,14 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nuki.config_flow.NukiBridge.info",
+        "smarthub.components.nuki.config_flow.NukiBridge.info",
         side_effect=InvalidCredentialsException,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -77,14 +77,14 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nuki.config_flow.NukiBridge.info",
+        "smarthub.components.nuki.config_flow.NukiBridge.info",
         side_effect=RequestException,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -100,14 +100,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_unknown_exception(hass: HomeAssistant) -> None:
+async def test_form_unknown_exception(hass: SmartHub) -> None:
     """Test we handle unknown exceptions."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.nuki.config_flow.NukiBridge.info",
+        "smarthub.components.nuki.config_flow.NukiBridge.info",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -123,7 +123,7 @@ async def test_form_unknown_exception(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "unknown"}
 
 
-async def test_form_already_configured(hass: HomeAssistant) -> None:
+async def test_form_already_configured(hass: SmartHub) -> None:
     """Test we get the form."""
     await setup_nuki_integration(hass)
     result = await hass.config_entries.flow.async_init(
@@ -131,7 +131,7 @@ async def test_form_already_configured(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.nuki.config_flow.NukiBridge.info",
+        "smarthub.components.nuki.config_flow.NukiBridge.info",
         return_value=MOCK_INFO,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -147,7 +147,7 @@ async def test_form_already_configured(hass: HomeAssistant) -> None:
         assert result2["reason"] == "already_configured"
 
 
-async def test_dhcp_flow(hass: HomeAssistant) -> None:
+async def test_dhcp_flow(hass: SmartHub) -> None:
     """Test that DHCP discovery for new bridge works."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -160,11 +160,11 @@ async def test_dhcp_flow(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nuki.config_flow.NukiBridge.info",
+            "smarthub.components.nuki.config_flow.NukiBridge.info",
             return_value=MOCK_INFO,
         ),
         patch(
-            "homeassistant.components.nuki.async_setup_entry",
+            "smarthub.components.nuki.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -189,7 +189,7 @@ async def test_dhcp_flow(hass: HomeAssistant) -> None:
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_dhcp_flow_already_configured(hass: HomeAssistant) -> None:
+async def test_dhcp_flow_already_configured(hass: SmartHub) -> None:
     """Test that DHCP doesn't setup already configured devices."""
     await setup_nuki_integration(hass)
     result = await hass.config_entries.flow.async_init(
@@ -202,7 +202,7 @@ async def test_dhcp_flow_already_configured(hass: HomeAssistant) -> None:
     assert result["reason"] == "already_configured"
 
 
-async def test_reauth_success(hass: HomeAssistant) -> None:
+async def test_reauth_success(hass: SmartHub) -> None:
     """Test starting a reauthentication flow."""
     entry = await setup_nuki_integration(hass)
 
@@ -212,11 +212,11 @@ async def test_reauth_success(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.nuki.config_flow.NukiBridge.info",
+            "smarthub.components.nuki.config_flow.NukiBridge.info",
             return_value=MOCK_INFO,
         ),
         patch(
-            "homeassistant.components.nuki.async_setup_entry",
+            "smarthub.components.nuki.async_setup_entry",
             return_value=True,
         ),
     ):
@@ -231,7 +231,7 @@ async def test_reauth_success(hass: HomeAssistant) -> None:
         assert entry.data[CONF_TOKEN] == "new-token"
 
 
-async def test_reauth_invalid_auth(hass: HomeAssistant) -> None:
+async def test_reauth_invalid_auth(hass: SmartHub) -> None:
     """Test starting a reauthentication flow with invalid auth."""
     entry = await setup_nuki_integration(hass)
 
@@ -240,7 +240,7 @@ async def test_reauth_invalid_auth(hass: HomeAssistant) -> None:
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.nuki.config_flow.NukiBridge.info",
+        "smarthub.components.nuki.config_flow.NukiBridge.info",
         side_effect=InvalidCredentialsException,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -253,7 +253,7 @@ async def test_reauth_invalid_auth(hass: HomeAssistant) -> None:
         assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_reauth_cannot_connect(hass: HomeAssistant) -> None:
+async def test_reauth_cannot_connect(hass: SmartHub) -> None:
     """Test starting a reauthentication flow with cannot connect."""
     entry = await setup_nuki_integration(hass)
 
@@ -262,7 +262,7 @@ async def test_reauth_cannot_connect(hass: HomeAssistant) -> None:
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.nuki.config_flow.NukiBridge.info",
+        "smarthub.components.nuki.config_flow.NukiBridge.info",
         side_effect=RequestException,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -275,7 +275,7 @@ async def test_reauth_cannot_connect(hass: HomeAssistant) -> None:
         assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_reauth_unknown_exception(hass: HomeAssistant) -> None:
+async def test_reauth_unknown_exception(hass: SmartHub) -> None:
     """Test starting a reauthentication flow with an unknown exception."""
     entry = await setup_nuki_integration(hass)
 
@@ -284,7 +284,7 @@ async def test_reauth_unknown_exception(hass: HomeAssistant) -> None:
     assert result["step_id"] == "reauth_confirm"
 
     with patch(
-        "homeassistant.components.nuki.config_flow.NukiBridge.info",
+        "smarthub.components.nuki.config_flow.NukiBridge.info",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(

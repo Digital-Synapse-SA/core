@@ -2,20 +2,20 @@
 
 from unittest.mock import MagicMock, patch
 
-from homeassistant.components.landisgyr_heat_meter.const import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.landisgyr_heat_meter.const import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 API_HEAT_METER_SERVICE = (
-    "homeassistant.components.landisgyr_heat_meter.ultraheat_api.HeatMeterService"
+    "smarthub.components.landisgyr_heat_meter.ultraheat_api.HeatMeterService"
 )
 
 
 @patch(API_HEAT_METER_SERVICE)
-async def test_unload_entry(mock_meter_service: MagicMock, hass: HomeAssistant) -> None:
+async def test_unload_entry(mock_meter_service: MagicMock, hass: SmartHub) -> None:
     """Test removing config entry."""
     mock_entry_data = {
         "device": "/dev/USB0",
@@ -40,7 +40,7 @@ async def test_unload_entry(mock_meter_service: MagicMock, hass: HomeAssistant) 
 @patch(API_HEAT_METER_SERVICE)
 async def test_migrate_entry(
     mock_meter_service: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test successful migration of entry data from version 1 to 2."""

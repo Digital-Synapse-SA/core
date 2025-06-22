@@ -8,9 +8,9 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .const import NETWORK_INFO
 
@@ -19,7 +19,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed, snapshot_plat
 
 @pytest.mark.usefixtures("mock_entry")
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -32,7 +32,7 @@ async def test_sensors(
 
 @pytest.mark.usefixtures("mock_entry")
 async def test_device_update_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_device: AsyncMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -61,7 +61,7 @@ async def test_device_update_error(
 
 @pytest.mark.usefixtures("mock_entry")
 async def test_device_update_timeout(
-    hass: HomeAssistant, mock_device: AsyncMock, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_device: AsyncMock, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test handling of a device timeout during an update."""
     mock_device.get_network_info.side_effect = (TimeoutError, NETWORK_INFO)
@@ -88,7 +88,7 @@ async def test_device_update_timeout(
 
 @pytest.mark.usefixtures("mock_entry")
 async def test_device_cache(
-    hass: HomeAssistant, mock_device: AsyncMock, freezer: FrozenDateTimeFactory
+    hass: SmartHub, mock_device: AsyncMock, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test that the device isn't re-opened for subsequent refreshes."""
     assert mock_device.get_network_info.call_count == 1

@@ -5,14 +5,14 @@ from unittest.mock import patch
 from aiomodernforms import ModernFormsConnectionError
 import pytest
 
-from homeassistant.components.light import ATTR_BRIGHTNESS, DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.modern_forms.const import (
+from smarthub.components.light import ATTR_BRIGHTNESS, DOMAIN as LIGHT_DOMAIN
+from smarthub.components.modern_forms.const import (
     ATTR_SLEEP_TIME,
     DOMAIN,
     SERVICE_CLEAR_LIGHT_SLEEP_TIMER,
     SERVICE_SET_LIGHT_SLEEP_TIMER,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     SERVICE_TURN_OFF,
@@ -20,8 +20,8 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -29,7 +29,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 
 async def test_light_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_light_state(
 
 
 async def test_change_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -79,7 +79,7 @@ async def test_change_state(
 
 
 async def test_sleep_timer_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -108,7 +108,7 @@ async def test_sleep_timer_services(
 
 
 async def test_light_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -120,7 +120,7 @@ async def test_light_error(
     aioclient_mock.post("http://192.168.1.123:80/mf", text="", status=400)
 
     with patch(
-        "homeassistant.components.modern_forms.coordinator.ModernFormsDevice.update"
+        "smarthub.components.modern_forms.coordinator.ModernFormsDevice.update"
     ):
         await hass.services.async_call(
             LIGHT_DOMAIN,
@@ -135,17 +135,17 @@ async def test_light_error(
 
 
 async def test_light_connection_error(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test error handling of the Moder Forms lights."""
     await init_integration(hass, aioclient_mock)
 
     with (
         patch(
-            "homeassistant.components.modern_forms.coordinator.ModernFormsDevice.update"
+            "smarthub.components.modern_forms.coordinator.ModernFormsDevice.update"
         ),
         patch(
-            "homeassistant.components.modern_forms.coordinator.ModernFormsDevice.light",
+            "smarthub.components.modern_forms.coordinator.ModernFormsDevice.light",
             side_effect=ModernFormsConnectionError,
         ),
     ):

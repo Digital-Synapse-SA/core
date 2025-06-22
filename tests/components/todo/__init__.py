@@ -1,9 +1,9 @@
 """Tests for the To-do integration."""
 
-from homeassistant.components.todo import DOMAIN, TodoItem, TodoListEntity
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.components.todo import DOMAIN, TodoItem, TodoListEntity
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from tests.common import MockConfigEntry, MockPlatform, mock_platform
 
@@ -43,13 +43,13 @@ class MockTodoListEntity(TodoListEntity):
 
 
 async def create_mock_platform(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entities: list[TodoListEntity],
 ) -> MockConfigEntry:
     """Create a todo platform with the specified entities."""
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:

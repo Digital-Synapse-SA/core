@@ -9,11 +9,11 @@ from unittest.mock import patch
 import pytest
 import voluptuous as vol
 
-from homeassistant import config_entries, data_entry_flow
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.schema_config_entry_flow import (
+from smarthub import config_entries, data_entry_flow
+from smarthub.core import SmartHub, callback
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.schema_config_entry_flow import (
     SchemaCommonFlowHandler,
     SchemaConfigFlowHandler,
     SchemaFlowError,
@@ -22,7 +22,7 @@ from homeassistant.helpers.schema_config_entry_flow import (
     SchemaOptionsFlowHandler,
     wrapped_entity_config_entry_title,
 )
-from homeassistant.util.decorator import Registry
+from smarthub.util.decorator import Registry
 
 from tests.common import MockConfigEntry, MockModule, mock_integration, mock_platform
 
@@ -75,7 +75,7 @@ def manager_fixture():
     return mgr
 
 
-async def test_name(hass: HomeAssistant, entity_registry: er.EntityRegistry) -> None:
+async def test_name(hass: SmartHub, entity_registry: er.EntityRegistry) -> None:
     """Test the config flow name is copied from registry entry, with fallback to state."""
     entity_id = "switch.ceiling"
 
@@ -108,7 +108,7 @@ async def test_name(hass: HomeAssistant, entity_registry: er.EntityRegistry) -> 
 
 @pytest.mark.parametrize("marker", [vol.Required, vol.Optional])
 async def test_config_flow_advanced_option(
-    hass: HomeAssistant, manager: data_entry_flow.FlowManager, marker
+    hass: SmartHub, manager: data_entry_flow.FlowManager, marker
 ) -> None:
     """Test handling of advanced options in config flow."""
     manager.hass = hass
@@ -203,7 +203,7 @@ async def test_config_flow_advanced_option(
 
 @pytest.mark.parametrize("marker", [vol.Required, vol.Optional])
 async def test_options_flow_advanced_option(
-    hass: HomeAssistant, manager: data_entry_flow.FlowManager, marker
+    hass: SmartHub, manager: data_entry_flow.FlowManager, marker
 ) -> None:
     """Test handling of advanced options in options flow."""
     manager.hass = hass
@@ -313,7 +313,7 @@ async def test_options_flow_advanced_option(
         assert isinstance(option, str)
 
 
-async def test_menu_step(hass: HomeAssistant) -> None:
+async def test_menu_step(hass: SmartHub) -> None:
     """Test menu step."""
 
     MENU_1 = ["option1", "option2"]
@@ -369,7 +369,7 @@ async def test_menu_step(hass: HomeAssistant) -> None:
         assert result["type"] == FlowResultType.CREATE_ENTRY
 
 
-async def test_schema_none(hass: HomeAssistant) -> None:
+async def test_schema_none(hass: SmartHub) -> None:
     """Test SchemaFlowFormStep with schema set to None."""
 
     CONFIG_FLOW: dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
@@ -400,7 +400,7 @@ async def test_schema_none(hass: HomeAssistant) -> None:
         assert result["type"] == FlowResultType.CREATE_ENTRY
 
 
-async def test_last_step(hass: HomeAssistant) -> None:
+async def test_last_step(hass: SmartHub) -> None:
     """Test SchemaFlowFormStep with schema set to None."""
 
     async def _step2_next_step(_: dict[str, Any]) -> str:
@@ -441,7 +441,7 @@ async def test_last_step(hass: HomeAssistant) -> None:
         assert result["type"] == FlowResultType.CREATE_ENTRY
 
 
-async def test_next_step_function(hass: HomeAssistant) -> None:
+async def test_next_step_function(hass: SmartHub) -> None:
     """Test SchemaFlowFormStep with a next_step function."""
 
     async def _step1_next_step(_: dict[str, Any]) -> str:
@@ -478,7 +478,7 @@ async def test_next_step_function(hass: HomeAssistant) -> None:
 
 
 async def test_suggested_values(
-    hass: HomeAssistant, manager: data_entry_flow.FlowManager
+    hass: SmartHub, manager: data_entry_flow.FlowManager
 ) -> None:
     """Test suggested_values handling in SchemaFlowFormStep."""
     manager.hass = hass
@@ -591,7 +591,7 @@ async def test_suggested_values(
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 
-async def test_options_flow_state(hass: HomeAssistant) -> None:
+async def test_options_flow_state(hass: SmartHub) -> None:
     """Test flow_state handling in SchemaFlowFormStep."""
 
     OPTIONS_SCHEMA = vol.Schema(
@@ -674,7 +674,7 @@ async def test_options_flow_state(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow_omit_optional_keys(
-    hass: HomeAssistant, manager: data_entry_flow.FlowManager
+    hass: SmartHub, manager: data_entry_flow.FlowManager
 ) -> None:
     """Test handling of advanced options in options flow."""
     manager.hass = hass

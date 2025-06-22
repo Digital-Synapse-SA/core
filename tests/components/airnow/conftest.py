@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.airnow.const import DOMAIN
-from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_RADIUS
-from homeassistant.core import HomeAssistant
-from homeassistant.util.json import JsonArrayType
+from smarthub.components.airnow.const import DOMAIN
+from smarthub.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_RADIUS
+from smarthub.core import SmartHub
+from smarthub.util.json import JsonArrayType
 
 from tests.common import MockConfigEntry, load_json_array_fixture
 
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config: dict[str, Any], options: dict[str, Any]
+    hass: SmartHub, config: dict[str, Any], options: dict[str, Any]
 ) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
@@ -66,6 +66,6 @@ def setup_airnow_fixture(mock_api_get: AsyncMock) -> Generator[None]:
     """Define a fixture to set up AirNow."""
     with (
         patch("pyairnow.WebServiceAPI._get", mock_api_get),
-        patch("homeassistant.components.airnow.PLATFORMS", []),
+        patch("smarthub.components.airnow.PLATFORMS", []),
     ):
         yield

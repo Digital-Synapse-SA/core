@@ -9,15 +9,15 @@ from unittest.mock import MagicMock, Mock, patch
 
 from aiohttp import ClientConnectionError, ClientResponseError
 
-from homeassistant import config_entries
-from homeassistant.components.bond.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.device_registry import format_mac
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.bond.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_ACCESS_TOKEN, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.device_registry import format_mac
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .common import (
     patch_bond_bridge,
@@ -32,7 +32,7 @@ from .common import (
 from tests.common import MockConfigEntry
 
 
-async def test_user_form(hass: HomeAssistant) -> None:
+async def test_user_form(hass: SmartHub) -> None:
     """Test we get the user initiated form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -66,7 +66,7 @@ async def test_user_form(hass: HomeAssistant) -> None:
 
 
 async def test_user_form_can_create_when_already_discovered(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we get the user initiated form can create when already discovered."""
 
@@ -118,7 +118,7 @@ async def test_user_form_can_create_when_already_discovered(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_form_with_non_bridge(hass: HomeAssistant) -> None:
+async def test_user_form_with_non_bridge(hass: SmartHub) -> None:
     """Test setup a smart by bond fan."""
 
     result = await hass.config_entries.flow.async_init(
@@ -156,7 +156,7 @@ async def test_user_form_with_non_bridge(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_user_form_invalid_auth(hass: HomeAssistant) -> None:
+async def test_user_form_invalid_auth(hass: SmartHub) -> None:
     """Test we handle invalid auth."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -178,7 +178,7 @@ async def test_user_form_invalid_auth(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "invalid_auth"}
 
 
-async def test_user_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_user_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -198,7 +198,7 @@ async def test_user_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_user_form_old_firmware(hass: HomeAssistant) -> None:
+async def test_user_form_old_firmware(hass: SmartHub) -> None:
     """Test we handle unsupported old firmware."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -218,7 +218,7 @@ async def test_user_form_old_firmware(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "old_firmware"}
 
 
-async def test_user_form_unexpected_client_error(hass: HomeAssistant) -> None:
+async def test_user_form_unexpected_client_error(hass: SmartHub) -> None:
     """Test we handle unexpected client error gracefully."""
     await _help_test_form_unexpected_error(
         hass,
@@ -228,7 +228,7 @@ async def test_user_form_unexpected_client_error(hass: HomeAssistant) -> None:
     )
 
 
-async def test_user_form_unexpected_error(hass: HomeAssistant) -> None:
+async def test_user_form_unexpected_error(hass: SmartHub) -> None:
     """Test we handle unexpected error gracefully."""
     await _help_test_form_unexpected_error(
         hass,
@@ -238,7 +238,7 @@ async def test_user_form_unexpected_error(hass: HomeAssistant) -> None:
     )
 
 
-async def test_user_form_one_entry_per_device_allowed(hass: HomeAssistant) -> None:
+async def test_user_form_one_entry_per_device_allowed(hass: SmartHub) -> None:
     """Test that only one entry allowed per unique ID reported by Bond hub device."""
     MockConfigEntry(
         domain=DOMAIN,
@@ -268,7 +268,7 @@ async def test_user_form_one_entry_per_device_allowed(hass: HomeAssistant) -> No
     assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_zeroconf_form(hass: HomeAssistant) -> None:
+async def test_zeroconf_form(hass: SmartHub) -> None:
     """Test we get the discovery form."""
 
     with patch_bond_version(), patch_bond_token():
@@ -309,7 +309,7 @@ async def test_zeroconf_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_dhcp_discovery(hass: HomeAssistant) -> None:
+async def test_dhcp_discovery(hass: SmartHub) -> None:
     """Test DHCP discovery."""
 
     with patch_bond_version(), patch_bond_token():
@@ -346,7 +346,7 @@ async def test_dhcp_discovery(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_dhcp_discovery_already_exists(hass: HomeAssistant) -> None:
+async def test_dhcp_discovery_already_exists(hass: SmartHub) -> None:
     """Test DHCP discovery for an already existing entry."""
 
     entry = MockConfigEntry(
@@ -372,7 +372,7 @@ async def test_dhcp_discovery_already_exists(hass: HomeAssistant) -> None:
         assert result["reason"] == "already_configured"
 
 
-async def test_dhcp_discovery_short_name(hass: HomeAssistant) -> None:
+async def test_dhcp_discovery_short_name(hass: SmartHub) -> None:
     """Test DHCP discovery with the name cut off."""
 
     with patch_bond_version(), patch_bond_token():
@@ -410,7 +410,7 @@ async def test_dhcp_discovery_short_name(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_zeroconf_form_token_unavailable(hass: HomeAssistant) -> None:
+async def test_zeroconf_form_token_unavailable(hass: SmartHub) -> None:
     """Test we get the discovery form and we handle the token being unavailable."""
 
     with patch_bond_version(), patch_bond_token():
@@ -452,7 +452,7 @@ async def test_zeroconf_form_token_unavailable(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_zeroconf_form_token_times_out(hass: HomeAssistant) -> None:
+async def test_zeroconf_form_token_times_out(hass: SmartHub) -> None:
     """Test we get the discovery form and we handle the token request timeout."""
 
     with patch_bond_version(), patch_bond_token(side_effect=TimeoutError):
@@ -494,7 +494,7 @@ async def test_zeroconf_form_token_times_out(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_zeroconf_form_with_token_available(hass: HomeAssistant) -> None:
+async def test_zeroconf_form_with_token_available(hass: SmartHub) -> None:
     """Test we get the discovery form when we can get the token."""
 
     with (
@@ -537,7 +537,7 @@ async def test_zeroconf_form_with_token_available(hass: HomeAssistant) -> None:
 
 
 async def test_zeroconf_form_with_token_available_name_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test we get the discovery form when we can get the token but the name is unavailable."""
 
@@ -580,7 +580,7 @@ async def test_zeroconf_form_with_token_available_name_unavailable(
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_zeroconf_already_configured(hass: HomeAssistant) -> None:
+async def test_zeroconf_already_configured(hass: SmartHub) -> None:
     """Test starting a flow from discovery when already configured."""
 
     entry = MockConfigEntry(
@@ -612,7 +612,7 @@ async def test_zeroconf_already_configured(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_zeroconf_in_setup_retry_state(hass: HomeAssistant) -> None:
+async def test_zeroconf_in_setup_retry_state(hass: SmartHub) -> None:
     """Test we retry right away on zeroconf discovery."""
 
     entry = MockConfigEntry(
@@ -651,7 +651,7 @@ async def test_zeroconf_in_setup_retry_state(hass: HomeAssistant) -> None:
     assert entry.state is ConfigEntryState.LOADED
 
 
-async def test_zeroconf_already_configured_refresh_token(hass: HomeAssistant) -> None:
+async def test_zeroconf_already_configured_refresh_token(hass: SmartHub) -> None:
     """Test starting a flow from zeroconf when already configured and the token is out of date."""
     entry2 = MockConfigEntry(
         domain=DOMAIN,
@@ -701,7 +701,7 @@ async def test_zeroconf_already_configured_refresh_token(hass: HomeAssistant) ->
 
 
 async def test_zeroconf_already_configured_no_reload_same_host(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test starting a flow from zeroconf when already configured does not reload if the host is the same."""
     entry = MockConfigEntry(
@@ -735,7 +735,7 @@ async def test_zeroconf_already_configured_no_reload_same_host(
     assert len(mock_setup_entry.mock_calls) == 0
 
 
-async def test_zeroconf_form_unexpected_error(hass: HomeAssistant) -> None:
+async def test_zeroconf_form_unexpected_error(hass: SmartHub) -> None:
     """Test we handle unexpected error gracefully."""
     await _help_test_form_unexpected_error(
         hass,
@@ -755,7 +755,7 @@ async def test_zeroconf_form_unexpected_error(hass: HomeAssistant) -> None:
 
 
 async def _help_test_form_unexpected_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     *,
     source: str,
     initial_input: dict[str, Any] | None = None,
@@ -782,6 +782,6 @@ async def _help_test_form_unexpected_error(
 
 def _patch_async_setup_entry():
     return patch(
-        "homeassistant.components.bond.async_setup_entry",
+        "smarthub.components.bond.async_setup_entry",
         return_value=True,
     )

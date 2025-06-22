@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from smarthub.const import Platform
+from smarthub.core import SmartHub
 
 from . import setup_owproxy_mock_devices
 
@@ -19,13 +19,13 @@ from tests.typing import ClientSessionGenerator
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.onewire._PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.onewire._PLATFORMS", [Platform.SWITCH]):
         yield
 
 
 @pytest.mark.parametrize("device_id", ["EF.111111111113"], indirect=True)
 async def test_entry_diagnostics(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     hass_client: ClientSessionGenerator,
     owproxy: MagicMock,

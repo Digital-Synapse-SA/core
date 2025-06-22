@@ -5,11 +5,11 @@ from unittest.mock import Mock, patch
 import pytest
 import yarl
 
-from homeassistant.components import media_source
-from homeassistant.components.media_player import BrowseError, MediaClass
-from homeassistant.components.media_source import const, models
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import media_source
+from smarthub.components.media_player import BrowseError, MediaClass
+from smarthub.components.media_source import const, models
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import WebSocketGenerator
 
@@ -41,7 +41,7 @@ async def test_generate_media_source_id() -> None:
         )
 
 
-async def test_async_browse_media(hass: HomeAssistant) -> None:
+async def test_async_browse_media(hass: SmartHub) -> None:
     """Test browse media."""
     assert await async_setup_component(hass, media_source.DOMAIN, {})
     await hass.async_block_till_done()
@@ -74,7 +74,7 @@ async def test_async_browse_media(hass: HomeAssistant) -> None:
         return item
 
     with patch(
-        "homeassistant.components.media_source.models.MediaSourceItem.async_browse",
+        "smarthub.components.media_source.models.MediaSourceItem.async_browse",
         not_shown_browse,
     ):
         media = await media_source.async_browse_media(
@@ -99,7 +99,7 @@ async def test_async_browse_media(hass: HomeAssistant) -> None:
     assert media.children[0].title == "My media"
 
 
-async def test_async_resolve_media(hass: HomeAssistant) -> None:
+async def test_async_resolve_media(hass: SmartHub) -> None:
     """Test browse media."""
     assert await async_setup_component(hass, media_source.DOMAIN, {})
     await hass.async_block_till_done()
@@ -115,7 +115,7 @@ async def test_async_resolve_media(hass: HomeAssistant) -> None:
 
 
 async def test_async_resolve_media_no_entity(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test browse media."""
     assert await async_setup_component(hass, media_source.DOMAIN, {})
@@ -130,7 +130,7 @@ async def test_async_resolve_media_no_entity(
         )
 
 
-async def test_async_unresolve_media(hass: HomeAssistant) -> None:
+async def test_async_unresolve_media(hass: SmartHub) -> None:
     """Test browse media."""
     assert await async_setup_component(hass, media_source.DOMAIN, {})
     await hass.async_block_till_done()
@@ -151,7 +151,7 @@ async def test_async_unresolve_media(hass: HomeAssistant) -> None:
 
 
 async def test_websocket_browse_media(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test browse media websocket."""
     assert await async_setup_component(hass, media_source.DOMAIN, {})
@@ -170,7 +170,7 @@ async def test_websocket_browse_media(
     )
 
     with patch(
-        "homeassistant.components.media_source.async_browse_media",
+        "smarthub.components.media_source.async_browse_media",
         return_value=media,
     ):
         await client.send_json(
@@ -187,7 +187,7 @@ async def test_websocket_browse_media(
     assert media.as_dict() == msg["result"]
 
     with patch(
-        "homeassistant.components.media_source.async_browse_media",
+        "smarthub.components.media_source.async_browse_media",
         side_effect=BrowseError("test"),
     ):
         await client.send_json(
@@ -207,7 +207,7 @@ async def test_websocket_browse_media(
 
 @pytest.mark.parametrize("filename", ["test.mp3", "Epic Sax Guy 10 Hours.mp4"])
 async def test_websocket_resolve_media(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, filename
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, filename
 ) -> None:
     """Test browse media websocket."""
     assert await async_setup_component(hass, media_source.DOMAIN, {})
@@ -221,7 +221,7 @@ async def test_websocket_resolve_media(
     )
 
     with patch(
-        "homeassistant.components.media_source.async_resolve_media",
+        "smarthub.components.media_source.async_resolve_media",
         return_value=media,
     ):
         await client.send_json(
@@ -245,7 +245,7 @@ async def test_websocket_resolve_media(
     assert "authSig" in parsed.query
 
     with patch(
-        "homeassistant.components.media_source.async_resolve_media",
+        "smarthub.components.media_source.async_resolve_media",
         side_effect=media_source.Unresolvable("test"),
     ):
         await client.send_json(

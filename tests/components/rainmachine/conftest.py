@@ -7,10 +7,10 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.rainmachine import DOMAIN
-from homeassistant.const import CONF_IP_ADDRESS, CONF_PASSWORD, CONF_PORT, CONF_SSL
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.rainmachine import DOMAIN
+from smarthub.const import CONF_IP_ADDRESS, CONF_PASSWORD, CONF_PORT, CONF_SSL
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -34,7 +34,7 @@ def config_fixture() -> dict[str, Any]:
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config: dict[str, Any], controller_mac: str
+    hass: SmartHub, config: dict[str, Any], controller_mac: str
 ) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
@@ -150,17 +150,17 @@ def data_zones_fixture():
 
 @pytest.fixture(name="setup_rainmachine")
 async def setup_rainmachine_fixture(
-    hass: HomeAssistant, client: AsyncMock, config: dict[str, Any]
+    hass: SmartHub, client: AsyncMock, config: dict[str, Any]
 ) -> AsyncGenerator[None]:
     """Define a fixture to set up RainMachine."""
     with (
-        patch("homeassistant.components.rainmachine.Client", return_value=client),
+        patch("smarthub.components.rainmachine.Client", return_value=client),
         patch(
-            "homeassistant.components.rainmachine.config_flow.Client",
+            "smarthub.components.rainmachine.config_flow.Client",
             return_value=client,
         ),
         patch(
-            "homeassistant.components.rainmachine.PLATFORMS",
+            "smarthub.components.rainmachine.PLATFORMS",
             [],
         ),
     ):

@@ -9,9 +9,9 @@ from google_nest_sdm.event import EventMessage, EventType
 from google_nest_sdm.traits import TraitType
 import pytest
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.util.dt import utcnow
 
 from .common import DEVICE_ID, TEST_CLIP_URL, CreateDevice, create_nest_event
 from .conftest import PlatformSetup
@@ -142,7 +142,7 @@ def create_event_messages(
     ],
 )
 async def test_receive_events(
-    hass: HomeAssistant,
+    hass: SmartHub,
     subscriber: AsyncMock,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
@@ -182,7 +182,7 @@ async def test_receive_events(
 
 @pytest.mark.parametrize(("trait_type"), [(TraitType.DOORBELL_CHIME)])
 async def test_ignore_unrelated_event(
-    hass: HomeAssistant,
+    hass: SmartHub,
     subscriber: AsyncMock,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,
@@ -212,7 +212,7 @@ async def test_ignore_unrelated_event(
 
 @pytest.mark.freeze_time("2024-08-24T12:00:00Z")
 async def test_event_threads(
-    hass: HomeAssistant,
+    hass: SmartHub,
     subscriber: AsyncMock,
     setup_platform: PlatformSetup,
     create_device: CreateDevice,

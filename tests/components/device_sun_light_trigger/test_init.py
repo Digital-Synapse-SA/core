@@ -7,14 +7,14 @@ from unittest.mock import patch
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components import (
+from smarthub.components import (
     device_sun_light_trigger,
     device_tracker,
     group,
     light,
 )
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
-from homeassistant.const import (
+from smarthub.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     CONF_PLATFORM,
     EVENT_HOMEASSISTANT_START,
@@ -24,9 +24,9 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import CoreState, HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.core import CoreState, SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import async_fire_time_changed, setup_test_component_platform
 from tests.components.device_tracker.common import MockScanner
@@ -35,10 +35,10 @@ from tests.components.light.common import MockLight
 
 @pytest.fixture
 async def scanner(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_light_entities: list[MockLight],
     mock_legacy_device_scanner: MockScanner,
-    mock_legacy_device_tracker_setup: Callable[[HomeAssistant, MockScanner], None],
+    mock_legacy_device_tracker_setup: Callable[[SmartHub, MockScanner], None],
 ) -> None:
     """Initialize components."""
     mock_legacy_device_tracker_setup(hass, mock_legacy_device_scanner)
@@ -48,7 +48,7 @@ async def scanner(
     setup_test_component_platform(hass, "light", mock_light_entities)
 
     with patch(
-        "homeassistant.components.device_tracker.legacy.load_yaml_config_file",
+        "smarthub.components.device_tracker.legacy.load_yaml_config_file",
         return_value={
             "device_1": {
                 "mac": "DEV1",
@@ -80,7 +80,7 @@ async def scanner(
 
 @pytest.mark.usefixtures("scanner")
 async def test_lights_on_when_sun_sets(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test lights go on when there is someone home and the sun sets."""
     test_time = datetime(2017, 4, 5, 1, 2, 3, tzinfo=dt_util.UTC)
@@ -108,7 +108,7 @@ async def test_lights_on_when_sun_sets(
 
 
 @pytest.mark.usefixtures("enable_custom_integrations")
-async def test_lights_turn_off_when_everyone_leaves(hass: HomeAssistant) -> None:
+async def test_lights_turn_off_when_everyone_leaves(hass: SmartHub) -> None:
     """Test lights turn off when everyone leaves the house."""
     assert await async_setup_component(
         hass, "light", {light.DOMAIN: {CONF_PLATFORM: "test"}}
@@ -137,7 +137,7 @@ async def test_lights_turn_off_when_everyone_leaves(hass: HomeAssistant) -> None
 
 @pytest.mark.usefixtures("scanner")
 async def test_lights_turn_on_when_coming_home_after_sun_set(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test lights turn on when coming home after sun set."""
     test_time = datetime(2017, 4, 5, 3, 2, 3, tzinfo=dt_util.UTC)
@@ -174,7 +174,7 @@ async def test_lights_turn_on_when_coming_home_after_sun_set(
 
 @pytest.mark.usefixtures("scanner")
 async def test_lights_turn_on_when_coming_home_after_sun_set_person(
-    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+    hass: SmartHub, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test lights turn on when coming home after sun set."""
     # Ensure all setup tasks are done (avoid flaky tests)
@@ -258,7 +258,7 @@ async def test_lights_turn_on_when_coming_home_after_sun_set_person(
     assert hass.states.get("person.me").state == "home"
 
 
-async def test_initialize_start(hass: HomeAssistant) -> None:
+async def test_initialize_start(hass: SmartHub) -> None:
     """Test we initialize when HA starts."""
     hass.set_state(CoreState.not_running)
     assert await async_setup_component(
@@ -268,7 +268,7 @@ async def test_initialize_start(hass: HomeAssistant) -> None:
     )
 
     with patch(
-        "homeassistant.components.device_sun_light_trigger.activate_automation"
+        "smarthub.components.device_sun_light_trigger.activate_automation"
     ) as mock_activate:
         hass.bus.fire(EVENT_HOMEASSISTANT_START)
         await hass.async_block_till_done()

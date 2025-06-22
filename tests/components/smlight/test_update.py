@@ -10,8 +10,8 @@ from pysmlight.sse import MessageEvent
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.smlight.const import DOMAIN, SCAN_FIRMWARE_INTERVAL
-from homeassistant.components.update import (
+from smarthub.components.smlight.const import DOMAIN, SCAN_FIRMWARE_INTERVAL
+from smarthub.components.update import (
     ATTR_IN_PROGRESS,
     ATTR_INSTALLED_VERSION,
     ATTR_LATEST_VERSION,
@@ -19,10 +19,10 @@ from homeassistant.components.update import (
     DOMAIN as PLATFORM,
     SERVICE_INSTALL,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import get_mock_event_function
 from .conftest import setup_integration
@@ -83,7 +83,7 @@ def platforms() -> list[Platform]:
 
 
 async def test_update_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -96,10 +96,10 @@ async def test_update_setup(
     await hass.config_entries.async_unload(entry.entry_id)
 
 
-@patch("homeassistant.components.smlight.update.asyncio.sleep", return_value=None)
+@patch("smarthub.components.smlight.update.asyncio.sleep", return_value=None)
 async def test_update_firmware(
     mock_sleep: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
@@ -148,7 +148,7 @@ async def test_update_firmware(
 
 
 async def test_update_zigbee2_firmware(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
@@ -192,7 +192,7 @@ async def test_update_zigbee2_firmware(
 
 
 async def test_update_legacy_firmware_v2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
@@ -240,7 +240,7 @@ async def test_update_legacy_firmware_v2(
 
 
 async def test_update_firmware_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
 ) -> None:
@@ -266,17 +266,17 @@ async def test_update_firmware_failed(
     async def _call_event_function(event: MessageEvent):
         event_function(event)
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await _call_event_function(MOCK_FIRMWARE_FAIL)
     state = hass.states.get(entity_id)
     assert state.attributes[ATTR_IN_PROGRESS] is False
     assert state.attributes[ATTR_UPDATE_PERCENTAGE] is None
 
 
-@patch("homeassistant.components.smlight.const.LOGGER.warning")
+@patch("smarthub.components.smlight.const.LOGGER.warning")
 async def test_update_reboot_timeout(
     mock_warning: MagicMock,
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
@@ -291,11 +291,11 @@ async def test_update_reboot_timeout(
 
     with (
         patch(
-            "homeassistant.components.smlight.update.asyncio.timeout",
+            "smarthub.components.smlight.update.asyncio.timeout",
             side_effect=TimeoutError,
         ),
         patch(
-            "homeassistant.components.smlight.update.asyncio.sleep",
+            "smarthub.components.smlight.update.asyncio.sleep",
             return_value=None,
         ),
     ):
@@ -330,7 +330,7 @@ async def test_update_reboot_timeout(
     ],
 )
 async def test_update_release_notes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id: str,
     freezer: FrozenDateTimeFactory,
     mock_config_entry: MockConfigEntry,
@@ -362,7 +362,7 @@ async def test_update_release_notes(
 
 
 async def test_update_blank_release_notes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_smlight_client: MagicMock,
     hass_ws_client: WebSocketGenerator,

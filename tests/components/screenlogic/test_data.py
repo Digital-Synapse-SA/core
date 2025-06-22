@@ -4,10 +4,10 @@ from unittest.mock import DEFAULT, patch
 
 from screenlogicpy import ScreenLogicGateway
 
-from homeassistant.components.screenlogic import DOMAIN
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.screenlogic import DOMAIN
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import (
     DATA_MIN_ENTITY_CLEANUP,
@@ -21,7 +21,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_async_cleanup_entries(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,

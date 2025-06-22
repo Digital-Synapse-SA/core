@@ -5,14 +5,14 @@ import logging
 import blebox_uniapi
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .conftest import mock_config, patch_product_identify, setup_product_mock
 
 
 async def test_setup_failure(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that setup failure is handled and logged."""
 
@@ -30,7 +30,7 @@ async def test_setup_failure(
 
 
 async def test_setup_failure_on_connection(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that setup failure is handled and logged."""
 
@@ -47,7 +47,7 @@ async def test_setup_failure_on_connection(
     assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_unload_config_entry(hass: HomeAssistant) -> None:
+async def test_unload_config_entry(hass: SmartHub) -> None:
     """Test that unloading works properly."""
     setup_product_mock("switches", [])
 

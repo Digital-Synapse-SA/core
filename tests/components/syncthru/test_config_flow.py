@@ -4,13 +4,13 @@ from unittest.mock import AsyncMock
 
 from pysyncthru import SyncThruAPINotSupported
 
-from homeassistant import config_entries
-from homeassistant.components.syncthru.const import DOMAIN
-from homeassistant.config_entries import SOURCE_SSDP, SOURCE_USER
-from homeassistant.const import CONF_NAME, CONF_URL
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.ssdp import (
+from smarthub import config_entries
+from smarthub.components.syncthru.const import DOMAIN
+from smarthub.config_entries import SOURCE_SSDP, SOURCE_USER
+from smarthub.const import CONF_NAME, CONF_URL
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.ssdp import (
     ATTR_UPNP_DEVICE_TYPE,
     ATTR_UPNP_MANUFACTURER,
     ATTR_UPNP_PRESENTATION_URL,
@@ -28,7 +28,7 @@ FIXTURE_USER_INPUT = {
 
 
 async def test_full_flow(
-    hass: HomeAssistant, mock_syncthru: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_syncthru: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test the full flow."""
     result = await hass.config_entries.flow.async_init(
@@ -49,7 +49,7 @@ async def test_full_flow(
 
 
 async def test_already_configured_by_url(
-    hass: HomeAssistant, mock_syncthru: AsyncMock
+    hass: SmartHub, mock_syncthru: AsyncMock
 ) -> None:
     """Test we match and update already configured devices by URL."""
 
@@ -74,7 +74,7 @@ async def test_already_configured_by_url(
 
 
 async def test_syncthru_not_supported(
-    hass: HomeAssistant, mock_syncthru: AsyncMock
+    hass: SmartHub, mock_syncthru: AsyncMock
 ) -> None:
     """Test we show user form on unsupported device."""
     mock_syncthru.update.side_effect = SyncThruAPINotSupported
@@ -89,7 +89,7 @@ async def test_syncthru_not_supported(
     assert result["errors"] == {CONF_URL: "syncthru_not_supported"}
 
 
-async def test_unknown_state(hass: HomeAssistant, mock_syncthru: AsyncMock) -> None:
+async def test_unknown_state(hass: SmartHub, mock_syncthru: AsyncMock) -> None:
     """Test we show user form on unsupported device."""
     mock_syncthru.is_unknown_state.return_value = True
     result = await hass.config_entries.flow.async_init(
@@ -120,7 +120,7 @@ async def test_unknown_state(hass: HomeAssistant, mock_syncthru: AsyncMock) -> N
 
 
 async def test_ssdp(
-    hass: HomeAssistant, mock_syncthru: AsyncMock, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_syncthru: AsyncMock, mock_setup_entry: AsyncMock
 ) -> None:
     """Test SSDP discovery initiates config properly."""
 
@@ -160,7 +160,7 @@ async def test_ssdp(
 
 
 async def test_ssdp_already_configured(
-    hass: HomeAssistant, mock_syncthru: AsyncMock, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_syncthru: AsyncMock, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test SSDP discovery initiates config properly."""
 

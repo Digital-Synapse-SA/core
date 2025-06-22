@@ -10,15 +10,15 @@ from opendata_transport.exceptions import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.swiss_public_transport.const import (
+from smarthub.components.sensor import DOMAIN as SENSOR_DOMAIN
+from smarthub.components.swiss_public_transport.const import (
     DEFAULT_UPDATE_TIME,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -32,14 +32,14 @@ from tests.test_config_entries import FrozenDateTimeFactory
 
 
 async def test_all_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_opendata_client: AsyncMock,
     swiss_public_transport_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.cookidoo.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.cookidoo.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, swiss_public_transport_config_entry)
 
     assert swiss_public_transport_config_entry.state is ConfigEntryState.LOADED
@@ -54,7 +54,7 @@ async def test_all_entities(
     [OpendataTransportConnectionError, OpendataTransportError],
 )
 async def test_fetching_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     mock_opendata_client: AsyncMock,
     swiss_public_transport_config_entry: MockConfigEntry,
@@ -133,7 +133,7 @@ async def test_fetching_data(
     ],
 )
 async def test_fetching_data_setup_exception(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_opendata_client: AsyncMock,
     swiss_public_transport_config_entry: MockConfigEntry,
     raise_error: Exception,

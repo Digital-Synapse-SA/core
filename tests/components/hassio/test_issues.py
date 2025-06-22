@@ -29,9 +29,9 @@ from aiohasupervisor.models import (
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.repairs import DOMAIN as REPAIRS_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.repairs import DOMAIN as REPAIRS_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .test_init import MOCK_ENVIRON
 
@@ -39,7 +39,7 @@ from tests.typing import WebSocketGenerator
 
 
 @pytest.fixture(autouse=True)
-async def setup_repairs(hass: HomeAssistant) -> None:
+async def setup_repairs(hass: SmartHub) -> None:
     """Set up the repairs integration."""
     assert await async_setup_component(hass, REPAIRS_DOMAIN, {REPAIRS_DOMAIN: {}})
 
@@ -103,7 +103,7 @@ def assert_repair_in_list(
         "is_fixable": False,
         "issue_id": f"{repair_type}_system_{reason}",
         "issue_domain": None,
-        "learn_more_url": f"https://www.home-assistant.io/more-info/{repair_type}/{reason}",
+        "learn_more_url": f"https://www.smart-hub.io/more-info/{repair_type}/{reason}",
         "severity": "critical" if unhealthy else "warning",
         "translation_key": f"{repair_type}_{reason}",
         "translation_placeholders": None,
@@ -141,7 +141,7 @@ def assert_issue_repair_in_list(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_unhealthy_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -165,7 +165,7 @@ async def test_unhealthy_issues(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_unsupported_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -192,7 +192,7 @@ async def test_unsupported_issues(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_unhealthy_issues_add_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -249,7 +249,7 @@ async def test_unhealthy_issues_add_remove(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_unsupported_issues_add_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -306,7 +306,7 @@ async def test_unsupported_issues_add_remove(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_reset_issues_supervisor_restart(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -380,7 +380,7 @@ async def test_reset_issues_supervisor_restart(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_reasons_added_and_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -435,7 +435,7 @@ async def test_reasons_added_and_removed(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_ignored_unsupported_skipped(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -460,7 +460,7 @@ async def test_ignored_unsupported_skipped(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_new_unsupported_unhealthy_reason(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -489,7 +489,7 @@ async def test_new_unsupported_unhealthy_reason(
         "is_fixable": False,
         "issue_id": "unhealthy_system_fake_unhealthy",
         "issue_domain": None,
-        "learn_more_url": "https://www.home-assistant.io/more-info/unhealthy/fake_unhealthy",
+        "learn_more_url": "https://www.smart-hub.io/more-info/unhealthy/fake_unhealthy",
         "severity": "critical",
         "translation_key": "unhealthy",
         "translation_placeholders": {"reason": "fake_unhealthy"},
@@ -503,7 +503,7 @@ async def test_new_unsupported_unhealthy_reason(
         "is_fixable": False,
         "issue_id": "unsupported_system_fake_unsupported",
         "issue_domain": None,
-        "learn_more_url": "https://www.home-assistant.io/more-info/unsupported/fake_unsupported",
+        "learn_more_url": "https://www.smart-hub.io/more-info/unsupported/fake_unsupported",
         "severity": "warning",
         "translation_key": "unsupported",
         "translation_placeholders": {"reason": "fake_unsupported"},
@@ -512,7 +512,7 @@ async def test_new_unsupported_unhealthy_reason(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issues(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -582,7 +582,7 @@ async def test_supervisor_issues(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issues_initial_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     resolution_info: AsyncMock,
     hass_ws_client: WebSocketGenerator,
@@ -618,7 +618,7 @@ async def test_supervisor_issues_initial_failure(
         resolution_info.return_value,
     ]
 
-    with patch("homeassistant.components.hassio.issues.REQUEST_REFRESH_DELAY", new=0.1):
+    with patch("smarthub.components.hassio.issues.REQUEST_REFRESH_DELAY", new=0.1):
         result = await async_setup_component(hass, "hassio", {})
         await hass.async_block_till_done()
         assert result
@@ -640,7 +640,7 @@ async def test_supervisor_issues_initial_failure(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issues_add_remove(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -719,7 +719,7 @@ async def test_supervisor_issues_add_remove(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issues_suggestions_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     resolution_suggestions_for_issue: AsyncMock,
     hass_ws_client: WebSocketGenerator,
@@ -751,7 +751,7 @@ async def test_supervisor_issues_suggestions_fail(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_remove_missing_issue_without_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -785,7 +785,7 @@ async def test_supervisor_remove_missing_issue_without_error(
 
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_system_is_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     resolution_info: AsyncMock,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -803,7 +803,7 @@ async def test_system_is_not_ready(
 )
 @pytest.mark.usefixtures("all_setup_requests")
 async def test_supervisor_issues_detached_addon_missing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     hass_ws_client: WebSocketGenerator,
 ) -> None:

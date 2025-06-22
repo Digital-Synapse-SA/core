@@ -4,15 +4,15 @@ from unittest.mock import AsyncMock, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration
 
@@ -20,20 +20,20 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test all entities."""
-    with patch("homeassistant.components.velbus.PLATFORMS", [Platform.SWITCH]):
+    with patch("smarthub.components.velbus.PLATFORMS", [Platform.SWITCH]):
         await init_integration(hass, config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
 
 async def test_switch_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_relay: AsyncMock,
     config_entry: MockConfigEntry,
 ) -> None:

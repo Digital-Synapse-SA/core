@@ -8,8 +8,8 @@ from bimmer_connected.vehicle.remote_services import RemoteServices
 import pytest
 import respx
 
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError, ServiceValidationError
 
 from . import (
     REMOTE_SERVICE_EXC_TRANSLATION,
@@ -19,7 +19,7 @@ from . import (
 
 
 async def test_legacy_notify_service_simple(
-    hass: HomeAssistant,
+    hass: SmartHub,
     bmw_fixture: respx.Router,
 ) -> None:
     """Test successful sending of POIs."""
@@ -91,7 +91,7 @@ async def test_legacy_notify_service_simple(
     ],
 )
 async def test_service_call_invalid_input(
-    hass: HomeAssistant,
+    hass: SmartHub,
     data: dict,
     exc_translation: str,
 ) -> None:
@@ -116,12 +116,12 @@ async def test_service_call_invalid_input(
 @pytest.mark.parametrize(
     ("raised", "expected"),
     [
-        (MyBMWRemoteServiceError, HomeAssistantError),
-        (MyBMWAPIError, HomeAssistantError),
+        (MyBMWRemoteServiceError, SmartHubError),
+        (MyBMWAPIError, SmartHubError),
     ],
 )
 async def test_service_call_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     raised: Exception,
     expected: Exception,
     monkeypatch: pytest.MonkeyPatch,

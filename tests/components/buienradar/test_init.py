@@ -1,9 +1,9 @@
 """Tests for the buienradar component."""
 
-from homeassistant.components.buienradar.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
+from smarthub.components.buienradar.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -13,7 +13,7 @@ TEST_LONGITUDE = 5.4002156
 
 
 async def test_load_unload(
-    aioclient_mock: AiohttpClientMocker, hass: HomeAssistant
+    aioclient_mock: AiohttpClientMocker, hass: SmartHub
 ) -> None:
     """Test options flow."""
     entry = MockConfigEntry(

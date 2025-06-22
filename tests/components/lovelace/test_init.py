@@ -6,18 +6,18 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import frame
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.helpers import frame
+from smarthub.setup import async_setup_component
 
 from tests.typing import WebSocketGenerator
 
 
 @pytest.fixture
 def mock_onboarding_not_done() -> Generator[MagicMock]:
-    """Mock that Home Assistant is currently onboarding."""
+    """Mock that SmartHub is currently onboarding."""
     with patch(
-        "homeassistant.components.onboarding.async_is_onboarded",
+        "smarthub.components.onboarding.async_is_onboarded",
         return_value=False,
     ) as mock_onboarding:
         yield mock_onboarding
@@ -25,9 +25,9 @@ def mock_onboarding_not_done() -> Generator[MagicMock]:
 
 @pytest.fixture
 def mock_onboarding_done() -> Generator[MagicMock]:
-    """Mock that Home Assistant is currently onboarding."""
+    """Mock that SmartHub is currently onboarding."""
     with patch(
-        "homeassistant.components.onboarding.async_is_onboarded",
+        "smarthub.components.onboarding.async_is_onboarded",
         return_value=True,
     ) as mock_onboarding:
         yield mock_onboarding
@@ -35,15 +35,15 @@ def mock_onboarding_done() -> Generator[MagicMock]:
 
 @pytest.fixture
 def mock_add_onboarding_listener() -> Generator[MagicMock]:
-    """Mock that Home Assistant is currently onboarding."""
+    """Mock that SmartHub is currently onboarding."""
     with patch(
-        "homeassistant.components.onboarding.async_add_listener",
+        "smarthub.components.onboarding.async_add_listener",
     ) as mock_add_onboarding_listener:
         yield mock_add_onboarding_listener
 
 
 async def test_create_dashboards_when_onboarded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
     mock_onboarding_done,
@@ -61,7 +61,7 @@ async def test_create_dashboards_when_onboarded(
 
 
 async def test_create_dashboards_when_not_onboarded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
     mock_add_onboarding_listener,
@@ -102,7 +102,7 @@ async def test_create_dashboards_when_not_onboarded(
 @pytest.mark.parametrize("integration_frame_path", ["custom_components/my_integration"])
 @pytest.mark.usefixtures("mock_integration_frame")
 async def test_hass_data_compatibility(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test compatibility for external access.

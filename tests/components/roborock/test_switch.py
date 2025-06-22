@@ -5,10 +5,10 @@ from unittest.mock import Mock
 import pytest
 import roborock
 
-from homeassistant.components.switch import SERVICE_TURN_OFF, SERVICE_TURN_ON
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.components.switch import SERVICE_TURN_OFF, SERVICE_TURN_ON
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry
 
@@ -28,7 +28,7 @@ def platforms() -> list[Platform]:
     ],
 )
 async def test_update_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_send_message: Mock,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
@@ -67,7 +67,7 @@ async def test_update_success(
     "send_message_side_effect", [roborock.exceptions.RoborockTimeout]
 )
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_send_message: Mock,
     bypass_api_fixture,
     setup_entry: MockConfigEntry,
@@ -78,7 +78,7 @@ async def test_update_failed(
     # Ensure that the entity exist, as these test can pass even if there is no entity.
     assert hass.states.get(entity_id) is not None
     with (
-        pytest.raises(HomeAssistantError, match="Failed to update Roborock options"),
+        pytest.raises(SmartHubError, match="Failed to update Roborock options"),
     ):
         await hass.services.async_call(
             "switch",

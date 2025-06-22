@@ -7,15 +7,15 @@ from unittest.mock import AsyncMock, patch
 from telegram import WebhookInfo
 from telegram.error import TimedOut
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 from tests.typing import ClientSessionGenerator
 
 
 async def test_set_webhooks_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_webhooks_config_entry: MockConfigEntry,
     mock_external_calls: None,
     mock_generate_secret_token,
@@ -25,7 +25,7 @@ async def test_set_webhooks_failed(
 
     with (
         patch(
-            "homeassistant.components.telegram_bot.webhooks.Bot.get_webhook_info",
+            "smarthub.components.telegram_bot.webhooks.Bot.get_webhook_info",
             AsyncMock(
                 return_value=WebhookInfo(
                     url="mock url",
@@ -36,10 +36,10 @@ async def test_set_webhooks_failed(
             ),
         ) as mock_webhook_info,
         patch(
-            "homeassistant.components.telegram_bot.webhooks.Bot.set_webhook",
+            "smarthub.components.telegram_bot.webhooks.Bot.set_webhook",
         ) as mock_set_webhook,
         patch(
-            "homeassistant.components.telegram_bot.webhooks.ApplicationBuilder"
+            "smarthub.components.telegram_bot.webhooks.ApplicationBuilder"
         ) as application_builder_class,
     ):
         mock_set_webhook.side_effect = [TimedOut("mock timeout"), False]
@@ -61,7 +61,7 @@ async def test_set_webhooks_failed(
 
 
 async def test_set_webhooks(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_webhooks_config_entry: MockConfigEntry,
     mock_external_calls: None,
     mock_generate_secret_token,
@@ -71,7 +71,7 @@ async def test_set_webhooks(
 
     with (
         patch(
-            "homeassistant.components.telegram_bot.webhooks.Bot.get_webhook_info",
+            "smarthub.components.telegram_bot.webhooks.Bot.get_webhook_info",
             AsyncMock(
                 return_value=WebhookInfo(
                     url="mock url",
@@ -82,11 +82,11 @@ async def test_set_webhooks(
             ),
         ) as mock_webhook_info,
         patch(
-            "homeassistant.components.telegram_bot.webhooks.Bot.set_webhook",
+            "smarthub.components.telegram_bot.webhooks.Bot.set_webhook",
             AsyncMock(return_value=True),
         ) as mock_set_webhook,
         patch(
-            "homeassistant.components.telegram_bot.webhooks.ApplicationBuilder"
+            "smarthub.components.telegram_bot.webhooks.ApplicationBuilder"
         ) as application_builder_class,
     ):
         application = application_builder_class.return_value.bot.return_value.updater.return_value.build.return_value
@@ -106,7 +106,7 @@ async def test_set_webhooks(
 
 
 async def test_webhooks_update_invalid_json(
-    hass: HomeAssistant,
+    hass: SmartHub,
     webhook_platform,
     hass_client: ClientSessionGenerator,
     mock_generate_secret_token,
@@ -124,7 +124,7 @@ async def test_webhooks_update_invalid_json(
 
 
 async def test_webhooks_unauthorized_network(
-    hass: HomeAssistant,
+    hass: SmartHub,
     webhook_platform,
     mock_external_calls: None,
     mock_generate_secret_token,
@@ -135,7 +135,7 @@ async def test_webhooks_unauthorized_network(
     client = await hass_client()
 
     with patch(
-        "homeassistant.components.telegram_bot.webhooks.ip_address",
+        "smarthub.components.telegram_bot.webhooks.ip_address",
         return_value=IPv4Network("1.2.3.4"),
     ) as mock_remote:
         response = await client.post(

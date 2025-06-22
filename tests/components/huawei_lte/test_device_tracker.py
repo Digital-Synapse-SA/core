@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.huawei_lte import device_tracker
+from smarthub.components.huawei_lte import device_tracker
 
 
 @pytest.mark.parametrize(

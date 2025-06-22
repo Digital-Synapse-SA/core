@@ -3,7 +3,7 @@
 import pytest
 from smarttub import SpaLight
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 # the light in light_zone should have initial state light_state. we will call
@@ -20,7 +20,7 @@ from homeassistant.core import HomeAssistant
 async def test_light(
     spa,
     setup_entry,
-    hass: HomeAssistant,
+    hass: SmartHub,
     light_zone,
     light_state,
     service_name,

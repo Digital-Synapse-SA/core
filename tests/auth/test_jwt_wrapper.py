@@ -1,9 +1,9 @@
-"""Tests for the Home Assistant auth jwt_wrapper module."""
+"""Tests for the SmartHub auth jwt_wrapper module."""
 
 import jwt
 import pytest
 
-from homeassistant.auth import jwt_wrapper
+from smarthub.auth import jwt_wrapper
 
 
 async def test_all_default_options_are_in_verify_options() -> None:

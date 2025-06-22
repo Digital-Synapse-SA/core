@@ -6,22 +6,22 @@ from unittest.mock import patch
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components import zone
-from homeassistant.components.device_tracker.legacy import Device
-from homeassistant.components.geofency import CONF_MOBILE_BEACONS, DOMAIN
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components import zone
+from smarthub.components.device_tracker.legacy import Device
+from smarthub.components.geofency import CONF_MOBILE_BEACONS, DOMAIN
+from smarthub.const import (
     ATTR_LATITUDE,
     ATTR_LONGITUDE,
     STATE_HOME,
     STATE_NOT_HOME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.setup import async_setup_component
-from homeassistant.util import slugify
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.setup import async_setup_component
+from smarthub.util import slugify
 
 from tests.typing import ClientSessionGenerator
 
@@ -123,7 +123,7 @@ def mock_dev_track(mock_device_tracker_conf: list[Device]) -> None:
 
 @pytest.fixture
 async def geofency_client(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> TestClient:
     """Geofency mock client (unauthenticated)."""
 
@@ -132,12 +132,12 @@ async def geofency_client(
     )
     await hass.async_block_till_done()
 
-    with patch("homeassistant.components.device_tracker.legacy.update_config"):
+    with patch("smarthub.components.device_tracker.legacy.update_config"):
         return await hass_client_no_auth()
 
 
 @pytest.fixture(autouse=True)
-async def setup_zones(hass: HomeAssistant) -> None:
+async def setup_zones(hass: SmartHub) -> None:
     """Set up Zone config in HA."""
     assert await async_setup_component(
         hass,
@@ -155,7 +155,7 @@ async def setup_zones(hass: HomeAssistant) -> None:
 
 
 @pytest.fixture
-async def webhook_id(hass: HomeAssistant) -> str:
+async def webhook_id(hass: SmartHub) -> str:
     """Initialize the Geofency component and get the webhook_id."""
     await async_process_ha_core_config(
         hass,
@@ -192,7 +192,7 @@ async def test_data_validation(geofency_client: TestClient, webhook_id: str) -> 
 
 
 async def test_gps_enter_and_exit_home(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     geofency_client: TestClient,
@@ -240,7 +240,7 @@ async def test_gps_enter_and_exit_home(
 
 
 async def test_beacon_enter_and_exit_home(
-    hass: HomeAssistant, geofency_client: TestClient, webhook_id: str
+    hass: SmartHub, geofency_client: TestClient, webhook_id: str
 ) -> None:
     """Test iBeacon based zone enter and exit - a.k.a stationary iBeacon."""
     url = f"/api/webhook/{webhook_id}"
@@ -263,7 +263,7 @@ async def test_beacon_enter_and_exit_home(
 
 
 async def test_beacon_enter_and_exit_car(
-    hass: HomeAssistant, geofency_client: TestClient, webhook_id: str
+    hass: SmartHub, geofency_client: TestClient, webhook_id: str
 ) -> None:
     """Test use of mobile iBeacon."""
     url = f"/api/webhook/{webhook_id}"
@@ -305,7 +305,7 @@ async def test_beacon_enter_and_exit_car(
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant, geofency_client: TestClient, webhook_id: str
+    hass: SmartHub, geofency_client: TestClient, webhook_id: str
 ) -> None:
     """Test that the appropriate dispatch signals are added and removed."""
     url = f"/api/webhook/{webhook_id}"

@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from homeassistant.components.energy import data, is_configured
-from homeassistant.components.recorder import Recorder
-from homeassistant.components.recorder.statistics import async_add_external_statistics
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.energy import data, is_configured
+from smarthub.components.recorder import Recorder
+from smarthub.components.recorder.statistics import async_add_external_statistics
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, flush_store, mock_platform
 from tests.components.recorder.common import (
@@ -21,13 +21,13 @@ from tests.typing import WebSocketGenerator
 
 
 @pytest.fixture(autouse=True)
-async def setup_integration(recorder_mock: Recorder, hass: HomeAssistant) -> None:
+async def setup_integration(recorder_mock: Recorder, hass: SmartHub) -> None:
     """Set up the integration."""
     assert await async_setup_component(hass, "energy", {})
 
 
 @pytest.fixture
-def mock_energy_platform(hass: HomeAssistant) -> None:
+def mock_energy_platform(hass: SmartHub) -> None:
     """Mock an energy platform."""
     hass.config.components.add("some_domain")
     mock_platform(
@@ -47,7 +47,7 @@ def mock_energy_platform(hass: HomeAssistant) -> None:
 
 
 async def test_get_preferences_no_data(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we get error if no preferences set."""
     client = await hass_ws_client(hass)
@@ -62,7 +62,7 @@ async def test_get_preferences_no_data(
 
 
 async def test_get_preferences_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
 ) -> None:
@@ -84,7 +84,7 @@ async def test_get_preferences_default(
 
 
 async def test_save_preferences(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],
     mock_energy_platform,
@@ -225,7 +225,7 @@ async def test_save_preferences(
 
 
 async def test_handle_duplicate_from_stat(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we handle duplicate from stats."""
     client = await hass_ws_client(hass)
@@ -266,7 +266,7 @@ async def test_handle_duplicate_from_stat(
 
 
 async def test_validate(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can validate the preferences."""
     client = await hass_ws_client(hass)
@@ -284,7 +284,7 @@ async def test_validate(
 
 
 async def test_get_solar_forecast(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, mock_energy_platform
+    hass: SmartHub, hass_ws_client: WebSocketGenerator, mock_energy_platform
 ) -> None:
     """Test we get preferences."""
     entry = MockConfigEntry(domain="some_domain")
@@ -321,7 +321,7 @@ async def test_get_solar_forecast(
 
 @pytest.mark.freeze_time("2021-08-01 00:00:00+00:00")
 async def test_fossil_energy_consumption_no_co2(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test fossil_energy_consumption when co2 data is missing."""
     now = dt_util.utcnow()
@@ -486,7 +486,7 @@ async def test_fossil_energy_consumption_no_co2(
 
 @pytest.mark.freeze_time("2021-08-01 00:00:00+00:00")
 async def test_fossil_energy_consumption_hole(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test fossil_energy_consumption when some data points lack sum."""
     now = dt_util.utcnow()
@@ -651,7 +651,7 @@ async def test_fossil_energy_consumption_hole(
 
 @pytest.mark.freeze_time("2021-08-01 00:00:00+00:00")
 async def test_fossil_energy_consumption_no_data(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test fossil_energy_consumption when there is no data."""
     now = dt_util.utcnow()
@@ -801,7 +801,7 @@ async def test_fossil_energy_consumption_no_data(
 
 @pytest.mark.freeze_time("2021-08-01 00:00:00+00:00")
 async def test_fossil_energy_consumption(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test fossil_energy_consumption with co2 sensor data."""
     now = dt_util.utcnow()
@@ -998,7 +998,7 @@ async def test_fossil_energy_consumption(
 
 
 async def test_fossil_energy_consumption_checks(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test fossil_energy_consumption parameter validation."""
     client = await hass_ws_client(hass)
@@ -1052,7 +1052,7 @@ async def test_fossil_energy_consumption_checks(
 
 @pytest.mark.freeze_time("2021-08-01 01:00:00+00:00")
 async def test_fossil_energy_consumption_check_missing_hour(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test explicitly if the API keeps the first hour of data for the requested time frame."""
 
@@ -1169,7 +1169,7 @@ async def test_fossil_energy_consumption_check_missing_hour(
 
 @pytest.mark.freeze_time("2021-08-01 00:00:00+00:00")
 async def test_fossil_energy_consumption_missing_sum(
-    recorder_mock: Recorder, hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    recorder_mock: Recorder, hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test fossil_energy_consumption statistics missing sum."""
     now = dt_util.utcnow()

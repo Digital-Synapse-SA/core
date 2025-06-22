@@ -7,12 +7,12 @@ from http import HTTPStatus
 
 from aiohttp.client_exceptions import ClientResponseError
 
-from homeassistant.components.buienradar.const import CONF_DELTA, DOMAIN
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_COUNTRY_CODE, CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.components.buienradar.const import CONF_DELTA, DOMAIN
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import CONF_COUNTRY_CODE, CONF_LATITUDE, CONF_LONGITUDE
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -32,7 +32,7 @@ def radar_map_url(country_code: str = "NL") -> str:
     return f"https://api.buienradar.nl/image/1.0/RadarMap{country_code}?w=700&h=700"
 
 
-async def _setup_config_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+async def _setup_config_entry(hass: SmartHub, entry: ConfigEntry) -> None:
     entity_registry = er.async_get(hass)
     entity_registry.async_get_or_create(
         domain="camera",
@@ -49,7 +49,7 @@ async def _setup_config_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
 
 async def test_fetching_url_and_caching(
     aioclient_mock: AiohttpClientMocker,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test that it fetches the given url."""
@@ -79,7 +79,7 @@ async def test_fetching_url_and_caching(
 
 async def test_expire_delta(
     aioclient_mock: AiohttpClientMocker,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test that the cache expires after delta."""
@@ -112,7 +112,7 @@ async def test_expire_delta(
 
 async def test_only_one_fetch_at_a_time(
     aioclient_mock: AiohttpClientMocker,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test that it fetches with only one request at the same time."""
@@ -139,7 +139,7 @@ async def test_only_one_fetch_at_a_time(
 
 async def test_belgium_country(
     aioclient_mock: AiohttpClientMocker,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test that it actually adheres to another country like Belgium."""
@@ -163,7 +163,7 @@ async def test_belgium_country(
 
 async def test_failure_response_not_cached(
     aioclient_mock: AiohttpClientMocker,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test that it does not cache a failure response."""
@@ -185,7 +185,7 @@ async def test_failure_response_not_cached(
 
 async def test_last_modified_updates(
     aioclient_mock: AiohttpClientMocker,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test that it does respect HTTP not modified."""
@@ -234,7 +234,7 @@ async def test_last_modified_updates(
 
 async def test_retries_after_error(
     aioclient_mock: AiohttpClientMocker,
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
 ) -> None:
     """Test that it does retry after an error instead of caching."""

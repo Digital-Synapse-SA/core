@@ -1,9 +1,9 @@
-"""Test for a Home Assistant bridge that changes fan features at runtime."""
+"""Test for a SmartHub bridge that changes fan features at runtime."""
 
-from homeassistant.components.fan import FanEntityFeature
-from homeassistant.const import ATTR_SUPPORTED_FEATURES
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.fan import FanEntityFeature
+from smarthub.const import ATTR_SUPPORTED_FEATURES
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from ..common import (
     device_config_changed,
@@ -13,7 +13,7 @@ from ..common import (
 
 
 async def test_fan_add_feature_at_runtime(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that new features can be added at runtime."""
 
@@ -71,7 +71,7 @@ async def test_fan_add_feature_at_runtime(
 
 
 async def test_fan_remove_feature_at_runtime(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that features can be removed at runtime."""
 
@@ -129,7 +129,7 @@ async def test_fan_remove_feature_at_runtime(
 
 
 async def test_bridge_with_two_fans_one_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test a bridge with two fans and one gets removed."""

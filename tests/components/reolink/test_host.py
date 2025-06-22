@@ -10,8 +10,8 @@ import pytest
 from reolink_aio.enums import SubType
 from reolink_aio.exceptions import NotSupportedError, ReolinkError, SubscriptionError
 
-from homeassistant.components.reolink import DEVICE_UPDATE_INTERVAL
-from homeassistant.components.reolink.host import (
+from smarthub.components.reolink import DEVICE_UPDATE_INTERVAL
+from smarthub.components.reolink.host import (
     FIRST_ONVIF_LONG_POLL_TIMEOUT,
     FIRST_ONVIF_TIMEOUT,
     FIRST_TCP_PUSH_TIMEOUT,
@@ -19,14 +19,14 @@ from homeassistant.components.reolink.host import (
     LONG_POLL_ERROR_COOLDOWN,
     POLL_INTERVAL_NO_PUSH,
 )
-from homeassistant.components.webhook import async_handle_webhook
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.helpers.network import NoURLAvailableError
-from homeassistant.util.aiohttp import MockRequest
+from smarthub.components.webhook import async_handle_webhook
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.dispatcher import async_dispatcher_connect
+from smarthub.helpers.network import NoURLAvailableError
+from smarthub.util.aiohttp import MockRequest
 
 from .conftest import TEST_NVR_NAME
 
@@ -36,7 +36,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_setup_with_tcp_push(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
@@ -44,7 +44,7 @@ async def test_setup_with_tcp_push(
     """Test successful setup of the integration with TCP push callbacks."""
     reolink_connect.baichuan.events_active = True
     reolink_connect.baichuan.subscribe_events.reset_mock(side_effect=True)
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.BINARY_SENSOR]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -61,14 +61,14 @@ async def test_setup_with_tcp_push(
 
 
 async def test_unloading_with_tcp_push(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test successful unloading of the integration with TCP push callbacks."""
     reolink_connect.baichuan.events_active = True
     reolink_connect.baichuan.subscribe_events.reset_mock(side_effect=True)
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.BINARY_SENSOR]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -86,7 +86,7 @@ async def test_unloading_with_tcp_push(
 
 
 async def test_webhook_callback(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
@@ -96,7 +96,7 @@ async def test_webhook_callback(
     """Test webhook callback with motion sensor."""
     reolink_connect.motion_detected.return_value = False
 
-    with patch("homeassistant.components.reolink.PLATFORMS", [Platform.BINARY_SENSOR]):
+    with patch("smarthub.components.reolink.PLATFORMS", [Platform.BINARY_SENSOR]):
         assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.LOADED
@@ -175,7 +175,7 @@ async def test_webhook_callback(
 
 
 async def test_no_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -190,7 +190,7 @@ async def test_no_mac(
 
 
 async def test_subscribe_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -204,7 +204,7 @@ async def test_subscribe_error(
 
 
 async def test_subscribe_unsuccesfull(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -216,7 +216,7 @@ async def test_subscribe_unsuccesfull(
 
 
 async def test_initial_ONVIF_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -236,7 +236,7 @@ async def test_initial_ONVIF_not_supported(
 
 
 async def test_ONVIF_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
@@ -261,7 +261,7 @@ async def test_ONVIF_not_supported(
 
 
 async def test_renew(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
@@ -301,7 +301,7 @@ async def test_renew(
 
 
 async def test_long_poll_renew_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
@@ -324,13 +324,13 @@ async def test_long_poll_renew_fail(
 
 
 async def test_register_webhook_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
 ) -> None:
     """Test errors while registering the webhook."""
     with patch(
-        "homeassistant.components.reolink.host.get_url",
+        "smarthub.components.reolink.host.get_url",
         side_effect=NoURLAvailableError("Test error"),
     ):
         assert await hass.config_entries.async_setup(config_entry.entry_id) is False
@@ -339,7 +339,7 @@ async def test_register_webhook_errors(
 
 
 async def test_long_poll_stop_when_push(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
@@ -369,7 +369,7 @@ async def test_long_poll_stop_when_push(
 
 
 async def test_long_poll_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
@@ -405,7 +405,7 @@ async def test_long_poll_errors(
 
 
 async def test_fast_polling_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     config_entry: MockConfigEntry,
     reolink_connect: MagicMock,
@@ -443,7 +443,7 @@ async def test_fast_polling_errors(
 
 
 async def test_diagnostics_event_connection(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_client_no_auth: ClientSessionGenerator,
     freezer: FrozenDateTimeFactory,

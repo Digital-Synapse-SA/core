@@ -9,16 +9,16 @@ from freezegun import freeze_time
 from hdate.translator import set_language
 import pytest
 
-from homeassistant.components.jewish_calendar.const import (
+from smarthub.components.jewish_calendar.const import (
     CONF_CANDLE_LIGHT_MINUTES,
     CONF_DIASPORA,
     CONF_HAVDALAH_OFFSET_MINUTES,
     DEFAULT_NAME,
     DOMAIN,
 )
-from homeassistant.const import CONF_LANGUAGE, CONF_TIME_ZONE
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.const import CONF_LANGUAGE, CONF_TIME_ZONE
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry
 
@@ -41,7 +41,7 @@ LOCATIONS = {
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.jewish_calendar.async_setup_entry", return_value=True
+        "smarthub.components.jewish_calendar.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -56,7 +56,7 @@ def location_data(request: pytest.FixtureRequest) -> _LocationData | None:
 
 
 @pytest.fixture
-def tz_info(hass: HomeAssistant, location_data: _LocationData | None) -> dt.tzinfo:
+def tz_info(hass: SmartHub, location_data: _LocationData | None) -> dt.tzinfo:
     """Return time zone info."""
     if location_data is None:
         return dt_util.get_time_zone(hass.config.time_zone)
@@ -114,8 +114,8 @@ def language() -> str:
 
 
 @pytest.fixture(autouse=True)
-async def setup_hass(hass: HomeAssistant, location_data: _LocationData | None) -> None:
-    """Set up Home Assistant for testing the jewish_calendar integration."""
+async def setup_hass(hass: SmartHub, location_data: _LocationData | None) -> None:
+    """Set up SmartHub for testing the jewish_calendar integration."""
 
     if location_data:
         await hass.config.async_set_time_zone(location_data.timezone)
@@ -153,7 +153,7 @@ def config_entry(
 
 @pytest.fixture
 async def setup_at_time(
-    test_time: dt.datetime, hass: HomeAssistant, config_entry: MockConfigEntry
+    test_time: dt.datetime, hass: SmartHub, config_entry: MockConfigEntry
 ) -> AsyncGenerator[None]:
     """Set up the jewish_calendar integration at a specific time."""
     with freeze_time(test_time):

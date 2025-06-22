@@ -2,15 +2,15 @@
 
 from unittest.mock import patch
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_awair
 from .const import LOCAL_CONFIG, LOCAL_UNIQUE_ID
 
 
 async def test_local_awair_sensors(
-    hass: HomeAssistant, local_devices, local_data, device_registry: dr.DeviceRegistry
+    hass: SmartHub, local_devices, local_data, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test expected sensors on a local Awair."""
     fixtures = [local_devices, local_data]

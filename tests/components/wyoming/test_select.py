@@ -2,20 +2,20 @@
 
 from unittest.mock import Mock, patch
 
-from homeassistant.components import assist_pipeline
-from homeassistant.components.assist_pipeline.pipeline import PipelineData
-from homeassistant.components.assist_pipeline.select import OPTION_PREFERRED
-from homeassistant.components.assist_pipeline.vad import VadSensitivity
-from homeassistant.components.wyoming.devices import SatelliteDevice
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import assist_pipeline
+from smarthub.components.assist_pipeline.pipeline import PipelineData
+from smarthub.components.assist_pipeline.select import OPTION_PREFERRED
+from smarthub.components.assist_pipeline.vad import VadSensitivity
+from smarthub.components.wyoming.devices import SatelliteDevice
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import reload_satellite
 
 
 async def test_pipeline_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     satellite_config_entry: ConfigEntry,
     satellite_device: SatelliteDevice,
 ) -> None:
@@ -95,7 +95,7 @@ async def test_pipeline_select(
 
 
 async def test_noise_suppression_level_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     satellite_config_entry: ConfigEntry,
     satellite_device: SatelliteDevice,
 ) -> None:
@@ -144,7 +144,7 @@ async def test_noise_suppression_level_select(
 
 
 async def test_vad_sensitivity_select(
-    hass: HomeAssistant,
+    hass: SmartHub,
     satellite_config_entry: ConfigEntry,
     satellite_device: SatelliteDevice,
 ) -> None:

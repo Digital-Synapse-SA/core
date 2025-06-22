@@ -10,13 +10,13 @@ from aiounifi.models.message import MessageKey
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.image import DOMAIN as IMAGE_DOMAIN
-from homeassistant.config_entries import RELOAD_AFTER_UPDATE_DELAY
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_registry import RegistryEntryDisabler
-from homeassistant.util import dt as dt_util
+from smarthub.components.image import DOMAIN as IMAGE_DOMAIN
+from smarthub.config_entries import RELOAD_AFTER_UPDATE_DELAY
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.entity_registry import RegistryEntryDisabler
+from smarthub.util import dt as dt_util
 
 from .conftest import (
     ConfigEntryFactoryType,
@@ -32,7 +32,7 @@ from tests.typing import ClientSessionGenerator
 def mock_getrandbits():
     """Mock image access token which normally is randomized."""
     with patch(
-        "homeassistant.components.image.SystemRandom.getrandbits",
+        "smarthub.components.image.SystemRandom.getrandbits",
         return_value=1,
     ):
         yield
@@ -86,14 +86,14 @@ WLAN = {
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 @pytest.mark.freeze_time("2021-01-01 01:01:00")
 async def test_entity_and_device_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     config_entry_factory: ConfigEntryFactoryType,
     site_payload: dict[str, Any],
     snapshot: SnapshotAssertion,
 ) -> None:
     """Validate entity and device data with and without admin rights."""
-    with patch("homeassistant.components.unifi.PLATFORMS", [Platform.IMAGE]):
+    with patch("smarthub.components.unifi.PLATFORMS", [Platform.IMAGE]):
         config_entry = await config_entry_factory()
     if site_payload[0]["role"] == "admin":
         await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
@@ -104,7 +104,7 @@ async def test_entity_and_device_data(
 @pytest.mark.parametrize("wlan_payload", [[WLAN]])
 @pytest.mark.usefixtures("config_entry_setup")
 async def test_wlan_qr_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_client: ClientSessionGenerator,
     snapshot: SnapshotAssertion,
@@ -158,7 +158,7 @@ async def test_wlan_qr_code(
 @pytest.mark.usefixtures("config_entry_setup")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_hub_state_change(
-    hass: HomeAssistant, mock_websocket_state: WebsocketStateManager
+    hass: SmartHub, mock_websocket_state: WebsocketStateManager
 ) -> None:
     """Verify entities state reflect on hub becoming unavailable."""
     assert hass.states.get("image.ssid_1_qr_code").state != STATE_UNAVAILABLE
@@ -176,7 +176,7 @@ async def test_hub_state_change(
 @pytest.mark.usefixtures("config_entry_setup")
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_source_availability(
-    hass: HomeAssistant, mock_websocket_message: WebsocketMessageMock
+    hass: SmartHub, mock_websocket_message: WebsocketMessageMock
 ) -> None:
     """Verify entities state reflect on source becoming unavailable."""
     assert hass.states.get("image.ssid_1_qr_code").state != STATE_UNAVAILABLE

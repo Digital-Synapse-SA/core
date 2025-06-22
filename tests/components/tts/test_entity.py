@@ -4,9 +4,9 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components import tts
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant, State
+from smarthub.components import tts
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub, State
 
 from .common import (
     DEFAULT_LANG,
@@ -39,7 +39,7 @@ async def test_default_entity_attributes() -> None:
 
 
 async def test_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tts_entity: MockTTSEntity,
 ) -> None:
     """Test we restore state in the integration."""
@@ -57,7 +57,7 @@ async def test_restore_state(
 
 
 async def test_tts_entity_subclass_properties(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test for errors when subclasses of the TextToSpeechEntity are missing required properties."""
 

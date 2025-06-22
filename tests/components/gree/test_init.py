@@ -2,26 +2,26 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.gree.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.gree.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
-async def test_setup_simple(hass: HomeAssistant) -> None:
+async def test_setup_simple(hass: SmartHub) -> None:
     """Test gree integration is setup."""
     entry = MockConfigEntry(domain=DOMAIN)
     entry.add_to_hass(hass)
 
     with (
         patch(
-            "homeassistant.components.gree.climate.async_setup_entry",
+            "smarthub.components.gree.climate.async_setup_entry",
             return_value=True,
         ) as climate_setup,
         patch(
-            "homeassistant.components.gree.switch.async_setup_entry",
+            "smarthub.components.gree.switch.async_setup_entry",
             return_value=True,
         ) as switch_setup,
     ):
@@ -36,7 +36,7 @@ async def test_setup_simple(hass: HomeAssistant) -> None:
     assert len(hass.config_entries.flow.async_progress()) == 0
 
 
-async def test_unload_config_entry(hass: HomeAssistant) -> None:
+async def test_unload_config_entry(hass: SmartHub) -> None:
     """Test that the async_unload_entry works."""
     # As we have currently no configuration, we just to pass the domain here.
     entry = MockConfigEntry(domain=DOMAIN)

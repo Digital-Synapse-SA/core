@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import requests_mock
 
-from homeassistant.components.uk_transport.sensor import (
+from smarthub.components.uk_transport.sensor import (
     ATTR_ATCOCODE,
     ATTR_CALLING_AT,
     ATTR_LAST_UPDATED,
@@ -18,9 +18,9 @@ from homeassistant.components.uk_transport.sensor import (
     CONF_API_APP_KEY,
     UkTransportSensor,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.dt import now
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.dt import now
 
 from tests.common import async_load_fixture
 
@@ -46,7 +46,7 @@ VALID_CONFIG = {
 }
 
 
-async def test_bus(hass: HomeAssistant) -> None:
+async def test_bus(hass: SmartHub) -> None:
     """Test for operational uk_transport sensor with proper attributes."""
     with requests_mock.Mocker() as mock_req:
         uri = re.compile(UkTransportSensor.TRANSPORT_API_URL_BASE + "*")
@@ -68,11 +68,11 @@ async def test_bus(hass: HomeAssistant) -> None:
         assert None is not direction_re.search(bus["direction"])
 
 
-async def test_train(hass: HomeAssistant) -> None:
+async def test_train(hass: SmartHub) -> None:
     """Test for operational uk_transport sensor with proper attributes."""
     with (
         requests_mock.Mocker() as mock_req,
-        patch("homeassistant.util.dt.now", return_value=now().replace(hour=13)),
+        patch("smarthub.util.dt.now", return_value=now().replace(hour=13)),
     ):
         uri = re.compile(UkTransportSensor.TRANSPORT_API_URL_BASE + "*")
         mock_req.get(

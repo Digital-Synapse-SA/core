@@ -5,22 +5,22 @@ from unittest.mock import AsyncMock
 from aioaquacell import ApiException, AuthenticationFailed
 import pytest
 
-from homeassistant.components.aquacell.const import (
+from smarthub.components.aquacell.const import (
     CONF_BRAND,
     CONF_REFRESH_TOKEN,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import TEST_CONFIG_ENTRY, TEST_USER_INPUT
 
 from tests.common import MockConfigEntry
 
 
-async def test_config_flow_already_configured(hass: HomeAssistant) -> None:
+async def test_config_flow_already_configured(hass: SmartHub) -> None:
     """Test already configured."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -49,7 +49,7 @@ async def test_config_flow_already_configured(hass: HomeAssistant) -> None:
 
 
 async def test_full_flow(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_aquacell_api: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_aquacell_api: AsyncMock
 ) -> None:
     """Test the full config flow."""
     result = await hass.config_entries.flow.async_init(
@@ -85,7 +85,7 @@ async def test_full_flow(
     ],
 )
 async def test_form_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: Exception,
     error: str,
     mock_setup_entry: AsyncMock,

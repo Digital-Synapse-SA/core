@@ -3,14 +3,14 @@
 from datetime import timedelta
 from unittest.mock import MagicMock
 
-from homeassistant.components.vera import SubscriptionRegistry
-from homeassistant.core import HomeAssistant
-from homeassistant.util.dt import utcnow
+from smarthub.components.vera import SubscriptionRegistry
+from smarthub.core import SmartHub
+from smarthub.util.dt import utcnow
 
 from tests.common import async_fire_time_changed
 
 
-async def test_subscription_registry(hass: HomeAssistant) -> None:
+async def test_subscription_registry(hass: SmartHub) -> None:
     """Test subscription registry polling."""
     subscription_registry = SubscriptionRegistry(hass)
     subscription_registry.poll_server_once = poll_server_once_mock = MagicMock()

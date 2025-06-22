@@ -8,7 +8,7 @@ from freezegun.api import FrozenDateTimeFactory
 from nibe.exceptions import CoilNotFoundException
 import pytest
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import MockConnection
 
@@ -19,7 +19,7 @@ from tests.common import async_fire_time_changed
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Make sure we never actually run setup."""
     with patch(
-        "homeassistant.components.nibe_heatpump.async_setup_entry", return_value=True
+        "smarthub.components.nibe_heatpump.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -42,10 +42,10 @@ async def fixture_mock_connection(mock_connection_construct):
 
     with ExitStack() as stack:
         places = [
-            "homeassistant.components.nibe_heatpump.config_flow.NibeGW",
-            "homeassistant.components.nibe_heatpump.config_flow.Modbus",
-            "homeassistant.components.nibe_heatpump.NibeGW",
-            "homeassistant.components.nibe_heatpump.Modbus",
+            "smarthub.components.nibe_heatpump.config_flow.NibeGW",
+            "smarthub.components.nibe_heatpump.config_flow.Modbus",
+            "smarthub.components.nibe_heatpump.NibeGW",
+            "smarthub.components.nibe_heatpump.Modbus",
         ]
         for place in places:
             stack.enter_context(patch(place, new=construct))
@@ -55,7 +55,7 @@ async def fixture_mock_connection(mock_connection_construct):
 @pytest.fixture(name="coils")
 async def fixture_coils(mock_connection: MockConnection):
     """Return a dict with coil data."""
-    from homeassistant.components.nibe_heatpump import HeatPump  # noqa: PLC0415
+    from smarthub.components.nibe_heatpump import HeatPump  # noqa: PLC0415
 
     get_coils_original = HeatPump.get_coils
     get_coil_by_address_original = HeatPump.get_coil_by_address
@@ -78,7 +78,7 @@ async def fixture_coils(mock_connection: MockConnection):
 
 
 @pytest.fixture(name="freezer_ticker")
-async def fixture_freezer_ticker(hass: HomeAssistant, freezer: FrozenDateTimeFactory):
+async def fixture_freezer_ticker(hass: SmartHub, freezer: FrozenDateTimeFactory):
     """Tick time and perform actions."""
 
     async def ticker(delay, block=True):

@@ -14,8 +14,8 @@ from aioesphomeapi import (
 )
 import pytest
 
-from homeassistant.components import media_source
-from homeassistant.components.media_player import (
+from smarthub.components import media_source
+from smarthub.components.media_player import (
     ATTR_MEDIA_ANNOUNCE,
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
@@ -33,10 +33,10 @@ from homeassistant.components.media_player import (
     MediaClass,
     MediaType,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from .conftest import MockESPHomeDeviceType, MockGenericDeviceEntryType
 
@@ -45,7 +45,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_media_player_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_generic_device_entry: MockGenericDeviceEntryType,
 ) -> None:
@@ -156,7 +156,7 @@ async def test_media_player_entity(
 
 
 async def test_media_player_entity_with_source(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     hass_ws_client: WebSocketGenerator,
     mock_generic_device_entry: MockGenericDeviceEntryType,
@@ -172,7 +172,7 @@ async def test_media_player_entity_with_source(
                     media_class=MediaClass.APP,
                     media_content_id="",
                     media_content_type="spotify",
-                    thumbnail="https://brands.home-assistant.io/_/spotify/logo.png",
+                    thumbnail="https://brands.smart-hub.io/_/spotify/logo.png",
                     can_play=False,
                     can_expand=True,
                 )
@@ -242,7 +242,7 @@ async def test_media_player_entity_with_source(
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.media_source.async_resolve_media",
+        "smarthub.components.media_source.async_resolve_media",
         return_value=play_media,
     ):
         await hass.services.async_call(
@@ -289,7 +289,7 @@ async def test_media_player_entity_with_source(
 
 
 async def test_media_player_proxy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
@@ -348,7 +348,7 @@ async def test_media_player_proxy(
 
     with (
         patch(
-            "homeassistant.components.esphome.media_player.async_create_proxy_url",
+            "smarthub.components.esphome.media_player.async_create_proxy_url",
             return_value=proxy_url,
         ) as mock_async_create_proxy_url,
     ):
@@ -432,7 +432,7 @@ async def test_media_player_proxy(
 
 
 async def test_media_player_formats_reload_preserves_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: APIClient,
     mock_esphome_device: MockESPHomeDeviceType,
 ) -> None:

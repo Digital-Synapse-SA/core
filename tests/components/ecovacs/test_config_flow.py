@@ -11,17 +11,17 @@ from deebot_client.exceptions import InvalidAuthenticationError, MqttError
 from deebot_client.mqtt_client import create_mqtt_config
 import pytest
 
-from homeassistant.components.ecovacs.const import (
+from smarthub.components.ecovacs.const import (
     CONF_OVERRIDE_MQTT_URL,
     CONF_OVERRIDE_REST_URL,
     CONF_VERIFY_MQTT_CERTIFICATE,
     DOMAIN,
     InstanceMode,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_MODE, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_MODE, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .const import (
     VALID_ENTRY_DATA_CLOUD,
@@ -41,7 +41,7 @@ class _TestFnUserInput:
 
 
 async def _test_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     user_input: _TestFnUserInput,
 ) -> dict[str, Any]:
     """Test config flow."""
@@ -61,7 +61,7 @@ async def _test_user_flow(
 
 
 async def _test_user_flow_show_advanced_options(
-    hass: HomeAssistant,
+    hass: SmartHub,
     user_input: _TestFnUserInput,
 ) -> dict[str, Any]:
     """Test config flow."""
@@ -111,11 +111,11 @@ async def _test_user_flow_show_advanced_options(
     ids=["advanced_cloud", "advanced_self_hosted", "cloud"],
 )
 async def test_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_authenticator_authenticate: AsyncMock,
     mock_mqtt_client: Mock,
-    test_fn: Callable[[HomeAssistant, _TestFnUserInput], Awaitable[dict[str, Any]]],
+    test_fn: Callable[[SmartHub, _TestFnUserInput], Awaitable[dict[str, Any]]],
     test_fn_user_input: _TestFnUserInput,
     entry_data: dict[str, Any],
 ) -> None:
@@ -177,7 +177,7 @@ def _cannot_connect_error(user_input: dict[str, Any]) -> str:
     ids=["advanced_cloud", "advanced_self_hosted", "cloud"],
 )
 async def test_user_flow_raise_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_authenticator_authenticate: AsyncMock,
     mock_mqtt_client: Mock,
@@ -185,7 +185,7 @@ async def test_user_flow_raise_error(
     reason_rest: str,
     side_effect_mqtt: Exception,
     errors_mqtt: Callable[[dict[str, Any]], str],
-    test_fn: Callable[[HomeAssistant, _TestFnUserInput], Awaitable[dict[str, Any]]],
+    test_fn: Callable[[SmartHub, _TestFnUserInput], Awaitable[dict[str, Any]]],
     test_fn_user_input: _TestFnUserInput,
     entry_data: dict[str, Any],
 ) -> None:
@@ -233,7 +233,7 @@ async def test_user_flow_raise_error(
 
 
 async def test_user_flow_self_hosted_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_authenticator_authenticate: AsyncMock,
     mock_mqtt_client: Mock,
@@ -267,7 +267,7 @@ async def test_user_flow_self_hosted_error(
 
     data = VALID_ENTRY_DATA_SELF_HOSTED | {CONF_VERIFY_MQTT_CERTIFICATE: False}
     with patch(
-        "homeassistant.components.ecovacs.config_flow.create_mqtt_config",
+        "smarthub.components.ecovacs.config_flow.create_mqtt_config",
         wraps=create_mqtt_config,
     ) as mock_create_mqtt_config:
         result = await hass.config_entries.flow.async_configure(
@@ -307,8 +307,8 @@ async def test_user_flow_self_hosted_error(
     ids=["advanced_cloud", "advanced_self_hosted", "cloud"],
 )
 async def test_already_exists(
-    hass: HomeAssistant,
-    test_fn: Callable[[HomeAssistant, _TestFnUserInput], Awaitable[dict[str, Any]]],
+    hass: SmartHub,
+    test_fn: Callable[[SmartHub, _TestFnUserInput], Awaitable[dict[str, Any]]],
     test_fn_user_input: _TestFnUserInput,
 ) -> None:
     """Test we don't allow duplicated config entries."""

@@ -1,14 +1,14 @@
 """Test KNX date."""
 
-from homeassistant.components.datetime import (
+from smarthub.components.datetime import (
     ATTR_DATETIME,
     DOMAIN as DATETIME_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.components.knx.const import CONF_RESPOND_TO_READ, KNX_ADDRESS
-from homeassistant.components.knx.schema import DateTimeSchema
-from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant, State
+from smarthub.components.knx.const import CONF_RESPOND_TO_READ, KNX_ADDRESS
+from smarthub.components.knx.schema import DateTimeSchema
+from smarthub.const import CONF_NAME
+from smarthub.core import SmartHub, State
 
 from .conftest import KNXTestKit
 
@@ -17,7 +17,7 @@ from tests.common import mock_restore_cache
 # KNX DPT 19.001 doesn't provide timezone information so we send local time
 
 
-async def test_datetime(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_datetime(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX datetime."""
     # default timezone in tests is US/Pacific
     test_address = "1/1/1"
@@ -53,7 +53,7 @@ async def test_datetime(hass: HomeAssistant, knx: KNXTestKit) -> None:
     assert state.state == "2023-07-25T16:40:08+00:00"
 
 
-async def test_date_restore_and_respond(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_date_restore_and_respond(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX datetime with passive_address, restoring state and respond_to_read."""
     await hass.config.async_set_time_zone("Europe/Vienna")
     test_address = "1/1/1"

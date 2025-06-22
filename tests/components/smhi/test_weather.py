@@ -9,12 +9,12 @@ from pysmhi import SMHIForecast, SmhiForecastException, SMHIPointForecast
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.smhi.const import DOMAIN
-from homeassistant.components.smhi.weather import (
+from smarthub.components.smhi.const import DOMAIN
+from smarthub.components.smhi.weather import (
     ATTR_SMHI_THUNDER_PROBABILITY,
     CONDITION_CLASSES,
 )
-from homeassistant.components.weather import (
+from smarthub.components.weather import (
     ATTR_CONDITION_CLEAR_NIGHT,
     ATTR_FORECAST_CONDITION,
     ATTR_WEATHER_WIND_GUST_SPEED,
@@ -22,16 +22,16 @@ from homeassistant.components.weather import (
     DOMAIN as WEATHER_DOMAIN,
     SERVICE_GET_FORECASTS,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
     UnitOfSpeed,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import ENTITY_ID, TEST_CONFIG
 
@@ -44,7 +44,7 @@ from tests.typing import WebSocketGenerator
     [[Platform.WEATHER]],
 )
 async def test_setup_hass(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -63,7 +63,7 @@ async def test_setup_hass(
 )
 @freeze_time(datetime(2023, 8, 7, 1, tzinfo=dt_util.UTC))
 async def test_clear_night(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: SMHIPointForecast,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -99,7 +99,7 @@ async def test_clear_night(
 
 
 async def test_properties_no_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: MockConfigEntry,
     mock_client: MagicMock,
     freezer: FrozenDateTimeFactory,
@@ -134,7 +134,7 @@ async def test_properties_no_data(
 
 
 async def test_properties_unknown_symbol(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_client: MagicMock,
 ) -> None:
     """Test behaviour when unknown symbol from API."""
@@ -241,7 +241,7 @@ async def test_properties_unknown_symbol(
 
 @pytest.mark.parametrize("error", [SmhiForecastException(), TimeoutError()])
 async def test_refresh_weather_forecast_retry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     error: Exception,
     load_int: MockConfigEntry,
     mock_client: MagicMock,
@@ -339,7 +339,7 @@ def test_condition_class() -> None:
 
 
 async def test_custom_speed_unit(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     load_int: MockConfigEntry,
 ) -> None:
@@ -367,7 +367,7 @@ async def test_custom_speed_unit(
     [[Platform.WEATHER]],
 )
 async def test_forecast_services(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     load_int: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -427,7 +427,7 @@ async def test_forecast_services(
     [2],
 )
 async def test_forecast_services_lack_of_data(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     load_int: MockConfigEntry,
     snapshot: SnapshotAssertion,
@@ -460,7 +460,7 @@ async def test_forecast_services_lack_of_data(
     [[Platform.WEATHER]],
 )
 async def test_forecast_service(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:

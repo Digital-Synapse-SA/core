@@ -7,10 +7,10 @@ from freezegun.api import FrozenDateTimeFactory
 from peblar import PeblarAuthenticationError, PeblarConnectionError, PeblarError
 import pytest
 
-from homeassistant.components.peblar.const import DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE, Platform
-from homeassistant.core import HomeAssistant
+from smarthub.components.peblar.const import DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE, Platform
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -40,7 +40,7 @@ pytestmark = [
     ],
 )
 async def test_coordinator_error_handler(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_peblar: MagicMock,
     freezer: FrozenDateTimeFactory,
     caplog: pytest.LogCaptureFixture,
@@ -80,7 +80,7 @@ async def test_coordinator_error_handler(
 
 
 async def test_coordinator_error_handler_authentication_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_peblar: MagicMock,
     freezer: FrozenDateTimeFactory,

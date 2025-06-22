@@ -1,8 +1,8 @@
 """Test the Govee BLE binary_sensor."""
 
-from homeassistant.components.govee_ble.const import CONF_DEVICE_TYPE, DOMAIN
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant
+from smarthub.components.govee_ble.const import CONF_DEVICE_TYPE, DOMAIN
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub
 
 from . import (
     GV5123_CLOSED_SERVICE_INFO,
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 from tests.components.bluetooth import inject_bluetooth_service_info
 
 
-async def test_window_sensor(hass: HomeAssistant) -> None:
+async def test_window_sensor(hass: SmartHub) -> None:
     """Test setting up creates the window sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -45,7 +45,7 @@ async def test_window_sensor(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_presence_sensor(hass: HomeAssistant) -> None:
+async def test_presence_sensor(hass: SmartHub) -> None:
     """Test the presence sensor."""
     entry = MockConfigEntry(
         domain=DOMAIN,

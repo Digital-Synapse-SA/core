@@ -4,24 +4,24 @@ import pytest
 from pytest_unordered import unordered
 import voluptuous_serialize
 
-from homeassistant.components import automation
-from homeassistant.components.climate import (
+from smarthub.components import automation
+from smarthub.components.climate import (
     DOMAIN,
     HVACAction,
     HVACMode,
     const,
     device_trigger,
 )
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.const import EntityCategory, UnitOfTemperature
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import (
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.const import EntityCategory, UnitOfTemperature
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import (
     config_validation as cv,
     device_registry as dr,
     entity_registry as er,
 )
-from homeassistant.helpers.entity_registry import RegistryEntryHider
-from homeassistant.setup import async_setup_component
+from smarthub.helpers.entity_registry import RegistryEntryHider
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, async_get_device_automations
 
@@ -32,7 +32,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 async def test_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -86,7 +86,7 @@ async def test_get_triggers(
     ],
 )
 async def test_get_triggers_hidden_auxiliary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     hidden_by,
@@ -138,7 +138,7 @@ async def test_get_triggers_hidden_auxiliary(
 
 
 async def test_if_fires_on_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -259,7 +259,7 @@ async def test_if_fires_on_state_change(
 
 
 async def test_if_fires_on_state_change_legacy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     service_calls: list[ServiceCall],
@@ -323,7 +323,7 @@ async def test_if_fires_on_state_change_legacy(
     assert service_calls[0].data["some"] == "hvac_mode_changed"
 
 
-async def test_get_trigger_capabilities_hvac_mode(hass: HomeAssistant) -> None:
+async def test_get_trigger_capabilities_hvac_mode(hass: SmartHub) -> None:
     """Test we get the expected capabilities from a climate trigger."""
     capabilities = await device_trigger.async_get_trigger_capabilities(
         hass,
@@ -366,7 +366,7 @@ async def test_get_trigger_capabilities_hvac_mode(hass: HomeAssistant) -> None:
     ],
 )
 async def test_get_trigger_capabilities_temp_humid(
-    hass: HomeAssistant, type, suffix
+    hass: SmartHub, type, suffix
 ) -> None:
     """Test we get the expected capabilities from a climate trigger."""
     capabilities = await device_trigger.async_get_trigger_capabilities(

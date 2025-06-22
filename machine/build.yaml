@@ -1,16 +1,16 @@
-image: ghcr.io/home-assistant/{machine}-homeassistant
+image: ghcr.io/smart-hub/{machine}-smarthub
 build_from:
-  aarch64: "ghcr.io/home-assistant/aarch64-homeassistant:"
-  armv7: "ghcr.io/home-assistant/armv7-homeassistant:"
-  armhf: "ghcr.io/home-assistant/armhf-homeassistant:"
-  amd64: "ghcr.io/home-assistant/amd64-homeassistant:"
-  i386: "ghcr.io/home-assistant/i386-homeassistant:"
+  aarch64: "ghcr.io/smart-hub/aarch64-smarthub:"
+  armv7: "ghcr.io/smart-hub/armv7-smarthub:"
+  armhf: "ghcr.io/smart-hub/armhf-smarthub:"
+  amd64: "ghcr.io/smart-hub/amd64-smarthub:"
+  i386: "ghcr.io/smart-hub/i386-smarthub:"
 codenotary:
-  signer: notary@home-assistant.io
-  base_image: notary@home-assistant.io
+  signer: notary@smart-hub.io
+  base_image: notary@smart-hub.io
 cosign:
-  base_identity: https://github.com/home-assistant/core/.*
-  identity: https://github.com/home-assistant/core/.*
+  base_identity: https://github.com/smart-hub/core/.*
+  identity: https://github.com/smart-hub/core/.*
 labels:
   io.hass.type: core
-  org.opencontainers.image.source: https://github.com/home-assistant/core
+  org.opencontainers.image.source: https://github.com/smart-hub/core

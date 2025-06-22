@@ -7,8 +7,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from brother import BrotherSensors
 import pytest
 
-from homeassistant.components.brother.const import DOMAIN
-from homeassistant.const import CONF_HOST, CONF_TYPE
+from smarthub.components.brother.const import DOMAIN
+from smarthub.const import CONF_HOST, CONF_TYPE
 
 from tests.common import MockConfigEntry
 
@@ -81,7 +81,7 @@ BROTHER_DATA = BrotherSensors(
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
     with patch(
-        "homeassistant.components.brother.async_setup_entry", return_value=True
+        "smarthub.components.brother.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
 
@@ -90,7 +90,7 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 def mock_unload_entry() -> Generator[AsyncMock]:
     """Override async_unload_entry."""
     with patch(
-        "homeassistant.components.brother.async_unload_entry", return_value=True
+        "smarthub.components.brother.async_unload_entry", return_value=True
     ) as mock_unload_entry:
         yield mock_unload_entry
 
@@ -99,9 +99,9 @@ def mock_unload_entry() -> Generator[AsyncMock]:
 def mock_brother_client() -> Generator[MagicMock]:
     """Mock Brother client."""
     with (
-        patch("homeassistant.components.brother.Brother", autospec=True) as mock_client,
+        patch("smarthub.components.brother.Brother", autospec=True) as mock_client,
         patch(
-            "homeassistant.components.brother.config_flow.Brother",
+            "smarthub.components.brother.config_flow.Brother",
             new=mock_client,
         ),
     ):

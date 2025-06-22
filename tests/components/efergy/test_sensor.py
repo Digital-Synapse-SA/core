@@ -4,22 +4,22 @@ from datetime import timedelta
 
 import pytest
 
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     STATE_UNAVAILABLE,
     UnitOfEnergy,
     UnitOfPower,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util import dt as dt_util
 
 from . import MULTI_SENSOR_TOKEN, mock_responses, setup_platform
 
@@ -33,7 +33,7 @@ def enable_all_entities(entity_registry_enabled_by_default: None) -> None:
 
 
 async def test_sensor_readings(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -98,7 +98,7 @@ async def test_sensor_readings(
 
 
 async def test_multi_sensor_readings(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test for multiple sensors in one household."""
     await setup_platform(hass, aioclient_mock, SENSOR_DOMAIN, MULTI_SENSOR_TOKEN)
@@ -120,7 +120,7 @@ async def test_multi_sensor_readings(
 
 
 async def test_failed_update_and_reconnection(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test failed update and reconnection."""
     await setup_platform(hass, aioclient_mock, SENSOR_DOMAIN)

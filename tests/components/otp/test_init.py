@@ -1,13 +1,13 @@
 """Test the One-Time Password (OTP) init."""
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_entry_setup_unload(
-    hass: HomeAssistant, otp_config_entry: MockConfigEntry
+    hass: SmartHub, otp_config_entry: MockConfigEntry
 ) -> None:
     """Test integration setup and unload."""
 

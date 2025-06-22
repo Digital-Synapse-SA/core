@@ -5,13 +5,13 @@ from unittest.mock import Mock
 from pyfibaro.fibaro_client import FibaroAuthenticationFailed, FibaroConnectFailed
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.fibaro import DOMAIN
-from homeassistant.components.fibaro.config_flow import _normalize_url
-from homeassistant.components.fibaro.const import CONF_IMPORT_PLUGINS
-from homeassistant.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
+from smarthub import config_entries
+from smarthub.components.fibaro import DOMAIN
+from smarthub.components.fibaro.config_flow import _normalize_url
+from smarthub.components.fibaro.const import CONF_IMPORT_PLUGINS
+from smarthub.const import CONF_PASSWORD, CONF_URL, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResult, FlowResultType
 
 from .conftest import TEST_NAME, TEST_PASSWORD, TEST_URL, TEST_USERNAME
 
@@ -21,7 +21,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry", "mock_fibaro_client")
 
 
 async def _recovery_after_failure_works(
-    hass: HomeAssistant, mock_fibaro_client: Mock, result: FlowResult
+    hass: SmartHub, mock_fibaro_client: Mock, result: FlowResult
 ) -> None:
     mock_fibaro_client.connect_with_credentials.side_effect = None
     mock_fibaro_client.connect_with_credentials.return_value = (
@@ -48,7 +48,7 @@ async def _recovery_after_failure_works(
 
 
 async def _recovery_after_reauth_failure_works(
-    hass: HomeAssistant, mock_fibaro_client: Mock, result: FlowResult
+    hass: SmartHub, mock_fibaro_client: Mock, result: FlowResult
 ) -> None:
     mock_fibaro_client.connect_with_credentials.side_effect = None
     mock_fibaro_client.connect_with_credentials.return_value = (
@@ -64,7 +64,7 @@ async def _recovery_after_reauth_failure_works(
     assert result["reason"] == "reauth_successful"
 
 
-async def test_config_flow_user_initiated_success(hass: HomeAssistant) -> None:
+async def test_config_flow_user_initiated_success(hass: SmartHub) -> None:
     """Successful flow manually initialized by the user."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -94,7 +94,7 @@ async def test_config_flow_user_initiated_success(hass: HomeAssistant) -> None:
 
 
 async def test_config_flow_user_initiated_auth_failure(
-    hass: HomeAssistant, mock_fibaro_client: Mock
+    hass: SmartHub, mock_fibaro_client: Mock
 ) -> None:
     """Authentication failure in flow manually initialized by the user."""
     result = await hass.config_entries.flow.async_init(
@@ -126,7 +126,7 @@ async def test_config_flow_user_initiated_auth_failure(
 
 
 async def test_config_flow_user_initiated_connect_failure(
-    hass: HomeAssistant, mock_fibaro_client: Mock
+    hass: SmartHub, mock_fibaro_client: Mock
 ) -> None:
     """Unknown failure in flow manually initialized by the user."""
     result = await hass.config_entries.flow.async_init(
@@ -156,7 +156,7 @@ async def test_config_flow_user_initiated_connect_failure(
 
 
 async def test_reauth_success(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Successful reauth flow initialized by the user."""
     result = await mock_config_entry.start_reauth_flow(hass)
@@ -174,7 +174,7 @@ async def test_reauth_success(
 
 
 async def test_reauth_connect_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_fibaro_client: Mock,
 ) -> None:
@@ -199,7 +199,7 @@ async def test_reauth_connect_failure(
 
 
 async def test_reauth_auth_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_fibaro_client: Mock,
 ) -> None:

@@ -7,14 +7,14 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.apcupsd.const import DOMAIN
-from homeassistant.components.apcupsd.coordinator import UPDATE_INTERVAL
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.entity_platform import async_get_platforms
-from homeassistant.util import slugify, utcnow
+from smarthub.components.apcupsd.const import DOMAIN
+from smarthub.components.apcupsd.coordinator import UPDATE_INTERVAL
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.entity_platform import async_get_platforms
+from smarthub.util import slugify, utcnow
 
 from . import CONF_DATA, MOCK_MINIMAL_STATUS, MOCK_STATUS, async_init_integration
 
@@ -39,7 +39,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
     ],
 )
 async def test_async_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     status: OrderedDict,
     device_registry: dr.DeviceRegistry,
     snapshot: SnapshotAssertion,
@@ -57,7 +57,7 @@ async def test_async_setup_entry(
     assert all(len(p.entities) > 0 for p in platforms)
 
 
-async def test_multiple_integrations(hass: HomeAssistant) -> None:
+async def test_multiple_integrations(hass: SmartHub) -> None:
     """Test successful setup for multiple entries."""
     # Load two integrations from two mock hosts.
     status1 = MOCK_STATUS | {"LOADPCT": "15.0 Percent", "SERIALNO": "XXXXX1"}
@@ -82,7 +82,7 @@ async def test_multiple_integrations(hass: HomeAssistant) -> None:
     assert state1.state != state2.state
 
 
-async def test_multiple_integrations_different_devices(hass: HomeAssistant) -> None:
+async def test_multiple_integrations_different_devices(hass: SmartHub) -> None:
     """Test successful setup for multiple entries with different device names."""
     status1 = MOCK_STATUS | {"SERIALNO": "XXXXX1", "UPSNAME": "MyUPS1"}
     status2 = MOCK_STATUS | {"SERIALNO": "XXXXX2", "UPSNAME": "MyUPS2"}
@@ -108,7 +108,7 @@ async def test_multiple_integrations_different_devices(hass: HomeAssistant) -> N
     "error",
     [OSError(), asyncio.IncompleteReadError(partial=b"", expected=0)],
 )
-async def test_connection_error(hass: HomeAssistant, error: Exception) -> None:
+async def test_connection_error(hass: SmartHub, error: Exception) -> None:
     """Test connection error during integration setup."""
     entry = MockConfigEntry(
         version=1,
@@ -125,7 +125,7 @@ async def test_connection_error(hass: HomeAssistant, error: Exception) -> None:
         assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_unload_remove_entry(hass: HomeAssistant) -> None:
+async def test_unload_remove_entry(hass: SmartHub) -> None:
     """Test successful unload and removal of an entry."""
     # Load two integrations from two mock hosts.
     entries = (
@@ -159,7 +159,7 @@ async def test_unload_remove_entry(hass: HomeAssistant) -> None:
     assert len(hass.config_entries.async_entries(DOMAIN)) == 0
 
 
-async def test_availability(hass: HomeAssistant) -> None:
+async def test_availability(hass: SmartHub) -> None:
     """Ensure that we mark the entity's availability properly when network is down / back up."""
     await async_init_integration(hass)
 

@@ -6,15 +6,15 @@ from eheimdigital.types import EheimDeviceType
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import (
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .conftest import init_integration
 
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry, snapshot_platform
 
 @pytest.mark.usefixtures("classic_vario_mock")
 async def test_setup_classic_vario(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -33,9 +33,9 @@ async def test_setup_classic_vario(
     mock_config_entry.add_to_hass(hass)
 
     with (
-        patch("homeassistant.components.eheimdigital.PLATFORMS", [Platform.SWITCH]),
+        patch("smarthub.components.eheimdigital.PLATFORMS", [Platform.SWITCH]),
         patch(
-            "homeassistant.components.eheimdigital.coordinator.asyncio.Event",
+            "smarthub.components.eheimdigital.coordinator.asyncio.Event",
             new=AsyncMock,
         ),
     ):
@@ -53,7 +53,7 @@ async def test_setup_classic_vario(
     ("service", "active"), [(SERVICE_TURN_OFF, False), (SERVICE_TURN_ON, True)]
 )
 async def test_turn_on_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     classic_vario_mock: MagicMock,
@@ -108,7 +108,7 @@ async def test_turn_on_off(
     ],
 )
 async def test_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     eheimdigital_hub_mock: MagicMock,
     mock_config_entry: MockConfigEntry,
     device_name: str,

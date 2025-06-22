@@ -35,23 +35,23 @@ from aiohomeconnect.model.program import (
 from aiohomeconnect.model.setting import SettingConstraints
 import pytest
 
-from homeassistant.components.home_connect.const import DOMAIN
-from homeassistant.components.select import (
+from smarthub.components.home_connect.const import DOMAIN
+from smarthub.components.select import (
     ATTR_OPTION,
     ATTR_OPTIONS,
     DOMAIN as SELECT_DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_SELECT_OPTION,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -64,7 +64,7 @@ def platforms() -> list[str]:
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_paired_depaired_devices_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -140,7 +140,7 @@ async def test_paired_depaired_devices_flow(
     indirect=["appliance"],
 )
 async def test_connected_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     client: MagicMock,
@@ -208,7 +208,7 @@ async def test_connected_devices(
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_select_entity_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -348,7 +348,7 @@ async def test_filter_programs(
     indirect=["appliance"],
 )
 async def test_select_program_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -423,7 +423,7 @@ async def test_select_program_functionality(
     ],
 )
 async def test_select_exception_handling(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_with_exception: MagicMock,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
     config_entry: MockConfigEntry,
@@ -452,7 +452,7 @@ async def test_select_exception_handling(
     with pytest.raises(HomeConnectError):
         await getattr(client_with_exception, mock_attr)()
 
-    with pytest.raises(HomeAssistantError, match=exception_match):
+    with pytest.raises(SmartHubError, match=exception_match):
         await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
@@ -464,7 +464,7 @@ async def test_select_exception_handling(
 
 @pytest.mark.parametrize("appliance", ["Washer"], indirect=True)
 async def test_programs_updated_on_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -547,7 +547,7 @@ async def test_programs_updated_on_connect(
     ],
 )
 async def test_select_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -609,7 +609,7 @@ async def test_select_functionality(
     ],
 )
 async def test_fetch_allowed_values(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -664,7 +664,7 @@ async def test_fetch_allowed_values(
     ],
 )
 async def test_fetch_allowed_values_after_rate_limit_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -737,7 +737,7 @@ async def test_fetch_allowed_values_after_rate_limit_error(
     ],
 )
 async def test_default_values_after_fetch_allowed_values_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -788,7 +788,7 @@ async def test_default_values_after_fetch_allowed_values_error(
     ],
 )
 async def test_select_entity_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client_with_exception: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],
@@ -817,7 +817,7 @@ async def test_select_entity_error(
         await getattr(client_with_exception, mock_attr)()
 
     with pytest.raises(
-        HomeAssistantError, match=r"Error.*assign.*value.*to.*setting.*"
+        SmartHubError, match=r"Error.*assign.*value.*to.*setting.*"
     ):
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -901,7 +901,7 @@ async def test_select_entity_error(
     ],
 )
 async def test_options_functionality(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MagicMock,
     config_entry: MockConfigEntry,
     integration_setup: Callable[[MagicMock], Awaitable[bool]],

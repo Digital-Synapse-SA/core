@@ -12,24 +12,24 @@ from zeroconf import (
 )
 from zeroconf.asyncio import AsyncServiceInfo
 
-from homeassistant import config_entries
-from homeassistant.components import zeroconf
-from homeassistant.components.zeroconf import discovery
-from homeassistant.const import (
+from smarthub import config_entries
+from smarthub.components import zeroconf
+from smarthub.components.zeroconf import discovery
+from smarthub.const import (
     EVENT_COMPONENT_LOADED,
     EVENT_HOMEASSISTANT_CLOSE,
     EVENT_HOMEASSISTANT_START,
     EVENT_HOMEASSISTANT_STARTED,
     EVENT_HOMEASSISTANT_STOP,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.generated import zeroconf as zc_gen
-from homeassistant.helpers.discovery_flow import DiscoveryKey
-from homeassistant.helpers.service_info.zeroconf import (
+from smarthub.core import SmartHub
+from smarthub.generated import zeroconf as zc_gen
+from smarthub.helpers.discovery_flow import DiscoveryKey
+from smarthub.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
-from homeassistant.setup import ATTR_COMPONENT, async_setup_component
+from smarthub.setup import ATTR_COMPONENT, async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -162,7 +162,7 @@ def get_zeroconf_info_mock_model(model):
     return mock_zc_info
 
 
-async def test_setup(hass: HomeAssistant, mock_async_zeroconf: MagicMock) -> None:
+async def test_setup(hass: SmartHub, mock_async_zeroconf: MagicMock) -> None:
     """Test configured options for a device are loaded via config entry."""
     mock_zc = {
         "_http._tcp.local.": [
@@ -185,7 +185,7 @@ async def test_setup(hass: HomeAssistant, mock_async_zeroconf: MagicMock) -> Non
             discovery, "AsyncServiceBrowser", side_effect=service_update_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_service_info_mock,
         ),
     ):
@@ -210,14 +210,14 @@ async def test_setup(hass: HomeAssistant, mock_async_zeroconf: MagicMock) -> Non
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_setup_with_overly_long_url_and_name(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we still setup with long urls and names."""
     with (
         patch.object(hass.config_entries.flow, "async_init"),
         patch.object(discovery, "AsyncServiceBrowser", side_effect=service_update_mock),
         patch(
-            "homeassistant.components.zeroconf.get_url",
+            "smarthub.components.zeroconf.get_url",
             return_value=(
                 "https://this.url.is.way.too.long/very/deep/path/that/will/make/us/go/over"
                 "/the/maximum/string/length/and/would/cause/zeroconf/to/fail/to/startup"
@@ -241,7 +241,7 @@ async def test_setup_with_overly_long_url_and_name(
             ),
         ),
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo.async_request",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo.async_request",
         ),
     ):
         assert await async_setup_component(hass, zeroconf.DOMAIN, {zeroconf.DOMAIN: {}})
@@ -254,14 +254,14 @@ async def test_setup_with_overly_long_url_and_name(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_setup_with_defaults(
-    hass: HomeAssistant, mock_zeroconf: MagicMock
+    hass: SmartHub, mock_zeroconf: MagicMock
 ) -> None:
     """Test default interface config."""
     with (
         patch.object(hass.config_entries.flow, "async_init"),
         patch.object(discovery, "AsyncServiceBrowser", side_effect=service_update_mock),
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_service_info_mock,
         ),
     ):
@@ -275,7 +275,7 @@ async def test_setup_with_defaults(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_zeroconf_match_macaddress(hass: HomeAssistant) -> None:
+async def test_zeroconf_match_macaddress(hass: SmartHub) -> None:
     """Test configured options for a device are loaded via config entry."""
 
     def http_only_service_update_mock(zeroconf, services, handlers):
@@ -306,7 +306,7 @@ async def test_zeroconf_match_macaddress(hass: HomeAssistant) -> None:
             discovery, "AsyncServiceBrowser", side_effect=http_only_service_update_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_zeroconf_info_mock("FFAADDCC11DD"),
         ),
     ):
@@ -328,7 +328,7 @@ async def test_zeroconf_match_macaddress(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_zeroconf_match_manufacturer(hass: HomeAssistant) -> None:
+async def test_zeroconf_match_manufacturer(hass: SmartHub) -> None:
     """Test configured options for a device are loaded via config entry."""
 
     def http_only_service_update_mock(zeroconf, services, handlers):
@@ -355,7 +355,7 @@ async def test_zeroconf_match_manufacturer(hass: HomeAssistant) -> None:
             discovery, "AsyncServiceBrowser", side_effect=http_only_service_update_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_zeroconf_info_mock_manufacturer("Samsung Electronics"),
         ),
     ):
@@ -369,7 +369,7 @@ async def test_zeroconf_match_manufacturer(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_zeroconf_match_model(hass: HomeAssistant) -> None:
+async def test_zeroconf_match_model(hass: SmartHub) -> None:
     """Test matching a specific model in zeroconf."""
 
     def http_only_service_update_mock(zeroconf, services, handlers):
@@ -396,7 +396,7 @@ async def test_zeroconf_match_model(hass: HomeAssistant) -> None:
             discovery, "AsyncServiceBrowser", side_effect=http_only_service_update_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_zeroconf_info_mock_model("appletv"),
         ),
     ):
@@ -410,7 +410,7 @@ async def test_zeroconf_match_model(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_zeroconf_match_manufacturer_not_present(hass: HomeAssistant) -> None:
+async def test_zeroconf_match_manufacturer_not_present(hass: SmartHub) -> None:
     """Test matchers reject when a property is missing."""
 
     def http_only_service_update_mock(zeroconf, services, handlers):
@@ -437,7 +437,7 @@ async def test_zeroconf_match_manufacturer_not_present(hass: HomeAssistant) -> N
             discovery, "AsyncServiceBrowser", side_effect=http_only_service_update_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_zeroconf_info_mock("aabbccddeeff"),
         ),
     ):
@@ -450,7 +450,7 @@ async def test_zeroconf_match_manufacturer_not_present(hass: HomeAssistant) -> N
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_zeroconf_no_match(hass: HomeAssistant) -> None:
+async def test_zeroconf_no_match(hass: SmartHub) -> None:
     """Test configured options for a device are loaded via config entry."""
 
     def http_only_service_update_mock(zeroconf, services, handlers):
@@ -473,7 +473,7 @@ async def test_zeroconf_no_match(hass: HomeAssistant) -> None:
             discovery, "AsyncServiceBrowser", side_effect=http_only_service_update_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_zeroconf_info_mock("FFAADDCC11DD"),
         ),
     ):
@@ -486,7 +486,7 @@ async def test_zeroconf_no_match(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_zeroconf_no_match_manufacturer(hass: HomeAssistant) -> None:
+async def test_zeroconf_no_match_manufacturer(hass: SmartHub) -> None:
     """Test configured options for a device are loaded via config entry."""
 
     def http_only_service_update_mock(zeroconf, services, handlers):
@@ -513,7 +513,7 @@ async def test_zeroconf_no_match_manufacturer(hass: HomeAssistant) -> None:
             discovery, "AsyncServiceBrowser", side_effect=http_only_service_update_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_zeroconf_info_mock_manufacturer("Not Samsung Electronics"),
         ),
     ):
@@ -526,7 +526,7 @@ async def test_zeroconf_no_match_manufacturer(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_match_partial_space(hass: HomeAssistant) -> None:
+async def test_homekit_match_partial_space(hass: SmartHub) -> None:
     """Test configured options for a device are loaded via config entry."""
     with (
         patch.dict(
@@ -548,7 +548,7 @@ async def test_homekit_match_partial_space(hass: HomeAssistant) -> None:
             ),
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_homekit_info_mock("LIFX bulb", HOMEKIT_STATUS_UNPAIRED),
         ),
     ):
@@ -573,7 +573,7 @@ async def test_homekit_match_partial_space(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_device_with_invalid_name(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test we ignore devices with an invalid name."""
     with (
@@ -596,7 +596,7 @@ async def test_device_with_invalid_name(
             ),
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=BadTypeInNameException,
         ),
     ):
@@ -610,7 +610,7 @@ async def test_device_with_invalid_name(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_match_partial_dash(hass: HomeAssistant) -> None:
+async def test_homekit_match_partial_dash(hass: SmartHub) -> None:
     """Test configured options for a device are loaded via config entry."""
     with (
         patch.dict(
@@ -632,7 +632,7 @@ async def test_homekit_match_partial_dash(hass: HomeAssistant) -> None:
             ),
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_homekit_info_mock(
                 "Smart Bridge-001", HOMEKIT_STATUS_UNPAIRED
             ),
@@ -648,7 +648,7 @@ async def test_homekit_match_partial_dash(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_match_partial_fnmatch(hass: HomeAssistant) -> None:
+async def test_homekit_match_partial_fnmatch(hass: SmartHub) -> None:
     """Test matching homekit devices with fnmatch."""
     with (
         patch.dict(
@@ -670,7 +670,7 @@ async def test_homekit_match_partial_fnmatch(hass: HomeAssistant) -> None:
             ),
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_homekit_info_mock("YLDP13YL", HOMEKIT_STATUS_UNPAIRED),
         ),
     ):
@@ -684,7 +684,7 @@ async def test_homekit_match_partial_fnmatch(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_match_full(hass: HomeAssistant) -> None:
+async def test_homekit_match_full(hass: SmartHub) -> None:
     """Test configured options for a device are loaded via config entry."""
     with (
         patch.dict(
@@ -706,7 +706,7 @@ async def test_homekit_match_full(hass: HomeAssistant) -> None:
             ),
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_homekit_info_mock("BSB002", HOMEKIT_STATUS_UNPAIRED),
         ),
     ):
@@ -720,7 +720,7 @@ async def test_homekit_match_full(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_already_paired(hass: HomeAssistant) -> None:
+async def test_homekit_already_paired(hass: SmartHub) -> None:
     """Test that an already paired device is sent to homekit_controller."""
     with (
         patch.dict(
@@ -745,7 +745,7 @@ async def test_homekit_already_paired(hass: HomeAssistant) -> None:
             ),
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_homekit_info_mock("tado", HOMEKIT_STATUS_PAIRED),
         ),
     ):
@@ -760,7 +760,7 @@ async def test_homekit_already_paired(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_invalid_paring_status(hass: HomeAssistant) -> None:
+async def test_homekit_invalid_paring_status(hass: SmartHub) -> None:
     """Test that missing paring data is not sent to homekit_controller."""
     with (
         patch.dict(
@@ -782,7 +782,7 @@ async def test_homekit_invalid_paring_status(hass: HomeAssistant) -> None:
             ),
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_homekit_info_mock("Smart Bridge", b"invalid"),
         ),
     ):
@@ -796,7 +796,7 @@ async def test_homekit_invalid_paring_status(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_homekit_not_paired(hass: HomeAssistant) -> None:
+async def test_homekit_not_paired(hass: SmartHub) -> None:
     """Test that an not paired device is sent to homekit_controller."""
     with (
         patch.dict(
@@ -809,7 +809,7 @@ async def test_homekit_not_paired(hass: HomeAssistant) -> None:
             discovery, "AsyncServiceBrowser", side_effect=service_update_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_homekit_info_mock(
                 "this_will_not_match_any_integration", HOMEKIT_STATUS_UNPAIRED
             ),
@@ -826,7 +826,7 @@ async def test_homekit_not_paired(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_controller_still_discovered_unpaired_for_cloud(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test discovery is still passed to homekit controller when unpaired.
 
@@ -855,7 +855,7 @@ async def test_homekit_controller_still_discovered_unpaired_for_cloud(
             ),
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_homekit_info_mock("Rachio-xyz", HOMEKIT_STATUS_UNPAIRED),
         ),
     ):
@@ -871,7 +871,7 @@ async def test_homekit_controller_still_discovered_unpaired_for_cloud(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_homekit_controller_still_discovered_unpaired_for_polling(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test discovery is still passed to homekit controller when unpaired.
 
@@ -900,7 +900,7 @@ async def test_homekit_controller_still_discovered_unpaired_for_polling(
             ),
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_homekit_info_mock("iSmartGate", HOMEKIT_STATUS_UNPAIRED),
         ),
     ):
@@ -914,7 +914,7 @@ async def test_homekit_controller_still_discovered_unpaired_for_polling(
     assert mock_config_flow.mock_calls[1][1][0] == "homekit_controller"
 
 
-async def test_info_from_service_non_utf8(hass: HomeAssistant) -> None:
+async def test_info_from_service_non_utf8(hass: SmartHub) -> None:
     """Test info_from_service handles non UTF-8 property keys and values correctly."""
     service_type = "_test._tcp.local."
     info = zeroconf.info_from_service(
@@ -927,7 +927,7 @@ async def test_info_from_service_non_utf8(hass: HomeAssistant) -> None:
     )
 
 
-async def test_info_from_service_with_addresses(hass: HomeAssistant) -> None:
+async def test_info_from_service_with_addresses(hass: SmartHub) -> None:
     """Test info_from_service does not throw when there are no addresses."""
     service_type = "_test._tcp.local."
     info = zeroconf.info_from_service(
@@ -937,7 +937,7 @@ async def test_info_from_service_with_addresses(hass: HomeAssistant) -> None:
 
 
 async def test_info_from_service_with_link_local_address_first(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that the link local address is ignored."""
     service_type = "_test._tcp.local."
@@ -949,7 +949,7 @@ async def test_info_from_service_with_link_local_address_first(
 
 
 async def test_info_from_service_with_unspecified_address_first(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that the unspecified address is ignored."""
     service_type = "_test._tcp.local."
@@ -961,7 +961,7 @@ async def test_info_from_service_with_unspecified_address_first(
 
 
 async def test_info_from_service_with_unspecified_address_only(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that the unspecified address is ignored."""
     service_type = "_test._tcp.local."
@@ -972,7 +972,7 @@ async def test_info_from_service_with_unspecified_address_only(
 
 
 async def test_info_from_service_with_link_local_address_second(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that the link local address is ignored."""
     service_type = "_test._tcp.local."
@@ -984,7 +984,7 @@ async def test_info_from_service_with_link_local_address_second(
 
 
 async def test_info_from_service_with_link_local_address_only(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test that the link local address is ignored."""
     service_type = "_test._tcp.local."
@@ -994,7 +994,7 @@ async def test_info_from_service_with_link_local_address_only(
     assert info is None
 
 
-async def test_info_from_service_prefers_ipv4(hass: HomeAssistant) -> None:
+async def test_info_from_service_prefers_ipv4(hass: SmartHub) -> None:
     """Test that ipv4 addresses are preferred."""
     service_type = "_test._tcp.local."
     service_info = get_service_info_mock(service_type, f"test.{service_type}")
@@ -1003,7 +1003,7 @@ async def test_info_from_service_prefers_ipv4(hass: HomeAssistant) -> None:
     assert info.host == "192.168.66.12"
 
 
-async def test_info_from_service_can_return_ipv6(hass: HomeAssistant) -> None:
+async def test_info_from_service_can_return_ipv6(hass: SmartHub) -> None:
     """Test that IPv6-only devices can be discovered."""
     service_type = "_test._tcp.local."
     service_info = get_service_info_mock(service_type, f"test.{service_type}")
@@ -1013,7 +1013,7 @@ async def test_info_from_service_can_return_ipv6(hass: HomeAssistant) -> None:
 
 
 async def test_get_instance(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test we get an instance."""
     assert await async_setup_component(hass, zeroconf.DOMAIN, {zeroconf.DOMAIN: {}})
@@ -1029,7 +1029,7 @@ async def test_get_instance(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_removed_ignored(hass: HomeAssistant) -> None:
+async def test_removed_ignored(hass: SmartHub) -> None:
     """Test we remove it when a zeroconf entry is removed."""
 
     def service_update_mock(zeroconf, services, handlers):
@@ -1056,7 +1056,7 @@ async def test_removed_ignored(hass: HomeAssistant) -> None:
     with (
         patch.object(discovery, "AsyncServiceBrowser", side_effect=service_update_mock),
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_service_info_mock,
         ) as mock_service_info,
     ):
@@ -1083,19 +1083,19 @@ _ADAPTER_WITH_DEFAULT_ENABLED = [
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_async_detect_interfaces_setting_non_loopback_route(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test without default interface and the route returns a non-loopback address."""
     with (
-        patch("homeassistant.components.zeroconf.HaZeroconf") as mock_zc,
+        patch("smarthub.components.zeroconf.HaZeroconf") as mock_zc,
         patch.object(hass.config_entries.flow, "async_init"),
         patch.object(discovery, "AsyncServiceBrowser", side_effect=service_update_mock),
         patch(
-            "homeassistant.components.zeroconf.network.async_get_loaded_adapters",
+            "smarthub.components.zeroconf.network.async_get_loaded_adapters",
             return_value=_ADAPTER_WITH_DEFAULT_ENABLED,
         ),
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_service_info_mock,
         ),
     ):
@@ -1170,20 +1170,20 @@ _ADAPTERS_WITH_MANUAL_CONFIG = [
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_async_detect_interfaces_setting_empty_route_linux(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test without default interface config and the route returns nothing on linux."""
     with (
-        patch("homeassistant.components.zeroconf.sys.platform", "linux"),
-        patch("homeassistant.components.zeroconf.HaZeroconf") as mock_zc,
+        patch("smarthub.components.zeroconf.sys.platform", "linux"),
+        patch("smarthub.components.zeroconf.HaZeroconf") as mock_zc,
         patch.object(hass.config_entries.flow, "async_init"),
         patch.object(discovery, "AsyncServiceBrowser", side_effect=service_update_mock),
         patch(
-            "homeassistant.components.zeroconf.network.async_get_loaded_adapters",
+            "smarthub.components.zeroconf.network.async_get_loaded_adapters",
             return_value=_ADAPTERS_WITH_MANUAL_CONFIG,
         ),
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_service_info_mock,
         ),
     ):
@@ -1204,20 +1204,20 @@ async def test_async_detect_interfaces_setting_empty_route_linux(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_async_detect_interfaces_setting_empty_route_freebsd(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test without default interface and the route returns nothing on freebsd."""
     with (
-        patch("homeassistant.components.zeroconf.sys.platform", "freebsd"),
-        patch("homeassistant.components.zeroconf.HaZeroconf") as mock_zc,
+        patch("smarthub.components.zeroconf.sys.platform", "freebsd"),
+        patch("smarthub.components.zeroconf.HaZeroconf") as mock_zc,
         patch.object(hass.config_entries.flow, "async_init"),
         patch.object(discovery, "AsyncServiceBrowser", side_effect=service_update_mock),
         patch(
-            "homeassistant.components.zeroconf.network.async_get_loaded_adapters",
+            "smarthub.components.zeroconf.network.async_get_loaded_adapters",
             return_value=_ADAPTERS_WITH_MANUAL_CONFIG,
         ),
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_service_info_mock,
         ),
     ):
@@ -1255,20 +1255,20 @@ _ADAPTER_WITH_DEFAULT_ENABLED_AND_IPV6 = [
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_async_detect_interfaces_explicitly_set_ipv6_linux(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test interfaces are explicitly set when IPv6 is present on linux."""
     with (
-        patch("homeassistant.components.zeroconf.sys.platform", "linux"),
-        patch("homeassistant.components.zeroconf.HaZeroconf") as mock_zc,
+        patch("smarthub.components.zeroconf.sys.platform", "linux"),
+        patch("smarthub.components.zeroconf.HaZeroconf") as mock_zc,
         patch.object(hass.config_entries.flow, "async_init"),
         patch.object(discovery, "AsyncServiceBrowser", side_effect=service_update_mock),
         patch(
-            "homeassistant.components.zeroconf.network.async_get_loaded_adapters",
+            "smarthub.components.zeroconf.network.async_get_loaded_adapters",
             return_value=_ADAPTER_WITH_DEFAULT_ENABLED_AND_IPV6,
         ),
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_service_info_mock,
         ),
     ):
@@ -1284,20 +1284,20 @@ async def test_async_detect_interfaces_explicitly_set_ipv6_linux(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_async_detect_interfaces_explicitly_set_ipv6_freebsd(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test interfaces are explicitly set when IPv6 is present on freebsd."""
     with (
-        patch("homeassistant.components.zeroconf.sys.platform", "freebsd"),
-        patch("homeassistant.components.zeroconf.HaZeroconf") as mock_zc,
+        patch("smarthub.components.zeroconf.sys.platform", "freebsd"),
+        patch("smarthub.components.zeroconf.HaZeroconf") as mock_zc,
         patch.object(hass.config_entries.flow, "async_init"),
         patch.object(discovery, "AsyncServiceBrowser", side_effect=service_update_mock),
         patch(
-            "homeassistant.components.zeroconf.network.async_get_loaded_adapters",
+            "smarthub.components.zeroconf.network.async_get_loaded_adapters",
             return_value=_ADAPTER_WITH_DEFAULT_ENABLED_AND_IPV6,
         ),
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_service_info_mock,
         ),
     ):
@@ -1313,20 +1313,20 @@ async def test_async_detect_interfaces_explicitly_set_ipv6_freebsd(
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
 async def test_async_detect_interfaces_explicitly_before_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test interfaces are explicitly set with IPv6 before setup is called."""
     with (
-        patch("homeassistant.components.zeroconf.sys.platform", "linux"),
-        patch("homeassistant.components.zeroconf.HaZeroconf") as mock_zc,
+        patch("smarthub.components.zeroconf.sys.platform", "linux"),
+        patch("smarthub.components.zeroconf.HaZeroconf") as mock_zc,
         patch.object(hass.config_entries.flow, "async_init"),
         patch.object(discovery, "AsyncServiceBrowser", side_effect=service_update_mock),
         patch(
-            "homeassistant.components.zeroconf.network.async_get_loaded_adapters",
+            "smarthub.components.zeroconf.network.async_get_loaded_adapters",
             return_value=_ADAPTER_WITH_DEFAULT_ENABLED_AND_IPV6,
         ),
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_service_info_mock,
         ),
     ):
@@ -1341,21 +1341,21 @@ async def test_async_detect_interfaces_explicitly_before_setup(
     )
 
 
-async def test_no_name(hass: HomeAssistant, mock_async_zeroconf: MagicMock) -> None:
+async def test_no_name(hass: SmartHub, mock_async_zeroconf: MagicMock) -> None:
     """Test fallback to Home for mDNS announcement if the name is missing."""
     hass.config.location_name = ""
-    with patch("homeassistant.components.zeroconf.HaZeroconf"):
+    with patch("smarthub.components.zeroconf.HaZeroconf"):
         assert await async_setup_component(hass, zeroconf.DOMAIN, {zeroconf.DOMAIN: {}})
         hass.bus.async_fire(EVENT_HOMEASSISTANT_START)
         await hass.async_block_till_done()
 
     register_call = mock_async_zeroconf.async_register_service.mock_calls[-1]
     info = register_call.args[0]
-    assert info.name == "Home._home-assistant._tcp.local."
+    assert info.name == "Home._smart-hub._tcp.local."
 
 
 async def test_setup_with_disallowed_characters_in_local_name(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test we still setup with disallowed characters in the location name."""
     with (
@@ -1367,7 +1367,7 @@ async def test_setup_with_disallowed_characters_in_local_name(
             "My.House",
         ),
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo.async_request",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo.async_request",
         ),
     ):
         assert await async_setup_component(hass, zeroconf.DOMAIN, {zeroconf.DOMAIN: {}})
@@ -1375,14 +1375,14 @@ async def test_setup_with_disallowed_characters_in_local_name(
         await hass.async_block_till_done()
 
     calls = mock_async_zeroconf.async_register_service.mock_calls
-    assert calls[0][1][0].name == "My House._home-assistant._tcp.local."
+    assert calls[0][1][0].name == "My House._smart-hub._tcp.local."
 
 
 async def test_start_with_frontend(
-    hass: HomeAssistant, mock_async_zeroconf: MagicMock
+    hass: SmartHub, mock_async_zeroconf: MagicMock
 ) -> None:
     """Test we start with the frontend."""
-    with patch("homeassistant.components.zeroconf.HaZeroconf"):
+    with patch("smarthub.components.zeroconf.HaZeroconf"):
         assert await async_setup_component(hass, zeroconf.DOMAIN, {zeroconf.DOMAIN: {}})
         hass.bus.async_fire(EVENT_COMPONENT_LOADED, {ATTR_COMPONENT: "frontend"})
         await hass.async_block_till_done()
@@ -1391,7 +1391,7 @@ async def test_start_with_frontend(
 
 
 @pytest.mark.usefixtures("mock_async_zeroconf")
-async def test_zeroconf_removed(hass: HomeAssistant) -> None:
+async def test_zeroconf_removed(hass: SmartHub) -> None:
     """Test we dismiss flows when a PTR record is removed."""
 
     def _device_removed_mock(zeroconf, services, handlers):
@@ -1426,7 +1426,7 @@ async def test_zeroconf_removed(hass: HomeAssistant) -> None:
             discovery, "AsyncServiceBrowser", side_effect=_device_removed_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_zeroconf_info_mock("FFAADDCC11DD"),
         ),
     ):
@@ -1505,7 +1505,7 @@ async def test_zeroconf_removed(hass: HomeAssistant) -> None:
     ],
 )
 async def test_zeroconf_rediscover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_domain: str,
     entry_discovery_keys: dict[str, tuple[DiscoveryKey, ...]],
     entry_source: str,
@@ -1549,7 +1549,7 @@ async def test_zeroconf_rediscover(
             discovery, "AsyncServiceBrowser", side_effect=http_only_service_update_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_zeroconf_info_mock("FFAADDCC11DD"),
         ),
     ):
@@ -1621,7 +1621,7 @@ async def test_zeroconf_rediscover(
     ],
 )
 async def test_zeroconf_rediscover_no_match(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_domain: str,
     entry_discovery_keys: dict[str, tuple[DiscoveryKey, ...]],
     entry_source: str,
@@ -1669,7 +1669,7 @@ async def test_zeroconf_rediscover_no_match(
             discovery, "AsyncServiceBrowser", side_effect=http_only_service_update_mock
         ) as mock_service_browser,
         patch(
-            "homeassistant.components.zeroconf.discovery.AsyncServiceInfo",
+            "smarthub.components.zeroconf.discovery.AsyncServiceInfo",
             side_effect=get_zeroconf_info_mock("FFAADDCC11DD"),
         ),
     ):
@@ -1702,12 +1702,12 @@ async def test_zeroconf_rediscover_no_match(
     [
         (
             "ATTR_PROPERTIES_ID",
-            "homeassistant.helpers.service_info.zeroconf.ATTR_PROPERTIES_ID",
+            "smarthub.helpers.service_info.zeroconf.ATTR_PROPERTIES_ID",
             ATTR_PROPERTIES_ID,
         ),
         (
             "ZeroconfServiceInfo",
-            "homeassistant.helpers.service_info.zeroconf.ZeroconfServiceInfo",
+            "smarthub.helpers.service_info.zeroconf.ZeroconfServiceInfo",
             ZeroconfServiceInfo,
         ),
     ],

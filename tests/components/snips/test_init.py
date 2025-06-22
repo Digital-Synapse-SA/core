@@ -6,18 +6,18 @@ import logging
 import pytest
 import voluptuous as vol
 
-from homeassistant.components import snips
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.intent import ServiceIntentHandler, async_register
-from homeassistant.setup import async_setup_component
+from smarthub.components import snips
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.intent import ServiceIntentHandler, async_register
+from smarthub.setup import async_setup_component
 
 from tests.common import async_fire_mqtt_message, async_mock_intent, async_mock_service
 from tests.typing import MqttMockHAClient
 
 
 async def test_snips_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mqtt_mock: MqttMockHAClient,
     issue_registry: ir.IssueRegistry,
 ) -> None:
@@ -40,7 +40,7 @@ async def test_snips_config(
 
 
 async def test_snips_no_mqtt(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test Snips Config."""
     result = await async_setup_component(
@@ -59,7 +59,7 @@ async def test_snips_no_mqtt(
 
 
 async def test_snips_bad_config(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test Snips bad config."""
     result = await async_setup_component(
@@ -77,7 +77,7 @@ async def test_snips_bad_config(
 
 
 async def test_snips_config_feedback_on(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test Snips Config."""
     result = await async_setup_component(
@@ -96,7 +96,7 @@ async def test_snips_config_feedback_on(
 
 
 async def test_snips_config_feedback_off(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test Snips Config."""
     result = await async_setup_component(
@@ -115,7 +115,7 @@ async def test_snips_config_feedback_off(
 
 
 async def test_snips_config_no_feedback(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test Snips Config."""
     calls = async_mock_service(hass, "snips", "say")
@@ -125,7 +125,7 @@ async def test_snips_config_no_feedback(
     assert len(calls) == 0
 
 
-async def test_snips_intent(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) -> None:
+async def test_snips_intent(hass: SmartHub, mqtt_mock: MqttMockHAClient) -> None:
     """Test intent via Snips."""
     result = await async_setup_component(hass, "snips", {"snips": {}})
     assert result
@@ -171,7 +171,7 @@ async def test_snips_intent(hass: HomeAssistant, mqtt_mock: MqttMockHAClient) ->
 
 
 async def test_snips_service_intent(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test ServiceIntentHandler via Snips."""
     hass.states.async_set("light.kitchen", "off")
@@ -215,7 +215,7 @@ async def test_snips_service_intent(
 
 
 async def test_snips_intent_with_duration(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test intent with Snips duration."""
     result = await async_setup_component(hass, "snips", {"snips": {}})
@@ -270,7 +270,7 @@ async def test_snips_intent_with_duration(
 
 
 async def test_intent_speech_response(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test intent speech response via Snips."""
     result = await async_setup_component(hass, "snips", {"snips": {}})
@@ -310,7 +310,7 @@ async def test_intent_speech_response(
 
 
 async def test_unknown_intent(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test unknown intent."""
     caplog.set_level(logging.WARNING)
@@ -333,7 +333,7 @@ async def test_unknown_intent(
 
 
 async def test_snips_intent_user(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test intentName format user_XXX__intentName."""
     result = await async_setup_component(hass, "snips", {"snips": {}})
@@ -359,7 +359,7 @@ async def test_snips_intent_user(
 
 
 async def test_snips_intent_username(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test intentName format username:intentName."""
     result = await async_setup_component(hass, "snips", {"snips": {}})
@@ -385,7 +385,7 @@ async def test_snips_intent_username(
 
 
 async def test_snips_low_probability(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test intent via Snips."""
     caplog.set_level(logging.WARNING)
@@ -411,7 +411,7 @@ async def test_snips_low_probability(
 
 
 async def test_intent_special_slots(
-    hass: HomeAssistant, mqtt_mock: MqttMockHAClient
+    hass: SmartHub, mqtt_mock: MqttMockHAClient
 ) -> None:
     """Test intent special slot values via Snips."""
     calls = async_mock_service(hass, "light", "turn_on")
@@ -456,7 +456,7 @@ async def test_intent_special_slots(
     assert calls[0].data["site_id"] == "default"
 
 
-async def test_snips_say(hass: HomeAssistant) -> None:
+async def test_snips_say(hass: SmartHub) -> None:
     """Test snips say with invalid config."""
     calls = async_mock_service(hass, "snips", "say", snips.SERVICE_SCHEMA_SAY)
     data = {"text": "Hello"}
@@ -469,7 +469,7 @@ async def test_snips_say(hass: HomeAssistant) -> None:
     assert calls[0].data["text"] == "Hello"
 
 
-async def test_snips_say_action(hass: HomeAssistant) -> None:
+async def test_snips_say_action(hass: SmartHub) -> None:
     """Test snips say_action with invalid config."""
     calls = async_mock_service(
         hass, "snips", "say_action", snips.SERVICE_SCHEMA_SAY_ACTION
@@ -486,7 +486,7 @@ async def test_snips_say_action(hass: HomeAssistant) -> None:
     assert calls[0].data["intent_filter"] == ["myIntent"]
 
 
-async def test_snips_say_invalid_config(hass: HomeAssistant) -> None:
+async def test_snips_say_invalid_config(hass: SmartHub) -> None:
     """Test snips say with invalid config."""
     calls = async_mock_service(hass, "snips", "say", snips.SERVICE_SCHEMA_SAY)
 
@@ -498,7 +498,7 @@ async def test_snips_say_invalid_config(hass: HomeAssistant) -> None:
     assert len(calls) == 0
 
 
-async def test_snips_say_action_invalid(hass: HomeAssistant) -> None:
+async def test_snips_say_action_invalid(hass: SmartHub) -> None:
     """Test snips say_action with invalid config."""
     calls = async_mock_service(
         hass, "snips", "say_action", snips.SERVICE_SCHEMA_SAY_ACTION
@@ -513,7 +513,7 @@ async def test_snips_say_action_invalid(hass: HomeAssistant) -> None:
     assert len(calls) == 0
 
 
-async def test_snips_feedback_on(hass: HomeAssistant) -> None:
+async def test_snips_feedback_on(hass: SmartHub) -> None:
     """Test snips say with invalid config."""
     calls = async_mock_service(
         hass, "snips", "feedback_on", snips.SERVICE_SCHEMA_FEEDBACK
@@ -529,7 +529,7 @@ async def test_snips_feedback_on(hass: HomeAssistant) -> None:
     assert calls[0].data["site_id"] == "remote"
 
 
-async def test_snips_feedback_off(hass: HomeAssistant) -> None:
+async def test_snips_feedback_off(hass: SmartHub) -> None:
     """Test snips say with invalid config."""
     calls = async_mock_service(
         hass, "snips", "feedback_off", snips.SERVICE_SCHEMA_FEEDBACK
@@ -545,7 +545,7 @@ async def test_snips_feedback_off(hass: HomeAssistant) -> None:
     assert calls[0].data["site_id"] == "remote"
 
 
-async def test_snips_feedback_config(hass: HomeAssistant) -> None:
+async def test_snips_feedback_config(hass: SmartHub) -> None:
     """Test snips say with invalid config."""
     calls = async_mock_service(
         hass, "snips", "feedback_on", snips.SERVICE_SCHEMA_FEEDBACK

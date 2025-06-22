@@ -6,7 +6,7 @@ from typing import Any
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.knx.const import (
+from smarthub.components.knx.const import (
     CONF_CONTEXT_TIMEOUT,
     CONF_IGNORE_INTERNAL_STATE,
     CONF_INVERT,
@@ -14,8 +14,8 @@ from homeassistant.components.knx.const import (
     CONF_STATE_ADDRESS,
     CONF_SYNC_STATE,
 )
-from homeassistant.components.knx.schema import BinarySensorSchema
-from homeassistant.const import (
+from smarthub.components.knx.schema import BinarySensorSchema
+from smarthub.const import (
     CONF_ENTITY_CATEGORY,
     CONF_NAME,
     STATE_OFF,
@@ -23,8 +23,8 @@ from homeassistant.const import (
     EntityCategory,
     Platform,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er
 
 from . import KnxEntityGenerator
 from .conftest import KNXTestKit
@@ -37,7 +37,7 @@ from tests.common import (
 
 
 async def test_binary_sensor_entity_category(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, knx: KNXTestKit
+    hass: SmartHub, entity_registry: er.EntityRegistry, knx: KNXTestKit
 ) -> None:
     """Test KNX binary sensor entity category."""
     await knx.setup_integration(
@@ -59,7 +59,7 @@ async def test_binary_sensor_entity_category(
     assert entity.entity_category is EntityCategory.DIAGNOSTIC
 
 
-async def test_binary_sensor(hass: HomeAssistant, knx: KNXTestKit) -> None:
+async def test_binary_sensor(hass: SmartHub, knx: KNXTestKit) -> None:
     """Test KNX binary sensor and inverted binary_sensor."""
     await knx.setup_integration(
         {
@@ -110,7 +110,7 @@ async def test_binary_sensor(hass: HomeAssistant, knx: KNXTestKit) -> None:
 
 
 async def test_binary_sensor_ignore_internal_state(
-    hass: HomeAssistant, knx: KNXTestKit
+    hass: SmartHub, knx: KNXTestKit
 ) -> None:
     """Test KNX binary_sensor with ignore_internal_state."""
     await knx.setup_integration(
@@ -154,7 +154,7 @@ async def test_binary_sensor_ignore_internal_state(
 
 
 async def test_binary_sensor_counter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -220,7 +220,7 @@ async def test_binary_sensor_counter(
 
 
 async def test_binary_sensor_reset(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -250,7 +250,7 @@ async def test_binary_sensor_reset(
     assert state.state is STATE_OFF
 
 
-async def test_binary_sensor_restore_and_respond(hass: HomeAssistant, knx) -> None:
+async def test_binary_sensor_restore_and_respond(hass: SmartHub, knx) -> None:
     """Test restoring KNX binary sensor state and respond to read."""
     _ADDRESS = "2/2/2"
     fake_state = State("binary_sensor.test", STATE_ON)
@@ -278,7 +278,7 @@ async def test_binary_sensor_restore_and_respond(hass: HomeAssistant, knx) -> No
     assert state.state is STATE_OFF
 
 
-async def test_binary_sensor_restore_invert(hass: HomeAssistant, knx) -> None:
+async def test_binary_sensor_restore_invert(hass: SmartHub, knx) -> None:
     """Test restoring KNX binary sensor state with invert."""
     _ADDRESS = "2/2/2"
     fake_state = State("binary_sensor.test", STATE_ON)
@@ -323,7 +323,7 @@ async def test_binary_sensor_restore_invert(hass: HomeAssistant, knx) -> None:
     ],
 )
 async def test_binary_sensor_ui_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     knx: KNXTestKit,
     create_ui_entity: KnxEntityGenerator,
     knx_data: dict[str, Any],

@@ -6,7 +6,7 @@ from pyhap.characteristic import Characteristic
 from pyhap.const import HAP_REPR_AID, HAP_REPR_CHARS, HAP_REPR_IID, HAP_REPR_VALUE
 import pytest
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_HUMIDITY,
     ATTR_CURRENT_TEMPERATURE,
     ATTR_FAN_MODE,
@@ -43,7 +43,7 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.homekit.const import (
+from smarthub.components.homekit.const import (
     ATTR_VALUE,
     CHAR_CURRENT_FAN_STATE,
     CHAR_ROTATION_SPEED,
@@ -55,7 +55,7 @@ from homeassistant.components.homekit.const import (
     PROP_MIN_STEP,
     PROP_MIN_VALUE,
 )
-from homeassistant.components.homekit.type_thermostats import (
+from smarthub.components.homekit.type_thermostats import (
     FAN_STATE_ACTIVE,
     FAN_STATE_IDLE,
     FAN_STATE_INACTIVE,
@@ -66,8 +66,8 @@ from homeassistant.components.homekit.type_thermostats import (
     Thermostat,
     WaterHeater,
 )
-from homeassistant.components.water_heater import DOMAIN as DOMAIN_WATER_HEATER
-from homeassistant.const import (
+from smarthub.components.water_heater import DOMAIN as DOMAIN_WATER_HEATER
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
     ATTR_SUPPORTED_FEATURES,
@@ -77,14 +77,14 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     UnitOfTemperature,
 )
-from homeassistant.core import CoreState, Event, HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.core import CoreState, Event, SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from tests.common import async_mock_service
 
 
-async def test_thermostat(hass: HomeAssistant, hk_driver, events: list[Event]) -> None:
+async def test_thermostat(hass: SmartHub, hk_driver, events: list[Event]) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "climate.test"
     base_attrs = {
@@ -414,7 +414,7 @@ async def test_thermostat(hass: HomeAssistant, hk_driver, events: list[Event]) -
 
 
 async def test_thermostat_auto(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "climate.test"
@@ -549,7 +549,7 @@ async def test_thermostat_auto(
 
 
 async def test_thermostat_mode_and_temp_change(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory where the mode and temp change in the same call."""
     entity_id = "climate.test"
@@ -657,7 +657,7 @@ async def test_thermostat_mode_and_temp_change(
 
 
 async def test_thermostat_humidity(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly with humidity."""
     entity_id = "climate.test"
@@ -722,7 +722,7 @@ async def test_thermostat_humidity(
 
 
 async def test_thermostat_humidity_with_target_humidity(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test if accessory and HA are updated accordingly with humidity without target hudmidity.
 
@@ -747,7 +747,7 @@ async def test_thermostat_humidity_with_target_humidity(
 
 
 async def test_thermostat_power_state(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "climate.test"
@@ -857,7 +857,7 @@ async def test_thermostat_power_state(
 
 
 async def test_thermostat_fahrenheit(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "climate.test"
@@ -969,7 +969,7 @@ async def test_thermostat_fahrenheit(
     assert events[-1].data[ATTR_VALUE] == "TargetTemperature to 24.0°C"
 
 
-async def test_thermostat_get_temperature_range(hass: HomeAssistant, hk_driver) -> None:
+async def test_thermostat_get_temperature_range(hass: SmartHub, hk_driver) -> None:
     """Test if temperature range is evaluated correctly."""
     entity_id = "climate.test"
 
@@ -996,7 +996,7 @@ async def test_thermostat_get_temperature_range(hass: HomeAssistant, hk_driver) 
 
 
 async def test_thermostat_temperature_step_whole(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test climate device with single digit precision."""
     entity_id = "climate.test"
@@ -1013,7 +1013,7 @@ async def test_thermostat_temperature_step_whole(
 
 
 async def test_thermostat_restore(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, hk_driver
+    hass: SmartHub, entity_registry: er.EntityRegistry, hk_driver
 ) -> None:
     """Test setting up an entity from state in the event registry."""
     hass.set_state(CoreState.not_running)
@@ -1066,7 +1066,7 @@ async def test_thermostat_restore(
     }
 
 
-async def test_thermostat_hvac_modes(hass: HomeAssistant, hk_driver) -> None:
+async def test_thermostat_hvac_modes(hass: SmartHub, hk_driver) -> None:
     """Test if unsupported HVAC modes are deactivated in HomeKit."""
     entity_id = "climate.test"
 
@@ -1100,7 +1100,7 @@ async def test_thermostat_hvac_modes(hass: HomeAssistant, hk_driver) -> None:
 
 
 async def test_thermostat_hvac_modes_with_auto_heat_cool(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test we get heat cool over auto."""
     entity_id = "climate.test"
@@ -1165,7 +1165,7 @@ async def test_thermostat_hvac_modes_with_auto_heat_cool(
 
 
 async def test_thermostat_hvac_modes_with_auto_no_heat_cool(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test we get auto when there is no heat cool."""
     entity_id = "climate.test"
@@ -1224,7 +1224,7 @@ async def test_thermostat_hvac_modes_with_auto_no_heat_cool(
 
 
 async def test_thermostat_hvac_modes_with_auto_only(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test if unsupported HVAC modes are deactivated in HomeKit."""
     entity_id = "climate.test"
@@ -1280,7 +1280,7 @@ async def test_thermostat_hvac_modes_with_auto_only(
 
 
 async def test_thermostat_hvac_modes_with_heat_only(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test if unsupported HVAC modes are deactivated in HomeKit and siri calls get converted to heat."""
     entity_id = "climate.test"
@@ -1360,7 +1360,7 @@ async def test_thermostat_hvac_modes_with_heat_only(
 
 
 async def test_thermostat_hvac_modes_with_cool_only(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test if unsupported HVAC modes are deactivated in HomeKit and siri calls get converted to cool."""
     entity_id = "climate.test"
@@ -1415,7 +1415,7 @@ async def test_thermostat_hvac_modes_with_cool_only(
 
 
 async def test_thermostat_hvac_modes_with_heat_cool_only(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test if unsupported HVAC modes are deactivated in HomeKit and siri calls get converted to heat or cool."""
     entity_id = "climate.test"
@@ -1505,7 +1505,7 @@ async def test_thermostat_hvac_modes_with_heat_cool_only(
 
 
 async def test_thermostat_hvac_modes_without_off(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test a thermostat that has no off."""
     entity_id = "climate.test"
@@ -1544,7 +1544,7 @@ async def test_thermostat_hvac_modes_without_off(
 
 
 async def test_thermostat_without_target_temp_only_range(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test a thermostat that only supports a range."""
     entity_id = "climate.test"
@@ -1707,7 +1707,7 @@ async def test_thermostat_without_target_temp_only_range(
 
 
 async def test_water_heater(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are updated accordingly."""
     entity_id = "water_heater.test"
@@ -1783,7 +1783,7 @@ async def test_water_heater(
 
 
 async def test_water_heater_fahrenheit(
-    hass: HomeAssistant, hk_driver, events: list[Event]
+    hass: SmartHub, hk_driver, events: list[Event]
 ) -> None:
     """Test if accessory and HA are update accordingly."""
     entity_id = "water_heater.test"
@@ -1817,7 +1817,7 @@ async def test_water_heater_fahrenheit(
 
 
 async def test_water_heater_get_temperature_range(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test if temperature range is evaluated correctly."""
     entity_id = "water_heater.test"
@@ -1845,7 +1845,7 @@ async def test_water_heater_get_temperature_range(
 
 
 async def test_water_heater_restore(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, hk_driver
+    hass: SmartHub, entity_registry: er.EntityRegistry, hk_driver
 ) -> None:
     """Test setting up an entity from state in the event registry."""
     hass.set_state(CoreState.not_running)
@@ -1895,7 +1895,7 @@ async def test_water_heater_restore(
 
 
 async def test_thermostat_with_no_modes_when_we_first_see(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test if a thermostat that is not ready when we first see it."""
     entity_id = "climate.test"
@@ -1949,7 +1949,7 @@ async def test_thermostat_with_no_modes_when_we_first_see(
 
 
 async def test_thermostat_with_no_off_after_recheck(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test if a thermostat that is not ready when we first see it that actually does not have off."""
     entity_id = "climate.test"
@@ -2002,7 +2002,7 @@ async def test_thermostat_with_no_off_after_recheck(
         assert mock_reload.called
 
 
-async def test_thermostat_with_temp_clamps(hass: HomeAssistant, hk_driver) -> None:
+async def test_thermostat_with_temp_clamps(hass: SmartHub, hk_driver) -> None:
     """Test that temperatures are clamped to valid values to prevent homekit crash."""
     entity_id = "climate.test"
     base_attrs = {
@@ -2057,7 +2057,7 @@ async def test_thermostat_with_temp_clamps(hass: HomeAssistant, hk_driver) -> No
 
 
 async def test_thermostat_with_fan_modes_with_auto(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test a thermostate with fan modes with an auto fan mode."""
     entity_id = "climate.test"
@@ -2263,7 +2263,7 @@ async def test_thermostat_with_fan_modes_with_auto(
 
 
 async def test_thermostat_with_fan_modes_with_off(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test a thermostate with fan modes that can turn off."""
     entity_id = "climate.test"
@@ -2372,7 +2372,7 @@ async def test_thermostat_with_fan_modes_with_off(
 
 
 async def test_thermostat_with_fan_modes_set_to_none(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test a thermostate with fan modes set to None."""
     entity_id = "climate.test"
@@ -2416,7 +2416,7 @@ async def test_thermostat_with_fan_modes_set_to_none(
 
 
 async def test_thermostat_with_fan_modes_set_to_none_not_supported(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test a thermostate with fan modes set to None and supported feature missing."""
     entity_id = "climate.test"
@@ -2459,7 +2459,7 @@ async def test_thermostat_with_fan_modes_set_to_none_not_supported(
 
 
 async def test_thermostat_with_supported_features_target_temp_but_fan_mode_set(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test a thermostate with fan mode and supported feature missing."""
     entity_id = "climate.test"
@@ -2497,7 +2497,7 @@ async def test_thermostat_with_supported_features_target_temp_but_fan_mode_set(
 
 
 async def test_thermostat_fan_state_with_preheating_and_defrosting(
-    hass: HomeAssistant, hk_driver
+    hass: SmartHub, hk_driver
 ) -> None:
     """Test thermostat fan state mappings for preheating and defrosting actions."""
     entity_id = "climate.test"
@@ -2588,7 +2588,7 @@ async def test_thermostat_fan_state_with_preheating_and_defrosting(
     assert acc.char_current_fan_state.value == FAN_STATE_INACTIVE
 
 
-async def test_thermostat_handles_unknown_state(hass: HomeAssistant, hk_driver) -> None:
+async def test_thermostat_handles_unknown_state(hass: SmartHub, hk_driver) -> None:
     """Test a thermostat can handle unknown state."""
     entity_id = "climate.test"
     attrs = {
@@ -2727,7 +2727,7 @@ async def test_thermostat_handles_unknown_state(hass: HomeAssistant, hk_driver) 
     assert call_set_hvac_mode[1].data[ATTR_HVAC_MODE] == HVACMode.HEAT
 
 
-async def test_thermostat_reversed_min_max(hass: HomeAssistant, hk_driver) -> None:
+async def test_thermostat_reversed_min_max(hass: SmartHub, hk_driver) -> None:
     """Test reversed min/max temperatures."""
     entity_id = "climate.test"
     base_attrs = {

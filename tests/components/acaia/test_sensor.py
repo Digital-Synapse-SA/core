@@ -4,9 +4,9 @@ from unittest.mock import MagicMock, patch
 
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.const import PERCENTAGE, Platform
-from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import PERCENTAGE, Platform
+from smarthub.core import SmartHub, State
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -18,21 +18,21 @@ from tests.common import (
 
 
 async def test_sensors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_scale: MagicMock,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the Acaia sensors."""
-    with patch("homeassistant.components.acaia.PLATFORMS", [Platform.SENSOR]):
+    with patch("smarthub.components.acaia.PLATFORMS", [Platform.SENSOR]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)
 
 
 async def test_restore_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_scale: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

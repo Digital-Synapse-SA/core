@@ -10,11 +10,11 @@ from nextcloudmonitor import (
 )
 import pytest
 
-from homeassistant.components.nextcloud.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_URL, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.nextcloud.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_URL, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import init_integration, mock_config_entry
 from .const import MOCKED_ENTRY_ID, NC_DATA, VALID_CONFIG
@@ -22,14 +22,14 @@ from .const import MOCKED_ENTRY_ID, NC_DATA, VALID_CONFIG
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_async_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a successful setup entry."""
     assert await init_integration(hass, VALID_CONFIG, NC_DATA)
 
 
 async def test_unique_id_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test migration of unique ids to stable ones."""
@@ -54,7 +54,7 @@ async def test_unique_id_migration(
 
     with (
         patch(
-            "homeassistant.components.nextcloud.NextcloudMonitor"
+            "smarthub.components.nextcloud.NextcloudMonitor"
         ) as mock_nextcloud_monitor,
     ):
         mock_nextcloud_monitor.update = Mock(return_value=True)
@@ -76,7 +76,7 @@ async def test_unique_id_migration(
     ],
 )
 async def test_setup_entry_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exception: NextcloudMonitorError,
     expcted_entry_state: ConfigEntryState,
 ) -> None:
@@ -87,7 +87,7 @@ async def test_setup_entry_errors(
 
     with (
         patch(
-            "homeassistant.components.nextcloud.NextcloudMonitor", side_effect=exception
+            "smarthub.components.nextcloud.NextcloudMonitor", side_effect=exception
         ),
     ):
         await hass.config_entries.async_setup(entry.entry_id)

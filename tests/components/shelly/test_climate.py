@@ -13,7 +13,7 @@ from aioshelly.exceptions import DeviceConnectionError, InvalidAuthError, RpcCal
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_CURRENT_HUMIDITY,
     ATTR_CURRENT_TEMPERATURE,
     ATTR_HVAC_ACTION,
@@ -27,21 +27,21 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.components.shelly.const import DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
-from homeassistant.const import (
+from smarthub.components.shelly.const import DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.config_entries import SOURCE_REAUTH, ConfigEntryState
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+from smarthub.core import SmartHub, State
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import issue_registry as ir
+from smarthub.helpers.device_registry import DeviceRegistry
+from smarthub.helpers.entity_registry import EntityRegistry
+from smarthub.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from . import MOCK_MAC, init_integration, register_device, register_entity
 from .conftest import MOCK_STATUS_COAP
@@ -56,7 +56,7 @@ ENTITY_ID = f"{CLIMATE_DOMAIN}.test_name"
 
 
 async def test_climate_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     entity_registry: EntityRegistry,
@@ -125,7 +125,7 @@ async def test_climate_hvac_mode(
 
 
 async def test_climate_set_temperature(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test climate set temperature service."""
     monkeypatch.delattr(mock_block_device.blocks[DEVICE_BLOCK_ID], "targetTemp")
@@ -178,7 +178,7 @@ async def test_climate_set_temperature(
 
 
 async def test_climate_set_preset_mode(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test climate set preset mode service."""
     monkeypatch.delattr(mock_block_device.blocks[DEVICE_BLOCK_ID], "targetTemp")
@@ -233,7 +233,7 @@ async def test_climate_set_preset_mode(
 
 
 async def test_block_restored_climate(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -304,7 +304,7 @@ async def test_block_restored_climate(
 
 
 async def test_block_restored_climate_us_customary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -381,7 +381,7 @@ async def test_block_restored_climate_us_customary(
 
 
 async def test_block_restored_climate_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -410,7 +410,7 @@ async def test_block_restored_climate_unavailable(
 
 
 async def test_block_restored_climate_set_preset_before_online(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -449,7 +449,7 @@ async def test_block_restored_climate_set_preset_before_online(
 
 
 async def test_block_set_mode_connection_error(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device set mode connection error."""
     monkeypatch.setattr(mock_block_device.blocks[DEVICE_BLOCK_ID], "valveError", 0)
@@ -465,7 +465,7 @@ async def test_block_set_mode_connection_error(
     await hass.async_block_till_done(wait_background_tasks=True)
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Device communication error occurred while calling action for climate.test_name of Test name",
     ):
         await hass.services.async_call(
@@ -477,7 +477,7 @@ async def test_block_set_mode_connection_error(
 
 
 async def test_block_set_mode_auth_error(
-    hass: HomeAssistant, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_block_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test block device set mode authentication error."""
     monkeypatch.setattr(mock_block_device.blocks[DEVICE_BLOCK_ID], "valveError", 0)
@@ -516,7 +516,7 @@ async def test_block_set_mode_auth_error(
 
 
 async def test_block_restored_climate_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     device_registry: DeviceRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -565,7 +565,7 @@ async def test_block_restored_climate_auth_error(
 
 
 async def test_device_not_calibrated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_block_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
     issue_registry: ir.IssueRegistry,
@@ -606,7 +606,7 @@ async def test_device_not_calibrated(
 
 
 async def test_rpc_climate_hvac_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -645,7 +645,7 @@ async def test_rpc_climate_hvac_mode(
 
 
 async def test_rpc_climate_without_humidity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: EntityRegistry,
     mock_rpc_device: Mock,
     monkeypatch: pytest.MonkeyPatch,
@@ -670,7 +670,7 @@ async def test_rpc_climate_without_humidity(
 
 
 async def test_rpc_climate_set_temperature(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test climate set target temperature."""
     entity_id = "climate.test_name"
@@ -697,7 +697,7 @@ async def test_rpc_climate_set_temperature(
 
 
 async def test_rpc_climate_hvac_mode_cool(
-    hass: HomeAssistant, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
+    hass: SmartHub, mock_rpc_device: Mock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test climate with hvac mode cooling."""
     entity_id = "climate.test_name"
@@ -713,7 +713,7 @@ async def test_rpc_climate_hvac_mode_cool(
 
 
 async def test_wall_display_thermostat_mode(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -739,7 +739,7 @@ async def test_wall_display_thermostat_mode(
 
 
 async def test_wall_display_thermostat_mode_external_actuator(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_rpc_device: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -770,7 +770,7 @@ async def test_wall_display_thermostat_mode_external_actuator(
 
 
 async def test_blu_trv_climate_set_temperature(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     entity_registry: EntityRegistry,
     monkeypatch: pytest.MonkeyPatch,
@@ -805,7 +805,7 @@ async def test_blu_trv_climate_set_temperature(
 
 
 async def test_blu_trv_climate_disabled(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -829,7 +829,7 @@ async def test_blu_trv_climate_disabled(
 
 
 async def test_blu_trv_climate_hvac_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -864,7 +864,7 @@ async def test_blu_trv_climate_hvac_action(
     ],
 )
 async def test_blu_trv_set_target_temp_exc(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
     exception: Exception,
     error: str,
@@ -874,7 +874,7 @@ async def test_blu_trv_set_target_temp_exc(
 
     mock_blu_trv.blu_trv_set_target_temperature.side_effect = exception
 
-    with pytest.raises(HomeAssistantError, match=error):
+    with pytest.raises(SmartHubError, match=error):
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             SERVICE_SET_TEMPERATURE,
@@ -884,7 +884,7 @@ async def test_blu_trv_set_target_temp_exc(
 
 
 async def test_blu_trv_set_target_temp_auth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_blu_trv: Mock,
 ) -> None:
     """BLU TRV target temperature setting test with authentication error."""

@@ -8,13 +8,13 @@ from unittest.mock import AsyncMock, patch
 from aioaquacell import AquacellApiException, AuthenticationFailed
 import pytest
 
-from homeassistant.components.aquacell.const import (
+from smarthub.components.aquacell.const import (
     CONF_REFRESH_TOKEN,
     CONF_REFRESH_TOKEN_CREATION_TIME,
     DOMAIN,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -22,7 +22,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aquacell_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -39,7 +39,7 @@ async def test_load_unload_entry(
 
 
 async def test_load_withoutbrand(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aquacell_api: AsyncMock,
     mock_config_entry_without_brand: MockConfigEntry,
 ) -> None:
@@ -50,7 +50,7 @@ async def test_load_withoutbrand(
 
 
 async def test_coordinator_update_valid_refresh_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aquacell_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -66,7 +66,7 @@ async def test_coordinator_update_valid_refresh_token(
 
 
 async def test_coordinator_update_expired_refresh_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aquacell_api: AsyncMock,
     mock_config_entry_expired: MockConfigEntry,
 ) -> None:
@@ -75,7 +75,7 @@ async def test_coordinator_update_expired_refresh_token(
 
     now = datetime.now()
     with patch(
-        "homeassistant.components.aquacell.coordinator.datetime"
+        "smarthub.components.aquacell.coordinator.datetime"
     ) as datetime_mock:
         datetime_mock.now.return_value = now
         await setup_integration(hass, mock_config_entry_expired)
@@ -100,7 +100,7 @@ async def test_coordinator_update_expired_refresh_token(
     ],
 )
 async def test_load_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aquacell_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,

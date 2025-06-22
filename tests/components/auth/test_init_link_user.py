@@ -4,7 +4,7 @@ from http import HTTPStatus
 from typing import Any
 from unittest.mock import patch
 
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 from . import async_setup_auth
 
@@ -13,7 +13,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def async_get_code(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> dict[str, Any]:
     """Return authorization code for link user tests."""
     config = [
@@ -72,7 +72,7 @@ async def async_get_code(
 
 
 async def test_link_user(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test linking a user to new credentials."""
     info = await async_get_code(hass, aiohttp_client)
@@ -91,7 +91,7 @@ async def test_link_user(
 
 
 async def test_link_user_invalid_client_id(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test linking a user to new credentials."""
     info = await async_get_code(hass, aiohttp_client)
@@ -110,7 +110,7 @@ async def test_link_user_invalid_client_id(
 
 
 async def test_link_user_invalid_code(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test linking a user to new credentials."""
     info = await async_get_code(hass, aiohttp_client)
@@ -128,7 +128,7 @@ async def test_link_user_invalid_code(
 
 
 async def test_link_user_invalid_auth(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test linking a user to new credentials."""
     info = await async_get_code(hass, aiohttp_client)
@@ -147,7 +147,7 @@ async def test_link_user_invalid_auth(
 
 
 async def test_link_user_already_linked_same_user(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test linking a user to a credential it's already linked to."""
     info = await async_get_code(hass, aiohttp_client)
@@ -170,7 +170,7 @@ async def test_link_user_already_linked_same_user(
 
 
 async def test_link_user_already_linked_other_user(
-    hass: HomeAssistant, aiohttp_client: ClientSessionGenerator
+    hass: SmartHub, aiohttp_client: ClientSessionGenerator
 ) -> None:
     """Test linking a user to a credential already linked to other user."""
     info = await async_get_code(hass, aiohttp_client)

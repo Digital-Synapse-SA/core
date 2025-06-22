@@ -6,14 +6,14 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.demo import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.json import JSONEncoder
-from homeassistant.setup import async_setup_component
+from smarthub.components.demo import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers.json import JSONEncoder
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture
-def mock_history(hass: HomeAssistant) -> None:
+def mock_history(hass: SmartHub) -> None:
     """Mock history component loaded."""
     hass.config.components.add("history")
 
@@ -21,11 +21,11 @@ def mock_history(hass: HomeAssistant) -> None:
 @pytest.fixture(autouse=True)
 def mock_device_tracker_update_config() -> Generator[None]:
     """Prevent device tracker from creating known devices file."""
-    with patch("homeassistant.components.device_tracker.legacy.update_config"):
+    with patch("smarthub.components.device_tracker.legacy.update_config"):
         yield
 
 
-async def test_setting_up_demo(mock_history: None, hass: HomeAssistant) -> None:
+async def test_setting_up_demo(mock_history: None, hass: SmartHub) -> None:
     """Test if we can set up the demo and dump it to JSON."""
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: {}})
     await hass.async_block_till_done()

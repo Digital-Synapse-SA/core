@@ -8,17 +8,17 @@ from python_overseerr import OverseerrAuthenticationError, OverseerrConnectionEr
 from python_overseerr.models import WebhookNotificationOptions
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components import cloud
-from homeassistant.components.cloud import CloudNotAvailable
-from homeassistant.components.overseerr import (
+from smarthub.components import cloud
+from smarthub.components.cloud import CloudNotAvailable
+from smarthub.components.overseerr import (
     CONF_CLOUDHOOK_URL,
     JSON_PAYLOAD,
     REGISTERED_NOTIFICATIONS,
 )
-from homeassistant.components.overseerr.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from smarthub.components.overseerr.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
 
 from . import setup_integration
 
@@ -34,7 +34,7 @@ from tests.components.cloud import mock_cloud
     ],
 )
 async def test_initialization_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
@@ -49,7 +49,7 @@ async def test_initialization_errors(
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_overseerr_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
@@ -65,7 +65,7 @@ async def test_device_info(
 
 
 async def test_proper_webhook_configuration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_overseerr_client: AsyncMock,
 ) -> None:
@@ -105,7 +105,7 @@ async def test_proper_webhook_configuration(
     ],
 )
 async def test_webhook_configuration_need_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_overseerr_client: AsyncMock,
     update_mock: dict[str, Any],
@@ -146,7 +146,7 @@ async def test_webhook_configuration_need_update(
     ],
 )
 async def test_webhook_failing_test(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_overseerr_client: AsyncMock,
     update_mock: dict[str, Any],
@@ -162,7 +162,7 @@ async def test_webhook_failing_test(
 
 
 async def test_prefer_internal_ip(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_overseerr_client: AsyncMock,
 ) -> None:
@@ -184,7 +184,7 @@ async def test_prefer_internal_ip(
 
 
 async def test_cloudhook_setup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_overseerr_client_needs_change: AsyncMock,
 ) -> None:
@@ -199,15 +199,15 @@ async def test_cloudhook_setup(
     ]
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=True),
         patch.object(cloud, "async_active_subscription", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ) as fake_create_cloudhook,
         patch(
-            "homeassistant.components.cloud.async_delete_cloudhook"
+            "smarthub.components.cloud.async_delete_cloudhook"
         ) as fake_delete_cloudhook,
     ):
         await setup_integration(hass, mock_config_entry)
@@ -237,7 +237,7 @@ async def test_cloudhook_setup(
 
 
 async def test_cloudhook_consistent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloudhook_config_entry: MockConfigEntry,
     mock_overseerr_client_needs_change: AsyncMock,
 ) -> None:
@@ -252,11 +252,11 @@ async def test_cloudhook_consistent(
     ]
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=True),
         patch.object(cloud, "async_active_subscription", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ) as fake_create_cloudhook,
     ):
@@ -281,7 +281,7 @@ async def test_cloudhook_consistent(
 
 
 async def test_cloudhook_needs_no_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloudhook_config_entry: MockConfigEntry,
     mock_overseerr_client_cloudhook: AsyncMock,
 ) -> None:
@@ -296,7 +296,7 @@ async def test_cloudhook_needs_no_change(
 
 
 async def test_cloudhook_not_needed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_overseerr_client_needs_change: AsyncMock,
 ) -> None:
@@ -328,7 +328,7 @@ async def test_cloudhook_not_needed(
 
 
 async def test_cloudhook_not_connecting(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloudhook_config_entry: MockConfigEntry,
     mock_overseerr_client_needs_change: AsyncMock,
 ) -> None:
@@ -342,11 +342,11 @@ async def test_cloudhook_not_connecting(
     )
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=True),
         patch.object(cloud, "async_active_subscription", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ) as fake_create_cloudhook,
     ):
@@ -373,7 +373,7 @@ async def test_cloudhook_not_connecting(
 
 
 async def test_removing_entry_with_cloud_unavailable(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_cloudhook_config_entry: MockConfigEntry,
     mock_overseerr_client: AsyncMock,
 ) -> None:
@@ -383,18 +383,18 @@ async def test_removing_entry_with_cloud_unavailable(
     await hass.async_block_till_done()
 
     with (
-        patch("homeassistant.components.cloud.async_is_logged_in", return_value=True),
-        patch("homeassistant.components.cloud.async_is_connected", return_value=True),
+        patch("smarthub.components.cloud.async_is_logged_in", return_value=True),
+        patch("smarthub.components.cloud.async_is_connected", return_value=True),
         patch.object(cloud, "async_active_subscription", return_value=True),
         patch(
-            "homeassistant.components.cloud.async_create_cloudhook",
+            "smarthub.components.cloud.async_create_cloudhook",
             return_value="https://hooks.nabu.casa/ABCD",
         ),
         patch(
-            "homeassistant.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
+            "smarthub.helpers.config_entry_oauth2_flow.async_get_config_entry_implementation",
         ),
         patch(
-            "homeassistant.components.cloud.async_delete_cloudhook",
+            "smarthub.components.cloud.async_delete_cloudhook",
             side_effect=CloudNotAvailable(),
         ),
     ):

@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 from awesomeversion import AwesomeVersion, AwesomeVersionStrategy
 import pytest
 
-from homeassistant.components.update import (
+from smarthub.components.update import (
     ATTR_BACKUP,
     ATTR_VERSION,
     DOMAIN,
@@ -16,7 +16,7 @@ from homeassistant.components.update import (
     UpdateEntity,
     UpdateEntityDescription,
 )
-from homeassistant.components.update.const import (
+from smarthub.components.update.const import (
     ATTR_AUTO_UPDATE,
     ATTR_DISPLAY_PRECISION,
     ATTR_IN_PROGRESS,
@@ -29,8 +29,8 @@ from homeassistant.components.update.const import (
     ATTR_UPDATE_PERCENTAGE,
     UpdateEntityFeature,
 )
-from homeassistant.config_entries import ConfigEntry, ConfigFlow
-from homeassistant.const import (
+from smarthub.config_entries import ConfigEntry, ConfigFlow
+from smarthub.const import (
     ATTR_ENTITY_ID,
     ATTR_ENTITY_PICTURE,
     ATTR_FRIENDLY_NAME,
@@ -42,11 +42,11 @@ from homeassistant.const import (
     EntityCategory,
     Platform,
 )
-from homeassistant.core import HomeAssistant, State, callback
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.helpers.event import async_track_state_change_event
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, State, callback
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from smarthub.helpers.event import async_track_state_change_event
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -68,7 +68,7 @@ class MockUpdateEntity(UpdateEntity):
     """Mock UpdateEntity to use in tests."""
 
 
-async def test_update(hass: HomeAssistant) -> None:
+async def test_update(hass: SmartHub) -> None:
     """Test getting data from the mocked update entity."""
     update = MockUpdateEntity()
     update.hass = hass
@@ -83,7 +83,7 @@ async def test_update(hass: HomeAssistant) -> None:
     assert update.entity_category is EntityCategory.DIAGNOSTIC
     assert (
         update.entity_picture
-        == "https://brands.home-assistant.io/_/test_platform/icon.png"
+        == "https://brands.smart-hub.io/_/test_platform/icon.png"
     )
     assert update.installed_version == "1.0.0"
     assert update.latest_version == "1.0.1"
@@ -175,7 +175,7 @@ async def test_update(hass: HomeAssistant) -> None:
 
 
 async def test_entity_with_no_install(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
 ) -> None:
     """Test entity with no updates."""
@@ -192,7 +192,7 @@ async def test_entity_with_no_install(
     assert state.attributes[ATTR_LATEST_VERSION] == "1.0.1"
 
     # Should not be able to install as the entity doesn't support that
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_INSTALL,
@@ -240,7 +240,7 @@ async def test_entity_with_no_install(
 
 
 async def test_entity_with_no_updates(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
 ) -> None:
     """Test entity with no updates."""
@@ -257,7 +257,7 @@ async def test_entity_with_no_updates(
     assert state.attributes[ATTR_LATEST_VERSION] == "1.0.0"
 
     # Should not be able to skip when there is no update available
-    with pytest.raises(HomeAssistantError, match="No update available to skip for"):
+    with pytest.raises(SmartHubError, match="No update available to skip for"):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SKIP,
@@ -266,7 +266,7 @@ async def test_entity_with_no_updates(
         )
 
     # Should not be able to install an update when there is no update available
-    with pytest.raises(HomeAssistantError, match="No update available for"):
+    with pytest.raises(SmartHubError, match="No update available for"):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_INSTALL,
@@ -276,7 +276,7 @@ async def test_entity_with_no_updates(
 
     # Updating to a specific version is not supported by this entity
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Installing a specific version is not supported for",
     ):
         await hass.services.async_call(
@@ -288,7 +288,7 @@ async def test_entity_with_no_updates(
 
 
 async def test_entity_with_auto_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -315,7 +315,7 @@ async def test_entity_with_auto_update(
 
     # Should not be able to skip the update
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Skipping update is not supported for update.update_with_auto_update",
     ):
         await hass.services.async_call(
@@ -327,7 +327,7 @@ async def test_entity_with_auto_update(
 
     # Should not be able to clear a skipped the update
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Clearing skipped update is not supported for update.update_with_auto_update",
     ):
         await hass.services.async_call(
@@ -339,7 +339,7 @@ async def test_entity_with_auto_update(
 
 
 async def test_entity_with_updates_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -392,7 +392,7 @@ async def test_entity_with_updates_available(
 
 
 async def test_entity_with_unknown_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -410,7 +410,7 @@ async def test_entity_with_unknown_version(
     assert state.attributes[ATTR_SKIPPED_VERSION] is None
 
     # Should not be able to install an update when there is no update available
-    with pytest.raises(HomeAssistantError, match="No update available for"):
+    with pytest.raises(SmartHubError, match="No update available for"):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_INSTALL,
@@ -419,7 +419,7 @@ async def test_entity_with_unknown_version(
         )
 
     # Should not be to skip the update
-    with pytest.raises(HomeAssistantError, match="Cannot skip an unknown version for"):
+    with pytest.raises(SmartHubError, match="Cannot skip an unknown version for"):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_SKIP,
@@ -429,7 +429,7 @@ async def test_entity_with_unknown_version(
 
 
 async def test_entity_with_specific_version(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -477,7 +477,7 @@ async def test_entity_with_specific_version(
     assert "Installed latest update" in caplog.text
 
     # This entity does not support doing a backup before upgrade
-    with pytest.raises(HomeAssistantError, match="Backup is not supported for"):
+    with pytest.raises(SmartHubError, match="Backup is not supported for"):
         await hass.services.async_call(
             DOMAIN,
             SERVICE_INSTALL,
@@ -491,7 +491,7 @@ async def test_entity_with_specific_version(
 
 
 async def test_entity_with_backup_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -557,7 +557,7 @@ async def test_entity_with_backup_support(
     ],
 )
 async def test_entity_already_in_progress(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     caplog: pytest.LogCaptureFixture,
     entity_id: str,
@@ -580,7 +580,7 @@ async def test_entity_already_in_progress(
     assert state.attributes[ATTR_UPDATE_PERCENTAGE] == expected_update_percentage
 
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Update installation already in progress for",
     ):
         await hass.services.async_call(
@@ -602,13 +602,13 @@ async def test_entity_already_in_progress(
 
 
 async def test_entity_without_progress_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test update entity without progress support.
 
-    In that case, progress is still handled by Home Assistant.
+    In that case, progress is still handled by SmartHub.
     """
     setup_test_component_platform(hass, DOMAIN, mock_update_entities)
 
@@ -643,13 +643,13 @@ async def test_entity_without_progress_support(
 
 
 async def test_entity_without_progress_support_raising(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test update entity without progress support that raises during install.
 
-    In that case, progress is still handled by Home Assistant.
+    In that case, progress is still handled by SmartHub.
     """
     setup_test_component_platform(hass, DOMAIN, mock_update_entities)
 
@@ -666,7 +666,7 @@ async def test_entity_without_progress_support_raising(
 
     with (
         patch(
-            "homeassistant.components.update.UpdateEntity.async_install",
+            "smarthub.components.update.UpdateEntity.async_install",
             side_effect=RuntimeError,
         ),
         pytest.raises(RuntimeError),
@@ -693,7 +693,7 @@ async def test_entity_without_progress_support_raising(
 
 
 async def test_restore_state(
-    hass: HomeAssistant, mock_update_entities: list[MockUpdateEntity]
+    hass: SmartHub, mock_update_entities: list[MockUpdateEntity]
 ) -> None:
     """Test we restore skipped version state."""
     mock_restore_cache(
@@ -723,7 +723,7 @@ async def test_restore_state(
 
 
 async def test_release_notes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -748,7 +748,7 @@ async def test_release_notes(
 
 
 async def test_release_notes_entity_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -774,7 +774,7 @@ async def test_release_notes_entity_not_found(
 
 
 async def test_release_notes_entity_does_not_support_release_notes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_update_entities: list[MockUpdateEntity],
     hass_ws_client: WebSocketGenerator,
 ) -> None:
@@ -804,7 +804,7 @@ class MockFlow(ConfigFlow):
 
 
 @pytest.fixture(autouse=True)
-def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
+def config_flow_fixture(hass: SmartHub) -> Generator[None]:
     """Mock config flow."""
     mock_platform(hass, f"{TEST_DOMAIN}.config_flow")
 
@@ -812,11 +812,11 @@ def config_flow_fixture(hass: HomeAssistant) -> Generator[None]:
         yield
 
 
-async def test_name(hass: HomeAssistant) -> None:
+async def test_name(hass: SmartHub) -> None:
     """Test update name."""
 
     async def async_setup_entry_init(
-        hass: HomeAssistant, config_entry: ConfigEntry
+        hass: SmartHub, config_entry: ConfigEntry
     ) -> bool:
         """Set up test config entry."""
         await hass.config_entries.async_forward_entry_setups(
@@ -858,7 +858,7 @@ async def test_name(hass: HomeAssistant) -> None:
     )
 
     async def async_setup_entry_platform(
-        hass: HomeAssistant,
+        hass: SmartHub,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
     ) -> None:
@@ -899,7 +899,7 @@ async def test_name(hass: HomeAssistant) -> None:
     assert expected.items() <= state.attributes.items()
 
 
-async def test_custom_version_is_newer(hass: HomeAssistant) -> None:
+async def test_custom_version_is_newer(hass: SmartHub) -> None:
     """Test UpdateEntity with overridden version_is_newer method."""
 
     class MockUpdateEntity(UpdateEntity):
@@ -969,7 +969,7 @@ async def test_custom_version_is_newer(hass: HomeAssistant) -> None:
     ],
 )
 async def test_update_percentage_backwards_compatibility(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supported_features: UpdateEntityFeature,
     extra_expected_attributes: list[dict],
 ) -> None:
@@ -991,7 +991,7 @@ async def test_update_percentage_backwards_compatibility(
     expected_attributes = {
         ATTR_AUTO_UPDATE: False,
         ATTR_DISPLAY_PRECISION: 0,
-        ATTR_ENTITY_PICTURE: "https://brands.home-assistant.io/_/test/icon.png",
+        ATTR_ENTITY_PICTURE: "https://brands.smart-hub.io/_/test/icon.png",
         ATTR_FRIENDLY_NAME: "legacy",
         ATTR_INSTALLED_VERSION: "1.0.0",
         ATTR_IN_PROGRESS: False,

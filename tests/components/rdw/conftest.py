@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from vehicle import Vehicle
 
-from homeassistant.components.rdw.const import CONF_LICENSE_PLATE, DOMAIN
-from homeassistant.core import HomeAssistant
+from smarthub.components.rdw.const import CONF_LICENSE_PLATE, DOMAIN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, load_fixture
 
@@ -28,7 +28,7 @@ def mock_config_entry() -> MockConfigEntry:
 @pytest.fixture
 def mock_setup_entry() -> Generator[None]:
     """Mock setting up a config entry."""
-    with patch("homeassistant.components.rdw.async_setup_entry", return_value=True):
+    with patch("smarthub.components.rdw.async_setup_entry", return_value=True):
         yield
 
 
@@ -36,7 +36,7 @@ def mock_setup_entry() -> Generator[None]:
 def mock_rdw_config_flow() -> Generator[MagicMock]:
     """Return a mocked RDW client."""
     with patch(
-        "homeassistant.components.rdw.config_flow.RDW", autospec=True
+        "smarthub.components.rdw.config_flow.RDW", autospec=True
     ) as rdw_mock:
         rdw = rdw_mock.return_value
         rdw.vehicle.return_value = Vehicle.from_json(load_fixture("rdw/11ZKZ3.json"))
@@ -51,7 +51,7 @@ def mock_rdw(request: pytest.FixtureRequest) -> Generator[MagicMock]:
         fixture = request.param
 
     vehicle = Vehicle.from_json(load_fixture(fixture))
-    with patch("homeassistant.components.rdw.RDW", autospec=True) as rdw_mock:
+    with patch("smarthub.components.rdw.RDW", autospec=True) as rdw_mock:
         rdw = rdw_mock.return_value
         rdw.vehicle.return_value = vehicle
         yield rdw
@@ -59,7 +59,7 @@ def mock_rdw(request: pytest.FixtureRequest) -> Generator[MagicMock]:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_rdw: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_rdw: MagicMock
 ) -> MockConfigEntry:
     """Set up the RDW integration for testing."""
     mock_config_entry.add_to_hass(hass)

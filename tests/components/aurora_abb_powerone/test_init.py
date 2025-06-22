@@ -2,19 +2,19 @@
 
 from unittest.mock import patch
 
-from homeassistant.components.aurora_abb_powerone.const import (
+from smarthub.components.aurora_abb_powerone.const import (
     ATTR_FIRMWARE,
     ATTR_MODEL,
     DOMAIN,
 )
-from homeassistant.const import ATTR_SERIAL_NUMBER, CONF_ADDRESS, CONF_PORT
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.const import ATTR_SERIAL_NUMBER, CONF_ADDRESS, CONF_PORT
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test unloading the aurora_abb_powerone entry."""
 
     with (

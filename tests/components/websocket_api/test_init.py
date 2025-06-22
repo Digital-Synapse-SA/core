@@ -1,16 +1,16 @@
-"""Tests for the Home Assistant Websocket API."""
+"""Tests for the SmartHub Websocket API."""
 
 from unittest.mock import Mock, patch
 
 from aiohttp import WSMsgType
 import voluptuous as vol
 
-from homeassistant.components.websocket_api import (
+from smarthub.components.websocket_api import (
     async_register_command,
     const,
     messages,
 )
-from homeassistant.core import HomeAssistant
+from smarthub.core import SmartHub
 
 
 async def test_invalid_message_format(websocket_client) -> None:
@@ -34,7 +34,7 @@ async def test_invalid_json(websocket_client) -> None:
     assert msg.type == WSMsgType.close
 
 
-async def test_quiting_hass(hass: HomeAssistant, websocket_client) -> None:
+async def test_quiting_hass(hass: SmartHub, websocket_client) -> None:
     """Test sending invalid JSON."""
     with patch.object(hass.loop, "stop"):
         await hass.async_stop()
@@ -53,7 +53,7 @@ async def test_unknown_command(websocket_client) -> None:
     assert msg["error"]["code"] == const.ERR_UNKNOWN_COMMAND
 
 
-async def test_handler_failing(hass: HomeAssistant, websocket_client) -> None:
+async def test_handler_failing(hass: SmartHub, websocket_client) -> None:
     """Test a command that raises."""
     async_register_command(
         hass,
@@ -70,7 +70,7 @@ async def test_handler_failing(hass: HomeAssistant, websocket_client) -> None:
     assert msg["error"]["code"] == const.ERR_UNKNOWN_ERROR
 
 
-async def test_invalid_vol(hass: HomeAssistant, websocket_client) -> None:
+async def test_invalid_vol(hass: SmartHub, websocket_client) -> None:
     """Test a command that raises invalid vol error."""
     async_register_command(
         hass,

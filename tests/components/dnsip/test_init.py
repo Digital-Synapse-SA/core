@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from homeassistant.components.dnsip.const import (
+from smarthub.components.dnsip.const import (
     CONF_HOSTNAME,
     CONF_IPV4,
     CONF_IPV6,
@@ -14,23 +14,23 @@ from homeassistant.components.dnsip.const import (
     DEFAULT_PORT,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import CONF_NAME, CONF_PORT
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import SOURCE_USER, ConfigEntryState
+from smarthub.const import CONF_NAME, CONF_PORT
+from smarthub.core import SmartHub
 
 from . import RetrieveDNS
 
 from tests.common import MockConfigEntry
 
 
-async def test_load_unload_entry(hass: HomeAssistant) -> None:
+async def test_load_unload_entry(hass: SmartHub) -> None:
     """Test load and unload an entry."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,
         data={
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_IPV4: True,
             CONF_IPV6: False,
         },
@@ -41,12 +41,12 @@ async def test_load_unload_entry(hass: HomeAssistant) -> None:
             CONF_PORT_IPV6: 53,
         },
         entry_id="1",
-        unique_id="home-assistant.io",
+        unique_id="smart-hub.io",
     )
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.dnsip.config_flow.aiodns.DNSResolver",
+        "smarthub.components.dnsip.config_flow.aiodns.DNSResolver",
         return_value=RetrieveDNS(),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -59,7 +59,7 @@ async def test_load_unload_entry(hass: HomeAssistant) -> None:
 
 
 async def test_port_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test migration of the config entry from no ports to with ports."""
 
@@ -67,8 +67,8 @@ async def test_port_migration(
         domain=DOMAIN,
         source=SOURCE_USER,
         data={
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_IPV4: True,
             CONF_IPV6: True,
         },
@@ -77,14 +77,14 @@ async def test_port_migration(
             CONF_RESOLVER_IPV6: "2620:119:53::53",
         },
         entry_id="1",
-        unique_id="home-assistant.io",
+        unique_id="smart-hub.io",
         version=1,
         minor_version=1,
     )
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.dnsip.sensor.aiodns.DNSResolver",
+        "smarthub.components.dnsip.sensor.aiodns.DNSResolver",
         return_value=RetrieveDNS(),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -97,15 +97,15 @@ async def test_port_migration(
     assert entry.state is ConfigEntryState.LOADED
 
 
-async def test_migrate_error_from_future(hass: HomeAssistant) -> None:
+async def test_migrate_error_from_future(hass: SmartHub) -> None:
     """Test a future version isn't migrated."""
 
     entry = MockConfigEntry(
         domain=DOMAIN,
         source=SOURCE_USER,
         data={
-            CONF_HOSTNAME: "home-assistant.io",
-            CONF_NAME: "home-assistant.io",
+            CONF_HOSTNAME: "smart-hub.io",
+            CONF_NAME: "smart-hub.io",
             CONF_IPV4: True,
             CONF_IPV6: True,
             "some_new_data": "new_value",
@@ -115,14 +115,14 @@ async def test_migrate_error_from_future(hass: HomeAssistant) -> None:
             CONF_RESOLVER_IPV6: "2620:119:53::53",
         },
         entry_id="1",
-        unique_id="home-assistant.io",
+        unique_id="smart-hub.io",
         version=2,
         minor_version=1,
     )
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.dnsip.sensor.aiodns.DNSResolver",
+        "smarthub.components.dnsip.sensor.aiodns.DNSResolver",
         return_value=RetrieveDNS(),
     ):
         await hass.config_entries.async_setup(entry.entry_id)

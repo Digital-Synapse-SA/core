@@ -6,13 +6,13 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components import generic_hygrostat
-from homeassistant.components.generic_hygrostat import DOMAIN
-from homeassistant.components.generic_hygrostat.config_flow import ConfigFlowHandler
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.event import async_track_entity_registry_updated_event
+from smarthub.components import generic_hygrostat
+from smarthub.components.generic_hygrostat import DOMAIN
+from smarthub.components.generic_hygrostat.config_flow import ConfigFlowHandler
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import Event, SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.event import async_track_entity_registry_updated_event
 
 from .test_humidifier import ENT_SENSOR
 
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry
 
 
 @pytest.fixture
-def sensor_config_entry(hass: HomeAssistant) -> er.RegistryEntry:
+def sensor_config_entry(hass: SmartHub) -> er.RegistryEntry:
     """Fixture to create a sensor config entry."""
     sensor_config_entry = MockConfigEntry()
     sensor_config_entry.add_to_hass(hass)
@@ -56,7 +56,7 @@ def sensor_entity_entry(
 
 
 @pytest.fixture
-def switch_config_entry(hass: HomeAssistant) -> er.RegistryEntry:
+def switch_config_entry(hass: SmartHub) -> er.RegistryEntry:
     """Fixture to create a switch config entry."""
     switch_config_entry = MockConfigEntry()
     switch_config_entry.add_to_hass(hass)
@@ -93,7 +93,7 @@ def switch_entity_entry(
 
 @pytest.fixture
 def generic_hygrostat_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     sensor_entity_entry: er.RegistryEntry,
     switch_entity_entry: er.RegistryEntry,
 ) -> MockConfigEntry:
@@ -119,7 +119,7 @@ def generic_hygrostat_config_entry(
     return config_entry
 
 
-def track_entity_registry_actions(hass: HomeAssistant, entity_id: str) -> list[str]:
+def track_entity_registry_actions(hass: SmartHub, entity_id: str) -> list[str]:
     """Track entity registry actions for an entity."""
     events = []
 
@@ -133,7 +133,7 @@ def track_entity_registry_actions(hass: HomeAssistant, entity_id: str) -> list[s
 
 
 async def test_device_cleaning(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -233,7 +233,7 @@ async def test_device_cleaning(
     [("switch.test_unique", True, ["update"]), ("sensor.test_unique", False, [])],
 )
 async def test_async_handle_source_entity_changes_source_entity_removed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     generic_hygrostat_config_entry: MockConfigEntry,
@@ -274,7 +274,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed(
     # Remove the source entity's config entry from the device, this removes the
     # source entity
     with patch(
-        "homeassistant.components.generic_hygrostat.async_unload_entry",
+        "smarthub.components.generic_hygrostat.async_unload_entry",
         wraps=generic_hygrostat.async_unload_entry,
     ) as mock_unload_entry:
         device_registry.async_update_device(
@@ -309,7 +309,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed(
     [("switch.test_unique", True, 1, ["update"]), ("sensor.test_unique", False, 0, [])],
 )
 async def test_async_handle_source_entity_changes_source_entity_removed_from_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     generic_hygrostat_config_entry: MockConfigEntry,
@@ -343,7 +343,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed_from_dev
 
     # Remove the source entity from the device
     with patch(
-        "homeassistant.components.generic_hygrostat.async_unload_entry",
+        "smarthub.components.generic_hygrostat.async_unload_entry",
         wraps=generic_hygrostat.async_unload_entry,
     ) as mock_unload_entry:
         entity_registry.async_update_entity(
@@ -377,7 +377,7 @@ async def test_async_handle_source_entity_changes_source_entity_removed_from_dev
     [("switch.test_unique", True, 1, ["update"]), ("sensor.test_unique", False, 0, [])],
 )
 async def test_async_handle_source_entity_changes_source_entity_moved_other_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     generic_hygrostat_config_entry: MockConfigEntry,
@@ -418,7 +418,7 @@ async def test_async_handle_source_entity_changes_source_entity_moved_other_devi
 
     # Move the source entity to another device
     with patch(
-        "homeassistant.components.generic_hygrostat.async_unload_entry",
+        "smarthub.components.generic_hygrostat.async_unload_entry",
         wraps=generic_hygrostat.async_unload_entry,
     ) as mock_unload_entry:
         entity_registry.async_update_entity(
@@ -459,7 +459,7 @@ async def test_async_handle_source_entity_changes_source_entity_moved_other_devi
     ],
 )
 async def test_async_handle_source_entity_new_entity_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     generic_hygrostat_config_entry: MockConfigEntry,
@@ -493,7 +493,7 @@ async def test_async_handle_source_entity_new_entity_id(
 
     # Change the source entity's entity ID
     with patch(
-        "homeassistant.components.generic_hygrostat.async_unload_entry",
+        "smarthub.components.generic_hygrostat.async_unload_entry",
         wraps=generic_hygrostat.async_unload_entry,
     ) as mock_unload_entry:
         entity_registry.async_update_entity(

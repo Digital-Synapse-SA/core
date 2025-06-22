@@ -5,15 +5,15 @@ from unittest.mock import Mock
 from google_photos_library_api.exceptions import GooglePhotosApiError
 import pytest
 
-from homeassistant.components.google_photos.const import DOMAIN, UPLOAD_SCOPE
-from homeassistant.components.media_source import (
+from smarthub.components.google_photos.const import DOMAIN, UPLOAD_SCOPE
+from smarthub.components.media_source import (
     URI_SCHEME,
     BrowseError,
     async_browse_media,
     async_resolve_media,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .conftest import CONFIG_ENTRY_ID
 
@@ -21,14 +21,14 @@ from tests.common import MockConfigEntry
 
 
 @pytest.fixture(autouse=True)
-async def setup_components(hass: HomeAssistant) -> None:
+async def setup_components(hass: SmartHub) -> None:
     """Fixture to initialize the integration."""
     await async_setup_component(hass, "media_source", {})
 
 
 @pytest.mark.usefixtures("setup_integration")
 async def test_no_config_entries(
-    hass: HomeAssistant, config_entry: MockConfigEntry
+    hass: SmartHub, config_entry: MockConfigEntry
 ) -> None:
     """Test a media source with no active config entry."""
 
@@ -52,7 +52,7 @@ async def test_no_config_entries(
     ],
 )
 async def test_no_read_scopes(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test a media source with only write scopes configured so no media source exists."""
     browse = await async_browse_media(hass, f"{URI_SCHEME}{DOMAIN}")
@@ -87,7 +87,7 @@ async def test_no_read_scopes(
     ],
 )
 async def test_browse_albums(
-    hass: HomeAssistant,
+    hass: SmartHub,
     album_path: str,
     expected_album_title: str,
     expected_results: list[tuple[str, str]],
@@ -130,7 +130,7 @@ async def test_browse_albums(
 
 
 @pytest.mark.usefixtures("setup_integration", "mock_api")
-async def test_invalid_config_entry(hass: HomeAssistant) -> None:
+async def test_invalid_config_entry(hass: SmartHub) -> None:
     """Test browsing to a config entry that does not exist."""
     with pytest.raises(BrowseError, match="Could not find config entry"):
         await async_browse_media(hass, f"{URI_SCHEME}{DOMAIN}/invalid-config-entry")
@@ -138,7 +138,7 @@ async def test_invalid_config_entry(hass: HomeAssistant) -> None:
 
 @pytest.mark.usefixtures("setup_integration", "mock_api")
 @pytest.mark.parametrize("fixture_name", ["list_mediaitems.json"])
-async def test_browse_invalid_path(hass: HomeAssistant) -> None:
+async def test_browse_invalid_path(hass: SmartHub) -> None:
     """Test browsing to a photo is not possible."""
     browse = await async_browse_media(hass, f"{URI_SCHEME}{DOMAIN}")
     assert browse.domain == DOMAIN
@@ -165,7 +165,7 @@ async def test_browse_invalid_path(hass: HomeAssistant) -> None:
     ],
 )
 async def test_missing_photo_id(
-    hass: HomeAssistant, identifier: str, expected_error: str
+    hass: SmartHub, identifier: str, expected_error: str
 ) -> None:
     """Test parsing an invalid media identifier."""
     with pytest.raises(BrowseError, match=expected_error):
@@ -173,7 +173,7 @@ async def test_missing_photo_id(
 
 
 @pytest.mark.usefixtures("setup_integration", "mock_api")
-async def test_list_media_items_failure(hass: HomeAssistant, mock_api: Mock) -> None:
+async def test_list_media_items_failure(hass: SmartHub, mock_api: Mock) -> None:
     """Test browsing to an album id that does not exist."""
     browse = await async_browse_media(hass, f"{URI_SCHEME}{DOMAIN}")
     assert browse.domain == DOMAIN

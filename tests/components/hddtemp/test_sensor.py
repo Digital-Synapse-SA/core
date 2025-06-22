@@ -5,12 +5,12 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from homeassistant.components.hddtemp import DOMAIN
-from homeassistant.components.sensor import DOMAIN as PLATFORM_DOMAIN
-from homeassistant.const import UnitOfTemperature
-from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
-from homeassistant.helpers import issue_registry as ir
-from homeassistant.setup import async_setup_component
+from smarthub.components.hddtemp import DOMAIN
+from smarthub.components.sensor import DOMAIN as PLATFORM_DOMAIN
+from smarthub.const import UnitOfTemperature
+from smarthub.core import DOMAIN as HOMEASSISTANT_DOMAIN, SmartHub
+from smarthub.helpers import issue_registry as ir
+from smarthub.setup import async_setup_component
 
 VALID_CONFIG_MINIMAL = {"sensor": {"platform": "hddtemp"}}
 
@@ -88,11 +88,11 @@ class TelnetMock:
 @pytest.fixture
 def telnetmock():
     """Mock telnet."""
-    with patch("homeassistant.components.hddtemp.sensor.Telnet", new=TelnetMock):
+    with patch("smarthub.components.hddtemp.sensor.Telnet", new=TelnetMock):
         yield
 
 
-async def test_hddtemp_min_config(hass: HomeAssistant, telnetmock) -> None:
+async def test_hddtemp_min_config(hass: SmartHub, telnetmock) -> None:
     """Test minimal hddtemp configuration."""
     assert await async_setup_component(hass, "sensor", VALID_CONFIG_MINIMAL)
     await hass.async_block_till_done()
@@ -113,7 +113,7 @@ async def test_hddtemp_min_config(hass: HomeAssistant, telnetmock) -> None:
     )
 
 
-async def test_hddtemp_rename_config(hass: HomeAssistant, telnetmock) -> None:
+async def test_hddtemp_rename_config(hass: SmartHub, telnetmock) -> None:
     """Test hddtemp configuration with different name."""
     assert await async_setup_component(hass, "sensor", VALID_CONFIG_NAME)
     await hass.async_block_till_done()
@@ -126,7 +126,7 @@ async def test_hddtemp_rename_config(hass: HomeAssistant, telnetmock) -> None:
     assert state.attributes.get("friendly_name") == f"FooBar {reference['device']}"
 
 
-async def test_hddtemp_one_disk(hass: HomeAssistant, telnetmock) -> None:
+async def test_hddtemp_one_disk(hass: SmartHub, telnetmock) -> None:
     """Test hddtemp one disk configuration."""
     assert await async_setup_component(hass, "sensor", VALID_CONFIG_ONE_DISK)
     await hass.async_block_till_done()
@@ -146,7 +146,7 @@ async def test_hddtemp_one_disk(hass: HomeAssistant, telnetmock) -> None:
     )
 
 
-async def test_hddtemp_wrong_disk(hass: HomeAssistant, telnetmock) -> None:
+async def test_hddtemp_wrong_disk(hass: SmartHub, telnetmock) -> None:
     """Test hddtemp wrong disk configuration."""
     assert await async_setup_component(hass, "sensor", VALID_CONFIG_WRONG_DISK)
     await hass.async_block_till_done()
@@ -156,7 +156,7 @@ async def test_hddtemp_wrong_disk(hass: HomeAssistant, telnetmock) -> None:
     assert state.attributes.get("friendly_name") == "HD Temperature /dev/sdx1"
 
 
-async def test_hddtemp_multiple_disks(hass: HomeAssistant, telnetmock) -> None:
+async def test_hddtemp_multiple_disks(hass: SmartHub, telnetmock) -> None:
     """Test hddtemp multiple disk configuration."""
     assert await async_setup_component(hass, "sensor", VALID_CONFIG_MULTIPLE_DISKS)
     await hass.async_block_till_done()
@@ -183,14 +183,14 @@ async def test_hddtemp_multiple_disks(hass: HomeAssistant, telnetmock) -> None:
         )
 
 
-async def test_hddtemp_host_refused(hass: HomeAssistant, telnetmock) -> None:
+async def test_hddtemp_host_refused(hass: SmartHub, telnetmock) -> None:
     """Test hddtemp if host is refused."""
     assert await async_setup_component(hass, "sensor", VALID_CONFIG_HOST_REFUSED)
     await hass.async_block_till_done()
     assert len(hass.states.async_all()) == 0
 
 
-async def test_hddtemp_host_unreachable(hass: HomeAssistant, telnetmock) -> None:
+async def test_hddtemp_host_unreachable(hass: SmartHub, telnetmock) -> None:
     """Test hddtemp if host unreachable."""
     assert await async_setup_component(hass, "sensor", VALID_CONFIG_HOST_UNREACHABLE)
     await hass.async_block_till_done()
@@ -199,7 +199,7 @@ async def test_hddtemp_host_unreachable(hass: HomeAssistant, telnetmock) -> None
 
 @patch.dict("sys.modules", gsp=Mock())
 async def test_repair_issue_is_created(
-    hass: HomeAssistant,
+    hass: SmartHub,
     issue_registry: ir.IssueRegistry,
 ) -> None:
     """Test repair issue is created."""

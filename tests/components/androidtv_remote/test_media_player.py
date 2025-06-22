@@ -5,10 +5,10 @@ from unittest.mock import MagicMock, call
 from androidtvremote2 import ConnectionClosed
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
@@ -17,7 +17,7 @@ MEDIA_PLAYER_ENTITY = "media_player.my_android_tv"
 
 
 async def test_media_player_receives_push_updates(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test the Android TV Remote media player receives push updates and state is updated."""
     mock_config_entry.add_to_hass(hass)
@@ -72,7 +72,7 @@ async def test_media_player_receives_push_updates(
 
 
 async def test_media_player_toggles(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test the Android TV Remote media player toggles."""
     mock_config_entry.add_to_hass(hass)
@@ -101,7 +101,7 @@ async def test_media_player_toggles(
 
 
 async def test_media_player_volume(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test the Android TV Remote media player up/down/mute volume."""
     mock_config_entry.add_to_hass(hass)
@@ -150,7 +150,7 @@ async def test_media_player_volume(
 
 
 async def test_media_player_controls(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test the Android TV Remote media player play/pause/stop/next/prev."""
     mock_config_entry.add_to_hass(hass)
@@ -213,7 +213,7 @@ async def test_media_player_controls(
 
 
 async def test_media_player_play_media(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
     """Test the Android TV Remote media player play_media."""
     mock_config_entry.add_to_hass(hass)
@@ -317,7 +317,7 @@ async def test_media_player_play_media(
 
 
 async def test_browse_media(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_config_entry: MockConfigEntry,
     mock_api: MagicMock,
@@ -386,16 +386,16 @@ async def test_browse_media(
 
 
 async def test_media_player_connection_closed(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_api: MagicMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_api: MagicMock
 ) -> None:
-    """Test media_player raise HomeAssistantError if ConnectionClosed."""
+    """Test media_player raise SmartHubError if ConnectionClosed."""
     mock_config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(mock_config_entry.entry_id)
     assert mock_config_entry.state is ConfigEntryState.LOADED
 
     mock_api.send_key_command.side_effect = ConnectionClosed()
     with pytest.raises(
-        HomeAssistantError, match="Connection to the Android TV device is closed"
+        SmartHubError, match="Connection to the Android TV device is closed"
     ):
         await hass.services.async_call(
             "media_player",
@@ -406,7 +406,7 @@ async def test_media_player_connection_closed(
 
     mock_api.send_launch_app_command.side_effect = ConnectionClosed()
     with pytest.raises(
-        HomeAssistantError, match="Connection to the Android TV device is closed"
+        SmartHubError, match="Connection to the Android TV device is closed"
     ):
         await hass.services.async_call(
             "media_player",

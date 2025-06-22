@@ -6,10 +6,10 @@ from unittest.mock import patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.config_entries import ConfigEntry
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .const import MOCK_VEHICLES
 
@@ -24,14 +24,14 @@ _TEST_VEHICLES = [v for v in MOCK_VEHICLES if v != "zoe_40"]
 @pytest.fixture(autouse=True)
 def override_platforms() -> Generator[None]:
     """Override PLATFORMS."""
-    with patch("homeassistant.components.renault.PLATFORMS", [Platform.DEVICE_TRACKER]):
+    with patch("smarthub.components.renault.PLATFORMS", [Platform.DEVICE_TRACKER]):
         yield
 
 
 @pytest.mark.usefixtures("fixtures_with_data")
 @pytest.mark.parametrize("vehicle_type", _TEST_VEHICLES, indirect=True)
 async def test_device_trackers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -46,7 +46,7 @@ async def test_device_trackers(
 @pytest.mark.usefixtures("fixtures_with_no_data")
 @pytest.mark.parametrize("vehicle_type", ["zoe_50"], indirect=True)
 async def test_device_tracker_empty(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -61,7 +61,7 @@ async def test_device_tracker_empty(
 @pytest.mark.usefixtures("fixtures_with_invalid_upstream_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_50"], indirect=True)
 async def test_device_tracker_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -76,7 +76,7 @@ async def test_device_tracker_errors(
 @pytest.mark.usefixtures("fixtures_with_access_denied_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_50"], indirect=True)
 async def test_device_tracker_access_denied(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -90,7 +90,7 @@ async def test_device_tracker_access_denied(
 @pytest.mark.usefixtures("fixtures_with_not_supported_exception")
 @pytest.mark.parametrize("vehicle_type", ["zoe_50"], indirect=True)
 async def test_device_tracker_not_supported(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: ConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:

@@ -16,7 +16,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 def mock_not_onboarded() -> Generator[None]:
     """Mock that we're not onboarded."""
     with patch(
-        "homeassistant.components.hassio.http.async_is_onboarded", return_value=False
+        "smarthub.components.hassio.http.async_is_onboarded", return_value=False
     ):
         yield
 

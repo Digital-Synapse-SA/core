@@ -4,24 +4,24 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant.components.device_tracker import (
+from smarthub.components.device_tracker import (
     CONF_CONSIDER_HOME,
     DEFAULT_CONSIDER_HOME,
 )
-from homeassistant.components.fritz.const import (
+from smarthub.components.fritz.const import (
     DOMAIN,
     FRITZ_AUTH_EXCEPTIONS,
     FRITZ_EXCEPTIONS,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from .const import MOCK_USER_DATA
 
 from tests.common import MockConfigEntry
 
 
-async def test_setup(hass: HomeAssistant, fc_class_mock, fh_class_mock) -> None:
+async def test_setup(hass: SmartHub, fc_class_mock, fh_class_mock) -> None:
     """Test setup and unload of Fritz!Tools."""
 
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
@@ -36,7 +36,7 @@ async def test_setup(hass: HomeAssistant, fc_class_mock, fh_class_mock) -> None:
 
 
 async def test_options_reload(
-    hass: HomeAssistant, fc_class_mock, fh_class_mock
+    hass: SmartHub, fc_class_mock, fh_class_mock
 ) -> None:
     """Test reload of Fritz!Tools, when options changed."""
 
@@ -48,7 +48,7 @@ async def test_options_reload(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.config_entries.ConfigEntries.async_reload",
+        "smarthub.config_entries.ConfigEntries.async_reload",
         return_value=None,
     ) as mock_reload:
         await hass.config_entries.async_setup(entry.entry_id)
@@ -68,14 +68,14 @@ async def test_options_reload(
     "error",
     FRITZ_AUTH_EXCEPTIONS,
 )
-async def test_setup_auth_fail(hass: HomeAssistant, error) -> None:
+async def test_setup_auth_fail(hass: SmartHub, error) -> None:
     """Test starting a flow by user with an already configured device."""
 
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.fritz.coordinator.FritzConnection",
+        "smarthub.components.fritz.coordinator.FritzConnection",
         side_effect=error,
     ):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -88,14 +88,14 @@ async def test_setup_auth_fail(hass: HomeAssistant, error) -> None:
     "error",
     FRITZ_EXCEPTIONS,
 )
-async def test_setup_fail(hass: HomeAssistant, error) -> None:
+async def test_setup_fail(hass: SmartHub, error) -> None:
     """Test starting a flow by user with an already configured device."""
 
     entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_DATA)
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.fritz.coordinator.FritzConnection",
+        "smarthub.components.fritz.coordinator.FritzConnection",
         side_effect=error,
     ):
         await hass.config_entries.async_setup(entry.entry_id)

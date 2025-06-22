@@ -7,17 +7,17 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components.config import entity_registry
-from homeassistant.const import ATTR_ICON, EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.device_registry import DeviceEntryDisabler
-from homeassistant.helpers.entity_component import EntityComponent
-from homeassistant.helpers.entity_registry import (
+from smarthub.components.config import entity_registry
+from smarthub.const import ATTR_ICON, EntityCategory
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.device_registry import DeviceEntryDisabler
+from smarthub.helpers.entity_component import EntityComponent
+from smarthub.helpers.entity_registry import (
     RegistryEntryDisabler,
     RegistryEntryHider,
 )
-from homeassistant.util.dt import utcnow
+from smarthub.util.dt import utcnow
 
 from tests.common import (
     ANY,
@@ -32,7 +32,7 @@ from tests.typing import MockHAClientWebSocket, WebSocketGenerator
 
 @pytest.fixture
 async def client(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> MockHAClientWebSocket:
     """Fixture that can interact with the config manager API."""
     entity_registry.async_setup(hass)
@@ -41,7 +41,7 @@ async def client(
 
 @pytest.mark.usefixtures("freezer")
 async def test_list_entities(
-    hass: HomeAssistant, client: MockHAClientWebSocket
+    hass: SmartHub, client: MockHAClientWebSocket
 ) -> None:
     """Test list entries."""
     mock_registry(
@@ -165,7 +165,7 @@ async def test_list_entities(
 
 
 async def test_list_entities_for_display(
-    hass: HomeAssistant, client: MockHAClientWebSocket
+    hass: SmartHub, client: MockHAClientWebSocket
 ) -> None:
     """Test list entries."""
     mock_registry(
@@ -343,7 +343,7 @@ async def test_list_entities_for_display(
     }
 
 
-async def test_get_entity(hass: HomeAssistant, client: MockHAClientWebSocket) -> None:
+async def test_get_entity(hass: SmartHub, client: MockHAClientWebSocket) -> None:
     """Test get entry."""
     name_created_at = datetime(1994, 2, 14, 12, 0, 0)
     no_name_created_at = datetime(2024, 2, 14, 12, 0, 1)
@@ -440,7 +440,7 @@ async def test_get_entity(hass: HomeAssistant, client: MockHAClientWebSocket) ->
     }
 
 
-async def test_get_entities(hass: HomeAssistant, client: MockHAClientWebSocket) -> None:
+async def test_get_entities(hass: SmartHub, client: MockHAClientWebSocket) -> None:
     """Test get entry."""
     name_created_at = datetime(1994, 2, 14, 12, 0, 0)
     no_name_created_at = datetime(2024, 2, 14, 12, 0, 1)
@@ -539,7 +539,7 @@ async def test_get_entities(hass: HomeAssistant, client: MockHAClientWebSocket) 
 
 
 async def test_update_entity(
-    hass: HomeAssistant, client: MockHAClientWebSocket, freezer: FrozenDateTimeFactory
+    hass: SmartHub, client: MockHAClientWebSocket, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test updating entity."""
     created = datetime.fromisoformat("2024-02-14T12:00:00.900075+00:00")
@@ -889,7 +889,7 @@ async def test_update_entity(
 
 
 async def test_update_entity_require_restart(
-    hass: HomeAssistant, client: MockHAClientWebSocket, freezer: FrozenDateTimeFactory
+    hass: SmartHub, client: MockHAClientWebSocket, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test updating entity."""
     created = datetime.fromisoformat("2024-02-14T12:00:00+00:00")
@@ -953,7 +953,7 @@ async def test_update_entity_require_restart(
 
 
 async def test_enable_entity_disabled_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: MockHAClientWebSocket,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1003,7 +1003,7 @@ async def test_enable_entity_disabled_device(
 
 
 async def test_update_entity_no_changes(
-    hass: HomeAssistant, client: MockHAClientWebSocket, freezer: FrozenDateTimeFactory
+    hass: SmartHub, client: MockHAClientWebSocket, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test update entity with no changes."""
     created = datetime.fromisoformat("2024-02-14T12:00:00.900075+00:00")
@@ -1104,7 +1104,7 @@ async def test_update_nonexisting_entity(client: MockHAClientWebSocket) -> None:
 
 
 async def test_update_entity_id(
-    hass: HomeAssistant, client: MockHAClientWebSocket, freezer: FrozenDateTimeFactory
+    hass: SmartHub, client: MockHAClientWebSocket, freezer: FrozenDateTimeFactory
 ) -> None:
     """Test update entity id."""
     created = datetime.fromisoformat("2024-02-14T12:00:00.900075+00:00")
@@ -1175,7 +1175,7 @@ async def test_update_entity_id(
 
 
 async def test_update_existing_entity_id(
-    hass: HomeAssistant, client: MockHAClientWebSocket
+    hass: SmartHub, client: MockHAClientWebSocket
 ) -> None:
     """Test update entity id to an already registered entity id."""
     mock_registry(
@@ -1213,7 +1213,7 @@ async def test_update_existing_entity_id(
 
 
 async def test_update_invalid_entity_id(
-    hass: HomeAssistant, client: MockHAClientWebSocket
+    hass: SmartHub, client: MockHAClientWebSocket
 ) -> None:
     """Test update entity id to an invalid entity id."""
     mock_registry(
@@ -1245,7 +1245,7 @@ async def test_update_invalid_entity_id(
 
 
 async def test_remove_entity(
-    hass: HomeAssistant, client: MockHAClientWebSocket
+    hass: SmartHub, client: MockHAClientWebSocket
 ) -> None:
     """Test removing entity."""
     registry = mock_registry(
@@ -1275,7 +1275,7 @@ async def test_remove_entity(
 
 
 async def test_remove_non_existing_entity(
-    hass: HomeAssistant, client: MockHAClientWebSocket
+    hass: SmartHub, client: MockHAClientWebSocket
 ) -> None:
     """Test removing non existing entity."""
     mock_registry(hass, {})
@@ -1297,7 +1297,7 @@ DOMAIN = "test_domain"
 
 
 async def test_get_automatic_entity_ids(
-    hass: HomeAssistant, client: MockHAClientWebSocket
+    hass: SmartHub, client: MockHAClientWebSocket
 ) -> None:
     """Test get_automatic_entity_ids."""
     mock_registry(

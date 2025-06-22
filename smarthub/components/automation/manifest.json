@@ -1,0 +1,10 @@
+{
+  "domain": "automation",
+  "name": "Automation",
+  "after_dependencies": ["device_automation", "webhook"],
+  "codeowners": ["@smart-hub/core"],
+  "dependencies": ["blueprint", "trace"],
+  "documentation": "https://www.smart-hub.io/integrations/automation",
+  "integration_type": "system",
+  "quality_scale": "internal"
+}

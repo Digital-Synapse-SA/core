@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from homeassistant.const import (
+from smarthub.const import (
     CONF_ICON,
     CONF_NAME,
     CONF_STATE,
@@ -13,9 +13,9 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import template
-from homeassistant.helpers.trigger_template_entity import (
+from smarthub.core import SmartHub
+from smarthub.helpers import template
+from smarthub.helpers.trigger_template_entity import (
     CONF_ATTRIBUTES,
     CONF_AVAILABILITY,
     CONF_PICTURE,
@@ -49,7 +49,7 @@ _PICTURE_TEMPLATE = '/local/picture_o{{ "n" if value=="on" else "ff" }}'
     ],
 )
 async def test_value_template_object(
-    hass: HomeAssistant,
+    hass: SmartHub,
     value: Any,
     test_template: str,
     error_value: Any,
@@ -79,7 +79,7 @@ async def test_value_template_object(
         assert error in caplog.text
 
 
-async def test_template_entity_requires_hass_set(hass: HomeAssistant) -> None:
+async def test_template_entity_requires_hass_set(hass: SmartHub) -> None:
     """Test manual trigger template entity."""
     config = {
         "name": template.Template("test_entity", hass),
@@ -130,7 +130,7 @@ async def test_template_entity_requires_hass_set(hass: HomeAssistant) -> None:
     ],
 )
 async def test_trigger_template_availability(
-    hass: HomeAssistant,
+    hass: SmartHub,
     test_template: str,
     test_entity_state: str,
     expected: bool,
@@ -156,7 +156,7 @@ async def test_trigger_template_availability(
 
 
 async def test_trigger_no_availability_template(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test manual trigger template entity when availability template isn't used."""
     config = {
@@ -200,7 +200,7 @@ async def test_trigger_no_availability_template(
 
 
 async def test_trigger_template_availability_with_syntax_error(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test manual trigger template entity when availability render fails."""
     config = {
@@ -219,7 +219,7 @@ async def test_trigger_template_availability_with_syntax_error(
 
 
 async def test_attribute_order(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test manual trigger template entity when availability render fails."""
     config = {
@@ -248,7 +248,7 @@ async def test_attribute_order(
     )
 
 
-async def test_trigger_template_complex(hass: HomeAssistant) -> None:
+async def test_trigger_template_complex(hass: SmartHub) -> None:
     """Test manual trigger template entity complex template."""
     complex_template = """
     {% set d = {'test_key':'test_data'} %}

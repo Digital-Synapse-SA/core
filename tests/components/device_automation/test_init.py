@@ -7,21 +7,21 @@ import pytest
 from pytest_unordered import unordered
 import voluptuous as vol
 
-from homeassistant import loader
-from homeassistant.components import automation, device_automation
-from homeassistant.components.device_automation import (
+from smarthub import loader
+from smarthub.components import automation, device_automation
+from smarthub.components.device_automation import (
     InvalidDeviceAutomationConfig,
     toggle_entity,
 )
-from homeassistant.components.websocket_api import TYPE_RESULT
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_OFF, STATE_ON
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.loader import IntegrationNotFound
-from homeassistant.requirements import RequirementsNotFound
-from homeassistant.setup import async_setup_component
+from smarthub.components.websocket_api import TYPE_RESULT
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_OFF, STATE_ON
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.typing import ConfigType
+from smarthub.loader import IntegrationNotFound
+from smarthub.requirements import RequirementsNotFound
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, MockModule, mock_integration, mock_platform
 from tests.typing import WebSocketGenerator
@@ -40,26 +40,26 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
 
 
 @pytest.fixture
-def fake_integration(hass: HomeAssistant) -> None:
+def fake_integration(hass: SmartHub) -> None:
     """Set up a mock integration with device automation support."""
     DOMAIN = "fake_integration"
 
     hass.config.components.add(DOMAIN)
 
     async def _async_get_actions(
-        hass: HomeAssistant, device_id: str
+        hass: SmartHub, device_id: str
     ) -> list[dict[str, str]]:
         """List device actions."""
         return await toggle_entity.async_get_actions(hass, device_id, DOMAIN)
 
     async def _async_get_conditions(
-        hass: HomeAssistant, device_id: str
+        hass: SmartHub, device_id: str
     ) -> list[dict[str, str]]:
         """List device conditions."""
         return await toggle_entity.async_get_conditions(hass, device_id, DOMAIN)
 
     async def _async_get_triggers(
-        hass: HomeAssistant, device_id: str
+        hass: SmartHub, device_id: str
     ) -> list[dict[str, str]]:
         """List device triggers."""
         return await toggle_entity.async_get_triggers(hass, device_id, DOMAIN)
@@ -103,7 +103,7 @@ def fake_integration(hass: HomeAssistant) -> None:
 
 
 async def test_websocket_get_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -158,7 +158,7 @@ async def test_websocket_get_actions(
 
 
 async def test_websocket_get_conditions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -212,7 +212,7 @@ async def test_websocket_get_conditions(
 
 
 async def test_websocket_get_triggers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -274,7 +274,7 @@ async def test_websocket_get_triggers(
 
 
 async def test_websocket_get_action_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -300,7 +300,7 @@ async def test_websocket_get_action_capabilities(
     }
 
     async def _async_get_action_capabilities(
-        hass: HomeAssistant, config: ConfigType
+        hass: SmartHub, config: ConfigType
     ) -> dict[str, vol.Schema]:
         """List action capabilities."""
         if config["type"] == "turn_on":
@@ -342,7 +342,7 @@ async def test_websocket_get_action_capabilities(
 
 
 async def test_websocket_get_action_capabilities_unknown_domain(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -368,7 +368,7 @@ async def test_websocket_get_action_capabilities_unknown_domain(
 
 
 async def test_websocket_get_action_capabilities_no_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -399,7 +399,7 @@ async def test_websocket_get_action_capabilities_no_capabilities(
 
 
 async def test_websocket_get_action_capabilities_bad_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -433,7 +433,7 @@ async def test_websocket_get_action_capabilities_bad_action(
 
 
 async def test_websocket_get_condition_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -457,7 +457,7 @@ async def test_websocket_get_condition_capabilities(
     }
 
     async def _async_get_condition_capabilities(
-        hass: HomeAssistant, config: ConfigType
+        hass: SmartHub, config: ConfigType
     ) -> dict[str, vol.Schema]:
         """List condition capabilities."""
         return await toggle_entity.async_get_condition_capabilities(hass, config)
@@ -501,7 +501,7 @@ async def test_websocket_get_condition_capabilities(
 
 
 async def test_websocket_get_condition_capabilities_unknown_domain(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -527,7 +527,7 @@ async def test_websocket_get_condition_capabilities_unknown_domain(
 
 
 async def test_websocket_get_condition_capabilities_no_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -562,7 +562,7 @@ async def test_websocket_get_condition_capabilities_no_capabilities(
 
 
 async def test_websocket_get_condition_capabilities_bad_condition(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -600,7 +600,7 @@ async def test_websocket_get_condition_capabilities_bad_condition(
 
 
 async def test_async_get_device_automations_single_device_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -623,7 +623,7 @@ async def test_async_get_device_automations_single_device_trigger(
 
 
 async def test_async_get_device_automations_all_devices_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -646,7 +646,7 @@ async def test_async_get_device_automations_all_devices_trigger(
 
 
 async def test_async_get_device_automations_all_devices_condition(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -669,7 +669,7 @@ async def test_async_get_device_automations_all_devices_condition(
 
 
 async def test_async_get_device_automations_all_devices_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -692,7 +692,7 @@ async def test_async_get_device_automations_all_devices_action(
 
 
 async def test_async_get_device_automations_all_devices_action_exception_throw(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     caplog: pytest.LogCaptureFixture,
@@ -709,7 +709,7 @@ async def test_async_get_device_automations_all_devices_action_exception_throw(
         "light", "test", "5678", device_id=device_entry.id
     )
     with patch(
-        "homeassistant.components.light.device_trigger.async_get_triggers",
+        "smarthub.components.light.device_trigger.async_get_triggers",
         side_effect=KeyError,
     ):
         result = await device_automation.async_get_device_automations(
@@ -725,7 +725,7 @@ async def test_async_get_device_automations_all_devices_action_exception_throw(
     ["trigger", "platform"],
 )
 async def test_websocket_get_trigger_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -750,7 +750,7 @@ async def test_websocket_get_trigger_capabilities(
     }
 
     async def _async_get_trigger_capabilities(
-        hass: HomeAssistant, config: ConfigType
+        hass: SmartHub, config: ConfigType
     ) -> dict[str, vol.Schema]:
         """List trigger capabilities."""
         return await toggle_entity.async_get_trigger_capabilities(hass, config)
@@ -795,7 +795,7 @@ async def test_websocket_get_trigger_capabilities(
 
 
 async def test_websocket_get_trigger_capabilities_unknown_domain(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -821,7 +821,7 @@ async def test_websocket_get_trigger_capabilities_unknown_domain(
 
 
 async def test_websocket_get_trigger_capabilities_no_capabilities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -856,7 +856,7 @@ async def test_websocket_get_trigger_capabilities_no_capabilities(
 
 
 async def test_websocket_get_trigger_capabilities_bad_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -894,7 +894,7 @@ async def test_websocket_get_trigger_capabilities_bad_trigger(
 
 
 async def test_automation_with_non_existing_integration(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test device automation trigger with non existing integration."""
     assert await async_setup_component(
@@ -917,7 +917,7 @@ async def test_automation_with_non_existing_integration(
 
 
 async def test_automation_with_device_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -965,7 +965,7 @@ async def test_automation_with_device_action(
 
 
 async def test_automation_with_dynamically_validated_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     fake_integration,
@@ -1000,7 +1000,7 @@ async def test_automation_with_dynamically_validated_action(
 
 
 async def test_automation_with_integration_without_device_action(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test device automation action with integration without device action support."""
     mock_integration(hass, MockModule(domain="test"))
@@ -1022,7 +1022,7 @@ async def test_automation_with_integration_without_device_action(
 
 
 async def test_automation_with_device_condition(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1067,7 +1067,7 @@ async def test_automation_with_device_condition(
 
 
 async def test_automation_with_dynamically_validated_condition(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     fake_integration,
@@ -1107,7 +1107,7 @@ async def test_automation_with_dynamically_validated_condition(
 
 
 async def test_automation_with_integration_without_device_condition(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test device automation condition with integration without device condition support."""
     mock_integration(hass, MockModule(domain="test"))
@@ -1135,7 +1135,7 @@ async def test_automation_with_integration_without_device_condition(
 
 
 async def test_automation_with_device_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1179,7 +1179,7 @@ async def test_automation_with_device_trigger(
 
 
 async def test_automation_with_dynamically_validated_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1224,7 +1224,7 @@ async def test_automation_with_dynamically_validated_trigger(
 
 
 async def test_automation_with_integration_without_device_trigger(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test device automation trigger with integration without device trigger support."""
     mock_integration(hass, MockModule(domain="test"))
@@ -1282,10 +1282,10 @@ BAD_TRIGGERS = BAD_CONDITIONS = [
 ]
 
 
-@patch("homeassistant.helpers.device_registry.DeviceEntry", MockDeviceEntry)
+@patch("smarthub.helpers.device_registry.DeviceEntry", MockDeviceEntry)
 @pytest.mark.parametrize(("action", "expected_error"), BAD_AUTOMATIONS)
 async def test_automation_with_bad_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1316,10 +1316,10 @@ async def test_automation_with_bad_action(
     assert expected_error.format(path="['actions'][0]") in caplog.text
 
 
-@patch("homeassistant.helpers.device_registry.DeviceEntry", MockDeviceEntry)
+@patch("smarthub.helpers.device_registry.DeviceEntry", MockDeviceEntry)
 @pytest.mark.parametrize(("condition", "expected_error"), BAD_CONDITIONS)
 async def test_automation_with_bad_condition_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1350,10 +1350,10 @@ async def test_automation_with_bad_condition_action(
     assert expected_error.format(path="['actions'][0]") in caplog.text
 
 
-@patch("homeassistant.helpers.device_registry.DeviceEntry", MockDeviceEntry)
+@patch("smarthub.helpers.device_registry.DeviceEntry", MockDeviceEntry)
 @pytest.mark.parametrize(("condition", "expected_error"), BAD_CONDITIONS)
 async def test_automation_with_bad_condition(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     condition: dict[str, str],
@@ -1385,7 +1385,7 @@ async def test_automation_with_bad_condition(
 
 
 async def test_automation_with_sub_condition(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -1513,10 +1513,10 @@ async def test_automation_with_sub_condition(
     )
 
 
-@patch("homeassistant.helpers.device_registry.DeviceEntry", MockDeviceEntry)
+@patch("smarthub.helpers.device_registry.DeviceEntry", MockDeviceEntry)
 @pytest.mark.parametrize(("condition", "expected_error"), BAD_CONDITIONS)
 async def test_automation_with_bad_sub_condition(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     condition: dict[str, str],
@@ -1551,10 +1551,10 @@ async def test_automation_with_bad_sub_condition(
     assert expected_error.format(path=path) in caplog.text
 
 
-@patch("homeassistant.helpers.device_registry.DeviceEntry", MockDeviceEntry)
+@patch("smarthub.helpers.device_registry.DeviceEntry", MockDeviceEntry)
 @pytest.mark.parametrize(("trigger", "expected_error"), BAD_TRIGGERS)
 async def test_automation_with_bad_trigger(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     trigger: dict[str, str],
@@ -1585,7 +1585,7 @@ async def test_automation_with_bad_trigger(
 
 
 async def test_websocket_device_not_found(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test calling command with unknown device."""
     await async_setup_component(hass, "device_automation", {})
@@ -1601,7 +1601,7 @@ async def test_websocket_device_not_found(
 
 
 async def test_automation_with_unknown_device(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, fake_integration
+    hass: SmartHub, caplog: pytest.LogCaptureFixture, fake_integration
 ) -> None:
     """Test device automation with a trigger with an unknown device."""
 
@@ -1633,7 +1633,7 @@ async def test_automation_with_unknown_device(
 
 
 async def test_automation_with_device_wrong_domain(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     fake_integration,
@@ -1675,7 +1675,7 @@ async def test_automation_with_device_wrong_domain(
 
 
 async def test_automation_with_device_component_not_loaded(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     device_registry: dr.DeviceRegistry,
     fake_integration,
@@ -1721,13 +1721,13 @@ async def test_automation_with_device_component_not_loaded(
     ],
 )
 async def test_async_get_device_automations_platform_reraises_exceptions(
-    hass: HomeAssistant, exc: Exception
+    hass: SmartHub, exc: Exception
 ) -> None:
     """Test InvalidDeviceAutomationConfig is raised when async_get_integration_with_requirements fails."""
     await async_setup_component(hass, "device_automation", {})
     with (
         patch(
-            "homeassistant.components.device_automation.async_get_integration_with_requirements",
+            "smarthub.components.device_automation.async_get_integration_with_requirements",
             side_effect=exc,
         ),
         pytest.raises(InvalidDeviceAutomationConfig),

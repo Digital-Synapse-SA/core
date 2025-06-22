@@ -4,28 +4,28 @@ from unittest import mock
 
 import pytest
 
-from homeassistant.components import light
-from homeassistant.components.mochad import light as mochad
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import light
+from smarthub.components.mochad import light as mochad
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(autouse=True)
 def pymochad_mock():
     """Mock pymochad."""
-    with mock.patch("homeassistant.components.mochad.light.device") as device:
+    with mock.patch("smarthub.components.mochad.light.device") as device:
         yield device
 
 
 @pytest.fixture
-def light_mock(hass: HomeAssistant, brightness: int) -> mochad.MochadLight:
+def light_mock(hass: SmartHub, brightness: int) -> mochad.MochadLight:
     """Mock light."""
     controller_mock = mock.MagicMock()
     dev_dict = {"address": "a1", "name": "fake_light", "brightness_levels": brightness}
     return mochad.MochadLight(hass, controller_mock, dev_dict)
 
 
-async def test_setup_adds_proper_devices(hass: HomeAssistant) -> None:
+async def test_setup_adds_proper_devices(hass: SmartHub) -> None:
     """Test if setup adds devices."""
     good_config = {
         "mochad": {},

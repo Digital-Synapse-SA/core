@@ -3,24 +3,24 @@
 from datetime import timedelta
 from unittest.mock import patch
 
-from homeassistant.components.canary.const import DOMAIN, MANUFACTURER
-from homeassistant.components.canary.sensor import (
+from smarthub.components.canary.const import DOMAIN, MANUFACTURER
+from smarthub.components.canary.sensor import (
     ATTR_AIR_QUALITY,
     STATE_AIR_QUALITY_ABNORMAL,
     STATE_AIR_QUALITY_NORMAL,
     STATE_AIR_QUALITY_VERY_ABNORMAL,
 )
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
+from smarthub.components.sensor import SensorDeviceClass
+from smarthub.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     PERCENTAGE,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.util.dt import utcnow
 
 from . import init_integration, mock_device, mock_location, mock_reading
 
@@ -28,7 +28,7 @@ from tests.common import async_fire_time_changed
 
 
 async def test_sensors_pro(
-    hass: HomeAssistant,
+    hass: SmartHub,
     canary,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -47,7 +47,7 @@ async def test_sensors_pro(
         mock_reading("air_quality", "0.59"),
     ]
 
-    with patch("homeassistant.components.canary.PLATFORMS", ["sensor"]):
+    with patch("smarthub.components.canary.PLATFORMS", ["sensor"]):
         await init_integration(hass)
 
     sensors = {
@@ -93,7 +93,7 @@ async def test_sensors_pro(
     assert device.model == "Canary Pro"
 
 
-async def test_sensors_attributes_pro(hass: HomeAssistant, canary) -> None:
+async def test_sensors_attributes_pro(hass: SmartHub, canary) -> None:
     """Test the creation and values of the sensors attributes for Canary Pro."""
 
     online_device_at_home = mock_device(20, "Dining Room", True, "Canary Pro")
@@ -109,7 +109,7 @@ async def test_sensors_attributes_pro(hass: HomeAssistant, canary) -> None:
         mock_reading("air_quality", "0.59"),
     ]
 
-    with patch("homeassistant.components.canary.PLATFORMS", ["sensor"]):
+    with patch("smarthub.components.canary.PLATFORMS", ["sensor"]):
         await init_integration(hass)
 
     entity_id = "sensor.home_dining_room_air_quality"
@@ -152,7 +152,7 @@ async def test_sensors_attributes_pro(hass: HomeAssistant, canary) -> None:
 
 
 async def test_sensors_flex(
-    hass: HomeAssistant,
+    hass: SmartHub,
     canary,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
@@ -170,7 +170,7 @@ async def test_sensors_flex(
         mock_reading("wifi", "-57"),
     ]
 
-    with patch("homeassistant.components.canary.PLATFORMS", ["sensor"]):
+    with patch("smarthub.components.canary.PLATFORMS", ["sensor"]):
         await init_integration(hass)
 
     sensors = {

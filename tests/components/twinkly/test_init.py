@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock
 from aiohttp import ClientConnectionError
 import pytest
 
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.twinkly.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, CONF_ID, CONF_MODEL, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.components.twinkly.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import CONF_HOST, CONF_ID, CONF_MODEL, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import setup_integration
 from .const import TEST_MAC, TEST_MODEL
@@ -20,7 +20,7 @@ from tests.common import MockConfigEntry
 
 @pytest.mark.usefixtures("mock_twinkly_client")
 async def test_load_unload_entry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test the load/unload of the config entry."""
 
@@ -34,7 +34,7 @@ async def test_load_unload_entry(
 
 
 async def test_config_entry_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_twinkly_client: AsyncMock,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_config_entry_not_ready(
 
 @pytest.mark.usefixtures("mock_twinkly_client")
 async def test_mac_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
 ) -> None:

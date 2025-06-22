@@ -6,16 +6,16 @@ from pyenphase.exceptions import EnvoyError
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.enphase_envoy.const import Platform
-from homeassistant.components.number import (
+from smarthub.components.enphase_envoy.const import Platform
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import entity_registry as er
 
 from . import setup_integration
 
@@ -29,14 +29,14 @@ from tests.common import MockConfigEntry, snapshot_platform
 )
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test number platform entities against snapshot."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
         await setup_integration(hass, config_entry)
     await snapshot_platform(hass, entity_registry, snapshot, config_entry.entry_id)
 
@@ -52,13 +52,13 @@ async def test_number(
     indirect=True,
 )
 async def test_no_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test number platform entities are not created."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
         await setup_integration(hass, config_entry)
     assert not er.async_entries_for_config_entry(entity_registry, config_entry.entry_id)
 
@@ -72,7 +72,7 @@ async def test_no_number(
     indirect=["mock_envoy"],
 )
 async def test_number_operation_storage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     use_serial: bool,
@@ -80,7 +80,7 @@ async def test_number_operation_storage(
     test_value: float,
 ) -> None:
     """Test enphase_envoy number storage entities operation."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
         await setup_integration(hass, config_entry)
 
     test_entity = f"{Platform.NUMBER}.{use_serial}_reserve_battery_level"
@@ -109,7 +109,7 @@ async def test_number_operation_storage(
     indirect=["mock_envoy"],
 )
 async def test_number_operation_storage_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     use_serial: bool,
@@ -117,14 +117,14 @@ async def test_number_operation_storage_with_error(
     test_value: float,
 ) -> None:
     """Test enphase_envoy number storage entities operation."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
         await setup_integration(hass, config_entry)
 
     test_entity = f"number.{use_serial}_{target}"
 
     mock_envoy.set_reserve_soc.side_effect = EnvoyError("Test")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=f"Failed to execute async_set_native_value for {test_entity}, host",
     ):
         await hass.services.async_call(
@@ -151,7 +151,7 @@ async def test_number_operation_storage_with_error(
     ],
 )
 async def test_number_operation_relays(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     relay: str,
@@ -161,7 +161,7 @@ async def test_number_operation_relays(
     test_field: str,
 ) -> None:
     """Test enphase_envoy number relay entities operation."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
         await setup_integration(hass, config_entry)
 
     assert (dry_contact := mock_envoy.data.dry_contact_settings[relay])
@@ -195,7 +195,7 @@ async def test_number_operation_relays(
     indirect=["mock_envoy"],
 )
 async def test_number_operation_relays_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_envoy: AsyncMock,
     config_entry: MockConfigEntry,
     relay: str,
@@ -203,7 +203,7 @@ async def test_number_operation_relays_with_error(
     test_value: float,
 ) -> None:
     """Test enphase_envoy number relay entities operation with error returned."""
-    with patch("homeassistant.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
+    with patch("smarthub.components.enphase_envoy.PLATFORMS", [Platform.NUMBER]):
         await setup_integration(hass, config_entry)
 
     assert (dry_contact := mock_envoy.data.dry_contact_settings[relay])
@@ -213,7 +213,7 @@ async def test_number_operation_relays_with_error(
 
     mock_envoy.update_dry_contact.side_effect = EnvoyError("Test")
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=f"Failed to execute async_set_native_value for {test_entity}, host",
     ):
         await hass.services.async_call(

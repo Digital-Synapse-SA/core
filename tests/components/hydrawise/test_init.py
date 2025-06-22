@@ -4,14 +4,14 @@ from unittest.mock import AsyncMock
 
 from aiohttp import ClientError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_connect_retry(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_pydrawise: AsyncMock
+    hass: SmartHub, mock_config_entry: MockConfigEntry, mock_pydrawise: AsyncMock
 ) -> None:
     """Test that a connection error triggers a retry."""
     mock_pydrawise.get_user.side_effect = ClientError
@@ -22,7 +22,7 @@ async def test_connect_retry(
 
 
 async def test_update_version(
-    hass: HomeAssistant, mock_config_entry_legacy: MockConfigEntry
+    hass: SmartHub, mock_config_entry_legacy: MockConfigEntry
 ) -> None:
     """Test updating to the GaphQL API works."""
     mock_config_entry_legacy.add_to_hass(hass)

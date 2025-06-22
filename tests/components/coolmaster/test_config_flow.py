@@ -2,11 +2,11 @@
 
 from unittest.mock import patch
 
-from homeassistant import config_entries
-from homeassistant.components.coolmaster.config_flow import AVAILABLE_MODES
-from homeassistant.components.coolmaster.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.coolmaster.config_flow import AVAILABLE_MODES
+from smarthub.components.coolmaster.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
 def _flow_data():
@@ -17,7 +17,7 @@ def _flow_data():
     return options
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -27,11 +27,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.coolmaster.config_flow.CoolMasterNet.status",
+            "smarthub.components.coolmaster.config_flow.CoolMasterNet.status",
             return_value={"test_id": "test_unit"},
         ),
         patch(
-            "homeassistant.components.coolmaster.async_setup_entry",
+            "smarthub.components.coolmaster.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -51,14 +51,14 @@ async def test_form(hass: HomeAssistant) -> None:
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_timeout(hass: HomeAssistant) -> None:
+async def test_form_timeout(hass: SmartHub) -> None:
     """Test we handle a connection timeout."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.coolmaster.config_flow.CoolMasterNet.status",
+        "smarthub.components.coolmaster.config_flow.CoolMasterNet.status",
         side_effect=TimeoutError(),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -69,14 +69,14 @@ async def test_form_timeout(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_connection_refused(hass: HomeAssistant) -> None:
+async def test_form_connection_refused(hass: SmartHub) -> None:
     """Test we handle a connection error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.coolmaster.config_flow.CoolMasterNet.status",
+        "smarthub.components.coolmaster.config_flow.CoolMasterNet.status",
         side_effect=ConnectionRefusedError(),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -87,14 +87,14 @@ async def test_form_connection_refused(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_no_units(hass: HomeAssistant) -> None:
+async def test_form_no_units(hass: SmartHub) -> None:
     """Test we handle no units found."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.coolmaster.config_flow.CoolMasterNet.status",
+        "smarthub.components.coolmaster.config_flow.CoolMasterNet.status",
         return_value={},
     ):
         result2 = await hass.config_entries.flow.async_configure(

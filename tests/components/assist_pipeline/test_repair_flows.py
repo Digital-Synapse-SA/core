@@ -2,7 +2,7 @@
 
 import pytest
 
-from homeassistant.components.assist_pipeline.repair_flows import (
+from smarthub.components.assist_pipeline.repair_flows import (
     AssistInProgressDeprecatedRepairFlow,
 )
 

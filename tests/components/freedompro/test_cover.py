@@ -5,21 +5,21 @@ from unittest.mock import ANY, patch
 
 import pytest
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     ATTR_POSITION,
     DOMAIN as COVER_DOMAIN,
     CoverState,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
     SERVICE_SET_COVER_POSITION,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
-from homeassistant.util.dt import utcnow
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
+from smarthub.util.dt import utcnow
 
 from .conftest import get_states_response_for_uid
 
@@ -38,7 +38,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
     ],
 )
 async def test_cover_get_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device_registry: dr.DeviceRegistry,
     init_integration: MockConfigEntry,
@@ -68,7 +68,7 @@ async def test_cover_get_state(
     states_response = get_states_response_for_uid(uid)
     states_response[0]["state"]["position"] = 100
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         async_fire_time_changed(hass, utcnow() + timedelta(hours=2))
@@ -97,7 +97,7 @@ async def test_cover_get_state(
     ],
 )
 async def test_cover_set_position(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
     entity_id: str,
@@ -116,7 +116,7 @@ async def test_cover_set_position(
     assert entry
     assert entry.unique_id == uid
 
-    with patch("homeassistant.components.freedompro.cover.put_state") as mock_put_state:
+    with patch("smarthub.components.freedompro.cover.put_state") as mock_put_state:
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_SET_COVER_POSITION,
@@ -128,7 +128,7 @@ async def test_cover_set_position(
     states_response = get_states_response_for_uid(uid)
     states_response[0]["state"]["position"] = 33
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         async_fire_time_changed(hass, utcnow() + timedelta(hours=2))
@@ -151,7 +151,7 @@ async def test_cover_set_position(
     ],
 )
 async def test_cover_close(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
     entity_id: str,
@@ -164,7 +164,7 @@ async def test_cover_close(
     states_response = get_states_response_for_uid(uid)
     states_response[0]["state"]["position"] = 100
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         await async_update_entity(hass, entity_id)
@@ -180,7 +180,7 @@ async def test_cover_close(
     assert entry
     assert entry.unique_id == uid
 
-    with patch("homeassistant.components.freedompro.cover.put_state") as mock_put_state:
+    with patch("smarthub.components.freedompro.cover.put_state") as mock_put_state:
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_CLOSE_COVER,
@@ -191,7 +191,7 @@ async def test_cover_close(
 
     states_response[0]["state"]["position"] = 0
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         async_fire_time_changed(hass, utcnow() + timedelta(hours=2))
@@ -213,7 +213,7 @@ async def test_cover_close(
     ],
 )
 async def test_cover_open(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     init_integration: MockConfigEntry,
     entity_id: str,
@@ -232,7 +232,7 @@ async def test_cover_open(
     assert entry
     assert entry.unique_id == uid
 
-    with patch("homeassistant.components.freedompro.cover.put_state") as mock_put_state:
+    with patch("smarthub.components.freedompro.cover.put_state") as mock_put_state:
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
@@ -244,7 +244,7 @@ async def test_cover_open(
     states_response = get_states_response_for_uid(uid)
     states_response[0]["state"]["position"] = 100
     with patch(
-        "homeassistant.components.freedompro.coordinator.get_states",
+        "smarthub.components.freedompro.coordinator.get_states",
         return_value=states_response,
     ):
         async_fire_time_changed(hass, utcnow() + timedelta(hours=2))

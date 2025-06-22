@@ -2,15 +2,15 @@
 
 import pytest
 
-from homeassistant.components.homeassistant_hardware.helpers import (
+from smarthub.components.smarthub_hardware.helpers import (
     async_notify_firmware_info,
 )
-from homeassistant.components.homeassistant_hardware.util import (
+from smarthub.components.smarthub_hardware.util import (
     ApplicationType,
     FirmwareInfo,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from .common import USB_DATA_ZBT1
 
@@ -19,13 +19,13 @@ from tests.common import MockConfigEntry
 UPDATE_ENTITY_ID = "update.home_assistant_connect_zbt_1_9e2adbd7_firmware"
 
 
-async def test_zbt1_update_entity(hass: HomeAssistant) -> None:
+async def test_zbt1_update_entity(hass: SmartHub) -> None:
     """Test the ZBT-1 firmware update entity."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     # Set up the ZBT-1 integration
     zbt1_config_entry = MockConfigEntry(
-        domain="homeassistant_sky_connect",
+        domain="smarthub_sky_connect",
         data={
             "firmware": "ezsp",
             "firmware_version": "7.3.1.0 build 0",
@@ -99,13 +99,13 @@ async def test_zbt1_update_entity(hass: HomeAssistant) -> None:
     ],
 )
 async def test_zbt1_update_entity_state(
-    hass: HomeAssistant, firmware: str, version: str, expected: str
+    hass: SmartHub, firmware: str, version: str, expected: str
 ) -> None:
     """Test the ZBT-1 firmware update entity with different firmware types."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
 
     zbt1_config_entry = MockConfigEntry(
-        domain="homeassistant_sky_connect",
+        domain="smarthub_sky_connect",
         data={
             "firmware": firmware,
             "firmware_version": version,

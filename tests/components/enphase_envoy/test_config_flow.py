@@ -7,18 +7,18 @@ from unittest.mock import AsyncMock
 from pyenphase import EnvoyAuthenticationError, EnvoyError
 import pytest
 
-from homeassistant.components.enphase_envoy.const import (
+from smarthub.components.enphase_envoy.const import (
     DOMAIN,
     OPTION_DIAGNOSTICS_INCLUDE_FIXTURES,
     OPTION_DIAGNOSTICS_INCLUDE_FIXTURES_DEFAULT_VALUE,
     OPTION_DISABLE_KEEP_ALIVE,
     OPTION_DISABLE_KEEP_ALIVE_DEFAULT_VALUE,
 )
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_NAME, CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from . import setup_integration
 
@@ -28,7 +28,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
 ) -> None:
@@ -59,7 +59,7 @@ async def test_form(
 
 
 async def test_user_no_serial_number(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
 ) -> None:
@@ -100,7 +100,7 @@ async def test_user_no_serial_number(
     ],
 )
 async def test_form_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
     exception: Exception,
@@ -153,7 +153,7 @@ def _get_schema_default(schema, key_name):
     ],
 )
 async def test_zeroconf(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
     version: str,
@@ -200,7 +200,7 @@ async def test_zeroconf(
 
 
 async def test_form_host_already_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -261,7 +261,7 @@ async def test_form_host_already_exists(
 
 
 async def test_zeroconf_serial_already_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -291,7 +291,7 @@ async def test_zeroconf_serial_already_exists(
 
 
 async def test_zeroconf_serial_already_exists_ignores_ipv6(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -319,7 +319,7 @@ async def test_zeroconf_serial_already_exists_ignores_ipv6(
 
 
 async def test_zeroconf_host_already_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -348,7 +348,7 @@ async def test_zeroconf_host_already_exists(
 
 
 async def test_zero_conf_while_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -381,7 +381,7 @@ async def test_zero_conf_while_form(
 
 
 async def test_zero_conf_second_envoy_while_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -435,7 +435,7 @@ async def test_zero_conf_second_envoy_while_form(
 
 
 async def test_zero_conf_old_blank_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
 ) -> None:
@@ -474,7 +474,7 @@ async def test_zero_conf_old_blank_entry(
 
 
 async def test_zero_conf_old_blank_entry_standard_title(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
 ) -> None:
@@ -515,7 +515,7 @@ async def test_zero_conf_old_blank_entry_standard_title(
 
 
 async def test_zero_conf_old_blank_entry_user_title(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
 ) -> None:
@@ -556,7 +556,7 @@ async def test_zero_conf_old_blank_entry_user_title(
 
 
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -578,7 +578,7 @@ async def test_reauth(
 
 
 async def test_options_default(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -600,7 +600,7 @@ async def test_options_default(
 
 
 async def test_options_set(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -626,7 +626,7 @@ async def test_options_set(
 
 
 async def test_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -662,7 +662,7 @@ async def test_reconfigure(
 
 
 async def test_reconfigure_nochange(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -698,7 +698,7 @@ async def test_reconfigure_nochange(
 
 
 async def test_reconfigure_otherenvoy(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -740,7 +740,7 @@ async def test_reconfigure_otherenvoy(
     ],
 )
 async def test_reconfigure_auth_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,
@@ -793,7 +793,7 @@ async def test_reconfigure_auth_failure(
 
 
 async def test_reconfigure_change_ip_to_existing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
     mock_envoy: AsyncMock,

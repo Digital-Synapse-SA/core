@@ -9,14 +9,14 @@ from aiohasupervisor.models import Discovery
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.hassio.handler import HassioAPIError
-from homeassistant.components.mqtt import DOMAIN as MQTT_DOMAIN
-from homeassistant.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STARTED
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.discovery_flow import DiscoveryKey
-from homeassistant.helpers.service_info.hassio import HassioServiceInfo
-from homeassistant.setup import async_setup_component
+from smarthub import config_entries
+from smarthub.components.hassio.handler import HassioAPIError
+from smarthub.components.mqtt import DOMAIN as MQTT_DOMAIN
+from smarthub.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STARTED
+from smarthub.core import SmartHub
+from smarthub.helpers.discovery_flow import DiscoveryKey
+from smarthub.helpers.service_info.hassio import HassioServiceInfo
+from smarthub.setup import async_setup_component
 
 from tests.common import (
     MockConfigEntry,
@@ -30,7 +30,7 @@ from tests.test_util.aiohttp import AiohttpClientMocker
 
 @pytest.fixture(name="mock_mqtt")
 def mock_mqtt_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> Generator[type[config_entries.ConfigFlow]]:
     """Mock the MQTT integration's config flow."""
     mock_integration(hass, MockModule(MQTT_DOMAIN))
@@ -49,7 +49,7 @@ def mock_mqtt_fixture(
 
 @pytest.mark.usefixtures("hassio_client")
 async def test_hassio_discovery_startup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_mqtt: type[config_entries.ConfigFlow],
     addon_installed: AsyncMock,
     get_addon_discovery_info: AsyncMock,
@@ -98,7 +98,7 @@ async def test_hassio_discovery_startup(
 
 @pytest.mark.usefixtures("hassio_client")
 async def test_hassio_discovery_startup_done(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     mock_mqtt: type[config_entries.ConfigFlow],
     addon_installed: AsyncMock,
@@ -127,11 +127,11 @@ async def test_hassio_discovery_startup_done(
 
     with (
         patch(
-            "homeassistant.components.hassio.HassIO.update_hass_api",
+            "smarthub.components.hassio.HassIO.update_hass_api",
             return_value={"result": "ok"},
         ),
         patch(
-            "homeassistant.components.hassio.HassIO.get_info",
+            "smarthub.components.hassio.HassIO.get_info",
             Mock(side_effect=HassioAPIError()),
         ),
     ):
@@ -159,7 +159,7 @@ async def test_hassio_discovery_startup_done(
 
 
 async def test_hassio_discovery_webhook(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hassio_client: TestClient,
     mock_mqtt: type[config_entries.ConfigFlow],
     addon_installed: AsyncMock,
@@ -248,7 +248,7 @@ TEST_UUID = str(uuid4())
     ],
 )
 async def test_hassio_rediscover(
-    hass: HomeAssistant,
+    hass: SmartHub,
     aioclient_mock: AiohttpClientMocker,
     hassio_client: TestClient,
     addon_installed: AsyncMock,
@@ -325,7 +325,7 @@ async def test_hassio_rediscover(
     ],
 )
 async def test_hassio_rediscover_no_match(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hassio_client: TestClient,
     entry_domain: str,
     entry_discovery_keys: dict[str, tuple[DiscoveryKey, ...]],

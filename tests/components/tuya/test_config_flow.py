@@ -7,10 +7,10 @@ from unittest.mock import MagicMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.tuya.const import CONF_APP_TYPE, CONF_USER_CODE, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.tuya.const import CONF_APP_TYPE, CONF_USER_CODE, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -19,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 @pytest.mark.usefixtures("mock_tuya_login_control")
 async def test_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test the full happy path user flow from start to finish."""
@@ -49,7 +49,7 @@ async def test_user_flow(
 
 
 async def test_user_flow_failed_qr_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tuya_login_control: MagicMock,
 ) -> None:
     """Test an error occurring while retrieving the QR code."""
@@ -90,7 +90,7 @@ async def test_user_flow_failed_qr_code(
 
 
 async def test_user_flow_failed_scan(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tuya_login_control: MagicMock,
 ) -> None:
     """Test an error occurring while verifying login."""
@@ -138,7 +138,7 @@ async def test_user_flow_failed_scan(
 
 @pytest.mark.usefixtures("mock_tuya_login_control")
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -163,7 +163,7 @@ async def test_reauth_flow(
 
 @pytest.mark.usefixtures("mock_tuya_login_control")
 async def test_reauth_flow_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_old_config_entry: MockConfigEntry,
     snapshot: SnapshotAssertion,
 ) -> None:
@@ -206,7 +206,7 @@ async def test_reauth_flow_migration(
 
 
 async def test_reauth_flow_failed_qr_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tuya_login_control: MagicMock,
     mock_old_config_entry: MockConfigEntry,
 ) -> None:

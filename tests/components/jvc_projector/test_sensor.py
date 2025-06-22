@@ -2,8 +2,8 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -11,7 +11,7 @@ POWER_ID = "sensor.jvc_projector_power_status"
 
 
 async def test_entity_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_device: MagicMock,
     mock_integration: MockConfigEntry,

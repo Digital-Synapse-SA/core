@@ -4,16 +4,16 @@ from datetime import timedelta
 
 import pytest
 
-from homeassistant.components.bluetooth.const import UNAVAILABLE_TRACK_SECONDS
-from homeassistant.components.ibeacon.const import DOMAIN, UPDATE_INTERVAL
-from homeassistant.components.sensor import ATTR_STATE_CLASS
-from homeassistant.const import (
+from smarthub.components.bluetooth.const import UNAVAILABLE_TRACK_SECONDS
+from smarthub.components.ibeacon.const import DOMAIN, UPDATE_INTERVAL
+from smarthub.components.sensor import ATTR_STATE_CLASS
+from smarthub.const import (
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import (
     BLUECHARM_BEACON_SERVICE_INFO,
@@ -38,7 +38,7 @@ def mock_bluetooth(enable_bluetooth: None) -> None:
     """Auto mock bluetooth."""
 
 
-async def test_sensors_updates_fixed_mac_address(hass: HomeAssistant) -> None:
+async def test_sensors_updates_fixed_mac_address(hass: SmartHub) -> None:
     """Test creating and updating sensors with a fixed mac address."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -117,7 +117,7 @@ async def test_sensors_updates_fixed_mac_address(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_sensor_with_no_local_name(hass: HomeAssistant) -> None:
+async def test_sensor_with_no_local_name(hass: SmartHub) -> None:
     """Test creating and updating sensors."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -140,7 +140,7 @@ async def test_sensor_with_no_local_name(hass: HomeAssistant) -> None:
     assert await hass.config_entries.async_unload(entry.entry_id)
 
 
-async def test_sensor_sees_last_service_info(hass: HomeAssistant) -> None:
+async def test_sensor_sees_last_service_info(hass: SmartHub) -> None:
     """Test sensors are created from recent history."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -159,7 +159,7 @@ async def test_sensor_sees_last_service_info(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
 
-async def test_can_unload_and_reload(hass: HomeAssistant) -> None:
+async def test_can_unload_and_reload(hass: SmartHub) -> None:
     """Test sensors get recreated on unload/setup."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -187,7 +187,7 @@ async def test_can_unload_and_reload(hass: HomeAssistant) -> None:
     )
 
 
-async def test_multiple_uuids_same_beacon(hass: HomeAssistant) -> None:
+async def test_multiple_uuids_same_beacon(hass: SmartHub) -> None:
     """Test a beacon that broadcasts multiple uuids."""
     entry = MockConfigEntry(
         domain=DOMAIN,

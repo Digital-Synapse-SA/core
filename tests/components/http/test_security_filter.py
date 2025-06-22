@@ -7,7 +7,7 @@ from aiohttp import web
 import pytest
 import urllib3
 
-from homeassistant.components.http.security_filter import setup_security_filter
+from smarthub.components.http.security_filter import setup_security_filter
 
 from tests.typing import ClientSessionGenerator
 

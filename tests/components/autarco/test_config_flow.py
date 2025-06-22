@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock, patch
 from autarco import AutarcoAuthenticationError, AutarcoConnectionError
 import pytest
 
-from homeassistant.components.autarco.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.autarco.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_EMAIL, CONF_PASSWORD
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_full_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_autarco_client: AsyncMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -44,7 +44,7 @@ async def test_full_user_flow(
 
 
 async def test_duplicate_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_autarco_client: AsyncMock,
 ) -> None:
@@ -74,7 +74,7 @@ async def test_duplicate_entry(
     ],
 )
 async def test_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_autarco_client: AsyncMock,
     mock_setup_entry: AsyncMock,
     exception: Exception,
@@ -103,7 +103,7 @@ async def test_exceptions(
 
 
 async def test_step_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -114,7 +114,7 @@ async def test_step_reauth(
     assert result.get("type") is FlowResultType.FORM
     assert result.get("step_id") == "reauth_confirm"
 
-    with patch("homeassistant.components.autarco.config_flow.Autarco", autospec=True):
+    with patch("smarthub.components.autarco.config_flow.Autarco", autospec=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input={CONF_PASSWORD: "new-password"},
@@ -135,7 +135,7 @@ async def test_step_reauth(
     ],
 )
 async def test_step_reauth_exceptions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_autarco_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
     mock_setup_entry: AsyncMock,

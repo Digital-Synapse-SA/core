@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from . import setup_integration
 
@@ -13,13 +13,13 @@ from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_thinq_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test load and unload entry."""
     with patch(
-        "homeassistant.components.lg_thinq.ThinQMQTT.async_connect",
+        "smarthub.components.lg_thinq.ThinQMQTT.async_connect",
         return_value=True,
     ):
         await setup_integration(hass, mock_config_entry)
@@ -34,14 +34,14 @@ async def test_load_unload_entry(
 
 @pytest.mark.parametrize("exception", [AttributeError(), TypeError(), ValueError()])
 async def test_config_not_ready(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_thinq_api: AsyncMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
 ) -> None:
     """Test for setup failure exception occurred."""
     with patch(
-        "homeassistant.components.lg_thinq.ThinQMQTT.async_connect",
+        "smarthub.components.lg_thinq.ThinQMQTT.async_connect",
         side_effect=exception,
     ):
         await setup_integration(hass, mock_config_entry)

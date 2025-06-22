@@ -12,16 +12,16 @@ from gotailwind import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.cover import (
+from smarthub.components.cover import (
     DOMAIN as COVER_DOMAIN,
     SERVICE_CLOSE_COVER,
     SERVICE_OPEN_COVER,
 )
-from homeassistant.components.tailwind.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.components.tailwind.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 pytestmark = pytest.mark.usefixtures("init_integration")
 
@@ -34,7 +34,7 @@ pytestmark = pytest.mark.usefixtures("init_integration")
     ],
 )
 async def test_cover_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
@@ -53,7 +53,7 @@ async def test_cover_entities(
 
 
 async def test_cover_operations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_tailwind: MagicMock,
 ) -> None:
     """Test operating the doors."""
@@ -87,7 +87,7 @@ async def test_cover_operations(
     # Test door disabled error handling
     mock_tailwind.operate.side_effect = TailwindDoorDisabledError("Door disabled")
 
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
@@ -101,7 +101,7 @@ async def test_cover_operations(
     assert excinfo.value.translation_domain == DOMAIN
     assert excinfo.value.translation_key == "door_disabled"
 
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_CLOSE_COVER,
@@ -118,7 +118,7 @@ async def test_cover_operations(
     # Test door locked out error handling
     mock_tailwind.operate.side_effect = TailwindDoorLockedOutError("Door locked out")
 
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
@@ -132,7 +132,7 @@ async def test_cover_operations(
     assert excinfo.value.translation_domain == DOMAIN
     assert excinfo.value.translation_key == "door_locked_out"
 
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_CLOSE_COVER,
@@ -149,7 +149,7 @@ async def test_cover_operations(
     # Test door error handling
     mock_tailwind.operate.side_effect = TailwindError("Some error")
 
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
@@ -166,7 +166,7 @@ async def test_cover_operations(
     assert excinfo.value.translation_domain == DOMAIN
     assert excinfo.value.translation_key == "communication_error"
 
-    with pytest.raises(HomeAssistantError) as excinfo:
+    with pytest.raises(SmartHubError) as excinfo:
         await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_CLOSE_COVER,

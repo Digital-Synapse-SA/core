@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.climate import (
+from smarthub.components.climate import (
     ATTR_FAN_MODE,
     ATTR_HVAC_MODE,
     ATTR_SWING_MODE,
@@ -20,14 +20,14 @@ from homeassistant.components.climate import (
     SWING_BOTH,
     HVACMode,
 )
-from homeassistant.components.fujitsu_fglair.climate import (
+from smarthub.components.fujitsu_fglair.climate import (
     HA_TO_FUJI_FAN,
     HA_TO_FUJI_HVAC,
     HA_TO_FUJI_SWING,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import entity_id
 
@@ -41,7 +41,7 @@ def platforms() -> list[str]:
 
 
 async def test_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_ayla_api: AsyncMock,
@@ -55,7 +55,7 @@ async def test_entities(
 
 
 async def test_set_attributes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_ayla_api: AsyncMock,

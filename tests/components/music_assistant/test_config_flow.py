@@ -13,12 +13,12 @@ from music_assistant_client.exceptions import (
 from music_assistant_models.api import ServerInfoMessage
 import pytest
 
-from homeassistant.components.music_assistant.config_flow import CONF_URL
-from homeassistant.components.music_assistant.const import DEFAULT_NAME, DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.music_assistant.config_flow import CONF_URL
+from smarthub.components.music_assistant.const import DEFAULT_NAME, DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry, async_load_fixture
 
@@ -28,7 +28,7 @@ SERVER_INFO = {
     "server_version": "0.0.0",
     "schema_version": 23,
     "min_supported_schema_version": 23,
-    "homeassistant_addon": True,
+    "smarthub_addon": True,
 }
 
 ZEROCONF_DATA = ZeroconfServiceInfo(
@@ -43,7 +43,7 @@ ZEROCONF_DATA = ZeroconfServiceInfo(
 
 
 async def test_full_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_server_info: AsyncMock,
 ) -> None:
     """Test full flow."""
@@ -67,7 +67,7 @@ async def test_full_flow(
 
 
 async def test_zero_conf_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_server_info: AsyncMock,
 ) -> None:
     """Test zeroconf flow."""
@@ -91,7 +91,7 @@ async def test_zero_conf_flow(
 
 
 async def test_zero_conf_missing_server_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_server_info: AsyncMock,
 ) -> None:
     """Test zeroconf flow with missing server id."""
@@ -108,7 +108,7 @@ async def test_zero_conf_missing_server_id(
 
 
 async def test_duplicate_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_server_info: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -134,7 +134,7 @@ async def test_duplicate_user(
 
 
 async def test_duplicate_zeroconf(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_server_info: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -161,7 +161,7 @@ async def test_duplicate_zeroconf(
     ],
 )
 async def test_flow_user_server_version_invalid(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_server_info: AsyncMock,
     exception: MusicAssistantClientException,
     error_message: str,
@@ -200,7 +200,7 @@ async def test_flow_user_server_version_invalid(
 
 
 async def test_flow_zeroconf_connect_issue(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_server_info: AsyncMock,
 ) -> None:
     """Test zeroconf flow when server connect be reached."""

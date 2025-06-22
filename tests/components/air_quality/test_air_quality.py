@@ -2,23 +2,23 @@
 
 import pytest
 
-from homeassistant.components.air_quality import ATTR_N2O, ATTR_OZONE, ATTR_PM_10
-from homeassistant.const import (
+from smarthub.components.air_quality import ATTR_N2O, ATTR_OZONE, ATTR_PM_10
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_UNIT_OF_MEASUREMENT,
     CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 
 @pytest.fixture(autouse=True)
-async def setup_homeassistant(hass: HomeAssistant):
-    """Set up the homeassistant integration."""
-    await async_setup_component(hass, "homeassistant", {})
+async def setup_smarthub(hass: SmartHub):
+    """Set up the smarthub integration."""
+    await async_setup_component(hass, "smarthub", {})
 
 
-async def test_state(hass: HomeAssistant) -> None:
+async def test_state(hass: SmartHub) -> None:
     """Test Air Quality state."""
     config = {"air_quality": {"platform": "demo"}}
 
@@ -31,7 +31,7 @@ async def test_state(hass: HomeAssistant) -> None:
     assert state.state == "14"
 
 
-async def test_attributes(hass: HomeAssistant) -> None:
+async def test_attributes(hass: SmartHub) -> None:
     """Test Air Quality attributes."""
     config = {"air_quality": {"platform": "demo"}}
 
@@ -45,7 +45,7 @@ async def test_attributes(hass: HomeAssistant) -> None:
     assert data.get(ATTR_PM_10) == 16
     assert data.get(ATTR_N2O) is None
     assert data.get(ATTR_OZONE) is None
-    assert data.get(ATTR_ATTRIBUTION) == "Powered by Home Assistant"
+    assert data.get(ATTR_ATTRIBUTION) == "Powered by SmartHub"
     assert (
         data.get(ATTR_UNIT_OF_MEASUREMENT) == CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
     )

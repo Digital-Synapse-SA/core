@@ -12,20 +12,20 @@ from homewizard_energy.errors import (
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant import config_entries
-from homeassistant.components.homewizard.const import DOMAIN
-from homeassistant.const import CONF_IP_ADDRESS, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub import config_entries
+from smarthub.components.homewizard.const import DOMAIN
+from smarthub.const import CONF_IP_ADDRESS, CONF_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from tests.common import MockConfigEntry
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_manual_flow_works(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     mock_setup_entry: AsyncMock,
     snapshot: SnapshotAssertion,
@@ -53,7 +53,7 @@ async def test_manual_flow_works(
 
 @pytest.mark.usefixtures("mock_homewizardenergy", "mock_setup_entry")
 async def test_discovery_flow_works(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
 ) -> None:
     """Test discovery setup flow works."""
@@ -97,7 +97,7 @@ async def test_discovery_flow_works(
 
 @pytest.mark.usefixtures("mock_homewizardenergy")
 async def test_discovery_flow_during_onboarding(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_onboarding: MagicMock,
     snapshot: SnapshotAssertion,
@@ -131,7 +131,7 @@ async def test_discovery_flow_during_onboarding(
 
 
 async def test_discovery_flow_during_onboarding_disabled_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     mock_setup_entry: AsyncMock,
     mock_onboarding: MagicMock,
@@ -180,7 +180,7 @@ async def test_discovery_flow_during_onboarding_disabled_api(
 
 
 async def test_discovery_disabled_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
 ) -> None:
     """Test discovery detecting disabled api."""
@@ -217,7 +217,7 @@ async def test_discovery_disabled_api(
     assert result["errors"] == {"base": "api_not_enabled"}
 
 
-async def test_discovery_missing_data_in_service_info(hass: HomeAssistant) -> None:
+async def test_discovery_missing_data_in_service_info(hass: SmartHub) -> None:
     """Test discovery detecting missing discovery info."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -244,7 +244,7 @@ async def test_discovery_missing_data_in_service_info(hass: HomeAssistant) -> No
 
 
 async def test_dhcp_discovery_updates_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -272,7 +272,7 @@ async def test_dhcp_discovery_updates_entry(
     [(DisabledError), (RequestError)],
 )
 async def test_dhcp_discovery_updates_entry_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
@@ -296,7 +296,7 @@ async def test_dhcp_discovery_updates_entry_fails(
 
 
 async def test_dhcp_discovery_ignores_unknown(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
 ) -> None:
     """Test DHCP discovery is only used for updates.
@@ -318,7 +318,7 @@ async def test_dhcp_discovery_ignores_unknown(
 
 
 async def test_dhcp_discovery_aborts_for_v2_api(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -344,7 +344,7 @@ async def test_dhcp_discovery_aborts_for_v2_api(
 
 
 async def test_discovery_flow_updates_new_ip(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test discovery setup updates new config data."""
@@ -385,7 +385,7 @@ async def test_discovery_flow_updates_new_ip(
     [(DisabledError, "api_not_enabled"), (RequestError, "network_error")],
 )
 async def test_error_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     exception: Exception,
     reason: str,
@@ -426,7 +426,7 @@ async def test_error_flow(
     ],
 )
 async def test_abort_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     exception: Exception,
     reason: str,
@@ -451,7 +451,7 @@ async def test_abort_flow(
 
 @pytest.mark.usefixtures("mock_homewizardenergy", "mock_setup_entry")
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test reauth flow while API is enabled."""
@@ -469,7 +469,7 @@ async def test_reauth_flow(
 
 
 async def test_reauth_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -489,7 +489,7 @@ async def test_reauth_error(
 
 
 async def test_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -517,7 +517,7 @@ async def test_reconfigure(
 
 
 async def test_reconfigure_nochange(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -545,7 +545,7 @@ async def test_reconfigure_nochange(
 
 
 async def test_reconfigure_wrongdevice(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -576,7 +576,7 @@ async def test_reconfigure_wrongdevice(
     [(DisabledError, "api_not_enabled"), (RequestError, "network_error")],
 )
 async def test_reconfigure_cannot_connect(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy: MagicMock,
     mock_config_entry: MockConfigEntry,
     exception: Exception,
@@ -621,7 +621,7 @@ async def test_reconfigure_cannot_connect(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_manual_flow_works_with_v2_api_support(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy_v2: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -638,7 +638,7 @@ async def test_manual_flow_works_with_v2_api_support(
     mock_homewizardenergy_v2.get_token.side_effect = DisabledError
 
     with patch(
-        "homeassistant.components.homewizard.config_flow.has_v2_api", return_value=True
+        "smarthub.components.homewizard.config_flow.has_v2_api", return_value=True
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {CONF_IP_ADDRESS: "2.2.2.2"}
@@ -660,7 +660,7 @@ async def test_manual_flow_works_with_v2_api_support(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_manual_flow_detects_failed_user_authorization(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homewizardenergy_v2: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -677,7 +677,7 @@ async def test_manual_flow_detects_failed_user_authorization(
     mock_homewizardenergy_v2.get_token.side_effect = DisabledError
 
     with patch(
-        "homeassistant.components.homewizard.config_flow.has_v2_api", return_value=True
+        "smarthub.components.homewizard.config_flow.has_v2_api", return_value=True
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {CONF_IP_ADDRESS: "2.2.2.2"}
@@ -705,7 +705,7 @@ async def test_manual_flow_detects_failed_user_authorization(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_reauth_flow_updates_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry_v2: MockConfigEntry,
     mock_homewizardenergy_v2: MagicMock,
@@ -740,7 +740,7 @@ async def test_reauth_flow_updates_token(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_reauth_flow_handles_user_not_pressing_button(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_config_entry_v2: MockConfigEntry,
     mock_homewizardenergy_v2: MagicMock,
@@ -786,7 +786,7 @@ async def test_reauth_flow_handles_user_not_pressing_button(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_discovery_with_v2_api_ask_authorization(
-    hass: HomeAssistant,
+    hass: SmartHub,
     # mock_setup_entry: AsyncMock,
     mock_homewizardenergy_v2: MagicMock,
 ) -> None:
@@ -819,7 +819,7 @@ async def test_discovery_with_v2_api_ask_authorization(
     mock_homewizardenergy_v2.get_token.side_effect = DisabledError
 
     with patch(
-        "homeassistant.components.homewizard.config_flow.has_v2_api", return_value=True
+        "smarthub.components.homewizard.config_flow.has_v2_api", return_value=True
     ):
         result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
 

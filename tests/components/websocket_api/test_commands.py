@@ -9,25 +9,25 @@ from unittest.mock import ANY, AsyncMock, Mock, patch
 import pytest
 import voluptuous as vol
 
-from homeassistant import loader
-from homeassistant.components.device_automation import toggle_entity
-from homeassistant.components.websocket_api import const
-from homeassistant.components.websocket_api.auth import (
+from smarthub import loader
+from smarthub.components.device_automation import toggle_entity
+from smarthub.components.websocket_api import const
+from smarthub.components.websocket_api.auth import (
     TYPE_AUTH,
     TYPE_AUTH_OK,
     TYPE_AUTH_REQUIRED,
 )
-from homeassistant.components.websocket_api.const import FEATURE_COALESCE_MESSAGES, URL
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import SIGNAL_BOOTSTRAP_INTEGRATIONS
-from homeassistant.core import Context, HomeAssistant, State, SupportsResponse, callback
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.event import async_track_state_change_event
-from homeassistant.loader import async_get_integration
-from homeassistant.setup import async_set_domains_to_be_loaded, async_setup_component
-from homeassistant.util.json import json_loads
+from smarthub.components.websocket_api.const import FEATURE_COALESCE_MESSAGES, URL
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import SIGNAL_BOOTSTRAP_INTEGRATIONS
+from smarthub.core import Context, SmartHub, State, SupportsResponse, callback
+from smarthub.exceptions import SmartHubError, ServiceValidationError
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.dispatcher import async_dispatcher_send
+from smarthub.helpers.event import async_track_state_change_event
+from smarthub.loader import async_get_integration
+from smarthub.setup import async_set_domains_to_be_loaded, async_setup_component
+from smarthub.util.json import json_loads
 
 from tests.common import (
     MockConfigEntry,
@@ -57,7 +57,7 @@ STATE_KEY_LONG_NAMES = {v: k for k, v in STATE_KEY_SHORT_NAMES.items()}
 
 
 @pytest.fixture
-def fake_integration(hass: HomeAssistant):
+def fake_integration(hass: SmartHub):
     """Set up a mock integration with device automation support."""
     DOMAIN = "fake_integration"
 
@@ -98,7 +98,7 @@ def _apply_entities_changes(state_dict: dict, change_dict: dict) -> None:
 
 
 async def test_fire_event(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test fire event command."""
     runs = []
@@ -127,7 +127,7 @@ async def test_fire_event(
 
 
 async def test_fire_event_without_data(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test fire event command."""
     runs = []
@@ -155,7 +155,7 @@ async def test_fire_event_without_data(
 
 
 async def test_call_service(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test call service command."""
     calls = async_mock_service(hass, "domain_test", "test_service")
@@ -182,7 +182,7 @@ async def test_call_service(
     assert call.context.as_dict() == msg["result"]["context"]
 
 
-async def test_return_response_error(hass: HomeAssistant, websocket_client) -> None:
+async def test_return_response_error(hass: SmartHub, websocket_client) -> None:
     """Test return_response=True errors when service has no response."""
     hass.services.async_register(
         "domain_test", "test_service_with_no_response", lambda x: None
@@ -205,9 +205,9 @@ async def test_return_response_error(hass: HomeAssistant, websocket_client) -> N
 
 @pytest.mark.parametrize("command", ["call_service", "call_service_action"])
 async def test_call_service_blocking(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket, command
+    hass: SmartHub, websocket_client: MockHAClientWebSocket, command
 ) -> None:
-    """Test call service commands block, except for homeassistant restart / stop."""
+    """Test call service commands block, except for smarthub restart / stop."""
     async_mock_service(
         hass,
         "domain_test",
@@ -216,7 +216,7 @@ async def test_call_service_blocking(
         supports_response=SupportsResponse.OPTIONAL,
     )
     with patch(
-        "homeassistant.core.ServiceRegistry.async_call", autospec=True
+        "smarthub.core.ServiceRegistry.async_call", autospec=True
     ) as mock_call:
         mock_call.return_value = {"foo": "bar"}
         await websocket_client.send_json_auto_id(
@@ -245,7 +245,7 @@ async def test_call_service_blocking(
     )
 
     with patch(
-        "homeassistant.core.ServiceRegistry.async_call", autospec=True
+        "smarthub.core.ServiceRegistry.async_call", autospec=True
     ) as mock_call:
         mock_call.return_value = None
         await websocket_client.send_json_auto_id(
@@ -271,15 +271,15 @@ async def test_call_service_blocking(
         return_response=False,
     )
 
-    async_mock_service(hass, "homeassistant", "test_service")
+    async_mock_service(hass, "smarthub", "test_service")
     with patch(
-        "homeassistant.core.ServiceRegistry.async_call", autospec=True
+        "smarthub.core.ServiceRegistry.async_call", autospec=True
     ) as mock_call:
         mock_call.return_value = None
         await websocket_client.send_json_auto_id(
             {
                 "type": "call_service",
-                "domain": "homeassistant",
+                "domain": "smarthub",
                 "service": "test_service",
             },
         )
@@ -289,7 +289,7 @@ async def test_call_service_blocking(
     assert msg["success"]
     mock_call.assert_called_once_with(
         ANY,
-        "homeassistant",
+        "smarthub",
         "test_service",
         ANY,
         blocking=True,
@@ -298,15 +298,15 @@ async def test_call_service_blocking(
         return_response=False,
     )
 
-    async_mock_service(hass, "homeassistant", "restart")
+    async_mock_service(hass, "smarthub", "restart")
     with patch(
-        "homeassistant.core.ServiceRegistry.async_call", autospec=True
+        "smarthub.core.ServiceRegistry.async_call", autospec=True
     ) as mock_call:
         mock_call.return_value = None
         await websocket_client.send_json_auto_id(
             {
                 "type": "call_service",
-                "domain": "homeassistant",
+                "domain": "smarthub",
                 "service": "restart",
             },
         )
@@ -316,7 +316,7 @@ async def test_call_service_blocking(
     assert msg["success"]
     mock_call.assert_called_once_with(
         ANY,
-        "homeassistant",
+        "smarthub",
         "restart",
         ANY,
         blocking=True,
@@ -327,7 +327,7 @@ async def test_call_service_blocking(
 
 
 async def test_call_service_target(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test call service command with target."""
     calls = async_mock_service(hass, "domain_test", "test_service")
@@ -363,7 +363,7 @@ async def test_call_service_target(
 
 
 async def test_call_service_target_template(
-    hass: HomeAssistant, websocket_client
+    hass: SmartHub, websocket_client
 ) -> None:
     """Test call service command with target does not allow template."""
     await websocket_client.send_json_auto_id(
@@ -385,7 +385,7 @@ async def test_call_service_target_template(
 
 
 async def test_call_service_not_found(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test call service command."""
     await websocket_client.send_json_auto_id(
@@ -407,11 +407,11 @@ async def test_call_service_not_found(
         "service": "test_service",
     }
     assert msg["error"]["translation_key"] == "service_not_found"
-    assert msg["error"]["translation_domain"] == "homeassistant"
+    assert msg["error"]["translation_domain"] == "smarthub"
 
 
 async def test_call_service_child_not_found(
-    hass: HomeAssistant, websocket_client
+    hass: SmartHub, websocket_client
 ) -> None:
     """Test not reporting not found errors if it's not the called service."""
 
@@ -448,7 +448,7 @@ async def test_call_service_child_not_found(
 
 
 async def test_call_service_schema_validation_error(
-    hass: HomeAssistant, websocket_client
+    hass: SmartHub, websocket_client
 ) -> None:
     """Test call service command with invalid service data."""
 
@@ -514,7 +514,7 @@ async def test_call_service_schema_validation_error(
 
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_call_service_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     websocket_client: MockHAClientWebSocket,
 ) -> None:
@@ -523,7 +523,7 @@ async def test_call_service_error(
 
     @callback
     def ha_error_call(_):
-        raise HomeAssistantError(
+        raise SmartHubError(
             "error_message",
             translation_domain="test",
             translation_key="custom_error",
@@ -601,7 +601,7 @@ async def test_call_service_error(
 
 
 async def test_subscribe_unsubscribe_events(
-    hass: HomeAssistant, websocket_client
+    hass: SmartHub, websocket_client
 ) -> None:
     """Test subscribe/unsubscribe events command."""
     init_count = sum(hass.bus.async_listeners().values())
@@ -646,7 +646,7 @@ async def test_subscribe_unsubscribe_events(
 
 
 async def test_get_states(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test get_states command."""
     hass.states.async_set("greeting.hello", "world")
@@ -664,7 +664,7 @@ async def test_get_states(
 
 
 async def test_get_services(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test get_services command."""
     for id_ in (5, 6):
@@ -678,7 +678,7 @@ async def test_get_services(
 
 
 async def test_get_config(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test get_config command."""
     await websocket_client.send_json_auto_id({"type": "get_config"})
@@ -713,7 +713,7 @@ async def test_ping(websocket_client: MockHAClientWebSocket) -> None:
 
 
 async def test_call_service_context_with_user(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     hass_access_token: str,
 ) -> None:
@@ -770,7 +770,7 @@ async def test_subscribe_requires_admin(
 
 
 async def test_states_filters_visible(
-    hass: HomeAssistant, hass_admin_user: MockUser, websocket_client
+    hass: SmartHub, hass_admin_user: MockUser, websocket_client
 ) -> None:
     """Test we only get entities that we're allowed to see."""
     hass_admin_user.groups = []
@@ -788,7 +788,7 @@ async def test_states_filters_visible(
 
 
 async def test_get_states_not_allows_nan(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test get_states command converts NaN to None."""
     hass.states.async_set("greeting.hello", "world")
@@ -811,7 +811,7 @@ async def test_get_states_not_allows_nan(
 
 
 async def test_subscribe_unsubscribe_events_whitelist(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -849,7 +849,7 @@ async def test_subscribe_unsubscribe_events_whitelist(
 
 
 async def test_subscribe_unsubscribe_events_state_changed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -877,7 +877,7 @@ async def test_subscribe_unsubscribe_events_state_changed(
 
 
 async def test_subscribe_entities_with_unserializable_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -996,7 +996,7 @@ async def test_subscribe_entities_with_unserializable_state(
 
 
 async def test_subscribe_unsubscribe_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -1165,7 +1165,7 @@ async def test_subscribe_unsubscribe_entities(
 
 
 async def test_subscribe_unsubscribe_entities_specific_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -1229,7 +1229,7 @@ async def test_subscribe_unsubscribe_entities_specific_entities(
 
 
 async def test_subscribe_unsubscribe_entities_with_filter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -1277,7 +1277,7 @@ async def test_subscribe_unsubscribe_entities_with_filter(
 
 
 async def test_render_template_renders_template(
-    hass: HomeAssistant, websocket_client
+    hass: SmartHub, websocket_client
 ) -> None:
     """Test simple template is rendered and updated."""
     hass.states.async_set("light.test", "on")
@@ -1325,7 +1325,7 @@ async def test_render_template_renders_template(
 
 
 async def test_render_template_with_timeout_and_variables(
-    hass: HomeAssistant, websocket_client
+    hass: SmartHub, websocket_client
 ) -> None:
     """Test a template with a timeout and variables renders without error."""
     await websocket_client.send_json_auto_id(
@@ -1358,7 +1358,7 @@ async def test_render_template_with_timeout_and_variables(
 
 
 async def test_render_template_manual_entity_ids_no_longer_needed(
-    hass: HomeAssistant, websocket_client
+    hass: SmartHub, websocket_client
 ) -> None:
     """Test that updates to specified entity ids cause a template rerender."""
     hass.states.async_set("light.test", "on")
@@ -1477,7 +1477,7 @@ EVENT_UNDEFINED_FILTER = {
     ],
 )
 async def test_render_template_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     caplog: pytest.LogCaptureFixture,
     template: str,
@@ -1548,7 +1548,7 @@ async def test_render_template_with_error(
     ],
 )
 async def test_render_template_with_timeout_and_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     caplog: pytest.LogCaptureFixture,
     template: str,
@@ -1613,7 +1613,7 @@ async def test_render_template_with_timeout_and_error(
     ],
 )
 async def test_render_template_strict_with_timeout_and_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client,
     caplog: pytest.LogCaptureFixture,
     template: str,
@@ -1674,7 +1674,7 @@ async def test_render_template_strict_with_timeout_and_error(
     ],
 )
 async def test_render_template_strict_with_timeout_and_error_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client,
     caplog: pytest.LogCaptureFixture,
     template: str,
@@ -1758,7 +1758,7 @@ async def test_render_template_strict_with_timeout_and_error_2(
     ],
 )
 async def test_render_template_error_in_template_code(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     caplog: pytest.LogCaptureFixture,
     template: str,
@@ -1822,7 +1822,7 @@ async def test_render_template_error_in_template_code(
     ],
 )
 async def test_render_template_error_in_template_code_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client,
     caplog: pytest.LogCaptureFixture,
     template: str,
@@ -1853,7 +1853,7 @@ async def test_render_template_error_in_template_code_2(
 
 
 async def test_render_template_with_delayed_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -1925,7 +1925,7 @@ async def test_render_template_with_delayed_error(
 
 
 async def test_render_template_with_delayed_error_2(
-    hass: HomeAssistant, websocket_client, caplog: pytest.LogCaptureFixture
+    hass: SmartHub, websocket_client, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test a template with an error that only happens after a state change.
 
@@ -1977,7 +1977,7 @@ async def test_render_template_with_delayed_error_2(
 
 
 async def test_render_template_with_timeout(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2008,7 +2008,7 @@ async def test_render_template_with_timeout(
 
 
 async def test_render_template_returns_with_match_all(
-    hass: HomeAssistant, websocket_client
+    hass: SmartHub, websocket_client
 ) -> None:
     """Test that a template that would match with all entities still return success."""
     await websocket_client.send_json_auto_id(
@@ -2021,7 +2021,7 @@ async def test_render_template_returns_with_match_all(
 
 
 async def test_manifest_list(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test loading manifests."""
     http = await async_get_integration(hass, "http")
@@ -2039,7 +2039,7 @@ async def test_manifest_list(
 
 
 async def test_manifest_list_specific_integrations(
-    hass: HomeAssistant, websocket_client
+    hass: SmartHub, websocket_client
 ) -> None:
     """Test loading manifests for specific integrations."""
     websocket_api = await async_get_integration(hass, "websocket_api")
@@ -2059,7 +2059,7 @@ async def test_manifest_list_specific_integrations(
 
 
 async def test_manifest_get(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test getting a manifest."""
     hue = await async_get_integration(hass, "hue")
@@ -2085,7 +2085,7 @@ async def test_manifest_get(
 
 
 async def test_entity_source_admin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -2125,7 +2125,7 @@ async def test_entity_source_admin(
 
 
 async def test_subscribe_trigger(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test subscribing to a trigger."""
     init_count = sum(hass.bus.async_listeners().values())
@@ -2177,7 +2177,7 @@ async def test_subscribe_trigger(
 
 
 async def test_test_condition(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test testing a condition."""
     hass.states.async_set("hello.world", "paulus")
@@ -2233,7 +2233,7 @@ async def test_test_condition(
 
 
 async def test_execute_script(
-    hass: HomeAssistant, websocket_client: MockHAClientWebSocket
+    hass: SmartHub, websocket_client: MockHAClientWebSocket
 ) -> None:
     """Test testing a condition."""
     calls = async_mock_service(
@@ -2296,7 +2296,7 @@ async def test_execute_script(
     ("raise_exception", "err_code"),
     [
         (
-            HomeAssistantError(
+            SmartHubError(
                 "Some error",
                 translation_domain="test",
                 translation_key="test_error",
@@ -2317,9 +2317,9 @@ async def test_execute_script(
 )
 @pytest.mark.parametrize("ignore_translations_for_mock_domains", ["test"])
 async def test_execute_script_err_localization(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
-    raise_exception: HomeAssistantError,
+    raise_exception: SmartHubError,
     err_code: str,
 ) -> None:
     """Test testing a condition."""
@@ -2351,10 +2351,10 @@ async def test_execute_script_err_localization(
 
 
 async def test_execute_script_complex_response(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test testing a condition."""
-    await async_setup_component(hass, "homeassistant", {})
+    await async_setup_component(hass, "smarthub", {})
     await async_setup_component(hass, "calendar", {"calendar": {"platform": "demo"}})
     await hass.async_block_till_done()
     ws_client = await hass_ws_client(hass)
@@ -2393,7 +2393,7 @@ async def test_execute_script_complex_response(
 
 
 async def test_execute_script_with_dynamically_validated_action(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     device_registry: dr.DeviceRegistry,
     fake_integration,
@@ -2439,7 +2439,7 @@ async def test_execute_script_with_dynamically_validated_action(
 
 
 async def test_subscribe_unsubscribe_bootstrap_integrations(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -2463,13 +2463,13 @@ async def test_subscribe_unsubscribe_bootstrap_integrations(
 
 
 async def test_integration_setup_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
     """Test subscribe/unsubscribe bootstrap_integrations."""
     with patch(
-        "homeassistant.components.websocket_api.commands.async_get_setup_timings",
+        "smarthub.components.websocket_api.commands.async_get_setup_timings",
         return_value={
             "august": 12.5,
             "isy994": 12.8,
@@ -2539,7 +2539,7 @@ async def test_validate_config_works(
                 "'non_existing', 'entity_id': 'hello.world', 'state': 'paulus'}"
             ),
         ),
-        # Raises HomeAssistantError
+        # Raises SmartHubError
         (
             "conditions",
             {
@@ -2576,7 +2576,7 @@ async def test_validate_config_invalid(
 
 
 async def test_message_coalescing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -2650,7 +2650,7 @@ async def test_message_coalescing(
 
 
 async def test_message_coalescing_not_supported_by_websocket_client(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -2694,7 +2694,7 @@ async def test_message_coalescing_not_supported_by_websocket_client(
 
 
 async def test_client_message_coalescing(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -2769,7 +2769,7 @@ async def test_client_message_coalescing(
 
 
 async def test_integration_descriptions(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can get integration descriptions."""
     assert await async_setup_component(hass, "config", {})
@@ -2783,7 +2783,7 @@ async def test_integration_descriptions(
 
 
 async def test_subscribe_entities_chained_state_change(
-    hass: HomeAssistant,
+    hass: SmartHub,
     websocket_client: MockHAClientWebSocket,
     hass_admin_user: MockUser,
 ) -> None:
@@ -2841,7 +2841,7 @@ async def test_subscribe_entities_chained_state_change(
     ],
 )
 async def test_wait_integration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     domain: str,
     result: dict[str, Any],
@@ -2861,7 +2861,7 @@ async def test_wait_integration(
 
 
 async def test_wait_integration_startup(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> None:
     """Test we can get wait for an integration to load during startup."""
     ws_client = await hass_ws_client(hass)
@@ -2869,7 +2869,7 @@ async def test_wait_integration_startup(
     setup_stall = asyncio.Event()
     setup_started = asyncio.Event()
 
-    async def mock_setup(hass: HomeAssistant, _) -> bool:
+    async def mock_setup(hass: SmartHub, _) -> bool:
         setup_started.set()
         await setup_stall.wait()
         return True

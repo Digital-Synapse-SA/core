@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import nextcord
 
-from homeassistant.components.discord.const import DOMAIN
-from homeassistant.const import CONF_API_TOKEN, CONF_NAME
-from homeassistant.core import HomeAssistant
+from smarthub.components.discord.const import DOMAIN
+from smarthub.const import CONF_API_TOKEN, CONF_NAME
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -21,8 +21,8 @@ CONF_DATA = {
 }
 
 
-def create_entry(hass: HomeAssistant) -> MockConfigEntry:
-    """Add config entry in Home Assistant."""
+def create_entry(hass: SmartHub) -> MockConfigEntry:
+    """Add config entry in SmartHub."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         data=CONF_DATA,
@@ -38,14 +38,14 @@ def mocked_discord_info():
     mocked_discord.id = "1234567890"
     mocked_discord.name = NAME
     return patch(
-        "homeassistant.components.discord.config_flow.nextcord.Client.application_info",
+        "smarthub.components.discord.config_flow.nextcord.Client.application_info",
         return_value=mocked_discord,
     )
 
 
 def patch_discord_login():
     """Patch discord info."""
-    return patch("homeassistant.components.discord.config_flow.nextcord.Client.login")
+    return patch("smarthub.components.discord.config_flow.nextcord.Client.login")
 
 
 def mock_exception():

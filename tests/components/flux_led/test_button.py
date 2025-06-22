@@ -1,11 +1,11 @@
 """Tests for button platform."""
 
-from homeassistant.components import flux_led
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN
-from homeassistant.components.flux_led.const import DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, CONF_HOST, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components import flux_led
+from smarthub.components.button import DOMAIN as BUTTON_DOMAIN
+from smarthub.components.flux_led.const import DOMAIN
+from smarthub.const import ATTR_ENTITY_ID, CONF_HOST, CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -22,7 +22,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_button_reboot(hass: HomeAssistant) -> None:
+async def test_button_reboot(hass: SmartHub) -> None:
     """Test a smart plug can be rebooted."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -45,7 +45,7 @@ async def test_button_reboot(hass: HomeAssistant) -> None:
     switch.async_reboot.assert_called_once()
 
 
-async def test_button_unpair_remotes_bulb(hass: HomeAssistant) -> None:
+async def test_button_unpair_remotes_bulb(hass: SmartHub) -> None:
     """Test that remotes can be unpaired from a bulb."""
     _mock_config_entry_for_bulb(hass)
     bulb = _mocked_bulb()
@@ -63,7 +63,7 @@ async def test_button_unpair_remotes_bulb(hass: HomeAssistant) -> None:
     bulb.async_unpair_remotes.assert_called_once()
 
 
-async def test_button_unpair_remotes_smart_switch(hass: HomeAssistant) -> None:
+async def test_button_unpair_remotes_smart_switch(hass: SmartHub) -> None:
     """Test that remotes can be unpaired from a smart switch."""
     _mock_config_entry_for_bulb(hass)
     switch = _mocked_switch()

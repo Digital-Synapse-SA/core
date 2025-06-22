@@ -3,10 +3,10 @@
 from aiohttp.test_utils import TestClient
 import pytest
 
-from homeassistant.components.websocket_api.auth import TYPE_AUTH_REQUIRED
-from homeassistant.components.websocket_api.http import URL
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
+from smarthub.components.websocket_api.auth import TYPE_AUTH_REQUIRED
+from smarthub.components.websocket_api.http import URL
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
 
 from tests.typing import (
     ClientSessionGenerator,
@@ -17,7 +17,7 @@ from tests.typing import (
 
 @pytest.fixture
 async def websocket_client(
-    hass: HomeAssistant, hass_ws_client: WebSocketGenerator
+    hass: SmartHub, hass_ws_client: WebSocketGenerator
 ) -> MockHAClientWebSocket:
     """Create a websocket client."""
     return await hass_ws_client(hass)
@@ -25,7 +25,7 @@ async def websocket_client(
 
 @pytest.fixture
 async def no_auth_websocket_client(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> TestClient:
     """Websocket connection that requires authentication."""
     assert await async_setup_component(hass, "websocket_api", {})

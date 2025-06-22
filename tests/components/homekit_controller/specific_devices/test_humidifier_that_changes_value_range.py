@@ -1,8 +1,8 @@
-"""Test for a Home Assistant bridge that changes humidifier min/max at runtime."""
+"""Test for a SmartHub bridge that changes humidifier min/max at runtime."""
 
-from homeassistant.components.humidifier import ATTR_MAX_HUMIDITY, ATTR_MIN_HUMIDITY
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.components.humidifier import ATTR_MAX_HUMIDITY, ATTR_MIN_HUMIDITY
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from ..common import (
     device_config_changed,
@@ -12,7 +12,7 @@ from ..common import (
 
 
 async def test_humidifier_change_range_at_runtime(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test that min max can be changed at runtime."""
 

@@ -6,8 +6,8 @@ from aioswitcher.api.messages import SwitcherBaseResponse
 from aioswitcher.device import DeviceState
 import pytest
 
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import (
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -15,9 +15,9 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.util import slugify
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.util import slugify
 
 from . import init_integration
 from .consts import (
@@ -59,7 +59,7 @@ ENTITY_ID5_3 = f"{LIGHT_DOMAIN}.{slugify(DEVICE5.name)}_light_3"
     "mock_bridge", [[DEVICE, DEVICE2, DEVICE3, DEVICE4, DEVICE5]], indirect=True
 )
 async def test_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge,
     mock_api,
     monkeypatch: pytest.MonkeyPatch,
@@ -86,7 +86,7 @@ async def test_light(
 
     # Test turning on light
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_light",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_light",
     ) as mock_set_light:
         await hass.services.async_call(
             LIGHT_DOMAIN, SERVICE_TURN_ON, {ATTR_ENTITY_ID: entity_id}, blocking=True
@@ -99,7 +99,7 @@ async def test_light(
 
     # Test turning off light
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_light"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_light"
     ) as mock_set_light:
         await hass.services.async_call(
             LIGHT_DOMAIN, SERVICE_TURN_OFF, {ATTR_ENTITY_ID: entity_id}, blocking=True
@@ -113,7 +113,7 @@ async def test_light(
 
 @pytest.mark.parametrize("mock_bridge", [[DEVICE]], indirect=True)
 async def test_light_ignore_previous_async_state(
-    hass: HomeAssistant, mock_bridge, mock_api
+    hass: SmartHub, mock_bridge, mock_api
 ) -> None:
     """Test light ignores previous async state."""
     await init_integration(hass, USERNAME, TOKEN)
@@ -127,7 +127,7 @@ async def test_light_ignore_previous_async_state(
 
     # Test turning off light
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_light"
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_light"
     ) as mock_set_light:
         await hass.services.async_call(
             LIGHT_DOMAIN, SERVICE_TURN_OFF, {ATTR_ENTITY_ID: entity_id}, blocking=True
@@ -167,7 +167,7 @@ async def test_light_ignore_previous_async_state(
     "mock_bridge", [[DEVICE, DEVICE2, DEVICE3, DEVICE4, DEVICE5]], indirect=True
 )
 async def test_light_control_fail(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_bridge,
     mock_api,
     monkeypatch: pytest.MonkeyPatch,
@@ -190,10 +190,10 @@ async def test_light_control_fail(
 
     # Test exception during turn on
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_light",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_light",
         side_effect=RuntimeError("fake error"),
     ) as mock_control_device:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 LIGHT_DOMAIN,
                 SERVICE_TURN_ON,
@@ -215,10 +215,10 @@ async def test_light_control_fail(
 
     # Test error response during turn on
     with patch(
-        "homeassistant.components.switcher_kis.entity.SwitcherApi.set_light",
+        "smarthub.components.switcher_kis.entity.SwitcherApi.set_light",
         return_value=SwitcherBaseResponse(None),
     ) as mock_control_device:
-        with pytest.raises(HomeAssistantError):
+        with pytest.raises(SmartHubError):
             await hass.services.async_call(
                 LIGHT_DOMAIN,
                 SERVICE_TURN_ON,

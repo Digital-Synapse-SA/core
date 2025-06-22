@@ -8,7 +8,7 @@ from caldav.lib.error import DAVError, NotFoundError
 from caldav.objects import Todo
 import pytest
 
-from homeassistant.components.todo import (
+from smarthub.components.todo import (
     ATTR_DESCRIPTION,
     ATTR_DUE_DATE,
     ATTR_DUE_DATETIME,
@@ -18,9 +18,9 @@ from homeassistant.components.todo import (
     DOMAIN as TODO_DOMAIN,
     TodoServices,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
 
 from tests.common import MockConfigEntry
 from tests.typing import WebSocketGenerator
@@ -100,7 +100,7 @@ def platforms() -> list[Platform]:
 
 
 @pytest.fixture(autouse=True)
-async def set_tz(hass: HomeAssistant) -> None:
+async def set_tz(hass: SmartHub) -> None:
     """Fixture to set timezone with fixed offset year round."""
     await hass.config.async_set_time_zone("America/Regina")
 
@@ -148,7 +148,7 @@ def mock_calendars(calendar: Mock) -> list[Mock]:
 
 @pytest.fixture(autouse=True)
 async def mock_add_to_hass(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Fixture to add the ConfigEntry."""
@@ -193,7 +193,7 @@ def compact_ics(ics: str) -> list[str]:
     ),
 )
 async def test_todo_list_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     expected_state: str,
 ) -> None:
@@ -215,7 +215,7 @@ async def test_todo_list_state(
     [([], False), (["VTODO"], True), (["VEVENT"], False), (["VEVENT", "VTODO"], True)],
 )
 async def test_supported_components(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     has_entity: bool,
 ) -> None:
@@ -266,7 +266,7 @@ async def test_supported_components(
     ],
 )
 async def test_add_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     dav_client: Mock,
     calendar: Mock,
@@ -303,7 +303,7 @@ async def test_add_item(
 
 
 async def test_add_item_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     calendar: Mock,
 ) -> None:
@@ -312,7 +312,7 @@ async def test_add_item_failure(
 
     calendar.save_todo.side_effect = DAVError()
 
-    with pytest.raises(HomeAssistantError, match="CalDAV save error"):
+    with pytest.raises(SmartHubError, match="CalDAV save error"):
         await hass.services.async_call(
             TODO_DOMAIN,
             TodoServices.ADD_ITEM,
@@ -484,7 +484,7 @@ async def test_add_item_failure(
     ],
 )
 async def test_update_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     dav_client: Mock,
     calendar: Mock,
@@ -539,7 +539,7 @@ async def test_update_item(
 
 
 async def test_update_item_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     dav_client: Mock,
     calendar: Mock,
@@ -554,7 +554,7 @@ async def test_update_item_failure(
     calendar.todo_by_uid = MagicMock(return_value=item)
     dav_client.put.side_effect = DAVError()
 
-    with pytest.raises(HomeAssistantError, match="CalDAV save error"):
+    with pytest.raises(SmartHubError, match="CalDAV save error"):
         await hass.services.async_call(
             TODO_DOMAIN,
             TodoServices.UPDATE_ITEM,
@@ -572,7 +572,7 @@ async def test_update_item_failure(
     [(DAVError, "CalDAV lookup error"), (NotFoundError, "Could not find")],
 )
 async def test_update_item_lookup_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     dav_client: Mock,
     calendar: Mock,
@@ -588,7 +588,7 @@ async def test_update_item_lookup_failure(
 
     calendar.todo_by_uid.side_effect = side_effect
 
-    with pytest.raises(HomeAssistantError, match=match):
+    with pytest.raises(SmartHubError, match=match):
         await hass.services.async_call(
             TODO_DOMAIN,
             TodoServices.UPDATE_ITEM,
@@ -612,7 +612,7 @@ async def test_update_item_lookup_failure(
     ids=("none", "item1-only", "item2-only", "both-items"),
 )
 async def test_remove_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     dav_client: Mock,
     calendar: Mock,
@@ -662,7 +662,7 @@ async def test_remove_item(
     ],
 )
 async def test_remove_item_lookup_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     calendar: Mock,
     side_effect: Any,
@@ -674,7 +674,7 @@ async def test_remove_item_lookup_failure(
 
     calendar.todo_by_uid.side_effect = side_effect
 
-    with pytest.raises(HomeAssistantError, match=match):
+    with pytest.raises(SmartHubError, match=match):
         await hass.services.async_call(
             TODO_DOMAIN,
             TodoServices.REMOVE_ITEM,
@@ -685,7 +685,7 @@ async def test_remove_item_lookup_failure(
 
 
 async def test_remove_item_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     dav_client: Mock,
     calendar: Mock,
@@ -703,7 +703,7 @@ async def test_remove_item_failure(
     calendar.todo_by_uid = Mock(side_effect=lookup)
     dav_client.delete.return_value.status = 500
 
-    with pytest.raises(HomeAssistantError, match="CalDAV delete error"):
+    with pytest.raises(SmartHubError, match="CalDAV delete error"):
         await hass.services.async_call(
             TODO_DOMAIN,
             TodoServices.REMOVE_ITEM,
@@ -714,7 +714,7 @@ async def test_remove_item_failure(
 
 
 async def test_remove_item_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     dav_client: Mock,
     calendar: Mock,
@@ -731,7 +731,7 @@ async def test_remove_item_not_found(
 
     calendar.todo_by_uid.side_effect = NotFoundError()
 
-    with pytest.raises(HomeAssistantError, match="Could not find"):
+    with pytest.raises(SmartHubError, match="Could not find"):
         await hass.services.async_call(
             TODO_DOMAIN,
             TodoServices.REMOVE_ITEM,
@@ -742,7 +742,7 @@ async def test_remove_item_not_found(
 
 
 async def test_subscribe(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     dav_client: Mock,
     calendar: Mock,

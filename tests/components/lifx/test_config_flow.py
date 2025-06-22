@@ -7,20 +7,20 @@ from unittest.mock import patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.lifx import DOMAIN
-from homeassistant.components.lifx.config_flow import LifXConfigFlow
-from homeassistant.components.lifx.const import CONF_SERIAL
-from homeassistant.const import CONF_DEVICE, CONF_HOST
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from homeassistant.helpers.service_info.zeroconf import (
+from smarthub import config_entries
+from smarthub.components.lifx import DOMAIN
+from smarthub.components.lifx.config_flow import LifXConfigFlow
+from smarthub.components.lifx.const import CONF_SERIAL
+from smarthub.const import CONF_DEVICE, CONF_HOST
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.service_info.dhcp import DhcpServiceInfo
+from smarthub.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
-from homeassistant.setup import async_setup_component
+from smarthub.setup import async_setup_component
 
 from . import (
     DEFAULT_ENTRY_TITLE,
@@ -40,7 +40,7 @@ from . import (
 from tests.common import MockConfigEntry
 
 
-async def test_discovery(hass: HomeAssistant) -> None:
+async def test_discovery(hass: SmartHub) -> None:
     """Test setting up discovery."""
     with _patch_discovery(), _patch_config_flow_try_connect():
         result = await hass.config_entries.flow.async_init(
@@ -105,7 +105,7 @@ async def test_discovery(hass: HomeAssistant) -> None:
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_discovery_but_cannot_connect(hass: HomeAssistant) -> None:
+async def test_discovery_but_cannot_connect(hass: SmartHub) -> None:
     """Test we can discover the device but we cannot connect."""
     with _patch_discovery(), _patch_config_flow_try_connect(no_device=True):
         result = await hass.config_entries.flow.async_init(
@@ -132,7 +132,7 @@ async def test_discovery_but_cannot_connect(hass: HomeAssistant) -> None:
     assert result3["reason"] == "cannot_connect"
 
 
-async def test_discovery_with_existing_device_present(hass: HomeAssistant) -> None:
+async def test_discovery_with_existing_device_present(hass: SmartHub) -> None:
     """Test setting up discovery."""
     config_entry = MockConfigEntry(
         domain=DOMAIN, data={CONF_HOST: "127.0.0.2"}, unique_id="dd:dd:dd:dd:dd:dd"
@@ -208,7 +208,7 @@ async def test_discovery_with_existing_device_present(hass: HomeAssistant) -> No
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_discovery_no_device(hass: HomeAssistant) -> None:
+async def test_discovery_no_device(hass: SmartHub) -> None:
     """Test discovery without device."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -225,7 +225,7 @@ async def test_discovery_no_device(hass: HomeAssistant) -> None:
     assert result2["reason"] == "no_devices_found"
 
 
-async def test_manual(hass: HomeAssistant) -> None:
+async def test_manual(hass: SmartHub) -> None:
     """Test manually setup."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -282,7 +282,7 @@ async def test_manual(hass: HomeAssistant) -> None:
     assert result2["reason"] == "already_configured"
 
 
-async def test_manual_dns_error(hass: HomeAssistant) -> None:
+async def test_manual_dns_error(hass: SmartHub) -> None:
     """Test manually setup with unresolving host."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -309,7 +309,7 @@ async def test_manual_dns_error(hass: HomeAssistant) -> None:
     with (
         _patch_discovery(no_device=True),
         patch(
-            "homeassistant.components.lifx.config_flow.LIFXConnection",
+            "smarthub.components.lifx.config_flow.LIFXConnection",
             MockLifxConnectonDnsError,
         ),
     ):
@@ -323,7 +323,7 @@ async def test_manual_dns_error(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_manual_no_capabilities(hass: HomeAssistant) -> None:
+async def test_manual_no_capabilities(hass: SmartHub) -> None:
     """Test manually setup without successful get_capabilities."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -349,7 +349,7 @@ async def test_manual_no_capabilities(hass: HomeAssistant) -> None:
     }
 
 
-async def test_discovered_by_discovery_and_dhcp(hass: HomeAssistant) -> None:
+async def test_discovered_by_discovery_and_dhcp(hass: SmartHub) -> None:
     """Test we get the form with discovery and abort for dhcp source when we get both."""
 
     with _patch_discovery(), _patch_config_flow_try_connect():
@@ -443,7 +443,7 @@ async def test_discovered_by_discovery_and_dhcp(hass: HomeAssistant) -> None:
     ],
 )
 async def test_discovered_by_dhcp_or_discovery(
-    hass: HomeAssistant, source, data
+    hass: SmartHub, source, data
 ) -> None:
     """Test we can setup when discovered from dhcp or discovery."""
 
@@ -503,7 +503,7 @@ async def test_discovered_by_dhcp_or_discovery(
     ],
 )
 async def test_discovered_by_dhcp_or_discovery_failed_to_get_device(
-    hass: HomeAssistant, source, data
+    hass: SmartHub, source, data
 ) -> None:
     """Test we abort if we cannot get the unique id when discovered from dhcp."""
 
@@ -543,7 +543,7 @@ async def test_discovered_by_dhcp_or_discovery_failed_to_get_device(
     ],
 )
 async def test_discovered_by_dhcp_or_homekit_updates_ip(
-    hass: HomeAssistant, source, data
+    hass: SmartHub, source, data
 ) -> None:
     """Update host from dhcp."""
     config_entry = MockConfigEntry(
@@ -562,7 +562,7 @@ async def test_discovered_by_dhcp_or_homekit_updates_ip(
     assert config_entry.data[CONF_HOST] == IP_ADDRESS
 
 
-async def test_refuse_relays(hass: HomeAssistant) -> None:
+async def test_refuse_relays(hass: SmartHub) -> None:
     """Test we refuse to setup relays."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -584,7 +584,7 @@ async def test_refuse_relays(hass: HomeAssistant) -> None:
 
 
 async def test_suggested_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

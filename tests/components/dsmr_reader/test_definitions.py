@@ -2,15 +2,15 @@
 
 import pytest
 
-from homeassistant.components.dsmr_reader.const import DOMAIN
-from homeassistant.components.dsmr_reader.definitions import (
+from smarthub.components.dsmr_reader.const import DOMAIN
+from smarthub.components.dsmr_reader.definitions import (
     DSMRReaderSensorEntityDescription,
     dsmr_transform,
     tariff_transform,
 )
-from homeassistant.components.dsmr_reader.sensor import DSMRSensor
-from homeassistant.const import STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
+from smarthub.components.dsmr_reader.sensor import DSMRSensor
+from smarthub.const import STATE_UNKNOWN
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry, MockEntityPlatform, async_fire_mqtt_message
 
@@ -40,7 +40,7 @@ async def test_tariff_transform(input, expected) -> None:
 
 
 @pytest.mark.usefixtures("mqtt_mock")
-async def test_entity_tariff(hass: HomeAssistant) -> None:
+async def test_entity_tariff(hass: SmartHub) -> None:
     """Test the state attribute of DSMRReaderSensorEntityDescription when a tariff transform is needed."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -72,7 +72,7 @@ async def test_entity_tariff(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mqtt_mock")
-async def test_entity_dsmr_transform(hass: HomeAssistant) -> None:
+async def test_entity_dsmr_transform(hass: SmartHub) -> None:
     """Test the state attribute of DSMRReaderSensorEntityDescription when a dsmr transform is needed."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,

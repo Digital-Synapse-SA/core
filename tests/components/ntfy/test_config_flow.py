@@ -12,9 +12,9 @@ from aiontfy.exceptions import (
 )
 import pytest
 
-from homeassistant.components.ntfy.const import CONF_TOPIC, DOMAIN, SECTION_AUTH
-from homeassistant.config_entries import SOURCE_USER, ConfigSubentry
-from homeassistant.const import (
+from smarthub.components.ntfy.const import CONF_TOPIC, DOMAIN, SECTION_AUTH
+from smarthub.config_entries import SOURCE_USER, ConfigSubentry
+from smarthub.const import (
     CONF_NAME,
     CONF_PASSWORD,
     CONF_TOKEN,
@@ -22,8 +22,8 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -57,7 +57,7 @@ from tests.common import MockConfigEntry
 )
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_form(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     user_input: dict[str, Any],
     entry_data: dict[str, Any],
@@ -101,7 +101,7 @@ async def test_form(
     ],
 )
 async def test_form_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_aiontfy: AsyncMock,
     exception: Exception,
@@ -149,7 +149,7 @@ async def test_form_errors(
 
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_form_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort when entry is already configured."""
@@ -174,7 +174,7 @@ async def test_form_already_configured(
 
 
 @pytest.mark.usefixtures("mock_aiontfy")
-async def test_add_topic_flow(hass: HomeAssistant) -> None:
+async def test_add_topic_flow(hass: SmartHub) -> None:
     """Test add topic subentry flow."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -222,7 +222,7 @@ async def test_add_topic_flow(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.usefixtures("mock_aiontfy")
-async def test_generated_topic(hass: HomeAssistant, mock_random: AsyncMock) -> None:
+async def test_generated_topic(hass: SmartHub, mock_random: AsyncMock) -> None:
     """Test add topic subentry flow with generated topic name."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -276,7 +276,7 @@ async def test_generated_topic(hass: HomeAssistant, mock_random: AsyncMock) -> N
 
 
 @pytest.mark.usefixtures("mock_aiontfy")
-async def test_invalid_topic(hass: HomeAssistant, mock_random: AsyncMock) -> None:
+async def test_invalid_topic(hass: SmartHub, mock_random: AsyncMock) -> None:
     """Test add topic subentry flow with invalid topic name."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -332,7 +332,7 @@ async def test_invalid_topic(hass: HomeAssistant, mock_random: AsyncMock) -> Non
 
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_topic_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test we abort when entry is already configured."""
@@ -372,7 +372,7 @@ async def test_topic_already_configured(
 )
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_flow_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aiontfy: AsyncMock,
     user_input: dict[str, Any],
 ) -> None:
@@ -429,7 +429,7 @@ async def test_flow_reauth(
     ],
 )
 async def test_form_reauth_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aiontfy: AsyncMock,
     exception: Exception,
     error: str,
@@ -479,7 +479,7 @@ async def test_form_reauth_errors(
 
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_flow_reauth_account_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test reauth flow."""
@@ -516,7 +516,7 @@ async def test_flow_reauth_account_mismatch(
     ],
 )
 async def test_flow_reconfigure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aiontfy: AsyncMock,
     entry_data: dict[str, str | None],
     user_input: dict[str, str],
@@ -563,7 +563,7 @@ async def test_flow_reconfigure(
 )
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_flow_reconfigure_token(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entry_data: dict[str, Any],
     step_id: str,
 ) -> None:
@@ -618,7 +618,7 @@ async def test_flow_reconfigure_token(
     ],
 )
 async def test_flow_reconfigure_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_aiontfy: AsyncMock,
     exception: Exception,
     error: str,
@@ -671,7 +671,7 @@ async def test_flow_reconfigure_errors(
 
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_flow_reconfigure_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test reconfigure flow already configured."""
@@ -705,7 +705,7 @@ async def test_flow_reconfigure_already_configured(
 
 @pytest.mark.usefixtures("mock_aiontfy")
 async def test_flow_reconfigure_account_mismatch(
-    hass: HomeAssistant,
+    hass: SmartHub,
 ) -> None:
     """Test reconfigure flow account mismatch."""
     config_entry = MockConfigEntry(

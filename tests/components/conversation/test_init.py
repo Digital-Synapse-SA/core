@@ -7,19 +7,19 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 import voluptuous as vol
 
-from homeassistant.components import conversation
-from homeassistant.components.conversation import (
+from smarthub.components import conversation
+from smarthub.components.conversation import (
     ConversationInput,
     async_handle_intents,
     async_handle_sentence_triggers,
     default_agent,
 )
-from homeassistant.components.conversation.const import DATA_DEFAULT_ENTITY
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.core import Context, HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import intent
-from homeassistant.setup import async_setup_component
+from smarthub.components.conversation.const import DATA_DEFAULT_ENTITY
+from smarthub.components.light import DOMAIN as LIGHT_DOMAIN
+from smarthub.core import Context, SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import intent
+from smarthub.setup import async_setup_component
 
 from . import MockAgent
 
@@ -29,7 +29,7 @@ from tests.typing import ClientSessionGenerator
 AGENT_ID_OPTIONS = [
     None,
     # Old value of conversation.HOME_ASSISTANT_AGENT,
-    "homeassistant",
+    "smarthub",
     # Current value of conversation.HOME_ASSISTANT_AGENT,
     "conversation.home_assistant",
 ]
@@ -39,7 +39,7 @@ AGENT_ID_OPTIONS = [
 @pytest.mark.parametrize("sentence", ["turn on kitchen", "turn kitchen on"])
 @pytest.mark.parametrize("conversation_id", ["my_new_conversation", None])
 async def test_turn_on_intent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     conversation_id,
     sentence,
@@ -72,12 +72,12 @@ async def test_turn_on_intent(
     assert result == snapshot
 
 
-async def test_service_fails(hass: HomeAssistant, init_components) -> None:
+async def test_service_fails(hass: SmartHub, init_components) -> None:
     """Test calling the turn on intent."""
     with (
-        pytest.raises(HomeAssistantError),
+        pytest.raises(SmartHubError),
         patch(
-            "homeassistant.components.conversation.async_converse",
+            "smarthub.components.conversation.async_converse",
             side_effect=intent.IntentHandleError,
         ),
     ):
@@ -90,7 +90,7 @@ async def test_service_fails(hass: HomeAssistant, init_components) -> None:
 
 
 @pytest.mark.parametrize("sentence", ["turn off kitchen", "turn kitchen off"])
-async def test_turn_off_intent(hass: HomeAssistant, init_components, sentence) -> None:
+async def test_turn_off_intent(hass: SmartHub, init_components, sentence) -> None:
     """Test calling the turn on intent."""
     hass.states.async_set("light.kitchen", "on")
     calls = async_mock_service(hass, LIGHT_DOMAIN, "turn_off")
@@ -109,7 +109,7 @@ async def test_turn_off_intent(hass: HomeAssistant, init_components, sentence) -
 
 @pytest.mark.usefixtures("init_components")
 async def test_custom_agent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client: ClientSessionGenerator,
     hass_admin_user: MockUser,
     mock_conversation_agent: MockAgent,
@@ -144,7 +144,7 @@ async def test_custom_agent(
     )
 
 
-async def test_prepare_reload(hass: HomeAssistant, init_components) -> None:
+async def test_prepare_reload(hass: SmartHub, init_components) -> None:
     """Test calling the reload service."""
     language = hass.config.language
 
@@ -171,9 +171,9 @@ async def test_prepare_reload(hass: HomeAssistant, init_components) -> None:
     assert not agent._lang_intents.get(language)
 
 
-async def test_prepare_fail(hass: HomeAssistant) -> None:
+async def test_prepare_fail(hass: SmartHub) -> None:
     """Test calling prepare with a non-existent language."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})
 
     # Load intents
@@ -186,7 +186,7 @@ async def test_prepare_fail(hass: HomeAssistant) -> None:
 
 
 async def test_agent_id_validator_invalid_agent(
-    hass: HomeAssistant, init_components
+    hass: SmartHub, init_components
 ) -> None:
     """Test validating agent id."""
     with pytest.raises(vol.Invalid):
@@ -197,7 +197,7 @@ async def test_agent_id_validator_invalid_agent(
 
 
 async def test_get_agent_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     mock_conversation_agent: MockAgent,
     snapshot: SnapshotAssertion,
@@ -205,8 +205,8 @@ async def test_get_agent_info(
     """Test get agent info."""
     agent_info = conversation.async_get_agent_info(hass)
     # Test it's the default
-    assert conversation.async_get_agent_info(hass, "homeassistant") == agent_info
-    assert conversation.async_get_agent_info(hass, "homeassistant") == snapshot
+    assert conversation.async_get_agent_info(hass, "smarthub") == agent_info
+    assert conversation.async_get_agent_info(hass, "smarthub") == snapshot
     assert (
         conversation.async_get_agent_info(hass, mock_conversation_agent.agent_id)
         == snapshot
@@ -223,20 +223,20 @@ async def test_get_agent_info(
     default_agent = conversation.async_get_agent(hass)
     default_agent._attr_supports_streaming = True
     assert (
-        conversation.async_get_agent_info(hass, "homeassistant").supports_streaming
+        conversation.async_get_agent_info(hass, "smarthub").supports_streaming
         is True
     )
 
 
 @pytest.mark.parametrize("agent_id", AGENT_ID_OPTIONS)
 async def test_prepare_agent(
-    hass: HomeAssistant,
+    hass: SmartHub,
     init_components,
     agent_id: str,
 ) -> None:
     """Test prepare agent."""
     with patch(
-        "homeassistant.components.conversation.default_agent.DefaultAgent.async_prepare"
+        "smarthub.components.conversation.default_agent.DefaultAgent.async_prepare"
     ) as mock_prepare:
         await conversation.async_prepare_agent(hass, agent_id, "en")
 
@@ -248,10 +248,10 @@ async def test_prepare_agent(
     [("response {{ trigger.device_id }}", "response 1234"), ("", "")],
 )
 async def test_async_handle_sentence_triggers(
-    hass: HomeAssistant, response_template: str, expected_response: str
+    hass: SmartHub, response_template: str, expected_response: str
 ) -> None:
     """Test handling sentence triggers with async_handle_sentence_triggers."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})
 
     assert await async_setup_component(
@@ -286,9 +286,9 @@ async def test_async_handle_sentence_triggers(
     assert actual_response == expected_response
 
 
-async def test_async_handle_intents(hass: HomeAssistant) -> None:
+async def test_async_handle_intents(hass: SmartHub) -> None:
     """Test handling registered intents with async_handle_intents."""
-    assert await async_setup_component(hass, "homeassistant", {})
+    assert await async_setup_component(hass, "smarthub", {})
     assert await async_setup_component(hass, "conversation", {})
 
     # Reuse custom sentences in test config to trigger default agent.

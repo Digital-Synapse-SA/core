@@ -10,8 +10,8 @@ from aiohomekit.model.characteristics import (
 )
 from aiohomekit.model.services import ServicesTypes
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .common import setup_test_component
 
@@ -62,7 +62,7 @@ def create_char_switch_service(accessory: Accessory) -> None:
 
 
 async def test_switch_change_outlet_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a HomeKit outlet on and off again."""
     helper = await setup_test_component(hass, get_next_aid(), create_switch_service)
@@ -89,7 +89,7 @@ async def test_switch_change_outlet_state(
 
 
 async def test_switch_read_outlet_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit outlet accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_switch_service)
@@ -124,7 +124,7 @@ async def test_switch_read_outlet_state(
 
 
 async def test_faucet_change_active_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a HomeKit outlet on and off again."""
     helper = await setup_test_component(hass, get_next_aid(), create_faucet_service)
@@ -151,7 +151,7 @@ async def test_faucet_change_active_state(
 
 
 async def test_faucet_read_active_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit outlet accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_faucet_service)
@@ -176,7 +176,7 @@ async def test_faucet_read_active_state(
 
 
 async def test_valve_change_active_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a valve on and off again."""
     helper = await setup_test_component(hass, get_next_aid(), create_valve_service)
@@ -203,7 +203,7 @@ async def test_valve_change_active_state(
 
 
 async def test_valve_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a valve accessory."""
     helper = await setup_test_component(hass, get_next_aid(), create_valve_service)
@@ -238,7 +238,7 @@ async def test_valve_read_state(
 
 
 async def test_char_switch_change_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can turn a characteristic on and off again."""
     helper = await setup_test_component(
@@ -273,7 +273,7 @@ async def test_char_switch_change_state(
 
 
 async def test_char_switch_read_state(
-    hass: HomeAssistant, get_next_aid: Callable[[], int]
+    hass: SmartHub, get_next_aid: Callable[[], int]
 ) -> None:
     """Test that we can read the state of a HomeKit characteristic switch."""
     helper = await setup_test_component(
@@ -296,7 +296,7 @@ async def test_char_switch_read_state(
 
 
 async def test_migrate_unique_id(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     get_next_aid: Callable[[], int],
 ) -> None:

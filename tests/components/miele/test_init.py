@@ -11,11 +11,11 @@ from pymiele import OAUTH2_TOKEN
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.miele.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.setup import async_setup_component
+from smarthub.components.miele.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.setup import async_setup_component
 
 from . import setup_integration
 
@@ -29,7 +29,7 @@ from tests.typing import WebSocketGenerator
 
 
 async def test_load_unload_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -62,7 +62,7 @@ async def test_load_unload_entry(
     ids=["unauthorized", "internal_server_error"],
 )
 async def test_expired_token_refresh_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
     status: http.HTTPStatus,
@@ -83,7 +83,7 @@ async def test_expired_token_refresh_failure(
 
 @pytest.mark.parametrize("expires_at", [time.time() - 3600], ids=["expired"])
 async def test_expired_token_refresh_connection_failure(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
 ) -> None:
@@ -101,7 +101,7 @@ async def test_expired_token_refresh_connection_failure(
 
 
 async def test_devices_multiple_created_count(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_miele_client: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -113,7 +113,7 @@ async def test_devices_multiple_created_count(
 
 
 async def test_device_info(
-    hass: HomeAssistant,
+    hass: SmartHub,
     snapshot: SnapshotAssertion,
     mock_miele_client: MagicMock,
     mock_config_entry: MockConfigEntry,
@@ -129,7 +129,7 @@ async def test_device_info(
 
 
 async def test_device_remove_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     mock_config_entry: MockConfigEntry,
     mock_miele_client: MagicMock,
@@ -167,7 +167,7 @@ async def test_device_remove_devices(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_setup_all_platforms(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_miele_client: MagicMock,
     mock_config_entry: MockConfigEntry,
     device_registry: dr.DeviceRegistry,

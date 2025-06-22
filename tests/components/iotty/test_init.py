@@ -2,16 +2,16 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.iotty.const import DOMAIN
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub.components.iotty.const import DOMAIN
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import config_entry_oauth2_flow
 
 from tests.common import MockConfigEntry
 
 
 async def test_load_unload_coordinator_called(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_coordinator: MagicMock,
     local_oauth_impl,
@@ -42,7 +42,7 @@ async def test_load_unload_coordinator_called(
 
 
 async def test_load_unload_iottyproxy_called(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_iotty: MagicMock,
     local_oauth_impl,

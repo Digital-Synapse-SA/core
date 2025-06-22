@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.light import (
+from smarthub.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP_KELVIN,
     ATTR_HS_COLOR,
@@ -15,9 +15,9 @@ from homeassistant.components.light import (
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import build_mock_node, setup_integration
 
@@ -34,7 +34,7 @@ def mock_attribute_map(attributes) -> dict:
 
 
 async def setup_mock_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     file: str,
@@ -63,7 +63,7 @@ async def setup_mock_light(
     ],
 )
 async def test_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     data: dict[str, Any],
@@ -82,7 +82,7 @@ async def test_turn_on(
 
 
 async def test_turn_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -101,7 +101,7 @@ async def test_turn_off(
 
 
 async def test_toggle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -137,7 +137,7 @@ async def test_toggle(
 
 
 async def test_light_snapshot(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_homee: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -152,7 +152,7 @@ async def test_light_snapshot(
         mock_homee.nodes[i].attribute_map = mock_attribute_map(
             mock_homee.nodes[i].attributes
         )
-    with patch("homeassistant.components.homee.PLATFORMS", [Platform.LIGHT]):
+    with patch("smarthub.components.homee.PLATFORMS", [Platform.LIGHT]):
         await setup_integration(hass, mock_config_entry)
 
     await snapshot_platform(hass, entity_registry, snapshot, mock_config_entry.entry_id)

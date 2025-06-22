@@ -1,14 +1,14 @@
 """The tests for the litejet component."""
 
-from homeassistant.components import scene
-from homeassistant.const import (
+from smarthub.components import scene
+from smarthub.const import (
     ATTR_ENTITY_ID,
     SERVICE_TURN_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import async_init_integration
 
@@ -19,7 +19,7 @@ ENTITY_OTHER_SCENE_NUMBER = 2
 
 
 async def test_disabled_by_default(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry, mock_litejet
+    hass: SmartHub, entity_registry: er.EntityRegistry, mock_litejet
 ) -> None:
     """Test the scene is disabled by default."""
     await async_init_integration(hass)
@@ -33,7 +33,7 @@ async def test_disabled_by_default(
     assert entry.disabled_by is er.RegistryEntryDisabler.INTEGRATION
 
 
-async def test_activate(hass: HomeAssistant, mock_litejet) -> None:
+async def test_activate(hass: SmartHub, mock_litejet) -> None:
     """Test activating the scene."""
 
     await async_init_integration(hass, use_scene=True)
@@ -48,7 +48,7 @@ async def test_activate(hass: HomeAssistant, mock_litejet) -> None:
     mock_litejet.activate_scene.assert_called_once_with(ENTITY_SCENE_NUMBER)
 
 
-async def test_connected_event(hass: HomeAssistant, mock_litejet) -> None:
+async def test_connected_event(hass: SmartHub, mock_litejet) -> None:
     """Test handling an event from LiteJet."""
 
     await async_init_integration(hass, use_scene=True)

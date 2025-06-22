@@ -2,11 +2,11 @@
 
 from enocean.utils import combine_hex
 
-from homeassistant.components.enocean import DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.components.enocean import DOMAIN
+from smarthub.components.switch import DOMAIN as SWITCH_DOMAIN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from tests.common import MockConfigEntry, assert_setup_component
 
@@ -23,7 +23,7 @@ SWITCH_CONFIG = {
 
 
 async def test_unique_id_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
 ) -> None:
     """Test EnOcean switch ID migration."""

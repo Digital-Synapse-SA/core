@@ -4,23 +4,23 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.gree.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.gree.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from .common import FakeDiscovery
 
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-@patch("homeassistant.components.gree.config_flow.DISCOVERY_TIMEOUT", 0)
+@patch("smarthub.components.gree.config_flow.DISCOVERY_TIMEOUT", 0)
 async def test_creating_entry_sets_up_climate(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test setting up Gree creates the climate components."""
     with patch(
-        "homeassistant.components.gree.config_flow.Discovery",
+        "smarthub.components.gree.config_flow.Discovery",
         return_value=FakeDiscovery(),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -38,13 +38,13 @@ async def test_creating_entry_sets_up_climate(
         assert len(mock_setup_entry.mock_calls) == 1
 
 
-@patch("homeassistant.components.gree.config_flow.DISCOVERY_TIMEOUT", 0)
+@patch("smarthub.components.gree.config_flow.DISCOVERY_TIMEOUT", 0)
 async def test_creating_entry_has_no_devices(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock
 ) -> None:
     """Test setting up Gree creates the climate components."""
     with patch(
-        "homeassistant.components.gree.config_flow.Discovery",
+        "smarthub.components.gree.config_flow.Discovery",
         return_value=FakeDiscovery(),
     ) as discovery:
         discovery.return_value.mock_devices = []

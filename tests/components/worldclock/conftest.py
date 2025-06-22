@@ -8,15 +8,15 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from homeassistant.components.worldclock.const import (
+from smarthub.components.worldclock.const import (
     CONF_TIME_FORMAT,
     DEFAULT_NAME,
     DEFAULT_TIME_STR_FORMAT,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_NAME, CONF_TIME_ZONE
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_NAME, CONF_TIME_ZONE
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
@@ -25,7 +25,7 @@ from tests.common import MockConfigEntry
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Automatically patch setup."""
     with patch(
-        "homeassistant.components.worldclock.async_setup_entry",
+        "smarthub.components.worldclock.async_setup_entry",
         return_value=True,
     ) as mock_setup_entry:
         yield mock_setup_entry
@@ -47,9 +47,9 @@ async def get_config_to_integration_load() -> dict[str, Any]:
 
 @pytest.fixture(name="loaded_entry")
 async def load_integration(
-    hass: HomeAssistant, get_config: dict[str, Any]
+    hass: SmartHub, get_config: dict[str, Any]
 ) -> MockConfigEntry:
-    """Set up the Worldclock integration in Home Assistant."""
+    """Set up the Worldclock integration in SmartHub."""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         title=DEFAULT_NAME,

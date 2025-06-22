@@ -4,17 +4,17 @@ from unittest.mock import AsyncMock
 
 import aiohttp
 
-from homeassistant import config_entries
-from homeassistant.components.azure_devops.const import CONF_ORG, CONF_PROJECT, DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.azure_devops.const import CONF_ORG, CONF_PROJECT, DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import FIXTURE_REAUTH_INPUT, FIXTURE_USER_INPUT
 
 from tests.common import MockConfigEntry
 
 
-async def test_show_user_form(hass: HomeAssistant) -> None:
+async def test_show_user_form(hass: SmartHub) -> None:
     """Test that the setup form is served."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -25,7 +25,7 @@ async def test_show_user_form(hass: HomeAssistant) -> None:
 
 
 async def test_authorization_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_devops_client: AsyncMock,
 ) -> None:
     """Test we show user form on Azure DevOps authorization error."""
@@ -52,7 +52,7 @@ async def test_authorization_error(
 
 
 async def test_reauth_authorization_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: AsyncMock,
 ) -> None:
@@ -77,7 +77,7 @@ async def test_reauth_authorization_error(
 
 
 async def test_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_devops_client: AsyncMock,
 ) -> None:
     """Test we show user form on Azure DevOps connection error."""
@@ -104,7 +104,7 @@ async def test_connection_error(
 
 
 async def test_reauth_connection_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: AsyncMock,
 ) -> None:
@@ -130,7 +130,7 @@ async def test_reauth_connection_error(
 
 
 async def test_project_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_devops_client: AsyncMock,
 ) -> None:
     """Test we show user form on Azure DevOps connection error."""
@@ -158,7 +158,7 @@ async def test_project_error(
 
 
 async def test_reauth_project_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: AsyncMock,
 ) -> None:
@@ -186,7 +186,7 @@ async def test_reauth_project_error(
 
 
 async def test_reauth_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_devops_client: AsyncMock,
 ) -> None:
@@ -215,7 +215,7 @@ async def test_reauth_flow(
 
 
 async def test_full_flow_implementation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     mock_devops_client: AsyncMock,
 ) -> None:

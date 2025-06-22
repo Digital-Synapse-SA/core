@@ -11,24 +11,24 @@ from aiohasupervisor import (
     SupervisorNotFoundError,
 )
 from aiohasupervisor.models import (
-    HomeAssistantUpdateOptions,
+    SmartHubUpdateOptions,
     OSUpdate,
     StoreAddonUpdate,
 )
 import pytest
 
-from homeassistant.components.backup import BackupManagerError, ManagerBackup
+from smarthub.components.backup import BackupManagerError, ManagerBackup
 
 # pylint: disable-next=hass-component-root-import
-from homeassistant.components.backup.manager import AgentBackupStatus
-from homeassistant.components.hassio import DOMAIN
-from homeassistant.components.hassio.const import REQUEST_REFRESH_DELAY
-from homeassistant.const import __version__ as HAVERSION
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.backup import async_initialize_backup
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt as dt_util
+from smarthub.components.backup.manager import AgentBackupStatus
+from smarthub.components.hassio import DOMAIN
+from smarthub.components.hassio.const import REQUEST_REFRESH_DELAY
+from smarthub.const import __version__ as HAVERSION
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers.backup import async_initialize_backup
+from smarthub.setup import async_setup_component
+from smarthub.util import dt as dt_util
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 from tests.test_util.aiohttp import AiohttpClientMocker
@@ -47,7 +47,7 @@ def mock_all(
     resolution_info: AsyncMock,
 ) -> None:
     """Mock all setup requests."""
-    aioclient_mock.post("http://127.0.0.1/homeassistant/options", json={"result": "ok"})
+    aioclient_mock.post("http://127.0.0.1/smarthub/options", json={"result": "ok"})
     aioclient_mock.post("http://127.0.0.1/supervisor/options", json={"result": "ok"})
     aioclient_mock.get(
         "http://127.0.0.1/info",
@@ -55,7 +55,7 @@ def mock_all(
             "result": "ok",
             "data": {
                 "supervisor": "222",
-                "homeassistant": "0.110.0",
+                "smarthub": "0.110.0",
                 "hassos": "1.2.3",
             },
         },
@@ -112,7 +112,7 @@ def mock_all(
                         "version": "2.0.0",
                         "version_latest": "2.0.1",
                         "repository": "core",
-                        "url": "https://github.com/home-assistant/addons/test",
+                        "url": "https://github.com/smart-hub/addons/test",
                     },
                     {
                         "name": "test2",
@@ -188,7 +188,7 @@ def mock_all(
     ],
 )
 async def test_update_entities(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_id,
     expected_state,
     auto_update,
@@ -217,7 +217,7 @@ async def test_update_entities(
     assert state.attributes["auto_update"] is auto_update
 
 
-async def test_update_addon(hass: HomeAssistant, update_addon: AsyncMock) -> None:
+async def test_update_addon(hass: SmartHub, update_addon: AsyncMock) -> None:
     """Test updating addon update entity."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
     config_entry.add_to_hass(hass)
@@ -232,7 +232,7 @@ async def test_update_addon(hass: HomeAssistant, update_addon: AsyncMock) -> Non
     await hass.async_block_till_done()
 
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+        "smarthub.components.backup.manager.BackupManager.async_create_backup",
     ) as mock_create_backup:
         await hass.services.async_call(
             "update",
@@ -244,7 +244,7 @@ async def test_update_addon(hass: HomeAssistant, update_addon: AsyncMock) -> Non
     update_addon.assert_called_once_with("test", StoreAddonUpdate(backup=False))
 
 
-async def setup_backup_integration(hass: HomeAssistant) -> None:
+async def setup_backup_integration(hass: SmartHub) -> None:
     """Set up the backup integration."""
     async_initialize_backup(hass)
     assert await async_setup_component(hass, "backup", {})
@@ -264,7 +264,7 @@ async def setup_backup_integration(hass: HomeAssistant) -> None:
                 "include_all_addons": False,
                 "include_database": False,
                 "include_folders": None,
-                "include_homeassistant": False,
+                "include_smarthub": False,
                 "name": "test 2.0.0",
                 "password": None,
             },
@@ -279,7 +279,7 @@ async def setup_backup_integration(hass: HomeAssistant) -> None:
                 "include_all_addons": False,
                 "include_database": False,
                 "include_folders": None,
-                "include_homeassistant": False,
+                "include_smarthub": False,
                 "name": "test 2.0.0",
                 "password": None,
             },
@@ -307,7 +307,7 @@ async def setup_backup_integration(hass: HomeAssistant) -> None:
                 "include_all_addons": False,
                 "include_database": False,
                 "include_folders": None,
-                "include_homeassistant": False,
+                "include_smarthub": False,
                 "name": "test 2.0.0",
                 "password": "hunter2",
             },
@@ -315,7 +315,7 @@ async def setup_backup_integration(hass: HomeAssistant) -> None:
     ],
 )
 async def test_update_addon_with_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     update_addon: AsyncMock,
@@ -344,7 +344,7 @@ async def test_update_addon_with_backup(
 
     supervisor_client.mounts.info.return_value.default_backup_mount = default_mount
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+        "smarthub.components.backup.manager.BackupManager.async_create_backup",
     ) as mock_create_backup:
         await hass.services.async_call(
             "update",
@@ -411,7 +411,7 @@ async def test_update_addon_with_backup(
     ],
 )
 async def test_update_addon_with_backup_removes_old_backups(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     update_addon: AsyncMock,
     backups: dict[str, ManagerBackup],
@@ -433,15 +433,15 @@ async def test_update_addon_with_backup_removes_old_backups(
     supervisor_client.mounts.info.return_value.default_backup_mount = None
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+            "smarthub.components.backup.manager.BackupManager.async_create_backup",
         ) as mock_create_backup,
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_delete_backup",
+            "smarthub.components.backup.manager.BackupManager.async_delete_backup",
             autospec=True,
             return_value={},
         ) as async_delete_backup,
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_get_backups",
+            "smarthub.components.backup.manager.BackupManager.async_get_backups",
             return_value=(backups, {}),
         ),
     ):
@@ -458,7 +458,7 @@ async def test_update_addon_with_backup_removes_old_backups(
         include_all_addons=False,
         include_database=False,
         include_folders=None,
-        include_homeassistant=False,
+        include_smarthub=False,
         name="test 2.0.0",
         password=None,
     )
@@ -468,7 +468,7 @@ async def test_update_addon_with_backup_removes_old_backups(
     update_addon.assert_called_once_with("test", StoreAddonUpdate(backup=False))
 
 
-async def test_update_os(hass: HomeAssistant, supervisor_client: AsyncMock) -> None:
+async def test_update_os(hass: SmartHub, supervisor_client: AsyncMock) -> None:
     """Test updating OS update entity."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
     config_entry.add_to_hass(hass)
@@ -484,7 +484,7 @@ async def test_update_os(hass: HomeAssistant, supervisor_client: AsyncMock) -> N
 
     supervisor_client.os.update.return_value = None
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+        "smarthub.components.backup.manager.BackupManager.async_create_backup",
     ) as mock_create_backup:
         await hass.services.async_call(
             "update",
@@ -508,8 +508,8 @@ async def test_update_os(hass: HomeAssistant, supervisor_client: AsyncMock) -> N
                 "include_all_addons": False,
                 "include_database": True,
                 "include_folders": None,
-                "include_homeassistant": True,
-                "name": f"Home Assistant Core {HAVERSION}",
+                "include_smarthub": True,
+                "name": f"SmartHub Core {HAVERSION}",
                 "password": None,
             },
         ),
@@ -522,8 +522,8 @@ async def test_update_os(hass: HomeAssistant, supervisor_client: AsyncMock) -> N
                 "include_all_addons": False,
                 "include_database": True,
                 "include_folders": None,
-                "include_homeassistant": True,
-                "name": f"Home Assistant Core {HAVERSION}",
+                "include_smarthub": True,
+                "name": f"SmartHub Core {HAVERSION}",
                 "password": None,
             },
         ),
@@ -549,7 +549,7 @@ async def test_update_os(hass: HomeAssistant, supervisor_client: AsyncMock) -> N
                 "include_all_addons": True,
                 "include_database": False,
                 "include_folders": ["share"],
-                "include_homeassistant": True,
+                "include_smarthub": True,
                 "name": "cool_backup",
                 "password": "hunter2",
                 "with_automatic_settings": True,
@@ -558,7 +558,7 @@ async def test_update_os(hass: HomeAssistant, supervisor_client: AsyncMock) -> N
     ],
 )
 async def test_update_os_with_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     commands: list[dict[str, Any]],
@@ -587,7 +587,7 @@ async def test_update_os_with_backup(
     supervisor_client.os.update.return_value = None
     supervisor_client.mounts.info.return_value.default_backup_mount = default_mount
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+        "smarthub.components.backup.manager.BackupManager.async_create_backup",
     ) as mock_create_backup:
         await hass.services.async_call(
             "update",
@@ -602,7 +602,7 @@ async def test_update_os_with_backup(
     supervisor_client.os.update.assert_called_once_with(OSUpdate(version=None))
 
 
-async def test_update_core(hass: HomeAssistant, supervisor_client: AsyncMock) -> None:
+async def test_update_core(hass: SmartHub, supervisor_client: AsyncMock) -> None:
     """Test updating core update entity."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
     config_entry.add_to_hass(hass)
@@ -616,9 +616,9 @@ async def test_update_core(hass: HomeAssistant, supervisor_client: AsyncMock) ->
         assert result
     await hass.async_block_till_done()
 
-    supervisor_client.homeassistant.update.return_value = None
+    supervisor_client.smarthub.update.return_value = None
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+        "smarthub.components.backup.manager.BackupManager.async_create_backup",
     ) as mock_create_backup:
         await hass.services.async_call(
             "update",
@@ -627,8 +627,8 @@ async def test_update_core(hass: HomeAssistant, supervisor_client: AsyncMock) ->
             blocking=True,
         )
     mock_create_backup.assert_not_called()
-    supervisor_client.homeassistant.update.assert_called_once_with(
-        HomeAssistantUpdateOptions(version=None, backup=False)
+    supervisor_client.smarthub.update.assert_called_once_with(
+        SmartHubUpdateOptions(version=None, backup=False)
     )
 
 
@@ -644,8 +644,8 @@ async def test_update_core(hass: HomeAssistant, supervisor_client: AsyncMock) ->
                 "include_all_addons": False,
                 "include_database": True,
                 "include_folders": None,
-                "include_homeassistant": True,
-                "name": f"Home Assistant Core {HAVERSION}",
+                "include_smarthub": True,
+                "name": f"SmartHub Core {HAVERSION}",
                 "password": None,
             },
         ),
@@ -658,8 +658,8 @@ async def test_update_core(hass: HomeAssistant, supervisor_client: AsyncMock) ->
                 "include_all_addons": False,
                 "include_database": True,
                 "include_folders": None,
-                "include_homeassistant": True,
-                "name": f"Home Assistant Core {HAVERSION}",
+                "include_smarthub": True,
+                "name": f"SmartHub Core {HAVERSION}",
                 "password": None,
             },
         ),
@@ -685,7 +685,7 @@ async def test_update_core(hass: HomeAssistant, supervisor_client: AsyncMock) ->
                 "include_all_addons": True,
                 "include_database": False,
                 "include_folders": ["share"],
-                "include_homeassistant": True,
+                "include_smarthub": True,
                 "name": "cool_backup",
                 "password": "hunter2",
                 "with_automatic_settings": True,
@@ -694,7 +694,7 @@ async def test_update_core(hass: HomeAssistant, supervisor_client: AsyncMock) ->
     ],
 )
 async def test_update_core_with_backup(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_ws_client: WebSocketGenerator,
     supervisor_client: AsyncMock,
     commands: list[dict[str, Any]],
@@ -720,10 +720,10 @@ async def test_update_core_with_backup(
         result = await client.receive_json()
         assert result["success"]
 
-    supervisor_client.homeassistant.update.return_value = None
+    supervisor_client.smarthub.update.return_value = None
     supervisor_client.mounts.info.return_value.default_backup_mount = default_mount
     with patch(
-        "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+        "smarthub.components.backup.manager.BackupManager.async_create_backup",
     ) as mock_create_backup:
         await hass.services.async_call(
             "update",
@@ -732,13 +732,13 @@ async def test_update_core_with_backup(
             blocking=True,
         )
     mock_create_backup.assert_called_once_with(**expected_kwargs)
-    supervisor_client.homeassistant.update.assert_called_once_with(
-        HomeAssistantUpdateOptions(version=None, backup=False)
+    supervisor_client.smarthub.update.assert_called_once_with(
+        SmartHubUpdateOptions(version=None, backup=False)
     )
 
 
 async def test_update_supervisor(
-    hass: HomeAssistant, supervisor_client: AsyncMock
+    hass: SmartHub, supervisor_client: AsyncMock
 ) -> None:
     """Test updating supervisor update entity."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
@@ -764,7 +764,7 @@ async def test_update_supervisor(
 
 
 async def test_update_addon_with_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     update_addon: AsyncMock,
 ) -> None:
     """Test updating addon update entity with error."""
@@ -780,7 +780,7 @@ async def test_update_addon_with_error(
     await hass.async_block_till_done()
 
     update_addon.side_effect = SupervisorError
-    with pytest.raises(HomeAssistantError, match=r"^Error updating test:"):
+    with pytest.raises(SmartHubError, match=r"^Error updating test:"):
         await hass.services.async_call(
             "update",
             "install",
@@ -797,7 +797,7 @@ async def test_update_addon_with_error(
     ],
 )
 async def test_update_addon_with_backup_and_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
     create_backup_error: Exception | None,
     delete_filtered_backups_error: Exception | None,
@@ -816,18 +816,18 @@ async def test_update_addon_with_backup_and_error(
         assert result
     await setup_backup_integration(hass)
 
-    supervisor_client.homeassistant.update.return_value = None
+    supervisor_client.smarthub.update.return_value = None
     supervisor_client.mounts.info.return_value.default_backup_mount = None
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+            "smarthub.components.backup.manager.BackupManager.async_create_backup",
             side_effect=create_backup_error,
         ),
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_delete_filtered_backups",
+            "smarthub.components.backup.manager.BackupManager.async_delete_filtered_backups",
             side_effect=delete_filtered_backups_error,
         ),
-        pytest.raises(HomeAssistantError, match=message),
+        pytest.raises(SmartHubError, match=message),
     ):
         await hass.services.async_call(
             "update",
@@ -838,7 +838,7 @@ async def test_update_addon_with_backup_and_error(
 
 
 async def test_update_os_with_error(
-    hass: HomeAssistant, supervisor_client: AsyncMock
+    hass: SmartHub, supervisor_client: AsyncMock
 ) -> None:
     """Test updating OS update entity with error."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
@@ -854,7 +854,7 @@ async def test_update_os_with_error(
 
     supervisor_client.os.update.side_effect = SupervisorError
     with pytest.raises(
-        HomeAssistantError, match=r"^Error updating Home Assistant Operating System:"
+        SmartHubError, match=r"^Error updating SmartHub Operating System:"
     ):
         await hass.services.async_call(
             "update",
@@ -865,7 +865,7 @@ async def test_update_os_with_error(
 
 
 async def test_update_os_with_backup_and_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
 ) -> None:
     """Test updating OS update entity with error."""
@@ -885,10 +885,10 @@ async def test_update_os_with_backup_and_error(
     supervisor_client.mounts.info.return_value.default_backup_mount = None
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+            "smarthub.components.backup.manager.BackupManager.async_create_backup",
             side_effect=BackupManagerError,
         ),
-        pytest.raises(HomeAssistantError, match=r"^Error creating backup:"),
+        pytest.raises(SmartHubError, match=r"^Error creating backup:"),
     ):
         await hass.services.async_call(
             "update",
@@ -902,7 +902,7 @@ async def test_update_os_with_backup_and_error(
 
 
 async def test_update_supervisor_with_error(
-    hass: HomeAssistant, supervisor_client: AsyncMock
+    hass: SmartHub, supervisor_client: AsyncMock
 ) -> None:
     """Test updating supervisor update entity with error."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
@@ -918,7 +918,7 @@ async def test_update_supervisor_with_error(
 
     supervisor_client.supervisor.update.side_effect = SupervisorError
     with pytest.raises(
-        HomeAssistantError, match=r"^Error updating Home Assistant Supervisor:"
+        SmartHubError, match=r"^Error updating SmartHub Supervisor:"
     ):
         await hass.services.async_call(
             "update",
@@ -929,7 +929,7 @@ async def test_update_supervisor_with_error(
 
 
 async def test_update_core_with_error(
-    hass: HomeAssistant, supervisor_client: AsyncMock
+    hass: SmartHub, supervisor_client: AsyncMock
 ) -> None:
     """Test updating core update entity with error."""
     config_entry = MockConfigEntry(domain=DOMAIN, data={}, unique_id=DOMAIN)
@@ -943,9 +943,9 @@ async def test_update_core_with_error(
         )
     await hass.async_block_till_done()
 
-    supervisor_client.homeassistant.update.side_effect = SupervisorError
+    supervisor_client.smarthub.update.side_effect = SupervisorError
     with pytest.raises(
-        HomeAssistantError, match=r"^Error updating Home Assistant Core:"
+        SmartHubError, match=r"^Error updating SmartHub Core:"
     ):
         await hass.services.async_call(
             "update",
@@ -956,7 +956,7 @@ async def test_update_core_with_error(
 
 
 async def test_update_core_with_backup_and_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     supervisor_client: AsyncMock,
 ) -> None:
     """Test updating core update entity with error."""
@@ -972,14 +972,14 @@ async def test_update_core_with_backup_and_error(
         assert result
     await setup_backup_integration(hass)
 
-    supervisor_client.homeassistant.update.return_value = None
+    supervisor_client.smarthub.update.return_value = None
     supervisor_client.mounts.info.return_value.default_backup_mount = None
     with (
         patch(
-            "homeassistant.components.backup.manager.BackupManager.async_create_backup",
+            "smarthub.components.backup.manager.BackupManager.async_create_backup",
             side_effect=BackupManagerError,
         ),
-        pytest.raises(HomeAssistantError, match=r"^Error creating backup:"),
+        pytest.raises(SmartHubError, match=r"^Error creating backup:"),
     ):
         await hass.services.async_call(
             "update",
@@ -990,7 +990,7 @@ async def test_update_core_with_backup_and_error(
 
 
 async def test_release_notes_between_versions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_changelog: AsyncMock,
     aioclient_mock: AiohttpClientMocker,
     hass_ws_client: WebSocketGenerator,
@@ -1028,7 +1028,7 @@ async def test_release_notes_between_versions(
 
 
 async def test_release_notes_full(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_changelog: AsyncMock,
     aioclient_mock: AiohttpClientMocker,
     hass_ws_client: WebSocketGenerator,
@@ -1078,7 +1078,7 @@ async def test_release_notes_full(
 
 
 async def test_not_release_notes(
-    hass: HomeAssistant,
+    hass: SmartHub,
     addon_changelog: AsyncMock,
     aioclient_mock: AiohttpClientMocker,
     hass_ws_client: WebSocketGenerator,
@@ -1114,15 +1114,15 @@ async def test_not_release_notes(
     assert result["result"] is None
 
 
-async def test_no_os_entity(hass: HomeAssistant) -> None:
+async def test_no_os_entity(hass: SmartHub) -> None:
     """Test handling where there is no os entity."""
     with (
         patch.dict(os.environ, MOCK_ENVIRON),
         patch(
-            "homeassistant.components.hassio.HassIO.get_info",
+            "smarthub.components.hassio.HassIO.get_info",
             return_value={
                 "supervisor": "222",
-                "homeassistant": "0.110.0",
+                "smarthub": "0.110.0",
                 "hassos": None,
             },
         ),
@@ -1140,7 +1140,7 @@ async def test_no_os_entity(hass: HomeAssistant) -> None:
 
 
 async def test_setting_up_core_update_when_addon_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     caplog: pytest.LogCaptureFixture,
     addon_installed: AsyncMock,
     addon_stats: AsyncMock,

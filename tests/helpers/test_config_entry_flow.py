@@ -7,10 +7,10 @@ from unittest.mock import Mock, PropertyMock, patch
 
 import pytest
 
-from homeassistant import config_entries, data_entry_flow, setup
-from homeassistant.core import HomeAssistant
-from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.helpers import config_entry_flow
+from smarthub import config_entries, data_entry_flow, setup
+from smarthub.core import SmartHub
+from smarthub.core_config import async_process_ha_core_config
+from smarthub.helpers import config_entry_flow
 
 from tests.common import MockConfigEntry, MockModule, mock_integration, mock_platform
 
@@ -27,11 +27,11 @@ def _make_discovery_flow_conf(
 
 
 @pytest.fixture
-def async_discovery_flow_conf(hass: HomeAssistant) -> Generator[dict[str, bool]]:
+def async_discovery_flow_conf(hass: SmartHub) -> Generator[dict[str, bool]]:
     """Register a handler with an async discovery function."""
     handler_conf = {"discovered": False}
 
-    async def has_discovered_devices(hass: HomeAssistant) -> bool:
+    async def has_discovered_devices(hass: SmartHub) -> bool:
         """Mock if we have discovered devices."""
         return handler_conf["discovered"]
 
@@ -40,11 +40,11 @@ def async_discovery_flow_conf(hass: HomeAssistant) -> Generator[dict[str, bool]]
 
 
 @pytest.fixture
-def discovery_flow_conf(hass: HomeAssistant) -> Generator[dict[str, bool]]:
+def discovery_flow_conf(hass: SmartHub) -> Generator[dict[str, bool]]:
     """Register a handler with a async friendly callback function."""
     handler_conf = {"discovered": False}
 
-    def has_discovered_devices(hass: HomeAssistant) -> bool:
+    def has_discovered_devices(hass: SmartHub) -> bool:
         """Mock if we have discovered devices."""
         return handler_conf["discovered"]
 
@@ -54,7 +54,7 @@ def discovery_flow_conf(hass: HomeAssistant) -> Generator[dict[str, bool]]:
 
 
 @pytest.fixture
-def webhook_flow_conf(hass: HomeAssistant) -> Generator[None]:
+def webhook_flow_conf(hass: SmartHub) -> Generator[None]:
     """Register a handler."""
     with patch.dict(config_entries.HANDLERS):
         config_entry_flow.register_webhook_flow("test_single", "Test Single", {}, False)
@@ -65,7 +65,7 @@ def webhook_flow_conf(hass: HomeAssistant) -> Generator[None]:
 
 
 async def test_single_entry_allowed(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool]
+    hass: SmartHub, discovery_flow_conf: dict[str, bool]
 ) -> None:
     """Test only a single entry is allowed."""
     flow = config_entries.HANDLERS["test"]()
@@ -80,7 +80,7 @@ async def test_single_entry_allowed(
 
 
 async def test_user_no_devices_found(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool]
+    hass: SmartHub, discovery_flow_conf: dict[str, bool]
 ) -> None:
     """Test if no devices found."""
     flow = config_entries.HANDLERS["test"]()
@@ -93,7 +93,7 @@ async def test_user_no_devices_found(
 
 
 async def test_user_has_confirmation(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool]
+    hass: SmartHub, discovery_flow_conf: dict[str, bool]
 ) -> None:
     """Test user requires confirmation to setup."""
     discovery_flow_conf["discovered"] = True
@@ -120,7 +120,7 @@ async def test_user_has_confirmation(
 
 
 async def test_user_has_confirmation_async_discovery_flow(
-    hass: HomeAssistant, async_discovery_flow_conf: dict[str, bool]
+    hass: SmartHub, async_discovery_flow_conf: dict[str, bool]
 ) -> None:
     """Test user requires confirmation to setup with an async has_discovered_devices."""
     async_discovery_flow_conf["discovered"] = True
@@ -158,7 +158,7 @@ async def test_user_has_confirmation_async_discovery_flow(
     ],
 )
 async def test_discovery_single_instance(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool], source: str
+    hass: SmartHub, discovery_flow_conf: dict[str, bool], source: str
 ) -> None:
     """Test we not allow duplicates."""
     flow = config_entries.HANDLERS["test"]()
@@ -184,7 +184,7 @@ async def test_discovery_single_instance(
     ],
 )
 async def test_discovery_confirmation(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool], source: str
+    hass: SmartHub, discovery_flow_conf: dict[str, bool], source: str
 ) -> None:
     """Test we ask for confirmation via discovery."""
     flow = config_entries.HANDLERS["test"]()
@@ -212,7 +212,7 @@ async def test_discovery_confirmation(
     ],
 )
 async def test_discovery_during_onboarding(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool], source: str
+    hass: SmartHub, discovery_flow_conf: dict[str, bool], source: str
 ) -> None:
     """Test we create config entry via discovery during onboarding."""
     flow = config_entries.HANDLERS["test"]()
@@ -220,7 +220,7 @@ async def test_discovery_during_onboarding(
     flow.context = {"source": source}
 
     with patch(
-        "homeassistant.components.onboarding.async_is_onboarded", return_value=False
+        "smarthub.components.onboarding.async_is_onboarded", return_value=False
     ):
         result = await getattr(flow, f"async_step_{source}")({})
 
@@ -228,7 +228,7 @@ async def test_discovery_during_onboarding(
 
 
 async def test_multiple_discoveries(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool]
+    hass: SmartHub, discovery_flow_conf: dict[str, bool]
 ) -> None:
     """Test we only create one instance for multiple discoveries."""
     mock_platform(hass, "test.config_flow", None)
@@ -246,7 +246,7 @@ async def test_multiple_discoveries(
 
 
 async def test_only_one_in_progress(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool]
+    hass: SmartHub, discovery_flow_conf: dict[str, bool]
 ) -> None:
     """Test a user initialized one will finish and cancel discovered one."""
     mock_platform(hass, "test.config_flow", None)
@@ -274,7 +274,7 @@ async def test_only_one_in_progress(
 
 
 async def test_import_abort_discovery(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool]
+    hass: SmartHub, discovery_flow_conf: dict[str, bool]
 ) -> None:
     """Test import will finish and cancel discovered one."""
     mock_platform(hass, "test.config_flow", None)
@@ -297,7 +297,7 @@ async def test_import_abort_discovery(
 
 
 async def test_import_no_confirmation(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool]
+    hass: SmartHub, discovery_flow_conf: dict[str, bool]
 ) -> None:
     """Test import requires no confirmation to set up."""
     flow = config_entries.HANDLERS["test"]()
@@ -310,7 +310,7 @@ async def test_import_no_confirmation(
 
 
 async def test_import_single_instance(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool]
+    hass: SmartHub, discovery_flow_conf: dict[str, bool]
 ) -> None:
     """Test import doesn't create second instance."""
     flow = config_entries.HANDLERS["test"]()
@@ -324,7 +324,7 @@ async def test_import_single_instance(
 
 
 async def test_ignored_discoveries(
-    hass: HomeAssistant, discovery_flow_conf: dict[str, bool]
+    hass: SmartHub, discovery_flow_conf: dict[str, bool]
 ) -> None:
     """Test we can ignore discovered entries."""
     mock_platform(hass, "test.config_flow", None)
@@ -358,7 +358,7 @@ async def test_ignored_discoveries(
 
 
 async def test_webhook_single_entry_allowed(
-    hass: HomeAssistant, webhook_flow_conf: None
+    hass: SmartHub, webhook_flow_conf: None
 ) -> None:
     """Test only a single entry is allowed."""
     flow = config_entries.HANDLERS["test_single"]()
@@ -372,7 +372,7 @@ async def test_webhook_single_entry_allowed(
 
 
 async def test_webhook_multiple_entries_allowed(
-    hass: HomeAssistant, webhook_flow_conf: None
+    hass: SmartHub, webhook_flow_conf: None
 ) -> None:
     """Test multiple entries are allowed when specified."""
     flow = config_entries.HANDLERS["test_multiple"]()
@@ -386,7 +386,7 @@ async def test_webhook_multiple_entries_allowed(
 
 
 async def test_webhook_config_flow_registers_webhook(
-    hass: HomeAssistant, webhook_flow_conf: None
+    hass: SmartHub, webhook_flow_conf: None
 ) -> None:
     """Test setting up an entry creates a webhook."""
     flow = config_entries.HANDLERS["test_single"]()
@@ -403,7 +403,7 @@ async def test_webhook_config_flow_registers_webhook(
 
 
 async def test_webhook_create_cloudhook(
-    hass: HomeAssistant, webhook_flow_conf: None
+    hass: SmartHub, webhook_flow_conf: None
 ) -> None:
     """Test cloudhook will be created if subscribed."""
     assert await setup.async_setup_component(hass, "cloud", {})
@@ -464,7 +464,7 @@ async def test_webhook_create_cloudhook(
 
 
 async def test_webhook_create_cloudhook_aborts_not_connected(
-    hass: HomeAssistant, webhook_flow_conf: None
+    hass: SmartHub, webhook_flow_conf: None
 ) -> None:
     """Test cloudhook aborts if subscribed but not connected."""
     assert await setup.async_setup_component(hass, "cloud", {})

@@ -6,12 +6,12 @@ from unittest.mock import AsyncMock, patch
 from brother import SnmpError, UnsupportedModelError
 import pytest
 
-from homeassistant.components.brother.const import DOMAIN
-from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
-from homeassistant.const import CONF_HOST, CONF_TYPE
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from smarthub.components.brother.const import DOMAIN
+from smarthub.config_entries import SOURCE_USER, SOURCE_ZEROCONF
+from smarthub.const import CONF_HOST, CONF_TYPE
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from . import init_integration
 
@@ -22,7 +22,7 @@ CONFIG = {CONF_HOST: "127.0.0.1", CONF_TYPE: "laser"}
 pytestmark = pytest.mark.usefixtures("mock_setup_entry", "mock_unload_entry")
 
 
-async def test_show_form(hass: HomeAssistant) -> None:
+async def test_show_form(hass: SmartHub) -> None:
     """Test that the form is served with no input."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -34,7 +34,7 @@ async def test_show_form(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("host", ["example.local", "127.0.0.1", "2001:db8::1428:57ab"])
 async def test_create_entry(
-    hass: HomeAssistant, host: str, mock_brother_client: AsyncMock
+    hass: SmartHub, host: str, mock_brother_client: AsyncMock
 ) -> None:
     """Test that the user step works with printer hostname/IPv4/IPv6."""
     result = await hass.config_entries.flow.async_init(
@@ -49,7 +49,7 @@ async def test_create_entry(
     assert result["data"][CONF_TYPE] == "laser"
 
 
-async def test_invalid_hostname(hass: HomeAssistant) -> None:
+async def test_invalid_hostname(hass: SmartHub) -> None:
     """Test invalid hostname in user_input."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -69,7 +69,7 @@ async def test_invalid_hostname(hass: HomeAssistant) -> None:
     ],
 )
 async def test_errors(
-    hass: HomeAssistant, exc: Exception, base_error: str, mock_brother_client: AsyncMock
+    hass: SmartHub, exc: Exception, base_error: str, mock_brother_client: AsyncMock
 ) -> None:
     """Test connection to host error."""
     mock_brother_client.async_update.side_effect = exc
@@ -81,10 +81,10 @@ async def test_errors(
     assert result["errors"] == {"base": base_error}
 
 
-async def test_unsupported_model_error(hass: HomeAssistant) -> None:
+async def test_unsupported_model_error(hass: SmartHub) -> None:
     """Test unsupported printer model error."""
     with patch(
-        "homeassistant.components.brother.Brother.create",
+        "smarthub.components.brother.Brother.create",
         new=AsyncMock(side_effect=UnsupportedModelError("error")),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -96,7 +96,7 @@ async def test_unsupported_model_error(hass: HomeAssistant) -> None:
 
 
 async def test_device_exists_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_brother_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -113,7 +113,7 @@ async def test_device_exists_abort(
 
 @pytest.mark.parametrize("exc", [ConnectionError, TimeoutError, SnmpError("error")])
 async def test_zeroconf_exception(
-    hass: HomeAssistant, exc: Exception, mock_brother_client: AsyncMock
+    hass: SmartHub, exc: Exception, mock_brother_client: AsyncMock
 ) -> None:
     """Test we abort zeroconf flow on exception."""
     mock_brother_client.async_update.side_effect = exc
@@ -136,10 +136,10 @@ async def test_zeroconf_exception(
     assert result["reason"] == "cannot_connect"
 
 
-async def test_zeroconf_unsupported_model(hass: HomeAssistant) -> None:
+async def test_zeroconf_unsupported_model(hass: SmartHub) -> None:
     """Test unsupported printer model error."""
     with patch(
-        "homeassistant.components.brother.Brother.create",
+        "smarthub.components.brother.Brother.create",
         new=AsyncMock(side_effect=UnsupportedModelError("error")),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -161,7 +161,7 @@ async def test_zeroconf_unsupported_model(hass: HomeAssistant) -> None:
 
 
 async def test_zeroconf_device_exists_abort(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_brother_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -189,13 +189,13 @@ async def test_zeroconf_device_exists_abort(
     assert mock_config_entry.data[CONF_HOST] == "127.0.0.1"
 
 
-async def test_zeroconf_no_probe_existing_device(hass: HomeAssistant) -> None:
+async def test_zeroconf_no_probe_existing_device(hass: SmartHub) -> None:
     """Test we do not probe the device is the host is already configured."""
     entry = MockConfigEntry(domain=DOMAIN, unique_id="0123456789", data=CONFIG)
     entry.add_to_hass(hass)
     with (
-        patch("homeassistant.components.brother.Brother.initialize"),
-        patch("homeassistant.components.brother.Brother._get_data") as mock_get_data,
+        patch("smarthub.components.brother.Brother.initialize"),
+        patch("smarthub.components.brother.Brother._get_data") as mock_get_data,
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -218,7 +218,7 @@ async def test_zeroconf_no_probe_existing_device(hass: HomeAssistant) -> None:
 
 
 async def test_zeroconf_confirm_create_entry(
-    hass: HomeAssistant, mock_brother_client: AsyncMock
+    hass: SmartHub, mock_brother_client: AsyncMock
 ) -> None:
     """Test zeroconf confirmation and create config entry."""
     result = await hass.config_entries.flow.async_init(
@@ -251,7 +251,7 @@ async def test_zeroconf_confirm_create_entry(
 
 
 async def test_reconfigure_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_brother_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -285,7 +285,7 @@ async def test_reconfigure_successful(
     ],
 )
 async def test_reconfigure_not_successful(
-    hass: HomeAssistant,
+    hass: SmartHub,
     exc: Exception,
     base_error: str,
     mock_brother_client: AsyncMock,
@@ -326,7 +326,7 @@ async def test_reconfigure_not_successful(
 
 
 async def test_reconfigure_invalid_hostname(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_brother_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -349,7 +349,7 @@ async def test_reconfigure_invalid_hostname(
 
 
 async def test_reconfigure_not_the_same_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_brother_client: AsyncMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:

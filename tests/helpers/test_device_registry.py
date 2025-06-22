@@ -12,22 +12,22 @@ from freezegun.api import FrozenDateTimeFactory
 import pytest
 from yarl import URL
 
-from homeassistant import config_entries
-from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
-from homeassistant.core import CoreState, HomeAssistant, ReleaseChannel
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import (
+from smarthub import config_entries
+from smarthub.const import EVENT_HOMEASSISTANT_STARTED
+from smarthub.core import CoreState, SmartHub, ReleaseChannel
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import (
     area_registry as ar,
     device_registry as dr,
     entity_registry as er,
 )
-from homeassistant.util.dt import utcnow
+from smarthub.util.dt import utcnow
 
 from tests.common import MockConfigEntry, async_capture_events, flush_store
 
 
 @pytest.fixture
-def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry(hass: SmartHub) -> MockConfigEntry:
     """Create a mock config entry and add it to hass."""
     entry = MockConfigEntry(title=None)
     entry.add_to_hass(hass)
@@ -35,7 +35,7 @@ def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
 
 
 @pytest.fixture
-def mock_config_entry_with_subentries(hass: HomeAssistant) -> MockConfigEntry:
+def mock_config_entry_with_subentries(hass: SmartHub) -> MockConfigEntry:
     """Create a mock config entry and add it to hass."""
     entry = MockConfigEntry(
         title=None,
@@ -61,7 +61,7 @@ def mock_config_entry_with_subentries(hass: HomeAssistant) -> MockConfigEntry:
 
 
 async def test_get_or_create_returns_same_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     area_registry: ar.AreaRegistry,
     mock_config_entry: MockConfigEntry,
@@ -149,7 +149,7 @@ async def test_requirement_for_identifier_or_connection(
     assert entry
     assert entry2
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         device_registry.async_get_or_create(
             config_entry_id=mock_config_entry.entry_id,
             connections=set(),
@@ -160,7 +160,7 @@ async def test_requirement_for_identifier_or_connection(
 
 
 async def test_multiple_config_entries(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure we do not get duplicate entries."""
     config_entry_1 = MockConfigEntry()
@@ -200,7 +200,7 @@ async def test_multiple_config_entries(
 
 
 async def test_multiple_config_subentries(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure we do not get duplicate entries."""
     config_entry_1 = MockConfigEntry(
@@ -305,7 +305,7 @@ async def test_multiple_config_subentries(
 @pytest.mark.parametrize("load_registries", [False])
 @pytest.mark.usefixtures("freezer")
 async def test_loading_from_storage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -449,7 +449,7 @@ async def test_loading_from_storage(
 @pytest.mark.parametrize("load_registries", [False])
 @pytest.mark.usefixtures("freezer")
 async def test_migration_from_1_1(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -599,7 +599,7 @@ async def test_migration_from_1_1(
 @pytest.mark.parametrize("load_registries", [False])
 @pytest.mark.usefixtures("freezer")
 async def test_migration_from_1_2(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -735,7 +735,7 @@ async def test_migration_from_1_2(
 @pytest.mark.parametrize("load_registries", [False])
 @pytest.mark.usefixtures("freezer")
 async def test_migration_fom_1_3(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -871,7 +871,7 @@ async def test_migration_fom_1_3(
 @pytest.mark.parametrize("load_registries", [False])
 @pytest.mark.usefixtures("freezer")
 async def test_migration_from_1_4(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -1009,7 +1009,7 @@ async def test_migration_from_1_4(
 @pytest.mark.parametrize("load_registries", [False])
 @pytest.mark.usefixtures("freezer")
 async def test_migration_from_1_5(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -1149,7 +1149,7 @@ async def test_migration_from_1_5(
 @pytest.mark.parametrize("load_registries", [False])
 @pytest.mark.usefixtures("freezer")
 async def test_migration_from_1_6(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -1291,7 +1291,7 @@ async def test_migration_from_1_6(
 @pytest.mark.parametrize("load_registries", [False])
 @pytest.mark.usefixtures("freezer")
 async def test_migration_from_1_7(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -1433,7 +1433,7 @@ async def test_migration_from_1_7(
 
 
 async def test_removing_config_entries(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure we do not get duplicate entries."""
     update_events = async_capture_events(hass, dr.EVENT_DEVICE_REGISTRY_UPDATED)
@@ -1521,7 +1521,7 @@ async def test_removing_config_entries(
 
 
 async def test_deleted_device_removing_config_entries(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure we do not get duplicate entries."""
     update_events = async_capture_events(hass, dr.EVENT_DEVICE_REGISTRY_UPDATED)
@@ -1641,7 +1641,7 @@ async def test_deleted_device_removing_config_entries(
 
 
 async def test_removing_config_subentries(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure we do not get duplicate entries."""
     update_events = async_capture_events(hass, dr.EVENT_DEVICE_REGISTRY_UPDATED)
@@ -1842,7 +1842,7 @@ async def test_removing_config_subentries(
 
 
 async def test_deleted_device_removing_config_subentries(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure we do not get duplicate entries."""
     update_events = async_capture_events(hass, dr.EVENT_DEVICE_REGISTRY_UPDATED)
@@ -2126,7 +2126,7 @@ async def test_removing_area_id_deleted_device(
 
 
 async def test_specifying_via_device_create(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2182,7 +2182,7 @@ async def test_specifying_via_device_create(
 
 
 async def test_specifying_via_device_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -2245,7 +2245,7 @@ async def test_specifying_via_device_update(
 
 
 async def test_loading_saving_data(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we load/save data correctly."""
     config_entry_1 = MockConfigEntry()
@@ -2388,7 +2388,7 @@ async def test_no_unnecessary_changes(
         identifiers={("hue", "456"), ("bla", "123")},
     )
     with patch(
-        "homeassistant.helpers.device_registry.DeviceRegistry.async_schedule_save"
+        "smarthub.helpers.device_registry.DeviceRegistry.async_schedule_save"
     ) as mock_save:
         entry2 = device_registry.async_get_or_create(
             config_entry_id=mock_config_entry.entry_id, identifiers={("hue", "456")}
@@ -2433,7 +2433,7 @@ async def test_format_mac(
 
 
 async def test_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
     freezer: FrozenDateTimeFactory,
@@ -2561,14 +2561,14 @@ async def test_update(
             "via_device_id": None,
         },
     }
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         device_registry.async_update_device(
             entry.id,
             merge_connections=new_connections,
             new_connections=new_connections,
         )
 
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         device_registry.async_update_device(
             entry.id,
             merge_identifiers=new_identifiers,
@@ -2663,7 +2663,7 @@ async def test_update_connection(
 
 
 async def test_update_remove_config_entries(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure we do not get duplicate entries."""
     update_events = async_capture_events(hass, dr.EVENT_DEVICE_REGISTRY_UPDATED)
@@ -2699,7 +2699,7 @@ async def test_update_remove_config_entries(
         entry2.id, add_config_entry_id=config_entry_3.entry_id
     )
     # Try to add an unknown config entry
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         device_registry.async_update_device(entry2.id, add_config_entry_id="blabla")
 
     assert len(device_registry.devices) == 2
@@ -2794,7 +2794,7 @@ async def test_update_remove_config_entries(
 
 
 async def test_update_remove_config_subentries(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure we do not get duplicate entries."""
     update_events = async_capture_events(hass, dr.EVENT_DEVICE_REGISTRY_UPDATED)
@@ -2895,14 +2895,14 @@ async def test_update_remove_config_subentries(
 
     # Try to add a subentry without specifying entry
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Can't add config subentry without specifying config entry",
     ):
         device_registry.async_update_device(entry_id, add_config_subentry_id="blabla")
 
     # Try to add an unknown subentry
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match=f"Config entry {config_entry_3.entry_id} has no subentry blabla",
     ):
         device_registry.async_update_device(
@@ -2913,7 +2913,7 @@ async def test_update_remove_config_subentries(
 
     # Try to remove a subentry without specifying entry
     with pytest.raises(
-        HomeAssistantError,
+        SmartHubError,
         match="Can't remove config subentry without specifying config entry",
     ):
         device_registry.async_update_device(
@@ -3070,7 +3070,7 @@ async def test_update_remove_config_subentries(
 
 
 async def test_update_suggested_area(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     area_registry: ar.AreaRegistry,
     mock_config_entry: MockConfigEntry,
@@ -3128,7 +3128,7 @@ async def test_update_suggested_area(
 
 
 async def test_cleanup_device_registry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -3167,7 +3167,7 @@ async def test_cleanup_device_registry(
 
 
 async def test_cleanup_device_registry_removes_expired_orphaned_devices(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -3203,12 +3203,12 @@ async def test_cleanup_device_registry_removes_expired_orphaned_devices(
     assert len(device_registry.deleted_devices) == 0
 
 
-async def test_cleanup_startup(hass: HomeAssistant) -> None:
+async def test_cleanup_startup(hass: SmartHub) -> None:
     """Test we run a cleanup on startup."""
     hass.set_state(CoreState.not_running)
 
     with patch(
-        "homeassistant.helpers.device_registry.Debouncer.async_call"
+        "smarthub.helpers.device_registry.Debouncer.async_call"
     ) as mock_call:
         hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
         await hass.async_block_till_done()
@@ -3218,7 +3218,7 @@ async def test_cleanup_startup(hass: HomeAssistant) -> None:
 
 @pytest.mark.parametrize("load_registries", [False])
 async def test_cleanup_entity_registry_change(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: SmartHub, mock_config_entry: MockConfigEntry
 ) -> None:
     """Test we run a cleanup when entity registry changes.
 
@@ -3236,7 +3236,7 @@ async def test_cleanup_entity_registry_change(
     )
 
     with patch(
-        "homeassistant.helpers.device_registry.Debouncer.async_schedule_call"
+        "smarthub.helpers.device_registry.Debouncer.async_schedule_call"
     ) as mock_call:
         entity = ent_reg.async_get_or_create("light", "hue", "e1")
         await hass.async_block_till_done()
@@ -3260,7 +3260,7 @@ async def test_cleanup_entity_registry_change(
 
 @pytest.mark.usefixtures("freezer")
 async def test_restore_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry_with_subentries: MockConfigEntry,
 ) -> None:
@@ -3421,7 +3421,7 @@ async def test_restore_device(
 
 @pytest.mark.usefixtures("freezer")
 async def test_restore_shared_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure device id is stable for shared devices."""
     update_events = async_capture_events(hass, dr.EVENT_DEVICE_REGISTRY_UPDATED)
@@ -3901,7 +3901,7 @@ async def test_verify_suggested_area_does_not_overwrite_area_id(
 
 
 async def test_disable_config_entry_disables_devices(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we disable entities tied to a config entry."""
     config_entry = MockConfigEntry(domain="light")
@@ -3943,7 +3943,7 @@ async def test_disable_config_entry_disables_devices(
 
 
 async def test_only_disable_device_if_all_config_entries_are_disabled(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test that we only disable device if all related config entries are disabled."""
     config_entry1 = MockConfigEntry(domain="light")
@@ -3995,23 +3995,23 @@ async def test_only_disable_device_if_all_config_entries_are_disabled(
         ("http://localhost/config", nullcontext()),
         ("http://localhost:8123/config", nullcontext()),
         ("https://example.com/config", nullcontext()),
-        ("homeassistant://config", nullcontext()),
+        ("smarthub://config", nullcontext()),
         (URL("http://localhost"), nullcontext()),
         (URL("http://localhost:8123"), nullcontext()),
         (URL("https://example.com"), nullcontext()),
         (URL("http://localhost/config"), nullcontext()),
         (URL("http://localhost:8123/config"), nullcontext()),
         (URL("https://example.com/config"), nullcontext()),
-        (URL("homeassistant://config"), nullcontext()),
+        (URL("smarthub://config"), nullcontext()),
         (None, nullcontext()),
         ("http://", pytest.raises(ValueError)),
         ("https://", pytest.raises(ValueError)),
         ("gopher://localhost", pytest.raises(ValueError)),
-        ("homeassistant://", pytest.raises(ValueError)),
+        ("smarthub://", pytest.raises(ValueError)),
         (URL("http://"), pytest.raises(ValueError)),
         (URL("https://"), pytest.raises(ValueError)),
         (URL("gopher://localhost"), pytest.raises(ValueError)),
-        (URL("homeassistant://"), pytest.raises(ValueError)),
+        (URL("smarthub://"), pytest.raises(ValueError)),
         # Exception implements __str__
         (Exception("https://example.com"), nullcontext()),
         (Exception("https://"), pytest.raises(ValueError)),
@@ -4019,7 +4019,7 @@ async def test_only_disable_device_if_all_config_entries_are_disabled(
     ],
 )
 async def test_device_info_configuration_url_validation(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     configuration_url: str | URL | None,
     expectation: AbstractContextManager,
@@ -4051,7 +4051,7 @@ async def test_device_info_configuration_url_validation(
 
 @pytest.mark.parametrize("load_registries", [False])
 async def test_loading_invalid_configuration_url_from_storage(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_storage: dict[str, Any],
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -4101,7 +4101,7 @@ async def test_loading_invalid_configuration_url_from_storage(
 
 
 async def test_removing_labels(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure we can clear labels."""
     config_entry = MockConfigEntry()
@@ -4132,7 +4132,7 @@ async def test_removing_labels(
 
 
 async def test_removing_labels_deleted_device(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Make sure we can clear labels."""
     config_entry = MockConfigEntry()
@@ -4191,7 +4191,7 @@ async def test_removing_labels_deleted_device(
 
 
 async def test_entries_for_label(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test getting device entries by label."""
     config_entry = MockConfigEntry()
@@ -4283,7 +4283,7 @@ async def test_entries_for_label(
     ],
 )
 async def test_device_name_translation_placeholders(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     translation_key: str | None,
     translations: dict[str, str] | None,
@@ -4293,7 +4293,7 @@ async def test_device_name_translation_placeholders(
     """Test device name when the device name translation has placeholders."""
 
     def async_get_cached_translations(
-        hass: HomeAssistant,
+        hass: SmartHub,
         language: str,
         category: str,
         integrations: Iterable[str] | None = None,
@@ -4305,7 +4305,7 @@ async def test_device_name_translation_placeholders(
     config_entry_1 = MockConfigEntry()
     config_entry_1.add_to_hass(hass)
     with patch(
-        "homeassistant.helpers.device_registry.translation.async_get_cached_translations",
+        "smarthub.helpers.device_registry.translation.async_get_cached_translations",
         side_effect=async_get_cached_translations,
     ):
         entry1 = device_registry.async_get_or_create(
@@ -4353,7 +4353,7 @@ async def test_device_name_translation_placeholders(
             {"placeholder": "special"},
             ReleaseChannel.BETA,
             pytest.raises(
-                HomeAssistantError, match="Missing placeholder '2ndplaceholder'"
+                SmartHubError, match="Missing placeholder '2ndplaceholder'"
             ),
             "",
         ),
@@ -4375,7 +4375,7 @@ async def test_device_name_translation_placeholders(
     ],
 )
 async def test_device_name_translation_placeholders_errors(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     translation_key: str | None,
     translations: dict[str, str] | None,
@@ -4388,7 +4388,7 @@ async def test_device_name_translation_placeholders_errors(
     """Test device name has placeholder issuess."""
 
     def async_get_cached_translations(
-        hass: HomeAssistant,
+        hass: SmartHub,
         language: str,
         category: str,
         integrations: Iterable[str] | None = None,
@@ -4401,11 +4401,11 @@ async def test_device_name_translation_placeholders_errors(
     config_entry_1.add_to_hass(hass)
     with (
         patch(
-            "homeassistant.helpers.device_registry.translation.async_get_cached_translations",
+            "smarthub.helpers.device_registry.translation.async_get_cached_translations",
             side_effect=async_get_cached_translations,
         ),
         patch(
-            "homeassistant.helpers.device_registry.get_release_channel",
+            "smarthub.helpers.device_registry.get_release_channel",
             return_value=release_channel,
         ),
         expectation,
@@ -4422,7 +4422,7 @@ async def test_device_name_translation_placeholders_errors(
 
 
 async def test_async_get_or_create_thread_safety(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -4445,7 +4445,7 @@ async def test_async_get_or_create_thread_safety(
 
 
 async def test_async_remove_device_thread_safety(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -4468,7 +4468,7 @@ async def test_async_remove_device_thread_safety(
 
 
 async def test_device_registry_connections_collision(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test connection collisions in the device registry."""
     config_entry = MockConfigEntry()
@@ -4499,7 +4499,7 @@ async def test_device_registry_connections_collision(
     # Attempt to merge connection for device3 with the same
     # connection that already exists in device1
     with pytest.raises(
-        HomeAssistantError, match=f"Connections.*already registered.*{device1.id}"
+        SmartHubError, match=f"Connections.*already registered.*{device1.id}"
     ):
         device_registry.async_update_device(
             device3.id,
@@ -4512,7 +4512,7 @@ async def test_device_registry_connections_collision(
     # Attempt to add new connections for device3 with the same
     # connection that already exists in device1
     with pytest.raises(
-        HomeAssistantError, match=f"Connections.*already registered.*{device1.id}"
+        SmartHubError, match=f"Connections.*already registered.*{device1.id}"
     ):
         device_registry.async_update_device(
             device3.id,
@@ -4556,7 +4556,7 @@ async def test_device_registry_connections_collision(
 
 
 async def test_device_registry_identifiers_collision(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test identifiers collisions in the device registry."""
     config_entry = MockConfigEntry()
@@ -4587,7 +4587,7 @@ async def test_device_registry_identifiers_collision(
     # Attempt to merge identifiers for device3 with the same
     # connection that already exists in device1
     with pytest.raises(
-        HomeAssistantError, match=f"Identifiers.*already registered.*{device1.id}"
+        SmartHubError, match=f"Identifiers.*already registered.*{device1.id}"
     ):
         device_registry.async_update_device(
             device3.id, merge_identifiers={("bridgeid", "0123"), ("bridgeid", "8888")}
@@ -4596,7 +4596,7 @@ async def test_device_registry_identifiers_collision(
     # Attempt to add new identifiers for device3 with the same
     # connection that already exists in device1
     with pytest.raises(
-        HomeAssistantError, match=f"Identifiers.*already registered.*{device1.id}"
+        SmartHubError, match=f"Identifiers.*already registered.*{device1.id}"
     ):
         device_registry.async_update_device(
             device3.id, new_identifiers={("bridgeid", "0123"), ("bridgeid", "8888")}
@@ -4632,7 +4632,7 @@ async def test_device_registry_identifiers_collision(
 
 
 async def test_device_registry_deleted_device_collision(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test update collisions with deleted devices in the device registry."""
     config_entry = MockConfigEntry()
@@ -4665,7 +4665,7 @@ async def test_device_registry_deleted_device_collision(
 
 
 async def test_primary_config_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test the primary integration field."""
@@ -4737,7 +4737,7 @@ async def test_primary_config_entry(
 
 
 async def test_update_device_no_connections_or_identifiers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
 ) -> None:
     """Test updating a device clearing connections and identifiers."""
@@ -4749,7 +4749,7 @@ async def test_update_device_no_connections_or_identifiers(
         connections={(dr.CONNECTION_NETWORK_MAC, "12:34:56:AB:CD:EF")},
         identifiers={("bridgeid", "0123")},
     )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(SmartHubError):
         device_registry.async_update_device(
             device.id, new_connections=set(), new_identifiers=set()
         )

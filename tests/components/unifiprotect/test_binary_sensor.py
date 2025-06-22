@@ -18,19 +18,19 @@ from uiprotect.data import (
 )
 from uiprotect.data.nvr import EventMetadata
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.components.unifiprotect.binary_sensor import (
+from smarthub.components.binary_sensor import BinarySensorDeviceClass
+from smarthub.components.unifiprotect.binary_sensor import (
     CAMERA_SENSORS,
     EVENT_SENSORS,
     LIGHT_SENSORS,
     MOUNTABLE_SENSE_SENSORS,
     SENSE_SENSORS,
 )
-from homeassistant.components.unifiprotect.const import (
+from smarthub.components.unifiprotect.const import (
     ATTR_EVENT_SCORE,
     DEFAULT_ATTRIBUTION,
 )
-from homeassistant.const import (
+from smarthub.const import (
     ATTR_ATTRIBUTION,
     ATTR_DEVICE_CLASS,
     EVENT_STATE_CHANGED,
@@ -39,8 +39,8 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     Platform,
 )
-from homeassistant.core import Event as HAEvent, EventStateChangedData, HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import Event as HAEvent, EventStateChangedData, SmartHub
+from smarthub.helpers import entity_registry as er
 
 from .utils import (
     MockUFPFixture,
@@ -58,7 +58,7 @@ SENSE_SENSORS_WRITE = SENSE_SENSORS[:3]
 
 
 async def test_binary_sensor_camera_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, doorbell: Camera, unadopted_camera: Camera
+    hass: SmartHub, ufp: MockUFPFixture, doorbell: Camera, unadopted_camera: Camera
 ) -> None:
     """Test removing and re-adding a camera device."""
 
@@ -72,7 +72,7 @@ async def test_binary_sensor_camera_remove(
 
 
 async def test_binary_sensor_light_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, light: Light
+    hass: SmartHub, ufp: MockUFPFixture, light: Light
 ) -> None:
     """Test removing and re-adding a light device."""
 
@@ -86,7 +86,7 @@ async def test_binary_sensor_light_remove(
 
 
 async def test_binary_sensor_sensor_remove(
-    hass: HomeAssistant, ufp: MockUFPFixture, sensor_all: Sensor
+    hass: SmartHub, ufp: MockUFPFixture, sensor_all: Sensor
 ) -> None:
     """Test removing and re-adding a light device."""
 
@@ -100,7 +100,7 @@ async def test_binary_sensor_sensor_remove(
 
 
 async def test_binary_sensor_setup_light(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     light: Light,
@@ -126,7 +126,7 @@ async def test_binary_sensor_setup_light(
 
 
 async def test_binary_sensor_setup_camera_all(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     doorbell: Camera,
@@ -184,7 +184,7 @@ async def test_binary_sensor_setup_camera_all(
 
 
 async def test_binary_sensor_setup_camera_none(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     camera: Camera,
@@ -212,7 +212,7 @@ async def test_binary_sensor_setup_camera_none(
 
 
 async def test_binary_sensor_setup_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     sensor_all: Sensor,
@@ -244,7 +244,7 @@ async def test_binary_sensor_setup_sensor(
 
 
 async def test_binary_sensor_setup_sensor_leak(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     ufp: MockUFPFixture,
     sensor: Sensor,
@@ -277,7 +277,7 @@ async def test_binary_sensor_setup_sensor_leak(
 
 
 async def test_binary_sensor_update_motion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -327,7 +327,7 @@ async def test_binary_sensor_update_motion(
 
 
 async def test_binary_sensor_update_light_motion(
-    hass: HomeAssistant, ufp: MockUFPFixture, light: Light, fixed_now: datetime
+    hass: SmartHub, ufp: MockUFPFixture, light: Light, fixed_now: datetime
 ) -> None:
     """Test binary_sensor motion entity."""
 
@@ -371,7 +371,7 @@ async def test_binary_sensor_update_light_motion(
 
 
 async def test_binary_sensor_update_mount_type_window(
-    hass: HomeAssistant, ufp: MockUFPFixture, sensor_all: Sensor
+    hass: SmartHub, ufp: MockUFPFixture, sensor_all: Sensor
 ) -> None:
     """Test binary_sensor motion entity."""
 
@@ -403,7 +403,7 @@ async def test_binary_sensor_update_mount_type_window(
 
 
 async def test_binary_sensor_update_mount_type_garage(
-    hass: HomeAssistant, ufp: MockUFPFixture, sensor_all: Sensor
+    hass: SmartHub, ufp: MockUFPFixture, sensor_all: Sensor
 ) -> None:
     """Test binary_sensor motion entity."""
 
@@ -438,7 +438,7 @@ async def test_binary_sensor_update_mount_type_garage(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensor_package_detected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,
@@ -579,7 +579,7 @@ async def test_binary_sensor_package_detected(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensor_person_detected(
-    hass: HomeAssistant,
+    hass: SmartHub,
     ufp: MockUFPFixture,
     doorbell: Camera,
     unadopted_camera: Camera,

@@ -4,10 +4,10 @@ from typing import Any
 
 import pytest
 
-from homeassistant import setup
-from homeassistant.components import lock, template
-from homeassistant.components.lock import LockEntityFeature, LockState
-from homeassistant.const import (
+from smarthub import setup
+from smarthub.components import lock, template
+from smarthub.components.lock import LockEntityFeature, LockState
+from smarthub.const import (
     ATTR_CODE,
     ATTR_ENTITY_ID,
     STATE_OFF,
@@ -15,9 +15,9 @@ from homeassistant.const import (
     STATE_OPEN,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.helpers import entity_registry as er
-from homeassistant.setup import async_setup_component
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.helpers import entity_registry as er
+from smarthub.setup import async_setup_component
 
 from .conftest import ConfigurationStyle
 
@@ -79,7 +79,7 @@ OPTIMISTIC_CODED_LOCK_CONFIG = {
 
 
 async def async_setup_legacy_format(
-    hass: HomeAssistant, count: int, lock_config: dict[str, Any]
+    hass: SmartHub, count: int, lock_config: dict[str, Any]
 ) -> None:
     """Do setup of lock integration via legacy format."""
     config = {"lock": {"platform": "template", "name": TEST_OBJECT_ID, **lock_config}}
@@ -96,7 +96,7 @@ async def async_setup_legacy_format(
 
 
 async def async_setup_modern_format(
-    hass: HomeAssistant, count: int, lock_config: dict[str, Any]
+    hass: SmartHub, count: int, lock_config: dict[str, Any]
 ) -> None:
     """Do setup of lock integration via modern format."""
     config = {"template": {"lock": {"name": TEST_OBJECT_ID, **lock_config}}}
@@ -115,7 +115,7 @@ async def async_setup_modern_format(
 
 @pytest.fixture
 async def setup_lock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     lock_config: dict[str, Any],
@@ -129,7 +129,7 @@ async def setup_lock(
 
 @pytest.fixture
 async def setup_base_lock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -152,7 +152,7 @@ async def setup_base_lock(
 
 @pytest.fixture
 async def setup_state_lock(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -180,7 +180,7 @@ async def setup_state_lock(
 
 @pytest.fixture
 async def setup_state_lock_with_extra_config(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -203,7 +203,7 @@ async def setup_state_lock_with_extra_config(
 
 @pytest.fixture
 async def setup_state_lock_with_attribute(
-    hass: HomeAssistant,
+    hass: SmartHub,
     count: int,
     style: ConfigurationStyle,
     state_template: str,
@@ -237,7 +237,7 @@ async def setup_state_lock_with_attribute(
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_lock")
-async def test_template_state(hass: HomeAssistant) -> None:
+async def test_template_state(hass: SmartHub) -> None:
     """Test template."""
     hass.states.async_set(TEST_STATE_ENTITY_ID, STATE_ON)
     await hass.async_block_till_done()
@@ -267,7 +267,7 @@ async def test_template_state(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("setup_state_lock_with_extra_config")
 async def test_open_lock_optimistic(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test optimistic open."""
     hass.states.async_set(TEST_STATE_ENTITY_ID, STATE_ON)
@@ -296,7 +296,7 @@ async def test_open_lock_optimistic(
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_lock")
-async def test_template_state_boolean_on(hass: HomeAssistant) -> None:
+async def test_template_state_boolean_on(hass: SmartHub) -> None:
     """Test the setting of the state with boolean on."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.state == LockState.LOCKED
@@ -307,7 +307,7 @@ async def test_template_state_boolean_on(hass: HomeAssistant) -> None:
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_lock")
-async def test_template_state_boolean_off(hass: HomeAssistant) -> None:
+async def test_template_state_boolean_off(hass: SmartHub) -> None:
     """Test the setting of the state with off."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.state == LockState.UNLOCKED
@@ -333,7 +333,7 @@ async def test_template_state_boolean_off(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_base_lock")
-async def test_template_syntax_error(hass: HomeAssistant) -> None:
+async def test_template_syntax_error(hass: SmartHub) -> None:
     """Test templating syntax errors don't create entities."""
     assert hass.states.async_all("lock") == []
 
@@ -348,7 +348,7 @@ async def test_template_syntax_error(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
-async def test_template_code_template_syntax_error(hass: HomeAssistant) -> None:
+async def test_template_code_template_syntax_error(hass: SmartHub) -> None:
     """Test templating code_format syntax errors don't create entities."""
     assert hass.states.async_all("lock") == []
 
@@ -358,7 +358,7 @@ async def test_template_code_template_syntax_error(hass: HomeAssistant) -> None:
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_lock")
-async def test_template_static(hass: HomeAssistant) -> None:
+async def test_template_static(hass: SmartHub) -> None:
     """Test that we allow static templates."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.state == LockState.UNLOCKED
@@ -382,7 +382,7 @@ async def test_template_static(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_state_lock")
-async def test_state_template(hass: HomeAssistant, expected: str) -> None:
+async def test_state_template(hass: SmartHub, expected: str) -> None:
     """Test state and value_template template."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.state == expected
@@ -400,7 +400,7 @@ async def test_state_template(hass: HomeAssistant, expected: str) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
-async def test_picture_template(hass: HomeAssistant) -> None:
+async def test_picture_template(hass: SmartHub) -> None:
     """Test entity_picture template."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.attributes.get("entity_picture") in ("", None)
@@ -424,7 +424,7 @@ async def test_picture_template(hass: HomeAssistant) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
-async def test_icon_template(hass: HomeAssistant) -> None:
+async def test_icon_template(hass: SmartHub) -> None:
     """Test entity_picture template."""
     state = hass.states.get(TEST_ENTITY_ID)
     assert state.attributes.get("icon") in ("", None)
@@ -443,7 +443,7 @@ async def test_icon_template(hass: HomeAssistant) -> None:
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_lock")
-async def test_lock_action(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_lock_action(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test lock action."""
     hass.states.async_set(TEST_STATE_ENTITY_ID, STATE_OFF)
     await hass.async_block_till_done()
@@ -470,7 +470,7 @@ async def test_lock_action(hass: HomeAssistant, calls: list[ServiceCall]) -> Non
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_lock")
-async def test_unlock_action(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_unlock_action(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test unlock action."""
     hass.states.async_set(TEST_STATE_ENTITY_ID, STATE_ON)
     await hass.async_block_till_done()
@@ -498,7 +498,7 @@ async def test_unlock_action(hass: HomeAssistant, calls: list[ServiceCall]) -> N
     "style", [ConfigurationStyle.LEGACY, ConfigurationStyle.MODERN]
 )
 @pytest.mark.usefixtures("setup_state_lock_with_extra_config")
-async def test_open_action(hass: HomeAssistant, calls: list[ServiceCall]) -> None:
+async def test_open_action(hass: SmartHub, calls: list[ServiceCall]) -> None:
     """Test open action."""
     hass.states.async_set(TEST_STATE_ENTITY_ID, STATE_ON)
     await hass.async_block_till_done()
@@ -537,7 +537,7 @@ async def test_open_action(hass: HomeAssistant, calls: list[ServiceCall]) -> Non
 )
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
 async def test_lock_action_with_code(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test lock action with defined code format and supplied lock code."""
     hass.states.async_set(TEST_STATE_ENTITY_ID, STATE_OFF)
@@ -578,7 +578,7 @@ async def test_lock_action_with_code(
 )
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
 async def test_unlock_action_with_code(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test unlock action with code format and supplied unlock code."""
     await setup.async_setup_component(hass, "switch", {})
@@ -627,7 +627,7 @@ async def test_unlock_action_with_code(
 )
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
 async def test_lock_actions_fail_with_invalid_code(
-    hass: HomeAssistant, calls: list[ServiceCall], test_action
+    hass: SmartHub, calls: list[ServiceCall], test_action
 ) -> None:
     """Test invalid lock codes."""
     await hass.services.async_call(
@@ -664,7 +664,7 @@ async def test_lock_actions_fail_with_invalid_code(
 )
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
 async def test_lock_actions_dont_execute_with_code_template_rendering_error(
-    hass: HomeAssistant, calls: list[ServiceCall]
+    hass: SmartHub, calls: list[ServiceCall]
 ) -> None:
     """Test lock code format rendering fails block lock/unlock actions."""
     await hass.services.async_call(
@@ -702,7 +702,7 @@ async def test_lock_actions_dont_execute_with_code_template_rendering_error(
 @pytest.mark.parametrize("action", [lock.SERVICE_LOCK, lock.SERVICE_UNLOCK])
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
 async def test_actions_with_none_as_codeformat_ignores_code(
-    hass: HomeAssistant, action, calls: list[ServiceCall]
+    hass: SmartHub, action, calls: list[ServiceCall]
 ) -> None:
     """Test lock actions with supplied lock code."""
     hass.states.async_set(TEST_STATE_ENTITY_ID, STATE_OFF)
@@ -744,7 +744,7 @@ async def test_actions_with_none_as_codeformat_ignores_code(
 @pytest.mark.parametrize("action", [lock.SERVICE_LOCK, lock.SERVICE_UNLOCK])
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
 async def test_actions_with_invalid_regexp_as_codeformat_never_execute(
-    hass: HomeAssistant, action, calls: list[ServiceCall]
+    hass: SmartHub, action, calls: list[ServiceCall]
 ) -> None:
     """Test lock actions don't execute with invalid regexp."""
     hass.states.async_set(TEST_STATE_ENTITY_ID, STATE_OFF)
@@ -783,7 +783,7 @@ async def test_actions_with_invalid_regexp_as_codeformat_never_execute(
     "test_state", [LockState.UNLOCKING, LockState.LOCKING, LockState.JAMMED]
 )
 @pytest.mark.usefixtures("setup_state_lock")
-async def test_lock_state(hass: HomeAssistant, test_state) -> None:
+async def test_lock_state(hass: SmartHub, test_state) -> None:
     """Test value template."""
     hass.states.async_set("input_select.test_state", test_state)
     await hass.async_block_till_done()
@@ -810,7 +810,7 @@ async def test_lock_state(hass: HomeAssistant, test_state) -> None:
     ],
 )
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
-async def test_available_template_with_entities(hass: HomeAssistant) -> None:
+async def test_available_template_with_entities(hass: SmartHub) -> None:
     """Test availability templates with values from other entities."""
     # When template returns true..
     hass.states.async_set("availability_state.state", STATE_ON)
@@ -846,7 +846,7 @@ async def test_available_template_with_entities(hass: HomeAssistant) -> None:
 )
 @pytest.mark.usefixtures("setup_state_lock_with_attribute")
 async def test_invalid_availability_template_keeps_component_available(
-    hass: HomeAssistant, caplog_setup_text
+    hass: SmartHub, caplog_setup_text
 ) -> None:
     """Test that an invalid availability keeps the device available."""
     assert hass.states.get(TEST_ENTITY_ID).state != STATE_UNAVAILABLE
@@ -868,7 +868,7 @@ async def test_invalid_availability_template_keeps_component_available(
     ],
 )
 @pytest.mark.usefixtures("start_ha")
-async def test_legacy_unique_id(hass: HomeAssistant) -> None:
+async def test_legacy_unique_id(hass: SmartHub) -> None:
     """Test unique_id option only creates one lock per id."""
     await setup.async_setup_component(
         hass,
@@ -890,7 +890,7 @@ async def test_legacy_unique_id(hass: HomeAssistant) -> None:
     assert len(hass.states.async_all("lock")) == 1
 
 
-async def test_modern_unique_id(hass: HomeAssistant) -> None:
+async def test_modern_unique_id(hass: SmartHub) -> None:
     """Test unique_id option only creates one cover per id."""
     config = {
         "template": {
@@ -926,7 +926,7 @@ async def test_modern_unique_id(hass: HomeAssistant) -> None:
 
 
 async def test_nested_unique_id(
-    hass: HomeAssistant, entity_registry: er.EntityRegistry
+    hass: SmartHub, entity_registry: er.EntityRegistry
 ) -> None:
     """Test a template unique_id propagates to lock unique_ids."""
     with assert_setup_component(1, template.DOMAIN):
@@ -969,7 +969,7 @@ async def test_nested_unique_id(
     assert entry.unique_id == "x-b"
 
 
-async def test_emtpy_action_config(hass: HomeAssistant) -> None:
+async def test_emtpy_action_config(hass: SmartHub) -> None:
     """Test configuration with empty script."""
     with assert_setup_component(1, lock.DOMAIN):
         assert await setup.async_setup_component(

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntry
+from smarthub.core import SmartHub
 
 
 async def test_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     load_int: ConfigEntry,
 ) -> None:
     """Test the Coolmaster sensor."""

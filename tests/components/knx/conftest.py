@@ -15,7 +15,7 @@ from xknx.telegram import Telegram, TelegramDirection
 from xknx.telegram.address import GroupAddress, IndividualAddress
 from xknx.telegram.apci import APCI, GroupValueRead, GroupValueResponse, GroupValueWrite
 
-from homeassistant.components.knx.const import (
+from smarthub.components.knx.const import (
     CONF_KNX_AUTOMATIC,
     CONF_KNX_CONNECTION_TYPE,
     CONF_KNX_DEFAULT_RATE_LIMIT,
@@ -28,15 +28,15 @@ from homeassistant.components.knx.const import (
     DEFAULT_ROUTING_IA,
     DOMAIN,
 )
-from homeassistant.components.knx.project import STORAGE_KEY as KNX_PROJECT_STORAGE_KEY
-from homeassistant.components.knx.storage.config_store import (
+from smarthub.components.knx.project import STORAGE_KEY as KNX_PROJECT_STORAGE_KEY
+from smarthub.components.knx.storage.config_store import (
     STORAGE_KEY as KNX_CONFIG_STORAGE_KEY,
 )
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.typing import ConfigType
-from homeassistant.setup import async_setup_component
+from smarthub.const import Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.typing import ConfigType
+from smarthub.setup import async_setup_component
 
 from . import KnxEntityGenerator
 
@@ -57,12 +57,12 @@ class KNXTestKit:
 
     def __init__(
         self,
-        hass: HomeAssistant,
+        hass: SmartHub,
         mock_config_entry: MockConfigEntry,
         hass_storage: dict[str, Any],
     ) -> None:
         """Init KNX test helper class."""
-        self.hass: HomeAssistant = hass
+        self.hass: SmartHub = hass
         self.mock_config_entry: MockConfigEntry = mock_config_entry
         self.hass_storage: dict[str, Any] = hass_storage
         self.xknx: XKNX
@@ -327,7 +327,7 @@ def mock_config_entry() -> MockConfigEntry:
 
 @pytest.fixture
 async def knx(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     hass_storage: dict[str, Any],
 ):
@@ -348,7 +348,7 @@ def load_knxproj(hass_storage: dict[str, Any]) -> None:
 
 @pytest.fixture
 async def create_ui_entity(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     hass_ws_client: WebSocketGenerator,
     hass_storage: dict[str, Any],

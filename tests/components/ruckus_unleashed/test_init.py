@@ -5,18 +5,18 @@ from unittest.mock import AsyncMock
 from aioruckus.const import ERROR_CONNECT_TIMEOUT, ERROR_LOGIN_INCORRECT
 from aioruckus.exceptions import AuthenticationError
 
-from homeassistant.components.ruckus_unleashed import DOMAIN, MANUFACTURER
-from homeassistant.components.ruckus_unleashed.const import (
+from smarthub.components.ruckus_unleashed import DOMAIN, MANUFACTURER
+from smarthub.components.ruckus_unleashed.const import (
     API_AP_DEVNAME,
     API_AP_MAC,
     API_AP_MODEL,
     API_SYS_SYSINFO,
     API_SYS_SYSINFO_VERSION,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr
+from smarthub.helpers.device_registry import CONNECTION_NETWORK_MAC
 
 from . import (
     DEFAULT_AP_INFO,
@@ -27,7 +27,7 @@ from . import (
 )
 
 
-async def test_setup_entry_login_error(hass: HomeAssistant) -> None:
+async def test_setup_entry_login_error(hass: SmartHub) -> None:
     """Test entry setup failed due to login error."""
     entry = mock_config_entry()
     with RuckusAjaxApiPatchContext(
@@ -40,7 +40,7 @@ async def test_setup_entry_login_error(hass: HomeAssistant) -> None:
     assert result is False
 
 
-async def test_setup_entry_connection_error(hass: HomeAssistant) -> None:
+async def test_setup_entry_connection_error(hass: SmartHub) -> None:
     """Test entry setup failed due to connection error."""
     entry = mock_config_entry()
     with RuckusAjaxApiPatchContext(
@@ -54,7 +54,7 @@ async def test_setup_entry_connection_error(hass: HomeAssistant) -> None:
 
 
 async def test_router_device_setup(
-    hass: HomeAssistant, device_registry: dr.DeviceRegistry
+    hass: SmartHub, device_registry: dr.DeviceRegistry
 ) -> None:
     """Test a router device is created."""
     await init_integration(hass)
@@ -77,7 +77,7 @@ async def test_router_device_setup(
     assert device.via_device_id is None
 
 
-async def test_unload_entry(hass: HomeAssistant) -> None:
+async def test_unload_entry(hass: SmartHub) -> None:
     """Test successful unload of entry."""
     entry = await init_integration(hass)
 

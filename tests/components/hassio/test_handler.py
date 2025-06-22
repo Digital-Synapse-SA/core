@@ -7,10 +7,10 @@ from typing import Any, Literal
 from aiohttp import hdrs, web
 import pytest
 
-from homeassistant.components.hassio import handler
-from homeassistant.components.hassio.handler import HassIO, HassioAPIError
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from smarthub.components.hassio import handler
+from smarthub.components.hassio.handler import HassIO, HassioAPIError
+from smarthub.core import SmartHub
+from smarthub.helpers.aiohttp_client import async_get_clientsession
 
 from tests.test_util.aiohttp import AiohttpClientMocker
 
@@ -23,21 +23,21 @@ async def test_api_info(
         "http://127.0.0.1/info",
         json={
             "result": "ok",
-            "data": {"supervisor": "222", "homeassistant": "0.110.0", "hassos": None},
+            "data": {"supervisor": "222", "smarthub": "0.110.0", "hassos": None},
         },
     )
 
     data = await hassio_handler.get_info()
     assert aioclient_mock.call_count == 1
     assert data["hassos"] is None
-    assert data["homeassistant"] == "0.110.0"
+    assert data["smarthub"] == "0.110.0"
     assert data["supervisor"] == "222"
 
 
 async def test_api_info_error(
     hassio_handler: HassIO, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    """Test setup with API Home Assistant info error."""
+    """Test setup with API SmartHub info error."""
     aioclient_mock.get(
         "http://127.0.0.1/info", json={"result": "error", "message": None}
     )
@@ -111,7 +111,7 @@ async def test_api_os_info(
 async def test_api_host_info_error(
     hassio_handler: HassIO, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    """Test setup with API Home Assistant info error."""
+    """Test setup with API SmartHub info error."""
     aioclient_mock.get(
         "http://127.0.0.1/host/info", json={"result": "error", "message": None}
     )
@@ -125,7 +125,7 @@ async def test_api_host_info_error(
 async def test_api_core_info(
     hassio_handler: HassIO, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    """Test setup with API Home Assistant Core info."""
+    """Test setup with API SmartHub Core info."""
     aioclient_mock.get(
         "http://127.0.0.1/core/info",
         json={"result": "ok", "data": {"version_latest": "1.0.0"}},
@@ -139,7 +139,7 @@ async def test_api_core_info(
 async def test_api_core_info_error(
     hassio_handler: HassIO, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    """Test setup with API Home Assistant Core info error."""
+    """Test setup with API SmartHub Core info error."""
     aioclient_mock.get(
         "http://127.0.0.1/core/info", json={"result": "error", "message": None}
     )
@@ -215,7 +215,7 @@ async def test_api_ingress_panels(
 @pytest.mark.usefixtures("socket_enabled")
 async def test_api_headers(
     aiohttp_raw_server,  # 'aiohttp_raw_server' must be before 'hass'!
-    hass: HomeAssistant,
+    hass: SmartHub,
     api_call: str,
     method: Literal["GET", "POST"],
     payload: Any,
@@ -259,7 +259,7 @@ async def test_api_headers(
 
 @pytest.mark.usefixtures("hassio_stubs")
 async def test_api_get_green_settings(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with API ping."""
     aioclient_mock.get(
@@ -284,7 +284,7 @@ async def test_api_get_green_settings(
 
 @pytest.mark.usefixtures("hassio_stubs")
 async def test_api_set_green_settings(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with API ping."""
     aioclient_mock.post(
@@ -303,7 +303,7 @@ async def test_api_set_green_settings(
 
 @pytest.mark.usefixtures("hassio_stubs")
 async def test_api_get_yellow_settings(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with API ping."""
     aioclient_mock.get(
@@ -324,7 +324,7 @@ async def test_api_get_yellow_settings(
 
 @pytest.mark.usefixtures("hassio_stubs")
 async def test_api_set_yellow_settings(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+    hass: SmartHub, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """Test setup with API ping."""
     aioclient_mock.post(
@@ -342,7 +342,7 @@ async def test_api_set_yellow_settings(
 
 
 @pytest.mark.usefixtures("hassio_stubs")
-async def test_send_command_invalid_command(hass: HomeAssistant) -> None:
+async def test_send_command_invalid_command(hass: SmartHub) -> None:
     """Test send command fails when command is invalid."""
     hassio: HassIO = hass.data["hassio"]
     with pytest.raises(HassioAPIError):

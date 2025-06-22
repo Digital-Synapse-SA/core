@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock
 from pyseventeentrack.errors import SeventeenTrackError
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.seventeentrack import DOMAIN
-from homeassistant.components.seventeentrack.const import (
+from smarthub import config_entries
+from smarthub.components.seventeentrack import DOMAIN
+from smarthub.components.seventeentrack.const import (
     CONF_SHOW_ARCHIVED,
     CONF_SHOW_DELIVERED,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PASSWORD, CONF_USERNAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -32,7 +32,7 @@ VALID_CONFIG_OLD = {
 
 
 async def test_create_entry(
-    hass: HomeAssistant, mock_setup_entry: AsyncMock, mock_seventeentrack: AsyncMock
+    hass: SmartHub, mock_setup_entry: AsyncMock, mock_seventeentrack: AsyncMock
 ) -> None:
     """Test that the user step works."""
     result = await hass.config_entries.flow.async_init(
@@ -71,7 +71,7 @@ async def test_create_entry(
     ],
 )
 async def test_flow_fails(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_seventeentrack: AsyncMock,
     return_value,
     side_effect,
@@ -105,7 +105,7 @@ async def test_flow_fails(
     }
 
 
-async def test_option_flow(hass: HomeAssistant, mock_seventeentrack: AsyncMock) -> None:
+async def test_option_flow(hass: SmartHub, mock_seventeentrack: AsyncMock) -> None:
     """Test option flow."""
     entry = MockConfigEntry(
         domain=DOMAIN,

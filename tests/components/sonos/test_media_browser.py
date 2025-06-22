@@ -5,20 +5,20 @@ from functools import partial
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE,
     BrowseMedia,
     MediaClass,
     MediaType,
 )
-from homeassistant.components.sonos.const import MEDIA_TYPE_DIRECTORY
-from homeassistant.components.sonos.media_browser import (
+from smarthub.components.sonos.const import MEDIA_TYPE_DIRECTORY
+from smarthub.components.sonos.media_browser import (
     build_item_response,
     get_thumbnail_url_full,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
 
 from .conftest import SoCoMockFactory
 
@@ -72,7 +72,7 @@ def mock_browse_by_idstring(
 
 
 async def test_build_item_response(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     soco,
@@ -110,7 +110,7 @@ async def test_build_item_response(
 
 
 async def test_browse_media_root(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     soco,
@@ -134,7 +134,7 @@ async def test_browse_media_root(
 
 
 async def test_browse_media_library(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     soco,
@@ -160,7 +160,7 @@ async def test_browse_media_library(
 
 
 async def test_browse_media_library_albums(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     soco,
@@ -235,7 +235,7 @@ async def test_browse_media_favorites(
     ],
 )
 async def test_browse_media_library_folders(
-    hass: HomeAssistant,
+    hass: SmartHub,
     soco_factory: SoCoMockFactory,
     async_autosetup_sonos,
     media_content_id: str,

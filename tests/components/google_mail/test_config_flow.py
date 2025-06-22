@@ -5,11 +5,11 @@ from unittest.mock import patch
 from httplib2 import Response
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.google_mail.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers import config_entry_oauth2_flow
+from smarthub import config_entries
+from smarthub.components.google_mail.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.helpers import config_entry_oauth2_flow
 
 from .conftest import CLIENT_ID, GOOGLE_AUTH_URI, GOOGLE_TOKEN_URI, SCOPES, TITLE
 
@@ -20,7 +20,7 @@ from tests.typing import ClientSessionGenerator
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_full_flow(
-    hass: HomeAssistant, hass_client_no_auth: ClientSessionGenerator
+    hass: SmartHub, hass_client_no_auth: ClientSessionGenerator
 ) -> None:
     """Check full flow."""
     result = await hass.config_entries.flow.async_init(
@@ -48,7 +48,7 @@ async def test_full_flow(
 
     with (
         patch(
-            "homeassistant.components.google_mail.async_setup_entry", return_value=True
+            "smarthub.components.google_mail.async_setup_entry", return_value=True
         ) as mock_setup,
         patch(
             "httplib2.Http.request",
@@ -92,7 +92,7 @@ async def test_full_flow(
 )
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_reauth(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     aioclient_mock: AiohttpClientMocker,
     config_entry: MockConfigEntry,
@@ -149,7 +149,7 @@ async def test_reauth(
 
     with (
         patch(
-            "homeassistant.components.google_mail.async_setup_entry", return_value=True
+            "smarthub.components.google_mail.async_setup_entry", return_value=True
         ) as mock_setup,
         patch(
             "httplib2.Http.request",
@@ -180,7 +180,7 @@ async def test_reauth(
 
 @pytest.mark.usefixtures("current_request_with_host")
 async def test_already_configured(
-    hass: HomeAssistant,
+    hass: SmartHub,
     hass_client_no_auth: ClientSessionGenerator,
     config_entry: MockConfigEntry,
 ) -> None:

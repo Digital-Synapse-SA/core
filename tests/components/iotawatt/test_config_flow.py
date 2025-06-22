@@ -4,13 +4,13 @@ from unittest.mock import patch
 
 import httpx
 
-from homeassistant import config_entries
-from homeassistant.components.iotawatt.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.iotawatt.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 
-async def test_form(hass: HomeAssistant) -> None:
+async def test_form(hass: SmartHub) -> None:
     """Test we get the form."""
 
     result = await hass.config_entries.flow.async_init(
@@ -21,11 +21,11 @@ async def test_form(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.iotawatt.async_setup_entry",
+            "smarthub.components.iotawatt.async_setup_entry",
             return_value=True,
         ),
         patch(
-            "homeassistant.components.iotawatt.config_flow.Iotawatt.connect",
+            "smarthub.components.iotawatt.config_flow.Iotawatt.connect",
             return_value=True,
         ) as mock_setup_entry,
     ):
@@ -44,7 +44,7 @@ async def test_form(hass: HomeAssistant) -> None:
     }
 
 
-async def test_form_auth(hass: HomeAssistant) -> None:
+async def test_form_auth(hass: SmartHub) -> None:
     """Test we handle auth."""
 
     result = await hass.config_entries.flow.async_init(
@@ -54,7 +54,7 @@ async def test_form_auth(hass: HomeAssistant) -> None:
     assert result["step_id"] == "user"
 
     with patch(
-        "homeassistant.components.iotawatt.config_flow.Iotawatt.connect",
+        "smarthub.components.iotawatt.config_flow.Iotawatt.connect",
         return_value=False,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -67,7 +67,7 @@ async def test_form_auth(hass: HomeAssistant) -> None:
     assert result2["step_id"] == "auth"
 
     with patch(
-        "homeassistant.components.iotawatt.config_flow.Iotawatt.connect",
+        "smarthub.components.iotawatt.config_flow.Iotawatt.connect",
         return_value=False,
     ):
         result3 = await hass.config_entries.flow.async_configure(
@@ -85,11 +85,11 @@ async def test_form_auth(hass: HomeAssistant) -> None:
 
     with (
         patch(
-            "homeassistant.components.iotawatt.async_setup_entry",
+            "smarthub.components.iotawatt.async_setup_entry",
             return_value=True,
         ) as mock_setup_entry,
         patch(
-            "homeassistant.components.iotawatt.config_flow.Iotawatt.connect",
+            "smarthub.components.iotawatt.config_flow.Iotawatt.connect",
             return_value=True,
         ),
     ):
@@ -111,14 +111,14 @@ async def test_form_auth(hass: HomeAssistant) -> None:
     }
 
 
-async def test_form_cannot_connect(hass: HomeAssistant) -> None:
+async def test_form_cannot_connect(hass: SmartHub) -> None:
     """Test we handle cannot connect error."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.iotawatt.config_flow.Iotawatt.connect",
+        "smarthub.components.iotawatt.config_flow.Iotawatt.connect",
         side_effect=httpx.HTTPError("any"),
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -130,14 +130,14 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"base": "cannot_connect"}
 
 
-async def test_form_setup_exception(hass: HomeAssistant) -> None:
+async def test_form_setup_exception(hass: SmartHub) -> None:
     """Test we handle broad exception."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
 
     with patch(
-        "homeassistant.components.iotawatt.config_flow.Iotawatt.connect",
+        "smarthub.components.iotawatt.config_flow.Iotawatt.connect",
         side_effect=Exception,
     ):
         result2 = await hass.config_entries.flow.async_configure(

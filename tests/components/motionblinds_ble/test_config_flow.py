@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, Mock, patch
 from motionblindsble.const import MotionBlindType
 import pytest
 
-from homeassistant import config_entries
-from homeassistant.components.bluetooth.models import BluetoothServiceInfoBleak
-from homeassistant.components.motionblinds_ble import const
-from homeassistant.const import CONF_ADDRESS
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub import config_entries
+from smarthub.components.bluetooth.models import BluetoothServiceInfoBleak
+from smarthub.components.motionblinds_ble import const
+from smarthub.const import CONF_ADDRESS
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -18,7 +18,7 @@ from tests.common import MockConfigEntry
 @pytest.mark.usefixtures("motionblinds_ble_connect")
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_config_flow_manual_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     blind_type: MotionBlindType,
     mac_code: str,
     address: str,
@@ -58,7 +58,7 @@ async def test_config_flow_manual_success(
 @pytest.mark.usefixtures("motionblinds_ble_connect")
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_config_flow_manual_error_invalid_mac(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac_code: str,
     address: str,
     local_name: str,
@@ -110,14 +110,14 @@ async def test_config_flow_manual_error_invalid_mac(
 
 @pytest.mark.usefixtures("motionblinds_ble_connect")
 async def test_config_flow_manual_error_no_bluetooth_adapter(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac_code: str,
 ) -> None:
     """No Bluetooth adapter error flow manually initialized by the user."""
 
     # Try step_user with zero Bluetooth adapters
     with patch(
-        "homeassistant.components.motionblinds_ble.config_flow.bluetooth.async_scanner_count",
+        "smarthub.components.motionblinds_ble.config_flow.bluetooth.async_scanner_count",
         return_value=0,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -135,7 +135,7 @@ async def test_config_flow_manual_error_no_bluetooth_adapter(
     assert result["errors"] == {}
 
     with patch(
-        "homeassistant.components.motionblinds_ble.config_flow.bluetooth.async_scanner_count",
+        "smarthub.components.motionblinds_ble.config_flow.bluetooth.async_scanner_count",
         return_value=0,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -148,7 +148,7 @@ async def test_config_flow_manual_error_no_bluetooth_adapter(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_config_flow_manual_error_could_not_find_motor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     motionblinds_ble_connect: tuple[AsyncMock, Mock],
     mac_code: str,
     local_name: str,
@@ -202,7 +202,7 @@ async def test_config_flow_manual_error_could_not_find_motor(
 
 
 async def test_config_flow_manual_error_no_devices_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     motionblinds_ble_connect: tuple[AsyncMock, Mock],
     mac_code: str,
 ) -> None:
@@ -228,7 +228,7 @@ async def test_config_flow_manual_error_no_devices_found(
 
 @pytest.mark.usefixtures("motionblinds_ble_connect")
 async def test_config_flow_bluetooth_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mac_code: str,
     service_info: BluetoothServiceInfoBleak,
     address: str,
@@ -264,7 +264,7 @@ async def test_config_flow_bluetooth_success(
 
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
 ) -> None:
     """Test the options flow."""

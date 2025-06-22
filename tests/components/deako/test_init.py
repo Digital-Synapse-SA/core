@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 from pydeako import FindDevicesError
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.core import SmartHub
 
 from tests.common import MockConfigEntry
 
 
 async def test_deako_async_setup_entry(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     pydeako_deako_mock: MagicMock,
     pydeako_discoverer_mock: MagicMock,
@@ -39,7 +39,7 @@ async def test_deako_async_setup_entry(
 
 
 async def test_deako_async_setup_entry_devices_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     pydeako_deako_mock: MagicMock,
     pydeako_discoverer_mock: MagicMock,

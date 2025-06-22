@@ -9,16 +9,16 @@ from amberelectric.models.site import Site
 from amberelectric.models.site_status import SiteStatus
 import pytest
 
-from homeassistant.components.amberelectric.config_flow import filter_sites
-from homeassistant.components.amberelectric.const import (
+from smarthub.components.amberelectric.config_flow import filter_sites
+from smarthub.components.amberelectric.const import (
     CONF_SITE_ID,
     CONF_SITE_NAME,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_API_TOKEN
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_API_TOKEN
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 API_KEY = "psk_123456789"
 
@@ -150,7 +150,7 @@ def mock_no_site_api() -> Generator:
 
 
 async def test_single_pending_site(
-    hass: HomeAssistant, single_site_pending_api: Mock
+    hass: SmartHub, single_site_pending_api: Mock
 ) -> None:
     """Test single site."""
     initial_result = await hass.config_entries.flow.async_init(
@@ -182,7 +182,7 @@ async def test_single_pending_site(
     assert data[CONF_SITE_ID] == "01FG0AGP818PXK0DWHXJRRT2DH"
 
 
-async def test_single_site(hass: HomeAssistant, single_site_api: Mock) -> None:
+async def test_single_site(hass: SmartHub, single_site_api: Mock) -> None:
     """Test single site."""
     initial_result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -214,7 +214,7 @@ async def test_single_site(hass: HomeAssistant, single_site_api: Mock) -> None:
 
 
 async def test_single_closed_site_no_closed_date(
-    hass: HomeAssistant, single_site_closed_no_close_date_api: Mock
+    hass: SmartHub, single_site_closed_no_close_date_api: Mock
 ) -> None:
     """Test single closed site with no closed date."""
     initial_result = await hass.config_entries.flow.async_init(
@@ -247,7 +247,7 @@ async def test_single_closed_site_no_closed_date(
 
 
 async def test_single_site_rejoin(
-    hass: HomeAssistant, single_site_rejoin_api: Mock
+    hass: SmartHub, single_site_rejoin_api: Mock
 ) -> None:
     """Test single site."""
     initial_result = await hass.config_entries.flow.async_init(
@@ -279,7 +279,7 @@ async def test_single_site_rejoin(
     assert data[CONF_SITE_ID] == "01FG0AGP818PXK0DWHXJRRT2DH"
 
 
-async def test_no_site(hass: HomeAssistant, no_site_api: Mock) -> None:
+async def test_no_site(hass: SmartHub, no_site_api: Mock) -> None:
     """Test no site."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -293,7 +293,7 @@ async def test_no_site(hass: HomeAssistant, no_site_api: Mock) -> None:
     assert result.get("errors") == {"api_token": "no_site"}
 
 
-async def test_invalid_key(hass: HomeAssistant, invalid_key_api: Mock) -> None:
+async def test_invalid_key(hass: SmartHub, invalid_key_api: Mock) -> None:
     """Test invalid api key."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -313,7 +313,7 @@ async def test_invalid_key(hass: HomeAssistant, invalid_key_api: Mock) -> None:
     assert result.get("errors") == {"api_token": "invalid_api_token"}
 
 
-async def test_unknown_error(hass: HomeAssistant, api_error: Mock) -> None:
+async def test_unknown_error(hass: SmartHub, api_error: Mock) -> None:
     """Test invalid api key."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}

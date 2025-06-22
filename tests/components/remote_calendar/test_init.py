@@ -4,9 +4,9 @@ from httpx import ConnectError, Response, UnsupportedProtocol
 import pytest
 import respx
 
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_OFF
-from homeassistant.core import HomeAssistant
+from smarthub.config_entries import ConfigEntryState
+from smarthub.const import STATE_OFF
+from smarthub.core import SmartHub
 
 from . import setup_integration
 from .conftest import CALENDER_URL, TEST_ENTITY
@@ -16,7 +16,7 @@ from tests.common import MockConfigEntry
 
 @respx.mock
 async def test_load_unload(
-    hass: HomeAssistant, config_entry: MockConfigEntry, ics_content: str
+    hass: SmartHub, config_entry: MockConfigEntry, ics_content: str
 ) -> None:
     """Test loading and unloading a config entry."""
     respx.get(CALENDER_URL).mock(
@@ -40,7 +40,7 @@ async def test_load_unload(
 
 @respx.mock
 async def test_raise_for_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test update failed using respx to simulate HTTP exceptions."""
@@ -63,7 +63,7 @@ async def test_raise_for_status(
 )
 @respx.mock
 async def test_update_failed(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
     side_effect: Exception,
 ) -> None:
@@ -75,7 +75,7 @@ async def test_update_failed(
 
 @respx.mock
 async def test_calendar_parse_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     config_entry: MockConfigEntry,
 ) -> None:
     """Test CalendarParseError using respx."""

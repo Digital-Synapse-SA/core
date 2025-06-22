@@ -2,14 +2,14 @@
 
 from unittest.mock import ANY
 
-from homeassistant.components.lutron_caseta import DOMAIN
-from homeassistant.components.lutron_caseta.const import (
+from smarthub.components.lutron_caseta import DOMAIN
+from smarthub.components.lutron_caseta.const import (
     CONF_CA_CERTS,
     CONF_CERTFILE,
     CONF_KEYFILE,
 )
-from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from smarthub.const import CONF_HOST
+from smarthub.core import SmartHub
 
 from . import MockBridge, async_setup_integration
 
@@ -19,7 +19,7 @@ from tests.typing import ClientSessionGenerator
 
 
 async def test_diagnostics(
-    hass: HomeAssistant, hass_client: ClientSessionGenerator
+    hass: SmartHub, hass_client: ClientSessionGenerator
 ) -> None:
     """Test generating diagnostics for lutron_caseta."""
     config_entry = MockConfigEntry(

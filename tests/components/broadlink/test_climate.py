@@ -4,9 +4,9 @@ from typing import Any
 
 import pytest
 
-from homeassistant.components.broadlink.climate import SensorMode
-from homeassistant.components.broadlink.const import DOMAIN
-from homeassistant.components.climate import (
+from smarthub.components.broadlink.climate import SensorMode
+from smarthub.components.broadlink.const import DOMAIN
+from smarthub.components.climate import (
     ATTR_TEMPERATURE,
     DOMAIN as CLIMATE_DOMAIN,
     SERVICE_SET_TEMPERATURE,
@@ -15,10 +15,10 @@ from homeassistant.components.climate import (
     HVACAction,
     HVACMode,
 )
-from homeassistant.const import ATTR_ENTITY_ID, Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.const import ATTR_ENTITY_ID, Platform
+from smarthub.core import SmartHub
+from smarthub.helpers import device_registry as dr, entity_registry as er
+from smarthub.helpers.entity_component import async_update_entity
 
 from . import get_device
 
@@ -85,7 +85,7 @@ async def test_climate(
     expected_current_temperature: int,
     expected_temperature: int,
     expected_hvac_action: HVACAction,
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
@@ -115,7 +115,7 @@ async def test_climate(
 
 
 async def test_climate_set_temperature_turn_off_turn_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device_registry: dr.DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:

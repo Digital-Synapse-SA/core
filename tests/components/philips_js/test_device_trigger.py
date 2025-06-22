@@ -3,11 +3,11 @@
 import pytest
 from pytest_unordered import unordered
 
-from homeassistant.components import automation
-from homeassistant.components.device_automation import DeviceAutomationType
-from homeassistant.components.philips_js.const import DOMAIN
-from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.setup import async_setup_component
+from smarthub.components import automation
+from smarthub.components.device_automation import DeviceAutomationType
+from smarthub.components.philips_js.const import DOMAIN
+from smarthub.core import SmartHub, ServiceCall
+from smarthub.setup import async_setup_component
 
 from tests.common import async_get_device_automations
 
@@ -17,7 +17,7 @@ def stub_blueprint_populate_autouse(stub_blueprint_populate: None) -> None:
     """Stub copying the blueprints to the config folder."""
 
 
-async def test_get_triggers(hass: HomeAssistant, mock_device) -> None:
+async def test_get_triggers(hass: SmartHub, mock_device) -> None:
     """Test we get the expected triggers."""
     expected_triggers = [
         {
@@ -36,7 +36,7 @@ async def test_get_triggers(hass: HomeAssistant, mock_device) -> None:
 
 
 async def test_if_fires_on_turn_on_request(
-    hass: HomeAssistant,
+    hass: SmartHub,
     service_calls: list[ServiceCall],
     mock_tv,
     mock_entity,

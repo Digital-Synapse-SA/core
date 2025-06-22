@@ -10,12 +10,12 @@ import pytest
 from pytrafikverket.exceptions import InvalidAuthentication, NoFerryFound
 from pytrafikverket.models import FerryStopModel
 
-from homeassistant.components.trafikverket_ferry.const import DOMAIN
-from homeassistant.components.trafikverket_ferry.coordinator import next_departuredate
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import STATE_UNAVAILABLE, WEEKDAYS
-from homeassistant.core import HomeAssistant
-from homeassistant.util import dt as dt_util
+from smarthub.components.trafikverket_ferry.const import DOMAIN
+from smarthub.components.trafikverket_ferry.coordinator import next_departuredate
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import STATE_UNAVAILABLE, WEEKDAYS
+from smarthub.core import SmartHub
+from smarthub.util import dt as dt_util
 
 from . import ENTRY_CONFIG
 
@@ -24,7 +24,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_coordinator(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     monkeypatch: pytest.MonkeyPatch,
     get_ferries: list[FerryStopModel],
@@ -40,7 +40,7 @@ async def test_coordinator(
     entry.add_to_hass(hass)
 
     with patch(
-        "homeassistant.components.trafikverket_ferry.coordinator.TrafikverketFerry.async_get_next_ferry_stops",
+        "smarthub.components.trafikverket_ferry.coordinator.TrafikverketFerry.async_get_next_ferry_stops",
         return_value=get_ferries,
     ) as mock_data:
         await hass.config_entries.async_setup(entry.entry_id)

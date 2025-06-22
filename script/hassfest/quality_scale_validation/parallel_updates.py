@@ -1,11 +1,11 @@
 """Enforce that the integration sets PARALLEL_UPDATES constant.
 
-https://developers.home-assistant.io/docs/core/integration-quality-scale/rules/parallel-updates
+https://developers.smart-hub.io/docs/core/integration-quality-scale/rules/parallel-updates
 """
 
 import ast
 
-from homeassistant.const import Platform
+from smarthub.const import Platform
 from script.hassfest import ast_parse_module
 from script.hassfest.model import Config, Integration
 

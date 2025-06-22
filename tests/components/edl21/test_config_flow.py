@@ -2,11 +2,11 @@
 
 import pytest
 
-from homeassistant.components.edl21.const import CONF_SERIAL_PORT, DEFAULT_TITLE, DOMAIN
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.components.edl21.const import CONF_SERIAL_PORT, DEFAULT_TITLE, DOMAIN
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_NAME
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
@@ -16,7 +16,7 @@ VALID_LEGACY_CONFIG = {CONF_NAME: "My Smart Meter", CONF_SERIAL_PORT: "/dev/ttyU
 pytestmark = pytest.mark.usefixtures("mock_setup_entry")
 
 
-async def test_show_form(hass: HomeAssistant) -> None:
+async def test_show_form(hass: SmartHub) -> None:
     """Test that the form is served with no input."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
@@ -35,7 +35,7 @@ async def test_show_form(hass: HomeAssistant) -> None:
     assert result["data"][CONF_SERIAL_PORT] == VALID_CONFIG[CONF_SERIAL_PORT]
 
 
-async def test_integration_already_exists(hass: HomeAssistant) -> None:
+async def test_integration_already_exists(hass: SmartHub) -> None:
     """Test that a new entry must not have the same serial port as an existing entry."""
 
     MockConfigEntry(

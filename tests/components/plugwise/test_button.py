@@ -2,20 +2,20 @@
 
 from unittest.mock import MagicMock
 
-from homeassistant.components.button import (
+from smarthub.components.button import (
     DOMAIN as BUTTON_DOMAIN,
     SERVICE_PRESS,
     ButtonDeviceClass,
 )
-from homeassistant.const import ATTR_DEVICE_CLASS, ATTR_ENTITY_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.const import ATTR_DEVICE_CLASS, ATTR_ENTITY_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
 
 async def test_adam_reboot_button(
-    hass: HomeAssistant, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
+    hass: SmartHub, mock_smile_adam: MagicMock, init_integration: MockConfigEntry
 ) -> None:
     """Test creation of button entities."""
     state = hass.states.get("button.adam_reboot")

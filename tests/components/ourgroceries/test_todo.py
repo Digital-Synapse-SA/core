@@ -6,17 +6,17 @@ from aiohttp import ClientError
 from freezegun.api import FrozenDateTimeFactory
 import pytest
 
-from homeassistant.components.ourgroceries.coordinator import SCAN_INTERVAL
-from homeassistant.components.todo import (
+from smarthub.components.ourgroceries.coordinator import SCAN_INTERVAL
+from smarthub.components.todo import (
     ATTR_ITEM,
     ATTR_RENAME,
     ATTR_STATUS,
     DOMAIN as TODO_DOMAIN,
     TodoServices,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_component import async_update_entity
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.helpers.entity_component import async_update_entity
 
 from . import items_to_shopping_list
 
@@ -43,7 +43,7 @@ def _mock_version_id(og: AsyncMock, version: int) -> None:
     ],
 )
 async def test_todo_item_state(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     expected_state: str,
 ) -> None:
@@ -55,7 +55,7 @@ async def test_todo_item_state(
 
 
 async def test_add_todo_list_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ourgroceries: AsyncMock,
 ) -> None:
@@ -94,7 +94,7 @@ async def test_add_todo_list_item(
 
 @pytest.mark.parametrize(("items"), [[{"id": "12345", "name": "Soda"}]])
 async def test_update_todo_item_status(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ourgroceries: AsyncMock,
 ) -> None:
@@ -166,7 +166,7 @@ async def test_update_todo_item_status(
     ],
 )
 async def test_update_todo_item_summary(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ourgroceries: AsyncMock,
     category: str | None,
@@ -207,7 +207,7 @@ async def test_update_todo_item_summary(
     ],
 )
 async def test_remove_todo_item(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_integration: None,
     ourgroceries: AsyncMock,
 ) -> None:
@@ -241,7 +241,7 @@ async def test_remove_todo_item(
 
 
 async def test_version_id_optimization(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     setup_integration: None,
     ourgroceries: AsyncMock,
@@ -267,7 +267,7 @@ async def test_version_id_optimization(
     ],
 )
 async def test_coordinator_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     freezer: FrozenDateTimeFactory,
     setup_integration: None,
     ourgroceries: AsyncMock,

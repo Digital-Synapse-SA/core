@@ -15,27 +15,27 @@ from pyotgw.vars import (
 )
 import pytest
 
-from homeassistant.components.opentherm_gw import DOMAIN
-from homeassistant.components.opentherm_gw.const import (
+from smarthub.components.opentherm_gw import DOMAIN
+from smarthub.components.opentherm_gw.const import (
     DATA_GATEWAYS,
     DATA_OPENTHERM_GW,
     OpenThermDeviceIdentifier,
 )
-from homeassistant.components.opentherm_gw.select import (
+from smarthub.components.opentherm_gw.select import (
     OpenThermSelectGPIOMode,
     OpenThermSelectLEDMode,
     PyotgwGPIOMode,
     PyotgwLEDMode,
 )
-from homeassistant.components.select import (
+from smarthub.components.select import (
     ATTR_OPTION,
     DOMAIN as SELECT_DOMAIN,
     SERVICE_SELECT_OPTION,
 )
-from homeassistant.const import ATTR_ENTITY_ID, CONF_ID, STATE_UNKNOWN
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.dispatcher import async_dispatcher_send
+from smarthub.const import ATTR_ENTITY_ID, CONF_ID, STATE_UNKNOWN
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
+from smarthub.helpers.dispatcher import async_dispatcher_send
 
 from tests.common import MockConfigEntry
 
@@ -108,7 +108,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_select_change_value(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_pyotgw: MagicMock,
@@ -185,7 +185,7 @@ async def test_select_change_value(
     ],
 )
 async def test_select_state_update(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     mock_config_entry: MockConfigEntry,
     mock_pyotgw: MagicMock,

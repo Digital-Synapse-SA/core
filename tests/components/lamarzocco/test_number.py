@@ -13,15 +13,15 @@ from pylamarzocco.exceptions import RequestNotSuccessful
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.number import (
+from smarthub.components.number import (
     ATTR_VALUE,
     DOMAIN as NUMBER_DOMAIN,
     SERVICE_SET_VALUE,
 )
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from smarthub.const import ATTR_ENTITY_ID
+from smarthub.core import SmartHub
+from smarthub.exceptions import SmartHubError
+from smarthub.helpers import device_registry as dr, entity_registry as er
 
 from . import async_init_integration
 
@@ -46,7 +46,7 @@ from tests.common import MockConfigEntry
     ],
 )
 async def test_general_numbers(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -92,7 +92,7 @@ async def test_general_numbers(
 
 @pytest.mark.parametrize("device_fixture", [ModelName.LINEA_MICRA])
 async def test_preinfusion(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -133,7 +133,7 @@ async def test_preinfusion(
 
 @pytest.mark.parametrize("device_fixture", [ModelName.LINEA_MICRA])
 async def test_prebrew_on(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -180,7 +180,7 @@ async def test_prebrew_on(
 
 @pytest.mark.parametrize("device_fixture", [ModelName.LINEA_MICRA])
 async def test_prebrew_off(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
     entity_registry: er.EntityRegistry,
@@ -226,7 +226,7 @@ async def test_prebrew_off(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_number_error(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_lamarzocco: MagicMock,
     mock_config_entry: MockConfigEntry,
 ) -> None:
@@ -240,7 +240,7 @@ async def test_number_error(
     mock_lamarzocco.set_coffee_target_temperature.side_effect = RequestNotSuccessful(
         "Boom"
     )
-    with pytest.raises(HomeAssistantError) as exc_info:
+    with pytest.raises(SmartHubError) as exc_info:
         await hass.services.async_call(
             NUMBER_DOMAIN,
             SERVICE_SET_VALUE,

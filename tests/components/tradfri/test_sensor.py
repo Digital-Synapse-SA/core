@@ -12,14 +12,14 @@ from pytradfri.const import (
 )
 from pytradfri.device import Device
 
-from homeassistant.components.sensor import (
+from smarthub.components.sensor import (
     ATTR_STATE_CLASS,
     DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.components.tradfri.const import DOMAIN
-from homeassistant.const import (
+from smarthub.components.tradfri.const import DOMAIN
+from smarthub.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
@@ -28,8 +28,8 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     UnitOfTime,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from smarthub.core import SmartHub
+from smarthub.helpers import entity_registry as er
 
 from . import GATEWAY_ID
 from .common import CommandStore, setup_integration
@@ -45,7 +45,7 @@ def remote_control() -> str:
 
 @pytest.mark.parametrize("device", ["remote_control"], indirect=True)
 async def test_battery_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
 ) -> None:
@@ -74,7 +74,7 @@ async def test_battery_sensor(
 
 @pytest.mark.parametrize("device", ["blind"], indirect=True)
 async def test_cover_battery_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: Device,
 ) -> None:
     """Test that a battery sensor is correctly added for a cover (blind)."""
@@ -91,7 +91,7 @@ async def test_cover_battery_sensor(
 
 @pytest.mark.parametrize("device", ["air_purifier"], indirect=True)
 async def test_air_quality_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
 ) -> None:
@@ -123,7 +123,7 @@ async def test_air_quality_sensor(
 
 @pytest.mark.parametrize("device", ["air_purifier"], indirect=True)
 async def test_filter_time_left_sensor(
-    hass: HomeAssistant,
+    hass: SmartHub,
     device: Device,
 ) -> None:
     """Test that a battery sensor is correctly added."""
@@ -140,7 +140,7 @@ async def test_filter_time_left_sensor(
 
 @pytest.mark.parametrize("device", ["air_purifier"], indirect=True)
 async def test_sensor_available(
-    hass: HomeAssistant,
+    hass: SmartHub,
     command_store: CommandStore,
     device: Device,
 ) -> None:
@@ -163,7 +163,7 @@ async def test_sensor_available(
 
 @pytest.mark.parametrize("device", ["remote_control"], indirect=True)
 async def test_unique_id_migration(
-    hass: HomeAssistant,
+    hass: SmartHub,
     entity_registry: er.EntityRegistry,
     device: Device,
 ) -> None:

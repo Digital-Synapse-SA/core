@@ -4,19 +4,19 @@ from unittest.mock import MagicMock
 
 from pyegps.exceptions import UsbError
 
-from homeassistant.components.energenie_power_sockets.const import (
+from smarthub.components.energenie_power_sockets.const import (
     CONF_DEVICE_API_ID,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.config_entries import SOURCE_USER
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from tests.common import MockConfigEntry
 
 
 async def test_user_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     demo_config_data: dict,
     mock_get_device: MagicMock,
     mock_search_for_devices: MagicMock,
@@ -38,7 +38,7 @@ async def test_user_flow(
 
 
 async def test_user_flow_already_exists(
-    hass: HomeAssistant,
+    hass: SmartHub,
     valid_config_entry: MockConfigEntry,
     mock_get_device: MagicMock,
     mock_search_for_devices: MagicMock,
@@ -59,7 +59,7 @@ async def test_user_flow_already_exists(
 
 
 async def test_user_flow_no_new_device(
-    hass: HomeAssistant,
+    hass: SmartHub,
     valid_config_entry: MockConfigEntry,
     mock_get_device: MagicMock,
     mock_search_for_devices: MagicMock,
@@ -80,7 +80,7 @@ async def test_user_flow_no_new_device(
 
 
 async def test_user_flow_no_device_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     demo_config_data: dict,
     mock_get_device: MagicMock,
     mock_search_for_devices: MagicMock,
@@ -98,7 +98,7 @@ async def test_user_flow_no_device_found(
 
 
 async def test_user_flow_device_not_found(
-    hass: HomeAssistant,
+    hass: SmartHub,
     demo_config_data: dict,
     mock_get_device: MagicMock,
     mock_search_for_devices: MagicMock,
@@ -123,7 +123,7 @@ async def test_user_flow_device_not_found(
 
 
 async def test_user_flow_no_usb_access(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_get_device: MagicMock,
     mock_search_for_devices: MagicMock,
 ) -> None:

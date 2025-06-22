@@ -5,14 +5,14 @@ from typing import Any, Generic, TypeVar
 
 from twitchAPI.object.base import TwitchObject
 
-from homeassistant.components.twitch.const import DOMAIN
-from homeassistant.core import HomeAssistant
-from homeassistant.util.json import JsonArrayType
+from smarthub.components.twitch.const import DOMAIN
+from smarthub.core import SmartHub
+from smarthub.util.json import JsonArrayType
 
 from tests.common import MockConfigEntry, async_load_json_array_fixture
 
 
-async def setup_integration(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+async def setup_integration(hass: SmartHub, config_entry: MockConfigEntry) -> None:
     """Fixture for setting up the component."""
     config_entry.add_to_hass(hass)
 
@@ -31,7 +31,7 @@ class TwitchIterObject(Generic[TwitchType]):
     total: int
 
     def __init__(
-        self, hass: HomeAssistant, fixture: str, target_type: type[TwitchType]
+        self, hass: SmartHub, fixture: str, target_type: type[TwitchType]
     ) -> None:
         """Initialize object."""
         self.hass = hass
@@ -51,7 +51,7 @@ class TwitchIterObject(Generic[TwitchType]):
 
 
 async def get_generator(
-    hass: HomeAssistant, fixture: str, target_type: type[TwitchType]
+    hass: SmartHub, fixture: str, target_type: type[TwitchType]
 ) -> AsyncGenerator[TwitchType]:
     """Return async generator."""
     data = await async_load_json_array_fixture(hass, fixture, DOMAIN)

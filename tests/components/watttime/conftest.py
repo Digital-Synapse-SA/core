@@ -6,24 +6,24 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from homeassistant.components.watttime.config_flow import (
+from smarthub.components.watttime.config_flow import (
     CONF_LOCATION_TYPE,
     LOCATION_TYPE_COORDINATES,
 )
-from homeassistant.components.watttime.const import (
+from smarthub.components.watttime.const import (
     CONF_BALANCING_AUTHORITY,
     CONF_BALANCING_AUTHORITY_ABBREV,
     DOMAIN,
 )
-from homeassistant.const import (
+from smarthub.const import (
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_PASSWORD,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util.json import JsonObjectType
+from smarthub.core import SmartHub
+from smarthub.setup import async_setup_component
+from smarthub.util.json import JsonObjectType
 
 from tests.common import MockConfigEntry, load_json_object_fixture
 
@@ -69,7 +69,7 @@ def config_location_type_fixture() -> dict[str, Any]:
 
 @pytest.fixture(name="config_entry")
 def config_entry_fixture(
-    hass: HomeAssistant, config_auth: dict[str, Any], config_coordinates: dict[str, Any]
+    hass: SmartHub, config_auth: dict[str, Any], config_coordinates: dict[str, Any]
 ) -> MockConfigEntry:
     """Define a config entry fixture."""
     entry = MockConfigEntry(
@@ -108,7 +108,7 @@ def get_grid_region_fixture(data_grid_region: JsonObjectType) -> AsyncMock:
 
 @pytest.fixture(name="setup_watttime")
 async def setup_watttime_fixture(
-    hass: HomeAssistant,
+    hass: SmartHub,
     client: Mock,
     config_auth: dict[str, Any],
     config_coordinates: dict[str, Any],
@@ -116,13 +116,13 @@ async def setup_watttime_fixture(
     """Define a fixture to set up WattTime."""
     with (
         patch(
-            "homeassistant.components.watttime.Client.async_login", return_value=client
+            "smarthub.components.watttime.Client.async_login", return_value=client
         ),
         patch(
-            "homeassistant.components.watttime.config_flow.Client.async_login",
+            "smarthub.components.watttime.config_flow.Client.async_login",
             return_value=client,
         ),
-        patch("homeassistant.components.watttime.PLATFORMS", []),
+        patch("smarthub.components.watttime.PLATFORMS", []),
     ):
         assert await async_setup_component(
             hass, DOMAIN, {**config_auth, **config_coordinates}

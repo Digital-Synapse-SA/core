@@ -6,28 +6,28 @@ from unittest.mock import AsyncMock
 import pytest
 from python_opensky.exceptions import OpenSkyUnauthenticatedError
 
-from homeassistant.components.opensky.const import (
+from smarthub.components.opensky.const import (
     CONF_ALTITUDE,
     CONF_CONTRIBUTING_USER,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import (
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import (
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_PASSWORD,
     CONF_RADIUS,
     CONF_USERNAME,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
 
 from . import setup_integration
 
 from tests.common import MockConfigEntry
 
 
-async def test_full_user_flow(hass: HomeAssistant, mock_setup_entry) -> None:
+async def test_full_user_flow(hass: SmartHub, mock_setup_entry) -> None:
     """Test the full user configuration flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -59,14 +59,14 @@ async def test_full_user_flow(hass: HomeAssistant, mock_setup_entry) -> None:
     ("user_input", "error"),
     [
         (
-            {CONF_USERNAME: "homeassistant", CONF_CONTRIBUTING_USER: False},
+            {CONF_USERNAME: "smarthub", CONF_CONTRIBUTING_USER: False},
             "password_missing",
         ),
         ({CONF_PASSWORD: "secret", CONF_CONTRIBUTING_USER: False}, "username_missing"),
         ({CONF_CONTRIBUTING_USER: True}, "no_authentication"),
         (
             {
-                CONF_USERNAME: "homeassistant",
+                CONF_USERNAME: "smarthub",
                 CONF_PASSWORD: "secret",
                 CONF_CONTRIBUTING_USER: True,
             },
@@ -75,7 +75,7 @@ async def test_full_user_flow(hass: HomeAssistant, mock_setup_entry) -> None:
     ],
 )
 async def test_options_flow_failures(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     opensky_client: AsyncMock,
     config_entry: MockConfigEntry,
@@ -106,7 +106,7 @@ async def test_options_flow_failures(
         result["flow_id"],
         user_input={
             CONF_RADIUS: 10000,
-            CONF_USERNAME: "homeassistant",
+            CONF_USERNAME: "smarthub",
             CONF_PASSWORD: "secret",
             CONF_CONTRIBUTING_USER: True,
         },
@@ -116,14 +116,14 @@ async def test_options_flow_failures(
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_RADIUS: 10000,
-        CONF_USERNAME: "homeassistant",
+        CONF_USERNAME: "smarthub",
         CONF_PASSWORD: "secret",
         CONF_CONTRIBUTING_USER: True,
     }
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
     opensky_client: AsyncMock,
     config_entry: MockConfigEntry,
@@ -136,7 +136,7 @@ async def test_options_flow(
         result["flow_id"],
         user_input={
             CONF_RADIUS: 10000,
-            CONF_USERNAME: "homeassistant",
+            CONF_USERNAME: "smarthub",
             CONF_PASSWORD: "secret",
             CONF_CONTRIBUTING_USER: True,
         },
@@ -146,7 +146,7 @@ async def test_options_flow(
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_RADIUS: 10000,
-        CONF_USERNAME: "homeassistant",
+        CONF_USERNAME: "smarthub",
         CONF_PASSWORD: "secret",
         CONF_CONTRIBUTING_USER: True,
     }

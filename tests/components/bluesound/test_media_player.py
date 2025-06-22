@@ -9,14 +9,14 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 from syrupy.filters import props
 
-from homeassistant.components.bluesound import DOMAIN
-from homeassistant.components.bluesound.const import ATTR_MASTER
-from homeassistant.components.bluesound.media_player import (
+from smarthub.components.bluesound import DOMAIN
+from smarthub.components.bluesound.const import ATTR_MASTER
+from smarthub.components.bluesound.media_player import (
     SERVICE_CLEAR_TIMER,
     SERVICE_JOIN,
     SERVICE_SET_TIMER,
 )
-from homeassistant.components.media_player import (
+from smarthub.components.media_player import (
     ATTR_INPUT_SOURCE,
     ATTR_MEDIA_VOLUME_LEVEL,
     DOMAIN as MEDIA_PLAYER_DOMAIN,
@@ -31,9 +31,9 @@ from homeassistant.components.media_player import (
     SERVICE_VOLUME_UP,
     MediaPlayerState,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from smarthub.const import ATTR_ENTITY_ID, STATE_UNAVAILABLE
+from smarthub.core import SmartHub
+from smarthub.exceptions import ServiceValidationError
 
 from .conftest import PlayerMocks
 
@@ -48,7 +48,7 @@ from .conftest import PlayerMocks
     ],
 )
 async def test_simple_actions(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     player_mocks: PlayerMocks,
     service: str,
@@ -66,7 +66,7 @@ async def test_simple_actions(
 
 
 async def test_volume_set(
-    hass: HomeAssistant, setup_config_entry: None, player_mocks: PlayerMocks
+    hass: SmartHub, setup_config_entry: None, player_mocks: PlayerMocks
 ) -> None:
     """Test the media player volume set."""
     await hass.services.async_call(
@@ -80,7 +80,7 @@ async def test_volume_set(
 
 
 async def test_volume_mute(
-    hass: HomeAssistant, setup_config_entry: None, player_mocks: PlayerMocks
+    hass: SmartHub, setup_config_entry: None, player_mocks: PlayerMocks
 ) -> None:
     """Test the media player volume mute."""
     await hass.services.async_call(
@@ -94,7 +94,7 @@ async def test_volume_mute(
 
 
 async def test_volume_up(
-    hass: HomeAssistant, setup_config_entry: None, player_mocks: PlayerMocks
+    hass: SmartHub, setup_config_entry: None, player_mocks: PlayerMocks
 ) -> None:
     """Test the media player volume up."""
     await hass.services.async_call(
@@ -108,7 +108,7 @@ async def test_volume_up(
 
 
 async def test_volume_down(
-    hass: HomeAssistant, setup_config_entry: None, player_mocks: PlayerMocks
+    hass: SmartHub, setup_config_entry: None, player_mocks: PlayerMocks
 ) -> None:
     """Test the media player volume down."""
     await hass.services.async_call(
@@ -122,7 +122,7 @@ async def test_volume_down(
 
 
 async def test_select_input_source(
-    hass: HomeAssistant, setup_config_entry: None, player_mocks: PlayerMocks
+    hass: SmartHub, setup_config_entry: None, player_mocks: PlayerMocks
 ) -> None:
     """Test the media player select input source."""
     await hass.services.async_call(
@@ -135,7 +135,7 @@ async def test_select_input_source(
 
 
 async def test_select_preset_source(
-    hass: HomeAssistant, setup_config_entry: None, player_mocks: PlayerMocks
+    hass: SmartHub, setup_config_entry: None, player_mocks: PlayerMocks
 ) -> None:
     """Test the media player select preset source."""
     await hass.services.async_call(
@@ -148,7 +148,7 @@ async def test_select_preset_source(
 
 
 async def test_attributes_set(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     player_mocks: PlayerMocks,
     snapshot: SnapshotAssertion,
@@ -161,7 +161,7 @@ async def test_attributes_set(
 
 
 async def test_stop_maps_to_idle(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     player_mocks: PlayerMocks,
 ) -> None:
@@ -181,7 +181,7 @@ async def test_stop_maps_to_idle(
 
 
 async def test_status_updated(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     player_mocks: PlayerMocks,
 ) -> None:
@@ -204,7 +204,7 @@ async def test_status_updated(
 
 
 async def test_unavailable_when_offline(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     player_mocks: PlayerMocks,
 ) -> None:
@@ -226,7 +226,7 @@ async def test_unavailable_when_offline(
 
 
 async def test_set_sleep_timer(
-    hass: HomeAssistant, setup_config_entry: None, player_mocks: PlayerMocks
+    hass: SmartHub, setup_config_entry: None, player_mocks: PlayerMocks
 ) -> None:
     """Test the set sleep timer action."""
     await hass.services.async_call(
@@ -240,7 +240,7 @@ async def test_set_sleep_timer(
 
 
 async def test_clear_sleep_timer(
-    hass: HomeAssistant, setup_config_entry: None, player_mocks: PlayerMocks
+    hass: SmartHub, setup_config_entry: None, player_mocks: PlayerMocks
 ) -> None:
     """Test the clear sleep timer action."""
 
@@ -257,7 +257,7 @@ async def test_clear_sleep_timer(
 
 
 async def test_join_cannot_join_to_self(
-    hass: HomeAssistant, setup_config_entry: None, player_mocks: PlayerMocks
+    hass: SmartHub, setup_config_entry: None, player_mocks: PlayerMocks
 ) -> None:
     """Test that joining to self is not allowed."""
     with pytest.raises(ServiceValidationError, match="Cannot join player to itself"):
@@ -273,7 +273,7 @@ async def test_join_cannot_join_to_self(
 
 
 async def test_join(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     setup_config_entry_secondary: None,
     player_mocks: PlayerMocks,
@@ -295,7 +295,7 @@ async def test_join(
 
 
 async def test_unjoin(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     setup_config_entry_secondary: None,
     player_mocks: PlayerMocks,
@@ -323,7 +323,7 @@ async def test_unjoin(
 
 
 async def test_attr_master(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     player_mocks: PlayerMocks,
 ) -> None:
@@ -350,7 +350,7 @@ async def test_attr_master(
 
 
 async def test_attr_bluesound_group(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     setup_config_entry_secondary: None,
     player_mocks: PlayerMocks,
@@ -378,7 +378,7 @@ async def test_attr_bluesound_group(
 
 
 async def test_attr_bluesound_group_for_follower(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     setup_config_entry_secondary: None,
     player_mocks: PlayerMocks,
@@ -417,13 +417,13 @@ async def test_attr_bluesound_group_for_follower(
 
 
 async def test_volume_up_from_6_to_7(
-    hass: HomeAssistant,
+    hass: SmartHub,
     setup_config_entry: None,
     player_mocks: PlayerMocks,
 ) -> None:
     """Test the media player volume up from 6 to 7.
 
-    This fails if if rounding is not done correctly. See https://github.com/home-assistant/core/issues/129956 for more details.
+    This fails if if rounding is not done correctly. See https://github.com/smart-hub/core/issues/129956 for more details.
     """
     player_mocks.player_data.status_long_polling_mock.set(
         dataclasses.replace(

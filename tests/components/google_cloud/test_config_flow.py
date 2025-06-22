@@ -3,19 +3,19 @@
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
-from homeassistant import config_entries
-from homeassistant.components import tts
-from homeassistant.components.google_cloud.config_flow import UPLOADED_KEY_FILE
-from homeassistant.components.google_cloud.const import (
+from smarthub import config_entries
+from smarthub.components import tts
+from smarthub.components.google_cloud.config_flow import UPLOADED_KEY_FILE
+from smarthub.components.google_cloud.const import (
     CONF_KEY_FILE,
     CONF_SERVICE_ACCOUNT_INFO,
     DOMAIN,
 )
-from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.setup import async_setup_component
+from smarthub.config_entries import SOURCE_USER
+from smarthub.const import CONF_PLATFORM
+from smarthub.core import SmartHub
+from smarthub.data_entry_flow import FlowResultType
+from smarthub.setup import async_setup_component
 
 from .conftest import VALID_SERVICE_ACCOUNT_INFO
 
@@ -23,7 +23,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_user_flow_success(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_process_uploaded_file: MagicMock,
     mock_setup_entry: AsyncMock,
 ) -> None:
@@ -48,7 +48,7 @@ async def test_user_flow_success(
 
 
 async def test_user_flow_missing_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_setup_entry: AsyncMock,
 ) -> None:
     """Test user flow when uploaded file is missing."""
@@ -69,7 +69,7 @@ async def test_user_flow_missing_file(
 
 
 async def test_user_flow_invalid_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_invalid_google_credentials_json: str,
     mock_process_uploaded_file: MagicMock,
     mock_setup_entry: AsyncMock,
@@ -94,7 +94,7 @@ async def test_user_flow_invalid_file(
 
 
 async def test_import_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_google_credentials_json: str,
     mock_api_tts_from_service_account_file: AsyncMock,
     mock_api_tts_from_service_account_info: AsyncMock,
@@ -116,7 +116,7 @@ async def test_import_flow(
 
 
 async def test_import_flow_invalid_file(
-    hass: HomeAssistant,
+    hass: SmartHub,
     create_invalid_google_credentials_json: str,
     mock_api_tts_from_service_account_file: AsyncMock,
 ) -> None:
@@ -136,7 +136,7 @@ async def test_import_flow_invalid_file(
 
 
 async def test_options_flow(
-    hass: HomeAssistant,
+    hass: SmartHub,
     mock_config_entry: MockConfigEntry,
     mock_api_tts_from_service_account_info: AsyncMock,
 ) -> None:
